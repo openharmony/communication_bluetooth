@@ -1,0 +1,56 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+SUBSYSTEM_DIR = "//foundation/communication"
+PART_DIR = "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard"
+BT_SERVICE_DIR = "$PART_DIR/service"
+
+config("btservice_mock_public_config") {
+  include_dirs = [
+    "$BT_SERVICE_DIR/include",
+    "$PART_DIR/ipc/common",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/include",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/util",
+  ]
+}
+
+ohos_shared_library("btservice_mock") {
+  public_configs = [ ":btservice_mock_public_config" ]
+
+  deps = [
+    "$PART_DIR/common:btcommon",
+    "$PART_DIR/external:btdummy",
+    "$PART_DIR/stack:btstack",
+    "//third_party/libxml2:xml2",
+    "//utils/native/base:utilsecurec_shared",
+  ]
+
+  sources = [
+    "common/adapter_manager_mock.cpp",
+    "common/profile_service_manager_mock.cpp",
+    "gatt/gatt_client_service_mock.cpp",
+    "gatt/gatt_server_service_mock.cpp",
+    "sock/socket_service_mock.cpp",
+  ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+
+  subsystem_name = "communication"
+  part_name = "bluetooth_standard"
+}
