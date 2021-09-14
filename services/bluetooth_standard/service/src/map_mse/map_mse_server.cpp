@@ -738,7 +738,7 @@ void MapMseServer::GetMASInstanceInformation(ObexServerSession &session, const O
         bodyObj->Write((uint8_t *)masStr.data(), masStr.size());
         ObexTlvParamters obexAppPrarams;
         obexAppPrarams.AppendTlvtriplet(
-            TlvTriplet(MapMseParams::PARAM_OWNER_UCI, (u_int8_t)ownerUci.size(), (uint8_t *)ownerUci.data()));
+            TlvTriplet(MapMseParams::PARAM_OWNER_UCI, (uint8_t)ownerUci.size(), (uint8_t *)ownerUci.data()));
         resHeader->AppendItemAppParams(obexAppPrarams);
         session.SendGetResponse(req, *resHeader, bodyObj);
         return;
