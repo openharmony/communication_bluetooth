@@ -48,6 +48,7 @@ struct GattServiceWapper {
     int index;
     int maxNum;
     int handleOffset;
+    bool isAdding;
 };
 
 struct GattServerWapper {
@@ -63,6 +64,7 @@ GattServerWapper g_GattServers[MAXIMUM_NUMBER_APPLICATION];
 
 void GetAddrFromString(std::string in, unsigned char out[6]);
 void GetAddrFromByte(unsigned char in[6], std::string &out);
+static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle);
 
 class GattServerCallbackWapper : public GattServerCallback {
 public:
@@ -106,11 +108,46 @@ public:
 
     void OnServiceAdded(GattService *Service, int ret)
     {
-        GATTSERVICES(serverId_, 0).handleOffset = Service->GetHandle() - 1;
-        HILOGI("serverId: %{public}d, service handle is: %{public}d, offset: %{public}d",
-            serverId_, GATTSERVICE(serverId_, 0)->GetHandle(), GATTSERVICES(serverId_, 0).handleOffset);
+        int i;
+        int err = OHOS_BT_STATUS_SUCCESS;
+        for (i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
+            if (GATTSERVICE(serverId_, i) != NULL) {
+                HILOGI("isAdding: %{public}d, srvcUuid: %{public}s, ind: %{public}s",
+                    GATTSERVICES(serverId_, i).isAdding,
+                    GATTSERVICE(serverId_, i)->GetUuid().ToString().c_str(),
+                    Service->GetUuid().ToString().c_str());
+            } else {
+                HILOGE("services is empty!");
+            }
+            if (GATTSERVICE(serverId_, i) != NULL &&
+                GATTSERVICES(serverId_, i).isAdding &&
+                GATTSERVICE(serverId_, i)->GetUuid().CompareTo(Service->GetUuid()) == 0) {
+                GATTSERVICES(serverId_, i).isAdding = false;
+                GATTSERVICES(serverId_, i).handleOffset = Service->GetHandle() - i;
+                HILOGI("serverId: %{public}d, service handle is: %{public}d, offset: %{public}d",
+                    serverId_, GATTSERVICE(serverId_, i)->GetHandle(), GATTSERVICES(serverId_, i).handleOffset);
+                break;
+            }
+        }
+
+        if (i == MAXIMUM_NUMBER_GATTSERVICE) {
+            HILOGE("add service failed, invalid srvcHandle: %d", Service->GetHandle());
+            err = OHOS_BT_STATUS_FAIL;
+        }
+
+        vector<GattCharacteristic> &characteristics = Service->GetCharacteristics();
+        for (auto item = characteristics.begin(); item != characteristics.end(); item++) {
+            HILOGI("charHandle: %{public}d, uuid: %{public}s",
+                item->GetHandle(), item->GetUuid().ToString().c_str());
+            vector<GattDescriptor> &descriptors = item->GetDescriptors();
+            for (auto des = descriptors.begin(); des != descriptors.end(); des++) {
+                HILOGI("    desHandle: %{public}d, uuid: %{public}s",
+                    des->GetHandle(), des->GetUuid().ToString().c_str());
+            }
+        }
+
         if (g_GattsCallback != NULL && g_GattsCallback->serviceAddCb != NULL) {
-            g_GattsCallback->serviceStartCb(0, serverId_, 0);
+            g_GattsCallback->serviceStartCb(err, serverId_, i);
         }
     }
 
@@ -124,11 +161,14 @@ public:
         std::map<int, struct ConnectedDevice>::iterator iter;
         iter = FindDeviceRecord(dev);
 
+        int srvcHandle = 0;
+        FindCharacteristic(serverId_, characteristic.GetHandle(), true, &srvcHandle);
+
         BtReqReadCbPara readInfo;
         readInfo.connId = iter->first;
         readInfo.transId = requestId;
         readInfo.bdAddr = &dev.remoteAddr;
-        readInfo.attrHandle = characteristic.GetHandle();
+        readInfo.attrHandle = characteristic.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
         readInfo.offset = 0;
         readInfo.isLong = false;
         HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d",
@@ -147,13 +187,16 @@ public:
 
         std::map<int, struct ConnectedDevice>::iterator iter;
         iter = FindDeviceRecord(dev);
+
+        int srvcHandle = 0;
+        FindCharacteristic(serverId_, characteristic.GetHandle(), true, &srvcHandle);
         
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
         writeInfo.connId = iter->first;
         writeInfo.transId = requestId;
         writeInfo.bdAddr = &dev.remoteAddr;
-        writeInfo.attrHandle = characteristic.GetHandle();
+        writeInfo.attrHandle = characteristic.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
         writeInfo.offset = 0;
         writeInfo.value = characteristic.GetValue(&length).get();
         writeInfo.length = length;
@@ -174,11 +217,15 @@ public:
         std::map<int, struct ConnectedDevice>::iterator iter;
         iter = FindDeviceRecord(dev);
 
+        const GattCharacteristic *characteristic = descriptor.GetCharacteristic();
+        int srvcHandle = 0;
+        FindCharacteristic(serverId_, characteristic->GetHandle(), true, &srvcHandle);
+
         BtReqReadCbPara readInfo;
         readInfo.connId = iter->first;
         readInfo.transId = requestId;
         readInfo.bdAddr = &dev.remoteAddr;
-        readInfo.attrHandle = descriptor.GetHandle();
+        readInfo.attrHandle = descriptor.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
         readInfo.offset = 0;
         readInfo.isLong = false;
         if (g_GattsCallback != NULL && g_GattsCallback->requestReadCb != NULL) {
@@ -195,13 +242,17 @@ public:
 
         std::map<int, struct ConnectedDevice>::iterator iter;
         iter = FindDeviceRecord(dev);
+
+        const GattCharacteristic *characteristic = descriptor.GetCharacteristic();
+        int srvcHandle = 0;
+        FindCharacteristic(serverId_, characteristic->GetHandle(), true, &srvcHandle);
         
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
         writeInfo.connId = iter->first;
         writeInfo.transId = requestId;
         writeInfo.bdAddr = &dev.remoteAddr;
-        writeInfo.attrHandle = descriptor.GetHandle();
+        writeInfo.attrHandle = descriptor.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
         writeInfo.offset = 0;
         writeInfo.value = descriptor.GetValue(&length).get();
         writeInfo.length = length;
@@ -214,6 +265,15 @@ public:
     void OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu)
     {
         HILOGI("mtu: %{public}d", mtu);
+        struct ConnectedDevice dev;
+        dev.serverId = serverId_;
+        GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
+
+        std::map<int, struct ConnectedDevice>::iterator iter;
+        iter = FindDeviceRecord(dev);
+        if (g_GattsCallback != NULL && g_GattsCallback->mtuChangeCb != NULL) {
+            g_GattsCallback->mtuChangeCb(iter->first, mtu);
+        }
     }
 
     void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int result)
@@ -245,18 +305,28 @@ private:
     int serverId_;
 };
 
-static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle)
+static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle)
 {
-    GattService *gattService = GATTSERVICE(serverId, attrHandle);
-    if (gattService == NULL) {
+    if (srvcHandle == NULL) {
         return NULL;
     }
+    for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
+        GattService *gattService = GATTSERVICE(serverId, i);
+        if (gattService == NULL) {
+            continue;
+        }
 
-    std::vector<GattCharacteristic> gattCharacteristics = gattService->GetCharacteristics();
+        std::vector<GattCharacteristic> gattCharacteristics = gattService->GetCharacteristics();
+        int tempHandle = attrHandle;
+        if (isOffset) {
+            tempHandle -= GATTSERVICES(serverId, i).handleOffset;
+        }
 
-    for (auto &character : gattCharacteristics) {
-	if (character.GetHandle() == attrHandle) {
-            return &character;
+        for (auto &character : gattCharacteristics) {
+            if (character.GetHandle() == attrHandle) {
+                *srvcHandle = i;
+                return &character;
+            }
         }
     }
     return NULL;
@@ -395,9 +465,10 @@ int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number
         if (GATTSERVICE(serverId, i) == NULL) {
             HILOGI("add srvcHandle: %{public}d", i);
             GATTSERVICE(serverId, i) = new GattService(
-                uuid, isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
+                uuid, i, number, isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
             GATTSERVICES(serverId, i).maxNum = number;
-            GATTSERVICES(serverId, i).index = 0;
+            GATTSERVICES(serverId, i).index = i + 1;
+            GATTSERVICES(serverId, i).isAdding = false;
             if (g_GattsCallback != NULL && g_GattsCallback->serviceAddCb != NULL) {
                 g_GattsCallback->serviceAddCb(0, serverId, &srvcUuid, i);
             }
@@ -462,7 +533,8 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
     string strUuid(characUuid.uuid);
     UUID uuid(UUID::FromString(strUuid));
 
-    int chHandle = GATTSERVICES(serverId, srvcHandle).index += 2;
+    int chHandle = GATTSERVICES(serverId, srvcHandle).index;
+    GATTSERVICES(serverId, srvcHandle).index += 2;
     GattCharacteristic characteristic(uuid, chHandle, ConvertPermissions(permissions), properties);
 
     unsigned char stubValue[1] = {0x31};
@@ -496,7 +568,7 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
     HILOGI("descUuid: %{public}s", strUuid.c_str());
     UUID uuid(UUID::FromString(strUuid));
     GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
-    int desHandle = ++GATTSERVICES(serverId, srvcHandle).index;
+    int desHandle = GATTSERVICES(serverId, srvcHandle).index++;
     GattDescriptor descriptor(uuid, desHandle, ConvertPermissions(permissions));
 
     unsigned char stubValue[1] = {0x32};
@@ -522,7 +594,9 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
  */
 int BleGattsStartService(int serverId, int srvcHandle)
 {
-    HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, uuid: %{public}s",
+        serverId, srvcHandle, GATTSERVICE(serverId, srvcHandle)->GetUuid().ToString().c_str());
+    GATTSERVICES(serverId, srvcHandle).isAdding = true;
     GATTSERVER(serverId)->AddService(*GATTSERVICE(serverId, srvcHandle));
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -539,6 +613,7 @@ int BleGattsStartService(int serverId, int srvcHandle)
 int BleGattsStopService(int serverId, int srvcHandle)
 {
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+    GATTSERVICES(serverId, srvcHandle).isAdding = false;
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -595,7 +670,9 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
     
     BluetoothRemoteDevice device(strAddress, 1);
     HILOGI("attrHandle: %{public}d", param->attrHandle);
-    GATTSERVER(serverId)->SendResponse(device, param->attrHandle, param->status, 0, (unsigned char *)param->value, param->valueLen);
+
+    GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
+        param->status, 0, (unsigned char *)param->value, param->valueLen);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -622,13 +699,18 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
     
     BluetoothRemoteDevice device(strAddress, 1);
 
-    GattCharacteristic *appCharacteristic = FindCharacteristic(serverId, param->attrHandle);
+    int srvcHandle = 0;
+    GattCharacteristic *appCharacteristic = FindCharacteristic(serverId, param->attrHandle, false, &srvcHandle);
     if (appCharacteristic == NULL) {
+        HILOGE("not find characteristic, serverId:%{public}d, attrHandle:%{public}d",
+            serverId, param->attrHandle);
         return OHOS_BT_STATUS_FAIL;
     }
 
+    HILOGE("serverId:%{public}d, srvcHandle: %{public}d, attrHandle:%{public}d",
+        serverId, param->attrHandle, srvcHandle);
     GattCharacteristic characteristic(appCharacteristic->GetUuid(),
-        appCharacteristic->GetHandle() + GATTSERVICES(serverId, 0).handleOffset,
+        appCharacteristic->GetHandle() + GATTSERVICES(serverId, srvcHandle).handleOffset,
         appCharacteristic->GetPermissions(),
         appCharacteristic->GetProperties());
 
