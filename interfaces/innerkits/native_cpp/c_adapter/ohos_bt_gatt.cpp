@@ -216,7 +216,7 @@ int BleStartAdv(int advId, const BleAdvParams *param)
  */
 int BleStopAdv(int advId)
 {
-    if (advId > 0 && advId < MAX_BLE_ADV_NUM) {
+    if (advId >= 0 && advId < MAX_BLE_ADV_NUM) {
         g_BleAdvCallbacks[advId]->GetAdvHandle()->StopAdvertising(*g_BleAdvCallbacks[advId]);
         g_BleAdvCallbacks[advId]->GetAdvHandle()->Close(*g_BleAdvCallbacks[advId]);
         delete g_BleAdvCallbacks[advId];
@@ -389,37 +389,29 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     BleAdvertiser *advHandle = g_BleAdvCallbacks[i]->GetAdvHandle();
     
     BleAdvertiserSettings settings;
-    BleAdvertiserData advData;
-    BleAdvertiserData responseData;
-
+    settings.SetInterval(advParam.minInterval);
     if (advParam.advType == OHOS_BLE_ADV_SCAN_IND ||
         advParam.advType == OHOS_BLE_ADV_NONCONN_IND) {
         settings.SetConnectable(false);
     }
 
-    unsigned char length = rawData.advData[3];
+    vector<uint8_t> advData;
+    if (rawData.advData != NULL) {
+        for (unsigned int i = 0; i < rawData.advDataLen; i++) {
+            advData.push_back(rawData.advData[i]);
+        }
+    }
 
-    string STRING_UUID_CLOSERANGE = "0000FDEE-0000-1000-8000-00805F9B34FB";
-    ParcelUuid uuid(UUID::FromString(STRING_UUID_CLOSERANGE));
+    vector<uint8_t> scanResponse;
+    if (rawData.rspData != NULL) {
+        for (unsigned int i = 0; i < rawData.rspDataLen; i++) {
+            scanResponse.push_back(rawData.rspData[i]);
+        }
+    }
 
-    // char temp[255] = {0};
-    // int k = 0;
-    // for (int j = 7; j < length - 3; j++) {
-    //     sprintf(&temp[k++], "%02x", rawData.advData[j]);
-    // }
-    string serviceData(reinterpret_cast<char *>(rawData.advData + 7), rawData.advDataLen - 7);
-    advData.AddServiceData(uuid, serviceData);
+    HILOGI("advData size: %{pubic}d, %{public}d", advData.size(), scanResponse.size());
 
-    length = rawData.rspData[0];
-    uint16_t manufacturerId = rawData.rspData[3] << 8 | rawData.rspData[2];
-    // k = 0;
-    // memset(temp, 0, 255);
-    // for (int j = 4; j < length - 4; j++) {
-    //     sprintf(&temp[k++], "%02x", rawData.rspData[j]);
-    // }
-    string strRespData(reinterpret_cast<char *>(rawData.rspData + 4), rawData.rspDataLen - 4);
-    responseData.AddManufacturerData(manufacturerId, strRespData);
-    advHandle->StartAdvertising(settings, advData, responseData, *g_BleAdvCallbacks[i]);
+    advHandle->StartAdvertising(settings, advData, scanResponse, *g_BleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;
 }
 }  // namespace Bluetooth

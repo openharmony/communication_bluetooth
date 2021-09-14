@@ -35,8 +35,10 @@ bool BluetoothGattService::Marshalling(Parcel &parcel) const {
     if (!parcel.WriteUint16(endHandle_)) {
         return false;
     }
-    if (!parcel.WriteUint32(uuid_.ConvertTo32Bits())) {
-        return false;
+    uint8_t uuid[16] = {0};
+    uuid_.ConvertToBytesLE(uuid, 16);
+    for (int i = 0; i < 16; i++) {
+        parcel.WriteUint8(uuid[i]);
     }
     int ser_num = includeServices_.size();
     if (!parcel.WriteInt32(ser_num)) {
@@ -134,12 +136,11 @@ BluetoothGattService* BluetoothGattService::Unmarshalling(Parcel &parcel) {
     } else {
         noError = false;
     }
-    uint32_t uuid;
-    if (parcel.ReadUint32(uuid)) {
-        gattservice->uuid_ = bluetooth::Uuid::ConvertFrom32Bits(uuid);
-    } else {
-        noError = false;
+    uint8_t uuid[16] = {0};
+    for (int i = 0; i < 16; i++) {
+        parcel.ReadUint8(uuid[i]);
     }
+    gattservice->uuid_ = bluetooth::Uuid::ConvertFromBytesLE(uuid, 16);
     int ser_num;
     if (parcel.ReadInt32(ser_num)) {
         if (ser_num != 0) {

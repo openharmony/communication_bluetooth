@@ -19,5 +19,5 @@ service bluetooth_service /system/bin/sa_main /system/profile/bluetooth_service.
     class z_core
     user root
     group root shell
-    seclabel u:r:bluetooth_service:s0
+    seclabel u:r:wifi_manager_service:s0
 

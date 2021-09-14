@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<T1 section="OutputSetting">
-		<T1 property="BtsnoopOutput">false</T1>
-		<T1 property="BtsnoopOutputPath">./snoop.log</T1>
+		<T1 property="BtsnoopOutput">true</T1>
+		<T1 property="BtsnoopOutputPath">/data/log/snoop.log</T1>
 		<T1 property="HciLogOutput">false</T1>
 		<T1 property="Desensitization">false</T1>
 	</T1>
