@@ -25,8 +25,10 @@ namespace Bluetooth {
 using namespace bluetooth;
 class BluetoothA2dpSrcProxy : public IRemoteProxy<IBluetoothA2dpSrc> {
 public:
-    explicit BluetoothA2dpSrcProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothA2dpSrc>(impl) {}
-    ~BluetoothA2dpSrcProxy() {}
+    explicit BluetoothA2dpSrcProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothA2dpSrc>(impl)
+    {}
+    ~BluetoothA2dpSrcProxy()
+    {}
 
     int GetDeviceState(const RawAddress &device) override;
     void RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer) override;
@@ -34,6 +36,6 @@ public:
 private:
     static inline BrokerDelegator<BluetoothA2dpSrcProxy> delegator_;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_A2DP_SRC_PROXY_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_A2DP_SRC_PROXY_H

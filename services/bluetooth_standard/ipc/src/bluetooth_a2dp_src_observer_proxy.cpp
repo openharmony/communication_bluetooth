@@ -23,7 +23,7 @@ void BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged(const RawAddress &devi
     MessageParcel data;
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("BluetoothA2dpSrcObserverProxy::OnStateChanged write device error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(playingState)) {
         HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged playingState error");
@@ -36,7 +36,7 @@ void BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged(const RawAddress &devi
     }
 
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
 
     int ret = Remote()->SendRequest(
         IBluetoothA2dpSrcObserver::Code::BT_A2DP_SRC_OBSERVER_PLAYING_STATE_CHANGED, data, reply, option);
@@ -45,5 +45,5 @@ void BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged(const RawAddress &devi
         return;
     }
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

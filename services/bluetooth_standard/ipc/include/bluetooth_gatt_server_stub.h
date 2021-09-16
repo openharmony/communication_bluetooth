@@ -26,12 +26,12 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothGattServerStub : public IRemoteStub<IBluetoothGattServer> {
 public:
-
     BluetoothGattServerStub();
     virtual ~BluetoothGattServerStub();
 
-    virtual int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                    MessageOption &option) override;
+    virtual int OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
     ErrCode AddServiceInner(MessageParcel &data, MessageParcel &reply);
     ErrCode ClearServicesInner(MessageParcel &data, MessageParcel &reply);
@@ -44,10 +44,9 @@ private:
     ErrCode RespondCharacteristicWriteInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RespondDescriptorReadInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RespondDescriptorWriteInner(MessageParcel &data, MessageParcel &reply);
-    using BluetoothGattServerFunc =
-            ErrCode (BluetoothGattServerStub::*)(MessageParcel &data, MessageParcel &reply);
+    using BluetoothGattServerFunc = ErrCode (BluetoothGattServerStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothGattServerFunc> memberFuncMap_;
-    
+
     DISALLOW_COPY_AND_MOVE(BluetoothGattServerStub);
 };
 

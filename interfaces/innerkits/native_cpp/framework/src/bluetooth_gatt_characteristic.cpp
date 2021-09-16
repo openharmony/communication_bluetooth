@@ -20,9 +20,9 @@ namespace OHOS {
 namespace Bluetooth {
 
 GattCharacteristic::GattCharacteristic(const UUID uuid, int permissions, int properties)
-    : writeType_(properties & Propertie::AUTHENTICATED_SIGNED_WRITES
-                     ? WriteType::SIGNED
-                     : properties & Propertie::WRITE_WITHOUT_RESPONSE ? WriteType::NO_RESPONSE : WriteType::DEFAULT),
+    : writeType_(properties & Propertie::AUTHENTICATED_SIGNED_WRITES ? WriteType::SIGNED
+                 : properties & Propertie::WRITE_WITHOUT_RESPONSE    ? WriteType::NO_RESPONSE
+                                                                     : WriteType::DEFAULT),
       handle_(0),
       permissions_(permissions),
       properties_(properties),
@@ -36,9 +36,9 @@ GattCharacteristic::GattCharacteristic(const UUID uuid, int permissions, int pro
 }
 
 GattCharacteristic::GattCharacteristic(const UUID uuid, uint16_t handle, const int permissions, const int properties)
-    : writeType_(properties & Propertie::AUTHENTICATED_SIGNED_WRITES
-                     ? WriteType::SIGNED
-                     : properties & Propertie::WRITE_WITHOUT_RESPONSE ? WriteType::NO_RESPONSE : WriteType::DEFAULT),
+    : writeType_(properties & Propertie::AUTHENTICATED_SIGNED_WRITES ? WriteType::SIGNED
+                 : properties & Propertie::WRITE_WITHOUT_RESPONSE    ? WriteType::NO_RESPONSE
+                                                                     : WriteType::DEFAULT),
       handle_(handle),
       permissions_(permissions),
       properties_(properties),
@@ -49,7 +49,6 @@ GattCharacteristic::GattCharacteristic(const UUID uuid, uint16_t handle, const i
       uuid_(uuid)
 {
     HILOGI("GattCharacteristic::GattCharacteristic (4 parameters) starts");
-
 }
 
 GattCharacteristic::GattCharacteristic(const GattCharacteristic &src)
@@ -203,6 +202,5 @@ void GattCharacteristic::SetValue(const uint8_t *values, const size_t length)
     memcpy(value_.get(), values, length);
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
-
+}  // namespace Bluetooth
+}  // namespace OHOS

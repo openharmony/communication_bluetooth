@@ -19,15 +19,17 @@
 namespace OHOS {
 namespace Bluetooth {
 
-bool BluetoothRawAddress::Marshalling(Parcel &parcel) const {
+bool BluetoothRawAddress::Marshalling(Parcel &parcel) const
+{
     if (!parcel.WriteString(address_)) {
         return false;
     }
     return true;
 }
-    
-BluetoothRawAddress* BluetoothRawAddress::Unmarshalling(Parcel &parcel) {
-    BluetoothRawAddress* rawaddress = new BluetoothRawAddress();
+
+BluetoothRawAddress *BluetoothRawAddress::Unmarshalling(Parcel &parcel)
+{
+    BluetoothRawAddress *rawaddress = new BluetoothRawAddress();
 
     bool noError = true;
     std::string address = "";
@@ -43,11 +45,13 @@ BluetoothRawAddress* BluetoothRawAddress::Unmarshalling(Parcel &parcel) {
     return rawaddress;
 }
 
-bool BluetoothRawAddress::WriteToParcel(Parcel &parcel) {
+bool BluetoothRawAddress::WriteToParcel(Parcel &parcel)
+{
     return Marshalling(parcel);
 }
 
-bool BluetoothRawAddress::ReadFromParcel(Parcel &parcel) {
+bool BluetoothRawAddress::ReadFromParcel(Parcel &parcel)
+{
     bool noError = true;
     std::string address = "";
     if (parcel.ReadString(address)) {
@@ -58,5 +62,5 @@ bool BluetoothRawAddress::ReadFromParcel(Parcel &parcel) {
     return noError;
 }
 
-}  // namespace bluetooth
-}  // namespace polaris
+}  // namespace Bluetooth
+}  // namespace OHOS

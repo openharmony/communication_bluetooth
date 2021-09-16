@@ -23,19 +23,21 @@ using namespace bluetooth;
 namespace OHOS {
 namespace Bluetooth {
 
-int BluetoothSocketServer::Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) {
+int BluetoothSocketServer::Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
+{
     HILOGI("BluetoothSocketServer: Connect starts");
-    IProfileSocket* socket = (IProfileSocket*)IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP);
+    IProfileSocket *socket = (IProfileSocket *)IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP);
 
     return socket->Connect(addr, uuid, (int)securityFlag, (int)type);
 }
 
-int BluetoothSocketServer::Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) {
+int BluetoothSocketServer::Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
+{
     HILOGI("BluetoothSocketServer: Listen starts");
-    IProfileSocket* socket = (IProfileSocket*)IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP);
-    
+    IProfileSocket *socket = (IProfileSocket *)IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP);
+
     return socket->Listen(name, uuid, (int)securityFlag, (int)type);
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

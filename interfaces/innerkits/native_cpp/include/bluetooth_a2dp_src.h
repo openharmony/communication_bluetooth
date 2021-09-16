@@ -55,7 +55,8 @@ public:
      * @param error  the error information.
      * @since 6.0
      */
-    virtual void OnPlayingStateChanged(const BluetoothRemoteDevice &device, int playingState, int error) {}
+    virtual void OnPlayingStateChanged(const BluetoothRemoteDevice &device, int playingState, int error)
+    {}
 };
 
 /**
@@ -168,7 +169,6 @@ public:
      */
     int GetConnectStrategy(const BluetoothRemoteDevice &device) const;
 
-
     /**
      * @brief Set whether enables the optional codec.
      *
@@ -249,7 +249,6 @@ public:
      */
     void SetAudioConfigure(const BluetoothRemoteDevice &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel);
 
-
 private:
     static BluetoothA2dpSrc a2dpSrcProfile_;
     /**
@@ -271,5 +270,5 @@ private:
 };
 
 }  // namespace Bluetooth
-} // namespace OHOS
+}  // namespace OHOS
 #endif  // BLUETOOTH_A2DP_SRC_H

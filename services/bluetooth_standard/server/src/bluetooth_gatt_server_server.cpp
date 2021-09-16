@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
+#include <list>
+#include <mutex>
 
-#include "i_bluetooth_gatt_server.h"
 #include "bluetooth_gatt_server_server.h"
+#include "bluetooth_log.h"
+#include "gatt_data.h"
+#include "i_bluetooth_gatt_server.h"
 #include "interface_adapter_manager.h"
 #include "interface_profile_gatt_server.h"
 #include "interface_profile_manager.h"
 #include "interface_adapter_manager.h"
-#include "gatt_data.h"
 #include "hilog/log.h"
-#include "bluetooth_log.h"
-#include <list>
-#include <mutex>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -32,7 +32,7 @@ struct BluetoothGattServerServer::impl {
     class GattServerCallbackImpl;
     class SystemStateObserver;
 
-    bluetooth::IProfileGattServer* serverService_;
+    bluetooth::IProfileGattServer *serverService_;
     std::unique_ptr<SystemStateObserver> systemStateObserver_;
     std::list<std::unique_ptr<GattServerCallbackImpl>> callbacks_;
     std::mutex registerMutex_;
@@ -40,87 +40,94 @@ struct BluetoothGattServerServer::impl {
     impl();
     ~impl();
 
-    bluetooth::IProfileGattServer* GetServicePtr()
+    bluetooth::IProfileGattServer *GetServicePtr()
     {
         if (bluetooth::IProfileManager::GetInstance() == nullptr) {
             return nullptr;
         }
-        return static_cast<bluetooth::IProfileGattServer*>(
+        return static_cast<bluetooth::IProfileGattServer *>(
             bluetooth::IProfileManager::GetInstance()->GetProfileService(bluetooth::PROFILE_NAME_GATT_SERVER));
     }
 };
 class BluetoothGattServerServer::impl::SystemStateObserver : public bluetooth::ISystemStateObserver {
 public:
-    SystemStateObserver(BluetoothGattServerServer::impl* impl) : impl_(impl){};
+    SystemStateObserver(BluetoothGattServerServer::impl *impl) : impl_(impl){};
     ~SystemStateObserver() override = default;
 
     void OnSystemStateChange(const bluetooth::BTSystemState state) override
     {
         std::lock_guard<std::mutex> lck(impl_->registerMutex_);
         switch (state) {
-        case bluetooth::BTSystemState::ON:
-            impl_->serverService_ = impl_->GetServicePtr();
-            break;
-        case bluetooth::BTSystemState::OFF:
-            impl_->serverService_ = nullptr;
-            break;
-        default:
-            break;
+            case bluetooth::BTSystemState::ON:
+                impl_->serverService_ = impl_->GetServicePtr();
+                break;
+            case bluetooth::BTSystemState::OFF:
+                impl_->serverService_ = nullptr;
+                break;
+            default:
+                break;
         }
     }
 
 private:
-    BluetoothGattServerServer::impl* impl_;
+    BluetoothGattServerServer::impl *impl_;
 };
 
 class BluetoothGattServerServer::impl::GattServerCallbackImpl : public bluetooth::IGattServerCallback {
 public:
     void OnCharacteristicReadRequest(
-                    const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override {
-        callback_->OnCharacteristicReadRequest((BluetoothGattDevice)device,
-                                               (BluetoothGattCharacteristic)characteristic);
+        const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override
+    {
+        callback_->OnCharacteristicReadRequest(
+            (BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic);
     }
     void OnCharacteristicReadByUuidRequest(
-                    const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override {
-
+        const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override
+    {}
+    void OnCharacteristicWriteRequest(const bluetooth::GattDevice &device,
+        const bluetooth::Characteristic &characteristic, bool needRespones) override
+    {
+        callback_->OnCharacteristicWriteRequest(
+            (BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic, needRespones);
     }
-    void OnCharacteristicWriteRequest(
-    const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic, bool needRespones) override {
-        callback_->OnCharacteristicWriteRequest((BluetoothGattDevice)device,
-                                                (BluetoothGattCharacteristic)characteristic, needRespones);
-    }
-    void OnDescriptorReadRequest(
-                                const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override {
+    void OnDescriptorReadRequest(const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override
+    {
         callback_->OnDescriptorReadRequest((BluetoothGattDevice)device, (BluetoothGattDescriptor)descriptor);
     }
-    void OnDescriptorWriteRequest(
-                            const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override {
+    void OnDescriptorWriteRequest(const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override
+    {
         callback_->OnDescriptorWriteRequest((BluetoothGattDevice)device, (BluetoothGattDescriptor)descriptor);
     }
     void OnNotifyConfirm(
-            const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic, int result) override {
+        const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic, int result) override
+    {
         callback_->OnNotifyConfirm((BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic, result);
     }
-    void OnConnectionStateChanged(const bluetooth::GattDevice &device, int ret, int state) override {
+    void OnConnectionStateChanged(const bluetooth::GattDevice &device, int ret, int state) override
+    {
         callback_->OnConnectionStateChanged((BluetoothGattDevice)device, ret, state);
     }
-    void OnMtuChanged(const bluetooth::GattDevice &device, int mtu) override {
+    void OnMtuChanged(const bluetooth::GattDevice &device, int mtu) override
+    {
         callback_->OnMtuChanged((BluetoothGattDevice)device, mtu);
     }
-    void OnAddService(int ret, const bluetooth::Service &services) override {
+    void OnAddService(int ret, const bluetooth::Service &services) override
+    {
         callback_->OnAddService(ret, (BluetoothGattService)services);
     }
-    void OnServiceChanged(const bluetooth::Service &services) override {}
+    void OnServiceChanged(const bluetooth::Service &services) override
+    {}
     void OnConnectionParameterChanged(
-                    const bluetooth::GattDevice &device, int interval, int latency, int timeout, int status) override {
+        const bluetooth::GattDevice &device, int interval, int latency, int timeout, int status) override
+    {
         callback_->OnConnectionParameterChanged((BluetoothGattDevice)device, interval, latency, timeout, status);
     }
-    
-    sptr<IBluetoothGattServerCallback> GetCallback() 
+
+    sptr<IBluetoothGattServerCallback> GetCallback()
     {
         return callback_;
     }
-    GattServerCallbackImpl(const sptr<IBluetoothGattServerCallback>& callback, BluetoothGattServerServer& owner);
+    GattServerCallbackImpl(const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner);
     ~GattServerCallbackImpl()
     {
         callback_ = nullptr;
@@ -130,46 +137,47 @@ public:
 private:
     class GattServerCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        GattServerCallbackDeathRecipient(const sptr<IBluetoothGattServerCallback>& callback,
-                               BluetoothGattServerServer& owner);
+        GattServerCallbackDeathRecipient(
+            const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner);
 
         sptr<IBluetoothGattServerCallback> Getcallback() const
         {
             return callback_;
         };
 
-        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
 
     private:
         sptr<IBluetoothGattServerCallback> callback_;
-        BluetoothGattServerServer& owner_;
+        BluetoothGattServerServer &owner_;
     };
 
     sptr<IBluetoothGattServerCallback> callback_;
     sptr<GattServerCallbackDeathRecipient> deathRecipient_;
 };
 BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackImpl(
-    const sptr<IBluetoothGattServerCallback>& callback, BluetoothGattServerServer& owner)
-    : callback_(callback), deathRecipient_(new GattServerCallbackDeathRecipient(callback, owner)) {}
+    const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
+    : callback_(callback), deathRecipient_(new GattServerCallbackDeathRecipient(callback, owner))
+{}
 
-BluetoothGattServerServer::impl::GattServerCallbackImpl::
-                                                GattServerCallbackDeathRecipient::GattServerCallbackDeathRecipient(
-    const sptr<IBluetoothGattServerCallback>& callback, BluetoothGattServerServer& owner)
-    : callback_(callback), owner_(owner) {}
+BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::
+    GattServerCallbackDeathRecipient(
+        const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
+    : callback_(callback), owner_(owner)
+{}
 
 void BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::OnRemoteDied(
-    const wptr<IRemoteObject>& remote)
+    const wptr<IRemoteObject> &remote)
 {
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
         if ((*it)->GetCallback() == iface_cast<IBluetoothGattServerCallback>(remote.promote())) {
             *it = nullptr;
             owner_.pimpl->callbacks_.erase(it);
-            return ;
+            return;
         }
     }
 }
-BluetoothGattServerServer::impl::impl()
-    : serverService_(nullptr), systemStateObserver_(new SystemStateObserver(this))
+BluetoothGattServerServer::impl::impl() : serverService_(nullptr), systemStateObserver_(new SystemStateObserver(this))
 {
     bluetooth::IAdapterManager::GetInstance()->RegisterSystemStateObserver(*systemStateObserver_);
 }
@@ -179,13 +187,12 @@ BluetoothGattServerServer::impl::~impl()
     bluetooth::IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*systemStateObserver_);
 }
 
-int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService* services)
+int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService *services)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
 
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
-         
     }
 
     bluetooth::Service svc = (bluetooth::Service)*services;
@@ -193,33 +200,30 @@ int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService* s
     return pimpl->serverService_->AddService(appId, svc);
 }
 
-
 void BluetoothGattServerServer::ClearServices(int appId)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
 
         return;
-         
     }
 
     pimpl->serverService_->ClearServices(appId);
 }
 
-void BluetoothGattServerServer::CancelConnection(const BluetoothGattDevice& device) 
+void BluetoothGattServerServer::CancelConnection(const BluetoothGattDevice &device)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
 
         return;
-         
     }
 
     pimpl->serverService_->CancelConnection((bluetooth::GattDevice)device);
 }
 
 int BluetoothGattServerServer::NotifyClient(
-                    const BluetoothGattDevice& device,BluetoothGattCharacteristic* characteristic, bool needConfirm)
+    const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, bool needConfirm)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
@@ -234,23 +238,22 @@ int BluetoothGattServerServer::NotifyClient(
     return pimpl->serverService_->NotifyClient((bluetooth::GattDevice)device, character, needConfirm);
 }
 
-int BluetoothGattServerServer::RemoveService(int32_t appId, const BluetoothGattService& services)
+int BluetoothGattServerServer::RemoveService(int32_t appId, const BluetoothGattService &services)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT; 
+        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
     return pimpl->serverService_->RemoveService(appId, (bluetooth::Service)services);
-
 }
 
 int BluetoothGattServerServer::RespondCharacteristicRead(
-                        const BluetoothGattDevice& device,BluetoothGattCharacteristic* characteristic,int32_t ret)
+    const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT; 
+        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
     bluetooth::Characteristic character(characteristic->handle_);
@@ -262,7 +265,7 @@ int BluetoothGattServerServer::RespondCharacteristicRead(
 }
 
 int BluetoothGattServerServer::RespondCharacteristicWrite(
-                    const BluetoothGattDevice& device,const BluetoothGattCharacteristic& characteristic,int32_t ret)
+    const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
@@ -270,15 +273,15 @@ int BluetoothGattServerServer::RespondCharacteristicWrite(
     }
 
     return pimpl->serverService_->RespondCharacteristicWrite(
-                                        (bluetooth::GattDevice)device, (bluetooth::Characteristic)characteristic, ret);
+        (bluetooth::GattDevice)device, (bluetooth::Characteristic)characteristic, ret);
 }
 
 int BluetoothGattServerServer::RespondDescriptorRead(
-                                    const BluetoothGattDevice& device,BluetoothGattDescriptor* descriptor, int32_t ret)
+    const BluetoothGattDevice &device, BluetoothGattDescriptor *descriptor, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
-        return  bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
     bluetooth::Descriptor desc(descriptor->handle_);
@@ -290,15 +293,15 @@ int BluetoothGattServerServer::RespondDescriptorRead(
 }
 
 int BluetoothGattServerServer::RespondDescriptorWrite(
-                            const BluetoothGattDevice& device,const BluetoothGattDescriptor& descriptor, int32_t ret)
+    const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (nullptr == pimpl->serverService_) {
-        return  bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
     return pimpl->serverService_->RespondDescriptorWrite(
-                            (bluetooth::GattDevice)device, (bluetooth::Descriptor)descriptor, ret);
+        (bluetooth::GattDevice)device, (bluetooth::Descriptor)descriptor, ret);
 }
 
 int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback)
@@ -310,8 +313,8 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
-    auto it = pimpl->callbacks_.emplace(pimpl->callbacks_.begin(),
-                                        std::make_unique<impl::GattServerCallbackImpl>(callback, *this));
+    auto it = pimpl->callbacks_.emplace(
+        pimpl->callbacks_.begin(), std::make_unique<impl::GattServerCallbackImpl>(callback, *this));
 
     return pimpl->serverService_->RegisterApplication(*it->get());
 }
@@ -329,9 +332,9 @@ int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
 BluetoothGattServerServer::BluetoothGattServerServer() : pimpl(new impl())
 {
     HILOGI("Bluetooth Gatt Server Server Created!");
-
 }
 
-BluetoothGattServerServer::~BluetoothGattServerServer() {}
-}// namespace Bluetooth
-}// namespace OHOS
+BluetoothGattServerServer::~BluetoothGattServerServer()
+{}
+}  // namespace Bluetooth
+}  // namespace OHOS

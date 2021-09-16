@@ -22,8 +22,8 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace bluetooth;
-int32_t BluetoothA2dpSrcStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                           MessageOption &option)
+int32_t BluetoothA2dpSrcStub::OnRemoteRequest(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothA2dpSrcStub: transaction of code: %{public}d is received", code);
 
@@ -70,9 +70,9 @@ ErrCode BluetoothA2dpSrcStub::GetDeviceStateInner(MessageParcel &data, MessagePa
     if (!ret) {
         HILOGE("BluetoothA2dpSrcStub: GetDeviceStateInner reply writing failed in: %{public}s.", __func__);
         return TRANSACTION_ERR;
-    }    
+    }
 
     return NO_ERROR;
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

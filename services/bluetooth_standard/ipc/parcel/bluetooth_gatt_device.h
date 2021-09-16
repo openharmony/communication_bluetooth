@@ -25,21 +25,21 @@ namespace Bluetooth {
 class BluetoothGattDevice : public Parcelable, public ::bluetooth::GattDevice {
 public:
     BluetoothGattDevice() = default;
-    BluetoothGattDevice(const ::bluetooth::GattDevice& other)
-        : ::bluetooth::GattDevice(other) {}
-    BluetoothGattDevice(const BluetoothGattDevice& other)
-        : ::bluetooth::GattDevice(other) {}
+    BluetoothGattDevice(const ::bluetooth::GattDevice &other) : ::bluetooth::GattDevice(other)
+    {}
+    BluetoothGattDevice(const BluetoothGattDevice &other) : ::bluetooth::GattDevice(other)
+    {}
     ~BluetoothGattDevice() = default;
 
     bool Marshalling(Parcel &parcel) const override;
-    
-    static BluetoothGattDevice* Unmarshalling(Parcel &parcel);
+
+    static BluetoothGattDevice *Unmarshalling(Parcel &parcel);
 
     bool writeToParcel(Parcel &parcel);
 
     bool readFromParcel(Parcel &parcel);
 };
 }  // namespace Bluetooth
-} // namespace OHOS
+}  // namespace OHOS
 
-#endif // BLUETOOTH_PARCEL_GATT_DEVICE_H
+#endif  // BLUETOOTH_PARCEL_GATT_DEVICE_H

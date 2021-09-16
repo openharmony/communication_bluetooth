@@ -16,7 +16,6 @@
 #ifndef BLUETOOTH_PARCEL_GATT_SERVER_CALLBACK_H
 #define BLUETOOTH_PARCEL_GATT_SERVER_CALLBACK_H
 
-
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_gatt_service.h"
 // #include "bluetooth/bluetooth_gatt_characteristic.h"
@@ -29,10 +28,9 @@
 namespace OHOS {
 namespace Bluetooth {
 
-class IBluetoothGattServerCallback : public OHOS::IRemoteBroker{
-    public:
+class IBluetoothGattServerCallback : public OHOS::IRemoteBroker {
+public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattServerCallback");
-
 
     enum Code {
         GATT_SERVER_ON_CHARACTERISTIC_READREQUEST = 0,
@@ -47,25 +45,24 @@ class IBluetoothGattServerCallback : public OHOS::IRemoteBroker{
         GATT_SERVER_ON_CONNECTION_PARAMETER_CHANGED,
     };
 
-
     virtual void OnConnectionStateChanged(const BluetoothGattDevice &device, int32_t ret, int32_t state) = 0;
-    virtual void OnAddService(int32_t ret, const BluetoothGattService &service)= 0;
+    virtual void OnAddService(int32_t ret, const BluetoothGattService &service) = 0;
     virtual void OnCharacteristicReadRequest(
-                    const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) = 0;
+        const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) = 0;
     virtual void OnCharacteristicWriteRequest(
-        const BluetoothGattDevice &device,const BluetoothGattCharacteristic &characteristic, bool needRespones) = 0;
+        const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, bool needRespones) = 0;
     virtual void OnDescriptorReadRequest(
-                                const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) = 0;
+        const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) = 0;
     virtual void OnDescriptorWriteRequest(
-                                const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) = 0;
+        const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) = 0;
     virtual void OnMtuChanged(const BluetoothGattDevice &device, int32_t mtu) = 0;
     virtual void OnNotifyConfirm(
         const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int result) = 0;
     virtual void OnConnectionParameterChanged(
         const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status) = 0;
 };
-    
+
 }  // namespace Bluetooth
-} // namespace OHOS   
-    
-#endif // BLUETOOTH_PARCEL_GATT_SERVER_CALLBACK_H   
+}  // namespace OHOS
+
+#endif  // BLUETOOTH_PARCEL_GATT_SERVER_CALLBACK_H

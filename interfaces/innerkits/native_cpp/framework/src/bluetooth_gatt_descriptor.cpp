@@ -98,5 +98,5 @@ uint16_t GattDescriptor::GetHandle() const
     return handle_;
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

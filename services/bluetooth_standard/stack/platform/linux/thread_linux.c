@@ -70,7 +70,7 @@ static void *ThreadStartFunc(void *promise)
 
     thread->tid = (long int)syscall(__NR_gettid);
     prctl(PR_SET_NAME, startPromise->name);
-    ReactorSetThreadId(thread->reactor, pthread_self());
+    ReactorSetThreadId(thread->reactor, (unsigned long)pthread_self());
 
     SemaphorePost(startPromise->sync);
 

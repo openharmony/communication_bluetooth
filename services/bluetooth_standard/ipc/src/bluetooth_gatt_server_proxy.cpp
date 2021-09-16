@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Bluetooth {
 
-int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService* services)
+int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService *services)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
@@ -32,14 +32,14 @@ int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService* se
         HILOGE("BluetoothGattServerProxy::AddService error");
         return ERROR;
     }
-    
+
     if (!data.WriteParcelable(services)) {
         HILOGE("BluetoothGattServerProxy::AddService error");
         return ERROR;
     }
-    
+
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
+    MessageOption option{MessageOption::TF_SYNC};
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_ADD_SERVICE, data, reply, option);
     if (error != NO_ERROR) {
@@ -47,7 +47,6 @@ int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService* se
         return ERROR;
     }
     return reply.ReadInt32();
-
 }
 void BluetoothGattServerProxy::ClearServices(int appId)
 {
@@ -58,20 +57,20 @@ void BluetoothGattServerProxy::ClearServices(int appId)
     }
     if (!data.WriteInt32(appId)) {
         HILOGE("BluetoothGattServerProxy::ClearServices error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
 
-    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CLEAR_SERVICES,data, reply, option);
-    if(error != NO_ERROR){
+    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CLEAR_SERVICES, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::ClearServices done fail, error: %d", error);
         return;
     }
     return;
 }
-void BluetoothGattServerProxy::CancelConnection(const BluetoothGattDevice& device) 
-{   
+void BluetoothGattServerProxy::CancelConnection(const BluetoothGattDevice &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerProxy::CancelConnection WriteInterfaceToken error");
@@ -79,12 +78,12 @@ void BluetoothGattServerProxy::CancelConnection(const BluetoothGattDevice& devic
     }
     if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerProxy::CancelConnection error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
-    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CANCEL_CONNECTION,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_ASYNC};
+    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CANCEL_CONNECTION, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::CancelConnection done fail, error: %d", error);
         return;
     }
@@ -97,15 +96,15 @@ int BluetoothGattServerProxy::RegisterApplication(const sptr<IBluetoothGattServe
         HILOGE("BluetoothGattServerProxy::RegisterApplication WriteInterfaceToken error");
         return ERROR;
     }
-    if (!data.WriteRemoteObject(callback->AsObject())){
+    if (!data.WriteRemoteObject(callback->AsObject())) {
         HILOGE("BluetoothGattServerProxy::RegisterApplication error");
         return ERROR;
     }
 
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
-    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REGISTER,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_SYNC};
+    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REGISTER, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::RegisterApplication done fail, error: %d", error);
         return ERROR;
     }
@@ -123,17 +122,18 @@ int BluetoothGattServerProxy::DeregisterApplication(int appId)
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
+    MessageOption option{MessageOption::TF_SYNC};
 
-    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_DEREGISTER,data, reply, option);
-    if(error != NO_ERROR){
+    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_DEREGISTER, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::DeregisterApplication done fail, error: %d", error);
-        return ERROR; 
+        return ERROR;
     }
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::NotifyClient(
-                    const BluetoothGattDevice& device,BluetoothGattCharacteristic* characteristic, bool needConfirm){
+    const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, bool needConfirm)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerProxy::WriteInterfaceToken WriteInterfaceToken error");
@@ -152,16 +152,17 @@ int BluetoothGattServerProxy::NotifyClient(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
+    MessageOption option{MessageOption::TF_SYNC};
 
-    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_NOTIFY_CLIENT,data, reply, option);
-    if(error != NO_ERROR){
+    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_NOTIFY_CLIENT, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::NotifyClient done fail, error: %d", error);
-        return ERROR; 
+        return ERROR;
     }
     return reply.ReadInt32();
 }
-int BluetoothGattServerProxy::RemoveService(int32_t appId, const BluetoothGattService& services) {
+int BluetoothGattServerProxy::RemoveService(int32_t appId, const BluetoothGattService &services)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerProxy::RemoveService WriteInterfaceToken error");
@@ -176,18 +177,18 @@ int BluetoothGattServerProxy::RemoveService(int32_t appId, const BluetoothGattSe
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
+    MessageOption option{MessageOption::TF_SYNC};
 
-    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REMOVE_SERVICE,data, reply, option);
-    if(error != NO_ERROR){
+    int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REMOVE_SERVICE, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::RemoveService done fail, error: %d", error);
-        return ERROR; 
+        return ERROR;
     }
     return reply.ReadInt32();
-
 }
 int BluetoothGattServerProxy::RespondCharacteristicRead(
-                        const BluetoothGattDevice& device,BluetoothGattCharacteristic* characteristic,int32_t ret) {
+    const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, int32_t ret)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead WriteInterfaceToken error");
@@ -206,18 +207,18 @@ int BluetoothGattServerProxy::RespondCharacteristicRead(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
-    int error = Remote()->SendRequest(
-                            IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_READ,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_SYNC};
+    int error =
+        Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_READ, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead done fail, error: %d", error);
-        return ERROR; 
+        return ERROR;
     }
     return reply.ReadInt32();
-
 }
 int BluetoothGattServerProxy::RespondCharacteristicWrite(
-                    const BluetoothGattDevice& device,const BluetoothGattCharacteristic& characteristic,int32_t ret) {
+    const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int32_t ret)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite WriteInterfaceToken error");
@@ -236,17 +237,18 @@ int BluetoothGattServerProxy::RespondCharacteristicWrite(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
+    MessageOption option{MessageOption::TF_SYNC};
     int error = Remote()->SendRequest(
-                            IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE,data, reply, option);
-    if(error != NO_ERROR){
+        IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite done fail, error: %d", error);
-        return ERROR; 
+        return ERROR;
     }
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RespondDescriptorRead(
-                                const BluetoothGattDevice& device,BluetoothGattDescriptor* descriptor, int32_t ret) {
+    const BluetoothGattDevice &device, BluetoothGattDescriptor *descriptor, int32_t ret)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerProxy::RespondDescriptorRead WriteInterfaceToken error");
@@ -265,17 +267,18 @@ int BluetoothGattServerProxy::RespondDescriptorRead(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
-    int error = Remote()->SendRequest(
-                                IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_READ,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_SYNC};
+    int error =
+        Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_READ, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::RespondDescriptorRead done fail, error: %d", error);
-        return ERROR; 
+        return ERROR;
     }
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RespondDescriptorWrite(
-                            const BluetoothGattDevice& device,const BluetoothGattDescriptor& descriptor, int32_t ret) {
+    const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor, int32_t ret)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite WriteInterfaceToken error");
@@ -294,14 +297,14 @@ int BluetoothGattServerProxy::RespondDescriptorWrite(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
-    int error = Remote()->SendRequest(
-                                IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_WRITE,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_SYNC};
+    int error =
+        Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_WRITE, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite done fail, error: %d", error);
-        return ERROR; 
+        return ERROR;
     }
     return reply.ReadInt32();
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

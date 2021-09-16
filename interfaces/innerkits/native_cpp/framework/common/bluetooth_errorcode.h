@@ -26,8 +26,8 @@ enum ErrCode {
     ERR_INVALID_VALUE,
     ERROR,
 
-}; 
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 
-#endif // BLUETOOTH_ERRORCODE_H
+#endif  // BLUETOOTH_ERRORCODE_H

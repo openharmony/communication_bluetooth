@@ -26,14 +26,20 @@
 #include "system_ability_definition.h"
 #include "raw_address.h"
 
-
 namespace OHOS {
 namespace Bluetooth {
 
 struct SppClientSocket::impl {
     impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSocketType type, bool auth);
     impl(int fd, std::string address);
-    ~impl() {
+    ~impl()
+    {
+
+        if (!proxy_) {
+            HILOGI("SppClientSocket::impl:～impl() failed: no proxy_");
+            return;
+        }
+
         proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 
         if (fd_ > 0) {
@@ -74,7 +80,6 @@ struct SppClientSocket::impl {
                 return;
             }
         }
-
     }
 
     bool RecvSocketSignal()
@@ -93,7 +98,7 @@ struct SppClientSocket::impl {
         bool state = recvStateBuf[0];
 
         uint8_t buf[6] = {0};
-#ifdef  DARWIN_PLATFORM
+#ifdef DARWIN_PLATFORM
         int recvAddrSize = recv(fd_, buf, sizeof(buf), 0);
 #else
         int recvAddrSize = recv(fd_, buf, sizeof(buf), MSG_WAITALL);
@@ -163,9 +168,7 @@ struct SppClientSocket::impl {
     int fd_;
     bool auth_;
     int socketStatus_;
-
 };
-
 
 class SppClientSocket::impl::BluetoothClientSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
@@ -173,39 +176,41 @@ public:
     ~BluetoothClientSocketDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothClientSocketDeathRecipient);
 
-    void OnRemoteDied(const wptr<IRemoteObject>& remote) final {
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
+    {
         HILOGI("SppClientSocket::impl::BluetoothClientSocketDeathRecipient::OnRemoteDied starts");
         host_.proxy_ = nullptr;
     }
+
 private:
     SppClientSocket::impl &host_;
 };
 
 SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSocketType type, bool auth)
-        : inputStream_(nullptr),
-          outputStream_(nullptr),
-          remoteDevice_(addr),
-          uuid_(uuid),
-          type_(type),
-          isServer_(false),
-          fd_(-1),
-          auth_(auth),
-          socketStatus_(SOCKET_INIT)
+    : inputStream_(nullptr),
+      outputStream_(nullptr),
+      remoteDevice_(addr),
+      uuid_(uuid),
+      type_(type),
+      isServer_(false),
+      fd_(-1),
+      auth_(auth),
+      socketStatus_(SOCKET_INIT)
 {
 
     HILOGI("SppClientSocket::impl:impl(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
-    if(!hostRemote){
+    if (!hostRemote) {
         int try_time = 5;
-        while(!hostRemote && try_time-- > 0){
+        while (!hostRemote && try_time-- > 0) {
             sleep(1);
             hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
         }
     }
 
-    if(!hostRemote){
+    if (!hostRemote) {
         HILOGI("SppClientSocket::impl:impl() failed: no hostRemote");
         return;
     }
@@ -213,15 +218,15 @@ SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSoc
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SPP);
 
-    if(!remote){
+    if (!remote) {
         int try_time = 5;
-        while(!remote && try_time-- > 0){
+        while (!remote && try_time-- > 0) {
             sleep(1);
             remote = hostProxy->GetProfile(PROFILE_SPP);
         }
     }
 
-    if(!remote){
+    if (!remote) {
         HILOGI("SppClientSocket::impl:impl() failed: no remote");
         return;
     }
@@ -230,26 +235,31 @@ SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSoc
     proxy_ = iface_cast<IBluetoothSocket>(remote);
 
     deathRecipient_ = new BluetoothClientSocketDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 
+    if (!proxy_) {
+        HILOGE("SppClientSocket:impl: proxy_ is nullptr");
+        return;
+    }
+
+    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
 SppClientSocket::impl::impl(int fd, std::string address)
-        : inputStream_(std::make_unique<InputStream>(fd)),
-          outputStream_(std::make_unique<OutputStream>(fd)),
-          remoteDevice_(BluetoothRemoteDevice(address, 0)),
-          type_(TYPE_RFCOMM),
-          address_(address),
-          isServer_(true),
-          fd_(fd),
-          auth_(false),
-          socketStatus_(SOCKET_CONNECTED)
+    : inputStream_(std::make_unique<InputStream>(fd)),
+      outputStream_(std::make_unique<OutputStream>(fd)),
+      remoteDevice_(BluetoothRemoteDevice(address, 0)),
+      type_(TYPE_RFCOMM),
+      address_(address),
+      isServer_(true),
+      fd_(fd),
+      auth_(false),
+      socketStatus_(SOCKET_CONNECTED)
 {
     HILOGI("SppClientSocket::impl:impl(2 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
-    if(!hostRemote){
+    if (!hostRemote) {
         HILOGI("SppClientSocket::impl:impl() failed: no hostRemote");
         return;
     }
@@ -257,8 +267,7 @@ SppClientSocket::impl::impl(int fd, std::string address)
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SPP);
 
-
-    if(!remote){
+    if (!remote) {
         HILOGI("SppClientSocket::impl:impl() failed: no remote");
         return;
     }
@@ -267,8 +276,13 @@ SppClientSocket::impl::impl(int fd, std::string address)
     proxy_ = iface_cast<IBluetoothSocket>(remote);
 
     deathRecipient_ = new BluetoothClientSocketDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 
+    if (!proxy_) {
+        HILOGE("SppClientSocket:impl: proxy_ is nullptr");
+        return;
+    }
+
+    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
 SppClientSocket::SppClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, SppSocketType type, bool auth)
@@ -288,19 +302,26 @@ int SppClientSocket::Connect()
 
     std::string tempAddress = pimpl->address_;
     if (!tempAddress.size()) {
-        return -1;
+        return SPPStatus::SPP_FAILURE;
     }
     if (pimpl->socketStatus_ == SOCKET_CLOSED) {
         HILOGE("socket closed");
-        return -1;
+        return SPPStatus::SPP_FAILURE;
     }
 
     bluetooth::Uuid serverUuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits());
-    pimpl->fd_ = pimpl->proxy_->Connect(tempAddress, serverUuid, (int32_t)pimpl->getSecurityFlags(), (int32_t)pimpl->type_);
+
+    if (!pimpl->proxy_) {
+        HILOGE("SppClientSocket:Connect: proxy_ is nullptr");
+        return SPPStatus::SPP_FAILURE;
+    }
+
+    pimpl->fd_ =
+        pimpl->proxy_->Connect(tempAddress, serverUuid, (int32_t)pimpl->getSecurityFlags(), (int32_t)pimpl->type_);
 
     if (pimpl->fd_ == -1) {
         HILOGE("connect failed!");
-        return -1;
+        return SPPStatus::SPP_FAILURE;
     }
 
     bool recvret = pimpl->RecvSocketSignal();
@@ -310,11 +331,10 @@ int SppClientSocket::Connect()
 
     if (!recvret) {
         HILOGE("connect failed!");
-        return -1;
+        return SPPStatus::SPP_FAILURE;
     }
     pimpl->socketStatus_ = SOCKET_CONNECTED;
-    return 0;
-
+    return SPPStatus::SPP_SUCCESS;
 }
 
 void SppClientSocket::Close()
@@ -347,11 +367,16 @@ bool SppClientSocket::IsConnected() const
     return pimpl->IsConnected();
 }
 
-
 struct SppServerSocket::impl {
     impl(const std::string &name, UUID uuid, SppSocketType type, bool auth);
     ~impl()
     {
+
+        if (!proxy_) {
+            HILOGE("SppServerSocket:impl: proxy_ is nullptr");
+            return;
+        }
+
         proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 
         if (fd_ > 0) {
@@ -361,22 +386,25 @@ struct SppServerSocket::impl {
     }
 
     int Listen()
-    {   
+    {
         HILOGI("SppServerSocket::Listen() starts");
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGE("Listen is failed, bluetooth is off!");
-            return -1;
+            return SPPStatus::SPP_FAILURE;
         }
 
         bluetooth::Uuid serverUuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits());
-        fd_ = proxy_->Listen(name_,
-            serverUuid,
-            (int32_t)getSecurityFlags(),
-            (int32_t)type_);
+
+        if (!proxy_) {
+            HILOGE("SppServerSocket:Listen: proxy_ is nullptr");
+            return SPPStatus::SPP_FAILURE;
+        }
+
+        fd_ = proxy_->Listen(name_, serverUuid, (int32_t)getSecurityFlags(), (int32_t)type_);
 
         if (fd_ == -1) {
             HILOGE("Listen is failed, bluetooth is off!");
-            return -1;
+            return SPPStatus::SPP_FAILURE;
         }
 
         if (socketStatus_ == SOCKET_INIT) {
@@ -386,7 +414,7 @@ struct SppServerSocket::impl {
             close(fd_);
         }
 
-        return 0;
+        return SPPStatus::SPP_SUCCESS;
     }
 
     int getSecurityFlags()
@@ -411,7 +439,7 @@ struct SppServerSocket::impl {
         setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time, sizeof(time));
 
         acceptFd_ = RecvSocketFd();
-        HILOGE("RecvSocketFd acceptFd: %{public}d",acceptFd_);
+        HILOGE("RecvSocketFd acceptFd: %{public}d", acceptFd_);
         if (acceptFd_ <= 0) {
             return nullptr;
         }
@@ -449,19 +477,19 @@ struct SppServerSocket::impl {
 #endif
         if (rv == -1) {
             HILOGE("[sock] recvmsg error  %{public}d,  fd: %{public}d", errno, fd_);
-            return -1;
+            return SPPStatus::SPP_FAILURE;
         }
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
         if ((cmptr != NULL) && (cmptr->cmsg_len == CMSG_LEN(sizeof(int)))) {
             if (cmptr->cmsg_level != SOL_SOCKET || cmptr->cmsg_type != SCM_RIGHTS) {
                 HILOGE("[sock] control level: %{public}d", cmptr->cmsg_level);
                 HILOGE("[sock] control type: %{public}d", cmptr->cmsg_type);
-                return -1;
+                return SPPStatus::SPP_FAILURE;
             }
             clientFd = *((int *)CMSG_DATA(cmptr));
         } else {
 
-            return -1;
+            return SPPStatus::SPP_FAILURE;
         }
         uint8_t recvBuf[rv];
         memset(&recvBuf, 0, sizeof(recvBuf));
@@ -504,7 +532,6 @@ struct SppServerSocket::impl {
         return socketServiceType_;
     }
 
-
     class BluetoothServerSocketDeathRecipient;
     sptr<BluetoothServerSocketDeathRecipient> deathRecipient_;
 
@@ -518,7 +545,6 @@ struct SppServerSocket::impl {
     int acceptFd_;
     std::string acceptAddress_;
     std::string socketServiceType_{""};
-
 };
 
 class SppServerSocket::impl::BluetoothServerSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -527,35 +553,41 @@ public:
     ~BluetoothServerSocketDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothServerSocketDeathRecipient);
 
-    void OnRemoteDied(const wptr<IRemoteObject>& remote) final {
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
+    {
         HILOGI("SppServerSocket::impl::BluetoothServerSocketDeathRecipient::OnRemoteDied starts");
         host_.proxy_ = nullptr;
     }
+
 private:
     SppServerSocket::impl &host_;
 };
 
 SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType type, bool auth)
-        : uuid_(uuid), type_(type), auth_(auth), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
-    {
-        HILOGI("SppServerSocket::impl::impl(4 parameters) starts");
-        sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    : uuid_(uuid), type_(type), auth_(auth), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
+{
+    HILOGI("SppServerSocket::impl::impl(4 parameters) starts");
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
-        sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-        sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SPP);
+    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SPP);
 
-        if(!remote){
-            HILOGI("SppServerSocket::impl:impl() failed: no remote");
-        }
-        HILOGI("SppServerSocket::impl:impl() remote obtained");
-
-        proxy_ = iface_cast<IBluetoothSocket>(remote);
-
-        deathRecipient_ = new BluetoothServerSocketDeathRecipient(*this);
-        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-
+    if (!remote) {
+        HILOGI("SppServerSocket::impl:impl() failed: no remote");
     }
+    HILOGI("SppServerSocket::impl:impl() remote obtained");
+
+    proxy_ = iface_cast<IBluetoothSocket>(remote);
+
+    if (!proxy_) {
+        HILOGI("SppServerSocket::impl:impl() failed: no proxy_");
+        return;
+    }
+
+    deathRecipient_ = new BluetoothServerSocketDeathRecipient(*this);
+    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+}
 
 SppServerSocket::SppServerSocket(const std::string &name, UUID uuid, SppSocketType type, bool auth)
     : pimpl(new SppServerSocket::impl(name, uuid, type, auth))
@@ -587,7 +619,6 @@ const std::string &SppServerSocket::GetStringTag()
     HILOGI("SppServerSocket::GetStringTag:() starts");
     return pimpl->GetStringTag();
 }
-
 
 SppClientSocket *SocketFactory::BuildInsecureRfcommDataSocketByServiceRecord(
     const BluetoothRemoteDevice &device, const UUID &uuid)
@@ -625,5 +656,5 @@ SppServerSocket *SocketFactory::DataListenRfcommByServiceRecord(const std::strin
     return new SppServerSocket(name, uuid, TYPE_RFCOMM, true);
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

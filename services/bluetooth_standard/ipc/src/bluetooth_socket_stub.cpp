@@ -19,17 +19,14 @@
 #include "parcel_bt_uuid.h"
 //#include "bluetooth_errorcode.h"
 
-
 namespace OHOS {
 namespace Bluetooth {
-    
+
 BluetoothSocketStub::BluetoothSocketStub()
 {
     HILOGD("%{public}s start.", __func__);
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothSocket::Code::SOCKET_CONNECT)] =
-        &BluetoothSocketStub::ConnectInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothSocket::Code::SOCKET_LISTEN)] =
-        &BluetoothSocketStub::ListenInner;
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothSocket::Code::SOCKET_CONNECT)] = &BluetoothSocketStub::ConnectInner;
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothSocket::Code::SOCKET_LISTEN)] = &BluetoothSocketStub::ListenInner;
 }
 
 BluetoothSocketStub::~BluetoothSocketStub()
@@ -38,9 +35,8 @@ BluetoothSocketStub::~BluetoothSocketStub()
     memberFuncMap_.clear();
 }
 
-
-int32_t BluetoothSocketStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                           MessageOption &option)
+int32_t BluetoothSocketStub::OnRemoteRequest(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothSocketStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
 
@@ -77,7 +73,7 @@ ErrCode BluetoothSocketStub::ConnectInner(MessageParcel &data, MessageParcel &re
     if (!ret) {
         HILOGE("BluetoothSocketStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
-    }    
+    }
 
     return NO_ERROR;
 }
@@ -96,9 +92,9 @@ ErrCode BluetoothSocketStub::ListenInner(MessageParcel &data, MessageParcel &rep
     if (!ret) {
         HILOGE("BluetoothSocketStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
-    }    
+    }
 
     return NO_ERROR;
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

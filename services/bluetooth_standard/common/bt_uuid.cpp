@@ -138,7 +138,7 @@ Uuid Uuid::ConvertFromMostAndLeastBit(uint64_t mostSigBits, uint64_t leastSigBit
     }
 
     for (int i = division; i < UUID128_BYTES_TYPE; i++) {
-        tmp.uuid_[i] = (leastSigBits >> (BASE_BIT_OPT_SIZE * (division - i - 1))) & 0xFF;
+        tmp.uuid_[i] = (leastSigBits >> (BASE_BIT_OPT_SIZE * (2*division - i - 1))) & 0xFF;
     }
 
     return tmp;

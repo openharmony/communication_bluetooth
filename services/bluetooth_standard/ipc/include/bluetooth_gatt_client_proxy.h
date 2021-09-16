@@ -24,21 +24,22 @@ namespace Bluetooth {
 
 class BluetoothGattClientProxy : public IRemoteProxy<IBluetoothGattClient> {
 public:
-    explicit BluetoothGattClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothGattClient>(impl) {}
-    ~BluetoothGattClientProxy() {}
+    explicit BluetoothGattClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothGattClient>(impl)
+    {}
+    ~BluetoothGattClientProxy()
+    {}
 
-    int RegisterApplication(
-        const sptr<IBluetoothGattClientCallback>& callback, 
-        const BluetoothRawAddress& addr, int32_t transport) override;
+    int RegisterApplication(const sptr<IBluetoothGattClientCallback> &callback, const BluetoothRawAddress &addr,
+        int32_t transport) override;
     int DeregisterApplication(int32_t appId) override;
     int Connect(int32_t appId, bool autoConnect) override;
     int Disconnect(int32_t appId) override;
     int DiscoveryServices(int32_t appId) override;
-    int ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic& characteristic) override;
-    int WriteCharacteristic(int32_t appId, BluetoothGattCharacteristic* characteristic, bool withoutRespond) override;
-    int SignedWriteCharacteristic(int32_t appId, BluetoothGattCharacteristic* characteristic) override;
-    int ReadDescriptor(int32_t appId, const BluetoothGattDescriptor& descriptor) override;
-    int WriteDescriptor(int32_t appId, BluetoothGattDescriptor* descriptor) override;
+    int ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic &characteristic) override;
+    int WriteCharacteristic(int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond) override;
+    int SignedWriteCharacteristic(int32_t appId, BluetoothGattCharacteristic *characteristic) override;
+    int ReadDescriptor(int32_t appId, const BluetoothGattDescriptor &descriptor) override;
+    int WriteDescriptor(int32_t appId, BluetoothGattDescriptor *descriptor) override;
     int RequestExchangeMtu(int32_t appId, int32_t mtu) override;
     void GetAllDevice(std::vector<BluetoothGattDevice> &devices) override;
     int RequestConnectionPriority(int32_t appId, int32_t connPriority) override;
@@ -47,6 +48,6 @@ public:
 private:
     static inline BrokerDelegator<BluetoothGattClientProxy> delegator_;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_GATT_CLIENT_PROXY_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_GATT_CLIENT_PROXY_H

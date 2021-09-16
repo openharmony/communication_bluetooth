@@ -35,6 +35,6 @@ public:
     virtual int Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) = 0;
     virtual int Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) = 0;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_SOCKET_INTERFACE_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_SOCKET_INTERFACE_H
