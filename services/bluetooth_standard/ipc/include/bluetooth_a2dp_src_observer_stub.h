@@ -23,14 +23,17 @@
 
 namespace OHOS {
 namespace Bluetooth {
-    
+
 class BluetoothA2dpSrcObserverStub : public IRemoteStub<IBluetoothA2dpSrcObserver> {
 public:
-    BluetoothA2dpSrcObserverStub() {}
-    ~BluetoothA2dpSrcObserverStub() {}
+    BluetoothA2dpSrcObserverStub()
+    {}
+    ~BluetoothA2dpSrcObserverStub()
+    {}
 
-    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                    MessageOption &option) override;
+    virtual int32_t OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
     ErrCode OnPlayingStateChangedInner(MessageParcel &data, MessageParcel &reply);
 };

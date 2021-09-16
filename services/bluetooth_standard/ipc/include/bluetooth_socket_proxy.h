@@ -23,8 +23,10 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothSocketProxy : public IRemoteProxy<IBluetoothSocket> {
 public:
-    explicit BluetoothSocketProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothSocket>(impl) {}
-    ~BluetoothSocketProxy() {}
+    explicit BluetoothSocketProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothSocket>(impl)
+    {}
+    ~BluetoothSocketProxy()
+    {}
 
     int Connect(std::string &addr, bluetooth::Uuid &uuid, int securityFlag, int type) override;
     int Listen(std::string &name, bluetooth::Uuid &uuid, int securityFlag, int type) override;
@@ -32,6 +34,6 @@ public:
 private:
     static inline BrokerDelegator<BluetoothSocketProxy> delegator_;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_SOCKET_PROXY_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_SOCKET_PROXY_H

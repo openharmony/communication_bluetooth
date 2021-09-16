@@ -21,7 +21,8 @@
 namespace OHOS {
 namespace Bluetooth {
 
-bool BluetoothGattCharacteristic::Marshalling(Parcel &parcel) const {
+bool BluetoothGattCharacteristic::Marshalling(Parcel &parcel) const
+{
     if (!parcel.WriteUint16(handle_)) {
         return false;
     }
@@ -40,19 +41,20 @@ bool BluetoothGattCharacteristic::Marshalling(Parcel &parcel) const {
     if (!parcel.WriteUint32(length_)) {
         return false;
     }
-    for(size_t i = 0; i < length_; i++) {
+    for (size_t i = 0; i < length_; i++) {
         if (!parcel.WriteUint8(value_[i])) {
             return false;
         }
     }
-    if (!parcel.WriteUint32(uuid_.ConvertTo32Bits())) {
+    BluetoothUuid *bt_uuid = new BluetoothUuid(uuid_);
+    if (!parcel.WriteParcelable(bt_uuid)) {
         return false;
     }
     int des_num = descriptors_.size();
     if (!parcel.WriteInt32(des_num)) {
         return false;
     }
-    for(int j = 0; j < des_num; j++) {
+    for (int j = 0; j < des_num; j++) {
         if (!parcel.WriteUint16(descriptors_[j].handle_)) {
             return false;
         }
@@ -62,19 +64,21 @@ bool BluetoothGattCharacteristic::Marshalling(Parcel &parcel) const {
         if (!parcel.WriteUint32(descriptors_[j].length_)) {
             return false;
         }
-        for(size_t k = 0; k < descriptors_[j].length_; k++) {
+        for (size_t k = 0; k < descriptors_[j].length_; k++) {
             if (!parcel.WriteUint8(descriptors_[j].value_[k])) {
                 return false;
             }
         }
-        if (!parcel.WriteUint32(descriptors_[j].uuid_.ConvertTo32Bits())) {
+        BluetoothUuid *de_bt_uuid = new BluetoothUuid(descriptors_[j].uuid_);
+        if (!parcel.WriteParcelable(de_bt_uuid)) {
             return false;
         }
     }
     return true;
 }
 
-BluetoothGattCharacteristic* BluetoothGattCharacteristic::Unmarshalling(Parcel &parcel) {
+BluetoothGattCharacteristic *BluetoothGattCharacteristic::Unmarshalling(Parcel &parcel)
+{
     bool noError = true;
     uint16_t handle;
     if (!parcel.ReadUint16(handle)) {
@@ -101,17 +105,17 @@ BluetoothGattCharacteristic* BluetoothGattCharacteristic::Unmarshalling(Parcel &
         noError = false;
     }
     uint8_t value_v[length];
-    for(size_t i = 0; i < length; i++) {
-        if(!parcel.ReadUint8(value_v[i])) {
+    for (size_t i = 0; i < length; i++) {
+        if (!parcel.ReadUint8(value_v[i])) {
             noError = false;
         }
     }
-    uint32_t uuid;
-    if (!parcel.ReadUint32(uuid)) {
-        noError = false;
+    BluetoothUuid *bt_uuid = parcel.ReadParcelable<BluetoothUuid>();
+    if (!bt_uuid) {
+        return nullptr;
     }
-    BluetoothGattCharacteristic* characteristic = new BluetoothGattCharacteristic(
-        Characteristic(bluetooth::Uuid::ConvertFrom32Bits(uuid), handle, properties, permissions, value_v, length));
+    BluetoothGattCharacteristic *characteristic = new BluetoothGattCharacteristic(
+        Characteristic((bluetooth::Uuid)(*bt_uuid), handle, properties, permissions, value_v, length));
     characteristic->endHandle_ = endHandle;
     characteristic->valueHandle_ = valueHandle;
     int des_num;
@@ -119,8 +123,7 @@ BluetoothGattCharacteristic* BluetoothGattCharacteristic::Unmarshalling(Parcel &
         uint16_t des_handle;
         int des_permissions;
         size_t des_length;
-        uint32_t des_uuid;
-        for(int j = 0; j < des_num; j++) {
+        for (int j = 0; j < des_num; j++) {
             if (!parcel.ReadUint16(des_handle)) {
                 noError = false;
             }
@@ -131,16 +134,18 @@ BluetoothGattCharacteristic* BluetoothGattCharacteristic::Unmarshalling(Parcel &
                 noError = false;
             }
             uint8_t des_value[des_length];
-            for(size_t k = 0; k < des_length; k++) {
+            for (size_t k = 0; k < des_length; k++) {
                 if (!parcel.ReadUint8(des_value[k])) {
                     noError = false;
                 }
             }
-            if (!parcel.ReadUint32(des_uuid)) {
-                noError = false;
+            BluetoothUuid *de_bt_uuid = parcel.ReadParcelable<BluetoothUuid>();
+            if (!de_bt_uuid) {
+                delete characteristic;
+                return nullptr;
             }
             bluetooth::Descriptor desc = bluetooth::Descriptor(
-                bluetooth::Uuid::ConvertFrom32Bits(des_uuid), des_handle, des_permissions, des_value, des_length);
+                (bluetooth::Uuid)(*de_bt_uuid), des_handle, des_permissions, des_value, des_length);
             characteristic->descriptors_.push_back(desc);
         }
     } else {
@@ -153,11 +158,13 @@ BluetoothGattCharacteristic* BluetoothGattCharacteristic::Unmarshalling(Parcel &
     return characteristic;
 }
 
-bool BluetoothGattCharacteristic::writeToParcel(Parcel &parcel) {
+bool BluetoothGattCharacteristic::writeToParcel(Parcel &parcel)
+{
     return Marshalling(parcel);
 }
 
-bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel) {
+bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel)
+{
     bool noError = true;
     uint16_t handle;
     if (parcel.ReadUint16(handle)) {
@@ -191,7 +198,7 @@ bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel) {
     }
     int len;
     if (parcel.ReadInt32(len)) {
-        for(int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             if (parcel.ReadUint8(value_[i])) {
                 i += 0;
             } else {
@@ -221,7 +228,7 @@ bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel) {
         std::unique_ptr<uint8_t[]> des_value;
         size_t des_length;
         uint32_t des_uuid;
-        for(int j = 0; j < des_num; j++) {
+        for (int j = 0; j < des_num; j++) {
             if (parcel.ReadUint16(des_handle)) {
                 j += 0;
             } else {
@@ -233,7 +240,7 @@ bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel) {
                 noError = false;
             }
             if (parcel.ReadInt32(des_len)) {
-                for(k = 0; k < des_len; k++) {
+                for (k = 0; k < des_len; k++) {
                     if (parcel.ReadUint8(des_value[k])) {
                         k += 0;
                     } else {
@@ -258,12 +265,11 @@ bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel) {
                 bluetooth::Uuid::ConvertFrom32Bits(des_uuid), des_handle, des_permissions, par_value, des_length);
             descriptors_.push_back(desc);
         }
-    }
-    else {
+    } else {
         noError = false;
     }
     return noError;
 }
 
-} // namespace bluetooth
-} // namespace polaris
+}  // namespace Bluetooth
+}  // namespace OHOS

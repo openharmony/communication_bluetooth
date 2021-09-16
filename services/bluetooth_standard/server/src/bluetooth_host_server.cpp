@@ -160,7 +160,7 @@ public:
             impl_->observers_.ForEach([transport, state](sptr<IBluetoothHostObserver> observer) {
                 observer->OnStateChanged(transport, state);
             });
-        } else {
+        } else if (transport == BTTransport::ADAPTER_BLE) {
             impl_->bleObservers_.ForEach([transport, state](sptr<IBluetoothHostObserver> observer) {
                 observer->OnStateChanged(transport, state);
             });

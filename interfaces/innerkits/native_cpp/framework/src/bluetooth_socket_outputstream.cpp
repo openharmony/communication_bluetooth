@@ -45,5 +45,5 @@ size_t OutputStream::Write(const char *buf, const size_t length)
     return ret;
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

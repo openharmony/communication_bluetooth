@@ -21,7 +21,8 @@
 namespace OHOS {
 namespace Bluetooth {
 BluetoothGattServerStub::BluetoothGattServerStub()
-{   HILOGD("%{public}s start.", __func__);
+{
+    HILOGD("%{public}s start.", __func__);
     memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerStub::Code::GATT_SERVER_ADD_SERVICE)] =
         &BluetoothGattServerStub::AddServiceInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerStub::Code::GATT_SERVER_CLEAR_SERVICES)] =
@@ -45,14 +46,14 @@ BluetoothGattServerStub::BluetoothGattServerStub()
     memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerStub::Code::GATT_SERVER_RESPOND_DESCRIPTOR_WRITE)] =
         &BluetoothGattServerStub::RespondDescriptorWriteInner;
 }
-    
+
 BluetoothGattServerStub::~BluetoothGattServerStub()
 {
     HILOGD("%{public}s start.", __func__);
     memberFuncMap_.clear();
 }
-int BluetoothGattServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                                        MessageOption &option)
+int BluetoothGattServerStub::OnRemoteRequest(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothGattServerStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
     std::u16string descriptor = BluetoothGattServerStub::GetDescriptor();
@@ -76,7 +77,7 @@ ErrCode BluetoothGattServerStub::AddServiceInner(MessageParcel &data, MessagePar
 {
     int32_t appID = data.ReadInt32();
     BluetoothGattService *services = data.ReadParcelable<BluetoothGattService>();
-    int result = AddService(appID,services);
+    int result = AddService(appID, services);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
@@ -105,7 +106,7 @@ ErrCode BluetoothGattServerStub::RegisterApplicationInner(MessageParcel &data, M
     const sptr<IBluetoothGattServerCallback> callback = OHOS::iface_cast<IBluetoothGattServerCallback>(remote);
     int result = RegisterApplication(callback);
     bool ret = reply.WriteInt32(result);
-    if (!ret){
+    if (!ret) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
@@ -116,93 +117,99 @@ ErrCode BluetoothGattServerStub::DeregisterApplicationInner(MessageParcel &data,
     int appId = data.ReadInt32();
     int result = DeregisterApplication(appId);
     bool ret = reply.WriteInt32(result);
-    if (!ret){
+    if (!ret) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
 }
-ErrCode BluetoothGattServerStub::NotifyClientInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattServerStub::NotifyClientInner(MessageParcel &data, MessageParcel &reply)
+{
     const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
     BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
     bool needConfirm = data.ReadBool();
-    int result = NotifyClient(*device,characteristic,needConfirm);
+    int result = NotifyClient(*device, characteristic, needConfirm);
     delete device;
     delete characteristic;
     bool ret = reply.WriteInt32(result);
-    if (!ret){
+    if (!ret) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
 }
-ErrCode BluetoothGattServerStub::RemoveServiceInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattServerStub::RemoveServiceInner(MessageParcel &data, MessageParcel &reply)
+{
     int appId = data.ReadInt32();
     const BluetoothGattService *services = data.ReadParcelable<BluetoothGattService>();
-    int result = RemoveService(appId,*services);
+    int result = RemoveService(appId, *services);
     delete services;
     bool ret = reply.WriteInt32(result);
-    if (!ret){
+    if (!ret) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
 }
-ErrCode BluetoothGattServerStub::RespondCharacteristicReadInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattServerStub::RespondCharacteristicReadInner(MessageParcel &data, MessageParcel &reply)
+{
     const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
     BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
     int ret1 = data.ReadInt32();
-    int result = RespondCharacteristicRead(*device,characteristic,ret1);
+    int result = RespondCharacteristicRead(*device, characteristic, ret1);
     delete device;
     delete characteristic;
     bool ret2 = reply.WriteInt32(result);
-    if (!ret2){
+    if (!ret2) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
 }
-ErrCode BluetoothGattServerStub::RespondCharacteristicWriteInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattServerStub::RespondCharacteristicWriteInner(MessageParcel &data, MessageParcel &reply)
+{
     const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
     const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
     int ret1 = data.ReadInt32();
-    int result = RespondCharacteristicWrite(*device,*characteristic,ret1);
+    int result = RespondCharacteristicWrite(*device, *characteristic, ret1);
     delete device;
     delete characteristic;
     bool ret2 = reply.WriteInt32(result);
-    if (!ret2){
+    if (!ret2) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
 }
-ErrCode BluetoothGattServerStub::RespondDescriptorReadInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattServerStub::RespondDescriptorReadInner(MessageParcel &data, MessageParcel &reply)
+{
     const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
     BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
     int ret1 = data.ReadInt32();
-    int result = RespondDescriptorRead(*device,descriptor,ret1);
+    int result = RespondDescriptorRead(*device, descriptor, ret1);
     delete device;
     delete descriptor;
     bool ret2 = reply.WriteInt32(result);
-    if (!ret2){
+    if (!ret2) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
 }
-ErrCode BluetoothGattServerStub::RespondDescriptorWriteInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattServerStub::RespondDescriptorWriteInner(MessageParcel &data, MessageParcel &reply)
+{
     const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
     BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
     int ret1 = data.ReadInt32();
-    int result = RespondDescriptorWrite(*device,*descriptor,ret1);
+    int result = RespondDescriptorWrite(*device, *descriptor, ret1);
     delete device;
     delete descriptor;
     bool ret2 = reply.WriteInt32(result);
-    if (!ret2){
+    if (!ret2) {
         HILOGE("BluetoothGattServerStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

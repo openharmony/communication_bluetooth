@@ -24,15 +24,16 @@ namespace Bluetooth {
 
 class BluetoothA2dpSourceServer : public BluetoothA2dpSrcStub {
 public:
-    BluetoothA2dpSourceServer() {}
-    ~BluetoothA2dpSourceServer() {}
+    BluetoothA2dpSourceServer()
+    {}
+    ~BluetoothA2dpSourceServer()
+    {}
 
     void Init();
     void Destroy();
     int GetDeviceState(const RawAddress &device) override;
     void RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer) override;
-
 };
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_A2DP_SOURCE_SERVER_H

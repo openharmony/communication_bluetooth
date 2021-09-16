@@ -37,6 +37,6 @@ public:
     virtual int GetDeviceState(const RawAddress &device) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer) = 0;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_A2DP_INTERFACE_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_A2DP_INTERFACE_H

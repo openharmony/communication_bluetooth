@@ -45,16 +45,13 @@ public:
 
     void OnPlayingStateChanged(const RawAddress &device, int playingState, int error) override
     {
-		observers_.ForEach(
-            [device, playingState, error](std::shared_ptr<BluetoothA2dpSrcObserver> observer) {
-                observer->OnPlayingStateChanged(BluetoothRemoteDevice(device.GetAddress(),0), playingState, error);
-            }
-        );
+        observers_.ForEach([device, playingState, error](std::shared_ptr<BluetoothA2dpSrcObserver> observer) {
+            observer->OnPlayingStateChanged(BluetoothRemoteDevice(device.GetAddress(), 0), playingState, error);
+        });
     }
 
 private:
     BluetoothObserverList<BluetoothA2dpSrcObserver> observers_;
-    
 };
 
 struct BluetoothA2dpSrc::impl {
@@ -64,15 +61,15 @@ struct BluetoothA2dpSrc::impl {
         sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
-        if(!hostRemote){
+        if (!hostRemote) {
             HILOGI("BluetoothA2dpSrc::impl:impl() failed: no hostRemote");
             return;
         }
 
-        sptr<IBluetoothHost> hostProxy  = iface_cast<IBluetoothHost>(hostRemote);
+        sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
         sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_A2DP_SRC);
 
-        if(!remote){
+        if (!remote) {
             HILOGI("BluetoothA2dpSrc::impl:impl() failed: no remote");
             return;
         }
@@ -82,17 +79,19 @@ struct BluetoothA2dpSrc::impl {
         observerImp_ = new BluetoothA2dpSourceObserverImp();
 
         proxy_->RegisterObserver(observerImp_);
-        
     }
-    ~impl() {}
+    ~impl()
+    {}
 
     sptr<IBluetoothA2dpSrc> proxy_;
     sptr<BluetoothA2dpSourceObserverImp> observerImp_;
 };
 
 BluetoothA2dpSrc BluetoothA2dpSrc::a2dpSrcProfile_;
-BluetoothA2dpSrc::BluetoothA2dpSrc() : pimpl(std::make_unique<impl>()) {}
-BluetoothA2dpSrc::~BluetoothA2dpSrc() {}
+BluetoothA2dpSrc::BluetoothA2dpSrc() : pimpl(std::make_unique<impl>())
+{}
+BluetoothA2dpSrc::~BluetoothA2dpSrc()
+{}
 
 BluetoothA2dpSrc &BluetoothA2dpSrc::GetProfile()
 {
@@ -114,5 +113,5 @@ void BluetoothA2dpSrc::DeregisterObserver(std::shared_ptr<BluetoothA2dpSrcObserv
     pimpl->observerImp_->Deregister(observer);
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

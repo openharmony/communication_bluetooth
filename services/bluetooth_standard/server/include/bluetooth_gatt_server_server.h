@@ -23,31 +23,32 @@
 #include "bluetooth_types.h"
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothGattServerServer : public BluetoothGattServerStub   {
+class BluetoothGattServerServer : public BluetoothGattServerStub {
 public:
     BluetoothGattServerServer();
     ~BluetoothGattServerServer() override;
 
-    int AddService(int32_t appId, BluetoothGattService* services) override;
+    int AddService(int32_t appId, BluetoothGattService *services) override;
     void ClearServices(int appId) override;
-    void CancelConnection(const BluetoothGattDevice& device) override;
+    void CancelConnection(const BluetoothGattDevice &device) override;
     int RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback) override;
     int DeregisterApplication(int32_t appId) override;
     int NotifyClient(
-        const BluetoothGattDevice& device,BluetoothGattCharacteristic* characteristic, bool needConfirm) override;
-    int RemoveService(int32_t appId, const BluetoothGattService& services) override;
+        const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, bool needConfirm) override;
+    int RemoveService(int32_t appId, const BluetoothGattService &services) override;
     int RespondCharacteristicRead(
-                    const BluetoothGattDevice& device,BluetoothGattCharacteristic* characteristic,int32_t ret) override;
+        const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, int32_t ret) override;
     int RespondCharacteristicWrite(
-            const BluetoothGattDevice& device,const BluetoothGattCharacteristic& characteristic,int32_t ret) override;
+        const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int32_t ret) override;
     int RespondDescriptorRead(
-                        const BluetoothGattDevice& device,BluetoothGattDescriptor* descriptor, int32_t ret) override;
+        const BluetoothGattDevice &device, BluetoothGattDescriptor *descriptor, int32_t ret) override;
     int RespondDescriptorWrite(
-                    const BluetoothGattDevice& device,const BluetoothGattDescriptor& descriptor, int32_t ret) override;
+        const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor, int32_t ret) override;
+
 private:
     BLUETOOTH_DECLARE_IMPL();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothGattServerServer);
 };
-}// namespace Bluetooth
-}// namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_A2DP_SOURCE_SERVER_H

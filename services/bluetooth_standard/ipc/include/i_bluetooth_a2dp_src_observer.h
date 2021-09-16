@@ -31,6 +31,6 @@ public:
 
     virtual void OnPlayingStateChanged(const RawAddress &device, int playingState, int error) = 0;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_A2DP_SRC_OBSERVER_INTERFACE_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_A2DP_SRC_OBSERVER_INTERFACE_H
