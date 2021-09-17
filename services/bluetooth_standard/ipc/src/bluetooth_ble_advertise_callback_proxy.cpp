@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 BluetoothBleAdvertiseCallbackProxy::BluetoothBleAdvertiseCallbackProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IBluetoothBleAdvertiseCallback>(impl)
 {}
@@ -105,6 +104,5 @@ ErrCode BluetoothBleAdvertiseCallbackProxy::InnerTransact(
         }
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

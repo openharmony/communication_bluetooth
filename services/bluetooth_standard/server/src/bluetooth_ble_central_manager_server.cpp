@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include <string>
 #include "bluetooth_ble_central_manager_server.h"
 #include "ble_service_data.h"
 #include "bluetooth_log.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
 #include "remote_observer_list.h"
+#include <string>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -34,7 +34,7 @@ public:
     {
         HILOGI("BleCentralManageCallback::OnScanCallback start.");
 
-        observers_->ForEach([result](IBluetoothBleCentralManageCallback *observer) {
+        observers_->ForEach([result](IBluetoothBleCentralManagerCallback *observer) {
             HILOGI("BleCentralManageCallback::OnScanCallback:Address= %{public}s",
                 result.GetPeripheralDevice().GetRawAddress().GetAddress().c_str());
 
@@ -83,7 +83,7 @@ public:
     {
         HILOGI("BleCentralManageCallback::OnBleBatchScanResultsEvent start.");
 
-        observers_->ForEach([results](IBluetoothBleCentralManageCallback *observer) {
+        observers_->ForEach([results](IBluetoothBleCentralManagerCallback *observer) {
             std::vector<BluetoothBleScanResult> bleScanResults;
 
             for (auto iter = results.begin(); iter != results.end(); iter++) {
@@ -100,8 +100,8 @@ public:
 
                 if (iter->GetPeripheralDevice().IsManufacturerData()) {
                     std::map<uint16_t, std::string> manuData = iter->GetPeripheralDevice().GetManufacturerData();
-                    for (auto it = manuData.begin(); it != manuData.end(); it++) {
-                        bleScanResult.AddManufacturerData(it->first, it->second);
+                    for (auto manuDataIter = manuData.begin(); manuDataIter != manuData.end(); manuDataIter++) {
+                        bleScanResult.AddManufacturerData(manuDataIter->first, manuDataIter->second);
                     }
                 }
 
@@ -109,16 +109,17 @@ public:
 
                 if (iter->GetPeripheralDevice().IsServiceUUID()) {
                     std::vector<Uuid> uuids = iter->GetPeripheralDevice().GetServiceUUID();
-                    for (auto it = uuids.begin(); it != uuids.end(); it++) {
-                        bleScanResult.AddServiceUuid(*it);
+                    for (auto serviceUuidIter = uuids.begin(); serviceUuidIter != uuids.end(); serviceUuidIter++) {
+                        bleScanResult.AddServiceUuid(*serviceUuidIter);
                     }
                 }
 
                 if (iter->GetPeripheralDevice().IsServiceData()) {
                     std::vector<Uuid> uuids = iter->GetPeripheralDevice().GetServiceDataUUID();
                     int index = 0;
-                    for (auto it = uuids.begin(); it != uuids.end(); it++) {
-                        bleScanResult.AddServiceData(*it, iter->GetPeripheralDevice().GetServiceData(index));
+                    for (auto serviceDataIter = uuids.begin(); serviceDataIter != uuids.end(); serviceDataIter++) {
+                        bleScanResult.AddServiceData(
+                            *serviceDataIter, iter->GetPeripheralDevice().GetServiceData(index));
                         ++index;
                     }
                 }
@@ -138,16 +139,16 @@ public:
     {
         HILOGI("BleCentralManageCallback::OnStartScanFailed start.");
         observers_->ForEach(
-            [resultCode](IBluetoothBleCentralManageCallback *observer) { observer->OnStartScanFailed(resultCode); });
+            [resultCode](IBluetoothBleCentralManagerCallback *observer) { observer->OnStartScanFailed(resultCode); });
     }
 
-    void SetObserver(RemoteObserverList<IBluetoothBleCentralManageCallback> *observers)
+    void SetObserver(RemoteObserverList<IBluetoothBleCentralManagerCallback> *observers)
     {
         observers_ = observers;
     }
 
 private:
-    RemoteObserverList<IBluetoothBleCentralManageCallback> *observers_;
+    RemoteObserverList<IBluetoothBleCentralManagerCallback> *observers_;
 };
 
 struct BluetoothBleCentralManagerServer::impl {
@@ -156,11 +157,11 @@ struct BluetoothBleCentralManagerServer::impl {
 
     /// sys state observer
     class SystemStateObserver;
-    std::unique_ptr<SystemStateObserver> systemStateObserver_{nullptr};
+    std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
-    RemoteObserverList<IBluetoothBleCentralManageCallback> observers_{};
+    RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
     std::unique_ptr<BleCentralManagerCallback> observerImp_{std::make_unique<BleCentralManagerCallback>()};
-    IAdapterBle *bleService_{nullptr};
+    IAdapterBle *bleService_ = nullptr;
 };
 
 class BluetoothBleCentralManagerServer::impl::SystemStateObserver : public ISystemStateObserver {
@@ -201,7 +202,7 @@ BluetoothBleCentralManagerServer::impl::~impl()
 
 BluetoothBleCentralManagerServer::BluetoothBleCentralManagerServer()
 {
-    pimpl = std::unique_ptr<impl>(new impl);
+    pimpl = std::make_unique<impl>();
     pimpl->observerImp_->SetObserver(&(pimpl->observers_));
     pimpl->systemStateObserver_ = std::make_unique<impl::SystemStateObserver>(pimpl.get());
     IAdapterManager::GetInstance()->RegisterSystemStateObserver(*(pimpl->systemStateObserver_));
@@ -260,7 +261,7 @@ void BluetoothBleCentralManagerServer::StopScan()
 }
 
 void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
-    const sptr<IBluetoothBleCentralManageCallback> &callback)
+    const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     HILOGI("BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback start.");
 
@@ -273,7 +274,7 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
 }
 
 void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
-    const sptr<IBluetoothBleCentralManageCallback> &callback)
+    const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     HILOGI("BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback start.");
 

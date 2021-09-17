@@ -21,10 +21,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothBleScanSettings : public Parcelable, public ::bluetooth::ScanSettings {
 public:
-    BluetoothBleScanSettings() = default;
+    explicit BluetoothBleScanSettings() = default;
     BluetoothBleScanSettings(const ::bluetooth::ScanSettings &other) : ::bluetooth::ScanSettings(other)
     {}
     BluetoothBleScanSettings(const BluetoothBleScanSettings &other) : ::bluetooth::ScanSettings(other)

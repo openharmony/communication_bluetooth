@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothBleAdvertiserData::Marshalling(Parcel &parcel) const
 {
     if (!WriteServiceUuids(parcel)) {
@@ -182,6 +181,5 @@ bool BluetoothBleAdvertiserData::ReadServiceData(std::map<bluetooth::Uuid, std::
     }
     return noError;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

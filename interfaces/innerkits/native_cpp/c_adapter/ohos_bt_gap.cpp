@@ -214,10 +214,6 @@ bool IsBleEnabled()
     return ret;
 }
 
-/**
- *  @brief Get local host bluetooth address
- *  @return @c Local host bluetooth address
- */
 bool GetLocalAddr(unsigned char *mac, unsigned int len)
 {
     if (mac == NULL || len < OHOS_BD_ADDR_LEN) {
@@ -230,28 +226,10 @@ bool GetLocalAddr(unsigned char *mac, unsigned int len)
 
     string localAddress = g_BluetoothHost->GetLocalAddress();
     GetAddrFromString(localAddress, mac);
-    HILOGI("adress: %02X:%02X:*:*:*:%02X", mac[0], mac[1], mac[5]);
+    HILOGI("address: %02X:%02X:*:*:*:%02X", mac[0], mac[1], mac[5]);
     return true;
 }
 
-/**
- *  @brief Get local host bluetooth name
- *  @param localName actual receiving device name
-           length - localName length, initail set length to zero, and call this func to set real length
- *  @return Local host bluetooth name
- */
-bool GetLocalName(unsigned char *localName, unsigned char *length)
-{
-    return false;
-}
-
-/**
- * @brief Set local device name.
- * @param localName Device name.
-          length device name length
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
 bool SetLocalName(unsigned char *localName, unsigned char length)
 {
     if (localName == NULL) {
@@ -269,115 +247,6 @@ bool SetLocalName(unsigned char *localName, unsigned char length)
     return ret;
 }
 
-/**
- * @brief Factory reset bluetooth service.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool BluetoothFactoryReset(void)
-{
-    return false;
-}
-
-/**
- * @brief Set device scan mode.
- * @param mode Scan mode.
- * @param duration Scan time, see details {@link GapBtScanMode}
- * @return special mode
- */
-int GetBtScanMode(void)
-{
-    return OHOS_GAP_SCAN_MODE_NONE;
-}
-
-/**
- * @brief Set device scan mode.
- * @param mode Scan mode, see details {@link GapBtScanMode}.
- * @param duration Scan time.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool SetBtScanMode(int mode, int duration)
-{
-    return false;
-}
-
-/*
- * @brief Get paired devices.
- * @param pairList - 按照maxPairNums申请的设备列表数组
-          maxPairNums - 指定需要获取的设备列表最大个数
-          realPairNums - 实际的配对设备列表个数
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool GetPariedDevicesNum(unsigned int *number)
-{
-    return false;
-}
-
-bool GetPairedDevicesList(PairedDeviceInfo *devInfo, int *number)
-{
-    return false;
-}
-
-/**
- * @brief Get device pair state.
- * @param device Remote device.
- * @return Returns device pair state. see detail {@link GapBtPairedState}
- */
-int GetPairState()
-{
-    return false;
-}
-
-/**
- * @brief Remove pair.
- * @param BdAddr Remote device address.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool RemovePair(const BdAddr addr)
-{
-    return false;
-}
-
-/**
- * @brief Remove all pairs.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool RemoveAllPairs(void)
-{
-    return false;
-}
-
-/**
- * @brief Check if device acl connected.
- * @param addr device address.
- * @return Returns <b>true</b> if device acl connected;
- *         returns <b>false</b> if device does not acl connect.
- */
-bool IsAclConnected(BdAddr addr)
-{
-    return false;
-}
-
-/**
- * @brief disconnect remote device acl connected.
- * @param addr device address.
- * @return Returns <b>true</b> if device acl connected;
- *         returns <b>false</b> if device does not acl connect.
- */
-bool DisconnectRemoteDevice(BdAddr *addr)
-{
-    return false;
-}
-
-/**
- * @brief 注册GAP回调函数。
- * @param func 回调函数原型，参考{@link BtGapCallBacks}。
- * @return 成功返回{@link OHOS_BT_STATUS_SUCCESS}，失败返回错误码，具体错误码含义参考{@link BtStatus}定义
- */
 int GapRegisterCallbacks(BtGapCallBacks *func)
 {
     HILOGI();

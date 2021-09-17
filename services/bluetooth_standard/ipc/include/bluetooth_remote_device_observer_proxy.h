@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothRemoteDeviceObserverproxy : public IRemoteProxy<IBluetoothRemoteDeviceOberver> {
+class BluetoothRemoteDeviceObserverproxy : public IRemoteProxy<IBluetoothRemoteDeviceObserver> {
 public:
     explicit BluetoothRemoteDeviceObserverproxy(const sptr<IRemoteObject> &impl);
     ~BluetoothRemoteDeviceObserverproxy();
@@ -40,7 +40,6 @@ private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothRemoteDeviceObserverproxy> delegator_;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_REMOTE_DEVICE_OBSERVER_PROXY_H

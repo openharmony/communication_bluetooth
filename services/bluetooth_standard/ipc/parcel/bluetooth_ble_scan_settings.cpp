@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothBleScanSettings::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteInt64(reportDelayMillis_)) {
@@ -70,6 +69,5 @@ bool BluetoothBleScanSettings::ReadFromParcel(Parcel &parcel)
     }
     return noError;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

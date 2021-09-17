@@ -79,7 +79,7 @@ public:
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
-        HILOGI("device:%02X:%02X:***:%02X, connect state: %{public}d",
+        HILOGI("device:%{public}02X:%{public}02X:***:%{public}02X, connect state: %{public}d",
             dev.remoteAddr.addr[0], dev.remoteAddr.addr[1], dev.remoteAddr.addr[5], state);
 
         if (state == static_cast<int>(BTConnectState::CONNECTED)) {
@@ -89,9 +89,10 @@ public:
                 HILOGW("device already in maps! connId: %{public}d", iter->first);
                 g_GattsCallback->connectServerCb(iter->first, serverId_, &dev.remoteAddr);
             } else {
-                g_MapConnectedDevice.insert(std::pair<int, struct ConnectedDevice>(g_connId++, dev));
+                g_MapConnectedDevice.insert(std::pair<int, struct ConnectedDevice>(g_connId, dev));
                 HILOGI("device connected. connId: %{public}d", g_connId);
                 g_GattsCallback->connectServerCb(g_connId, serverId_, &dev.remoteAddr);
+                g_connId++;
             }
         }
 
@@ -278,7 +279,16 @@ public:
 
     void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int result)
     {
-        HILOGI("");
+        HILOGI("result:%{public}d", result);
+        struct ConnectedDevice dev;
+        dev.serverId = serverId_;
+        GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
+
+        std::map<int, struct ConnectedDevice>::iterator iter;
+        iter = FindDeviceRecord(dev);
+        if (g_GattsCallback != NULL && g_GattsCallback->indicationSentCb != NULL) {
+            g_GattsCallback->indicationSentCb(iter->first, result);
+        }
     }
 
     void OnConnectionParameterChanged(
@@ -346,7 +356,7 @@ void GetAddrFromString(string in, unsigned char out[6]) {
 void GetAddrFromByte(unsigned char in[6], std::string &out)
 {
     char temp[18] = {0};
-    sprintf(temp, "%02x:%02x:%02x:%02x:%02x:%02x",
+    sprintf(temp, "%02X:%02X:%02X:%02X:%02X:%02X",
         in[0], in[1], in[2], in[3], in[4], in[5]);
     out = string(temp);
 }
@@ -492,7 +502,7 @@ int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number
  */
 int BleGattsAddIncludedService(int serverId, int srvcHandle, int includedHandle)
 {
-    return OHOS_BT_STATUS_FAIL;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -571,7 +581,7 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
     int desHandle = GATTSERVICES(serverId, srvcHandle).index++;
     GattDescriptor descriptor(uuid, desHandle, ConvertPermissions(permissions));
 
-    unsigned char stubValue[1] = {0x32};
+    unsigned char stubValue[2] = {0x01, 0x00};
     descriptor.SetValue(stubValue, sizeof(stubValue));
 
     characteristic.AddDescriptor(descriptor);
@@ -669,10 +679,15 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
     
     BluetoothRemoteDevice device(strAddress, 1);
+    // request id
     HILOGI("attrHandle: %{public}d", param->attrHandle);
 
-    GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
+    int ret = GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
         param->status, 0, (unsigned char *)param->value, param->valueLen);
+
+    if (g_GattsCallback != NULL && g_GattsCallback->responseConfirmationCb != NULL) {
+        g_GattsCallback->responseConfirmationCb(ret, param->attrHandle);
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -694,6 +709,10 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 
     struct ConnectedDevice value = iter->second;
 
+    HILOGI("device:%{public}02X:%{public}02X:%{public}02X:%{public}02X:%{public}02X:%{public}02X",
+            value.remoteAddr.addr[0], value.remoteAddr.addr[1], value.remoteAddr.addr[2],
+            value.remoteAddr.addr[3], value.remoteAddr.addr[4], value.remoteAddr.addr[5]);
+
     string strAddress;
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
     
@@ -714,6 +733,8 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
         appCharacteristic->GetPermissions(),
         appCharacteristic->GetProperties());
 
+    characteristic.SetValue((unsigned char*)param->value, param->valueLen);
+
     GATTSERVER(serverId)->NotifyCharacteristicChanged(device, characteristic,
         (param->confirm == 1) ? true : false);
     return OHOS_BT_STATUS_SUCCESS;
@@ -729,7 +750,7 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
  * @since 6
  */
 int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -763,7 +784,7 @@ int BleGattsRegisterCallbacks(BtGattServerCallbacks *func)
  * @since 6
  */
 int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -777,7 +798,7 @@ int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo) {
  * @since 6
  */
 int BleGattsStopServiceEx(int srvcHandle) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

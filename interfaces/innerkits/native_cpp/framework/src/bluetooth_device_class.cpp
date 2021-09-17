@@ -143,6 +143,5 @@ bool BluetoothDeviceClass::IsServiceSupported(int service) const
 {
     return ((class_ & BluetoothDevice::SERVICE_BITMASK & service) != 0);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

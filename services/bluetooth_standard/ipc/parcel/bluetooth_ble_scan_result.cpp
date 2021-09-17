@@ -14,10 +14,9 @@
  */
 
 #include "bluetooth_ble_scan_result.h"
-#include "bluetooth_log.h"
+
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothBleScanResult::Marshalling(Parcel &parcel) const
 {
     if (!WirteServiceUuidsToParcel(parcel)) {
@@ -195,6 +194,5 @@ bool BluetoothBleScanResult::ReadServiceDataFromParcel(Parcel &parcel)
     }
     return true;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

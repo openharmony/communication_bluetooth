@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class IBluetoothBleAdvertiseCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleAdvertiseCallback");

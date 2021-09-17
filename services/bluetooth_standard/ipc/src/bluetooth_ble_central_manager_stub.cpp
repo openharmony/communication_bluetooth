@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 const std::map<uint32_t, std::function<ErrCode(BluetoothBleCentralManagerStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleCentralManagerStub::interfaces_ = {
         {IBluetoothBleCentralManager::Code::BLE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK,
@@ -83,8 +82,8 @@ ErrCode BluetoothBleCentralManagerStub::RegisterBleCentralManagerCallbackInner(
     MessageParcel &data, MessageParcel &reply)
 {
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
-    const sptr<IBluetoothBleCentralManageCallback> callBack =
-        OHOS::iface_cast<IBluetoothBleCentralManageCallback>(remote);
+    const sptr<IBluetoothBleCentralManagerCallback> callBack =
+        OHOS::iface_cast<IBluetoothBleCentralManagerCallback>(remote);
     RegisterBleCentralManagerCallback(callBack);
     return NO_ERROR;
 }
@@ -93,8 +92,8 @@ ErrCode BluetoothBleCentralManagerStub::DeregisterBleCentralManagerCallbackInner
     MessageParcel &data, MessageParcel &reply)
 {
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
-    const sptr<IBluetoothBleCentralManageCallback> callBack =
-        OHOS::iface_cast<IBluetoothBleCentralManageCallback>(remote);
+    const sptr<IBluetoothBleCentralManagerCallback> callBack =
+        OHOS::iface_cast<IBluetoothBleCentralManagerCallback>(remote);
     DeregisterBleCentralManagerCallback(callBack);
     return NO_ERROR;
 }
@@ -122,6 +121,5 @@ ErrCode BluetoothBleCentralManagerStub::StopScanInner(MessageParcel &data, Messa
     StopScan();
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -153,6 +153,5 @@ ErrCode BluetoothHostObserverStub::OnDeviceAddrChangedInner(MessageParcel &data,
 
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

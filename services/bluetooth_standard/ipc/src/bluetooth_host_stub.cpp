@@ -925,8 +925,8 @@ ErrCode BluetoothHostStub::IsAclConnectedInner(MessageParcel &data, MessageParce
 ErrCode BluetoothHostStub::RegisterRemoteDeviceObserverInner(MessageParcel &data, MessageParcel &reply)
 {
     auto tempObject = data.ReadRemoteObject();
-    sptr<IBluetoothRemoteDeviceOberver> observer;
-    observer = iface_cast<IBluetoothRemoteDeviceOberver>(tempObject);
+    sptr<IBluetoothRemoteDeviceObserver> observer;
+    observer = iface_cast<IBluetoothRemoteDeviceObserver>(tempObject);
     RegisterRemoteDeviceObserver(observer);
     return NO_ERROR;
 }
@@ -934,8 +934,8 @@ ErrCode BluetoothHostStub::RegisterRemoteDeviceObserverInner(MessageParcel &data
 ErrCode BluetoothHostStub::DeregisterRemoteDeviceObserverInner(MessageParcel &data, MessageParcel &reply)
 {
     auto tempObject = data.ReadRemoteObject();
-    sptr<IBluetoothRemoteDeviceOberver> observer;
-    observer = iface_cast<IBluetoothRemoteDeviceOberver>(tempObject);
+    sptr<IBluetoothRemoteDeviceObserver> observer;
+    observer = iface_cast<IBluetoothRemoteDeviceObserver>(tempObject);
     DeregisterRemoteDeviceObserver(observer);
     return NO_ERROR;
 }
@@ -1169,6 +1169,5 @@ ErrCode BluetoothHostStub::DeregisterBlePeripheralCallbackInner(MessageParcel &d
     DeregisterBlePeripheralCallback(observer);
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

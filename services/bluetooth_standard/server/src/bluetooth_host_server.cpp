@@ -36,9 +36,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 using namespace bluetooth;
-
 struct BluetoothHostServer::impl {
     impl();
     ~impl();
@@ -73,14 +71,14 @@ struct BluetoothHostServer::impl {
     std::unique_ptr<BlePeripheralCallback> bleRemoteObserverImp_ = nullptr;
 
     /// user regist observers
-    RemoteObserverList<IBluetoothHostObserver> observers_{};
-    RemoteObserverList<IBluetoothHostObserver> bleObservers_{};
+    RemoteObserverList<IBluetoothHostObserver> observers_;
+    RemoteObserverList<IBluetoothHostObserver> bleObservers_;
 
     /// user regist remote observers
-    RemoteObserverList<IBluetoothRemoteDeviceOberver> remoteObservers_{};
+    RemoteObserverList<IBluetoothRemoteDeviceObserver> remoteObservers_;
 
     /// user regist remote observers
-    RemoteObserverList<IBluetoothBlePeripheralObserver> bleRemoteObservers_{};
+    RemoteObserverList<IBluetoothBlePeripheralObserver> bleRemoteObservers_;
 
     std::map<std::string, sptr<IRemoteObject>> servers_;
     std::map<std::string, sptr<IRemoteObject>> bleServers_;
@@ -143,7 +141,7 @@ public:
     }
 
 private:
-    BluetoothHostServer::impl *impl_{nullptr};
+    BluetoothHostServer::impl *impl_ = nullptr;
 };
 
 class BluetoothHostServer::impl::AdapterStateObserver : public IAdapterStateObserver {
@@ -168,7 +166,7 @@ public:
     };
 
 private:
-    BluetoothHostServer::impl *impl_{nullptr};
+    BluetoothHostServer::impl *impl_ = nullptr;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AdapterStateObserver);
 };
 
@@ -221,7 +219,7 @@ public:
     }
 
 private:
-    BluetoothHostServer::impl *impl_{nullptr};
+    BluetoothHostServer::impl *impl_ = nullptr;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AdapterClassicObserver);
 };
 class BluetoothHostServer::impl::ClassicRemoteDeviceObserver : public IClassicRemoteDeviceObserver {
@@ -231,7 +229,7 @@ public:
 
     void OnPairStatusChanged(const BTTransport transport, const RawAddress &device, const int32_t status) override
     {
-        impl_->remoteObservers_.ForEach([transport, device, status](IBluetoothRemoteDeviceOberver *observer) {
+        impl_->remoteObservers_.ForEach([transport, device, status](IBluetoothRemoteDeviceObserver *observer) {
             observer->OnPairStatusChanged(transport, device, status);
         });
     }
@@ -242,21 +240,21 @@ public:
         for (const auto &val : uuids) {
             btUuids.push_back(val);
         }
-        impl_->remoteObservers_.ForEach([device, btUuids](IBluetoothRemoteDeviceOberver *observer) {
+        impl_->remoteObservers_.ForEach([device, btUuids](IBluetoothRemoteDeviceObserver *observer) {
             observer->OnRemoteUuidChanged(device, btUuids);
         });
     }
 
     void OnRemoteNameChanged(const RawAddress &device, const std::string &deviceName) override
     {
-        impl_->remoteObservers_.ForEach([device, deviceName](IBluetoothRemoteDeviceOberver *observer) {
+        impl_->remoteObservers_.ForEach([device, deviceName](IBluetoothRemoteDeviceObserver *observer) {
             observer->OnRemoteNameChanged(device, deviceName);
         });
     }
 
     void OnRemoteAliasChanged(const RawAddress &device, const std::string &alias) override
     {
-        impl_->remoteObservers_.ForEach([device, alias](IBluetoothRemoteDeviceOberver *observer) {
+        impl_->remoteObservers_.ForEach([device, alias](IBluetoothRemoteDeviceObserver *observer) {
             observer->OnRemoteAliasChanged(device, alias);
         });
     }
@@ -264,18 +262,18 @@ public:
     void OnRemoteCodChanged(const RawAddress &device, int32_t cod) override
     {
         impl_->remoteObservers_.ForEach(
-            [device, cod](IBluetoothRemoteDeviceOberver *observer) { observer->OnRemoteCodChanged(device, cod); });
+            [device, cod](IBluetoothRemoteDeviceObserver *observer) { observer->OnRemoteCodChanged(device, cod); });
     }
 
     void OnRemoteBatteryLevelChanged(const RawAddress &device, const int32_t batteryLevel) override
     {
-        impl_->remoteObservers_.ForEach([device, batteryLevel](IBluetoothRemoteDeviceOberver *observer) {
+        impl_->remoteObservers_.ForEach([device, batteryLevel](IBluetoothRemoteDeviceObserver *observer) {
             observer->OnRemoteBatteryLevelChanged(device, batteryLevel);
         });
     }
 
 private:
-    BluetoothHostServer::impl *impl_{nullptr};
+    BluetoothHostServer::impl *impl_ = nullptr;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(ClassicRemoteDeviceObserver);
 };
 class BluetoothHostServer::impl::AdapterBleObserver : public IAdapterBleObserver {
@@ -331,7 +329,7 @@ public:
     {}
 
 private:
-    BluetoothHostServer::impl *impl_{nullptr};
+    BluetoothHostServer::impl *impl_ = nullptr;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AdapterBleObserver);
 };
 
@@ -355,7 +353,7 @@ public:
     }
 
 private:
-    BluetoothHostServer::impl *impl_{nullptr};
+    BluetoothHostServer::impl *impl_ = nullptr;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BlePeripheralCallback);
 };
 
@@ -461,7 +459,7 @@ void BluetoothHostServer::impl::createServers()
 
 BluetoothHostServer::BluetoothHostServer() : SystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, true)
 {
-    pimpl = std::unique_ptr<impl>(new impl);
+    pimpl = std::make_unique<impl>();
 }
 
 BluetoothHostServer::~BluetoothHostServer()
@@ -1174,7 +1172,7 @@ bool BluetoothHostServer::ReadRemoteRssiValue(const std::string &address)
     return false;
 }
 
-void BluetoothHostServer::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer)
+void BluetoothHostServer::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (observer == nullptr) {
@@ -1184,7 +1182,7 @@ void BluetoothHostServer::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemo
     pimpl->remoteObservers_.Register(observer);
 }
 
-void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer)
+void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (observer == nullptr) {
@@ -1242,6 +1240,5 @@ void BluetoothHostServer::DeregisterBlePeripheralCallback(const sptr<IBluetoothB
     }
     pimpl->bleRemoteObservers_.Deregister(observer);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

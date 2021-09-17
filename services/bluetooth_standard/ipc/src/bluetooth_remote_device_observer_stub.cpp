@@ -20,17 +20,17 @@ namespace OHOS {
 namespace Bluetooth {
 std::map<uint32_t, ErrCode (BluetoothRemoteDeviceObserverstub::*)(MessageParcel &data, MessageParcel &reply)>
     BluetoothRemoteDeviceObserverstub::memberFuncMap_ = {
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS),
+        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS),
             &BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID),
+        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID),
             &BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME),
+        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME),
             &BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_ALIAS_CHANGED),
+        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_ALIAS_CHANGED),
             &BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD),
+        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD),
             &BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL),
+        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL),
             &BluetoothRemoteDeviceObserverstub::OnRemoteBatteryLevelChangedInner},
 };
 
@@ -119,6 +119,5 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteBatteryLevelChangedInner(Mess
     OnRemoteBatteryLevelChanged(*result, batteryLevel);
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

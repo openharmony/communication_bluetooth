@@ -23,9 +23,9 @@
 namespace OHOS {
 namespace Bluetooth {
 
-class IBluetoothBleCentralManageCallback : public OHOS::IRemoteBroker {
+class IBluetoothBleCentralManagerCallback : public OHOS::IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleCentralManageCallback");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleCentralManagerCallback");
 
     enum Code {
         BT_BLE_CENTRAL_MANAGER_CALLBACK = 0,
