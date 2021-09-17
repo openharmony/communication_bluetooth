@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 const std::map<uint32_t, std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleAdvertiseCallbackStub::memberFuncMap_ = {
         {IBluetoothBleAdvertiseCallback::Code::BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT,
@@ -82,6 +81,5 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner(MessageParcel
     OnAutoStopAdvEvent(advHandle);
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

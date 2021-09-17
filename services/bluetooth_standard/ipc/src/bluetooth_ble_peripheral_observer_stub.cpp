@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 std::map<uint32_t, ErrCode (BluetoothBlePeripheralObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
     BluetoothBlePeripheralObserverStub::memberFuncMap_ = {
         {static_cast<uint32_t>(IBluetoothBlePeripheralObserver::Code::BLE_ON_READ_REMOTE_RSSI_EVENT),
@@ -81,6 +80,5 @@ ErrCode BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner(MessageParc
     OnPairStatusChanged(transport, *device, status);
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

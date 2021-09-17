@@ -20,17 +20,16 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 const std::map<uint32_t,
     std::function<ErrCode(BluetoothBleCentralManagerCallBackStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleCentralManagerCallBackStub::memberFuncMap_ = {
-        {IBluetoothBleCentralManageCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK,
+        {IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK,
             std::bind(&BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
-        {IBluetoothBleCentralManageCallback::Code::BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK,
+        {IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK,
             std::bind(&BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
-        {IBluetoothBleCentralManageCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED,
+        {IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED,
             std::bind(&BluetoothBleCentralManagerCallBackStub::OnStartScanFailedInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
 };
@@ -102,6 +101,5 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnStartScanFailedInner(MessagePa
     OnStartScanFailed(resultCode);
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -26,10 +26,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 sptr<BluetoothHostProxy> GetHostProxy()
 {
-
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> remote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
@@ -393,6 +391,5 @@ bool BluetoothRemoteDevice::ReadRemoteRssiValue()
     }
     return hostProxy->ReadRemoteRssiValue(address_);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

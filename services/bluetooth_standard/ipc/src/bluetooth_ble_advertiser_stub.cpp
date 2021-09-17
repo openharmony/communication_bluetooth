@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 const std::map<uint32_t, std::function<ErrCode(BluetoothBleAdvertiserStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleAdvertiserStub::interfaces_ = {
         {IBluetoothBleAdvertiser::Code::BLE_REGISTER_BLE_ADVERTISER_CALLBACK,

@@ -21,60 +21,57 @@
 #include "i_bluetooth_ble_advertiser.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+
 #include <memory>
 
 namespace OHOS {
 namespace Bluetooth {
-
 using namespace bluetooth;
 
 struct BleAdvertiser::impl {
     impl();
     ~impl();
+    class BluetoothBleAdvertiserCallbackImp : public BluetoothBleAdvertiseCallbackStub {
+    public:
+        BluetoothBleAdvertiserCallbackImp(BleAdvertiser::impl &bleAdvertiser) : bleAdvertiser_(bleAdvertiser){};
+        ~BluetoothBleAdvertiserCallbackImp()
+        {}
 
-    class BluetoothBleAdvertiserCallbackImp;
-    sptr<BluetoothBleAdvertiserCallbackImp> callbackImp_ = nullptr;
-
-    BluetoothObserverMap<BleAdvertiseCallback> callbacks_ {};
-    sptr<IBluetoothBleAdvertiser> proxy_ = nullptr;
-};
-
-class BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp : public BluetoothBleAdvertiseCallbackStub {
-public:
-    BluetoothBleAdvertiserCallbackImp(BleAdvertiser::impl &bleAdvertiser) : bleAdvertiser_(bleAdvertiser){};
-    ~BluetoothBleAdvertiserCallbackImp()
-    {}
-
-    void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) override
-    {
-        HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnStartResultEvent");
-        bleAdvertiser_.callbacks_.ForEach(
-            [result, advHandle](int32_t handle, BleAdvertiseCallback *observer) {
-                if (advHandle == handle) {
-                    observer->OnStartResultEvent(result);
+        void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) override
+        {
+            HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnStartResultEvent");
+            bleAdvertiser_.callbacks_.ForEach(
+                [result, advHandle](int32_t handle, BleAdvertiseCallback *observer) {
+                    if (advHandle == handle) {
+                        observer->OnStartResultEvent(result);
+                    }
+                },
+                advHandle);
+            if ((opcode == BLE_ADV_STOP_COMPLETE_OP_CODE && result == 0) || opcode == BLE_ADV_START_FAILED_OP_CODE) {
+                BleAdvertiseCallback *observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
+                if (observer != nullptr) {
+                    bleAdvertiser_.callbacks_.Deregister(observer);
                 }
-            },
-            advHandle);
-        if ((opcode == BLE_ADV_STOP_COMPLETE_OP_CODE && result == 0) || opcode == BLE_ADV_START_FAILED_OP_CODE) {
+            }
+        }
+
+        void OnAutoStopAdvEvent(int32_t advHandle) override
+        {
+            HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnAutoStopAdvEvent advHandle");
             BleAdvertiseCallback *observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
             if (observer != nullptr) {
                 bleAdvertiser_.callbacks_.Deregister(observer);
             }
         }
-    }
 
-    void OnAutoStopAdvEvent(int32_t advHandle) override
-    {
-        HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnAutoStopAdvEvent advHandle");
-        BleAdvertiseCallback *observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
-        if (observer != nullptr) {
-            bleAdvertiser_.callbacks_.Deregister(observer);
-        }
-    }
+    private:
+        BleAdvertiser::impl &bleAdvertiser_;
+        BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleAdvertiserCallbackImp);
+    };
+    sptr<BluetoothBleAdvertiserCallbackImp> callbackImp_ = nullptr;
 
-private:
-    BleAdvertiser::impl &bleAdvertiser_;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleAdvertiserCallbackImp);
+    BluetoothObserverMap<BleAdvertiseCallback> callbacks_{};
+    sptr<IBluetoothBleAdvertiser> proxy_ = nullptr;
 };
 
 BleAdvertiser::impl::impl()

@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothBleAdvertiserStub : public IRemoteStub<IBluetoothBleAdvertiser> {
-
 public:
     BluetoothBleAdvertiserStub();
     ~BluetoothBleAdvertiserStub() override;
@@ -45,7 +44,6 @@ private:
     ErrCode CloseInner(MessageParcel &data, MessageParcel &reply);
     ErrCode GetAdvertiserHandleInner(MessageParcel &data, MessageParcel &reply);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 

@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 BluetoothBlePeripheralObserverProxy::BluetoothBlePeripheralObserverProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IBluetoothBlePeripheralObserver>(impl)
 {}
@@ -117,6 +116,5 @@ ErrCode BluetoothBlePeripheralObserverProxy::InnerTransact(
         }
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

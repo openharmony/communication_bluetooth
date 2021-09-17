@@ -21,10 +21,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothBleAdvertiserSettings : public Parcelable, public ::bluetooth::AdvertiserSettings {
 public:
-    BluetoothBleAdvertiserSettings() = default;
+    explicit BluetoothBleAdvertiserSettings() = default;
     BluetoothBleAdvertiserSettings(const ::bluetooth::AdvertiserSettings &other)
         : ::bluetooth::AdvertiserSettings(other)
     {}

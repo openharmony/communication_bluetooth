@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothBleCentralManagerCallBackProxy : public IRemoteProxy<IBluetoothBleCentralManageCallback> {
+class BluetoothBleCentralManagerCallBackProxy : public IRemoteProxy<IBluetoothBleCentralManagerCallback> {
 public:
     BluetoothBleCentralManagerCallBackProxy(const sptr<IRemoteObject> &impl);
     ~BluetoothBleCentralManagerCallBackProxy() override;
@@ -35,7 +35,6 @@ private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothBleCentralManagerCallBackProxy> delegator_;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif

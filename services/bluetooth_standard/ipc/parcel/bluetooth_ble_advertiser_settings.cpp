@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothBleAdvertiserSettings::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteBool(connectable_)) {
@@ -79,6 +78,5 @@ bool BluetoothBleAdvertiserSettings::ReadFromParcel(Parcel &parcel)
     }
     return noError;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -23,8 +23,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
-class BluetoothRemoteDeviceObserverstub : public IRemoteStub<IBluetoothRemoteDeviceOberver> {
+class BluetoothRemoteDeviceObserverstub : public IRemoteStub<IBluetoothRemoteDeviceObserver> {
 public:
     explicit BluetoothRemoteDeviceObserverstub();
     ~BluetoothRemoteDeviceObserverstub() override;
@@ -43,7 +42,6 @@ private:
         memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothRemoteDeviceObserverstub);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_REMOTE_DEVICE_OBSERVER_STUB_H

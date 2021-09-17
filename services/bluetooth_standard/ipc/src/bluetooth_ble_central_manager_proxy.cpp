@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 BluetoothBleCentralManagerProxy::BluetoothBleCentralManagerProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IBluetoothBleCentralManager>(impl)
 {}
@@ -28,7 +27,7 @@ BluetoothBleCentralManagerProxy::~BluetoothBleCentralManagerProxy()
 {}
 
 void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(
-    const sptr<IBluetoothBleCentralManageCallback> &callback)
+    const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -50,7 +49,7 @@ void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(
 }
 
 void BluetoothBleCentralManagerProxy::DeregisterBleCentralManagerCallback(
-    const sptr<IBluetoothBleCentralManageCallback> &callback)
+    const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -147,6 +146,5 @@ ErrCode BluetoothBleCentralManagerProxy::InnerTransact(
         }
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

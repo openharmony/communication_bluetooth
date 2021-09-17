@@ -17,7 +17,7 @@
 #define BLUETOOTH_STANDARD_BLUETOOTH_BLE_PERIPHERAL_OBSERVER_STUB_H
 
 #include "i_bluetooth_ble_peripheral_observer.h"
-#include "i_bluetooth_host.h"
+
 #include "iremote_stub.h"
 #include <map>
 
@@ -40,7 +40,6 @@ private:
         memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothBlePeripheralObserverStub);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_STANDARD_BLUETOOTH_BLE_PERIPHERAL_OBSERVER_STUB_H

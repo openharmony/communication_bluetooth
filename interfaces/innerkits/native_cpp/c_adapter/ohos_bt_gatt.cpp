@@ -173,7 +173,7 @@ int DisableBtStack(void) {
  * @since 6
  */
 int SetDeviceName(const char *name, unsigned int len) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -187,8 +187,7 @@ int SetDeviceName(const char *name, unsigned int len) {
  */
 int BleSetAdvData(int advId, const BleConfigAdvData *data)
 {
-    //TODO
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -202,8 +201,7 @@ int BleSetAdvData(int advId, const BleConfigAdvData *data)
  */
 int BleStartAdv(int advId, const BleAdvParams *param)
 {
-    //TODO
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -235,7 +233,7 @@ int BleStopAdv(int advId)
  * @since 6
  */
 int BleUpdateAdv(int advId, const BleAdvParams *param) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -247,7 +245,7 @@ int BleUpdateAdv(int advId, const BleAdvParams *param) {
  * @since 6
  */
 int BleSetSecurityIoCap(BleIoCapMode mode) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -259,7 +257,7 @@ int BleSetSecurityIoCap(BleIoCapMode mode) {
  * @since 6
  */
 int BleSetSecurityAuthReq(BleAuthReqMode mode) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -273,7 +271,7 @@ int BleSetSecurityAuthReq(BleAuthReqMode mode) {
  * @since 6
  */
 int BleGattSecurityRsp(BdAddr bdAddr, bool accept) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -286,7 +284,7 @@ int BleGattSecurityRsp(BdAddr bdAddr, bool accept) {
  * @since 6
  */
 int ReadBtMacAddr(unsigned char *mac, unsigned int len) {
-    return OHOS_BT_STATUS_SUCCESS;
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
@@ -312,6 +310,7 @@ int BleSetScanParameters(int clientId, BleScanParams *param)
  */
 int BleStartScan(void)
 {
+    HILOGI("");
     if (g_BleCentralManager == NULL) {
         return 1;
     }
@@ -372,6 +371,7 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
  * @since 6
  */
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam) {
+    HILOGI("enter");
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
         if (g_BleAdvCallbacks[i] == NULL) {
@@ -408,8 +408,6 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
             scanResponse.push_back(rawData.rspData[i]);
         }
     }
-
-    HILOGI("advData size: %{pubic}d, %{public}d", advData.size(), scanResponse.size());
 
     advHandle->StartAdvertising(settings, advData, scanResponse, *g_BleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;

@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef OHOS_BT_GAP_H
 #define OHOS_BT_GAP_H
 
@@ -23,18 +22,7 @@
 extern "C" {
 #endif
 
-#define SERVICE_LIMITED_DISCOVERABILITY 0x002000
-#define SERVICE_POSITIONING 0x010000
-#define SERVICE_NETWORKING 0x020000
-#define SERVICE_RENDER 0x040000
-#define SERVICE_CAPTURE 0x080000
-#define SERVICE_OBJECT_TRANSFER 0x100000
-#define SERVICE_AUDIO 0x200000
-#define SERVICE_TELEPHONY 0x400000
-#define SERVICE_INFORMATION 0x800000
-
 #define OHOS_BD_NAME_LEN 32
-
 typedef struct {
     BdAddr addr;
     unsigned char deviceName[OHOS_BD_NAME_LEN]; /* Name of the device record, must be in UTF-8 */
@@ -93,253 +81,207 @@ typedef enum {
     OHOS_GAP_PAIR_PAIRED = 0x03
 } GapBtPairedState;
 
+/**
+ * @brief Enable ble.
+ *
+ * @return Returns <b>true</b> if the operation is accepted;
+ *         returns <b>false</b> if the operation is rejected.
+ */
 bool EnableBle(void);
 
+/**
+ * @brief Disable ble.
+ *
+ * @return Returns <b>true</b> if the operation is accepted;
+ *         returns <b>false</b> if the operation is rejected.
+ */
 bool DisableBle(void);
 
+/**
+ * @brief Enable classic.
+ *
+ * @return Returns <b>true</b> if the operation is accepted;
+ *         returns <b>false</b> if the operation is rejected.
+ */
 bool EnableBt(void);
 
+/**
+ * @brief Disable classic.
+ *
+ * @return Returns <b>true</b> if the operation is accepted;
+ *         returns <b>false</b> if the operation is rejected.
+ */
 bool DisableBt(void);
 
+/**
+ * @brief Get classic enable/disable state.
+ *
+ * @return Returns classic enable/disable state, {@link BtStackState}.
+ */
 int GetBtState();
 
+/**
+ * @brief Get ble enable/disable state.
+ *
+ * @return Returns <b>true</b> if ble is enabled;
+ *         returns <b>false</b> if ble is not enabled.
+ */
 bool IsBleEnabled();
 
 /**
- *  @brief Get local host bluetooth address
- *  @return @c Local host bluetooth address
+ * @brief Get local host bluetooth address.
+ * 
+ * @return Returns <b>true</b> if the operation is accepted;
+ *         returns <b>false</b> if the operation is rejected.
  */
-// BdAddr* GetLocalAddress(void);
 bool GetLocalAddr(unsigned char *mac, unsigned int len);
-/**
- *  @brief Get local host bluetooth name
- *  @param localName actual receiving device name
-           length - localName length, initail set length to zero, and call this func to set real length
- *  @return Local host bluetooth name
- */
-bool GetLocalName(unsigned char *localName, unsigned char *length);
 
 /**
  * @brief Set local device name.
+ * 
  * @param localName Device name.
-          length device name length
+ * @param length localName length, The maximum length of the name is {@link OHOS_BD_NAME_LEN}.
  * @return Returns <b>true</b> if the operation is successful;
  *         returns <b>false</b> if the operation fails.
  */
 bool SetLocalName(unsigned char *localName, unsigned char length);
 
 /**
- * @brief Factory reset bluetooth service.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool BluetoothFactoryReset(void);
-
-/**
- * @brief Set device scan mode.
- * @param mode Scan mode.
- * @param duration Scan time, see details {@link GapBtScanMode}
- * @return special mode
- */
-int GetBtScanMode(void);
-
-/**
- * @brief Set device scan mode.
- * @param mode Scan mode, see details {@link GapBtScanMode}.
- * @param duration Scan time.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool SetBtScanMode(int mode, int duration);
-
-/*
- * @brief Get paired devices.
- * @param pairList - 按照maxPairNums申请的设备列表数组
-          maxPairNums - 指定需要获取的设备列表最大个数
-          realPairNums - 实际的配对设备列表个数
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool GetPariedDevicesNum(unsigned int *number);
-
-bool GetPairedDevicesList(PairedDeviceInfo *devInfo, int *number);
-
-/**
- * @brief Get device pair state.
- * @param device Remote device.
- * @return Returns device pair state. see detail {@link GapBtPairedState}
- */
-int GetPairState();
-
-/**
- * @brief Remove pair.
- * @param BdAddr Remote device address.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool RemovePair(const BdAddr addr);
-
-/**
- * @brief Remove all pairs.
- * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
- */
-bool RemoveAllPairs(void);
-
-/**
- * @brief Check if device acl connected.
- * @param addr device address.
- * @return Returns <b>true</b> if device acl connected;
- *         returns <b>false</b> if device does not acl connect.
- */
-bool IsAclConnected(BdAddr addr);
-
-/**
- * @brief disconnect remote device acl connected.
- * @param addr device address.
- * @return Returns <b>true</b> if device acl connected;
- *         returns <b>false</b> if device does not acl connect.
- */
-bool DisconnectRemoteDevice(BdAddr *addr);
-
-/**
- * @brief Adapter state change function. 开关蓝牙的callback上报
- * @param transport Transport type when state change.
- *        OHOS_BT_TRANSPORT_BR_EDR : classic;
- *        OHOS_BT_TRANSPORT_LE : ble.
- *        detail see {@link BtTransportId}
- * @param state Change to the new state 
- *        details see {@link BtStackState}.
+ * @brief Gap state changed callback.
+ * 
+ * @param transport Transport type when state change, details see {@link BtTransportId}
+ * @param status Change to the new state, details see {@link BtStackState}.
  */
 typedef void (*GapStateChangedCallback)(const int transport, const int status);
 
 /**
- * @brief ACL state change callback
- * @param BtGapAclState - details of acl state changed
- * @param reason - clarify detals of REASON CODE from stack - If possible, suggest using the standard HCI error code.
- * @return void
+ * @brief ACL state changed callback.
+ * 
+ * @param bdAddr device address.
+ * @param state details of acl state changed.
+ * @param reason clarify detals of REASON CODE from stack - If possible, suggest using the standard HCI error code.
  */
 typedef void (*GapAclStateChangedCallback)(const BdAddr *bdAddr, GapAclState state, unsigned int reason);
 
 /**
- * @brief Discovery state changed observer.
+ * @brief Discovery state changed callback.
+ * 
  * @param status DISCOVERY_STARTED/DISCOVERYING/DISCOVERY_STOPED
- * @return void
  */
 typedef void (*GapDiscoveryStateChangedCallback)(int status);
 
 /**
  * @brief Discovery state changed observer.
+ * 
  * @param status Device discovery status.
- * @return void
  */
 typedef void (*GapDiscoveryResultCallback)(const BdAddr *bdAddr);
 
 /**
  * @brief Pair request observer.
+ * 
  * @param bdAddr Remote device address.
- * @return void
  */
 typedef void (*GapPairRequestedCallback)(const BdAddr *bdAddr);
 
 /**
  * @brief Pair confirmed observer.
- * @param BdAddr Remote device address.
+ * 
+ * @param bdAddr Remote device address.
  * @param reqType Pair type.
  * @param number Paired passkey.
- * @return void
  */
 typedef void (*GapPairConfirmedCallback)(const BdAddr *bdAddr, int reqType, int number);
 
 /**
  * @brief Scan mode changed observer.
+ * 
  * @param mode Device scan mode.
- * @return void
  */
 typedef void (*GapScanModeChangedCallback)(int mode);
 
 /**
  * @brief Device name changed observer.
+ * 
  * @param deviceName Device name.
- * @return void
  */
 typedef void (*GapLocalDeviceNameChangedCallback)(const unsigned char *deviceName, unsigned char length);
 
 /**
  * @brief Device address changed observer.
+ * 
  * @param bdAddr Device address.
- * @return void
  */
 typedef void (*GapLocalDeviceAddrChangedCallback)(const BdAddr *bdAddr);
 
 /**
  * @brief Pair status changed observer.
+ * 
  * @param bdAddr Device address.
  * @param status Remote device pair status.
- * @return void
  */
 typedef void (*GapPairStatusChangedCallback)(const BdAddr *bdAddr, int status);
 
 /**
  * @brief Remote uuid changed observer.
+ * 
  * @param bdAddr Device address.
  * @param uuid Remote device uuids.
- * @return void
  */
 typedef void (*GapRemoteUuidChangedCallback)(const BdAddr *bdAddr, BtUuid uuid);
 
 /**
  * @brief Remote name changed observer.
+ * 
  * @param bdAddr Device address.
  * @param deviceName Remote device name.
- * @return void
  */
 typedef void (*GapRemoteNameChangedCallback)(const BdAddr *bdAddr,
     const unsigned char *deviceName, unsigned char length);
 
 /**
  * @brief Remote alias changed observer.
+ * 
  * @param bdAddr Device address.
  * @param alias Remote device alias.
- * @return void
  */
 typedef void (*GapRemoteAliasChangedCallback)(const BdAddr *bdAddr, const unsigned char *alias, unsigned char length);
 
 /**
  * @brief Remote cod changed observer.
+ * 
  * @param bdAddr Device address.
  * @param cod Remote device cod.
- * @return void
  */
 typedef void (*GapRemoteCodChangedCallback)(const BdAddr *bdAddr, int cod);
 
 /**
  * @brief Remote battery level changed observer.
+ * 
  * @param bdAddr Device address.
  * @param cod Remote device battery Level.
- * @return void
  */
 typedef void (*GapRemoteBatteryLevelChangedCallback)(const BdAddr *bdAddr, int batteryLevel);
 
 /**
  * @brief Remote rssi event observer.
+ * 
  * @param bdAddr Device address.
  * @param rssi Remote device rssi.
  * @param status Read status.
- * @return void
  */
 typedef void (*GapReadRemoteRssiEventCallback)(const BdAddr *bdAddr, int rssi, int status);
 
 /**
  * @brief Query application whether to accept the connection.
+ * 
  * @param bdAddr Device address.
  * @param res Application decision, 0 is reject, 1 is accept.
- * @return void
  */
 typedef void (*GapIsAcceptConnOnSafeModeCallback)(const BdAddr *bdAddr, bool *res);
 
 /**
- * @brief GAP回调函数接口定义
+ * @brief Defines callbacks for the GAP
  */
 typedef struct {
     GapStateChangedCallback stateChangeCallback;
@@ -362,9 +304,10 @@ typedef struct {
 } BtGapCallBacks;
 
 /**
- * @brief 注册GAP回调函数。
- * @param func 回调函数原型，参考{@link BtGapCallBacks}。
- * @return 成功返回{@link OHOS_BT_STATUS_SUCCESS}，失败返回错误码，具体错误码含义参考{@link BtStatus}定义
+ * @brief Registers GAP callbacks.
+ * 
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the callbacks are registered;
+ * returns an error code defined in {@link BtStatus} otherwise.
  */
 int GapRegisterCallbacks(BtGapCallBacks *func);
 

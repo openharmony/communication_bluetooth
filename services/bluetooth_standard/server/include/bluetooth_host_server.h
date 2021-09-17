@@ -82,8 +82,8 @@ public:
     std::vector<sptr<BluetoothRawAddress>> GetPairedDevices(const int32_t transport) override;
     bool RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) override;
     bool RemoveAllPairs() override;
-    void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer) override;
-    void DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer) override;
+    void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) override;
+    void DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) override;
     int32_t GetBleMaxAdvertisingDataLength() override;
     int32_t GetPhonebookPermission(const std::string &address) override;
     bool SetPhonebookPermission(const std::string &address, int32_t permission) override;

@@ -257,6 +257,5 @@ ErrCode BluetoothHostObserverProxy::InnerTransact(
         }
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

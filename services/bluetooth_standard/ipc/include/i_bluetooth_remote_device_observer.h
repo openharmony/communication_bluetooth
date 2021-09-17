@@ -22,10 +22,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
-class IBluetoothRemoteDeviceOberver : public OHOS::IRemoteBroker {
+class IBluetoothRemoteDeviceObserver : public OHOS::IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothRemoteDeviceOberver");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothRemoteDeviceObserver");
 
     enum Code {
         BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS = 0,

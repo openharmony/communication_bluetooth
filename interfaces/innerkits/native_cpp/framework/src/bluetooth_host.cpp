@@ -18,10 +18,10 @@
 #include "bluetooth_ble_peripheral_observer_stub.h"
 #include "bluetooth_host_observer_stub.h"
 #include "bluetooth_host_proxy.h"
+#include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"
 #include "bluetooth_remote_device_observer_stub.h"
 
-#include "bluetooth_log.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include <memory>
@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 struct BluetoothHost::impl {
     impl();
     ~impl();
@@ -815,6 +814,5 @@ int BluetoothHost::GetBleMaxAdvertisingDataLength() const
     }
     return pimpl->proxy_->GetBleMaxAdvertisingDataLength();
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

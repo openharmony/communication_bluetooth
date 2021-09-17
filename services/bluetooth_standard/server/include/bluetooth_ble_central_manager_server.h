@@ -29,8 +29,8 @@ public:
     BluetoothBleCentralManagerServer();
     ~BluetoothBleCentralManagerServer() override;
 
-    virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManageCallback> &callback) override;
-    virtual void DeregisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManageCallback> &callback) override;
+    virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
+    virtual void DeregisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
     virtual void StartScan() override;
     virtual void StartScan(const BluetoothBleScanSettings &settings) override;
     virtual void StopScan() override;
