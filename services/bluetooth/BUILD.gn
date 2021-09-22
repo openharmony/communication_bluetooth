@@ -14,5 +14,7 @@
 import("//build/lite/config/component/lite_component.gni")
 
 lite_component("bluetooth") {
-  deps = [ "$ohos_board_adapter_dir/hals/communication/bluetooth/services:btservice" ]
+  deps = [
+    "$ohos_board_adapter_dir/hals/communication/bluetooth/services:btservice",
+  ]
 }
