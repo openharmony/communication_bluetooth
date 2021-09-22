@@ -36,7 +36,9 @@ void BluetoothGattServerCallbackProxy::OnCharacteristicReadRequest(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CHARACTERISTIC_READREQUEST, data, reply, option);
     if (error != NO_ERROR) {
@@ -66,7 +68,9 @@ void BluetoothGattServerCallbackProxy::OnConnectionStateChanged(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CONNECTIONSTATE_CHANGED, data, reply, option);
     if (error != NO_ERROR) {
@@ -91,7 +95,9 @@ void BluetoothGattServerCallbackProxy::OnAddService(int32_t ret, const Bluetooth
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error =
         Remote()->SendRequest(IBluetoothGattServerCallback::Code::GATT_SERVER_ON_ADD_SERVICE, data, reply, option);
     if (error != NO_ERROR) {
@@ -121,7 +127,9 @@ void BluetoothGattServerCallbackProxy::OnCharacteristicWriteRequest(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CHARACTERISTIC_WRITE_REQUEST, data, reply, option);
     if (error != NO_ERROR) {
@@ -147,7 +155,9 @@ void BluetoothGattServerCallbackProxy::OnDescriptorReadRequest(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattServerCallback::Code::GATT_SERVER_ON_DESCRIPTOR_READ_REQUEST, data, reply, option);
     if (error != NO_ERROR) {
@@ -173,7 +183,9 @@ void BluetoothGattServerCallbackProxy::OnDescriptorWriteRequest(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattServerCallback::Code::GATT_SERVER_ON_DESCRIPTOR_WRITE_REQUEST, data, reply, option);
     if (error != NO_ERROR) {
@@ -198,7 +210,9 @@ void BluetoothGattServerCallbackProxy::OnMtuChanged(const BluetoothGattDevice &d
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error =
         Remote()->SendRequest(IBluetoothGattServerCallback::Code::GATT_SERVER_ON_MTU_CHANGED, data, reply, option);
     if (error != NO_ERROR) {
@@ -228,7 +242,9 @@ void BluetoothGattServerCallbackProxy::OnNotifyConfirm(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error =
         Remote()->SendRequest(IBluetoothGattServerCallback::Code::GATT_SERVER_ON_NOTIFY_CONFIRM, data, reply, option);
     if (error != NO_ERROR) {
@@ -266,7 +282,9 @@ void BluetoothGattServerCallbackProxy::OnConnectionParameterChanged(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CONNECTION_PARAMETER_CHANGED, data, reply, option);
     if (error != NO_ERROR) {

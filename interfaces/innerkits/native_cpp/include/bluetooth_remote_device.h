@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BLUETOOTH_API BluetoothRemoteDevice {
 public:
     /// common

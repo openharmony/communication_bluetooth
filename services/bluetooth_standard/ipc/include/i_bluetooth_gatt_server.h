@@ -18,7 +18,6 @@
 
 #include "i_bluetooth_gatt_server_callback.h"
 #include "iremote_broker.h"
-// #include "parcel_bt_uuid.h"
 #include "../parcel/bluetooth_gatt_characteristic.h"
 #include "../parcel/bluetooth_gatt_descriptor.h"
 #include "../parcel/bluetooth_gatt_device.h"
@@ -26,7 +25,6 @@
 #include "gatt_data.h"
 namespace OHOS {
 namespace Bluetooth {
-
 class IBluetoothGattServer : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattServer");

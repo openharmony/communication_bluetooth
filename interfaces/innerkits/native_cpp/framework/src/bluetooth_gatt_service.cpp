@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 void GattService::AddCharacteristic(const GattCharacteristic &characteristic)
 {
     characteristics_.insert(characteristics_.end(), characteristic)->service_ = this;

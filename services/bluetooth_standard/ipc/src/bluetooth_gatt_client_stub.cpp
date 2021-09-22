@@ -287,6 +287,5 @@ ErrCode BluetoothGattClientStub::GetServicesInner(MessageParcel &data, MessagePa
     }
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

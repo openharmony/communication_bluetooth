@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace bluetooth;
-
 class BleCentralManagerCallback : public IBleCentralManagerCallback {
 public:
     BleCentralManagerCallback() = default;
@@ -160,7 +159,7 @@ struct BluetoothBleCentralManagerServer::impl {
     std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
     RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
-    std::unique_ptr<BleCentralManagerCallback> observerImp_{std::make_unique<BleCentralManagerCallback>()};
+    std::unique_ptr<BleCentralManagerCallback> observerImp_ = std::make_unique<BleCentralManagerCallback>();
     IAdapterBle *bleService_ = nullptr;
 };
 
@@ -186,7 +185,7 @@ public:
     };
 
 private:
-    BluetoothBleCentralManagerServer::impl *pimpl_{nullptr};
+    BluetoothBleCentralManagerServer::impl *pimpl_ = nullptr;
 };
 
 BluetoothBleCentralManagerServer::impl::impl()
@@ -285,6 +284,5 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
     }
     pimpl->observers_.Deregister(callback);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

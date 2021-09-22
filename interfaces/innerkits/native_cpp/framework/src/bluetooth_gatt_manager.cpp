@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 struct GattManager::impl {
 public:
     impl()
@@ -61,13 +60,13 @@ std::vector<BluetoothRemoteDevice> GattManager::GetDevicesByStates(
         stateSet.emplace(state);
     }
     std::vector<BluetoothRemoteDevice> result;
-    if (nullptr != pimpl->clientProxy_) {
+    if (pimpl->clientProxy_ != nullptr) {
         std::vector<BluetoothGattDevice> devices;
         pimpl->clientProxy_->GetAllDevice(devices);
         for (auto &item : devices) {
             if (stateSet.find(item.connectState_) != stateSet.end()) {
                 result.push_back(BluetoothRemoteDevice(item.addr_.GetAddress(),
-                    item.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR));
+                    item.transport_ == (GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)));
             }
         }
     }
@@ -77,18 +76,17 @@ std::vector<BluetoothRemoteDevice> GattManager::GetDevicesByStates(
 std::vector<BluetoothRemoteDevice> GattManager::GetConnectedDevices()
 {
     std::vector<BluetoothRemoteDevice> result;
-    if (nullptr != pimpl->clientProxy_) {
+    if (pimpl->clientProxy_ != nullptr) {
         std::vector<BluetoothGattDevice> device;
         pimpl->clientProxy_->GetAllDevice(device);
         for (auto &item : device) {
             if (item.connectState_ == static_cast<int>(BTConnectState::CONNECTED)) {
                 result.push_back(BluetoothRemoteDevice(item.addr_.GetAddress(),
-                    item.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR));
+                    item.transport_ == (GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)));
             }
         }
     }
     return result;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

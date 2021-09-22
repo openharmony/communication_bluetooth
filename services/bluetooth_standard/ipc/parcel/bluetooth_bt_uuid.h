@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief This class provides bluetooth uuid.
  *
@@ -65,7 +64,6 @@ public:
 
     static BluetoothUuid *Unmarshalling(Parcel &parcel);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 

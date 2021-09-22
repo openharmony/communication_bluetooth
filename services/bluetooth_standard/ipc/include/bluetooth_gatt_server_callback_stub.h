@@ -49,7 +49,6 @@ private:
 
     DISALLOW_COPY_AND_MOVE(BluetoothGattServerCallbackStub);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_GATT_SERVER_STUB_H

@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothGattDescriptor::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteUint16(handle_)) {
@@ -123,6 +122,5 @@ bool BluetoothGattDescriptor::readFromParcel(Parcel &parcel)
     }
     return noError;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

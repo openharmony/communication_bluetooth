@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService *services)
 {
     MessageParcel data;
@@ -39,7 +38,9 @@ int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService *se
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_ADD_SERVICE, data, reply, option);
     if (error != NO_ERROR) {
@@ -60,7 +61,9 @@ void BluetoothGattServerProxy::ClearServices(int appId)
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CLEAR_SERVICES, data, reply, option);
     if (error != NO_ERROR) {
@@ -81,7 +84,9 @@ void BluetoothGattServerProxy::CancelConnection(const BluetoothGattDevice &devic
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CANCEL_CONNECTION, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::CancelConnection done fail, error: %d", error);
@@ -102,7 +107,9 @@ int BluetoothGattServerProxy::RegisterApplication(const sptr<IBluetoothGattServe
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REGISTER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerProxy::RegisterApplication done fail, error: %d", error);
@@ -122,7 +129,9 @@ int BluetoothGattServerProxy::DeregisterApplication(int appId)
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_DEREGISTER, data, reply, option);
     if (error != NO_ERROR) {
@@ -152,7 +161,9 @@ int BluetoothGattServerProxy::NotifyClient(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_NOTIFY_CLIENT, data, reply, option);
     if (error != NO_ERROR) {
@@ -177,7 +188,9 @@ int BluetoothGattServerProxy::RemoveService(int32_t appId, const BluetoothGattSe
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REMOVE_SERVICE, data, reply, option);
     if (error != NO_ERROR) {
@@ -207,7 +220,9 @@ int BluetoothGattServerProxy::RespondCharacteristicRead(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
     int error =
         Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_READ, data, reply, option);
     if (error != NO_ERROR) {
@@ -237,7 +252,9 @@ int BluetoothGattServerProxy::RespondCharacteristicWrite(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE, data, reply, option);
     if (error != NO_ERROR) {
@@ -267,7 +284,9 @@ int BluetoothGattServerProxy::RespondDescriptorRead(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
     int error =
         Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_READ, data, reply, option);
     if (error != NO_ERROR) {
@@ -297,7 +316,9 @@ int BluetoothGattServerProxy::RespondDescriptorWrite(
         return ERROR;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
     int error =
         Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_WRITE, data, reply, option);
     if (error != NO_ERROR) {

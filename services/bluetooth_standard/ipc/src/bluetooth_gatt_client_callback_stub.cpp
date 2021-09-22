@@ -171,6 +171,5 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &d
     OnServicesChanged(service);
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS
