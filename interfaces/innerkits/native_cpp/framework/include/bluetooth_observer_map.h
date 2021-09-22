@@ -37,20 +37,20 @@ public:
     bool IsExistAdvertiserCallback(T *observer, int &handle);
 
 private:
-    std::mutex lock_{};
-    std::map<int, T *> observers_{};
+    std::mutex lock_;
+    std::map<int, T *> observers_;
 
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothObserverMap);
 };
 
-template <typename T>
+template<typename T>
 BluetoothObserverMap<T>::~BluetoothObserverMap()
 {
     std::lock_guard<std::mutex> lock(lock_);
     observers_.clear();
 }
 
-template <typename T>
+template<typename T>
 bool BluetoothObserverMap<T>::Register(int handle, T *observer)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -71,7 +71,7 @@ bool BluetoothObserverMap<T>::Register(int handle, T *observer)
     return true;
 }
 
-template <typename T>
+template<typename T>
 bool BluetoothObserverMap<T>::Deregister(T *observer)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -88,7 +88,7 @@ bool BluetoothObserverMap<T>::Deregister(T *observer)
     return false;
 }
 
-template <typename T>
+template<typename T>
 void BluetoothObserverMap<T>::ForEach(const std::function<void(uint8_t, T *)> &observer, int handle)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -99,7 +99,7 @@ void BluetoothObserverMap<T>::ForEach(const std::function<void(uint8_t, T *)> &o
     }
 }
 
-template <typename T>
+template<typename T>
 uint8_t BluetoothObserverMap<T>::GetAdvertiserHandle(T *observer)
 {
     uint8_t advHandle = bluetooth::BLE_INVALID_ADVERTISING_HANDLE;
@@ -118,7 +118,7 @@ uint8_t BluetoothObserverMap<T>::GetAdvertiserHandle(T *observer)
     return advHandle;
 }
 
-template <typename T>
+template<typename T>
 T *BluetoothObserverMap<T>::GetAdvertiserObserver(uint8_t advHandle)
 {
     auto it = observers_.begin();
@@ -131,7 +131,7 @@ T *BluetoothObserverMap<T>::GetAdvertiserObserver(uint8_t advHandle)
     return nullptr;
 }
 
-template <typename T>
+template<typename T>
 bool BluetoothObserverMap<T>::IsExistAdvertiserCallback(T *observer, int &handle)
 {
     bool isExtist = false;

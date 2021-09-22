@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothGattCharacteristic : public Parcelable, public ::bluetooth::Characteristic {
 public:
     BluetoothGattCharacteristic() = default;

@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothGattService::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteBool(isPrimary_)) {
@@ -630,6 +629,5 @@ bool BluetoothGattService::ServiceIteratorRead(std::vector<Service> &service, Pa
     }
     return noError;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

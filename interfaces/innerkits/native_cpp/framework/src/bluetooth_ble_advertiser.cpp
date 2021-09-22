@@ -70,7 +70,7 @@ struct BleAdvertiser::impl {
     };
     sptr<BluetoothBleAdvertiserCallbackImp> callbackImp_ = nullptr;
 
-    BluetoothObserverMap<BleAdvertiseCallback> callbacks_{};
+    BluetoothObserverMap<BleAdvertiseCallback> callbacks_;
     sptr<IBluetoothBleAdvertiser> proxy_ = nullptr;
 };
 
@@ -137,7 +137,6 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
         setting.SetInterval(settings.GetInterval());
         setting.SetLegacyMode(settings.IsLegacyMode());
         setting.SetTxPower(settings.GetTxPower());
-
         BluetoothBleAdvertiserData bleAdvertiserData;
         bleAdvertiserData.SetAdvFlag(advData.GetAdvFlag());
         std::map<uint16_t, std::string> manufacturerData = advData.GetManufacturerData();
@@ -146,15 +145,12 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
         }
         std::map<ParcelUuid, std::string> serviceData = advData.GetServiceData();
         for (auto it = serviceData.begin(); it != serviceData.end(); it++) {
-            Uuid uuid = Uuid::ConvertFromString(it->first.ToString());
-            bleAdvertiserData.AddServiceData(uuid, it->second);
+            bleAdvertiserData.AddServiceData(Uuid::ConvertFromString(it->first.ToString()), it->second);
         }
         std::vector<ParcelUuid> serviceUuids = advData.GetServiceUuids();
         for (auto it = serviceUuids.begin(); it != serviceUuids.end(); it++) {
-            Uuid uuid = Uuid::ConvertFromString(it->ToString());
-            bleAdvertiserData.AddServiceUuid(uuid);
+            bleAdvertiserData.AddServiceUuid(Uuid::ConvertFromString(it->ToString()));
         }
-
         BluetoothBleAdvertiserData bleScanResponse;
         manufacturerData = scanResponse.GetManufacturerData();
         for (auto it = manufacturerData.begin(); it != manufacturerData.end(); it++) {
@@ -162,15 +158,12 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
         }
         serviceData = scanResponse.GetServiceData();
         for (auto it = serviceData.begin(); it != serviceData.end(); it++) {
-            Uuid uuid = Uuid::ConvertFromString(it->first.ToString());
-            bleScanResponse.AddServiceData(uuid, it->second);
+            bleScanResponse.AddServiceData(Uuid::ConvertFromString(it->first.ToString()), it->second);
         }
         serviceUuids = scanResponse.GetServiceUuids();
         for (auto it = serviceUuids.begin(); it != serviceUuids.end(); it++) {
-            Uuid uuid = Uuid::ConvertFromString(it->ToString());
-            bleScanResponse.AddServiceUuid(uuid);
+            bleScanResponse.AddServiceUuid(Uuid::ConvertFromString(it->ToString()));
         }
-
         int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
         if (pimpl->callbacks_.IsExistAdvertiserCallback(&callback, advHandle)) {
             pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, false);
@@ -207,7 +200,6 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
         BluetoothBleAdvertiserData bleScanResponse;
         respPayload.assign(scanResponse.begin(), scanResponse.end());
         bleScanResponse.SetPayload(respPayload);
-
         int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
         if (pimpl->callbacks_.IsExistAdvertiserCallback(&callback, advHandle)) {
             pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, true);

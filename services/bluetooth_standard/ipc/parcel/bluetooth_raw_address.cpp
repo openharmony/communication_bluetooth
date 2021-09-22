@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothRawAddress::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(address_)) {
@@ -61,6 +60,5 @@ bool BluetoothRawAddress::ReadFromParcel(Parcel &parcel)
     }
     return noError;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

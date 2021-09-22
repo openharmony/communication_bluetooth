@@ -33,7 +33,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 std::string GattClientServiceName = "bluetooth-gatt-client-server";
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_READ = 0x00;
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_WRITE = 0x01;
@@ -592,7 +591,8 @@ int GattClient::RequestBleMtuSize(int mtu)
 
 int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool enable)
 {
-    static const uint8_t NOTIFICATION[2] = {1, 0}, DEFAULT_VALUE[2] = {0};
+    static const uint8_t NOTIFICATION[2] = {1, 0};
+    static const uint8_t DEFAULT_VALUE[2] = {0};
     static const size_t CLIENT_CHARACTERISTIC_CONFIGURATION_VALUE_LENGTH = 0x02;
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
@@ -631,7 +631,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
     }
     size_t length = 0;
     auto &characterValue = characteristic.GetValue(&length);
-    if (nullptr == characterValue || 0 == length) {
+    if (characterValue == nullptr || length == 0) {
         return GattStatus::INVALID_PARAMETER;
     }
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
@@ -649,7 +649,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
         }
         result = pimpl->proxy_->SignedWriteCharacteristic(pimpl->applicationId_, &character);
     } else {
-        withoutRespond = characteristic.GetWriteType() == (int)GattCharacteristic::WriteType::DEFAULT ? false : true;
+        withoutRespond = (characteristic.GetWriteType() == (int)GattCharacteristic::WriteType::DEFAULT ? false : true);
         if (!pimpl->proxy_) {
             HILOGI("GattClient::WriteCharacteristic() proxy_ is null when used!");
             return GattStatus::GATT_FAILURE;
@@ -672,7 +672,7 @@ int GattClient::WriteDescriptor(GattDescriptor &descriptor)
     }
     size_t length = 0;
     auto &characterValue = descriptor.GetValue(&length);
-    if (nullptr == characterValue || 0 == length) {
+    if (characterValue == nullptr || length == 0) {
         return GattStatus::INVALID_PARAMETER;
     }
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
@@ -713,6 +713,5 @@ int GattClient::RequestConnectionPriority(int connPriority)
     result = pimpl->proxy_->RequestConnectionPriority(pimpl->applicationId_, connPriority);
     return result;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

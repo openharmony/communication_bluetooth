@@ -26,9 +26,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothGattClientServer : public BluetoothGattClientStub {
-
 public:
     explicit BluetoothGattClientServer();
     ~BluetoothGattClientServer() override;
@@ -53,7 +51,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothGattClientServer);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_GATT_CLIENT_SERVER_H

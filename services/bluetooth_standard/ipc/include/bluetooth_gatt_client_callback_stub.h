@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothGattClientCallbackStub : public IRemoteStub<IBluetoothGattClientCallback> {
 public:
     BluetoothGattClientCallbackStub();

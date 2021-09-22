@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 struct BleCentralManager::impl {
     impl();
     ~impl();
@@ -113,7 +112,7 @@ struct BleCentralManager::impl {
     sptr<BluetoothBleCentralManagerCallbackImp> callbackImp_ = nullptr;
 
     sptr<IBluetoothBleCentralManager> proxy_ = nullptr;
-    BluetoothObserverList<BleCentralManagerCallback> callbacks_{};
+    BluetoothObserverList<BleCentralManagerCallback> callbacks_;
 };
 
 BleCentralManager::impl::impl()

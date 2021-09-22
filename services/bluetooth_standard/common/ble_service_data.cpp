@@ -1260,5 +1260,4 @@ size_t BlePeripheralDevice::GetPayloadLen() const
 {
     return payloadLen_;
 }
-
 }  // namespace bluetooth

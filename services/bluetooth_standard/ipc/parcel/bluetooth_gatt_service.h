@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothGattService : public Parcelable, public ::bluetooth::Service {
 public:
     BluetoothGattService() = default;

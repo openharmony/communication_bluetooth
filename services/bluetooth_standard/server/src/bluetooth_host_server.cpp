@@ -1194,7 +1194,7 @@ void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRe
 
 bool BluetoothHostServer::IsBtEnabled()
 {
-    return GetBtState() == (int32_t)(bluetooth::BTStateID::STATE_TURN_ON) ? true : false;
+    return GetBtState() == static_cast<int32_t>(bluetooth::BTStateID::STATE_TURN_ON) ? true : false;
 }
 
 void BluetoothHostServer::RegisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer)

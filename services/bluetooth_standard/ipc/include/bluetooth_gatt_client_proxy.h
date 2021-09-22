@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothGattClientProxy : public IRemoteProxy<IBluetoothGattClient> {
 public:
     explicit BluetoothGattClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothGattClient>(impl)

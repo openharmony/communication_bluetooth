@@ -219,7 +219,7 @@ public:
  */
 class BLUETOOTH_API BluetoothHost {
 public:
-    //common
+    // common
     /**
      * @brief Get default host device.
      *
@@ -471,7 +471,6 @@ public:
 
     /**
      * @brief Get device address.
-     *.
      * @return Returns <b>true</b> if the operation is successful;
      *         returns <b>false</b> if the operation fails.
      * @since 6
@@ -590,8 +589,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHost);
     BLUETOOTH_DECLARE_IMPL();
 };
-
-
 } // namespace Bluetooth
 } // namespace OHOS
 

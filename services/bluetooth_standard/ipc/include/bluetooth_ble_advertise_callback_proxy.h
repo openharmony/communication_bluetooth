@@ -34,7 +34,6 @@ private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothBleAdvertiseCallbackProxy> delegator_;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif
