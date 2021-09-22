@@ -25,15 +25,15 @@ namespace Bluetooth {
 class BluetoothGattService : public Parcelable, public ::bluetooth::Service {
 public:
     BluetoothGattService() = default;
-    BluetoothGattService(const ::bluetooth::Service& other)
-        : ::bluetooth::Service(other) {}
-    BluetoothGattService(const BluetoothGattService& other)
-        : ::bluetooth::Service(other) {}
+    BluetoothGattService(const ::bluetooth::Service &other) : ::bluetooth::Service(other)
+    {}
+    BluetoothGattService(const BluetoothGattService &other) : ::bluetooth::Service(other)
+    {}
     ~BluetoothGattService() = default;
 
     bool Marshalling(Parcel &parcel) const override;
-    
-    static BluetoothGattService* Unmarshalling(Parcel &parcel);
+
+    static BluetoothGattService *Unmarshalling(Parcel &parcel);
 
     bool writeToParcel(Parcel &parcel);
 
@@ -43,8 +43,7 @@ public:
 
     static bool ServiceIteratorRead(std::vector<Service> &service, Parcel &parcel, int length);
 };
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS
 
-#endif // BLUETOOTH_PARCEL_GATT_SERVICES_H
-
+#endif  // BLUETOOTH_PARCEL_GATT_SERVICES_H

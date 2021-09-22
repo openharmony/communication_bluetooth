@@ -22,12 +22,14 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothSocketServer : public BluetoothSocketStub {
 public:
-    BluetoothSocketServer() {}
-    ~BluetoothSocketServer() {}
+    BluetoothSocketServer()
+    {}
+    ~BluetoothSocketServer()
+    {}
 
     int Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) override;
     int Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) override;
 };
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_SOCKET_SERVER_H

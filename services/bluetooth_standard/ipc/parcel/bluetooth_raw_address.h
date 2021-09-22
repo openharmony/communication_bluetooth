@@ -25,23 +25,23 @@ namespace Bluetooth {
 class BluetoothRawAddress : public Parcelable, public ::bluetooth::RawAddress {
 public:
     BluetoothRawAddress() = default;
-    BluetoothRawAddress(const ::bluetooth::RawAddress& other)
-        : ::bluetooth::RawAddress(other){}
-    BluetoothRawAddress(const BluetoothRawAddress& other)
-        : ::bluetooth::RawAddress(other){}
-    BluetoothRawAddress(const std::string& address)
-        : ::bluetooth::RawAddress(address){}
+    BluetoothRawAddress(const ::bluetooth::RawAddress &other) : ::bluetooth::RawAddress(other)
+    {}
+    BluetoothRawAddress(const BluetoothRawAddress &other) : ::bluetooth::RawAddress(other)
+    {}
+    BluetoothRawAddress(const std::string &address) : ::bluetooth::RawAddress(address)
+    {}
     ~BluetoothRawAddress() = default;
 
     bool Marshalling(Parcel &parcel) const override;
-    
-    static BluetoothRawAddress* Unmarshalling(Parcel &parcel);
+
+    static BluetoothRawAddress *Unmarshalling(Parcel &parcel);
 
     bool WriteToParcel(Parcel &parcel);
 
     bool ReadFromParcel(Parcel &parcel);
 };
 }  // namespace Bluetooth
-} // namespace OHOS
+}  // namespace OHOS
 
-#endif // BLUETOOTH_PARCEL_RAW_ADDRESS_H
+#endif  // BLUETOOTH_PARCEL_RAW_ADDRESS_H

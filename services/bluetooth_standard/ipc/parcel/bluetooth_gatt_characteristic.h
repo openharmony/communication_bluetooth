@@ -16,7 +16,6 @@
 #ifndef BLUETOOTH_PARCEL_GATT_CHARACTERISTIC_H
 #define BLUETOOTH_PARCEL_GATT_CHARACTERISTIC_H
 
-
 #include "gatt_data.h"
 #include "parcel.h"
 
@@ -26,21 +25,21 @@ namespace Bluetooth {
 class BluetoothGattCharacteristic : public Parcelable, public ::bluetooth::Characteristic {
 public:
     BluetoothGattCharacteristic() = default;
-    BluetoothGattCharacteristic(const ::bluetooth::Characteristic& other)
-        : ::bluetooth::Characteristic(other) {}
-    BluetoothGattCharacteristic(const BluetoothGattCharacteristic& other)
-        : ::bluetooth::Characteristic(other) {}
+    BluetoothGattCharacteristic(const ::bluetooth::Characteristic &other) : ::bluetooth::Characteristic(other)
+    {}
+    BluetoothGattCharacteristic(const BluetoothGattCharacteristic &other) : ::bluetooth::Characteristic(other)
+    {}
     ~BluetoothGattCharacteristic() = default;
 
     bool Marshalling(Parcel &parcel) const override;
-    
-    static BluetoothGattCharacteristic* Unmarshalling(Parcel &parcel);
+
+    static BluetoothGattCharacteristic *Unmarshalling(Parcel &parcel);
 
     bool writeToParcel(Parcel &parcel);
 
     bool readFromParcel(Parcel &parcel);
 };
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS
 
-#endif // BLUETOOTH_PARCEL_GATT_CHARACTERISTIC_H
+#endif  // BLUETOOTH_PARCEL_GATT_CHARACTERISTIC_H

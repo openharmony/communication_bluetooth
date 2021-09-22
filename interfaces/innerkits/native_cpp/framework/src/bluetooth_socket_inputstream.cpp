@@ -43,5 +43,5 @@ size_t InputStream::Read(char *buf, const size_t length)
     }
     return ret;
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

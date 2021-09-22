@@ -20,252 +20,260 @@
 namespace OHOS {
 namespace Bluetooth {
 void BluetoothGattServerCallbackProxy::OnCharacteristicReadRequest(
-                            const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) {
+    const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicReadRequest WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicReadRequest error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&characteristic)){
+    if (!data.WriteParcelable(&characteristic)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicReadRequest error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
-                    IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CHARACTERISTIC_READREQUEST,data, reply, option);
-    if(error != NO_ERROR){
+        IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CHARACTERISTIC_READREQUEST, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicReadRequest done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
-
+    return;
 }
 void BluetoothGattServerCallbackProxy::OnConnectionStateChanged(
-                                                    const BluetoothGattDevice &device, int32_t ret, int32_t state) {
+    const BluetoothGattDevice &device, int32_t ret, int32_t state)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionStateChanged WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionStateChanged error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(ret)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionStateChanged error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(state)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionStateChanged error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
-                    IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CONNECTIONSTATE_CHANGED,data, reply, option);
-    if(error != NO_ERROR){
+        IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CONNECTIONSTATE_CHANGED, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionStateChanged done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
-}  
-void BluetoothGattServerCallbackProxy::OnAddService(int32_t ret, const BluetoothGattService &service) {
+    return;
+}
+void BluetoothGattServerCallbackProxy::OnAddService(int32_t ret, const BluetoothGattService &service)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnAddService WriteInterfaceToken error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(ret)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnAddService error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&service)){
+    if (!data.WriteParcelable(&service)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnAddService error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
-    int error = Remote()->SendRequest(
-                                IBluetoothGattServerCallback::Code::GATT_SERVER_ON_ADD_SERVICE,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_ASYNC};
+    int error =
+        Remote()->SendRequest(IBluetoothGattServerCallback::Code::GATT_SERVER_ON_ADD_SERVICE, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnAddService done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
+    return;
 }
 void BluetoothGattServerCallbackProxy::OnCharacteristicWriteRequest(
-            const BluetoothGattDevice &device,const BluetoothGattCharacteristic &characteristic, bool needRespones) {
+    const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, bool needRespones)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicWriteRequest WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicWriteRequest error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&characteristic)){
+    if (!data.WriteParcelable(&characteristic)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicWriteRequest error");
-        return ;
+        return;
     }
     if (!data.WriteBool(needRespones)) {
         HILOGE("BluetoothGattServerProxy::OnCharacteristicWriteRequest error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
-                IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CHARACTERISTIC_WRITE_REQUEST,data, reply, option);
-    if(error != NO_ERROR){
+        IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CHARACTERISTIC_WRITE_REQUEST, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnCharacteristicWriteRequest done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
+    return;
 }
 void BluetoothGattServerCallbackProxy::OnDescriptorReadRequest(
-                                        const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) {
+    const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorReadRequest WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorReadRequest error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&descriptor)){
+    if (!data.WriteParcelable(&descriptor)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorReadRequest error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
-                        IBluetoothGattServerCallback::Code::GATT_SERVER_ON_DESCRIPTOR_READ_REQUEST,data, reply, option);
-    if(error != NO_ERROR){
+        IBluetoothGattServerCallback::Code::GATT_SERVER_ON_DESCRIPTOR_READ_REQUEST, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorReadRequest done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
+    return;
 }
 void BluetoothGattServerCallbackProxy::OnDescriptorWriteRequest(
-                                    const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) {
+    const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorWriteRequest WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorWriteRequest error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&descriptor)){
+    if (!data.WriteParcelable(&descriptor)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorWriteRequest error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
-                    IBluetoothGattServerCallback::Code::GATT_SERVER_ON_DESCRIPTOR_WRITE_REQUEST,data, reply, option);
-    if(error != NO_ERROR){
+        IBluetoothGattServerCallback::Code::GATT_SERVER_ON_DESCRIPTOR_WRITE_REQUEST, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnDescriptorWriteRequest done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
+    return;
 }
-void BluetoothGattServerCallbackProxy::OnMtuChanged(const BluetoothGattDevice &device, int32_t mtu) {
+void BluetoothGattServerCallbackProxy::OnMtuChanged(const BluetoothGattDevice &device, int32_t mtu)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnMtuUpdateOnMtuChanged WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnMtuUpdateOnMtuChanged error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(mtu)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnMtuUpdateOnMtuChanged error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
-    int error = Remote()->SendRequest(
-                                    IBluetoothGattServerCallback::Code::GATT_SERVER_ON_MTU_CHANGED,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_ASYNC};
+    int error =
+        Remote()->SendRequest(IBluetoothGattServerCallback::Code::GATT_SERVER_ON_MTU_CHANGED, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnMtuUpdateOnMtuChanged done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
+    return;
 }
 void BluetoothGattServerCallbackProxy::OnNotifyConfirm(
-                const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int result) {
+    const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int result)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnNotifyConfirm WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnNotifyConfirm error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&characteristic)){
+    if (!data.WriteParcelable(&characteristic)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnNotifyConfirm error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(result)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnNotifyConfirm error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
-    int error = Remote()->SendRequest(IBluetoothGattServerCallback::Code::GATT_SERVER_ON_NOTIFY_CONFIRM,data, reply, option);
-    if(error != NO_ERROR){
+    MessageOption option{MessageOption::TF_ASYNC};
+    int error =
+        Remote()->SendRequest(IBluetoothGattServerCallback::Code::GATT_SERVER_ON_NOTIFY_CONFIRM, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnNotifyConfirm done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
+    return;
 }
 void BluetoothGattServerCallbackProxy::OnConnectionParameterChanged(
-            const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status) {
+    const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattServerCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionParameterChanged WriteInterfaceToken error");
-        return ;
+        return;
     }
-    if (!data.WriteParcelable(&device)){
+    if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionParameterChanged error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(interval)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionParameterChanged error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(latency)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionParameterChanged error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(timeout)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionParameterChanged error");
-        return ;
+        return;
     }
     if (!data.WriteInt32(status)) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionParameterChanged error");
-        return ;
+        return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
-                IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CONNECTION_PARAMETER_CHANGED,data, reply, option);
-    if(error != NO_ERROR){
+        IBluetoothGattServerCallback::Code::GATT_SERVER_ON_CONNECTION_PARAMETER_CHANGED, data, reply, option);
+    if (error != NO_ERROR) {
         HILOGE("BluetoothGattServerCallbackProxy::OnConnectionParameterChanged done fail, error: %d", error);
-        return ;
+        return;
     }
-    return ;
-
+    return;
 }
 }  // namespace Bluetooth
-} // namespace OHOS
+}  // namespace OHOS

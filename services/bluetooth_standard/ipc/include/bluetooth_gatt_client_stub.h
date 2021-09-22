@@ -25,12 +25,12 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothGattClientStub : public IRemoteStub<IBluetoothGattClient> {
 public:
-
     BluetoothGattClientStub();
     virtual ~BluetoothGattClientStub();
 
-    virtual int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                    MessageOption &option) override;
+    virtual int OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
     ErrCode RegisterApplicationInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DeregisterApplicationInner(MessageParcel &data, MessageParcel &reply);

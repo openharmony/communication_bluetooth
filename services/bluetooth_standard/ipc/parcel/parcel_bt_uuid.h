@@ -43,4 +43,4 @@ public:
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_PARCEL_BT_UUID_H
+#endif  // OHOS_BLUETOOTH_STANDARD_PARCEL_BT_UUID_H

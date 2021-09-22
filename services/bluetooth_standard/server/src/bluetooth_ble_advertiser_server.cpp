@@ -24,7 +24,6 @@ namespace OHOS {
 namespace Bluetooth {
 
 using namespace bluetooth;
-
 class BleAdvertiserCallback : public IBleAdvertiserCallback {
 public:
     BleAdvertiserCallback() = default;
@@ -62,11 +61,11 @@ struct BluetoothBleAdvertiserServer::impl {
 
     /// sys state observer
     class SystemStateObserver;
-    std::unique_ptr<SystemStateObserver> systemStateObserver_{nullptr};
+    std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
-    RemoteObserverList<IBluetoothBleAdvertiseCallback> observers_{};
+    RemoteObserverList<IBluetoothBleAdvertiseCallback> observers_;
     std::unique_ptr<BleAdvertiserCallback> observerImp_{std::make_unique<BleAdvertiserCallback>()};
-    IAdapterBle *bleService_{nullptr};
+    IAdapterBle *bleService_ = nullptr;
 };
 
 class BluetoothBleAdvertiserServer::impl::SystemStateObserver : public ISystemStateObserver {
@@ -91,7 +90,7 @@ public:
     };
 
 private:
-    BluetoothBleAdvertiserServer::impl *pimpl_{nullptr};
+    BluetoothBleAdvertiserServer::impl *pimpl_ = nullptr;
 };
 
 BluetoothBleAdvertiserServer::impl::impl()
@@ -107,7 +106,7 @@ BluetoothBleAdvertiserServer::impl::~impl()
 
 BluetoothBleAdvertiserServer::BluetoothBleAdvertiserServer()
 {
-    pimpl = std::unique_ptr<impl>(new impl);
+    pimpl = std::make_unique<impl>();
     pimpl->observerImp_->SetObserver(&(pimpl->observers_));
     pimpl->systemStateObserver_ = std::make_unique<impl::SystemStateObserver>(pimpl.get());
     IAdapterManager::GetInstance()->RegisterSystemStateObserver(*(pimpl->systemStateObserver_));
@@ -126,10 +125,9 @@ BluetoothBleAdvertiserServer::~BluetoothBleAdvertiserServer()
 
 void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
     const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle,
-        bool isRawData)
+    bool isRawData)
 {
     HILOGI("BluetoothBleAdvertiserServer::StartAdvertising");
-    
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -142,7 +140,7 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
         settingsImpl.SetTxPower(settings.GetTxPower());
 
         BleAdvertiserDataImpl bleAdvertiserData;
-        if(!isRawData) {
+        if (!isRawData) {
             bleAdvertiserData.SetFlags(advData.GetAdvFlag());
         }
         std::map<uint16_t, std::string> manufacturerData = advData.GetManufacturerData();
@@ -157,8 +155,8 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
         for (auto it = serviceUuids.begin(); it != serviceUuids.end(); it++) {
             bleAdvertiserData.AddServiceUuid(*it);
         }
-        bleAdvertiserData.AddData(advData.GetPayload()); 
-        
+        bleAdvertiserData.AddData(advData.GetPayload());
+
         BleAdvertiserDataImpl bleScanResponse;
         manufacturerData = scanResponse.GetManufacturerData();
         for (auto it = manufacturerData.begin(); it != manufacturerData.end(); it++) {
@@ -172,8 +170,8 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
         for (auto it = serviceUuids.begin(); it != serviceUuids.end(); it++) {
             bleScanResponse.AddServiceUuid(*it);
         }
-        bleScanResponse.AddData(scanResponse.GetPayload()); 
-        
+        bleScanResponse.AddData(scanResponse.GetPayload());
+
         if (pimpl->bleService_ != nullptr) {
             pimpl->bleService_->StartAdvertising(settingsImpl, bleAdvertiserData, bleScanResponse, advHandle);
         }
@@ -243,6 +241,5 @@ int32_t BluetoothBleAdvertiserServer::GetAdvertiserHandle()
 
     return advHandle;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

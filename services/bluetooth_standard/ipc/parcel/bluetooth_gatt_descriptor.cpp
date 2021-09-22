@@ -20,7 +20,8 @@
 namespace OHOS {
 namespace Bluetooth {
 
-bool BluetoothGattDescriptor::Marshalling(Parcel &parcel) const {
+bool BluetoothGattDescriptor::Marshalling(Parcel &parcel) const
+{
     if (!parcel.WriteUint16(handle_)) {
         return false;
     }
@@ -30,20 +31,22 @@ bool BluetoothGattDescriptor::Marshalling(Parcel &parcel) const {
     if (!parcel.WriteUint32(length_)) {
         return false;
     }
-    for(size_t i = 0; i < length_; i++) {
+    for (size_t i = 0; i < length_; i++) {
         if (!parcel.WriteUint8(value_[i])) {
             return false;
         }
     }
-    if (!parcel.WriteUint32(uuid_.ConvertTo32Bits())) {
+    BluetoothUuid *bt_uuid = new BluetoothUuid(uuid_);
+    if (!parcel.WriteParcelable(bt_uuid)) {
         return false;
     }
     return true;
 }
-    
-BluetoothGattDescriptor* BluetoothGattDescriptor::Unmarshalling(Parcel &parcel) {
+
+BluetoothGattDescriptor *BluetoothGattDescriptor::Unmarshalling(Parcel &parcel)
+{
     bool noError = true;
-    uint16_t handle ;
+    uint16_t handle;
     if (!parcel.ReadUint16(handle)) {
         noError = false;
     }
@@ -56,17 +59,17 @@ BluetoothGattDescriptor* BluetoothGattDescriptor::Unmarshalling(Parcel &parcel) 
         noError = false;
     }
     uint8_t value_v[length];
-    for(size_t i = 0; i < length; i++) {
-        if(!parcel.ReadUint8(value_v[i])) {
+    for (size_t i = 0; i < length; i++) {
+        if (!parcel.ReadUint8(value_v[i])) {
             noError = false;
         }
     }
-    uint32_t uuid;
-    if (!parcel.ReadUint32(uuid)) {
-        noError = false;
+    BluetoothUuid *bt_uuid = parcel.ReadParcelable<BluetoothUuid>();
+    if (!bt_uuid) {
+        return nullptr;
     }
-    BluetoothGattDescriptor* descriptor = new BluetoothGattDescriptor(
-        Descriptor(bluetooth::Uuid::ConvertFrom32Bits(uuid), handle, permissions, value_v, length));
+    BluetoothGattDescriptor *descriptor =
+        new BluetoothGattDescriptor(Descriptor((bluetooth::Uuid)(*bt_uuid), handle, permissions, value_v, length));
     if (!noError) {
         delete descriptor;
         descriptor = nullptr;
@@ -74,13 +77,15 @@ BluetoothGattDescriptor* BluetoothGattDescriptor::Unmarshalling(Parcel &parcel) 
     return descriptor;
 }
 
-bool BluetoothGattDescriptor::writeToParcel(Parcel &parcel) {
+bool BluetoothGattDescriptor::writeToParcel(Parcel &parcel)
+{
     return Marshalling(parcel);
 }
 
-bool BluetoothGattDescriptor::readFromParcel(Parcel &parcel) {
+bool BluetoothGattDescriptor::readFromParcel(Parcel &parcel)
+{
     bool noError = true;
-    uint16_t handle ;
+    uint16_t handle;
     if (parcel.ReadUint16(handle)) {
         handle_ = handle;
     } else {
@@ -94,7 +99,7 @@ bool BluetoothGattDescriptor::readFromParcel(Parcel &parcel) {
     }
     int len;
     if (parcel.ReadInt32(len)) {
-        for(int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             if (parcel.ReadUint8(value_[i])) {
                 i += 0;
             } else {
@@ -119,5 +124,5 @@ bool BluetoothGattDescriptor::readFromParcel(Parcel &parcel) {
     return noError;
 }
 
-}  // namespace bluetooth
-}  // namespace polaris
+}  // namespace Bluetooth
+}  // namespace OHOS

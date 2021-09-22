@@ -39,7 +39,6 @@ private:
         memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothBleAdvertiseCallbackStub);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif

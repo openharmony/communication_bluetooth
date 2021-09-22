@@ -24,16 +24,18 @@ namespace Bluetooth {
 
 class BluetoothGattClientCallbackProxy : public IRemoteProxy<IBluetoothGattClientCallback> {
 public:
-    explicit BluetoothGattClientCallbackProxy(
-        const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothGattClientCallback>(impl) {}
-    ~BluetoothGattClientCallbackProxy() {}
+    explicit BluetoothGattClientCallbackProxy(const sptr<IRemoteObject> &impl)
+        : IRemoteProxy<IBluetoothGattClientCallback>(impl)
+    {}
+    ~BluetoothGattClientCallbackProxy()
+    {}
 
     void OnConnectionStateChanged(int32_t state, int32_t newState) override;
-    void OnCharacteristicChanged(const BluetoothGattCharacteristic& characteristic) override;
-    void OnCharacteristicRead(int32_t ret, const BluetoothGattCharacteristic& characteristic) override;
-    void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic& characteristic) override;
-    void OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor& descriptor) override;
-    void OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor& descriptor) override;
+    void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) override;
+    void OnCharacteristicRead(int32_t ret, const BluetoothGattCharacteristic &characteristic) override;
+    void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic) override;
+    void OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor &descriptor) override;
+    void OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor &descriptor) override;
     void OnMtuChanged(int32_t state, int32_t mtu) override;
     void OnServicesDiscovered(int32_t status) override;
     void OnConnectionParameterChanged(int32_t interval, int32_t latency, int32_t timeout, int32_t status) override;
@@ -41,8 +43,7 @@ public:
 
 private:
     static inline BrokerDelegator<BluetoothGattClientCallbackProxy> delegator_;
-
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_GATT_CLIENT_CALLBACK_PROXY_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_GATT_CLIENT_CALLBACK_PROXY_H

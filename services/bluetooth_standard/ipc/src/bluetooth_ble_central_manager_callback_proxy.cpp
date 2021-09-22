@@ -20,9 +20,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 BluetoothBleCentralManagerCallBackProxy::BluetoothBleCentralManagerCallBackProxy(const sptr<IRemoteObject> &impl)
-    : IRemoteProxy<IBluetoothBleCentralManageCallback>(impl)
+    : IRemoteProxy<IBluetoothBleCentralManagerCallback>(impl)
 {}
 BluetoothBleCentralManagerCallBackProxy::~BluetoothBleCentralManagerCallBackProxy()
 {}
@@ -43,7 +42,7 @@ void BluetoothBleCentralManagerCallBackProxy::OnScanCallback(const BluetoothBleS
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int error =
-        InnerTransact(IBluetoothBleCentralManageCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK, option, data, reply);
+        InnerTransact(IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothBleCentralManagerCallBackProxy::OnScanCallback done fail, error: %{public}d", error);
         return;
@@ -75,7 +74,7 @@ void BluetoothBleCentralManagerCallBackProxy::OnBleBatchScanResultsEvent(std::ve
     MessageOption option = {MessageOption::TF_ASYNC};
 
     int error = InnerTransact(
-        IBluetoothBleCentralManageCallback::Code::BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK, option, data, reply);
+        IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE(
             "BluetoothBleCentralManagerCallBackProxy::OnBleBatchScanResultsEvent done fail, error: %{public}d", error);
@@ -97,7 +96,7 @@ void BluetoothBleCentralManagerCallBackProxy::OnStartScanFailed(int resultCode)
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int error = InnerTransact(
-        IBluetoothBleCentralManageCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED, option, data, reply);
+        IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothBleCentralManagerCallBackProxy::OnStartScanFailed done fail, error: %{public}d", error);
         return;
@@ -127,6 +126,5 @@ ErrCode BluetoothBleCentralManagerCallBackProxy::InnerTransact(
         }
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

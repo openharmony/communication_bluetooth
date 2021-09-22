@@ -21,7 +21,8 @@
 namespace OHOS {
 namespace Bluetooth {
 
-bool BluetoothGattDevice::Marshalling(Parcel &parcel) const {
+bool BluetoothGattDevice::Marshalling(Parcel &parcel) const
+{
     if (!parcel.WriteBool(isEncryption_)) {
         return false;
     }
@@ -40,8 +41,9 @@ bool BluetoothGattDevice::Marshalling(Parcel &parcel) const {
     return true;
 }
 
-BluetoothGattDevice* BluetoothGattDevice::Unmarshalling(Parcel &parcel) {
-    BluetoothGattDevice* gattdevice = new BluetoothGattDevice();
+BluetoothGattDevice *BluetoothGattDevice::Unmarshalling(Parcel &parcel)
+{
+    BluetoothGattDevice *gattdevice = new BluetoothGattDevice();
 
     bool noError = true;
     bool isEncryption;
@@ -50,13 +52,13 @@ BluetoothGattDevice* BluetoothGattDevice::Unmarshalling(Parcel &parcel) {
     } else {
         noError = false;
     }
-    uint8_t  transport;
+    uint8_t transport;
     if (parcel.ReadUint8(transport)) {
         gattdevice->transport_ = transport;
     } else {
         noError = false;
     }
-    uint8_t  addressType;
+    uint8_t addressType;
     if (parcel.ReadUint8(addressType)) {
         gattdevice->addressType_ = addressType;
     } else {
@@ -81,11 +83,13 @@ BluetoothGattDevice* BluetoothGattDevice::Unmarshalling(Parcel &parcel) {
     return gattdevice;
 }
 
-bool BluetoothGattDevice::writeToParcel(Parcel &parcel) {
+bool BluetoothGattDevice::writeToParcel(Parcel &parcel)
+{
     return Marshalling(parcel);
 }
 
-bool BluetoothGattDevice::readFromParcel(Parcel &parcel) {
+bool BluetoothGattDevice::readFromParcel(Parcel &parcel)
+{
     bool noError = true;
     bool isEncryption;
     if (parcel.ReadBool(isEncryption)) {
@@ -93,13 +97,13 @@ bool BluetoothGattDevice::readFromParcel(Parcel &parcel) {
     } else {
         noError = false;
     }
-    uint8_t  transport;
+    uint8_t transport;
     if (parcel.ReadUint8(transport)) {
         transport_ = transport;
     } else {
         noError = false;
     }
-    uint8_t  addressType;
+    uint8_t addressType;
     if (parcel.ReadUint8(addressType)) {
         addressType_ = addressType;
     } else {
@@ -121,4 +125,4 @@ bool BluetoothGattDevice::readFromParcel(Parcel &parcel) {
 }
 
 }  // namespace Bluetooth
-} // namespace OHOS
+}  // namespace OHOS

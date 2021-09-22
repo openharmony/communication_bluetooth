@@ -33,7 +33,6 @@ public:
     virtual void OnReadRemoteRssiEvent(const BluetoothRawAddress &device, int rssi, int status) = 0;
     virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status) = 0;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // OHOS_BLUETOOTH_STANDARD_BLE_PERIPHERAL_OBSERVER_INTERFACE_H

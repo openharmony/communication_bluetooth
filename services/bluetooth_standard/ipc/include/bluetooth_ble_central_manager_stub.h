@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothBleCentralManagerStub : public IRemoteStub<IBluetoothBleCentralManager> {
-
 public:
     BluetoothBleCentralManagerStub();
     ~BluetoothBleCentralManagerStub() override;
@@ -44,7 +43,6 @@ private:
     ErrCode StartScanWithSettingsInner(MessageParcel &data, MessageParcel &reply);
     ErrCode StopScanInner(MessageParcel &data, MessageParcel &reply);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 

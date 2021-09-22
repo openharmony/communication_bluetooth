@@ -25,21 +25,21 @@ namespace Bluetooth {
 class BluetoothGattDescriptor : public Parcelable, public ::bluetooth::Descriptor {
 public:
     BluetoothGattDescriptor() = default;
-    BluetoothGattDescriptor(const ::bluetooth::Descriptor& other)
-        : ::bluetooth::Descriptor(other) {}
-    BluetoothGattDescriptor(const BluetoothGattDescriptor& other)
-        : ::bluetooth::Descriptor(other) {}
+    BluetoothGattDescriptor(const ::bluetooth::Descriptor &other) : ::bluetooth::Descriptor(other)
+    {}
+    BluetoothGattDescriptor(const BluetoothGattDescriptor &other) : ::bluetooth::Descriptor(other)
+    {}
     ~BluetoothGattDescriptor() = default;
 
     bool Marshalling(Parcel &parcel) const override;
-    
-    static BluetoothGattDescriptor* Unmarshalling(Parcel &parcel);
+
+    static BluetoothGattDescriptor *Unmarshalling(Parcel &parcel);
 
     bool writeToParcel(Parcel &parcel);
 
     bool readFromParcel(Parcel &parcel);
 };
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS
 
-#endif // BLUETOOTH_PARCEL_GATT_DESCRIPTOR_H
+#endif  // BLUETOOTH_PARCEL_GATT_DESCRIPTOR_H

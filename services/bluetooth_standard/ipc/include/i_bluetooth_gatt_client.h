@@ -27,11 +27,11 @@
 namespace OHOS {
 namespace Bluetooth {
 
-class IBluetoothGattClient :public OHOS::IRemoteBroker {
+class IBluetoothGattClient : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattClient");
 
-    enum Code{
+    enum Code {
         BT_GATT_CLIENT_REGISTER_APP = 0,
         BT_GATT_CLIENT_DEREGISTER_APP,
         BT_GATT_CLIENT_CONNECT,
@@ -49,23 +49,22 @@ public:
     };
 
     virtual int RegisterApplication(
-        const sptr<IBluetoothGattClientCallback>& callback, const BluetoothRawAddress& addr, int32_t transport) = 0;
+        const sptr<IBluetoothGattClientCallback> &callback, const BluetoothRawAddress &addr, int32_t transport) = 0;
     virtual int DeregisterApplication(int32_t appId) = 0;
     virtual int Connect(int32_t appId, bool autoConnect) = 0;
     virtual int Disconnect(int32_t appId) = 0;
     virtual int DiscoveryServices(int32_t appId) = 0;
-    virtual int ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic& characteristic) = 0;
+    virtual int ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic &characteristic) = 0;
     virtual int WriteCharacteristic(
-        int32_t appId, BluetoothGattCharacteristic* characteristic, bool withoutRespond) = 0;
-    virtual int SignedWriteCharacteristic(int32_t appId, BluetoothGattCharacteristic* characteristic) = 0;
-    virtual int ReadDescriptor(int32_t appId, const BluetoothGattDescriptor& descriptor) = 0;
-    virtual int WriteDescriptor(int32_t appId, BluetoothGattDescriptor* descriptor) = 0;
+        int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond) = 0;
+    virtual int SignedWriteCharacteristic(int32_t appId, BluetoothGattCharacteristic *characteristic) = 0;
+    virtual int ReadDescriptor(int32_t appId, const BluetoothGattDescriptor &descriptor) = 0;
+    virtual int WriteDescriptor(int32_t appId, BluetoothGattDescriptor *descriptor) = 0;
     virtual int RequestExchangeMtu(int32_t appId, int32_t mtu) = 0;
     virtual void GetAllDevice(std::vector<BluetoothGattDevice> &device) = 0;
     virtual int RequestConnectionPriority(int32_t appId, int32_t connPriority) = 0;
     virtual void GetServices(int32_t appId, std::vector<BluetoothGattService> &service) = 0;
-
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_GATT_CLIENT_INTERFACE_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_GATT_CLIENT_INTERFACE_H

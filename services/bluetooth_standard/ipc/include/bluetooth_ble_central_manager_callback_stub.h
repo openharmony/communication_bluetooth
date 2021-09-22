@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothBleCentralManagerCallBackStub : public IRemoteStub<IBluetoothBleCentralManageCallback> {
+class BluetoothBleCentralManagerCallBackStub : public IRemoteStub<IBluetoothBleCentralManagerCallback> {
 public:
     BluetoothBleCentralManagerCallBackStub();
     ~BluetoothBleCentralManagerCallBackStub() override;
@@ -41,7 +41,6 @@ private:
         memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothBleCentralManagerCallBackStub);
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_STANDARD_BLUETOOTH_BLE_CENTRAL_MANAGER_CALLBACK_STUB_H

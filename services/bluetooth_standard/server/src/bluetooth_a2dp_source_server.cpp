@@ -34,11 +34,9 @@ public:
 
     void OnPlayingStatusChaned(const RawAddress &device, int playingState, int error) override
     {
-        observers_.ForEach(
-            [device, playingState, error](sptr<IBluetoothA2dpSrcObserver> observer) {
-                observer->OnPlayingStateChanged(device, playingState, error);
-            }
-        );
+        observers_.ForEach([device, playingState, error](sptr<IBluetoothA2dpSrcObserver> observer) {
+            observer->OnPlayingStateChanged(device, playingState, error);
+        });
     }
 
 private:
@@ -47,26 +45,30 @@ private:
 
 A2dpSrcObserverImpl g_A2dpSrcObserver;
 
-void BluetoothA2dpSourceServer::Init() {
-    //bluetooth::IProfileA2dpSrc::GetSrcProfile()->RegisterObserver(&g_A2dpSrcObserver);
+void BluetoothA2dpSourceServer::Init()
+{
+    // bluetooth::IProfileA2dpSrc::GetSrcProfile()->RegisterObserver(&g_A2dpSrcObserver);
 }
 
-void BluetoothA2dpSourceServer::Destroy() {
-   // bluetooth::IProfileA2dpSrc::GetSrcProfile()->DeregisterObserver(&g_A2dpSrcObserver);
+void BluetoothA2dpSourceServer::Destroy()
+{
+    // bluetooth::IProfileA2dpSrc::GetSrcProfile()->DeregisterObserver(&g_A2dpSrcObserver);
 }
 
-int BluetoothA2dpSourceServer::GetDeviceState(const RawAddress &device) {
-    // IProfileA2dpSrc* a2dpSrc = 
+int BluetoothA2dpSourceServer::GetDeviceState(const RawAddress &device)
+{
+    // IProfileA2dpSrc* a2dpSrc =
     //     (IProfileA2dpSrc*)IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_A2DP_SRC);
 
     // return a2dpSrc->GetDeviceState(device);
     return 0;
 }
 
-void BluetoothA2dpSourceServer::RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer) {
+void BluetoothA2dpSourceServer::RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer)
+{
     HILOGI("BluetoothA2dpSourceServer::RegisterObserver starts");
     g_A2dpSrcObserver.Register(observer);
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

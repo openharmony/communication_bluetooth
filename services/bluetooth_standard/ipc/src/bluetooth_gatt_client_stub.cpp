@@ -20,7 +20,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-BluetoothGattClientStub::BluetoothGattClientStub() {
+BluetoothGattClientStub::BluetoothGattClientStub()
+{
     HILOGD("%{public}s start.", __func__);
     memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClient::Code::BT_GATT_CLIENT_REGISTER_APP)] =
         &BluetoothGattClientStub::RegisterApplicationInner;
@@ -45,20 +46,22 @@ BluetoothGattClientStub::BluetoothGattClientStub() {
     memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClient::Code::BT_GATT_CLIENT_REQUEST_EXCHANGE_MTU)] =
         &BluetoothGattClientStub::RequestExchangeMtuInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClient::Code::BT_GATT_CLIENT_GET_ALL_DEVICE)] =
-         &BluetoothGattClientStub::GetAllDeviceInner;
+        &BluetoothGattClientStub::GetAllDeviceInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClient::Code::BT_GATT_CLIENT_REQUEST_CONNECTION_PRIORITY)] =
         &BluetoothGattClientStub::RequestConnectionPriorityInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClient::Code::BT_GATT_CLIENT_GET_SERVICES)] =
         &BluetoothGattClientStub::GetServicesInner;
 }
 
-BluetoothGattClientStub::~BluetoothGattClientStub() {
+BluetoothGattClientStub::~BluetoothGattClientStub()
+{
     HILOGD("%{public}s start.", __func__);
     memberFuncMap_.clear();
 }
 
 int BluetoothGattClientStub::OnRemoteRequest(
-    uint32_t code, MessageParcel &data, MessageParcel &reply,MessageOption &option) {
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
     HILOGD("BluetoothGattClientStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
     std::u16string descriptor = BluetoothGattClientStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
@@ -77,7 +80,8 @@ int BluetoothGattClientStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothGattClientStub::RegisterApplicationInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::RegisterApplicationInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::RegisterApplicationInner starts");
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     const sptr<IBluetoothGattClientCallback> callback = OHOS::iface_cast<IBluetoothGattClientCallback>(remote);
@@ -92,7 +96,8 @@ ErrCode BluetoothGattClientStub::RegisterApplicationInner(MessageParcel &data, M
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::DeregisterApplicationInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::DeregisterApplicationInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::DeregisterApplicationInner starts");
     int32_t appId = data.ReadInt32();
     int result = DeregisterApplication(appId);
@@ -104,7 +109,8 @@ ErrCode BluetoothGattClientStub::DeregisterApplicationInner(MessageParcel &data,
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::ConnectInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::ConnectInner starts");
     int32_t appId = data.ReadInt32();
     bool autoConnect = data.ReadBool();
@@ -117,7 +123,8 @@ ErrCode BluetoothGattClientStub::ConnectInner(MessageParcel &data, MessageParcel
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::DisconnectInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::DisconnectInner starts");
     int32_t appId = data.ReadInt32();
     int result = Disconnect(appId);
@@ -129,7 +136,8 @@ ErrCode BluetoothGattClientStub::DisconnectInner(MessageParcel &data, MessagePar
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::DiscoveryServicesInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::DiscoveryServicesInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::DiscoveryServicesInner starts");
     int32_t appId = data.ReadInt32();
     int result = DiscoveryServices(appId);
@@ -141,7 +149,8 @@ ErrCode BluetoothGattClientStub::DiscoveryServicesInner(MessageParcel &data, Mes
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::ReadCharacteristicInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::ReadCharacteristicInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::ReadCharacteristicInner starts");
     int32_t appId = data.ReadInt32();
     const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
@@ -155,7 +164,8 @@ ErrCode BluetoothGattClientStub::ReadCharacteristicInner(MessageParcel &data, Me
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::WriteCharacteristicInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::WriteCharacteristicInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::WriteCharacteristicInner starts");
     int32_t appId = data.ReadInt32();
     BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
@@ -170,7 +180,8 @@ ErrCode BluetoothGattClientStub::WriteCharacteristicInner(MessageParcel &data, M
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::SignedWriteCharacteristicInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::SignedWriteCharacteristicInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::SignedWriteCharacteristicInner starts");
     int32_t appId = data.ReadInt32();
     BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
@@ -184,7 +195,8 @@ ErrCode BluetoothGattClientStub::SignedWriteCharacteristicInner(MessageParcel &d
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::ReadDescriptorInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::ReadDescriptorInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::ReadDescriptorInner starts");
     int32_t appId = data.ReadInt32();
     const BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
@@ -198,7 +210,8 @@ ErrCode BluetoothGattClientStub::ReadDescriptorInner(MessageParcel &data, Messag
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::WriteDescriptorInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::WriteDescriptorInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::WriteDescriptorInner starts");
     int32_t appId = data.ReadInt32();
     BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
@@ -212,7 +225,8 @@ ErrCode BluetoothGattClientStub::WriteDescriptorInner(MessageParcel &data, Messa
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::RequestExchangeMtuInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::RequestExchangeMtuInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::RequestExchangeMtuInner starts");
     int32_t appId = data.ReadInt32();
     int32_t mtu = data.ReadInt32();
@@ -225,23 +239,25 @@ ErrCode BluetoothGattClientStub::RequestExchangeMtuInner(MessageParcel &data, Me
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::GetAllDeviceInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::GetAllDeviceInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::GetAllDeviceInner starts");
     std::vector<BluetoothGattDevice> device;
     GetAllDevice(device);
     reply.WriteInt32(device.size());
-    int num=device.size();
-    for(int i = 0; i < num; i++) {
+    int num = device.size();
+    for (int i = 0; i < num; i++) {
         bool ret = reply.WriteParcelable(&device[i]);
-        if(!ret){
+        if (!ret) {
             HILOGE("WriteParcelable<GetAllDeviceInner> failed");
-            return ERR_INVALID_VALUE; 
+            return ERR_INVALID_VALUE;
         }
     }
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::RequestConnectionPriorityInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::RequestConnectionPriorityInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::RequestConnectionPriorityInner starts");
     int32_t appId = data.ReadInt32();
     int32_t connPriority = data.ReadInt32();
@@ -254,22 +270,23 @@ ErrCode BluetoothGattClientStub::RequestConnectionPriorityInner(MessageParcel &d
     return NO_ERROR;
 }
 
-ErrCode BluetoothGattClientStub::GetServicesInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothGattClientStub::GetServicesInner(MessageParcel &data, MessageParcel &reply)
+{
     HILOGI("BluetoothGattClientStub::GetServicesInner starts");
     int32_t appId = data.ReadInt32();
     std::vector<BluetoothGattService> service;
     GetServices(appId, service);
     reply.WriteInt32(service.size());
-    int num=service.size();
-    for(int i = 0; i < num; i++) {
+    int num = service.size();
+    for (int i = 0; i < num; i++) {
         bool ret = reply.WriteParcelable(&service[i]);
-        if(!ret){
+        if (!ret) {
             HILOGE("WriteParcelable<GetServicesInner> failed");
-            return ERR_INVALID_VALUE; 
+            return ERR_INVALID_VALUE;
         }
     }
     return NO_ERROR;
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

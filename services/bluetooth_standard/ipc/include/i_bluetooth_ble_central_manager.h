@@ -34,8 +34,8 @@ public:
         BLE_STOP_SCAN,
     };
 
-    virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManageCallback> &callback) = 0;
-    virtual void DeregisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManageCallback> &callback) = 0;
+    virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
+    virtual void DeregisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
     virtual void StartScan() = 0;
     virtual void StartScan(const BluetoothBleScanSettings &settings) = 0;
     virtual void StopScan() = 0;

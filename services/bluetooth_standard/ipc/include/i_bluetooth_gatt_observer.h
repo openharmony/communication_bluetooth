@@ -25,13 +25,13 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattObserver");
 
     enum Code {
-       // BT_HOST_OBSERVER_STATE_CHANGE = 0,
-        //BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE = 0,
+        // BT_HOST_OBSERVER_STATE_CHANGE = 0,
+        // BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE = 0,
     };
 
-    //virtual void OnStateChanged(int32_t transport, int32_t status) = 0;
-    //virtual void OnDiscoveryStateChanged(int32_t status)=0;
+    // virtual void OnStateChanged(int32_t transport, int32_t status) = 0;
+    // virtual void OnDiscoveryStateChanged(int32_t status)=0;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_HOST_OBSERVER_INTERFACE_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_HOST_OBSERVER_INTERFACE_H

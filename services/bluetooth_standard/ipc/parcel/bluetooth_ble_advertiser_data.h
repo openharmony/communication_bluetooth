@@ -22,16 +22,16 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothBleAdvertiserData : public Parcelable, public ::bluetooth::AdvertiserData {
 public:
-    BluetoothBleAdvertiserData() = default;
-    BluetoothBleAdvertiserData(const ::bluetooth::AdvertiserData& other)
-        : ::bluetooth::AdvertiserData(other) {}
-    BluetoothBleAdvertiserData(const BluetoothBleAdvertiserData& other)
-        : ::bluetooth::AdvertiserData(other) {}
+    explicit BluetoothBleAdvertiserData() = default;
+    BluetoothBleAdvertiserData(const ::bluetooth::AdvertiserData &other) : ::bluetooth::AdvertiserData(other)
+    {}
+    BluetoothBleAdvertiserData(const BluetoothBleAdvertiserData &other) : ::bluetooth::AdvertiserData(other)
+    {}
     ~BluetoothBleAdvertiserData() = default;
 
     bool Marshalling(Parcel &parcel) const override;
 
-    static BluetoothBleAdvertiserData* Unmarshalling(Parcel &parcel);
+    static BluetoothBleAdvertiserData *Unmarshalling(Parcel &parcel);
 
     bool WriteToParcel(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel);
@@ -49,4 +49,4 @@ private:
 }  // namespace Bluetooth
 }  // namespace OHOS
 
-#endif // BLUETOOTH_PARCEL_BLE_ADVERTISER_DATA_H
+#endif  // BLUETOOTH_PARCEL_BLE_ADVERTISER_DATA_H

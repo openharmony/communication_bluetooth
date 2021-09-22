@@ -664,7 +664,7 @@ bool BluetoothHostProxy::RemoveAllPairs()
     return reply.ReadBool();
 }
 
-void BluetoothHostProxy::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer)
+void BluetoothHostProxy::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
@@ -685,7 +685,7 @@ void BluetoothHostProxy::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemot
     return;
 }
 
-void BluetoothHostProxy::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer)
+void BluetoothHostProxy::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
@@ -1431,6 +1431,5 @@ ErrCode BluetoothHostProxy::InnerTransact(
     }
     return NO_ERROR;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -16,7 +16,7 @@
 #include "bluetooth_gatt_service.h"
 
 namespace OHOS {
-namespace Bluetooth{
+namespace Bluetooth {
 
 void GattService::AddCharacteristic(const GattCharacteristic &characteristic)
 {
@@ -25,13 +25,11 @@ void GattService::AddCharacteristic(const GattCharacteristic &characteristic)
 
 GattService::GattService(const UUID &uuid, const GattServiceType type)
     : handle_(0), endHandle_(0), serviceType_(type), includeServices_(), characteristics_(), uuid_(uuid)
-{
-}
+{}
 
 GattService::GattService(const UUID &uuid, uint16_t handle, uint16_t endHandle, const GattServiceType type)
     : handle_(handle), endHandle_(endHandle), serviceType_(type), includeServices_(), characteristics_(), uuid_(uuid)
-{
-}
+{}
 
 GattService::GattService(const GattService &src)
     : handle_(src.handle_),
@@ -100,5 +98,5 @@ const UUID &GattService::GetUuid() const
 {
     return uuid_;
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

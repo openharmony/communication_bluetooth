@@ -29,93 +29,91 @@ struct BleCentralManager::impl {
     ~impl();
 
     void BindServer();
-    class BluetoothBleCentralManagerCallbackImp;
-    sptr<BluetoothBleCentralManagerCallbackImp> callbackImp_ = nullptr;
-
-    sptr<IBluetoothBleCentralManager> proxy_ = nullptr;
-    BluetoothObserverList<BleCentralManagerCallback> callbacks_ {};
-};
-
-class BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
-public:
-    BluetoothBleCentralManagerCallbackImp(BleCentralManager::impl &bleCentralManger)
-        : bleCentralManger_(bleCentralManger){};
-    ~BluetoothBleCentralManagerCallbackImp() override = default;
-    void OnScanCallback(const BluetoothBleScanResult &result) override
-    {
-        HILOGD("BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp::OnScanCallback");
-        bleCentralManger_.callbacks_.ForEach([&result](std::shared_ptr<BleCentralManagerCallback> observer) {
-            BluetoothBleScanResult tempResult = result;
-            BleScanResult scanResult;
-            for (auto &data : tempResult.GetManufacturerData()) {
-                scanResult.AddManufacturerData(data.first, data.second);
-            }
-
-            for (auto &data : tempResult.GetServiceUuids()) {
-                UUID uuid = UUID::ConvertFrom128Bits(data.ConvertTo128Bits());
-                scanResult.AddServiceUuid(uuid);
-            }
-
-            for (auto &data : tempResult.GetServiceData()) {
-                UUID uuid = UUID::ConvertFrom128Bits(data.first.ConvertTo128Bits());
-                scanResult.AddServiceData(uuid, data.second);
-            }
-
-            scanResult.SetAdvertiseFlag(tempResult.GetAdvertiseFlag());
-            scanResult.SetRssi(tempResult.GetRssi());
-            scanResult.SetConnectable(tempResult.IsConnectable());
-            BluetoothRemoteDevice device(tempResult.GetPeripheralDevice().GetAddress(), BT_TRANSPORT_BLE);
-            scanResult.SetPeripheralDevice(device);
-            scanResult.SetPayload(tempResult.GetPayload());
-
-            observer->OnScanCallback(scanResult);
-        });
-    }
-    void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) override
-    {
-        HILOGD("BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp::OnBleBatchScanResultsEvent");
-        bleCentralManger_.callbacks_.ForEach([&results](std::shared_ptr<BleCentralManagerCallback> observer) {
-            std::vector<BleScanResult> scanResults;
-            for (auto &result : results) {
+    class BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
+    public:
+        BluetoothBleCentralManagerCallbackImp(BleCentralManager::impl &bleCentralManger)
+            : bleCentralManger_(bleCentralManger){};
+        ~BluetoothBleCentralManagerCallbackImp() override = default;
+        void OnScanCallback(const BluetoothBleScanResult &result) override
+        {
+            HILOGD("BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp::OnScanCallback");
+            bleCentralManger_.callbacks_.ForEach([&result](std::shared_ptr<BleCentralManagerCallback> observer) {
+                BluetoothBleScanResult tempResult = result;
                 BleScanResult scanResult;
-                for (auto &data : result.GetManufacturerData()) {
-                    scanResult.AddManufacturerData(data.first, data.second);
+                for (auto &manufacturerData : tempResult.GetManufacturerData()) {
+                    scanResult.AddManufacturerData(manufacturerData.first, manufacturerData.second);
                 }
 
-                for (auto &data : result.GetServiceData()) {
-                    UUID uuid = UUID::ConvertFrom128Bits(data.first.ConvertTo128Bits());
-                    scanResult.AddServiceData(uuid, data.second);
-                }
-
-                for (auto &data : result.GetServiceUuids()) {
-                    UUID uuid = UUID::ConvertFrom128Bits(data.ConvertTo128Bits());
+                for (auto &serviceUuidData : tempResult.GetServiceUuids()) {
+                    UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.ConvertTo128Bits());
                     scanResult.AddServiceUuid(uuid);
                 }
 
-                scanResult.SetAdvertiseFlag(result.GetAdvertiseFlag());
-                scanResult.SetConnectable(result.IsConnectable());
-                scanResult.SetRssi(result.GetRssi());
-                BluetoothRemoteDevice device(result.GetPeripheralDevice().GetAddress(), BT_TRANSPORT_BLE);
+                for (auto &serviceData : tempResult.GetServiceData()) {
+                    UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
+                    scanResult.AddServiceData(uuid, serviceData.second);
+                }
+
+                scanResult.SetAdvertiseFlag(tempResult.GetAdvertiseFlag());
+                scanResult.SetRssi(tempResult.GetRssi());
+                scanResult.SetConnectable(tempResult.IsConnectable());
+                BluetoothRemoteDevice device(tempResult.GetPeripheralDevice().GetAddress(), BT_TRANSPORT_BLE);
                 scanResult.SetPeripheralDevice(device);
-                scanResult.SetPayload(result.GetPayload());
+                scanResult.SetPayload(tempResult.GetPayload());
 
-                scanResults.push_back(scanResult);
-            }
+                observer->OnScanCallback(scanResult);
+            });
+        }
+        void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) override
+        {
+            HILOGD("BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp::OnBleBatchScanResultsEvent");
+            bleCentralManger_.callbacks_.ForEach([&results](std::shared_ptr<BleCentralManagerCallback> observer) {
+                std::vector<BleScanResult> scanResults;
+                for (auto &result : results) {
+                    BleScanResult scanResult;
+                    for (auto &manufaturerData : result.GetManufacturerData()) {
+                        scanResult.AddManufacturerData(manufaturerData.first, manufaturerData.second);
+                    }
 
-            observer->OnBleBatchScanResultsEvent(scanResults);
-        });
-    }
+                    for (auto &serviceData : result.GetServiceData()) {
+                        UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
+                        scanResult.AddServiceData(uuid, serviceData.second);
+                    }
 
-    void OnStartScanFailed(int resultCode) override
-    {
-        bleCentralManger_.callbacks_.ForEach([resultCode](std::shared_ptr<BleCentralManagerCallback> observer) {
-            observer->OnStartScanFailed(resultCode);
-        });
-    }
+                    for (auto &serviceUuidData : result.GetServiceUuids()) {
+                        UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.ConvertTo128Bits());
+                        scanResult.AddServiceUuid(uuid);
+                    }
 
-private:
-    BleCentralManager::impl &bleCentralManger_;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleCentralManagerCallbackImp);
+                    scanResult.SetAdvertiseFlag(result.GetAdvertiseFlag());
+                    scanResult.SetConnectable(result.IsConnectable());
+                    scanResult.SetRssi(result.GetRssi());
+                    BluetoothRemoteDevice device(result.GetPeripheralDevice().GetAddress(), BT_TRANSPORT_BLE);
+                    scanResult.SetPeripheralDevice(device);
+                    scanResult.SetPayload(result.GetPayload());
+
+                    scanResults.push_back(scanResult);
+                }
+
+                observer->OnBleBatchScanResultsEvent(scanResults);
+            });
+        }
+
+        void OnStartScanFailed(int resultCode) override
+        {
+            bleCentralManger_.callbacks_.ForEach([resultCode](std::shared_ptr<BleCentralManagerCallback> observer) {
+                observer->OnStartScanFailed(resultCode);
+            });
+        }
+
+    private:
+        BleCentralManager::impl &bleCentralManger_;
+        BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleCentralManagerCallbackImp);
+    };
+    sptr<BluetoothBleCentralManagerCallbackImp> callbackImp_ = nullptr;
+
+    sptr<IBluetoothBleCentralManager> proxy_ = nullptr;
+    BluetoothObserverList<BleCentralManagerCallback> callbacks_{};
 };
 
 BleCentralManager::impl::impl()
@@ -203,7 +201,6 @@ void BleCentralManager::StopScan()
         pimpl->proxy_->StopScan();
     }
 }
-//////////////////////////////BleScanResult Start///////////////////////////////////////
 
 BleScanResult::BleScanResult()
 {}
@@ -290,7 +287,6 @@ void BleScanResult::SetAdvertiseFlag(uint8_t flag)
 {
     advertiseFlag_ = flag;
 }
-//////////////////////////////BleScanResult End///////////////////////////////////////
 
 BleScanSettings::BleScanSettings()
 {}
@@ -342,6 +338,5 @@ int BleScanSettings::GetPhy() const
 {
     return phy_;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

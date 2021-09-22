@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Bluetooth {
 namespace {
-    const int32_t BLE_INVALID_ADVERTISING_HANDLE = 0xFF;
+const int32_t BLE_INVALID_ADVERTISING_HANDLE = 0xFF;
 }
 
 BluetoothBleAdvertiserProxy::BluetoothBleAdvertiserProxy(const sptr<IRemoteObject> &impl)
@@ -72,8 +72,8 @@ void BluetoothBleAdvertiserProxy::DeregisterBleAdvertiserCallback(const sptr<IBl
 }
 
 void BluetoothBleAdvertiserProxy::StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
-    const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle, 
-        bool isRawData)
+    const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle,
+    bool isRawData)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
@@ -101,7 +101,7 @@ void BluetoothBleAdvertiserProxy::StartAdvertising(const BluetoothBleAdvertiserS
         return;
     }
 
-     if (!data.WriteBool(isRawData)) {
+    if (!data.WriteBool(isRawData)) {
         HILOGW("[StartAdvertising] fail: write isRawData failed.");
         return;
     }
@@ -197,6 +197,5 @@ ErrCode BluetoothBleAdvertiserProxy::InnerTransact(
         }
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

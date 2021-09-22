@@ -262,6 +262,11 @@ enum GattStatus {
     GATT_SUCCESS
 };
 
+enum SPPStatus {
+    SPP_FAILURE = -1,
+    SPP_SUCCESS
+};
+
 /*********************************************
  *
  * BLE Macro Define

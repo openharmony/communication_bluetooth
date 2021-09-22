@@ -18,7 +18,6 @@
 
 #include "i_bluetooth_ble_advertise_callback.h"
 #include "iremote_proxy.h"
-
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothBleAdvertiseCallbackProxy : public IRemoteProxy<IBluetoothBleAdvertiseCallback> {

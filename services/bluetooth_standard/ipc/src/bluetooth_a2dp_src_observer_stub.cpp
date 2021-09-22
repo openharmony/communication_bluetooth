@@ -20,8 +20,8 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace bluetooth;
-int32_t BluetoothA2dpSrcObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                           MessageOption &option)
+int32_t BluetoothA2dpSrcObserverStub::OnRemoteRequest(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothA2dpSrcObserverStub: transaction of code: %{public}d is received", code);
 
@@ -49,5 +49,5 @@ ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStateChangedInner(MessageParcel &
 
     return NO_ERROR;
 }
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

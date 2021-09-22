@@ -23,14 +23,17 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothA2dpSrcObserverProxy : public IRemoteProxy<IBluetoothA2dpSrcObserver> {
 public:
-    explicit BluetoothA2dpSrcObserverProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothA2dpSrcObserver>(impl) {}
-    ~BluetoothA2dpSrcObserverProxy() {}
+    explicit BluetoothA2dpSrcObserverProxy(const sptr<IRemoteObject> &impl)
+        : IRemoteProxy<IBluetoothA2dpSrcObserver>(impl)
+    {}
+    ~BluetoothA2dpSrcObserverProxy()
+    {}
 
     void OnPlayingStateChanged(const RawAddress &device, int playingState, int error) override;
 
 private:
     static inline BrokerDelegator<BluetoothA2dpSrcObserverProxy> delegator_;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_A2DP_SRC_OBSERVER_PROXY_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_A2DP_SRC_OBSERVER_PROXY_H

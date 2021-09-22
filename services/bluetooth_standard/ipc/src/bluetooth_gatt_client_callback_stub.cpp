@@ -18,7 +18,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub() {
+BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub()
+{
     HILOGD("%{public}s start.", __func__);
     memberFuncMap_[static_cast<uint32_t>(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE)] =
@@ -26,20 +27,16 @@ BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub() {
     memberFuncMap_[static_cast<uint32_t>(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_CHANGE)] =
         &BluetoothGattClientCallbackStub::OnCharacteristicChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_READ)] =
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_READ)] =
         &BluetoothGattClientCallbackStub::OnCharacteristicReadInner;
-    memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_WRITE)] =
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_WRITE)] =
         &BluetoothGattClientCallbackStub::OnCharacteristicWriteInner;
-    memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_READ)] =
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_READ)] =
         &BluetoothGattClientCallbackStub::OnDescriptorReadInner;
     memberFuncMap_[static_cast<uint32_t>(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_WRITE)] =
         &BluetoothGattClientCallbackStub::OnDescriptorWriteInner;
-    memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_MTU_UPDATE)] =
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_MTU_UPDATE)] =
         &BluetoothGattClientCallbackStub::OnMtuChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_DISCOVER)] =
@@ -52,15 +49,18 @@ BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub() {
         &BluetoothGattClientCallbackStub::OnServicesChangedInner;
 }
 
-BluetoothGattClientCallbackStub::~BluetoothGattClientCallbackStub() {
+BluetoothGattClientCallbackStub::~BluetoothGattClientCallbackStub()
+{
     HILOGD("%{public}s start.", __func__);
     memberFuncMap_.clear();
 }
 
 int BluetoothGattClientCallbackStub::OnRemoteRequest(
-    uint32_t code, MessageParcel &data, MessageParcel &reply,MessageOption &option) {
-    HILOGD("BluetoothGattClientCallbackStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", 
-        code, option.GetFlags());
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    HILOGD("BluetoothGattClientCallbackStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
+        code,
+        option.GetFlags());
     std::u16string descriptor = BluetoothGattClientCallbackStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
@@ -164,7 +164,7 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &d
     HILOGI("BluetoothGattClientCallbackStub::OnServicesChangedInner Triggered!");
     int32_t num = data.ReadInt32();
     std::vector<BluetoothGattService> service;
-    for(int i = num; i > 0; i--) {
+    for (int i = num; i > 0; i--) {
         std::unique_ptr<BluetoothGattService> dev(data.ReadParcelable<BluetoothGattService>());
         service.push_back(*dev);
     }
@@ -172,5 +172,5 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &d
     return NO_ERROR;
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

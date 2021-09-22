@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 namespace {
 const std::string PROFILE_GATT_CLIENT = "GattClientServer";
 const std::string PROFILE_GATT_SERVER = "GattServerServer";
@@ -146,8 +145,8 @@ public:
     virtual std::vector<sptr<BluetoothRawAddress>> GetPairedDevices(const int32_t transport) = 0;
     virtual bool RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) = 0;
     virtual bool RemoveAllPairs() = 0;
-    virtual void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer) = 0;
-    virtual void DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceOberver> &observer) = 0;
+    virtual void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) = 0;
+    virtual void DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) = 0;
     virtual int32_t GetBleMaxAdvertisingDataLength() = 0;
     virtual int32_t GetDeviceType(int32_t transport, const std::string &address) = 0;
     virtual int32_t GetPhonebookPermission(const std::string &address) = 0;

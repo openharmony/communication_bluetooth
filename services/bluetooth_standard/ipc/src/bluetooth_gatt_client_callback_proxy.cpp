@@ -19,7 +19,8 @@
 namespace OHOS {
 namespace Bluetooth {
 
-void BluetoothGattClientCallbackProxy::OnConnectionStateChanged(int32_t state, int32_t newState) {
+void BluetoothGattClientCallbackProxy::OnConnectionStateChanged(int32_t state, int32_t newState)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnConnectionStateChanged Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -35,7 +36,7 @@ void BluetoothGattClientCallbackProxy::OnConnectionStateChanged(int32_t state, i
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE, data, reply, option);
     if (error != NO_ERROR) {
@@ -44,7 +45,8 @@ void BluetoothGattClientCallbackProxy::OnConnectionStateChanged(int32_t state, i
     }
 }
 
-void BluetoothGattClientCallbackProxy::OnCharacteristicChanged(const BluetoothGattCharacteristic& characteristic) {
+void BluetoothGattClientCallbackProxy::OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnCharacteristicChanged Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -56,7 +58,7 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicChanged(const BluetoothGa
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_CHANGE, data, reply, option);
     if (error != NO_ERROR) {
@@ -66,7 +68,8 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicChanged(const BluetoothGa
 }
 
 void BluetoothGattClientCallbackProxy::OnCharacteristicRead(
-    int32_t ret, const BluetoothGattCharacteristic& characteristic) {
+    int32_t ret, const BluetoothGattCharacteristic &characteristic)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnCharacteristicRead Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -82,7 +85,7 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicRead(
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_READ, data, reply, option);
     if (error != NO_ERROR) {
@@ -92,7 +95,8 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicRead(
 }
 
 void BluetoothGattClientCallbackProxy::OnCharacteristicWrite(
-    int32_t ret, const BluetoothGattCharacteristic& characteristic) {
+    int32_t ret, const BluetoothGattCharacteristic &characteristic)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnCharacteristicWrite Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -108,7 +112,7 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicWrite(
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_WRITE, data, reply, option);
     if (error != NO_ERROR) {
@@ -117,7 +121,8 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicWrite(
     }
 }
 
-void BluetoothGattClientCallbackProxy::OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor& descriptor) {
+void BluetoothGattClientCallbackProxy::OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor &descriptor)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnDescriptorRead Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -133,7 +138,7 @@ void BluetoothGattClientCallbackProxy::OnDescriptorRead(int32_t ret, const Bluet
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_READ, data, reply, option);
     if (error != NO_ERROR) {
@@ -142,7 +147,8 @@ void BluetoothGattClientCallbackProxy::OnDescriptorRead(int32_t ret, const Bluet
     }
 }
 
-void BluetoothGattClientCallbackProxy::OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor& descriptor) {
+void BluetoothGattClientCallbackProxy::OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor &descriptor)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnDescriptorWrite Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -158,7 +164,7 @@ void BluetoothGattClientCallbackProxy::OnDescriptorWrite(int32_t ret, const Blue
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_WRITE, data, reply, option);
     if (error != NO_ERROR) {
@@ -167,7 +173,8 @@ void BluetoothGattClientCallbackProxy::OnDescriptorWrite(int32_t ret, const Blue
     }
 }
 
-void BluetoothGattClientCallbackProxy::OnMtuChanged(int32_t state, int32_t mtu) {
+void BluetoothGattClientCallbackProxy::OnMtuChanged(int32_t state, int32_t mtu)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnMtuChanged Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -183,7 +190,7 @@ void BluetoothGattClientCallbackProxy::OnMtuChanged(int32_t state, int32_t mtu) 
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_MTU_UPDATE, data, reply, option);
     if (error != NO_ERROR) {
@@ -192,7 +199,8 @@ void BluetoothGattClientCallbackProxy::OnMtuChanged(int32_t state, int32_t mtu) 
     }
 }
 
-void BluetoothGattClientCallbackProxy::OnServicesDiscovered(int32_t status) {
+void BluetoothGattClientCallbackProxy::OnServicesDiscovered(int32_t status)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnServicesDiscovered Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -204,7 +212,7 @@ void BluetoothGattClientCallbackProxy::OnServicesDiscovered(int32_t status) {
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_DISCOVER, data, reply, option);
     if (error != NO_ERROR) {
@@ -214,7 +222,8 @@ void BluetoothGattClientCallbackProxy::OnServicesDiscovered(int32_t status) {
 }
 
 void BluetoothGattClientCallbackProxy::OnConnectionParameterChanged(
-    int32_t interval, int32_t latency, int32_t timeout, int32_t status) {
+    int32_t interval, int32_t latency, int32_t timeout, int32_t status)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnConnectionParameterChanged Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
@@ -238,7 +247,7 @@ void BluetoothGattClientCallbackProxy::OnConnectionParameterChanged(
         return;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECTION_PARA_CHANGE, data, reply, option);
     if (error != NO_ERROR) {
@@ -247,26 +256,27 @@ void BluetoothGattClientCallbackProxy::OnConnectionParameterChanged(
     }
 }
 
-void BluetoothGattClientCallbackProxy::OnServicesChanged(std::vector<BluetoothGattService> &service) {
+void BluetoothGattClientCallbackProxy::OnServicesChanged(std::vector<BluetoothGattService> &service)
+{
     HILOGI("BluetoothGattClientCallbackProxy::OnServicesChanged Triggered!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientCallbackProxy::GetDescriptor())) {
         HILOGE("BluetoothGattClientCallbackProxy::OnServicesChanged WriteInterfaceToken error");
         return;
     }
-    int num=service.size();
+    int num = service.size();
     if (!data.WriteInt32(num)) {
         HILOGE("BluetoothGattClientCallbackProxy::OnServicesChanged transport error");
         return;
     }
-    for(int i = 0; i<num; i++) {
+    for (int i = 0; i < num; i++) {
         if (!data.WriteParcelable(&service[i])) {
             HILOGE("BluetoothGattClientCallbackProxy::OnServicesChanged transport error");
             return;
         }
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_ASYNC };
+    MessageOption option{MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED, data, reply, option);
     if (error != NO_ERROR) {
@@ -275,5 +285,5 @@ void BluetoothGattClientCallbackProxy::OnServicesChanged(std::vector<BluetoothGa
     }
 }
 
-} // namespace Bluetooth
-} // namespace OHOS
+}  // namespace Bluetooth
+}  // namespace OHOS

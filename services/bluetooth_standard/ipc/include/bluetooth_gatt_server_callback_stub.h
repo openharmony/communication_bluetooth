@@ -26,14 +26,13 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothGattServerCallbackStub : public IRemoteStub<IBluetoothGattServerCallback> {
 public:
-
     BluetoothGattServerCallbackStub();
     virtual ~BluetoothGattServerCallbackStub();
 
-    virtual int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                    MessageOption &option) override;
+    virtual int OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
-    
     ErrCode OnCharacteristicReadRequestInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnAddServiceInner(MessageParcel &data, MessageParcel &reply);
@@ -44,11 +43,10 @@ private:
     ErrCode OnNotifyConfirmInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply);
 
-
-    using BluetoothGattServerCallbackFunc =
-            ErrCode (BluetoothGattServerCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
+    using BluetoothGattServerCallbackFunc = ErrCode (BluetoothGattServerCallbackStub::*)(
+        MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothGattServerCallbackFunc> memberFuncMap_;
-    
+
     DISALLOW_COPY_AND_MOVE(BluetoothGattServerCallbackStub);
 };
 

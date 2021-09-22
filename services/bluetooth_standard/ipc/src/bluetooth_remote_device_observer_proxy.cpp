@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Bluetooth {
 BluetoothRemoteDeviceObserverproxy::BluetoothRemoteDeviceObserverproxy(const sptr<IRemoteObject> &impl)
-    : IRemoteProxy<IBluetoothRemoteDeviceOberver>(impl)
+    : IRemoteProxy<IBluetoothRemoteDeviceObserver>(impl)
 {}
 BluetoothRemoteDeviceObserverproxy::~BluetoothRemoteDeviceObserverproxy()
 {}
@@ -48,7 +48,7 @@ void BluetoothRemoteDeviceObserverproxy::OnPairStatusChanged(
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int32_t error =
-        InnerTransact(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS, option, data, reply);
+        InnerTransact(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothRemoteDeviceObserverproxy::OnPairStatusChanged done fail, error: %{public}d", error);
         return;
@@ -86,7 +86,7 @@ void BluetoothRemoteDeviceObserverproxy::OnRemoteUuidChanged(
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int32_t error =
-        InnerTransact(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID, option, data, reply);
+        InnerTransact(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothRemoteDeviceObserverproxy::OnPairStatusChanged done fail, error: %{public}d", error);
         return;
@@ -113,7 +113,7 @@ void BluetoothRemoteDeviceObserverproxy::OnRemoteNameChanged(
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int32_t error =
-        InnerTransact(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME, option, data, reply);
+        InnerTransact(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothRemoteDeviceObserverproxy::OnRemoteNameChanged done fail, error: %{public}d", error);
         return;
@@ -140,7 +140,7 @@ void BluetoothRemoteDeviceObserverproxy::OnRemoteAliasChanged(
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int32_t error = InnerTransact(
-        IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_ALIAS_CHANGED, option, data, reply);
+        IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_ALIAS_CHANGED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothRemoteDeviceObserverproxy::OnRemoteAliasChanged done fail, error: %{public}d", error);
         return;
@@ -166,7 +166,7 @@ void BluetoothRemoteDeviceObserverproxy::OnRemoteCodChanged(const BluetoothRawAd
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int32_t error =
-        InnerTransact(IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD, option, data, reply);
+        InnerTransact(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothRemoteDeviceObserverproxy::OnRemoteCodChanged done fail, error: %{public}d", error);
         return;
@@ -193,7 +193,7 @@ void BluetoothRemoteDeviceObserverproxy::OnRemoteBatteryLevelChanged(
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
     int32_t error = InnerTransact(
-        IBluetoothRemoteDeviceOberver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL, option, data, reply);
+        IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothRemoteDeviceObserverproxy::OnRemoteBatteryLevelChanged done fail, error: %{public}d", error);
         return;
@@ -223,6 +223,5 @@ ErrCode BluetoothRemoteDeviceObserverproxy::InnerTransact(
         }
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

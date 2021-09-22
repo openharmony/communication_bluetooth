@@ -23,28 +23,28 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothGattServerCallbackProxy : public IRemoteProxy<IBluetoothGattServerCallback> {
 public:
-    explicit BluetoothGattServerCallbackProxy(
-                const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothGattServerCallback>(impl) {};
-    ~BluetoothGattServerCallbackProxy() {};
+    explicit BluetoothGattServerCallbackProxy(const sptr<IRemoteObject> &impl)
+        : IRemoteProxy<IBluetoothGattServerCallback>(impl){};
+    ~BluetoothGattServerCallbackProxy(){};
 
     void OnCharacteristicReadRequest(
-                        const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) override;
+        const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) override;
     void OnConnectionStateChanged(const BluetoothGattDevice &device, int32_t ret, int32_t state) override;
     void OnAddService(int32_t ret, const BluetoothGattService &service) override;
-    void OnCharacteristicWriteRequest(
-                        const BluetoothGattDevice &device,
-                        const BluetoothGattCharacteristic &characteristic, bool needRespones) override;
+    void OnCharacteristicWriteRequest(const BluetoothGattDevice &device,
+        const BluetoothGattCharacteristic &characteristic, bool needRespones) override;
     void OnDescriptorReadRequest(const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) override;
     void OnDescriptorWriteRequest(
-                        const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) override;
+        const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) override;
     void OnMtuChanged(const BluetoothGattDevice &device, int32_t mtu) override;
     void OnNotifyConfirm(
         const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int result) override;
     void OnConnectionParameterChanged(
         const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status) override;
+
 private:
     static inline BrokerDelegator<BluetoothGattServerCallbackProxy> delegator_;
 };
-} // namespace Bluetooth
-} // namespace OHOS
-#endif // OHOS_BLUETOOTH_STANDARD_GATT_SERVER_CALLBACK_PROXY_H
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // OHOS_BLUETOOTH_STANDARD_GATT_SERVER_CALLBACK_PROXY_H
