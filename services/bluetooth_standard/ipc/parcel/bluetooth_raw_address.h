@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothRawAddress : public Parcelable, public ::bluetooth::RawAddress {
 public:
     BluetoothRawAddress() = default;

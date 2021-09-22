@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothUuid::Marshalling(Parcel &parcel) const
 {
     uint64_t most_sig_bits =

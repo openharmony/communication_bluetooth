@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 void BluetoothGattClientCallbackProxy::OnConnectionStateChanged(int32_t state, int32_t newState)
 {
     HILOGI("BluetoothGattClientCallbackProxy::OnConnectionStateChanged Triggered!");
@@ -36,7 +35,9 @@ void BluetoothGattClientCallbackProxy::OnConnectionStateChanged(int32_t state, i
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE, data, reply, option);
     if (error != NO_ERROR) {
@@ -58,7 +59,9 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicChanged(const BluetoothGa
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_CHANGE, data, reply, option);
     if (error != NO_ERROR) {
@@ -85,7 +88,9 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicRead(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_READ, data, reply, option);
     if (error != NO_ERROR) {
@@ -112,7 +117,9 @@ void BluetoothGattClientCallbackProxy::OnCharacteristicWrite(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_WRITE, data, reply, option);
     if (error != NO_ERROR) {
@@ -138,7 +145,9 @@ void BluetoothGattClientCallbackProxy::OnDescriptorRead(int32_t ret, const Bluet
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_READ, data, reply, option);
     if (error != NO_ERROR) {
@@ -164,7 +173,9 @@ void BluetoothGattClientCallbackProxy::OnDescriptorWrite(int32_t ret, const Blue
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_WRITE, data, reply, option);
     if (error != NO_ERROR) {
@@ -190,7 +201,9 @@ void BluetoothGattClientCallbackProxy::OnMtuChanged(int32_t state, int32_t mtu)
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_MTU_UPDATE, data, reply, option);
     if (error != NO_ERROR) {
@@ -212,7 +225,9 @@ void BluetoothGattClientCallbackProxy::OnServicesDiscovered(int32_t status)
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_DISCOVER, data, reply, option);
     if (error != NO_ERROR) {
@@ -247,7 +262,9 @@ void BluetoothGattClientCallbackProxy::OnConnectionParameterChanged(
         return;
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECTION_PARA_CHANGE, data, reply, option);
     if (error != NO_ERROR) {
@@ -276,7 +293,9 @@ void BluetoothGattClientCallbackProxy::OnServicesChanged(std::vector<BluetoothGa
         }
     }
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
     int error = Remote()->SendRequest(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED, data, reply, option);
     if (error != NO_ERROR) {
@@ -284,6 +303,5 @@ void BluetoothGattClientCallbackProxy::OnServicesChanged(std::vector<BluetoothGa
         return;
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

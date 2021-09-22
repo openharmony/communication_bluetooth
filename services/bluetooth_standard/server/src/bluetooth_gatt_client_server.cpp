@@ -32,7 +32,6 @@
 using namespace bluetooth;
 namespace OHOS {
 namespace Bluetooth {
-
 struct BluetoothGattClientServer::impl {
     class GattClientCallbackImpl;
     class SystemStateObserver;
@@ -225,7 +224,7 @@ int BluetoothGattClientServer::RegisterApplication(
     HILOGI("Bluetooth Gatt Client Server RegisterApplication Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     pimpl->clientService_ = pimpl->GetServicePtr();
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: RegisterApplication request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -238,7 +237,7 @@ int BluetoothGattClientServer::DeregisterApplication(int32_t appId)
 {
     HILOGI("Bluetooth Gatt Client Server DeregisterApplication Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: DeregisterApplication request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -249,7 +248,7 @@ int BluetoothGattClientServer::Connect(int32_t appId, bool autoConnect)
 {
     HILOGI("Bluetooth Gatt Client Server Connect Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: Connect request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -260,7 +259,7 @@ int BluetoothGattClientServer::Disconnect(int32_t appId)
 {
     HILOGI("Bluetooth Gatt Client Server Disconnect Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: Disconnect request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -271,7 +270,7 @@ int BluetoothGattClientServer::DiscoveryServices(int32_t appId)
 {
     HILOGI("Bluetooth Gatt Client Server DiscoveryServices Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: DiscoveryServices request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -282,7 +281,7 @@ int BluetoothGattClientServer::ReadCharacteristic(int32_t appId, const Bluetooth
 {
     HILOGI("Bluetooth Gatt Client Server ReadCharacteristic Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: ReadCharacteristic request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -298,7 +297,7 @@ int BluetoothGattClientServer::WriteCharacteristic(
     character.value_ = std::move(characteristic->value_);
     characteristic->length_ = 0;
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: WriteCharacteristic request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -312,7 +311,7 @@ int BluetoothGattClientServer::SignedWriteCharacteristic(int32_t appId, Bluetoot
     character.value_ = std::move(characteristic->value_);
     characteristic->length_ = 0;
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: SignedWriteCharacteristic request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -323,7 +322,7 @@ int BluetoothGattClientServer::ReadDescriptor(int32_t appId, const BluetoothGatt
 {
     HILOGI("Bluetooth Gatt Client Server ReadDescriptor Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: ReadDescriptor request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -338,7 +337,7 @@ int BluetoothGattClientServer::WriteDescriptor(int32_t appId, BluetoothGattDescr
     desc.value_ = std::move(descriptor->value_);
     descriptor->length_ = 0;
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: WriteDescriptor request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -349,7 +348,7 @@ int BluetoothGattClientServer::RequestExchangeMtu(int32_t appId, int32_t mtu)
 {
     HILOGI("Bluetooth Gatt Client Server RequestExchangeMtu Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: RequestExchangeMtu request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -360,7 +359,7 @@ void BluetoothGattClientServer::GetAllDevice(::std::vector<BluetoothGattDevice> 
 {
     HILOGI("Bluetooth Gatt Client Server GetAllDevice Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         return;
     }
     for (auto &dev : pimpl->clientService_->GetAllDevice()) {
@@ -372,7 +371,7 @@ int BluetoothGattClientServer::RequestConnectionPriority(int32_t appId, int32_t 
 {
     HILOGI("Bluetooth Gatt Client Server RequestConnectionPriority Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         return 0;
     }
     return pimpl->clientService_->RequestConnectionPriority(appId, connPriority);
@@ -382,13 +381,12 @@ void BluetoothGattClientServer::GetServices(int32_t appId, ::std::vector<Bluetoo
 {
     HILOGI("Bluetooth Gatt Client Server GetServices Triggered!");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->clientService_) {
+    if (pimpl->clientService_ == nullptr) {
         return;
     }
     for (auto &svc : pimpl->clientService_->GetServices(appId)) {
         service.push_back(svc);
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

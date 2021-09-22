@@ -38,7 +38,7 @@ void BluetoothHostObserverProxy::OnStateChanged(int32_t transport, int32_t statu
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_STATE_CHANGE, option, data, reply);
     if (result != NO_ERROR) {
@@ -63,7 +63,7 @@ void BluetoothHostObserverProxy::OnDiscoveryStateChanged(int32_t status)
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE, option, data, reply);
     if (result != NO_ERROR) {
@@ -87,7 +87,7 @@ void BluetoothHostObserverProxy::OnDiscoveryResult(const BluetoothRawAddress &de
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_DISCOVERY_RESULT, option, data, reply);
     if (result != NO_ERROR) {
@@ -116,7 +116,7 @@ void BluetoothHostObserverProxy::OnPairRequested(const int32_t transport, const 
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_PAIR_REQUESTED, option, data, reply);
     if (result != NO_ERROR) {
@@ -156,7 +156,7 @@ void BluetoothHostObserverProxy::OnPairConfirmed(
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_PAIR_CONFIRMED, option, data, reply);
     if (result != NO_ERROR) {
@@ -179,7 +179,7 @@ void BluetoothHostObserverProxy::OnScanModeChanged(int32_t mode)
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_SCAN_MODE_CHANGED, option, data, reply);
     if (result != NO_ERROR) {
@@ -202,7 +202,7 @@ void BluetoothHostObserverProxy::OnDeviceNameChanged(const std::string &deviceNa
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_DEVICE_NAME_CHANGED, option, data, reply);
     if (result != NO_ERROR) {
@@ -225,7 +225,7 @@ void BluetoothHostObserverProxy::OnDeviceAddrChanged(const std::string &address)
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_ASYNC};
 
     ErrCode result = InnerTransact(BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED, option, data, reply);
     if (result != NO_ERROR) {

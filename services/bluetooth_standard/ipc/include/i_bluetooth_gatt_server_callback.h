@@ -18,16 +18,12 @@
 
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_gatt_service.h"
-// #include "bluetooth/bluetooth_gatt_characteristic.h"
 #include "../parcel/bluetooth_gatt_descriptor.h"
-// #include "i_bluetooth_gatt_server.h"
 #include "../parcel/bluetooth_gatt_device.h"
 #include "../parcel/bluetooth_gatt_characteristic.h"
-// #include "bluetooth/bluetooth_remote_device.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
 class IBluetoothGattServerCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattServerCallback");
@@ -61,7 +57,6 @@ public:
     virtual void OnConnectionParameterChanged(
         const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status) = 0;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 

@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 using namespace bluetooth;
 class BleAdvertiserCallback : public IBleAdvertiserCallback {
 public:
@@ -64,7 +63,7 @@ struct BluetoothBleAdvertiserServer::impl {
     std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
     RemoteObserverList<IBluetoothBleAdvertiseCallback> observers_;
-    std::unique_ptr<BleAdvertiserCallback> observerImp_{std::make_unique<BleAdvertiserCallback>()};
+    std::unique_ptr<BleAdvertiserCallback> observerImp_ = std::make_unique<BleAdvertiserCallback>();
     IAdapterBle *bleService_ = nullptr;
 };
 

@@ -23,6 +23,8 @@
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_log.h"
 
+#include "securec.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -356,7 +358,7 @@ void GetAddrFromString(string in, unsigned char out[6]) {
 void GetAddrFromByte(unsigned char in[6], std::string &out)
 {
     char temp[18] = {0};
-    sprintf(temp, "%02X:%02X:%02X:%02X:%02X:%02X",
+    sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
         in[0], in[1], in[2], in[3], in[4], in[5]);
     out = string(temp);
 }
@@ -684,7 +686,7 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
 
     int ret = GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
         param->status, 0, (unsigned char *)param->value, param->valueLen);
-
+    
     if (g_GattsCallback != NULL && g_GattsCallback->responseConfirmationCb != NULL) {
         g_GattsCallback->responseConfirmationCb(ret, param->attrHandle);
     }

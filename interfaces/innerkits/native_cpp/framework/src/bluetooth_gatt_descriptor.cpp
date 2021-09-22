@@ -16,7 +16,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 GattDescriptor::GattDescriptor(const UUID uuid, const int permissions)
     : handle_(0), permissions_(permissions), characteristic_(nullptr), value_(nullptr), length_(0), uuid_(uuid)
 {}
@@ -33,7 +32,7 @@ GattDescriptor::GattDescriptor(const GattDescriptor &src)
       length_(src.length_),
       uuid_(src.uuid_)
 {
-    if (nullptr != src.value_ && 0 != length_) {
+    if (0 != length_ && nullptr != src.value_) {
         value_ = std::make_unique<uint8_t[]>(length_);
         memcpy(value_.get(), src.value_.get(), length_);
     } else {
@@ -51,7 +50,7 @@ GattDescriptor &GattDescriptor::operator=(const GattDescriptor &src)
         characteristic_ = src.characteristic_;
         length_ = src.length_;
 
-        if (nullptr != src.value_ && 0 != length_) {
+        if (0 != length_ && nullptr != src.value_) {
             value_ = std::make_unique<uint8_t[]>(length_);
             memcpy(value_.get(), src.value_.get(), length_);
         } else {
@@ -85,7 +84,7 @@ const std::unique_ptr<uint8_t[]> &GattDescriptor::GetValue(size_t *size) const
 
 void GattDescriptor::SetValue(const uint8_t *values, const size_t length)
 {
-    if (nullptr == values || 0 == length) {
+    if (0 == length || nullptr == values) {
         return;
     }
     value_ = std::make_unique<uint8_t[]>(length);
@@ -97,6 +96,5 @@ uint16_t GattDescriptor::GetHandle() const
 {
     return handle_;
 }
-
-}  // namespace Bluetooth
-}  // namespace OHOS
+} // namespace Bluetooth
+} // namespace OHOS

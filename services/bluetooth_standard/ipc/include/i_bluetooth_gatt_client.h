@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class IBluetoothGattClient : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattClient");

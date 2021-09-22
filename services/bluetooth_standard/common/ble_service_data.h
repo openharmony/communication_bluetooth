@@ -1163,5 +1163,4 @@ private:
     uint8_t advertiseFlag_ {};
 };
 }  // namespace bluetooth
-
 #endif  /// BLE_SERVICE_DATA_H

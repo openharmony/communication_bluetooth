@@ -45,11 +45,15 @@ struct RequestInformation {
     } context_;
 
     RequestInformation(uint8_t type, const bluetooth::GattDevice &device, GattCharacteristic *characteristic)
-        : type_(type), device_(device), context_{.characteristic_ = characteristic}
+        : type_(type), device_(device), context_ {
+            .characteristic_ = characteristic
+        }
     {}
 
     RequestInformation(uint8_t type, const bluetooth::GattDevice &device, GattDescriptor *decriptor)
-        : type_(type), device_(device), context_{.descriptor_ = decriptor}
+        : type_(type), device_(device), context_ {
+            .descriptor_ = decriptor
+        }
     {}
 
     RequestInformation(uint8_t type, const bluetooth::GattDevice &device) : type_(type), device_(device)
@@ -128,7 +132,7 @@ public:
             }
             server_.pimpl->callback_.OnCharacteristicReadRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                    (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
                 gattcharacter.value().get(),
                 server_.pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_READ, device.transport_));
             return;
@@ -156,7 +160,7 @@ public:
 
             server_.pimpl->callback_.OnCharacteristicWriteRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                    (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
                 gattcharacter.value().get(),
                 server_.pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_WRITE, device.transport_));
             return;
@@ -179,7 +183,7 @@ public:
             }
             server_.pimpl->callback_.OnDescriptorReadRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                    (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
                 gattdesc.value().get(),
                 server_.pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_READ, device.transport_));
             return;
@@ -204,7 +208,7 @@ public:
             }
             server_.pimpl->callback_.OnDescriptorWriteRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                    (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
                 gattdesc.value().get(),
                 server_.pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_WRITE, device.transport_));
             return;
@@ -219,7 +223,7 @@ public:
     {
         server_.pimpl->callback_.OnNotificationCharacteristicChanged(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
-                device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
             result);
         return;
     }
@@ -241,7 +245,7 @@ public:
 
         server_.pimpl->callback_.OnConnectionStateUpdate(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
-                device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
             state);
 
         return;
@@ -251,7 +255,7 @@ public:
     {
         server_.pimpl->callback_.OnMtuUpdate(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
-                device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
             mtu);
         return;
     }
@@ -277,7 +281,7 @@ public:
     {
         server_.pimpl->callback_.OnConnectionParameterChanged(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
-                device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR)),
             interval,
             latency,
             timeout,
@@ -332,7 +336,7 @@ void GattServer::impl::BuildIncludeService(GattService &svc, const std::vector<b
 {
     for (auto &iSvc : iSvcs) {
         GattService *pSvc = GetIncludeService(iSvc.startHandle_);
-        if (nullptr == pSvc) {
+        if (!pSvc) {
             HILOGE("GattServer::impl::BuildIncludeService: Can not find include service entity in service ");
             continue;
         }
@@ -411,7 +415,7 @@ bluetooth::GattDevice *GattServer::impl::FindConnectedDevice(const BluetoothRemo
     for (auto &gattDevice : devices_) {
         if (device.GetDeviceAddr().compare(gattDevice.addr_.GetAddress()) == 0 &&
             (device.GetTransportType() ==
-                (gattDevice.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR))) {
+            (gattDevice.transport_ == GATT_TRANSPORT_TYPE_LE ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR))) {
             return &gattDevice;
         }
     }
@@ -602,7 +606,7 @@ int GattServer::NotifyCharacteristicChanged(
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
 
-    if (nullptr == pimpl->proxy_ || !pimpl->isRegisterSucceeded_) {
+    if (!pimpl->proxy_ || !pimpl->isRegisterSucceeded_) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
 
@@ -654,7 +658,8 @@ int GattServer::SendResponse(
     }
 
     int result = GattStatus::INVALID_PARAMETER;
-    uint8_t requestType = requestId >> 8, transport = requestId & 0xFF;
+    uint8_t requestType = requestId >> 8; 
+    uint8_t transport = requestId & 0xFF;
     if (transport != GATT_TRANSPORT_TYPE_CLASSIC && transport != GATT_TRANSPORT_TYPE_LE) {
         return result;
     }
@@ -698,6 +703,5 @@ GattServer::~GattServer()
     }
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

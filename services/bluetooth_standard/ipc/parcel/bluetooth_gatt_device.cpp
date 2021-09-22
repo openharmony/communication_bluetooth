@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 bool BluetoothGattDevice::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteBool(isEncryption_)) {
@@ -123,6 +122,5 @@ bool BluetoothGattDevice::readFromParcel(Parcel &parcel)
     }
     return noError;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

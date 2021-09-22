@@ -154,7 +154,7 @@ bool BluetoothBleScanResult::ReadManufacturerDataFromParcel(Parcel &parcel)
         if (!parcel.ReadString(manufacturedData)) {
             return false;
         }
-        manufacturerSpecificData_.insert({manufacturerId, manufacturedData});
+        manufacturerSpecificData_.emplace(manufacturerId, manufacturedData);
     }
     return true;
 }
@@ -190,7 +190,7 @@ bool BluetoothBleScanResult::ReadServiceDataFromParcel(Parcel &parcel)
         if (!parcel.ReadString(serviceData)) {
             return false;
         }
-        serviceData_.insert({bluetooth::Uuid::ConvertFrom32Bits(serviceId), serviceData});
+        serviceData_.emplace(bluetooth::Uuid::ConvertFrom32Bits(serviceId), serviceData);
     }
     return true;
 }

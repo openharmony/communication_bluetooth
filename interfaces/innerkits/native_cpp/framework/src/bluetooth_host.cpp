@@ -47,10 +47,10 @@ struct BluetoothHost::impl {
     sptr<BluetoothBlePeripheralCallbackImp> bleRemoteObserverImp_ = nullptr;
 
     // user regist observers
-    BluetoothObserverList<BluetoothHostObserver> observers_{};
+    BluetoothObserverList<BluetoothHostObserver> observers_;
 
     // user regist remote observers
-    BluetoothObserverList<BluetoothRemoteDeviceObserver> remoteObservers_{};
+    BluetoothObserverList<BluetoothRemoteDeviceObserver> remoteObservers_;
 
     sptr<IBluetoothHost> proxy_ = nullptr;
 

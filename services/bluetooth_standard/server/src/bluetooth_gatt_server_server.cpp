@@ -161,8 +161,7 @@ BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackImpl(
 {}
 
 BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::
-    GattServerCallbackDeathRecipient(
-        const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
+GattServerCallbackDeathRecipient(const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
     : callback_(callback), owner_(owner)
 {}
 
@@ -190,35 +189,29 @@ BluetoothGattServerServer::impl::~impl()
 int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService *services)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
-
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
-
     bluetooth::Service svc = (bluetooth::Service)*services;
-
+    
     return pimpl->serverService_->AddService(appId, svc);
 }
 
 void BluetoothGattServerServer::ClearServices(int appId)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
-
+    if (!pimpl->serverService_) {
         return;
     }
-
     pimpl->serverService_->ClearServices(appId);
 }
 
 void BluetoothGattServerServer::CancelConnection(const BluetoothGattDevice &device)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
-
+    if (!pimpl->serverService_) {
         return;
     }
-
     pimpl->serverService_->CancelConnection((bluetooth::GattDevice)device);
 }
 
@@ -226,10 +219,9 @@ int BluetoothGattServerServer::NotifyClient(
     const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, bool needConfirm)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
-
     bluetooth::Characteristic character(characteristic->handle_);
     character.length_ = characteristic->length_;
     character.value_ = std::move(characteristic->value_);
@@ -241,7 +233,7 @@ int BluetoothGattServerServer::NotifyClient(
 int BluetoothGattServerServer::RemoveService(int32_t appId, const BluetoothGattService &services)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
@@ -252,10 +244,9 @@ int BluetoothGattServerServer::RespondCharacteristicRead(
     const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
-
     bluetooth::Characteristic character(characteristic->handle_);
     character.length_ = characteristic->length_;
     character.value_ = std::move(characteristic->value_);
@@ -268,7 +259,7 @@ int BluetoothGattServerServer::RespondCharacteristicWrite(
     const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
@@ -280,10 +271,9 @@ int BluetoothGattServerServer::RespondDescriptorRead(
     const BluetoothGattDevice &device, BluetoothGattDescriptor *descriptor, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
-
     bluetooth::Descriptor desc(descriptor->handle_);
     desc.length_ = descriptor->length_;
     desc.value_ = std::move(descriptor->value_);
@@ -296,7 +286,7 @@ int BluetoothGattServerServer::RespondDescriptorWrite(
     const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor, int32_t ret)
 {
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
@@ -322,8 +312,8 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
 int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
 {
 
-    // std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
-    if (nullptr == pimpl->serverService_) {
+    std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
+    if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
 
