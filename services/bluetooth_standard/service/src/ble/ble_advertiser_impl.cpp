@@ -20,7 +20,6 @@
 #include "ble_adapter.h"
 #include "ble_defs.h"
 #include "ble_feature.h"
-#include "ble_feature.h"
 #include "ble_properties.h"
 #include "ble_utils.h"
 #include "securec.h"
@@ -487,13 +486,6 @@ void BleAdvertiserImpl::Close(uint8_t advHandle) const
     }
 
     StopAdvertising(advHandle);
-    int ret = DeregisterCallbackToGap();
-    if (ret != BT_NO_ERROR) {
-        iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        LOG_DEBUG("[BleAdvertiserImpl] %{public}s:Deregister Callback to gap failed!.", __func__);
-        callback_->OnStartResultEvent(ret, advHandle);
-        return;
-    }
     iter->second.advStatus_ = ADVERTISE_NOT_STARTED;
 }
 
@@ -1777,7 +1769,8 @@ void BleAdvertiserImpl::HandleGapExAdvEvent(const BLE_GAP_CB_EVENT &event, int s
             LOG_ERROR("[BleAdvertiserImpl] %{public}s:clrear event! %{public}d.", __func__, event);
             break;
         case BLE_GAP_EX_ADV_SCAN_REQUEST_RECEIVED_EVT:
-            LOG_ERROR("[BleAdvertiserImpl] %{public}s:scan request! %{public}d status %{public}d.", __func__, event, status);
+            LOG_ERROR(
+                "[BleAdvertiserImpl] %{public}s:scan request! %{public}d status %{public}d.", __func__, event, status);
             break;
         case BLE_GAP_EX_ADC_TERMINATED_ADV_SET_EVT:
             GapExAdvTerminatedAdvSetEvt(status, handle);
@@ -1876,8 +1869,9 @@ void BleAdvertiserImpl::GenResPriAddrResultTask(uint8_t result, BtAddr btAddr) c
 
 void BleAdvertiserImpl::GenResPriAddrResult(uint8_t result, const uint8_t addr[BT_ADDRESS_SIZE], void *context)
 {
-    LOG_DEBUG(
-        "[BleAdvertiserImpl] %{public}s:ResPriAddr = %{public}s", __func__, RawAddress::ConvertToString(addr).GetAddress().c_str());
+    LOG_DEBUG("[BleAdvertiserImpl] %{public}s:ResPriAddr = %{public}s",
+        __func__,
+        RawAddress::ConvertToString(addr).GetAddress().c_str());
 
     auto *bleAdvertiser = static_cast<BleAdvertiserImpl *>(context);
 

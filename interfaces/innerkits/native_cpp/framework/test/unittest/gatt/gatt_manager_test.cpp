@@ -23,18 +23,10 @@
 
 using namespace testing;
 using namespace testing::ext;
-using namespace bluetooth;
+// using namespace bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
-
-// URI: scheme://authority/path1/path2/path3?id = 1&name = mingming&old#fragment
-/*
- * @tc.number: Xxx_Unittest_AttachId_GetId_0100
- * @tc.name: AttachId/GetId
- * @tc.desc: Test if attachd and getid return values are correct.
- */
-
 class GattClientCallbackTest : public GattClientCallback {
 public:
     GattClientCallbackTest()
@@ -136,7 +128,6 @@ HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetDevicesByStates, TestSize.Le
 
 HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetConnectedDevices, TestSize.Level1)
 {
-
     GTEST_LOG_(INFO) << "GattManager::GattManager ends";
     BluetoothRemoteDevice device;
     GattClient client(device);

@@ -106,28 +106,54 @@ public:
 
 class BleAdvCallback : public BleAdvertiseCallback {
 public:
-    BleAdvCallback(BleAdvertiser *handle) {
+    BleAdvCallback(BleAdvertiser *handle, int advId) {
         advHandle = handle;
-    }
-
-    ~BleAdvCallback() {
-        delete advHandle;
+        isStarted = false;
+        advId_ = advId;
     }
 
     void OnStartResultEvent(int result) {
+        if (result != 0) {
+            HILOGE("result : %{public}d", result);
+            return;
+        }
 
+        if (isStarted) {
+            HILOGI("adv stoped.");
+            isStarted = false;
+            if (g_AppCallback != NULL && g_AppCallback->advDisableCb != NULL) {
+                HILOGI("adv stoped advId_: %{public}d.", advId_);
+                g_AppCallback->advDisableCb(advId_, 0);
+            }
+            g_BleAdvCallbacks[advId_] = NULL;
+            HILOGI("g_BleAdvCallbacks[%{public}d] = %{public}p.", advId_, g_BleAdvCallbacks[advId_]);
+            delete this;
+        } else {
+            HILOGI("adv started.");
+            isStarted = true;
+            if (g_AppCallback != NULL && g_AppCallback->advEnableCb != NULL) {
+                g_AppCallback->advEnableCb(advId_, 0);
+            }
+            
+        }
     }
 
     BleAdvertiser *GetAdvHandle() {
         return advHandle;
     }
 protected:
+    ~BleAdvCallback() {
+        delete advHandle;
+    }
+
     BleAdvertiserData *advData;
     BleAdvertiserData *advResponseData;
     BleAdvertiserSettings *advSetting;
 
 private:
     BleAdvertiser *advHandle;
+    bool isStarted;
+    int advId_;
 };
 
 /**
@@ -216,9 +242,6 @@ int BleStopAdv(int advId)
 {
     if (advId >= 0 && advId < MAX_BLE_ADV_NUM) {
         g_BleAdvCallbacks[advId]->GetAdvHandle()->StopAdvertising(*g_BleAdvCallbacks[advId]);
-        g_BleAdvCallbacks[advId]->GetAdvHandle()->Close(*g_BleAdvCallbacks[advId]);
-        delete g_BleAdvCallbacks[advId];
-        g_BleAdvCallbacks[advId] = NULL;
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -375,9 +398,10 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
         if (g_BleAdvCallbacks[i] == NULL) {
-            g_BleAdvCallbacks[i] = new BleAdvCallback(new BleAdvertiser());
+            g_BleAdvCallbacks[i] = new BleAdvCallback(new BleAdvertiser(), i);
             break;
         }
+        HILOGI("g_BleAdvCallbacks[%{public}d] = %{public}p.", i, g_BleAdvCallbacks[i]);
     }
 
     if (i == MAX_BLE_ADV_NUM) {

@@ -143,8 +143,6 @@ public:
      */
     void SetValue(const uint8_t *values, const size_t length);
 
-
-
 private:
     /**
      * @brief The handle of descriptor.
@@ -194,9 +192,6 @@ private:
      */
     UUID uuid_;
     friend class GattCharacteristic;
-
-
-
 };
 } // namespace Bluetooth
 } // namespace OHOS
