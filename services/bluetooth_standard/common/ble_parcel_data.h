@@ -31,8 +31,8 @@
  * @since 6
  */
 
-#ifndef BLE_AIDL_DATA_H
-#define BLE_AIDL_DATA_H
+#ifndef BLE_PARCEL_DATA_H
+#define BLE_PARCEL_DATA_H
 
 #include <map>
 #include <vector>
@@ -645,4 +645,4 @@ public:
 };
 }  // namespace bluetooth
 
-#endif  /// BLE_AIDL_DATA_H
+#endif  /// BLE_PARCEL_DATA_H

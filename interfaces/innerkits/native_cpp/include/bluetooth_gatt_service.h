@@ -40,7 +40,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 /** A GATT-based Service type.
  *  Define GATT-based Service types.
  */

@@ -649,7 +649,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
         }
         result = pimpl->proxy_->SignedWriteCharacteristic(pimpl->applicationId_, &character);
     } else {
-        withoutRespond = (characteristic.GetWriteType() == (int)GattCharacteristic::WriteType::DEFAULT ? false : true);
+        withoutRespond = ((characteristic.GetWriteType() == (int)GattCharacteristic::WriteType::DEFAULT) ? false : true);
         if (!pimpl->proxy_) {
             HILOGI("GattClient::WriteCharacteristic() proxy_ is null when used!");
             return GattStatus::GATT_FAILURE;

@@ -40,18 +40,16 @@ struct BleAdvertiser::impl {
         void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) override
         {
             HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnStartResultEvent");
-            bleAdvertiser_.callbacks_.ForEach(
-                [result, advHandle](int32_t handle, BleAdvertiseCallback *observer) {
-                    if (advHandle == handle) {
-                        observer->OnStartResultEvent(result);
-                    }
-                },
-                advHandle);
-            if ((opcode == BLE_ADV_STOP_COMPLETE_OP_CODE && result == 0) || opcode == BLE_ADV_START_FAILED_OP_CODE) {
-                BleAdvertiseCallback *observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
-                if (observer != nullptr) {
-                    bleAdvertiser_.callbacks_.Deregister(observer);
-                }
+            BleAdvertiseCallback *observer = nullptr;
+            if ((opcode == bluetooth::BLE_ADV_STOP_COMPLETE_OP_CODE && result == 0) ||
+                (opcode == bluetooth::BLE_ADV_START_FAILED_OP_CODE)) {
+                observer = bleAdvertiser_.callbacks_.PopAdvertiserObserver(advHandle);
+            } else {
+                observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
+            }
+
+            if (observer != nullptr) {
+                observer->OnStartResultEvent(result);
             }
         }
 
@@ -76,6 +74,7 @@ struct BleAdvertiser::impl {
 
 BleAdvertiser::impl::impl()
 {
+    HILOGE("BleAdvertiser::impl::impl()");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
         HILOGE("BleAdvertiser::impl::impl() error: no samgr");
@@ -217,7 +216,7 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
 
 void BleAdvertiser::StopAdvertising(BleAdvertiseCallback &callback)
 {
-    HILOGD("BleAdvertiser::StartAdvertising");
+    HILOGD("BleAdvertiser::StopAdvertising");
     if (pimpl->proxy_ != nullptr) {
         uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(&callback);
         if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
@@ -230,9 +229,17 @@ void BleAdvertiser::StopAdvertising(BleAdvertiseCallback &callback)
 
 void BleAdvertiser::Close(BleAdvertiseCallback &callback)
 {
+    HILOGD("BleAdvertiser::Close");
     if (pimpl->proxy_ != nullptr) {
         uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(&callback);
-        pimpl->proxy_->Close(advHandle);
+        if (advHandle != BLE_INVALID_ADVERTISING_HANDLE) {
+            pimpl->proxy_->Close(advHandle);
+        }
+
+        BleAdvertiseCallback *observer = pimpl->callbacks_.GetAdvertiserObserver(advHandle);
+        if (observer != nullptr) {
+            pimpl->callbacks_.Deregister(observer);
+        }
     }
 }
 

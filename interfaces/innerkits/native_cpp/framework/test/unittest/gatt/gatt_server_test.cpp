@@ -22,7 +22,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
 class BluetoothGattServerCallbackCommon : public GattServerCallback {
 public:
     BluetoothGattServerCallbackCommon() = default;
@@ -81,12 +80,11 @@ void GattServerTest::SetUp()
 void GattServerTest::TearDown()
 {}
 
-// URI: scheme://authority/path1/path2/path3?id = 1&name = mingming&old#fragment
-
-//  * @tc.number: Xxx_Unittest_AttachId_GetId_0100
-//  * @tc.name: AttachId/GetId
-//  * @tc.desc: Test if attachd and getid return values are correct.
-
+/*
+ * @tc.number: GattServer001
+ * @tc.name: AddService
+ * @tc.desc: Check the addservice interface.
+*/
 HWTEST_F(GattServerTest, GattServer_ModuleTest_AddService, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_AddService start";
@@ -96,114 +94,149 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_AddService, TestSize.Level1)
     GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
     int ret = server.AddService(serviceOne);
 
-    EXPECT_EQ(ret, bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(ret, 0);
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_AddService end";
 }
 
-// HWTEST_F(GattServerTest, GattServer_ModuleTest_CancelConnection, TestSize.Level1)
-// {
+/*
+ * @tc.number: GattServer002
+ * @tc.name: CancelConnection
+ * @tc.desc: Check the CancelConnection interface.
+*/
+HWTEST_F(GattServerTest, GattServer_ModuleTest_CancelConnection, TestSize.Level1)
+{
 
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_CancelConnection start";
-//     GattServer server(callback_);
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_CancelConnection start";
+    GattServer server(callback_);
 
-//     BluetoothRemoteDevice deviceBle_;
+    BluetoothRemoteDevice deviceBle_;
 
-//     server.CancelConnection(deviceBle_);
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_CancelConnection end";
-// }
+    server.CancelConnection(deviceBle_);
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_CancelConnection end";
+}
 
-// HWTEST_F(GattServerTest, GattServer_ModuleTest_RemoveService, TestSize.Level1)
-// {
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_RemoveService start";
-//     GattServer server(callback_);
+/*
+ * @tc.number: GattServer003
+ * @tc.name: RemoveService
+ * @tc.desc: Check the RemoveService interface.
+*/
+HWTEST_F(GattServerTest, GattServer_ModuleTest_RemoveService, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_RemoveService start";
+    GattServer server(callback_);
 
-//     std::list<GattService> &list = server.GetServices();
-//     int ret = server.RemoveGattService(list.back());
-//     EXPECT_EQ(ret, bluetooth::GattStatus::GATT_SUCCESS);
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_RemoveService end";
-// }
+    std::list<GattService> &list = server.GetServices();
+    int ret = server.RemoveGattService(list.back());
+    EXPECT_EQ(ret, 0);
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_RemoveService end";
+}
 
-// HWTEST_F(GattServerTest, GattServer_ModuleTest_ClearServices, TestSize.Level1)
-// {
+/*
+ * @tc.number: GattServer005
+ * @tc.name: ClearServices
+ * @tc.desc: Check the ClearServices interface.
+*/
+HWTEST_F(GattServerTest, GattServer_ModuleTest_ClearServices, TestSize.Level1)
+{
 
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_ClearServices start";
-//     GattServer server(callback_);
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_ClearServices start";
+    GattServer server(callback_);
 
-//     std::list<GattService>& list = server.GetServices();
-//     GTEST_LOG_(INFO) << (int)list.size();
-//     server.ClearServices();
-//     list = server.GetServices();
-//     EXPECT_EQ((int)list.size(), 0);
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_ClearServices end";
-// }
+    std::list<GattService>& list = server.GetServices();
+    GTEST_LOG_(INFO) << (int)list.size();
+    server.ClearServices();
+    list = server.GetServices();
+    EXPECT_EQ((int)list.size(), 0);
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_ClearServices end";
+}
 
-// HWTEST_F(GattServerTest, GattServer_ModuleTest_Notify, TestSize.Level1)
-// {
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_Notify start";
-//     GattServer server(callback_);
+/*
+ * @tc.number: GattServer006
+ * @tc.name: NotifyCharacteristicChanged
+ * @tc.desc: Check the NotifyCharacteristicChanged interface.
+*/
+HWTEST_F(GattServerTest, GattServer_ModuleTest_NotifyCharacteristicChanged, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_Notify start";
+    GattServer server(callback_);
 
-//     BluetoothRemoteDevice deviceBle_;
-//     UUID uuidSerPer;
-//     uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
-//     GattCharacteristic* aa = new GattCharacteristic(uuidSerPer,1,1);
-//     int res = server.NotifyCharacteristicChanged(deviceBle_, *aa, false);
-//     EXPECT_EQ(res, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    BluetoothRemoteDevice deviceBle_;
+    UUID uuidSerPer;
+    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
+    GattCharacteristic* aa = new GattCharacteristic(uuidSerPer,1,1);
+    int res = server.NotifyCharacteristicChanged(deviceBle_, *aa, false);
+    EXPECT_EQ(res, 0);
 
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_Notify end";
-// }
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_Notify end";
+}
 
-// HWTEST_F(GattServerTest, GattServer_ModuleTest_SendResponse, TestSize.Level1)
-// {
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_SendResponse start";
-//     GattServer server(callback_);
+/*
+ * @tc.number: GattServer007
+ * @tc.name: SendResponse
+ * @tc.desc: Check the SendResponse interface.
+*/
+HWTEST_F(GattServerTest, GattServer_ModuleTest_SendResponse, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_SendResponse start";
+    GattServer server(callback_);
 
-//     BluetoothRemoteDevice deviceBle_;
-//     string valueChrTwo = "2";
-//     int ret = server.SendResponse(deviceBle_,
-//         0,
-//         (int)GattStatus::GATT_SUCCESS,
-//         1,
-//         (uint8_t *)valueChrTwo.c_str(),
-//         valueChrTwo.size());
-//     EXPECT_EQ(ret, bluetooth::GattStatus::GATT_SUCCESS);
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_SendResponse end";
+    BluetoothRemoteDevice deviceBle_;
+    string valueChrTwo = "2";
+    int ret = server.SendResponse(deviceBle_,
+        0,
+        (int)GattStatus::GATT_SUCCESS,
+        1,
+        (uint8_t *)valueChrTwo.c_str(),
+        valueChrTwo.size());
+    EXPECT_EQ(ret, 0);
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_SendResponse end";
+}
 
-// }
+/*
+ * @tc.number: GattServer008
+ * @tc.name: GetServices
+ * @tc.desc: Check the GetServices interface.
+*/
+HWTEST_F(GattServerTest, GattServer_ModuleTest_GetServices, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetServices start";
+    GattServer server(callback_);
 
-// HWTEST_F(GattServerTest, GattServer_ModuleTest_GetServices, TestSize.Level1)
-// {
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetServices start";
-//     GattServer server(callback_);
+    UUID uuidSerPer;
+    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
 
-//     UUID uuidSerPer;
-//     uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
+    GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
+    int ret = server.AddService(serviceOne);
 
-//     GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
-//     int ret = server.AddService(serviceOne);
+    EXPECT_EQ(ret, 0);
+    std::list<GattService> list = server.GetServices();
+    EXPECT_EQ((int)list.size(), 1);
 
-//     EXPECT_EQ(ret, bluetooth::GattStatus::GATT_SUCCESS);
-//     std::list<GattService> list = server.GetServices();
-//     EXPECT_EQ((int)list.size(), 1);
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetServices end";
+}
 
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetServices end";
-// }
+/*
+ * @tc.number: GattServer009
+ * @tc.name: GetService
+ * @tc.desc: Check the GetService interface.
+*/
 
-// HWTEST_F(GattServerTest, GattServer_ModuleTest_GetService, TestSize.Level1)
-// {
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetService start";
-//     GattServer server(callback_);
+HWTEST_F(GattServerTest, GattServer_ModuleTest_GetService, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetService start";
+    GattServer server(callback_);
 
-//     UUID uuidSerPer;
-//     uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
+    UUID uuidSerPer;
+    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
 
-//     GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
-//     int ret = server.AddService(serviceOne);
+    GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
+    int ret = server.AddService(serviceOne);
 
-//     EXPECT_EQ(ret, bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(ret, 0);
 
-//     std::optional<GattService> listSecondary = server.GetService(uuidSerPer, false);
-//     EXPECT_FALSE(listSecondary->IsPrimary());
-//     GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetService end";
-// }
+    std::optional<GattService> listSecondary = server.GetService(uuidSerPer, false);
+    EXPECT_FALSE(listSecondary->IsPrimary());
+    GTEST_LOG_(INFO) << "GattServer_ModuleTest_GetService end";
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

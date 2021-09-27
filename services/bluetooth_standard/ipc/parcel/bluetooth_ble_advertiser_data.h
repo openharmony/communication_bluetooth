@@ -15,7 +15,7 @@
 #ifndef BLUETOOTH_PARCEL_BLE_ADVERTISER_DATA_H
 #define BLUETOOTH_PARCEL_BLE_ADVERTISER_DATA_H
 
-#include "ble_aidl_data.h"
+#include "ble_parcel_data.h"
 #include "parcel.h"
 
 namespace OHOS {

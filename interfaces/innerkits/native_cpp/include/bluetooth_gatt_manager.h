@@ -85,7 +85,6 @@ public:
      */
     ~GattManager();
 
-
 private:
     BLUETOOTH_DECLARE_IMPL();
 };
