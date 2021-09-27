@@ -35,6 +35,10 @@
         }
       ],
       "test_list": [
+        "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/gatt:unittest",
+        "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/spp:unittest",
+        "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/host:unittest",
+        "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest:unittest"
       ]
     }
   }

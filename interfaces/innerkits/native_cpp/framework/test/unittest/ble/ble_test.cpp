@@ -21,12 +21,11 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 BleTest *BleTest::bleInstance_ = nullptr;
-
 namespace {
-
 const static int defaultInt = 150;
+const static int INTERVAL = 350;
+const static int MAX_ADV_LENGTH = 1650;
 Bluetooth::UUID g_uuid = Bluetooth::UUID::FromString("00000000-0000-1000-8000-00805F9B34FB");
 Bluetooth::UUID g_serviceDataUuid = Bluetooth::UUID::FromString("00000000-0000-1000-8000-00805F9B34FA");
 std::string g_serviceData = "123";
@@ -37,14 +36,13 @@ std::mutex g_mx;
 std::condition_variable g_cv;
 bool g_ready = false;
 int g_wait_time = 3;
-
 }  // namespace
 
 void BleTest::InitAdvertiseSettings()
 {
     BleTest::bleInstance_->bleAdvertiserSettings_.SetConnectable(true);
     BleTest::bleInstance_->bleAdvertiserSettings_.SetLegacyMode(true);
-    BleTest::bleInstance_->bleAdvertiserSettings_.SetInterval(350);
+    BleTest::bleInstance_->bleAdvertiserSettings_.SetInterval(INTERVAL);
     BleTest::bleInstance_->bleAdvertiserSettings_.SetTxPower(BLE_ADV_TX_POWER_LEVEL::BLE_ADV_TX_POWER_MEDIUM);
     BleTest::bleInstance_->bleAdvertiserSettings_.SetPrimaryPhy(PHY_TYPE::PHY_LE_ALL_SUPPORTED);
     BleTest::bleInstance_->bleAdvertiserSettings_.SetSecondaryPhy(PHY_TYPE::PHY_LE_2M);
@@ -202,7 +200,7 @@ HWTEST_F(BleTest, BLE_ModuleTest_StartAdvertising_00100, TestSize.Level1)
     bleAdvertise.StartAdvertising(
         BleTest::bleInstance_->bleAdvertiserSettings_, advData1, scanData1, bleAdvertiseCallbackTest_);
     bleAdvertise.StopAdvertising(bleAdvertiseCallbackTest_);
-    EXPECT_EQ(1650, host_->GetBleMaxAdvertisingDataLength());
+    EXPECT_EQ(MAX_ADV_LENGTH, host_->GetBleMaxAdvertisingDataLength());
 
     bleAdvertise.Close(bleAdvertiseCallbackTest_);
     EXPECT_TRUE(DisableBle());
@@ -215,7 +213,7 @@ HWTEST_F(BleTest, BLE_ModuleTest_StartAdvertising_00200, TestSize.Level1)
     BleTest::bleInstance_->InitAdvertiseSettings();
     EXPECT_TRUE(BleTest::bleInstance_->bleAdvertiserSettings_.IsConnectable());
     EXPECT_TRUE(BleTest::bleInstance_->bleAdvertiserSettings_.IsLegacyMode());
-    EXPECT_EQ((uint16_t)350, BleTest::bleInstance_->bleAdvertiserSettings_.GetInterval());
+    EXPECT_EQ((uint16_t)INTERVAL, BleTest::bleInstance_->bleAdvertiserSettings_.GetInterval());
     EXPECT_EQ(
         BLE_ADV_TX_POWER_LEVEL::BLE_ADV_TX_POWER_MEDIUM, BleTest::bleInstance_->bleAdvertiserSettings_.GetTxPower());
     EXPECT_EQ(PHY_TYPE::PHY_LE_ALL_SUPPORTED, BleTest::bleInstance_->bleAdvertiserSettings_.GetPrimaryPhy());
@@ -259,6 +257,5 @@ HWTEST_F(BleTest, BLE_ModuleTest_StartCentralManager_00200, TestSize.Level1)
     EXPECT_EQ(PHY_TYPE::PHY_LE_ALL_SUPPORTED, BleTest::bleInstance_->bleScanSettings_.GetPhy());
     GTEST_LOG_(INFO) << "BLE_ModuleTest_StartCentralManager_00200 end";
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

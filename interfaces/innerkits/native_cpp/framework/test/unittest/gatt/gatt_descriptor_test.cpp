@@ -21,7 +21,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
-
 class GattDescriptorTest : public testing::Test {
 public:
     GattDescriptorTest()
@@ -143,6 +142,5 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_SetValue, TestSize.Level1
     GTEST_LOG_(INFO) << "GattDescriptor::GattDescriptor ends";
     GTEST_LOG_(INFO) << "GattDescriptor::SetValue ends";
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

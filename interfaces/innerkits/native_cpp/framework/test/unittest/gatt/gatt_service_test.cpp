@@ -22,7 +22,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
-
 class GattServiceTest : public testing::Test {
 public:
     GattServiceTest()
@@ -206,6 +205,5 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetCharacteristics, TestSize.Le
     GTEST_LOG_(INFO) << "GattService::GattService ends";
     GTEST_LOG_(INFO) << "GattService::GetCharacteristics ends";
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS
