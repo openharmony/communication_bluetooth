@@ -33,6 +33,7 @@ public:
     void ForEach(const std::function<void(uint8_t, T *)> &observer, int handle);
 
     uint8_t GetAdvertiserHandle(T *observer);
+    T *PopAdvertiserObserver(uint8_t advHandle);
     T *GetAdvertiserObserver(uint8_t advHandle);
     bool IsExistAdvertiserCallback(T *observer, int &handle);
 
@@ -102,6 +103,7 @@ void BluetoothObserverMap<T>::ForEach(const std::function<void(uint8_t, T *)> &o
 template<typename T>
 uint8_t BluetoothObserverMap<T>::GetAdvertiserHandle(T *observer)
 {
+    std::lock_guard<std::mutex> lock(lock_);
     uint8_t advHandle = bluetooth::BLE_INVALID_ADVERTISING_HANDLE;
     if (observer == nullptr) {
         return advHandle;
@@ -119,8 +121,25 @@ uint8_t BluetoothObserverMap<T>::GetAdvertiserHandle(T *observer)
 }
 
 template<typename T>
+T *BluetoothObserverMap<T>::PopAdvertiserObserver(uint8_t advHandle)
+{
+    std::lock_guard<std::mutex> lock(lock_);
+    T *t = nullptr;
+    auto it = observers_.begin();
+    for (; it != observers_.end(); it++) {
+        if (it->first == advHandle) {
+            t = it->second;
+            observers_.erase(it++);
+            break;
+        }
+    }
+    return t;
+}
+
+template<typename T>
 T *BluetoothObserverMap<T>::GetAdvertiserObserver(uint8_t advHandle)
 {
+    std::lock_guard<std::mutex> lock(lock_);
     auto it = observers_.begin();
     for (; it != observers_.end(); it++) {
         if (it->first == advHandle) {

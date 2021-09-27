@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 using namespace testing::ext;
 
 class BleAdvertiseCallbackTest : public Bluetooth::BleAdvertiseCallback {
@@ -98,6 +97,5 @@ public:
 private:
     bool isHaveUuid = false;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS

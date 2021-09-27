@@ -32,7 +32,7 @@ GattDescriptor::GattDescriptor(const GattDescriptor &src)
       length_(src.length_),
       uuid_(src.uuid_)
 {
-    if (0 != length_ && nullptr != src.value_) {
+    if (length_ != 0 && src.value_ != nullptr) {
         value_ = std::make_unique<uint8_t[]>(length_);
         memcpy(value_.get(), src.value_.get(), length_);
     } else {
@@ -50,7 +50,7 @@ GattDescriptor &GattDescriptor::operator=(const GattDescriptor &src)
         characteristic_ = src.characteristic_;
         length_ = src.length_;
 
-        if (0 != length_ && nullptr != src.value_) {
+    if (length_ != 0 && src.value_ != nullptr) {
             value_ = std::make_unique<uint8_t[]>(length_);
             memcpy(value_.get(), src.value_.get(), length_);
         } else {
@@ -84,7 +84,7 @@ const std::unique_ptr<uint8_t[]> &GattDescriptor::GetValue(size_t *size) const
 
 void GattDescriptor::SetValue(const uint8_t *values, const size_t length)
 {
-    if (0 == length || nullptr == values) {
+    if (length == 0 || values == nullptr) {
         return;
     }
     value_ = std::make_unique<uint8_t[]>(length);

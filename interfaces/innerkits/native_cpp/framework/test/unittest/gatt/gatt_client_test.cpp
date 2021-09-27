@@ -28,7 +28,6 @@ using namespace bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
-
 class GattClientCallbackTest : public GattClientCallback {
 public:
     GattClientCallbackTest()
@@ -307,6 +306,5 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_RequestConnectionPriority, TestSi
     EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_RequestConnectionPriority end";
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS
