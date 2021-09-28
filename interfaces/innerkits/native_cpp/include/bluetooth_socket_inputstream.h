@@ -77,7 +77,6 @@ private:
     int socketFd_;
     InputStream() = delete;
 };
-
 } // namespace Bluetooth
 } // namespace OHOS
 #endif  // BLUETOOTH_INPUTSTREAM_H

@@ -15,9 +15,8 @@
 
 #include <sys/socket.h>
 #include <string>
+#include "securec.h"
 #include <unistd.h>
-#include <errno.h>
-#include <memory>
 #include "bluetooth_log.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_socket_proxy.h"
@@ -28,13 +27,11 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 struct SppClientSocket::impl {
     impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSocketType type, bool auth);
     impl(int fd, std::string address);
     ~impl()
     {
-
         if (!proxy_) {
             HILOGI("SppClientSocket::impl:～impl() failed: no proxy_");
             return;
@@ -84,7 +81,6 @@ struct SppClientSocket::impl {
 
     bool RecvSocketSignal()
     {
-
         uint8_t recvStateBuf[1];
 #ifdef DARWIN_PLATFORM
         int recvBufSize = recv(fd_, recvStateBuf, sizeof(recvStateBuf), 0);
@@ -109,7 +105,9 @@ struct SppClientSocket::impl {
         }
         char token[18] = {0};
         sprintf(token, "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
-        BluetoothRawAddress rawAddr{token};
+        BluetoothRawAddress rawAddr {
+            token
+        };
         std::string address = rawAddr.GetAddress().c_str();
         return state;
     }
@@ -158,8 +156,12 @@ struct SppClientSocket::impl {
     sptr<BluetoothClientSocketDeathRecipient> deathRecipient_;
 
     sptr<IBluetoothSocket> proxy_;
-    std::unique_ptr<InputStream> inputStream_{nullptr};
-    std::unique_ptr<OutputStream> outputStream_{nullptr};
+    std::unique_ptr<InputStream> inputStream_ {
+        nullptr
+    };
+    std::unique_ptr<OutputStream> outputStream_ {
+        nullptr
+    };
     BluetoothRemoteDevice remoteDevice_;
     UUID uuid_;
     SppSocketType type_;
@@ -197,7 +199,6 @@ SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSoc
       auth_(auth),
       socketStatus_(SOCKET_INIT)
 {
-
     HILOGI("SppClientSocket::impl:impl(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
@@ -371,7 +372,6 @@ struct SppServerSocket::impl {
     impl(const std::string &name, UUID uuid, SppSocketType type, bool auth);
     ~impl()
     {
-
         if (!proxy_) {
             HILOGE("SppServerSocket:impl: proxy_ is nullptr");
             return;
@@ -401,7 +401,6 @@ struct SppServerSocket::impl {
         }
 
         fd_ = proxy_->Listen(name_, serverUuid, (int32_t)getSecurityFlags(), (int32_t)type_);
-
         if (fd_ == -1) {
             HILOGE("Listen is failed, bluetooth is off!");
             return SPPStatus::SPP_FAILURE;
@@ -464,7 +463,7 @@ struct SppServerSocket::impl {
         char buffer[10];
         struct iovec io = {.iov_base = buffer, .iov_len = sizeof(buffer)};
         struct msghdr msg;
-        memset(&msg, 0, sizeof(msg));
+        memset_s(&msg, sizeof(msg), 0, sizeof(msg));
         msg.msg_control = ccmsg;
         msg.msg_controllen = sizeof(ccmsg);
         msg.msg_iov = &io;
@@ -488,19 +487,20 @@ struct SppServerSocket::impl {
             }
             clientFd = *((int *)CMSG_DATA(cmptr));
         } else {
-
             return SPPStatus::SPP_FAILURE;
         }
         uint8_t recvBuf[rv];
-        memset(&recvBuf, 0, sizeof(recvBuf));
-        memcpy(recvBuf, (uint8_t *)msg.msg_iov[0].iov_base, rv);
+        memset_s(&recvBuf, sizeof(recvBuf),0, sizeof(recvBuf));
+        memcpy_s(recvBuf, rv, (uint8_t *)msg.msg_iov[0].iov_base, rv);
 
         uint8_t buf[6] = {0};
-        memcpy(buf, &recvBuf[1], sizeof(buf));
+        memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf));
 
         char token[18] = {0};
         sprintf(token, "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
-        BluetoothRawAddress rawAddr{token};
+        BluetoothRawAddress rawAddr {
+            token
+        };
         acceptAddress_ = rawAddr.GetAddress().c_str();
         return clientFd;
     }
@@ -541,10 +541,14 @@ struct SppServerSocket::impl {
     bool auth_;
     int fd_;
     int socketStatus_;
-    std::string name_{""};
+    std::string name_ {
+        ""
+        };
     int acceptFd_;
     std::string acceptAddress_;
-    std::string socketServiceType_{""};
+    std::string socketServiceType_ {
+        ""
+    };
 };
 
 class SppServerSocket::impl::BluetoothServerSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -655,6 +659,5 @@ SppServerSocket *SocketFactory::DataListenRfcommByServiceRecord(const std::strin
     HILOGI("SocketFactory::DataListenRfcommByServiceRecord starts");
     return new SppServerSocket(name, uuid, TYPE_RFCOMM, true);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

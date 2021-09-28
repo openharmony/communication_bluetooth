@@ -22,7 +22,6 @@ using namespace bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
-
 int BluetoothSocketServer::Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
 {
     HILOGI("BluetoothSocketServer: Connect starts");
@@ -38,6 +37,5 @@ int BluetoothSocketServer::Listen(std::string &name, bluetooth::Uuid &uuid, int3
 
     return socket->Listen(name, uuid, (int)securityFlag, (int)type);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

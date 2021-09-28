@@ -14,14 +14,13 @@
  */
 
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include "bluetooth_socket_outputstream.h"
 #include "bluetooth_log.h"
 #include "sys/socket.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
 OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 {}
 
@@ -44,6 +43,5 @@ size_t OutputStream::Write(const char *buf, const size_t length)
     }
     return ret;
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS
