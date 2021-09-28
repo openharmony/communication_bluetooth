@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothA2dpSrcObserverStub : public IRemoteStub<IBluetoothA2dpSrcObserver> {
 public:
     BluetoothA2dpSrcObserverStub()

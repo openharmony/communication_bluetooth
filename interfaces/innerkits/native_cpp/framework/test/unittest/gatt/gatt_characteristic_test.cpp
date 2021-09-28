@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "securec.h"
 #include <gmock/gmock.h>
 #include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_descriptor.h"
@@ -135,7 +136,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
     size_t *plength_Get = &length_Get;
 
     std::unique_ptr<uint8_t[]> values_Get = std::make_unique<uint8_t[]>(length_Get);
-    memcpy(values_Get.get(), pGattCharacteristic->GetValue(plength_Get).get(), length_Get);
+    memcpy_s(values_Get.get(), length_Get, pGattCharacteristic->GetValue(plength_Get).get(), length_Get);
     const uint8_t *values = static_cast<uint8_t *>(values_Get.get());
     // std::unique_ptr<uint8_t[]> values_Get = std::move(pGattCharacteristic->GetValue(plength_Get));
     uint8_t resultValuesArray = values[0];

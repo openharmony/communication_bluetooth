@@ -17,11 +17,9 @@
 #include "bluetooth_log.h"
 #include "ipc_types.h"
 #include "parcel_bt_uuid.h"
-//#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
 BluetoothSocketStub::BluetoothSocketStub()
 {
     HILOGD("%{public}s start.", __func__);
