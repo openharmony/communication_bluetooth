@@ -268,7 +268,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothA2dpSrc);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_A2DP_SRC_H

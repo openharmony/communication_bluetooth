@@ -105,7 +105,6 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_AddService, TestSize.Level1)
 */
 HWTEST_F(GattServerTest, GattServer_ModuleTest_CancelConnection, TestSize.Level1)
 {
-
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_CancelConnection start";
     GattServer server(callback_);
 
@@ -138,7 +137,6 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_RemoveService, TestSize.Level1)
 */
 HWTEST_F(GattServerTest, GattServer_ModuleTest_ClearServices, TestSize.Level1)
 {
-
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_ClearServices start";
     GattServer server(callback_);
 

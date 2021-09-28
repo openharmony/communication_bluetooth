@@ -44,7 +44,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 enum SppSocketType {
     TYPE_RFCOMM,
     TYPE_L2CAP,
@@ -245,7 +244,6 @@ public:
      */
     static SppClientSocket *BuildRfcommDataSocketByServiceRecord(const BluetoothRemoteDevice &device, const UUID &uuid);
 };
-
 } // namespace Bluetooth
 } // namespace OHOS
 #endif  // BLUETOOTH_SOCKET_H

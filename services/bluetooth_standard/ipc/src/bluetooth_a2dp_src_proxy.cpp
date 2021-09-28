@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 void BluetoothA2dpSrcProxy::RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer)
 {
     MessageParcel data;
@@ -33,7 +32,9 @@ void BluetoothA2dpSrcProxy::RegisterObserver(const sptr<IBluetoothA2dpSrcObserve
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
 
     int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
@@ -55,7 +56,9 @@ int BluetoothA2dpSrcProxy::GetDeviceState(const RawAddress &device)
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_GET_DEVICE_STATE, data, reply, option);
     if (error != NO_ERROR) {

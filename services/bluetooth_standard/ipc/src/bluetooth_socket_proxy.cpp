@@ -50,7 +50,9 @@ int BluetoothSocketProxy::Connect(std::string &addr, bluetooth::Uuid &uuid, int3
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(BluetoothSocketProxy::Code::SOCKET_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
@@ -91,7 +93,9 @@ int BluetoothSocketProxy::Listen(std::string &name, bluetooth::Uuid &uuid, int32
     }
 
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
 
     int error = Remote()->SendRequest(BluetoothSocketProxy::Code::SOCKET_LISTEN, data, reply, option);
     if (error != NO_ERROR) {
