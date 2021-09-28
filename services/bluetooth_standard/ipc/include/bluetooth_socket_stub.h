@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothSocketStub : public IRemoteStub<IBluetoothSocket> {
-
 public:
     BluetoothSocketStub();
     ~BluetoothSocketStub();

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include "sys/socket.h"
 #include "bluetooth_socket_inputstream.h"
 #include "bluetooth_log.h"

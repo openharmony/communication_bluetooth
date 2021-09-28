@@ -112,6 +112,5 @@ void BluetoothA2dpSrc::DeregisterObserver(std::shared_ptr<BluetoothA2dpSrcObserv
 {
     pimpl->observerImp_->Deregister(observer);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS
