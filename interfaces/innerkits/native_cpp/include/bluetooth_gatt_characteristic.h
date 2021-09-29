@@ -300,9 +300,6 @@ private:
     UUID uuid_;
 
     friend class GattService;
-
-    //BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(GattCharacteristic);
-   // BLUETOOTH_DECLARE_IMPL();
 };
 
 } // namespace Bluetooth
