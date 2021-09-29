@@ -104,7 +104,6 @@ struct SppClientSocket::impl {
             return false;
         }
         char token[18] = {0};
-        sprintf(token, "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
         BluetoothRawAddress rawAddr {
             token
         };
@@ -497,7 +496,6 @@ struct SppServerSocket::impl {
         memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf));
 
         char token[18] = {0};
-        sprintf(token, "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
         BluetoothRawAddress rawAddr {
             token
         };
