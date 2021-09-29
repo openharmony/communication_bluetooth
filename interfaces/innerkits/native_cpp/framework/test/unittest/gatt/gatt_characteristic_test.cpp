@@ -68,7 +68,6 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
     GTEST_LOG_(INFO) << "GattCharacteristic_GattCharacteristic(4 parameters) end";
 
     GTEST_LOG_(INFO) << "GattCharacteristic_GattCharacteristic(3 parameters) start";
-    // GattCharacteristic* pGattCharacteristicOther = new GattCharacteristic(uuid_ , permissions_, properties_);
     GTEST_LOG_(INFO) << "GattCharacteristic_GattCharacteristic(3 parameters) end";
 
     GTEST_LOG_(INFO) << "GattCharacteristic_AddDescriptor start";
