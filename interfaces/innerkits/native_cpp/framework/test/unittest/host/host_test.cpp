@@ -143,7 +143,6 @@ HWTEST_F(HostTest, Host_ModuleTest_GetRemoteDevice_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetRemoteDevice_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    // host_->RegisterObserver(btObserver_);
     EXPECT_TRUE(host_->EnableBt());
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
@@ -153,7 +152,6 @@ HWTEST_F(HostTest, Host_ModuleTest_GetRemoteDevice_00100, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::seconds(3));
     EXPECT_TRUE(host_->DisableBt());
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    // host_->DeregisterObserver(btObserver_);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetRemoteDevice_00100 end";
 }
@@ -183,7 +181,6 @@ HWTEST_F(HostTest, Host_ModuleTest_BluetoothFactoryReset_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_BluetoothFactoryReset_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    // EXPECT_TRUE(host_->BluetoothFactoryReset());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_BluetoothFactoryReset_00100 end";
 }
