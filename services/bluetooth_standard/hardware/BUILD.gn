@@ -24,11 +24,11 @@ ohos_shared_library("bluetooth_hdi_adapter") {
     "$bt_hdi_path/ohos/hardware/bt/v1_0/client",
   ]
 
-  cflags = ["-fPIC"]
+  cflags = [ "-fPIC" ]
 
   sources = [
-    "src/bluetooth_hdi.cpp",
     "src/bluetooth_hci_callbacks.cpp",
+    "src/bluetooth_hdi.cpp",
   ]
 
   deps = [
@@ -44,12 +44,12 @@ ohos_shared_library("bluetooth_hdi_adapter") {
   if (is_standard_system) {
     external_deps = [
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core"
+      "ipc:ipc_core",
     ]
   } else {
     external_deps = [
+      "hilog:libhilog",
       "ipc:ipc_core",
-      "hilog:libhilog"
     ]
   }
 
