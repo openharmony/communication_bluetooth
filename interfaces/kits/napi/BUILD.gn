@@ -1,0 +1,73 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+ohos_shared_library("bluetooth") {
+  #install_enable = true
+  include_dirs = [
+    "include",
+    "//third_party/node/src",
+    "//native_engine",
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/common",
+  ]
+
+  defines = [
+    "BT_LOG_TAG = \"bluetooth_napi\"",
+    "BT_LOG_DOMAIN = 0xD005310",
+  ]
+
+  sources = [
+    "src/native_module.cpp",
+    "src/napi_bluetooth_ble.cpp",
+    "src/napi_bluetooth_host.cpp",
+    "src/napi_bluetooth_host_observer.cpp",
+    "src/napi_bluetooth_utils.cpp",
+    "src/napi_bluetooth_gatt_client.cpp",
+    "src/napi_bluetooth_gatt_client_callback.cpp",
+    "src/napi_bluetooth_ble_central_manager_callback.cpp",
+    "src/napi_bluetooth_remote_device_observer.cpp",
+    "src/napi_bluetooth_ble_advertise_callback.cpp",
+    "src/napi_bluetooth_gatt_server.cpp",
+    "src/napi_bluetooth_gatt_server_callback.cpp",
+    "src/napi_bluetooth_spp_client.cpp",
+    "src/napi_bluetooth_spp_server.cpp",
+  ]
+
+  deps = [
+    "//foundation/ace/napi:ace_napi",
+    "//utils/native/base:utils",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "appexecfwk_standard:appexecfwk_base",
+    "appexecfwk_standard:appexecfwk_core",
+    "aafwk_standard:want",
+    "aafwk_standard:ability_manager",
+  ]
+
+
+  relative_install_dir = "module"
+  part_name = "bluetooth_standard"
+  subsystem_name = "communication"
+}
+

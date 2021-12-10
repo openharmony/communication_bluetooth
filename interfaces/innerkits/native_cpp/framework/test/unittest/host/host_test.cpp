@@ -14,13 +14,13 @@
  */
 
 #include <gtest/gtest.h>
-#include <thread>
 #include <mutex>
+#include <thread>
 
-#include "bluetooth_def.h"
-#include "bluetooth_host.h"
 #include "bluetooth_a2dp_src.h"
+#include "bluetooth_def.h"
 #include "bluetooth_device_class.h"
+#include "bluetooth_host.h"
 
 using namespace testing::ext;
 
@@ -40,9 +40,6 @@ public:
     void OnDeviceNameChanged(const std::string &deviceName) override{};
     void OnScanModeChanged(int mode) override{};
     void OnDeviceAddrChanged(const std::string &address) override{};
-
-private:
-    std::mutex mtx_;
 };
 
 BluetoothHostObserverCommon &BluetoothHostObserverCommon::GetInstance()
@@ -53,7 +50,6 @@ BluetoothHostObserverCommon &BluetoothHostObserverCommon::GetInstance()
 
 void BluetoothHostObserverCommon::OnStateChanged(const int transport, const int status)
 {
-    // std::unique_lock<std::mutex> lck(mtx_);
     if (transport == BT_TRANSPORT_BLE) {
         switch (status) {
             case STATE_TURNING_ON:
@@ -133,6 +129,18 @@ void HostTest::SetUp()
 void HostTest::TearDown()
 {}
 
+HWTEST_F(HostTest, Host_ModuleTest_EnableBt_00100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_EnableBt_00100 start";
+
+    host_ = &BluetoothHost::GetDefaultHost();
+    EXPECT_TRUE(host_->EnableBt());
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    GTEST_LOG_(INFO) << "Host_ModuleTest_EnableBt_00100 end";
+}
+
 /**
  * @tc.number: Host_ModuleTest_GetRemoteDevice_00100
  * @tc.name:
@@ -143,14 +151,10 @@ HWTEST_F(HostTest, Host_ModuleTest_GetRemoteDevice_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetRemoteDevice_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->EnableBt());
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
     BluetoothRemoteDevice remoteDevice = host_->GetRemoteDevice(device_.GetDeviceAddr(), BT_TRANSPORT_BREDR);
     EXPECT_EQ(device_.GetDeviceAddr(), remoteDevice.GetDeviceAddr());
-
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-    EXPECT_TRUE(host_->DisableBt());
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetRemoteDevice_00100 end";
@@ -166,7 +170,7 @@ HWTEST_F(HostTest, Host_ModuleTest_GetBtState_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtState_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_EQ(host_->GetBtState(), BTStateID::STATE_TURN_OFF);
+    EXPECT_EQ(host_->GetBtState(), BTStateID::STATE_TURN_ON);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtState_00100 end";
 }
@@ -286,7 +290,7 @@ HWTEST_F(HostTest, Host_ModuleTest_GetLocalDeviceClass_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetLocalDeviceClass_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    BluetoothDeviceClass remotCod(0x10000);
+    BluetoothDeviceClass remotCod(0x2A0104);
     EXPECT_TRUE(host_->SetLocalDeviceClass(remotCod));
     BluetoothDeviceClass getLocalcod = host_->GetLocalDeviceClass();
     EXPECT_EQ(remotCod.GetMajorClass(), getLocalcod.GetMajorClass());
@@ -363,22 +367,6 @@ HWTEST_F(HostTest, Host_ModuleTest_SetLocalName_00100, TestSize.Level1)
 }
 
 /**
- * @tc.number: Host_ModuleTest_GetBtScanMode_00100
- * @tc.name:
- * @tc.desc:
- */
-HWTEST_F(HostTest, Host_ModuleTest_GetBtScanMode_00100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtScanMode_00100 start";
-
-    host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->SetBtScanMode(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, 0));
-    EXPECT_EQ(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, host_->GetBtScanMode());
-
-    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtScanMode_00100 end";
-}
-
-/**
  * @tc.number: Host_ModuleTest_SetBtScanMode_00100
  * @tc.name:
  * @tc.desc:
@@ -389,7 +377,6 @@ HWTEST_F(HostTest, Host_ModuleTest_SetBtScanMode_00100, TestSize.Level1)
 
     host_ = &BluetoothHost::GetDefaultHost();
     EXPECT_TRUE(host_->SetBtScanMode(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, 0));
-    EXPECT_EQ(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, host_->GetBtScanMode());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetBtScanMode_00100 end";
 }
@@ -399,15 +386,14 @@ HWTEST_F(HostTest, Host_ModuleTest_SetBtScanMode_00100, TestSize.Level1)
  * @tc.name:
  * @tc.desc:
  */
-HWTEST_F(HostTest, Host_ModuleTest_GetBondableMode_00100, TestSize.Level1)
+HWTEST_F(HostTest, Host_ModuleTest_GetBtScanMode_00100, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBondableMode_00100 start";
+    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtScanMode_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->SetBondableMode(BT_TRANSPORT_BREDR, BONDABLE_MODE_OFF));
-    EXPECT_EQ(host_->GetBondableMode(BTTransport::ADAPTER_BREDR), BONDABLE_MODE_ON);
+    EXPECT_EQ(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, host_->GetBtScanMode());
 
-    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBondableMode_00100 end";
+    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtScanMode_00100 end";
 }
 
 /**
@@ -421,9 +407,23 @@ HWTEST_F(HostTest, Host_ModuleTest_SetBondableMode_00100, TestSize.Level1)
 
     host_ = &BluetoothHost::GetDefaultHost();
     EXPECT_TRUE(host_->SetBondableMode(BT_TRANSPORT_BREDR, BONDABLE_MODE_OFF));
-    EXPECT_EQ(host_->GetBondableMode(BTTransport::ADAPTER_BREDR), BONDABLE_MODE_ON);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetBondableMode_00100 end";
+}
+
+/**
+ * @tc.number: Host_ModuleTest_GetBtScanMode_00100
+ * @tc.name:
+ * @tc.desc:
+ */
+HWTEST_F(HostTest, Host_ModuleTest_GetBondableMode_00100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBondableMode_00100 start";
+
+    host_ = &BluetoothHost::GetDefaultHost();
+    EXPECT_EQ(host_->GetBondableMode(BTTransport::ADAPTER_BREDR), BONDABLE_MODE_OFF);
+
+    GTEST_LOG_(INFO) << "Host_ModuleTest_GetBondableMode_00100 end";
 }
 
 /**
@@ -442,22 +442,6 @@ HWTEST_F(HostTest, Host_ModuleTest_StartBtDiscovery_00100, TestSize.Level1)
 }
 
 /**
- * @tc.number: Host_ModuleTest_CancelBtDiscovery_00100
- * @tc.name:
- * @tc.desc:
- */
-HWTEST_F(HostTest, Host_ModuleTest_CancelBtDiscovery_00100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "Host_ModuleTest_CancelBtDiscovery_00100 start";
-
-    host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->StartBtDiscovery());
-    EXPECT_TRUE(host_->CancelBtDiscovery());
-
-    GTEST_LOG_(INFO) << "Host_ModuleTest_CancelBtDiscovery_00100 end";
-}
-
-/**
  * @tc.number: Host_ModuleTest_IsBtDiscovering_00100
  * @tc.name:
  * @tc.desc:
@@ -467,10 +451,24 @@ HWTEST_F(HostTest, Host_ModuleTest_IsBtDiscovering_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_IsBtDiscovering_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->StartBtDiscovery());
     EXPECT_TRUE(host_->IsBtDiscovering(BTTransport::ADAPTER_BREDR));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_IsBtDiscovering_00100 end";
+}
+
+/**
+ * @tc.number: Host_ModuleTest_CancelBtDiscovery_00100
+ * @tc.name:
+ * @tc.desc:
+ */
+HWTEST_F(HostTest, Host_ModuleTest_CancelBtDiscovery_00100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_CancelBtDiscovery_00100 start";
+
+    host_ = &BluetoothHost::GetDefaultHost();
+    EXPECT_TRUE(host_->CancelBtDiscovery());
+
+    GTEST_LOG_(INFO) << "Host_ModuleTest_CancelBtDiscovery_00100 end";
 }
 
 /**
@@ -671,7 +669,7 @@ HWTEST_F(HostTest, Host_ModuleTest_GetDeviceName_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceName_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_FALSE(device_.GetDeviceName().empty());
+    EXPECT_TRUE(device_.GetDeviceName().empty());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceName_00100 end";
 }
@@ -973,6 +971,17 @@ HWTEST_F(HostTest, Host_ModuleTest_IsValidBluetoothRemoteDevice_00100, TestSize.
     EXPECT_FALSE(device1_.IsValidBluetoothRemoteDevice());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_IsValidBluetoothRemoteDevice_00100 end";
+}
+
+HWTEST_F(HostTest, Host_ModuleTest_DisableBt_00100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_DisableBt_00100 start";
+
+    host_ = &BluetoothHost::GetDefaultHost();
+    EXPECT_TRUE(host_->DisableBt());
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    GTEST_LOG_(INFO) << "Host_ModuleTest_DisableBt_00100 end";
 }
 
 }  // namespace Bluetooth

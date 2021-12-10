@@ -49,13 +49,13 @@ struct DiscoverInfomation {
 
     struct Service {
         bool isDiscoverCompleted_;
-        bool isDiscoverCccCompleted_;
+        bool isDiscoverCharacteristicCompleted_;
         bool isDiscoverIncludeSvcCompleted_;
         uint16_t endHandle_;
         std::map<uint16_t, Characteristics> characteristics_;
         Service(uint16_t endHandle)
             : isDiscoverCompleted_(false),
-              isDiscoverCccCompleted_(false),
+              isDiscoverCharacteristicCompleted_(false),
               isDiscoverIncludeSvcCompleted_(false),
               endHandle_(endHandle)
         {}
@@ -576,6 +576,7 @@ int GattClient::ReadDescriptor(GattDescriptor &descriptor)
 
 int GattClient::RequestBleMtuSize(int mtu)
 {
+    HILOGI("GattClient::RequestBleMtuSize called");
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
         return GattStatus::REQUEST_NOT_SUPPORT;
@@ -591,6 +592,7 @@ int GattClient::RequestBleMtuSize(int mtu)
 
 int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool enable)
 {
+	HILOGI("GattClient::SetNotifyCharacteristic called");
     static const uint8_t NOTIFICATION[2] = {1, 0};
     static const uint8_t DEFAULT_VALUE[2] = {0};
     static const size_t CLIENT_CHARACTERISTIC_CONFIGURATION_VALUE_LENGTH = 0x02;
@@ -625,6 +627,7 @@ int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool
 
 int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
 {
+    HILOGI("GattClient::WriteCharacteristic called");
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
         return GattStatus::REQUEST_NOT_SUPPORT;
@@ -666,6 +669,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
 
 int GattClient::WriteDescriptor(GattDescriptor &descriptor)
 {
+    HILOGI("GattClient::WriteDescriptor Called");
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
         return GattStatus::REQUEST_NOT_SUPPORT;

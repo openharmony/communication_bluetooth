@@ -23,7 +23,6 @@
 
 using namespace testing;
 using namespace testing::ext;
-// using namespace bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -121,7 +120,8 @@ HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetDevicesByStates, TestSize.Le
     std::array<int, GattManager::GATT_CONNECTION_STATE_NUM> states = {1, 2, 3};
 
     GattManager test;
-    test.GetDevicesByStates(states);
+
+    EXPECT_EQ((int)test.GetDevicesByStates(states).size(), 0);
 
     GTEST_LOG_(INFO) << "GattManager::GetDevicesByState ends";
 }
@@ -137,7 +137,8 @@ HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetConnectedDevices, TestSize.L
     client.Connect(callback_, isAutoConnect, transport);
 
     GattManager test;
-    test.GetConnectedDevices();
+
+    EXPECT_EQ((int)test.GetConnectedDevices().size(), 0);
 
     GTEST_LOG_(INFO) << "GattManager::GetConnectedDevices ends";
 }

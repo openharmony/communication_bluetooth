@@ -23,7 +23,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
 class SocketTest : public testing::Test {
 public:
     SocketTest()

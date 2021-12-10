@@ -595,6 +595,7 @@ std::list<GattService> &GattServer::GetServices()
 int GattServer::NotifyCharacteristicChanged(
     const BluetoothRemoteDevice &device, const GattCharacteristic &characteristic, bool confirm)
 {
+    HILOGI("GattServer::NotifyCharacteristicChanged called");
     if (!pimpl->proxy_) {
         HILOGE("GattServer::NotifyCharacteristicChanged: proxy_ is nullptr");
         return GattStatus::REQUEST_NOT_SUPPORT;
@@ -622,6 +623,7 @@ int GattServer::NotifyCharacteristicChanged(
 
 int GattServer::RemoveGattService(const GattService &service)
 {
+    HILOGI("GattServer::RemoveGattService called");
     if (!pimpl->proxy_) {
         HILOGE("GattServer::RemoveGattService: proxy_ is nullptr");
         return GattStatus::REQUEST_NOT_SUPPORT;
@@ -646,6 +648,7 @@ int GattServer::RemoveGattService(const GattService &service)
 int GattServer::SendResponse(
     const BluetoothRemoteDevice &device, int requestId, int status, int offset, const uint8_t *value, int length)
 {
+    HILOGI("GattServer::SendResponse called");
     if (!pimpl->proxy_) {
         HILOGE("GattServer::SendResponse proxy_ is nullptr");
         return GattStatus::REQUEST_NOT_SUPPORT;

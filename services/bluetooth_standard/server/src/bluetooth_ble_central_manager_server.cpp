@@ -161,6 +161,7 @@ struct BluetoothBleCentralManagerServer::impl {
     RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
     std::unique_ptr<BleCentralManagerCallback> observerImp_ = std::make_unique<BleCentralManagerCallback>();
     IAdapterBle *bleService_ = nullptr;
+    std::vector<sptr<IBluetoothBleCentralManagerCallback>> scanCallback_;
 };
 
 class BluetoothBleCentralManagerServer::impl::SystemStateObserver : public ISystemStateObserver {
@@ -269,7 +270,10 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
             "BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback called with NULL binder. Ignoring.");
         return;
     }
-    pimpl->observers_.Register(callback);
+    if (pimpl != nullptr) {
+        pimpl->observers_.Register(callback);
+        pimpl->scanCallback_.push_back(callback);
+    }
 }
 
 void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
@@ -282,7 +286,15 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
             "BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback called with NULL binder. Ignoring.");
         return;
     }
-    pimpl->observers_.Deregister(callback);
+    for (auto iter = pimpl->scanCallback_.begin(); iter != pimpl->scanCallback_.end(); ++iter) {
+        if ((*iter)->AsObject() == callback->AsObject()) {
+            if (pimpl != nullptr) {
+                pimpl->observers_.Deregister(*iter);
+                pimpl->scanCallback_.erase(iter);
+                break;
+            }
+        }
+    }
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

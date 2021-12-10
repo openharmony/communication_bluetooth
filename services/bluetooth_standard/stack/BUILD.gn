@@ -103,7 +103,7 @@ StackGapSrc = [
 ]
 
 StackHciSrc = [
-  "src/hci/hal_wrapper.c",
+  "src/hci/hdi_wrapper.c",
   "src/hci/acl/hci_acl.c",
   "src/hci/hci.c",
   "src/hci/cmd/hci_cmd.c",

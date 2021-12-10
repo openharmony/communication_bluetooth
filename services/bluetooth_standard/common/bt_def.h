@@ -313,8 +313,11 @@ const uint8_t BLE_ADVERTISEMENT_PHY_1M = 0x01;
 const uint8_t BLE_ADVERTISEMENT_PHY_2M = 0x02;
 const uint8_t BLE_ADVERTISEMENT_PHY_CODED = 0x03;
 
+const uint8_t BLE_LEGACY_SCAN_RESPONSE = 3;
+const uint8_t BLE_LEGACY_ADV_SCAN_IND = 1;
 const uint8_t BLE_LEGACY_ADV_IND_WITH_EX_ADV = 0x13;
 const uint8_t BLE_LEGACY_ADV_NONCONN_IND_WITH_EX_ADV = 0x10;
+const uint8_t BLE_ADV_EVT_LEGACY_BIT = 4;
 
 // Incomplete, more data to come
 const uint8_t BLE_EX_SCAN_DATE_STATUS_INCOMPLETE_MORE = 0x20;

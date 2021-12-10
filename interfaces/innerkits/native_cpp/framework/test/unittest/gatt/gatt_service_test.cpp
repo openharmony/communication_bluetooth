@@ -65,7 +65,7 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetHandle_, TestSize.Level1)
     uint16_t handle_ = 0b0000000000010000;
     uint16_t endHandle_ = 0b0000000000010001;
     uint16_t result = GattService(uuid_, handle_, endHandle_, serviceType_).GetHandle();
-    EXPECT_GE(0, result);
+    EXPECT_EQ(16, result);
     GTEST_LOG_(INFO) << "GattService::GattService ends";
     GTEST_LOG_(INFO) << "GattService::GetHandle ends";
 }
@@ -124,7 +124,7 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetIncludedServices, TestSize.L
     service.AddService(addservice);
     includedservices = service.GetIncludedServices();
     bool result = false;
-    if (includedservices.size() == 0) {
+    if (includedservices.size() == 1) {
         result = true;
     }
     EXPECT_EQ(true, result);

@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string.h>
 #include <sstream>
+#include <unistd.h>
 #include <vector>
 
 #include "bluetooth_ble_central_manager.h"
@@ -108,7 +109,6 @@ class BleAdvCallback : public BleAdvertiseCallback {
 public:
     BleAdvCallback(BleAdvertiser *handle, int advId) {
         advHandle = handle;
-        isStarted = false;
         advId_ = advId;
     }
 
@@ -118,23 +118,9 @@ public:
             return;
         }
 
-        if (isStarted) {
-            HILOGI("adv stoped.");
-            isStarted = false;
-            if (g_AppCallback != NULL && g_AppCallback->advDisableCb != NULL) {
-                HILOGI("adv stoped advId_: %{public}d.", advId_);
-                g_AppCallback->advDisableCb(advId_, 0);
-            }
-            g_BleAdvCallbacks[advId_] = NULL;
-            HILOGI("g_BleAdvCallbacks[%{public}d] = %{public}p.", advId_, g_BleAdvCallbacks[advId_]);
-            delete this;
-        } else {
-            HILOGI("adv started.");
-            isStarted = true;
-            if (g_AppCallback != NULL && g_AppCallback->advEnableCb != NULL) {
-                g_AppCallback->advEnableCb(advId_, 0);
-            }
-            
+        HILOGI("adv started.");
+        if (g_AppCallback != NULL && g_AppCallback->advEnableCb != NULL) {
+            g_AppCallback->advEnableCb(advId_, 0);
         }
     }
 
@@ -152,7 +138,6 @@ protected:
 
 private:
     BleAdvertiser *advHandle;
-    bool isStarted;
     int advId_;
 };
 
@@ -242,6 +227,12 @@ int BleStopAdv(int advId)
 {
     if (advId >= 0 && advId < MAX_BLE_ADV_NUM) {
         g_BleAdvCallbacks[advId]->GetAdvHandle()->StopAdvertising(*g_BleAdvCallbacks[advId]);
+    }
+
+    usleep(100);
+    if (g_AppCallback != NULL && g_AppCallback->advDisableCb != NULL) {
+        HILOGI("adv stoped advId_: %{public}d.", advId);
+        g_AppCallback->advDisableCb(advId, 0);
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
