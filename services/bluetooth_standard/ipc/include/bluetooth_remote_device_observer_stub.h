@@ -19,7 +19,7 @@
 #include "i_bluetooth_host.h"
 #include "i_bluetooth_remote_device_observer.h"
 #include "iremote_stub.h"
-#include "map"
+#include <map>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -38,7 +38,9 @@ private:
     ErrCode OnRemoteAliasChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnRemoteCodChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnRemoteBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
-    static std::map<uint32_t, ErrCode (BluetoothRemoteDeviceObserverstub::*)(MessageParcel &data, MessageParcel &reply)>
+
+    static const std::map<uint32_t,
+        std::function<ErrCode(BluetoothRemoteDeviceObserverstub *, MessageParcel &, MessageParcel &)>>
         memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothRemoteDeviceObserverstub);
 };

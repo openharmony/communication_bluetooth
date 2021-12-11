@@ -30,22 +30,24 @@
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
+#include "bluetooth_a2dp_codec.h"
 
 namespace OHOS {
 namespace Bluetooth {
+
 /**
  * @brief A2dp source API callback function.
  *
  * @since 6.0
  */
-class BluetoothA2dpSrcObserver {
+class A2dpSourceObserver {
 public:
     /**
      * @brief A destructor used to delete the a2dp source Observer instance.
      *
      * @since 6.0
      */
-    virtual ~BluetoothA2dpSrcObserver() = default;
+    virtual ~A2dpSourceObserver() = default;
 
     /**
      * @brief The callback function after device's playing state changed.
@@ -55,7 +57,27 @@ public:
      * @param error  the error information.
      * @since 6.0
      */
-    virtual void OnPlayingStateChanged(const BluetoothRemoteDevice &device, int playingState, int error)
+    virtual void OnPlayingStatusChanged(const BluetoothRemoteDevice &device, int playingState, int error)
+    {}
+
+    /**
+     * @brief The callback function after device's codec information changed.
+     *
+     * @param device  the remote bluetooth device.
+     * @param info  the device's codec information.
+     * @param error  the error information.
+     * @since 6.0
+     */
+    virtual void OnConfigurationChanged(const BluetoothRemoteDevice &device, const A2dpCodecInfo &info, int error)
+    {}
+
+    /**
+     * @brief ConnectionState Changed observer.
+     * @param device bluetooth device address.
+     * @param state Connection state.
+     * @since 6.0
+     */
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
     {}
 };
 
@@ -64,7 +86,7 @@ public:
  *
  * @since 6.0
  */
-class BLUETOOTH_API BluetoothA2dpSrc {
+class BLUETOOTH_API A2dpSource {
 public:
     /**
      * @brief Get a2dp source instance.
@@ -72,7 +94,7 @@ public:
      * @return Returns an instance of a2dp source.
      * @since 6.0
      */
-    static BluetoothA2dpSrc &GetProfile();
+    static A2dpSource *GetProfile();
 
     /**
      * @brief Get devices by connection states.
@@ -170,6 +192,25 @@ public:
     int GetConnectStrategy(const BluetoothRemoteDevice &device) const;
 
     /**
+     * @brief Get codec status information of connected device.
+     *
+     * @param device The address of the bluetooth device.
+     * @return Returns codec status information of connected device.
+     * @since 6.0
+     */
+    A2dpCodecStatus GetCodecStatus(const BluetoothRemoteDevice &device) const;
+
+    /**
+     * @brief Set the codec encoding preferences of the specified device.
+     *
+     * @param device The address of the bluetooth device.
+     * @param info The codec encoding information.
+     * @return Return the result setted.
+     * @since 6.0
+     */
+    int SetCodecPreference(const BluetoothRemoteDevice &device, const A2dpCodecInfo &info);
+
+    /**
      * @brief Set whether enables the optional codec.
      *
      * @param device The address of the bluetooth device.
@@ -229,7 +270,7 @@ public:
      * @param observer Reference to the a2dp source observer.
      * @since 6.0
      */
-    void RegisterObserver(std::shared_ptr<BluetoothA2dpSrcObserver> &observer);
+    void RegisterObserver(A2dpSourceObserver *observer);
 
     /**
      * @brief Deregister callback function of framework.
@@ -237,7 +278,7 @@ public:
      * @param observer Reference to the a2dp source observer.
      * @since 6.0
      */
-    void DeregisterObserver(std::shared_ptr<BluetoothA2dpSrcObserver> &observer);
+    void DeregisterObserver(A2dpSourceObserver *observer);
 
     /**
      * @brief Set audio configure.
@@ -250,24 +291,23 @@ public:
     void SetAudioConfigure(const BluetoothRemoteDevice &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel);
 
 private:
-    static BluetoothA2dpSrc a2dpSrcProfile_;
     /**
      * @brief A constructor used to create a a2dp source instance.
      *
      * @since 6.0
      */
-    BluetoothA2dpSrc();
+    A2dpSource(void);
 
     /**
      * @brief A destructor used to delete the a2dp source instance.
      *
      * @since 6.0
      */
-    ~BluetoothA2dpSrc();
-
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothA2dpSrc);
+    ~A2dpSource(void);
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(A2dpSource);
     BLUETOOTH_DECLARE_IMPL();
 };
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_A2DP_SRC_H

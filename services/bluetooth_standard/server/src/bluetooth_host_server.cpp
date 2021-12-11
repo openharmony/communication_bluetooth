@@ -83,6 +83,11 @@ struct BluetoothHostServer::impl {
     std::map<std::string, sptr<IRemoteObject>> servers_;
     std::map<std::string, sptr<IRemoteObject>> bleServers_;
 
+    std::vector<sptr<IBluetoothHostObserver>> hostObservers_;
+    std::vector<sptr<IBluetoothRemoteDeviceObserver>> remoteDeviceObservers_;
+    std::vector<sptr<IBluetoothHostObserver>> bleAdapterObservers_;
+    std::vector<sptr<IBluetoothBlePeripheralObserver>> blePeripheralObservers_;
+
 private:
     void createServers();
 };
@@ -529,6 +534,7 @@ void BluetoothHostServer::RegisterObserver(const sptr<IBluetoothHostObserver> &o
         return;
     }
     pimpl->observers_.Register(observer);
+    pimpl->hostObservers_.push_back(observer);
 }
 
 void BluetoothHostServer::DeregisterObserver(const sptr<IBluetoothHostObserver> &observer)
@@ -537,7 +543,15 @@ void BluetoothHostServer::DeregisterObserver(const sptr<IBluetoothHostObserver> 
         HILOGE("BluetoothHostServer: DeregisterObserver observer is null");
         return;
     }
-    pimpl->observers_.Deregister(observer);
+    for (auto iter = pimpl->hostObservers_.begin(); iter != pimpl->hostObservers_.end(); ++iter) {
+        if ((*iter)->AsObject() == observer->AsObject()) {
+            if (pimpl != nullptr) {
+                pimpl->observers_.Deregister(*iter);
+                pimpl->hostObservers_.erase(iter);
+                break;
+            }
+        }
+    }
 }
 
 bool BluetoothHostServer::EnableBt()
@@ -584,13 +598,12 @@ bool BluetoothHostServer::BluetoothFactoryReset()
     return IAdapterManager::GetInstance()->FactoryReset();
 }
 
-// Get_Profile_CODE
 int32_t BluetoothHostServer::GetDeviceType(int32_t transport, const std::string &address)
 {
     RawAddress addr(address);
-    if ((transport_ == BT_TRANSPORT_BREDR) && IsBtEnabled()) {
+    if ((transport == BTTransport::ADAPTER_BREDR) && IsBtEnabled()) {
         return pimpl->classicService_->GetDeviceType(addr);
-    } else if ((transport_ == BT_TRANSPORT_BREDR) && IsBleEnabled()) {
+    } else if ((transport == BTTransport::ADAPTER_BLE) && IsBleEnabled()) {
         return pimpl->bleService_->GetDeviceType(addr);
     } else {
         HILOGE("[%{public}s]: %{public}s() Parameter::transport invalid or BT current state is not enabled!",
@@ -1180,6 +1193,7 @@ void BluetoothHostServer::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemo
         return;
     }
     pimpl->remoteObservers_.Register(observer);
+    pimpl->remoteDeviceObservers_.push_back(observer);
 }
 
 void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer)
@@ -1189,7 +1203,15 @@ void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRe
         HILOGE("[%{public}s]: %{public}s() observer is nullptr!", __FILE__, __FUNCTION__);
         return;
     }
-    pimpl->remoteObservers_.Deregister(observer);
+    for (auto iter = pimpl->remoteDeviceObservers_.begin(); iter != pimpl->remoteDeviceObservers_.end(); ++iter) {
+        if ((*iter)->AsObject() == observer->AsObject()) {
+            if (pimpl != nullptr) {
+                pimpl->remoteObservers_.Deregister(*iter);
+                pimpl->remoteDeviceObservers_.erase(iter);
+                break;
+            }
+        }
+    }
 }
 
 bool BluetoothHostServer::IsBtEnabled()
@@ -1206,6 +1228,7 @@ void BluetoothHostServer::RegisterBleAdapterObserver(const sptr<IBluetoothHostOb
         return;
     }
     pimpl->bleObservers_.Register(observer);
+    pimpl->bleAdapterObservers_.push_back(observer);
 }
 
 void BluetoothHostServer::DeregisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer)
@@ -1216,7 +1239,15 @@ void BluetoothHostServer::DeregisterBleAdapterObserver(const sptr<IBluetoothHost
         HILOGE("[%{public}s]: %{public}s() observer is nullptr!", __FILE__, __FUNCTION__);
         return;
     }
-    pimpl->bleObservers_.Deregister(observer);
+    for (auto iter = pimpl->bleAdapterObservers_.begin(); iter != pimpl->bleAdapterObservers_.end(); ++iter) {
+        if ((*iter)->AsObject() == observer->AsObject()) {
+            if (pimpl != nullptr) {
+                pimpl->bleObservers_.Deregister(*iter);
+                pimpl->bleAdapterObservers_.erase(iter);
+                break;
+            }
+        }
+    }
 }
 
 void BluetoothHostServer::RegisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer)
@@ -1228,6 +1259,7 @@ void BluetoothHostServer::RegisterBlePeripheralCallback(const sptr<IBluetoothBle
         return;
     }
     pimpl->bleRemoteObservers_.Register(observer);
+    pimpl->blePeripheralObservers_.push_back(observer);
 }
 
 void BluetoothHostServer::DeregisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer)
@@ -1238,7 +1270,15 @@ void BluetoothHostServer::DeregisterBlePeripheralCallback(const sptr<IBluetoothB
         HILOGE("[%{public}s]: %{public}s() observer is nullptr!", __FILE__, __FUNCTION__);
         return;
     }
-    pimpl->bleRemoteObservers_.Deregister(observer);
+    for (auto iter = pimpl->blePeripheralObservers_.begin(); iter != pimpl->blePeripheralObservers_.end(); ++iter) {
+        if ((*iter)->AsObject() == observer->AsObject()) {
+            if (pimpl != nullptr) {
+                pimpl->bleRemoteObservers_.Deregister(*iter);
+                pimpl->blePeripheralObservers_.erase(iter);
+                break;
+            }
+        }
+    }
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

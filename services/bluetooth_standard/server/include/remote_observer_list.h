@@ -66,7 +66,12 @@ RemoteObserverList<T>::~RemoteObserverList()
     HILOGI("RemoteObserverList<T>::~RemoteObserverList() called");
     std::lock_guard<std::mutex> lock(lock_);
     for (auto it = observers_.begin(); it != observers_.end(); ++it) {
+        sptr<ObserverDeathRecipient> dr = it->second;
         observers_.erase(it);
+
+        if (!dr->GetObserver()->AsObject()->RemoveDeathRecipient(dr)) {
+            HILOGE("Failed to unlink death recipient from observer");
+        }
     }
     observers_.clear();
 }
@@ -145,7 +150,7 @@ bool RemoteObserverList<T>::UnregisterInternal(typename ObserverMap::iterator it
     observers_.erase(iter);
 
     if (!dr->GetObserver()->AsObject()->RemoveDeathRecipient(dr)) {
-        HILOGE("Failed to unlink death recipient from binder");
+        HILOGE("Failed to unlink death recipient from observer");
         return false;
     }
 

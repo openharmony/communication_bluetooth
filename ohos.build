@@ -5,7 +5,8 @@
       "module_list": [
         "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_sa_profile",
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-        "//foundation/communication/bluetooth/services/bluetooth_standard/server:bluetooth_server"
+        "//foundation/communication/bluetooth/services/bluetooth_standard/server:bluetooth_server",
+        "//foundation/communication/bluetooth/interfaces/kits/napi:bluetooth"
       ],
       "inner_kits": [
         {
@@ -38,7 +39,8 @@
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/gatt:unittest",
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/spp:unittest",
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/host:unittest",
-        "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest:unittest"
+        "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest:unittest",
+        "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/ble:unittest"
       ]
     }
   }

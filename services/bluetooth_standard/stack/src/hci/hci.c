@@ -30,7 +30,7 @@
 #include "acl/hci_acl.h"
 #include "cmd/hci_cmd.h"
 #include "evt/hci_evt.h"
-#include "hal_wrapper.h"
+#include "hdi_wrapper.h"
 #include "hci_def.h"
 #include "hci_failure.h"
 #include "hci_internal.h"
@@ -38,7 +38,7 @@
 #define HCI_TX_QUEUE_SIZE INT32_MAX
 #define HCI_RX_QUEUE_SIZE INT32_MAX
 
-static BtHciCallbacks g_halCallacks;
+static BtHciCallbacks g_hdiCallacks;
 
 static Queue *g_hciTxQueue = NULL;
 static Queue *g_hciRxQueue = NULL;
@@ -46,10 +46,10 @@ static Queue *g_hciRxQueue = NULL;
 static ReactorItem *g_hciTxReactorItem = NULL;
 static ReactorItem *g_hciRxReactorItem = NULL;
 
-static Semaphore *g_waitHalInit;
-static BtStatus g_halInitStatus = UNKNOWN;
+static Semaphore *g_waitHdiInit;
+static BtStatus g_hdiInitStatus = UNKNOWN;
 
-static HALLib *g_halLib = NULL;
+static HDILib *g_hdiLib = NULL;
 
 static bool g_transmissionCapture = false;
 static void (*g_transmissionCallback)(uint8_t type, const uint8_t *data, uint16_t length) = NULL;
@@ -101,20 +101,20 @@ static int HciInitHal()
 {
     int result = BT_NO_ERROR;
 
-    g_waitHalInit = SemaphoreCreate(0);
-    int ret = g_halLib->halInit(&g_halCallacks);
+    g_waitHdiInit = SemaphoreCreate(0);
+    int ret = g_hdiLib->hdiInit(&g_hdiCallacks);
     if (ret == SUCCESS) {
-        SemaphoreWait(g_waitHalInit);
-        if (g_halInitStatus != SUCCESS) {
-            LOG_ERROR("HalInited failed: %{public}d", g_halInitStatus);
+        SemaphoreWait(g_waitHdiInit);
+        if (g_hdiInitStatus != SUCCESS) {
+            LOG_ERROR("HdiInited failed: %{public}d", g_hdiInitStatus);
             result = BT_OPERATION_FAILED;
         }
     } else {
-        LOG_ERROR("HalInit failed: %{public}d", ret);
+        LOG_ERROR("hdiInit failed: %{public}d", ret);
         result = BT_OPERATION_FAILED;
     }
-    SemaphoreDelete(g_waitHalInit);
-    g_waitHalInit = NULL;
+    SemaphoreDelete(g_waitHdiInit);
+    g_waitHdiInit = NULL;
 
     return result;
 }
@@ -148,8 +148,8 @@ int HCI_Initialize()
     int result;
 
     do {
-        g_halLib = LoadHalLib();
-        if (g_halLib == NULL) {
+        g_hdiLib = LoadHdiLib();
+        if (g_hdiLib == NULL) {
             result = BT_OPERATION_FAILED;
             break;
         }
@@ -174,9 +174,9 @@ int HCI_Initialize()
     } while (0);
 
     if (result != BT_NO_ERROR) {
-        if (g_halLib != NULL) {
-            UnloadHALLib(g_halLib);
-            g_halLib = NULL;
+        if (g_hdiLib != NULL) {
+            UnloadHdiLib(g_hdiLib);
+            g_hdiLib = NULL;
         }
 
         HciCloseQueue();
@@ -253,8 +253,8 @@ void HCI_Close()
         g_hciTxThread = NULL;
     }
 
-    if (g_halLib != NULL && g_halLib->halClose != NULL) {
-        g_halLib->halClose();
+    if (g_hdiLib != NULL && g_hdiLib->hdiClose != NULL) {
+        g_hdiLib->hdiClose();
     }
 
     CleanRxPacket();
@@ -281,18 +281,18 @@ void HCI_Close()
     HciCloseAcl();
     HciCloseFailure();
 
-    if (g_halLib != NULL) {
-        UnloadHALLib(g_halLib);
-        g_halLib = NULL;
+    if (g_hdiLib != NULL) {
+        UnloadHdiLib(g_hdiLib);
+        g_hdiLib = NULL;
     }
 
     LOG_DEBUG("%{public}s end", __FUNCTION__);
 }
 
-static void HciOnHALInited(BtStatus status)
+static void HciOnHDIInited(BtStatus status)
 {
-    g_halInitStatus = status;
-    SemaphorePost(g_waitHalInit);
+    g_hdiInitStatus = status;
+    SemaphorePost(g_waitHdiInit);
 }
 
 static void HciOnReceivedHciPacket(BtPacketType type, const BtPacket *btPacket)
@@ -333,20 +333,20 @@ static void HciSendPacketCallback(void *param)
 
         int result;
 
-        if (g_halLib == NULL) {
-            LOG_ERROR("HAL is invalid.");
+        if (g_hdiLib == NULL) {
+            LOG_ERROR("HDI is invalid.");
             return;
         }
 
         switch (packet->type) {
             case H2C_CMD:
-                result = g_halLib->halSendHciPacket(PACKET_TYPE_CMD, &btPacket);
+                result = g_hdiLib->hdiSendHciPacket(PACKET_TYPE_CMD, &btPacket);
                 break;
             case H2C_ACLDATA:
-                result = g_halLib->halSendHciPacket(PACKET_TYPE_ACL, &btPacket);
+                result = g_hdiLib->hdiSendHciPacket(PACKET_TYPE_ACL, &btPacket);
                 break;
             case H2C_SCODATA:
-                result = g_halLib->halSendHciPacket(PACKET_TYPE_SCO, &btPacket);
+                result = g_hdiLib->hdiSendHciPacket(PACKET_TYPE_SCO, &btPacket);
                 break;
             default:
                 result = UNKNOWN;
@@ -354,7 +354,7 @@ static void HciSendPacketCallback(void *param)
         }
 
         if (result != SUCCESS) {
-            LOG_ERROR("Send packet to HAL failed: %{public}d", result);
+            LOG_ERROR("Send packet to HDI failed: %{public}d", result);
         } else {
             if (g_transmissionCapture && g_transmissionCallback != NULL) {
                 uint8_t type = (packet->type == H2C_CMD) ? TRANSMISSON_TYPE_H2C_CMD : TRANSMISSON_TYPE_H2C_DATA;
@@ -411,7 +411,7 @@ int HCI_DisableTransmissionCapture()
     return BT_NO_ERROR;
 }
 
-static BtHciCallbacks g_halCallacks = {
-    .OnInited = HciOnHALInited,
+static BtHciCallbacks g_hdiCallacks = {
+    .OnInited = HciOnHDIInited,
     .OnReceivedHciPacket = HciOnReceivedHciPacket,
 };

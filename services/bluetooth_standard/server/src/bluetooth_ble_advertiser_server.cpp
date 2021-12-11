@@ -65,6 +65,7 @@ struct BluetoothBleAdvertiserServer::impl {
     RemoteObserverList<IBluetoothBleAdvertiseCallback> observers_;
     std::unique_ptr<BleAdvertiserCallback> observerImp_ = std::make_unique<BleAdvertiserCallback>();
     IAdapterBle *bleService_ = nullptr;
+    std::vector<sptr<IBluetoothBleAdvertiseCallback>> advCallBack_;
 };
 
 class BluetoothBleAdvertiserServer::impl::SystemStateObserver : public ISystemStateObserver {
@@ -209,8 +210,12 @@ void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBlu
         HILOGE("BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback:RegisterBleAdvertiserCallback called with "
                "NULL binder. "
                "Ignoring.");
+        return;
     }
-    pimpl->observers_.Register(callback);
+    if (pimpl != nullptr) {
+        pimpl->observers_.Register(callback);
+        pimpl->advCallBack_.push_back(callback);
+    }
 }
 
 void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback)
@@ -221,8 +226,19 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
         HILOGE("BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback:DeregisterBleAdvertiserCallback called "
                "with NULL binder."
                "Ignoring.");
+        return;
     }
-    pimpl->observers_.Deregister(callback);
+    for (auto iter = pimpl->advCallBack_.begin(); iter != pimpl->advCallBack_.end(); ++iter) {
+        HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
+        if ((*iter)->AsObject() == callback->AsObject()) {
+            HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
+            if (pimpl != nullptr) {
+                pimpl->observers_.Deregister(*iter);
+                pimpl->advCallBack_.erase(iter);
+                break;
+            }
+        }
+    }
 }
 
 int32_t BluetoothBleAdvertiserServer::GetAdvertiserHandle()

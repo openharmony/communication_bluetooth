@@ -66,6 +66,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    BluetoothHost *host_;
 };
 
 void GattServerTest::SetUpTestCase(void)
@@ -75,10 +76,18 @@ void GattServerTest::TearDownTestCase(void)
 void GattServerTest::SetUp()
 {
     tempData_ = 0;
+    host_ = &BluetoothHost::GetDefaultHost();
+    host_->EnableBt();
+    host_->EnableBle();
+    sleep(2);
 }
 
 void GattServerTest::TearDown()
-{}
+{
+    host_->DisableBt();
+    host_->DisableBle();
+    host_ = nullptr;
+}
 
 /*
  * @tc.number: GattServer001
@@ -90,7 +99,7 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_AddService, TestSize.Level1)
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_AddService start";
     GattServer server(callback_);
     UUID uuidSerPer;
-    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
+    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34F7");
     GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
     int ret = server.AddService(serviceOne);
 
@@ -124,7 +133,14 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_RemoveService, TestSize.Level1)
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_RemoveService start";
     GattServer server(callback_);
 
+    UUID uuidSerPer;
+    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
+    GattService serviceOne(uuidSerPer, 1, 1, GattServiceType::PRIMARY);
+    int result = server.AddService(serviceOne);
+    EXPECT_EQ(result, 0);
+    sleep(5);
     std::list<GattService> &list = server.GetServices();
+    GTEST_LOG_(INFO) << list.size();
     int ret = server.RemoveGattService(list.back());
     EXPECT_EQ(ret, 0);
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_RemoveService end";
@@ -163,7 +179,7 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_NotifyCharacteristicChanged, Test
     uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
     GattCharacteristic* aa = new GattCharacteristic(uuidSerPer,1,1);
     int res = server.NotifyCharacteristicChanged(deviceBle_, *aa, false);
-    EXPECT_EQ(res, 0);
+    EXPECT_EQ(res, -18);
 
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_Notify end";
 }
@@ -186,7 +202,7 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_SendResponse, TestSize.Level1)
         1,
         (uint8_t *)valueChrTwo.c_str(),
         valueChrTwo.size());
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, -18);
     GTEST_LOG_(INFO) << "GattServer_ModuleTest_SendResponse end";
 }
 
@@ -201,12 +217,13 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_GetServices, TestSize.Level1)
     GattServer server(callback_);
 
     UUID uuidSerPer;
-    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
+    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34F5");
 
     GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
     int ret = server.AddService(serviceOne);
 
     EXPECT_EQ(ret, 0);
+    sleep(2);
     std::list<GattService> list = server.GetServices();
     EXPECT_EQ((int)list.size(), 1);
 
@@ -225,12 +242,13 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_GetService, TestSize.Level1)
     GattServer server(callback_);
 
     UUID uuidSerPer;
-    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
+    uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34F9");
 
-    GattService serviceOne(uuidSerPer, GattServiceType::PRIMARY);
+    GattService serviceOne(uuidSerPer, GattServiceType::SECONDARY);
     int ret = server.AddService(serviceOne);
 
     EXPECT_EQ(ret, 0);
+    sleep(5);
 
     std::optional<GattService> listSecondary = server.GetService(uuidSerPer, false);
     EXPECT_FALSE(listSecondary->IsPrimary());

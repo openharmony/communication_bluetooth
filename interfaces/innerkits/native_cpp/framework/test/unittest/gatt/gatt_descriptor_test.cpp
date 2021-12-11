@@ -59,7 +59,7 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetHandle, TestSize.Level
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 27;
     uint16_t handle = GattDescriptor(uuid_, permissions).GetHandle();
-    EXPECT_GE(handle, 0);
+    EXPECT_EQ(handle, 0);
     GTEST_LOG_(INFO) << "GattDescriptor::GattDescriptor ends";
     GTEST_LOG_(INFO) << "GattDescriptor::GetHandle ends";
 }
@@ -91,7 +91,7 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetCharacteristic, TestSi
     uint16_t handle_ = 0b0000000000010000;
     auto res = GattDescriptor(uuid_, handle_, permissions).GetCharacteristic();
     bool result = false;
-    if (!res) {
+    if (res) {
         result = true;
     }
     EXPECT_EQ(false, result);

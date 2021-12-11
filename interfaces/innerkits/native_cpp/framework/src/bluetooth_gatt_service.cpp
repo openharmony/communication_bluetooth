@@ -14,11 +14,13 @@
  */
 
 #include "bluetooth_gatt_service.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
 void GattService::AddCharacteristic(const GattCharacteristic &characteristic)
 {
+    HILOGI("GattService::AddCharacteristic is called");
     characteristics_.insert(characteristics_.end(), characteristic)->service_ = this;
 }
 
@@ -39,8 +41,8 @@ GattService::GattService(const GattService &src)
       uuid_(src.uuid_)
 {
     includeServices_ = src.includeServices_;
-    for (auto &ccc : src.characteristics_) {
-        AddCharacteristic(ccc);
+    for (auto &characteristic : src.characteristics_) {
+        AddCharacteristic(characteristic);
     }
 }
 
@@ -53,8 +55,8 @@ GattService::GattService(GattService &&src)
       uuid_(src.uuid_)
 {
     includeServices_ = std::move(src.includeServices_);
-    for (auto &ccc : src.characteristics_) {
-        characteristics_.insert(characteristics_.end(), std::move(ccc))->service_ = this;
+    for (auto &characteristic : src.characteristics_) {
+        characteristics_.insert(characteristics_.end(), std::move(characteristic))->service_ = this;
     }
 }
 
@@ -65,9 +67,9 @@ void GattService::AddService(GattService &service)
 
 GattCharacteristic *GattService::GetCharacteristic(const UUID &uuid)
 {
-    for (auto &ccc : characteristics_) {
-        if (ccc.GetUuid().Equals(uuid)) {
-            return &ccc;
+    for (auto &characteristic : characteristics_) {
+        if (characteristic.GetUuid().Equals(uuid)) {
+            return &characteristic;
         }
     }
     return nullptr;

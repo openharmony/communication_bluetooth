@@ -24,8 +24,6 @@
 
 using namespace testing;
 using namespace testing::ext;
-using namespace bluetooth;
-
 namespace OHOS {
 namespace Bluetooth {
 class GattClientCallbackTest : public GattClientCallback {
@@ -127,9 +125,9 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_Connect, TestSize.Level1)
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     int result = client.Connect(callback_, isAutoConnect, transport);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_Connect end";
 }
 
@@ -140,10 +138,10 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_Disconnect, TestSize.Level1)
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     int result = client.Disconnect();
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_Disconnect end";
 }
 
@@ -154,10 +152,10 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_DiscoverServices, TestSize.Level1
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     int result = client.DiscoverServices();
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_DiscoverServices end";
 }
 
@@ -168,10 +166,15 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_1, TestSize.Level1)
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
+    bool ret = false;
     client.Connect(callback_, isAutoConnect, transport);
     UUID id = UUID::RandomUUID();
     client.GetService(id);
+    if (client.GetService(id) != std::nullopt) {
+        ret = true;
+    }
+    EXPECT_EQ(ret,false);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_1 end";
 }
 
@@ -182,9 +185,9 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_2, TestSize.Level1)
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
-    client.GetService();
+    EXPECT_EQ((int)client.GetService().size(),0);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_2 end";
 }
 
@@ -195,14 +198,14 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_ReadCharacteristic, TestSize.Leve
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 17;
     int properties = 37;
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     int result = client.ReadCharacteristic(characteristic);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_ReadCharacteristic end";
 }
 
@@ -213,13 +216,13 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_ReadDescriptor, TestSize.Level1)
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 17;
     GattDescriptor descriptor = GattDescriptor(uuid_, permissions);
     int result = client.ReadDescriptor(descriptor);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_ReadDescriptor end";
 }
 
@@ -230,11 +233,11 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_RequestBleMtuSize, TestSize.Level
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     int result = client.Connect(callback_, isAutoConnect, transport);
     int mtu = 17;
     result = client.RequestBleMtuSize(mtu);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_RequestBleMtuSize end";
 }
 
@@ -245,7 +248,7 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_SetNotifyCharacteristic, TestSize
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 17;
@@ -253,7 +256,7 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_SetNotifyCharacteristic, TestSize
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     bool enable = true;
     int result = client.SetNotifyCharacteristic(characteristic, enable);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_SetNotifyCharacteristic end";
 }
 
@@ -264,14 +267,14 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_WriteCharacteristic, TestSize.Lev
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 17;
     int properties = 37;
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     int result = client.WriteCharacteristic(characteristic);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_WriteCharacteristic end";
 }
 
@@ -282,13 +285,13 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_WriteDescriptor, TestSize.Level1)
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 17;
     GattDescriptor descriptor = GattDescriptor(uuid_, permissions);
     int result = client.WriteDescriptor(descriptor);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_WriteDescriptor end";
 }
 
@@ -299,11 +302,11 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_RequestConnectionPriority, TestSi
     GattClient client(device);
     GattClientCallbackTest callback_;
     bool isAutoConnect = true;
-    int transport = 12;
+    int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     int connPriority = 2;
     int result = client.RequestConnectionPriority(connPriority);
-    EXPECT_EQ(result, (int)bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(result, -18);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_RequestConnectionPriority end";
 }
 }  // namespace Bluetooth

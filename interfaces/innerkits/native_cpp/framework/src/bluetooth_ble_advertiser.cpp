@@ -41,8 +41,7 @@ struct BleAdvertiser::impl {
         {
             HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnStartResultEvent");
             BleAdvertiseCallback *observer = nullptr;
-            if ((opcode == bluetooth::BLE_ADV_STOP_COMPLETE_OP_CODE && result == 0) ||
-                (opcode == bluetooth::BLE_ADV_START_FAILED_OP_CODE)) {
+            if (opcode == bluetooth::BLE_ADV_START_FAILED_OP_CODE) {
                 observer = bleAdvertiser_.callbacks_.PopAdvertiserObserver(advHandle);
             } else {
                 observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
@@ -220,9 +219,14 @@ void BleAdvertiser::StopAdvertising(BleAdvertiseCallback &callback)
     if (pimpl->proxy_ != nullptr) {
         uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(&callback);
         if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
-            callback.OnStartResultEvent(BLE_INVALID_ADVERTISING_HANDLE);
             return;
         }
+
+        BleAdvertiseCallback *observer = pimpl->callbacks_.GetAdvertiserObserver(advHandle);
+        if (observer != nullptr) {
+            pimpl->callbacks_.Deregister(observer);
+        }
+
         pimpl->proxy_->StopAdvertising(advHandle);
     }
 }

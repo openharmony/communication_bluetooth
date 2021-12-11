@@ -35,7 +35,7 @@ private:
     ErrCode OnReadRemoteRssiEventInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply);
 
-    static std::map<uint32_t,
+    std::map<uint32_t,
         ErrCode (BluetoothBlePeripheralObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
         memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothBlePeripheralObserverStub);

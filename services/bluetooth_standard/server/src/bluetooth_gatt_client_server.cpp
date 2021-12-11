@@ -153,6 +153,9 @@ public:
     GattClientCallbackImpl(const sptr<IBluetoothGattClientCallback> &callback, BluetoothGattClientServer &owner);
     ~GattClientCallbackImpl()
     {
+        if (!callback_->AsObject()->RemoveDeathRecipient(deathRecipient_)) {
+            HILOGE("Failed to unlink death recipient to callback");
+        }
         callback_ = nullptr;
         deathRecipient_ = nullptr;
     };
@@ -181,7 +184,11 @@ private:
 BluetoothGattClientServer::impl::GattClientCallbackImpl::GattClientCallbackImpl(
     const sptr<IBluetoothGattClientCallback> &callback, BluetoothGattClientServer &owner)
     : callback_(callback), deathRecipient_(new CallbackDeathRecipient(callback, owner))
-{}
+{
+    if (!callback_->AsObject()->AddDeathRecipient(deathRecipient_)) {
+        HILOGE("Failed to link death recipient to callback");
+    }
+}
 
 BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecipient::CallbackDeathRecipient(
     const sptr<IBluetoothGattClientCallback> &callback, BluetoothGattClientServer &owner)
@@ -192,9 +199,13 @@ void BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecip
     const wptr<IRemoteObject> &remote)
 {
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
-        if ((*it)->GetCallback() == iface_cast<IBluetoothGattClientCallback>(remote.promote())) {
+        if ((*it)->GetCallback() == remote) {
             *it = nullptr;
             owner_.pimpl->callbacks_.erase(it);
+            sptr<CallbackDeathRecipient> dr = (*it)->deathRecipient_;
+            if (!dr->GetCallback()->AsObject()->RemoveDeathRecipient(dr)) {
+                HILOGE("Failed to unlink death recipient from callback");
+            }
             return;
         }
     }

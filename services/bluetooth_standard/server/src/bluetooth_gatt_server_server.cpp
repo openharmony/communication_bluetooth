@@ -130,6 +130,9 @@ public:
     GattServerCallbackImpl(const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner);
     ~GattServerCallbackImpl()
     {
+        if (!callback_->AsObject()->RemoveDeathRecipient(deathRecipient_)) {
+            HILOGE("Failed to unlink death recipient to callback");
+        }
         callback_ = nullptr;
         deathRecipient_ = nullptr;
     };
@@ -140,7 +143,7 @@ private:
         GattServerCallbackDeathRecipient(
             const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner);
 
-        sptr<IBluetoothGattServerCallback> Getcallback() const
+        sptr<IBluetoothGattServerCallback> GetCallback() const
         {
             return callback_;
         };
@@ -155,10 +158,15 @@ private:
     sptr<IBluetoothGattServerCallback> callback_;
     sptr<GattServerCallbackDeathRecipient> deathRecipient_;
 };
+
 BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackImpl(
     const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
     : callback_(callback), deathRecipient_(new GattServerCallbackDeathRecipient(callback, owner))
-{}
+{
+    if (!callback_->AsObject()->AddDeathRecipient(deathRecipient_)) {
+        HILOGE("Failed to link death recipient to callback");
+    }
+}
 
 BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::
 GattServerCallbackDeathRecipient(const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
@@ -169,9 +177,14 @@ void BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallback
     const wptr<IRemoteObject> &remote)
 {
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
-        if ((*it)->GetCallback() == iface_cast<IBluetoothGattServerCallback>(remote.promote())) {
-            *it = nullptr;
+        if ((*it)->GetCallback() == remote) {
             owner_.pimpl->callbacks_.erase(it);
+            HILOGI("callback is erased from callbacks");
+            sptr<GattServerCallbackDeathRecipient> dr = (*it)->deathRecipient_;
+            if (!dr->GetCallback()->AsObject()->RemoveDeathRecipient(dr)) {
+                HILOGE("Failed to unlink death recipient from callback");
+            }
+            *it = nullptr;
             return;
         }
     }

@@ -13,28 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef HAL_WRAPPER_H
-#define HAL_WRAPPER_H
+#ifndef NAPI_BLUETOOTH_BLE_ADVERTISE_CALLBACK_H
+#define NAPI_BLUETOOTH_BLE_ADVERTISE_CALLBACK_H
 
-#include "bluetooth_hal.h"
+#include "bluetooth_ble_advertiser.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace OHOS {
+namespace Bluetooth {
+class NapiBluetoothBleAdvertiseCallback : public BleAdvertiseCallback {
+public:
+    NapiBluetoothBleAdvertiseCallback() = default;
+    virtual ~NapiBluetoothBleAdvertiseCallback() = default;
 
-typedef struct {
-    HalInitFunc halInit;
-    HalSendHciPacketFunc halSendHciPacket;
-    HalCloseFunc halClose;
-
-    void *lib;
-} HALLib;
-
-HALLib *LoadHalLib();
-void UnloadHALLib(HALLib *lib);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+    void OnStartResultEvent(int result) override;
+};
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif  // NAPI_BLUETOOTH_BLE_ADVERTISE_CALLBACK_H

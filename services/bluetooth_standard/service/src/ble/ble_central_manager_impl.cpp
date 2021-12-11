@@ -62,6 +62,90 @@ struct BleCentralManagerImpl::impl {
     std::unique_ptr<utility::Timer> timer_ = nullptr;
     std::map<std::string, std::vector<uint8_t>> incompleteData_ {};
     BleCentralManagerImpl *bleCentralManagerImpl_ = nullptr;
+
+    /// Adv data cache
+    class BleAdvertisingDataCache {
+    public:
+        // Set the adv data to cache by device address
+        const std::vector<uint8_t> &SetAdvData(
+            uint8_t addrType, const RawAddress &address, std::vector<uint8_t> advData)
+        {
+            auto it = SearchByAddress(addrType, address);
+            if (it != itemDatas_.end()) {
+                it->advData_ = std::move(advData);
+                return it->advData_;
+            }
+
+            if (itemDatas_.size() > MAX_CACHE) {
+                itemDatas_.pop_back();
+            }
+
+            itemDatas_.emplace_front(addrType, address, std::move(advData));
+            return itemDatas_.front().advData_;
+        }
+
+        // Append adv data for device address
+        const std::vector<uint8_t> &AppendAdvData(
+            uint8_t addrType, const RawAddress &address, std::vector<uint8_t> advData)
+        {
+            auto it = SearchByAddress(addrType, address);
+            if (it != itemDatas_.end()) {
+                it->advData_.insert(it->advData_.end(), advData.begin(), advData.end());
+                return it->advData_;
+            }
+
+            if (itemDatas_.size() > MAX_CACHE) {
+                itemDatas_.pop_back();
+            }
+
+            itemDatas_.emplace_front(addrType, address, std::move(advData));
+            return itemDatas_.front().advData_;
+        }
+
+        // Clear adv data by device addr
+        void ClearAdvData(uint8_t addrType, const RawAddress &address)
+        {
+            auto it = SearchByAddress(addrType, address);
+            if (it != itemDatas_.end()) {
+                itemDatas_.erase(it);
+            }
+        }
+
+        // Clear all data
+        void ClearAllData()
+        {
+            for (auto item : itemDatas_) {
+                item.advData_.clear();
+            }
+        }
+
+    private:
+        struct ItemData {
+            uint8_t addrType_;
+            RawAddress address_;
+            std::vector<uint8_t> advData_;
+
+            ItemData(uint8_t addrType, const RawAddress &address, std::vector<uint8_t> advData)
+                : addrType_(addrType), address_(address), advData_(advData)
+            {}
+        };
+
+        std::list<ItemData>::iterator SearchByAddress(uint8_t addrType, const RawAddress &address)
+        {
+            for (auto it = itemDatas_.begin(); it != itemDatas_.end(); it++) {
+                if (it->addrType_ == addrType && it->address_ == address) {
+                    return it;
+                }
+            }
+            return itemDatas_.end();
+        }
+
+        // Keep max 7 devices address in the cache
+        const size_t MAX_CACHE = 7;
+        std::list<ItemData> itemDatas_ {};
+    };
+
+    BleAdvertisingDataCache advDataCache_ {};
 };
 
 BleCentralManagerImpl::BleCentralManagerImpl(
@@ -136,14 +220,30 @@ void BleCentralManagerImpl::AdvertisingReport(
 
     auto *centralManager = static_cast<BleCentralManagerImpl *>(context);
     if ((centralManager != nullptr) && (centralManager->dispatcher_ != nullptr)) {
+        bool isScannable = (advType == SCAN_ADV_IND || advType == SCAN_ADV_SCAN_IND);
+        bool isScanResp = (advType == SCAN_SCAN_RSP);
+        bool isStart = isScannable && !isScanResp;
+
+        RawAddress rawAddress(RawAddress::ConvertToString(peerAddr->addr));
+        std::vector<uint8_t> datas(reportParam.data, reportParam.data + reportParam.dataLen);
+        std::vector<uint8_t> const &advData =
+            isStart ? centralManager->pimpl->advDataCache_.SetAdvData(peerAddr->type, rawAddress, std::move(datas))
+                    : centralManager->pimpl->advDataCache_.AppendAdvData(peerAddr->type, rawAddress, std::move(datas));
+
+        if (isScannable && !isScanResp) {
+            return;
+        }
+
+        std::vector<uint8_t> mergeData(advData);
+        centralManager->pimpl->advDataCache_.ClearAdvData(peerAddr->type, rawAddress);
+
         BtAddr addr;
         (void)memset_s(&addr, sizeof(addr), 0x00, sizeof(addr));
         addr.type = peerAddr->type;
         (void)memcpy_s(addr.addr, BT_ADDRESS_SIZE, peerAddr->addr, BT_ADDRESS_SIZE);
-        std::vector<uint8_t> datas(reportParam.data, reportParam.data + reportParam.dataLen);
-        LOG_INFO("AdvertisingReport Data=%{public}s", BleUtils::ConvertIntToHexString(datas).c_str());
+        LOG_INFO("AdvertisingReport Data=%{public}s", BleUtils::ConvertIntToHexString(mergeData).c_str());
         centralManager->dispatcher_->PostTask(std::bind(
-            &BleCentralManagerImpl::AdvertisingReportTask, centralManager, advType, addr, datas, reportParam.rssi));
+            &BleCentralManagerImpl::AdvertisingReportTask, centralManager, advType, addr, mergeData, reportParam.rssi));
     }
 }
 
@@ -154,6 +254,28 @@ void BleCentralManagerImpl::ExAdvertisingReport(
 
     auto *pCentralManager = static_cast<BleCentralManagerImpl *>(context);
     if ((pCentralManager != nullptr) && (pCentralManager->dispatcher_)) {
+        bool isLegacy = (advType & (1 << BLE_ADV_EVT_LEGACY_BIT));
+        std::vector<uint8_t> mergeData(reportParam.data, reportParam.data + reportParam.dataLen);
+        if (isLegacy) {
+            bool isScannable = (advType & (1 << BLE_LEGACY_ADV_SCAN_IND));
+            bool isScanResp = (advType & (1 << BLE_LEGACY_SCAN_RESPONSE));
+            bool isStart = isScannable && !isScanResp;
+
+            RawAddress rawAddress(RawAddress::ConvertToString(addr->addr));
+            std::vector<uint8_t> datas(reportParam.data, reportParam.data + reportParam.dataLen);
+            std::vector<uint8_t> const &advData =
+                isStart ? pCentralManager->pimpl->advDataCache_.SetAdvData(addr->type, rawAddress, std::move(datas))
+                        : pCentralManager->pimpl->advDataCache_.AppendAdvData(addr->type, rawAddress, std::move(datas));
+
+            if (isScannable && !isScanResp) {
+                LOG_DEBUG("[BleCentralManagerImpl] Waiting for scan response");
+                return;
+            }
+
+            mergeData = advData;
+            pCentralManager->pimpl->advDataCache_.ClearAdvData(addr->type, rawAddress);
+        }
+
         BtAddr peerAddr;
         peerAddr.type = addr->type;
         (void)memcpy_s(peerAddr.addr, BT_ADDRESS_SIZE, addr->addr, BT_ADDRESS_SIZE);
@@ -166,13 +288,12 @@ void BleCentralManagerImpl::ExAdvertisingReport(
             peerCurrentAddr = peerAddr;
         }
 
-        std::vector<uint8_t> datas(reportParam.data, reportParam.data + reportParam.dataLen);
-        LOG_INFO("ExAdvertisingReport Data=%{public}s", BleUtils::ConvertIntToHexString(datas).c_str());
+        LOG_INFO("ExAdvertisingReport Data=%{public}s", BleUtils::ConvertIntToHexString(mergeData).c_str());
         pCentralManager->dispatcher_->PostTask(std::bind(&BleCentralManagerImpl::ExAdvertisingReportTask,
             pCentralManager,
             advType,
             peerAddr,
-            datas,
+            mergeData,
             reportParam.rssi,
             peerCurrentAddr));
     }
@@ -959,6 +1080,7 @@ void BleCentralManagerImpl::GapScanStopCompleteEvt(int status) const
         pimpl->scanStatus_ = SCAN_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleCentralManagerImpl] %{public}s:Stop scan failed! %{public}d.", __func__, status);
     }
+    pimpl->advDataCache_.ClearAllData();
     pimpl->scanStatus_ = SCAN_NOT_STARTED;
     centralManagerCallbacks_->OnStartScanFailed(status);
 }
@@ -1075,6 +1197,7 @@ void BleCentralManagerImpl::GapExScanStopCompleteEvt(int status) const
         LOG_ERROR("[BleCentralManagerImpl] %{public}s:Stop scan failed! %{public}d.", __func__, status);
     }
     pimpl->scanStatus_ = SCAN_NOT_STARTED;
+    pimpl->advDataCache_.ClearAllData();
     centralManagerCallbacks_->OnStartScanFailed(status);
 }
 

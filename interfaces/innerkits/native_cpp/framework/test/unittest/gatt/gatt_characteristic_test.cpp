@@ -24,7 +24,6 @@
 
 using namespace testing;
 using namespace testing::ext;
-using namespace bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -52,8 +51,6 @@ void GattCharacteristicTest::SetUp()
 
 void GattCharacteristicTest::TearDown()
 {}
-
-// URI: scheme://authority/path1/path2/path3?id = 1&name = mingming&old#fragment
 
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize, TestSize.Level1)
 {
@@ -137,7 +134,6 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
     std::unique_ptr<uint8_t[]> values_Get = std::make_unique<uint8_t[]>(length_Get);
     memcpy_s(values_Get.get(), length_Get, pGattCharacteristic->GetValue(plength_Get).get(), length_Get);
     const uint8_t *values = static_cast<uint8_t *>(values_Get.get());
-    // std::unique_ptr<uint8_t[]> values_Get = std::move(pGattCharacteristic->GetValue(plength_Get));
     uint8_t resultValuesArray = values[0];
     uint8_t resultValuesPointer = *values;
 
@@ -157,7 +153,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
     GattCharacteristic::WriteType typeTemp = GattCharacteristic::WriteType::DEFAULT;
     int returnCode = 0;
     returnCode = pGattCharacteristic->SetWriteType(typeTemp);
-    EXPECT_EQ(returnCode, bluetooth::GattStatus::GATT_SUCCESS);
+    EXPECT_EQ(returnCode, 0);
     GTEST_LOG_(INFO) << "GattCharacteristic_SetWriteType end";
 
     GTEST_LOG_(INFO) << "GattCharacteristic_GetWriteType start";

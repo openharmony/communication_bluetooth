@@ -267,7 +267,10 @@ void BleAdvertiserImpl::StartAdvertising(const BleAdvertiserSettingsImpl &settin
     int ret = CheckAdvertiserPara(settings, advData, scanResponse);
     if (ret != BT_NO_ERROR) {
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Check adv parameter failed!.", __func__);
-        callback_->OnStartResultEvent(ret, advHandle, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(
+            ret == BT_BAD_PARAM ? ADVERTISE_FAILED_DATA_TOO_LARGE : ADVERTISE_FAILED_INTERNAL_ERROR,
+            advHandle,
+            BLE_ADV_START_FAILED_OP_CODE);
         return;
     }
 
@@ -303,7 +306,7 @@ void BleAdvertiserImpl::LegacyAdvertising(uint8_t advHandle)
     if (ret != BT_NO_ERROR) {
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Set ble roles failed!.", __func__);
-        callback_->OnStartResultEvent(ret, advHandle);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, advHandle);
         return;
     }
 
@@ -312,7 +315,7 @@ void BleAdvertiserImpl::LegacyAdvertising(uint8_t advHandle)
     if (ret != BT_NO_ERROR) {
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Set adv parameter to gap failed!.", __func__);
-        callback_->OnStartResultEvent(ret, advHandle);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, advHandle);
     }
 }
 
@@ -325,7 +328,7 @@ void BleAdvertiserImpl::ExtentAdvertising(uint8_t advHandle)
     if (ret != BT_NO_ERROR) {
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("Register ex adv gap callback failed!");
-        callback_->OnStartResultEvent(ret, advHandle, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, advHandle, BLE_ADV_START_FAILED_OP_CODE);
         RemoveAdvHandle(advHandle);
         return;
     }
@@ -335,7 +338,7 @@ void BleAdvertiserImpl::ExtentAdvertising(uint8_t advHandle)
     if (ret != BT_NO_ERROR) {
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("Set adv parameter to gap failed!");
-        callback_->OnStartResultEvent(ret, advHandle, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, advHandle, BLE_ADV_START_FAILED_OP_CODE);
         RemoveAdvHandle(advHandle);
     }
 }
@@ -353,7 +356,6 @@ void BleAdvertiserImpl::StopAdvertising(uint8_t advHandle) const
 
     if (iter->second.advStatus_ == ADVERTISE_NOT_STARTED) {
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:StopAdvertising failed! %u.", __func__, advHandle);
-        callback_->OnStartResultEvent(iter->second.advStatus_, advHandle);
         return;
     }
 
@@ -373,7 +375,6 @@ void BleAdvertiserImpl::StopAdvertising(uint8_t advHandle) const
     if (ret != BT_NO_ERROR) {
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Stop advertising failed!.", __func__);
-        callback_->OnStartResultEvent(ret, advHandle);
     } else {
         pimpl->isStopAdv_ = true;
         iter->second.advStatus_ = ADVERTISE_NOT_STARTED;
@@ -1186,7 +1187,6 @@ void BleAdvertiserImpl::RemoveAllAdvHandle(int status) const
             iter->second.timer_->Stop();
             iter->second.timer_ = nullptr;
         }
-        callback_->OnStartResultEvent(status, iter->first, BLE_ADV_STOP_COMPLETE_OP_CODE);
     }
     pimpl->advHandleSettingDatas_.clear();
 }
@@ -1215,7 +1215,7 @@ void BleAdvertiserImpl::GapAdvParamSetCompleteEvt(int status) const
 
     if (status != BT_NO_ERROR) {
         paraIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Set adv param failed! %{public}d.", __func__, status);
         return;
     }
@@ -1223,7 +1223,7 @@ void BleAdvertiserImpl::GapAdvParamSetCompleteEvt(int status) const
     if (ret != BT_NO_ERROR) {
         paraIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Read adv tx power from gap failed! %{public}d.", __func__, ret);
-        callback_->OnStartResultEvent(ret, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
     }
 }
 
@@ -1239,7 +1239,7 @@ void BleAdvertiserImpl::GapAdvReadTxPowerEvt(int status, int8_t txPower) const
 
     if (status != BT_NO_ERROR) {
         txPowerIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Read tx power failed! %{public}d.", __func__, status);
         return;
     }
@@ -1247,7 +1247,7 @@ void BleAdvertiserImpl::GapAdvReadTxPowerEvt(int status, int8_t txPower) const
     if (ret != BT_NO_ERROR) {
         txPowerIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Set adv data to gap failed! %{public}d.", __func__, ret);
-        callback_->OnStartResultEvent(ret, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_DATA_TOO_LARGE, pimpl->advStartHandle_);
     }
 }
 
@@ -1263,7 +1263,7 @@ void BleAdvertiserImpl::GapAdvDataSetCompleteEvt(int status, int8_t txPower) con
 
     if (status != BT_NO_ERROR) {
         dataIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Set adv data failed! %{public}d.", __func__, status);
         return;
     }
@@ -1271,7 +1271,7 @@ void BleAdvertiserImpl::GapAdvDataSetCompleteEvt(int status, int8_t txPower) con
     if (ret != BT_NO_ERROR) {
         dataIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Set adv response data to gap failed! %{public}d.", __func__, ret);
-        callback_->OnStartResultEvent(ret, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
     }
 }
 
@@ -1287,7 +1287,7 @@ void BleAdvertiserImpl::GapAdvScanRspDataSetCompleteEvt(int status) const
 
     if (status != BT_NO_ERROR) {
         scanResIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Set scan response data failed! %{public}d.", __func__, status);
         return;
     }
@@ -1299,7 +1299,7 @@ void BleAdvertiserImpl::GapAdvScanRspDataSetCompleteEvt(int status) const
     if (ret != BT_NO_ERROR) {
         scanResIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Start advertising failed! %{public}d.", __func__, ret);
-        callback_->OnStartResultEvent(ret, pimpl->advStartHandle_);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
     }
 }
 
@@ -1326,12 +1326,13 @@ void BleAdvertiserImpl::GapAdvStartCompleteEvt(int status)
         return;
     }
 
-    callback_->OnStartResultEvent(status, pimpl->advStartHandle_);
     if (status != BT_NO_ERROR) {
         startIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Start advertising failed! %{public}d.", __func__, status);
+        callback_->OnStartResultEvent(ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_);
         return;
     }
+    callback_->OnStartResultEvent(status, pimpl->advStartHandle_);
 
     if (BleConfig::GetInstance().GetBleAddrType() == BLE_ADDR_TYPE_RPA) {
         if (startIter->second.timer_ == nullptr) {
@@ -1359,7 +1360,6 @@ void BleAdvertiserImpl::GapAdvStopCompleteEvt(int status) const
 
     switch (stopIter->second.stopAllAdvType_) {
         case STOP_ADV_TYPE_SINGLE:
-            callback_->OnStartResultEvent(status, pimpl->advStopHandle_, BLE_ADV_STOP_COMPLETE_OP_CODE);
             break;
         case STOP_ADV_TYPE_ALL:
             callback_->OnAutoStopAdvEvent(pimpl->advStopHandle_);
@@ -1430,7 +1430,8 @@ void BleAdvertiserImpl::GapExAdvSetRandAddrResultEvt(int status) const
 
     if (status != BT_NO_ERROR) {
         LOG_ERROR("Set rand addr failed! %{public}d", status);
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(
+            ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         RemoveAdvHandle(pimpl->advStartHandle_);
         return;
@@ -1443,7 +1444,8 @@ void BleAdvertiserImpl::GapExAdvSetRandAddrResultEvt(int status) const
     if (ret != BT_NO_ERROR) {
         LOG_ERROR("Start ex advertising failed!");
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        callback_->OnStartResultEvent(ret, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(
+            ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
         RemoveAdvHandle(pimpl->advStartHandle_);
     }
 }
@@ -1461,7 +1463,8 @@ void BleAdvertiserImpl::GapExAdvParamSetCompleteEvt(int status, int8_t txPower) 
     if (status != BT_NO_ERROR) {
         LOG_ERROR("Set ex adv parameter failed! %{public}d", status);
         iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(
+            ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
         RemoveAdvHandle(pimpl->advStartHandle_);
         return;
     }
@@ -1470,7 +1473,8 @@ void BleAdvertiserImpl::GapExAdvParamSetCompleteEvt(int status, int8_t txPower) 
         if (ret != BT_NO_ERROR) {
             LOG_ERROR("Set ex adv data to gap failed!");
             iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-            callback_->OnStartResultEvent(ret, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+            callback_->OnStartResultEvent(
+                ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
             RemoveAdvHandle(pimpl->advStartHandle_);
         }
     } else {
@@ -1478,7 +1482,8 @@ void BleAdvertiserImpl::GapExAdvParamSetCompleteEvt(int status, int8_t txPower) 
         if (ret != BT_NO_ERROR) {
             LOG_ERROR("Set ex adv response data to gap failed!");
             iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-            callback_->OnStartResultEvent(ret, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+            callback_->OnStartResultEvent(
+                ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
             RemoveAdvHandle(pimpl->advStartHandle_);
         }
     }
@@ -1496,7 +1501,8 @@ void BleAdvertiserImpl::GapExAdvDataSetCompleteEvt(int status, int8_t txPower)
 
     if (status != BT_NO_ERROR) {
         LOG_ERROR("Set ex adv data failed! %{public}d", status);
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(
+            ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
         exAdvDataIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         RemoveAdvHandle(pimpl->advStartHandle_);
         return;
@@ -1507,7 +1513,8 @@ void BleAdvertiserImpl::GapExAdvDataSetCompleteEvt(int status, int8_t txPower)
         if (ret != BT_NO_ERROR) {
             LOG_ERROR("Set ex adv response data to gap failed!");
             exAdvDataIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-            callback_->OnStartResultEvent(ret, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+            callback_->OnStartResultEvent(
+                ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
             RemoveAdvHandle(pimpl->advStartHandle_);
         }
     } else {
@@ -1523,7 +1530,8 @@ void BleAdvertiserImpl::GapExAdvDataSetCompleteEvt(int status, int8_t txPower)
             if (ret != BT_NO_ERROR) {
                 LOG_ERROR("Start ex advertising failed!");
                 exAdvDataIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-                callback_->OnStartResultEvent(ret, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+                callback_->OnStartResultEvent(
+                    ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
                 RemoveAdvHandle(pimpl->advStartHandle_);
             }
         }
@@ -1542,7 +1550,8 @@ void BleAdvertiserImpl::GapExAdvScanRspDataSetCompleteEvt(int status)
 
     if (status != BT_NO_ERROR) {
         LOG_ERROR("Set ex scan response data failed! %{public}d", status);
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(
+            ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
         exAdvScanDataIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         RemoveAdvHandle(pimpl->advStartHandle_);
         return;
@@ -1559,7 +1568,8 @@ void BleAdvertiserImpl::GapExAdvScanRspDataSetCompleteEvt(int status)
         if (ret != BT_NO_ERROR) {
             LOG_ERROR("Start ex advertising failed!");
             exAdvScanDataIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-            callback_->OnStartResultEvent(ret, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+            callback_->OnStartResultEvent(
+                ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
             RemoveAdvHandle(pimpl->advStartHandle_);
         }
     }
@@ -1577,7 +1587,8 @@ void BleAdvertiserImpl::GapExAdvStartCompleteEvt(int status)
 
     if (status != BT_NO_ERROR) {
         LOG_ERROR("Start ex advertising failed! %{public}d", status);
-        callback_->OnStartResultEvent(status, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+        callback_->OnStartResultEvent(
+            ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
         exAdvStartIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         RemoveAdvHandle(pimpl->advStartHandle_);
         return;
@@ -1619,7 +1630,6 @@ void BleAdvertiserImpl::GapExAdvStopAllCompleteEvt(int status) const
     if (status != BT_NO_ERROR) {
         for (auto iter = pimpl->advHandleSettingDatas_.begin(); iter != pimpl->advHandleSettingDatas_.end(); iter++) {
             iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-            callback_->OnStartResultEvent(status, iter->second.advStatus_);
             LOG_ERROR("Stop ex advertising failed! %{public}d", status);
         }
         return;
@@ -1666,18 +1676,15 @@ void BleAdvertiserImpl::GapExAdvStopCompleteEvt(int status) const
     auto exAdvStopIter = pimpl->advHandleSettingDatas_.find(pimpl->advStopHandle_);
     if (exAdvStopIter == pimpl->advHandleSettingDatas_.end()) {
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:invalid handle! %u.", __func__, pimpl->advStopHandle_);
-        callback_->OnStartResultEvent(status, pimpl->advStopHandle_);
         return;
     }
 
     if (status != BT_NO_ERROR) {
         exAdvStopIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Stop ex advertising failed! %{public}d", __func__, status);
-        callback_->OnStartResultEvent(status, pimpl->advStopHandle_);
         return;
     }
     RemoveAdvHandle(pimpl->advStopHandle_);
-    callback_->OnStartResultEvent(status, pimpl->advStopHandle_, BLE_ADV_STOP_COMPLETE_OP_CODE);
 }
 
 void BleAdvertiserImpl::GapExAdvRemoveHandleResultEvt(int status) const
@@ -1687,18 +1694,15 @@ void BleAdvertiserImpl::GapExAdvRemoveHandleResultEvt(int status) const
     auto exAdvRemoveIter = pimpl->advHandleSettingDatas_.find(pimpl->advStopHandle_);
     if (exAdvRemoveIter == pimpl->advHandleSettingDatas_.end()) {
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:invalid handle! %u.", __func__, pimpl->advStopHandle_);
-        callback_->OnStartResultEvent(status, pimpl->advStopHandle_);
         return;
     }
 
     if (status != BT_NO_ERROR) {
         exAdvRemoveIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Remove handle failed! %{public}d", __func__, status);
-        callback_->OnStartResultEvent(status, pimpl->advStopHandle_);
         return;
     }
     RemoveAdvHandle(pimpl->advStopHandle_);
-    callback_->OnStartResultEvent(status, pimpl->advStopHandle_, BLE_ADV_STOP_COMPLETE_OP_CODE);
 }
 
 void BleAdvertiserImpl::GapExAdvTerminatedAdvSetEvt(int status, uint8_t handle) const
@@ -1708,7 +1712,6 @@ void BleAdvertiserImpl::GapExAdvTerminatedAdvSetEvt(int status, uint8_t handle) 
     auto exAdvTermIter = pimpl->advHandleSettingDatas_.find(handle);
     if (exAdvTermIter == pimpl->advHandleSettingDatas_.end()) {
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:invalid handle! %u.", __func__, handle);
-        callback_->OnStartResultEvent(status, handle, BLE_ADV_START_FAILED_OP_CODE);
         return;
     }
 
@@ -1725,7 +1728,6 @@ void BleAdvertiserImpl::GapExAdvTerminatedAdvSetEvt(int status, uint8_t handle) 
     if (ret != BT_NO_ERROR) {
         LOG_ERROR("[BleAdvertiserImpl] %{public}s:Start advertising failed!.", __func__);
         exAdvTermIter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-        callback_->OnStartResultEvent(status, handle, BLE_ADV_START_FAILED_OP_CODE);
         RemoveAdvHandle(handle);
     }
 }
@@ -1854,7 +1856,8 @@ void BleAdvertiserImpl::GenResPriAddrResultTask(uint8_t result, BtAddr btAddr) c
             if (ret != BT_NO_ERROR) {
                 LOG_ERROR("Set ex adv rand addr gap failed!");
                 iter->second.advStatus_ = ADVERTISE_FAILED_INTERNAL_ERROR;
-                callback_->OnStartResultEvent(ret, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
+                callback_->OnStartResultEvent(
+                    ADVERTISE_FAILED_INTERNAL_ERROR, pimpl->advStartHandle_, BLE_ADV_START_FAILED_OP_CODE);
                 RemoveAdvHandle(pimpl->advStartHandle_);
             }
         } else {

@@ -18,30 +18,36 @@
 
 namespace OHOS {
 namespace Bluetooth {
-std::map<uint32_t, ErrCode (BluetoothRemoteDeviceObserverstub::*)(MessageParcel &data, MessageParcel &reply)>
+const std::map<uint32_t, std::function<ErrCode(BluetoothRemoteDeviceObserverstub *, MessageParcel &, MessageParcel &)>>
     BluetoothRemoteDeviceObserverstub::memberFuncMap_ = {
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS),
-            &BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID),
-            &BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME),
-            &BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_ALIAS_CHANGED),
-            &BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD),
-            &BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner},
-        {static_cast<uint32_t>(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL),
-            &BluetoothRemoteDeviceObserverstub::OnRemoteBatteryLevelChangedInner},
+        {IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_ALIAS_CHANGED,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteBatteryLevelChangedInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
 };
 
 BluetoothRemoteDeviceObserverstub::BluetoothRemoteDeviceObserverstub()
 {
     HILOGD("%{public}s start.", __func__);
 }
+
 BluetoothRemoteDeviceObserverstub::~BluetoothRemoteDeviceObserverstub()
 {
     HILOGD("%{public}s start.", __func__);
-    memberFuncMap_.clear();
 }
 
 int BluetoothRemoteDeviceObserverstub::OnRemoteRequest(
@@ -51,18 +57,16 @@ int BluetoothRemoteDeviceObserverstub::OnRemoteRequest(
     std::u16string descriptor = BluetoothRemoteDeviceObserverstub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOGI("local descriptor is not equal to remote");
+        HILOGE("BluetoothHostStub::OnRemoteRequest, local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
-
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
-    HILOGW("BluetoothRemoteDeviceObserverstub::OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
