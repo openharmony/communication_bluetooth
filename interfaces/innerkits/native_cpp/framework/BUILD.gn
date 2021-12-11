@@ -43,9 +43,12 @@ ohos_shared_library("btframework") {
   configs = [ ":btframework_config" ]
   public_configs = [ ":btframework_public_config" ]
   sources = [
+    "../c_adapter/ohos_bt_adapter_utils.cpp",
     "../c_adapter/ohos_bt_gap.cpp",
     "../c_adapter/ohos_bt_gatt.cpp",
+    "../c_adapter/ohos_bt_gatt_client.cpp",
     "../c_adapter/ohos_bt_gatt_server.cpp",
+    "../c_adapter/ohos_bt_spp.cpp",
     "src/bluetooth_ble_advertiser.cpp",
     "src/bluetooth_ble_central_manager.cpp",
     "src/bluetooth_device_class.cpp",

@@ -206,14 +206,12 @@ napi_value NSppClient::SppWrite(napi_env env, napi_callback_info info)
 
     if (clientMap[id]) {
         OHOS::Bluetooth::OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
-        char buf[totalSize + 1];
-        memset(buf, 0, totalSize + 1);
-        strcpy(buf, totalBuf);
 
         while (totalSize) {
-            int result = outputStream.Write(buf, totalSize);
+            int result = outputStream.Write(totalBuf, totalSize);
             if (result > 0) {
-                totalSize -= result;
+                totalSize = totalSize - result;
+                totalBuf += result;
                 isOK = true;
             } else if (result < 0) {
                 HILOGI("Write socket exception!");
