@@ -20,6 +20,7 @@
 #include <vector>
 #include <map>
 
+#include "ohos_bt_adapter_utils.h"
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_log.h"
 
@@ -64,8 +65,6 @@ GattServerWapper g_GattServers[MAXIMUM_NUMBER_APPLICATION];
 #define GATTSERVICES(x, y) g_GattServers[x].gattServices[y]
 #define GATTSERVICE(x, y) GATTSERVICES(x, y).gattService
 
-void GetAddrFromString(std::string in, unsigned char out[6]);
-void GetAddrFromByte(unsigned char in[6], std::string &out);
 static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle);
 
 class GattServerCallbackWapper : public GattServerCallback {
@@ -342,25 +341,6 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
         }
     }
     return NULL;
-}
-
-void GetAddrFromString(string in, unsigned char out[6]) {
-    int j = 0;
-    for (unsigned int i = 0; i < in.length(); i++) {
-        if (in.at(i) != ':') {
-            out[j] = strtoul(in.substr(i, 2).c_str(), 0, 16);
-            i += 2;
-            j++;
-        }
-    }
-}
-
-void GetAddrFromByte(unsigned char in[6], std::string &out)
-{
-    char temp[18] = {0};
-    sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
-        in[0], in[1], in[2], in[3], in[4], in[5]);
-    out = string(temp);
 }
 
 /**

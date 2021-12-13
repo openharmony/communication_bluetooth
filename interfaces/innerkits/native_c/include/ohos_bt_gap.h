@@ -147,6 +147,37 @@ bool GetLocalAddr(unsigned char *mac, unsigned int len);
 bool SetLocalName(unsigned char *localName, unsigned char length);
 
 /**
+ * @brief Set device scan mode.
+ * @param mode Scan mode, see details {@link GapBtScanMode}.
+ * @param duration Scan time.
+ * @return Returns <b>true</b> if the operation is successful;
+ *         returns <b>false</b> if the operation fails.
+ */
+bool SetBtScanMode(int mode, int duration);
+
+/**
+ * @brief Check device pair request reply.
+ *
+ * @param bdAddr device address.
+ * @param transport Transport type, details see {@link BtTransportId}
+ * @param accept Set gap accept flag.
+ * @return Returns <b>true</b> if the operation is successful;
+ *         returns <b>false</b> if the operation fails.
+ */
+bool PairRequestReply(const BdAddr *bdAddr, int transport, bool accept);
+
+/**
+ * @brief Set device pairing confirmation.
+ *
+ * @param bdAddr device address.
+ * @param transport Transport type, details see {@link BtTransportId}
+ * @param accept Set gap accept flag.
+ * @return Returns <b>true</b> if the operation is successful;
+ *         returns <b>false</b> if the operation fails.
+ */
+bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool accept);
+
+/**
  * @brief Gap state changed callback.
  * 
  * @param transport Transport type when state change, details see {@link BtTransportId}
@@ -181,17 +212,19 @@ typedef void (*GapDiscoveryResultCallback)(const BdAddr *bdAddr);
  * @brief Pair request observer.
  * 
  * @param bdAddr Remote device address.
+ * @param transport Transport type, details see {@link BtTransportId}
  */
-typedef void (*GapPairRequestedCallback)(const BdAddr *bdAddr);
+typedef void (*GapPairRequestedCallback)(const BdAddr *bdAddr, int transport);
 
 /**
  * @brief Pair confirmed observer.
  * 
  * @param bdAddr Remote device address.
+ * @param transport Transport type, details see {@link BtTransportId}
  * @param reqType Pair type.
  * @param number Paired passkey.
  */
-typedef void (*GapPairConfirmedCallback)(const BdAddr *bdAddr, int reqType, int number);
+typedef void (*GapPairConfirmedCallback)(const BdAddr *bdAddr, int transport, int reqType, int number);
 
 /**
  * @brief Scan mode changed observer.

@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <vector>
 
+#include "ohos_bt_adapter_utils.h"
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_log.h"
@@ -46,9 +47,6 @@ static BleCentralManager *g_BleCentralManager;
 static BleCentralManagerCallbackWapper *g_ScanCallback;
 
 static BleAdvCallback *g_BleAdvCallbacks[MAX_BLE_ADV_NUM];
-
-extern void GetAddrFromString(std::string in, unsigned char out[6]);
-extern void GetAddrFromByte(unsigned char in[6], std::string &out);
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:

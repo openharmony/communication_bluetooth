@@ -66,8 +66,9 @@ public:
      *
      * @param buf Data to be written.
      * @param length The length of data to be written.
-     * @return Returns <b>0</b> if the operation is successful.
-     *         Returns <b>-1</b> if the operation fails.
+     * @return Returns <b> >0 </b> operation succeeded.The return value is length of the written data.
+     *         Returns <b> 0 </b> operation succeeded,but the data length is 0.
+     *         Returns <b> -1 </b> operation failed.
      * @since 6
      */
     size_t Write(const char *buf, const size_t length);

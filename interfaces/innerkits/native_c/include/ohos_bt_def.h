@@ -298,6 +298,13 @@ typedef enum {
     OHOS_A2DP_IS_PLAYING
 } BtA2dpPlayingState;
 
+typedef enum {
+    OHOS_STATE_CONNECTING = 0x00,
+    OHOS_STATE_CONNECTED,
+    OHOS_STATE_DISCONNECTING,
+    OHOS_STATE_DISCONNECTED,
+} BtConnectState;
+
 /**
  * @brief Defines the Bluetooth address of the device.
  *

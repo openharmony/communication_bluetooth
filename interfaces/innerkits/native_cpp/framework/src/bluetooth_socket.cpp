@@ -43,14 +43,9 @@ struct SppClientSocket::impl {
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
-
-            if (isServer_) {
-                HILOGE("accept fd closed");
-                close(fd_);
-                fd_ = -1;
-            } else {
-                HILOGE("accept fd closed");
-            }
+            close(fd_);
+            fd_ = -1;
+            HILOGE("fd closed");
         }
     }
 
@@ -65,14 +60,9 @@ struct SppClientSocket::impl {
             if (fd_ > 0) {
                 shutdown(fd_, SHUT_RD);
                 shutdown(fd_, SHUT_WR);
-
-                if (isServer_) {
-                    HILOGE("accept fd closed");
-                    close(fd_);
-                    fd_ = -1;
-                } else {
-                    HILOGE("accept fd closed");
-                }
+                close(fd_);
+                fd_ = -1;
+                HILOGE("fd closed");
             } else {
                 HILOGE("socket not created");
                 return;
@@ -167,7 +157,6 @@ struct SppClientSocket::impl {
     UUID uuid_;
     SppSocketType type_;
     std::string address_;
-    bool isServer_;
     int fd_;
     bool auth_;
     int socketStatus_;
@@ -195,7 +184,6 @@ SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSoc
       remoteDevice_(addr),
       uuid_(uuid),
       type_(type),
-      isServer_(false),
       fd_(-1),
       auth_(auth),
       socketStatus_(SOCKET_INIT)
@@ -236,7 +224,6 @@ SppClientSocket::impl::impl(int fd, std::string address)
       remoteDevice_(BluetoothRemoteDevice(address, 0)),
       type_(TYPE_RFCOMM),
       address_(address),
-      isServer_(true),
       fd_(fd),
       auth_(false),
       socketStatus_(SOCKET_CONNECTED)

@@ -142,8 +142,12 @@ public:
         if (newState == static_cast<int>(BTConnectState::DISCONNECTED)) {
             client_.pimpl->CleanConnectionInfo();
         }
-        std::lock_guard<std::mutex> lck(client_.pimpl->connStateMutex_);
-        client_.pimpl->connectionState_ = newState;
+
+        {
+            std::lock_guard<std::mutex> lck(client_.pimpl->connStateMutex_);
+            client_.pimpl->connectionState_ = newState;
+        }
+
         client_.pimpl->callback_->OnConnectionStateChanged(newState, state);
     }
 
@@ -290,11 +294,14 @@ GattClient::impl::~impl()
 
 int GattClient::impl::DiscoverStart()
 {
-    std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
-    while (discoverInformation_.isDiscovering_) {
-        discoverInformation_.condition_.wait(lock);
+    {
+        std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
+        while (discoverInformation_.isDiscovering_) {
+            discoverInformation_.condition_.wait(lock);
+        }
+        discoverInformation_.isDiscovering_ = true;
     }
-    discoverInformation_.isDiscovering_ = true;
+
     if (!isRegisterSucceeded_) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -312,13 +319,15 @@ int GattClient::impl::DiscoverStart()
 
 void GattClient::impl::DiscoverComplete(int state)
 {
-    std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
-    if (discoverInformation_.isDiscovering_) {
-        discoverInformation_.isDiscovering_ = false;
-        isGetServiceYet_ = false;
-        callback_->OnServicesDiscovered(state);
-        discoverInformation_.condition_.notify_all();
+    {
+        std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
+        if (discoverInformation_.isDiscovering_) {
+            discoverInformation_.isDiscovering_ = false;
+            isGetServiceYet_ = false;
+            discoverInformation_.condition_.notify_all();
+        }
     }
+    callback_->OnServicesDiscovered(state);
 }
 
 void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> &src)
@@ -592,7 +601,7 @@ int GattClient::RequestBleMtuSize(int mtu)
 
 int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool enable)
 {
-	HILOGI("GattClient::SetNotifyCharacteristic called");
+    HILOGI("GattClient::SetNotifyCharacteristic called");
     static const uint8_t NOTIFICATION[2] = {1, 0};
     static const uint8_t DEFAULT_VALUE[2] = {0};
     static const size_t CLIENT_CHARACTERISTIC_CONFIGURATION_VALUE_LENGTH = 0x02;
@@ -652,7 +661,8 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
         }
         result = pimpl->proxy_->SignedWriteCharacteristic(pimpl->applicationId_, &character);
     } else {
-        withoutRespond = ((characteristic.GetWriteType() == (int)GattCharacteristic::WriteType::DEFAULT) ? false : true);
+        withoutRespond =
+            ((characteristic.GetWriteType() == (int)GattCharacteristic::WriteType::DEFAULT) ? false : true);
         if (!pimpl->proxy_) {
             HILOGI("GattClient::WriteCharacteristic() proxy_ is null when used!");
             return GattStatus::GATT_FAILURE;
