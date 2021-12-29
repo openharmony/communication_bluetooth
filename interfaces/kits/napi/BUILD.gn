@@ -33,36 +33,36 @@ ohos_shared_library("bluetooth") {
   ]
 
   sources = [
-    "src/native_module.cpp",
     "src/napi_bluetooth_ble.cpp",
-    "src/napi_bluetooth_host.cpp",
-    "src/napi_bluetooth_host_observer.cpp",
-    "src/napi_bluetooth_utils.cpp",
+    "src/napi_bluetooth_ble_advertise_callback.cpp",
+    "src/napi_bluetooth_ble_central_manager_callback.cpp",
     "src/napi_bluetooth_gatt_client.cpp",
     "src/napi_bluetooth_gatt_client_callback.cpp",
-    "src/napi_bluetooth_ble_central_manager_callback.cpp",
-    "src/napi_bluetooth_remote_device_observer.cpp",
-    "src/napi_bluetooth_ble_advertise_callback.cpp",
     "src/napi_bluetooth_gatt_server.cpp",
     "src/napi_bluetooth_gatt_server_callback.cpp",
+    "src/napi_bluetooth_host.cpp",
+    "src/napi_bluetooth_host_observer.cpp",
+    "src/napi_bluetooth_remote_device_observer.cpp",
     "src/napi_bluetooth_spp_client.cpp",
     "src/napi_bluetooth_spp_server.cpp",
+    "src/napi_bluetooth_utils.cpp",
+    "src/native_module.cpp",
   ]
 
   deps = [
-    "//foundation/ace/napi:ace_napi",
-    "//utils/native/base:utils",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/ace/napi:ace_napi",
     "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "aafwk_standard:ability_manager",
+    "aafwk_standard:want",
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
-    "aafwk_standard:want",
-    "aafwk_standard:ability_manager",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
 
   relative_install_dir = "module"
