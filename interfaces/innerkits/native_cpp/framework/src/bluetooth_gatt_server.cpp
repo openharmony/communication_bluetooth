@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-#define EIGHT_BITS 8
+const int EIGHT_BITS = 8;
 std::string GattServerServiceName = "bluetooth-gatt-server-server";
 
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_READ = 0x00;
@@ -662,7 +662,7 @@ int GattServer::SendResponse(
     }
 
     int result = GattStatus::INVALID_PARAMETER;
-    uint8_t requestType = requestId >> EIGHT_BITS; 
+    uint8_t requestType = requestId >> EIGHT_BITS;
     uint8_t transport = requestId & 0xFF;
     if (transport != GATT_TRANSPORT_TYPE_CLASSIC && transport != GATT_TRANSPORT_TYPE_LE) {
         return result;

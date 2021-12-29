@@ -117,11 +117,14 @@ void NapiBluetoothRemoteDeviceObserver::DealPairStatus(const int &status, int &b
 {
     HILOGI("NapiBluetoothRemoteDeviceObserver::DealPairStatus called, status is %{public}d", status);
     switch (status) {
-        case BLE_PAIR_PAIRING:
-            boneStatus = STATUS_BONDING;
+        case PAIR_NONE:
+            boneStatus = BondState::BOND_STATE_INVALID;
             break;
-        case BLE_PAIR_PAIRED:
-            boneStatus = STATUS_BONDED;
+        case PAIR_PAIRING:
+            boneStatus = BondState::BOND_STATE_BONDING;
+            break;
+        case PAIR_PAIRED:
+            boneStatus = BondState::BOND_STATE_BONDING;
             break;
         default:
             break;

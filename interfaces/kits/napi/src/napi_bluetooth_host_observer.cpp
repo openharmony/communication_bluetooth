@@ -14,10 +14,6 @@
  */
 #include "napi_bluetooth_host_observer.h"
 
-#include <map>
-#include <memory>
-#include <string>
-
 #include "bluetooth_log.h"
 
 #include "napi/native_api.h"

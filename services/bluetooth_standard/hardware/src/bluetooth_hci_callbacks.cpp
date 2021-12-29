@@ -26,7 +26,7 @@ int32_t BluetoothHciCallbacks::OnInited(ohos::hardware::bt::v1_0::BtStatus statu
 }
 
 int32_t BluetoothHciCallbacks::OnReceivedHciPacket(
-    ohos::hardware::bt::v1_0::BtType type, const std::vector<int8_t> &data)
+    ohos::hardware::bt::v1_0::BtType type, const std::vector<uint8_t> &data)
 {
     if ((callbacks_ != nullptr) && (callbacks_->OnReceivedHciPacket)) {
         BtPacketType packetType = BtPacketType::PACKET_TYPE_UNKNOWN;

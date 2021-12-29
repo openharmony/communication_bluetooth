@@ -15,19 +15,19 @@
 
 #include <sys/socket.h>
 #include <string>
-#include "securec.h"
 #include <unistd.h>
 #include "bluetooth_log.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_socket_proxy.h"
 #include "bluetooth_socket.h"
 #include "iservice_registry.h"
+#include "securec.h"
 #include "system_ability_definition.h"
 #include "raw_address.h"
 
 namespace OHOS {
 namespace Bluetooth {
-#define LENGTH 0x12
+const int LENGTH = 18;
 struct SppClientSocket::impl {
     impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSocketType type, bool auth);
     impl(int fd, std::string address);
@@ -95,7 +95,8 @@ struct SppClientSocket::impl {
             return false;
         }
         char token[LENGTH] = {0};
-        sprintf_s(token, LENGTH, "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
+        (void)sprintf_s(token,
+            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
         BluetoothRawAddress rawAddr {
             token
         };
@@ -164,7 +165,7 @@ struct SppClientSocket::impl {
 
 class SppClientSocket::impl::BluetoothClientSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothClientSocketDeathRecipient(SppClientSocket::impl &host) : host_(host){};
+    BluetoothClientSocketDeathRecipient(SppClientSocket::impl &host) : host_(host) {};
     ~BluetoothClientSocketDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothClientSocketDeathRecipient);
 
@@ -467,16 +468,15 @@ struct SppServerSocket::impl {
         }
         uint8_t recvBuf[rv];
         memset_s(&recvBuf, sizeof(recvBuf),0, sizeof(recvBuf));
-        memcpy_s(recvBuf, rv, (uint8_t *)msg.msg_iov[0].iov_base, rv);
+        memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv);
 
         uint8_t buf[6] = {0};
         memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf));
 
         char token[LENGTH] = {0};
-        sprintf_s(token, LENGTH, "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
-        BluetoothRawAddress rawAddr {
-            token
-        };
+        (void)sprintf_s(token,
+            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
+        BluetoothRawAddress rawAddr {token};
         acceptAddress_ = rawAddr.GetAddress().c_str();
         return clientFd;
     }
@@ -503,11 +503,10 @@ struct SppServerSocket::impl {
     const std::string &GetStringTag()
     {
         HILOGI("SppServerSocket::GetStringTag() starts");
-        if(socketStatus_ == SOCKET_CLOSED) {
+        if (socketStatus_ == SOCKET_CLOSED) {
             HILOGE("SppServerSocket::GetStringTag() socketStatus_ is SOCKET_CLOSED");
             socketServiceType_ = "";
-        }
-        else {
+        } else {
             socketServiceType_ = "ServerSocket: Type: TYPE_RFCOMM";
             socketServiceType_.append(" ServerName: ").append(name_);
         }
@@ -550,7 +549,7 @@ private:
 };
 
 SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType type, bool auth)
-        : uuid_(uuid), type_(type), auth_(auth), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
+    : uuid_(uuid), type_(type), auth_(auth), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
 {
     HILOGI("SppServerSocket::impl::impl(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -582,9 +581,7 @@ SppServerSocket::SppServerSocket(const std::string &name, UUID uuid, SppSocketTy
     int ret = pimpl->Listen();
     if (ret < 0) {
         HILOGE("bind listen failed!");
-
     }
-    
 }
 
 SppServerSocket::~SppServerSocket()

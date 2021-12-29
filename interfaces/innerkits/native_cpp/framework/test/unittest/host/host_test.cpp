@@ -26,7 +26,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothHostObserverCommon : public BluetoothHostObserver {
 public:
     BluetoothHostObserverCommon() = default;
@@ -64,6 +63,8 @@ void BluetoothHostObserverCommon::OnStateChanged(const int transport, const int 
             case STATE_TURN_OFF:
                 GTEST_LOG_(INFO) << "BLE:Turn off";
                 break;
+            default:
+                break;
         }
         return;
     } else {
@@ -79,6 +80,8 @@ void BluetoothHostObserverCommon::OnStateChanged(const int transport, const int 
                 break;
             case STATE_TURN_OFF:
                 GTEST_LOG_(INFO) << "BREDR:Turn off";
+                break;
+            default:
                 break;
         }
         return;
@@ -973,6 +976,11 @@ HWTEST_F(HostTest, Host_ModuleTest_IsValidBluetoothRemoteDevice_00100, TestSize.
     GTEST_LOG_(INFO) << "Host_ModuleTest_IsValidBluetoothRemoteDevice_00100 end";
 }
 
+/**
+ * @tc.number: Host_ModuleTest_DisableBt_00100
+ * @tc.name:
+ * @tc.desc:
+ */
 HWTEST_F(HostTest, Host_ModuleTest_DisableBt_00100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Host_ModuleTest_DisableBt_00100 start";
@@ -983,6 +991,5 @@ HWTEST_F(HostTest, Host_ModuleTest_DisableBt_00100, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_DisableBt_00100 end";
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

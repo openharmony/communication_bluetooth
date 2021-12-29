@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "securec.h"
-#include <gmock/gmock.h>
 #include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "uuid.h"
@@ -27,7 +27,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
-
 class GattCharacteristicTest : public testing::Test {
 public:
     GattCharacteristicTest()
@@ -166,6 +165,5 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
 
     GTEST_LOG_(INFO) << "GattCharacteristic_ModuleTest_RequestBleMtuSize end";
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -21,9 +21,9 @@
 #include "platform/include/allocator.h"
 
 #ifdef __x86_64__
-#define HDI_LIB "libbluetooth_hdi.so"
+#define HDI_LIB "libbluetooth_hdi_adapter.so"
 #else
-#define HDI_LIB "libbluetooth_hdi.z.so"
+#define HDI_LIB "libbluetooth_hdi_adapter.z.so"
 #endif
 
 HDILib *LoadHdiLib()
@@ -33,7 +33,7 @@ HDILib *LoadHdiLib()
         do {
             lib->lib = dlopen(HDI_LIB, RTLD_LAZY | RTLD_NODELETE);
             if (lib->lib == NULL) {
-                LOG_ERROR("Load libbluetooth_hdi.so failed");
+                LOG_ERROR("Load libbluetooth_hdi_adapter.so failed, %{public}s", dlerror());
                 break;
             }
 

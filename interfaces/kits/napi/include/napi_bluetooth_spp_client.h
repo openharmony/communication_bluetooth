@@ -16,22 +16,18 @@
 #define NAPI_BLUETOOTH_SPP_CLIENT_H_
 
 #include <thread>
+#include <map>
 #include "bluetooth_socket.h"
 #include "napi_bluetooth_utils.h"
-#include <map>
 
 namespace OHOS {
 namespace Bluetooth {
-
 const std::string STR_BT_SPP_READ = "sppRead";
 
 struct NSppClient {
-
     static napi_value SppConnect(napi_env env, napi_callback_info info);
     static napi_value SppCloseClientSocket(napi_env env, napi_callback_info info);
     static napi_value SppWrite(napi_env env, napi_callback_info info);
-    // static napi_value On(napi_env env, napi_callback_info info);
-    // static napi_value Off(napi_env env, napi_callback_info info);
     static void On(napi_env env, napi_callback_info info);
     static void Off(napi_env env, napi_callback_info info);
     static void sppRead(int id);

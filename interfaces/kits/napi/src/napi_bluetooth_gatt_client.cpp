@@ -14,9 +14,9 @@
  */
 #include <unistd.h>
 #include "bluetooth_log.h"
-#include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_host.h"
+#include "napi_bluetooth_gatt_client.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -25,7 +25,8 @@ using namespace std;
 napi_value NGattClient::constructor_ = nullptr;
 
 
-napi_value NGattClient::CreateGattClientDevice(napi_env env, napi_callback_info info) {
+napi_value NGattClient::CreateGattClientDevice(napi_env env, napi_callback_info info)
+{
     HILOGI("CreateGattClientDevice called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -42,10 +43,10 @@ napi_value NGattClient::CreateGattClientDevice(napi_env env, napi_callback_info 
     return result;
 }
 
-void NGattClient::DefineGattClientJSClass(napi_env env) {
-    
+void NGattClient::DefineGattClientJSClass(napi_env env)
+{
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
@@ -53,7 +54,7 @@ void NGattClient::DefineGattClientJSClass(napi_env env) {
         DECLARE_NAPI_FUNCTION("readDescriptorValue", ReadDescriptorValue),
         DECLARE_NAPI_FUNCTION("close", Close),
         DECLARE_NAPI_FUNCTION("getServices", GetServices),
-        DECLARE_NAPI_FUNCTION("BLECharacteristicChange", OnCharacteristicChanged), //Test only
+        DECLARE_NAPI_FUNCTION("BLECharacteristicChange", OnCharacteristicChanged), // Test only
 
         DECLARE_NAPI_FUNCTION("writeCharacteristicValue", WriteCharacteristicValue),
         DECLARE_NAPI_FUNCTION("writeDescriptorValue", WriteDescriptorValue),
@@ -65,12 +66,12 @@ void NGattClient::DefineGattClientJSClass(napi_env env) {
         DECLARE_NAPI_FUNCTION("OnConnectionStateChanged", OnConnectionStateChanged), // test
     };
 
-    napi_define_class(env, "GattClientDevice", NAPI_AUTO_LENGTH, GattClientConstructor, nullptr, 
+    napi_define_class(env, "GattClientDevice", NAPI_AUTO_LENGTH, GattClientConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor_);
-
 }
 
-napi_value NGattClient::GattClientConstructor(napi_env env, napi_callback_info info) {
+napi_value NGattClient::GattClientConstructor(napi_env env, napi_callback_info info)
+{
     HILOGI("GattClientConstructor called");
     napi_value thisVar = nullptr;
 
@@ -99,7 +100,7 @@ napi_value NGattClient::GattClientConstructor(napi_env env, napi_callback_info i
 }
 
 
-napi_value NGattClient::On(napi_env env, napi_callback_info info) 
+napi_value NGattClient::On(napi_env env, napi_callback_info info)
 {
     HILOGI("On called");
     NGattClient* gattClient = nullptr;
@@ -112,10 +113,10 @@ napi_value NGattClient::On(napi_env env, napi_callback_info info)
     napi_get_undefined(env, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 2 argument.");
         return ret;
-    } 
+    }
     string type;
     ParseString(env, type, argv[PARAM0]);
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
@@ -124,7 +125,7 @@ napi_value NGattClient::On(napi_env env, napi_callback_info info)
     napi_unwrap(env, thisVar, (void **)&gattClient);
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, argv[PARAM1], &valueType);
-    if(valueType != napi_function) {
+    if (valueType != napi_function) {
         HILOGE("Wrong argument type. Function expected.");
         return ret;
     }
@@ -136,7 +137,7 @@ napi_value NGattClient::On(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::Off(napi_env env, napi_callback_info info) 
+napi_value NGattClient::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("Off called");
     NGattClient* gattClient = nullptr;
@@ -149,22 +150,22 @@ napi_value NGattClient::Off(napi_env env, napi_callback_info info)
     napi_get_undefined(env, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
 
     string type;
     ParseString(env, type, argv[PARAM0]);
 
     napi_unwrap(env, thisVar, (void **)&gattClient);
     gattClient->GetCallback().SetCallbackInfo(type, nullptr);
-    
+
     return ret;
 }
 
 
-napi_value NGattClient::Connect(napi_env env, napi_callback_info info) 
+napi_value NGattClient::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
     NGattClient *gattClient = nullptr;
@@ -184,7 +185,7 @@ napi_value NGattClient::Connect(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::Disconnect(napi_env env, napi_callback_info info) 
+napi_value NGattClient::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
     NGattClient* gattClient = nullptr;
@@ -193,7 +194,7 @@ napi_value NGattClient::Disconnect(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattClient);
-    if(gattClient->GetClient()->Disconnect() == GattStatus::GATT_SUCCESS) {
+    if (gattClient->GetClient()->Disconnect() == GattStatus::GATT_SUCCESS) {
         isOK = true;
     }
 
@@ -215,10 +216,10 @@ napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info
     napi_get_undefined(env, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
+    if (argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
         HILOGE("Requires 1 or 2 arguments.");
         return ret;
-    } 
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
@@ -227,7 +228,7 @@ napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info
     callbackInfo->env_ = env;
     callbackInfo->client_ = gattClient->GetClient();
     callbackInfo->inputCharacteristic_ = GetCharacteristicFromJS(env, argv[PARAM0], nullptr, callbackInfo->client_);
-    
+
     napi_value promise = nullptr;
 
     if (argc == expectedArgsCount) {
@@ -235,7 +236,7 @@ napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info
         HILOGI("readCharacteristicValue callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM1], &valueType);
-        if(valueType != napi_function) {
+        if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
             return ret;
         }
@@ -256,24 +257,24 @@ napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info
         resource,
         [](napi_env env, void *data) {
             HILOGI("readCharacteristicValue execute");
-            ReadCharacteristicValueCallbackInfo* callbackInfo = (ReadCharacteristicValueCallbackInfo*)data;  
+            ReadCharacteristicValueCallbackInfo* callbackInfo = (ReadCharacteristicValueCallbackInfo*)data;
             callbackInfo->asyncState_ = ASYNC_START;
             int result = -1;
             if (callbackInfo->inputCharacteristic_ != nullptr) {
                 result = callbackInfo->client_->ReadCharacteristic(*(callbackInfo->inputCharacteristic_));
             }
 
-            if(result == GattStatus::GATT_SUCCESS) {
+            if (result == GattStatus::GATT_SUCCESS) {
                 callbackInfo->errorCode_ = CODE_SUCCESS;
                 int tryTime = 100;
-                while(callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
-                    usleep(50000);
-                    if(callbackInfo->asyncState_ == ASYNC_DONE) {
+                while (callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
+                    usleep(SLEEP_TIME);
+                    if (callbackInfo->asyncState_ == ASYNC_DONE) {
                         break;
                     }
                     tryTime--;
                 }
-                if(callbackInfo->asyncState_ != ASYNC_DONE){
+                if (callbackInfo->asyncState_ != ASYNC_DONE) {
                     callbackInfo->errorCode_ = CODE_FAILED;
                 }
             } else {
@@ -288,11 +289,11 @@ napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info
             napi_value undefined = 0;
             napi_value callResult = 0;
             napi_get_undefined(env, &undefined);
-            
-            if(callbackInfo->errorCode_ == CODE_SUCCESS){
+
+            if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_object(env, &result[PARAM1]);
-            
-                ConvertBLECharacteristicToJS(env, result[PARAM1], 
+
+                ConvertBLECharacteristicToJS(env, result[PARAM1],
                     const_cast<GattCharacteristic&>(*(callbackInfo->outputCharacteristic_)));
             } else {
                 napi_get_undefined(env, &result[PARAM1]);
@@ -305,7 +306,7 @@ napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
                 napi_delete_reference(env, callbackInfo->callback_);
             } else {
-                if(callbackInfo->errorCode_ == CODE_SUCCESS) {
+                if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 // Promise mode
                     napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
                 } else {
@@ -331,16 +332,16 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
-   
+
     napi_value thisVar = nullptr;
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
+    if (argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
         HILOGE("Requires 1 or 2 arguments.");
         return ret;
-    } 
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
@@ -349,7 +350,7 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
     callbackInfo->env_ = env;
     callbackInfo->client_ = gattClient->GetClient();
     callbackInfo->inputDescriptor_ = GetDescriptorFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
-    
+
     napi_value promise = nullptr;
 
     if (argc == expectedArgsCount) {
@@ -357,7 +358,7 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
         HILOGI("readDescriptorValue callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM1], &valueType);
-        if(valueType != napi_function) {
+        if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
             return ret;
         }
@@ -376,29 +377,29 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
         env, nullptr, resource,
         [](napi_env env, void* data) {
             HILOGI("readDescriptorValue execute");
-            ReadDescriptorValueCallbackInfo* callbackInfo = (ReadDescriptorValueCallbackInfo*)data;  
+            ReadDescriptorValueCallbackInfo* callbackInfo = (ReadDescriptorValueCallbackInfo*)data;
             callbackInfo->asyncState_ = ASYNC_START;
             int result = -1;
             if (callbackInfo->inputDescriptor_ != nullptr) {
-                result = callbackInfo->client_->ReadDescriptor(*(callbackInfo->inputDescriptor_)); 
-            } 
+                result = callbackInfo->client_->ReadDescriptor(*(callbackInfo->inputDescriptor_));
+            }
 
-            if(result == GattStatus::GATT_SUCCESS) {
+            if (result == GattStatus::GATT_SUCCESS) {
                 callbackInfo->errorCode_ = CODE_SUCCESS;
                 int tryTime = 100;
-                while(callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
-                    usleep(50000);
-                    if(callbackInfo->asyncState_ == ASYNC_DONE) {
+                while (callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
+                    usleep(SLEEP_TIME);
+                    if (callbackInfo->asyncState_ == ASYNC_DONE) {
                         break;
                     }
                     tryTime--;
                 }
-                if(callbackInfo->asyncState_ != ASYNC_DONE){
+                if (callbackInfo->asyncState_ != ASYNC_DONE) {
                     callbackInfo->errorCode_ = CODE_FAILED;
                 }
             } else {
                 callbackInfo->errorCode_ = CODE_FAILED;
-            }       
+            }
         },
         [](napi_env env, napi_status status, void* data) {
             HILOGI("readDescriptorValue execute back");
@@ -408,11 +409,11 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
             napi_value undefined = 0;
             napi_value callResult = 0;
             napi_get_undefined(env, &undefined);
-            
-            if(callbackInfo->errorCode_ == CODE_SUCCESS){
+
+            if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_object(env, &result[PARAM1]);
-            
-                ConvertBLEDescriptorToJS(env, result[PARAM1], 
+
+                ConvertBLEDescriptorToJS(env, result[PARAM1],
                     const_cast<GattDescriptor&>(*(callbackInfo->outputDescriptor_)));
             } else {
                 napi_get_undefined(env, &result[PARAM1]);
@@ -425,7 +426,7 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
                 napi_delete_reference(env, callbackInfo->callback_);
             } else {
-                if(callbackInfo->errorCode_ == CODE_SUCCESS) {
+                if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 // Promise mode
                     napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
                 } else {
@@ -438,28 +439,29 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
         },
         (void*)callbackInfo,
         &callbackInfo->asyncWork_);
-    
+
     napi_queue_async_work(env, callbackInfo->asyncWork_);
 
     return promise;
 }
 
-napi_value NGattClient::GetServices(napi_env env, napi_callback_info info) {
+napi_value NGattClient::GetServices(napi_env env, napi_callback_info info)
+{
     HILOGI("getServices called");
     NGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
-   
+
     napi_value thisVar = nullptr;
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
+    if (argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
         HILOGE("Requires 0 or 1 arguments.");
         return ret;
-    } 
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
@@ -475,7 +477,7 @@ napi_value NGattClient::GetServices(napi_env env, napi_callback_info info) {
         HILOGI("getService callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM0], &valueType);
-        if(valueType != napi_function) {
+        if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
             return ret;
         }
@@ -494,11 +496,11 @@ napi_value NGattClient::GetServices(napi_env env, napi_callback_info info) {
         env, nullptr, resource,
         [](napi_env env, void* data) {
             HILOGI("getServices execute");
-            GetServiceCallbackInfo* callbackInfo = (GetServiceCallbackInfo*)data;  
-            if(callbackInfo->client_->DiscoverServices() != GattStatus::GATT_SUCCESS) {
+            GetServiceCallbackInfo* callbackInfo = (GetServiceCallbackInfo*)data;
+            if (callbackInfo->client_->DiscoverServices() != GattStatus::GATT_SUCCESS) {
                 callbackInfo->errorCode_ = CODE_FAILED;
             } else {
-                callbackInfo->services_ = callbackInfo->client_->GetService();  
+                callbackInfo->services_ = callbackInfo->client_->GetService();
                 callbackInfo->errorCode_ = CODE_SUCCESS;
             }
         },
@@ -510,8 +512,8 @@ napi_value NGattClient::GetServices(napi_env env, napi_callback_info info) {
             napi_value undefined = 0;
             napi_value callResult = 0;
             napi_get_undefined(env, &undefined);
-            
-            if(callbackInfo->errorCode_ == CODE_SUCCESS){
+
+            if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_array(env, &result[PARAM1]);
                 ConvertGattServiceVectorToJS(env, result[PARAM1], callbackInfo->services_);
             } else {
@@ -525,7 +527,7 @@ napi_value NGattClient::GetServices(napi_env env, napi_callback_info info) {
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
                 napi_delete_reference(env, callbackInfo->callback_);
             } else {
-                if(callbackInfo->errorCode_ == CODE_SUCCESS) {
+                if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 // Promise mode
                     napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
                 } else {
@@ -544,7 +546,8 @@ napi_value NGattClient::GetServices(napi_env env, napi_callback_info info) {
     return promise;
 }
 
-napi_value NGattClient::Close(napi_env env, napi_callback_info info) {
+napi_value NGattClient::Close(napi_env env, napi_callback_info info)
+{
     HILOGI("Close called");
     NGattClient* gattClient = nullptr;
     bool isOK = true;
@@ -560,7 +563,8 @@ napi_value NGattClient::Close(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NGattClient::OnCharacteristicChanged(napi_env env, napi_callback_info info) {
+napi_value NGattClient::OnCharacteristicChanged(napi_env env, napi_callback_info info)
+{
     HILOGI("OnCharacteristicChanged called");
     NGattClient *gattClient = nullptr;
     napi_value thisVar = nullptr;
@@ -574,7 +578,7 @@ napi_value NGattClient::OnCharacteristicChanged(napi_env env, napi_callback_info
     return ret;
 }
 
-napi_value NGattClient::WriteCharacteristicValue(napi_env env, napi_callback_info info) 
+napi_value NGattClient::WriteCharacteristicValue(napi_env env, napi_callback_info info)
 {
     HILOGI("WriteCharacteristicValue called");
     NGattClient* gattClient = nullptr;
@@ -588,10 +592,10 @@ napi_value NGattClient::WriteCharacteristicValue(napi_env env, napi_callback_inf
     bool isOK = false;
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
@@ -607,7 +611,7 @@ napi_value NGattClient::WriteCharacteristicValue(napi_env env, napi_callback_inf
     return ret;
 }
 
-napi_value NGattClient::WriteDescriptorValue(napi_env env, napi_callback_info info) 
+napi_value NGattClient::WriteDescriptorValue(napi_env env, napi_callback_info info)
 {
     HILOGI("WriteDescriptorValue called");
     NGattClient* gattClient = nullptr;
@@ -621,10 +625,10 @@ napi_value NGattClient::WriteDescriptorValue(napi_env env, napi_callback_info in
     bool isOK = false;
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
@@ -640,7 +644,7 @@ napi_value NGattClient::WriteDescriptorValue(napi_env env, napi_callback_info in
     return ret;
 }
 
-napi_value NGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info) 
+napi_value NGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
 {
     HILOGI("SetBLEMtuSize called");
     NGattClient* gattClient = nullptr;
@@ -654,17 +658,17 @@ napi_value NGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
     bool isOK = false;
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
-    
+
     int32_t mtuSize;
     ParseInt32(env, mtuSize, argv[PARAM0]);
 
-    if(gattClient->GetClient()->RequestBleMtuSize(mtuSize) == GattStatus::GATT_SUCCESS) {
+    if (gattClient->GetClient()->RequestBleMtuSize(mtuSize) == GattStatus::GATT_SUCCESS) {
         isOK = true;
     }
 
@@ -672,7 +676,7 @@ napi_value NGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info) 
+napi_value NGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info)
 {
     HILOGI("SetNotifyCharacteristicChanged called");
     NGattClient* gattClient = nullptr;
@@ -686,19 +690,19 @@ napi_value NGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_callba
     bool isOK = false;
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
     GattCharacteristic* characteristic = GetCharacteristicFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
-    
+
     bool enableNotify = false;
     ParseBool(env, enableNotify, argv[PARAM1]);
 
-    if(gattClient->GetClient()->SetNotifyCharacteristic(*characteristic, enableNotify) == 
+    if (gattClient->GetClient()->SetNotifyCharacteristic(*characteristic, enableNotify) ==
         GattStatus::GATT_SUCCESS) {
         isOK = true;
     }
@@ -707,20 +711,20 @@ napi_value NGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_callba
     return ret;
 }
 
-bool NGattClient::DiscoverServices() {
-
+bool NGattClient::DiscoverServices()
+{
     DiscoverServicesCallbackInfo* callbackInfo = discoverServicesCallbackInfo_;
     callbackInfo->asyncState_ = ASYNC_START;
-    if(client_->DiscoverServices() != GattStatus::GATT_SUCCESS) {
+    if (client_->DiscoverServices() != GattStatus::GATT_SUCCESS) {
         delete callbackInfo;
         callbackInfo = nullptr;
         return false;
     }
     callbackInfo = new DiscoverServicesCallbackInfo();
     int tryTime = 100;
-    while(callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
-        usleep(50000);
-        if(callbackInfo->asyncState_ == ASYNC_DONE) {
+    while (callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
+        usleep(SLEEP_TIME);
+        if (callbackInfo->asyncState_ == ASYNC_DONE) {
             break;
         }
         tryTime--;
@@ -728,7 +732,7 @@ bool NGattClient::DiscoverServices() {
     delete callbackInfo;
     callbackInfo = nullptr;
 
-    if(callbackInfo->asyncState_ != ASYNC_DONE || callbackInfo->status_ != GattStatus::GATT_SUCCESS){
+    if (callbackInfo->asyncState_ != ASYNC_DONE || callbackInfo->status_ != GattStatus::GATT_SUCCESS) {
         return false;
     }
     return true;
@@ -743,11 +747,10 @@ napi_value NGattClient::OnConnectionStateChanged(napi_env env, napi_callback_inf
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattClient);
     gattClient->OnConnectionStateChanged();
-    
+
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
     return ret;
 }
-
 } // namespace Bluetooth
 } // namespace OHOS

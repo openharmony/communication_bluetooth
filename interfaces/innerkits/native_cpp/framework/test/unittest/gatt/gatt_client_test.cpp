@@ -174,7 +174,7 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_1, TestSize.Level1)
     if (client.GetService(id) != std::nullopt) {
         ret = true;
     }
-    EXPECT_EQ(ret,false);
+    EXPECT_EQ(ret, false);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_1 end";
 }
 
@@ -187,7 +187,7 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_2, TestSize.Level1)
     bool isAutoConnect = true;
     int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
-    EXPECT_EQ((int)client.GetService().size(),0);
+    EXPECT_EQ((int)client.GetService().size(), 0);
     GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_2 end";
 }
 

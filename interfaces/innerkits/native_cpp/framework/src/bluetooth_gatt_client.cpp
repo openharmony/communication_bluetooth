@@ -400,12 +400,14 @@ int GattClient::impl::GetTransport(int &transport)
             if (deviceType == DEVICE_TYPE_BREDR) {
                 return GattStatus::REQUEST_NOT_SUPPORT;
             }
-        } break;
+            break;
+        }
         case GATT_TRANSPORT_TYPE_CLASSIC: {
             if (deviceType == DEVICE_TYPE_LE) {
                 return GattStatus::REQUEST_NOT_SUPPORT;
             }
-        } break;
+            break;
+        }
         case GATT_TRANSPORT_TYPE_AUTO: {
             if (deviceType == DEVICE_TYPE_LE || deviceType == DEVICE_TYPE_DUAL_MONO ||
                 deviceType == DEVICE_TYPE_UNKNOWN) {
@@ -413,7 +415,8 @@ int GattClient::impl::GetTransport(int &transport)
             } else {
                 transport = GATT_TRANSPORT_TYPE_CLASSIC;
             }
-        } break;
+            break;
+        }
         default:
             return GattStatus::INVALID_PARAMETER;
             break;

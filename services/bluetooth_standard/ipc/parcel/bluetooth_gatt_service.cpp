@@ -177,12 +177,12 @@ BluetoothGattService *BluetoothGattService::Unmarshalling(Parcel &parcel)
             if (!parcel.ReadInt32(cha_permissions)) {
                 noError = false;
             }
-            size_t cha_length;
+            uint32_t cha_length;
             if (!parcel.ReadUint32(cha_length)) {
                 noError = false;
             }
             uint8_t value_v[cha_length];
-            for (size_t cha_i = 0; cha_i < cha_length; cha_i++) {
+            for (uint32_t cha_i = 0; cha_i < cha_length; cha_i++) {
                 if (!parcel.ReadUint8(value_v[cha_i])) {
                     noError = false;
                 }
@@ -200,8 +200,8 @@ BluetoothGattService *BluetoothGattService::Unmarshalling(Parcel &parcel)
             if (parcel.ReadInt32(des_num)) {
                 uint16_t des_handle;
                 int des_permissions;
-                size_t des_k;
-                size_t des_length;
+                uint32_t des_k;
+                uint32_t des_length;
                 for (int des_j = 0; des_j < des_num; des_j++) {
                     if (!parcel.ReadUint16(des_handle)) {
                         noError = false;
@@ -337,7 +337,7 @@ bool BluetoothGattService::readFromParcel(Parcel &parcel)
             } else {
                 noError = false;
             }
-            size_t cha_length;
+            uint32_t cha_length;
             if (parcel.ReadUint32(cha_length)) {
                 characteristics_[z].length_ = cha_length;
             } else {
@@ -355,7 +355,7 @@ bool BluetoothGattService::readFromParcel(Parcel &parcel)
                 int des_permissions;
                 int des_len, des_k;
                 std::unique_ptr<uint8_t[]> des_value;
-                size_t des_length;
+                uint32_t des_length;
                 uint32_t des_uuid;
                 for (int des_j = 0; des_j < des_num; des_j++) {
                     if (parcel.ReadUint16(des_handle)) {
@@ -568,12 +568,12 @@ bool BluetoothGattService::ServiceIteratorRead(std::vector<Service> &service, Pa
                 if (!parcel.ReadInt32(cha_permissions)) {
                     noError = false;
                 }
-                size_t cha_length;
+                uint32_t cha_length;
                 if (!parcel.ReadUint32(cha_length)) {
                     noError = false;
                 }
                 uint8_t value_v[cha_length];
-                for (size_t cha_i = 0; cha_i < cha_length; cha_i++) {
+                for (uint32_t cha_i = 0; cha_i < cha_length; cha_i++) {
                     if (!parcel.ReadUint8(value_v[cha_i])) {
                         noError = false;
                     }
@@ -591,8 +591,8 @@ bool BluetoothGattService::ServiceIteratorRead(std::vector<Service> &service, Pa
                 if (parcel.ReadInt32(des_num)) {
                     uint16_t des_handle;
                     int des_permissions;
-                    size_t des_k;
-                    size_t des_length;
+                    uint32_t des_k;
+                    uint32_t des_length;
                     for (int des_j = 0; des_j < des_num; des_j++) {
                         if (!parcel.ReadUint16(des_handle)) {
                             noError = false;

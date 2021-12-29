@@ -174,7 +174,6 @@ private:
     BluetoothHostServer::impl *impl_ = nullptr;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AdapterStateObserver);
 };
-
 class BluetoothHostServer::impl::AdapterClassicObserver : public IAdapterClassicObserver {
 public:
     AdapterClassicObserver(BluetoothHostServer::impl *impl) : impl_(impl){};
@@ -337,7 +336,6 @@ private:
     BluetoothHostServer::impl *impl_ = nullptr;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AdapterBleObserver);
 };
-
 class BluetoothHostServer::impl::BlePeripheralCallback : public IBlePeripheralCallback {
 public:
     BlePeripheralCallback(BluetoothHostServer::impl *impl) : impl_(impl){};

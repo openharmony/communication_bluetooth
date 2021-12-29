@@ -53,12 +53,12 @@ BluetoothGattDescriptor *BluetoothGattDescriptor::Unmarshalling(Parcel &parcel)
     if (!parcel.ReadInt32(permissions)) {
         noError = false;
     }
-    size_t length;
+    uint32_t length;
     if (!parcel.ReadUint32(length)) {
         noError = false;
     }
     uint8_t value_v[length];
-    for (size_t i = 0; i < length; i++) {
+    for (uint32_t i = 0; i < length; i++) {
         if (!parcel.ReadUint8(value_v[i])) {
             noError = false;
         }
@@ -108,7 +108,7 @@ bool BluetoothGattDescriptor::readFromParcel(Parcel &parcel)
     } else {
         noError = false;
     }
-    size_t length;
+    uint32_t length;
     if (parcel.ReadUint32(length)) {
         length_ = length;
     } else {
