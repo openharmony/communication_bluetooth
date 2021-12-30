@@ -14,17 +14,18 @@
  */
 
 #include <unistd.h>
-#include "napi_bluetooth_spp_client.h"
 #include "securec.h"
+#include "napi_bluetooth_spp_client.h"
 
 
 namespace OHOS {
 namespace Bluetooth {
-
+const int sleepTime = 5;
 std::map<int, std::shared_ptr<NSppClient>> NSppClient::clientMap;
 int NSppClient::count = 0;
 
-napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info) {
+napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info)
+{
     HILOGI("SppConnect called");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
@@ -34,17 +35,16 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info) {
     napi_get_undefined(env, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    if(argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
+    if (argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
         HILOGE("Requires 2 or 3 arguments.");
-        return ret;
-    } 
-    
-    std::string deviceId;
-    if(!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("Wrong argument type. String expected.");
         return ret;
     }
 
+    std::string deviceId;
+    if (!ParseString(env, deviceId, argv[PARAM0])) {
+        HILOGE("Wrong argument type. String expected.");
+        return ret;
+    }
 
     SppConnectCallbackInfo *callbackInfo = new SppConnectCallbackInfo();
     callbackInfo->env_ = env;
@@ -52,13 +52,13 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info) {
     callbackInfo->deviceId_ = deviceId;
 
     napi_value promise = nullptr;
-    
+
     if (argc == expectedArgsCount) {
         // Callback mode
         HILOGI("SppConnect callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM2], &valueType);
-        if(valueType != napi_function) {
+        if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
             return ret;
         }
@@ -77,13 +77,13 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info) {
         env, nullptr, resource,
         [](napi_env env, void* data) {
             HILOGI("SppConnect execute");
-            SppConnectCallbackInfo* callbackInfo = (SppConnectCallbackInfo*)data; 
+            SppConnectCallbackInfo* callbackInfo = (SppConnectCallbackInfo*)data;
             callbackInfo->device_ = std::make_shared<BluetoothRemoteDevice>(callbackInfo->deviceId_, 0);
-            callbackInfo->client_ = std::make_shared<SppClientSocket>
-                (*callbackInfo->device_, UUID::FromString(callbackInfo->sppOption_->uuid_), 
+            callbackInfo->client_ = std::make_shared<SppClientSocket>(*callbackInfo->device_, 
+                UUID::FromString(callbackInfo->sppOption_->uuid_), 
                 callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
             HILOGI("SppConnect client_ constructed");
-            if(callbackInfo->client_->Connect() == SPPStatus::SPP_SUCCESS) {
+            if (callbackInfo->client_->Connect() == SPPStatus::SPP_SUCCESS) {
                 HILOGI("SppConnect successfully");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
             } else {
@@ -99,8 +99,8 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info) {
             napi_value undefined = 0;
             napi_value callResult = 0;
             napi_get_undefined(env, &undefined);
-            
-            if(callbackInfo->errorCode_ == CODE_SUCCESS){
+
+            if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 HILOGI("SppConnect execute back success");
                 std::shared_ptr<NSppClient> client =  std::make_shared<NSppClient>();
                 client->device_ = callbackInfo->device_;
@@ -122,7 +122,7 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info) {
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
                 napi_delete_reference(env, callbackInfo->callback_);
             } else {
-                if(callbackInfo->errorCode_ == CODE_SUCCESS) {
+                if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 // Promise mode
                     HILOGI("SppConnect execute Promise mode successfully");
                     napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
@@ -141,8 +141,8 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NSppClient::SppCloseClientSocket(napi_env env, napi_callback_info info) {
-
+napi_value NSppClient::SppCloseClientSocket(napi_env env, napi_callback_info info)
+{
     HILOGI("SppCloseClientSocket called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -152,23 +152,23 @@ napi_value NSppClient::SppCloseClientSocket(napi_env env, napi_callback_info inf
     napi_value ret = nullptr;
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
 
     std::shared_ptr<NSppClient> client = nullptr;
     int id =  -1;
     ParseInt32(env, id, argv[PARAM0]);
-    
-    if(clientMap[id]) {
+
+    if (clientMap[id]) {
         client = clientMap[id];
-    } else{
+    } else {
         HILOGE("no such key in map.");
         return ret;
     }
-    
-    if(client->client_) {
+
+    if (client->client_) {
         client->client_->Close();
         isOK = true;
     }
@@ -176,8 +176,8 @@ napi_value NSppClient::SppCloseClientSocket(napi_env env, napi_callback_info inf
     napi_get_boolean(env, isOK, &ret);
     return ret;
 }
-    
-napi_value NSppClient::SppWrite(napi_env env, napi_callback_info info) 
+
+napi_value NSppClient::SppWrite(napi_env env, napi_callback_info info)
 {
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
@@ -192,14 +192,14 @@ napi_value NSppClient::SppWrite(napi_env env, napi_callback_info info)
     napi_get_boolean(env, isOK, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 3 argument.");
         return ret;
-    } 
+    }
 
     ParseInt32(env, id, argv[PARAM0]);
 
-    if(!ParseArrayBuffer(env, (uint8_t**)(&totalBuf), totalSize, argv[PARAM1])) {
+    if (!ParseArrayBuffer(env, (uint8_t**)(&totalBuf), totalSize, argv[PARAM1])) {
         HILOGE("ParseArrayBuffer failed");
         return ret;
     }
@@ -224,8 +224,8 @@ napi_value NSppClient::SppWrite(napi_env env, napi_callback_info info)
     napi_get_boolean(env, isOK, &ret);
     return ret;
 }
-
-void NSppClient::On(napi_env env, napi_callback_info info) {
+void NSppClient::On(napi_env env, napi_callback_info info)
+{
     HILOGI("On is called");
 
     size_t expectedArgsCount = ARGS_SIZE_THREE;
@@ -235,10 +235,10 @@ void NSppClient::On(napi_env env, napi_callback_info info) {
     int id = -1;
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 3 argument.");
         return;
-    } 
+    }
     std::string type;
     ParseString(env, type, argv[PARAM0]);
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
@@ -248,7 +248,7 @@ void NSppClient::On(napi_env env, napi_callback_info info) {
     napi_valuetype valueType2 = napi_undefined;
     napi_typeof(env, argv[PARAM1], &valueType1);
     napi_typeof(env, argv[PARAM2], &valueType2);
-    if(valueType1 != napi_number && valueType2 != napi_function) {
+    if (valueType1 != napi_number && valueType2 != napi_function) {
         HILOGE("Wrong argument type. Function expected.");
         return;
     }
@@ -257,7 +257,7 @@ void NSppClient::On(napi_env env, napi_callback_info info) {
 
     ParseInt32(env, id, argv[PARAM1]);
     std::shared_ptr<NSppClient> client = clientMap[id];
-    if(!client) {
+    if (!client) {
         HILOGI("client is nullptr");
         return;
     }
@@ -269,7 +269,8 @@ void NSppClient::On(napi_env env, napi_callback_info info) {
     return;
 }
 
-void NSppClient::Off(napi_env env, napi_callback_info info) {
+void NSppClient::Off(napi_env env, napi_callback_info info)
+{
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_THREE] = {0};
@@ -277,7 +278,7 @@ void NSppClient::Off(napi_env env, napi_callback_info info) {
     int id = -1;
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if(argc != expectedArgsCount) {
+    if (argc != expectedArgsCount) {
         HILOGE("Requires 3 argument.");
         return;
     }
@@ -287,13 +288,13 @@ void NSppClient::Off(napi_env env, napi_callback_info info) {
 
     ParseInt32(env, id, argv[PARAM1]);
     std::shared_ptr<NSppClient> client = clientMap[id];
-    if(!client) {
+    if (!client) {
         HILOGI("client is nullptr");
         return;
-    }    
+    }
     client->callbackInfos_[type] = nullptr;
     client->sppReadFlag = false;
-    sleep(5);
+    sleep(sleepTime);
     return;
 }
 
@@ -309,11 +310,11 @@ void NSppClient::sppRead(int id)
         if (clientMap[id] == nullptr) {
             isRead = false;
             break;
-        } 
+        }
         isRead = clientMap[id]->sppReadFlag;
         HILOGI("inputStream.Read start");
         while (true) {
-            memset(buf, 0, sizeof(buf));
+            memset_s(buf, sizeof(buf), 0, sizeof(buf));
             ret = inputStream.Read(buf, sizeof(buf));
             HILOGI("inputStream.Read end");
             if (ret <= 0) {
@@ -347,7 +348,7 @@ void NSppClient::sppRead(int id)
             }
         }
     }
-    return;  
-}   
+    return;
+}
 } // namespace Bluetooth
 } // namespace OHOS

@@ -17,8 +17,6 @@
 #define BT_VENDOR_LIB_H
 
 #include <stdint.h>
-#include <sys/cdefs.h>
-#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {

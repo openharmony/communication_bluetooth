@@ -157,9 +157,9 @@ public:
         string charcUuid = characteristic.GetUuid().ToString();
         GattcBuildUuid(&characData.attribute.characteristic.serviceUuid, srvUuid);
         GattcBuildUuid(&characData.attribute.characteristic.characteristicUuid, charcUuid);
-        unsigned int tmpLen = 0;
+        size_t tmpLen = 0;
         characData.data = characteristic.GetValue(&tmpLen).get();
-        characData.dataLen = tmpLen;
+        characData.dataLen = (unsigned short)tmpLen;
 
         HILOGI("OnCharacteristicReadResult, clientId: %{public}d, ret: %{public}d, dataLen: %{public}d",
             clientId_, ret, characData.dataLen);
@@ -211,9 +211,9 @@ public:
         GattcBuildUuid(&descData.attribute.descriptor.characteristic.serviceUuid, srvUuid);
         GattcBuildUuid(&descData.attribute.descriptor.characteristic.characteristicUuid, charcUuid);
         GattcBuildUuid(&descData.attribute.descriptor.descriptorUuid, descUuid);
-        unsigned int tmpLen = 0;
+        size_t tmpLen = 0;
         descData.data = descriptor.GetValue(&tmpLen).get();
-        descData.dataLen = tmpLen;
+        descData.dataLen = (unsigned short)tmpLen;
 
         HILOGI("OnDescriptorReadResult, clientId: %{public}d, ret: %{public}d, dataLen: %{public}d",
             clientId_, ret, descData.dataLen);
@@ -287,9 +287,9 @@ public:
         string charcUuid = characteristic.GetUuid().ToString();
         GattcBuildUuid(&notificationData.attribute.characteristic.serviceUuid, srvUuid);
         GattcBuildUuid(&notificationData.attribute.characteristic.characteristicUuid, charcUuid);
-        unsigned int tmpLen = 0;
+        size_t tmpLen = 0;
         notificationData.data = characteristic.GetValue(&tmpLen).get();
-        notificationData.dataLen = tmpLen;
+        notificationData.dataLen = (unsigned short)tmpLen;
 
         HILOGI("OnCharacteristicChanged, clientId: %{public}d, dataLen: %{public}d, ",
             clientId_, notificationData.dataLen);

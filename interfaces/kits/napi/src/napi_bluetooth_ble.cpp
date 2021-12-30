@@ -100,7 +100,6 @@ static napi_value ParseScanParameters(
     napi_valuetype valuetype = napi_undefined;
     napi_value result = nullptr;
 
-    // interval ?: number
     NAPI_CALL(env, napi_has_named_property(env, scanArg, "interval", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, scanArg, "interval", &result);
@@ -110,7 +109,6 @@ static napi_value ParseScanParameters(
         HILOGI("StartBLEScan interval is %{public}d", params.interval);
     }
 
-    // dutyMode ?: number
     NAPI_CALL(env, napi_has_named_property(env, scanArg, "dutyMode", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, scanArg, "dutyMode", &result);
@@ -122,7 +120,6 @@ static napi_value ParseScanParameters(
         ConvertDutyMode(params, dutyMode);
     }
 
-    // matchMode ?: number
     NAPI_CALL(env, napi_has_named_property(env, scanArg, "matchMode", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, scanArg, "matchMode", &result);
@@ -155,7 +152,6 @@ static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &arg
             NAPI_CALL(env, napi_typeof(env, scanFilter, &valuetype));
             NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
             bool hasProperty = false;
-            // deviceId?: string;
             NAPI_CALL(env, napi_has_named_property(env, scanFilter, "deviceId", &hasProperty));
             if (hasProperty) {
                 napi_get_named_property(env, scanFilter, "deviceId", &result);
@@ -227,7 +223,6 @@ static napi_value ParseAdvertisingSettingsParameters(
     napi_valuetype valuetype = napi_undefined;
     napi_value result = nullptr;
 
-    // interval: number
     NAPI_CALL(env, napi_has_named_property(env, args, "interval", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, args, "interval", &result);
@@ -238,7 +233,6 @@ static napi_value ParseAdvertisingSettingsParameters(
         HILOGI("ParseAdvertisingSettingsParameters interval is %{public}d", interval);
         settings.SetInterval(interval);
     }
-    // txPower: number
     NAPI_CALL(env, napi_has_named_property(env, args, "txPower", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, args, "txPower", &result);
@@ -250,7 +244,6 @@ static napi_value ParseAdvertisingSettingsParameters(
         settings.SetTxPower(txPower);
     }
 
-    // connectable: boolean
     NAPI_CALL(env, napi_has_named_property(env, args, "connectable", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, args, "connectable", &result);
@@ -311,7 +304,6 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
         NAPI_CALL(env, napi_typeof(env, manufactureData, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
         bool hasProperty = false;
-        // manufactureId : number
         NAPI_CALL(env, napi_has_named_property(env, manufactureData, "manufactureId", &hasProperty));
         NAPI_ASSERT(env, hasProperty, "manufactureId expected.");
         napi_get_named_property(env, manufactureData, "manufactureId", &result);
@@ -320,7 +312,6 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
         int32_t manufactureId = 0;
         napi_get_value_int32(env, result, &manufactureId);
         HILOGI("ParseManufactureDataParameters::manufactureId = %{public}d", manufactureId);
-        // manufactureValue : ArrayBuffer
         NAPI_CALL(env, napi_has_named_property(env, manufactureData, "manufactureValue", &hasProperty));
         NAPI_ASSERT(env, hasProperty, "manufactureValue expected.");
         napi_get_named_property(env, manufactureData, "manufactureValue", &result);
@@ -359,7 +350,6 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
         NAPI_CALL(env, napi_typeof(env, serviceData, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
         bool hasProperty = false;
-        // serviceUuid : string
         NAPI_CALL(env, napi_has_named_property(env, serviceData, "serviceUuid", &hasProperty));
         NAPI_ASSERT(env, hasProperty, "serviceUuid expected.");
         napi_get_named_property(env, serviceData, "serviceUuid", &result);
@@ -368,7 +358,6 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
         ParcelUuid serviceUuid(ParcelUuid::FromString(serviceBuffer));
         HILOGI("ParseManufactureDataParameters::serviceUuid = %{public}s", serviceUuid.ToString().c_str());
 
-        // serviceValue: ArrayBuffer
         NAPI_CALL(env, napi_has_named_property(env, serviceData, "serviceValue", &hasProperty));
         NAPI_ASSERT(env, hasProperty, "serviceValue expected.");
         napi_get_named_property(env, serviceData, "serviceValue", &result);
@@ -390,17 +379,14 @@ static napi_value ParseAdvertisDataParameters(
 {
     HILOGI("ParseAdvertisDataParameters start");
     bool hasProperty = false;
-    // serviceUuids: Array<string>
     NAPI_CALL(env, napi_has_named_property(env, args, "serviceUuids", &hasProperty));
     if (hasProperty) {
         ParseServiceUuidParameters(env, args, data);
     }
-    // manufactureData : Array<ManufactureData>
     NAPI_CALL(env, napi_has_named_property(env, args, "manufactureData", &hasProperty));
     if (hasProperty) {
         ParseManufactureDataParameters(env, args, data);
     }
-    // serviceData : Array<ServiceData>
     NAPI_CALL(env, napi_has_named_property(env, args, "serviceData", &hasProperty));
     if (hasProperty) {
         ParseServiceDataParameters(env, args, data);

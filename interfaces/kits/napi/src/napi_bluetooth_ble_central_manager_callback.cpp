@@ -14,11 +14,6 @@
  */
 #include "napi_bluetooth_ble_central_manager_callback.h"
 
-#include <cstring>
-#include <map>
-#include <memory>
-#include <string>
-
 #include "bluetooth_log.h"
 #include "napi_bluetooth_utils.h"
 #include "securec.h"
@@ -84,14 +79,11 @@ void NapiBluetoothBleCentralManagerCallback::ConvertScanResult(
         napi_value result = nullptr;
         napi_value value = nullptr;
         napi_create_object(env, &result);
-        // deviceId?: string
         napi_create_string_utf8(
             env, bleScanResult.GetPeripheralDevice().GetDeviceAddr().c_str(), NAPI_AUTO_LENGTH, &value);
         napi_set_named_property(env, result, "deviceId", value);
-        // rssi?: number
         napi_create_int32(env, bleScanResult.GetRssi(), &value);
         napi_set_named_property(env, result, "rssi", value);
-        // data?: ArrayBuffer
         uint8_t *native = nullptr;
         napi_value buffer = nullptr;
         napi_create_arraybuffer(env, bleScanResult.GetPayload().size(), reinterpret_cast<void **>(&native), &buffer);

@@ -24,7 +24,6 @@ namespace Bluetooth {
 void DefineSppFunctions(napi_env env, napi_value exports);
 
 struct NSppServer {
-
     static napi_value SppListen(napi_env env, napi_callback_info info);
     static napi_value SppAccept(napi_env env, napi_callback_info info);
     static napi_value SppConnect(napi_env env, napi_callback_info info);
@@ -35,7 +34,6 @@ struct NSppServer {
 
     std::shared_ptr<SppServerSocket> server_ = nullptr;
     int id_ = -1;
-    
 };
 } // namespace Bluetooth
 } // namespace OHOS

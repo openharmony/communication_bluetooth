@@ -99,7 +99,7 @@ BluetoothGattCharacteristic *BluetoothGattCharacteristic::Unmarshalling(Parcel &
     if (!parcel.ReadInt32(permissions)) {
         noError = false;
     }
-    size_t length;
+    uint32_t length;
     if (!parcel.ReadUint32(length)) {
         noError = false;
     }
@@ -121,7 +121,7 @@ BluetoothGattCharacteristic *BluetoothGattCharacteristic::Unmarshalling(Parcel &
     if (parcel.ReadInt32(des_num)) {
         uint16_t des_handle;
         int des_permissions;
-        size_t des_length;
+        uint32_t des_length;
         for (int j = 0; j < des_num; j++) {
             if (!parcel.ReadUint16(des_handle)) {
                 noError = false;
@@ -133,7 +133,7 @@ BluetoothGattCharacteristic *BluetoothGattCharacteristic::Unmarshalling(Parcel &
                 noError = false;
             }
             uint8_t des_value[des_length];
-            for (size_t k = 0; k < des_length; k++) {
+            for (uint32_t k = 0; k < des_length; k++) {
                 if (!parcel.ReadUint8(des_value[k])) {
                     noError = false;
                 }
@@ -207,7 +207,7 @@ bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel)
     } else {
         noError = false;
     }
-    size_t length;
+    uint32_t length;
     if (parcel.ReadUint32(length)) {
         length_ = length;
     } else {
@@ -225,7 +225,7 @@ bool BluetoothGattCharacteristic::readFromParcel(Parcel &parcel)
         int des_permissions;
         int des_len, k;
         std::unique_ptr<uint8_t[]> des_value;
-        size_t des_length;
+        uint32_t des_length;
         uint32_t des_uuid;
         for (int j = 0; j < des_num; j++) {
             if (parcel.ReadUint16(des_handle)) {

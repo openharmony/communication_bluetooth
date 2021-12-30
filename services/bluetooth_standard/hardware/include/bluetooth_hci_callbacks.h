@@ -28,7 +28,7 @@ public:
 
     int32_t OnInited(ohos::hardware::bt::v1_0::BtStatus status) override;
 
-    int32_t OnReceivedHciPacket(ohos::hardware::bt::v1_0::BtType type, const std::vector<int8_t> &data) override;
+    int32_t OnReceivedHciPacket(ohos::hardware::bt::v1_0::BtType type, const std::vector<uint8_t> &data) override;
 
 private:
     BtHciCallbacks *callbacks_;

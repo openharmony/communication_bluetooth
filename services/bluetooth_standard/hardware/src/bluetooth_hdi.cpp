@@ -71,7 +71,7 @@ int HdiSendHciPacket(BtPacketType type, const BtPacket *packet)
         default:
             break;
     }
-    std::vector<int8_t> data;
+    std::vector<uint8_t> data;
     data.assign(packet->data, packet->data + packet->size);
     int32_t result = g_iBtHci->SendHciPacket(btType, data);
     if (result != ohos::hardware::bt::v1_0::BtStatus::SUCCESS) {

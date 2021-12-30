@@ -80,11 +80,8 @@ struct SppOption {
 const std::string REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const std::string REGISTER_STATE_CHANGE_TYPE = "stateChange";
 const std::string REGISTER_PIN_REQUEST_TYPE = "pinRequired";
-const std::string REGISTER_BONE_STATE_TYPE = "boneStateChange";
+const std::string REGISTER_BONE_STATE_TYPE = "bondStateChange";
 const std::string REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
-
-const int STATUS_BONDED = 2;
-const int STATUS_BONDING = 1;
 
 bool ParseString(napi_env env, std::string &param, napi_value args);
 bool ParseInt32(napi_env env, int32_t &param, napi_value args);
@@ -287,6 +284,21 @@ enum class BluetoothState {
     STATE_BLE_ON = 5,
     /** Indicates the local Bluetooth is turning off LE only mode */
     STATE_BLE_TURNING_OFF = 6
+};
+
+enum BondState {
+    BOND_STATE_INVALID = 0,
+    BOND_STATE_BONDING = 1,
+    BOND_STATE_BONDED = 2
+};
+
+enum class ScanMode {
+    SCAN_MODE_NONE = 0,
+    SCAN_MODE_CONNECTABLE = 1,
+    SCAN_MODE_GENERAL_DISCOVERABLE = 2,
+    SCAN_MODE_LIMITED_DISCOVERABLE = 3,
+    SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE = 4,
+    SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE = 5
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

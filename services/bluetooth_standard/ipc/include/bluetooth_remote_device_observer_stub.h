@@ -16,10 +16,12 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_REMOTE_DEVICE_OBSERVER_STUB_H
 #define OHOS_BLUETOOTH_STANDARD_REMOTE_DEVICE_OBSERVER_STUB_H
 
+#include <map>
+
+#include "iremote_stub.h"
+
 #include "i_bluetooth_host.h"
 #include "i_bluetooth_remote_device_observer.h"
-#include "iremote_stub.h"
-#include <map>
 
 namespace OHOS {
 namespace Bluetooth {

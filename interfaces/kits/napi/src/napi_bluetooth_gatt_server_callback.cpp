@@ -44,18 +44,17 @@ void NGattServerCallback::OnCharacteristicReadRequest(
     napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
-void NGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device, 
-        GattCharacteristic &characteristic, int requestId)  {
-    
+void NGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device,
+    GattCharacteristic &characteristic, int requestId)
+{
     HILOGI("NGattServerCallback::OnCharacteristicWriteRequest called");
-    
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE]) {
         HILOGW("NGattServerCallback::OnCharacteristicWriteRequest: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NGattServerCallback::OnCharacteristicWriteRequest: %{public}s is registered by ability", 
+    HILOGI("NGattServerCallback::OnCharacteristicWriteRequest: %{public}s is registered by ability",
         STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = 
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE];
     napi_value result = nullptr;
     napi_create_object(callbackInfo->env_, &result);
@@ -70,7 +69,7 @@ void NGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevi
 }
 
 
-void NGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state) 
+void NGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("NGattServerCallback::OnConnectionStateUpdate called");
 
@@ -83,7 +82,7 @@ void NGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &d
                 break;
             }
         }
-        if(!hasAddr) {
+        if (!hasAddr) {
             HILOGI("NGattServerCallback::OnConnectionStateUpdate add devices");
             NGattServer::deviceList.push_back(device.GetDeviceAddr());
         }
@@ -98,14 +97,14 @@ void NGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &d
             }
         }
     }
-    
+
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE]) {
         HILOGW("NGattServerCallback::OnConnectionStateUpdate: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NGattServerCallback::OnConnectionStateUpdate: %{public}s is registered by ability", 
+    HILOGI("NGattServerCallback::OnConnectionStateUpdate: %{public}s is registered by ability",
         STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = 
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE];
     napi_value result = nullptr;
     napi_create_object(callbackInfo->env_, &result);
@@ -119,18 +118,18 @@ void NGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &d
     napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
-void NGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device, 
+void NGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
     HILOGI("NGattServerCallback::OnDescriptorWriteRequest called");
-    
+
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE]) {
         HILOGW("NGattServerCallback::OnDescriptorWriteRequest: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NGattServerCallback::OnDescriptorWriteRequest: %{public}s is registered by ability", 
+    HILOGI("NGattServerCallback::OnDescriptorWriteRequest: %{public}s is registered by ability",
         STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = 
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE];
     napi_value result = nullptr;
     napi_create_object(callbackInfo->env_, &result);
@@ -144,18 +143,18 @@ void NGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &
     napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
-void NGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &device, 
+void NGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
     HILOGI("NGattServerCallback::OnDescriptorReadRequest called");
-    
+
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ]) {
         HILOGW("NGattServerCallback::OnDescriptorReadRequest: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NGattServerCallback::OnDescriptorReadRequest: %{public}s is registered by ability", 
+    HILOGI("NGattServerCallback::OnDescriptorReadRequest: %{public}s is registered by ability",
         STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = 
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ];
     napi_value result = nullptr;
     napi_create_object(callbackInfo->env_, &result);
@@ -168,6 +167,5 @@ void NGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &d
     napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
     napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
-
 } // namespace Bluetooth
 } // namespace OHOS

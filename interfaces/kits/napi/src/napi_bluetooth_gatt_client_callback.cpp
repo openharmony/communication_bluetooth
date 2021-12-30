@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 void NGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
 {
     HILOGI("NGattClientCallback::OnCharacteristicChanged called");
@@ -45,35 +44,37 @@ void NGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &char
     napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
-void NGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret) {
+void NGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
+{
     HILOGI("NGattClientCallback::OnCharacteristicChanged called");
 
     ReadCharacteristicValueCallbackInfo *callbackInfo = client_->readCharacteristicValueCallbackInfo_;
-    if(!callbackInfo) {
+    if (!callbackInfo) {
         return;
     }
-    if(callbackInfo->asyncState_ == ASYNC_START) {
+    if (callbackInfo->asyncState_ == ASYNC_START) {
         callbackInfo->ret = ret;
         callbackInfo->outputCharacteristic_ = &characteristic;
         callbackInfo->asyncState_ = ASYNC_DONE;
     }
 }
 
-void NGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret) {
+void NGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
+{
     HILOGI("NGattClientCallback::OnDescriptorReadResult called");
 
     ReadDescriptorValueCallbackInfo *callbackInfo = client_->readDescriptorValueCallbackInfo_;
-    if(!callbackInfo) {
+    if (!callbackInfo) {
         return;
     }
-    if(callbackInfo->asyncState_ == ASYNC_START) {
+    if (callbackInfo->asyncState_ == ASYNC_START) {
         callbackInfo->ret = ret;
         callbackInfo->outputDescriptor_ = &descriptor;
         callbackInfo->asyncState_ = ASYNC_DONE;
     }
 }
 
-void NGattClientCallback::OnConnectionStateChanged(int connectionState, int ret) 
+void NGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
 {
     HILOGI("NGattClientCallback::OnConnectionStateChanged called");
 
@@ -81,7 +82,7 @@ void NGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
         HILOGW("NGattClientCallback::OnConnectionStateChanged: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NGattClientCallback::OnConnectionStateChanged: %{public}s is registered by ability", 
+    HILOGI("NGattClientCallback::OnConnectionStateChanged: %{public}s is registered by ability",
         STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE];
@@ -89,7 +90,7 @@ void NGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
     napi_value result = nullptr;
     napi_create_object(callbackInfo->env_, &result);
     ConvertBLEConnectStateChangeToJS(callbackInfo->env_, result, connectionState, ret);
-    
+
     napi_value callback = nullptr;
     napi_value undefined = nullptr;
     napi_value callResult = nullptr;
@@ -98,17 +99,17 @@ void NGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
     napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
-void NGattClientCallback::OnServicesDiscovered(int status) {
+void NGattClientCallback::OnServicesDiscovered(int status)
+{
     HILOGI("NGattClientCallback::OnServicesDiscovered called");
     DiscoverServicesCallbackInfo *callbackInfo = client_->discoverServicesCallbackInfo_;
-    if(!callbackInfo) {
+    if (!callbackInfo) {
         return;
     }
-    if(callbackInfo->asyncState_ == ASYNC_START) {
+    if (callbackInfo->asyncState_ == ASYNC_START) {
         callbackInfo->status_ = status;
         callbackInfo->asyncState_ = ASYNC_DONE;
     }
 }
-
 } // namespace Bluetooth
 } // namespace OHOS

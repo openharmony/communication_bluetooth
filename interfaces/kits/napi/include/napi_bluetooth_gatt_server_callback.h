@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 const std::string STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ = "characteristicRead";
 const std::string STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE = "characteristicWrite";
 const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ = "descriptorRead";
@@ -28,25 +27,25 @@ const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE = "descriptorWrit
 const std::string STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectStateChange";
 
 class NGattServerCallback : public GattServerCallback {
-
 public:
     void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state) override;
     void OnServiceAdded(GattService *Service, int ret) override {}
-    void OnCharacteristicReadRequest(const BluetoothRemoteDevice &device, 
+    void OnCharacteristicReadRequest(const BluetoothRemoteDevice &device,
         GattCharacteristic &characteristic, int requestId) override;
-    void OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device, 
+    void OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device,
         GattCharacteristic &characteristic, int requestId) override;
-    void OnDescriptorReadRequest(const BluetoothRemoteDevice &device, 
+    void OnDescriptorReadRequest(const BluetoothRemoteDevice &device,
         GattDescriptor &descriptor, int requestId) override;
-    void OnDescriptorWriteRequest(const BluetoothRemoteDevice &device, 
+    void OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
         GattDescriptor &descriptor, int requestId) override;
     void OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu) override {}
-    void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, 
+    void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device,
         int result) override {}
-    void OnConnectionParameterChanged(const BluetoothRemoteDevice &device, 
-        int interval, int latency, int timeout, int status) override{}
+    void OnConnectionParameterChanged(const BluetoothRemoteDevice &device,
+        int interval, int latency, int timeout, int status) override {}
 
-    void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo) {
+    void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo)
+    {
         HILOGI("SetCallbackInfo called");
         callbackInfos_[type] = callbackInfo;
     }

@@ -93,7 +93,6 @@ napi_value SetLocalName(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
     napi_valuetype valuetype = napi_undefined;
-    // argv[0] : string
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
     size_t bufferSize = 0;
@@ -135,13 +134,11 @@ napi_value SetBluetoothScanMode(napi_env env, napi_callback_info info)
     }
     napi_valuetype valuetype = napi_undefined;
 
-    // argv[0]:number
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
     int32_t mode = 0;
     napi_get_value_int32(env, argv[PARAM0], &mode);
     HILOGI("SetBluetoothScanMode::mode = %{public}d", mode);
-    // argv[1]:number
     NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
     int32_t duration = 0;
@@ -310,7 +307,6 @@ napi_value SetDevicePariringConfirmation(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
     ParseString(env, g_RemoteDeviceAddr, argv[PARAM0]);
-    // accept:bool
     napi_valuetype valuetype = napi_undefined;
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
@@ -420,19 +416,36 @@ static napi_value ParseParameters(const napi_env &env, const napi_callback_info 
     return NapiGetNull(env);
 }
 
+static void GetDeviceNameSyncWorkStart(const napi_env env, GattGetDeviceNameCallbackInfo *asynccallbackinfo)
+{
+    std::string deviceId = GetGattClientDeviceId();
+    asynccallbackinfo->deviceId =
+        BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceId, BT_TRANSPORT_BLE).GetDeviceName();
+    if (asynccallbackinfo->deviceId.empty()) {
+        HILOGI("GetDeviceName failed.");
+        asynccallbackinfo->promise.errorCode = CODE_FAILED;
+        asynccallbackinfo->result = NapiGetNull(env);
+    } else {
+        HILOGI("GetDeviceName success.");
+        napi_value result = nullptr;
+        napi_create_string_utf8(env, asynccallbackinfo->deviceId.c_str(), asynccallbackinfo->deviceId.size(), &result);
+        asynccallbackinfo->result = result;
+        asynccallbackinfo->promise.errorCode = CODE_SUCCESS;
+    }
+}
+
 napi_value GetDeviceName(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceName start");
     napi_ref callback = nullptr;
     GattGetDeviceNameCallbackInfo *asynccallbackinfo =
-        new (std::nothrow) GattGetDeviceNameCallbackInfo{.env = env, .asyncWork = nullptr};
+        new (std::nothrow)GattGetDeviceNameCallbackInfo{.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return JSParaError(env, callback);
     }
     ParseParameters(env, info, asynccallbackinfo->promise);
     napi_value promise = nullptr;
     PaddingCallbackPromiseInfo(env, asynccallbackinfo->promise.callback, asynccallbackinfo->promise, promise);
-
     napi_value resourceName = nullptr;
     napi_create_string_latin1(env, "getDeviceName", NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
@@ -442,31 +455,15 @@ napi_value GetDeviceName(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             HILOGI("GetDeviceName napi_create_async_work start");
             GattGetDeviceNameCallbackInfo *asynccallbackinfo = (GattGetDeviceNameCallbackInfo *)data;
-            std::string deviceId = GetGattClientDeviceId();
-            asynccallbackinfo->deviceId =
-                BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceId, BT_TRANSPORT_BLE).GetDeviceName();
-            if (asynccallbackinfo->deviceId.empty()) {
-                HILOGI("GetDeviceName failed.");
-                asynccallbackinfo->promise.errorCode = CODE_FAILED;
-                asynccallbackinfo->result = NapiGetNull(env);
-            } else {
-                HILOGI("GetDeviceName success.");
-                napi_value result = nullptr;
-                napi_create_string_utf8(
-                    env, asynccallbackinfo->deviceId.c_str(), asynccallbackinfo->deviceId.size(), &result);
-                asynccallbackinfo->result = result;
-                asynccallbackinfo->promise.errorCode = CODE_SUCCESS;
-            }
+            GetDeviceNameSyncWorkStart(env, asynccallbackinfo);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOGI("GetDeviceName napi_create_async_work complete start");
             GattGetDeviceNameCallbackInfo *asynccallbackinfo = (GattGetDeviceNameCallbackInfo *)data;
             ReturnCallbackPromise(env, asynccallbackinfo->promise, asynccallbackinfo->result);
-
             if (asynccallbackinfo->promise.callback != nullptr) {
                 napi_delete_reference(env, asynccallbackinfo->promise.callback);
             }
-
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
                 delete asynccallbackinfo;
@@ -476,16 +473,32 @@ napi_value GetDeviceName(napi_env env, napi_callback_info info)
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
-
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
-
     if (asynccallbackinfo->promise.isCallback) {
         return NapiGetNull(env);
     } else {
         return promise;
     }
-
     HILOGI("GetDeviceName end");
+}
+
+static void GetRssiValueSyncWorkStart(const napi_env env, GattGetRssiValueCallbackInfo *asynccallbackinfo)
+{
+    std::string deviceId = GetGattClientDeviceId();
+    bool isResult = BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceId, BT_TRANSPORT_BLE).ReadRemoteRssiValue();
+    if (!isResult) {
+        asynccallbackinfo->promise.errorCode = CODE_FAILED;
+        asynccallbackinfo->result = NapiGetNull(env);
+    } else {
+        std::unique_lock<std::mutex> lock(asynccallbackinfo->mutexRssi);
+        asynccallbackinfo->env = env;
+        std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo(asynccallbackinfo);
+        SetRssiValueCallbackInfo(callbackInfo);
+        if (asynccallbackinfo->cvfull.wait_for(lock, std::chrono::seconds(THREAD_WAIT_TIMEOUT)) ==
+            std::cv_status::timeout) {
+            HILOGI("GetRssiValue ReadRemoteRssi timeout!");
+        }
+    }
 }
 
 napi_value GetRssiValue(napi_env env, napi_callback_info info)
@@ -493,11 +506,10 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
     HILOGI("GetRssiValue start");
     napi_ref callback = nullptr;
     GattGetRssiValueCallbackInfo *asynccallbackinfo =
-        new (std::nothrow) GattGetRssiValueCallbackInfo{.env = env, .asyncWork = nullptr};
+        new (std::nothrow)GattGetRssiValueCallbackInfo{.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return JSParaError(env, callback);
     }
-
     ParseParameters(env, info, asynccallbackinfo->promise);
     napi_value promise = nullptr;
     PaddingCallbackPromiseInfo(env, asynccallbackinfo->promise.callback, asynccallbackinfo->promise, promise);
@@ -511,22 +523,7 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             HILOGI("GetRssiValue napi_create_async_work start");
             GattGetRssiValueCallbackInfo *asynccallbackinfo = (GattGetRssiValueCallbackInfo *)data;
-            std::string deviceId = GetGattClientDeviceId();
-            bool isResult =
-                BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceId, BT_TRANSPORT_BLE).ReadRemoteRssiValue();
-            if (!isResult) {
-                asynccallbackinfo->promise.errorCode = CODE_FAILED;
-                asynccallbackinfo->result = NapiGetNull(env);
-            } else {
-                std::unique_lock<std::mutex> lock(asynccallbackinfo->mutexRssi);
-                asynccallbackinfo->env = env;
-                std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo(asynccallbackinfo);
-                SetRssiValueCallbackInfo(callbackInfo);
-                if (asynccallbackinfo->cvfull.wait_for(lock, std::chrono::seconds(THREAD_WAIT_TIMEOUT)) ==
-                    std::cv_status::timeout) {
-                    HILOGI("GetRssiValue ReadRemoteRssi timeout!");
-                }
-            }
+            GetRssiValueSyncWorkStart(env, asynccallbackinfo);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOGI("GetRssiValue napi_create_async_work complete start");
@@ -546,15 +543,12 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
-
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
-
     if (asynccallbackinfo->promise.isCallback) {
         return NapiGetNull(env);
     } else {
         return promise;
     }
-
     HILOGI("GetRssiValue end");
 }
 
@@ -564,8 +558,10 @@ napi_value StateChangeInit(napi_env env, napi_value exports)
 
     napi_value stateObj = nullptr;
     napi_value profileStateObj = nullptr;
+    napi_value scanModeObj = nullptr;
     napi_create_object(env, &stateObj);
     napi_create_object(env, &profileStateObj);
+    napi_create_object(env, &scanModeObj);
 
     SetNamedPropertyByInteger(env, stateObj, static_cast<int>(BluetoothState::STATE_OFF), "STATE_OFF");
     SetNamedPropertyByInteger(env, stateObj, static_cast<int>(BluetoothState::STATE_TURNING_ON), "STATE_TURNING_ON");
@@ -581,9 +577,25 @@ napi_value StateChangeInit(napi_env env, napi_value exports)
     SetNamedPropertyByInteger(env, profileStateObj, ProfileConnectionState::STATE_CONNECTING, "STATE_CONNECTING");
     SetNamedPropertyByInteger(env, profileStateObj, ProfileConnectionState::STATE_CONNECTED, "STATE_CONNECTED");
     SetNamedPropertyByInteger(env, profileStateObj, ProfileConnectionState::STATE_DISCONNECTING, "STATE_DISCONNECTING");
+
+    SetNamedPropertyByInteger(env, scanModeObj, static_cast<int>(ScanMode::SCAN_MODE_NONE), "SCAN_MODE_NONE");
+    SetNamedPropertyByInteger(
+        env, scanModeObj, static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE), "SCAN_MODE_CONNECTABLE");
+    SetNamedPropertyByInteger(
+        env, scanModeObj, static_cast<int>(ScanMode::SCAN_MODE_GENERAL_DISCOVERABLE), "SCAN_MODE_GENERAL_DISCOVERABLE");
+    SetNamedPropertyByInteger(env,
+        scanModeObj,
+        static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE),
+        "SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE");
+    SetNamedPropertyByInteger(env,
+        scanModeObj,
+        static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE),
+        "SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE");
+
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("BluetoothState", stateObj),
         DECLARE_NAPI_PROPERTY("ProfileConnectionState", profileStateObj),
+        DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
     };
 
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);

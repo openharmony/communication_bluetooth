@@ -22,6 +22,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
+const int TIME = 2;
 class BluetoothGattServerCallbackCommon : public GattServerCallback {
 public:
     BluetoothGattServerCallbackCommon() = default;
@@ -79,7 +80,7 @@ void GattServerTest::SetUp()
     host_ = &BluetoothHost::GetDefaultHost();
     host_->EnableBt();
     host_->EnableBle();
-    sleep(2);
+    sleep(TIME);
 }
 
 void GattServerTest::TearDown()

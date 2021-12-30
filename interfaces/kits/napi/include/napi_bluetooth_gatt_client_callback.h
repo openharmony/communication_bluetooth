@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLECharacteristicChange";
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
 class NGattClient;
@@ -37,20 +36,22 @@ public:
     void OnServicesDiscovered(int status) override;
     void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override {}
     void OnSetNotifyCharacteristic(int status) override {}
-    
-    void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo) {
+
+    void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo)
+    {
         callbackInfos_[type] = callbackInfo;
     }
-    void SetClient(NGattClient *client) {client_ = client;}
+    void SetClient(NGattClient *client)
+    {
+        client_ = client;
+    }
     NGattClientCallback() = default;
     virtual ~NGattClientCallback() = default;
-    
 
 private:
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
     NGattClient *client_ = nullptr;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_GATT_CLIENT_CALLBACK_H_ */

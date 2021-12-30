@@ -216,6 +216,7 @@ ohos_shared_library("btstack") {
 
   deps = [
     "$PART_DIR/external:btdummy",
+    "$PART_DIR/hardware:bluetooth_hdi_adapter",
     "//third_party/openssl:libcrypto_static",
     "//utils/native/base:utilsecurec_shared",
   ]

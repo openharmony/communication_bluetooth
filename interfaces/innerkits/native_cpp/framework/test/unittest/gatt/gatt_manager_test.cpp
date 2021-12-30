@@ -23,7 +23,6 @@
 
 using namespace testing;
 using namespace testing::ext;
-
 namespace OHOS {
 namespace Bluetooth {
 class GattClientCallbackTest : public GattClientCallback {
