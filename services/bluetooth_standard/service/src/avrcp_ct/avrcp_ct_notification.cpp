@@ -58,7 +58,7 @@ Packet *AvrcCtNotifyPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
 
     size_t bufferSize = AVRC_CT_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_CT_NOTIFY_PARAMETER_LENGTH;
-    LOG_DEBUG("[AVRCP CT] BufferMalloc[%{public}d]", bufferSize);
+    LOG_DEBUG("[AVRCP CT] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
@@ -162,7 +162,7 @@ bool AvrcCtNotifyPacket::DisassembleTrackChanged(uint8_t *buffer)
     uint64_t payload = 0x00;
     offset += PopOctets8((buffer + offset), payload);
     uid_ = payload;
-    LOG_DEBUG("[AVRCP CT] uid_[%llx]", uid_);
+    LOG_DEBUG("[AVRCP CT] uid_[%jx]", uid_);
 
     isValid_ = true;
 

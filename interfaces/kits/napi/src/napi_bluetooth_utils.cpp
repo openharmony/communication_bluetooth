@@ -111,7 +111,7 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
         (*data)[0] = -1;
         return false;
     }
-    HILOGE("arraybuffer size is %{public}d", size);
+    HILOGE("arraybuffer size is %{public}zu", size);
     HILOGE("arraybuffer is %{public}d", (*data)[0]);
     return true;
 }
@@ -123,7 +123,7 @@ void ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::s
     if (stringVector.empty()) {
         return;
     }
-    HILOGI("ConvertStringVectorToJS size is %{public}d", stringVector.size());
+    HILOGI("ConvertStringVectorToJS size is %{public}zu", stringVector.size());
     for (auto& str : stringVector) {
         napi_value obj = nullptr;
         napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &obj);
@@ -139,7 +139,7 @@ void ConvertGattServiceVectorToJS(napi_env env, napi_value result, vector<GattSe
     if (services.empty()) {
         return;
     }
-    HILOGI("ConverGattServiceVectorToJS size is %{public}d", services.size());
+    HILOGI("ConverGattServiceVectorToJS size is %{public}zu", services.size());
     for (auto& service : services) {
         napi_value obj = nullptr;
         napi_create_object(env, &obj);
@@ -238,7 +238,7 @@ void ConvertBLEDescriptorVectorToJS(napi_env env, napi_value result, vector<Gatt
     if (descriptors.empty()) {
         return;
     }
-    HILOGI("ConvertBLEDescriptorVectorToJS size is %{public}d", descriptors.size());
+    HILOGI("ConvertBLEDescriptorVectorToJS size is %{public}zu", descriptors.size());
     for (auto& descriptor : descriptors) {
         napi_value obj = nullptr;
         napi_create_object(env, &obj);
@@ -520,7 +520,7 @@ void GetServiceVectorFromJS(napi_env env, napi_value object, vector<GattService>
     HILOGI("GetServiceVectorFromJS called");
     size_t idx = 0;
     bool hasElement = false;
-    HILOGI("GetServiceVectorFromJS size is %{public}d", services.size());
+    HILOGI("GetServiceVectorFromJS size is %{public}zu", services.size());
     napi_has_element(env, object, idx, &hasElement);
     while (hasElement) {
         napi_value result = nullptr;
@@ -614,7 +614,7 @@ void GetCharacteristicVectorFromJS(napi_env env, napi_value object, vector<GattC
 
     bool hasElement = false;
     napi_has_element(env, object, idx, &hasElement);
-    HILOGI("GetCharacteristicVectorFromJS size is %{public}d", characteristics.size());
+    HILOGI("GetCharacteristicVectorFromJS size is %{public}zu", characteristics.size());
     while(hasElement) {
         napi_value result = nullptr;
         napi_create_object(env, &result);
@@ -804,7 +804,7 @@ void GetDescriptorVectorFromJS(napi_env env, napi_value object, vector<GattDescr
     bool hasElement = false;
     napi_has_element(env, object, idx, &hasElement);
 
-    HILOGI("GetDescriptorVectorFromJS size is %{public}d", descriptors.size());
+    HILOGI("GetDescriptorVectorFromJS size is %{public}zu", descriptors.size());
 
     while (hasElement) {
         napi_value result = nullptr;

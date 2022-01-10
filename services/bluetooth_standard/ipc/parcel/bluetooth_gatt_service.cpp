@@ -499,7 +499,7 @@ bool BluetoothGattService::ServiceIteratorRead(std::vector<Service> &service, Pa
 {
     HILOGI("BluetoothGattService::ServiceIteratorRead: start");
     bool noError = true;
-    HILOGI("BluetoothGattService::service = %{public}d", service.size());
+    HILOGI("BluetoothGattService::service = %{public}zu", service.size());
     for (int i = 0; i < length; i++) {
         bool isPrimary;
         if (!parcel.ReadBool(isPrimary)) {
@@ -530,7 +530,7 @@ bool BluetoothGattService::ServiceIteratorRead(std::vector<Service> &service, Pa
         HILOGI("BluetoothGattService::new service: start");
         service.push_back(serv);
         HILOGI("BluetoothGattService::new service: end");
-        HILOGI("BluetoothGattService::service = %{public}d", service.size());
+        HILOGI("BluetoothGattService::service = %{public}zu", service.size());
         service[i].isPrimary_ = isPrimary;
         int ser_num;
         if (parcel.ReadInt32(ser_num)) {

@@ -233,7 +233,7 @@ const Packet *AvrcCtCpPacket::AssemblePacket(void)
     LOG_DEBUG("[AVRCP CT] direction_[%x]", direction_);
 
     offset += PushOctets8((buffer + offset), folderUid_);
-    LOG_DEBUG("[AVRCP CT] folderUid_[%llx]", folderUid_);
+    LOG_DEBUG("[AVRCP CT] folderUid_[%jx]", folderUid_);
 
     return pkt_;
 }
@@ -512,7 +512,7 @@ uint16_t AvrcCtGfiPacket::DisassembleMeParameter(uint8_t *buffer)
 
     offset += PopOctets8((buffer + offset), payload);
     auto uid = static_cast<uint64_t>(payload);
-    LOG_DEBUG("[AVRCP CT] uid[%llx]", uid);
+    LOG_DEBUG("[AVRCP CT] uid[%jx]", uid);
 
     offset += PopOctets1((buffer + offset), payload);
     auto type = static_cast<uint8_t>(payload);
@@ -680,7 +680,7 @@ const Packet *AvrcCtGiaPacket::AssemblePacket(void)
     LOG_DEBUG("[AVRCP CT] scope_[%x]", scope_);
 
     offset += PushOctets8((buffer + offset), uid_);
-    LOG_DEBUG("[AVRCP CT] uid_[%llx]", uid_);
+    LOG_DEBUG("[AVRCP CT] uid_[%jx]", uid_);
 
     offset += PushOctets2((buffer + offset), uidCounter_);
     LOG_DEBUG("[AVRCP CT] uidCounter_[%{public}d]", uidCounter_);

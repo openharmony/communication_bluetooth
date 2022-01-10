@@ -78,7 +78,7 @@ bool AvrcTgSubUnitPacket::DisassemblePacket(Packet *pkt)
         isValid = true;
     } else {
         crCode_ = AVRC_TG_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP TG] The size of the packet is invalid! - actual size[%u] - valid min size[%u]",
+        LOG_DEBUG("[AVRCP TG] The size of the packet is invalid! - actual size[%zu] - valid min size[%u]",
             size,
             AVRC_TG_SUB_UNIT_COMMAND_SIZE);
     }

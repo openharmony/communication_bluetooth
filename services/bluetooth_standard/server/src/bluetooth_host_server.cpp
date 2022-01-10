@@ -457,7 +457,7 @@ void BluetoothHostServer::impl::createServers()
     sptr<BluetoothBleCentralManagerServer> bleCentralManger = new BluetoothBleCentralManagerServer();
     bleServers_[BLE_CENTRAL_MANAGER_SERVER] = bleCentralManger->AsObject();
 
-    HILOGI("BluetoothHostServer::impl::Init servers_ constructed, size is %{public}d", servers_.size());
+    HILOGI("BluetoothHostServer::impl::Init servers_ constructed, size is %{public}zu", servers_.size());
 }
 
 BluetoothHostServer::BluetoothHostServer() : SystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, true)
