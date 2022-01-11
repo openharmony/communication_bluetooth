@@ -927,7 +927,7 @@ void AvrcpCtService::OnGetCapabilities(const RawAddress &rawAddr, const std::vec
     const std::vector<uint8_t> &events, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] companies.size[%{public}d] - events.size[%{public}d] - result[%{public}d]", companies.size(), events.size(), result);
+    LOG_DEBUG("[AVRCP CT] companies.size[%{public}zu] - events.size[%{public}zu] - result[%{public}d]", companies.size(), events.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetCapabilities(rawAddr, companies, events, result);
@@ -988,7 +988,7 @@ void AvrcpCtService::OnGetPlayerAppSettingAttribtues(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attribute.size[%{public}d] - result[%{public}d]", attributes.size(), result);
+    LOG_DEBUG("[AVRCP CT] attribute.size[%{public}zu] - result[%{public}d]", attributes.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingAttributes(rawAddr, attributes, result);
@@ -1047,7 +1047,7 @@ void AvrcpCtService::OnGetPlayerAppSettingValues(
     const RawAddress &rawAddr, uint8_t attribute, const std::vector<uint8_t> &values, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}d] - result[%{public}d]", attribute, values.size(), result);
+    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}zu] - result[%{public}d]", attribute, values.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingValues(rawAddr, attribute, values, result);
@@ -1107,7 +1107,7 @@ void AvrcpCtService::OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
     LOG_DEBUG(
-        "[AVRCP CT] attributes.size[%{public}d] - values.size[%{public}d] - result[%{public}d]", attributes.size(), values.size(), result);
+        "[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]", attributes.size(), values.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingCurrentValue(rawAddr, attributes, values, result);
@@ -2054,7 +2054,7 @@ void AvrcpCtService::OnPlaybackStatusChanged(const RawAddress &rawAddr, uint8_t 
 void AvrcpCtService::OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] uid[%llx]", uid);
+    LOG_DEBUG("[AVRCP CT] uid[%jx]", uid);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnTrackChanged(rawAddr, uid, result);

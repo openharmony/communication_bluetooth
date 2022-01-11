@@ -93,7 +93,7 @@ bool AvrcTgBrowsePacket::IsValidParameterLength(Packet *pkt)
             result = true;
         }
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%u] - valid size[%u]",
+        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%zu] - valid size[%u]",
             size,
             AVRC_TG_BROWSE_MIN_SIZE);
     }
@@ -178,7 +178,7 @@ const Packet *AvrcTgSbpPacket::AssemblePacket(void)
 
     for (std::string folderName : folderNames_) {
         offset += PushOctets2((buffer + offset), folderName.size());
-        LOG_DEBUG("[AVRCP TG] folderNameLength_[%{public}d]", folderName.size());
+        LOG_DEBUG("[AVRCP TG] folderNameLength_[%{public}zu]", folderName.size());
 
         for (auto it = folderName.begin(); it != folderName.end(); it++) {
             offset += PushOctets1((buffer + offset), *it);
@@ -316,12 +316,12 @@ bool AvrcTgCpPacket::DisassemblePacket(Packet *pkt)
             }
 
             offset += PopOctets8((buffer + offset), folderUid_);
-            LOG_DEBUG("[AVRCP TG] folderUid_[%llx]", folderUid_);
+            LOG_DEBUG("[AVRCP TG] folderUid_[%jx]", folderUid_);
 
             isValid_ = true;
         } while (false);
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}d] - valid size[%{public}d]",
+        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}zu] - valid size[%{public}d]",
             size,
             AVRC_TG_CP_FIXED_CMD_FRAME_SIZE);
     }
@@ -484,7 +484,7 @@ void AvrcTgGfiPacket::AssembleMpItem(uint8_t *buffer, uint16_t offset)
         LOG_DEBUG("[AVRCP TG] itemType_[%x]", item.itemType_);
 
         newOffset += PushOctets2((buffer + newOffset), itemLength + item.name_.size());
-        LOG_DEBUG("[AVRCP TG] itemLength[%{public}d]", itemLength + item.name_.size());
+        LOG_DEBUG("[AVRCP TG] itemLength[%{public}zu]", itemLength + item.name_.size());
 
         newOffset += PushOctets2((buffer + newOffset), item.playerId_);
         LOG_DEBUG("[AVRCP TG] playerId_[%x]", item.playerId_);
@@ -510,7 +510,7 @@ void AvrcTgGfiPacket::AssembleMpItem(uint8_t *buffer, uint16_t offset)
         newOffset += PushOctets2((buffer + newOffset), AVRC_MEDIA_CHARACTER_SET_UTF8);
 
         newOffset += PushOctets2((buffer + newOffset), item.name_.size());
-        LOG_DEBUG("[AVRCP TG] nameLength[%{public}d]", item.name_.size());
+        LOG_DEBUG("[AVRCP TG] nameLength[%{public}zu]", item.name_.size());
 
         for (auto it = item.name_.begin(); it != item.name_.end(); it++) {
             newOffset += PushOctets1((buffer + newOffset), *it);
@@ -710,7 +710,7 @@ bool AvrcTgGfiPacket::DisassemblePacket(Packet *pkt)
             isValid_ = true;
         } while (false);
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}d] - valid size[%{public}d]",
+        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}zu] - valid size[%{public}d]",
             size,
             AVRC_TG_GIA_MIN_CMD_FRAME_SIZE);
     }
@@ -831,7 +831,7 @@ const Packet *AvrcTgGiaPacket::AssemblePacket(void)
         LOG_DEBUG("[AVRCP TG] characterSetId[%x]", AVRC_MEDIA_CHARACTER_SET_UTF8);
 
         offset += PushOctets2((buffer + offset), values_.at(i).size());
-        LOG_DEBUG("[AVRCP TG] valueLength[%{public}d]", values_.at(i).size());
+        LOG_DEBUG("[AVRCP TG] valueLength[%{public}zu]", values_.at(i).size());
 
         for (auto it = values_.at(i).begin(); it != values_.at(i).end(); it++) {
             offset += PushOctets1((buffer + offset), *it);
@@ -874,7 +874,7 @@ bool AvrcTgGiaPacket::DisassemblePacket(Packet *pkt)
 
             offset += PopOctets8((buffer + offset), payload);
             uid_ = static_cast<uint64_t>(payload);
-            LOG_DEBUG("[AVRCP TG] uid_[%llx]", uid_);
+            LOG_DEBUG("[AVRCP TG] uid_[%jx]", uid_);
 
             offset += PopOctets2((buffer + offset), payload);
             uint32_t uidCounter = static_cast<uint16_t>(payload);
@@ -894,7 +894,7 @@ bool AvrcTgGiaPacket::DisassemblePacket(Packet *pkt)
             isValid_ = true;
         } while (false);
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}d] - valid size[%{public}d]",
+        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}zu] - valid size[%{public}d]",
             size,
             AVRC_TG_GFI_MIN_CMD_FRAME_SIZE);
     }

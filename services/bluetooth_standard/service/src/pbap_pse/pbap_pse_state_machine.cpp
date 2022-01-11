@@ -479,7 +479,7 @@ void PseConnected::SendPhoneBookResponse(ObexServerSession &obexSession, const O
     std::shared_ptr<ObexArrayBodyObject> bodyObject = nullptr;
     // ADD BODY
     if (!pbResult.phoneBookSizeOnly_ && pbResult.result_.size() > 0) {
-            PBAP_PSE_LOG_DEBUG("pbResult.result_.size() = %{public}d", pbResult.result_.size());
+            PBAP_PSE_LOG_DEBUG("pbResult.result_.size() = %{public}zu", pbResult.result_.size());
             bodyObject = std::make_shared<ObexArrayBodyObject>(pbResult.result_.data(), pbResult.result_.size());
     }
     obexSession.SendGetResponse(req, *resp, bodyObject);

@@ -36,7 +36,7 @@ size_t OutputStream::Write(const char *buf, const size_t length)
     }
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
 
-    HILOGE("[sock]write ret:%{public}d errno: %{public}d", ret, errno);
+    HILOGE("[sock]write ret:%{public}zd errno: %{public}d", ret, errno);
 
     if (ret == -1) {
         HILOGE("[sock]write Error. errno: %{public}d", errno);
