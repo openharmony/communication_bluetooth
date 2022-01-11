@@ -196,12 +196,12 @@ std::unique_ptr<bluetooth::ObexHeader> ObexClient::ObexClientTransportObserver::
     uint8_t *packetBuf = obexPacket.GetBuffer();
     size_t packetBufSize = obexPacket.GetSize();
     if (packetBufSize < ObexHeader::MIN_PACKET_LENGTH) {
-        OBEX_LOG_ERROR("dataSize[%{public}d] < min[%{public}d]", packetBufSize, ObexHeader::MIN_PACKET_LENGTH);
+        OBEX_LOG_ERROR("dataSize[%{public}zu] < min[%{public}d]", packetBufSize, ObexHeader::MIN_PACKET_LENGTH);
         return nullptr;
     }
     uint16_t packetLength = ObexUtils::GetBufData16(&packetBuf[0], 1);
     if (packetLength != packetBufSize) {
-        OBEX_LOG_ERROR("packetLength[%{public}d] != packetBufSize[%{public}d]", packetLength, packetBufSize);
+        OBEX_LOG_ERROR("packetLength[%{public}hu] != packetBufSize[%{public}zu]", packetLength, packetBufSize);
         return nullptr;
     }
     std::unique_ptr<bluetooth::ObexHeader> resp;

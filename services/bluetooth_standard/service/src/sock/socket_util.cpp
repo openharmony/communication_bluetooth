@@ -76,7 +76,7 @@ int SocketUtil::SocketSendFd(int sockFd, const uint8_t *buf, int len, int accept
 #else
         ssize_t size = sendmsg(sockFd, &msghdr, MSG_NOSIGNAL);
 #endif
-        LOG_INFO("[sock]%{public}s sendmsg size:%{public}d", __func__, size);
+        LOG_INFO("[sock]%{public}s sendmsg size:%{public}zu", __func__, size);
         if (size < 0) {
             sendSize = -1;
             break;

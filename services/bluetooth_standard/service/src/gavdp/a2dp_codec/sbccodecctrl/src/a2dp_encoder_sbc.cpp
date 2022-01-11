@@ -496,7 +496,7 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
             uint32_t pktTimeStamp = a2dpSbcEncoderCb_.timestamp;
             a2dpSbcEncoderCb_.timestamp += frameIter * blocksXsubbands;
             EnqueuePacket(pkt, frameIter, encodePacketSize, pktTimeStamp, (uint16_t)encoded);  // Enqueue Packet.
-            LOG_INFO("[EnqueuePacket][encoded:%{public}d][frameIter:%u]", encoded, frameIter);
+            LOG_INFO("[EnqueuePacket][encoded:%{public}zu][frameIter:%u]", encoded, frameIter);
         }
     }
     PacketFree(pkt);
@@ -505,7 +505,7 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
 void A2dpSbcEncoder::EnqueuePacket(
     Packet *pkt, size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const
 {
-    LOG_INFO("[EnqueuePacket][frameSize:%u][FrameNum:%u], mtu[%u]", frameSize, frames, a2dpSbcEncoderCb_.mtuSize);
+    LOG_INFO("[EnqueuePacket][frameSize:%hu][FrameNum:%zu], mtu[%hu]", frameSize, frames, a2dpSbcEncoderCb_.mtuSize);
 
     LOG_INFO("[EnqueuePacket] totalSize[%u]", PacketSize(pkt));
     if (PacketSize(pkt) < static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize)) {
@@ -544,7 +544,7 @@ void A2dpSbcEncoder::EnqueuePacket(
             timeStamp++;
             frames = frames - frameNum;
             PacketFree(mediaPacket);
-            LOG_INFO("[EnqueuePacket][sendNum:%u][remainFrameNum:%u], [DataLen:%u]", frameNum, frames, pktLen);
+            LOG_INFO("[EnqueuePacket][sendNum:%u][remainFrameNum:%zu], [DataLen:%u]", frameNum, frames, pktLen);
         } while (count > 0);
     }
 }

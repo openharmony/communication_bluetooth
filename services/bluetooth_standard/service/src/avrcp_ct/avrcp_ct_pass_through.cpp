@@ -88,7 +88,7 @@ bool AvrcCtPassPacket::DisassemblePacket(Packet *pkt)
         }
     } else {
         crCode_ = AVRC_CT_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP CT] Call - PacketPayloadRead - Failed! - size[%{public}d] < AVRC_CT_PASS_RESPONSE_SIZE[%{public}d]",
+        LOG_DEBUG("[AVRCP CT] Call - PacketPayloadRead - Failed! - size[%{public}zu] < AVRC_CT_PASS_RESPONSE_SIZE[%{public}d]",
             size,
             AVRC_CT_PASS_COMMAND_SIZE);
     }

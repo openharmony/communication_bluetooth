@@ -845,7 +845,7 @@ int BleAdvertiserImpl::SetAdvDataToGap(
         for (size_t i = 0; i < data.GetPayload().size(); i++) {
             legacyDatas.push_back(data.GetPayload()[i]);
         }
-        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}d",
+        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}zu",
             __func__,
             BleUtils::ConvertIntToHexString(legacyDatas).c_str(),
             data.GetPayload().size());
@@ -977,7 +977,7 @@ int BleAdvertiserImpl::SetExAdvDataToGap(
         for (size_t i = 0; i < data.GetPayload().size(); i++) {
             exAdvDatas.push_back(data.GetPayload()[i]);
         }
-        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}d",
+        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}zu",
             __func__,
             BleUtils::ConvertIntToHexString(exAdvDatas).c_str(),
             data.GetPayload().size());
@@ -1005,7 +1005,7 @@ int BleAdvertiserImpl::SetAdvScanRspDataToGap(
         for (size_t i = 0; i < legacyScandata.GetPayload().size(); i++) {
             legacyDatas.push_back(legacyScandata.GetPayload()[i]);
         }
-        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}d",
+        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}zu",
             __func__,
             BleUtils::ConvertIntToHexString(legacyDatas).c_str(),
             legacyScandata.GetPayload().size());
@@ -1038,7 +1038,7 @@ int BleAdvertiserImpl::SetExAdvScanRspDataToGap(
         for (size_t i = 0; i < exAdvScandata.GetPayload().size(); i++) {
             exAdvDatas.push_back(exAdvScandata.GetPayload()[i]);
         }
-        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}d",
+        LOG_INFO("[BleAdvertiserImpl] %{public}s: Advertising Data Data=%{public}s %{public}zu",
             __func__,
             BleUtils::ConvertIntToHexString(exAdvDatas).c_str(),
             exAdvScandata.GetPayload().size());

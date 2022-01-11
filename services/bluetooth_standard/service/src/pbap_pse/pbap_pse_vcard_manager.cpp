@@ -535,7 +535,7 @@ private:
                 }
                 std::string propertyDetails = dataResult->GetString(index++);
                 std::string propertyValue = dataResult->GetString(index++);
-                PBAP_PSE_LOG_DEBUG("[%{public}d]: %lld\t%{public}d\t%{public}d\t%{public}s\t%{public}s\t%{public}s",
+                PBAP_PSE_LOG_DEBUG("[%{public}zu]: %jd\t%{public}d\t%{public}d\t%{public}s\t%{public}s\t%{public}s",
                     i,
                     vcardUid,
                     vcardHandleId,

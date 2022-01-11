@@ -520,7 +520,7 @@ bool Socket::SendAppConnectInfo(int fd, BtAddr addr, bool status, int acceptFd)
     (void)memset_s(&connectInfo, sizeof(connectInfo), 0, sizeof(connectInfo));
     (void)memcpy_s(connectInfo.addr, sizeof(addr.addr), addr.addr, sizeof(addr.addr));
     connectInfo.status = status;
-    LOG_INFO("[sock]%{public}s size:%{public}d", __func__, sizeof(connectInfo));
+    LOG_INFO("[sock]%{public}s size:%{public}zu", __func__, sizeof(connectInfo));
     if (acceptFd == -1) {
         return SocketUtil::SocketSendData(fd, reinterpret_cast<const uint8_t *>(&connectInfo), sizeof(connectInfo));
     } else {
@@ -871,7 +871,7 @@ void Socket::OnSocketExceptionNative(Socket &sock)
     std::lock_guard<std::recursive_mutex> lk(Socket::g_socketMutex);
     std::vector<Socket *>::iterator it;
 
-    LOG_INFO("[sock]%{public}s size:%{public}d", __func__, g_allServerSockets.size());
+    LOG_INFO("[sock]%{public}s size:%{public}zu", __func__, g_allServerSockets.size());
 
     for (it = g_allServerSockets.begin(); it != g_allServerSockets.end(); ++it) {
         if (*it == &sock) {
@@ -946,7 +946,7 @@ void Socket::EraseSocket(Socket &socket)
     LOG_INFO("[sock]%{public}s", __func__);
 
     std::vector<Socket *>::iterator it;
-    LOG_INFO("[sock]%{public}s size:%{public}d", __func__, g_allServerSockets.size());
+    LOG_INFO("[sock]%{public}s size:%{public}zu", __func__, g_allServerSockets.size());
 
     for (it = g_allServerSockets.begin(); it != g_allServerSockets.end(); ++it) {
         if (*it == &socket) {
@@ -999,7 +999,7 @@ void Socket::ClearUpAllSocket()
 {
     LOG_INFO("[sock]%{public}s", __func__);
 
-    LOG_INFO("[sock]%{public}s size:%{public}d", __func__, g_allServerSockets.size());
+    LOG_INFO("[sock]%{public}s size:%{public}zu", __func__, g_allServerSockets.size());
     if (g_allServerSockets.size() > 0) {
         g_allServerSockets.clear();
     }

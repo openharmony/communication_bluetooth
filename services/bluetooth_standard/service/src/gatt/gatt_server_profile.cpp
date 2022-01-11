@@ -208,7 +208,7 @@ void GattServerProfile::impl::AddResponseList(void)
 {
     auto iter = requestList_.begin();
     responseList_.emplace_back(*iter);
-    LOG_INFO("%{public}s: server responseList size: %{public}d", __FUNCTION__, responseList_.size());
+    LOG_INFO("%{public}s: server responseList size: %{public}zu", __FUNCTION__, responseList_.size());
 }
 /**
  * @brief This sub-procedure is used by the server to process split read by type request message.

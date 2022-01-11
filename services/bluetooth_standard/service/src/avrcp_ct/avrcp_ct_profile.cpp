@@ -788,7 +788,7 @@ void AvrcCtProfile::ReceiveListPlayerApplicationSettingValuesRsp(const RawAddres
         lpasvPkt->DisassemblePacket(pkt);
     }
 
-    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}d] - result[%{public}d]",
+    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}zu] - result[%{public}d]",
         lpasvPkt->GetAttribute(),
         lpasvPkt->GetValues().size(),
         ExplainCrCodeToResult(lpasvPkt->GetCrCode()));
@@ -828,7 +828,7 @@ void AvrcCtProfile::SendGetCurrentPlayerApplicationSettingValueCmd(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}d]", attributes.size());
+    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu]", attributes.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGcpasvPacket>(attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -855,7 +855,7 @@ void AvrcCtProfile::ReceiveGetCurrentPlayerApplicationSettingValueRsp(const RawA
         gcpasvPkt->DisassemblePacket(pkt);
     }
 
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}d] - values.size[%{public}d] - result[%{public}d]",
+    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]",
         gcpasvPkt->GetAttributes().size(),
         gcpasvPkt->GetValues().size(),
         ExplainCrCodeToResult(gcpasvPkt->GetCrCode()));
@@ -897,7 +897,7 @@ void AvrcCtProfile::SendSetPlayerApplicationSettingValueCmd(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}d] - values.size[%{public}d]", attributes.size(), values.size());
+    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu]", attributes.size(), values.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtSpasvPacket>(attributes, values);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -919,7 +919,7 @@ void AvrcCtProfile::SendGetPlayerApplicationSettingAttributeTextCmd(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}d]", attributes.size());
+    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu]", attributes.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGpasatPacket>(attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -946,7 +946,7 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingAttributeTextRsp(const Raw
         gpasatPkt = static_cast<AvrcCtGpasatPacket *>(packet.get());
         gpasatPkt->DisassemblePacket(pkt);
     }
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}d] - attributeStringLength.size[%{public}d] - result[%{public}d]",
+    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - attributeStringLength.size[%{public}zu] - result[%{public}d]",
         gpasatPkt->GetAttributes().size(),
         gpasatPkt->GetAttributeName().size(),
         ExplainCrCodeToResult(gpasatPkt->GetCrCode()));
@@ -988,7 +988,7 @@ void AvrcCtProfile::SendGetPlayerApplicationSettingValueTextCmd(
     const RawAddress &rawAddr, uint8_t attributeId, const std::vector<uint8_t> &values)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] values.size[%{public}d]", values.size());
+    LOG_DEBUG("[AVRCP CT] values.size[%{public}zu]", values.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGpasvtPacket>(attributeId, values);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1015,7 +1015,7 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingValueTextRsp(const RawAddr
         gpasvtPkt = static_cast<AvrcCtGpasvtPacket *>(packet.get());
         gpasvtPkt->DisassemblePacket(pkt);
     }
-    LOG_DEBUG("[AVRCP CT] values.size[%{public}d] - valuestr.size[%{public}d] - result[%{public}d]",
+    LOG_DEBUG("[AVRCP CT] values.size[%{public}zu] - valuestr.size[%{public}zu] - result[%{public}d]",
         gpasvtPkt->GetValues().size(),
         gpasvtPkt->GetValueName().size(),
         ExplainCrCodeToResult(gpasvtPkt->GetCrCode()));
@@ -1057,7 +1057,7 @@ void AvrcCtProfile::SendGetElementAttributesCmd(
     const RawAddress &rawAddr, uint64_t identifier, const std::vector<uint32_t> &attributes)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] identifier[%llu] - attributes.size[%zu]", identifier, attributes.size());
+    LOG_DEBUG("[AVRCP CT] identifier[%ju] - attributes.size[%zu]", identifier, attributes.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGeaPacket>(identifier, attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1084,7 +1084,7 @@ void AvrcCtProfile::ReceiveGetElementAttributesRsp(const RawAddress &rawAddr, Pa
         geaPkt->DisassemblePacket(pkt);
     }
 
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}d] - values.size[%{public}d] - result[%{public}d]",
+    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]",
         geaPkt->GetAttributes().size(),
         geaPkt->GetValues().size(),
         ExplainCrCodeToResult(geaPkt->GetCrCode()));
@@ -1213,7 +1213,7 @@ void AvrcCtProfile::ReceiveSetAddressedPlayerRsp(const RawAddress &rawAddr, Pack
 void AvrcCtProfile::SendPlayItemCmd(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%x] - uid[%llx] - uidCounter[%{public}d]", scope, uid, uidCounter);
+    LOG_DEBUG("[AVRCP CT] scope[%x] - uid[%jx] - uidCounter[%{public}hd]", scope, uid, uidCounter);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtPiPacket>(scope, uid, uidCounter);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1240,7 +1240,7 @@ void AvrcCtProfile::ReceivePlayItemRsp(const RawAddress &rawAddr, Packet *pkt)
 void AvrcCtProfile::SendAddToNowPlayingCmd(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%hhx] - uid[%lld] - uidCounter[%hu]", scope, uid, uidCounter);
+    LOG_DEBUG("[AVRCP CT] scope[%hhx] - uid[%ju] - uidCounter[%hu]", scope, uid, uidCounter);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtAtnpPacket>(scope, uid, uidCounter);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1288,7 +1288,7 @@ void AvrcCtProfile::ReceiveSetAbsoluteVolumeRsp(const RawAddress &rawAddr, Packe
 void AvrcCtProfile::EnableNotification(const RawAddress &rawAddr, const std::vector<uint8_t> &events, uint32_t interval)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] events.size[%{public}d]", events.size());
+    LOG_DEBUG("[AVRCP CT] events.size[%{public}zu]", events.size());
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     for (auto event : events) {
@@ -1797,7 +1797,7 @@ void AvrcCtProfile::SendChangePathCmd(
     const RawAddress &rawAddr, uint16_t uidCounter, uint8_t direction, uint64_t folderUid)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] direction[%x] - folderUid[%llx]", direction, folderUid);
+    LOG_DEBUG("[AVRCP CT] direction[%x] - folderUid[%jx]", direction, folderUid);
 
     std::shared_ptr<AvrcCtBrowsePacket> packet = std::make_shared<AvrcCtCpPacket>(uidCounter, direction, folderUid);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1860,7 +1860,7 @@ void AvrcCtProfile::SendGetItemAttributesCmd(const RawAddress &rawAddr, uint8_t 
     uint16_t uidCounter, const std::vector<uint32_t> &attributes)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%x] - uid[%llx] - uidCounter[%{public}d]", scope, uid, uidCounter);
+    LOG_DEBUG("[AVRCP CT] scope[%x] - uid[%jx] - uidCounter[%{public}hu]", scope, uid, uidCounter);
 
     std::shared_ptr<AvrcCtBrowsePacket> packet = std::make_shared<AvrcCtGiaPacket>(scope, uid, uidCounter, attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);

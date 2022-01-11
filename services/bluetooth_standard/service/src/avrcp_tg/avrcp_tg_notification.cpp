@@ -104,7 +104,7 @@ void AvrcTgNotifyPacket::AssemblePlaybackStatusChanged(Packet *pkt)
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_ID_PLAYBACK_STATUS_SIZE);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%llu]",
+    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_ID_PLAYBACK_STATUS_SIZE));
 
@@ -134,7 +134,7 @@ void AvrcTgNotifyPacket::AssembleTrackChanged(Packet *pkt)
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_UID_SIZE);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%llu]",
+    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_UID_SIZE));
 
@@ -150,7 +150,7 @@ void AvrcTgNotifyPacket::AssembleTrackChanged(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
 
     offset += PushOctets8((bufferPtr + offset), uid_);
-    LOG_DEBUG("[AVRCP TG] uid_[%llx]", uid_);
+    LOG_DEBUG("[AVRCP TG] uid_[%jx]", uid_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -164,7 +164,7 @@ void AvrcTgNotifyPacket::AssemblePlaybackPosChanged(Packet *pkt)
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_PLAYBACK_POSITION_SIZE);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%llu]",
+    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_PLAYBACK_POSITION_SIZE));
 
@@ -199,7 +199,7 @@ void AvrcTgNotifyPacket::AssemblePlayerApplicationSettingChanged(Packet *pkt)
     size_t bufferSize = AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                         AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_GCPASV_NUM_OF_VALUES_SIZE + numOfAttributes +
                         numOfAttributes;
-    LOG_DEBUG("[AVRCP CT] BufferMalloc[%x]", bufferSize);
+    LOG_DEBUG("[AVRCP CT] BufferMalloc[%zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
@@ -228,8 +228,8 @@ void AvrcTgNotifyPacket::AssemblePlayerApplicationSettingChanged(Packet *pkt)
     attributes_.erase(attributes_.begin(), attributes_.begin() + numOfAttributes);
     values_.erase(values_.begin(), values_.begin() + numOfAttributes);
 
-    LOG_DEBUG("[AVRCP TG] attributes_.size[%{public}d]", attributes_.size());
-    LOG_DEBUG("[AVRCP TG] values_.size[%{public}d]", values_.size());
+    LOG_DEBUG("[AVRCP TG] attributes_.size[%{public}zu]", attributes_.size());
+    LOG_DEBUG("[AVRCP TG] values_.size[%{public}zu]", values_.size());
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -243,7 +243,7 @@ void AvrcTgNotifyPacket::AssembleAddressedPlayerChanged(Packet *pkt)
     size_t bufferSize = AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                         AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_PLAYER_ID_SIZE +
                         AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE;
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}d]", bufferSize);
+    LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
@@ -278,7 +278,7 @@ void AvrcTgNotifyPacket::AssembleUidsChanged(Packet *pkt)
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%llu]",
+    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE));
 
@@ -308,7 +308,7 @@ void AvrcTgNotifyPacket::AssembleVolumeChanged(Packet *pkt)
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_ID_VOLUME_SIZE);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%llu]",
+    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_ID_VOLUME_SIZE));
 
@@ -338,7 +338,7 @@ void AvrcTgNotifyPacket::AssembleCommonChanged(Packet *pkt)
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_PARAMETER_LENGTH + AVRC_TG_NOTIFY_EVENT_ID_SIZE);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%llu]",
+    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_PARAMETER_LENGTH +
             AVRC_TG_NOTIFY_EVENT_ID_SIZE));
 

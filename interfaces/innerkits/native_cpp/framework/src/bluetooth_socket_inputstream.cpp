@@ -36,7 +36,7 @@ size_t InputStream::Read(char *buf, const size_t length)
 
     auto ret = recv(socketFd_, buf, length, MSG_NOSIGNAL);
 
-    HILOGE("[sock] Read ret:%{public}d", ret);
+    HILOGE("[sock] Read ret:%{public}zd", ret);
 
     if (ret < 0) {
         HILOGE("[sock]socket exception! errno:%{public}d", errno);

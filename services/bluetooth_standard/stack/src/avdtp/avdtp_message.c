@@ -1073,7 +1073,7 @@ void AvdtParseSignalInd(AvdtSigCtrl *sigCtrl, uint8_t sigId, uint8_t label, cons
     if (sigCtrl == NULL) {
         return;
     }
-    LOG_DEBUG("[AVDT]%{public}s:sendLabel(%hhu) ReceiveLabel(%hhu),sigId(0x%x),PaketSize(%zu)",
+    LOG_DEBUG("[AVDT]%{public}s:sendLabel(%hhu) ReceiveLabel(%hhu),sigId(0x%x),PaketSize(%u)",
         __func__,
         sigCtrl->label,
         sigCtrl->rcvLabel,

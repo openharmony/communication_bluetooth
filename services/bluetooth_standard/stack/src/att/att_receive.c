@@ -191,7 +191,7 @@ static void AttCount(uint8_t format, uint16_t *inforLenPtr, uint16_t *uuidLenPtr
  */
 static int AttJudgeInfoLen(uint16_t inforLen, size_t dataLen, uint16_t *inforNum)
 {
-    LOG_INFO("%{public}s enter,inforLen = %hu,dataLen = %u,inforNum = %hu ", __FUNCTION__, inforLen, dataLen, *inforNum);
+    LOG_INFO("%{public}s enter,inforLen = %hu,dataLen = %zu,inforNum = %hu ", __FUNCTION__, inforLen, dataLen, *inforNum);
 
     int ret = BT_OPERATION_FAILED;
 

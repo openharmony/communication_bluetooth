@@ -1062,7 +1062,7 @@ void GattClientProfile::impl::AddResponseList(void)
     auto iter = requestList_.begin();
     if (iter != requestList_.end()) {
         responseList_.emplace_back(*iter);
-        LOG_INFO("%{public}s: responseList size: %{public}d", __FUNCTION__, responseList_.size());
+        LOG_INFO("%{public}s: responseList size: %{public}zu", __FUNCTION__, responseList_.size());
         dispatcher_->PostTask(std::bind(&impl::RemoveRequestList, this, iter));
     }
 }

@@ -75,7 +75,7 @@ bool A2dpSbcDecoder::DecodePacket(uint8_t *data, uint16_t size)
         }
         count += len;
     }
-    LOG_INFO("[DataAvailable][packetSize:%u][count:%{public}d][len:%{public}d][frameLen:%{public}d]", packetSize, count, len, frameLen);
+    LOG_INFO("[DataAvailable][packetSize:%hu][count:%{public}d][len:%{public}zu][frameLen:%{public}d]", packetSize, count, len, frameLen);
 
     if (count > 0) {
         observer_->DataAvailable(pcmData, count);

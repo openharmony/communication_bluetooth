@@ -229,7 +229,7 @@ std::vector<MseParticipant> MapMseResource::GetParticipantContent(
             contact.priority_ = dataResult->GetInt(0x8);
         }
         contacts.push_back(contact);
-        MSE_LOG_INFO("contacts : %{public}d Enter", contacts.size());
+        MSE_LOG_INFO("contacts : %{public}zu Enter", contacts.size());
     }
     return contacts;
 }
@@ -267,7 +267,7 @@ std::vector<std::unique_ptr<MseConvoLstElement>> MapMseResource::GetConvoLstCont
     auto stmt2 = dataProvider->CreateStatement(sql2);
     for (auto &iter : convoIds) {
         auto contacts = GetParticipantContent(*stmt2, appParameter, iter);
-        MSE_LOG_INFO("contacts : %{public}d Enter", contacts.size());
+        MSE_LOG_INFO("contacts : %{public}zu Enter", contacts.size());
         convoElementMap[iter]->contacts_ = contacts;
         convoList.push_back(std::move(convoElementMap[iter]));
     }
