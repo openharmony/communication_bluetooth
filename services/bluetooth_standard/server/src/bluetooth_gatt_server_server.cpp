@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -169,7 +169,8 @@ BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackImpl(
 }
 
 BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::
-GattServerCallbackDeathRecipient(const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
+    GattServerCallbackDeathRecipient(
+    const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
     : callback_(callback), owner_(owner)
 {}
 
@@ -177,7 +178,7 @@ void BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallback
     const wptr<IRemoteObject> &remote)
 {
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
-        if ((*it)->GetCallback() == remote) {
+        if ((*it)->GetCallback()->AsObject() == remote) {
             owner_.pimpl->callbacks_.erase(it);
             HILOGI("callback is erased from callbacks");
             sptr<GattServerCallbackDeathRecipient> dr = (*it)->deathRecipient_;
@@ -206,7 +207,7 @@ int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService *s
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
     bluetooth::Service svc = (bluetooth::Service)*services;
-    
+
     return pimpl->serverService_->AddService(appId, svc);
 }
 

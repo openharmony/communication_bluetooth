@@ -17,6 +17,7 @@
 #include <string>
 #include <unistd.h>
 #include "bluetooth_log.h"
+#include "bluetooth_host.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_socket_proxy.h"
 #include "bluetooth_socket.h"
@@ -44,8 +45,8 @@ struct SppClientSocket::impl {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
             close(fd_);
+            HILOGI("fd closed, fd_: %{pubilc}d", fd_);
             fd_ = -1;
-            HILOGE("fd closed");
         }
     }
 
@@ -53,7 +54,7 @@ struct SppClientSocket::impl {
     {
         HILOGI("SppClientSocket::Close starts");
         if (socketStatus_ == SOCKET_CLOSED) {
-            HILOGE("socket closed");
+            HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
         } else {
             socketStatus_ = SOCKET_CLOSED;
@@ -61,8 +62,8 @@ struct SppClientSocket::impl {
                 shutdown(fd_, SHUT_RD);
                 shutdown(fd_, SHUT_WR);
                 close(fd_);
+                HILOGI("fd closed, fd_: %{pubilc}d", fd_);
                 fd_ = -1;
-                HILOGE("fd closed");
             } else {
                 HILOGE("socket not created");
                 return;
@@ -272,6 +273,10 @@ SppClientSocket::~SppClientSocket()
 int SppClientSocket::Connect()
 {
     HILOGI("SppClientSocket::Connect starts");
+    if (!IS_BT_ENABLED()) {
+        HILOGI("BR is not TURN_ON");
+        return SPPStatus::SPP_FAILURE;
+    }
     pimpl->address_ = pimpl->remoteDevice_.GetDeviceAddr();
 
     std::string tempAddress = pimpl->address_;
@@ -355,28 +360,35 @@ struct SppServerSocket::impl {
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
+            close(fd_);
+            HILOGI("fd closed, fd_: %{public}d", fd_);
+            fd_ = -1;
         }
     }
 
     int Listen()
     {
         HILOGI("SppServerSocket::Listen() starts");
+        if (!IS_BT_ENABLED()) {
+            HILOGI("BR is not TURN_ON");
+            return SPPStatus::SPP_FAILURE;
+        }
         if (socketStatus_ == SOCKET_CLOSED) {
-            HILOGE("Listen is failed, bluetooth is off!");
+            HILOGE("Listen failed, socketStatus_ is SOCKET_CLOSED");
             return SPPStatus::SPP_FAILURE;
         }
 
         bluetooth::Uuid serverUuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits());
 
         if (!proxy_) {
-            HILOGE("SppServerSocket:Listen: proxy_ is nullptr");
+            HILOGE("Listen failed, proxy_ is nullptr");
             socketStatus_ = SOCKET_CLOSED;
             return SPPStatus::SPP_FAILURE;
         }
 
         fd_ = proxy_->Listen(name_, serverUuid, (int32_t)getSecurityFlags(), (int32_t)type_);
         if (fd_ == -1) {
-            HILOGE("Listen is failed, bluetooth is off!");
+            HILOGE("Listen failed, fd_ is -1");
             socketStatus_ = SOCKET_CLOSED;
             return SPPStatus::SPP_FAILURE;
         }
@@ -384,7 +396,7 @@ struct SppServerSocket::impl {
         if (socketStatus_ == SOCKET_INIT) {
             socketStatus_ = SOCKET_LISTENING;
         } else {
-            HILOGE("Listen is failed, bluetooth is off!");
+            HILOGE("Listen failed, socketStatus_: %{public}d is not SOCKET_INIT", socketStatus_);
             close(fd_);
             socketStatus_ = SOCKET_CLOSED;
             return SPPStatus::SPP_FAILURE;
@@ -485,12 +497,15 @@ struct SppServerSocket::impl {
     {
         HILOGI("SppServerSocket::Close() starts");
         if (socketStatus_ == SOCKET_CLOSED) {
+            HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
         } else {
             socketStatus_ = SOCKET_CLOSED;
             if (fd_ > 0) {
                 shutdown(fd_, SHUT_RD);
                 shutdown(fd_, SHUT_WR);
+                close(fd_);
+                HILOGI("fd closed, fd_: %{public}d", fd_);
                 fd_ = -1;
                 return;
             } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,31 +19,88 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
+#include <uv.h>
+
 namespace OHOS {
 namespace Bluetooth {
-void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int status)
+void NapiBluetoothHostObserver::UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state)
 {
-    HILOGI("NapiBluetoothHostObserver::OnStateChanged called");
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
-    if (!observers[REGISTER_STATE_CHANGE_TYPE]) {
-        HILOGW("NapiBluetoothHostObserver::OnStateChanged: This callback is not registered by ability.");
+    HILOGI("OnStateChanged uv_work_t start");
+
+    if (work == nullptr) {
+        HILOGE("work is null");
         return;
     }
-    HILOGI("NapiBluetoothHostObserver::OnStateChanged: %{public}s is registered by ability",
-        REGISTER_STATE_CHANGE_TYPE.c_str());
+    auto callbackData = (AfterWorkCallbackData<NapiBluetoothHostObserver,
+        decltype(&NapiBluetoothHostObserver::UvQueueWorkOnStateChanged),
+        BluetoothState> *)work->data;
+    if (callbackData == nullptr) {
+        HILOGE("callbackData is null");
+        return;
+    }
 
-    BluetoothState state;
-    DealStateChange(transport, status, state);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_STATE_CHANGE_TYPE];
     napi_value result = 0;
     napi_value callback = 0;
     napi_value undefined = 0;
     napi_value callResult = 0;
-    napi_get_undefined(callbackInfo->env_, &undefined);
-    HILOGI("NapiBluetoothHostObserver::OnStateChanged: Status is %{public}d", state);
-    napi_create_int32(callbackInfo->env_, static_cast<int32_t>(state), &result);
-    napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+
+    napi_get_undefined(callbackData->env, &undefined);
+    HILOGD("UvQueueWorkOnStateChanged Status is %{public}d", state);
+    napi_create_int32(callbackData->env, static_cast<int32_t>(state), &result);
+    napi_get_reference_value(callbackData->env, callbackData->callback, &callback);
+    napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+}
+
+void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int status)
+{
+    HILOGD("NapiBluetoothHostObserver::OnStateChanged called");
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
+    if (!observers[REGISTER_STATE_CHANGE_TYPE]) {
+        HILOGE("NapiBluetoothHostObserver::OnStateChanged: This callback is not registered by ability.");
+        return;
+    }
+
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_STATE_CHANGE_TYPE];
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(callbackInfo->env_, &loop);
+    if (loop == nullptr) {
+        HILOGE("loop instance is nullptr");
+        return;
+    }
+
+    BluetoothState state;
+    DealStateChange(transport, status, state);
+
+    auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothHostObserver,
+        decltype(&NapiBluetoothHostObserver::UvQueueWorkOnStateChanged),
+        BluetoothState>();
+    if (callbackData == nullptr) {
+        HILOGE("new callbackData failed");
+        return;
+    }
+
+    callbackData->object = this;
+    callbackData->function = &NapiBluetoothHostObserver::UvQueueWorkOnStateChanged;
+    callbackData->env = callbackInfo->env_;
+    callbackData->callback = callbackInfo->callback_;
+    callbackData->data = state;
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOGE("new work failed");
+        delete callbackData;
+        callbackData = nullptr;
+        return;
+    }
+    work->data = (void *)callbackData;
+    int ret = uv_queue_work(
+        loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
+    if (ret != 0) {
+        delete callbackData;
+        callbackData = nullptr;
+        delete work;
+        work = nullptr;
+    }
 }
 
 void NapiBluetoothHostObserver::OnDiscoveryStateChanged(int status)
@@ -51,18 +108,50 @@ void NapiBluetoothHostObserver::OnDiscoveryStateChanged(int status)
     HILOGI("NapiBluetoothHostObserver::OnDiscoveryStateChanged called, status is %{public}d", status);
     switch (status) {
         case DISCOVERY_STARTED:
-            HILOGI("NapiBluetoothHostObserver::OnDiscoveryStateChanged discover start");
+            HILOGD("NapiBluetoothHostObserver::OnDiscoveryStateChanged discover start");
             break;
         case DISCOVERYING:
-            HILOGI("NapiBluetoothHostObserver::OnDiscoveryStateChanged discovering");
+            HILOGD("NapiBluetoothHostObserver::OnDiscoveryStateChanged discovering");
             break;
         case DISCOVERY_STOPED:
-            HILOGI("NapiBluetoothHostObserver::OnDiscoveryStateChanged discover stop");
+            HILOGD("NapiBluetoothHostObserver::OnDiscoveryStateChanged discover stop");
             break;
         default:
-            HILOGI("NapiBluetoothHostObserver::OnDiscoveryStateChanged other status");
+            HILOGD("NapiBluetoothHostObserver::OnDiscoveryStateChanged other status");
             break;
     }
+}
+
+void NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult(
+    uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device)
+{
+    HILOGI("OnDiscoveryResult uv_work_t start");
+
+    if (work == nullptr) {
+        HILOGE("work is null");
+        return;
+    }
+    auto callbackData = (AfterWorkCallbackData<NapiBluetoothHostObserver,
+        decltype(&NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult),
+        std::shared_ptr<BluetoothRemoteDevice>> *)work->data;
+    if (callbackData == nullptr) {
+        HILOGE("callbackData is null");
+        return;
+    }
+
+    napi_value result = 0;
+    napi_value value = 0;
+    napi_value callback = 0;
+    napi_value undefined = 0;
+    napi_value callResult = 0;
+    napi_get_undefined(callbackData->env, &undefined);
+    HILOGD("NapiBluetoothHostObserver::OnDiscoveryResult: Status is %{public}s", device->GetDeviceAddr().c_str());
+    napi_create_array(callbackData->env, &result);
+    napi_create_string_utf8(callbackData->env, device->GetDeviceAddr().c_str(), device->GetDeviceAddr().size(), &value);
+    napi_set_element(callbackData->env, result, 0, value);
+
+    napi_get_reference_value(callbackData->env, callbackData->callback, &callback);
+    napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
 void NapiBluetoothHostObserver::OnDiscoveryResult(const BluetoothRemoteDevice &device)
@@ -70,24 +159,51 @@ void NapiBluetoothHostObserver::OnDiscoveryResult(const BluetoothRemoteDevice &d
     HILOGI("NapiBluetoothHostObserver::OnDiscoveryResult called");
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
     if (!observers[REGISTER_DEVICE_FIND_TYPE]) {
-        HILOGW("NapiBluetoothHostObserver::OnDiscoveryResult: This callback is not registered by ability.");
+        HILOGE("NapiBluetoothHostObserver::OnDiscoveryResult: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiBluetoothHostObserver::OnDiscoveryResult: %{public}s is registered by ability",
+    HILOGD("NapiBluetoothHostObserver::OnDiscoveryResult: %{public}s is registered by ability",
         REGISTER_DEVICE_FIND_TYPE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_DEVICE_FIND_TYPE];
-    napi_value result = 0;
-    napi_value value = 0;
-    napi_value callback = 0;
-    napi_value undefined = 0;
-    napi_value callResult = 0;
-    napi_get_undefined(callbackInfo->env_, &undefined);
-    HILOGI("NapiBluetoothHostObserver::OnDiscoveryResult: Status is %{public}s", device.GetDeviceAddr().c_str());
-    napi_create_array(callbackInfo->env_, &result);
-    napi_create_string_utf8(callbackInfo->env_, device.GetDeviceAddr().c_str(), device.GetDeviceAddr().size(), &value);
-    napi_set_element(callbackInfo->env_, result, 0, value);
-    napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(callbackInfo->env_, &loop);
+    if (loop == nullptr) {
+        HILOGE("loop instance is nullptr");
+        return;
+    }
+
+    auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothHostObserver,
+        decltype(&NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult),
+        std::shared_ptr<BluetoothRemoteDevice>>();
+    if (callbackData == nullptr) {
+        HILOGE("new callbackData failed");
+        return;
+    }
+
+    callbackData->object = this;
+    callbackData->function = &NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult;
+    callbackData->env = callbackInfo->env_;
+    callbackData->callback = callbackInfo->callback_;
+    callbackData->data = std::make_shared<BluetoothRemoteDevice>(device);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOGE("new work failed");
+        delete callbackData;
+        callbackData = nullptr;
+        return;
+    }
+
+    work->data = (void *)callbackData;
+
+    int ret = uv_queue_work(
+        loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
+    if (ret != 0) {
+        delete callbackData;
+        callbackData = nullptr;
+        delete work;
+        work = nullptr;
+    }
 }
 
 void NapiBluetoothHostObserver::OnPairRequested(const BluetoothRemoteDevice &device)
@@ -132,19 +248,19 @@ void NapiBluetoothHostObserver::DealStateChange(const int transport, const int s
     if (transport == BT_TRANSPORT_BREDR) {
         switch (status) {
             case BTStateID::STATE_TURNING_ON:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turning on");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning on");
                 state = BluetoothState::STATE_TURNING_ON;
                 break;
             case BTStateID::STATE_TURN_ON:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turn on");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn on");
                 state = BluetoothState::STATE_ON;
                 break;
             case BTStateID::STATE_TURNING_OFF:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turning off");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning off");
                 state = BluetoothState::STATE_TURNING_OFF;
                 break;
             case BTStateID::STATE_TURN_OFF:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turn off");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn off");
                 state = BluetoothState::STATE_OFF;
                 break;
             default:
@@ -153,26 +269,26 @@ void NapiBluetoothHostObserver::DealStateChange(const int transport, const int s
     } else if (transport == BT_TRANSPORT_BLE) {
         switch (status) {
             case BTStateID::STATE_TURNING_ON:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BLE Turning on");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turning on");
                 state = BluetoothState::STATE_BLE_TURNING_ON;
                 break;
             case BTStateID::STATE_TURN_ON:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BLE Turn on");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turn on");
                 state = BluetoothState::STATE_BLE_ON;
                 break;
             case BTStateID::STATE_TURNING_OFF:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BLE Turning off");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turning off");
                 state = BluetoothState::STATE_BLE_TURNING_OFF;
                 break;
             case BTStateID::STATE_TURN_OFF:
-                HILOGI("NapiBluetoothHostObserver::OnStateChanged BLE Turn off");
+                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turn off");
                 state = BluetoothState::STATE_OFF;
                 break;
             default:
                 break;
         }
     } else {
-        HILOGI("NapiBluetoothHostObserver::OnStateChanged error");
+        HILOGD("NapiBluetoothHostObserver::OnStateChanged error");
     }
 }
 
@@ -180,24 +296,24 @@ void NapiBluetoothHostObserver::DealBredrPairComfirmed(const std::string &addr, 
 {
     switch (reqType) {
         case PAIR_CONFIRM_TYPE_PIN_CODE: {
-            HILOGI("PAIR_CONFIRM_TYPE_PIN_CODE");
+            HILOGD("PAIR_CONFIRM_TYPE_PIN_CODE");
             break;
         }
         case PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY: {
-            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY");
+            HILOGD("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY");
             break;
         }
         case PAIR_CONFIRM_TYPE_PASSKEY_INPUT: {
-            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_INPUT");
+            HILOGD("PAIR_CONFIRM_TYPE_PASSKEY_INPUT");
             break;
         }
         case PAIR_CONFIRM_TYPE_NUMERIC: {
-            HILOGI("PAIR_CONFIRM_TYPE_NUMERIC, please setPairConfirm.");
+            HILOGD("PAIR_CONFIRM_TYPE_NUMERIC, please setPairConfirm.");
             OnPairConfirmedCallBack(addr, number);
             break;
         }
         case PAIR_CONFIRM_TYPE_CONSENT: {
-            HILOGI("PAIR_CONFIRM_TYPE_CONSENT, please setPairConfirm.");
+            HILOGD("PAIR_CONFIRM_TYPE_CONSENT, please setPairConfirm.");
             OnPairConfirmedCallBack(addr, number);
             break;
         }
@@ -210,50 +326,109 @@ void NapiBluetoothHostObserver::DealBlePairComfirmed(const std::string &addr, co
 {
     switch (reqType) {
         case PAIR_CONFIRM_TYPE_PIN_CODE: {
-            HILOGI("PAIR_CONFIRM_TYPE_PIN_CODE");
+            HILOGD("PAIR_CONFIRM_TYPE_PIN_CODE");
             break;
         }
         case PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY: {
-            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY");
+            HILOGD("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY");
             break;
         }
         case PAIR_CONFIRM_TYPE_PASSKEY_INPUT: {
-            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_INPUT");
+            HILOGD("PAIR_CONFIRM_TYPE_PASSKEY_INPUT");
             break;
         }
         case PAIR_CONFIRM_TYPE_NUMERIC: {
-            HILOGI("PAIR_CONFIRM_TYPE_NUMERIC, please setPairConfirm.");
+            HILOGD("PAIR_CONFIRM_TYPE_NUMERIC, please setPairConfirm.");
             OnPairConfirmedCallBack(addr, number);
             break;
         }
     }
 }
 
-void NapiBluetoothHostObserver::OnPairConfirmedCallBack(const std::string &deviceAddr, const int number)
+void NapiBluetoothHostObserver::UvQueueWorkOnPairConfirmedCallBack(uv_work_t *work, std::pair<std::string, int> &data)
 {
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
-    if (!observers[REGISTER_PIN_REQUEST_TYPE]) {
-        HILOGW("NapiBluetoothHostObserver::OnPairRequested: This callback is not registered by ability.");
+    HILOGI("OnPairConfirmedCallBack uv_work_t start");
+
+    if (work == nullptr) {
+        HILOGE("work is null");
         return;
     }
-    HILOGI("NapiBluetoothHostObserver::OnPairRequested: %{public}s is registered by ability",
-        REGISTER_PIN_REQUEST_TYPE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_PIN_REQUEST_TYPE];
+    auto callbackData = (AfterWorkCallbackData<NapiBluetoothHostObserver,
+        decltype(&NapiBluetoothHostObserver::UvQueueWorkOnPairConfirmedCallBack),
+        std::pair<std::string, int>> *)work->data;
+    if (callbackData == nullptr) {
+        HILOGE("callbackData is null");
+        return;
+    }
+
     napi_value result = 0;
     napi_value callback = 0;
     napi_value undefined = 0;
     napi_value callResult = 0;
-    napi_get_undefined(callbackInfo->env_, &undefined);
-    HILOGI("NapiBluetoothHostObserver::OnPairRequested: Addr is %{public}s", deviceAddr.c_str());
-    napi_create_object(callbackInfo->env_, &result);
+    napi_get_undefined(callbackData->env, &undefined);
+    HILOGI("NapiBluetoothHostObserver::UvQueueWorkOnPairConfirmedCallBack: Addr is %{public}s", deviceAddr.c_str());
+    napi_create_object(callbackData->env, &result);
     napi_value device = 0;
-    napi_create_string_utf8(callbackInfo->env_, deviceAddr.c_str(), deviceAddr.size(), &device);
-    napi_set_named_property(callbackInfo->env_, result, "deviceId", device);
+    napi_create_string_utf8(
+        callbackData->env, callbackData->data.first.data(), callbackData->data.first.size(), &device);
+    napi_set_named_property(callbackData->env, result, "deviceId", device);
     napi_value pinCode = 0;
-    napi_create_int32(callbackInfo->env_, number, &pinCode);
-    napi_set_named_property(callbackInfo->env_, result, "pinCode", pinCode);
-    napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+    napi_create_int32(callbackData->env, callbackData->data.second, &pinCode);
+    napi_set_named_property(callbackData->env, result, "pinCode", pinCode);
+
+    napi_get_reference_value(callbackData->env, callbackData->callback, &callback);
+    napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+}
+
+void NapiBluetoothHostObserver::OnPairConfirmedCallBack(const std::string &deviceAddr, const int number)
+{
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
+    if (!observers[REGISTER_PIN_REQUEST_TYPE]) {
+        HILOGE("NapiBluetoothHostObserver::OnPairConfirmedCallBack: This callback is not registered by ability.");
+        return;
+    }
+    HILOGD("NapiBluetoothHostObserver::OnPairConfirmedCallBack: %{public}s is registered by ability",
+        REGISTER_PIN_REQUEST_TYPE.c_str());
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_PIN_REQUEST_TYPE];
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(callbackInfo->env_, &loop);
+    if (loop == nullptr) {
+        HILOGE("loop instance is nullptr");
+        return;
+    }
+
+    auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothHostObserver,
+        decltype(&NapiBluetoothHostObserver::UvQueueWorkOnPairConfirmedCallBack),
+        std::pair<std::string, int>>();
+    if (callbackData == nullptr) {
+        HILOGE("new callbackData failed");
+        return;
+    }
+
+    callbackData->object = this;
+    callbackData->function = &NapiBluetoothHostObserver::UvQueueWorkOnPairConfirmedCallBack;
+    callbackData->env = callbackInfo->env_;
+    callbackData->callback = callbackInfo->callback_;
+    callbackData->data = std::pair<std::string, int>(deviceAddr, number);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOGE("new work failed");
+        delete callbackData;
+        callbackData = nullptr;
+        return;
+    }
+
+    work->data = (void *)callbackData;
+
+    int ret = uv_queue_work(
+        loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
+    if (ret != 0) {
+        delete callbackData;
+        callbackData = nullptr;
+        delete work;
+        work = nullptr;
+    }
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

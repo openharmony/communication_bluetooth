@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -223,13 +223,14 @@ int BleStartAdv(int advId, const BleAdvParams *param)
  */
 int BleStopAdv(int advId)
 {
+    HILOGI("BleStopAdv, advId: %{public}d.", advId);
     if (advId >= 0 && advId < MAX_BLE_ADV_NUM) {
         g_BleAdvCallbacks[advId]->GetAdvHandle()->StopAdvertising(*g_BleAdvCallbacks[advId]);
     }
 
     usleep(100);
     if (g_AppCallback != NULL && g_AppCallback->advDisableCb != NULL) {
-        HILOGI("adv stoped advId_: %{public}d.", advId);
+        HILOGI("adv stopped advId: %{public}d.", advId);
         g_AppCallback->advDisableCb(advId, 0);
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -322,7 +323,7 @@ int BleSetScanParameters(int clientId, BleScanParams *param)
  */
 int BleStartScan(void)
 {
-    HILOGI("");
+    HILOGI("BleStartScan enter");
     if (g_BleCentralManager == NULL) {
         return 1;
     }
@@ -340,6 +341,7 @@ int BleStartScan(void)
  */
 int BleStopScan(void)
 {
+    HILOGI("BleStopScan enter");
     if (g_BleCentralManager == NULL) {
         return 1;
     }
@@ -358,6 +360,7 @@ int BleStopScan(void)
  */
 int BleGattRegisterCallbacks(BtGattCallbacks *func)
 {
+    HILOGI("BleGattRegisterCallbacks enter");
     g_AppCallback = func;
 
     if (g_ScanCallback == NULL) {
@@ -383,7 +386,7 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
  * @since 6
  */
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam) {
-    HILOGI("enter");
+    HILOGI("BleStartAdvEx enter");
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
         if (g_BleAdvCallbacks[i] == NULL) {
@@ -398,9 +401,10 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     }
 
     *advId = i;
+    HILOGI(" ret advId: %{public}d.", *advId);
 
     BleAdvertiser *advHandle = g_BleAdvCallbacks[i]->GetAdvHandle();
-    
+
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam.minInterval);
     if (advParam.advType == OHOS_BLE_ADV_SCAN_IND ||

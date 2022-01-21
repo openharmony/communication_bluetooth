@@ -41,6 +41,9 @@
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/host:unittest",
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest:unittest",
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/test/unittest/ble:unittest"
+      ],
+      "hisysevent_config": [
+        "//foundation/communication/bluetooth/hisysevent.yaml"
       ]
     }
   }

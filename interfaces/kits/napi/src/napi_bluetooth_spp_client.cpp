@@ -301,7 +301,7 @@ void NSppClient::Off(napi_env env, napi_callback_info info)
 void NSppClient::sppRead(int id)
 {
     HILOGI("sppRead is called");
-    napi_value result[ARGS_SIZE_TWO];
+    napi_value result = nullptr;
     OHOS::Bluetooth::InputStream inputStream = clientMap[id]->client_->GetInputStream();
     char buf[1024];
     int ret = 0;
@@ -328,15 +328,8 @@ void NSppClient::sppRead(int id)
 
                 uint8_t* bufferData = nullptr;
                 std::shared_ptr<BluetoothCallbackInfo> callbackInfo = clientMap[id]->callbackInfos_[STR_BT_SPP_READ];
-                napi_value eCode = nullptr;
-                napi_value resultCode = nullptr;
 
-                napi_create_int32(callbackInfo->env_, 0, &eCode);
-                napi_create_object(callbackInfo->env_, &resultCode);
-                napi_set_named_property(callbackInfo->env_, resultCode, "code", eCode);
-                result[PARAM0] = resultCode;
-
-                napi_create_arraybuffer(callbackInfo->env_ , ret, (void**)&bufferData, &result[PARAM1]);
+                napi_create_arraybuffer(callbackInfo->env_, ret, (void**)&bufferData, &result);
                 memcpy_s(bufferData, ret, totalBuf, ret);
                 free(totalBuf);
                 napi_value callback = nullptr;
@@ -344,7 +337,7 @@ void NSppClient::sppRead(int id)
                 napi_value callResult = nullptr;
                 napi_get_undefined(callbackInfo->env_, &undefined);
                 napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-                napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
+                napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             }
         }
     }

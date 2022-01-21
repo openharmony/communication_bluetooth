@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +17,7 @@
 #define NAPI_BLUETOOTH_REMOTE_DEVICE_OBSERVER_H
 
 #include "bluetooth_host.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -37,6 +36,7 @@ public:
 
 private:
     void DealPairStatus(const int &status, int &boneStatus);
+    void UvQueueWorkOnPairStatusChanged(uv_work_t *work, std::pair<std::string, int> &data);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
