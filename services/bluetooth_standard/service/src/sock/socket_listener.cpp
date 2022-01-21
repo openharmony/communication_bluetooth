@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -146,6 +146,7 @@ void SocketThread::OnListenEvents(void)
                 LOG_INFO("[SocketListener]: remove fd:%{public}d", fd);
                 epoll_ctl(epollFd_, EPOLL_CTL_DEL, fd, nullptr);
                 DeleteFd(sock);
+                count_--;
                 LOG_INFO("[SocketListener]: exceptCallback");
                 exceptCallback_(sock);
             }
@@ -181,6 +182,7 @@ bool SocketThread::DeleteSocket(Socket &sock)
     }
     if (epoll_ctl(epollFd_, EPOLL_CTL_DEL, fd, nullptr) != -1) {
         DeleteFd(sock);
+        count_--;
         return true;
     }
     LOG_DEBUG("SocketThread: DeleteSocket errno:%{public}d", errno);

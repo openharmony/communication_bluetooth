@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -354,9 +354,9 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsRegister(BtUuid appUuid) 
+int BleGattsRegister(BtUuid appUuid)
 {
-    HILOGI();
+    HILOGI("BleGattsRegister enter");
     if (g_GattsCallback == NULL) {
         HILOGE("callback is null, call BleGattsRegisterCallbacks first");
         return OHOS_BT_STATUS_FAIL;
@@ -389,6 +389,7 @@ int BleGattsRegister(BtUuid appUuid)
  */
 int BleGattsUnRegister(int serverId)
 {
+    HILOGI("BleGattsUnRegister enter");
     if (serverId >= 0 && serverId < MAXIMUM_NUMBER_APPLICATION) {
         if (GATTSERVER(serverId) != NULL) {
             delete GATTSERVER(serverId);
@@ -413,6 +414,7 @@ int BleGattsUnRegister(int serverId)
  */
 int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
 {
+    HILOGI("BleGattsDisconnect enter");
     if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -450,6 +452,7 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
  */
 int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number)
 {
+    HILOGI("BleGattsAddService enter");
     string strUuid(srvcUuid.uuid);
     UUID uuid(UUID::FromString(strUuid));
 
@@ -487,6 +490,21 @@ int BleGattsAddIncludedService(int serverId, int srvcHandle, int includedHandle)
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
+static int ConvertPermissions(int permission)
+{
+    int newPermission = 0;
+
+    if ((permission & OHOS_GATT_PERMISSION_READ) == OHOS_GATT_PERMISSION_READ) {
+        newPermission = static_cast<int>(GattPermission::READABLE);
+    }
+
+    if ((permission & OHOS_GATT_PERMISSION_WRITE) == OHOS_GATT_PERMISSION_WRITE) {
+        newPermission += static_cast<int>(GattPermission::WRITABLE);
+    }
+
+    return newPermission;
+}
+
 /**
  * @brief Adds a characteristic to a specified service.
  *
@@ -503,25 +521,10 @@ int BleGattsAddIncludedService(int serverId, int srvcHandle, int includedHandle)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-static int ConvertPermissions(int permission)
-{
-    int newPermission = 0;
-
-    if ((permission & OHOS_GATT_PERMISSION_READ) == OHOS_GATT_PERMISSION_READ) {
-        newPermission = static_cast<int>(GattPermission::READABLE);
-    }
-
-    if ((permission & OHOS_GATT_PERMISSION_WRITE) == OHOS_GATT_PERMISSION_WRITE) {
-        newPermission += static_cast<int>(GattPermission::WRITABLE);
-    }
-
-    return newPermission;
-}
-
 int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
                               int properties, int permissions)
 {
-    HILOGI("properties: %{public}d, permissions:%{public}d", properties, permissions);
+    HILOGI("BleGattsAddCharacteristic, properties: %{public}d, permissions:%{public}d", properties, permissions);
     string strUuid(characUuid.uuid);
     UUID uuid(UUID::FromString(strUuid));
 
@@ -557,7 +560,7 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
 int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int permissions)
 {
     string strUuid(descUuid.uuid);
-    HILOGI("descUuid: %{public}s", strUuid.c_str());
+    HILOGI("BleGattsAddDescriptor, descUuid: %{public}s", strUuid.c_str());
     UUID uuid(UUID::FromString(strUuid));
     GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
     int desHandle = GATTSERVICES(serverId, srvcHandle).index++;
@@ -586,7 +589,7 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
  */
 int BleGattsStartService(int serverId, int srvcHandle)
 {
-    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, uuid: %{public}s",
+    HILOGI("BleGattsStartService, serverId: %{public}d, srvcHandle: %{public}d, uuid: %{public}s",
         serverId, srvcHandle, GATTSERVICE(serverId, srvcHandle)->GetUuid().ToString().c_str());
     GATTSERVICES(serverId, srvcHandle).isAdding = true;
     GATTSERVER(serverId)->AddService(*GATTSERVICE(serverId, srvcHandle));
@@ -604,7 +607,7 @@ int BleGattsStartService(int serverId, int srvcHandle)
  */
 int BleGattsStopService(int serverId, int srvcHandle)
 {
-    HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+    HILOGI("BleGattsStopService, serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVICES(serverId, srvcHandle).isAdding = false;
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     return OHOS_BT_STATUS_SUCCESS;
@@ -621,7 +624,7 @@ int BleGattsStopService(int serverId, int srvcHandle)
  */
 int BleGattsDeleteService(int serverId, int srvcHandle)
 {
-    HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+    HILOGI("BleGattsDeleteService, serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     delete GATTSERVICE(serverId, srvcHandle);
     GATTSERVICE(serverId, srvcHandle) = NULL;
@@ -637,7 +640,7 @@ int BleGattsDeleteService(int serverId, int srvcHandle)
  * @since 6
  */
 int BleGattsClearServices(int serverId) {
-    HILOGI("serverId: %{public}d", serverId);
+    HILOGI("BleGattsClearServices, serverId: %{public}d", serverId);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -652,6 +655,7 @@ int BleGattsClearServices(int serverId) {
  */
 int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
 {
+    HILOGI("BleGattsSendResponse, serverId: %{public}d", serverId);
     std::map<int, struct ConnectedDevice>::iterator iter;
     iter = g_MapConnectedDevice.find(param->connectId);
 
@@ -659,14 +663,14 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
 
     string strAddress;
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
-    
+
     BluetoothRemoteDevice device(strAddress, 1);
     // request id
     HILOGI("attrHandle: %{public}d", param->attrHandle);
 
     int ret = GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
         param->status, 0, (unsigned char *)param->value, param->valueLen);
-    
+
     if (g_GattsCallback != NULL && g_GattsCallback->responseConfirmationCb != NULL) {
         g_GattsCallback->responseConfirmationCb(ret, param->attrHandle);
     }
@@ -686,6 +690,7 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
  */
 int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 {
+    HILOGI("BleGattsSendIndication, serverId: %{public}d", serverId);
     std::map<int, struct ConnectedDevice>::iterator iter;
     iter = g_MapConnectedDevice.find(param->connectId);
 
@@ -743,8 +748,9 @@ int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsRegisterCallbacks(BtGattServerCallbacks *func) 
+int BleGattsRegisterCallbacks(BtGattServerCallbacks *func)
 {
+    HILOGI("BleGattsRegisterCallbacks enter");
     if (func == NULL) {
         return OHOS_BT_STATUS_PARM_INVALID;
     }

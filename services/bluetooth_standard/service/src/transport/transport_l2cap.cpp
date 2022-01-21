@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -258,7 +258,8 @@ void L2capTransport::TransportL2cConnectReqCallback(const BtAddr *addr, uint16_t
         transport->l2capHandle_ = lcid;
         LOG_INFO("[L2capTransport]%{public}s l2capHandle_:%hu", __func__, transport->l2capHandle_);
         std::lock_guard<std::recursive_mutex> lk(L2capTransport::g_clientTransportMutex);
-        LOG_INFO("[L2capTransport]%{public}s clientTransportMap size:%{public}zu", __func__, g_clientTransportMap.size());
+        LOG_INFO("[L2capTransport]%{public}s clientTransportMap size:%{public}zu",
+            __func__, g_clientTransportMap.size());
         std::map<uint16_t, L2capTransport *>::iterator it;
         for (it = g_clientTransportMap.begin(); it != g_clientTransportMap.end(); ++it) {
             LOG_INFO("[L2capTransport]%{public}s lcid:%hu", __func__, it->first);
