@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,7 +106,7 @@ static napi_value ParseScanParameters(
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int32(env, result, &params.interval);
-        HILOGI("StartBLEScan interval is %{public}d", params.interval);
+        HILOGD("StartBLEScan interval is %{public}d", params.interval);
     }
 
     NAPI_CALL(env, napi_has_named_property(env, scanArg, "dutyMode", &hasProperty));
@@ -116,7 +116,7 @@ static napi_value ParseScanParameters(
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         int32_t dutyMode = 0;
         napi_get_value_int32(env, result, &dutyMode);
-        HILOGI("StartBLEScan dutyMode is %{public}d", dutyMode);
+        HILOGD("StartBLEScan dutyMode is %{public}d", dutyMode);
         ConvertDutyMode(params, dutyMode);
     }
 
@@ -127,7 +127,7 @@ static napi_value ParseScanParameters(
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         int32_t matchMode = -1;
         napi_get_value_int32(env, result, &matchMode);
-        HILOGI("StartBLEScan matchMode is %{public}d", matchMode);
+        HILOGD("StartBLEScan matchMode is %{public}d", matchMode);
         ConvertMatchMode(params, matchMode);
     }
     return NapiGetNull(env);
@@ -157,7 +157,7 @@ static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &arg
                 napi_get_named_property(env, scanFilter, "deviceId", &result);
                 std::string deviceId;
                 ParseString(env, deviceId, result);
-                HILOGI("ParseScanFilterParameters::deviceId = %{public}s", deviceId.c_str());
+                HILOGD("ParseScanFilterParameters::deviceId = %{public}s", deviceId.c_str());
             }
 
             NAPI_CALL(env, napi_has_named_property(env, scanFilter, "name", &hasProperty));
@@ -165,7 +165,7 @@ static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &arg
                 napi_get_named_property(env, scanFilter, "name", &result);
                 std::string name;
                 ParseString(env, name, result);
-                HILOGI("ParseScanFilterParameters::name = %{public}s", name.c_str());
+                HILOGD("ParseScanFilterParameters::name = %{public}s", name.c_str());
             }
 
             NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceUuid", &hasProperty));
@@ -173,7 +173,7 @@ static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &arg
                 napi_get_named_property(env, scanFilter, "serviceUuid", &result);
                 std::string serviceUuid;
                 ParseString(env, serviceUuid, result);
-                HILOGI("ParseScanFilterParameters::serviceUuid = %{public}s", serviceUuid.c_str());
+                HILOGD("ParseScanFilterParameters::serviceUuid = %{public}s", serviceUuid.c_str());
             }
         }
     }
@@ -230,7 +230,7 @@ static napi_value ParseAdvertisingSettingsParameters(
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         int32_t interval = 0;
         napi_get_value_int32(env, result, &interval);
-        HILOGI("ParseAdvertisingSettingsParameters interval is %{public}d", interval);
+        HILOGD("ParseAdvertisingSettingsParameters interval is %{public}d", interval);
         settings.SetInterval(interval);
     }
     NAPI_CALL(env, napi_has_named_property(env, args, "txPower", &hasProperty));
@@ -240,7 +240,7 @@ static napi_value ParseAdvertisingSettingsParameters(
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         int32_t txPower = 0;
         napi_get_value_int32(env, result, &txPower);
-        HILOGI("ParseAdvertisingSettingsParameters txPower is %{public}d", txPower);
+        HILOGD("ParseAdvertisingSettingsParameters txPower is %{public}d", txPower);
         settings.SetTxPower(txPower);
     }
 
@@ -251,7 +251,7 @@ static napi_value ParseAdvertisingSettingsParameters(
         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Boolean expected.");
         bool connectable = true;
         napi_get_value_bool(env, result, &connectable);
-        HILOGI("ParseAdvertisingSettingsParameters connectable is %{public}d", connectable);
+        HILOGD("ParseAdvertisingSettingsParameters connectable is %{public}d", connectable);
         settings.SetConnectable(connectable);
     }
     HILOGI("ParseAdvertisingSettingsParameters end");
@@ -276,7 +276,7 @@ static napi_value ParseServiceUuidParameters(const napi_env &env, const napi_val
         std::string serviceUuid;
         ParseString(env, serviceUuid, uuid);
         data.AddServiceUuid(ParcelUuid::FromString(serviceUuid));
-        HILOGI("Service Uuid = %{public}s", serviceUuid.c_str());
+        HILOGD("Service Uuid = %{public}s", serviceUuid.c_str());
     }
     HILOGI("ParseServiceUuidParameters end");
     return NapiGetNull(env);
@@ -294,7 +294,7 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
     uint32_t length = 0;
     napi_get_array_length(env, result, &length);
     if (length < 0) {
-        HILOGI("ParseManufactureDataParameters,The array is empty.");
+        HILOGE("ParseManufactureDataParameters,The array is empty.");
         return NapiGetNull(env);
     }
     for (size_t manufactureDataIter = 0; manufactureDataIter < length; ++manufactureDataIter) {
@@ -311,7 +311,7 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         int32_t manufactureId = 0;
         napi_get_value_int32(env, result, &manufactureId);
-        HILOGI("ParseManufactureDataParameters::manufactureId = %{public}d", manufactureId);
+        HILOGD("ParseManufactureDataParameters::manufactureId = %{public}d", manufactureId);
         NAPI_CALL(env, napi_has_named_property(env, manufactureData, "manufactureValue", &hasProperty));
         NAPI_ASSERT(env, hasProperty, "manufactureValue expected.");
         napi_get_named_property(env, manufactureData, "manufactureValue", &result);
@@ -341,7 +341,7 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
     uint32_t length = 0;
     napi_get_array_length(env, result, &length);
     if (length < 0) {
-        HILOGI("ParseServiceDataParameters,The array is empty.");
+        HILOGE("ParseServiceDataParameters,The array is empty.");
         return NapiGetNull(env);
     }
     for (size_t serviceDataIter = 0; serviceDataIter < length; ++serviceDataIter) {
@@ -356,7 +356,7 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
         std::string serviceBuffer;
         ParseString(env, serviceBuffer, result);
         ParcelUuid serviceUuid(ParcelUuid::FromString(serviceBuffer));
-        HILOGI("ParseManufactureDataParameters::serviceUuid = %{public}s", serviceUuid.ToString().c_str());
+        HILOGD("ParseManufactureDataParameters::serviceUuid = %{public}s", serviceUuid.ToString().c_str());
 
         NAPI_CALL(env, napi_has_named_property(env, serviceData, "serviceValue", &hasProperty));
         NAPI_ASSERT(env, hasProperty, "serviceValue expected.");
@@ -440,7 +440,7 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
 
 napi_value PropertyInit(napi_env env, napi_value exports)
 {
-    HILOGI("%{public}s, called", __func__);
+    HILOGI("%{public}s, enter", __func__);
 
     napi_value matchModeObj = nullptr;
     napi_value scanDutyObj = nullptr;

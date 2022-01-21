@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -53,6 +53,7 @@ ohos_shared_library("bluetooth") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/ace/napi:ace_napi",
     "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "//third_party/libuv:uv_static",
     "//utils/native/base:utils",
   ]
 

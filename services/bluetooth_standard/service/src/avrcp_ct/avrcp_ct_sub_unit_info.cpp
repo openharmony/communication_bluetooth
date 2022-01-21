@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,7 +84,7 @@ bool AvrcCtSubUnitPacket::DisassemblePacket(Packet *pkt)
         isValid = true;
     } else {
         crCode_ = AVRC_CT_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP CT] The size of the packet is invalid! - actual size[%{public}zu] - valid min size[%{public}d]",
+        LOG_DEBUG("[AVRCP CT]The size of the packet is invalid! actual size[%{public}zu], valid min size[%{public}d]",
             size,
             AVRC_CT_SUB_UNIT_RESPONSE_SIZE);
     }

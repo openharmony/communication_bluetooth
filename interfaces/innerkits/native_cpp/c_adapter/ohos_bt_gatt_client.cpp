@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -321,6 +321,7 @@ int BleGattcRegister(BtUuid appUuid)
     struct GattClientWrapper clientWrapper;
     clientWrapper.gattClient = nullptr;
     clientWrapper.gattClientCallback = nullptr;
+    clientWrapper.remoteAddr = "";
     int clientId = g_ClientIncrease;
     GATTCLIENT.insert(std::pair<int, struct GattClientWrapper>(clientId, clientWrapper));
     HILOGI("BleGattcRegister, clientId: %{public}d", clientId);
@@ -372,10 +373,19 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
 
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
-    BluetoothRemoteDevice device(strAddress, transport);
-    GattClient *client = new GattClient(device);
-    GattClientCallbackWrapper *clientWrapper = new GattClientCallbackWrapper(func, clientId);
 
+    GattClient *client = nullptr;
+    if (iter->second.gattClient != nullptr && iter->second.remoteAddr == strAddress) {
+        HILOGI("BleGattcConnect, connect to the same remote device again.");
+        client = iter->second.gattClient;
+        delete iter->second.gattClientCallback;
+        iter->second.gattClientCallback = nullptr;
+    } else {
+        BluetoothRemoteDevice device(strAddress, transport);
+        client = new GattClient(device);
+    }
+
+    GattClientCallbackWrapper *clientWrapper = new GattClientCallbackWrapper(func, clientId);
     int result = client->Connect(*(clientWrapper), isAutoConnect, transport);
     HILOGI("BleGattcConnect, clientId: %{public}d, result: %{public}d", clientId, result);
     if (result == OHOS_BT_STATUS_SUCCESS) {
@@ -387,6 +397,9 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
         HILOGE("BleGattcConnect fail.");
         delete client;
         delete clientWrapper;
+        iter->second.gattClient = nullptr;
+        iter->second.gattClientCallback = nullptr;
+        iter->second.remoteAddr = "";
         return OHOS_BT_STATUS_FAIL;
     }
 }

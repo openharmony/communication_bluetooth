@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,13 +22,17 @@
 #include "bluetooth_ble_central_manager_server.h"
 #include "bluetooth_gatt_client_server.h"
 #include "bluetooth_gatt_server_server.h"
+#include "bluetooth_host_dumper.h"
 #include "bluetooth_log.h"
 #include "bluetooth_socket_server.h"
+#include "file_ex.h"
+#include "hisysevent.h"
 #include "interface_adapter_manager.h"
 
 #include "interface_adapter_ble.h"
 #include "interface_adapter_classic.h"
 #include "interface_profile_manager.h"
+#include "ipc_skeleton.h"
 #include "raw_address.h"
 #include "remote_observer_list.h"
 #include "string_ex.h"
@@ -163,10 +167,22 @@ public:
             impl_->observers_.ForEach([transport, state](sptr<IBluetoothHostObserver> observer) {
                 observer->OnStateChanged(transport, state);
             });
+            if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
+                int32_t pid = IPCSkeleton::GetCallingPid();
+                int32_t uid = IPCSkeleton::GetCallingUid();
+                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BR_STATE",
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_STATE", state);
+            }
         } else if (transport == BTTransport::ADAPTER_BLE) {
             impl_->bleObservers_.ForEach([transport, state](sptr<IBluetoothHostObserver> observer) {
                 observer->OnStateChanged(transport, state);
             });
+            if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
+                int32_t pid = IPCSkeleton::GetCallingPid();
+                int32_t uid = IPCSkeleton::GetCallingUid();
+                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_STATE",
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BLE_STATE", state);
+            }
         }
     };
 
@@ -184,6 +200,12 @@ public:
         impl_->observers_.ForEach([status](sptr<IBluetoothHostObserver> observer) {
             observer->OnDiscoveryStateChanged(static_cast<int32_t>(status));
         });
+        if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
+            int32_t pid = IPCSkeleton::GetCallingPid();
+            int32_t uid = IPCSkeleton::GetCallingUid();
+            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_SCAN_STATE",
+                HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_SCAN_STATE", status);
+        }
     }
 
     void OnDiscoveryResult(const RawAddress &device) override
@@ -1277,6 +1299,23 @@ void BluetoothHostServer::DeregisterBlePeripheralCallback(const sptr<IBluetoothB
             }
         }
     }
+}
+
+int32_t BluetoothHostServer::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    std::vector<std::string> argsInStr8;
+    std::transform(args.begin(), args.end(), std::back_inserter(argsInStr8), [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    std::string result;
+    BluetoothHostDumper::BluetoothDump(argsInStr8, result);
+
+    if (!SaveStringToFd(fd, result)) {
+        HILOGE("[%{public}s]: %{public}s() bluetooth dump save string to fd failed!", __FILE__, __FUNCTION__);
+        return ERR_INVALID_OPERATION;
+    }
+    return ERR_OK;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

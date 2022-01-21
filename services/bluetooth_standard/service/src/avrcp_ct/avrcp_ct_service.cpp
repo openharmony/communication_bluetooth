@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -927,7 +927,8 @@ void AvrcpCtService::OnGetCapabilities(const RawAddress &rawAddr, const std::vec
     const std::vector<uint8_t> &events, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] companies.size[%{public}zu] - events.size[%{public}zu] - result[%{public}d]", companies.size(), events.size(), result);
+    LOG_DEBUG("[AVRCP CT] companies.size[%{public}zu] - events.size[%{public}zu] - result[%{public}d]",
+        companies.size(), events.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetCapabilities(rawAddr, companies, events, result);
@@ -1047,7 +1048,8 @@ void AvrcpCtService::OnGetPlayerAppSettingValues(
     const RawAddress &rawAddr, uint8_t attribute, const std::vector<uint8_t> &values, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}zu] - result[%{public}d]", attribute, values.size(), result);
+    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}zu] - result[%{public}d]",
+        attribute, values.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingValues(rawAddr, attribute, values, result);
@@ -1106,8 +1108,8 @@ void AvrcpCtService::OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr
     const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG(
-        "[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]", attributes.size(), values.size(), result);
+    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]",
+        attributes.size(), values.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingCurrentValue(rawAddr, attributes, values, result);
