@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -150,6 +150,16 @@ public:
         return callback_;
     }
 
+    void SetAppId(int appId)
+    {
+        applicationId_ = appId;
+    }
+
+    int GetAppId()
+    {
+        return applicationId_;
+    }
+
     GattClientCallbackImpl(const sptr<IBluetoothGattClientCallback> &callback, BluetoothGattClientServer &owner);
     ~GattClientCallbackImpl()
     {
@@ -179,6 +189,7 @@ private:
 
     sptr<IBluetoothGattClientCallback> callback_;
     sptr<CallbackDeathRecipient> deathRecipient_;
+    int applicationId_;
 };
 
 BluetoothGattClientServer::impl::GattClientCallbackImpl::GattClientCallbackImpl(
@@ -198,17 +209,23 @@ BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecipient:
 void BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecipient::OnRemoteDied(
     const wptr<IRemoteObject> &remote)
 {
+    HILOGI("Enter OnRemoteDied");
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
-        if ((*it)->GetCallback() == remote) {
-            *it = nullptr;
-            owner_.pimpl->callbacks_.erase(it);
+        if ((*it)->GetCallback()->AsObject() == remote) {
+            HILOGI("callback is found from callbacks");
             sptr<CallbackDeathRecipient> dr = (*it)->deathRecipient_;
             if (!dr->GetCallback()->AsObject()->RemoveDeathRecipient(dr)) {
                 HILOGE("Failed to unlink death recipient from callback");
             }
+            HILOGI("App id is %{public}d", (*it)->GetAppId());
+            owner_.Disconnect((*it)->GetAppId());
+            owner_.DeregisterApplication((*it)->GetAppId());
+            owner_.pimpl->callbacks_.erase(it);
+            *it = nullptr;
             return;
         }
     }
+    HILOGE("No callback erased from callbacks");
 }
 
 BluetoothGattClientServer::impl::impl() : clientService_(nullptr), systemStateObserver_(new SystemStateObserver(this))
@@ -241,7 +258,9 @@ int BluetoothGattClientServer::RegisterApplication(
     }
     auto it = pimpl->callbacks_.emplace(
         pimpl->callbacks_.begin(), std::make_unique<impl::GattClientCallbackImpl>(callback, *this));
-    return pimpl->clientService_->RegisterApplication(*it->get(), (RawAddress)addr, transport);
+    int appId = pimpl->clientService_->RegisterApplication(*it->get(), (RawAddress)addr, transport);
+    (*it)->SetAppId(appId);
+    return appId;
 }
 
 int BluetoothGattClientServer::DeregisterApplication(int32_t appId)

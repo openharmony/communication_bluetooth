@@ -112,6 +112,7 @@ public:
     void DeregisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer) override;
     void GetLocalSupportedUuids(std::vector<std::string> &uuids) override;
     std::vector<bluetooth::Uuid> GetDeviceUuids(int32_t transport, const std::string &address) override;
+    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 
 private:
     static sptr<BluetoothHostServer> instance;

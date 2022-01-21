@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,7 @@
 #define NAPI_BLUETOOTH_BLE_CENTRAL_MANAGER_H
 
 #include "bluetooth_ble_central_manager.h"
-
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -34,6 +32,8 @@ public:
 
 private:
     void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env &env, napi_value &scanResultArray);
+    void UvQueueWorkOnScanCallback(uv_work_t *work, std::shared_ptr<BleScanResult> &result);
+    void UvQueueWorkOnBleBatchScanResultsEvent(uv_work_t *work, const std::vector<BleScanResult> &results);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

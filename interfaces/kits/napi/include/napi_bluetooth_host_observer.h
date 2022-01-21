@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,10 @@ private:
     void DealBredrPairComfirmed(const std::string &addr, const int reqType, const int number);
     void DealBlePairComfirmed(const std::string &addr, const int reqType, const int number);
     void OnPairConfirmedCallBack(const std::string &addr, const int number);
+
+    void UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state);
+    void UvQueueWorkOnDiscoveryResult(uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device);
+    void UvQueueWorkOnPairConfirmedCallBack(uv_work_t *work, std::pair<std::string, int> &data);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

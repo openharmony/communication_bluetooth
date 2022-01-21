@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -191,7 +191,8 @@ static void AttCount(uint8_t format, uint16_t *inforLenPtr, uint16_t *uuidLenPtr
  */
 static int AttJudgeInfoLen(uint16_t inforLen, size_t dataLen, uint16_t *inforNum)
 {
-    LOG_INFO("%{public}s enter,inforLen = %hu,dataLen = %zu,inforNum = %hu ", __FUNCTION__, inforLen, dataLen, *inforNum);
+    LOG_INFO("%{public}s enter,inforLen = %hu,dataLen = %zu,inforNum = %hu ",
+        __FUNCTION__, inforLen, dataLen, *inforNum);
 
     int ret = BT_OPERATION_FAILED;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@
 
 #include "ohos_bt_adapter_utils.h"
 #include "bluetooth_socket.h"
-#include "bluetooth_def.h"
+#include "bluetooth_host.h"
 #include "bluetooth_log.h"
 
 #ifdef __cplusplus
@@ -62,6 +62,11 @@ static std::map<int, std::shared_ptr<ClientSocketWrapper>> g_SppClientMap;
 int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned int len)
 {
     HILOGI("SppServerCreate start!");
+    if (!IS_BT_ENABLED()) {
+        HILOGE("SppServerCreate fail,BR is not TURN_ON");
+        return BT_SPP_INVALID_ID;
+    }
+
     if (socketPara->socketType != OHOS_SPP_SOCKET_RFCOMM || strlen(name) != len ||
         strlen(socketPara->uuid.uuid) != socketPara->uuid.uuidLen) {
         HILOGI("SppServerCreate param invalid!");
@@ -107,6 +112,10 @@ int SppServerAccept(int serverId)
     }
 
     std::shared_ptr<SppClientSocket> client = server->Accept(0);
+    if (client == nullptr) {
+        HILOGE("SppServerAccept client is null!");
+        return BT_SPP_INVALID_ID;
+    }
 
     std::shared_ptr<ClientSocketWrapper> clientWrap = std::make_shared<ClientSocketWrapper>();
     clientWrap->clientSocket = client;
@@ -206,19 +215,20 @@ int SppDisconnect(int clientId)
  */
 int SppGetRemoteAddr(int clientId, BdAddr *remoteAddr)
 {
+    HILOGI("SppGetRemoteAddr, clientId: %{public}d", clientId);
     SppClientIterator iter = SPP_CLIENT_MAP.find(clientId);
     if (iter == SPP_CLIENT_MAP.end()) {
-        HILOGE("SppGetRemoteAddr clientId is not exist, clientId: %{public}d", clientId);
+        HILOGE("SppGetRemoteAddr clientId is not exist!");
         return OHOS_BT_STATUS_FAIL;
     }
     std::shared_ptr<SppClientSocket> client = iter->second->clientSocket;
     if (client == nullptr) {
-        HILOGE("SppGetRemoteAddr client is null, clientId: %{public}d", clientId);
+        HILOGE("SppGetRemoteAddr client is null!");
         return OHOS_BT_STATUS_FAIL;
     }
     string tmpAddr = client->GetRemoteDevice().GetDeviceAddr();
     GetAddrFromString(tmpAddr, remoteAddr->addr);
-    HILOGI("SppGetRemoteAddr, addr: %02X:%02X:*:*:*:%02X",
+    HILOGI("SppGetRemoteAddr, addr: %{public}02X:%{public}02X:*:*:*:%{public}02X",
         remoteAddr->addr[0], remoteAddr->addr[1], remoteAddr->addr[5]);
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -260,16 +270,16 @@ int SppRead(int clientId, char *buf, const unsigned int bufLen)
 {
     SppClientIterator iter = SPP_CLIENT_MAP.find(clientId);
     if (iter == SPP_CLIENT_MAP.end()) {
-        HILOGE("SppRead clientId is not exist, clientId: %{public}d", clientId);
+        HILOGE("SppRead clientId is not exist!");
         return BT_SPP_READ_FAILED;
     }
     std::shared_ptr<SppClientSocket> client = iter->second->clientSocket;
     if (client == nullptr) {
-        HILOGE("SppRead client is null, clientId: %{public}d", clientId);
+        HILOGE("SppRead client is null!");
         return BT_SPP_READ_FAILED;
     }
     int readLen = client->GetInputStream().Read(buf, bufLen);
-    HILOGI("SppRead, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
+    HILOGI("SppRead ret, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
     return readLen;
 }
 
@@ -283,18 +293,19 @@ int SppRead(int clientId, char *buf, const unsigned int bufLen)
  */
 int SppWrite(int clientId, const char *data, const unsigned int len)
 {
+    HILOGI("SppWrite start, clientId: %{public}d, len: %{public}d", clientId, len);
     SppClientIterator iter = SPP_CLIENT_MAP.find(clientId);
     if (iter == SPP_CLIENT_MAP.end()) {
-        HILOGE("SppWrite clientId is not exist, clientId: %{public}d", clientId);
+        HILOGE("SppWrite clientId is not exist!");
         return OHOS_BT_STATUS_FAIL;
     }
     std::shared_ptr<SppClientSocket> client = iter->second->clientSocket;
     if (client == nullptr) {
-        HILOGE("SppWrite client is null, clientId: %{public}d", clientId);
+        HILOGE("SppWrite client is null!");
         return OHOS_BT_STATUS_FAIL;
     }
     int writeLen = client->GetOutputStream().Write(data, len);
-    HILOGI("SppWrite, clientId: %{public}d, writeLen: %{public}d", clientId, writeLen);
+    HILOGI("SppWrite end, writeLen: %{public}d", writeLen);
     return writeLen;
 }
 }  // namespace Bluetooth

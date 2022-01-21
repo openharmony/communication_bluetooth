@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,15 +31,15 @@ size_t OutputStream::Write(const char *buf, const size_t length)
 {
     HILOGI("OutputStream::Write(2 parameters) starts");
     if (socketFd_ == -1) {
-        HILOGE("[sock]socket closed");
+        HILOGE("[sock]socket closed.");
         return -1;
     }
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
 
-    HILOGE("[sock]write ret:%{public}zd errno: %{public}d", ret, errno);
+    HILOGI("[sock]write ret: %{public}zu", ret);
 
     if (ret == -1) {
-        HILOGE("[sock]write Error. errno: %{public}d", errno);
+        HILOGE("[sock]write Error.");
     }
     return ret;
 }

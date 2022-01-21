@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ std::string g_RemoteDeviceAddr;
 napi_value BluetoothHostInit(napi_env env, napi_value exports)
 {
     HILOGI("BluetoothHostInit start");
-    StateChangeInit(env, exports);
+    PropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("enableBluetooth", EnableBluetooth),
         DECLARE_NAPI_FUNCTION("disableBluetooth", DisableBluetooth),
@@ -44,22 +44,50 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getState", GetState),
         DECLARE_NAPI_FUNCTION("getBtConnectionState", GetBtConnectionState),
         DECLARE_NAPI_FUNCTION("pairDevice", PairDevice),
+        DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDevice),
         DECLARE_NAPI_FUNCTION("getPairedDevices", GetPairedDevices),
-        DECLARE_NAPI_FUNCTION("setDevicePariringConfirmation", SetDevicePariringConfirmation),
-        DECLARE_NAPI_FUNCTION("on", RegisterObserver),
-        DECLARE_NAPI_FUNCTION("off", DeregisterObserver),
+        DECLARE_NAPI_FUNCTION("setDevicePairingConfirmation", SetDevicePairingConfirmation),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
+        DECLARE_NAPI_FUNCTION("on", RegisterObserverToHost),
+        DECLARE_NAPI_FUNCTION("off", DeregisterObserverToHost),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     HILOGI("BluetoothHostInit end");
     return exports;
 }
 
+napi_value RegisterObserverToHost(napi_env env, napi_callback_info info)
+{
+    HILOGI("RegisterObserverToHost start");
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
+    if (observers.empty()) {
+        HILOGD("RegisterObserverToHost empty");
+        BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+        host->RegisterObserver(g_bluetoothHostObserver);
+        host->RegisterRemoteDeviceObserver(g_bluetoothRemoteDevice);
+    }
+    return RegisterObserver(env, info);
+}
+
+napi_value DeregisterObserverToHost(napi_env env, napi_callback_info info)
+{
+    HILOGI("DeregisterObserverToHost start");
+    napi_value ret = DeregisterObserver(env, info);
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
+    if (observers.empty()) {
+        HILOGD("DeregisterObserverToHost empty");
+        BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+        host->DeregisterObserver(g_bluetoothHostObserver);
+        host->DeregisterRemoteDeviceObserver(g_bluetoothRemoteDevice);
+    }
+    return ret;
+}
+
 napi_value EnableBluetooth(napi_env env, napi_callback_info info)
 {
     HILOGI("EnableBluetooth start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    host->RegisterObserver(g_bluetoothHostObserver);
-    host->RegisterRemoteDeviceObserver(g_bluetoothRemoteDevice);
     bool enabled = host->EnableBt();
     enabled |= host->EnableBle();
     napi_value result = nullptr;
@@ -72,8 +100,6 @@ napi_value DisableBluetooth(napi_env env, napi_callback_info info)
 {
     HILOGI("DisableBluetooth start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    host->DeregisterObserver(g_bluetoothHostObserver);
-    host->DeregisterRemoteDeviceObserver(g_bluetoothRemoteDevice);
     bool enabled = host->DisableBt();
     enabled &= host->DisableBle();
     napi_value result = nullptr;
@@ -98,7 +124,7 @@ napi_value SetLocalName(napi_env env, napi_callback_info info)
     size_t bufferSize = 0;
     size_t strLength = 0;
     napi_get_value_string_utf8(env, argv[PARAM0], nullptr, 0, &bufferSize);
-    HILOGI("local name writeChar bufferSize = %{public}d", (int)bufferSize);
+    HILOGD("local name writeChar bufferSize = %{public}d", (int)bufferSize);
     char buffer[bufferSize + 1];
     napi_get_value_string_utf8(env, argv[PARAM0], buffer, bufferSize + 1, &strLength);
     std::string localName(buffer);
@@ -122,6 +148,56 @@ napi_value GetLocalName(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value GetRemoteDeviceName(napi_env env, napi_callback_info info)
+{
+    HILOGI("GetRemoteDeviceName start");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    if (argc == 0) {
+        return NapiGetNull(env);
+    }
+    napi_value result = nullptr;
+    ParseString(env, g_RemoteDeviceAddr, argv[PARAM0]);
+    std::string name =
+        BluetoothHost::GetDefaultHost().GetRemoteDevice(g_RemoteDeviceAddr, BT_TRANSPORT_BREDR).GetDeviceName();
+    napi_create_string_utf8(env, name.c_str(), name.size(), &result);
+    HILOGI("GetRemoteDeviceName end");
+    return result;
+}
+
+napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
+{
+    HILOGI("GetRemoteDeviceClass start");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    if (argc == 0) {
+        return NapiGetNull(env);
+    }
+    ParseString(env, g_RemoteDeviceAddr, argv[PARAM0]);
+    BluetoothDeviceClass deviceClass =
+        BluetoothHost::GetDefaultHost().GetRemoteDevice(g_RemoteDeviceAddr, BT_TRANSPORT_BREDR).GetDeviceClass();
+    int tmpCod = deviceClass.GetClassOfDevice();
+    int tmpMajorClass = deviceClass.GetMajorClass();
+    int tmpMajorMinorClass = deviceClass.GetMajorMinorClass();
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+    napi_value majorClass = 0;
+    napi_create_int32(env, tmpMajorClass, &majorClass);
+    napi_set_named_property(env, result, "majorClass", majorClass);
+    napi_value majorMinorClass = 0;
+    napi_create_int32(env, tmpMajorMinorClass, &majorMinorClass);
+    napi_set_named_property(env, result, "majorMinorClass", majorMinorClass);
+    napi_value cod = 0;
+    napi_create_int32(env, tmpCod, &cod);
+    napi_set_named_property(env, result, "classOfDevice", cod);
+    HILOGI("GetRemoteDeviceClass end");
+    return result;
+}
+
 napi_value SetBluetoothScanMode(napi_env env, napi_callback_info info)
 {
     HILOGI("SetBluetoothScanMode start");
@@ -138,12 +214,12 @@ napi_value SetBluetoothScanMode(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
     int32_t mode = 0;
     napi_get_value_int32(env, argv[PARAM0], &mode);
-    HILOGI("SetBluetoothScanMode::mode = %{public}d", mode);
+    HILOGD("SetBluetoothScanMode::mode = %{public}d", mode);
     NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
     int32_t duration = 0;
     napi_get_value_int32(env, argv[PARAM1], &duration);
-    HILOGI("SetBluetoothScanMode::duration = %{public}d", duration);
+    HILOGD("SetBluetoothScanMode::duration = %{public}d", duration);
 
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     bool enabled = host->SetBtScanMode(mode, duration);
@@ -195,19 +271,19 @@ napi_value GetState(napi_env env, napi_callback_info info)
     int32_t status = 0;
     switch (state) {
         case BTStateID::STATE_TURNING_ON:
-            HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turning on");
+            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning on");
             status = static_cast<int32_t>(BluetoothState::STATE_TURNING_ON);
             break;
         case BTStateID::STATE_TURN_ON:
-            HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turn on");
+            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn on");
             status = static_cast<int32_t>(BluetoothState::STATE_ON);
             break;
         case BTStateID::STATE_TURNING_OFF:
-            HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turning off");
+            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning off");
             status = static_cast<int32_t>(BluetoothState::STATE_TURNING_OFF);
             break;
         case BTStateID::STATE_TURN_OFF:
-            HILOGI("NapiBluetoothHostObserver::OnStateChanged BREDR Turn off");
+            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn off");
             status = static_cast<int32_t>(BluetoothState::STATE_OFF);
             break;
         default:
@@ -220,7 +296,7 @@ napi_value GetState(napi_env env, napi_callback_info info)
     }
 
     napi_value result = nullptr;
-    HILOGI("GetState start state %{public}d", status);
+    HILOGD("GetState start state %{public}d", status);
     napi_create_int32(env, status, &result);
     HILOGI("GetState end");
     return result;
@@ -231,23 +307,23 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
     HILOGI("GetBtConnectionState start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t state = host->GetBtConnectionState();
-    HILOGI("GetBtConnectionState start state %{public}d", state);
+    HILOGD("GetBtConnectionState start state %{public}d", state);
     int32_t profileConnectionState = ProfileConnectionState::STATE_DISCONNECTING;
     switch (state) {
         case static_cast<int32_t>(BTConnectState::CONNECTING):
-            HILOGI("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState connecting");
+            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState connecting");
             profileConnectionState = ProfileConnectionState::STATE_CONNECTING;
             break;
         case static_cast<int32_t>(BTConnectState::CONNECTED):
-            HILOGI("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState connected");
+            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState connected");
             profileConnectionState = ProfileConnectionState::STATE_CONNECTED;
             break;
         case static_cast<int32_t>(BTConnectState::DISCONNECTING):
-            HILOGI("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState disconnecting");
+            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState disconnecting");
             profileConnectionState = ProfileConnectionState::STATE_DISCONNECTING;
             break;
         case static_cast<int32_t>(BTConnectState::DISCONNECTED):
-            HILOGI("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState disconnected");
+            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState disconnected");
             profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
             break;
         default:
@@ -278,6 +354,26 @@ napi_value PairDevice(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
+{
+    HILOGI("CancelPairedDevice start");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    if (argc == 0) {
+        return NapiGetNull(env);
+    }
+    ParseString(env, g_RemoteDeviceAddr, argv[PARAM0]);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(g_RemoteDeviceAddr, BT_TRANSPORT_BREDR);
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    bool isSuccess = host->RemovePair(remoteDevice);
+    napi_value result = nullptr;
+    napi_get_boolean(env, isSuccess, &result);
+    HILOGI("CancelPairedDevice end");
+    return result;
+}
+
 napi_value GetPairedDevices(napi_env env, napi_callback_info info)
 {
     HILOGI("GetPairedDevices start");
@@ -296,9 +392,9 @@ napi_value GetPairedDevices(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value SetDevicePariringConfirmation(napi_env env, napi_callback_info info)
+napi_value SetDevicePairingConfirmation(napi_env env, napi_callback_info info)
 {
-    HILOGI("SetDevicePariringConfirmation start");
+    HILOGI("SetDevicePairingConfirmation start");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {nullptr};
     napi_value thisVar = nullptr;
@@ -313,14 +409,13 @@ napi_value SetDevicePariringConfirmation(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Boolean expected.");
     bool accept = false;
     napi_get_value_bool(env, argv[PARAM1], &accept);
-    HILOGI("SetDevicePariringConfirmation::accept = %{public}d", accept);
-    bool isSuccess = false;
-    BluetoothHost::GetDefaultHost()
+    HILOGD("SetDevicePairingConfirmation::accept = %{public}d", accept);
+    bool isSuccess = BluetoothHost::GetDefaultHost()
         .GetRemoteDevice(g_RemoteDeviceAddr, BT_TRANSPORT_BREDR)
         .SetDevicePairingConfirmation(accept);
     napi_value result = nullptr;
     napi_get_boolean(env, isSuccess, &result);
-    HILOGI("SetDevicePariringConfirmation end");
+    HILOGI("SetDevicePairingConfirmation end");
     return result;
 }
 
@@ -422,11 +517,11 @@ static void GetDeviceNameSyncWorkStart(const napi_env env, GattGetDeviceNameCall
     asynccallbackinfo->deviceId =
         BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceId, BT_TRANSPORT_BLE).GetDeviceName();
     if (asynccallbackinfo->deviceId.empty()) {
-        HILOGI("GetDeviceName failed.");
+        HILOGD("GetDeviceName failed.");
         asynccallbackinfo->promise.errorCode = CODE_FAILED;
         asynccallbackinfo->result = NapiGetNull(env);
     } else {
-        HILOGI("GetDeviceName success.");
+        HILOGD("GetDeviceName success.");
         napi_value result = nullptr;
         napi_create_string_utf8(env, asynccallbackinfo->deviceId.c_str(), asynccallbackinfo->deviceId.size(), &result);
         asynccallbackinfo->result = result;
@@ -439,7 +534,7 @@ napi_value GetDeviceName(napi_env env, napi_callback_info info)
     HILOGI("GetDeviceName start");
     napi_ref callback = nullptr;
     GattGetDeviceNameCallbackInfo *asynccallbackinfo =
-        new (std::nothrow)GattGetDeviceNameCallbackInfo{.env = env, .asyncWork = nullptr};
+        new (std::nothrow) GattGetDeviceNameCallbackInfo {.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return JSParaError(env, callback);
     }
@@ -453,12 +548,12 @@ napi_value GetDeviceName(napi_env env, napi_callback_info info)
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOGI("GetDeviceName napi_create_async_work start");
+            HILOGD("GetDeviceName napi_create_async_work start");
             GattGetDeviceNameCallbackInfo *asynccallbackinfo = (GattGetDeviceNameCallbackInfo *)data;
             GetDeviceNameSyncWorkStart(env, asynccallbackinfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOGI("GetDeviceName napi_create_async_work complete start");
+            HILOGD("GetDeviceName napi_create_async_work complete start");
             GattGetDeviceNameCallbackInfo *asynccallbackinfo = (GattGetDeviceNameCallbackInfo *)data;
             ReturnCallbackPromise(env, asynccallbackinfo->promise, asynccallbackinfo->result);
             if (asynccallbackinfo->promise.callback != nullptr) {
@@ -469,7 +564,7 @@ napi_value GetDeviceName(napi_env env, napi_callback_info info)
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
-            HILOGI("GetDeviceName napi_create_async_work complete end");
+            HILOGD("GetDeviceName napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -496,7 +591,7 @@ static void GetRssiValueSyncWorkStart(const napi_env env, GattGetRssiValueCallba
         SetRssiValueCallbackInfo(callbackInfo);
         if (asynccallbackinfo->cvfull.wait_for(lock, std::chrono::seconds(THREAD_WAIT_TIMEOUT)) ==
             std::cv_status::timeout) {
-            HILOGI("GetRssiValue ReadRemoteRssi timeout!");
+            HILOGD("GetRssiValue ReadRemoteRssi timeout!");
         }
     }
 }
@@ -506,7 +601,7 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
     HILOGI("GetRssiValue start");
     napi_ref callback = nullptr;
     GattGetRssiValueCallbackInfo *asynccallbackinfo =
-        new (std::nothrow)GattGetRssiValueCallbackInfo{.env = env, .asyncWork = nullptr};
+        new (std::nothrow) GattGetRssiValueCallbackInfo {.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return JSParaError(env, callback);
     }
@@ -521,12 +616,12 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOGI("GetRssiValue napi_create_async_work start");
+            HILOGD("GetRssiValue napi_create_async_work start");
             GattGetRssiValueCallbackInfo *asynccallbackinfo = (GattGetRssiValueCallbackInfo *)data;
             GetRssiValueSyncWorkStart(env, asynccallbackinfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOGI("GetRssiValue napi_create_async_work complete start");
+            HILOGD("GetRssiValue napi_create_async_work complete start");
             GattGetRssiValueCallbackInfo *asynccallbackinfo = (GattGetRssiValueCallbackInfo *)data;
             ReturnCallbackPromise(env, asynccallbackinfo->promise, asynccallbackinfo->result);
 
@@ -539,7 +634,7 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
-            HILOGI("GetRssiValue napi_create_async_work complete end");
+            HILOGD("GetRssiValue napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -552,55 +647,299 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
     HILOGI("GetRssiValue end");
 }
 
-napi_value StateChangeInit(napi_env env, napi_value exports)
+napi_value PropertyValueInit(napi_env env, napi_value exports)
 {
-    HILOGI("StateChangeInit start");
-
-    napi_value stateObj = nullptr;
-    napi_value profileStateObj = nullptr;
-    napi_value scanModeObj = nullptr;
-    napi_create_object(env, &stateObj);
-    napi_create_object(env, &profileStateObj);
-    napi_create_object(env, &scanModeObj);
-
-    SetNamedPropertyByInteger(env, stateObj, static_cast<int>(BluetoothState::STATE_OFF), "STATE_OFF");
-    SetNamedPropertyByInteger(env, stateObj, static_cast<int>(BluetoothState::STATE_TURNING_ON), "STATE_TURNING_ON");
-    SetNamedPropertyByInteger(env, stateObj, static_cast<int>(BluetoothState::STATE_ON), "STATE_ON");
-    SetNamedPropertyByInteger(env, stateObj, static_cast<int>(BluetoothState::STATE_TURNING_OFF), "STATE_TURNING_OFF");
-    SetNamedPropertyByInteger(
-        env, stateObj, static_cast<int>(BluetoothState::STATE_BLE_TURNING_ON), "STATE_BLE_TURNING_ON");
-    SetNamedPropertyByInteger(env, stateObj, static_cast<int>(BluetoothState::STATE_BLE_ON), "STATE_BLE_ON");
-    SetNamedPropertyByInteger(
-        env, stateObj, static_cast<int>(BluetoothState::STATE_BLE_TURNING_OFF), "STATE_BLE_TURNING_OFF");
-
-    SetNamedPropertyByInteger(env, profileStateObj, ProfileConnectionState::STATE_DISCONNECTED, "STATE_DISCONNECTED");
-    SetNamedPropertyByInteger(env, profileStateObj, ProfileConnectionState::STATE_CONNECTING, "STATE_CONNECTING");
-    SetNamedPropertyByInteger(env, profileStateObj, ProfileConnectionState::STATE_CONNECTED, "STATE_CONNECTED");
-    SetNamedPropertyByInteger(env, profileStateObj, ProfileConnectionState::STATE_DISCONNECTING, "STATE_DISCONNECTING");
-
-    SetNamedPropertyByInteger(env, scanModeObj, static_cast<int>(ScanMode::SCAN_MODE_NONE), "SCAN_MODE_NONE");
-    SetNamedPropertyByInteger(
-        env, scanModeObj, static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE), "SCAN_MODE_CONNECTABLE");
-    SetNamedPropertyByInteger(
-        env, scanModeObj, static_cast<int>(ScanMode::SCAN_MODE_GENERAL_DISCOVERABLE), "SCAN_MODE_GENERAL_DISCOVERABLE");
-    SetNamedPropertyByInteger(env,
-        scanModeObj,
-        static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE),
-        "SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE");
-    SetNamedPropertyByInteger(env,
-        scanModeObj,
-        static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE),
-        "SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE");
-
+    HILOGI("PropertyValueInit start");
+    napi_value stateObj = StateChangeInit(env);
+    napi_value profileStateObj = ProfileStateInit(env);
+    napi_value scanModeObj = ScanModeInit(env);
+    napi_value bondStateObj = BondStateInit(env);
+    napi_value majorClassObj = MajorClassOfDeviceInit(env);
+    napi_value majorMinorClassObj = MajorMinorClassOfDeviceInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("BluetoothState", stateObj),
         DECLARE_NAPI_PROPERTY("ProfileConnectionState", profileStateObj),
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
+        DECLARE_NAPI_PROPERTY("BondState", bondStateObj),
+        DECLARE_NAPI_PROPERTY("MajorClass", majorClassObj),
+        DECLARE_NAPI_PROPERTY("MajorMinorClass", majorMinorClassObj),
     };
-
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    HILOGI("StateChangeInit end");
+    HILOGI("PropertyValueInit end");
     return exports;
+}
+
+napi_value StateChangeInit(napi_env env)
+{
+    HILOGI("StateChangeInit");
+    napi_value state = nullptr;
+    napi_create_object(env, &state);
+    SetNamedPropertyByInteger(env, state, static_cast<int>(BluetoothState::STATE_OFF), "STATE_OFF");
+    SetNamedPropertyByInteger(env, state, static_cast<int>(BluetoothState::STATE_TURNING_ON), "STATE_TURNING_ON");
+    SetNamedPropertyByInteger(env, state, static_cast<int>(BluetoothState::STATE_ON), "STATE_ON");
+    SetNamedPropertyByInteger(env, state, static_cast<int>(BluetoothState::STATE_TURNING_OFF), "STATE_TURNING_OFF");
+    SetNamedPropertyByInteger(
+        env, state, static_cast<int>(BluetoothState::STATE_BLE_TURNING_ON), "STATE_BLE_TURNING_ON");
+    SetNamedPropertyByInteger(env, state, static_cast<int>(BluetoothState::STATE_BLE_ON), "STATE_BLE_ON");
+    SetNamedPropertyByInteger(
+        env, state, static_cast<int>(BluetoothState::STATE_BLE_TURNING_OFF), "STATE_BLE_TURNING_OFF");
+    return state;
+}
+
+napi_value ProfileStateInit(napi_env env)
+{
+    HILOGI("ProfileStateInit");
+    napi_value profileState = nullptr;
+    napi_create_object(env, &profileState);
+    SetNamedPropertyByInteger(env, profileState, ProfileConnectionState::STATE_DISCONNECTED, "STATE_DISCONNECTED");
+    SetNamedPropertyByInteger(env, profileState, ProfileConnectionState::STATE_CONNECTING, "STATE_CONNECTING");
+    SetNamedPropertyByInteger(env, profileState, ProfileConnectionState::STATE_CONNECTED, "STATE_CONNECTED");
+    SetNamedPropertyByInteger(env, profileState, ProfileConnectionState::STATE_DISCONNECTING, "STATE_DISCONNECTING");
+    return profileState;
+}
+
+napi_value ScanModeInit(napi_env env)
+{
+    HILOGI("ScanModeInit");
+    napi_value scanMode = nullptr;
+    napi_create_object(env, &scanMode);
+    SetNamedPropertyByInteger(env, scanMode, static_cast<int>(ScanMode::SCAN_MODE_NONE), "SCAN_MODE_NONE");
+    SetNamedPropertyByInteger(
+        env, scanMode, static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE), "SCAN_MODE_CONNECTABLE");
+    SetNamedPropertyByInteger(
+        env, scanMode, static_cast<int>(ScanMode::SCAN_MODE_GENERAL_DISCOVERABLE), "SCAN_MODE_GENERAL_DISCOVERABLE");
+    SetNamedPropertyByInteger(env,
+        scanMode,
+        static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE),
+        "SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE");
+    SetNamedPropertyByInteger(env,
+        scanMode,
+        static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE),
+        "SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE");
+    return scanMode;
+}
+
+napi_value BondStateInit(napi_env env)
+{
+    HILOGI("BondStateInit");
+    napi_value bondState = nullptr;
+    napi_create_object(env, &bondState);
+    SetNamedPropertyByInteger(env, bondState, BondState::BOND_STATE_INVALID, "BOND_STATE_INVALID");
+    SetNamedPropertyByInteger(env, bondState, BondState::BOND_STATE_BONDING, "BOND_STATE_BONDING");
+    SetNamedPropertyByInteger(env, bondState, BondState::BOND_STATE_BONDED, "BOND_STATE_BONDED");
+    return bondState;
+}
+
+napi_value MajorClassOfDeviceInit(napi_env env)
+{
+    HILOGI("MajorClassOfDeviceInit");
+    napi_value majorClass = nullptr;
+    napi_create_object(env, &majorClass);
+    // MajorClass
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_MISC, "MAJOR_MISC");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_COMPUTER, "MAJOR_COMPUTER");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_PHONE, "MAJOR_PHONE");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_NETWORKING, "MAJOR_NETWORKING");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_AUDIO_VIDEO, "MAJOR_AUDIO_VIDEO");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_PERIPHERAL, "MAJOR_PERIPHERAL");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_IMAGING, "MAJOR_IMAGING");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_WEARABLE, "MAJOR_WEARABLE");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_TOY, "MAJOR_TOY");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_HEALTH, "MAJOR_HEALTH");
+    SetNamedPropertyByInteger(env, majorClass, MajorClass::MAJOR_UNCATEGORIZED, "MAJOR_UNCATEGORIZED");
+    return majorClass;
+}
+
+napi_value MajorMinorClassOfDeviceInit(napi_env env)
+{
+    HILOGI("MajorMinorClassOfDeviceInit");
+    napi_value majorMinorClass = nullptr;
+    napi_create_object(env, &majorMinorClass);
+    // MajorMinorClass
+    // Computer Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_UNCATEGORIZED), "COMPUTER_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_DESKTOP), "COMPUTER_DESKTOP");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_SERVER), "COMPUTER_SERVER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_LAPTOP), "COMPUTER_LAPTOP");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_HANDHELD_PC_PDA), "COMPUTER_HANDHELD_PC_PDA");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_PALM_SIZE_PC_PDA), "COMPUTER_PALM_SIZE_PC_PDA");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_WEARABLE), "COMPUTER_WEARABLE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::COMPUTER_TABLET), "COMPUTER_TABLET");
+    // Phone Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PHONE_UNCATEGORIZED), "PHONE_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PHONE_CELLULAR), "PHONE_CELLULAR");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PHONE_CORDLESS), "PHONE_CORDLESS");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PHONE_SMART), "PHONE_SMART");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PHONE_MODEM_OR_GATEWAY), "PHONE_MODEM_OR_GATEWAY");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PHONE_ISDN), "PHONE_ISDN");
+    // LAN/Network Access Point Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_FULLY_AVAILABLE), "NETWORK_FULLY_AVAILABLE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_1_TO_17_UTILIZED), "NETWORK_1_TO_17_UTILIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_17_TO_33_UTILIZED), "NETWORK_17_TO_33_UTILIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_33_TO_50_UTILIZED), "NETWORK_33_TO_50_UTILIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_60_TO_67_UTILIZED), "NETWORK_60_TO_67_UTILIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_67_TO_83_UTILIZED), "NETWORK_67_TO_83_UTILIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_83_TO_99_UTILIZED), "NETWORK_83_TO_99_UTILIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::NETWORK_NO_SERVICE), "NETWORK_NO_SERVICE");
+    // Audio/Video Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_UNCATEGORIZED), "AUDIO_VIDEO_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_WEARABLE_HEADSET), "AUDIO_VIDEO_WEARABLE_HEADSET");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_HANDSFREE), "AUDIO_VIDEO_HANDSFREE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_MICROPHONE), "AUDIO_VIDEO_MICROPHONE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_LOUDSPEAKER), "AUDIO_VIDEO_LOUDSPEAKER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_HEADPHONES), "AUDIO_VIDEO_HEADPHONES");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_PORTABLE_AUDIO), "AUDIO_VIDEO_PORTABLE_AUDIO");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_CAR_AUDIO), "AUDIO_VIDEO_CAR_AUDIO");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_SET_TOP_BOX), "AUDIO_VIDEO_SET_TOP_BOX");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_HIFI_AUDIO), "AUDIO_VIDEO_HIFI_AUDIO");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VCR), "AUDIO_VIDEO_VCR");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_CAMERA), "AUDIO_VIDEO_VIDEO_CAMERA");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_CAMCORDER), "AUDIO_VIDEO_CAMCORDER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_MONITOR), "AUDIO_VIDEO_VIDEO_MONITOR");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER),
+        "AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_CONFERENCING), "AUDIO_VIDEO_VIDEO_CONFERENCING");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_GAMING_TOY), "AUDIO_VIDEO_VIDEO_GAMING_TOY");
+    // Peripheral Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_NON_KEYBOARD_NON_POINTING),
+        "PERIPHERAL_NON_KEYBOARD_NON_POINTING");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_KEYBOARD), "PERIPHERAL_KEYBOARD");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_POINTING_DEVICE), "PERIPHERAL_POINTING_DEVICE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_KEYBOARD_POINTING), "PERIPHERAL_KEYBOARD_POINTING");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_UNCATEGORIZED), "PERIPHERAL_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_JOYSTICK), "PERIPHERAL_JOYSTICK");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_GAMEPAD), "PERIPHERAL_GAMEPAD");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_REMOTE_CONTROL), "PERIPHERAL_REMOTE_CONTROL");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_SENSING_DEVICE), "PERIPHERAL_SENSING_DEVICE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_DIGITIZER_TABLET), "PERIPHERAL_DIGITIZER_TABLET");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_CARD_READER), "PERIPHERAL_CARD_READER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_DIGITAL_PEN), "PERIPHERAL_DIGITAL_PEN");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_SCANNER_RFID), "PERIPHERAL_SCANNER_RFID");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::PERIPHERAL_GESTURAL_INPUT), "PERIPHERAL_GESTURAL_INPUT");
+    // Imaging Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::IMAGING_UNCATEGORIZED), "IMAGING_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::IMAGING_DISPLAY), "IMAGING_DISPLAY");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::IMAGING_CAMERA), "IMAGING_CAMERA");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::IMAGING_SCANNER), "IMAGING_SCANNER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::IMAGING_PRINTER), "IMAGING_PRINTER");
+    // Wearable Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::WEARABLE_UNCATEGORIZED), "WEARABLE_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::WEARABLE_WRIST_WATCH), "WEARABLE_WRIST_WATCH");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::WEARABLE_PAGER), "WEARABLE_PAGER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::WEARABLE_JACKET), "WEARABLE_JACKET");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::WEARABLE_HELMET), "WEARABLE_HELMET");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::WEARABLE_GLASSES), "WEARABLE_GLASSES");
+    // Minor Device Class field - Toy Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::TOY_UNCATEGORIZED), "TOY_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::TOY_ROBOT), "TOY_ROBOT");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::TOY_VEHICLE), "TOY_VEHICLE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::TOY_DOLL_ACTION_FIGURE), "TOY_DOLL_ACTION_FIGURE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::TOY_CONTROLLER), "TOY_CONTROLLER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::TOY_GAME), "TOY_GAME");
+    // Minor Device Class field - Health
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_UNCATEGORIZED), "HEALTH_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_BLOOD_PRESSURE), "HEALTH_BLOOD_PRESSURE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_THERMOMETER), "HEALTH_THERMOMETER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_WEIGHING), "HEALTH_WEIGHING");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_GLUCOSE), "HEALTH_GLUCOSE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_PULSE_OXIMETER), "HEALTH_PULSE_OXIMETER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_PULSE_RATE), "HEALTH_PULSE_RATE");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_DATA_DISPLAY), "HEALTH_DATA_DISPLAY");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_STEP_COUNTER), "HEALTH_STEP_COUNTER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_BODY_COMPOSITION_ANALYZER), "HEALTH_BODY_COMPOSITION_ANALYZER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_PEAK_FLOW_MOITOR), "HEALTH_PEAK_FLOW_MOITOR");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_MEDICATION_MONITOR), "HEALTH_MEDICATION_MONITOR");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_KNEE_PROSTHESIS), "HEALTH_KNEE_PROSTHESIS");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_ANKLE_PROSTHESIS), "HEALTH_ANKLE_PROSTHESIS");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_GENERIC_HEALTH_MANAGER), "HEALTH_GENERIC_HEALTH_MANAGER");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::HEALTH_PERSONAL_MOBILITY_DEVICE), "HEALTH_PERSONAL_MOBILITY_DEVICE");
+    return majorMinorClass;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
