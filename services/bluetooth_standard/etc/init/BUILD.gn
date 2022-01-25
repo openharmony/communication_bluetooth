@@ -53,11 +53,7 @@ ohos_prebuilt_etc("bt_profile_config.xml") {
 }
 
 ohos_prebuilt_etc("bluetooth_service.rc") {
-  if (use_musl) {
-    source = "bluetooth_service.cfg"
-  } else {
-    source = "bluetooth_service.rc"
-  }
+  source = "bluetooth_service.cfg"
   relative_install_dir = "init"
   part_name = "bluetooth_standard"
   subsystem_name = "communication"
