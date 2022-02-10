@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef A2DP_AIDL_CODEC_H
-#define A2DP_AIDL_CODEC_H
+#ifndef A2DP_CODEC_H
+#define A2DP_CODEC_H
 
 #include <string>
 #include <stdint.h>
@@ -154,4 +154,4 @@ struct CodecStatus {
 };
 }  // namespace bluetooth
 
-#endif  // A2DP_AIDL_CODEC_H
+#endif
