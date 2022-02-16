@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -479,7 +479,7 @@ struct SppServerSocket::impl {
             return SPPStatus::SPP_FAILURE;
         }
         uint8_t recvBuf[rv];
-        memset_s(&recvBuf, sizeof(recvBuf),0, sizeof(recvBuf));
+        memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
         memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv);
 
         uint8_t buf[6] = {0};
@@ -549,7 +549,7 @@ struct SppServerSocket::impl {
 
 class SppServerSocket::impl::BluetoothServerSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothServerSocketDeathRecipient(SppServerSocket::impl &host) : host_(host){};
+    BluetoothServerSocketDeathRecipient(SppServerSocket::impl &host) : host_(host) {};
     ~BluetoothServerSocketDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothServerSocketDeathRecipient);
 
