@@ -192,7 +192,7 @@ private:
 };
 class BluetoothHostServer::impl::AdapterClassicObserver : public IAdapterClassicObserver {
 public:
-    AdapterClassicObserver(BluetoothHostServer::impl *impl) : impl_(impl){};
+    AdapterClassicObserver(BluetoothHostServer::impl *impl) : impl_(impl) {};
     ~AdapterClassicObserver() override = default;
 
     void OnDiscoveryStateChanged(const int32_t status) override
@@ -250,7 +250,7 @@ private:
 };
 class BluetoothHostServer::impl::ClassicRemoteDeviceObserver : public IClassicRemoteDeviceObserver {
 public:
-    ClassicRemoteDeviceObserver(BluetoothHostServer::impl *impl) : impl_(impl){};
+    ClassicRemoteDeviceObserver(BluetoothHostServer::impl *impl) : impl_(impl) {};
     ~ClassicRemoteDeviceObserver() override = default;
 
     void OnPairStatusChanged(const BTTransport transport, const RawAddress &device, const int32_t status) override
@@ -304,7 +304,7 @@ private:
 };
 class BluetoothHostServer::impl::AdapterBleObserver : public IAdapterBleObserver {
 public:
-    AdapterBleObserver(BluetoothHostServer::impl *impl) : impl_(impl){};
+    AdapterBleObserver(BluetoothHostServer::impl *impl) : impl_(impl) {};
     ~AdapterBleObserver() override = default;
 
     void OnDiscoveryStateChanged(const int32_t status) override
@@ -360,7 +360,7 @@ private:
 };
 class BluetoothHostServer::impl::BlePeripheralCallback : public IBlePeripheralCallback {
 public:
-    BlePeripheralCallback(BluetoothHostServer::impl *impl) : impl_(impl){};
+    BlePeripheralCallback(BluetoothHostServer::impl *impl) : impl_(impl) {};
     ~BlePeripheralCallback() override = default;
 
     void OnReadRemoteRssiEvent(const RawAddress &device, int32_t rssi, int32_t status) override
