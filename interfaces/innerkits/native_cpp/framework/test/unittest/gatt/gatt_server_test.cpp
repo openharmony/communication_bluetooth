@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -178,7 +178,7 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_NotifyCharacteristicChanged, Test
     BluetoothRemoteDevice deviceBle_;
     UUID uuidSerPer;
     uuidSerPer = UUID::FromString("00001810-0000-1000-8000-00805F9B34FB");
-    GattCharacteristic* aa = new GattCharacteristic(uuidSerPer,1,1);
+    GattCharacteristic* aa = new GattCharacteristic(uuidSerPer, 1, 1);
     int res = server.NotifyCharacteristicChanged(deviceBle_, *aa, false);
     EXPECT_EQ(res, -18);
 
