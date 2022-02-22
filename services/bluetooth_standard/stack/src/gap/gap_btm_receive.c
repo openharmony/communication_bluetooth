@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,7 +62,7 @@ static void GapAclConnectionCompleteTask(void *ctx)
 
 static void GapRecvAclConnectionComplete(const BtmAclConnectCompleteParam *param, void *context)
 {
-    LOG_INFO("%{public}s: status:0x%02x handle:0x%04x " BT_ADDR_FMT,
+    LOG_INFO("%{public}s: status:0x%{public}02x handle:0x%{public}04x " BT_ADDR_FMT,
         __FUNCTION__,
         param->status,
         param->connectionHandle,
@@ -95,7 +95,8 @@ static void GapAclDisconnectionCompleteTask(void *ctx)
 
 static void GapRecvAclDisconnectionComplete(uint8_t status, uint16_t connectionHandle, uint8_t reason, void *context)
 {
-    LOG_INFO("%{public}s: status:0x%02x handle:0x%04x reason:0x%02x", __FUNCTION__, status, connectionHandle, reason);
+    LOG_INFO("%{public}s: status:0x%{public}02x handle:0x%{public}04x reason:0x%{public}02x", __FUNCTION__,
+        status, connectionHandle, reason);
     GapAclDisconnectionCompleteParam *btmParam = MEM_MALLOC.alloc(sizeof(GapAclDisconnectionCompleteParam));
     if (btmParam == NULL) {
         LOG_ERROR("%{public}s: Alloc error.", __FUNCTION__);
@@ -141,7 +142,7 @@ static void GapLeConnectionCompleteTask(void *ctx)
 static void GapRecvLeConnectionComplete(
     uint8_t status, uint16_t connectionHandle, const BtAddr *addr, uint8_t role, void *context)
 {
-    LOG_INFO("%{public}s: status:0x%02x role:%hhu handle:0x%04x " BT_ADDR_FMT,
+    LOG_INFO("%{public}s: status:0x%{public}02x role:%{public}hhu handle:0x%{public}04x " BT_ADDR_FMT,
         __FUNCTION__,
         status,
         role,
@@ -173,7 +174,8 @@ static void GapLeDisconnectionCompleteTask(void *ctx)
 
 static void GapRecvLeDisconnectionComplete(uint8_t status, uint16_t connectionHandle, uint8_t reason, void *context)
 {
-    LOG_INFO("%{public}s: status:0x%02x handle:0x%04x reason:0x%02x", __FUNCTION__, status, connectionHandle, reason);
+    LOG_INFO("%{public}s: status:0x%{public}02x handle:0x%{public}04x reason:0x%{public}02x", __FUNCTION__,
+        status, connectionHandle, reason);
     GapLeDisconnectionCompleteParam *btmParam = MEM_MALLOC.alloc(sizeof(GapLeDisconnectionCompleteParam));
     if (btmParam == NULL) {
         LOG_ERROR("%{public}s: Alloc error.", __FUNCTION__);
