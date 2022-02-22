@@ -298,13 +298,14 @@ int SppClientSocket::Connect()
     pimpl->fd_ =
         pimpl->proxy_->Connect(tempAddress, serverUuid, (int32_t)pimpl->getSecurityFlags(), (int32_t)pimpl->type_);
 
+    HILOGI("SppClientSocket:Connect: fd_: %{public}d", pimpl->fd_);
     if (pimpl->fd_ == -1) {
         HILOGE("connect failed!");
         return SPPStatus::SPP_FAILURE;
     }
 
     bool recvret = pimpl->RecvSocketSignal();
-
+    HILOGI("SppClientSocket:Connect: recvret: %{public}d", recvret);
     pimpl->inputStream_ = std::make_unique<InputStream>(pimpl->fd_);
     pimpl->outputStream_ = std::make_unique<OutputStream>(pimpl->fd_);
 

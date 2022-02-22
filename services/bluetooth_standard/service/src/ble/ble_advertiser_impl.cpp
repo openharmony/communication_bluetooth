@@ -683,13 +683,14 @@ int BleAdvertiserImpl::RegisterExAdvCallbackToGap()
     return GAPIF_RegisterExAdvCallback(&exAdvCallback_, this);
 }
 
-int BleAdvertiserImpl::DeregisterCallbackToGap() const
+int BleAdvertiserImpl::DeregisterCallbackToGap()
 {
     LOG_DEBUG("[BleAdvertiserImpl] %{public}s", __func__);
 
     int ret;
     if (BleFeature::GetInstance().IsLeExtendedAdvertisingSupported()) {
         ret = GAPIF_DeregisterExAdvCallback();
+        exAdvCallback_ = {};
     } else {
         ret = GAPIF_DeregisterAdvCallback();
     }
