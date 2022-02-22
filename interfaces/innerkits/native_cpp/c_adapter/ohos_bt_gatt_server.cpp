@@ -192,7 +192,7 @@ public:
 
         int srvcHandle = 0;
         FindCharacteristic(serverId_, characteristic.GetHandle(), true, &srvcHandle);
-        
+
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
         writeInfo.connId = iter->first;
@@ -248,7 +248,7 @@ public:
         const GattCharacteristic *characteristic = descriptor.GetCharacteristic();
         int srvcHandle = 0;
         FindCharacteristic(serverId_, characteristic->GetHandle(), true, &srvcHandle);
-        
+
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
         writeInfo.connId = iter->first;
@@ -425,9 +425,7 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
 
     string strAddress;
     GetAddrFromByte(bdAddr.addr, strAddress);
-
-    //TODO transport_的值如何取
-    BluetoothRemoteDevice device(strAddress, 0);
+    BluetoothRemoteDevice device(strAddress, BT_TRANSPORT_BLE);
 
     GATTSERVER(serverId)->CancelConnection(device);
     HILOGI("serverId: %{public}d, connId: %{public}d", serverId, connId);
@@ -535,7 +533,7 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
     unsigned char stubValue[1] = {0x31};
     characteristic.SetValue(stubValue, sizeof(stubValue));
     GATTSERVICE(serverId, srvcHandle)->AddCharacteristic(characteristic);
-    
+
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d, charHandle: %{public}d", serverId, srvcHandle, chHandle);
     if (g_GattsCallback != NULL && g_GattsCallback->characteristicAddCb != NULL) {
         g_GattsCallback->characteristicAddCb(0, serverId, &characUuid, srvcHandle, chHandle);
@@ -702,7 +700,6 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 
     string strAddress;
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
-    
     BluetoothRemoteDevice device(strAddress, 1);
 
     int srvcHandle = 0;

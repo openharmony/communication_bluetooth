@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1999,7 +1999,7 @@ bool ClassicAdapter::PairRequestReply(const RawAddress &device, bool accept) con
 
 void ClassicAdapter::ConnectionComplete(const BtmAclConnectCompleteParam *param, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, param->status);
+    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %{public}u", __func__, param->status);
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     RawAddress device = RawAddress::ConvertToString(param->addr->addr);
@@ -2024,7 +2024,7 @@ void ClassicAdapter::ReceiveConnectionComplete(uint8_t status, uint16_t connecti
     } else if (status == BTM_ACL_CONNECTION_TIMEOUT) {
         LOG_ERROR("[ClassicAdapter] ACL Connection failed. Reason: ACL Supervision Timeout!");
     } else {
-        LOG_DEBUG("[ClassicAdapter]::%{public}s ACL Connection result: %u", __func__, status);
+        LOG_DEBUG("[ClassicAdapter]::%{public}s ACL Connection result: %{public}u", __func__, status);
     }
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
