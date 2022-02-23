@@ -42,22 +42,18 @@ config("module_private_config") {
 ohos_unittest("btfw_a2dp_snk_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "a2dp_snk_test.cpp",
-  ]
+  sources = [ "a2dp_snk_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -69,22 +65,18 @@ ohos_unittest("btfw_a2dp_snk_unit_test") {
 ohos_unittest("btfw_a2dp_src_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "a2dp_src_test.cpp",
-  ]
+  sources = [ "a2dp_src_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
