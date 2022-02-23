@@ -85,7 +85,6 @@ ohos_unittest("btfw_a2dp_src_unit_test") {
   ]
 }
 
-
 ################################################################################
 group("unittest") {
   testonly = true
