@@ -121,6 +121,7 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("GattClient::impl::GattClientDeathRecipient::OnRemoteDied starts");
+        client_.proxy_->AsObject()->RemoveDeathRecipient(client_.deathRecipient_);
         client_.proxy_ = nullptr;
     }
 
@@ -319,15 +320,19 @@ int GattClient::impl::DiscoverStart()
 
 void GattClient::impl::DiscoverComplete(int state)
 {
+    bool ret = false;
     {
         std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
         if (discoverInformation_.isDiscovering_) {
             discoverInformation_.isDiscovering_ = false;
             isGetServiceYet_ = false;
             discoverInformation_.condition_.notify_all();
+            ret = true;
         }
     }
-    callback_->OnServicesDiscovered(state);
+    if (ret) {
+        callback_->OnServicesDiscovered(state);
+    }
 }
 
 void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> &src)

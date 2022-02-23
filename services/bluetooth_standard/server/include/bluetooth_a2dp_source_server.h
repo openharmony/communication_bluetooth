@@ -18,21 +18,45 @@
 
 #include "bluetooth_a2dp_src_stub.h"
 #include "raw_address.h"
+#include "bluetooth_types.h"
+#include "i_bluetooth_a2dp_src.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "system_ability.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
 class BluetoothA2dpSourceServer : public BluetoothA2dpSrcStub {
 public:
-    BluetoothA2dpSourceServer()
-    {}
-    ~BluetoothA2dpSourceServer()
-    {}
+    BluetoothA2dpSourceServer();
+    ~BluetoothA2dpSourceServer() override;
 
-    void Init();
-    void Destroy();
+    // IBluetoothHost overrides:
+    void RegisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer) override;
+    void DeregisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer) override;
+    int Connect(const RawAddress &device) override;
+    int Disconnect(const RawAddress &device) override;
     int GetDeviceState(const RawAddress &device) override;
-    void RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer) override;
+    std::vector<RawAddress> GetDevicesByStates(const std::vector<int32_t> &states) override;
+    int GetPlayingState(const RawAddress &device) override;
+    int SetConnectStrategy(const RawAddress &device, int strategy) override;
+    int GetConnectStrategy(const RawAddress &device) override;
+    int SetActiveSinkDevice(const RawAddress &device) override;
+    RawAddress GetActiveSinkDevice() override;
+    BluetoothA2dpCodecStatus GetCodecStatus(const RawAddress &device) override;
+    int SetCodecPreference(const RawAddress &device, const BluetoothA2dpCodecInfo &info) override;
+    void SwitchOptionalCodecs(const RawAddress &device, bool isEnable) override;
+    int GetOptionalCodecsSupportState(const RawAddress &device ) override;
+    int StartPlaying(const RawAddress &device) override;
+    int SuspendPlaying(const RawAddress &device) override;
+    int StopPlaying(const RawAddress &device) override;
+    void SetAudioConfigure(const RawAddress &device, int sample, int bits, int channel) override;
+    int WriteFrame(const uint8_t *data, uint32_t size) override;
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
+
+private:
+    BLUETOOTH_DECLARE_IMPL();
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothA2dpSourceServer);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

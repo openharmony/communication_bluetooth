@@ -22,7 +22,6 @@
 #include "../../include/a2dp_codec_wrapper.h"
 
 namespace bluetooth {
-#define A2DP_SBC_FRAGMENT_HEADER 1
 class A2dpSbcDecoder : public A2dpDecoder {
 public:
     explicit A2dpSbcDecoder(A2dpDecoderObserver *observer);

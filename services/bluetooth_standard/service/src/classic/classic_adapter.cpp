@@ -1878,6 +1878,7 @@ bool ClassicAdapter::RemovePair(const RawAddress &device)
     std::vector<RawAddress> removeDevices;
     removeDevices.push_back(device);
     AdapterManager::GetInstance()->OnPairDevicesRemoved(BTTransport::ADAPTER_BREDR, removeDevices);
+    SendPairStatusChanged(BTTransport::ADAPTER_BREDR, device, PAIR_NONE);
     return true;
 }
 

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef BLUETOOTH_PARCEL_GATT_SERVER_H
-#define BLUETOOTH_PARCEL_GATT_SERVER_H
+#ifndef OHOS_BLUETOOTH_STANDARD_GATT_SERVER_INTERFACE_H
+#define OHOS_BLUETOOTH_STANDARD_GATT_SERVER_INTERFACE_H
 
 #include "i_bluetooth_gatt_server_callback.h"
 #include "iremote_broker.h"
@@ -63,4 +63,4 @@ public:
 }  // namespace Bluetooth
 }  // namespace OHOS
 
-#endif  // BLUETOOTH_PARCEL_GATT_SERVER_H
+#endif  // OHOS_BLUETOOTH_STANDARD_GATT_SERVER_INTERFACE_H

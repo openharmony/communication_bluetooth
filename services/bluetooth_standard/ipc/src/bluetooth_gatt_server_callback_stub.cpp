@@ -24,28 +24,28 @@ BluetoothGattServerCallbackStub::BluetoothGattServerCallbackStub()
 {
     HILOGD("%{public}s start.", __func__);
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_CHARACTERISTIC_READREQUEST)] =
+        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CHARACTERISTIC_READREQUEST)] =
         &BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_CONNECTIONSTATE_CHANGED)] =
+        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CONNECTIONSTATE_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_ADD_SERVICE)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_ADD_SERVICE)] =
         &BluetoothGattServerCallbackStub::OnAddServiceInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_CHARACTERISTIC_WRITE_REQUEST)] =
+        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE_REQUEST)] =
         &BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_DESCRIPTOR_READ_REQUEST)] =
+        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_DESCRIPTOR_READ_REQUEST)] =
         &BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_DESCRIPTOR_WRITE_REQUEST)] =
+        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE_REQUEST)] =
         &BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_MTU_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_MTU_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnMtuChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_NOTIFY_CONFIRM)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_NOTIFY_CONFIRM)] =
         &BluetoothGattServerCallbackStub::OnNotifyConfirmInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_ON_CONNECTION_PARAMETER_CHANGED)] =
+        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner;
     HILOGD("%{public}s ends.", __func__);
 }

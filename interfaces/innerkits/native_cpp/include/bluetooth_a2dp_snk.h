@@ -26,15 +26,11 @@
 #define BLUETOOTH_A2DP_SNK_H
 
 #include <cstdio>
-#include <vector>
-
-#include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief A2dp sink API callback function.
  *
@@ -55,7 +51,8 @@ public:
      * @param state Event Reported
      * @since 6.0
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state){};
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+    {};
 };
 
 /**
@@ -182,7 +179,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(A2dpSink);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_A2DP_SNK_H

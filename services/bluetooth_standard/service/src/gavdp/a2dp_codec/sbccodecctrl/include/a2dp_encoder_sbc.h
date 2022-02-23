@@ -19,65 +19,56 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <vector>
 #include "a2dp_sbc_dynamic_lib_ctrl.h"
 #include "../../include/a2dp_codec_config.h"
 #include "../../include/a2dp_codec_wrapper.h"
 #include "packet.h"
 
 namespace bluetooth {
-// A2DP sbc max mtu size.(byte)
-#define A2DP_SBC_MAX_PACKET_SIZE 6144
+/* A2DP sbc max mtu size.(byte) */
+constexpr int A2DP_SBC_MAX_PACKET_SIZE = 6144;
+constexpr int MAX_2MBPS_SBC_PAYLOAD_MTU = 655;
+constexpr int MAX_3MBPS_SBC_PAYLOAD_MTU = 997;
 
-#define MAX_2MBPS_SBC_PAYLOAD_MTU 655  // 679 - A2DP_SBC_PACKET_HEAD_SIZE - A2DP_SBC_MEDIA_PAYLOAD_HEAD_SIZE
-#define MAX_3MBPS_SBC_PAYLOAD_MTU 997  // 1021 - A2DP_SBC_PACKET_HEAD_SIZE - A2DP_SBC_MEDIA_PAYLOAD_HEAD_SIZE
-
-// AVDP media headsize.
-#define A2DP_SBC_PACKET_HEAD_SIZE 23  // (MEDIA PACKET HEADER + L2CAP PACKET HEADER + HCI HEADER)
-
-#define A2DP_SBC_MEDIA_PAYLOAD_HEAD_SIZE 1
-
-#define A2DP_SBC_ENCODER_INTERVAL_MS 20
-
-#define A2DP_SBC_NON_EDR_MAX_BITRATE 229
-
-#define A2DP_SBC_DEFAULT_BITRATE 328
-
-#define A2DP_SBC_HQ_DUAL_BP_53_FRAME_SIZE 224
-#define A2DP_SBC_FRAGMENT_HEADER 1
+/* AVDP media headsize. */
+constexpr int A2DP_SBC_PACKET_HEAD_SIZE = 23;
+constexpr int A2DP_SBC_MEDIA_PAYLOAD_HEAD_SIZE = 1;
+constexpr int A2DP_SBC_ENCODER_INTERVAL_MS = 20;
+constexpr int A2DP_SBC_NON_EDR_MAX_BITRATE = 229;
+constexpr int A2DP_SBC_DEFAULT_BITRATE = 328;
+constexpr int A2DP_SBC_HQ_DUAL_BP_53_FRAME_SIZE = 224;
+constexpr int A2DP_SBC_FRAGMENT_HEADER = 1;
 /* sample rate for sbc encode param */
-#define SBC_SAMPLE_RATE_16000 16000
-#define SBC_SAMPLE_RATE_32000 32000
-#define SBC_SAMPLE_RATE_44100 44100
-#define SBC_SAMPLE_RATE_48000 48000
-
+constexpr int SBC_SAMPLE_RATE_16000 = 16000;
+constexpr int SBC_SAMPLE_RATE_32000 = 32000;
+constexpr int SBC_SAMPLE_RATE_44100 = 44100;
+constexpr int SBC_SAMPLE_RATE_48000 = 48000;
 /* sample freq for sbc encode param */
-#define SBC_SAMPLE_BITS_16 16
-#define SBC_SAMPLE_BITS_24 24
-#define SBC_SAMPLE_BITS_32 32
-
+constexpr int SBC_SAMPLE_BITS_16 = 16;
+constexpr int SBC_SAMPLE_BITS_24 = 24;
+constexpr int SBC_SAMPLE_BITS_32 = 32;
 /* channel Mode for sbc encode param */
-#define SBC_MONO 0
-#define SBC_DUAL 1
-#define SBC_STEREO 2
-#define SBC_JOINT_STEREO 3
-
+constexpr int SBC_MONO = 0;
+constexpr int SBC_DUAL = 1;
+constexpr int SBC_STEREO = 2;
+constexpr int SBC_JOINT_STEREO = 3;
 /* channel count for sbc encode param */
-#define SBC_SINGLE_CHANNEL_COUNT 1
-#define SBC_DOUBLE_CHANNEL_COUNT 2
-
+constexpr int SBC_SINGLE_CHANNEL_COUNT = 1;
+constexpr int SBC_DOUBLE_CHANNEL_COUNT = 2;
 /* sub-band for sbc encode param */
-#define SBC_SUBBAND_4 4
-#define SBC_SUBBAND_8 8
-
+constexpr int SBC_SUBBAND_4 = 4;
+constexpr int SBC_SUBBAND_8 = 8;
 /* block-length for sbc encode param */
-#define SBC_BLOCKS_4 4
-#define SBC_BLOCKS_8 8
-#define SBC_BLOCKS_12 12
-#define SBC_BLOCKS_16 16
-
+constexpr int SBC_BLOCKS_4 = 4;
+constexpr int SBC_BLOCKS_8 = 8;
+constexpr int SBC_BLOCKS_12 = 12;
+constexpr int SBC_BLOCKS_16 = 16;
 /* allocation-method for sbc encode param */
-#define SBC_LOUDNESS 0
-#define SBC_SNR 1
+constexpr int SBC_LOUDNESS = 0;
+constexpr int SBC_SNR = 1;
+constexpr int FRAME_TWO = 2;
+constexpr int FRAME_THREE = 3;
 
 struct A2dpSBCFeedingParams {
     uint32_t sampleRate;     // 16000, 32000, 44100 or 48000.
@@ -114,26 +105,30 @@ struct A2dpSbcEncoderCb {
     SBCEncoderParams sbcEncoderParams;
     A2dpSBCFeedingParams feedingParams;
     A2dpSbcFeedingState feedingState;
-    uint8_t pcmBuffer[A2DP_SBC_MAX_PACKET_SIZE];
+    uint8_t pcmBuffer[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE];
     uint8_t pcmRemain[A2DP_SBC_MAX_PACKET_SIZE];
     uint16_t offsetPCM;
+    uint16_t sendDataSize;
+    uint16_t dalayValue;
 };
 
 class A2dpSbcEncoder : public A2dpEncoder {
 public:
     A2dpSbcEncoder(const A2dpEncoderInitPeerParams *peerParams, A2dpCodecConfig *config,
         A2dpEncoderObserver *observer);
-    ~A2dpSbcEncoder();
+    ~A2dpSbcEncoder() override;
     void ResetFeedingState(void) override;
     void SendFrames(uint64_t timeStampUs) override;
     void UpdateEncoderParam() override;
+    bool SetPcmData(const uint8_t *data, uint16_t dataSize) override;
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
 
 private:
     sbc::IEncoderBase* sbcEncoder_ = nullptr;
     std::unique_ptr<A2dpSBCDynamicLibCtrl> codecLib_ = nullptr;
     CODECSbcLib *codecSbcEncoderLib_ = nullptr;
     void updateParam(void);
-    bool A2dpSbcReadFeeding(uint32_t *bytesRead) const;
+    bool A2dpSbcReadFeeding(uint32_t *bytesRead);
     void A2dpSbcCalculateEncBitPool(uint16_t samplingFreq, uint16_t minBitPool, uint16_t maxBitPool);
     void A2dpSbcEncodeFrames(void);
     void CalculateSbcPCMRemain(uint16_t codecSize, uint32_t bytesNum, uint8_t *numOfFrame);
@@ -159,6 +154,8 @@ private:
     A2dpSbcEncoderCb a2dpSbcEncoderCb_ {};
     bool isFirstTimeToReadData_ = false;
     DISALLOW_COPY_AND_ASSIGN(A2dpSbcEncoder);
+    uint8_t data_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO];
+    uint16_t dataSize_;
 };
 }  // namespace bluetooth
 

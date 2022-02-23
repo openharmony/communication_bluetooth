@@ -25,20 +25,18 @@
 #ifndef BLUETOOTH_A2DP_CODEC_H
 #define BLUETOOTH_A2DP_CODEC_H
 
-#include "bluetooth_types.h"
-#include "bluetooth_def.h"
 #include <vector>
+#include "bluetooth_def.h"
+#include "bluetooth_types.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief A2dp codec configuration information of a2dp source
  *
  * @since 6.0
  */
 struct A2dpCodecInfo {
-
     // Codec priority
     uint32_t codecPriority;
 
@@ -74,15 +72,14 @@ struct A2dpCodecInfo {
  */
 struct A2dpCodecStatus {
     // current codec information
-    A2dpCodecInfo codecInfo{};
+    A2dpCodecInfo codecInfo;
 
     // local codec information
-    std::vector<A2dpCodecInfo> codecInfoLocalCap{};
+    std::vector<A2dpCodecInfo> codecInfoLocalCap;
 
     // Local device and peer confirmed codec information
-    std::vector<A2dpCodecInfo> codecInfoConfirmedCap{};
+    std::vector<A2dpCodecInfo> codecInfoConfirmedCap;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_A2DP_CODEC_H

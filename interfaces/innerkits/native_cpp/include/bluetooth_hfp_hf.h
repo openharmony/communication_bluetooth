@@ -37,7 +37,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <optional>
 
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"

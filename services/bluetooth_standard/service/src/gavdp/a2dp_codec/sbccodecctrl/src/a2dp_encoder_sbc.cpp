@@ -24,6 +24,7 @@
 
 namespace bluetooth {
 const int BIT_SBC_NUMBER_PER_SAMPLE = 8;
+const int S_TO_US = 1000000;
 const int MS_TO_US = 1000;
 const int NUMBER32 = 32;
 const int BIT8 = 8;
@@ -36,7 +37,6 @@ const int PROTECT_TWO = 2;
 const int PROTECT_THREE = 3;
 const int BIT_NUMBER5 = 5;
 const int PCM_REMAIN_BUFFER_SIZE = 1024;
-const int READ_THREE_TIMES = 3;
 const int BIT_POOL_SIXTEEN = 16;
 const int FRAGMENT_SIZE_TWO = 2;
 const int FRAGMENT_SIZE_THREE = 3;
@@ -54,8 +54,10 @@ A2dpSbcEncoder::A2dpSbcEncoder(
     a2dpSbcEncoderCb_.isPeerEdr = peerParams->isPeerEdr;
     a2dpSbcEncoderCb_.peerSupports3mbps = peerParams->peerSupports3mbps;
     a2dpSbcEncoderCb_.peerMtu = peerParams->peermtu;
+    a2dpSbcEncoderCb_.dalayValue = 0;
     a2dpSbcEncoderCb_.timestamp = 0;
-    isFirstTimeToReadData_ = false;
+    a2dpSbcEncoderCb_.sendDataSize = 0;
+    isFirstTimeToReadData_ = true;
     codecLib_ = std::make_unique<A2dpSBCDynamicLibCtrl>(true);
     codecSbcEncoderLib_ = codecLib_->LoadCodecSbcLib();
     if (codecSbcEncoderLib_ == nullptr) {
@@ -84,21 +86,43 @@ void A2dpSbcEncoder::ResetFeedingState(void)
         BIT_SBC_NUMBER_PER_SAMPLE * a2dpSbcEncoderCb_.feedingParams.channelCount * A2DP_SBC_ENCODER_INTERVAL_MS /
         MS_TO_US;
 
-    isFirstTimeToReadData_ = false;
+    isFirstTimeToReadData_ = true;
+    a2dpSbcEncoderCb_.dalayValue = 0;
+    a2dpSbcEncoderCb_.timestamp = 0;
+    a2dpSbcEncoderCb_.sendDataSize = 0;
+}
+
+bool A2dpSbcEncoder::SetPcmData(const uint8_t *data, uint16_t dataSize)
+{
+    std::lock_guard<std::recursive_mutex> lock(g_sbcMutex);
+    LOG_INFO("[A2dpSbcEncoder] %{public}s, data = %{public}s, dataSize = %{public}hd\n", __func__, data, dataSize);
+    if(dataSize > A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO) {
+        LOG_ERROR("[A2dpSbcEncoder] %{public}s dataSize too large\n", __func__);
+        return false;
+    }
+    if(!memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE, data, dataSize)) {
+        LOG_ERROR("[A2dpSbcEncoder] %{public}s copy error\n", __func__);
+        return false;
+    }
+    dataSize_ = dataSize;
+    return true;
+}
+
+void A2dpSbcEncoder::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
+{
+    std::lock_guard<std::recursive_mutex> lock(g_sbcMutex);
+    delayValue = a2dpSbcEncoderCb_.dalayValue;
+    sendDataSize = a2dpSbcEncoderCb_.sendDataSize;
+    timeStamp = a2dpSbcEncoderCb_.timestamp;
+    LOG_INFO("[A2dpSbcEncoder] %{public}s delayValue = %{public}hu, sendDataSize = %{public}hu, timeStamp = %{public}u\n",
+        __func__, delayValue, sendDataSize, timeStamp);
 }
 
 void A2dpSbcEncoder::SendFrames(uint64_t timeStampUs)
 {
+    LOG_INFO("[A2dpSbcEncoder] %{public}s\n", __func__);
     std::lock_guard<std::recursive_mutex> lock(g_sbcMutex);
-
-    if (!isFirstTimeToReadData_) {
-        for (int iTimes = 0; iTimes < READ_THREE_TIMES; iTimes++) {
-            A2dpSbcEncodeFrames();
-        }
-        isFirstTimeToReadData_ = true;
-    } else {
-        A2dpSbcEncodeFrames();
-    }
+    A2dpSbcEncodeFrames();
 }
 
 uint16_t A2dpSbcEncoder::A2dpSbcGetSampleRate(const uint8_t *codecInfo)
@@ -317,17 +341,16 @@ void A2dpSbcEncoder::UpdateEncoderParam(void)
     UpdateMtuSize();
 }
 
-bool A2dpSbcEncoder::A2dpSbcReadFeeding(uint32_t *bytesRead) const
+bool A2dpSbcEncoder::A2dpSbcReadFeeding(uint32_t *bytesRead)
 {
-    uint8_t *pcmBuffer = nullptr;
-    uint16_t needReadPcmData = 0;
-    uint16_t actualReadPcmData = observer_->Read(&pcmBuffer, needReadPcmData);
-    if (actualReadPcmData && pcmBuffer != nullptr) {
+    uint16_t actualReadPcmData = dataSize_;
+    if (actualReadPcmData) {
         LOG_INFO("[Feeding][offsetPCM:%u][readBytes:%u]", a2dpSbcEncoderCb_.offsetPCM, actualReadPcmData);
         (void)memcpy_s(((uint8_t *)&a2dpSbcEncoderCb_.pcmBuffer[a2dpSbcEncoderCb_.offsetPCM]), 
             A2DP_SBC_MAX_PACKET_SIZE,
-            pcmBuffer, actualReadPcmData);
+            data_, actualReadPcmData);
         *bytesRead = actualReadPcmData;
+        dataSize_ = 0;
         return true;
     } else {
         LOG_INFO("[Feeding][read no data][readBytes:%u]", actualReadPcmData);
@@ -457,6 +480,7 @@ void A2dpSbcEncoder::CalculateSbcPCMRemain(uint16_t codecSize, uint32_t bytesNum
 
 void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
 {
+    LOG_INFO("[A2dpSbcEncoder] %{public}s\n", __func__);
     size_t encoded = 0;
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     uint16_t blocksXsubbands = encParams->subBands * encParams->numOfBlocks;
@@ -494,7 +518,9 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
         (void)memset_s(a2dpSbcEncoderCb_.pcmRemain, A2DP_SBC_MAX_PACKET_SIZE, 0, sizeof(a2dpSbcEncoderCb_.pcmRemain));
         if (encodePacketSize > 0) {
             uint32_t pktTimeStamp = a2dpSbcEncoderCb_.timestamp;
-            a2dpSbcEncoderCb_.timestamp += frameIter * blocksXsubbands;
+            a2dpSbcEncoderCb_.timestamp += frameIter * subbands * blocks * channelMode * S_TO_US 
+                / a2dpSbcEncoderCb_.feedingParams.sampleRate;
+            a2dpSbcEncoderCb_.sendDataSize += codecSize;
             EnqueuePacket(pkt, frameIter, encodePacketSize, pktTimeStamp, (uint16_t)encoded);  // Enqueue Packet.
             LOG_INFO("[EnqueuePacket][encoded:%{public}zu][frameIter:%u]", encoded, frameIter);
         }

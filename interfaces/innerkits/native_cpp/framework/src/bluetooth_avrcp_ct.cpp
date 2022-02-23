@@ -25,17 +25,13 @@
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"
-#include "i_bluetooth_avrcp_ct_server.h"
+#include "i_bluetooth_avrcp_ct.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-
-// #include <memory>
 
 namespace OHOS {
 namespace Bluetooth {
 using namespace bluetooth;
-
-// std::string AvrcpCtServiceName = "bluetooth-avrcp-ct-server";
 
 AvrcpCtResponse::AvrcpCtResponse(uint8_t type, int resp) : type_(type), resp_(resp)
 {
@@ -47,7 +43,6 @@ AvrcpCtResponse::~AvrcpCtResponse()
     HILOGD("%{public}s start.", __func__);
 }
 
-// struct AvrcpController::impl : public BluetoothAvrcpCtServerStub {
 struct AvrcpController::impl {
 public:
     class ObserverImpl : public BluetoothAvrcpCtObserverStub {
@@ -138,8 +133,8 @@ public:
             return;
         }
 
-        void OnGetPlayerAppSettingCurrentValue(
-            const RawAddress &rawAddr, const std::vector<uint8_t> attributes, const std::vector<uint8_t> &values, int result) override
+        void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> attributes, 
+            const std::vector<uint8_t> &values, int result) override
         {
             HILOGD("%{public}s start.", __func__);
 
@@ -250,8 +245,6 @@ public:
         void OnGetFolderItems(const RawAddress &rawAddr, uint16_t uidCounter, std::vector<BluetoothAvrcpMeItem> &items,
             int result, int detail) override
         {
-            //LOG(INFO) << __func__ << "items.size = " << items.size();
-
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             std::vector<AvrcMeItem> myItems;
             for (size_t i = 0; i < items.size(); i++) {
@@ -271,14 +264,14 @@ public:
             return;
         }
 
-        void OnGetItemAttributes(const RawAddress &rawAddr,
-            const std::vector<uint32_t> &attribtues, const std::vector<std::string> &values, int result, int detail) override
+        void OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues, 
+            const std::vector<std::string> &values, int result, int detail) override
         {
             HILOGD("%{public}s start.", __func__);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
-              impl_->OnGetItemAttributes(device, attribtues, values, static_cast<int>(result), static_cast<int>(detail));
+            impl_->OnGetItemAttributes(device, attribtues, values, static_cast<int>(result), static_cast<int>(detail));
 
             return;
         }
@@ -429,7 +422,7 @@ public:
     ~impl()
     {
         HILOGD("%{public}s start.", __func__);
-        proxy_->UnregisterObserver(observer_.get());
+        proxy_->UnregisterObserver(observer_);
     }
 
     bool IsEnabled(void)
@@ -672,7 +665,7 @@ public:
             mediaItem.values_ = items.at(i).values_;
 
             mediaItems.push_back(mediaItem);
-        }        
+        }
 
         std::lock_guard<std::mutex> lock(observerMutex_);
         observers_.ForEach([device, result, mediaItems, uidCounter](std::shared_ptr<IObserver> observer) {
@@ -693,7 +686,7 @@ public:
             itemAttr.attribute_ = attributes.at(i);
             itemAttr.value_ = values.at(i);
             itemAttrs.push_back(itemAttr);
-        }        
+        }
 
         std::lock_guard<std::mutex> lock(observerMutex_);
         observers_.ForEach([device, result, itemAttrs](std::shared_ptr<IObserver> observer) {
@@ -861,34 +854,34 @@ public:
     std::mutex observerMutex_;
     BluetoothObserverList<AvrcpController::IObserver> observers_;
 
-    std::unique_ptr<ObserverImpl> observer_;
-    sptr<IBluetoothAvrcpCtServer> proxy_ = nullptr;
+    sptr<ObserverImpl> observer_;
+    sptr<IBluetoothAvrcpCt> proxy_ = nullptr;
     class BluetoothAvrcpCtDeathRecipient;
     sptr<BluetoothAvrcpCtDeathRecipient> deathRecipient_;
 };
 
 class AvrcpController::impl::BluetoothAvrcpCtDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothAvrcpCtDeathRecipient(AvrcpController::impl &AvrcpController) : avrcpCtServer_(AvrcpController){};
+    BluetoothAvrcpCtDeathRecipient(AvrcpController::impl &AvrcpController) : avrcpCt_(AvrcpController) {};
     ~BluetoothAvrcpCtDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothAvrcpCtDeathRecipient);
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("AvrcpController::impl::BluetoothAvrcpCtDeathRecipient::OnRemoteDied starts");
-        avrcpCtServer_.proxy_->AsObject()->RemoveDeathRecipient(avrcpCtServer_.deathRecipient_);
-        avrcpCtServer_.proxy_ = nullptr;
+        avrcpCt_.proxy_->AsObject()->RemoveDeathRecipient(avrcpCt_.deathRecipient_);
+        avrcpCt_.proxy_ = nullptr;
     }
 
 private:
-    AvrcpController::impl &avrcpCtServer_;
+    AvrcpController::impl &avrcpCt_;
 };
 
 AvrcpController::impl::impl()
 {
     HILOGD("%{public}s start.", __func__);
 
-    observer_ = std::make_unique<ObserverImpl>(this);
+    observer_ = new (std::nothrow) ObserverImpl(this);
     HILOGI("AvrcpController::impl::impl starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
@@ -906,11 +899,11 @@ AvrcpController::impl::impl()
     }
     HILOGI("AvrcpController::impl:impl() remote obtained");
 
-    proxy_ = iface_cast<IBluetoothAvrcpCtServer>(remote);
-    proxy_->RegisterObserver(observer_.get());
+    proxy_ = iface_cast<IBluetoothAvrcpCt>(remote);
+    proxy_->RegisterObserver(observer_);
 
     deathRecipient_ = new BluetoothAvrcpCtDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);        
+    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
 AvrcpController *AvrcpController::GetProfile(void)
@@ -1070,12 +1063,9 @@ int AvrcpController::PressButton(const BluetoothRemoteDevice &device, uint8_t bu
                 if (button >= AVRC_KEY_OPERATION_INVALID) {
                     result = RET_BAD_PARAM;
                 }
-
-                //LOG(INFO) << "[AVRCP CT] The button is not supported! - button[" << button << "]";
                 break;
         }
     }
-
     return result;
 }
 
@@ -1107,12 +1097,9 @@ int AvrcpController::ReleaseButton(const BluetoothRemoteDevice &device, uint8_t 
                 if (button >= AVRC_KEY_OPERATION_INVALID) {
                     result = RET_BAD_PARAM;
                 }
-
-                //LOG(INFO) << "[AVRCP CT] The button is not supported! - button[" << button << "]";
                 break;
         }
     }
-
     return result;
 }
 
@@ -1232,7 +1219,6 @@ int AvrcpController::GetPlayerAppSettingCurrentValue(
     int result = RET_NO_ERROR;
 
     if (pimpl->IsEnabled()) {
-
         do {
             std::vector<int32_t> attrs;
 
@@ -1317,7 +1303,6 @@ int AvrcpController::GetPlayerApplicationSettingAttributeText(
 
     int result = RET_BAD_STATUS;
     if (pimpl->IsEnabled()) {
-
         do {
             std::vector<int32_t> attrs;
 
@@ -1401,7 +1386,7 @@ int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, c
     }
 
     return result;
-}  // namespace bluetooth
+}  
 
 /******************************************************************
  * PLAY                                                           *

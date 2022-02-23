@@ -32,7 +32,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief This class provides the attribute of the result of the actions.
  *
@@ -47,8 +46,10 @@ public:
      */
     class Button {
     public:
-        Button(uint8_t code) : code_(code){};
-        ~Button(){};
+        Button(uint8_t code) : code_(code)
+        {};
+        ~Button()
+        {};
         uint8_t code_;  // The value of the button.
 
     private:
@@ -62,15 +63,17 @@ public:
      */
     class Capabilities {
     public:
-        Capabilities(std::vector<uint32_t> companies) : companies_(companies){};
-        Capabilities(std::vector<uint8_t> events) : events_(events){};
+        Capabilities(std::vector<uint32_t> companies) : companies_(companies)
+        {};
+        Capabilities(std::vector<uint8_t> events) : events_(events)
+        {};
         ~Capabilities()
         {
             events_.clear();
             companies_.clear();
         }
-        std::vector<uint32_t> companies_{};
-        std::vector<uint8_t> events_{};
+        std::vector<uint32_t> companies_;
+        std::vector<uint8_t> events_;
 
     private:
         Capabilities() = delete;
@@ -83,7 +86,8 @@ public:
      */
     class PlayerSettingAttributes {
     public:
-        PlayerSettingAttributes(std::vector<uint8_t> attributes) : attributes_(attributes){};
+        PlayerSettingAttributes(std::vector<uint8_t> attributes) : attributes_(attributes)
+        {};
         ~PlayerSettingAttributes()
         {
             attributes_.clear();
@@ -102,7 +106,8 @@ public:
     class PlayerSettingValues {
     public:
         PlayerSettingValues(uint8_t attribute, const std::vector<uint8_t> &values)
-            : attribute_(attribute), values_(values){};
+            : attribute_(attribute), values_(values)
+            {};
         ~PlayerSettingValues()
         {
             values_.clear();
@@ -122,7 +127,8 @@ public:
     class PlayerSettingCurrentValue {
     public:
         PlayerSettingCurrentValue(const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
-            : attributes_(attributes), values_(values){};
+            : attributes_(attributes), values_(values)
+            {};
         ~PlayerSettingCurrentValue()
         {
             attributes_.clear();
@@ -143,7 +149,8 @@ public:
     class PlayerGettingText {
     public:
         PlayerGettingText(const std::vector<uint8_t> &attributes, const std::vector<std::string> &attrStr)
-            : attributes_(attributes), attrStr_(attrStr){};
+            : attributes_(attributes), attrStr_(attrStr)
+            {};
         ~PlayerGettingText()
         {
             attributes_.clear();
@@ -164,7 +171,8 @@ public:
     class ElementAttributes {
     public:
         ElementAttributes(const std::vector<uint32_t> &attributes, const std::vector<std::string> &values)
-            : attributes_(attributes), values_(values){};
+            : attributes_(attributes), values_(values)
+            {};
         ~ElementAttributes()
         {
             attributes_.clear();
@@ -185,8 +193,10 @@ public:
     class PlayStatus {
     public:
         PlayStatus(uint32_t songLength, uint32_t songPosition, uint8_t playStatus)
-            : songLength_(songLength), songPosition_(songPosition), playStatus_(playStatus){};
-        ~PlayStatus(){};
+            : songLength_(songLength), songPosition_(songPosition), playStatus_(playStatus)
+            {};
+        ~PlayStatus()
+        {};
         uint32_t songLength_;    // The total length of the playing song in milliseconds.
         uint32_t songPosition_;  // The current position of the playing in milliseconds elapsed.
         uint8_t playStatus_;     // The current status of playing. Refer to <b>AvrcPlayStatus</b>.
@@ -206,22 +216,24 @@ public:
         struct MediaItem {
             // The value of the "Folder Type" and the "Media Type". Refer to <b>AvrcMediaFolderType</b> and
             // <b>AvrcMediaElementType</b>.
-            uint8_t type_{AVRC_MEDIA_ELEMENT_TYPE_RESERVED};
+            uint8_t type_ {AVRC_MEDIA_ELEMENT_TYPE_RESERVED};
             // The value of the "Is Playable". Refer to <b>AvrcMediaFolderPlayable</b>.
-            uint8_t playable_{AVRC_MEDIA_FOLDER_PLAYABLE_RESERVED};
-            uint64_t uid_{0xFFFFFFFFFFFFFFFF};
+            uint8_t playable_ {AVRC_MEDIA_FOLDER_PLAYABLE_RESERVED};
+            uint64_t uid_ {0xFFFFFFFFFFFFFFFF};
             // The value of the "Displayable Name".
-            std::string name_{};
+            std::string name_;
             // The list of the "Attribute ID".  Refer to <b>AvrcMediaAttribute</b>.
-            std::vector<uint32_t> attributes_{};
+            std::vector<uint32_t> attributes_;
             // The list of the "Attribute Value".
-            std::vector<std::string> values_{};
+            std::vector<std::string> values_;
         };
         MediaItems(uint16_t uidCounter, const std::vector<MediaItem> &mediaItems)
-            : uidCounter_(uidCounter), mediaItems_(mediaItems){};
-        ~MediaItems(){};
+            : uidCounter_(uidCounter), mediaItems_(mediaItems)
+            {};
+        ~MediaItems()
+        {};
 
-        uint16_t uidCounter_{0xFFFF};
+        uint16_t uidCounter_ {0xFFFF};
         std::vector<MediaItem> mediaItems_;
 
     private:
@@ -238,25 +250,27 @@ public:
         struct MediaPlayer {
             /// The value of the "Folder Type" and the "Media Type". Refer to <b>AvrcMediaFolderType</b> and
             /// <b>AvrcMediaElementType</b>.
-            uint8_t itemType_{AVRC_MEDIA_ELEMENT_TYPE_RESERVED};
+            uint8_t itemType_ {AVRC_MEDIA_ELEMENT_TYPE_RESERVED};
             /// The value of the "Is Playable". Refer to <b>AvrcMediaFolderPlayable</b>.
-            uint16_t playerId_{AVRC_MEDIA_FOLDER_PLAYABLE_RESERVED};
+            uint16_t playerId_ {AVRC_MEDIA_FOLDER_PLAYABLE_RESERVED};
             ///< The value of the "Major Player Type". Refer to <b>AvrcMediaMajorPlayerType</b>.
-            uint8_t majorType_= 0x00;
+            uint8_t majorType_ = 0x00;
             ///< The value of the "Player Sub Type". Refer to <b>AvrcMediaPlayerSubType</b>.
             uint32_t subType_ = 0x00;
             ///< The value of the "Play Status". Refer to <b>AvrcPlayStatus</b>.
             uint8_t playStatus_ = 0x00;
             ///< The value of the "Feature Bit Mask".
-            std::vector<uint8_t> features_{};
+            std::vector<uint8_t> features_;
             ///< The value of the "Displayable Name".
             std::string name_ = "\0";
         };
         MediaPlayers(uint16_t uidCounter, const std::vector<MediaPlayer> &mediaPlayers)
-            : uidCounter_(uidCounter), mediaPlayers_(mediaPlayers){};
-        ~MediaPlayers(){};
+            : uidCounter_(uidCounter), mediaPlayers_(mediaPlayers)
+            {};
+        ~MediaPlayers()
+        {};
 
-        uint16_t uidCounter_{0xFFFF};
+        uint16_t uidCounter_ {0xFFFF};
         std::vector<MediaPlayer> mediaPlayers_;
 
     private:
@@ -271,11 +285,13 @@ public:
     class ItemAttributes {
     public:
         struct ItemAttribute {
-            uint32_t attribute_{};
-            std::string value_{};
+            uint32_t attribute_;
+            std::string value_;
         };
-        ItemAttributes(const std::vector<ItemAttribute> &itemAttrs) : itemAttrs_(itemAttrs){};
-        ~ItemAttributes(){};
+        ItemAttributes(const std::vector<ItemAttribute> &itemAttrs) : itemAttrs_(itemAttrs)
+        {};
+        ~ItemAttributes()
+        {};
         std::vector<ItemAttribute> itemAttrs_;
 
     private:
@@ -290,8 +306,10 @@ public:
     class TotalNumberOfItems {
     public:
         TotalNumberOfItems(uint16_t uidCounter, uint32_t numOfItems)
-            : uidCounter_(uidCounter), numOfItems_(numOfItems){};
-        ~TotalNumberOfItems(){};
+            : uidCounter_(uidCounter), numOfItems_(numOfItems)
+            {};
+        ~TotalNumberOfItems()
+        {};
         uint16_t uidCounter_;  // The value of the uid counter.
         uint32_t numOfItems_;  // The number of items in the directory.
 
@@ -306,8 +324,10 @@ public:
      */
     class AbsoluteVolume {
     public:
-        AbsoluteVolume(uint8_t volume) : volume_(volume){};
-        ~AbsoluteVolume(){};
+        AbsoluteVolume(uint8_t volume) : volume_(volume)
+        {};
+        ~AbsoluteVolume()
+        {};
         uint8_t volume_;  // The percentage of the absolute volume.Refer to <b> AvrcAbsoluteVolume</ b>.
 
     private:
@@ -321,22 +341,29 @@ public:
      */
     class Notification {
     public:
-        Notification(uint8_t playStatus, uint8_t volume) : playStatus_(playStatus), volume_(volume){};
-        Notification(uint64_t uid) : uid_(uid){};
-        Notification(uint32_t playbackPos) : playbackPos_(playbackPos){};
+        Notification(uint8_t playStatus, uint8_t volume) : playStatus_(playStatus), volume_(volume)
+        {};
+        Notification(uint64_t uid) : uid_(uid)
+        {};
+        Notification(uint32_t playbackPos) : playbackPos_(playbackPos)
+        {};
         Notification(const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
-            : attributes_(attributes), values_(values){};
-        Notification(uint16_t playerId, uint16_t uidCounter) : playerId_(playerId), uidCounter_(uidCounter){};
-        Notification(uint16_t uidCounter) : uidCounter_(uidCounter){};
-        ~Notification(){};
-        uint8_t playStatus_{AVRC_PLAY_STATUS_ERROR};    // The value of the "PlayStatus".
-        uint64_t uid_{0xFFFFFFFFFFFFFFFF};              // The value of the "Identifier".
-        uint32_t playbackPos_{0x00000000};              // The value of the "Playback position".
-        std::vector<uint8_t> attributes_{};             // The value of the "PlayerApplicationSettingAttributeID".
-        std::vector<uint8_t> values_{};                 // The value of the "PlayerApplicationSettingValueID".
-        uint16_t playerId_{0xFFFF};                     // The value of the "Player Id".
-        uint16_t uidCounter_{0xFFFF};                   // The value of the "UID Counter".
-        uint8_t volume_{AVRC_ABSOLUTE_VOLUME_INVALID};  // The value of the "Absolute Volume".
+            : attributes_(attributes), values_(values)
+            {};
+        Notification(uint16_t playerId, uint16_t uidCounter) : playerId_(playerId), uidCounter_(uidCounter)
+        {};
+        Notification(uint16_t uidCounter) : uidCounter_(uidCounter)
+        {};
+        ~Notification()
+        {};
+        uint8_t playStatus_ {AVRC_PLAY_STATUS_ERROR};    // The value of the "PlayStatus".
+        uint64_t uid_ {0xFFFFFFFFFFFFFFFF};              // The value of the "Identifier".
+        uint32_t playbackPos_ {0x00000000};              // The value of the "Playback position".
+        std::vector<uint8_t> attributes_;             // The value of the "PlayerApplicationSettingAttributeID".
+        std::vector<uint8_t> values_;                 // The value of the "PlayerApplicationSettingValueID".
+        uint16_t playerId_ {0xFFFF};                     // The value of the "Player Id".
+        uint16_t uidCounter_ {0xFFFF};                   // The value of the "UID Counter".
+        uint8_t volume_ {AVRC_ABSOLUTE_VOLUME_INVALID};  // The value of the "Absolute Volume".
     private:
         Notification() = delete;
     };
@@ -347,33 +374,33 @@ public:
     uint8_t type_;  // The type of the action.
     int resp_;      // The result of the called action.
     // The unique pointer to the <b>AvrcpCtResponse::Button</b> class.
-    std::unique_ptr<Button> button_{nullptr};
+    std::unique_ptr<Button> button_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::GetCapabilities</b> class.
-    std::unique_ptr<Capabilities> capabilities_{nullptr};
+    std::unique_ptr<Capabilities> capabilities_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::PlayerSettingAttributes</b> class.
-    std::unique_ptr<PlayerSettingAttributes> playerAttrs_{nullptr};
+    std::unique_ptr<PlayerSettingAttributes> playerAttrs_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::PlayerSettingValues</b> class.
-    std::unique_ptr<PlayerSettingValues> playerVals_{nullptr};
+    std::unique_ptr<PlayerSettingValues> playerVals_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::PlayerSettingCurrentValue</b> class.
-    std::unique_ptr<PlayerSettingCurrentValue> playerCurVal_{nullptr};
+    std::unique_ptr<PlayerSettingCurrentValue> playerCurVal_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::PlayerGettingAttribtueText</b> class.
-    std::unique_ptr<PlayerGettingText> playerText_{nullptr};
+    std::unique_ptr<PlayerGettingText> playerText_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::GetElementAttributes</b> class.
-    std::unique_ptr<ElementAttributes> eleSts_{nullptr};
+    std::unique_ptr<ElementAttributes> eleSts_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::PlayStatus</b> class.
-    std::unique_ptr<PlayStatus> playSts_{nullptr};
+    std::unique_ptr<PlayStatus> playSts_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::MediaItem</b> class.
-    std::unique_ptr<MediaItems> mediaItems_{nullptr};
+    std::unique_ptr<MediaItems> mediaItems_ {nullptr};
     ///< The unique pointer to the <b>AvrcpCtResponse::MediaPlayer</b> class.
-    std::unique_ptr<MediaPlayers> mediaPlayers_{nullptr};
+    std::unique_ptr<MediaPlayers> mediaPlayers_ {nullptr};
     ///< The unique pointer to the <b>AvrcpCtResponse::ItemAttributes</b> class.
-    std::unique_ptr<ItemAttributes> itemAttrs_{nullptr};
+    std::unique_ptr<ItemAttributes> itemAttrs_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::TotalNumberOfItems</b> class.
-    std::unique_ptr<TotalNumberOfItems> totalItems_{nullptr};
+    std::unique_ptr<TotalNumberOfItems> totalItems_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::AbsoluteVolume</b> class.
-    std::unique_ptr<AbsoluteVolume> absVolume_{nullptr};
+    std::unique_ptr<AbsoluteVolume> absVolume_ {nullptr};
     // The unique pointer to the <b>AvrcpCtResponse::Notification</b> class.
-    std::unique_ptr<Notification> notify_{nullptr};
+    std::unique_ptr<Notification> notify_ {nullptr};
 
 private:
     AvrcpCtResponse() = delete;
@@ -1003,8 +1030,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AvrcpController);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
-
 #endif  // !BLUETOOTH_AVRCP_CT_H

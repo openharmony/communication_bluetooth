@@ -18,20 +18,15 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged(const RawAddress &device, int playingState, int error)
+void BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged(const RawAddress &device, int state)
 {
     MessageParcel data;
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSrcObserverProxy::OnStateChanged write device error");
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged write device error");
         return;
     }
-    if (!data.WriteInt32(playingState)) {
-        HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged playingState error");
-        return;
-    }
-
-    if (!data.WriteInt32(error)) {
-        HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged error error");
+    if (!data.WriteInt32(state)) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged state error");
         return;
     }
 
@@ -40,11 +35,91 @@ void BluetoothA2dpSrcObserverProxy::OnPlayingStateChanged(const RawAddress &devi
         MessageOption::TF_ASYNC
     };
 
-    int ret = Remote()->SendRequest(
-        IBluetoothA2dpSrcObserver::Code::BT_A2DP_SRC_OBSERVER_PLAYING_STATE_CHANGED, data, reply, option);
-    if (ret != NO_ERROR) {
-        HILOGE("BluetoothA2dpSrcProxy::OnPlayingStateChanged done fail, error: %{public}d", error);
+    ErrCode result = InnerTransact(BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGE("BluetoothA2dpSrcProxy::OnConnectionStateChanged done fail, error: %{public}d", result);
         return;
+    }
+}
+
+void BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged(const RawAddress &device, int playingState, int error)
+{
+    MessageParcel data;
+    if (!data.WriteString(device.GetAddress())) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged write device error");
+        return;
+    }
+    if (!data.WriteInt32(playingState)) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged playingState error");
+        return;
+    }
+
+    if (!data.WriteInt32(error)) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged error error");
+        return;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
+
+    ErrCode result = InnerTransact(BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGE("BluetoothA2dpSrcProxy::OnPlayingStatusChanged done fail, error: %{public}d", result);
+        return;
+    }
+}
+
+void BluetoothA2dpSrcObserverProxy::OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error)
+{
+    MessageParcel data;
+    if (!data.WriteString(device.GetAddress())) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConfigurationChanged write device error");
+        return;
+    }
+    if (!data.WriteParcelable(&info)) {
+        HILOGE("BluetoothGattClientCallbackProxy::OnConfigurationChanged transport error");
+        return;
+    }
+    if (!data.WriteInt32(error)) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConfigurationChanged error error");
+        return;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_ASYNC
+    };
+
+    ErrCode result = InnerTransact(BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGE("BluetoothA2dpSrcProxy::OnConfigurationChanged done fail, error: %{public}d", result);
+        return;
+    }
+}
+
+ErrCode BluetoothA2dpSrcObserverProxy::InnerTransact(
+    uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
+{
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOGE("[InnerTransact] fail: get Remote fail code %{public}d", code);
+        return ERR_DEAD_OBJECT;
+    }
+    int err = remote->SendRequest(code, data, reply, flags);
+    switch (err) {
+        case NO_ERROR: {
+            return ERR_OK;
+        }
+        case DEAD_OBJECT: {
+            HILOGE("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
+            return ERR_DEAD_OBJECT;
+        }
+        default: {
+            HILOGE("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
+            return TRANSACTION_ERR;
+        }
     }
 }
 }  // namespace Bluetooth

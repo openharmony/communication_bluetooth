@@ -12,41 +12,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <uv.h>
 #include "bluetooth_log.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_client_callback.h"
 
 namespace OHOS {
 namespace Bluetooth {
-void NGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
+void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
 {
-    HILOGI("NGattClientCallback::OnCharacteristicChanged called");
-
+    HILOGI("NapiGattClientCallback::OnCharacteristicChanged called");
+    
     if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]) {
-        HILOGW("NGattClientCallback::OnCharacteristicChanged: This callback is not registered by ability.");
+        HILOGW("NapiGattClientCallback::OnCharacteristicChanged: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NGattClientCallback::OnCharacteristicChanged: %{public}s is registered by ability",
+    HILOGI("NapiGattClientCallback::OnCharacteristicChanged: %{public}s is registered by ability",
         STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
-        callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE];
-
-    napi_value result = nullptr;
-    napi_create_object(callbackInfo->env_, &result);
-
-    ConvertBLECharacteristicToJS(callbackInfo->env_, result, const_cast<GattCharacteristic &>(characteristic));
-    napi_value callback = nullptr;
-    napi_value undefined = nullptr;
-    napi_value callResult = nullptr;
-    napi_get_undefined(callbackInfo->env_, &undefined);
-    napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+    std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo = 
+        std::static_pointer_cast<GattCharacteristicCallbackInfo>(callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]);
+    HILOGI("uuid is %{public}s", characteristic.GetUuid().ToString().c_str());
+    callbackInfo->characteristic_ = characteristic;
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(callbackInfo->env_, &loop);
+    uv_work_t *work = new uv_work_t;
+    work->data = (void*)callbackInfo.get();
+    uv_queue_work(
+        loop,
+        work,
+        [](uv_work_t *work) {},
+        [](uv_work_t *work, int status) {
+            GattCharacteristicCallbackInfo *callbackInfo = (GattCharacteristicCallbackInfo *)work->data;
+            napi_value result = nullptr;
+            napi_create_object(callbackInfo->env_, &result);
+            ConvertBLECharacteristicToJS(callbackInfo->env_, result, callbackInfo->characteristic_);
+            napi_value callback = nullptr;
+            napi_value undefined = nullptr;
+            napi_value callResult = nullptr;
+            napi_get_undefined(callbackInfo->env_, &undefined);
+            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+        } 
+    );           
 }
 
-void NGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
+void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
 {
-    HILOGI("NGattClientCallback::OnCharacteristicChanged called");
+    HILOGI("NapiGattClientCallback::OnCharacteristicChanged called");
 
     ReadCharacteristicValueCallbackInfo *callbackInfo = client_->readCharacteristicValueCallbackInfo_;
     if (!callbackInfo) {
@@ -59,9 +71,9 @@ void NGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &c
     }
 }
 
-void NGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
+void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
 {
-    HILOGI("NGattClientCallback::OnDescriptorReadResult called");
+    HILOGI("NapiGattClientCallback::OnDescriptorReadResult called");
 
     ReadDescriptorValueCallbackInfo *callbackInfo = client_->readDescriptorValueCallbackInfo_;
     if (!callbackInfo) {
@@ -74,34 +86,48 @@ void NGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descripto
     }
 }
 
-void NGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
+void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
 {
-    HILOGI("NGattClientCallback::OnConnectionStateChanged called");
+    HILOGI("NapiGattClientCallback::OnConnectionStateChanged called");
 
     if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE]) {
-        HILOGW("NGattClientCallback::OnConnectionStateChanged: This callback is not registered by ability.");
+        HILOGW("NapiGattClientCallback::OnConnectionStateChanged: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NGattClientCallback::OnConnectionStateChanged: %{public}s is registered by ability",
+    HILOGI("NapiGattClientCallback::OnConnectionStateChanged: %{public}s is registered by ability",
         STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE];
 
-    napi_value result = nullptr;
-    napi_create_object(callbackInfo->env_, &result);
-    ConvertBLEConnectStateChangeToJS(callbackInfo->env_, result, connectionState, ret);
+    callbackInfo->state_ = connectionState;
+    callbackInfo->deviceId_ = client_->GetDevice()->GetDeviceAddr();
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(callbackInfo->env_, &loop);
+    uv_work_t *work = new uv_work_t;
+    work->data = (void*)callbackInfo.get();
 
-    napi_value callback = nullptr;
-    napi_value undefined = nullptr;
-    napi_value callResult = nullptr;
-    napi_get_undefined(callbackInfo->env_, &undefined);
-    napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+    uv_queue_work(
+        loop,
+        work,
+        [](uv_work_t *work) {},
+        [](uv_work_t *work, int status) {
+            BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
+            napi_value result = nullptr;    
+            napi_create_object(callbackInfo->env_, &result);
+            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);      
+            napi_value callback = nullptr;
+            napi_value undefined = nullptr;
+            napi_value callResult = nullptr;
+            napi_get_undefined(callbackInfo->env_, &undefined);
+            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+        } 
+    );
 }
 
-void NGattClientCallback::OnServicesDiscovered(int status)
+void NapiGattClientCallback::OnServicesDiscovered(int status)
 {
-    HILOGI("NGattClientCallback::OnServicesDiscovered called");
+    HILOGI("NapiGattClientCallback::OnServicesDiscovered called");
     DiscoverServicesCallbackInfo *callbackInfo = client_->discoverServicesCallbackInfo_;
     if (!callbackInfo) {
         return;
