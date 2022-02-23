@@ -26,7 +26,7 @@ const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ = "descriptorRead"
 const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE = "descriptorWrite";
 const std::string STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectStateChange";
 
-class NGattServerCallback : public GattServerCallback {
+class NapiGattServerCallback : public GattServerCallback {
 public:
     void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state) override;
     void OnServiceAdded(GattService *Service, int ret) override {}
@@ -50,8 +50,8 @@ public:
         callbackInfos_[type] = callbackInfo;
     }
 
-    NGattServerCallback() = default;
-    virtual ~NGattServerCallback() = default;
+    NapiGattServerCallback() = default;
+    virtual ~NapiGattServerCallback() = default;
 
 private:
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};

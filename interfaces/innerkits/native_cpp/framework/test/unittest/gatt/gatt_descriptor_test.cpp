@@ -45,7 +45,11 @@ void GattDescriptorTest::SetUp()
 void GattDescriptorTest::TearDown()
 {}
 
-HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetPermissions, TestSize.Level1)
+/*
+ * @tc.number: GattDescriptor001
+ * @tc.name: GetPermissions
+*/
+HWTEST_F(GattDescriptorTest, GattDescriptor_UnitTest_GetPermissions, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 27;
@@ -54,7 +58,11 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetPermissions, TestSize.
     GTEST_LOG_(INFO) << "GattDescriptor::GetPermissions ends";
 }
 
-HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetHandle, TestSize.Level1)
+/*
+ * @tc.number: GattDescriptor002
+ * @tc.name: GetHandle
+*/
+HWTEST_F(GattDescriptorTest, GattDescriptor_UnitTest_GetHandle, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 27;
@@ -64,7 +72,11 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetHandle, TestSize.Level
     GTEST_LOG_(INFO) << "GattDescriptor::GetHandle ends";
 }
 
-HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetUuid, TestSize.Level1)
+/*
+ * @tc.number: GattDescriptor003
+ * @tc.name: GetUuid
+*/
+HWTEST_F(GattDescriptorTest, GattDescriptor_UnitTest_GetUuid, TestSize.Level1)
 {
     int permissions = 27;
     uint16_t handle_ = 0b0000000000010000;
@@ -84,7 +96,11 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetUuid, TestSize.Level1)
     GTEST_LOG_(INFO) << "GattDescriptor::GetUuid ends";
 }
 
-HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetCharacteristic, TestSize.Level1)
+/*
+ * @tc.number: GattDescriptor004
+ * @tc.name: GetCharacteristic
+*/
+HWTEST_F(GattDescriptorTest, GattDescriptor_UnitTest_GetCharacteristic, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 27;
@@ -99,7 +115,11 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetCharacteristic, TestSi
     GTEST_LOG_(INFO) << "GattDescriptor::GetCharacteristic ends";
 }
 
-HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetValue, TestSize.Level1)
+/*
+ * @tc.number: GattDescriptor005
+ * @tc.name: GetValue
+*/
+HWTEST_F(GattDescriptorTest, GattDescriptor_UnitTest_GetValue, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 27;
@@ -124,7 +144,11 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_GetValue, TestSize.Level1
     GTEST_LOG_(INFO) << "GattDescriptor::GetValue ends";
 }
 
-HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_SetValue, TestSize.Level1)
+/*
+ * @tc.number: GattDescriptor006
+ * @tc.name: SetValue
+*/
+HWTEST_F(GattDescriptorTest, GattDescriptor_UnitTest_SetValue, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     int permissions = 27;
@@ -142,5 +166,6 @@ HWTEST_F(GattDescriptorTest, GattDescriptor_ModuleTest_SetValue, TestSize.Level1
     GTEST_LOG_(INFO) << "GattDescriptor::GattDescriptor ends";
     GTEST_LOG_(INFO) << "GattDescriptor::SetValue ends";
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -106,7 +106,11 @@ void GattManagerTest::SetUp()
 void GattManagerTest::TearDown()
 {}
 
-HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetDevicesByStates, TestSize.Level1)
+/*
+ * @tc.number: GattManager001
+ * @tc.name: GetDevicesByStates
+*/
+HWTEST_F(GattManagerTest, GattManager_UnitTest_GetDevicesByStates, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattManager::GattManager ends";
     BluetoothRemoteDevice device;
@@ -125,7 +129,11 @@ HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetDevicesByStates, TestSize.Le
     GTEST_LOG_(INFO) << "GattManager::GetDevicesByState ends";
 }
 
-HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetConnectedDevices, TestSize.Level1)
+/*
+ * @tc.number: GattManager002
+ * @tc.name: GetConnectedDevices
+*/
+HWTEST_F(GattManagerTest, GattManager_UnitTest_GetConnectedDevices, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattManager::GattManager ends";
     BluetoothRemoteDevice device;
@@ -141,5 +149,6 @@ HWTEST_F(GattManagerTest, GattManager_ModuleTest_GetConnectedDevices, TestSize.L
 
     GTEST_LOG_(INFO) << "GattManager::GetConnectedDevices ends";
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS

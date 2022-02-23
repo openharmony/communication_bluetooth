@@ -262,9 +262,9 @@ enum GattStatus {
     GATT_SUCCESS
 };
 
-enum SPPStatus {
-    SPP_FAILURE = -1,
-    SPP_SUCCESS
+enum BtStatus{
+    BT_SUCCESS = 0,
+    BT_FAILURE = -1,
 };
 
 /*********************************************

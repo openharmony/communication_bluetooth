@@ -111,6 +111,7 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("GattServer::impl::BluetoothGattServerDeathRecipient::OnRemoteDied starts");
+        gattserver_.proxy_->AsObject()->RemoveDeathRecipient(gattserver_.deathRecipient_);
         gattserver_.proxy_ = nullptr;
     }
 

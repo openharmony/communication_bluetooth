@@ -33,13 +33,13 @@ namespace bluetooth {
 using utility::Dispatcher;
 using utility::Message;
 
-#define A2DP_AUDIO_SUSPEND 1
-#define A2DP_AUDIO_RECONFIGURE 2
-#define A2DP_AUDIO_START 3
-#define A2DP_PCM_ENCODED 4
-#define A2DP_FRAME_DECODED 5
-#define A2DP_FRAME_READY 6
-#define A2DP_PCM_PUSH 7
+constexpr int A2DP_AUDIO_SUSPEND = 1;
+constexpr int A2DP_AUDIO_RECONFIGURE = 2;
+constexpr int A2DP_AUDIO_START = 3;
+constexpr int A2DP_PCM_ENCODED = 4;
+constexpr int A2DP_FRAME_DECODED = 5;
+constexpr int A2DP_FRAME_READY = 6;
+constexpr int A2DP_PCM_PUSH = 7;
 
 class A2dpCodecThread {
 public:
@@ -115,24 +115,15 @@ public:
      */
     void ProcessMessage(utility::Message msg, const A2dpEncoderInitPeerParams &peerParams, A2dpCodecConfig *config,
         A2dpEncoderObserver *observer, A2dpDecoderObserver *decObserver);
-
-    /**
-     * @brief Start the timer
-     * @since 6.0
-     */
-    void StartTimer() const;
-
-    /**
-     * @brief Stop the timer
-     * @since 6.0
-     */
-    void StopTimer() const;
-
     /**
      * @brief Get the init status
      * @since 6.0
      */
     bool GetInitStatus() const;
+
+    bool WriteFrame(const uint8_t *data, uint16_t size) const;
+
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) const;
 
 private:
     /**
@@ -150,18 +141,10 @@ private:
      */
     void SinkDecode(const A2dpCodecConfig &config, A2dpDecoderObserver &observer);
 
-    /**
-     * @brief Timer to push pcm data
-     *
-     * @since 6.0
-     */
-    void SignalingTimeoutCallback() const;
-
     std::string name_ {};
     std::unique_ptr<Dispatcher> dispatcher_ {};
     std::unique_ptr<A2dpEncoder> encoder_ = nullptr;
     std::unique_ptr<A2dpDecoder> decoder_ = nullptr;
-    std::unique_ptr<utility::Timer> signalingTimer_ = nullptr;
     static A2dpCodecThread *g_instance;
     bool threadInit = false;
     bool isSbc_ = false;

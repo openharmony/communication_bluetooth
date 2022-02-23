@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 #include <mutex>
-#include "bluetooth_map_mse.h"
 #include "bluetooth_map_mse_observer_stub.h"
 #include "bluetooth_map_mse_proxy.h"
 #include "bluetooth_raw_address.h"
+#include "bluetooth_map_mse.h"
 
 #include "bt_def.h"
 #include "bluetooth_host.h"
@@ -77,7 +77,7 @@ struct MapServer::impl {
 
 class MapServer::impl::BluetoothMapMseDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothMapMseDeathRecipient(MapServer::impl &MapMse) : MapMse_(MapMse){};
+    BluetoothMapMseDeathRecipient(MapServer::impl &MapMse) : MapMse_(MapMse) {};
     ~BluetoothMapMseDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothMapMseDeathRecipient);
 
@@ -123,7 +123,7 @@ MapServer::impl::impl()
 MapServer::MapServer() : pimpl(nullptr)
 {
     HILOGI("%{public}s :excute", __func__);
-    pimpl = std::unique_ptr<impl>(new impl);
+    pimpl = std::make_unique<impl>();
 }
 
 MapServer::~MapServer()
@@ -151,6 +151,7 @@ void MapServer::DeregisterObserver(MapServerObserver &observer)
 
 int MapServer::GetState() const
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     int32_t ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         pimpl->proxy_->GetState(ret);
@@ -160,6 +161,7 @@ int MapServer::GetState() const
 
 bool MapServer::Disconnect(const BluetoothRemoteDevice &device)
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
         return false;
@@ -174,6 +176,7 @@ bool MapServer::Disconnect(const BluetoothRemoteDevice &device)
 
 bool MapServer::IsConnected(const BluetoothRemoteDevice &device)
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
         return false;
@@ -188,6 +191,7 @@ bool MapServer::IsConnected(const BluetoothRemoteDevice &device)
 
 std::vector<BluetoothRemoteDevice> MapServer::GetConnectedDevices() const
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     std::vector<BluetoothRemoteDevice> btDeviceList;
     std::vector<BluetoothRawAddress> btDevice;
     if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
@@ -201,6 +205,7 @@ std::vector<BluetoothRemoteDevice> MapServer::GetConnectedDevices() const
 
 std::vector<BluetoothRemoteDevice> MapServer::GetDevicesByStates(std::vector<int> states) const
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     std::vector<BluetoothRemoteDevice> btDeviceList;
     std::vector<BluetoothRawAddress> btDevice;
     if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
@@ -214,6 +219,7 @@ std::vector<BluetoothRemoteDevice> MapServer::GetDevicesByStates(std::vector<int
 
 int MapServer::GetConnectionState(const BluetoothRemoteDevice &device) const
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
         return (int)BTConnectState::DISCONNECTED;
@@ -228,6 +234,7 @@ int MapServer::GetConnectionState(const BluetoothRemoteDevice &device) const
 
 bool MapServer::SetConnectionStrategy(const BluetoothRemoteDevice &device, int strategy)
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
         return false;
@@ -242,6 +249,7 @@ bool MapServer::SetConnectionStrategy(const BluetoothRemoteDevice &device, int s
 
 int MapServer::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
         return (int)BTStrategyType::CONNECTION_FORBIDDEN;
@@ -256,6 +264,7 @@ int MapServer::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 
 void MapServer::GrantPermission(const BluetoothRemoteDevice &device, bool allow, bool save)
 {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
         return;

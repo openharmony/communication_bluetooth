@@ -22,9 +22,9 @@ namespace OHOS {
 namespace Bluetooth {
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLECharacteristicChange";
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
-class NGattClient;
+class NapiGattClient;
 
-class NGattClientCallback : public GattClientCallback {
+class NapiGattClientCallback : public GattClientCallback {
 public:
     void OnConnectionStateChanged(int connectionState, int ret) override;
     void OnCharacteristicChanged(const GattCharacteristic &characteristic) override;
@@ -41,16 +41,16 @@ public:
     {
         callbackInfos_[type] = callbackInfo;
     }
-    void SetClient(NGattClient *client)
+    void SetClient(NapiGattClient *client)
     {
         client_ = client;
     }
-    NGattClientCallback() = default;
-    virtual ~NGattClientCallback() = default;
+    NapiGattClientCallback() = default;
+    virtual ~NapiGattClientCallback() = default;
 
 private:
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
-    NGattClient *client_ = nullptr;
+    NapiGattClient *client_ = nullptr;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

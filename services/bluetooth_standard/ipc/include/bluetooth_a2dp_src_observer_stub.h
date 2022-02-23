@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,18 +23,22 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothA2dpSrcObserverStub : public IRemoteStub<IBluetoothA2dpSrcObserver> {
+class BluetoothA2dpSrcObserverStub : public IRemoteStub<IBluetoothA2dpSourceObserver> {
 public:
-    BluetoothA2dpSrcObserverStub()
-    {}
-    ~BluetoothA2dpSrcObserverStub()
-    {}
+    BluetoothA2dpSrcObserverStub();
+    virtual ~BluetoothA2dpSrcObserverStub();
 
-    virtual int32_t OnRemoteRequest(
+    virtual int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnPlayingStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply);
+    using BluetoothA2dpSrcObserverFunc = ErrCode (BluetoothA2dpSrcObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+    std::map<uint32_t, BluetoothA2dpSrcObserverFunc> memberFuncMap_;
+
+    DISALLOW_COPY_AND_MOVE(BluetoothA2dpSrcObserverStub);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

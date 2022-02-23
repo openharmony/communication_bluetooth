@@ -25,14 +25,13 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 class HfServiceObserver : public BluetoothHfpHfObserverStub {
 public:
-    HfServiceObserver(BluetoothObserverList<HandsFreeUnitObserver> &observers) : observers_(observers)
+    explicit HfServiceObserver(BluetoothObserverList<HandsFreeUnitObserver> &observers) : observers_(observers)
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     }
-    ~HfServiceObserver() override 
+    ~HfServiceObserver() override
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     }
@@ -50,8 +49,9 @@ public:
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeUnitObserver> observer) { 
-            observer->OnScoStateChanged(remoteDevice, state); });
+        observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeUnitObserver> observer) {
+            observer->OnScoStateChanged(remoteDevice, state);
+        });
     }
 
     void OnCallChanged(const BluetoothRawAddress &device,
@@ -69,8 +69,9 @@ public:
             call.IsOutgoing(),
             call.IsInBandRing(),
             call.GetCreationTime());
-        observers_.ForEach([remoteDevice, tmpCall](std::shared_ptr<HandsFreeUnitObserver> observer) { 
-            observer->OnCallChanged(remoteDevice, tmpCall); });
+        observers_.ForEach([remoteDevice, tmpCall](std::shared_ptr<HandsFreeUnitObserver> observer) {
+            observer->OnCallChanged(remoteDevice, tmpCall);
+        });
     }
 
     void OnSignalStrengthChanged(const BluetoothRawAddress &device, int32_t signal) override
@@ -163,7 +164,7 @@ struct HandsFreeUnit::impl {
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->DisconnectSco(BluetoothRawAddress(device.GetDeviceAddr()));;
+            return proxy_->DisconnectSco(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
     }
@@ -220,8 +221,9 @@ struct HandsFreeUnit::impl {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         if (proxy_ != nullptr && IS_BT_ENABLED() && !BluetoothHost::GetDefaultHost().IsBtDiscovering() &&
             device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
+                return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
+        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
         return false;
     }
 
@@ -231,6 +233,7 @@ struct HandsFreeUnit::impl {
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
+        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
         return false;
     }
 
@@ -359,8 +362,8 @@ private:
     const static int HFP_HF_SLC_STATE_DISCONNECTED = (int)BTConnectState::DISCONNECTED;
     const static int HFP_HF_SCO_STATE_DISCONNECTED = 3;
 
-    BluetoothObserverList<HandsFreeUnitObserver> observers_{};
-    HfServiceObserver serviceObserver_{HfServiceObserver(observers_)};
+    BluetoothObserverList<HandsFreeUnitObserver> observers_;
+    HfServiceObserver serviceObserver_ {HfServiceObserver(observers_)};
     sptr<IBluetoothHfpHf> proxy_;
     class HandsFreeUnitDeathRecipient;
     sptr<HandsFreeUnitDeathRecipient> deathRecipient_;
@@ -368,7 +371,8 @@ private:
 
 class HandsFreeUnit::impl::HandsFreeUnitDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    HandsFreeUnitDeathRecipient(HandsFreeUnit::impl &impl) : impl_(impl){};
+    HandsFreeUnitDeathRecipient(HandsFreeUnit::impl &impl) : impl_(impl)
+    {};
     ~HandsFreeUnitDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(HandsFreeUnitDeathRecipient);
 
@@ -514,15 +518,14 @@ std::optional<HandsFreeUnitCall> HandsFreeUnit::StartDial(
 
 void HandsFreeUnit::RegisterObserver(HandsFreeUnitObserver *observer)
 {
-    std::shared_ptr<HandsFreeUnitObserver> observerPtr(observer);
+    std::shared_ptr<HandsFreeUnitObserver> observerPtr(observer, [](HandsFreeUnitObserver *) {});
     return pimpl->RegisterObserver(observerPtr);
 }
 
 void HandsFreeUnit::DeregisterObserver(HandsFreeUnitObserver *observer)
 {
-    std::shared_ptr<HandsFreeUnitObserver> observerPtr(observer);
+    std::shared_ptr<HandsFreeUnitObserver> observerPtr(observer, [](HandsFreeUnitObserver *) {});
     return pimpl->DeregisterObserver(observerPtr);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

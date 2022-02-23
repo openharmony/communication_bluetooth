@@ -19,23 +19,23 @@ namespace OHOS {
 namespace Bluetooth {
 const int num_20 = 20;
 using namespace std;
-int NSppServer::count = 0;
-std::map<int, std::shared_ptr<NSppServer>> NSppServer::serverMap;
+int NapiSppServer::count = 0;
+std::map<int, std::shared_ptr<NapiSppServer>> NapiSppServer::serverMap;
 
 void DefineSppFunctions(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("sppListen", NSppServer::SppListen),
-        DECLARE_NAPI_FUNCTION("sppAccept", NSppServer::SppAccept),
-        DECLARE_NAPI_FUNCTION("sppConnect", NSppClient::SppConnect),
-        DECLARE_NAPI_FUNCTION("sppCloseServerSocket", NSppServer::SppCloseServerSocket),
-        DECLARE_NAPI_FUNCTION("sppCloseClientSocket", NSppClient::SppCloseClientSocket),
-        DECLARE_NAPI_FUNCTION("sppWrite", NSppClient::SppWrite),
+        DECLARE_NAPI_FUNCTION("sppListen", NapiSppServer::SppListen),
+        DECLARE_NAPI_FUNCTION("sppAccept", NapiSppServer::SppAccept),
+        DECLARE_NAPI_FUNCTION("sppConnect", NapiSppClient::SppConnect),
+        DECLARE_NAPI_FUNCTION("sppCloseServerSocket", NapiSppServer::SppCloseServerSocket),
+        DECLARE_NAPI_FUNCTION("sppCloseClientSocket", NapiSppClient::SppCloseClientSocket),
+        DECLARE_NAPI_FUNCTION("sppWrite", NapiSppClient::SppWrite),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
-napi_value NSppServer::SppListen(napi_env env, napi_callback_info info)
+napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 {
     HILOGI("SppListen called");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
@@ -112,8 +112,8 @@ napi_value NSppServer::SppListen(napi_env env, napi_callback_info info)
 
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 HILOGI("SppListen execute back listen success");
-                std::shared_ptr<NSppServer> server =  std::make_shared<NSppServer>();
-                server->id_ = NSppServer::count++;
+                std::shared_ptr<NapiSppServer> server =  std::make_shared<NapiSppServer>();
+                server->id_ = NapiSppServer::count++;
                 napi_create_int32(env, server->id_, &result[PARAM1]);
                 server->server_ = callbackInfo->server_;
                 serverMap.insert(std::make_pair(server->id_, server));
@@ -152,7 +152,7 @@ napi_value NSppServer::SppListen(napi_env env, napi_callback_info info)
 }
 
 
-napi_value NSppServer::SppAccept(napi_env env, napi_callback_info info)
+napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
 {
     HILOGI("SppAccept called");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
@@ -173,7 +173,7 @@ napi_value NSppServer::SppAccept(napi_env env, napi_callback_info info)
         HILOGE("Wrong argument type. int expected.");
         return ret;
     }
-    std::shared_ptr<NSppServer> server = serverMap[serverSocketNum];
+    std::shared_ptr<NapiSppServer> server = serverMap[serverSocketNum];
     if (!server) {
         HILOGE("server is null");
         return ret;
@@ -227,11 +227,11 @@ napi_value NSppServer::SppAccept(napi_env env, napi_callback_info info)
             napi_get_undefined(env, &undefined);
 
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
-                std::shared_ptr<NSppClient> client =  std::make_shared<NSppClient>();
-                client->id_ = NSppClient::count++;
+                std::shared_ptr<NapiSppClient> client =  std::make_shared<NapiSppClient>();
+                client->id_ = NapiSppClient::count++;
                 napi_create_int32(env, client->id_, &result[PARAM1]);
                 client->client_ = callbackInfo->client_;
-                NSppClient::clientMap.insert(std::make_pair(client->id_, client));
+                NapiSppClient::clientMap.insert(std::make_pair(client->id_, client));
             } else {
                 napi_get_undefined(env, &result[PARAM1]);
             }
@@ -262,7 +262,7 @@ napi_value NSppServer::SppAccept(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NSppServer::SppCloseServerSocket(napi_env env, napi_callback_info info)
+napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info info)
 {
     HILOGI("SppCloseServerSocket called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -278,16 +278,16 @@ napi_value NSppServer::SppCloseServerSocket(napi_env env, napi_callback_info inf
         return ret;
     }
 
-    std::shared_ptr<NSppServer> server = nullptr;
-    std::shared_ptr<NSppClient> client = nullptr;
+    std::shared_ptr<NapiSppServer> server = nullptr;
+    std::shared_ptr<NapiSppClient> client = nullptr;
     int id =  -1;
     ParseInt32(env, id, argv[PARAM0]);
 
-    if (NSppClient::clientMap[id] != nullptr) {
-        client = NSppClient::clientMap[id];
+    if (NapiSppClient::clientMap[id] != nullptr) {
+        client = NapiSppClient::clientMap[id];
         if (client->client_) {
             client->client_->Close();
-            NSppClient::clientMap.erase(id);
+            NapiSppClient::clientMap.erase(id);
         }
     } else {
         HILOGE("no such key in clientMap.");

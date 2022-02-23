@@ -386,6 +386,9 @@ public:
      */
     void SetAudioConfigure(const RawAddress &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel) override;
 
+    int WriteFrame(const uint8_t *data, uint32_t size) override;
+
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
     /**
      * @brief Get boject pointer of A2dpConnectManager.
      *

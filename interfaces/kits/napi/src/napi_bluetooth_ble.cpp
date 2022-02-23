@@ -39,8 +39,8 @@ void DefineBLEJSObject(napi_env env, napi_value exports)
     napi_value BLEObject = nullptr;
     PropertyInit(env, exports);
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createGattServer", NGattServer::CreateGattServer),
-        DECLARE_NAPI_FUNCTION("createGattClientDevice", NGattClient::CreateGattClientDevice),
+        DECLARE_NAPI_FUNCTION("createGattServer", NapiGattServer::CreateGattServer),
+        DECLARE_NAPI_FUNCTION("createGattClientDevice", NapiGattClient::CreateGattClientDevice),
         DECLARE_NAPI_FUNCTION("startBLEScan", StartBLEScan),
         DECLARE_NAPI_FUNCTION("stopBLEScan", StopBLEScan),
         DECLARE_NAPI_FUNCTION("on", RegisterObserver),
@@ -433,7 +433,7 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_array(env, &result);
 
-    ConvertStringVectorToJS(env, result, NGattServer::deviceList);
+    ConvertStringVectorToJS(env, result, NapiGattServer::deviceList);
     HILOGI("GetConnectedBLEDevices end");
     return result;
 }

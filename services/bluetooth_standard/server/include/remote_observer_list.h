@@ -54,10 +54,11 @@ public:
     std::mutex lock_{};
     ObserverMap observers_{};
 
-    bool UnregisterInternal(typename ObserverMap::iterator iter);
-
     RemoteObserverList(const RemoteObserverList &) = delete;
     RemoteObserverList &operator=(const RemoteObserverList &) = delete;
+
+private:
+    bool UnregisterInternal(typename ObserverMap::iterator iter);
 };
 
 template <typename T>
@@ -82,9 +83,11 @@ bool RemoteObserverList<T>::Register(const sptr<T> &observer)
     HILOGI("RemoteObserverList<T>::Register called");
     std::lock_guard<std::mutex> lock(lock_);
 
-    if (observers_.find(observer) != observers_.end()) {
-        HILOGI("Observer list already contains given observer");
-        return false;
+    for (const auto &it : observers_) {
+        if (it.first->AsObject() == observer->AsObject()) {
+            HILOGW("Observer list already contains given observer");
+            return false;
+        }
     }
 
     sptr<ObserverDeathRecipient> dr(new ObserverDeathRecipient(observer, this));
@@ -105,12 +108,14 @@ bool RemoteObserverList<T>::Deregister(const sptr<T> &observer)
     HILOGI("RemoteObserverList<T>::Deregister called");
     std::lock_guard<std::mutex> lock(lock_);
 
-    auto iter = observers_.find(observer);
-    if (iter == observers_.end()) {
-        HILOGW("Given observer not registered with this list");
-        return false;
+    for (auto it = observers_.begin(); it != observers_.end(); ++it) {
+        if (it->first->AsObject() == observer->AsObject()) {
+            return UnregisterInternal(it);
+        }
     }
-    return UnregisterInternal(iter);
+    HILOGW("Given observer not registered with this list");
+    return false;
+    
 }
 
 template <typename T>
@@ -122,6 +127,8 @@ void RemoteObserverList<T>::ForEach(const std::function<void(sptr<T>)> &observer
         observer(it.first);
     }
 }
+
+
 
 template <typename T>
 RemoteObserverList<T>::ObserverDeathRecipient::ObserverDeathRecipient(
@@ -137,8 +144,14 @@ void RemoteObserverList<T>::ObserverDeathRecipient::OnRemoteDied(const wptr<IRem
     // Remove the observer but no need to call unlinkToDeath.
     std::lock_guard<std::mutex> lock(owner_->lock_);
 
-    auto iter = owner_->observers_.find(GetObserver());
-    owner_->observers_.erase(iter);
+    for (auto it = owner_->observers_.begin(); it != owner_->observers_.end(); ++it) {
+        if (it->first->AsObject() == object) {
+            if (!it->first->AsObject()->RemoveDeathRecipient(it->second)) {
+                HILOGE("Failed to unlink death recipient from observer");
+            }
+            owner_->observers_.erase(it);
+        }
+    }
     HILOGI("Callback from dead process unregistered");
 }
 
@@ -147,12 +160,12 @@ bool RemoteObserverList<T>::UnregisterInternal(typename ObserverMap::iterator it
 {
     HILOGI("RemoteObserverList<T>::UnregisterInternal called");
     sptr<ObserverDeathRecipient> dr = iter->second;
-    observers_.erase(iter);
-
+    
     if (!dr->GetObserver()->AsObject()->RemoveDeathRecipient(dr)) {
         HILOGE("Failed to unlink death recipient from observer");
         return false;
     }
+    observers_.erase(iter);
 
     return true;
 }

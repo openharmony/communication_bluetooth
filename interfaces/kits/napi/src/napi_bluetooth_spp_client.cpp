@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#include <unistd.h>
-#include "securec.h"
 #include "napi_bluetooth_spp_client.h"
-
+#include "securec.h"
+#include <unistd.h>
+#include <uv.h>
 
 namespace OHOS {
 namespace Bluetooth {
 const int sleepTime = 5;
-std::map<int, std::shared_ptr<NSppClient>> NSppClient::clientMap;
-int NSppClient::count = 0;
+std::map<int, std::shared_ptr<NapiSppClient>> NapiSppClient::clientMap;
+int NapiSppClient::count = 0;
 
-napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info)
+napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
 {
     HILOGI("SppConnect called");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
@@ -83,7 +83,7 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info)
                 UUID::FromString(callbackInfo->sppOption_->uuid_), 
                 callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
             HILOGI("SppConnect client_ constructed");
-            if (callbackInfo->client_->Connect() == SPPStatus::SPP_SUCCESS) {
+            if (callbackInfo->client_->Connect() == BtStatus::BT_SUCCESS) {
                 HILOGI("SppConnect successfully");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
             } else {
@@ -102,9 +102,9 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info)
 
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 HILOGI("SppConnect execute back success");
-                std::shared_ptr<NSppClient> client =  std::make_shared<NSppClient>();
+                std::shared_ptr<NapiSppClient> client =  std::make_shared<NapiSppClient>();
                 client->device_ = callbackInfo->device_;
-                client->id_ = NSppClient::count++;
+                client->id_ = NapiSppClient::count++;
                 napi_create_int32(env, client->id_, &result[PARAM1]);
                 client->client_ = callbackInfo->client_;
                 clientMap.insert(std::make_pair(client->id_, client));
@@ -141,7 +141,7 @@ napi_value NSppClient::SppConnect(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NSppClient::SppCloseClientSocket(napi_env env, napi_callback_info info)
+napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info info)
 {
     HILOGI("SppCloseClientSocket called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -157,7 +157,7 @@ napi_value NSppClient::SppCloseClientSocket(napi_env env, napi_callback_info inf
         return ret;
     }
 
-    std::shared_ptr<NSppClient> client = nullptr;
+    std::shared_ptr<NapiSppClient> client = nullptr;
     int id =  -1;
     ParseInt32(env, id, argv[PARAM0]);
 
@@ -177,7 +177,7 @@ napi_value NSppClient::SppCloseClientSocket(napi_env env, napi_callback_info inf
     return ret;
 }
 
-napi_value NSppClient::SppWrite(napi_env env, napi_callback_info info)
+napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 {
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
@@ -224,7 +224,7 @@ napi_value NSppClient::SppWrite(napi_env env, napi_callback_info info)
     napi_get_boolean(env, isOK, &ret);
     return ret;
 }
-void NSppClient::On(napi_env env, napi_callback_info info)
+void NapiSppClient::On(napi_env env, napi_callback_info info)
 {
     HILOGI("On is called");
 
@@ -241,7 +241,12 @@ void NSppClient::On(napi_env env, napi_callback_info info)
     }
     std::string type;
     ParseString(env, type, argv[PARAM0]);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo;
+    if (type.c_str() == STR_BT_SPP_READ) {
+        callbackInfo = std::make_shared<BufferCallbackInfo>();
+    } else {
+        callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+    }
     callbackInfo->env_ = env;
 
     napi_valuetype valueType1 = napi_undefined;
@@ -256,7 +261,7 @@ void NSppClient::On(napi_env env, napi_callback_info info)
     napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
 
     ParseInt32(env, id, argv[PARAM1]);
-    std::shared_ptr<NSppClient> client = clientMap[id];
+    std::shared_ptr<NapiSppClient> client = clientMap[id];
     if (!client) {
         HILOGI("client is nullptr");
         return;
@@ -269,7 +274,7 @@ void NSppClient::On(napi_env env, napi_callback_info info)
     return;
 }
 
-void NSppClient::Off(napi_env env, napi_callback_info info)
+void NapiSppClient::Off(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
@@ -287,7 +292,7 @@ void NSppClient::Off(napi_env env, napi_callback_info info)
     ParseString(env, type, argv[PARAM0]);
 
     ParseInt32(env, id, argv[PARAM1]);
-    std::shared_ptr<NSppClient> client = clientMap[id];
+    std::shared_ptr<NapiSppClient> client = clientMap[id];
     if (!client) {
         HILOGI("client is nullptr");
         return;
@@ -298,10 +303,9 @@ void NSppClient::Off(napi_env env, napi_callback_info info)
     return;
 }
 
-void NSppClient::sppRead(int id)
+void NapiSppClient::sppRead(int id)
 {
     HILOGI("sppRead is called");
-    napi_value result = nullptr;
     OHOS::Bluetooth::InputStream inputStream = clientMap[id]->client_->GetInputStream();
     char buf[1024];
     int ret = 0;
@@ -323,21 +327,40 @@ void NSppClient::sppRead(int id)
                 break;
             } else {
                 HILOGI("napi_call_function begin");
-                uint8_t* totalBuf = (uint8_t*) malloc(ret);
-                memcpy_s(totalBuf, ret, buf, ret);
+                std::shared_ptr<BufferCallbackInfo> callbackInfo = 
+                    std::static_pointer_cast<BufferCallbackInfo>(clientMap[id]->callbackInfos_[STR_BT_SPP_READ]);
+                
+                callbackInfo->info_ = ret;
+                memcpy_s(callbackInfo->buffer_, sizeof(callbackInfo->buffer_), buf, ret);
 
-                uint8_t* bufferData = nullptr;
-                std::shared_ptr<BluetoothCallbackInfo> callbackInfo = clientMap[id]->callbackInfos_[STR_BT_SPP_READ];
+                uv_loop_s *loop = nullptr;
+                napi_get_uv_event_loop(callbackInfo->env_, &loop);
+                uv_work_t *work = new uv_work_t;
+                work->data = (void*)callbackInfo.get();
 
-                napi_create_arraybuffer(callbackInfo->env_, ret, (void**)&bufferData, &result);
-                memcpy_s(bufferData, ret, totalBuf, ret);
-                free(totalBuf);
-                napi_value callback = nullptr;
-                napi_value undefined = nullptr;
-                napi_value callResult = nullptr;
-                napi_get_undefined(callbackInfo->env_, &undefined);
-                napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-                napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+                uv_queue_work(
+                    loop,
+                    work,
+                    [](uv_work_t *work) {},
+                    [](uv_work_t *work, int status) {
+                        BufferCallbackInfo *callbackInfo = (BufferCallbackInfo *)work->data;
+                        int size = callbackInfo->info_;
+                        uint8_t* totalBuf = (uint8_t*) malloc(size);
+                        memcpy_s(totalBuf, size, callbackInfo->buffer_, size);
+                        napi_value result = nullptr;
+                        uint8_t* bufferData = nullptr;
+                        napi_create_arraybuffer(callbackInfo->env_ , size, (void**)&bufferData, &result);
+                        memcpy_s(bufferData, size, totalBuf, size);
+                        free(totalBuf);
+
+                        napi_value callback = nullptr;
+                        napi_value undefined = nullptr;
+                        napi_value callResult = nullptr;
+                        napi_get_undefined(callbackInfo->env_, &undefined);
+                        napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+                        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+                    }
+                );
             }
         }
     }

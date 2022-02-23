@@ -70,7 +70,7 @@ struct BluetoothBleAdvertiserServer::impl {
 
 class BluetoothBleAdvertiserServer::impl::SystemStateObserver : public ISystemStateObserver {
 public:
-    explicit SystemStateObserver(BluetoothBleAdvertiserServer::impl *pimpl) : pimpl_(pimpl){};
+    explicit SystemStateObserver(BluetoothBleAdvertiserServer::impl *pimpl) : pimpl_(pimpl) {};
     void OnSystemStateChange(const BTSystemState state) override
     {
         pimpl_->bleService_ =

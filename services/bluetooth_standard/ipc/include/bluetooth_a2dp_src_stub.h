@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,17 +24,39 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothA2dpSrcStub : public IRemoteStub<IBluetoothA2dpSrc> {
 public:
-    BluetoothA2dpSrcStub()
-    {}
-    ~BluetoothA2dpSrcStub()
-    {}
+    BluetoothA2dpSrcStub();
+    virtual ~BluetoothA2dpSrcStub();
 
-    virtual int32_t OnRemoteRequest(
+    virtual int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode ConnectInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode DisconnectInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RegisterObserverInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode DeregisterObserverInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetPlayingStateInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SetConnectStrategyInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetConnectStrategyInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SetActiveSinkDeviceInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetActiveSinkDeviceInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetCodecStatusInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SetCodecPreferenceInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SwitchOptionalCodecsInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetOptionalCodecsSupportStateInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode StartPlayingInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SuspendPlayingInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode StopPlayingInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SetAudioConfigureInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode WriteFrameInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetRenderPositionInner(MessageParcel &data, MessageParcel &reply);
+
+    using BluetoothA2dpSrcServerFunc = ErrCode (BluetoothA2dpSrcStub::*)(MessageParcel &data, MessageParcel &reply);
+    std::map<uint32_t, BluetoothA2dpSrcServerFunc> memberFuncMap_;
+
+    DISALLOW_COPY_AND_MOVE(BluetoothA2dpSrcStub);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

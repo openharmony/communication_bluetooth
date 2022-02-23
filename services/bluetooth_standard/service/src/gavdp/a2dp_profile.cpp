@@ -345,6 +345,25 @@ void A2dpProfile::UpdateAudioData(bool dataReady)
     audioDataReady_ = dataReady;
 }
 
+bool A2dpProfile::WriteFrame(const uint8_t *data, uint32_t size)
+{
+    LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
+
+    A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
+    if(!codecThread->WriteFrame(data, size)) {
+        return false;
+    }
+    return true;
+}
+
+void A2dpProfile::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
+{
+    LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
+
+    A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
+    codecThread->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+}
+
 void A2dpProfile::CreateSEPConfigureInfo(uint8_t role)
 {
     AvdtStreamConfig cfg[AVDT_NUM_SEPS] = {};
@@ -658,7 +677,7 @@ bool A2dpProfile::JudgeAllowedStreaming() const
     return ret;
 }
 
-int A2dpProfile::Close(uint16_t handle) const
+int A2dpProfile::Close(const uint16_t handle) const
 {
     int ret = RET_NO_ERROR;
     A2dpProfilePeer *peer = nullptr;

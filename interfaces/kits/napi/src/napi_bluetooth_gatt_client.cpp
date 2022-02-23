@@ -12,20 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "napi_bluetooth_gatt_client.h"
 #include <unistd.h>
 #include "bluetooth_log.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_host.h"
-#include "napi_bluetooth_gatt_client.h"
+
 
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-napi_value NGattClient::constructor_ = nullptr;
+napi_value NapiGattClient::constructor_ = nullptr;
 
 
-napi_value NGattClient::CreateGattClientDevice(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::CreateGattClientDevice(napi_env env, napi_callback_info info)
 {
     HILOGI("CreateGattClientDevice called");
 
@@ -43,7 +44,7 @@ napi_value NGattClient::CreateGattClientDevice(napi_env env, napi_callback_info 
     return result;
 }
 
-void NGattClient::DefineGattClientJSClass(napi_env env)
+void NapiGattClient::DefineGattClientJSClass(napi_env env)
 {
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
@@ -54,8 +55,6 @@ void NGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("readDescriptorValue", ReadDescriptorValue),
         DECLARE_NAPI_FUNCTION("close", Close),
         DECLARE_NAPI_FUNCTION("getServices", GetServices),
-        DECLARE_NAPI_FUNCTION("BLECharacteristicChange", OnCharacteristicChanged), // Test only
-
         DECLARE_NAPI_FUNCTION("writeCharacteristicValue", WriteCharacteristicValue),
         DECLARE_NAPI_FUNCTION("writeDescriptorValue", WriteDescriptorValue),
         DECLARE_NAPI_FUNCTION("setBLEMtuSize", SetBLEMtuSize),
@@ -63,14 +62,13 @@ void NGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getDeviceName", GetDeviceName),
         DECLARE_NAPI_FUNCTION("getRssiValue", GetRssiValue),
 
-        DECLARE_NAPI_FUNCTION("OnConnectionStateChanged", OnConnectionStateChanged), // test
     };
 
     napi_define_class(env, "GattClientDevice", NAPI_AUTO_LENGTH, GattClientConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor_);
 }
 
-napi_value NGattClient::GattClientConstructor(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_info info)
 {
     HILOGI("GattClientConstructor called");
     napi_value thisVar = nullptr;
@@ -85,12 +83,12 @@ napi_value NGattClient::GattClientConstructor(napi_env env, napi_callback_info i
     ParseString(env, deviceId, argv[PARAM0]);
     SetGattClinetDeviceId(deviceId);
 
-    NGattClient *gattClient = new NGattClient(deviceId);
+    NapiGattClient *gattClient = new NapiGattClient(deviceId);
 
     napi_wrap(
         env, thisVar, gattClient,
         [](napi_env env, void* data, void* hint) {
-            NGattClient* client = (NGattClient*)data;
+            NapiGattClient* client = (NapiGattClient*)data;
             delete client;
         },
         nullptr,
@@ -100,10 +98,10 @@ napi_value NGattClient::GattClientConstructor(napi_env env, napi_callback_info i
 }
 
 
-napi_value NGattClient::On(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
 {
     HILOGI("On called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -119,7 +117,12 @@ napi_value NGattClient::On(napi_env env, napi_callback_info info)
     }
     string type;
     ParseString(env, type, argv[PARAM0]);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo;
+    if (type.c_str() == STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE) {
+        callbackInfo = std::make_shared<GattCharacteristicCallbackInfo>();
+    } else {
+        callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+    }
     callbackInfo->env_ = env;
 
     napi_unwrap(env, thisVar, (void **)&gattClient);
@@ -137,10 +140,10 @@ napi_value NGattClient::On(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::Off(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("Off called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -165,10 +168,10 @@ napi_value NGattClient::Off(napi_env env, napi_callback_info info)
 }
 
 
-napi_value NGattClient::Connect(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
-    NGattClient *gattClient = nullptr;
+    NapiGattClient *gattClient = nullptr;
     napi_value thisVar = nullptr;
     bool isOK = false;
 
@@ -185,10 +188,10 @@ napi_value NGattClient::Connect(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::Disconnect(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
     napi_value thisVar = nullptr;
     bool isOK = false;
 
@@ -203,10 +206,10 @@ napi_value NGattClient::Disconnect(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info info)
 {
     HILOGI("ReadCharacteristicValue called");
-    NGattClient *gattClient = nullptr;
+    NapiGattClient *gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -325,10 +328,10 @@ napi_value NGattClient::ReadCharacteristicValue(napi_env env, napi_callback_info
     return promise;
 }
 
-napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info info)
 {
     HILOGI("readDescriptorValue called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -445,10 +448,10 @@ napi_value NGattClient::ReadDescriptorValue(napi_env env, napi_callback_info inf
     return promise;
 }
 
-napi_value NGattClient::GetServices(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
 {
     HILOGI("getServices called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -546,10 +549,10 @@ napi_value NGattClient::GetServices(napi_env env, napi_callback_info info)
     return promise;
 }
 
-napi_value NGattClient::Close(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::Close(napi_env env, napi_callback_info info)
 {
     HILOGI("Close called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
     bool isOK = true;
     napi_value thisVar = nullptr;
 
@@ -563,25 +566,10 @@ napi_value NGattClient::Close(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::OnCharacteristicChanged(napi_env env, napi_callback_info info)
-{
-    HILOGI("OnCharacteristicChanged called");
-    NGattClient *gattClient = nullptr;
-    napi_value thisVar = nullptr;
-
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    napi_unwrap(env, thisVar, (void **)&gattClient);
-    gattClient->OnCharacteristicChanged();
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-    return ret;
-}
-
-napi_value NGattClient::WriteCharacteristicValue(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::WriteCharacteristicValue(napi_env env, napi_callback_info info)
 {
     HILOGI("WriteCharacteristicValue called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -611,10 +599,10 @@ napi_value NGattClient::WriteCharacteristicValue(napi_env env, napi_callback_inf
     return ret;
 }
 
-napi_value NGattClient::WriteDescriptorValue(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::WriteDescriptorValue(napi_env env, napi_callback_info info)
 {
     HILOGI("WriteDescriptorValue called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -644,10 +632,10 @@ napi_value NGattClient::WriteDescriptorValue(napi_env env, napi_callback_info in
     return ret;
 }
 
-napi_value NGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
 {
     HILOGI("SetBLEMtuSize called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -676,10 +664,10 @@ napi_value NGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info)
 {
     HILOGI("SetNotifyCharacteristicChanged called");
-    NGattClient* gattClient = nullptr;
+    NapiGattClient* gattClient = nullptr;
 
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -711,7 +699,7 @@ napi_value NGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_callba
     return ret;
 }
 
-bool NGattClient::DiscoverServices()
+bool NapiGattClient::DiscoverServices()
 {
     DiscoverServicesCallbackInfo* callbackInfo = discoverServicesCallbackInfo_;
     callbackInfo->asyncState_ = ASYNC_START;
@@ -738,19 +726,5 @@ bool NGattClient::DiscoverServices()
     return true;
 }
 
-napi_value NGattClient::OnConnectionStateChanged(napi_env env, napi_callback_info info) // Test
-{
-    HILOGI("OnConnectionStateChanged called");
-    NGattClient* gattClient = nullptr;
-    napi_value thisVar = nullptr;
-
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    napi_unwrap(env, thisVar, (void**)&gattClient);
-    gattClient->OnConnectionStateChanged();
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-    return ret;
-}
 } // namespace Bluetooth
 } // namespace OHOS

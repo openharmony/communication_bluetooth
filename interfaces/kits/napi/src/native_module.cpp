@@ -18,34 +18,48 @@
 #include <thread>
 
 #include "bluetooth_log.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 #include "napi_bluetooth_ble.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
 #include "napi_bluetooth_host.h"
+#include "napi_bluetooth_hfp_ag.h"
+#include "napi_bluetooth_hfp_hf.h"
+#include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_spp_server.h"
+#include "napi_bluetooth_a2dp_snk.h"
+#include "napi_bluetooth_a2dp_src.h"
+#include "napi_bluetooth_pbap_pce.h"
+#include "napi_bluetooth_pbap_pse.h"
+#include "napi_bluetooth_avrcp_ct.h"
+#include "napi_bluetooth_avrcp_tg.h"
 
-// #include "napi_bluetooth_gatt_server.h"
 namespace OHOS {
 namespace Bluetooth {
-
 EXTERN_C_START
 /*
  * Module initialization function
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-
     napi_property_descriptor desc[] = {};
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
-    NGattServer::DefineGattServerJSClass(env);
-    NGattClient::DefineGattClientJSClass(env);
+    NapiGattServer::DefineGattServerJSClass(env);
+    NapiGattClient::DefineGattClientJSClass(env);
     DefineBLEJSObject(env, exports);
     DefineSppFunctions(env, exports);
+    DefineProfileFunctions(env, exports);
+    NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(env);
+    NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(env);
     BluetoothHostInit(env, exports);
+    NapiA2dpSink::DefineA2dpSinkJSClass(env);
+    NapiA2dpSource::DefineA2dpSourceJSClass(env);
+    NapiPbapClient::DefinePbapClientJSClass(env);
+    NapiPbapServer::DefinePbapServerJSClass(env);
+    NapiAvrcpController::DefineAvrcpControllerJSClass(env);
+    NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
+
 
     HILOGI("-----Init end------");
     return exports;
