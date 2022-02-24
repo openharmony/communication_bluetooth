@@ -48,7 +48,7 @@ bool A2dpSbcDecoder::DecodePacket(uint8_t *data, uint16_t size)
 {
     uint8_t pcmData[CODEC_BUFFER_SIZE4K];
     size_t len = 0;
-    int pos = A2DP_SBC_FRAGMENT_HEADER;
+    int pos = 0x01;
     int frameLen = 0;
     uint16_t packetSize = size;
     uint8_t buf[CODEC_BUFFER_SIZE4K] = {0};

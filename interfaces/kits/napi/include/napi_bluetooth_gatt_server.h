@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class NGattServer {
+class NapiGattServer {
 
 public:
     static napi_value CreateGattServer(napi_env env, napi_callback_info info);
@@ -43,24 +43,24 @@ public:
     {
         return server_;
     }
-    NGattServerCallback &GetCallback()
+    NapiGattServerCallback &GetCallback()
     {
         return callback_;
     }
     static std::vector<std::string> deviceList;
 
-    NGattServer()
+    NapiGattServer()
     {
-        HILOGI("NGattServer called");
+        HILOGI("NapiGattServer called");
         server_ = std::make_shared<GattServer>(callback_);
     }
-    ~NGattServer() = default;
+    ~NapiGattServer() = default;
 
     static napi_value constructor_;
 
 private:
     std::shared_ptr<GattServer> server_ = nullptr;
-    NGattServerCallback callback_;
+    NapiGattServerCallback callback_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

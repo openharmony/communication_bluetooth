@@ -20,32 +20,72 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace bluetooth;
-int32_t BluetoothA2dpSrcObserverStub::OnRemoteRequest(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
 {
-    HILOGD("BluetoothA2dpSrcObserverStub: transaction of code: %{public}d is received", code);
-
-    ErrCode errCode;
-    BluetoothA2dpSrcObserverStub::Code msgCode = static_cast<BluetoothA2dpSrcObserverStub::Code>(code);
-    switch (msgCode) {
-        case BluetoothA2dpSrcObserverStub::Code::BT_A2DP_SRC_OBSERVER_PLAYING_STATE_CHANGED:
-            errCode = OnPlayingStateChangedInner(data, reply);
-            break;
-        default:
-            HILOGW("BluetoothA2dpSrcObserverStub: no member func supporting, applying default process");
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-    }
-
-    return errCode;
+    HILOGD("%{public}s start.", __func__);
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED)] =
+        &BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED)] =
+        &BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
+        &BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner;
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStateChangedInner(MessageParcel &data, MessageParcel &reply)
+BluetoothA2dpSrcObserverStub::~BluetoothA2dpSrcObserverStub()
+{
+    HILOGD("%{public}s start.", __func__);
+    memberFuncMap_.clear();
+}
+
+int BluetoothA2dpSrcObserverStub::OnRemoteRequest(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    HILOGD("BluetoothA2dpSrcObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    std::u16string descriptor = BluetoothA2dpSrcObserverStub::GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (descriptor != remoteDescriptor) {
+        HILOGI("local descriptor is not equal to remote");
+        return ERR_INVALID_STATE;
+    }
+    auto itFunc = memberFuncMap_.find(code);
+    if (itFunc != memberFuncMap_.end()) {
+        auto memberFunc = itFunc->second;
+        if (memberFunc != nullptr) {
+            return (this->*memberFunc)(data, reply);
+        }
+    }
+    HILOGW("BluetoothA2dpSrcObserverStub::OnRemoteRequest, default case, need check.");
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+}
+
+ErrCode BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::string addr = data.ReadString();
+    int state = data.ReadInt32();
+
+    OnConnectionStateChanged(RawAddress(addr), state);
+
+    return NO_ERROR;
+}
+
+ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int playingState = data.ReadInt32();
     int error = data.ReadInt32();
 
-    OnPlayingStateChanged(RawAddress(addr), playingState, error);
+    OnPlayingStatusChanged(RawAddress(addr), playingState, error);
+
+    return NO_ERROR;
+}
+
+ErrCode BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::string addr = data.ReadString();
+    BluetoothA2dpCodecInfo info = *data.ReadParcelable<BluetoothA2dpCodecInfo>();
+    int error = data.ReadInt32();
+
+    OnConfigurationChanged(RawAddress(addr), info, error);
 
     return NO_ERROR;
 }

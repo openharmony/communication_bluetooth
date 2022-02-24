@@ -42,7 +42,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief Pbap PullPhoneBook app parameter
  *
@@ -188,10 +187,10 @@ private:
 class PbapPhoneBookData {
 public:
     uint16_t phoneBookSize_ = 0;                     // VCard size
-    std::vector<uint8_t> primaryFolderVersion_{};    // VCard PrimaryFolderVersion 16 bytes
-    std::vector<uint8_t> secondaryFolderVersion_{};  // VCard SecondaryFolderVersion 16 bytes
-    std::vector<uint8_t> databaseIdentifier_{};      // VCard DatabaseIdentifier 16 bytes
-    std::vector<uint8_t> result_{};                  // VCard bytes with utf-8
+    std::vector<uint8_t> primaryFolderVersion_ {};    // VCard PrimaryFolderVersion 16 bytes
+    std::vector<uint8_t> secondaryFolderVersion_ {};  // VCard SecondaryFolderVersion 16 bytes
+    std::vector<uint8_t> databaseIdentifier_ {};      // VCard DatabaseIdentifier 16 bytes
+    std::vector<uint8_t> result_ {};                  // VCard bytes with utf-8
 };
 
 /**
@@ -257,7 +256,6 @@ public:
     virtual void OnActionCompleted(
         const BluetoothRemoteDevice &device, int respCode, int actionType, const PbapPhoneBookData &result)
     {}
-
 };
 
 /**

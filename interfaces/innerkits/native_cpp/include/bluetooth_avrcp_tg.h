@@ -32,7 +32,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief This class provides a set of methods for operating the AVRCP target.
  *
@@ -109,7 +108,7 @@ public:
      * @brief Sets the active device.
      *
      * @detail Only one CT can interact witch TG.
-     * 
+     *
      * @since 6
      */
     void SetActiveDevice(const BluetoothRemoteDevice &device);
@@ -284,7 +283,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AvrcpTarget);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 

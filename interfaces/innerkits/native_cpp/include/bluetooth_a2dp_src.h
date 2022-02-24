@@ -34,7 +34,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief A2dp source API callback function.
  *
@@ -290,6 +289,10 @@ public:
      */
     void SetAudioConfigure(const BluetoothRemoteDevice &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel);
 
+    int WriteFrame(const uint8_t *data, uint32_t size);
+    
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp);
+
 private:
     /**
      * @brief A constructor used to create a a2dp source instance.
@@ -307,7 +310,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(A2dpSource);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_A2DP_SRC_H

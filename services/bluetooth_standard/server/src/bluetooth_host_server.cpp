@@ -13,17 +13,25 @@
  * limitations under the License.
  */
 
-#include "bluetooth_host_server.h"
-
 #include <thread>
 
+#include "bluetooth_a2dp_sink_server.h"
 #include "bluetooth_a2dp_source_server.h"
+#include "bluetooth_avrcp_ct_server.h"
+#include "bluetooth_avrcp_tg_server.h"
 #include "bluetooth_ble_advertiser_server.h"
 #include "bluetooth_ble_central_manager_server.h"
 #include "bluetooth_gatt_client_server.h"
 #include "bluetooth_gatt_server_server.h"
+#include "bluetooth_hfp_ag_server.h"
+#include "bluetooth_hfp_hf_server.h"
 #include "bluetooth_host_dumper.h"
+#include "bluetooth_host_server.h"
 #include "bluetooth_log.h"
+#include "bluetooth_map_mce_server.h"
+#include "bluetooth_map_mse_server.h"
+#include "bluetooth_pbap_pce_server.h"
+#include "bluetooth_pbap_pse_server.h"
 #include "bluetooth_socket_server.h"
 #include "file_ex.h"
 #include "hisysevent.h"
@@ -170,8 +178,15 @@ public:
             if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
-                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BR_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_STATE", state);
+                HiviewDFX::HiSysEvent::Write("BLUETOOTH",
+                    "BLUETOOTH_BR_STATE",
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                    "PID",
+                    pid,
+                    "UID",
+                    uid,
+                    "BR_STATE",
+                    state);
             }
         } else if (transport == BTTransport::ADAPTER_BLE) {
             impl_->bleObservers_.ForEach([transport, state](sptr<IBluetoothHostObserver> observer) {
@@ -180,8 +195,15 @@ public:
             if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
-                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BLE_STATE", state);
+                HiviewDFX::HiSysEvent::Write("BLUETOOTH",
+                    "BLUETOOTH_BLE_STATE",
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                    "PID",
+                    pid,
+                    "UID",
+                    uid,
+                    "BLE_STATE",
+                    state);
             }
         }
     };
@@ -192,7 +214,7 @@ private:
 };
 class BluetoothHostServer::impl::AdapterClassicObserver : public IAdapterClassicObserver {
 public:
-    AdapterClassicObserver(BluetoothHostServer::impl *impl) : impl_(impl) {};
+    AdapterClassicObserver(BluetoothHostServer::impl *impl) : impl_(impl){};
     ~AdapterClassicObserver() override = default;
 
     void OnDiscoveryStateChanged(const int32_t status) override
@@ -203,8 +225,15 @@ public:
         if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
             int32_t pid = IPCSkeleton::GetCallingPid();
             int32_t uid = IPCSkeleton::GetCallingUid();
-            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_SCAN_STATE",
-                HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_SCAN_STATE", status);
+            HiviewDFX::HiSysEvent::Write("BLUETOOTH",
+                "BLUETOOTH_SCAN_STATE",
+                HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                "PID",
+                pid,
+                "UID",
+                uid,
+                "BR_SCAN_STATE",
+                status);
         }
     }
 
@@ -250,7 +279,7 @@ private:
 };
 class BluetoothHostServer::impl::ClassicRemoteDeviceObserver : public IClassicRemoteDeviceObserver {
 public:
-    ClassicRemoteDeviceObserver(BluetoothHostServer::impl *impl) : impl_(impl) {};
+    ClassicRemoteDeviceObserver(BluetoothHostServer::impl *impl) : impl_(impl){};
     ~ClassicRemoteDeviceObserver() override = default;
 
     void OnPairStatusChanged(const BTTransport transport, const RawAddress &device, const int32_t status) override
@@ -304,7 +333,7 @@ private:
 };
 class BluetoothHostServer::impl::AdapterBleObserver : public IAdapterBleObserver {
 public:
-    AdapterBleObserver(BluetoothHostServer::impl *impl) : impl_(impl) {};
+    AdapterBleObserver(BluetoothHostServer::impl *impl) : impl_(impl){};
     ~AdapterBleObserver() override = default;
 
     void OnDiscoveryStateChanged(const int32_t status) override
@@ -360,7 +389,7 @@ private:
 };
 class BluetoothHostServer::impl::BlePeripheralCallback : public IBlePeripheralCallback {
 public:
-    BlePeripheralCallback(BluetoothHostServer::impl *impl) : impl_(impl) {};
+    BlePeripheralCallback(BluetoothHostServer::impl *impl) : impl_(impl){};
     ~BlePeripheralCallback() override = default;
 
     void OnReadRemoteRssiEvent(const RawAddress &device, int32_t rssi, int32_t status) override
@@ -450,12 +479,6 @@ void BluetoothHostServer::impl::Clear()
         /// ble remote observer
         bleService_->DeregisterBlePeripheralCallback(*bleRemoteObserverImp_.get());
     }
-
-    if (!servers_[PROFILE_A2DP_SRC]) {
-        sptr<BluetoothA2dpSourceServer> a2dpSrc =
-            OHOS::iface_cast<BluetoothA2dpSourceServer>(servers_[PROFILE_A2DP_SRC]);
-        a2dpSrc->Destroy();
-    }
 }
 
 void BluetoothHostServer::impl::createServers()
@@ -463,21 +486,47 @@ void BluetoothHostServer::impl::createServers()
     sptr<BluetoothSocketServer> socket = new BluetoothSocketServer();
     servers_[PROFILE_SPP] = socket->AsObject();
 
-    sptr<BluetoothA2dpSourceServer> a2dpSrc = new BluetoothA2dpSourceServer();
-    a2dpSrc->Init();
-    servers_[PROFILE_A2DP_SRC] = a2dpSrc->AsObject();
-
     sptr<BluetoothGattServerServer> gattserver = new BluetoothGattServerServer();
     servers_[PROFILE_GATT_SERVER] = gattserver->AsObject();
 
     sptr<BluetoothGattClientServer> gattclient = new BluetoothGattClientServer();
     servers_[PROFILE_GATT_CLIENT] = gattclient->AsObject();
 
+    sptr<BluetoothHfpAgServer> hfpAg = new BluetoothHfpAgServer();
+    servers_[PROFILE_HFP_AG] = hfpAg->AsObject();
+
+    sptr<BluetoothHfpHfServer> hfpHf = new BluetoothHfpHfServer();
+    servers_[PROFILE_HFP_HF] = hfpHf->AsObject();
+
+    sptr<BluetoothAvrcpCtServer> avrcpCtServer = new BluetoothAvrcpCtServer();
+    servers_[PROFILE_AVRCP_CT] = avrcpCtServer->AsObject();
+
+    sptr<BluetoothAvrcpTgServer> avrcpTgServer = new BluetoothAvrcpTgServer();
+    servers_[PROFILE_AVRCP_TG] = avrcpTgServer->AsObject();
+
     sptr<BluetoothBleAdvertiserServer> bleAdvertiser = new BluetoothBleAdvertiserServer();
     bleServers_[BLE_ADVERTISER_SERVER] = bleAdvertiser->AsObject();
 
     sptr<BluetoothBleCentralManagerServer> bleCentralManger = new BluetoothBleCentralManagerServer();
     bleServers_[BLE_CENTRAL_MANAGER_SERVER] = bleCentralManger->AsObject();
+
+    sptr<BluetoothPbapPceServer> pbapPce = new BluetoothPbapPceServer();
+    servers_[PROFILE_PBAP_PCE] = pbapPce->AsObject();
+
+    sptr<BluetoothPbapPseServer> pbapPse = new BluetoothPbapPseServer();
+    servers_[PROFILE_PBAP_PSE] = pbapPse->AsObject();
+
+    sptr<BluetoothMapMceServer> mapMce = new BluetoothMapMceServer();
+    servers_[PROFILE_MAP_MCE] = mapMce->AsObject();
+
+    sptr<BluetoothMapMseServer> mapMse = new BluetoothMapMseServer();
+    servers_[PROFILE_MAP_MSE] = mapMse->AsObject();
+
+    sptr<BluetoothA2dpSourceServer> a2dpSource = new BluetoothA2dpSourceServer();
+    servers_[PROFILE_A2DP_SRC] = a2dpSource->AsObject();
+
+    sptr<BluetoothA2dpSinkServer> a2dpSink = new BluetoothA2dpSinkServer();
+    servers_[PROFILE_A2DP_SINK] = a2dpSink->AsObject();
 
     HILOGI("BluetoothHostServer::impl::Init servers_ constructed, size is %{public}zu", servers_.size());
 }
@@ -1301,7 +1350,7 @@ void BluetoothHostServer::DeregisterBlePeripheralCallback(const sptr<IBluetoothB
     }
 }
 
-int32_t BluetoothHostServer::Dump(int32_t fd, const std::vector<std::u16string>& args)
+int32_t BluetoothHostServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     std::vector<std::string> argsInStr8;
     std::transform(args.begin(), args.end(), std::back_inserter(argsInStr8), [](const std::u16string &arg) {

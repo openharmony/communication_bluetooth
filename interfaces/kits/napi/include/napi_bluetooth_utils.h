@@ -37,7 +37,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 constexpr size_t CALLBACK_SIZE = 1;
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
@@ -103,18 +102,18 @@ void ConvertBLECharacteristicVectorToJS(
 void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor &descriptor);
 void ConvertBLEDescriptorVectorToJS(napi_env env, napi_value result, std::vector<GattDescriptor> &descriptors);
 
-void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const BluetoothRemoteDevice &device,
+void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std::string &device,
     GattCharacteristic &characteristic, int requestId);
 
-void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const BluetoothRemoteDevice &device,
+void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const std::string &device,
     GattCharacteristic &characteristic, int requestId);
 
 void ConvertDescriptorReadReqToJS(
-    napi_env env, napi_value result, const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId);
+    napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 
 void ConvertDescriptorWriteReqToJS(
-    napi_env env, napi_value result, const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId);
-
+    napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
+void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertBLEConnectStateChangeToJS(napi_env env, napi_value result, int connectState, int ret);
 void ConvertBLEConnectStateChangeToJS(napi_env env, napi_value result, const BluetoothRemoteDevice &device, int state);
 
@@ -221,6 +220,21 @@ struct DiscoverServicesCallbackInfo {
 struct BluetoothCallbackInfo {
     napi_env env_;
     napi_ref callback_ = 0;
+    int state_;
+    std::string deviceId_;
+    int info_;
+};
+
+struct GattCharacteristicCallbackInfo : public BluetoothCallbackInfo {
+    GattCharacteristic characteristic_ = {UUID::FromString("0"), 0, 0};
+};
+
+struct GattDescriptorCallbackInfo : public BluetoothCallbackInfo {
+    GattDescriptor descriptor_ = {UUID::FromString("0"), 0};
+};
+
+struct BufferCallbackInfo : public BluetoothCallbackInfo {
+    char buffer_[1024];
 };
 
 namespace {

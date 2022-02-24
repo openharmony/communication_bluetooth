@@ -224,7 +224,7 @@ HWTEST_F(GattServerTest, GattServer_ModuleTest_GetServices, TestSize.Level1)
     int ret = server.AddService(serviceOne);
 
     EXPECT_EQ(ret, 0);
-    sleep(2);
+    sleep(TIME);
     std::list<GattService> list = server.GetServices();
     EXPECT_EQ((int)list.size(), 1);
 

@@ -18,20 +18,19 @@
 #include <mutex>
 
 #include "bluetooth_def.h"
-#include "bluetooth_avrcp_tg.h"
 #include "bluetooth_avrcp_tg_proxy.h"
 #include "bluetooth_avrcp_tg_observer_stub.h"
 #include "bluetooth_host.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
-#include "hilog/log.h"
+#include "bluetooth_observer_list.h"
 #include "iservice_registry.h"
 #include "raw_address.h"
 #include "system_ability_definition.h"
+#include "bluetooth_avrcp_tg.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
 struct AvrcpTarget::impl {
 public:
     class ObserverImpl : public BluetoothAvrcpTgObserverStub {
@@ -97,15 +96,14 @@ public:
             proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
         }
 
-        observer_ = std::make_unique<ObserverImpl>(this);
-        proxy_->RegisterObserver(observer_.get());
+        observer_ = new (std::nothrow) ObserverImpl(this);
+        proxy_->RegisterObserver(observer_);
     }
 
     ~impl()
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        proxy_->UnregisterObserver(observer_.get());
-        observers_.clear();
+        proxy_->UnregisterObserver(observer_);
     }
 
     bool IsEnabled(void)
@@ -119,15 +117,15 @@ public:
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         std::lock_guard<std::mutex> lock(observerMutex_);
-        for (auto observer : observers_) {
+        observers_.ForEach([device, state](std::shared_ptr<IObserver> observer) {
             observer->OnConnectionStateChanged(device, state);
-        }
+        });
     }
 
     std::mutex observerMutex_;
     sptr<IBluetoothAvrcpTg> proxy_;
-    std::list<AvrcpTarget::IObserver *> observers_;
-    std::unique_ptr<ObserverImpl> observer_;
+    BluetoothObserverList<AvrcpTarget::IObserver> observers_;
+    sptr<ObserverImpl> observer_;
     sptr<AvrcpTgDeathRecipient> deathRecipient_;
 };
 
@@ -149,8 +147,10 @@ void AvrcpTarget::RegisterObserver(AvrcpTarget::IObserver *observer)
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-
-    pimpl->observers_.push_back(observer);
+    if (pimpl->IsEnabled()) {
+        std::shared_ptr<IObserver> observerPtr(observer, [](IObserver *) {});
+        pimpl->observers_.Register(observerPtr);
+    }
 }
 
 void AvrcpTarget::UnregisterObserver(AvrcpTarget::IObserver *observer)
@@ -159,19 +159,25 @@ void AvrcpTarget::UnregisterObserver(AvrcpTarget::IObserver *observer)
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
-    std::list<AvrcpTarget::IObserver *>::iterator iter;
-
-    for (iter = pimpl->observers_.begin(); iter != pimpl->observers_.end(); iter++) {
-        if (*iter == observer) {
-            pimpl->observers_.erase(iter);
-            break;
-        }
+    std::shared_ptr<IObserver> observerPtr(observer, [](IObserver *) {});
+    if (pimpl->IsEnabled()) {
+        pimpl->observers_.Deregister(observerPtr);
     }
 }
 
 /******************************************************************
  * CONNECTION                                                     *
  ******************************************************************/
+
+void AvrcpTarget::SetActiveDevice(const BluetoothRemoteDevice &device)
+{
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+
+    if (pimpl->IsEnabled()) {
+        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+        pimpl->proxy_->SetActiveDevice(rawAddr);
+    }
+}
 
 std::vector<BluetoothRemoteDevice> AvrcpTarget::GetConnectedDevices(void)
 {
@@ -387,6 +393,5 @@ AvrcpTarget::~AvrcpTarget(void)
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     pimpl = nullptr;
 }
-
 } // namespace ohos
 } // namespace bluetooth

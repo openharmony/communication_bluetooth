@@ -34,9 +34,9 @@
 #ifndef BLUETOOTH_HF_CALL_H
 #define BLUETOOTH_HF_CALL_H
 
-#include "bluetooth_types.h"
-#include "bluetooth_host.h"
 #include <ctime>
+#include "bluetooth_host.h"
+#include "bluetooth_types.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -263,15 +263,15 @@ public:
     }
 
 protected:
-    std::string device_{""};
-    int id_{0};
-    int state_{-1};
-    std::string number_{""};
-    UUID uuid_{};
-    bool multiParty_{false};
-    bool outgoing_{false};
-    bool inBandRing_{false};
-    long creationTime_{0};
+    std::string device_ {""};
+    int id_ {0};
+    int state_ {-1};
+    std::string number_ {""};
+    UUID uuid_;
+    bool multiParty_ {false};
+    bool outgoing_ {false};
+    bool inBandRing_ {false};
+    long creationTime_ {0};
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

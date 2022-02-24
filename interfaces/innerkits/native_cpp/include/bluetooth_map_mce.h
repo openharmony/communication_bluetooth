@@ -39,7 +39,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 /**
  * @brief Map Event Report
  *
@@ -487,7 +486,7 @@ struct MapAction {
                                  // MAP_SUPPORTED_FEATURES_CONVERSATION_LISTING 0x00100000
                                  // MAP_SUPPORTED_FEATURES_OWNER_STATUS 0x00200000
                                  // MAP_SUPPORTED_FEATURES_MESSAGE_FORWARDING 0x00400000
-    OwnerStatus ownerStatus_{};
+    OwnerStatus ownerStatus_ {};
 };
 
 /**
@@ -512,7 +511,7 @@ public:
      * @since 6
      */
     virtual void OnMapActionCompleted(
-        const BluetoothRemoteDevice &device, const MapAction &action, MapExecuteStatus status){};
+        const BluetoothRemoteDevice &device, const MapAction &action, MapExecuteStatus status) {};
     /**
      * @brief  Map EventReported observer
      *
@@ -520,13 +519,13 @@ public:
      * @param  report           EventReported string
      * @since 6
      */
-    virtual void OnMapEventReported(const BluetoothRemoteDevice &device, const MapEventReport &report){};
+    virtual void OnMapEventReported(const BluetoothRemoteDevice &device, const MapEventReport &report) {};
     /**
      * @brief  ConnectionState Changed observer
      * @param  device           bluetooth device address
      * @param  state            EventReported string
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state){};
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) {};
     /**
      * @brief  Bmessage completed observer
      *
@@ -536,7 +535,7 @@ public:
      * @since 6
      */
     virtual void OnBmessageCompleted(
-        const BluetoothRemoteDevice &deviceAddress, const MapBMessage &bmsg, MapExecuteStatus status){};
+        const BluetoothRemoteDevice &deviceAddress, const MapBMessage &bmsg, MapExecuteStatus status) {};
     /**
      * @brief  MessagesListing completed observer
      *
@@ -546,7 +545,7 @@ public:
      * @since 6
      */
     virtual void OnMessagesListingCompleted(
-        const BluetoothRemoteDevice &deviceAddress, const MessagesListing &listing, MapExecuteStatus status){};
+        const BluetoothRemoteDevice &deviceAddress, const MessagesListing &listing, MapExecuteStatus status) {};
     /**
      * @brief  ConversationListing completed observer
      *
@@ -556,7 +555,7 @@ public:
      * @since 6
      */
     virtual void OnConversationListingCompleted(
-        const BluetoothRemoteDevice &deviceAddress, const ConversationListing &listing, MapExecuteStatus status){};
+        const BluetoothRemoteDevice &deviceAddress, const ConversationListing &listing, MapExecuteStatus status) {};
 };
 /**
  * @brief MapClient class
@@ -763,7 +762,7 @@ public:
      * @param  device
      * @param  type
      * @param  msgStatus
-     * @return int 
+     * @return int
      */
     int SetMessageStatus(
         const BluetoothRemoteDevice &device, MapMessageType type, const MapSetMessageStatus &msgStatus);
@@ -812,7 +811,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(MapClient);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 

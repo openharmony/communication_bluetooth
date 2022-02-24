@@ -72,7 +72,7 @@ int BluetoothGattServerStub::OnRemoteRequest(
     }
     HILOGW("BluetoothGattServerStub::OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-};
+}
 ErrCode BluetoothGattServerStub::AddServiceInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t appID = data.ReadInt32();

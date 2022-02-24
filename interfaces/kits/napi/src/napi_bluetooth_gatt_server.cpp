@@ -24,10 +24,10 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-std::vector<std::string> NGattServer::deviceList;
-napi_value NGattServer::constructor_ = nullptr;
+std::vector<std::string> NapiGattServer::deviceList;
+napi_value NapiGattServer::constructor_ = nullptr;
 
-napi_value NGattServer::CreateGattServer(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info info)
 {
     HILOGI("CreateGattServer called");
     napi_value result;
@@ -37,7 +37,7 @@ napi_value NGattServer::CreateGattServer(napi_env env, napi_callback_info info)
     return result;
 }
 
-void NGattServer::DefineGattServerJSClass(napi_env env)
+void NapiGattServer::DefineGattServerJSClass(napi_env env)
 {
     napi_property_descriptor gattserverDesc[] = {
         DECLARE_NAPI_FUNCTION("on", On),
@@ -55,16 +55,16 @@ void NGattServer::DefineGattServerJSClass(napi_env env)
         sizeof(gattserverDesc) / sizeof(gattserverDesc[0]), gattserverDesc, &constructor_);
 }
 
-napi_value NGattServer::GattServerConstructor(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NGattServer* gattServer = new NGattServer();
+    NapiGattServer* gattServer = new NapiGattServer();
 
     napi_wrap(
         env, thisVar, gattServer,
         [](napi_env env, void* data, void* hint) {
-            NGattServer* server = (NGattServer*)data;
+            NapiGattServer* server = (NapiGattServer*)data;
             delete server;
         },
         nullptr,
@@ -73,10 +73,10 @@ napi_value NGattServer::GattServerConstructor(napi_env env, napi_callback_info i
     return thisVar;
 }
 
-napi_value NGattServer::On(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
 {
     HILOGI("RegisterGattServerCallback called");
-    NGattServer *GattServer = nullptr;
+    NapiGattServer *gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -92,28 +92,38 @@ napi_value NGattServer::On(napi_env env, napi_callback_info info)
     }
     string type;
     ParseString(env, type, argv[PARAM0]);
-    std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
-    pCallbackInfo->env_ = env;
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo ;
+    
+    if (type.c_str() == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ || 
+        type.c_str() == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE) {
+        callbackInfo = std::make_shared<GattCharacteristicCallbackInfo>();
+    } else if (type.c_str() == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE ||
+        type.c_str() == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ){
+        callbackInfo = std::make_shared<GattDescriptorCallbackInfo>();
+    } else {
+       callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+    }
+    callbackInfo->env_ = env;
 
-    napi_unwrap(env, thisVar, (void **)&GattServer);
+    napi_unwrap(env, thisVar, (void **)&gattServer);
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, argv[PARAM1], &valueType);
     if (valueType != napi_function) {
         HILOGE("Wrong argument type. Function expected.");
         return ret;
     }
-    napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_);
-    GattServer->GetCallback().SetCallbackInfo(type, pCallbackInfo);
+    napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
+    gattServer->GetCallback().SetCallbackInfo(type, callbackInfo);
 
     HILOGI("%{public}s is registered", type.c_str());
 
     return ret;
 }
 
-napi_value NGattServer::Off(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("DeregisterGattServerCallback called");
-    NGattServer *GattServer = nullptr;
+    NapiGattServer *GattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -136,10 +146,10 @@ napi_value NGattServer::Off(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattServer::AddService(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::AddService(napi_env env, napi_callback_info info)
 {
     HILOGI("AddService called");
-    NGattServer *gattServer = nullptr;
+    NapiGattServer *gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -165,10 +175,10 @@ napi_value NGattServer::AddService(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattServer::Close(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
 {
     HILOGI("Close called");
-    NGattServer* gattServer = nullptr;
+    NapiGattServer* gattServer = nullptr;
     bool isOK = true;
     napi_value thisVar = nullptr;
 
@@ -182,10 +192,10 @@ napi_value NGattServer::Close(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattServer::RemoveGattService(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info info)
 {
     HILOGI("RemoveGattService called");
-    NGattServer* gattServer = nullptr;
+    NapiGattServer* gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -219,9 +229,9 @@ napi_value NGattServer::RemoveGattService(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattServer::SendResponse(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
 {
-    NGattServer* gattServer = nullptr;
+    NapiGattServer* gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -249,10 +259,10 @@ napi_value NGattServer::SendResponse(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NGattServer::NotifyCharacteristicChanged(napi_env env, napi_callback_info info)
+napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callback_info info)
 {
     HILOGI("NotifyCharacteristicChanged called");
-    NGattServer* gattServer = nullptr;
+    NapiGattServer* gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     std::string deviceID;

@@ -137,7 +137,7 @@ struct PbapServer::impl {
     std::vector<BluetoothRemoteDevice> GetConnectedDevices()
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        std::vector<int> states{static_cast<int>(BTConnectState::CONNECTED)};
+        std::vector<int> states {static_cast<int>(BTConnectState::CONNECTED)};
         return GetDevicesByStates(states);
     }
 
@@ -213,7 +213,7 @@ private:
 
 class PbapServer::impl::BluetoothPbapPseDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothPbapPseDeathRecipient(PbapServer::impl &pbapPse) : pbapPse_(pbapPse){};
+    BluetoothPbapPseDeathRecipient(PbapServer::impl &pbapPse) : pbapPse_(pbapPse) {};
     ~BluetoothPbapPseDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothPbapPseDeathRecipient);
 
@@ -231,7 +231,6 @@ private:
 PbapServer::impl::impl()
 {
     serviceObserver_.SetObserver(&observers_);
-    // android::ProcessState::self()->startThreadPool();
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
@@ -261,7 +260,6 @@ PbapServer::impl::impl()
 PbapServer *PbapServer::GetProfile()
 {
     static PbapServer instance;
-    // instance.pimpl->BindServer();
     return &instance;
 }
 

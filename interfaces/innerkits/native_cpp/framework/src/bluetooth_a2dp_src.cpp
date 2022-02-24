@@ -48,7 +48,7 @@ private:
 
 class A2dpSource::impl::BluetoothA2dpSourceObserverImp : public BluetoothA2dpSrcObserverStub {
 public:
-    BluetoothA2dpSourceObserverImp(A2dpSource::impl &a2dpSource) : a2dpSource_(a2dpSource){};
+    BluetoothA2dpSourceObserverImp(A2dpSource::impl &a2dpSource) : a2dpSource_(a2dpSource) {};
     ~BluetoothA2dpSourceObserverImp() override{};
 
     void Register(std::shared_ptr<A2dpSourceObserver> &observer)
@@ -102,7 +102,8 @@ private:
 
 class A2dpSource::impl::BluetoothA2dpSourceDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothA2dpSourceDeathRecipient(A2dpSource::impl &a2dpSrcDeath) : a2dpSrcDeath_(a2dpSrcDeath){};
+    BluetoothA2dpSourceDeathRecipient(A2dpSource::impl &a2dpSrcDeath) : a2dpSrcDeath_(a2dpSrcDeath)
+    {};
     ~BluetoothA2dpSourceDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothA2dpSourceDeathRecipient);
 
@@ -139,7 +140,7 @@ A2dpSource::impl::~impl()
 
 void A2dpSource::impl::GetProxy()
 {
-    HILOGE("A2dpSource::impl::GetProxy start");
+    HILOGI("A2dpSource::impl::GetProxy start");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
         HILOGE("A2dpSource::impl::GetProxy error: no samgr");
@@ -148,7 +149,7 @@ void A2dpSource::impl::GetProxy()
 
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (!hostRemote) {
-        HILOGI("A2dpSource::impl:GetProxy failed: no hostRemote");
+        HILOGE("A2dpSource::impl:GetProxy failed: no hostRemote");
         return;
     }
 
@@ -173,7 +174,7 @@ void A2dpSource::impl::GetProxy()
 
 A2dpSource::A2dpSource()
 {
-    pimpl = std::unique_ptr<impl>(new impl);
+    pimpl = std::make_unique<impl>();
     if (!pimpl) {
         HILOGE("A2dpSource::A2dpSource fails: no pimpl");
     }
@@ -200,7 +201,7 @@ void A2dpSource::DeregisterObserver(A2dpSourceObserver *observer)
 
 std::vector<BluetoothRemoteDevice> A2dpSource::GetDevicesByStates(std::vector<int> states) const
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
     std::vector<BluetoothRemoteDevice> devices;
     std::vector<BluetoothRawAddress> devicesRaw;
 
@@ -228,7 +229,7 @@ std::vector<BluetoothRemoteDevice> A2dpSource::GetDevicesByStates(std::vector<in
 
 int A2dpSource::GetDeviceState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -237,7 +238,10 @@ int A2dpSource::GetDeviceState(const BluetoothRemoteDevice &device) const
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetDeviceState(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->GetDeviceState(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -245,7 +249,7 @@ int A2dpSource::GetDeviceState(const BluetoothRemoteDevice &device) const
 
 int A2dpSource::GetPlayingState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -254,7 +258,10 @@ int A2dpSource::GetPlayingState(const BluetoothRemoteDevice &device) const
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetPlayingState(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->GetPlayingState(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -262,7 +269,7 @@ int A2dpSource::GetPlayingState(const BluetoothRemoteDevice &device) const
 
 bool A2dpSource::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -271,14 +278,17 @@ bool A2dpSource::Connect(const BluetoothRemoteDevice &device)
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->Connect(RawAddress(device.GetDeviceAddr()));
+        ret= pimpl->proxy_->Connect(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return false;
     }
     return (RET_NO_ERROR == ret);
 }
 
 bool A2dpSource::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -287,21 +297,24 @@ bool A2dpSource::Disconnect(const BluetoothRemoteDevice &device)
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->Disconnect(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->Disconnect(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return false;
     }
     return (RET_NO_ERROR == ret);
 }
 
 A2dpSource *A2dpSource::GetProfile()
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
     static A2dpSource service;
     return &service;
 }
 
 int A2dpSource::SetActiveSinkDevice(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -310,7 +323,10 @@ int A2dpSource::SetActiveSinkDevice(const BluetoothRemoteDevice &device)
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->SetActiveSinkDevice(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->SetActiveSinkDevice(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return false;
     }
 
     return ret;
@@ -318,7 +334,7 @@ int A2dpSource::SetActiveSinkDevice(const BluetoothRemoteDevice &device)
 
 const BluetoothRemoteDevice &A2dpSource::GetActiveSinkDevice() const
 {
-    HILOGI("[A2dpSource] %s", __func__);
+    HILOGI("[A2dpSource] %{public}s", __func__);
 
     BluetoothRawAddress rawAddress;
     static BluetoothRemoteDevice deviceInfo;
@@ -333,7 +349,7 @@ const BluetoothRemoteDevice &A2dpSource::GetActiveSinkDevice() const
 
 bool A2dpSource::SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
 {
-    HILOGI("[A2dpSource] %s", __func__);
+    HILOGI("[A2dpSource] %{public}s", __func__);
 
     if ((!device.IsValidBluetoothRemoteDevice()) || (((int)BTStrategyType::CONNECTION_ALLOWED != strategy) &&
                                                         ((int)BTStrategyType::CONNECTION_FORBIDDEN != strategy))) {
@@ -343,7 +359,10 @@ bool A2dpSource::SetConnectStrategy(const BluetoothRemoteDevice &device, int str
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->SetConnectStrategy(RawAddress(device.GetDeviceAddr()), strategy);
+        ret = pimpl->proxy_->SetConnectStrategy(RawAddress(device.GetDeviceAddr()), strategy);
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return false;
     }
 
     return (RET_NO_ERROR == ret);
@@ -351,7 +370,7 @@ bool A2dpSource::SetConnectStrategy(const BluetoothRemoteDevice &device, int str
 
 int A2dpSource::GetConnectStrategy(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -360,7 +379,10 @@ int A2dpSource::GetConnectStrategy(const BluetoothRemoteDevice &device) const
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetConnectStrategy(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->GetConnectStrategy(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -368,7 +390,7 @@ int A2dpSource::GetConnectStrategy(const BluetoothRemoteDevice &device) const
 
 A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     A2dpCodecStatus ret;
     BluetoothA2dpCodecStatus codecStatus;
@@ -411,7 +433,7 @@ A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) 
 
 int A2dpSource::SetCodecPreference(const BluetoothRemoteDevice &device, const A2dpCodecInfo &info)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     int ret = RET_NO_ERROR;
     if (!device.IsValidBluetoothRemoteDevice()) {
@@ -426,9 +448,16 @@ int A2dpSource::SetCodecPreference(const BluetoothRemoteDevice &device, const A2
     serviceInfo.channelMode = info.channelMode;
     serviceInfo.bitsPerSample = info.bitsPerSample;
     serviceInfo.codecPriority = info.codecPriority;
+    serviceInfo.codecSpecific1 = info.codecSpecific1;
+    serviceInfo.codecSpecific2 = info.codecSpecific2;
+    serviceInfo.codecSpecific3 = info.codecSpecific3;
+    serviceInfo.codecSpecific4 = info.codecSpecific4;
 
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->SetCodecPreference(RawAddress(device.GetDeviceAddr()), serviceInfo);
+        ret = pimpl->proxy_->SetCodecPreference(RawAddress(device.GetDeviceAddr()), serviceInfo);
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -436,7 +465,7 @@ int A2dpSource::SetCodecPreference(const BluetoothRemoteDevice &device, const A2
 
 void A2dpSource::SwitchOptionalCodecs(const BluetoothRemoteDevice &device, bool isEnable)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -445,12 +474,15 @@ void A2dpSource::SwitchOptionalCodecs(const BluetoothRemoteDevice &device, bool 
 
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         pimpl->proxy_->SwitchOptionalCodecs(RawAddress(device.GetDeviceAddr()), isEnable);
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return;
     }
 }
 
 int A2dpSource::GetOptionalCodecsSupportState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -460,6 +492,9 @@ int A2dpSource::GetOptionalCodecsSupportState(const BluetoothRemoteDevice &devic
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         pimpl->proxy_->GetOptionalCodecsSupportState(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -467,7 +502,7 @@ int A2dpSource::GetOptionalCodecsSupportState(const BluetoothRemoteDevice &devic
 
 int A2dpSource::StartPlaying(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -476,7 +511,10 @@ int A2dpSource::StartPlaying(const BluetoothRemoteDevice &device)
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->StartPlaying(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->StartPlaying(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -484,7 +522,7 @@ int A2dpSource::StartPlaying(const BluetoothRemoteDevice &device)
 
 int A2dpSource::SuspendPlaying(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -493,7 +531,10 @@ int A2dpSource::SuspendPlaying(const BluetoothRemoteDevice &device)
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->SuspendPlaying(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->SuspendPlaying(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -501,7 +542,7 @@ int A2dpSource::SuspendPlaying(const BluetoothRemoteDevice &device)
 
 int A2dpSource::StopPlaying(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
@@ -510,7 +551,10 @@ int A2dpSource::StopPlaying(const BluetoothRemoteDevice &device)
 
     int ret = RET_NO_ERROR;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->StopPlaying(RawAddress(device.GetDeviceAddr()));
+        ret = pimpl->proxy_->StopPlaying(RawAddress(device.GetDeviceAddr()));
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
     }
 
     return ret;
@@ -519,7 +563,7 @@ int A2dpSource::StopPlaying(const BluetoothRemoteDevice &device)
 void A2dpSource::SetAudioConfigure(
     const BluetoothRemoteDevice &device, uint32_t sampleRate, uint32_t bits, uint8_t channel)
 {
-    HILOGI("[A2dpSource] %s\n", __func__);
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("[A2dpSource] input parameter error.");
         return;
@@ -528,8 +572,34 @@ void A2dpSource::SetAudioConfigure(
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         pimpl->proxy_->SetAudioConfigure(
             RawAddress(device.GetDeviceAddr()), (int)sampleRate, (int)bits, (int)channel);
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return;
     }
+    return;
+}
 
+int A2dpSource::WriteFrame(const uint8_t *data, uint32_t size)
+{
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
+    if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
+        return pimpl->proxy_->WriteFrame(data, size);
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return RET_BAD_STATUS;
+    }
+    return RET_BAD_STATUS;
+}
+    
+void A2dpSource::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
+{
+    HILOGI("[A2dpSource] %{public}s\n", __func__);
+    if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
+        pimpl->proxy_->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+    } else {
+        HILOGI("[A2dpSource] proxy or bt disable.");
+        return;
+    }
     return;
 }
 

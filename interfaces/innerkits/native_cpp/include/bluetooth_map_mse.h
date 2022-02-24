@@ -63,7 +63,7 @@ public:
      *     @c  BTConnectState::DISCONNECTED : the state is disconnected.
      * @since 6
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state){};
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) {};
 
     /**
      * @brief Called to validate if a connection to the bluetooth device should be accepted.
@@ -71,7 +71,7 @@ public:
      * @param device  the connecting bluetooth device.
      * @since 6
      */
-    virtual void OnPermission(const BluetoothRemoteDevice &device){};
+    virtual void OnPermission(const BluetoothRemoteDevice &device) {};
 };
 
 /**

@@ -48,7 +48,11 @@ void GattServiceTest::SetUp()
 void GattServiceTest::TearDown()
 {}
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_IsPrimary, TestSize.Level1)
+/*
+ * @tc.number: GattService001
+ * @tc.name: IsPrimary
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_IsPrimary, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     GattServiceType serviceType_ = GattServiceType::PRIMARY;
@@ -57,7 +61,11 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_IsPrimary, TestSize.Level1)
     GTEST_LOG_(INFO) << "GattService::IsPrimary ends";
 }
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_GetHandle_, TestSize.Level1)
+/*
+ * @tc.number: GattService001
+ * @tc.name: IsPrimary
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_GetHandle_, TestSize.Level1)
 {
     UUID uuid_;
     uuid_ = UUID::FromString("00001820-0000-1000-8000-00805F9B34FB");
@@ -70,7 +78,11 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetHandle_, TestSize.Level1)
     GTEST_LOG_(INFO) << "GattService::GetHandle ends";
 }
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_GetUuid, TestSize.Level1)
+/*
+ * @tc.number: GattService001
+ * @tc.name: IsPrimary
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_GetUuid, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     GattServiceType serviceType_ = GattServiceType::PRIMARY;
@@ -88,7 +100,11 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetUuid, TestSize.Level1)
     GTEST_LOG_(INFO) << "GattService::GetUuid ends";
 }
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_AddService, TestSize.Level1)
+/*
+ * @tc.number: GattService001
+ * @tc.name: IsPrimary
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_AddService, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     GattServiceType serviceType_ = GattServiceType::PRIMARY;
@@ -110,7 +126,11 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_AddService, TestSize.Level1)
     GTEST_LOG_(INFO) << "GattService::AddService ends";
 }
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_GetIncludedServices, TestSize.Level1)
+/*
+ * @tc.number: GattService002
+ * @tc.name: GetIncludedServices
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_GetIncludedServices, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     GattServiceType serviceType_ = GattServiceType::PRIMARY;
@@ -132,7 +152,11 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetIncludedServices, TestSize.L
     GTEST_LOG_(INFO) << "GattService::GetIncludedServices ends";
 }
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_AddCharacteristic, TestSize.Level1)
+/*
+ * @tc.number: GattService003
+ * @tc.name: AddCharacteristic
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_AddCharacteristic, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     GattServiceType serviceType_ = GattServiceType::PRIMARY;
@@ -156,7 +180,11 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_AddCharacteristic, TestSize.Lev
     GTEST_LOG_(INFO) << "GattService::AddCharacteristic ends";
 }
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_GetCharacteristic, TestSize.Level1)
+/*
+ * @tc.number: GattService004
+ * @tc.name: GetCharacteristic
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_GetCharacteristic, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     UUID uuid_test;
@@ -180,7 +208,11 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetCharacteristic, TestSize.Lev
     GTEST_LOG_(INFO) << "GattService::GetCharacteristic ends";
 }
 
-HWTEST_F(GattServiceTest, GattService_ModuleTest_GetCharacteristics, TestSize.Level1)
+/*
+ * @tc.number: GattService005
+ * @tc.name: GetCharacteristics
+*/
+HWTEST_F(GattServiceTest, GattService_UnitTest_GetCharacteristics, TestSize.Level1)
 {
     UUID uuid_ = UUID::RandomUUID();
     GattServiceType serviceType_ = GattServiceType::PRIMARY;
@@ -205,5 +237,6 @@ HWTEST_F(GattServiceTest, GattService_ModuleTest_GetCharacteristics, TestSize.Le
     GTEST_LOG_(INFO) << "GattService::GattService ends";
     GTEST_LOG_(INFO) << "GattService::GetCharacteristics ends";
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS

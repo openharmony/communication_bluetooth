@@ -215,7 +215,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(PbapServer);
     BLUETOOTH_DECLARE_IMPL();
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_PBAP_SERVER_H

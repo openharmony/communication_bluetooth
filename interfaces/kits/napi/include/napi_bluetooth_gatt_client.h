@@ -27,7 +27,7 @@ const int VALUE_1 = 1;
 const int VALUE_2 = 2;
 const int VALUE_3 = 3;
 
-class NGattClient {
+class NapiGattClient {
 public:
 
     static napi_value CreateGattClientDevice(napi_env env, napi_callback_info info);
@@ -44,14 +44,11 @@ public:
     static napi_value ReadCharacteristicValue(napi_env env, napi_callback_info info);
     static napi_value ReadDescriptorValue(napi_env env, napi_callback_info info);
 
-    static napi_value OnCharacteristicChanged(napi_env env, napi_callback_info info); // Test callback only
-
     static napi_value WriteCharacteristicValue(napi_env env, napi_callback_info info);
     static napi_value WriteDescriptorValue(napi_env env, napi_callback_info info);
     static napi_value SetBLEMtuSize(napi_env env, napi_callback_info info);
     static napi_value SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info);
 
-    static napi_value OnConnectionStateChanged(napi_env env, napi_callback_info info); // Test callback only
 
     bool DiscoverServices();
     std::shared_ptr<GattClient> &GetClient()
@@ -59,38 +56,24 @@ public:
         return client_;
     }
 
-    NGattClientCallback &GetCallback()
+    NapiGattClientCallback &GetCallback()
     {
         return callback_;
     }
 
-    void OnCharacteristicChanged()
-    {   // Test callback only
-        HILOGI("OnCharacteristicChanged called");
-        GattCharacteristic characteristic(UUID::FromString("21"), VALUE_1, VALUE_2, VALUE_3);
-        GattDescriptor descriptor(UUID::FromString("41"), VALUE_1, VALUE_2);
-        uint8_t data[3] = {50, 51, 52};
-        descriptor.SetValue(data, VALUE_3);
-        characteristic.AddDescriptor(descriptor);
-        callback_.OnCharacteristicChanged(characteristic);
-    }
-
-    void OnConnectionStateChanged()
-    {   // Test callback only
-        HILOGI("Client OnConnectionStateChanged called");
-        int connectState = 0;
-        int ret = 0;
-        callback_.OnConnectionStateChanged(connectState, ret);
-    }
-
-    NGattClient(std::string &deviceId)
+    std::shared_ptr<BluetoothRemoteDevice> GetDevice()
     {
-        HILOGI("NGattClient called");
+        return device_;
+    }
+
+    NapiGattClient(std::string &deviceId)
+    {
+        HILOGI("NapiGattClient called");
         device_ = std::make_shared<BluetoothRemoteDevice>(deviceId, 1);
         client_ = std::make_shared<GattClient>(*device_);
         callback_.SetClient(this);
     }
-    ~NGattClient() = default;
+    ~NapiGattClient() = default;
 
     static napi_value constructor_;
     ReadCharacteristicValueCallbackInfo *readCharacteristicValueCallbackInfo_;
@@ -99,7 +82,7 @@ public:
 
 private:
     std::shared_ptr<GattClient> client_ = nullptr;
-    NGattClientCallback callback_;
+    NapiGattClientCallback callback_;
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
 };
 } // namespace Bluetooth

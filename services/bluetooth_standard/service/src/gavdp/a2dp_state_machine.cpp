@@ -746,7 +746,6 @@ void A2dpStateStreaming::Entry()
 {
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
     if (codecThread->GetInitStatus()) {
-        codecThread->StartTimer();
     } else {
         if (codecThread != nullptr) {
             codecThread->StartA2dpCodecThread();
@@ -758,7 +757,6 @@ void A2dpStateStreaming::Exit()
 {
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
     if (codecThread->GetInitStatus()) {
-        codecThread->StopTimer();
     }
 }
 

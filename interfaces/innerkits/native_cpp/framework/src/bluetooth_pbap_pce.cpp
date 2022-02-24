@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "bluetooth_pbap_client.h"
 #include <fstream>
 #include <list>
 #include <mutex>
+#include <string>
+#include "bluetooth_pbap_client.h"
 #include "bluetooth_host.h"
 #include "bluetooth_pbap_pce_proxy.h"
-#include <string>
 #include "bluetooth_remote_device.h"
 #include "bluetooth_pbap_pce_observer_stub.h"
 #include "bluetooth_observer_list.h"
@@ -396,10 +396,10 @@ public:
     }
 
 private:
-    PbapPhoneBookData data_{};
+    PbapPhoneBookData data_ {};
 };
 
-class BluetoothPbapPceObserverImpl : public BluetoothPbapPceObserverStub{
+class BluetoothPbapPceObserverImpl : public BluetoothPbapPceObserverStub {
 public:
     BluetoothPbapPceObserverImpl() = default;
     ~BluetoothPbapPceObserverImpl() = default;
@@ -422,8 +422,8 @@ public:
         }
     }
 
-    void OnServicePasswordRequired(
-        const BluetoothRawAddress &device, const ::std::vector<uint8_t> &description, int8_t charset, bool fullAccess) override
+    void OnServicePasswordRequired(const BluetoothRawAddress &device, 
+        const ::std::vector<uint8_t> &description, int8_t charset, bool fullAccess) override
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         if (frameworkObserverListPtr_ != nullptr) {
@@ -435,12 +435,13 @@ public:
         }
     }
 
-    void  OnActionCompleted(
-        const BluetoothRawAddress &device, int respCode, int actionType, const BluetoothIPbapPhoneBookData &result) override
+    void  OnActionCompleted(const BluetoothRawAddress &device, 
+        int respCode, int actionType, const BluetoothIPbapPhoneBookData &result) override
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         if (frameworkObserverListPtr_ != nullptr) {
-            frameworkObserverListPtr_->ForEach([device, respCode, actionType, result](std::shared_ptr<PbapClientObserver> observer) {
+            frameworkObserverListPtr_->ForEach([device, 
+                respCode, actionType, result](std::shared_ptr<PbapClientObserver> observer) {
                 BluetoothRemoteDevice dev(device.GetAddress(), 0);
                 observer->OnActionCompleted(dev, respCode, actionType, PbapPhoneBookDataAdapter(result));
             });
@@ -448,7 +449,7 @@ public:
     }
 
 private:
-    BluetoothObserverList<PbapClientObserver> *frameworkObserverListPtr_{nullptr};
+    BluetoothObserverList<PbapClientObserver> *frameworkObserverListPtr_ {nullptr};
 };
 
 struct PbapClient::impl {
@@ -508,7 +509,7 @@ struct PbapClient::impl {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         std::vector<BluetoothRemoteDevice> remoteDevices;
         std::vector<BluetoothRawAddress> rawDevices;
-        std::vector<int> states{static_cast<int>(BTConnectState::CONNECTED)};
+        std::vector<int> states {static_cast<int>(BTConnectState::CONNECTED)};
         if (proxy_ != nullptr) {
             proxy_->GetDevicesByStates(states, rawDevices);
         }
@@ -577,7 +578,7 @@ struct PbapClient::impl {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         bool ret = false;
         if (proxy_ != nullptr) {
-           ret = proxy_->IsDownloading(bluetooth::RawAddress(device.GetDeviceAddr()));
+            ret = proxy_->IsDownloading(bluetooth::RawAddress(device.GetDeviceAddr()));
         }
         return ret;
     }
@@ -621,7 +622,7 @@ struct PbapClient::impl {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         int ret = (int)BTStrategyType::CONNECTION_UNKNOWN;
         if (proxy_ != nullptr) {
-           ret = proxy_->GetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()));
+            ret = proxy_->GetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()));
         }
         return ret;
     }
@@ -631,20 +632,21 @@ struct PbapClient::impl {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         int ret = -1;
         if (proxy_ != nullptr) {
-            ret = proxy_->SetDevicePassword(bluetooth::RawAddress(device.GetDeviceAddr()), password.c_str(), userId.c_str());
+            ret = proxy_->SetDevicePassword(bluetooth::RawAddress(device.GetDeviceAddr()), 
+                                                                        password.c_str(), userId.c_str());
         }
         return ret;
     }
 
 private:
     std::mutex mutex_;
-    BluetoothObserverList<PbapClientObserver> frameworkObserverList_{};
+    BluetoothObserverList<PbapClientObserver> frameworkObserverList_ {};
     BluetoothPbapPceObserverImpl serviceObserverImpl_;
 };
 
 class PbapClient::impl::BluetoothPbapPceDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothPbapPceDeathRecipient(PbapClient::impl &pbapPce) : pbapPce_(pbapPce){};
+    BluetoothPbapPceDeathRecipient(PbapClient::impl &pbapPce) : pbapPce_(pbapPce) {};
     ~BluetoothPbapPceDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothPbapPceDeathRecipient);
 
@@ -661,7 +663,6 @@ private:
 PbapClient::impl::impl()
 {
     serviceObserverImpl_.SetObserver(&frameworkObserverList_);  // bind frameworkObserverList_
-    // android::ProcessState::self()->startThreadPool();
     HILOGI("PbapClient::impl::impl starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
@@ -690,7 +691,6 @@ PbapClient::impl::impl()
 PbapClient *PbapClient::GetProfile()
 {
     static PbapClient instance;
-    // instance.pimpl->BindServer();
     return &instance;
 }
 

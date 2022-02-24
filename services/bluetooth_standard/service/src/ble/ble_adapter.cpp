@@ -697,6 +697,12 @@ bool BleAdapter::RemovePairWithDisConnect(const RawAddress &device, bool isDisco
     std::vector<RawAddress> removeDevices;
     removeDevices.push_back(device);
     AdapterManager::GetInstance()->OnPairDevicesRemoved(BTTransport::ADAPTER_BLE, removeDevices);
+
+    if (pimpl->blePeripheralCallback_ != nullptr) {
+        pimpl->blePeripheralCallback_->ForEach([device](IBlePeripheralCallback &observer) {
+            observer.OnPairStatusChanged(ADAPTER_BLE, device, BLE_PAIR_NONE);
+        });
+    }
     return true;
 }
 

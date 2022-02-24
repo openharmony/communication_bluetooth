@@ -39,6 +39,11 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+public:
+    UUID uuid_;
+    uint16_t handle_ = 1;
+    const int permissions_ = 100;
+    const int properties_ = 200;
 };
 
 void GattCharacteristicTest::SetUpTestCase(void)
@@ -46,31 +51,54 @@ void GattCharacteristicTest::SetUpTestCase(void)
 void GattCharacteristicTest::TearDownTestCase(void)
 {}
 void GattCharacteristicTest::SetUp()
-{}
+{
+    uuid_ = UUID::RandomUUID();
+}
 
 void GattCharacteristicTest::TearDown()
-{}
-
-HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattCharacteristic_ModuleTest_RequestBleMtuSize start";
-    UUID uuid_ = UUID::RandomUUID();
-    uint16_t handle_ = 1;
-    const int permissions_ = 100;
-    const int properties_ = 200;
 
+}
+
+/*
+ * @tc.number: GattClient001
+ * @tc.name: GattCharacteristic4
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GattCharacteristic4, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GattCharacteristic(4 parameters) start";
     pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     GTEST_LOG_(INFO) << "GattCharacteristic_GattCharacteristic(4 parameters) end";
+}
 
+/*
+ * @tc.number: GattClient002
+ * @tc.name: GattCharacteristic3
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GattCharacteristic3, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GattCharacteristic(3 parameters) start";
     GTEST_LOG_(INFO) << "GattCharacteristic_GattCharacteristic(3 parameters) end";
+}
 
+/*
+ * @tc.number: GattClient003
+ * @tc.name: AddDescriptor
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_AddDescriptor, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_AddDescriptor start";
     GattDescriptor *pdescriptor = new GattDescriptor(uuid_, permissions_);
     pGattCharacteristic->AddDescriptor(*pdescriptor);
     GTEST_LOG_(INFO) << "GattCharacteristic_AddDescriptor end";
+}
 
+/*
+ * @tc.number: GattClient004
+ * @tc.name: GetDescriptor
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetDescriptor, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetDescriptor start";
     GattDescriptor *pdescriptorTmp = pGattCharacteristic->GetDescriptor(uuid_);
     if (pdescriptorTmp->GetUuid().Equals(uuid_)) {
@@ -78,32 +106,50 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
         GTEST_LOG_(INFO) << "GattCharacteristic_GetDescriptor returns correctly";
     }
     GTEST_LOG_(INFO) << "GattCharacteristic_GetDescriptor end";
+}
 
-    GTEST_LOG_(INFO) << "GattCharacteristic_GetDescriptors start";
-    std::vector<GattDescriptor> descriptors_ = pGattCharacteristic->GetDescriptors();
-    bool result = false;
-    if (descriptors_.size() == 1) {
-        result = true;
-        EXPECT_EQ(true, result);
-        GTEST_LOG_(INFO) << "GattCharacteristic_GetDescriptors returns correctly";
-    }
-    GTEST_LOG_(INFO) << "GattCharacteristic_GetDescriptors end";
-
+/*
+ * @tc.number: GattClient005
+ * @tc.name: GetHandle
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetHandle, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetHandle start";
     uint16_t tempHandle = pGattCharacteristic->GetHandle();
     EXPECT_EQ(handle_, tempHandle);
     GTEST_LOG_(INFO) << "GattCharacteristic_GetHandle end";
+}
 
+/*
+ * @tc.number: GattClient006
+ * @tc.name: GetPermissions 
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetPermissions, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetPermissions start";
     int tempPer = pGattCharacteristic->GetPermissions();
     EXPECT_EQ(permissions_, tempPer);
     GTEST_LOG_(INFO) << "GattCharacteristic_GetPermissions end";
+}
 
+/*
+ * @tc.number: GattClient007
+ * @tc.name: GetProperties
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetProperties, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetProperties start";
     int tempPro = pGattCharacteristic->GetProperties();
     EXPECT_EQ(properties_, tempPro);
     GTEST_LOG_(INFO) << "GattCharacteristic_GetProperties end";
+}
 
+/*
+ * @tc.number: GattClient008
+ * @tc.name: GetService
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetService, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetService start";
     GattService *tempGattService = pGattCharacteristic->GetService();
     if (nullptr == tempGattService) {
@@ -111,7 +157,14 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
         GTEST_LOG_(INFO) << "GattCharacteristic_GetService returns correctly";
     }
     GTEST_LOG_(INFO) << "GattCharacteristic_GetService end";
+}
 
+/*
+ * @tc.number: GattClient009
+ * @tc.name: GetUuid
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetUuid, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetUuid start";
     UUID tempUuid = pGattCharacteristic->GetUuid();
     if (tempUuid.Equals(uuid_)) {
@@ -119,13 +172,27 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
         GTEST_LOG_(INFO) << "GattCharacteristic_GetUuid returns correctly";
     }
     GTEST_LOG_(INFO) << "GattCharacteristic_GetUuid end";
+}
 
+/*
+ * @tc.number: GattClient010
+ * @tc.name: SetValue
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_SetValue, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_SetValue start";
     size_t length_Set = 1;
     uint8_t values_Set[1] = {'a'};
     pGattCharacteristic->SetValue(values_Set, length_Set);
     GTEST_LOG_(INFO) << "GattCharacteristic_SetValue end";
+}
 
+/*
+ * @tc.number: GattClient011
+ * @tc.name: GetValue
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetValue, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetValue start";
     size_t length_Get = 1;
     size_t *plength_Get = &length_Get;
@@ -147,23 +214,37 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_ModuleTest_RequestBleMtuSize
     }
 
     GTEST_LOG_(INFO) << "GattCharacteristic_GetValue end";
+}
 
+/*
+ * @tc.number: GattClient012
+ * @tc.name: SetWriteType
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_SetWriteType, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_SetWriteType start";
     GattCharacteristic::WriteType typeTemp = GattCharacteristic::WriteType::DEFAULT;
     int returnCode = 0;
     returnCode = pGattCharacteristic->SetWriteType(typeTemp);
     EXPECT_EQ(returnCode, 0);
     GTEST_LOG_(INFO) << "GattCharacteristic_SetWriteType end";
+}
 
+/*
+ * @tc.number: GattClient013
+ * @tc.name: GetWriteType
+*/
+HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetWriteType, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "GattCharacteristic_GetWriteType start";
+    GattCharacteristic::WriteType typeTemp = GattCharacteristic::WriteType::DEFAULT;
     int resultType = pGattCharacteristic->GetWriteType();
     if (typeTemp == resultType) {
         EXPECT_TRUE(true);
         GTEST_LOG_(INFO) << "GattCharacteristic_GetWriteType returns correctly";
     }
     GTEST_LOG_(INFO) << "GattCharacteristic_GetWriteType end";
-
-    GTEST_LOG_(INFO) << "GattCharacteristic_ModuleTest_RequestBleMtuSize end";
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS

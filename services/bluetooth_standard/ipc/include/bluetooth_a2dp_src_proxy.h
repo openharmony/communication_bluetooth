@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,11 +30,36 @@ public:
     ~BluetoothA2dpSrcProxy()
     {}
 
+    int Connect(const RawAddress &device) override;
+    int Disconnect(const RawAddress &device) override;
+    void RegisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer) override;
+    void DeregisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer) override;
+    std::vector<RawAddress> GetDevicesByStates(const std::vector<int32_t> &states) override;
     int GetDeviceState(const RawAddress &device) override;
-    void RegisterObserver(const sptr<IBluetoothA2dpSrcObserver> &observer) override;
+    int GetPlayingState(const RawAddress &device) override;
+    int SetConnectStrategy(const RawAddress &device, int32_t strategy) override;
+    int GetConnectStrategy(const RawAddress &device) override;
+    int SetActiveSinkDevice(const RawAddress &device) override;
+    RawAddress GetActiveSinkDevice() override;
+    BluetoothA2dpCodecStatus GetCodecStatus(const RawAddress &device) override;
+    int SetCodecPreference(const RawAddress &device, const BluetoothA2dpCodecInfo &info) override;    void SwitchOptionalCodecs(const RawAddress &device, bool isEnable) override;
+    int GetOptionalCodecsSupportState(const RawAddress &device) override;
+    int StartPlaying(const RawAddress &device) override;
+    int SuspendPlaying(const RawAddress &device) override;
+    int StopPlaying(const RawAddress &device) override;
+    void SetAudioConfigure(const RawAddress &device, int32_t sampleRate, int32_t bits, int32_t channel) override;
+    int WriteFrame(const uint8_t *data, uint32_t size) override;
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
 
 private:
     static inline BrokerDelegator<BluetoothA2dpSrcProxy> delegator_;
+    /**
+     * @brief Write the serializable data
+     * @param parcelableVector The communication data of IPC
+     * @param reply Serializable data
+     * @return true: Write the serializable data successfully; otherwise is not.
+     */
+    bool WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

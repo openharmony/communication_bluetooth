@@ -30,11 +30,18 @@ public:
     ~SocketTest()
     {}
 
-    SppClientSocket *pSppClientSocket = nullptr;
+    SppClientSocket *sppClientSocket_ = nullptr;
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+    BluetoothRemoteDevice *pbluetoothRomote_;
+    UUID randomUuid_;
+    UUID insecureUuid_;
+
+    SppServerSocket *server_;
+    UUID uuid_;
 };
 
 void SocketTest::SetUpTestCase(void)
@@ -42,94 +49,149 @@ void SocketTest::SetUpTestCase(void)
 void SocketTest::TearDownTestCase(void)
 {}
 void SocketTest::SetUp()
-{}
+{
+    pbluetoothRomote_ = new BluetoothRemoteDevice();
+    randomUuid_ = UUID::RandomUUID();
+    sppClientSocket_ = new SppClientSocket(*pbluetoothRomote_, randomUuid_, TYPE_RFCOMM, false);
+    insecureUuid_ = UUID::FromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    server_ = nullptr;
+    uuid_ = UUID::FromString("11111111-0000-1000-8000-00805F9B34FB");
+    if (!server_)
+        GTEST_LOG_(INFO) << "SocketFactory::DataListenRfcommByServiceRecord starts";
+    server_ = SocketFactory::DataListenRfcommByServiceRecord("server", uuid_);
+}
 
 void SocketTest::TearDown()
-{}
+{
+    delete pbluetoothRomote_;
+    delete sppClientSocket_;
+}
 
 /**
  * @tc.number:Spp_UnitTest001
- * @tc.name: Spp_Client
+ * @tc.name: Connect
  * @tc.desc: 
  */
-HWTEST_F(SocketTest, Spp_UnitTest_Client, TestSize.Level1)
+HWTEST_F(SocketTest, Spp_UnitTest_Connect, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "Spp_ModuleTest_Unittest_001 start";
-    BluetoothRemoteDevice *pbluetoothRomote = new BluetoothRemoteDevice();
-    UUID randomUuid_ = UUID::RandomUUID();
-    pSppClientSocket = new SppClientSocket(*pbluetoothRomote, randomUuid_, TYPE_RFCOMM, false);
-    UUID insecureUuid_ = UUID::FromString("00001101-0000-1000-8000-00805F9B34FB");
-
-    BluetoothRemoteDevice device_ = *pbluetoothRomote;
-
     GTEST_LOG_(INFO) << "SppClientSocket::Connect starts";
-    pSppClientSocket->Connect();
+    sppClientSocket_->Connect();
     GTEST_LOG_(INFO) << "SppClientSocket::Connect ends";
+}
 
+/**
+ * @tc.number:Spp_UnitTest002
+ * @tc.name: Close
+ * @tc.desc: 
+ */
+HWTEST_F(SocketTest, Spp_UnitTest_Close, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "SppClientSocket::Close starts";
-    pSppClientSocket->Close();
+    sppClientSocket_->Close();
     GTEST_LOG_(INFO) << "SppClientSocket::Close ends";
+}
+
+/**
+ * @tc.number:Spp_UnitTest003
+ * @tc.name: GetInputStream
+ * @tc.desc: 
+ */
+HWTEST_F(SocketTest, Spp_UnitTest_GetInputStream, TestSize.Level1)
+{
     int fd = 37;
+    BluetoothRemoteDevice device_;
     SppClientSocket *pfd_SppClientSocket = new SppClientSocket(fd, device_.GetDeviceAddr());
 
     char receive[512];
     int DATASIZE = 1024;
     size_t returnInput = 0;
-    size_t returnOutput = 0;
-    char multiChar[10] = {'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n'};
+    
+    
     GTEST_LOG_(INFO) << "SppClientSocket::GetInputStream starts";
     InputStream input = pfd_SppClientSocket->GetInputStream();
     returnInput = input.Read(receive, DATASIZE);
     GTEST_LOG_(INFO) << "SppClientSocket::GetInputStream ends";
+}
 
+/**
+ * @tc.number:Spp_UnitTest004
+ * @tc.name: GetOutputStream
+ * @tc.desc: 
+ */
+HWTEST_F(SocketTest, Spp_UnitTest_GetOutputStream, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "SppClientSocket::GetOutputStream starts";
+    char multiChar[10] = {'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n'};
+    int fd = 37;
+    BluetoothRemoteDevice device_;
+    SppClientSocket *pfd_SppClientSocket = new SppClientSocket(fd, device_.GetDeviceAddr());
     OutputStream output = pfd_SppClientSocket->GetOutputStream();
+    size_t returnOutput = 0;
     returnOutput = output.Write(multiChar, 10);
     GTEST_LOG_(INFO) << "SppClientSocket::GetOutputStream ends";
+}
 
+/**
+ * @tc.number:Spp_UnitTest005
+ * @tc.name: GetRemoteDevice
+ * @tc.desc: 
+ */
+HWTEST_F(SocketTest, Spp_UnitTest_GetRemoteDevice, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "SppClientSocket::GetRemoteDevice starts";
+    int fd = 37;
+    BluetoothRemoteDevice device_;
+    SppClientSocket *pfd_SppClientSocket = new SppClientSocket(fd, device_.GetDeviceAddr());
     BluetoothRemoteDevice tempRemoteDevice = pfd_SppClientSocket->GetRemoteDevice();
     GTEST_LOG_(INFO) << "SppClientSocket::GetRemoteDevice ends";
-
+}
+    
+/**
+ * @tc.number:Spp_UnitTest006
+ * @tc.name: IsConnected
+ * @tc.desc: 
+ */
+HWTEST_F(SocketTest, Spp_UnitTest_IsConnected, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "SppClientSocket::IsConnected starts";
+    int fd = 37;
+    BluetoothRemoteDevice device_;
+    SppClientSocket *pfd_SppClientSocket = new SppClientSocket(fd, device_.GetDeviceAddr());
     bool IsConnected = false;
     IsConnected = pfd_SppClientSocket->IsConnected();
     EXPECT_EQ(IsConnected, true);
     GTEST_LOG_(INFO) << "SppClientSocket::IsConnected ends";
-
-    GTEST_LOG_(INFO) << "Spp_ModuleTest_Unittest_001 end";
 }
 
 /**
- * @tc.number:Spp_UnitTest002
- * @tc.name: Spp_Server
+ * @tc.number:Spp_UnitTest007
+ * @tc.name: GetStringTag
  * @tc.desc: 
  */
-HWTEST_F(SocketTest, Spp_UnitTest_Server, TestSize.Level1)
+HWTEST_F(SocketTest, Spp_UnitTest_GetStringTag, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "Spp_ModuleTest_Unittest_002 start";
-
-    SppServerSocket *server_ = nullptr;
-    UUID uuid_ = UUID::FromString("11111111-0000-1000-8000-00805F9B34FB");
-    if (!server_)
-        GTEST_LOG_(INFO) << "SocketFactory::DataListenRfcommByServiceRecord starts";
-    server_ = SocketFactory::DataListenRfcommByServiceRecord("server", uuid_);
-
     GTEST_LOG_(INFO) << "SppServerSocket::GetStringTag starts";
     std::string returnStr{""};
     returnStr = server_->GetStringTag();
     GTEST_LOG_(INFO) << "SppServerSocket::GetStringTag ends";
+}
 
+/**
+ * @tc.number:Spp_UnitTest008
+ * @tc.name: Accept
+ * @tc.desc: 
+ */
+HWTEST_F(SocketTest, Spp_UnitTest_Accept, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "SppServerSocket::Accept starts";
+    
     int SERTIMEOUT = 10;
     std::unique_ptr<SppClientSocket> preturn_SppClientSocket = server_->Accept(SERTIMEOUT);
     GTEST_LOG_(INFO) << "SppServerSocket::Accept ends";
-
-    GTEST_LOG_(INFO) << "SppServerSocket::Close starts";
-    server_->Close();
-    GTEST_LOG_(INFO) << "SppServerSocket::Close ends";
-
-    GTEST_LOG_(INFO) << "Spp_ModuleTest_Unittest_002 end";
 }
+
+
+
 }  // namespace Bluetooth
 }  // namespace OHOS
