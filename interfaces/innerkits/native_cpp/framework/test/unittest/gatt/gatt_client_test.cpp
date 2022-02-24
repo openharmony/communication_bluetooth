@@ -110,17 +110,25 @@ void GattClientTest::SetUp()
 void GattClientTest::TearDown()
 {}
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_GattClient, TestSize.Level1)
+/*
+ * @tc.number: GattClient001
+ * @tc.name: GattClient
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_GattClient, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_GattClient start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_GattClient start";
     BluetoothRemoteDevice device;
     GattClient client(device);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_GattClient end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_GattClient end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_Connect, TestSize.Level1)
+/*
+ * @tc.number: GattClient002
+ * @tc.name: Connect
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_Connect, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_Connect start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_Connect start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -128,12 +136,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_Connect, TestSize.Level1)
     int transport = 1;
     int result = client.Connect(callback_, isAutoConnect, transport);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_Connect end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_Connect end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_Disconnect, TestSize.Level1)
+/*
+ * @tc.number: GattClient003
+ * @tc.name: Disconnect
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_Disconnect, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_Disconnect start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_Disconnect start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -142,12 +154,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_Disconnect, TestSize.Level1)
     client.Connect(callback_, isAutoConnect, transport);
     int result = client.Disconnect();
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_Disconnect end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_Disconnect end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_DiscoverServices, TestSize.Level1)
+/*
+ * @tc.number: GattClient004
+ * @tc.name: DiscoverServices
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_DiscoverServices, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_DiscoverServices start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_DiscoverServices start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -156,12 +172,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_DiscoverServices, TestSize.Level1
     client.Connect(callback_, isAutoConnect, transport);
     int result = client.DiscoverServices();
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_DiscoverServices end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_DiscoverServices end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_1, TestSize.Level1)
+/*
+ * @tc.number: GattClient005
+ * @tc.name: GetService_1
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_GetService_1, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_1 start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_GetService_1 start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -175,12 +195,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_1, TestSize.Level1)
         ret = true;
     }
     EXPECT_EQ(ret, false);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_1 end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_GetService_1 end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_2, TestSize.Level1)
+/*
+ * @tc.number: GattClient006
+ * @tc.name: GetService_2
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_GetService_2, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_2 start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_GetService_2 start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -188,12 +212,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_GetService_2, TestSize.Level1)
     int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     EXPECT_EQ((int)client.GetService().size(), 0);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_GetService_2 end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_GetService_2 end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_ReadCharacteristic, TestSize.Level1)
+/*
+ * @tc.number: GattClient007
+ * @tc.name: ReadCharacteristic
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_ReadCharacteristic, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_ReadCharacteristic start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_ReadCharacteristic start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -206,12 +234,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_ReadCharacteristic, TestSize.Leve
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     int result = client.ReadCharacteristic(characteristic);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_ReadCharacteristic end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_ReadCharacteristic end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_ReadDescriptor, TestSize.Level1)
+/*
+ * @tc.number: GattClient008
+ * @tc.name: ReadDescriptor
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_ReadDescriptor, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_ReadDescriptor start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_ReadDescriptor start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -223,12 +255,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_ReadDescriptor, TestSize.Level1)
     GattDescriptor descriptor = GattDescriptor(uuid_, permissions);
     int result = client.ReadDescriptor(descriptor);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_ReadDescriptor end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_ReadDescriptor end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_RequestBleMtuSize, TestSize.Level1)
+/*
+ * @tc.number: GattClient009
+ * @tc.name: RequestBleMtuSize
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_RequestBleMtuSize, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_RequestBleMtuSize start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_RequestBleMtuSize start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -238,12 +274,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_RequestBleMtuSize, TestSize.Level
     int mtu = 17;
     result = client.RequestBleMtuSize(mtu);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_RequestBleMtuSize end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_RequestBleMtuSize end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_SetNotifyCharacteristic, TestSize.Level1)
+/*
+ * @tc.number: GattClient010
+ * @tc.name: SetNotifyCharacteristic
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_SetNotifyCharacteristic, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_SetNotifyCharacteristic start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_SetNotifyCharacteristic start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -257,12 +297,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_SetNotifyCharacteristic, TestSize
     bool enable = true;
     int result = client.SetNotifyCharacteristic(characteristic, enable);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_SetNotifyCharacteristic end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_SetNotifyCharacteristic end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_WriteCharacteristic, TestSize.Level1)
+/*
+ * @tc.number: GattClient011
+ * @tc.name: WriteCharacteristic
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_WriteCharacteristic, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_WriteCharacteristic start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_WriteCharacteristic start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -275,12 +319,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_WriteCharacteristic, TestSize.Lev
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     int result = client.WriteCharacteristic(characteristic);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_WriteCharacteristic end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_WriteCharacteristic end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_WriteDescriptor, TestSize.Level1)
+/*
+ * @tc.number: GattClient012
+ * @tc.name: WriteDescriptor
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_WriteDescriptor, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_WriteDescriptor start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_WriteDescriptor start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -292,12 +340,16 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_WriteDescriptor, TestSize.Level1)
     GattDescriptor descriptor = GattDescriptor(uuid_, permissions);
     int result = client.WriteDescriptor(descriptor);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_WriteDescriptor end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_WriteDescriptor end";
 }
 
-HWTEST_F(GattClientTest, GattClient_ModuleTest_RequestConnectionPriority, TestSize.Level1)
+/*
+ * @tc.number: GattClient013
+ * @tc.name: RequestConnectionPriority
+*/
+HWTEST_F(GattClientTest, GattClient_UnitTest_RequestConnectionPriority, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_RequestConnectionPriority start";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_RequestConnectionPriority start";
     BluetoothRemoteDevice device;
     GattClient client(device);
     GattClientCallbackTest callback_;
@@ -307,7 +359,8 @@ HWTEST_F(GattClientTest, GattClient_ModuleTest_RequestConnectionPriority, TestSi
     int connPriority = 2;
     int result = client.RequestConnectionPriority(connPriority);
     EXPECT_EQ(result, -18);
-    GTEST_LOG_(INFO) << "GattClient_ModuleTest_RequestConnectionPriority end";
+    GTEST_LOG_(INFO) << "GattClient_UnitTest_RequestConnectionPriority end";
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS

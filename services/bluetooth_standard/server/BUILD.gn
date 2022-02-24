@@ -26,13 +26,22 @@ ohos_shared_library("bluetooth_server") {
   ]
 
   sources = [
+    "src/bluetooth_a2dp_sink_server.cpp",
     "src/bluetooth_a2dp_source_server.cpp",
+    "src/bluetooth_avrcp_ct_server.cpp",
+    "src/bluetooth_avrcp_tg_server.cpp",
     "src/bluetooth_ble_advertiser_server.cpp",
     "src/bluetooth_ble_central_manager_server.cpp",
     "src/bluetooth_gatt_client_server.cpp",
     "src/bluetooth_gatt_server_server.cpp",
+    "src/bluetooth_hfp_ag_server.cpp",
+    "src/bluetooth_hfp_hf_server.cpp",
     "src/bluetooth_host_dumper.cpp",
     "src/bluetooth_host_server.cpp",
+    "src/bluetooth_map_mce_server.cpp",
+    "src/bluetooth_map_mse_server.cpp",
+    "src/bluetooth_pbap_pce_server.cpp",
+    "src/bluetooth_pbap_pse_server.cpp",
     "src/bluetooth_socket_server.cpp",
   ]
 

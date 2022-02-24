@@ -460,6 +460,10 @@ public:
      */
     void UpdateAudioData(bool dataReady);
 
+    bool WriteFrame(const uint8_t *data, uint32_t size);
+
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp);
+
 private:
     /**
      * @brief Get the instance of SDP.

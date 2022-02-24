@@ -50,6 +50,8 @@ public:
     }
     virtual void SendFrames(uint64_t timeStampUs) = 0;
     virtual void UpdateEncoderParam() = 0;
+    virtual bool SetPcmData(const uint8_t *data, uint16_t dataSize) = 0;
+    virtual void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) = 0;
 
 protected:
     DISALLOW_COPY_AND_ASSIGN(A2dpEncoder);

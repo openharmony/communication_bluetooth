@@ -24,7 +24,6 @@
 #include "interface_profile_gatt_server.h"
 #include "interface_profile_manager.h"
 #include "interface_adapter_manager.h"
-#include "hilog/log.h"
 
 namespace OHOS {
 namespace Bluetooth {

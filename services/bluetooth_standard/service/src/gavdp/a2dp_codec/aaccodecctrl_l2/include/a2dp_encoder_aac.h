@@ -34,6 +34,10 @@ public:
     {}
     void UpdateEncoderParam() override
     {}
+    bool SetPcmData(const uint8_t *data, uint16_t dataSize) override 
+    {return false;}
+    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override
+    {}
 };
 }  // namespace bluetooth
 #endif  // A2DP_ENCODER_AAC_H

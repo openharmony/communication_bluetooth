@@ -25,7 +25,6 @@
 #define INTERFACE_PROFILE_A2DP_SRC_H
 
 #include "interface_profile.h"
-#include <functional>
 
 namespace bluetooth {
 struct A2dpSrcCodecInfo {
@@ -95,7 +94,7 @@ public:
      * @param error  the error information.
      * @since 6.0
      */
-    virtual void OnPlayingStatusChaned(const RawAddress &device, int playingState, int error){};
+    virtual void OnPlayingStatusChaned(const RawAddress &device, int playingState, int error) {};
 
     /**
      * @brief The callback function after device's codec information changed.
@@ -105,7 +104,7 @@ public:
      * @param error  the error information.
      * @since 6.0
      */
-    virtual void OnConfigurationChanged(const RawAddress &device, const A2dpSrcCodecInfo &info, int error){};
+    virtual void OnConfigurationChanged(const RawAddress &device, const A2dpSrcCodecInfo &info, int error) {};
 
     /**
      * @brief ConnectionState Changed observer.
@@ -113,7 +112,7 @@ public:
      * @param state Connection state.
      * @since 6.0
      */
-    virtual void OnConnectionStateChanged(const RawAddress &remoteAddr, int state){};
+    virtual void OnConnectionStateChanged(const RawAddress &remoteAddr, int state) {};
 };
 
 /**
@@ -306,6 +305,23 @@ public:
      * @since 6.0
      */
     virtual void SetAudioConfigure(const RawAddress &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel) = 0;
+
+    /**
+     * @brief Send frame data.
+     * @param[in] data: The address of the data
+     * @param[in] size: The size of the data
+     * @since 6.0
+     */
+    virtual int WriteFrame(const uint8_t *data, uint32_t size) = 0;
+
+    /**
+     * @brief Get the current rendered position.
+     * @param[out] delayValue: The delayed time
+     * @param[out] sendDataSize: The size of the data sent
+     * @param[out] timeStamp: The time of the current position
+     * @since 6.0
+     */
+    virtual void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) = 0;
 };
 /**
  * @brief This class provides functions called by Framework API for a2dp source.

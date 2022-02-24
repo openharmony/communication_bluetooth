@@ -862,6 +862,35 @@ void A2dpService::SetAudioConfigure(const RawAddress &addr, uint32_t sampleRate,
     }
 }
 
+int A2dpService::WriteFrame(const uint8_t *data, uint32_t size)
+{
+    LOG_INFO("[A2dpService] %{public}s\n", __func__);
+
+    A2dpProfile *profile = GetProfileInstance(role_);
+    if (profile != nullptr) {
+        if(profile->WriteFrame(data, size)) {
+            LOG_ERROR("[A2dpService] %{public}s Failed to write frame. role_(%u)\n", __func__, role_);
+            return RET_BAD_STATUS;
+        }
+    } else {
+        LOG_ERROR("[A2dpService] %{public}s Failed to get profile instance. role_(%u)\n", __func__, role_);
+        return RET_BAD_STATUS;
+    }
+    return RET_NO_ERROR;
+}
+
+void A2dpService::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
+{
+    LOG_INFO("[A2dpService] %{public}s\n", __func__);
+
+    A2dpProfile *profile = GetProfileInstance(role_);
+    if (profile != nullptr) {
+        profile->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+    } else {
+        LOG_ERROR("[A2dpService] %{public}s Failed to get profile instance. role_(%u)\n", __func__, role_);
+    }
+}
+
 int A2dpService::GetMaxConnectNum()
 {
     LOG_INFO("[A2dpService] %{public}s\n", __func__);

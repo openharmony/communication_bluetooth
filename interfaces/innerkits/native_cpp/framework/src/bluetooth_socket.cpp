@@ -97,7 +97,7 @@ struct SppClientSocket::impl {
         }
         char token[LENGTH] = {0};
         (void)sprintf_s(token,
-            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
+            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
         BluetoothRawAddress rawAddr {
             token
         };
@@ -173,6 +173,7 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("SppClientSocket::impl::BluetoothClientSocketDeathRecipient::OnRemoteDied starts");
+        host_.proxy_->AsObject()->RemoveDeathRecipient(host_.deathRecipient_);
         host_.proxy_ = nullptr;
     }
 
@@ -275,24 +276,24 @@ int SppClientSocket::Connect()
     HILOGI("SppClientSocket::Connect starts");
     if (!IS_BT_ENABLED()) {
         HILOGI("BR is not TURN_ON");
-        return SPPStatus::SPP_FAILURE;
+        return BtStatus::BT_FAILURE;
     }
     pimpl->address_ = pimpl->remoteDevice_.GetDeviceAddr();
 
     std::string tempAddress = pimpl->address_;
     if (!tempAddress.size()) {
-        return SPPStatus::SPP_FAILURE;
+        return BtStatus::BT_FAILURE;
     }
     if (pimpl->socketStatus_ == SOCKET_CLOSED) {
         HILOGE("socket closed");
-        return SPPStatus::SPP_FAILURE;
+        return BtStatus::BT_FAILURE;
     }
 
     bluetooth::Uuid serverUuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits());
 
     if (!pimpl->proxy_) {
         HILOGE("SppClientSocket:Connect: proxy_ is nullptr");
-        return SPPStatus::SPP_FAILURE;
+        return BtStatus::BT_FAILURE;
     }
 
     pimpl->fd_ =
@@ -301,7 +302,7 @@ int SppClientSocket::Connect()
     HILOGI("SppClientSocket:Connect: fd_: %{public}d", pimpl->fd_);
     if (pimpl->fd_ == -1) {
         HILOGE("connect failed!");
-        return SPPStatus::SPP_FAILURE;
+        return BtStatus::BT_FAILURE;
     }
 
     bool recvret = pimpl->RecvSocketSignal();
@@ -311,10 +312,10 @@ int SppClientSocket::Connect()
 
     if (!recvret) {
         HILOGE("connect failed!");
-        return SPPStatus::SPP_FAILURE;
+        return BtStatus::BT_FAILURE;
     }
     pimpl->socketStatus_ = SOCKET_CONNECTED;
-    return SPPStatus::SPP_SUCCESS;
+    return BtStatus::BT_SUCCESS;
 }
 
 void SppClientSocket::Close()
@@ -372,11 +373,11 @@ struct SppServerSocket::impl {
         HILOGI("SppServerSocket::Listen() starts");
         if (!IS_BT_ENABLED()) {
             HILOGI("BR is not TURN_ON");
-            return SPPStatus::SPP_FAILURE;
+            return BtStatus::BT_FAILURE;
         }
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGE("Listen failed, socketStatus_ is SOCKET_CLOSED");
-            return SPPStatus::SPP_FAILURE;
+            return BtStatus::BT_FAILURE;
         }
 
         bluetooth::Uuid serverUuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits());
@@ -384,14 +385,14 @@ struct SppServerSocket::impl {
         if (!proxy_) {
             HILOGE("Listen failed, proxy_ is nullptr");
             socketStatus_ = SOCKET_CLOSED;
-            return SPPStatus::SPP_FAILURE;
+            return BtStatus::BT_FAILURE;
         }
 
         fd_ = proxy_->Listen(name_, serverUuid, (int32_t)getSecurityFlags(), (int32_t)type_);
         if (fd_ == -1) {
             HILOGE("Listen failed, fd_ is -1");
             socketStatus_ = SOCKET_CLOSED;
-            return SPPStatus::SPP_FAILURE;
+            return BtStatus::BT_FAILURE;
         }
 
         if (socketStatus_ == SOCKET_INIT) {
@@ -400,10 +401,10 @@ struct SppServerSocket::impl {
             HILOGE("Listen failed, socketStatus_: %{public}d is not SOCKET_INIT", socketStatus_);
             close(fd_);
             socketStatus_ = SOCKET_CLOSED;
-            return SPPStatus::SPP_FAILURE;
+            return BtStatus::BT_FAILURE;
         }
 
-        return SPPStatus::SPP_SUCCESS;
+        return BtStatus::BT_SUCCESS;
     }
 
     int getSecurityFlags()
@@ -466,18 +467,18 @@ struct SppServerSocket::impl {
 #endif
         if (rv == -1) {
             HILOGE("[sock] recvmsg error  %{public}d,  fd: %{public}d", errno, fd_);
-            return SPPStatus::SPP_FAILURE;
+            return BtStatus::BT_FAILURE;
         }
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
         if ((cmptr != NULL) && (cmptr->cmsg_len == CMSG_LEN(sizeof(int)))) {
             if (cmptr->cmsg_level != SOL_SOCKET || cmptr->cmsg_type != SCM_RIGHTS) {
                 HILOGE("[sock] control level: %{public}d", cmptr->cmsg_level);
                 HILOGE("[sock] control type: %{public}d", cmptr->cmsg_type);
-                return SPPStatus::SPP_FAILURE;
+                return BtStatus::BT_FAILURE;
             }
             clientFd = *((int *)CMSG_DATA(cmptr));
         } else {
-            return SPPStatus::SPP_FAILURE;
+            return BtStatus::BT_FAILURE;
         }
         uint8_t recvBuf[rv];
         memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
@@ -488,7 +489,7 @@ struct SppServerSocket::impl {
 
         char token[LENGTH] = {0};
         (void)sprintf_s(token,
-            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
+            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
         BluetoothRawAddress rawAddr {token};
         acceptAddress_ = rawAddr.GetAddress().c_str();
         return clientFd;

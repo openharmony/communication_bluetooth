@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,17 +21,20 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothA2dpSrcObserverProxy : public IRemoteProxy<IBluetoothA2dpSrcObserver> {
+class BluetoothA2dpSrcObserverProxy : public IRemoteProxy<IBluetoothA2dpSourceObserver> {
 public:
     explicit BluetoothA2dpSrcObserverProxy(const sptr<IRemoteObject> &impl)
-        : IRemoteProxy<IBluetoothA2dpSrcObserver>(impl)
+        : IRemoteProxy<IBluetoothA2dpSourceObserver>(impl)
     {}
     ~BluetoothA2dpSrcObserverProxy()
     {}
 
-    void OnPlayingStateChanged(const RawAddress &device, int playingState, int error) override;
+    void OnConnectionStateChanged(const RawAddress &device, int state) override;
+    void OnPlayingStatusChanged(const RawAddress &device, int playingState, int error) override;
+    void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) override;
 
 private:
+    ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothA2dpSrcObserverProxy> delegator_;
 };
 }  // namespace Bluetooth

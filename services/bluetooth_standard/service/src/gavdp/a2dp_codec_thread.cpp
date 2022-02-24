@@ -22,25 +22,18 @@
 #include "log.h"
 
 namespace bluetooth {
-const int ENCODE_TIMER_SBC = 20;
-const int ENCODE_TIMER_AAC = 25;
-#define PCM_DATA_ENCODED_TIMER(isSbc) (isSbc ? ENCODE_TIMER_SBC : ENCODE_TIMER_AAC)
 A2dpCodecThread *A2dpCodecThread::g_instance = nullptr;
 std::recursive_mutex g_codecMutex {};
 A2dpCodecThread::A2dpCodecThread(const std::string &name) : name_(name)
 {
     LOG_INFO("[A2dpCodecThread]%{public}s\n", __func__);
     dispatcher_ = std::make_unique<Dispatcher>(name);
-    auto callbackFunc = std::bind(&A2dpCodecThread::SignalingTimeoutCallback, this);
-    signalingTimer_ = std::make_unique<utility::Timer>(callbackFunc);
 }
 
 A2dpCodecThread::~A2dpCodecThread()
 {
     encoder_ = nullptr;
     decoder_ = nullptr;
-    signalingTimer_ = nullptr;
-    signalingTimer_ = nullptr;
     dispatcher_ = nullptr;
     g_instance = nullptr;
     isSbc_ = false;
@@ -76,10 +69,6 @@ void A2dpCodecThread::StopA2dpCodecThread()
     LOG_INFO("[A2dpCodecThread]%{public}s\n", __func__);
 
     dispatcher_->Uninitialize();
-
-    if (signalingTimer_ != nullptr) {
-        signalingTimer_->Stop();
-    }
     threadInit = false;
 }
 
@@ -132,27 +121,34 @@ void A2dpCodecThread::ProcessMessage(utility::Message msg, const A2dpEncoderInit
     }
 }
 
-void A2dpCodecThread::StartTimer() const
-{
-    if (signalingTimer_ != nullptr) {
-        signalingTimer_->Start(PCM_DATA_ENCODED_TIMER(isSbc_), true);
-    }
-}
-
-void A2dpCodecThread::StopTimer() const
-{
-    if (signalingTimer_ != nullptr) {
-        signalingTimer_->Stop();
-    }
-    if (encoder_ != nullptr) {
-        encoder_->ResetFeedingState();
-    }
-}
-
 bool A2dpCodecThread::GetInitStatus() const
 {
     return threadInit;
 }
+
+bool A2dpCodecThread::WriteFrame(const uint8_t *data, uint16_t size) const
+{
+    LOG_INFO("[A2dpCodecThread]%{public}s size:%{public}hu\n", __func__, size);
+    if (encoder_ != nullptr) {
+        if(!encoder_->SetPcmData(data, size)) {
+            return false;
+        }
+        utility::Message msg(A2DP_PCM_PUSH, 0, nullptr);
+        A2dpEncoderInitPeerParams peerParams = {};
+        PostMessage(msg, peerParams, nullptr, nullptr, nullptr);
+        return true;
+    }
+    return false;
+}
+
+void A2dpCodecThread::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) const
+{
+    LOG_INFO("[A2dpCodecThread]%{public}s\n", __func__);
+    if (encoder_ != nullptr) {
+        encoder_->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+    }
+}
+
 void A2dpCodecThread::SourceEncode(
     const A2dpEncoderInitPeerParams &peerParams, const A2dpCodecConfig &config, const A2dpEncoderObserver &observer)
 {
@@ -164,10 +160,6 @@ void A2dpCodecThread::SourceEncode(
             encoder_ = std::make_unique<A2dpSbcEncoder>(&const_cast<A2dpEncoderInitPeerParams &>(peerParams),
                 &const_cast<A2dpCodecConfig &>(config),
                 &const_cast<A2dpEncoderObserver &>(observer));
-            if (signalingTimer_ != nullptr) {
-                signalingTimer_->Stop();
-                signalingTimer_->Start(PCM_DATA_ENCODED_TIMER(isSbc_), true);
-            }
             break;
         case A2DP_SOURCE_CODEC_INDEX_AAC:
         case A2DP_SINK_CODEC_INDEX_AAC:
@@ -175,22 +167,10 @@ void A2dpCodecThread::SourceEncode(
             encoder_ = std::make_unique<A2dpAacEncoder>(&const_cast<A2dpEncoderInitPeerParams &>(peerParams),
                 &const_cast<A2dpCodecConfig &>(config),
                 &const_cast<A2dpEncoderObserver &>(observer));
-            if (signalingTimer_ != nullptr) {
-                signalingTimer_->Stop();
-                signalingTimer_->Start(PCM_DATA_ENCODED_TIMER(isSbc_), true);
-            }
             break;
         default:
             break;
     }
-}
-
-void A2dpCodecThread::SignalingTimeoutCallback() const
-{
-    utility::Message msg(A2DP_PCM_PUSH, 0, nullptr);
-    A2dpEncoderInitPeerParams peerParams = {};
-
-    PostMessage(msg, peerParams, nullptr, nullptr, nullptr);
 }
 
 void A2dpCodecThread::SinkDecode(const A2dpCodecConfig &config, A2dpDecoderObserver &observer)

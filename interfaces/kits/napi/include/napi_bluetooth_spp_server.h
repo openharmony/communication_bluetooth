@@ -23,13 +23,13 @@ namespace OHOS {
 namespace Bluetooth {
 void DefineSppFunctions(napi_env env, napi_value exports);
 
-struct NSppServer {
+struct NapiSppServer {
     static napi_value SppListen(napi_env env, napi_callback_info info);
     static napi_value SppAccept(napi_env env, napi_callback_info info);
     static napi_value SppConnect(napi_env env, napi_callback_info info);
     static napi_value SppCloseServerSocket(napi_env env, napi_callback_info info);
 
-    static std::map<int, std::shared_ptr<NSppServer>> serverMap;
+    static std::map<int, std::shared_ptr<NapiSppServer>> serverMap;
     static int count;
 
     std::shared_ptr<SppServerSocket> server_ = nullptr;

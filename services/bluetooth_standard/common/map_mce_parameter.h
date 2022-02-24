@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <vector>
 
-#include "bluetooth_def.h"
+#include "bt_def.h"
 
 namespace bluetooth {
 /**

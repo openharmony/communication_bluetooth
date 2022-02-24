@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,18 +18,24 @@
 
 #include "iremote_broker.h"
 #include "raw_address.h"
+#include "../parcel/bluetooth_a2dp_a2dpCodecInfo.h"
+
 namespace OHOS {
 namespace Bluetooth {
 using namespace bluetooth;
-class IBluetoothA2dpSrcObserver : public OHOS::IRemoteBroker {
+class IBluetoothA2dpSourceObserver : public OHOS::IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothA2DpSrcObserver");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothA2dpSourceObserver");
 
     enum Code {
-        BT_A2DP_SRC_OBSERVER_PLAYING_STATE_CHANGED = 0,
+        BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED = 0,
+        BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED,
+        BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
     };
 
-    virtual void OnPlayingStateChanged(const RawAddress &device, int playingState, int error) = 0;
+    virtual void OnConnectionStateChanged(const RawAddress &device, int state) = 0;
+    virtual void OnPlayingStatusChanged(const RawAddress &device, int playingState, int error) = 0;
+    virtual void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

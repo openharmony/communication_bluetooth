@@ -14,18 +14,16 @@
  */
 
 #include "bluetooth_host.h"
-
+#include <memory>
+#include <unistd.h>
 #include "bluetooth_ble_peripheral_observer_stub.h"
 #include "bluetooth_host_observer_stub.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"
 #include "bluetooth_remote_device_observer_stub.h"
-
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include <memory>
-#include <unistd.h>
 
 namespace OHOS {
 namespace Bluetooth {

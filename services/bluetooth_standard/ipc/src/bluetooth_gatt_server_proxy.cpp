@@ -15,7 +15,6 @@
 
 #include "bluetooth_gatt_server_proxy.h"
 #include "bluetooth_log.h"
-#include "i_bluetooth_gatt_server.h"
 #include "bluetooth_errorcode.h"
 
 namespace OHOS {

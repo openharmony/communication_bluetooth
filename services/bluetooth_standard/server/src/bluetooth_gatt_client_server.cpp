@@ -17,10 +17,8 @@
 #include <mutex>
 #include <thread>
 
-#include "bluetooth_a2dp_source_server.h"
 #include "bluetooth_gatt_client_server.h"
 #include "bluetooth_log.h"
-#include "bluetooth_socket_server.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_classic.h"
 #include "interface_adapter_manager.h"
