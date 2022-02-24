@@ -41,24 +41,20 @@ config("module_private_config") {
 ohos_unittest("btfw_pbap_client_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "pbap_client_test.cpp",
-  ]
+  sources = [ "pbap_client_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "//utils/native/base:utilsecurec_shared",
     "//third_party/libxml2:xml2",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
+    "//utils/native/base:utils",
+    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [
@@ -70,24 +66,20 @@ ohos_unittest("btfw_pbap_client_test") {
 ohos_unittest("btfw_pbap_server_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "pbap_server_test.cpp",
-  ]
+  sources = [ "pbap_server_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "//utils/native/base:utilsecurec_shared",
     "//third_party/libxml2:xml2",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
+    "//utils/native/base:utils",
+    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [
