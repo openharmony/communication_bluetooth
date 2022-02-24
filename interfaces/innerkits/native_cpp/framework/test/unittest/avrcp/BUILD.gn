@@ -42,22 +42,18 @@ config("module_private_config") {
 ohos_unittest("btfw_avrcp_tg_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "avrcp_tg_test.cpp",
-  ]
+  sources = [ "avrcp_tg_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -69,22 +65,18 @@ ohos_unittest("btfw_avrcp_tg_unit_test") {
 ohos_unittest("btfw_avrcp_ct_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "avrcp_ct_test.cpp",
-  ]
+  sources = [ "avrcp_ct_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -92,7 +84,6 @@ ohos_unittest("btfw_avrcp_ct_unit_test") {
     "ipc:ipc_core",
   ]
 }
-
 
 ################################################################################
 group("unittest") {
@@ -102,8 +93,8 @@ group("unittest") {
 
   if (is_phone_product) {
     deps += [
-      ":btfw_avrcp_tg_unit_test",
       ":btfw_avrcp_ct_unit_test",
+      ":btfw_avrcp_tg_unit_test",
     ]
   }
 }
