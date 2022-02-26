@@ -166,7 +166,6 @@ bool BleProperties::UpdateConfig(int type) const
             break;
         case BLE_CONFIG_LOCAL_ADDRESS:
             ret = BleConfig::GetInstance().SetLocalAddress(pimpl->macAddr_);
-            ret = BleConfig::GetInstance().SetBleLocalAddrType(BLE_ADDR_TYPE::BLE_ADDR_TYPE_PUBLIC);
             if (pimpl->observer_ != nullptr) {
                 std::string macAddr = pimpl->macAddr_;
                 pimpl->observer_->ForEach(

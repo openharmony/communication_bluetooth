@@ -27,9 +27,9 @@
         <T1 property="BleModel2Level">0x00</T1>
         <T1 property="BleSecurity">true</T1>
         <T1 property="BleScanMode">0x03</T1>
-        <T1 property="LocalAddrType">0x00</T1>
+        <T1 property="LocalAddrType">0x01</T1>
         <T1 property="LocalIrk"></T1>
-        <T1 property="BleAddrType">0x00</T1>
+        <T1 property="BleAddrType">0x03</T1>
         <T1 property="LocalIdentityAddr"></T1>
     </T1>
     
