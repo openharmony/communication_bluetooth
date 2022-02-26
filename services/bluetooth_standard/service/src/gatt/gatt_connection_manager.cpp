@@ -72,6 +72,7 @@ struct GattConnectionManager::impl : public GattServiceBase {
     GattConnectionManager::Device *FindDevice(const GattDevice &device, std::unique_lock<std::mutex> &deviceLock);
     GattConnectionManager::Device *FindDevice(uint16_t handle, std::unique_lock<std::mutex> &deviceLock);
     void ClearDeviceList();
+    void RemoveDevice(GattDevice &device, std::unique_lock<std::mutex> &deviceLock);
     void DisconnectAllDevice();
     void NotifyObserver(const GattDevice &device, uint8_t event, uint16_t connectionHandle, int ret);
     int DoConnect(GattConnectionManager::Device &device);
@@ -473,6 +474,20 @@ GattConnectionManager::Device *GattConnectionManager::impl::FindDevice(
     return nullptr;
 }
 
+void GattConnectionManager::impl::RemoveDevice(GattDevice &device, std::unique_lock<std::mutex> &deviceLock)
+{
+    LOG_INFO("%{public}s: enter", __FUNCTION__);
+    std::lock_guard<std::mutex> lock(devicelistRWMutex_);
+    for (auto &dev : devices_) {
+        if (dev->Info() == device) {
+            deviceLock = std::unique_lock<std::mutex>(dev->DeviceRWMutex());
+            devices_.remove(dev);
+            return;
+        }
+    }
+    LOG_INFO("%{public}s: can not find device", __FUNCTION__);
+}
+
 void GattConnectionManager::impl::ClearDeviceList()
 {
     std::lock_guard<std::mutex> lck(devicelistRWMutex_);
@@ -702,6 +717,8 @@ int GattConnectionManager::impl::DoConnect(GattConnectionManager::Device &device
         }
     } else {
         result = GattStatus::INTERNAL_ERROR;
+        std::unique_lock<std::mutex> devLock;
+        GattConnectionManager::GetInstance().pimpl->RemoveDevice(device.Info(), devLock);
         LOG_ERROR("%{public}s: Call - Connect - Fail!  - Return: %{public}d - Parameter(1): transportType: %{public}d",
             __FUNCTION__,
             result,
@@ -759,6 +776,10 @@ int GattConnectionManager::impl::DoDisconnectComplete(
         }
     }
 
+    if (result == GattStatus::GATT_SUCCESS) {
+        std::unique_lock<std::mutex> devLock;
+        GattConnectionManager::GetInstance().pimpl->RemoveDevice(device.Info(), devLock);
+    }
     return result;
 }
 

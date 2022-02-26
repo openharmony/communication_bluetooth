@@ -994,7 +994,7 @@ int SMP_SetIdentAddr(const BtAddr *addr)
         return SMP_ERR_OUT_OF_RES;
     }
     (void)memset_s(ctx, sizeof(SMP_SetIdentAddrTask_t), 0x00, sizeof(SMP_SetIdentAddrTask_t));
-    (void)memcpy_s(&ctx->addr, sizeof(&ctx->addr), addr, sizeof(BtAddr));
+    (void)memcpy_s(&ctx->addr, sizeof(ctx->addr), addr, sizeof(BtAddr));
     int ret = BTM_RunTaskInProcessingQueue(PROCESSING_QUEUE_ID_SMP, SMP_SetIdentAddrTask, (void *)ctx);
     if (ret != SMP_SUCCESS) {
         MEM_MALLOC.free(ctx);
