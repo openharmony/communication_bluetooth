@@ -868,7 +868,7 @@ int A2dpService::WriteFrame(const uint8_t *data, uint32_t size)
 
     A2dpProfile *profile = GetProfileInstance(role_);
     if (profile != nullptr) {
-        if(profile->WriteFrame(data, size)) {
+        if(!profile->WriteFrame(data, size)) {
             LOG_ERROR("[A2dpService] %{public}s Failed to write frame. role_(%u)\n", __func__, role_);
             return RET_BAD_STATUS;
         }
