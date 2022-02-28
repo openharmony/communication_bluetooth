@@ -45,6 +45,9 @@
 #include "remote_observer_list.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "idevmgr_hdi.h"
+
+constexpr const char *AUDIO_BLUETOOTH_SERVICE_NAME = "audio_bluetooth_hdi_service";
 
 namespace OHOS {
 namespace Bluetooth {
@@ -187,6 +190,20 @@ public:
                     uid,
                     "BR_STATE",
                     state);
+            }
+            if (state == BTStateID::STATE_TURN_ON) {
+                auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
+                if (devmgr != nullptr) {
+                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, loadDevice of a2dp HDF service");
+                    devmgr->LoadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
+                }
+            }
+            if (state == BTStateID::STATE_TURN_OFF) {
+                auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
+                if (devmgr != nullptr) {
+                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, UnloadDevice of a2dp HDF service");
+                    devmgr->UnloadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
+                }
             }
         } else if (transport == BTTransport::ADAPTER_BLE) {
             impl_->bleObservers_.ForEach([transport, state](sptr<IBluetoothHostObserver> observer) {

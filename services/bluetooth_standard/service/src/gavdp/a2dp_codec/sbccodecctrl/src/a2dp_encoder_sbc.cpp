@@ -24,7 +24,6 @@
 
 namespace bluetooth {
 const int BIT_SBC_NUMBER_PER_SAMPLE = 8;
-const int S_TO_US = 1000000;
 const int MS_TO_US = 1000;
 const int NUMBER32 = 32;
 const int BIT8 = 8;
@@ -518,8 +517,7 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
         (void)memset_s(a2dpSbcEncoderCb_.pcmRemain, A2DP_SBC_MAX_PACKET_SIZE, 0, sizeof(a2dpSbcEncoderCb_.pcmRemain));
         if (encodePacketSize > 0) {
             uint32_t pktTimeStamp = a2dpSbcEncoderCb_.timestamp;
-            a2dpSbcEncoderCb_.timestamp += frameIter * subbands * blocks * channelMode * S_TO_US 
-                / a2dpSbcEncoderCb_.feedingParams.sampleRate;
+            a2dpSbcEncoderCb_.timestamp += frameIter * blocksXsubbands;
             a2dpSbcEncoderCb_.sendDataSize += codecSize;
             EnqueuePacket(pkt, frameIter, encodePacketSize, pktTimeStamp, (uint16_t)encoded);  // Enqueue Packet.
             LOG_INFO("[EnqueuePacket][encoded:%{public}zu][frameIter:%u]", encoded, frameIter);
@@ -566,9 +564,8 @@ void A2dpSbcEncoder::EnqueuePacket(
             count--;
             LOG_INFO("[EnqueuePacket] [pktLen:%u] [sFrameNum:%u] [remain:%u]", pktLen, frameNum, PacketSize(pkt));
             PacketFragment(pkt, mediaPacket, pktLen);
-            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp);  // Enqueue Packet.
-            timeStamp++;
             frames = frames - frameNum;
+            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp-frames*128);  // Enqueue Packet.
             PacketFree(mediaPacket);
             LOG_INFO("[EnqueuePacket][sendNum:%u][remainFrameNum:%zu], [DataLen:%u]", frameNum, frames, pktLen);
         } while (count > 0);

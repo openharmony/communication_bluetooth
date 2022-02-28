@@ -158,6 +158,15 @@ void BluetoothA2dpSourceServer::RegisterObserver(const sptr<IBluetoothA2dpSource
         return;
     }
     pimpl->observers_.Register(observer);
+
+    //During A2DP HDF Registration, check the current status and callback
+    RawAddress device = GetActiveSinkDevice();
+    int state = GetDeviceState((const RawAddress &)device);
+    if (state == static_cast<int>(BTConnectState::CONNECTED))
+    {
+        HILOGI("BluetoothA2dpSourceServer::RegisterObserver onConnectionStateChanged");
+        observer->OnConnectionStateChanged(device, state);
+    }
 }
 
 void BluetoothA2dpSourceServer::DeregisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer)
