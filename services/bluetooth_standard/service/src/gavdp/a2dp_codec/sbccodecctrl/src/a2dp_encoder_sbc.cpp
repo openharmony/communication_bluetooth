@@ -99,7 +99,7 @@ bool A2dpSbcEncoder::SetPcmData(const uint8_t *data, uint16_t dataSize)
         LOG_ERROR("[A2dpSbcEncoder] %{public}s dataSize too large\n", __func__);
         return false;
     }
-    if(!memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO, data, dataSize)) {
+    if(memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO, data, dataSize) != EOK) {
         LOG_ERROR("[A2dpSbcEncoder] %{public}s copy error\n", __func__);
         return false;
     }
