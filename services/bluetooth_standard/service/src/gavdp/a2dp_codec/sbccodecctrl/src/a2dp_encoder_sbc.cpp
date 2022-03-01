@@ -568,7 +568,7 @@ void A2dpSbcEncoder::EnqueuePacket(
             LOG_INFO("[EnqueuePacket] [pktLen:%u] [sFrameNum:%u] [remain:%u]", pktLen, frameNum, PacketSize(pkt));
             PacketFragment(pkt, mediaPacket, pktLen);
             frames = frames - frameNum;
-            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp-frames * blocksXsubbands);  // Enqueue Packet.
+            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp-frames * blocksXsubbands);
             PacketFree(mediaPacket);
             LOG_INFO("[EnqueuePacket][sendNum:%u][remainFrameNum:%zu], [DataLen:%u]", frameNum, frames, pktLen);
         } while (count > 0);
