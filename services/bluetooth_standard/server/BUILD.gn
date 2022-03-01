@@ -52,11 +52,11 @@ ohos_shared_library("bluetooth_server") {
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/service:btservice",
+    "$hdf_uhdf_path/hdi:libhdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//utils/native/base:utils",
-    "$hdf_uhdf_path/hdi:libhdi",
   ]
 
   external_deps = [
