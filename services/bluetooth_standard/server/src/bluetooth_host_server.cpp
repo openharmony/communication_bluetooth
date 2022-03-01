@@ -194,14 +194,14 @@ public:
             if (state == BTStateID::STATE_TURN_ON) {
                 auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
                 if (devmgr != nullptr) {
-                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, loadDevice of a2dp HDF service");
+                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, loadDevice of a2dp HDF");
                     devmgr->LoadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
                 }
             }
             if (state == BTStateID::STATE_TURN_OFF) {
                 auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
                 if (devmgr != nullptr) {
-                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, UnloadDevice of a2dp HDF service");
+                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, UnloadDevice of a2dp HDF");
                     devmgr->UnloadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
                 }
             }

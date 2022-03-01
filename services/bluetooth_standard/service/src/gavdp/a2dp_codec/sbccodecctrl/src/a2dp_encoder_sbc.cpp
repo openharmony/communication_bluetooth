@@ -99,7 +99,7 @@ bool A2dpSbcEncoder::SetPcmData(const uint8_t *data, uint16_t dataSize)
         LOG_ERROR("[A2dpSbcEncoder] %{public}s dataSize too large\n", __func__);
         return false;
     }
-    if(!memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE, data, dataSize)) {
+    if(!memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO, data, dataSize)) {
         LOG_ERROR("[A2dpSbcEncoder] %{public}s copy error\n", __func__);
         return false;
     }
@@ -532,6 +532,9 @@ void A2dpSbcEncoder::EnqueuePacket(
     LOG_INFO("[EnqueuePacket][frameSize:%hu][FrameNum:%zu], mtu[%hu]", frameSize, frames, a2dpSbcEncoderCb_.mtuSize);
 
     LOG_INFO("[EnqueuePacket] totalSize[%u]", PacketSize(pkt));
+    uint16_t blocksXsubbands
+        = a2dpSbcEncoderCb_.sbcEncoderParams.subBands * a2dpSbcEncoderCb_.sbcEncoderParams.numOfBlocks;
+
     if (PacketSize(pkt) < static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize)) {
         Buffer *header = PacketHead(pkt);
         uint8_t *p = static_cast<uint8_t*>(BufferPtr(header));
@@ -565,7 +568,7 @@ void A2dpSbcEncoder::EnqueuePacket(
             LOG_INFO("[EnqueuePacket] [pktLen:%u] [sFrameNum:%u] [remain:%u]", pktLen, frameNum, PacketSize(pkt));
             PacketFragment(pkt, mediaPacket, pktLen);
             frames = frames - frameNum;
-            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp-frames*128);  // Enqueue Packet.
+            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp-frames * blocksXsubbands);  // Enqueue Packet.
             PacketFree(mediaPacket);
             LOG_INFO("[EnqueuePacket][sendNum:%u][remainFrameNum:%zu], [DataLen:%u]", frameNum, frames, pktLen);
         } while (count > 0);

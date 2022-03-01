@@ -71,7 +71,8 @@
         "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_sa_profile",
         "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
         "//foundation/communication/bluetooth/services/bluetooth_standard/server:bluetooth_server",
-        "//foundation/communication/bluetooth/interfaces/kits/napi:bluetooth"
+        "//foundation/communication/bluetooth/interfaces/kits/napi:bluetooth",
+        "//foundation/communication/bluetooth/services/bluetooth_standard/service:btsbc"
       ],
       "inner_kits": [
         {
