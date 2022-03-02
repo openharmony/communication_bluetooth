@@ -117,6 +117,8 @@ ohos_static_library("btipc_static") {
     "src/bluetooth_socket_stub.cpp",
   ]
 
+  cflags_cc = [ "-fvisibility=hidden" ]
+
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
