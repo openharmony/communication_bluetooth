@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,8 @@ using namespace std;
 
 NapiAvrcpTargetObserver NapiAvrcpTarget::observer_;
 
-void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env) {
+void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env)
+{
     
     napi_value constructor;
     napi_property_descriptor properties[] = {
@@ -45,7 +46,8 @@ void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env) {
     HILOGI("DefineAvrcpTargetJSClass finished");
 }
 
-napi_value NapiAvrcpTarget::AvrcpTargetConstructor(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpTarget::AvrcpTargetConstructor(napi_env env, napi_callback_info info)
+{
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
@@ -87,7 +89,8 @@ napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiAvrcpTarget::Off(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpTarget::Off(napi_env env, napi_callback_info info)
+{
     HILOGI("Off called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -114,7 +117,8 @@ napi_value NapiAvrcpTarget::Off(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiAvrcpTarget::GetConnectionDevices(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpTarget::GetConnectionDevices(napi_env env, napi_callback_info info)
+{
     
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
@@ -131,7 +135,8 @@ napi_value NapiAvrcpTarget::GetConnectionDevices(napi_env env, napi_callback_inf
     return ret;
 }
 
-napi_value NapiAvrcpTarget::GetDeviceState(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpTarget::GetDeviceState(napi_env env, napi_callback_info info)
+{
     HILOGI("GetDeviceState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -161,7 +166,8 @@ napi_value NapiAvrcpTarget::GetDeviceState(napi_env env, napi_callback_info info
     return result;
 }
 
-napi_value NapiAvrcpTarget::Connect(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpTarget::Connect(napi_env env, napi_callback_info info)
+{
     HILOGI("Connect called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -192,7 +198,8 @@ napi_value NapiAvrcpTarget::Connect(napi_env env, napi_callback_info info) {
     return result;
 }
 
-napi_value NapiAvrcpTarget::Disconnect(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpTarget::Disconnect(napi_env env, napi_callback_info info)
+{
     HILOGI("Disconnect called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;

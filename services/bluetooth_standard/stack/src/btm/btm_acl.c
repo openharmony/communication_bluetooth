@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -499,6 +499,11 @@ static void BtmAclTimeout(void *context)
 static void BtmOnConnectionComplete(const HciConnectionCompleteEventParam *eventParam)
 {
     if (eventParam->linkType != HCI_LINK_TYPE_ACL) {
+        return;
+    }
+
+    if (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS) {
+        LOG_DEBUG("%{public}s ACL Connection Already Exists!", __FUNCTION__);
         return;
     }
 

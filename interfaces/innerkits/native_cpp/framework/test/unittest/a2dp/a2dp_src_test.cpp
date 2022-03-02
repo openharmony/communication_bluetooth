@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,7 +81,6 @@ void A2dpSourceTest::TearDown()
     sleep(TIME);
 }
 
-
 /*
  * @tc.number: A2dpSource001
  * @tc.name: GetProfile
@@ -95,7 +94,6 @@ HWTEST_F(A2dpSourceTest, A2dpSource_UnitTest_GetProfile, TestSize.Level1)
     
     GTEST_LOG_(INFO) << "A2dpSource_UnitTest_GetProfile end";
 }
-
 
 /*
  * @tc.number: A2dpSource002
@@ -172,7 +170,6 @@ HWTEST_F(A2dpSourceTest, A2dpSource_UnitTest_GetDevicesByStates, TestSize.Level1
     vector<BluetoothRemoteDevice> devices = profile_->GetDevicesByStates(states);
     
     GTEST_LOG_(INFO) << "A2dpSource_UnitTest_GetDevicesByStates end";
-
 }
 
 /*
@@ -252,7 +249,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_GetConnectStrategy, TestSize.Le
     EXPECT_EQ(profile_->GetConnectStrategy(device), 0);
     
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_GetConnectStrategy end";
-
 }
 
 /*
@@ -270,7 +266,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_SetConnectStrategy, TestSize.Le
     EXPECT_EQ(isOK, false);
     
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_SetConnectStrategy end";
-
 }
 
 /*
@@ -287,7 +282,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_GetCodecStatus, TestSize.Level1
     A2dpCodecStatus ret = profile_->GetCodecStatus(device);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_GetCodecStatus end";
-
 }
 
 /*
@@ -314,7 +308,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_SetCodecPreference, TestSize.Le
     EXPECT_EQ(profile_->SetCodecPreference(device, info), 0);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_SetCodecPreference end";
-
 }
 
 /*
@@ -332,7 +325,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_SwitchOptionalCodecs, TestSize.
     profile_->SwitchOptionalCodecs(device, isEnable);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_SwitchOptionalCodecs end";
-
 }
 
 /*
@@ -349,7 +341,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_GetOptionalCodecsSupportState, 
     EXPECT_EQ(profile_->GetOptionalCodecsSupportState(device), 0);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_GetOptionalCodecsSupportState end";
-
 }
 
 /*
@@ -366,7 +357,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_StartPlaying, TestSize.Level1)
     EXPECT_EQ(profile_->StartPlaying(device), 0);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_StartPlaying end";
-
 }
 
 /*
@@ -383,7 +373,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_SuspendPlaying, TestSize.Level1
     EXPECT_EQ(profile_->SuspendPlaying(device), 0);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_SuspendPlaying end";
-
 }
 
 /*
@@ -400,7 +389,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_StopPlaying, TestSize.Level1)
     EXPECT_EQ(profile_->StopPlaying(device), 0);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_StopPlaying end";
-
 }
 
 /*
@@ -417,7 +405,6 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_SetAudioConfigure, TestSize.Lev
     profile_->SetAudioConfigure(device, 1, 2, 3);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_SetAudioConfigure end";
-
 }
 
 /*
@@ -430,12 +417,10 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_WriteFrame, TestSize.Level1)
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_WriteFrame start";
 
     uint8_t str[4] = {'1', '2', '3', '4'};
-
     profile_ = A2dpSource::GetProfile();
     profile_->WriteFrame(str, 4);
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_WriteFrame end";
-
 }
 
 /*
@@ -452,13 +437,10 @@ HWTEST_F(A2dpSourceTest, A2dpSourceTest_UnitTest_GetRenderPosition, TestSize.Lev
     uint32_t timeStamp = 0;
     profile_ = A2dpSource::GetProfile();
     profile_->GetRenderPosition(delayValue, sendDataSize, timeStamp);
-
     GTEST_LOG_(INFO) << "delayValue =" << delayValue << ",sendDataSize =" << sendDataSize << 
         ",timeStamp =" << timeStamp;
 
     GTEST_LOG_(INFO) << "A2dpSourceTest_UnitTest_GetRenderPosition end";
-
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -150,6 +150,7 @@ void RemoteObserverList<T>::ObserverDeathRecipient::OnRemoteDied(const wptr<IRem
                 HILOGE("Failed to unlink death recipient from observer");
             }
             owner_->observers_.erase(it);
+            break;
         }
     }
     HILOGI("Callback from dead process unregistered");

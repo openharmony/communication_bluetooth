@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) {
+void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+{
     HILOGI("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged called");
     if (!callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE]) {
         HILOGW("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged: This callback is not registered by ability.");
@@ -55,7 +56,8 @@ void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const Bluetooth
     );
 }
 
-void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state) {
+void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state)
+{
     HILOGI("NapiHandsFreeAudioGatewayObserver::OnScoStateChanged called");
     if (!callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE]) {
         HILOGW("NapiHandsFreeAudioGatewayObserver::OnScoStateChanged: This callback is not registered by ability.");
