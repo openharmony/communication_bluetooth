@@ -18,7 +18,6 @@
 
 #include <string>
 #include <vector>
-#include <stdint.h>
 
 namespace bluetooth {
 // Defined here are various status codes
