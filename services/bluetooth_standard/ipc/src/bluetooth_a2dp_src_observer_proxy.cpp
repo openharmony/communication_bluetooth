@@ -21,6 +21,10 @@ namespace Bluetooth {
 void BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged(const RawAddress &device, int state)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothA2dpSrcObserverProxy::GetDescriptor())) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged WriteInterfaceToken error");
+        return;
+    }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged write device error");
         return;
@@ -37,7 +41,7 @@ void BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged(const RawAddress &d
 
     ErrCode result = InnerTransact(BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("BluetoothA2dpSrcProxy::OnConnectionStateChanged done fail, error: %{public}d", result);
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged done fail, error: %{public}d", result);
         return;
     }
 }
@@ -45,6 +49,10 @@ void BluetoothA2dpSrcObserverProxy::OnConnectionStateChanged(const RawAddress &d
 void BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged(const RawAddress &device, int playingState, int error)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothA2dpSrcObserverProxy::GetDescriptor())) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged WriteInterfaceToken error");
+        return;
+    }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged write device error");
         return;
@@ -66,7 +74,7 @@ void BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged(const RawAddress &dev
 
     ErrCode result = InnerTransact(BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("BluetoothA2dpSrcProxy::OnPlayingStatusChanged done fail, error: %{public}d", result);
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged done fail, error: %{public}d", result);
         return;
     }
 }
@@ -74,12 +82,16 @@ void BluetoothA2dpSrcObserverProxy::OnPlayingStatusChanged(const RawAddress &dev
 void BluetoothA2dpSrcObserverProxy::OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothA2dpSrcObserverProxy::GetDescriptor())) {
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConfigurationChanged WriteInterfaceToken error");
+        return;
+    }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("BluetoothA2dpSrcObserverProxy::OnConfigurationChanged write device error");
         return;
     }
     if (!data.WriteParcelable(&info)) {
-        HILOGE("BluetoothGattClientCallbackProxy::OnConfigurationChanged transport error");
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConfigurationChanged transport error");
         return;
     }
     if (!data.WriteInt32(error)) {
@@ -94,7 +106,7 @@ void BluetoothA2dpSrcObserverProxy::OnConfigurationChanged(const RawAddress &dev
 
     ErrCode result = InnerTransact(BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("BluetoothA2dpSrcProxy::OnConfigurationChanged done fail, error: %{public}d", result);
+        HILOGE("BluetoothA2dpSrcObserverProxy::OnConfigurationChanged done fail, error: %{public}d", result);
         return;
     }
 }
