@@ -178,13 +178,12 @@ void BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallback
 {
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
         if ((*it)->GetCallback()->AsObject() == remote) {
-            owner_.pimpl->callbacks_.erase(it);
             HILOGI("callback is erased from callbacks");
             sptr<GattServerCallbackDeathRecipient> dr = (*it)->deathRecipient_;
             if (!dr->GetCallback()->AsObject()->RemoveDeathRecipient(dr)) {
                 HILOGE("Failed to unlink death recipient from callback");
             }
-            *it = nullptr;
+            owner_.pimpl->callbacks_.erase(it);
             return;
         }
     }

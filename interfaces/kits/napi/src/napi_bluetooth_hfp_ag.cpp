@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,8 @@ using namespace std;
 
 NapiHandsFreeAudioGatewayObserver NapiHandsFreeAudioGateway::observer_;
 
-void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env) {
+void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
+{
     
     napi_value constructor;
     napi_property_descriptor properties[] = {
@@ -35,6 +36,8 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("disconnectSco", DisconnectSco),
         DECLARE_NAPI_FUNCTION("openVoiceRecognition", OpenVoiceRecognition),
         DECLARE_NAPI_FUNCTION("closeVoiceRecognition", CloseVoiceRecognition), 
+        DECLARE_NAPI_FUNCTION("connect", Connect),
+        DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
     };
 
     napi_define_class(env, "HandsFreeAudioGateway", NAPI_AUTO_LENGTH, HandsFreeAudioGatewayConstructor, nullptr, 
@@ -48,13 +51,15 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
     HILOGI("DefineHandsFreeAudioGatewayJSClass finished");
 }
 
-napi_value NapiHandsFreeAudioGateway::HandsFreeAudioGatewayConstructor(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::HandsFreeAudioGatewayConstructor(napi_env env, napi_callback_info info)
+{
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
-napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info)
+{
     HILOGI("On called");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -86,7 +91,7 @@ napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info) 
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     observer_.callbackInfos_[type] = callbackInfo;
     HILOGI("%{public}s is registered", type.c_str());
-//test
+
     BluetoothRemoteDevice address("123",1);
     int state = 3;
     if (type.c_str() == STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE){
@@ -99,7 +104,8 @@ napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info) 
     return ret;
 }
 
-napi_value NapiHandsFreeAudioGateway::Off(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::Off(napi_env env, napi_callback_info info)
+{
     HILOGI("Off called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -126,7 +132,8 @@ napi_value NapiHandsFreeAudioGateway::Off(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_callback_info info)
+{
     
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
@@ -141,7 +148,8 @@ napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_ca
     return ret;
 }
 
-napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback_info info)
+{
     HILOGI("GetDeviceState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -171,7 +179,8 @@ napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback
     return result;
 }
 
-napi_value NapiHandsFreeAudioGateway::GetScoState(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::GetScoState(napi_env env, napi_callback_info info)
+{
     HILOGI("GetScoState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -201,7 +210,8 @@ napi_value NapiHandsFreeAudioGateway::GetScoState(napi_env env, napi_callback_in
     return result;
 }
 
-napi_value NapiHandsFreeAudioGateway::ConnectSco(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::ConnectSco(napi_env env, napi_callback_info info)
+{
     HILOGI("ConnectSco called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -234,7 +244,8 @@ napi_value NapiHandsFreeAudioGateway::ConnectSco(napi_env env, napi_callback_inf
     return result;
 }
 
-napi_value NapiHandsFreeAudioGateway::DisconnectSco(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::DisconnectSco(napi_env env, napi_callback_info info)
+{
     HILOGI("DisconnectSco called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -267,7 +278,8 @@ napi_value NapiHandsFreeAudioGateway::DisconnectSco(napi_env env, napi_callback_
     return result;
 }
 
-napi_value NapiHandsFreeAudioGateway::OpenVoiceRecognition(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeAudioGateway::OpenVoiceRecognition(napi_env env, napi_callback_info info)
+{
     HILOGI("OpenVoiceRecognition called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -297,7 +309,8 @@ napi_value NapiHandsFreeAudioGateway::OpenVoiceRecognition(napi_env env, napi_ca
     return result;
 }
 
-napi_value NapiHandsFreeAudioGateway::CloseVoiceRecognition(napi_env env, napi_callback_info info){
+napi_value NapiHandsFreeAudioGateway::CloseVoiceRecognition(napi_env env, napi_callback_info info)
+{
     HILOGI("CloseVoiceRecognition called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -327,7 +340,68 @@ napi_value NapiHandsFreeAudioGateway::CloseVoiceRecognition(napi_env env, napi_c
     return result;
 }
 
+napi_value NapiHandsFreeAudioGateway::Connect(napi_env env, napi_callback_info info)
+{
+    HILOGI("Connect called");
 
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
 
+    napi_value ret = nullptr;
+    napi_get_undefined(env, &ret);
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        HILOGE("Requires 1 argument.");
+        return ret;
+    }
+    string deviceId;
+    if (!ParseString(env, deviceId, argv[PARAM0])) {
+        HILOGE("string expected.");
+        return ret;
+    }
+
+    HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+    BluetoothRemoteDevice device(deviceId, 1);
+    bool res = profile->Connect(device);
+
+    napi_value result = nullptr;
+    napi_get_boolean(env, res, &result);
+    return result;
+}
+
+napi_value NapiHandsFreeAudioGateway::Disconnect(napi_env env, napi_callback_info info)
+{
+    HILOGI("Disconnect called");
+
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
+
+    napi_value ret = nullptr;
+    napi_get_undefined(env, &ret);
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        HILOGE("Requires 1 argument.");
+        return ret;
+    }
+    string deviceId;
+    if (!ParseString(env, deviceId, argv[PARAM0])) {
+        HILOGE("string expected.");
+        return ret;
+    }
+
+    HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+    BluetoothRemoteDevice device(deviceId, 1);
+    bool res = profile->Disconnect(device);
+
+    napi_value result = nullptr;
+    napi_get_boolean(env, res, &result);
+    return result;
+}
 } // namespace Bluetooth
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -65,7 +65,6 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
     napi_value promise = nullptr;
 
     if (argc == expectedArgsCount) {
-        // Callback mode
         HILOGI("SppListen callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM2], &valueType);
@@ -76,7 +75,6 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
     } else {
-        // Promise mode
         HILOGI("SppListen promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
@@ -123,7 +121,6 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
             }
 
             if (callbackInfo->callback_) {
-                // Callback mode
                 HILOGI("SppListen execute back listen Callback mode success");
                 result[PARAM0] = GetCallbackErrorValue(callbackInfo->env_, callbackInfo->errorCode_);
                 napi_get_reference_value(env, callbackInfo->callback_, &callback);
@@ -131,7 +128,6 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, callbackInfo->callback_);
             } else {
                 if (callbackInfo->errorCode_ == CODE_SUCCESS) {
-                // Promise mode
                     HILOGI("SppListen execute back listen Promise mode success");
                     napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
                 } else {
@@ -186,7 +182,6 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
     napi_value promise = nullptr;
 
     if (argc == expectedArgsCount) {
-        // Callback mode
         HILOGI("SppAccept callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM1], &valueType);
@@ -197,7 +192,6 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
     } else {
-        // Promise mode
         HILOGI("SppAccept promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
@@ -237,14 +231,12 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
             }
 
             if (callbackInfo->callback_) {
-                // Callback mode
                 result[PARAM0] = GetCallbackErrorValue(callbackInfo->env_, callbackInfo->errorCode_);
                 napi_get_reference_value(env, callbackInfo->callback_, &callback);
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
                 napi_delete_reference(env, callbackInfo->callback_);
             } else {
                 if (callbackInfo->errorCode_ == CODE_SUCCESS) {
-                // Promise mode
                     napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
                 } else {
                     napi_reject_deferred(env, callbackInfo->deferred_, result[PARAM1]);
