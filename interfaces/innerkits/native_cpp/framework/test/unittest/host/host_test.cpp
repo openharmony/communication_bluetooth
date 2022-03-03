@@ -578,8 +578,8 @@ HWTEST_F(HostTest, Host_ModuleTest_GetPhonebookPermission_00100, TestSize.Level1
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPhonebookPermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetPhonebookPermission(0));
-    EXPECT_EQ(device_.GetPhonebookPermission(), 0);
+    EXPECT_TRUE(device_.SetPhonebookPermission(1));
+    EXPECT_EQ(device_.GetPhonebookPermission(), 1);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPhonebookPermission_00100 end";
 }
@@ -594,8 +594,8 @@ HWTEST_F(HostTest, Host_ModuleTest_SetPhonebookPermission_00100, TestSize.Level1
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetPhonebookPermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetPhonebookPermission(1));
-    EXPECT_EQ(device_.GetPhonebookPermission(), 1);
+    EXPECT_TRUE(device_.SetPhonebookPermission(0));
+    EXPECT_EQ(device_.GetPhonebookPermission(), 0);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetPhonebookPermission_00100 end";
 }
@@ -610,8 +610,8 @@ HWTEST_F(HostTest, Host_ModuleTest_GetMessagePermission_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPhonebookPermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetMessagePermission(0));
-    EXPECT_EQ(device_.GetMessagePermission(), 0);
+    EXPECT_TRUE(device_.SetMessagePermission(1));
+    EXPECT_EQ(device_.GetMessagePermission(), 1);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetMessagePermission_00100 end";
 }
@@ -626,8 +626,8 @@ HWTEST_F(HostTest, Host_ModuleTest_SetMessagePermission_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetMessagePermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetMessagePermission(1));
-    EXPECT_EQ(device_.GetMessagePermission(), 1);
+    EXPECT_TRUE(device_.SetMessagePermission(0));
+    EXPECT_EQ(device_.GetMessagePermission(), 0);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetMessagePermission_00100 end";
 }
