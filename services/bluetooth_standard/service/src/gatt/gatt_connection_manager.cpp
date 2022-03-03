@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,7 +72,7 @@ struct GattConnectionManager::impl : public GattServiceBase {
     GattConnectionManager::Device *FindDevice(const GattDevice &device, std::unique_lock<std::mutex> &deviceLock);
     GattConnectionManager::Device *FindDevice(uint16_t handle, std::unique_lock<std::mutex> &deviceLock);
     void ClearDeviceList();
-    void RemoveDevice(GattDevice &device, std::unique_lock<std::mutex> &deviceLock);
+    void RemoveDevice(const GattDevice &device);
     void DisconnectAllDevice();
     void NotifyObserver(const GattDevice &device, uint8_t event, uint16_t connectionHandle, int ret);
     int DoConnect(GattConnectionManager::Device &device);
@@ -138,17 +138,23 @@ int GattConnectionManager::Connect(const GattDevice &device, bool autoConnect) c
 {
     int result = pimpl->CheckDeviceParameter(device);
     if (GattStatus::GATT_SUCCESS == result) {
-        std::unique_lock<std::mutex> devLock;
-        auto internalDevice = pimpl->FindOrRegister(device, autoConnect, devLock);
-        if (internalDevice != nullptr) {
-            if (internalDevice->ProcessMessage(Device::StateMachine::MSG_CONNECT)) {
-                result = GattStatus::GATT_SUCCESS;
+        {
+            std::unique_lock<std::mutex> devLock;
+            auto internalDevice = pimpl->FindOrRegister(device, autoConnect, devLock);
+            if (internalDevice != nullptr) {
+                if (internalDevice->ProcessMessage(Device::StateMachine::MSG_CONNECT)) {
+                    result = GattStatus::GATT_SUCCESS;
+                } else {
+                    result = GattStatus::INTERNAL_ERROR;
+                }
             } else {
-                result = GattStatus::INTERNAL_ERROR;
+                result = GattStatus::MAX_CONNECTIONS;
             }
-        } else {
-            result = GattStatus::MAX_CONNECTIONS;
         }
+    }
+
+    if (GattStatus::INTERNAL_ERROR == result) {
+        pimpl->RemoveDevice(device);
     }
 
     return result;
@@ -474,14 +480,14 @@ GattConnectionManager::Device *GattConnectionManager::impl::FindDevice(
     return nullptr;
 }
 
-void GattConnectionManager::impl::RemoveDevice(GattDevice &device, std::unique_lock<std::mutex> &deviceLock)
+void GattConnectionManager::impl::RemoveDevice(const GattDevice &device)
 {
     LOG_INFO("%{public}s: enter", __FUNCTION__);
-    std::lock_guard<std::mutex> lock(devicelistRWMutex_);
-    for (auto &dev : devices_) {
-        if (dev->Info() == device) {
-            deviceLock = std::unique_lock<std::mutex>(dev->DeviceRWMutex());
-            devices_.remove(dev);
+    std::lock_guard<std::mutex> lck(devicelistRWMutex_);
+    for (auto dev = devices_.begin(); dev != devices_.end(); ++dev) {
+        if ((*dev)->Info() == device) {
+            devices_.erase(dev);
+            LOG_INFO("%{public}s: device is found and removed", __FUNCTION__);
             return;
         }
     }
@@ -546,13 +552,21 @@ void GattConnectionManager::impl::LEConnectCompleted(uint16_t connectHandle, Att
 
 void GattConnectionManager::impl::LEDisconnectCompletedImpl(uint16_t connectHandle, AttLeDisconnectCallback data)
 {
-    std::unique_lock<std::mutex> devLock;
-    auto device = FindDevice(connectHandle, devLock);
-    if (device != nullptr) {
-        LOG_DEBUG("%{public}s: disconnect reason:%{public}d", __FUNCTION__, data.reason);
-        device->ProcessMessage(Device::StateMachine::MSG_DISCONNECT_COMPLETE, connectHandle, &data);
-    } else {
-        LOG_ERROR("%{public}s: Call - FindDevice - Fail!", __FUNCTION__);
+    bool ret = false;
+    GattConnectionManager::Device *device = nullptr;
+    {
+        std::unique_lock<std::mutex> devLock;
+        device = FindDevice(connectHandle, devLock);
+        if (device != nullptr) {
+            LOG_DEBUG("%{public}s: disconnect reason:%{public}d", __FUNCTION__, data.reason);
+            ret = device->ProcessMessage(Device::StateMachine::MSG_DISCONNECT_COMPLETE, connectHandle, &data);
+        } else {
+            LOG_ERROR("%{public}s: Call - FindDevice - Fail!", __FUNCTION__);
+        }
+    }
+
+    if (ret) {
+        GattConnectionManager::GetInstance().pimpl->RemoveDevice(device->Info());
     }
 }
 
@@ -583,12 +597,20 @@ void GattConnectionManager::impl::BREDRConnectCompleted(
 
 void GattConnectionManager::impl::BREDRDisconnectCompletedImpl(uint16_t connectHandle, AttBredrDisconnectCallback data)
 {
-    std::unique_lock<std::mutex> devLock;
-    auto device = FindDevice(connectHandle, devLock);
-    if (device != nullptr) {
-        device->ProcessMessage(Device::StateMachine::MSG_DISCONNECT_COMPLETE, connectHandle, &data);
-    } else {
-        LOG_ERROR("%{public}s: Call - FindDevice - Fail!", __FUNCTION__);
+    bool ret = false;
+    GattConnectionManager::Device *device = nullptr;
+    {
+        std::unique_lock<std::mutex> devLock;
+        device = FindDevice(connectHandle, devLock);
+        if (device != nullptr) {
+            ret = device->ProcessMessage(Device::StateMachine::MSG_DISCONNECT_COMPLETE, connectHandle, &data);
+        } else {
+            LOG_ERROR("%{public}s: Call - FindDevice - Fail!", __FUNCTION__);
+        }
+    }
+
+    if (ret) {
+        GattConnectionManager::GetInstance().pimpl->RemoveDevice(device->Info());
     }
 }
 
@@ -717,8 +739,6 @@ int GattConnectionManager::impl::DoConnect(GattConnectionManager::Device &device
         }
     } else {
         result = GattStatus::INTERNAL_ERROR;
-        std::unique_lock<std::mutex> devLock;
-        GattConnectionManager::GetInstance().pimpl->RemoveDevice(device.Info(), devLock);
         LOG_ERROR("%{public}s: Call - Connect - Fail!  - Return: %{public}d - Parameter(1): transportType: %{public}d",
             __FUNCTION__,
             result,
@@ -776,10 +796,6 @@ int GattConnectionManager::impl::DoDisconnectComplete(
         }
     }
 
-    if (result == GattStatus::GATT_SUCCESS) {
-        std::unique_lock<std::mutex> devLock;
-        GattConnectionManager::GetInstance().pimpl->RemoveDevice(device.Info(), devLock);
-    }
     return result;
 }
 

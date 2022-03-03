@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,14 +22,17 @@ using namespace std;
 
 NapiA2dpSourceObserver NapiA2dpSource::observer_;
 
-void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env) {
+void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env)
+{
     napi_value constructor;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),       
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
-        DECLARE_NAPI_FUNCTION("getPlayingState", GetPalyingState),
+        DECLARE_NAPI_FUNCTION("getPlayingState", GetPlayingState),
+        DECLARE_NAPI_FUNCTION("connect", Connect),
+        DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
     };
 
     napi_define_class(env, "A2dpSource", NAPI_AUTO_LENGTH, A2dpSourceConstructor, nullptr, 
@@ -43,13 +46,15 @@ void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env) {
     HILOGI("DefineA2dpSourceJSClass finished");
 }
 
-napi_value NapiA2dpSource::A2dpSourceConstructor(napi_env env, napi_callback_info info) {
+napi_value NapiA2dpSource::A2dpSourceConstructor(napi_env env, napi_callback_info info)
+{
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
-napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info) {
+napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info)
+{
     HILOGI("On called");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -85,7 +90,8 @@ napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiA2dpSource::Off(napi_env env, napi_callback_info info) {
+napi_value NapiA2dpSource::Off(napi_env env, napi_callback_info info)
+{
     HILOGI("Off called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -112,7 +118,8 @@ napi_value NapiA2dpSource::Off(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiA2dpSource::GetConnectionDevices(napi_env env, napi_callback_info info) {
+napi_value NapiA2dpSource::GetConnectionDevices(napi_env env, napi_callback_info info)
+{
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
@@ -128,7 +135,8 @@ napi_value NapiA2dpSource::GetConnectionDevices(napi_env env, napi_callback_info
     return ret;
 }
 
-napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info) {
+napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info)
+{
     HILOGI("GetDeviceState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -158,8 +166,9 @@ napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiA2dpSource::GetPalyingState(napi_env env, napi_callback_info info) {
-    HILOGI("GetPalyingState called");
+napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info)
+{
+    HILOGI("GetPlayingState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -189,6 +198,68 @@ napi_value NapiA2dpSource::GetPalyingState(napi_env env, napi_callback_info info
     return result;
 }
 
+napi_value NapiA2dpSource::Connect(napi_env env, napi_callback_info info)
+{
+    HILOGI("Connect called");
 
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
+
+    napi_value ret = nullptr;
+    napi_get_undefined(env, &ret);
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        HILOGE("Requires 1 argument.");
+        return ret;
+    }
+    string deviceId;
+    if (!ParseString(env, deviceId, argv[PARAM0])) {
+        HILOGE("string expected.");
+        return ret;
+    }
+
+    A2dpSource *profile = A2dpSource::GetProfile();
+    BluetoothRemoteDevice device(deviceId, 1);
+    bool res = profile->Connect(device);
+
+    napi_value result = nullptr;
+    napi_get_boolean(env, res, &result);
+    return result;
+}
+
+napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
+{
+    HILOGI("Disconnect called");
+
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
+
+    napi_value ret = nullptr;
+    napi_get_undefined(env, &ret);
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        HILOGE("Requires 1 argument.");
+        return ret;
+    }
+    string deviceId;
+    if (!ParseString(env, deviceId, argv[PARAM0])) {
+        HILOGE("string expected.");
+        return ret;
+    }
+
+    A2dpSource *profile = A2dpSource::GetProfile();
+    BluetoothRemoteDevice device(deviceId, 1);
+    bool res = profile->Disconnect(device);
+
+    napi_value result = nullptr;
+    napi_get_boolean(env, res, &result);
+    return result;
+}
 } // namespace Bluetooth
 } // namespace OHOS

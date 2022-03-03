@@ -24,22 +24,22 @@ bool BluetoothA2dpCodecStatus::Marshalling(Parcel &parcel) const
     bool status = true;
 
     status = parcel.WriteInt32((int)codecInfo.codecPriority);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 
     status = parcel.WriteInt32((int)codecInfo.codecType);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 
     status = parcel.WriteInt32((int)codecInfo.sampleRate);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 
     status = parcel.WriteInt32((int)codecInfo.bitsPerSample);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 
@@ -49,22 +49,22 @@ bool BluetoothA2dpCodecStatus::Marshalling(Parcel &parcel) const
     }
 
     status = parcel.WriteInt64(codecInfo.codecSpecific1);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 
     status = parcel.WriteInt64(codecInfo.codecSpecific2);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 
     status = parcel.WriteInt64(codecInfo.codecSpecific3);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 
     status = parcel.WriteInt64(codecInfo.codecSpecific4);
-    if (!status) { 
+    if (!status) {
         return status;
     }
 

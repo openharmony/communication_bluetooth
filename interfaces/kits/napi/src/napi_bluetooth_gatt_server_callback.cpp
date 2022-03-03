@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,7 @@ void NapiGattServerCallback::OnCharacteristicReadRequest(
             GattCharacteristicCallbackInfo *callbackInfo = (GattCharacteristicCallbackInfo *)work->data;
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
-            ConvertCharacteristicReadReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_, 
+            ConvertCharacteristicReadReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
                 callbackInfo->characteristic_, callbackInfo->info_);
 
             napi_value callback = nullptr;
@@ -60,7 +60,7 @@ void NapiGattServerCallback::OnCharacteristicReadRequest(
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        } 
+        }
     );
 }
 
@@ -104,7 +104,7 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        } 
+        }
     );
 }
 
@@ -160,7 +160,7 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
-            napi_value result = nullptr;    
+            napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);      
             napi_value callback = nullptr;
@@ -169,7 +169,7 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        } 
+        }
     );
 }
 
@@ -213,7 +213,7 @@ void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevic
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        } 
+        }
     );
 }
 
@@ -257,7 +257,7 @@ void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        } 
+        }
     );
 }
 } // namespace Bluetooth

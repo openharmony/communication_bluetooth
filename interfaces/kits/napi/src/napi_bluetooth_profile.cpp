@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,8 @@ namespace OHOS {
 namespace Bluetooth {
 std::map<ProfileCode, napi_value> NapiProfile::profiles_;
 
-void DefineProfileFunctions(napi_env env, napi_value exports) {
+void DefineProfileFunctions(napi_env env, napi_value exports)
+{
     napi_property_descriptor desc[] = {  
         DECLARE_NAPI_FUNCTION("getProfile", NapiProfile::GetProfile),
     };
@@ -27,11 +28,13 @@ void DefineProfileFunctions(napi_env env, napi_value exports) {
 
 }
 
-void NapiProfile::SetProfile(ProfileCode code, napi_value profile) {
+void NapiProfile::SetProfile(ProfileCode code, napi_value profile)
+{
     profiles_[code] = profile;
 }
 
-napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info) {
+napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
+{
     HILOGI("GetProfile called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
