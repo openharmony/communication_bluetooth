@@ -38,7 +38,7 @@
     "name": "bluetooth_standard",
     "subsystem": "communication",
     "syscap": [
-      "SystemCapability.Communication.Bluetooth"
+      "SystemCapability.Communication.Bluetooth.Core"
     ],
     "features": [],
     "adapted_system_type": [
