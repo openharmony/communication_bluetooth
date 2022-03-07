@@ -249,7 +249,8 @@ void bluetooth::GattClientProfile::DiscoverAllPrimaryServices(
 void bluetooth::GattClientProfile::DiscoverAllPrimaryServicesInter(
     int reqId, uint16_t connectHandle, uint16_t startHandle, uint16_t endHandle) const
 {
-    LOG_INFO("%{public}s: connectHandle is %{public}hu, Add requestList_: DISCOVER_ALL_PRIMARY_SERVICE.", __FUNCTION__, connectHandle);
+    LOG_INFO("%{public}s: connectHandle is %{public}hu, Add requestList_: DISCOVER_ALL_PRIMARY_SERVICE.",
+        __FUNCTION__, connectHandle);
     auto iter = pimpl->FindIteratorByRespones(DISCOVER_ALL_PRIMARY_SERVICE, reqId);
     if (iter == pimpl->responseList_.end()) {
         LOG_INFO("%{public}s: not find connectionHandle(%{public}hu) in response list", __FUNCTION__, connectHandle);
@@ -2202,7 +2203,7 @@ std::list<std::pair<uint16_t, GattRequestInfo>>::iterator GattClientProfile::imp
 }
 
 std::list<std::pair<uint16_t, GattRequestInfo>>::iterator GattClientProfile::impl::FindIteratorByRespones(
-        ResponesType reqType, int reqId)
+    ResponesType reqType, int reqId)
 {
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator iter;
     for (iter = responseList_.begin(); iter != responseList_.end(); iter++) {

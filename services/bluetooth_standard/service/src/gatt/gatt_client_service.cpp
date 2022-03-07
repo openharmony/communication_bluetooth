@@ -415,22 +415,26 @@ class GattClientService::impl::GattConnectionObserverImplement : public GattConn
 public:
     void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
-        LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
+        LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d",
+            __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
             std::bind(&impl::OnConnect, service_.pimpl.get(), device, connectionHandle, ret));
     }
 
     void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
-        LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
+        LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d",
+            __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
             std::bind(&impl::OnDisconnect, service_.pimpl.get(), device, connectionHandle, ret));
     }
 
     void OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state) override
     {
-        LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), state);
-        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged, service_.pimpl.get(), device, connectionHandle, state));
+        LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d",
+            __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), state);
+        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged,
+            service_.pimpl.get(), device, connectionHandle, state));
     }
 
     void OnConnectionParameterChanged(

@@ -526,17 +526,22 @@ void GattConnectionManager::impl::NotifyObserver(
                     item.second->OnDisconnect(device, connectionHandle, role, ret);
                     break;
                 case OBSERVER_EVENT_CONNECTING:
-                    item.second->OnConnectionChanged(device, connectionHandle, static_cast<int>(BTConnectState::CONNECTING));
+                    item.second->OnConnectionChanged(device,
+                        connectionHandle, static_cast<int>(BTConnectState::CONNECTING));
                     break;
                 case OBSERVER_EVENT_DISCONNECTING:
-                    item.second->OnConnectionChanged(device, connectionHandle, static_cast<int>(BTConnectState::DISCONNECTING));
+                    item.second->OnConnectionChanged(device,
+                        connectionHandle, static_cast<int>(BTConnectState::DISCONNECTING));
                     break;
                 case OBSERVER_EVENT_RECONNECTED:
-                    item.second->OnConnectionChanged(device, connectionHandle, static_cast<int>(BTConnectState::CONNECTED));
-                    item.second->OnReconnect(device, connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
+                    item.second->OnConnectionChanged(device,
+                        connectionHandle, static_cast<int>(BTConnectState::CONNECTED));
+                    item.second->OnReconnect(device,
+                        connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
                     break;
                 case OBSERVER_EVENT_DISCONNECTED_INTER:
-                    item.second->OnDisconnectInter(device, connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
+                    item.second->OnDisconnectInter(device,
+                        connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
                     break;
                 default:
                     break;
