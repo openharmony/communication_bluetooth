@@ -32,6 +32,7 @@ constexpr uint8_t OBSERVER_EVENT_DISCONNECTED = 0x1;
 constexpr uint8_t OBSERVER_EVENT_CONNECTING = 0x2;
 constexpr uint8_t OBSERVER_EVENT_DISCONNECTING = 0x3;
 constexpr uint8_t OBSERVER_EVENT_RECONNECTED = 0x04;
+constexpr uint8_t OBSERVER_EVENT_DISCONNECTED_INTER = 0x14;
 
 const std::string GattConnectionManager::Device::STATE_IDLE = "IDLE";
 const std::string GattConnectionManager::Device::STATE_CONNECTING = "CONNECTING";
@@ -532,6 +533,10 @@ void GattConnectionManager::impl::NotifyObserver(
                     break;
                 case OBSERVER_EVENT_RECONNECTED:
                     item.second->OnConnectionChanged(device, connectionHandle, static_cast<int>(BTConnectState::CONNECTED));
+                    item.second->OnReconnect(device, connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
+                    break;
+                case OBSERVER_EVENT_DISCONNECTED_INTER:
+                    item.second->OnDisconnectInter(device, connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
                     break;
                 default:
                     break;
@@ -1402,6 +1407,9 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
             }
             break;
         case MSG_RECONNECT_CAUSE_0X3E:
+            GattConnectionManager::GetInstance().pimpl->NotifyObserver(
+                    device_.Info(), OBSERVER_EVENT_DISCONNECTED_INTER, device_.handle_,
+                    device_.role_, GattStatus::GATT_SUCCESS)
             if (GattConnectionManager::GetInstance().pimpl->DoConnect(device_) == GattStatus::GATT_SUCCESS) {
                 result = true;
             }
