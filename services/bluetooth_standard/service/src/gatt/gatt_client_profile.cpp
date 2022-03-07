@@ -2390,8 +2390,6 @@ public:
             LOG_INFO("%{public}s device role is slave", __FUNCTION__);
             return;
         }
-        this->clientProfile_.pimpl->DeleteList(connectionHandle);
-        this->clientProfile_.pimpl->SetMtuInformation(connectionHandle, false, GATT_DEFAULT_MTU);
         this->clientProfile_.pimpl->DeleteCache(connectionHandle, device);
     }
 
