@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -232,6 +232,15 @@ void RfcommTransport::TransportRfcConnectFail(uint16_t handle, RfcommTransport *
             LOG_ERROR("[RfcommTransport]%{public}s handle:%hu: RFCOMM_CHANNEL_EV_CONNECT_FAIL transport does not exist",
                 __FUNCTION__,
                 handle);
+            std::map<RawAddress, uint16_t>::iterator it;
+            for (it = transport->handleMap_.begin(); it != transport->handleMap_.end(); ++it) {
+                if (it->second == handle) {
+                    LOG_INFO("[RfcommTransport]%{public}s erase handle map", __func__);
+                    transport->handleMap_.erase(it);
+                    break;
+                }
+            }
+            transport->addressMap_.erase(handle);
         }
     } else {
         transport->observer_.OnTransportError(transport, CONNECT_FAIL);
