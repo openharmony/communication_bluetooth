@@ -25,6 +25,7 @@
 #include "bluetooth_gatt_server_server.h"
 #include "bluetooth_hfp_ag_server.h"
 #include "bluetooth_hfp_hf_server.h"
+#include "bluetooth_hid_host_server.h"
 #include "bluetooth_host_dumper.h"
 #include "bluetooth_host_server.h"
 #include "bluetooth_log.h"
@@ -530,6 +531,10 @@ void BluetoothHostServer::impl::createServers()
 
     sptr<BluetoothA2dpSinkServer> a2dpSink = new BluetoothA2dpSinkServer();
     servers_[PROFILE_A2DP_SINK] = a2dpSink->AsObject();
+
+    sptr<BluetoothHidHostServer> hidHostServer = new BluetoothHidHostServer();
+    servers_[PROFILE_HID_HOST_SERVER] = hidHostServer->AsObject();
+
 
     HILOGI("BluetoothHostServer::impl::Init servers_ constructed, size is %{public}zu", servers_.size());
 }

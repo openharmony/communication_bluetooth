@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,6 +63,7 @@ const std::string PROFILE_NAME_PBAP_PCE = "PbapPceService";
 const std::string PROFILE_NAME_PBAP_PSE = "PbapPseService";
 const std::string PROFILE_NAME_SPP = "SocketService";
 const std::string PROFILE_NAME_DI = "DIService";
+const std::string PROFILE_NAME_HID_HOST = "HidHostService";
 
 /**
  * @brief profile connect state define, using to GetConnectState()...

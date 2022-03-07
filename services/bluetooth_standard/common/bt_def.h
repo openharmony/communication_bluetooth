@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,6 +48,7 @@ const std::string BLUETOOTH_UUID_PBAP_PCE = "0000112E-0000-1000-8000-00805F9B34F
 const std::string BLUETOOTH_UUID_PBAP_PSE = "0000112F-0000-1000-8000-00805F9B34FB";
 const std::string BLUETOOTH_UUID_SPP = "00001101-0000-1000-8000-00805F9B34FB";
 const std::string BLUETOOTH_UUID_PNP = "00001200-0000-1000-8000-00805F9B34FB";
+const std::string BLUETOOTH_UUID_HID_HOST = "00001124-0000-1000-8000-00805F9B34FB";
 
 /*********************************************
  *
@@ -121,6 +122,7 @@ const uint32_t PROFILE_ID_PBAP_PCE = 0x00000400;
 const uint32_t PROFILE_ID_PBAP_PSE = 0x00000800;
 const uint32_t PROFILE_ID_SPP = 0x00001000;
 const uint32_t PROFILE_ID_DI = 0x00002000;
+const uint32_t PROFILE_ID_HID_HOST = 0x00004000;
 
 /**
  * @brief default value
