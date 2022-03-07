@@ -402,7 +402,7 @@ A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) 
     }
 
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetCodecStatus(RawAddress(device.GetDeviceAddr()));
+        codecStatus = pimpl->proxy_->GetCodecStatus(RawAddress(device.GetDeviceAddr()));
     }
 
     ret.codecInfo.codecType = codecStatus.codecInfo.codecType;

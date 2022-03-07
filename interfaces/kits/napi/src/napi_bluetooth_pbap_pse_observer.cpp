@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void NapiPbapPseObserver::OnServiceConnectionStateChanged(const BluetoothRemoteDevice &device, int state) {
+void NapiPbapPseObserver::OnServiceConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+{
     HILOGI("NapiPbapPseObserver::OnServiceConnectionStateChanged called");
     if (!callbackInfos_[STR_BT_PBAP_PSE_CONNECTION_STATE_CHANGE]) {
         HILOGW("NapiPbapPseObserver::OnServiceConnectionStateChanged: This callback is not registered by ability.");
