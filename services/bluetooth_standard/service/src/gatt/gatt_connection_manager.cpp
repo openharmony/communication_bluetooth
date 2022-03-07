@@ -1409,7 +1409,7 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
         case MSG_RECONNECT_CAUSE_0X3E:
             GattConnectionManager::GetInstance().pimpl->NotifyObserver(
                     device_.Info(), OBSERVER_EVENT_DISCONNECTED_INTER, device_.handle_,
-                    device_.role_, GattStatus::GATT_SUCCESS)
+                    device_.role_, GattStatus::GATT_SUCCESS);
             if (GattConnectionManager::GetInstance().pimpl->DoConnect(device_) == GattStatus::GATT_SUCCESS) {
                 result = true;
             }
