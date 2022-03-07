@@ -2375,6 +2375,25 @@ public:
         this->clientProfile_.pimpl->DeleteCache(connectionHandle, device);
     }
 
+    void OnReconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    {
+        if (role == 1) { // slave role.
+            return;
+        }
+        this->clientProfile_.pimpl->CreateCache(connectionHandle, device);
+    }
+
+    void OnDisconnectInter(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    {
+        if (role == 1) {
+            LOG_INFO("%{public}s device role is slave", __FUNCTION__);
+            return;
+        }
+        this->clientProfile_.pimpl->DeleteList(connectionHandle);
+        this->clientProfile_.pimpl->SetMtuInformation(connectionHandle, false, GATT_DEFAULT_MTU);
+        this->clientProfile_.pimpl->DeleteCache(connectionHandle, device);
+    }
+
     GattConnectionObserverImplement(GattClientProfile &clientProfile) : clientProfile_(clientProfile)
     {}
     ~GattConnectionObserverImplement()
