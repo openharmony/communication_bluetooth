@@ -575,7 +575,7 @@ void GattConnectionManager::impl::LEDisconnectCompletedImpl(uint16_t connectHand
         }
     }
 
-    if (ret && device->RetryTimes == 0) {
+    if (ret && device->RetryTimes() == 0) {
         GattConnectionManager::GetInstance().pimpl->RemoveDevice(device->Info());
     }
 }
@@ -1401,7 +1401,7 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
                 result = true;
             }
             break;
-        case MSG_RECONNECT_0X3E:
+        case MSG_RECONNECT_CAUSE_0X3E:
             if (GattConnectionManager::GetInstance().pimpl->DoConnect(device_) == GattStatus::GATT_SUCCESS) {
                 result = true;
             }

@@ -1542,6 +1542,7 @@ void LeDisconnectReqCallBackAsync(const void *context)
             if (attConnectCallback->attConnect.attLEDisconnectCompleted != NULL) {
                 attConnectCallback->attConnect.attLEDisconnectCompleted(
                     connect->retGattConnectHandle, &leData, attConnectCallback->context);
+            }
         }
     }
 
