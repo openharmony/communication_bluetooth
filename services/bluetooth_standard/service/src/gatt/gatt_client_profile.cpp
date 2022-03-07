@@ -124,7 +124,7 @@ struct GattClientProfile::impl {
     void DeleteList(uint16_t connectHandle);
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByRequestInfor(uint16_t connectHandle);
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByRespones(
-        ResponseType reqType, int reqId);
+        ResponesType reqType, int reqId);
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByResponesInfor(
         uint16_t handle, uint16_t respType);
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByResponesInfor(
@@ -2201,8 +2201,8 @@ std::list<std::pair<uint16_t, GattRequestInfo>>::iterator GattClientProfile::imp
     return iter;
 }
 
-std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByRespones(
-        ResponseType reqType, int reqId)
+std::list<std::pair<uint16_t, GattRequestInfo>>::iterator GattClientProfile::impl::FindIteratorByRespones(
+        ResponesType reqType, int reqId)
 {
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator iter;
     for (iter = responseList_.begin(); iter != responseList_.end(); iter++) {
