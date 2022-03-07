@@ -57,7 +57,8 @@ public:
                 MSG_DISCONNECT_COMPLETE,
                 MSG_REQUEST_CONNECTION_PRIORITY,
                 MSG_RESPONSE_CONNECTION_PRIORITY,
-                MSG_DIRECT_CONNECT_TIMEOUT
+                MSG_DIRECT_CONNECT_TIMEOUT,
+                MSG_RECONNECT_CAUSE_0X3E
             };
             explicit StateMachine(GattConnectionManager::Device &device);
             ~StateMachine();

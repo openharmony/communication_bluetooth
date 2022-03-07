@@ -252,7 +252,7 @@ void bluetooth::GattClientProfile::DiscoverAllPrimaryServicesInter(
     LOG_INFO("%{public}s: connectHandle is %{public}hu, Add requestList_: DISCOVER_ALL_PRIMARY_SERVICE.", __FUNCTION__, connectHandle);
     auto iter = pimpl->FindIteratorByRespones(DISCOVER_ALL_PRIMARY_SERVICE, reqId);
     if (iter == pimpl->responseList_.end()) {
-        LOG_INFO("%{public}s: not find connectionHandle(%{public}d) in response list", __FUNCTION__, connectHandle);
+        LOG_INFO("%{public}s: not find connectionHandle(%{public}hu) in response list", __FUNCTION__, connectHandle);
         return;
     }
     pimpl->responseList_.erase(iter);
@@ -2366,6 +2366,10 @@ public:
 
     void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
+        if (role == 1) {
+            LOG_INFO("%{public}s device role is slave", __FUNCTION__);
+            return;
+        }
         this->clientProfile_.pimpl->DeleteList(connectionHandle);
         this->clientProfile_.pimpl->SetMtuInformation(connectionHandle, false, GATT_DEFAULT_MTU);
         this->clientProfile_.pimpl->DeleteCache(connectionHandle, device);
