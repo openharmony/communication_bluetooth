@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@
 #include "napi_bluetooth_pbap_pse.h"
 #include "napi_bluetooth_avrcp_ct.h"
 #include "napi_bluetooth_avrcp_tg.h"
+#include "napi_bluetooth_hid_host.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -59,8 +60,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NapiPbapServer::DefinePbapServerJSClass(env);
     NapiAvrcpController::DefineAvrcpControllerJSClass(env);
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
-
-
+    NapiHidHost::DefineHidHostJSClass(env);
     HILOGI("-----Init end------");
     return exports;
 }

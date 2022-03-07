@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ const std::vector<ProfileInfo> SupportProfilesInfo::SUPPORT_FILES = {
     ProfileInfo(PROFILE_NAME_PBAP_PSE, PROFILE_ID_PBAP_PSE, BLUETOOTH_UUID_PBAP_PSE),
     ProfileInfo(PROFILE_NAME_SPP, PROFILE_ID_SPP, BLUETOOTH_UUID_SPP),
     ProfileInfo(PROFILE_NAME_DI, PROFILE_ID_DI, BLUETOOTH_UUID_PNP),
+    ProfileInfo(PROFILE_NAME_HID_HOST, PROFILE_ID_HID_HOST, BLUETOOTH_UUID_HID_HOST),
 };
 
 const std::vector<ProfileInfo> &SupportProfilesInfo::GetSupportProfiles()

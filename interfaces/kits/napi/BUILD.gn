@@ -52,6 +52,8 @@ ohos_shared_library("bluetooth") {
     "src/napi_bluetooth_hfp_ag_observer.cpp",
     "src/napi_bluetooth_hfp_hf.cpp",
     "src/napi_bluetooth_hfp_hf_observer.cpp",
+    "src/napi_bluetooth_hid_host.cpp",
+    "src/napi_bluetooth_hid_host_observer.cpp",
     "src/napi_bluetooth_host.cpp",
     "src/napi_bluetooth_host_observer.cpp",
     "src/napi_bluetooth_pbap_pce.cpp",
