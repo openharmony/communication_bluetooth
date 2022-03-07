@@ -737,7 +737,7 @@ int BtmStartAutoConnection()
     return result;
 }
 
-static int BtmStopAutoConnectionInternal()
+static int BtmStopAutoConnectionInternal(void)
 {
     return HCI_LeCreateConnectionCancel();
 }
