@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,7 +72,6 @@ void AvrcpTargetTest::TearDown()
     host_ = nullptr;
 }
 
-
 /*
  * @tc.number: AvrcpTarget001
  * @tc.name: GetProfile
@@ -87,7 +86,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_GetProfile, TestSize.Level1)
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_GetProfile end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget002
  * @tc.name: GetConnectedDevices
@@ -99,7 +97,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_GetConnectedDevices, TestSize.Level1)
  
     profile_ = AvrcpTarget::GetProfile();
     vector<BluetoothRemoteDevice> devices = profile_->GetConnectedDevices();
-
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_GetConnectedDevices end";
 }
@@ -148,7 +145,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_UnregisterObserver, TestSize.Level1)
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_DeregisterObserver end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget006
  * @tc.name: SetActiveDevice
@@ -164,7 +160,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_SetActiveDevice, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_SetActiveDevice end";
 }
-
 
 /*
  * @tc.number: AvrcpTarget007
@@ -182,7 +177,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_GetDevicesByStates, TestSize.Level1)
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_GetDevicesByStates end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget008
  * @tc.name: Connect
@@ -198,7 +192,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_Connect, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_Connect end";
 }
-
 
 /*
  * @tc.number: AvrcpTarget009
@@ -216,7 +209,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_Disconnect, TestSize.Level1)
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_Disconnect end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget010
  * @tc.name: NotifyPlaybackStatusChanged
@@ -231,7 +223,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyPlaybackStatusChanged, TestSize.L
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyPlaybackStatusChanged end";
 }
-
 
 /*
  * @tc.number: AvrcpTarget011
@@ -248,7 +239,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyTrackChanged, TestSize.Level1)
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyTrackChanged end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget012
  * @tc.name: NotifyTrackReachedEnd
@@ -263,7 +253,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyTrackReachedEnd, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyTrackReachedEnd end";
 }
-
 
 /*
  * @tc.number: AvrcpTarget013
@@ -280,7 +269,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyTrackReachedStart, TestSize.Level
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyTrackReachedStart end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget014
  * @tc.name: NotifyPlaybackPosChanged
@@ -295,7 +283,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyPlaybackPosChanged, TestSize.Leve
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyPlaybackPosChanged end";
 }
-
 
 /*
  * @tc.number: AvrcpTarget015
@@ -314,7 +301,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyPlayerAppSettingChanged, TestSize
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyPlayerAppSettingChanged end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget016
  * @tc.name: NotifyNowPlayingContentChanged
@@ -330,7 +316,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyNowPlayingContentChanged, TestSiz
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyNowPlayingContentChanged end";
 }
-
 
 /*
  * @tc.number: AvrcpTarget017
@@ -348,7 +333,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyAvailablePlayersChanged, TestSize
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyAvailablePlayersChanged end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget018
  * @tc.name: NotifyAddressedPlayerChanged
@@ -364,7 +348,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyAddressedPlayerChanged, TestSize.
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyAddressedPlayerChanged end";
 }
-
 
 /*
  * @tc.number: AvrcpTarget019
@@ -382,7 +365,6 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyUidChanged, TestSize.Level1)
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyUidChanged end";
 }
 
-
 /*
  * @tc.number: AvrcpTarget020
  * @tc.name: NotifyVolumeChanged
@@ -398,7 +380,5 @@ HWTEST_F(AvrcpTargetTest, Avrcp_UnitTest_NotifyVolumeChanged, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "Avrcp_UnitTest_NotifyVolumeChanged end";
 }
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS

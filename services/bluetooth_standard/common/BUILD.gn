@@ -31,6 +31,8 @@ ohos_static_library("btcommon") {
     "raw_address.cpp",
   ]
 
+  cflags_cc = [ "-fvisibility=hidden" ]
+
   deps = [
     "//utils/native/base:utils",
     "//utils/native/base:utilsecurec_shared",

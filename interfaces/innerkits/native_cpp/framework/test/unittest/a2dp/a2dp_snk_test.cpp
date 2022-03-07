@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,8 +81,6 @@ void A2dpSinkTest::TearDown()
     sleep(TIME);
 }
 
-
-
 /*
  * @tc.number: A2dpSink001
  * @tc.name: GetProfile
@@ -96,7 +94,6 @@ HWTEST_F(A2dpSinkTest, A2dpSink_UnitTest_GetProfile, TestSize.Level1)
     
     GTEST_LOG_(INFO) << "A2dpSink_UnitTest_GetProfile end";
 }
-
 
 /*
  * @tc.number: A2dpSink002
@@ -205,7 +202,6 @@ HWTEST_F(A2dpSinkTest, A2dpSink_UnitTest_GetDevicesByStates, TestSize.Level1)
     vector<BluetoothRemoteDevice> devices = profile_->GetDevicesByStates(states);
     
     GTEST_LOG_(INFO) << "A2dpSink_UnitTest_GetDevicesByStates end";
-
 }
 
 /*
@@ -222,7 +218,6 @@ HWTEST_F(A2dpSinkTest, A2dpSink_UnitTest_GetConnectStrategy, TestSize.Level1)
     EXPECT_EQ(profile_->GetConnectStrategy(device), 0);
     
     GTEST_LOG_(INFO) << "A2dpSink_UnitTest_GetConnectStrategy end";
-
 }
 
 /*
@@ -240,9 +235,6 @@ HWTEST_F(A2dpSinkTest, A2dpSink_UnitTest_SetConnectStrategy, TestSize.Level1)
     EXPECT_EQ(isOK, false);
     
     GTEST_LOG_(INFO) << "A2dpSink_UnitTest_SetConnectStrategy end";
-
 }
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS

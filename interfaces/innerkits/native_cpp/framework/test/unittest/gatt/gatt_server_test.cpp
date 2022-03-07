@@ -88,6 +88,7 @@ void GattServerTest::TearDown()
     host_->DisableBt();
     host_->DisableBle();
     host_ = nullptr;
+    sleep(TIME);
 }
 
 /*
