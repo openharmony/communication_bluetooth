@@ -87,8 +87,8 @@ struct GattServerService::impl : public GattServiceBase {
     void OnDescriptorReadEvent(uint16_t connectionHandle, uint16_t valueHandle);
     void OnDescriptorWriteEvent(uint16_t connectionHandle, uint16_t valueHandle, GattValue &value, size_t length);
     void OnIndicationEvent(uint16_t connectionHandle, uint16_t valueHandle, int ret);
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret);
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret);
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret);
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret);
     void OnConnectionChanged(const GattDevice &device, int state);
     void OnConnectionParameterChanged(const GattDevice &device, int interval, int latency, int timeout, int status);
     void OnConnetionManagerShutDown();
@@ -421,24 +421,24 @@ const std::string GattServerService::GetDatabaseHash() const
 
 class GattServerService::impl::GattConnectionObserverImplement : public GattConnectionObserver {
 public:
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
-            std::bind(&impl::OnConnect, service_.pimpl.get(), device, connectionHandle, ret));
+            std::bind(&impl::OnConnect, service_.pimpl.get(), device, connectionHandle, role, ret));
     }
 
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
-            std::bind(&impl::OnDisconnect, service_.pimpl.get(), device, connectionHandle, ret));
+            std::bind(&impl::OnDisconnect, service_.pimpl.get(), device, connectionHandle, role, ret));
     }
 
-    void OnConnectionChanged(const GattDevice &device, int state) override
+    void OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), state);
-        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged, service_.pimpl.get(), device, state));
+        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged, service_.pimpl.get(), device, connectionHandle, state));
     }
 
     void OnConnectionParameterChanged(
@@ -1012,8 +1012,11 @@ void GattServerService::impl::OnIndicationEvent(uint16_t connectionHandle, uint1
     }
 }
 
-void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret)
+void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
 {
+    if (role == 0) { // only slave
+        return;
+    }
     if (GattStatus::GATT_SUCCESS == ret) {
         std::lock_guard<std::mutex> lck(remotesMutex_);
         remotes_.emplace(connectionHandle, GattConnection(device, 0, connectionHandle));
@@ -1030,19 +1033,26 @@ void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t conne
     }
 }
 
-void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret)
+void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
 {
+    bool findDevice = false;
     auto remote = remotes_.find(connectionHandle);
     if (remote != remotes_.end()) {
         std::lock_guard<std::mutex> lck(remotesMutex_);
         remotes_.erase(connectionHandle);
+        findDevice = true;
     } else {
         for (auto it = remotes_.begin(); it != remotes_.end(); it++) {
             if (it->second.GetDevice() == device) {
                 remotes_.erase(it);
+                findDevice = true;
                 break;
             }
         }
+    }
+
+    if (!findDevice) {
+        return;
     }
 
     if (device.transport_ == GATT_TRANSPORT_TYPE_CLASSIC && ret == GattStatus::GATT_SUCCESS) {
@@ -1058,6 +1068,9 @@ void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t co
 
 void GattServerService::impl::OnConnectionChanged(const GattDevice &device, int state)
 {
+    if (state == static_cast<int>(BTConnectState::CONNECTED)) {
+        return;
+    }
     for (auto &server : servers_) {
         server.second.callback_.OnConnectionStateChanged(device, GattStatus::GATT_SUCCESS, state);
     }

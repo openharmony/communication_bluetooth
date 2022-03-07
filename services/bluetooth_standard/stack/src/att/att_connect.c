@@ -1539,8 +1539,9 @@ void LeDisconnectReqCallBackAsync(const void *context)
     if (disLeConnectReqPtr->result != BT_NO_ERROR) {
         if (connect->transportType == BT_TRANSPORT_LE) {
             leData.status = LE_DISCONNECT_FAIL;
-            attConnectCallback->attConnect.attLEDisconnectCompleted(
-                connect->retGattConnectHandle, &leData, attConnectCallback->context);
+            if (attConnectCallback->attConnect.attLEDisconnectCompleted != NULL) {
+                attConnectCallback->attConnect.attLEDisconnectCompleted(
+                    connect->retGattConnectHandle, &leData, attConnectCallback->context);
         }
     }
 

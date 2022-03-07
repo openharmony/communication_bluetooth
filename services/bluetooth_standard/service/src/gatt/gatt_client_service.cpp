@@ -130,7 +130,7 @@ struct GattClientService::impl : public GattServiceBase {
     void OnExchangeMtuEvent(int requestId, uint16_t connectHandle, uint16_t rxMtu, bool status);
     void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret);
     void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret);
-    void OnConnectionChanged(const GattDevice &device, int state);
+    void OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state);
     void OnConnectionParameterChanged(const GattDevice &device, int interval, int latency, int timeout, int status);
     void OnConnetionManagerShutDown();
 
@@ -413,24 +413,24 @@ std::vector<Service> GattClientService::GetServices(int appId)
 
 class GattClientService::impl::GattConnectionObserverImplement : public GattConnectionObserver {
 public:
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
             std::bind(&impl::OnConnect, service_.pimpl.get(), device, connectionHandle, ret));
     }
 
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
             std::bind(&impl::OnDisconnect, service_.pimpl.get(), device, connectionHandle, ret));
     }
 
-    void OnConnectionChanged(const GattDevice &device, int state) override
+    void OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), state);
-        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged, service_.pimpl.get(), device, state));
+        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged, service_.pimpl.get(), device, connectionHandle, state));
     }
 
     void OnConnectionParameterChanged(
@@ -1124,12 +1124,19 @@ void GattClientService::impl::OnDisconnect(const GattDevice &device, uint16_t co
     }
 }
 
-void GattClientService::impl::OnConnectionChanged(const GattDevice &device, int state)
+void GattClientService::impl::OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state)
 {
     for (auto &it : clients_) {
         if (it.second.connection_.GetDevice() == device) {
-            it.second.connState_ = state;
-            it.second.callback_.OnConnectionStateChanged(GattStatus::GATT_SUCCESS, it.second.connState_);
+            if (it.second.connState_ == state) {
+                auto &client = it.second;
+                client.connection_.SetHandle(connectionHandle);
+                client.discover_.profile_.DiscoverAllPrimaryServicesInter(
+                    it.first, client.connection_.GetHandle(), MIN_ATTRIBUTE_HANDLE, MAX_ATTRIBUTE_HANDLE);
+            } else {
+                it.second.connState_ = state;
+                it.second.callback_.OnConnectionStateChanged(GattStatus::GATT_SUCCESS, it.second.connState_);
+            }
         }
     }
 }
