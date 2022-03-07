@@ -123,6 +123,8 @@ struct GattClientProfile::impl {
     void DeleteCache(uint16_t connectHandle, const GattDevice device);
     void DeleteList(uint16_t connectHandle);
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByRequestInfor(uint16_t connectHandle);
+    std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByRespones(
+        ResponseType reqType, int reqId);
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByResponesInfor(
         uint16_t handle, uint16_t respType);
     std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByResponesInfor(
@@ -234,6 +236,32 @@ void bluetooth::GattClientProfile::DiscoverAllPrimaryServices(
     pimpl->requestList_.emplace_back(connectHandle, GattRequestInfo(DISCOVER_ALL_PRIMARY_SERVICE, reqId));
     ATT_ReadByGroupTypeRequest(connectHandle, startHandle, endHandle, &primarySvcUuid);
 }
+
+/**
+ * @brief This sub-procedure is used by a client to discover all the primary services on a server.
+ *
+ * @param reqId Indicates request id.
+ * @param connectHandle Indicates identify a connection.
+ * @param startHandle Indicates starting handle of the specified service.
+ * @param endHandle Indicates ending handle of the specified service.n.
+ * @since 6.0
+ */
+void bluetooth::GattClientProfile::DiscoverAllPrimaryServicesInter(
+    int reqId, uint16_t connectHandle, uint16_t startHandle, uint16_t endHandle) const
+{
+    LOG_INFO("%{public}s: connectHandle is %{public}hu, Add requestList_: DISCOVER_ALL_PRIMARY_SERVICE.", __FUNCTION__, connectHandle);
+    auto iter = pimpl->FindIteratorByRespones(DISCOVER_ALL_PRIMARY_SERVICE, reqId);
+    if (iter == pimpl->responseList_.end()) {
+        LOG_INFO("%{public}s: not find connectionHandle(%{public}d) in response list", __FUNCTION__, connectHandle);
+        return;
+    }
+    pimpl->responseList_.erase(iter);
+
+    BtUuid primarySvcUuid = {BT_UUID_16, {UUID_PRIMARY_SERVICE}};
+    pimpl->requestList_.emplace_back(connectHandle, GattRequestInfo(DISCOVER_ALL_PRIMARY_SERVICE, reqId));
+    ATT_ReadByGroupTypeRequest(connectHandle, startHandle, endHandle, &primarySvcUuid);
+}
+
 /**
  * @brief This sub-procedure is used by a client to discover a specific primary service on a server when only
  * the Service UUID is known.
@@ -2172,6 +2200,18 @@ std::list<std::pair<uint16_t, GattRequestInfo>>::iterator GattClientProfile::imp
     }
     return iter;
 }
+
+std::list<std::pair<uint16_t, GattRequestInfo>>::iterator FindIteratorByRespones(
+        ResponseType reqType, int reqId)
+{
+    std::list<std::pair<uint16_t, GattRequestInfo>>::iterator iter;
+    for (iter = responseList_.begin(); iter != responseList_.end(); iter++) {
+        if (reqId == iter->second.reqId_ && reqType == iter->second.reqType_) {
+            break;
+        }
+    }
+    return iter;
+}
 std::list<std::pair<uint16_t, GattRequestInfo>>::iterator GattClientProfile::impl::FindIteratorByResponesInfor(
     uint16_t handle, ResponesType respType)
 {
@@ -2290,7 +2330,7 @@ uint8_t *GattClientProfile::impl::GetReadValueCache(uint16_t connectHandle, uint
  */
 void GattClientProfile::impl::DeleteList(uint16_t connectHandle)
 {
-    LOG_INFO("%{public}s: connectHandle is %hu.", __FUNCTION__, connectHandle);
+    LOG_INFO("%{public}s: connectHandle is %{public}hu.", __FUNCTION__, connectHandle);
     auto reqList = requestList_.begin();
     while (reqList != requestList_.end()) {
         if (connectHandle == reqList->first) {
@@ -2316,12 +2356,15 @@ void GattClientProfile::impl::DeleteList(uint16_t connectHandle)
  */
 class GattClientProfile::impl::GattConnectionObserverImplement : public GattConnectionObserver {
 public:
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
+        if (role == 1) { // slave role.
+            return;
+        }
         this->clientProfile_.pimpl->CreateCache(connectionHandle, device);
     }
 
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
         this->clientProfile_.pimpl->DeleteList(connectionHandle);
         this->clientProfile_.pimpl->SetMtuInformation(connectionHandle, false, GATT_DEFAULT_MTU);

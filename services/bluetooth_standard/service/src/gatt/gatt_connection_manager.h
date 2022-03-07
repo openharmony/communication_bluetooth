@@ -120,6 +120,8 @@ public:
         StateMachine &SM();
         uint16_t &MTU();
         uint16_t &Handle();
+        uint8_t &Role();
+        uint8_t &RetryTimes();
         std::mutex &DeviceRWMutex();
         utility::Timer &DirectConnect();
 
@@ -127,6 +129,8 @@ public:
         bool autoConnect_;
         uint16_t mtu_;
         uint16_t handle_;
+        uint8_t role_;
+        uint8_t retry_;
         uint8_t addr_[RawAddress::BT_ADDRESS_BYTE_LEN] = {0};
         GattDevice info_;
         std::mutex deviceRWMutex_;
