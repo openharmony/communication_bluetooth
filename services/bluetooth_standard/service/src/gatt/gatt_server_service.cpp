@@ -438,7 +438,7 @@ public:
     void OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), state);
-        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged, service_.pimpl.get(), device, connectionHandle, state));
+        service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnectionChanged, service_.pimpl.get(), device, state));
     }
 
     void OnConnectionParameterChanged(

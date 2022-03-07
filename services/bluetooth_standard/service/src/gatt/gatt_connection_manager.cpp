@@ -512,7 +512,7 @@ void GattConnectionManager::impl::DisconnectAllDevice()
 }
 
 void GattConnectionManager::impl::NotifyObserver(
-    const GattDevice &device, uint8_t event, uint16_t connectionHandle, uint8_t rile, int ret)
+    const GattDevice &device, uint8_t event, uint16_t connectionHandle, uint8_t role, int ret)
 {
     std::lock_guard<std::mutex> lck(registerMutex_);
     for (auto &item : observers_) {
@@ -565,15 +565,17 @@ void GattConnectionManager::impl::LEDisconnectCompletedImpl(uint16_t connectHand
             LOG_DEBUG("%{public}s: disconnect reason:%{public}d", __FUNCTION__, data.reason);
             if (data.reason == 0x3e && device->Role() == 0 && device->RetryTimes() < 2) { // 0x3e retry 3 times
                 device->RetryTimes() ++;
-                ret = device->ProcessMessage(Device::StateMachine::MSG_RECONNECT_0X3E, connectHandle, &data);
+                ret = device->ProcessMessage(Device::StateMachine::MSG_RECONNECT_CAUSE_0X3E, connectHandle, &data);
+            } else {
+                device->RetryTimes() = 0;
+                ret = device->ProcessMessage(Device::StateMachine::MSG_DISCONNECT_COMPLETE, connectHandle, &data);
             }
-            ret = device->ProcessMessage(Device::StateMachine::MSG_DISCONNECT_COMPLETE, connectHandle, &data);
         } else {
             LOG_ERROR("%{public}s: Call - FindDevice - Fail!", __FUNCTION__);
         }
     }
 
-    if (ret) {
+    if (ret && device->RetryTimes == 0) {
         GattConnectionManager::GetInstance().pimpl->RemoveDevice(device->Info());
     }
 }
@@ -1098,6 +1100,8 @@ GattConnectionManager::Device::Device(const GattDevice &device, bool autoConnect
     : autoConnect_(autoConnect),
       mtu_(GATT_DEFAULT_MTU),
       handle_(0),
+      role_(0),
+      retry_(0),
       info_(device),
       deviceRWMutex_(),
       sm_(*this),
@@ -1390,7 +1394,7 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
             break;
         case MSG_DIRECT_CONNECT_TIMEOUT:
             BtAddr addr;
-            if (memcpy_s(addr.addr, RawAddress::BT_ADDRESS_BYTE_LEN, device_.addr_, RawAddress::BT_ADDRESS_BYTE_LEN))
+            if (memcpy_s(addr.addr, RawAddress::BT_ADDRESS_BYTE_LEN, device_.addr_, RawAddress::BT_ADDRESS_BYTE_LEN)
                 == EOK) {
                 addr.type = device_.info_.addressType_;
                 ATT_LeConnectCancel(&addr);
@@ -1411,6 +1415,7 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
                     device_.Info(), OBSERVER_EVENT_RECONNECTED, device_.handle_,
                     device_.role_, GattStatus::GATT_SUCCESS);
             }
+            result = true;
             break;
         case MSG_CONNECT:
         default:
