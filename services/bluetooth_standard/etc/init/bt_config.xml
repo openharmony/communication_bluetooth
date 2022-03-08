@@ -44,12 +44,12 @@
 	</T1>
 	<T1 section="A2dpSrcService">
 		<T1 property="MaxConnectedDevices">0x06</T1>
-		<T1 property="CodecSbc">0x01</T1>
-		<T1 property="CodecAac">0x02</T1>
+		<T1 property="CodecAac">0x01</T1>
+		<T1 property="CodecSbc">0x02</T1>
 	</T1>
 	<T1 section="A2dpSnkService">
-		<T1 property="CodecSbc">0x01</T1>
-		<T1 property="CodecAac">0x02</T1>
+		<T1 property="CodecAac">0x01</T1>
+		<T1 property="CodecSbc">0x02</T1>
 	</T1>
 	<T1 section="GattService">
 		<T1 property="GattProfileMaxMtu">0x0200</T1>

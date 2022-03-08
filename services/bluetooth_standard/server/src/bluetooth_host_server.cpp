@@ -45,6 +45,9 @@
 #include "remote_observer_list.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "idevmgr_hdi.h"
+
+constexpr const char *AUDIO_BLUETOOTH_SERVICE_NAME = "audio_bluetooth_hdi_service";
 
 namespace OHOS {
 namespace Bluetooth {
@@ -188,6 +191,20 @@ public:
                     "BR_STATE",
                     state);
             }
+            if (state == BTStateID::STATE_TURN_ON) {
+                auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
+                if (devmgr != nullptr) {
+                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, loadDevice of a2dp HDF");
+                    devmgr->LoadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
+                }
+            }
+            if (state == BTStateID::STATE_TURN_OFF) {
+                auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
+                if (devmgr != nullptr) {
+                    HILOGI("BluetoothHostServer::impl::AdapterStateObserver::OnStateChange, UnloadDevice of a2dp HDF");
+                    devmgr->UnloadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
+                }
+            }
         } else if (transport == BTTransport::ADAPTER_BLE) {
             impl_->bleObservers_.ForEach([transport, state](sptr<IBluetoothHostObserver> observer) {
                 observer->OnStateChanged(transport, state);
@@ -195,15 +212,8 @@ public:
             if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
-                HiviewDFX::HiSysEvent::Write("BLUETOOTH",
-                    "BLUETOOTH_BLE_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC,
-                    "PID",
-                    pid,
-                    "UID",
-                    uid,
-                    "BLE_STATE",
-                    state);
+                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_STATE",
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BLE_STATE", state);
             }
         }
     };
@@ -225,15 +235,8 @@ public:
         if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
             int32_t pid = IPCSkeleton::GetCallingPid();
             int32_t uid = IPCSkeleton::GetCallingUid();
-            HiviewDFX::HiSysEvent::Write("BLUETOOTH",
-                "BLUETOOTH_SCAN_STATE",
-                HiviewDFX::HiSysEvent::EventType::STATISTIC,
-                "PID",
-                pid,
-                "UID",
-                uid,
-                "BR_SCAN_STATE",
-                status);
+            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_SCAN_STATE",
+                HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_SCAN_STATE", status);
         }
     }
 

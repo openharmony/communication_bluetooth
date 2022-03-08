@@ -24,7 +24,6 @@
 
 namespace bluetooth {
 const int BIT_SBC_NUMBER_PER_SAMPLE = 8;
-const int S_TO_US = 1000000;
 const int MS_TO_US = 1000;
 const int NUMBER32 = 32;
 const int BIT8 = 8;
@@ -100,7 +99,7 @@ bool A2dpSbcEncoder::SetPcmData(const uint8_t *data, uint16_t dataSize)
         LOG_ERROR("[A2dpSbcEncoder] %{public}s dataSize too large\n", __func__);
         return false;
     }
-    if(!memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE, data, dataSize)) {
+    if(memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO, data, dataSize) != EOK) {
         LOG_ERROR("[A2dpSbcEncoder] %{public}s copy error\n", __func__);
         return false;
     }
@@ -518,8 +517,7 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
         (void)memset_s(a2dpSbcEncoderCb_.pcmRemain, A2DP_SBC_MAX_PACKET_SIZE, 0, sizeof(a2dpSbcEncoderCb_.pcmRemain));
         if (encodePacketSize > 0) {
             uint32_t pktTimeStamp = a2dpSbcEncoderCb_.timestamp;
-            a2dpSbcEncoderCb_.timestamp += frameIter * subbands * blocks * channelMode * S_TO_US 
-                / a2dpSbcEncoderCb_.feedingParams.sampleRate;
+            a2dpSbcEncoderCb_.timestamp += frameIter * blocksXsubbands;
             a2dpSbcEncoderCb_.sendDataSize += codecSize;
             EnqueuePacket(pkt, frameIter, encodePacketSize, pktTimeStamp, (uint16_t)encoded);  // Enqueue Packet.
             LOG_INFO("[EnqueuePacket][encoded:%{public}zu][frameIter:%u]", encoded, frameIter);
@@ -534,6 +532,9 @@ void A2dpSbcEncoder::EnqueuePacket(
     LOG_INFO("[EnqueuePacket][frameSize:%hu][FrameNum:%zu], mtu[%hu]", frameSize, frames, a2dpSbcEncoderCb_.mtuSize);
 
     LOG_INFO("[EnqueuePacket] totalSize[%u]", PacketSize(pkt));
+    uint16_t blocksXsubbands
+        = a2dpSbcEncoderCb_.sbcEncoderParams.subBands * a2dpSbcEncoderCb_.sbcEncoderParams.numOfBlocks;
+
     if (PacketSize(pkt) < static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize)) {
         Buffer *header = PacketHead(pkt);
         uint8_t *p = static_cast<uint8_t*>(BufferPtr(header));
@@ -566,9 +567,8 @@ void A2dpSbcEncoder::EnqueuePacket(
             count--;
             LOG_INFO("[EnqueuePacket] [pktLen:%u] [sFrameNum:%u] [remain:%u]", pktLen, frameNum, PacketSize(pkt));
             PacketFragment(pkt, mediaPacket, pktLen);
-            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp);  // Enqueue Packet.
-            timeStamp++;
             frames = frames - frameNum;
+            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp-frames * blocksXsubbands);
             PacketFree(mediaPacket);
             LOG_INFO("[EnqueuePacket][sendNum:%u][remainFrameNum:%zu], [DataLen:%u]", frameNum, frames, pktLen);
         } while (count > 0);

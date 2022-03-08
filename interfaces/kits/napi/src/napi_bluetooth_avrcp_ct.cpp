@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,8 @@ using namespace std;
 
 NapiAvrcpControllerObserver NapiAvrcpController::observer_;
 
-void NapiAvrcpController::DefineAvrcpControllerJSClass(napi_env env) {
+void NapiAvrcpController::DefineAvrcpControllerJSClass(napi_env env)
+{
     
     napi_value constructor;
     napi_property_descriptor properties[] = {
@@ -45,13 +46,15 @@ void NapiAvrcpController::DefineAvrcpControllerJSClass(napi_env env) {
     HILOGI("DefineAvrcpControllerJSClass finished");
 }
 
-napi_value NapiAvrcpController::AvrcpControllerConstructor(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpController::AvrcpControllerConstructor(napi_env env, napi_callback_info info)
+{
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
-napi_value NapiAvrcpController::On(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpController::On(napi_env env, napi_callback_info info)
+{
     HILOGI("On called");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -87,7 +90,8 @@ napi_value NapiAvrcpController::On(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiAvrcpController::Off(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpController::Off(napi_env env, napi_callback_info info)
+{
     HILOGI("Off called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -114,8 +118,8 @@ napi_value NapiAvrcpController::Off(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiAvrcpController::GetConnectionDevices(napi_env env, napi_callback_info info) {
-    
+napi_value NapiAvrcpController::GetConnectionDevices(napi_env env, napi_callback_info info)
+{
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
@@ -131,7 +135,8 @@ napi_value NapiAvrcpController::GetConnectionDevices(napi_env env, napi_callback
     return ret;
 }
 
-napi_value NapiAvrcpController::GetDeviceState(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpController::GetDeviceState(napi_env env, napi_callback_info info)
+{
     HILOGI("GetDeviceState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -162,7 +167,8 @@ napi_value NapiAvrcpController::GetDeviceState(napi_env env, napi_callback_info 
 }
 
 
-napi_value NapiAvrcpController::Connect(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpController::Connect(napi_env env, napi_callback_info info)
+{
     HILOGI("Connect called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -193,7 +199,8 @@ napi_value NapiAvrcpController::Connect(napi_env env, napi_callback_info info) {
     return result;
 }
 
-napi_value NapiAvrcpController::Disconnect(napi_env env, napi_callback_info info) {
+napi_value NapiAvrcpController::Disconnect(napi_env env, napi_callback_info info)
+{
     HILOGI("Disconnect called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -223,7 +230,5 @@ napi_value NapiAvrcpController::Disconnect(napi_env env, napi_callback_info info
     napi_get_boolean(env, res, &result);
     return result;
 }
-
-
 } // namespace Bluetooth
 } // namespace OHOS

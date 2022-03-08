@@ -47,6 +47,7 @@ static BleCentralManager *g_BleCentralManager;
 static BleCentralManagerCallbackWapper *g_ScanCallback;
 
 static BleAdvCallback *g_BleAdvCallbacks[MAX_BLE_ADV_NUM];
+static BleAdvertiser *g_BleAdvertiser = NULL;
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -105,8 +106,8 @@ public:
 
 class BleAdvCallback : public BleAdvertiseCallback {
 public:
-    BleAdvCallback(BleAdvertiser *handle, int advId) {
-        advHandle = handle;
+    BleAdvCallback(int advId)
+    {
         advId_ = advId;
     }
 
@@ -116,26 +117,18 @@ public:
             return;
         }
 
-        HILOGI("adv started.");
+        HILOGI("adv started. advId_: %{public}d", advId_);
         if (g_AppCallback != NULL && g_AppCallback->advEnableCb != NULL) {
             g_AppCallback->advEnableCb(advId_, 0);
         }
     }
 
-    BleAdvertiser *GetAdvHandle() {
-        return advHandle;
-    }
 protected:
-    ~BleAdvCallback() {
-        delete advHandle;
-    }
-
     BleAdvertiserData *advData;
     BleAdvertiserData *advResponseData;
     BleAdvertiserSettings *advSetting;
 
 private:
-    BleAdvertiser *advHandle;
     int advId_;
 };
 
@@ -213,6 +206,16 @@ int BleStartAdv(int advId, const BleAdvParams *param)
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
+static bool IsAllAdvStopped()
+{
+    for (int i = 0; i < MAX_BLE_ADV_NUM; i++) {
+        if (g_BleAdvCallbacks[i] != NULL) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * @brief Stops advertising.
  *
@@ -224,14 +227,29 @@ int BleStartAdv(int advId, const BleAdvParams *param)
 int BleStopAdv(int advId)
 {
     HILOGI("BleStopAdv, advId: %{public}d.", advId);
-    if (advId >= 0 && advId < MAX_BLE_ADV_NUM) {
-        g_BleAdvCallbacks[advId]->GetAdvHandle()->StopAdvertising(*g_BleAdvCallbacks[advId]);
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGE("BleStopAdv fail, advId is invalid.");
+        return OHOS_BT_STATUS_FAIL;
     }
+    if (g_BleAdvertiser == NULL || g_BleAdvCallbacks[advId] == NULL) {
+        HILOGE("BleStopAdv fail, the current adv is not started.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    g_BleAdvertiser->StopAdvertising(*g_BleAdvCallbacks[advId]);
 
     usleep(100);
     if (g_AppCallback != NULL && g_AppCallback->advDisableCb != NULL) {
         HILOGI("adv stopped advId: %{public}d.", advId);
         g_AppCallback->advDisableCb(advId, 0);
+    }
+    delete g_BleAdvCallbacks[advId];
+    g_BleAdvCallbacks[advId] = NULL;
+
+    if (IsAllAdvStopped()) {
+        HILOGI("All adv have been stopped.");
+        delete g_BleAdvertiser;
+        g_BleAdvertiser = NULL;
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -385,12 +403,16 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam) {
+int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam)
+{
     HILOGI("BleStartAdvEx enter");
+    if (g_BleAdvertiser == NULL) {
+        g_BleAdvertiser = new BleAdvertiser();
+    }
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
         if (g_BleAdvCallbacks[i] == NULL) {
-            g_BleAdvCallbacks[i] = new BleAdvCallback(new BleAdvertiser(), i);
+            g_BleAdvCallbacks[i] = new BleAdvCallback(i);
             break;
         }
         HILOGI("g_BleAdvCallbacks[%{public}d] = %{public}p.", i, g_BleAdvCallbacks[i]);
@@ -401,9 +423,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     }
 
     *advId = i;
-    HILOGI(" ret advId: %{public}d.", *advId);
-
-    BleAdvertiser *advHandle = g_BleAdvCallbacks[i]->GetAdvHandle();
+    HILOGI("ret advId: %{public}d.", *advId);
 
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam.minInterval);
@@ -426,7 +446,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
         }
     }
 
-    advHandle->StartAdvertising(settings, advData, scanResponse, *g_BleAdvCallbacks[i]);
+    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, *g_BleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;
 }
 }  // namespace Bluetooth

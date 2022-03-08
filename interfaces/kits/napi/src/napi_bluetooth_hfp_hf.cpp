@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,8 @@ using namespace std;
 
 NapiHandsFreeUnitObserver NapiHandsFreeUnit::observer_;
 
-void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env) {
+void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
+{
     
     napi_value constructor;
     napi_property_descriptor properties[] = {
@@ -49,14 +50,16 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env) {
     HILOGI("DefineHandsFreeUnitJSClass finished");
 }
 
-napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callback_info info)
+{
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
 
-napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
+{
     HILOGI("On called");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -90,7 +93,6 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info) {
 
     HILOGI("%{public}s is registered", type.c_str());
 
-//test
     BluetoothRemoteDevice address("123",1);
     int state = 3;
     if (type.c_str() == STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE) {
@@ -103,7 +105,8 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info)
+{
     HILOGI("Off called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -130,7 +133,8 @@ napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info) {
     return ret;
 }
 
-napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_info info)
+{
     
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
@@ -146,7 +150,8 @@ napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_i
     return ret;
 }
 
-napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info info)
+{
     HILOGI("GetDeviceState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -176,7 +181,8 @@ napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info in
     return result;
 }
 
-napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
+{
     HILOGI("GetDeviceState called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -206,7 +212,8 @@ napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info)
+{
     HILOGI("Connect called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -236,7 +243,8 @@ napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info) {
     return result;
 }
 
-napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info)
+{
     HILOGI("Disconnect called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -266,7 +274,8 @@ napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info) 
     return result;
 }
 
-napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info)
+{
     HILOGI("ConnectSco called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -296,7 +305,8 @@ napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info) 
     return result;
 }
 
-napi_value NapiHandsFreeUnit::DisconnectSco(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::DisconnectSco(napi_env env, napi_callback_info info)
+{
     HILOGI("DisconnectSco called");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -326,7 +336,8 @@ napi_value NapiHandsFreeUnit::DisconnectSco(napi_env env, napi_callback_info inf
     return result;
 }
 
-napi_value NapiHandsFreeUnit::SendDTMF(napi_env env, napi_callback_info info) {
+napi_value NapiHandsFreeUnit::SendDTMF(napi_env env, napi_callback_info info)
+{
     HILOGI("SendDTMF called");
 
     size_t expectedArgsCount = ARGS_SIZE_TWO;
