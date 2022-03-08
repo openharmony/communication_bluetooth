@@ -20,7 +20,7 @@
 #include "log.h"
 
 namespace bluetooth {
-#define CODEC_LIB_SBC "libbtsbc.so"
+#define CODEC_LIB_SBC "libbtsbc.z.so"
 
 A2dpSBCDynamicLibCtrl::A2dpSBCDynamicLibCtrl(bool isEncoder)
 {
@@ -39,7 +39,7 @@ CODECSbcLib *A2dpSBCDynamicLibCtrl::LoadCodecSbcLib() const
         do {
             lib->lib = dlopen(CODEC_LIB_SBC, RTLD_LAZY | RTLD_NODELETE);
             if (lib->lib == nullptr) {
-                LOG_ERROR("Load libbtsbc.so failed");
+                LOG_ERROR("Load libbtsbc.z.so failed");
                 break;
             }
             if (isEncoder_) {

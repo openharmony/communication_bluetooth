@@ -756,6 +756,7 @@ int A2dpProfilePeer::SetUserCodecConfigure(const A2dpSrcCodecInfo &info)
                 codecReconfig_.pscMask = AVDT_PSC_MSK_CODEC;
             }
             Reconfigure(closeStream);
+            NotifyAudioConfigChanged();
         }
         ret = RET_NO_ERROR;
     } else {

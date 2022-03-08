@@ -18,7 +18,6 @@
 
 #include <string>
 #include <vector>
-#include <stdint.h>
 
 namespace bluetooth {
 // Defined here are various status codes
@@ -27,10 +26,10 @@ namespace bluetooth {
  * Interface Return Value Macro Define
  *
  *********************************************/
-#define RET_NO_ERROR 0
-#define RET_NO_SUPPORT (-1)
-#define RET_BAD_PARAM (-2)
-#define RET_BAD_STATUS (-3)
+constexpr int RET_NO_ERROR = 0;
+constexpr int RET_NO_SUPPORT = -1;
+constexpr int RET_BAD_PARAM = -2;
+constexpr int RET_BAD_STATUS = -3;
 
 /*********************************************
  *

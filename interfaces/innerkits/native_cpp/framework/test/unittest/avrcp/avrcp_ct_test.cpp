@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,8 +21,6 @@ using namespace testing;
 using namespace testing::ext;
 using namespace std;
 
-
-
 namespace OHOS {
 namespace Bluetooth {
 class AvrcpControllerObserverCommon : public AvrcpController::IObserver {
@@ -35,12 +33,8 @@ public:
 private:
 };
 
-
 const uint8_t ATTRIBUTES_TEST = 0x04;
 const uint32_t ITEMS_ATTRIBUTES_TEST = 1U;
-
-
-
 static AvrcpControllerObserverCommon observer_;
 static AvrcpController *profile_;
 
@@ -59,7 +53,6 @@ public:
     BluetoothHost *host_;
 };
 
-
 void AvrcpControllerTest::SetUpTestCase(void)
 {}
 void AvrcpControllerTest::TearDownTestCase(void)
@@ -71,14 +64,12 @@ void AvrcpControllerTest::SetUp()
     host_->EnableBle();
     
 }
-
 void AvrcpControllerTest::TearDown()
 {
     host_->DisableBt();
     host_->DisableBle();
     host_ = nullptr;
 }
-
 
 /*
  * @tc.number: AvrcpController001
@@ -88,12 +79,9 @@ void AvrcpControllerTest::TearDown()
 HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetProfile, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetProfile start";
- 
     profile_ = AvrcpController::GetProfile();
-    
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetProfile end";
 }
-
 
 /*
  * @tc.number: AvrcpController002
@@ -106,8 +94,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetConnectedDevices, Test
  
     profile_ = AvrcpController::GetProfile();
     vector<BluetoothRemoteDevice> devices = profile_->GetConnectedDevices();
-
-
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetConnectedDevices end";
 }
 
@@ -155,7 +141,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_UnregisterObserver, TestS
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_UnregisterObserver end";
 }
 
-
 /*
  * @tc.number: AvrcpController006
  * @tc.name: GetDevicesByStates
@@ -171,7 +156,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetDevicesByStates, TestS
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetDevicesByStates end";
 }
-
 
 /*
  * @tc.number: AvrcpController007
@@ -190,7 +174,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_Connect, TestSize.Level1)
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_Connect end";
 }
 
-
 /*
  * @tc.number: AvrcpController008
  * @tc.name: Disconnect
@@ -207,7 +190,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_Disconnect, TestSize.Leve
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_Disconnect end";
 }
-
 
 /*
  * @tc.number: AvrcpController009
@@ -227,8 +209,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_PressButton, TestSize.Lev
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_PressButton end";
 }
 
-
-
 /*
  * @tc.number: AvrcpController010
  * @tc.name: ReleaseButton
@@ -247,8 +227,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_ReleaseButton, TestSize.L
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_ReleaseButton end";
 }
 
-
-
 /*
  * @tc.number: AvrcpController011
  * @tc.name: GetUnitInfo
@@ -265,8 +243,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetUnitInfo, TestSize.Lev
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetUnitInfo end";
 }
-
-
 
 /*
  * @tc.number: AvrcpController012
@@ -285,7 +261,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetSubUnitInfo, TestSize.
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetSubUnitInfo end";
 }
 
-
 /*
  * @tc.number: AvrcpController013
  * @tc.name: SetAddressedPlayer
@@ -302,7 +277,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_SetAddressedPlayer, TestS
     EXPECT_EQ(ret, RET_BAD_STATUS);
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_SetAddressedPlayer end";
 }
-
 
 /*
  * @tc.number: AvrcpController014
@@ -321,8 +295,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_SetBrowsedPlayer, TestSiz
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_SetBrowsedPlayer end";
 }
 
-
-
 /*
  * @tc.number: AvrcpController015
  * @tc.name: GetSupportedCompanies
@@ -339,7 +311,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetSupportedCompanies, Te
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetSupportedCompanies end";
 }
-
 
 /*
  * @tc.number: AvrcpController016
@@ -358,8 +329,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetSupportedEvents, TestS
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetSupportedEvents end";
 }
 
-
-
 /*
  * @tc.number: AvrcpController017
  * @tc.name: GetPlayerAppSettingAttributes
@@ -376,8 +345,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetPlayerAppSettingAttrib
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetPlayerAppSettingAttributes end";
 }
-
-
 
 /*
  * @tc.number: AvrcpController018
@@ -396,8 +363,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetPlayerAppSettingValues
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetPlayerAppSettingValues end";
 }
 
-
-
 /*
  * @tc.number: AvrcpController019
  * @tc.name: GetPlayerAppSettingCurrentValue
@@ -415,8 +380,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetPlayerAppSettingCurren
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetPlayerAppSettingCurrentValue end";
 }
-
-
 
 /*
  * @tc.number: AvrcpController020
@@ -438,8 +401,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_SetPlayerAppSettingCurren
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_SetPlayerAppSettingCurrentValue end";
 }
 
-
-
 /*
  * @tc.number: AvrcpController021
  * @tc.name: GetPlayerApplicationSettingAttributeText
@@ -458,7 +419,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetPlayerApplicationSetti
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetPlayerApplicationSettingAttributeText end";
 }
-
 
 /*
  * @tc.number: AvrcpController022
@@ -479,7 +439,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetPlayerApplicationSetti
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetPlayerApplicationSettingValueText end";
 }
 
-
 /*
  * @tc.number: AvrcpController023
  * @tc.name: GetElementAttributes
@@ -499,7 +458,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetElementAttributes, Tes
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetElementAttributes end";
 }
 
-
 /*
  * @tc.number: AvrcpController024
  * @tc.name: GetPlayStatus
@@ -511,14 +469,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetPlayStatus, TestSize.L
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->GetPlayStatus(device);
     EXPECT_EQ(ret, 0);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetPlayStatus end";
 }
-
 
 /*
  * @tc.number: AvrcpController025
@@ -531,14 +486,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_PlayItem, TestSize.Level1
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->PlayItem(device, 0, 0);
     EXPECT_EQ(ret, 0);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_PlayItem end";
 }
-
 
 /*
  * @tc.number: AvrcpController026
@@ -551,14 +503,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_AddToNowPlaying, TestSize
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->AddToNowPlaying(device, 0, 0);
     EXPECT_EQ (ret, RET_BAD_STATUS);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_AddToNowPlaying end";
 }
-
 
 /*
  * @tc.number: AvrcpController027
@@ -571,14 +520,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_RequestContinuingResponse
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->RequestContinuingResponse(device, 0);
     EXPECT_EQ (ret, RET_BAD_STATUS);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_RequestContinuingResponse end";
 }
-
 
 /*
  * @tc.number: AvrcpController028
@@ -591,14 +537,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_AbortContinuingResponse, 
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->AbortContinuingResponse(device, 0);
     EXPECT_EQ (ret, RET_BAD_STATUS);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_AbortContinuingResponse end";
 }
-
 
 /*
  * @tc.number: AvrcpController029
@@ -611,14 +554,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_ChangePath, TestSize.Leve
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->ChangePath(device, 0, 0, 0);
     EXPECT_EQ (ret, RET_BAD_STATUS);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_ChangePath end";
 }
-
 
 /*
  * @tc.number: AvrcpController030
@@ -639,7 +579,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetFolderItems, TestSize.
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetFolderItems end";
 }
 
-
 /*
  * @tc.number: AvrcpController031
  * @tc.name: GetMeidaPlayerList
@@ -651,14 +590,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetMeidaPlayerList, TestS
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->GetMeidaPlayerList(device, 0, 1);
     EXPECT_EQ (ret, 0);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetMeidaPlayerList end";
 }
-
 
 /*
  * @tc.number: AvrcpController032
@@ -679,7 +615,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetItemAttributes, TestSi
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetItemAttributes end";
 }
 
-
 /*
  * @tc.number: AvrcpController033
  * @tc.name: GetTotalNumberOfItems
@@ -691,14 +626,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_GetTotalNumberOfItems, Te
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->GetTotalNumberOfItems(device);
     EXPECT_EQ (ret, 0);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_GetTotalNumberOfItems end";
 }
-
 
 /*
  * @tc.number: AvrcpController034
@@ -711,14 +643,11 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_SetAbsoluteVolume, TestSi
  
     profile_ = AvrcpController::GetProfile();
     BluetoothRemoteDevice device;
-
-
     int ret = profile_->SetAbsoluteVolume(device, 0);
     EXPECT_EQ (ret, 0);
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_SetAbsoluteVolume end";
 }
-
 
 /*
  * @tc.number: AvrcpController035
@@ -739,7 +668,6 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_EnableNotification, TestS
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_EnableNotification end";
 }
 
-
 /*
  * @tc.number: AvrcpController036
  * @tc.name: DisableNotification
@@ -758,7 +686,5 @@ HWTEST_F(AvrcpControllerTest, AvrcpController_UnitTest_DisableNotification, Test
 
     GTEST_LOG_(INFO) << "AvrcpController_UnitTest_DisableNotification end";
 }
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS
