@@ -32,7 +32,10 @@ constexpr uint8_t OBSERVER_EVENT_DISCONNECTED = 0x1;
 constexpr uint8_t OBSERVER_EVENT_CONNECTING = 0x2;
 constexpr uint8_t OBSERVER_EVENT_DISCONNECTING = 0x3;
 constexpr uint8_t OBSERVER_EVENT_RECONNECTED = 0x04;
-constexpr uint8_t OBSERVER_EVENT_DISCONNECTED_INTER = 0x14;
+constexpr uint8_t OBSERVER_EVENT_DISCONNECTED_INTER = 0x05;
+
+constexpr uint8_t MAX_RETRY_CONNECT_TIMES = 0;
+constexpr uint8_t HCI_CONNECTION_FAILED_TO_BE_ESTABLISHED = 0x3E;
 
 const std::string GattConnectionManager::Device::STATE_IDLE = "IDLE";
 const std::string GattConnectionManager::Device::STATE_CONNECTING = "CONNECTING";
@@ -573,7 +576,8 @@ void GattConnectionManager::impl::LEDisconnectCompletedImpl(uint16_t connectHand
         device = FindDevice(connectHandle, devLock);
         if (device != nullptr) {
             LOG_DEBUG("%{public}s: disconnect reason:%{public}d", __FUNCTION__, data.reason);
-            if (data.reason == 0x3e && device->Role() == 0 && device->RetryTimes() < 2) { // 0x3e retry 3 times
+            if (data.reason == HCI_CONNECTION_FAILED_TO_BE_ESTABLISHED &&
+                device->Role() == 0 && device->RetryTimes() < MAX_RETRY_CONNECT_TIMES) {
                 device->RetryTimes() ++;
                 ret = device->ProcessMessage(Device::StateMachine::MSG_RECONNECT_CAUSE_0X3E, connectHandle, &data);
             } else {
@@ -1413,8 +1417,8 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
             break;
         case MSG_RECONNECT_CAUSE_0X3E:
             GattConnectionManager::GetInstance().pimpl->NotifyObserver(
-                    device_.Info(), OBSERVER_EVENT_DISCONNECTED_INTER, device_.handle_,
-                    device_.role_, GattStatus::GATT_SUCCESS);
+                device_.Info(), OBSERVER_EVENT_DISCONNECTED_INTER, device_.handle_,
+                device_.role_, GattStatus::GATT_SUCCESS);
             if (GattConnectionManager::GetInstance().pimpl->DoConnect(device_) == GattStatus::GATT_SUCCESS) {
                 result = true;
             }
