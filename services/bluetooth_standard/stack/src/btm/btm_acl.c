@@ -145,7 +145,6 @@ static Alarm *g_cleanupTimer = NULL;
 
 static uint8_t g_status = STATUS_NONE;
 
-static Mutex *g_leConnectionModeLock = NULL;
 static uint16_t g_leScanInterval = LE_SCAN_INTERVAL_DEFAULT;
 static uint16_t g_leScanWindow = LE_SCAN_WINDOW_DEFAULT;
 
@@ -153,6 +152,8 @@ static Mutex *g_leConnectionCancelLock = NULL;
 static List *g_leConnectionCancelList = NULL;
 
 static Queue *g_leWhiteListPendingActionQueue;
+
+static Mutex *g_autoConnectLock = NULL;
 
 static BtmAclConnection *AllocAclConnection()
 {
@@ -211,7 +212,6 @@ static void BtmAclAllocRes()
     g_cleanupEvent = SemaphoreCreate(0);
     g_cleanupTimer = AlarmCreate("AclCleanup", false);
 
-    g_leConnectionModeLock = MutexCreate();
     g_leScanInterval = LE_SCAN_INTERVAL_DEFAULT;
     g_leScanWindow = LE_SCAN_WINDOW_DEFAULT;
 
@@ -219,6 +219,7 @@ static void BtmAclAllocRes()
     g_leConnectionCancelList = ListCreate(MEM_MALLOC.free);
 
     g_leWhiteListPendingActionQueue = QueueCreate(UINT16_MAX);
+    g_autoConnectLock = MutexCreate();
 }
 
 void BtmInitAcl()
@@ -266,10 +267,6 @@ static void BtmAclFreeRes()
         ListDelete(g_aclCallbackList);
         g_aclCallbackList = NULL;
     }
-    if (g_leConnectionModeLock != NULL) {
-        MutexDelete(g_leConnectionModeLock);
-        g_leConnectionModeLock = NULL;
-    }
     if (g_leConnectionCancelList != NULL) {
         ListDelete(g_leConnectionCancelList);
         g_leConnectionCancelList = NULL;
@@ -277,6 +274,10 @@ static void BtmAclFreeRes()
     if (g_leConnectionCancelLock != NULL) {
         MutexDelete(g_leConnectionCancelLock);
         g_leConnectionCancelLock = NULL;
+    }
+    if (g_autoConnectLock != NULL) {
+        MutexDelete(g_autoConnectLock);
+        g_autoConnectLock = NULL;
     }
     if (g_leWhiteListPendingActionQueue != NULL) {
         QueueDelete(g_leWhiteListPendingActionQueue, MEM_MALLOC.free);
@@ -498,12 +499,8 @@ static void BtmAclTimeout(void *context)
 
 static void BtmOnConnectionComplete(const HciConnectionCompleteEventParam *eventParam)
 {
-    if (eventParam->linkType != HCI_LINK_TYPE_ACL) {
-        return;
-    }
-
-    if (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS) {
-        LOG_DEBUG("%{public}s ACL Connection Already Exists!", __FUNCTION__);
+    if (eventParam->linkType != HCI_LINK_TYPE_ACL ||
+        (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS)) {
         return;
     }
 
@@ -660,10 +657,8 @@ static int BtmLeExtendedCreateConnection()
         countOfSets++;
     }
 
-    MutexLock(g_leConnectionModeLock);
     uint16_t leScanInterval = g_leScanInterval;
     uint16_t leScanWindow = g_leScanWindow;
-    MutexUnlock(g_leConnectionModeLock);
 
     HciLeConnectionParamSet *sets = MEM_MALLOC.alloc(sizeof(HciLeConnectionParamSet) * countOfSets);
 
@@ -694,7 +689,7 @@ static int BtmLeExtendedCreateConnection()
     return result;
 }
 
-int BtmStartAutoConnection()
+static int BtmStartAutoConnectionInternal()
 {
     if (BTM_IsControllerSupportLeExtendedAdvertising()) {
         return BtmLeExtendedCreateConnection();
@@ -705,10 +700,8 @@ int BtmStartAutoConnection()
                 BTM_IsControllerSupportLlPrivacy() ? LOCAL_ADDR_TYPE_RPA_OR_RANDOM : LOCAL_ADDR_TYPE_RANDOM;
         }
 
-        MutexLock(g_leConnectionModeLock);
         uint16_t leScanInterval = g_leScanInterval;
         uint16_t leScanWindow = g_leScanWindow;
-        MutexUnlock(g_leConnectionModeLock);
 
         HciLeCreateConnectionParam param = {
             .leScanInterval = leScanInterval,
@@ -731,9 +724,35 @@ int BtmStartAutoConnection()
     }
 }
 
-int BtmStopAutoConnection()
+int BtmStartAutoConnection()
+{
+    int result;
+    MutexLock(g_autoConnectLock);
+    if (BtmGetDeviceCountInWhiteList() > 0) {
+        result = BtmStartAutoConnectionInternal();
+    } else {
+        result = BT_NO_ERROR;
+    }
+    MutexUnlock(g_autoConnectLock);
+    return result;
+}
+
+static int BtmStopAutoConnectionInternal(void)
 {
     return HCI_LeCreateConnectionCancel();
+}
+
+int BtmStopAutoConnection()
+{
+    int result;
+    MutexLock(g_autoConnectLock);
+    if (BtmGetDeviceCountInWhiteList() > 0) {
+        result = BtmStopAutoConnectionInternal();
+    } else {
+        result = BT_NO_ERROR;
+    }
+    MutexUnlock(g_autoConnectLock);
+    return result;
 }
 
 static void BtmUpdateWhiteList()
@@ -755,6 +774,7 @@ static void BtmUpdateWhiteList()
 
 static int BtmLeCreateConnection(const BtAddr *addr)
 {
+    MutexLock(g_autoConnectLock);
     if (BtmGetDeviceCountInWhiteList() > 0) {
         BtmWhiteListPendingAction *action = MEM_MALLOC.alloc(sizeof(BtmWhiteListPendingAction));
         if (action != NULL) {
@@ -762,14 +782,14 @@ static int BtmLeCreateConnection(const BtAddr *addr)
             action->addr = *addr;
             QueueEnqueue(g_leWhiteListPendingActionQueue, action);
         }
-
-        return BtmStopAutoConnection();
+        MutexUnlock(g_autoConnectLock);
+        return BtmStopAutoConnectionInternal();
     } else {
         uint8_t whiteListAddressType =
             (addr->type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC : WHITE_LIST_ADDRESS_TYPE_RANDOM;
         BtmAddDeviceToWhiteList(whiteListAddressType, addr);
-
-        return BtmStartAutoConnection();
+        MutexUnlock(g_autoConnectLock);
+        return BtmStartAutoConnectionInternal();
     }
 }
 
@@ -890,6 +910,10 @@ static void BtmUpdateLeConnectionOnConnectComplete(
 
             ListAddLast(g_aclList, connection);
         }
+    } else if (eventParam->status == HCI_UNKNOWN_CONNECTION_IDENTIFIER) {
+        // Cancel. Do nothing.
+    } else if (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS) {
+        // Already exists. Do nothing.
     } else {
         BtmRemoveAllConnectingLeConnection();
     }
@@ -1011,6 +1035,51 @@ static bool IsZeroAddress(const uint8_t addr[BT_ADDRESS_SIZE])
     return isZeroAddress;
 }
 
+static void BtmUpdateUpdateWhiteListOnLeConnectionComplete(
+    const BtAddr *addrList, const uint8_t addrCount, const HciLeConnectionCompleteEventParam *eventParam)
+{
+    MutexLock(g_autoConnectLock);
+    BtAddr addr = {
+        .addr = {0},
+        .type = (eventParam->peerAddressType == HCI_PEER_ADDR_TYPE_PUBLIC) ? BT_PUBLIC_DEVICE_ADDRESS
+                                                                           : BT_RANDOM_DEVICE_ADDRESS,
+    };
+    (void)memcpy_s(addr.addr, BT_ADDRESS_SIZE, eventParam->peerAddress.raw, BT_ADDRESS_SIZE);
+
+    bool restartAutoConnection = false;
+    if (eventParam->status == HCI_SUCCESS) {
+        uint8_t whiteListAddrType = (eventParam->peerAddressType == HCI_PEER_ADDR_TYPE_PUBLIC)
+                                        ? WHITE_LIST_ADDRESS_TYPE_PUBLIC
+                                        : WHITE_LIST_ADDRESS_TYPE_RANDOM;
+        restartAutoConnection = BtmIsDeviceInWhiteList(whiteListAddrType, &addr);
+    } else if (eventParam->status == HCI_UNKNOWN_CONNECTION_IDENTIFIER) {
+        restartAutoConnection = true;
+    } else if (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS) {
+        restartAutoConnection = true;
+    }
+
+    BtmUpdateWhiteList();
+
+    if ((eventParam->status == HCI_SUCCESS) || (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS)) {
+        uint8_t addrType =
+            (addr.type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC : WHITE_LIST_ADDRESS_TYPE_RANDOM;
+        BtmRemoveDeviceFromWhiteList(addrType, &addr);
+    } else if (eventParam->status == HCI_UNKNOWN_CONNECTION_IDENTIFIER) {
+        // Cancel. Do nothing.
+    } else {
+        for (uint8_t i = 0; i < addrCount; i++) {
+            uint8_t addrType = ((addrList + i)->type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC
+                                                                                  : WHITE_LIST_ADDRESS_TYPE_RANDOM;
+            BtmRemoveDeviceFromWhiteList(addrType, addrList + i);
+        }
+    }
+
+    if (BtmGetDeviceCountInWhiteList() > 0 && restartAutoConnection) {
+        BtmStartAutoConnection();
+    }
+    MutexUnlock(g_autoConnectLock);
+}
+
 static void BtmOnLeConnectionComplete(const HciLeConnectionCompleteEventParam *eventParam)
 {
     uint8_t peerAddrType = (eventParam->peerAddressType == HCI_PEER_ADDR_TYPE_PUBLIC) ? BT_PUBLIC_DEVICE_ADDRESS
@@ -1036,23 +1105,7 @@ static void BtmOnLeConnectionComplete(const HciLeConnectionCompleteEventParam *e
         BtmLeReadRemoteFeatures(eventParam->connectionHandle);
     }
 
-    BtmUpdateWhiteList();
-
-    if (eventParam->status == HCI_SUCCESS) {
-        uint8_t addrType =
-            (addr.type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC : WHITE_LIST_ADDRESS_TYPE_RANDOM;
-        BtmRemoveDeviceFromWhiteList(addrType, &addr);
-    } else {
-        for (uint8_t i = 0; i < addrCount; i++) {
-            uint8_t addrType = ((addrList + i)->type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC
-                                                                                  : WHITE_LIST_ADDRESS_TYPE_RANDOM;
-            BtmRemoveDeviceFromWhiteList(addrType, addrList + i);
-        }
-    }
-
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStartAutoConnection();
-    }
+    BtmUpdateUpdateWhiteListOnLeConnectionComplete(addrList, addrCount, eventParam);
 
     switch (eventParam->status) {
         case HCI_SUCCESS:
@@ -1060,6 +1113,8 @@ static void BtmOnLeConnectionComplete(const HciLeConnectionCompleteEventParam *e
             break;
         case HCI_UNKNOWN_CONNECTION_IDENTIFIER:
             BtmLeCancelConnectCallback(eventParam->status);
+            break;
+        case HCI_CONNECTION_ALREADY_EXISTS:
             break;
         default:
             BtmOnLeConnectCallback(
@@ -1150,11 +1205,60 @@ static void BtmUpdateConnectionInfoOnLeEnhancedConnectionComplete(
         } else {
             BtmAllocLeConnectionOnEnhancedConnectComplete(addr, peerAddrType, eventParam);
         }
+    } else if (eventParam->status == HCI_UNKNOWN_CONNECTION_IDENTIFIER) {
+        // Cancel. Do nothing.
+    } else if (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS) {
+        // Already exists. Do nothing.
     } else {
         BtmRemoveAllConnectingLeConnection();
     }
 
     MutexUnlock(g_aclListLock);
+}
+
+static void BtmUpdateWhiteListOnLeEnhancedConnectionComplete(
+    const BtAddr *addrList, const uint8_t addrCount, const HciLeEnhancedConnectionCompleteEventParam *eventParam)
+{
+    MutexLock(g_autoConnectLock);
+    BtAddr addr = {
+        .addr = {0},
+        .type = (eventParam->peerAddressType == HCI_PEER_ADDR_TYPE_PUBLIC) ? BT_PUBLIC_DEVICE_ADDRESS
+                                                                           : BT_RANDOM_DEVICE_ADDRESS,
+    };
+    (void)memcpy_s(addr.addr, BT_ADDRESS_SIZE, eventParam->peerAddress.raw, BT_ADDRESS_SIZE);
+
+    bool restartAutoConnection = false;
+    if (eventParam->status == HCI_SUCCESS) {
+        uint8_t whiteListAddrType = (eventParam->peerAddressType == HCI_PEER_ADDR_TYPE_PUBLIC)
+                                        ? WHITE_LIST_ADDRESS_TYPE_PUBLIC
+                                        : WHITE_LIST_ADDRESS_TYPE_RANDOM;
+        restartAutoConnection = BtmIsDeviceInWhiteList(whiteListAddrType, &addr);
+    } else if (eventParam->status == HCI_UNKNOWN_CONNECTION_IDENTIFIER) {
+        restartAutoConnection = true;
+    } else if (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS) {
+        restartAutoConnection = true;
+    }
+
+    BtmUpdateWhiteList();
+
+    if ((eventParam->status == HCI_SUCCESS) || (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS)) {
+        uint8_t addrType =
+            (addr.type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC : WHITE_LIST_ADDRESS_TYPE_RANDOM;
+        BtmRemoveDeviceFromWhiteList(addrType, &addr);
+    } else if (eventParam->status == HCI_UNKNOWN_CONNECTION_IDENTIFIER) {
+        // Cancel. Do nothing.
+    } else {
+        for (uint8_t i = 0; i < addrCount; i++) {
+            uint8_t addrType = ((addrList + i)->type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC
+                                                                                  : WHITE_LIST_ADDRESS_TYPE_RANDOM;
+            BtmRemoveDeviceFromWhiteList(addrType, addrList + i);
+        }
+    }
+
+    if (BtmGetDeviceCountInWhiteList() > 0 && restartAutoConnection) {
+        BtmStartAutoConnectionInternal();
+    }
+    MutexUnlock(g_autoConnectLock);
 }
 
 static void BtmOnLeEnhancedConnectionComplete(const HciLeEnhancedConnectionCompleteEventParam *eventParam)
@@ -1182,23 +1286,7 @@ static void BtmOnLeEnhancedConnectionComplete(const HciLeEnhancedConnectionCompl
         BtmLeReadRemoteFeatures(eventParam->connectionHandle);
     }
 
-    BtmUpdateWhiteList();
-
-    if (eventParam->status == HCI_SUCCESS) {
-        uint8_t addrType =
-            (addr.type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC : WHITE_LIST_ADDRESS_TYPE_RANDOM;
-        BtmRemoveDeviceFromWhiteList(addrType, &addr);
-    } else {
-        for (uint8_t i = 0; i < addrCount; i++) {
-            uint8_t addrType = ((addrList + i)->type == BT_PUBLIC_DEVICE_ADDRESS) ? WHITE_LIST_ADDRESS_TYPE_PUBLIC
-                                                                                  : WHITE_LIST_ADDRESS_TYPE_RANDOM;
-            BtmRemoveDeviceFromWhiteList(addrType, addrList + i);
-        }
-    }
-
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStartAutoConnection();
-    }
+    BtmUpdateWhiteListOnLeEnhancedConnectionComplete(addrList, addrCount, eventParam);
 
     switch (eventParam->status) {
         case HCI_SUCCESS:
@@ -1206,6 +1294,8 @@ static void BtmOnLeEnhancedConnectionComplete(const HciLeEnhancedConnectionCompl
             break;
         case HCI_UNKNOWN_CONNECTION_IDENTIFIER:
             BtmLeCancelConnectCallback(eventParam->status);
+            break;
+        case HCI_CONNECTION_ALREADY_EXISTS:
             break;
         default:
             BtmOnLeConnectCallback(
@@ -2179,18 +2269,18 @@ int BTM_SetLeConnectionModeToFast()
         return BT_BAD_STATUS;
     }
 
-    MutexLock(g_leConnectionModeLock);
+    MutexLock(g_autoConnectLock);
 
     if (g_leScanInterval != LE_SCAN_INTERVAL_FAST || g_leScanWindow != LE_SCAN_WINDOW_FAST) {
         if (BtmGetDeviceCountInWhiteList() > 0) {
-            BtmStopAutoConnection();
+            BtmStopAutoConnectionInternal();
         }
 
         g_leScanInterval = LE_SCAN_INTERVAL_FAST;
         g_leScanWindow = LE_SCAN_WINDOW_FAST;
     }
 
-    MutexUnlock(g_leConnectionModeLock);
+    MutexUnlock(g_autoConnectLock);
 
     return BT_NO_ERROR;
 }
@@ -2201,18 +2291,18 @@ int BTM_SetLeConnectionModeToSlow()
         return BT_BAD_STATUS;
     }
 
-    MutexLock(g_leConnectionModeLock);
+    MutexLock(g_autoConnectLock);
 
     if (g_leScanInterval != LE_SCAN_INTERVAL_SLOW || g_leScanWindow != LE_SCAN_WINDOW_SLOW) {
         if (BtmGetDeviceCountInWhiteList() > 0) {
-            BtmStopAutoConnection();
+            BtmStopAutoConnectionInternal();
         }
 
         g_leScanInterval = LE_SCAN_INTERVAL_SLOW;
         g_leScanWindow = LE_SCAN_WINDOW_SLOW;
     }
 
-    MutexUnlock(g_leConnectionModeLock);
+    MutexUnlock(g_autoConnectLock);
 
     return BT_NO_ERROR;
 }

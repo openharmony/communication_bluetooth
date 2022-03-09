@@ -1785,16 +1785,19 @@ uint16_t GattServerProfile::impl::GetCccdValue(uint16_t connectHandle, uint16_t 
  */
 class GattServerProfile::impl::GattConnectionObserverImplement : public GattConnectionObserver {
 public:
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
-        if (ret == GATT_SUCCESS) {
+        if (ret == GATT_SUCCESS && role == 1) { // only role is slave.
             this->serverProfile_.pimpl->dispatcher_->PostTask(
                 std::bind(&impl::AddDeviceList, serverProfile_.pimpl.get(), connectionHandle, device));
         }
     }
 
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
+        if (role == 0) {
+            return;
+        }
         if (device.isEncryption_ == false) {
             this->serverProfile_.pimpl->dispatcher_->PostTask(
                 std::bind(&impl::DeleteCccdValue, serverProfile_.pimpl.get(), connectionHandle));
