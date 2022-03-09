@@ -16,6 +16,7 @@
 #ifndef BTM_WL_H
 #define BTM_WL_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "btstack.h"
@@ -32,6 +33,7 @@ int BtmAddDeviceToWhiteList(uint8_t addressType, const BtAddr *address);
 void BtmRemoveDeviceFromWhiteList(uint8_t addressType, const BtAddr *address);
 void BtmClearWhiteList();
 int BtmGetDeviceCountInWhiteList();
+bool BtmIsDeviceInWhiteList(uint8_t addressType, const BtAddr *address);
 
 void BtmInitWhiteList();
 void BtmCloseWhiteList();

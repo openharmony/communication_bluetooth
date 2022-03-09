@@ -24,7 +24,6 @@
 #include "btm.h"
 #include "btm_acl.h"
 #include "btm_controller.h"
-#include "btm_wl.h"
 
 #define STATUS_NONE 0
 #define STATUS_INITIALIZED 1
@@ -256,9 +255,7 @@ void BTM_SetLePairedDevices(const BtmLePairedDevice *pairedDevices, uint16_t cou
 
     MutexLock(g_lePairedDevicesLock);
 
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStopAutoConnection();
-    }
+    BtmStopAutoConnection();
 
     ListClear(g_lePairedDevices);
 
@@ -291,9 +288,7 @@ void BTM_SetLePairedDevices(const BtmLePairedDevice *pairedDevices, uint16_t cou
         BtmEnableAddressResolution();
     }
 
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStartAutoConnection();
-    }
+    BtmStartAutoConnection();
 
     MutexUnlock(g_lePairedDevicesLock);
 }
@@ -310,9 +305,7 @@ void BTM_AddLePairedDevice(const BtmLePairedDevice *device)
 
     MutexLock(g_lePairedDevicesLock);
 
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStopAutoConnection();
-    }
+    BtmStopAutoConnection();
 
     if (BTM_IsControllerSupportLlPrivacy()) {
         BtmDisableAddressResolution();
@@ -335,9 +328,7 @@ void BTM_AddLePairedDevice(const BtmLePairedDevice *device)
         BtmEnableAddressResolution();
     }
 
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStartAutoConnection();
-    }
+    BtmStartAutoConnection();
 
     MutexUnlock(g_lePairedDevicesLock);
 }
@@ -698,9 +689,7 @@ int BTM_SetLeRandomAddress(const BtAddr *addr)
         return BT_BAD_STATUS;
     }
 
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStopAutoConnection();
-    }
+    BtmStopAutoConnection();
 
     HciLeSetRandomAddressParam param = {
         .randomAddess = {0},
@@ -714,9 +703,7 @@ int BTM_SetLeRandomAddress(const BtAddr *addr)
         MutexUnlock(g_randomAddressLock);
     }
 
-    if (BtmGetDeviceCountInWhiteList() > 0) {
-        BtmStartAutoConnection();
-    }
+    BtmStartAutoConnection();
     return result;
 }
 
