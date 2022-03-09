@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,10 @@ namespace Bluetooth {
 void BluetoothA2dpSinkObserverProxy::OnConnectionStateChanged(const RawAddress &device, int state)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothA2dpSinkObserverProxy::GetDescriptor())) {
+        HILOGE("BluetoothA2dpSinkObserverProxy::OnConnectionStateChanged WriteInterfaceToken error");
+        return;
+    }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("BluetoothA2dpSinkObserverProxy::OnConnectionStateChanged write device error");
         return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -145,7 +145,7 @@ void RemoteObserverList<T>::ObserverDeathRecipient::OnRemoteDied(const wptr<IRem
     std::lock_guard<std::mutex> lock(owner_->lock_);
 
     for (auto it = owner_->observers_.begin(); it != owner_->observers_.end(); ++it) {
-        if (it->first->AsObject() == object) {
+        if (it->first != nullptr && it->first->AsObject() == object) {
             if (!it->first->AsObject()->RemoveDeathRecipient(it->second)) {
                 HILOGE("Failed to unlink death recipient from observer");
             }
