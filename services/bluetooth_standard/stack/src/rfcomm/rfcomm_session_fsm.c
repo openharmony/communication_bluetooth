@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -409,6 +409,7 @@ int RfcommRecvConnectReq(RfcommSessionInfo *session, const void *data)
             session->id = connectedInfo.id;
             session->l2capId = connectedInfo.lcid;
             session->isInitiator = false;
+            RfcommUpdateChannelDirectionBit(session, false);
             // fall-through
         case ST_SESSION_CLOSED:
             session->sessionState = ST_SESSION_RESPONDER_WAIT_SECURITY_RESULT;
@@ -528,25 +529,15 @@ int RfcommRecvLinkLoss(RfcommSessionInfo *session, const void *data)
     }
 
     switch (session->sessionState) {
-        case ST_SESSION_WAIT_CONNECT_RSP:
-        // fall-through
-        case ST_SESSION_INITIATOR_WAIT_CONFIG_REQ_AND_RSP:
-        // fall-through
-        case ST_SESSION_INITIATOR_WAIT_CONFIG_REQ:
-        // fall-through
-        case ST_SESSION_INITIATOR_WAIT_CONFIG_RSP:
-        // fall-through
-        case ST_SESSION_SABM0_REQ_WAIT_UA0:
-            // Stop timer.
-            RfcommStopSessionTimer(session);
-            // Notify all channels on the session that connection failed.
-            RfcommNotifyAllChannelEvtOnSession(session, RFCOMM_CHANNEL_EV_CONNECT_FAIL);
-            break;
         case ST_SESSION_CONNECTED:
             // Notify all channels on the session that disconnection.
             RfcommNotifyAllChannelEvtOnSession(session, RFCOMM_CHANNEL_EV_DISCONNECTED);
             break;
         default:
+            // Stop timer.
+            RfcommStopSessionTimer(session);
+            // Notify all channels on the session that connection failed.
+            RfcommNotifyAllChannelEvtOnSession(session, RFCOMM_CHANNEL_EV_CONNECT_FAIL);
             break;
     }
     // Remove all channels on session.

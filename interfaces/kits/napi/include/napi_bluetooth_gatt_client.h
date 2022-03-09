@@ -49,8 +49,6 @@ public:
     static napi_value SetBLEMtuSize(napi_env env, napi_callback_info info);
     static napi_value SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info);
 
-
-    bool DiscoverServices();
     std::shared_ptr<GattClient> &GetClient()
     {
         return client_;

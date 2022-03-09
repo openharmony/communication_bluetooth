@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -698,33 +698,5 @@ napi_value NapiGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_cal
     napi_get_boolean(env, isOK, &ret);
     return ret;
 }
-
-bool NapiGattClient::DiscoverServices()
-{
-    DiscoverServicesCallbackInfo* callbackInfo = discoverServicesCallbackInfo_;
-    callbackInfo->asyncState_ = ASYNC_START;
-    if (client_->DiscoverServices() != GattStatus::GATT_SUCCESS) {
-        delete callbackInfo;
-        callbackInfo = nullptr;
-        return false;
-    }
-    callbackInfo = new DiscoverServicesCallbackInfo();
-    int tryTime = 100;
-    while (callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
-        usleep(SLEEP_TIME);
-        if (callbackInfo->asyncState_ == ASYNC_DONE) {
-            break;
-        }
-        tryTime--;
-    }
-    delete callbackInfo;
-    callbackInfo = nullptr;
-
-    if (callbackInfo->asyncState_ != ASYNC_DONE || callbackInfo->status_ != GattStatus::GATT_SUCCESS) {
-        return false;
-    }
-    return true;
-}
-
 } // namespace Bluetooth
 } // namespace OHOS
