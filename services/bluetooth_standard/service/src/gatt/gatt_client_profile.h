@@ -50,6 +50,8 @@ public:
     void ExchangeMtu(int reqId, uint16_t connectHandle, uint16_t mtu) const;
     void DiscoverAllPrimaryServices(
         int reqId, uint16_t connectHandle, uint16_t startHandle, uint16_t endHandle) const;
+    void DiscoverAllPrimaryServicesInter(
+        int reqId, uint16_t connectHandle, uint16_t startHandle, uint16_t endHandle) const;
     void DiscoverPrimaryServicesByServiceUuid(int reqId, uint16_t connectHandle, const Uuid &uuid) const;
     void FindIncludedServices(
         int reqId, uint16_t connectHandle, uint16_t startHandle, uint16_t endHandle) const;

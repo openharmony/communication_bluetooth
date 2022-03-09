@@ -22,14 +22,20 @@
 namespace bluetooth {
 class GattConnectionObserver {
 public:
-    virtual void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret)
+    virtual void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
     {}
-    virtual void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret)
+    virtual void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
     {}
-    virtual void OnConnectionChanged(const GattDevice &device, int state)
+    virtual void OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state)
     {}
     virtual void OnConnectionParameterChanged(
         const GattDevice &device, int interval, int latency, int timeout, int status)
+    {}
+
+    virtual void OnReconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
+    {}
+
+    virtual void OnDisconnectInter(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
     {}
 
     virtual void OnShutDown()
