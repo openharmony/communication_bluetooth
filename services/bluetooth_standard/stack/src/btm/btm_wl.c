@@ -268,3 +268,21 @@ void BtmStopWhiteList()
     ListClear(g_whiteList);
     MutexUnlock(g_whiteListLock);
 }
+
+bool BtmIsDeviceInWhiteList(uint8_t addressType, const BtAddr *address)
+{
+    bool inWhiteList = false;
+    MutexLock(g_whiteListLock);
+    BtmWhiteListEntity *entity = NULL;
+    ListNode *node = ListGetFirstNode(g_whiteList);
+    while (node != NULL) {
+        entity = ListGetNodeData(node);
+        if (entity != NULL && (entity->addressType == addressType) && IsSameAddress(&entity->address, address)) {
+            inWhiteList = true;
+            break;
+        }
+        node = ListGetNextNode(node);
+    }
+    MutexUnlock(g_whiteListLock);
+    return inWhiteList;
+}
