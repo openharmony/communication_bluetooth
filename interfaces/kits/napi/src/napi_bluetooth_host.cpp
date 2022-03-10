@@ -33,24 +33,26 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports)
     HILOGI("BluetoothHostInit start");
     PropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("enableBluetooth", EnableBluetooth),
-        DECLARE_NAPI_FUNCTION("disableBluetooth", DisableBluetooth),
-        DECLARE_NAPI_FUNCTION("setLocalName", SetLocalName),
-        DECLARE_NAPI_FUNCTION("getLocalName", GetLocalName),
-        DECLARE_NAPI_FUNCTION("setBluetoothScanMode", SetBluetoothScanMode),
-        DECLARE_NAPI_FUNCTION("getBluetoothScanMode", GetBluetoothScanMode),
-        DECLARE_NAPI_FUNCTION("startBluetoothDiscovery", StartBluetoothDiscovery),
-        DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
         DECLARE_NAPI_FUNCTION("getState", GetState),
         DECLARE_NAPI_FUNCTION("getBtConnectionState", GetBtConnectionState),
         DECLARE_NAPI_FUNCTION("pairDevice", PairDevice),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDevice),
-        DECLARE_NAPI_FUNCTION("getPairedDevices", GetPairedDevices),
-        DECLARE_NAPI_FUNCTION("setDevicePairingConfirmation", SetDevicePairingConfirmation),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
+        DECLARE_NAPI_FUNCTION("enableBluetooth", EnableBluetooth),
+        DECLARE_NAPI_FUNCTION("disableBluetooth", DisableBluetooth),
+        DECLARE_NAPI_FUNCTION("getLocalName", GetLocalName),
+        DECLARE_NAPI_FUNCTION("getPairedDevices", GetPairedDevices),
+        DECLARE_NAPI_FUNCTION("getProfileConnState", GetProfileConnState),
+        DECLARE_NAPI_FUNCTION("setDevicePairingConfirmation", SetDevicePairingConfirmation),
+        DECLARE_NAPI_FUNCTION("setLocalName", SetLocalName),
+        DECLARE_NAPI_FUNCTION("setBluetoothScanMode", SetBluetoothScanMode),
+        DECLARE_NAPI_FUNCTION("getBluetoothScanMode", GetBluetoothScanMode),
+        DECLARE_NAPI_FUNCTION("startBluetoothDiscovery", StartBluetoothDiscovery),
+        DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
         DECLARE_NAPI_FUNCTION("on", RegisterObserverToHost),
         DECLARE_NAPI_FUNCTION("off", DeregisterObserverToHost),
+        
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     HILOGI("BluetoothHostInit end");
@@ -940,6 +942,38 @@ napi_value MajorMinorClassOfDeviceInit(napi_env env)
     SetNamedPropertyByInteger(env, majorMinorClass,
         static_cast<int>(MajorMinorClass::HEALTH_PERSONAL_MOBILITY_DEVICE), "HEALTH_PERSONAL_MOBILITY_DEVICE");
     return majorMinorClass;
+}
+
+napi_value GetProfileConnState(napi_env env, napi_callback_info info)
+{
+    HILOGI("GetProfileConnState start");
+
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
+
+    napi_value ret = nullptr;
+    napi_get_undefined(env, &ret);
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        HILOGE("Requires 1 argument.");
+        return ret;
+    }
+
+    int profileId = 0;
+    if (!ParseInt32(env, profileId, argv[PARAM0])) {
+        HILOGE("string expected.");
+        return ret;
+    }
+
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    int state = host->GetBtProfileConnState(profileId);
+    
+    napi_create_int32(env, state, &ret);
+
+    return ret;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
