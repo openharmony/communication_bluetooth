@@ -608,6 +608,9 @@ int BleGattsStopService(int serverId, int srvcHandle)
     HILOGI("BleGattsStopService, serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVICES(serverId, srvcHandle).isAdding = false;
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
+    if (g_GattsCallback != NULL && g_GattsCallback->serviceStopCb != NULL) {
+        g_GattsCallback->serviceStopCb(OHOS_BT_STATUS_SUCCESS, serverId, srvcHandle);
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -626,6 +629,9 @@ int BleGattsDeleteService(int serverId, int srvcHandle)
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     delete GATTSERVICE(serverId, srvcHandle);
     GATTSERVICE(serverId, srvcHandle) = NULL;
+    if (g_GattsCallback != NULL && g_GattsCallback->serviceDeleteCb != NULL) {
+        g_GattsCallback->serviceDeleteCb(OHOS_BT_STATUS_SUCCESS, serverId, srvcHandle);
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
