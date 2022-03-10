@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,6 +99,10 @@ A2dpSink::impl::impl()
 {
     HILOGI("A2dpSink::impl::impl start");
     GetProxy();
+    if (proxy_ == nullptr) {
+        HILOGI("A2dpSink::get proxy_ failed");
+        return;
+    }
 
     deathRecipient_ = new BluetoothA2dpSinkDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
