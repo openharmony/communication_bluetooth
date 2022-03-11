@@ -186,6 +186,7 @@ config("btstack_public_config") {
   include_dirs = [
     "include",
     "//third_party/openssl/include",
+    "//third_party/bounds_checking_function/include",
   ]
 }
 

@@ -275,6 +275,7 @@ config("btservice_public_config") {
     "$PART_DIR/ipc/common",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework/include",
+    "//third_party/bounds_checking_function/include",
   ]
 }
 
