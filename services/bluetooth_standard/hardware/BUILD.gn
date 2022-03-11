@@ -22,6 +22,7 @@ ohos_shared_library("bluetooth_hdi_adapter") {
     "$bt_hdi_path",
     "$bt_hdi_path/ohos/hardware/bt/v1_0",
     "$bt_hdi_path/ohos/hardware/bt/v1_0/client",
+    "//third_party/bounds_checking_function/include",
   ]
 
   cflags = [ "-fPIC" ]

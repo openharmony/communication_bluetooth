@@ -27,6 +27,7 @@ config("module_private_config") {
   include_dirs = [
     "mock/include",
     "//third_party/json/include",
+    "//third_party/bounds_checking_function/include",
     "//utils/system/safwk/native/include",
     "//foundation/communication/bluetooth/services/bluetooth_standard/service/src/common",
     "//foundation/communication/bluetooth/services/bluetooth_standard/service/src/",

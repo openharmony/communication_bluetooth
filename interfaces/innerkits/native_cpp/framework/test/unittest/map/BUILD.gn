@@ -28,6 +28,7 @@ config("module_private_config") {
   include_dirs = [
     "mock/include",
     "//third_party/json/include",
+    "//third_party/bounds_checking_function/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/common",
@@ -54,7 +55,7 @@ ohos_unittest("btfw_map_mce_unit_test") {
     "//third_party/googletest:gtest_main",
     "//third_party/libxml2:xml2",
     "//utils/native/base:utils",
-    "//utils/native/base:utilsecurec_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
   ]
 
   external_deps = [
@@ -79,7 +80,7 @@ ohos_unittest("btfw_map_mse_unit_test") {
     "//third_party/googletest:gtest_main",
     "//third_party/libxml2:xml2",
     "//utils/native/base:utils",
-    "//utils/native/base:utilsecurec_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
   ]
 
   external_deps = [
