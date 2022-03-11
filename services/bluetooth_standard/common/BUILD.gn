@@ -16,8 +16,8 @@ import("//build/ohos_var.gni")
 
 config("btcommon_public_config") {
   include_dirs = [
-     ".",
-     "//third_party/bounds_checking_function/include", 
+    ".",
+    "//third_party/bounds_checking_function/include",
   ]
 }
 
