@@ -327,7 +327,7 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
             continue;
         }
 
-        std::vector<GattCharacteristic> gattCharacteristics = gattService->GetCharacteristics();
+        std::vector<GattCharacteristic> &gattCharacteristics = gattService->GetCharacteristics();
         int tempHandle = attrHandle;
         if (isOffset) {
             tempHandle -= GATTSERVICES(serverId, i).handleOffset;
