@@ -15,7 +15,12 @@
 
 #ifndef PERMISSION_UTILS_H
 #define PERMISSION_UTILS_H
+
+#include "accesstoken_kit.h"
+
 namespace bluetooth {
+using namespace OHOS::Security::AccessToken;
+
 class PermissionUtils {
 public:
     static int VerifyUseBluetoothPermission();

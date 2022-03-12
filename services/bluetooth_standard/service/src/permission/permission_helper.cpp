@@ -14,8 +14,14 @@
  */
 
 #include "permission_helper.h"
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
+#include "log.h"
 
 namespace bluetooth {
+using namespace OHOS;
+using namespace Security::AccessToken;
+
 int PermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
 {
     auto callerToken = IPCSkeleton::GetCallingTokenID();
@@ -23,6 +29,7 @@ int PermissionHelper::VerifyPermission(const std::string &permissionName, const 
     if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
         return PERMISSION_GRANTED;
     } else {
+        LOG_INFO("callerToken=0x%{public}x has no permission_name=%{public}s", pid, permissionName.c_str());
         return PERMISSION_DENIED;
     }
 }

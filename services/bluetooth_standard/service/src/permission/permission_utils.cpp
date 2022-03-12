@@ -18,6 +18,8 @@
 #include "auth_center.h"
 
 namespace bluetooth {
+using namespace OHOS;
+
 int PermissionUtils::VerifyUseBluetoothPermission()
 {
     return AuthCenter::GetInstance().VerifyUseBluetoothPermission(

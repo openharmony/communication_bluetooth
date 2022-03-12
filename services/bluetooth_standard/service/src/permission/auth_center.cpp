@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 #include "auth_center.h"
-#include <stdbool>
+#include <stdbool.h>
+#include "accesstoken_kit.h"
 #include "permission_helper.h"
+
 
 namespace bluetooth {
 #ifdef PERMISSION_ALWAYS_GRANT
@@ -22,6 +24,8 @@ bool g_permissionAlwaysGrant = true;
 #else
 bool g_permissionAlwaysGrant = false;
 #endif
+
+using namespace OHOS::Security::AccessToken;
 
 AuthCenter &AuthCenter::GetInstance()
 {
