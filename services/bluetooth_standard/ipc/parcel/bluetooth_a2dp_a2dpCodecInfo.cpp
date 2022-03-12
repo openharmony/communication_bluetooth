@@ -19,54 +19,34 @@ namespace OHOS {
 namespace Bluetooth {
 bool BluetoothA2dpCodecInfo::Marshalling(Parcel &parcel) const
 {
-    bool status = true;
-
-    status = parcel.WriteInt32((int)codecPriority);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint8(codecPriority)) {
+        return false;
     }
-
-    status = parcel.WriteInt32((int)codecType);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint8(codecType)) {
+        return false;
     }
-
-    status = parcel.WriteInt32((int)sampleRate);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint32(sampleRate)) {
+        return false;
     }
-
-    status = parcel.WriteInt32((int)bitsPerSample);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint8(bitsPerSample)) {
+        return false;
     }
-
-    status = parcel.WriteInt32((int)channelMode);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint8(channelMode)) {
+        return false;
     }
-
-    status = parcel.WriteInt64(codecSpecific1);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint64(codecSpecific1)) {
+        return false;
     }
-
-    status = parcel.WriteInt64(codecSpecific2);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint64(codecSpecific2)) {
+        return false;
     }
-
-    status = parcel.WriteInt64(codecSpecific3);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint64(codecSpecific3)) {
+        return false;
     }
-
-    status = parcel.WriteInt64(codecSpecific4);
-    if (!status) { 
-        return status;
+    if (!parcel.WriteUint64(codecSpecific4)) {
+        return false;
     }
-
-    return status;
+    return true;
 }
 
 bool BluetoothA2dpCodecInfo::WriteToParcel(Parcel &parcel)
@@ -81,69 +61,38 @@ BluetoothA2dpCodecInfo *BluetoothA2dpCodecInfo::Unmarshalling(Parcel &parcel)
         delete codecData;
         codecData = nullptr;
     }
-
     return codecData;
 }
 
 bool BluetoothA2dpCodecInfo::ReadFromParcel(Parcel &parcel)
 {
-    bool status = true;
-    int tempInt;
-    int64_t tempInt16;
-
-    status = parcel.ReadInt32(tempInt);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint8(codecPriority)) {
+        return false;
     }
-    codecPriority = (uint8_t)tempInt;
-
-    status = parcel.ReadInt32(tempInt);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint8(codecType)) {
+        return false;
     }
-    codecType = (uint8_t)tempInt;
-
-    status = parcel.ReadInt32(tempInt);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint32(sampleRate)) {
+        return false;
     }
-    sampleRate = (uint32_t)tempInt;
-
-    status = parcel.ReadInt32(tempInt);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint8(bitsPerSample)) {
+        return false;
     }
-    bitsPerSample = (uint8_t)tempInt;
-
-    status = parcel.ReadInt32(tempInt);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint8(channelMode)) {
+        return false;
     }
-    channelMode = (uint8_t)tempInt;
-
-    status = parcel.ReadInt64(tempInt16);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint64(codecSpecific1)) {
+        return false;
     }
-    codecSpecific1 = (uint64_t)tempInt16;
-
-    status = parcel.ReadInt64(tempInt16);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint64(codecSpecific2)) {
+        return false;
     }
-    codecSpecific2 = (uint64_t)tempInt16;
-
-    status = parcel.ReadInt64(tempInt16);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint64(codecSpecific3)) {
+        return false;
     }
-    codecSpecific3 = (uint64_t)tempInt16;
-
-    status = parcel.ReadInt64(tempInt16);
-    if (!status) { 
-        return status;
+    if (!parcel.ReadUint64(codecSpecific4)) {
+        return false;
     }
-    codecSpecific4 = (uint64_t)tempInt16;
     return true;
 }
 

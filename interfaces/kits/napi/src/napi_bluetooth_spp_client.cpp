@@ -359,6 +359,8 @@ void NapiSppClient::sppRead(int id)
                         napi_get_undefined(callbackInfo->env_, &undefined);
                         napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
                         napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+                        delete work;
+                        work = nullptr;
                     }
                 );
             }

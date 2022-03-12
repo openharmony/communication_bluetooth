@@ -57,7 +57,7 @@ public:
     bool CancelBtDiscovery() override;
     bool IsBtDiscovering(const int32_t transport) override;
     long GetBtDiscoveryEndMillis() override;
-    std::vector<sptr<BluetoothRawAddress>> GetPairedDevices(const int32_t transport) override;
+    std::vector<BluetoothRawAddress> GetPairedDevices(const int32_t transport) override;
     bool RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) override;
     bool RemoveAllPairs() override;
     void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) override;

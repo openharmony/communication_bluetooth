@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -105,7 +105,10 @@ int BluetoothHfpHfStub::OnRemoteRequest(
 }
 
 ErrCode BluetoothHfpHfStub::ConnectScoInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = ConnectSco(*device);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -115,7 +118,10 @@ ErrCode BluetoothHfpHfStub::ConnectScoInner(MessageParcel &data, MessageParcel &
 }
 
 ErrCode BluetoothHfpHfStub::DisconnectScoInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = DisconnectSco(*device);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -129,12 +135,12 @@ ErrCode BluetoothHfpHfStub::GetDevicesByStatesInner(MessageParcel &data, Message
     std::vector<int> states;
     data.ReadInt32Vector(&states);
     GetDevicesByStates(states, devices);
-    int dev_num = devices.size();
-    if (!reply.WriteInt32(dev_num)) {
+    int devNum = devices.size();
+    if (!reply.WriteInt32(devNum)) {
         HILOGE("BluetoothHfpHfStub:WriteInt32 failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
-    for (int i = 0; i < dev_num; i++) {
+    for (int i = 0; i < devNum; i++) {
         if (!reply.WriteParcelable(&devices[i])) {
             HILOGE("BluetoothHfpHfStub:WriteParcelable failed in: %{public}s.", __func__);
             return ERR_INVALID_VALUE;
@@ -144,7 +150,10 @@ ErrCode BluetoothHfpHfStub::GetDevicesByStatesInner(MessageParcel &data, Message
 }
 
 ErrCode BluetoothHfpHfStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetDeviceState(*device);
     if (!reply.WriteInt32(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -154,7 +163,10 @@ ErrCode BluetoothHfpHfStub::GetDeviceStateInner(MessageParcel &data, MessageParc
 }
 
 ErrCode BluetoothHfpHfStub::GetScoStateInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetScoState(*device);
     if (!reply.WriteInt32(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -164,7 +176,10 @@ ErrCode BluetoothHfpHfStub::GetScoStateInner(MessageParcel &data, MessageParcel 
 }
 
 ErrCode BluetoothHfpHfStub::SendDTMFToneInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     uint8_t code = data.ReadUint8();
     int result = SendDTMFTone(*device, code);
     if (!reply.WriteInt32(result)) {
@@ -175,7 +190,10 @@ ErrCode BluetoothHfpHfStub::SendDTMFToneInner(MessageParcel &data, MessageParcel
 }
 
 ErrCode BluetoothHfpHfStub::ConnectInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = Connect(*device);
     if (!reply.WriteInt32(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -185,7 +203,10 @@ ErrCode BluetoothHfpHfStub::ConnectInner(MessageParcel &data, MessageParcel &rep
 }
 
 ErrCode BluetoothHfpHfStub::DisconnectInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = Disconnect(*device);
     if (!reply.WriteInt32(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -195,7 +216,10 @@ ErrCode BluetoothHfpHfStub::DisconnectInner(MessageParcel &data, MessageParcel &
 }
 
 ErrCode BluetoothHfpHfStub::OpenVoiceRecognitionInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = OpenVoiceRecognition(*device);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -205,7 +229,10 @@ ErrCode BluetoothHfpHfStub::OpenVoiceRecognitionInner(MessageParcel &data, Messa
 }
 
 ErrCode BluetoothHfpHfStub::CloseVoiceRecognitionInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = CloseVoiceRecognition(*device);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -216,14 +243,17 @@ ErrCode BluetoothHfpHfStub::CloseVoiceRecognitionInner(MessageParcel &data, Mess
 
 ErrCode BluetoothHfpHfStub::GetCurrentCallListInner(MessageParcel &data, MessageParcel &reply) {
     std::vector<BluetoothHfpHfCall> calls;
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     GetCurrentCallList(*device, calls);
-    int call_num = calls.size();
-    if (!reply.WriteInt32(call_num)) {
+    int callNum = calls.size();
+    if (!reply.WriteInt32(callNum)) {
         HILOGE("BluetoothHfpHfStub:WriteInt32 failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
-    for (int i = 0; i < call_num; i++) {
+    for (int i = 0; i < callNum; i++) {
         if (!reply.WriteParcelable(&calls[i])) {
             HILOGE("BluetoothHfpHfStub:WriteParcelable failed in: %{public}s.", __func__);
             return ERR_INVALID_VALUE;
@@ -233,7 +263,10 @@ ErrCode BluetoothHfpHfStub::GetCurrentCallListInner(MessageParcel &data, Message
 }
 
 ErrCode BluetoothHfpHfStub::AcceptIncomingCallInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int flag = data.ReadInt32();
     int result = AcceptIncomingCall(*device, flag);
     if (!reply.WriteBool(result)) {
@@ -244,7 +277,10 @@ ErrCode BluetoothHfpHfStub::AcceptIncomingCallInner(MessageParcel &data, Message
 }
 
 ErrCode BluetoothHfpHfStub::HoldActiveCallInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = HoldActiveCall(*device);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -254,7 +290,10 @@ ErrCode BluetoothHfpHfStub::HoldActiveCallInner(MessageParcel &data, MessageParc
 }
 
 ErrCode BluetoothHfpHfStub::RejectIncomingCallInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = RejectIncomingCall(*device);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -264,8 +303,14 @@ ErrCode BluetoothHfpHfStub::RejectIncomingCallInner(MessageParcel &data, Message
 }
 
 ErrCode BluetoothHfpHfStub::FinishActiveCallInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    BluetoothHfpHfCall *call = data.ReadParcelable<BluetoothHfpHfCall>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothHfpHfCall> call(data.ReadParcelable<BluetoothHfpHfCall>());
+    if (!call) {
+        return TRANSACTION_ERR;
+    }
     int result = FinishActiveCall(*device, *call);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
@@ -275,9 +320,15 @@ ErrCode BluetoothHfpHfStub::FinishActiveCallInner(MessageParcel &data, MessagePa
 }
 
 ErrCode BluetoothHfpHfStub::StartDialInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     std::string number = data.ReadString();
-    BluetoothHfpHfCall *call = data.ReadParcelable<BluetoothHfpHfCall>();
+    std::shared_ptr<BluetoothHfpHfCall> call(data.ReadParcelable<BluetoothHfpHfCall>());
+    if (!call) {
+        return TRANSACTION_ERR;
+    }
     int result = StartDial(*device, number, *call);
     if (!reply.WriteInt32(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,7 +90,10 @@ ErrCode BluetoothGattClientCallbackStub::OnConnectionStateChangedInner(MessagePa
 ErrCode BluetoothGattClientCallbackStub::OnCharacteristicChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnCharacteristicChangedInner Triggered!");
-    const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
     OnCharacteristicChanged(*characteristic);
     return NO_ERROR;
 }
@@ -99,7 +102,10 @@ ErrCode BluetoothGattClientCallbackStub::OnCharacteristicReadInner(MessageParcel
 {
     HILOGI("BluetoothGattClientCallbackStub::OnCharacteristicReadInner Triggered!");
     int32_t ret = data.ReadInt32();
-    const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
     OnCharacteristicRead(ret, *characteristic);
     return NO_ERROR;
 }
@@ -108,7 +114,10 @@ ErrCode BluetoothGattClientCallbackStub::OnCharacteristicWriteInner(MessageParce
 {
     HILOGI("BluetoothGattClientCallbackStub::OnCharacteristicWriteInner Triggered!");
     int32_t ret = data.ReadInt32();
-    const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
     OnCharacteristicWrite(ret, *characteristic);
     return NO_ERROR;
 }
@@ -117,8 +126,12 @@ ErrCode BluetoothGattClientCallbackStub::OnDescriptorReadInner(MessageParcel &da
 {
     HILOGI("BluetoothGattClientCallbackStub::OnDescriptorReadInner Triggered!");
     int32_t ret = data.ReadInt32();
-    const BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
+    std::shared_ptr<BluetoothGattDescriptor> descriptor(data.ReadParcelable<BluetoothGattDescriptor>());
+    if (!descriptor) {
+        return TRANSACTION_ERR;
+    }
     OnDescriptorRead(ret, *descriptor);
+
     return NO_ERROR;
 }
 
@@ -126,7 +139,10 @@ ErrCode BluetoothGattClientCallbackStub::OnDescriptorWriteInner(MessageParcel &d
 {
     HILOGI("BluetoothGattClientCallbackStub::OnDescriptorWriteInner Triggered!");
     int32_t ret = data.ReadInt32();
-    const BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
+    std::shared_ptr<BluetoothGattDescriptor> descriptor(data.ReadParcelable<BluetoothGattDescriptor>());
+    if (!descriptor) {
+        return TRANSACTION_ERR;
+    }
     OnDescriptorWrite(ret, *descriptor);
     return NO_ERROR;
 }
@@ -165,7 +181,10 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &d
     int32_t num = data.ReadInt32();
     std::vector<BluetoothGattService> service;
     for (int i = num; i > 0; i--) {
-        std::unique_ptr<BluetoothGattService> dev(data.ReadParcelable<BluetoothGattService>());
+        std::shared_ptr<BluetoothGattService> dev(data.ReadParcelable<BluetoothGattService>());
+        if (!dev) {
+            return TRANSACTION_ERR;
+        }
         service.push_back(*dev);
     }
     OnServicesChanged(service);

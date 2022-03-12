@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,7 +61,10 @@ int BluetoothBlePeripheralObserverStub::OnRemoteRequest(
 
 ErrCode BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothRawAddress> device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     const int32_t rssi = static_cast<int32_t>(data.ReadInt32());
     const int32_t status = static_cast<int32_t>(data.ReadInt32());
 
@@ -72,7 +75,10 @@ ErrCode BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner(MessagePa
 ErrCode BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     const int32_t transport = static_cast<int32_t>(data.ReadInt32());
-    sptr<BluetoothRawAddress> device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     const int32_t status = static_cast<int32_t>(data.ReadInt32());
 
     OnPairStatusChanged(transport, *device, status);

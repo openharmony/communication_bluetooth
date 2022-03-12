@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,6 @@ BluetoothBleAdvertiserData *BluetoothBleAdvertiserData::Unmarshalling(Parcel &pa
         delete advertiserData;
         advertiserData = nullptr;
     }
-
     return advertiserData;
 }
 
@@ -89,20 +88,19 @@ bool BluetoothBleAdvertiserData::WriteServiceUuids(Parcel &parcel) const
 
 bool BluetoothBleAdvertiserData::ReadServiceUuids(std::vector<bluetooth::Uuid> &serviceUuids, Parcel &parcel)
 {
-    bool noError = true;
     int32_t serviceUuidSize;
     if (!parcel.ReadInt32(serviceUuidSize)) {
-        noError = false;
+        return false;
     }
     for (int i = 0; i < serviceUuidSize; ++i) {
         uint32_t uuid;
         if (parcel.ReadUint32(uuid)) {
             serviceUuids.push_back(bluetooth::Uuid::ConvertFrom32Bits(uuid));
         } else {
-            noError = false;
+            return false;
         }
     }
-    return noError;
+    return true;
 }
 
 bool BluetoothBleAdvertiserData::WriteManufacturerData(Parcel &parcel) const
@@ -123,23 +121,22 @@ bool BluetoothBleAdvertiserData::WriteManufacturerData(Parcel &parcel) const
 
 bool BluetoothBleAdvertiserData::ReadManufacturerData(std::map<uint16_t, std::string> &manufacturerData, Parcel &parcel)
 {
-    bool noError = true;
     int manufacturerSize;
     if (!parcel.ReadInt32(manufacturerSize)) {
-        noError = false;
+        return false;
     }
     uint16_t manufacturerId;
     std::string manufacturerDataValue;
     for (int i = 0; i < manufacturerSize; ++i) {
         if (!parcel.ReadUint16(manufacturerId)) {
-            noError = false;
+            return false;
         }
         if (!parcel.ReadString(manufacturerDataValue)) {
-            noError = false;
+            return false;
         }
         manufacturerData.emplace(manufacturerId, manufacturerDataValue);
     }
-    return noError;
+    return true;
 }
 
 bool BluetoothBleAdvertiserData::WriteServiceData(Parcel &parcel) const
@@ -160,10 +157,9 @@ bool BluetoothBleAdvertiserData::WriteServiceData(Parcel &parcel) const
 
 bool BluetoothBleAdvertiserData::ReadServiceData(std::map<bluetooth::Uuid, std::string> &serviceData, Parcel &parcel)
 {
-    bool noError = true;
     int serviceDataSize;
     if (!parcel.ReadInt32(serviceDataSize)) {
-        noError = false;
+        return false;
     }
     bluetooth::Uuid serviceDataId;
     std::string serviceDataData;
@@ -172,14 +168,14 @@ bool BluetoothBleAdvertiserData::ReadServiceData(std::map<bluetooth::Uuid, std::
         if (parcel.ReadUint32(uuid)) {
             serviceDataId = bluetooth::Uuid::ConvertFrom32Bits(uuid);
         } else {
-            noError = false;
+            return false;
         }
         if (!parcel.ReadString(serviceDataData)) {
-            noError = false;
+            return false;
         }
         serviceData.emplace(serviceDataId, serviceDataData);
     }
-    return noError;
+    return true;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <cstring>
 #include <memory>
 #include <vector>
+#include "bt_def.h"
 #include "bt_uuid.h"
 #include "raw_address.h"
 
@@ -167,6 +168,7 @@ struct GattDevice {
     GattDevice(const RawAddress &addr, uint8_t transport);
 
     bool isEncryption_ = false;
+    uint8_t role_ = GATT_ROLE_INVALID;
     uint8_t transport_ = 0;
     uint8_t addressType_ = 0;
     int connectState_ = 0;

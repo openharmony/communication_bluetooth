@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,10 @@ int BluetoothPbapPceObserverStub::OnRemoteRequest(
 ErrCode BluetoothPbapPceObserverStub::OnServiceConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int state = data.ReadInt32();
 
     OnServiceConnectionStateChanged(*device, state);
@@ -71,7 +74,10 @@ ErrCode BluetoothPbapPceObserverStub::OnServiceConnectionStateChangedInner(Messa
 ErrCode BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     std::vector<uint8_t>* des = nullptr;
     if (!data.ReadUInt8Vector(des)) {
         HILOGW("BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner: get description failed.");
@@ -89,10 +95,16 @@ ErrCode BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner(MessageParc
 ErrCode BluetoothPbapPceObserverStub::OnActionCompletedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int respCode = data.ReadInt32();
     int actionType = data.ReadInt32();
-    const BluetoothIPbapPhoneBookData *result = data.ReadParcelable<BluetoothIPbapPhoneBookData>();
+    std::shared_ptr<BluetoothIPbapPhoneBookData> result(data.ReadParcelable<BluetoothIPbapPhoneBookData>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
 
     OnActionCompleted(*device, respCode, actionType, *result);
     

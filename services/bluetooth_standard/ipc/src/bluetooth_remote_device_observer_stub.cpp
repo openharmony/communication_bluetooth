@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,7 +73,10 @@ int BluetoothRemoteDeviceObserverstub::OnRemoteRequest(
 ErrCode BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
-    sptr<BluetoothRawAddress> result = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
     int32_t status = data.ReadInt32();
     OnPairStatusChanged(transport, *result, status);
     return NO_ERROR;
@@ -81,7 +84,10 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner(MessageParce
 
 ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothRawAddress> result = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
     int32_t uuidSize = data.ReadInt32();
     std::vector<bluetooth::Uuid> uuids;
     for (int i = 0; i < uuidSize; ++i) {
@@ -94,7 +100,10 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner(MessageP
 
 ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothRawAddress> result = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
     std::string deviceName = data.ReadString();
     OnRemoteNameChanged(*result, deviceName);
     return NO_ERROR;
@@ -102,7 +111,10 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner(MessageParce
 
 ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothRawAddress> result = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
     std::string alias = data.ReadString();
     OnRemoteAliasChanged(*result, alias);
     return NO_ERROR;
@@ -110,7 +122,10 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner(MessageParc
 
 ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothRawAddress> result = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
     int32_t cod = data.ReadInt32();
     OnRemoteCodChanged(*result, cod);
     return NO_ERROR;
@@ -118,7 +133,10 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner(MessageParcel
 
 ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothRawAddress> result = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
     int32_t batteryLevel = data.ReadInt32();
     OnRemoteBatteryLevelChanged(*result, batteryLevel);
     return NO_ERROR;

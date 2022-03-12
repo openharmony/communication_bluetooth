@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -43,26 +43,35 @@ ohos_unittest("btfw_gatt_spp_unit_test") {
   module_out_path = module_output_path
 
   sources = [
+    "a2dp/a2dp_snk_test.cpp",
+    "a2dp/a2dp_src_test.cpp",
+    "avrcp/avrcp_ct_test.cpp",
+    "avrcp/avrcp_tg_test.cpp",
     "gatt/gatt_client_test.cpp",
     "gatt/gatt_descriptor_test.cpp",
     "gatt/gatt_manager_test.cpp",
     "gatt/gatt_server_test.cpp",
     "gatt/gatt_service_test.cpp",
+    "hfp/hf_call_test.cpp",
+    "hfp/hfp_ag_test.cpp",
+    "hfp/hfp_hf_test.cpp",
+    "map/map_mce_test.cpp",
+    "map/map_mse_test.cpp",
+    "pbap/pbap_client_test.cpp",
+    "pbap/pbap_server_test.cpp",
     "spp/spp_test.cpp",
   ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -71,7 +80,6 @@ ohos_unittest("btfw_gatt_spp_unit_test") {
   ]
 }
 
-
 ################################################################################
 group("unittest") {
   testonly = true
@@ -79,8 +87,6 @@ group("unittest") {
   deps = []
 
   if (is_phone_product) {
-    deps += [
-      ":btfw_gatt_spp_unit_test",
-    ]
+    deps += [ ":btfw_gatt_spp_unit_test" ]
   }
 }

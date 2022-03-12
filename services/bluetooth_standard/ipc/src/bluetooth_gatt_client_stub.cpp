@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,7 +85,10 @@ ErrCode BluetoothGattClientStub::RegisterApplicationInner(MessageParcel &data, M
     HILOGI("BluetoothGattClientStub::RegisterApplicationInner starts");
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     const sptr<IBluetoothGattClientCallback> callback = OHOS::iface_cast<IBluetoothGattClientCallback>(remote);
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
     int32_t transport = data.ReadInt32();
     int result = RegisterApplication(callback, *addr, transport);
     bool ret = reply.WriteInt32(result);
@@ -153,10 +156,12 @@ ErrCode BluetoothGattClientStub::ReadCharacteristicInner(MessageParcel &data, Me
 {
     HILOGI("BluetoothGattClientStub::ReadCharacteristicInner starts");
     int32_t appId = data.ReadInt32();
-    const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
     int result = ReadCharacteristic(appId, *characteristic);
     bool ret = reply.WriteInt32(result);
-    delete characteristic;
     if (!ret) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
@@ -168,11 +173,13 @@ ErrCode BluetoothGattClientStub::WriteCharacteristicInner(MessageParcel &data, M
 {
     HILOGI("BluetoothGattClientStub::WriteCharacteristicInner starts");
     int32_t appId = data.ReadInt32();
-    BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
     bool withoutRespond = data.ReadBool();
-    int result = WriteCharacteristic(appId, characteristic, withoutRespond);
+    int result = WriteCharacteristic(appId, characteristic.get(), withoutRespond);
     bool ret = reply.WriteInt32(result);
-    delete characteristic;
     if (!ret) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
@@ -184,10 +191,12 @@ ErrCode BluetoothGattClientStub::SignedWriteCharacteristicInner(MessageParcel &d
 {
     HILOGI("BluetoothGattClientStub::SignedWriteCharacteristicInner starts");
     int32_t appId = data.ReadInt32();
-    BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
-    int result = SignedWriteCharacteristic(appId, characteristic);
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
+    int result = SignedWriteCharacteristic(appId, characteristic.get());
     bool ret = reply.WriteInt32(result);
-    delete characteristic;
     if (!ret) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
@@ -199,10 +208,12 @@ ErrCode BluetoothGattClientStub::ReadDescriptorInner(MessageParcel &data, Messag
 {
     HILOGI("BluetoothGattClientStub::ReadDescriptorInner starts");
     int32_t appId = data.ReadInt32();
-    const BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
+    std::shared_ptr<BluetoothGattDescriptor> descriptor(data.ReadParcelable<BluetoothGattDescriptor>());
+    if (!descriptor) {
+        return TRANSACTION_ERR;
+    }
     int result = ReadDescriptor(appId, *descriptor);
     bool ret = reply.WriteInt32(result);
-    delete descriptor;
     if (!ret) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
@@ -214,10 +225,12 @@ ErrCode BluetoothGattClientStub::WriteDescriptorInner(MessageParcel &data, Messa
 {
     HILOGI("BluetoothGattClientStub::WriteDescriptorInner starts");
     int32_t appId = data.ReadInt32();
-    BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
-    int result = WriteDescriptor(appId, descriptor);
+    std::shared_ptr<BluetoothGattDescriptor> descriptor(data.ReadParcelable<BluetoothGattDescriptor>());
+    if (!descriptor) {
+        return TRANSACTION_ERR;
+    }
+    int result = WriteDescriptor(appId, descriptor.get());
     bool ret = reply.WriteInt32(result);
-    delete descriptor;
     if (!ret) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;

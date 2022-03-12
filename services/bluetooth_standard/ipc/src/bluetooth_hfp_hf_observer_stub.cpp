@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,70 +81,103 @@ int BluetoothHfpHfObserverStub::OnRemoteRequest(
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int state = data.ReadInt32();
     OnConnectionStateChanged(*device, state);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int state = data.ReadInt32();
     OnScoStateChanged(*device, state);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnCallChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    BluetoothHfpHfCall *call = data.ReadParcelable<BluetoothHfpHfCall>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    sptr<BluetoothHfpHfCall> call = data.ReadParcelable<BluetoothHfpHfCall>();
+    if (!call) {
+        return TRANSACTION_ERR;
+    }
     OnCallChanged(*device, *call);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnSignalStrengthChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int signal = data.ReadInt32();
     OnSignalStrengthChanged(*device, signal);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnRegistrationStatusChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int status = data.ReadInt32();
     OnSignalStrengthChanged(*device, status);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnRoamingStatusChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int status = data.ReadInt32();
     OnRoamingStatusChanged(*device, status);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnOperatorSelectionChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     std::string name = data.ReadString();
     OnOperatorSelectionChanged(*device, name);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnSubscriberNumberChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     std::string number = data.ReadString();
     OnSubscriberNumberChanged(*device, number);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnVoiceRecognitionStatusChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int status = data.ReadInt32();
     OnVoiceRecognitionStatusChanged(*device, status);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpHfObserverStub::OnInBandRingToneChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int status = data.ReadInt32();
     OnInBandRingToneChanged(*device, status);
     return NO_ERROR;

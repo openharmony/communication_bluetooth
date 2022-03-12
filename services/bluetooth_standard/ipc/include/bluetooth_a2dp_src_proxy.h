@@ -42,7 +42,8 @@ public:
     int SetActiveSinkDevice(const RawAddress &device) override;
     RawAddress GetActiveSinkDevice() override;
     BluetoothA2dpCodecStatus GetCodecStatus(const RawAddress &device) override;
-    int SetCodecPreference(const RawAddress &device, const BluetoothA2dpCodecInfo &info) override;    void SwitchOptionalCodecs(const RawAddress &device, bool isEnable) override;
+    int SetCodecPreference(const RawAddress &device, const BluetoothA2dpCodecInfo &info) override;
+    void SwitchOptionalCodecs(const RawAddress &device, bool isEnable) override;
     int GetOptionalCodecsSupportState(const RawAddress &device) override;
     int StartPlaying(const RawAddress &device) override;
     int SuspendPlaying(const RawAddress &device) override;

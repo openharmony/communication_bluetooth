@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,9 +84,12 @@ int BluetoothHfpHfProxy::GetDevicesByStates(const std::vector<int> &states, std:
         HILOGE("BluetoothHfpHfProxy::GetDevicesByStates done fail, error: %{public}d", error);
         return ERROR;
     }
-    int dev_num = reply.ReadInt32();
-    for (int i = dev_num; i > 0; i--) {
-        std::unique_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
+    int devNum = reply.ReadInt32();
+    for (int i = devNum; i > 0; i--) {
+        std::shared_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
+        if (!dev) {
+            return TRANSACTION_ERR;
+        }
         devices.push_back(*dev);
     }
     return NO_ERROR;
@@ -277,9 +280,12 @@ int BluetoothHfpHfProxy::GetCurrentCallList(const BluetoothRawAddress &device, s
         HILOGE("BluetoothHfpHfProxy::GetCurrentCallList done fail, error: %{public}d", error);
         return ERROR;
     }
-    int call_num = reply.ReadInt32();
-    for (int i = call_num; i > 0; i--) {
-        std::unique_ptr<BluetoothHfpHfCall> call(reply.ReadParcelable<BluetoothHfpHfCall>());
+    int callNum = reply.ReadInt32();
+    for (int i = callNum; i > 0; i--) {
+        std::shared_ptr<BluetoothHfpHfCall> call(reply.ReadParcelable<BluetoothHfpHfCall>());
+        if (!call) {
+            return TRANSACTION_ERR;
+        }
         calls.push_back(*call);
     }
     return NO_ERROR;

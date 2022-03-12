@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -269,8 +269,11 @@ ErrCode BluetoothA2dpSrcStub::GetCodecStatusInner(MessageParcel &data, MessagePa
 ErrCode BluetoothA2dpSrcStub::SetCodecPreferenceInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    BluetoothA2dpCodecInfo info = *data.ReadParcelable<BluetoothA2dpCodecInfo>();
-    int result = SetCodecPreference(RawAddress(addr), info);
+    std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
+    if (!info) {
+        return TRANSACTION_ERR;
+    }
+    int result = SetCodecPreference(RawAddress(addr), *info);
 
     bool ret = reply.WriteInt32(result);
     if (!ret) {
