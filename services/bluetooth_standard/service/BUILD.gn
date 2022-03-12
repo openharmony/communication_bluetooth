@@ -289,8 +289,8 @@ config("btservice_config") {
     "$BT_SERVICE_DIR/src",
     "$BT_SERVICE_DIR/src/base",
     "$BT_SERVICE_DIR/src/common",
-    "$BT_SERVICE_DIR/src/common",
     "$BT_SERVICE_DIR/src/permission",
+    "$BT_SERVICE_DIR/src/util",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/aaccodecctrl_l2/include",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbccodecctrl/include",
   ]
