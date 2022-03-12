@@ -15,14 +15,25 @@
 
 #ifndef PERMISSION_HELPER_H
 #define PERMISSION_HELPER_H
+#include <string>
+
 namespace bluetooth {
 class PermissionHelper {
 public:
     /**
+     * @Description Verify where the app has the permission.
+     *
+     * @param permissionName Permission name.
+     * @param pid The app's process id.
+     * @param uid The app id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid);
+    /**
      * @Description Verify where the app has the permission to use bluetooth
      * 
-     * @param pid the app's process id.
-     * @param uid the app id.
+     * @param pid The app's process id.
+     * @param uid The app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
      */
     static int VerifyUseBluetoothPermission(const int &pid, const int &uid);
@@ -30,8 +41,8 @@ public:
     /**
      * @Description Verify where the app has the permission to discover bluetooth
      * 
-     * @param pid the app's process id.
-     * @param uid the app id.
+     * @param pid The app's process id.
+     * @param uid The app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
      */
     static int VerifyDiscoverBluetoothPermission(const int &pid, const int &uid);
@@ -39,8 +50,8 @@ public:
     /**
      * @Description Verify where the app has the permission to manager bluetooth
      * 
-     * @param pid the app's process id.
-     * @param uid the app id.
+     * @param pid The app's process id.
+     * @param uid The app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
      */
     static int VerifyManageBluetoothPermission(const int &pid, const int &uid);
