@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,15 +40,15 @@ napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info inf
 void NapiGattServer::DefineGattServerJSClass(napi_env env)
 {
     napi_property_descriptor gattserverDesc[] = {
-        DECLARE_NAPI_FUNCTION("on", On),
-        DECLARE_NAPI_FUNCTION("off", Off),
-        DECLARE_NAPI_FUNCTION("addService", AddService),
-        DECLARE_NAPI_FUNCTION("close", Close),
-        DECLARE_NAPI_FUNCTION("removeService", RemoveGattService),
-        DECLARE_NAPI_FUNCTION("sendResponse", SendResponse),
-        DECLARE_NAPI_FUNCTION("notifyCharacteristicChanged", NotifyCharacteristicChanged),
         DECLARE_NAPI_FUNCTION("startAdvertising", StartAdvertising),
         DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
+        DECLARE_NAPI_FUNCTION("addService", AddService),
+        DECLARE_NAPI_FUNCTION("removeService", RemoveGattService),
+        DECLARE_NAPI_FUNCTION("close", Close),
+        DECLARE_NAPI_FUNCTION("notifyCharacteristicChanged", NotifyCharacteristicChanged),
+        DECLARE_NAPI_FUNCTION("sendResponse", SendResponse),
+        DECLARE_NAPI_FUNCTION("on", On),
+        DECLARE_NAPI_FUNCTION("off", Off),
     };
 
     napi_define_class(env, "GattServer", NAPI_AUTO_LENGTH, GattServerConstructor, nullptr,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,10 @@ int BluetoothPbapPseObserverStub::OnRemoteRequest(
 ErrCode BluetoothPbapPseObserverStub::OnServiceConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int state = data.ReadInt32();
 
     OnServiceConnectionStateChanged(*device, state);
@@ -71,7 +74,10 @@ ErrCode BluetoothPbapPseObserverStub::OnServiceConnectionStateChangedInner(Messa
 ErrCode BluetoothPbapPseObserverStub::OnServicePasswordRequiredInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     std::vector<uint8_t>* des = nullptr;
     if (!data.ReadUInt8Vector(des)) {
         HILOGW("BluetoothPbapPseObserverStub::OnServicePasswordRequiredInner: get description failed.");
@@ -89,7 +95,10 @@ ErrCode BluetoothPbapPseObserverStub::OnServicePasswordRequiredInner(MessageParc
 ErrCode BluetoothPbapPseObserverStub::OnServicePermissionInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
 
     OnServicePermission(*device);
     

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,23 +51,22 @@ bool BluetoothBleScanSettings::WriteToParcel(Parcel &parcel)
 
 bool BluetoothBleScanSettings::ReadFromParcel(Parcel &parcel)
 {
-    bool noError = true;
     int64_t reportDelayMillis;
     if (parcel.ReadInt64(reportDelayMillis)) {
         BluetoothBleScanSettings::SetReportDelay(reportDelayMillis);
     } else {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadInt32(scanMode_)) {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadBool(legacy_)) {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadInt32(phy_)) {
-        noError = false;
+        return false;
     }
-    return noError;
+    return true;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

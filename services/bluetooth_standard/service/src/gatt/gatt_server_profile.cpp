@@ -1718,6 +1718,8 @@ void GattServerProfile::impl::AddDeviceList(uint16_t connectHandle, GattDevice d
  */
 void GattServerProfile::impl::AddCccdValue(uint16_t connectHandle, uint16_t attHandle, uint16_t value)
 {
+    LOG_INFO("%{public}s: connectHandle is %hu, attHandle is %hu, value is %hu.",
+        __FUNCTION__, connectHandle, attHandle, value);
     auto iter = devList_.begin();
     for (; iter != devList_.end(); iter++) {
         if (connectHandle == iter->first) {
@@ -1775,7 +1777,8 @@ uint16_t GattServerProfile::impl::GetCccdValue(uint16_t connectHandle, uint16_t 
             }
         }
     }
-
+    LOG_INFO("%{public}s: connectHandle is %hu, attHandle is %hu, CCCvalue is %hu.",
+        __FUNCTION__, connectHandle, attHandle, ret);
     return ret;
 }
 /**
@@ -1977,7 +1980,7 @@ const std::optional<std::reference_wrapper<GattDatabase::AttributeEntity>> GattS
 void GattServerProfile::SendNotification(
     uint16_t connectHandle, uint16_t handle, const GattValue &value, size_t len) const
 {
-    LOG_INFO("%{public}s: connectHandle is %hu.", __FUNCTION__, connectHandle);
+    LOG_INFO("%{public}s: connectHandle is %hu, handle is is %hu.", __FUNCTION__, connectHandle, handle);
     if (pimpl->GetCccdValue(connectHandle, handle + MIN_ATTRIBUTE_HANDLE) == GATT_NOTIFICATION_VALUE) {
         Buffer *buffer = GattServiceBase::BuildBuffer(value->get(), len);
         if (buffer != nullptr) {

@@ -29,100 +29,79 @@ bool BluetoothHfpHfCall::Marshalling(Parcel &parcel) const
 BluetoothHfpHfCall *BluetoothHfpHfCall::Unmarshalling(Parcel &parcel) 
 {
     BluetoothHfpHfCall *call = new BluetoothHfpHfCall();
-    if (!call->ReadFromParcel(parcel)) {
+    if (call!= nullptr && !call->ReadFromParcel(parcel)) {
         delete call;
-        return nullptr;
+        call = nullptr;
     }
     return call;
 }
 
 bool BluetoothHfpHfCall::WriteToParcel(Parcel &parcel) const 
 {
-    bool status = parcel.WriteString(string(device_.c_str(), device_.size()));
-    if (!status) {
-        return status;
+    if (!parcel.WriteString(device_)) {
+        return false;
     }
-    status = parcel.WriteInt32(id_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteInt32(id_)) {
+        return false;
     }
-    status = parcel.WriteInt32(state_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteInt32(state_)) {
+        return false;
     }
-    status = parcel.WriteString(string(number_.c_str(), number_.size()));
-    if (!status) {
-        return status;
+    if (!parcel.WriteString(number_)) {
+        return false;
     }
-    BluetoothUuid *bt_uuid = new BluetoothUuid(uuid_);
-    status = parcel.WriteParcelable(bt_uuid);
-    if (!status) {
-        return status;
+    BluetoothUuid uuid = BluetoothUuid(uuid_);
+    if (!parcel.WriteParcelable(&uuid)) {
+        return false;
     }
-    status = parcel.WriteBool(multiParty_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteBool(multiParty_)) {
+        return false;
     }
-    status = parcel.WriteBool(outgoing_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteBool(outgoing_)) {
+        return false;
     }
-    status = parcel.WriteBool(inBandRing_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteBool(inBandRing_)) {
+        return false;
     }
-    status = parcel.WriteInt64(creationTime_);
-    return status;
+    if (!parcel.WriteInt64(creationTime_)) {
+        return false;
+    }
+    return true;
 }
 
 bool BluetoothHfpHfCall::ReadFromParcel(Parcel &parcel) {
-    bool status = parcel.ReadString(device_);
-    if (!status) {
-        return status;
-    }
-
-    status = parcel.ReadInt32(id_);
-    if (!status) {
-        return status;
-    }
-
-    status = parcel.ReadInt32(state_);
-    if (!status) {
-        return status;
-    }
-
-    status = parcel.ReadString(number_);
-    if (!status) {
-        return status;
-    }
-
-    BluetoothUuid *bt_uuid = parcel.ReadParcelable<BluetoothUuid>();
-    if (!bt_uuid) {
+    if (!parcel.ReadString(device_)) {
         return false;
     }
-    uuid_ = *bt_uuid;
-
-    status = parcel.ReadBool(multiParty_);
-    if (!status) {
-        return status;
+    if (!parcel.ReadInt32(id_)) {
+        return false;
     }
-
-    status = parcel.ReadBool(outgoing_);
-    if (!status) {
-        return status;
+    if (!parcel.ReadInt32(state_)) {
+        return false;
     }
-
-    status = parcel.ReadBool(inBandRing_);
-    if (!status) {
-        return status;
+    if (!parcel.ReadString(number_)) {
+        return false;
     }
-
-    int64_t value64 = creationTime_;
-    status = parcel.ReadInt64(value64);
-    if (!status) {
-        return status;
+    std::shared_ptr<BluetoothUuid> uuid(parcel.ReadParcelable<BluetoothUuid>());
+    if (!uuid) {
+        return false;
     }
-    return status;
+    uuid_ = BluetoothUuid(*uuid);
+    if (!parcel.ReadBool(multiParty_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(outgoing_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(inBandRing_)) {
+        return false;
+    }
+    int64_t time;
+    if (!parcel.ReadInt64(time)) {
+        return false;
+    }
+    creationTime_ = time;
+    return true;
 }
 
 }  // namespace Bluetooth

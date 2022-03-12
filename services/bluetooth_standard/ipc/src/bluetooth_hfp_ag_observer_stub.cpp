@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,27 +64,39 @@ int BluetoothHfpAgObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &da
 }
 
 ErrCode BluetoothHfpAgObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int state = data.ReadInt32();
     OnConnectionStateChanged(*device, state);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpAgObserverStub::OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int state = data.ReadInt32();
     OnScoStateChanged(*device, state);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpAgObserverStub::OnActiveDeviceChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     OnActiveDeviceChanged(*device);
     return NO_ERROR;
 }
 
 ErrCode BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner(MessageParcel &data, MessageParcel &reply) {
-    BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int indValue = data.ReadInt32();
     OnScoStateChanged(*device, indValue);
     return NO_ERROR;

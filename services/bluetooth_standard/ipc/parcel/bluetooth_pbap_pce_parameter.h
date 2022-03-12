@@ -41,7 +41,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool writeToParcel(Parcel &parcel);
+    bool WriteToParcel(Parcel &parcel);
 
     bool Marshalling(Parcel &parcel) const override;
 
@@ -54,7 +54,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool readFromParcel(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel);
 };
 
 /**
@@ -81,7 +81,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool writeToParcel(Parcel &parcel);
+    bool WriteToParcel(Parcel &parcel);
 
     /**
      * @brief Read BluetoothIPbapPullvCardListingParam values from parcel.
@@ -91,7 +91,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool readFromParcel(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel);
 };
 
 /**
@@ -117,7 +117,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool writeToParcel(Parcel &parcel);
+    bool WriteToParcel(Parcel &parcel);
 
     /**
      * @brief Read BluetoothIPbapPullvCardEntryParam values from parcel.
@@ -127,7 +127,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool readFromParcel(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel);
 };
 
 
@@ -154,7 +154,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool writeToParcel(Parcel &parcel);
+    bool WriteToParcel(Parcel &parcel);
 
     /**
      * @brief Read BluetoothIPbapPhoneBookData values from parcel.
@@ -164,7 +164,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool readFromParcel(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel);
 };
 
 }  // namespace Bluetooth

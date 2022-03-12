@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,20 +28,12 @@ bool BluetoothRawAddress::Marshalling(Parcel &parcel) const
 
 BluetoothRawAddress *BluetoothRawAddress::Unmarshalling(Parcel &parcel)
 {
-    BluetoothRawAddress *rawaddress = new BluetoothRawAddress();
-
-    bool noError = true;
-    std::string address = "";
-    if (parcel.ReadString(address)) {
-        rawaddress->address_ = address;
-    } else {
-        noError = false;
+    BluetoothRawAddress *rawAddress = new BluetoothRawAddress();
+    if (rawAddress != nullptr && !rawAddress->ReadFromParcel(parcel)) {
+        delete rawAddress;
+        rawAddress = nullptr;
     }
-    if (!noError) {
-        delete rawaddress;
-        rawaddress = nullptr;
-    }
-    return rawaddress;
+    return rawAddress;
 }
 
 bool BluetoothRawAddress::WriteToParcel(Parcel &parcel)
@@ -51,14 +43,10 @@ bool BluetoothRawAddress::WriteToParcel(Parcel &parcel)
 
 bool BluetoothRawAddress::ReadFromParcel(Parcel &parcel)
 {
-    bool noError = true;
-    std::string address = "";
-    if (parcel.ReadString(address)) {
-        address_ = address;
-    } else {
-        noError = false;
+    if (!parcel.ReadString(address_)) {
+        return false;
     }
-    return noError;
+    return true;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

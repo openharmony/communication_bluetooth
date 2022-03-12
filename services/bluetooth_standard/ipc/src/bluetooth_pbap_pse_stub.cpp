@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,7 +71,10 @@ int BluetoothPbapPseStub::OnRemoteRequest(
 
 ErrCode BluetoothPbapPseStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetDeviceState(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -106,7 +109,10 @@ ErrCode BluetoothPbapPseStub::GetDevicesByStatesInner(MessageParcel &data, Messa
 ErrCode BluetoothPbapPseStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = Disconnect(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -119,7 +125,10 @@ ErrCode BluetoothPbapPseStub::DisconnectInner(MessageParcel &data, MessageParcel
 ErrCode BluetoothPbapPseStub::SetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int strategy = data.ReadInt32();
     int result = SetConnectionStrategy(*device, strategy);
     bool ret = reply.WriteInt32(result);
@@ -133,7 +142,10 @@ ErrCode BluetoothPbapPseStub::SetConnectionStrategyInner(MessageParcel &data, Me
 ErrCode BluetoothPbapPseStub::GetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetConnectionStrategy(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -146,7 +158,10 @@ ErrCode BluetoothPbapPseStub::GetConnectionStrategyInner(MessageParcel &data, Me
 ErrCode BluetoothPbapPseStub::GrantPermissionInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     bool allow = data.ReadBool();
     bool save = data.ReadBool();
     GrantPermission(*device, allow, save);
@@ -157,7 +172,10 @@ ErrCode BluetoothPbapPseStub::GrantPermissionInner(MessageParcel &data, MessageP
 ErrCode BluetoothPbapPseStub::SetDevicePasswordInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     const std::string password = data.ReadString();
     const std::string userId = data.ReadString();
     int result = SetDevicePassword(*device, password, userId);

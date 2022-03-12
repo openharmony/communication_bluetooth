@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -186,11 +186,10 @@ std::vector<BluetoothRemoteDevice> AvrcpTarget::GetConnectedDevices(void)
     std::vector<BluetoothRemoteDevice> devices;
 
     if (pimpl->IsEnabled()) {
-        std::vector<sptr<BluetoothRawAddress>> rawAddrs;
-        rawAddrs = pimpl->proxy_->GetConnectedDevices();
+        std::vector<BluetoothRawAddress> rawAddrs = pimpl->proxy_->GetConnectedDevices();
 
         for (auto rawAddr : rawAddrs) {
-            BluetoothRemoteDevice device(rawAddr->GetAddress(), BTTransport::ADAPTER_BREDR);
+            BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             devices.push_back(device);
         }
     }
@@ -209,11 +208,10 @@ std::vector<BluetoothRemoteDevice> AvrcpTarget::GetDevicesByStates(std::vector<i
         for (auto state : states) {
             convertStates.push_back(static_cast<int32_t>(state));
         }
-        std::vector<sptr<BluetoothRawAddress>> rawAddrs;
-        rawAddrs = pimpl->proxy_->GetDevicesByStates(convertStates);
+        std::vector<BluetoothRawAddress> rawAddrs = pimpl->proxy_->GetDevicesByStates(convertStates);
 
         for (auto rawAddr : rawAddrs) {
-            BluetoothRemoteDevice device(rawAddr->GetAddress(), BTTransport::ADAPTER_BREDR);
+            BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             devices.push_back(device);
         }
     }

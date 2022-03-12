@@ -589,7 +589,7 @@ void GattConnectionManager::impl::LEDisconnectCompletedImpl(uint16_t connectHand
         }
     }
 
-    if (ret && device->RetryTimes() == 0) {
+    if (ret && device->RetryTimes() == 0 && !device->AutoConnect()) {
         GattConnectionManager::GetInstance().pimpl->RemoveDevice(device->Info());
     }
 }
@@ -633,7 +633,7 @@ void GattConnectionManager::impl::BREDRDisconnectCompletedImpl(uint16_t connectH
         }
     }
 
-    if (ret) {
+    if (ret && !device->AutoConnect()) {
         GattConnectionManager::GetInstance().pimpl->RemoveDevice(device->Info());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,85 +42,39 @@ bool BluetoothGattDevice::Marshalling(Parcel &parcel) const
 
 BluetoothGattDevice *BluetoothGattDevice::Unmarshalling(Parcel &parcel)
 {
-    BluetoothGattDevice *gattdevice = new BluetoothGattDevice();
-
-    bool noError = true;
-    bool isEncryption;
-    if (parcel.ReadBool(isEncryption)) {
-        gattdevice->isEncryption_ = isEncryption;
-    } else {
-        noError = false;
+    BluetoothGattDevice *gattDevice = new BluetoothGattDevice();
+    if (gattDevice != nullptr && !gattDevice->ReadFromParcel(parcel))  {
+        delete gattDevice;
+        gattDevice = nullptr;
     }
-    uint8_t transport;
-    if (parcel.ReadUint8(transport)) {
-        gattdevice->transport_ = transport;
-    } else {
-        noError = false;
-    }
-    uint8_t addressType;
-    if (parcel.ReadUint8(addressType)) {
-        gattdevice->addressType_ = addressType;
-    } else {
-        noError = false;
-    }
-    int connectState;
-    if (parcel.ReadInt32(connectState)) {
-        gattdevice->connectState_ = connectState;
-    } else {
-        noError = false;
-    }
-    std::string address = "";
-    if (parcel.ReadString(address)) {
-        gattdevice->addr_ = bluetooth::RawAddress(address);
-    } else {
-        noError = false;
-    }
-    if (!noError) {
-        delete gattdevice;
-        gattdevice = nullptr;
-    }
-    return gattdevice;
+    return gattDevice;
 }
 
-bool BluetoothGattDevice::writeToParcel(Parcel &parcel)
+bool BluetoothGattDevice::WriteToParcel(Parcel &parcel)
 {
     return Marshalling(parcel);
 }
 
-bool BluetoothGattDevice::readFromParcel(Parcel &parcel)
+bool BluetoothGattDevice::ReadFromParcel(Parcel &parcel)
 {
-    bool noError = true;
-    bool isEncryption;
-    if (parcel.ReadBool(isEncryption)) {
-        isEncryption_ = isEncryption;
-    } else {
-        noError = false;
+    if (!parcel.ReadBool(isEncryption_)) {
+        return false;
     }
-    uint8_t transport;
-    if (parcel.ReadUint8(transport)) {
-        transport_ = transport;
-    } else {
-        noError = false;
+    if (!parcel.ReadUint8(transport_)) {
+        return false;
     }
-    uint8_t addressType;
-    if (parcel.ReadUint8(addressType)) {
-        addressType_ = addressType;
-    } else {
-        noError = false;
+    if (!parcel.ReadUint8(addressType_)) {
+        return false;
     }
-    int connectState;
-    if (parcel.ReadInt32(connectState)) {
-        connectState_ = connectState;
-    } else {
-        noError = false;
+    if (!parcel.ReadInt32(connectState_)) {
+        return false;
     }
-    std::string address = "";
-    if (parcel.ReadString(address)) {
-        addr_ = bluetooth::RawAddress(address);
-    } else {
-        noError = false;
+    std::string addr;
+    if (!parcel.ReadString(addr)) {
+        return false;
     }
-    return noError;
+    addr_ = bluetooth::RawAddress(addr);
+    return true;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

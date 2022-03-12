@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -79,7 +79,7 @@ public:
     bool CancelBtDiscovery() override;
     bool IsBtDiscovering(const int32_t transport) override;
     long GetBtDiscoveryEndMillis() override;
-    std::vector<sptr<BluetoothRawAddress>> GetPairedDevices(const int32_t transport) override;
+    std::vector<BluetoothRawAddress> GetPairedDevices(const int32_t transport) override;
     bool RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) override;
     bool RemoveAllPairs() override;
     void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) override;
