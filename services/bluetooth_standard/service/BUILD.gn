@@ -272,7 +272,7 @@ ServiceHidHostSrc = [
 ServicePermissionSrc = [
   "src/permission/auth_center.cpp",
   "src/permission/permission_helper.cpp",
-  "src/permission/permission_utils.cpp"
+  "src/permission/permission_utils.cpp",
 ]
 
 config("btservice_public_config") {
