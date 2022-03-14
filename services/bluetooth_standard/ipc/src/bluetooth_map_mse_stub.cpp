@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -108,10 +108,12 @@ ErrCode BluetoothMapMseStub::GetStateInner(MessageParcel &data, MessageParcel &r
 ErrCode BluetoothMapMseStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseStub::DisconnectInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t result;
     Disconnect(*device, result);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMseStub: reply writing failed in: %{public}s.", __func__);
@@ -123,10 +125,12 @@ ErrCode BluetoothMapMseStub::DisconnectInner(MessageParcel &data, MessageParcel 
 ErrCode BluetoothMapMseStub::IsConnectedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseStub::IsConnectedInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     bool result;
     IsConnected(*device, result);
-    delete device;
     bool ret = reply.WriteBool(result);
     if (!ret) {
         HILOGE("BluetoothMapMseStub: reply writing failed in: %{public}s.", __func__);
@@ -177,10 +181,12 @@ ErrCode BluetoothMapMseStub::GetDevicesByStatesInner(MessageParcel &data, Messag
 ErrCode BluetoothMapMseStub::GetConnectionStateInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseStub::GetConnectionStateInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t result;
     GetConnectionState(*device, result);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMseStub: reply writing failed in: %{public}s.", __func__);
@@ -192,11 +198,13 @@ ErrCode BluetoothMapMseStub::GetConnectionStateInner(MessageParcel &data, Messag
 ErrCode BluetoothMapMseStub::SetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseStub::SetConnectionStrategyInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t strategy = data.ReadInt32();
     bool result;
     SetConnectionStrategy(*device, strategy, result);
-    delete device;
     bool ret = reply.WriteBool(result);
     if (!ret) {
         HILOGE("BluetoothMapMseStub: reply writing failed in: %{public}s.", __func__);
@@ -208,10 +216,12 @@ ErrCode BluetoothMapMseStub::SetConnectionStrategyInner(MessageParcel &data, Mes
 ErrCode BluetoothMapMseStub::GetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseStub::GetConnectionStrategyInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t result;
     GetConnectionStrategy(*device, result);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMseStub: reply writing failed in: %{public}s.", __func__);
@@ -223,11 +233,13 @@ ErrCode BluetoothMapMseStub::GetConnectionStrategyInner(MessageParcel &data, Mes
 ErrCode BluetoothMapMseStub::GrantPermissionInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseStub::GrantPermissionInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     bool allow = data.ReadBool();
     bool save = data.ReadBool();
     GrantPermission(*device, allow, save);
-    delete device;
     return NO_ERROR;
 }
 }  // namespace Bluetooth

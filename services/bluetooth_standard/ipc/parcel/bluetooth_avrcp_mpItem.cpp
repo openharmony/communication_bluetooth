@@ -19,40 +19,32 @@ namespace OHOS {
 namespace Bluetooth {
 bool BluetoothAvrcpMpItem::Marshalling(Parcel &parcel) const
 {
-    bool status = parcel.WriteUint8(itemType_);
-    if (!status) {
-        return status;
-    }
-    status = parcel.WriteInt32(playerId_);
-    if (!status) {
-        return status;
-    }
-    status = parcel.WriteUint8(majorType_);
-    if (!status) {
-        return status;
-    }
-    status = parcel.WriteInt32(subType_);
-    if (!status) {
-        return status;
-    }
-    status = parcel.WriteUint8(playStatus_);
-    if (!status) {
-        return status;
-    }
-
-    status = parcel.WriteInt32(features_.size());
-    if (!status) {
+    if (!parcel.WriteUint8(itemType_)) {
         return false;
     }
-    for (auto &attribute : features_) {
-        status = parcel.WriteUint8(attribute);
-        if (!status) {
+    if (!parcel.WriteUint16(playerId_)) {
+        return false;
+    }
+    if (!parcel.WriteUint8(majorType_)) {
+        return false;
+    }
+    if (!parcel.WriteUint32(subType_)) {
+        return false;
+    }
+    if (!parcel.WriteUint8(playStatus_)) {
+        return false;
+    }
+    if (!parcel.WriteUint32(features_.size())) {
+        return false;
+    }
+    for (auto &feature : features_) {
+        if (!parcel.WriteUint8(feature)) {
             return false;
         }
     }
-
-    status = parcel.WriteString(name_);
-
+    if (!parcel.WriteString(name_)) {
+        return false;
+    }
     return true;
 }
 
@@ -68,66 +60,40 @@ BluetoothAvrcpMpItem *BluetoothAvrcpMpItem::Unmarshalling(Parcel &parcel)
         delete avrcpData;
         avrcpData = nullptr;
     }
-
     return avrcpData;
 }
 
 bool BluetoothAvrcpMpItem::ReadFromParcel(Parcel &parcel)
 {
-    uint8_t int8value = 0;
-    bool status = parcel.ReadUint8(int8value);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint8(itemType_)) {
+        return false;
     }
-    itemType_ = int8value;
-
-    int32_t value = 0;
-    status = parcel.ReadInt32(value);
-    if (!status) {
-        return status;
-    }      
-    playerId_ = (uint16_t)value;
-
-    int8value = 0;
-    status = parcel.ReadUint8(int8value);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint16(playerId_)) {
+        return false;
     }
-    majorType_ = int8value;
-
-    value = 0;
-    status = parcel.ReadInt32(value);
-    if (!status) {
-        return status;
-    }   
-    subType_ = value;
-
-    int8value = 0;
-    status = parcel.ReadUint8(int8value);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint8(majorType_)) {
+        return false;
     }
-    playStatus_ = int8value;
-
-    int featureSize = 0;
-    uint8_t myFeature;
-    status = parcel.ReadInt32(featureSize);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint32(subType_)) {
+        return false;
     }
-    for (int i = 0; i < featureSize; ++i) {
-        status = parcel.ReadUint8(myFeature);
-        if (!status) {
-            return status;
+    if (!parcel.ReadUint8(playStatus_)) {
+        return false;
+    }
+    uint32_t size = 0;
+    if (!parcel.ReadUint32(size)) {
+        return false;
+    }
+    for (size_t i = 0; i < size; i++) {
+        uint8_t feature;
+        if (!parcel.ReadUint8(feature)) {
+            return false;
         }
-        features_.push_back(myFeature);
+        features_.push_back(feature);
     }
-
-    status = parcel.ReadString(name_);
-    if (!status) {
-        return status;
+    if (!parcel.ReadString(name_)) {
+        return false;
     }
-
     return true;
 }
 

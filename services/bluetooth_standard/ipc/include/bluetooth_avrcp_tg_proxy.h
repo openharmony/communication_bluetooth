@@ -31,8 +31,8 @@ public:
     void SetActiveDevice(const BluetoothRawAddress &addr) override;
     int32_t Connect(const BluetoothRawAddress &addr) override;
     int32_t Disconnect(const BluetoothRawAddress &addr) override;
-    std::vector<sptr<BluetoothRawAddress>> GetConnectedDevices() override;
-    std::vector<sptr<BluetoothRawAddress>> GetDevicesByStates(const std::vector<int32_t> &states) override;
+    std::vector<BluetoothRawAddress> GetConnectedDevices() override;
+    std::vector<BluetoothRawAddress> GetDevicesByStates(const std::vector<int32_t> &states) override;
     int32_t GetDeviceState(const BluetoothRawAddress &addr) override;
     void NotifyPlaybackStatusChanged(int32_t playStatus, int32_t playbackPos) override;
     void NotifyTrackChanged(int64_t uid, int32_t playbackPos) override;

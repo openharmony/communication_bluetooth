@@ -38,9 +38,6 @@ public:
 
     bool WriteToParcel(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel);
-private:
-    bool WriteParcelableCodecVector(const std::vector<BluetoothA2dpCodecInfo> &localCodecInfo, Parcel &parcel) const;
-    bool ReadParcelableVector(const std::vector<BluetoothA2dpCodecInfo> &localCodecInfo, Parcel &parcel) const;
 };
 
 }  // namespace bluetooth

@@ -35,7 +35,7 @@ int BluetoothA2dpSinkObserverStub::OnRemoteRequest(
 {
     HILOGD("BluetoothA2dpSinkObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
 
-    ErrCode errCode;
+    ErrCode errCode = NO_ERROR;
     BluetoothA2dpSinkObserverStub::Code msgCode = static_cast<BluetoothA2dpSinkObserverStub::Code>(code);
     switch (msgCode) {
         case BluetoothA2dpSinkObserverStub::Code::BT_A2DP_SINK_OBSERVER_CONNECTION_STATE_CHANGED:

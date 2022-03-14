@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -331,9 +331,12 @@ BluetoothA2dpCodecStatus BluetoothA2dpSrcProxy::GetCodecStatus(const RawAddress 
         return codecStatus;
     }
 
-    codecStatus = *reply.ReadParcelable<BluetoothA2dpCodecStatus>();
+    std::shared_ptr<BluetoothA2dpCodecStatus> statusPtr(reply.ReadParcelable<BluetoothA2dpCodecStatus>());
+    if (!statusPtr) {
+        return codecStatus;
+    }
 
-    return codecStatus;
+    return *statusPtr;
 }
 
 int BluetoothA2dpSrcProxy::SetCodecPreference(const RawAddress &device, const BluetoothA2dpCodecInfo &info)

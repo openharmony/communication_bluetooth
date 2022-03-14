@@ -970,9 +970,7 @@ napi_value GetProfileConnState(napi_env env, napi_callback_info info)
 
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int state = host->GetBtProfileConnState(profileId);
-    
     napi_create_int32(env, state, &ret);
-
     return ret;
 }
 }  // namespace Bluetooth

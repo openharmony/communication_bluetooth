@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -92,7 +92,10 @@ ErrCode BluetoothHostObserverStub::OnDiscoveryStateChangedInner(MessageParcel &d
 
 ErrCode BluetoothHostObserverStub::OnDiscoveryResultInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothRawAddress> device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
 
     HILOGI("BluetoothHostObserverStub::OnDiscoveryResultInner starts");
     OnDiscoveryResult(*device);
@@ -103,7 +106,10 @@ ErrCode BluetoothHostObserverStub::OnDiscoveryResultInner(MessageParcel &data, M
 ErrCode BluetoothHostObserverStub::OnPairRequestedInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
-    sptr<BluetoothRawAddress> device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
 
     HILOGI("BluetoothHostObserverStub::OnPairRequestedInner starts");
     OnPairRequested(transport, *device);
@@ -114,7 +120,10 @@ ErrCode BluetoothHostObserverStub::OnPairRequestedInner(MessageParcel &data, Mes
 ErrCode BluetoothHostObserverStub::OnPairConfirmedInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
-    sptr<BluetoothRawAddress> device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t reqType = data.ReadInt32();
     int32_t number = data.ReadInt32();
 

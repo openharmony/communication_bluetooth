@@ -52,8 +52,8 @@ public:
     virtual void SetActiveDevice(const BluetoothRawAddress &addr) = 0;
     virtual int32_t Connect(const BluetoothRawAddress &addr) = 0;
     virtual int32_t Disconnect(const BluetoothRawAddress &addr) = 0;
-    virtual std::vector<sptr<BluetoothRawAddress>> GetConnectedDevices() = 0;
-    virtual std::vector<sptr<BluetoothRawAddress>> GetDevicesByStates(const std::vector<int32_t> &states) = 0;
+    virtual std::vector<BluetoothRawAddress> GetConnectedDevices() = 0;
+    virtual std::vector<BluetoothRawAddress> GetDevicesByStates(const std::vector<int32_t> &states) = 0;
     virtual int32_t GetDeviceState(const BluetoothRawAddress &addr) = 0;
     virtual void NotifyPlaybackStatusChanged(int32_t playStatus, int32_t playbackPos) = 0;
     virtual void NotifyTrackChanged(int64_t uid, int32_t playbackPos) = 0;

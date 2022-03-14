@@ -47,21 +47,20 @@ napi_value NapiGattClient::CreateGattClientDevice(napi_env env, napi_callback_in
 void NapiGattClient::DefineGattClientJSClass(napi_env env)
 {
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),
-        DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
+        DECLARE_NAPI_FUNCTION("close", Close),
+        DECLARE_NAPI_FUNCTION("getDeviceName", GetDeviceName),
+        DECLARE_NAPI_FUNCTION("getServices", GetServices),
         DECLARE_NAPI_FUNCTION("readCharacteristicValue", ReadCharacteristicValue),
         DECLARE_NAPI_FUNCTION("readDescriptorValue", ReadDescriptorValue),
-        DECLARE_NAPI_FUNCTION("close", Close),
-        DECLARE_NAPI_FUNCTION("getServices", GetServices),
         DECLARE_NAPI_FUNCTION("writeCharacteristicValue", WriteCharacteristicValue),
         DECLARE_NAPI_FUNCTION("writeDescriptorValue", WriteDescriptorValue),
+        DECLARE_NAPI_FUNCTION("getRssiValue", GetRssiValue),
         DECLARE_NAPI_FUNCTION("setBLEMtuSize", SetBLEMtuSize),
         DECLARE_NAPI_FUNCTION("setNotifyCharacteristicChanged", SetNotifyCharacteristicChanged),
-        DECLARE_NAPI_FUNCTION("getDeviceName", GetDeviceName),
-        DECLARE_NAPI_FUNCTION("getRssiValue", GetRssiValue),
-
+        DECLARE_NAPI_FUNCTION("on", On),
+        DECLARE_NAPI_FUNCTION("off", Off),
     };
 
     napi_define_class(env, "GattClientDevice", NAPI_AUTO_LENGTH, GattClientConstructor, nullptr,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,10 @@ int BluetoothMapMseObserverStub::OnRemoteRequest(
 ErrCode BluetoothMapMseObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseObserverStub::OnConnectionStateChangedInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
     int32_t status = data.ReadInt32();
     OnConnectionStateChanged(*addr, status);
     return NO_ERROR;
@@ -69,7 +72,10 @@ ErrCode BluetoothMapMseObserverStub::OnConnectionStateChangedInner(MessageParcel
 ErrCode BluetoothMapMseObserverStub::OnPermissionInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMseObserverStub::OnPermissionInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
     OnPermission(*addr);
     return NO_ERROR;
 }

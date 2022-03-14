@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,8 +35,8 @@ bool BluetoothGattDescriptor::Marshalling(Parcel &parcel) const
             return false;
         }
     }
-    BluetoothUuid *bt_uuid = new BluetoothUuid(uuid_);
-    if (!parcel.WriteParcelable(bt_uuid)) {
+    BluetoothUuid uuid(uuid_);
+    if (!parcel.WriteParcelable(&uuid)) {
         return false;
     }
     return true;
@@ -44,83 +44,43 @@ bool BluetoothGattDescriptor::Marshalling(Parcel &parcel) const
 
 BluetoothGattDescriptor *BluetoothGattDescriptor::Unmarshalling(Parcel &parcel)
 {
-    bool noError = true;
-    uint16_t handle;
-    if (!parcel.ReadUint16(handle)) {
-        noError = false;
-    }
-    int permissions;
-    if (!parcel.ReadInt32(permissions)) {
-        noError = false;
-    }
-    uint32_t length;
-    if (!parcel.ReadUint32(length)) {
-        noError = false;
-    }
-    uint8_t value_v[length];
-    for (uint32_t i = 0; i < length; i++) {
-        if (!parcel.ReadUint8(value_v[i])) {
-            noError = false;
-        }
-    }
-    BluetoothUuid *bt_uuid = parcel.ReadParcelable<BluetoothUuid>();
-    if (!bt_uuid) {
-        return nullptr;
-    }
-    BluetoothGattDescriptor *descriptor =
-        new BluetoothGattDescriptor(Descriptor((bluetooth::Uuid)(*bt_uuid), handle, permissions, value_v, length));
-    if (!noError) {
+    BluetoothGattDescriptor *descriptor = new BluetoothGattDescriptor();
+    if (descriptor != nullptr && !descriptor->ReadFromParcel(parcel)) {
         delete descriptor;
         descriptor = nullptr;
     }
     return descriptor;
 }
 
-bool BluetoothGattDescriptor::writeToParcel(Parcel &parcel)
+bool BluetoothGattDescriptor::WriteToParcel(Parcel &parcel)
 {
     return Marshalling(parcel);
 }
 
-bool BluetoothGattDescriptor::readFromParcel(Parcel &parcel)
+bool BluetoothGattDescriptor::ReadFromParcel(Parcel &parcel)
 {
-    bool noError = true;
-    uint16_t handle;
-    if (parcel.ReadUint16(handle)) {
-        handle_ = handle;
-    } else {
-        noError = false;
+    if (!parcel.ReadUint16(handle_)) {
+        return false;
     }
-    int permissions;
-    if (parcel.ReadInt32(permissions)) {
-        permissions_ = permissions;
-    } else {
-        noError = false;
-    }
-    int len;
-    if (parcel.ReadInt32(len)) {
-        for (int i = 0; i < len; i++) {
-            if (parcel.ReadUint8(value_[i])) {
-                i += 0;
-            } else {
-                noError = false;
-            }
-        }
-    } else {
-        noError = false;
+    if (!parcel.ReadInt32(permissions_)) {
+        return false;
     }
     uint32_t length;
-    if (parcel.ReadUint32(length)) {
-        length_ = length;
-    } else {
-        noError = false;
+    if (!parcel.ReadUint32(length)) {
+        return false;
     }
-    uint32_t uuid;
-    if (parcel.ReadUint32(uuid)) {
-        uuid_ = bluetooth::Uuid::ConvertFrom32Bits(uuid);
-    } else {
-        noError = false;
+    length_ = length;
+    for (size_t i = 0; i < length_; i++) {
+        if (!parcel.ReadUint8(value_[i])) {
+            return false;
+        }
     }
-    return noError;
+    std::shared_ptr<BluetoothUuid> uuid(parcel.ReadParcelable<BluetoothUuid>());
+    if (!uuid) {
+        return false;
+    }
+    uuid_ = bluetooth::Uuid(*uuid);
+    return true;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

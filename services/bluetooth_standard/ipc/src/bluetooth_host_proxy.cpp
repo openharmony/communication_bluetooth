@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -594,9 +594,9 @@ long BluetoothHostProxy::GetBtDiscoveryEndMillis()
     return millis;
 }
 
-std::vector<sptr<BluetoothRawAddress>> BluetoothHostProxy::GetPairedDevices(const int32_t transport)
+std::vector<BluetoothRawAddress> BluetoothHostProxy::GetPairedDevices(const int32_t transport)
 {
-    std::vector<sptr<BluetoothRawAddress>> vec;
+    std::vector<BluetoothRawAddress> vec;
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::GetPairedDevices WriteInterfaceToken error");
@@ -615,8 +615,11 @@ std::vector<sptr<BluetoothRawAddress>> BluetoothHostProxy::GetPairedDevices(cons
     }
     int32_t size = reply.ReadInt32();
     for (int32_t i = 0; i < size; i++) {
-        sptr<BluetoothRawAddress> rawAddress = reply.ReadStrongParcelable<BluetoothRawAddress>();
-        vec.push_back(rawAddress);
+        std::shared_ptr<BluetoothRawAddress> rawAddress(reply.ReadParcelable<BluetoothRawAddress>());
+        if (!rawAddress) {
+            return vec;
+        }
+        vec.push_back(*rawAddress);
     }
     return vec;
 }

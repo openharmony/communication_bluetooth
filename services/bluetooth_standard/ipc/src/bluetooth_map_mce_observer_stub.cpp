@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,8 +70,14 @@ int BluetoothMapMceObserverStub::OnRemoteRequest(
 ErrCode BluetoothMapMceObserverStub::OnMapActionCompletedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceObserverStub::OnMapActionCompletedInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileMapAction *action = data.ReadParcelable<BluetoothIProfileMapAction>();
+        std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileMapAction> action(data.ReadParcelable<BluetoothIProfileMapAction>());
+    if (!action) {
+        return TRANSACTION_ERR;
+    }
     int32_t status = data.ReadInt32();
     OnMapActionCompleted(*addr, *action, status);
     return NO_ERROR;
@@ -80,7 +86,10 @@ ErrCode BluetoothMapMceObserverStub::OnMapActionCompletedInner(MessageParcel &da
 ErrCode BluetoothMapMceObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceObserverStub::OnConnectionStateChangedInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
+        std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
     int32_t status = data.ReadInt32();
     OnConnectionStateChanged(*addr, status);
     return NO_ERROR;
@@ -89,8 +98,14 @@ ErrCode BluetoothMapMceObserverStub::OnConnectionStateChangedInner(MessageParcel
 ErrCode BluetoothMapMceObserverStub::OnMapEventReportedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceObserverStub::OnMapEventReportedInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileMapEventReport *event = data.ReadParcelable<BluetoothIProfileMapEventReport>();
+        std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileMapEventReport> event(data.ReadParcelable<BluetoothIProfileMapEventReport>());
+    if (!event) {
+        return TRANSACTION_ERR;
+    }
     OnMapEventReported(*addr, *event);
     return NO_ERROR;
 }
@@ -98,8 +113,11 @@ ErrCode BluetoothMapMceObserverStub::OnMapEventReportedInner(MessageParcel &data
 ErrCode BluetoothMapMceObserverStub::OnBmessageCompletedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceObserverStub::OnBmessageCompletedInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileBMessage *action = data.ReadParcelable<BluetoothIProfileBMessage>();
+        std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileBMessage> action(data.ReadParcelable<BluetoothIProfileBMessage>());
     int32_t status = data.ReadInt32();
     OnBmessageCompleted(*addr, *action, status);
     return NO_ERROR;
@@ -108,8 +126,11 @@ ErrCode BluetoothMapMceObserverStub::OnBmessageCompletedInner(MessageParcel &dat
 ErrCode BluetoothMapMceObserverStub::OnMessagesListingCompletedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceObserverStub::OnMessagesListingCompletedInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileMessagesListing *action = data.ReadParcelable<BluetoothIProfileMessagesListing>();
+        std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileMessagesListing> action(data.ReadParcelable<BluetoothIProfileMessagesListing>());
     int32_t status = data.ReadInt32();
     OnMessagesListingCompleted(*addr, *action, status);
     return NO_ERROR;
@@ -118,8 +139,12 @@ ErrCode BluetoothMapMceObserverStub::OnMessagesListingCompletedInner(MessageParc
 ErrCode BluetoothMapMceObserverStub::OnConversationListingCompletedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceObserverStub::OnConversationListingCompletedInner Triggered!");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileConversationListing *action = data.ReadParcelable<BluetoothIProfileConversationListing>();
+        std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileConversationListing> action(
+        data.ReadParcelable<BluetoothIProfileConversationListing>());
     int32_t status = data.ReadInt32();
     OnConversationListingCompleted(*addr, *action, status);
     return NO_ERROR;

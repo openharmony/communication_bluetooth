@@ -27,17 +27,18 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
     
     napi_value constructor;
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),       
-        DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+        DECLARE_NAPI_FUNCTION("connect", Connect),
+        DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
         DECLARE_NAPI_FUNCTION("getScoState", GetScoState),
         DECLARE_NAPI_FUNCTION("connectSco", ConnectSco),
         DECLARE_NAPI_FUNCTION("disconnectSco", DisconnectSco),
+        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("openVoiceRecognition", OpenVoiceRecognition),
         DECLARE_NAPI_FUNCTION("closeVoiceRecognition", CloseVoiceRecognition), 
-        DECLARE_NAPI_FUNCTION("connect", Connect),
-        DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
+        
     };
 
     napi_define_class(env, "HandsFreeAudioGateway", NAPI_AUTO_LENGTH, HandsFreeAudioGatewayConstructor, nullptr, 
@@ -91,15 +92,6 @@ napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info)
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     observer_.callbackInfos_[type] = callbackInfo;
     HILOGI("%{public}s is registered", type.c_str());
-
-    BluetoothRemoteDevice address("123",1);
-    int state = 3;
-    if (type.c_str() == STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE){
-        observer_.OnConnectionStateChanged(address, state);
-    }
-    else if (type.c_str() == STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE){
-        observer_.OnScoStateChanged(address, state);
-    }
     
     return ret;
 }
