@@ -88,6 +88,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GattCharacteristic3
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_AddDescriptor, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_AddDescriptor start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     GattDescriptor *pdescriptor = new GattDescriptor(uuid_, permissions_);
     pGattCharacteristic->AddDescriptor(*pdescriptor);
     GTEST_LOG_(INFO) << "GattCharacteristic_AddDescriptor end";
@@ -100,6 +101,10 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_AddDescriptor, Test
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetDescriptor, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetDescriptor start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
+    GattDescriptor *pdescriptor = new GattDescriptor(uuid_, permissions_);
+    pGattCharacteristic->AddDescriptor(*pdescriptor);
+
     GattDescriptor *pdescriptorTmp = pGattCharacteristic->GetDescriptor(uuid_);
     if (pdescriptorTmp->GetUuid().Equals(uuid_)) {
         EXPECT_TRUE(true);
@@ -115,6 +120,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetDescriptor, Test
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetHandle, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetHandle start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     uint16_t tempHandle = pGattCharacteristic->GetHandle();
     EXPECT_EQ(handle_, tempHandle);
     GTEST_LOG_(INFO) << "GattCharacteristic_GetHandle end";
@@ -127,6 +133,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetHandle, TestSize
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetPermissions, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetPermissions start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     int tempPer = pGattCharacteristic->GetPermissions();
     EXPECT_EQ(permissions_, tempPer);
     GTEST_LOG_(INFO) << "GattCharacteristic_GetPermissions end";
@@ -139,6 +146,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetPermissions, Tes
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetProperties, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetProperties start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     int tempPro = pGattCharacteristic->GetProperties();
     EXPECT_EQ(properties_, tempPro);
     GTEST_LOG_(INFO) << "GattCharacteristic_GetProperties end";
@@ -151,6 +159,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetProperties, Test
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetService, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetService start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     GattService *tempGattService = pGattCharacteristic->GetService();
     if (nullptr == tempGattService) {
         EXPECT_TRUE(true);
@@ -166,6 +175,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetService, TestSiz
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetUuid, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetUuid start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     UUID tempUuid = pGattCharacteristic->GetUuid();
     if (tempUuid.Equals(uuid_)) {
         EXPECT_TRUE(true);
@@ -181,6 +191,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetUuid, TestSize.L
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_SetValue, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_SetValue start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     size_t length_Set = 1;
     uint8_t values_Set[1] = {'a'};
     pGattCharacteristic->SetValue(values_Set, length_Set);
@@ -194,8 +205,12 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_SetValue, TestSize.
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetValue, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetValue start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
+    size_t length_Set = 1;
     size_t length_Get = 1;
     size_t *plength_Get = &length_Get;
+    uint8_t values_Set[1] = {'a'};
+    pGattCharacteristic->SetValue(values_Set, length_Set);
 
     std::unique_ptr<uint8_t[]> values_Get = std::make_unique<uint8_t[]>(length_Get);
     memcpy_s(values_Get.get(), length_Get, pGattCharacteristic->GetValue(plength_Get).get(), length_Get);
@@ -223,6 +238,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetValue, TestSize.
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_SetWriteType, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_SetWriteType start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     GattCharacteristic::WriteType typeTemp = GattCharacteristic::WriteType::DEFAULT;
     int returnCode = 0;
     returnCode = pGattCharacteristic->SetWriteType(typeTemp);
@@ -237,7 +253,12 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_SetWriteType, TestS
 HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetWriteType, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GattCharacteristic_GetWriteType start";
+    pGattCharacteristic = new GattCharacteristic(uuid_, handle_, permissions_, properties_);
     GattCharacteristic::WriteType typeTemp = GattCharacteristic::WriteType::DEFAULT;
+    int returnCode = 0;
+    returnCode = pGattCharacteristic->SetWriteType(typeTemp);
+    EXPECT_EQ(returnCode, 0);
+
     int resultType = pGattCharacteristic->GetWriteType();
     if (typeTemp == resultType) {
         EXPECT_TRUE(true);
