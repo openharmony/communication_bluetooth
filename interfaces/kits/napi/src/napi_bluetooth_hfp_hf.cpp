@@ -93,15 +93,6 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
 
     HILOGI("%{public}s is registered", type.c_str());
 
-    BluetoothRemoteDevice address("123",1);
-    int state = 3;
-    if (type.c_str() == STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE) {
-        observer_.OnConnectionStateChanged(address, state);
-    }
-    else if (type.c_str() == STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE) {
-        observer_.OnScoStateChanged(address, state);
-    }
-
     return ret;
 }
 

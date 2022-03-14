@@ -1637,8 +1637,8 @@ void GapOnEncryptionChangeEvent(const HciEncryptionChangeEventParam *eventParam)
         } else {
             GapUpdateSecurityRequest(devInfo, GAP_SEC_EVENT_ENC_FAILED, eventParam->status);
         }
-        devInfo->actionReq = NULL;
-        if (devInfo->status == GAP_DEV_SEC_STATUS_ACTION) {
+        if (devInfo->status == GAP_DEV_SEC_STATUS_ACTION && devInfo->actionReq->status != GAP_SEC_REQ_STATUS_ACTION) {
+            devInfo->actionReq = NULL;
             devInfo->status = GAP_DEV_SEC_STATUS_WAIT_DISC;
         }
     }

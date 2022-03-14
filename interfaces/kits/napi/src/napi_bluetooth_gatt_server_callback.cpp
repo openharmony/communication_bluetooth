@@ -60,6 +60,8 @@ void NapiGattServerCallback::OnCharacteristicReadRequest(
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
         }
     );
 }
@@ -104,6 +106,8 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
         }
     );
 }
@@ -169,6 +173,8 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
         }
     );
 }
@@ -213,6 +219,8 @@ void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevic
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
         }
     );
 }
@@ -257,6 +265,8 @@ void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
         }
     );
 }
