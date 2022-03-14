@@ -84,62 +84,62 @@ bool BluetoothIPbapPullPhoneBookParam::Marshalling(Parcel &parcel) const
     return status;
 }
 
-bool BluetoothIPbapPullPhoneBookParam::writeToParcel(Parcel &parcel)
+bool BluetoothIPbapPullPhoneBookParam::WriteToParcel(Parcel &parcel)
 {
     return Marshalling(parcel);
 }
 
-bool BluetoothIPbapPullPhoneBookParam::readFromParcel(Parcel &parcel)
+bool BluetoothIPbapPullPhoneBookParam::ReadFromParcel(Parcel &parcel)
 {
     bool status = false;
-    std::u16string tmpString16;
-    int64_t tmp64 = 0;
-    int tmp = 0;
-    status = parcel.ReadString16(tmpString16);
+    std::u16string valString16;
+    int64_t val64 = 0;
+    int val = 0;
+    status = parcel.ReadString16(valString16);
     if (!status) {
         return status;
     }
-    SetName(tmpString16);
-    status = parcel.ReadInt64(tmp64);
+    SetName(valString16);
+    status = parcel.ReadInt64(val64);
     if (!status) {
         return status;
     }
-    SetPropertySelector(tmp64);
-    status = parcel.ReadInt32(tmp);
+    SetPropertySelector(val64);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    SetFormat(tmp);
-    status = parcel.ReadInt32(tmp);
+    SetFormat(val);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    SetMaxListCount(tmp);
-    status = parcel.ReadInt32(tmp);
+    SetMaxListCount(val);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    SetListStartOffset(tmp);
-    status = parcel.ReadInt32(tmp);
+    SetListStartOffset(val);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    SetResetNewMissedCalls(tmp);
-    status = parcel.ReadInt64(tmp64);
+    SetResetNewMissedCalls(val);
+    status = parcel.ReadInt64(val64);
     if (!status) {
         return status;
     }
-    SetvCardSelector(tmp64);
-    status = parcel.ReadInt32(tmp);
+    SetvCardSelector(val64);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    SetvCardSelectorOp(tmp);
-    status = parcel.ReadInt64(tmp64);
+    SetvCardSelectorOp(val);
+    status = parcel.ReadInt64(val64);
     if (!status) {
         return status;
     }
-    SetSpecifiedBitset(tmp64);
+    SetSpecifiedBitset(val64);
 
     return status;
 }
@@ -147,11 +147,10 @@ bool BluetoothIPbapPullPhoneBookParam::readFromParcel(Parcel &parcel)
 BluetoothIPbapPullPhoneBookParam *BluetoothIPbapPullPhoneBookParam::Unmarshalling(Parcel &parcel)
 {
     BluetoothIPbapPullPhoneBookParam *pullPhoneBookParam = new BluetoothIPbapPullPhoneBookParam();
-    if (pullPhoneBookParam != nullptr && !pullPhoneBookParam->readFromParcel(parcel)) {
+    if (pullPhoneBookParam != nullptr && !pullPhoneBookParam->ReadFromParcel(parcel)) {
         delete pullPhoneBookParam;
         pullPhoneBookParam = nullptr;
     }
-
     return pullPhoneBookParam;
 }
 
@@ -230,80 +229,68 @@ bool BluetoothIPbapPullvCardListingParam::Marshalling(Parcel &parcel) const
     return status;
 }
 
-bool BluetoothIPbapPullvCardListingParam::writeToParcel(Parcel &parcel)
+bool BluetoothIPbapPullvCardListingParam::WriteToParcel(Parcel &parcel)
 {
     return Marshalling(parcel);
 }
 
-bool BluetoothIPbapPullvCardListingParam::readFromParcel(Parcel &parcel)
+bool BluetoothIPbapPullvCardListingParam::ReadFromParcel(Parcel &parcel)
 {
-    bool status = false;
-    std::u16string tmpString16;
-    std::string tmpString;
-    int64_t tmp64 = 0;
-    int tmp = 0;
-    status = parcel.ReadString16(tmpString16);
-    if (!status) {
-        return status;
+    std::u16string valString16;
+    std::string valString;
+    int64_t val64 = 0;
+    int val = 0;
+    if (!parcel.ReadString16(valString16)) {
+        return false;
     }
-    SetName(tmpString16);
-    status = parcel.ReadInt32(tmp);
-    if (!status) {
-        return status;
+    SetName(valString16);
+    if (!parcel.ReadInt32(val)) {
+        return false;
     }
-    SetOrder(tmp);
-    status = parcel.ReadString(tmpString);
-    if (!status) {
-        return status;
+    SetOrder(val);
+    if (!parcel.ReadString(valString)) {
+        return false;
     }
-    SetSearchValue(tmpString);
-    status = parcel.ReadInt32(tmp);
-    if (!status) {
-        return status;
+    SetSearchValue(valString);
+    if (!parcel.ReadInt32(val)) {
+        return false;
     }
-    SetSearchProperty(tmp);
-    status = parcel.ReadInt32(tmp);
-    if (!status) {
-        return status;
+    SetSearchProperty(val);
+    if (!parcel.ReadInt32(val)) {
+        return false;
     }
-    SetMaxListCount(tmp);
-    status = parcel.ReadInt32(tmp);
-    if (!status) {
-        return status;
+    SetMaxListCount(val);
+    if (!parcel.ReadInt32(val)) {
+        return false;
     }
-    SetListStartOffset(tmp);
-    status = parcel.ReadInt32(tmp);
-    if (!status) {
-        return status;
+    SetListStartOffset(val);
+    if (!parcel.ReadInt32(val)) {
+        return false;
     }
-    SetResetNewMissedCalls(tmp);
-    status = parcel.ReadInt64(tmp64);
-    if (!status) {
-        return status;
+    SetResetNewMissedCalls(val);
+    if (!parcel.ReadInt64(val64)) {
+        return false;
     }
-    SetvCardSelector(tmp64);
-    status = parcel.ReadInt32(tmp);
-    if (!status) {
-        return status;
+    SetvCardSelector(val64);
+    if (!parcel.ReadInt32(val)) {
+        return false;
     }
-    SetvCardSelectorOp(tmp);
-    status = parcel.ReadInt64(tmp64);
-    if (!status) {
-        return status;
+    SetvCardSelectorOp(val);
+    if (!parcel.ReadInt64(val64)) {
+        return false;
     }
-    SetSpecifiedBitset(tmp64);
+    SetSpecifiedBitset(val64);
 
-    return status;
+    return true;
 }
 
 BluetoothIPbapPullvCardListingParam *BluetoothIPbapPullvCardListingParam::Unmarshalling(Parcel &parcel)
 {
     BluetoothIPbapPullvCardListingParam *pullvCardListingParam = new BluetoothIPbapPullvCardListingParam();
-    if (pullvCardListingParam != nullptr && !pullvCardListingParam->readFromParcel(parcel)) {
+    if (pullvCardListingParam != nullptr && !pullvCardListingParam->ReadFromParcel(parcel)) {
         delete pullvCardListingParam;
         pullvCardListingParam = nullptr;
     }
-
     return pullvCardListingParam;
 }
 
@@ -345,48 +332,47 @@ bool BluetoothIPbapPullvCardEntryParam::Marshalling(Parcel &parcel) const
     return status;
 }
 
-bool BluetoothIPbapPullvCardEntryParam::writeToParcel(Parcel &parcel)
+bool BluetoothIPbapPullvCardEntryParam::WriteToParcel(Parcel &parcel)
 {
     return Marshalling(parcel);
 }
 
-bool BluetoothIPbapPullvCardEntryParam::readFromParcel(Parcel &parcel)
+bool BluetoothIPbapPullvCardEntryParam::ReadFromParcel(Parcel &parcel)
 {
     bool status = false;
-    std::u16string tmpString16;
-    int64_t tmp64 = 0;
-    int tmp = 0;
-    status = parcel.ReadString16(tmpString16);
+    std::u16string valString16;
+    int64_t val64 = 0;
+    int val = 0;
+    status = parcel.ReadString16(valString16);
     if (!status) {
         return status;
     }
-    SetName(tmpString16);
-    status = parcel.ReadInt64(tmp64);
+    SetName(valString16);
+    status = parcel.ReadInt64(val64);
     if (!status) {
         return status;
     }
-    SetPropertySelector(tmp64);
-    status = parcel.ReadInt32(tmp);
+    SetPropertySelector(val64);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    SetFormat(tmp);
-    status = parcel.ReadInt64(tmp64);
+    SetFormat(val);
+    status = parcel.ReadInt64(val64);
     if (!status) {
         return status;
     }
-    SetSpecifiedBitset(tmp64);
+    SetSpecifiedBitset(val64);
     return status;
 }
 
 BluetoothIPbapPullvCardEntryParam *BluetoothIPbapPullvCardEntryParam::Unmarshalling(Parcel &parcel)
 {
     BluetoothIPbapPullvCardEntryParam *pullvCardEntryParam = new BluetoothIPbapPullvCardEntryParam();
-    if (pullvCardEntryParam != nullptr && !pullvCardEntryParam->readFromParcel(parcel)) {
+    if (pullvCardEntryParam != nullptr && !pullvCardEntryParam->ReadFromParcel(parcel)) {
         delete pullvCardEntryParam;
         pullvCardEntryParam = nullptr;
     }
-
     return pullvCardEntryParam;
 }
 
@@ -464,20 +450,20 @@ bool BluetoothIPbapPhoneBookData::Marshalling(Parcel &parcel) const
     return status;
 }
 
-bool BluetoothIPbapPhoneBookData::writeToParcel(Parcel &parcel)
+bool BluetoothIPbapPhoneBookData::WriteToParcel(Parcel &parcel)
 {
     return Marshalling(parcel);
 }
 
-bool BluetoothIPbapPhoneBookData::readFromParcel(Parcel &parcel)
+bool BluetoothIPbapPhoneBookData::ReadFromParcel(Parcel &parcel)
 {
     bool status = false;
-    int32_t tmp = 0;
-    status = parcel.ReadInt32(tmp);
+    int32_t val = 0;
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    phoneBookSize_ = tmp;
+    phoneBookSize_ = val;
 
     status = parcel.ReadUInt8Vector(&primaryFolderVersion_);
     if (!status) {
@@ -506,18 +492,18 @@ bool BluetoothIPbapPhoneBookData::readFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    status = parcel.ReadInt32(tmp);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    resultLoaded_ = tmp;
+    resultLoaded_ = val;
 
     int size = 0;
-    status = parcel.ReadInt32(tmp);
+    status = parcel.ReadInt32(val);
     if (!status) {
         return status;
     }
-    size = tmp;
+    size = val;
 
     status = parcel.ReadUInt8Vector(&result_);
     return status;
@@ -526,11 +512,10 @@ bool BluetoothIPbapPhoneBookData::readFromParcel(Parcel &parcel)
 BluetoothIPbapPhoneBookData *BluetoothIPbapPhoneBookData::Unmarshalling(Parcel &parcel)
 {
     BluetoothIPbapPhoneBookData *phoneBookData = new BluetoothIPbapPhoneBookData();
-    if (phoneBookData != nullptr && !phoneBookData->readFromParcel(parcel)) {
+    if (phoneBookData != nullptr && !phoneBookData->ReadFromParcel(parcel)) {
         delete phoneBookData;
         phoneBookData = nullptr;
     }
-
     return phoneBookData;
 }
 }  // namespace Bluetooth

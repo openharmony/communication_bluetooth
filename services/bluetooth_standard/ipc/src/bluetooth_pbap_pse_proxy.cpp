@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,9 +68,12 @@ void BluetoothPbapPseProxy::GetDevicesByStates(const std::vector<int32_t> tmpSta
     if (error != NO_ERROR) {
         HILOGE("BluetoothPbapPseProxy::GetServices done fail, error: %d", error);
     }
-    int dev_num = reply.ReadInt32();
-    for (int i = dev_num; i > 0; i--) {
-        std::unique_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
+    int DevNum = reply.ReadInt32();
+    for (int i = DevNum; i > 0; i--) {
+        std::shared_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
+        if (!dev) {
+            return;
+        }
         rawDevices.push_back(*dev);
     }
 }

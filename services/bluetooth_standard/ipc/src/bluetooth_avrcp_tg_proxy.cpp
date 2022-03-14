@@ -133,9 +133,9 @@ int32_t BluetoothAvrcpTgProxy::Disconnect(const BluetoothRawAddress &addr)
     return reply.ReadInt32();
 }
 
-std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgProxy::GetConnectedDevices()
+std::vector<BluetoothRawAddress> BluetoothAvrcpTgProxy::GetConnectedDevices()
 {
-    std::vector<sptr<BluetoothRawAddress>> vec;
+    std::vector<BluetoothRawAddress> vec;
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothAvrcpTgProxy::GetDescriptor())) {
         HILOGE("BluetoothAvrcpTgProxy::GetConnectedDevices WriteInterfaceToken error");
@@ -151,15 +151,18 @@ std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgProxy::GetConnectedDevice
     }
     int32_t size = reply.ReadInt32();
     for (int32_t i = 0; i < size; i++) {
-        sptr<BluetoothRawAddress> rawAddress = reply.ReadStrongParcelable<BluetoothRawAddress>();
-        vec.push_back(rawAddress);
+        std::shared_ptr<BluetoothRawAddress> rawAddress(reply.ReadParcelable<BluetoothRawAddress>());
+        if (!rawAddress) {
+            return vec;
+        }
+        vec.push_back(*rawAddress);
     }
     return vec;
 }
 
-std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgProxy::GetDevicesByStates(const std::vector<int32_t> &states)
+std::vector<BluetoothRawAddress> BluetoothAvrcpTgProxy::GetDevicesByStates(const std::vector<int32_t> &states)
 {
-    std::vector<sptr<BluetoothRawAddress>> vec;
+    std::vector<BluetoothRawAddress> vec;
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothAvrcpTgProxy::GetDescriptor())) {
         HILOGE("BluetoothAvrcpTgProxy::GetConnectedDevices WriteInterfaceToken error");
@@ -186,8 +189,8 @@ std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgProxy::GetDevicesByStates
     }
     int32_t size = reply.ReadInt32();
     for (int32_t i = 0; i < size; i++) {
-        sptr<BluetoothRawAddress> rawAddress = reply.ReadStrongParcelable<BluetoothRawAddress>();
-        vec.push_back(rawAddress);
+        std::shared_ptr<BluetoothRawAddress> rawAddress(reply.ReadParcelable<BluetoothRawAddress>());
+        vec.push_back(*rawAddress);
     }
     return vec;
 }

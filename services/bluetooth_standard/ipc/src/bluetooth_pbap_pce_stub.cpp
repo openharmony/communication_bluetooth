@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,7 +84,10 @@ int BluetoothPbapPceStub::OnRemoteRequest(
 ErrCode BluetoothPbapPceStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetDeviceState(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -97,7 +100,10 @@ ErrCode BluetoothPbapPceStub::GetDeviceStateInner(MessageParcel &data, MessagePa
 ErrCode BluetoothPbapPceStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = Connect(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -110,8 +116,14 @@ ErrCode BluetoothPbapPceStub::ConnectInner(MessageParcel &data, MessageParcel &r
 ErrCode BluetoothPbapPceStub::PullPhoneBookInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIPbapPullPhoneBookParam *param = data.ReadParcelable<BluetoothIPbapPullPhoneBookParam>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIPbapPullPhoneBookParam> param(data.ReadParcelable<BluetoothIPbapPullPhoneBookParam>());
+    if (!param) {
+        return TRANSACTION_ERR;
+    }
     int result = PullPhoneBook(*device, *param);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -124,7 +136,10 @@ ErrCode BluetoothPbapPceStub::PullPhoneBookInner(MessageParcel &data, MessagePar
 ErrCode BluetoothPbapPceStub::SetPhoneBookInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     const std::u16string name = data.ReadString16();
     int32_t flag = data.ReadInt32();
     int result = SetPhoneBook(*device, name, flag);
@@ -139,8 +154,12 @@ ErrCode BluetoothPbapPceStub::SetPhoneBookInner(MessageParcel &data, MessageParc
 ErrCode BluetoothPbapPceStub::PullvCardListingInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIPbapPullvCardListingParam *param = data.ReadParcelable<BluetoothIPbapPullvCardListingParam>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIPbapPullvCardListingParam> param(
+        data.ReadParcelable<BluetoothIPbapPullvCardListingParam>());
     int result = PullvCardListing(*device, *param);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -153,8 +172,14 @@ ErrCode BluetoothPbapPceStub::PullvCardListingInner(MessageParcel &data, Message
 ErrCode BluetoothPbapPceStub::PullvCardEntryInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIPbapPullvCardEntryParam *param = data.ReadParcelable<BluetoothIPbapPullvCardEntryParam>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIPbapPullvCardEntryParam> param(data.ReadParcelable<BluetoothIPbapPullvCardEntryParam>());
+    if (!param) {
+        return TRANSACTION_ERR;
+    }
     int result = PullvCardEntry(*device, *param);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -167,7 +192,10 @@ ErrCode BluetoothPbapPceStub::PullvCardEntryInner(MessageParcel &data, MessagePa
 ErrCode BluetoothPbapPceStub::IsDownloadingInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     bool result = IsDownloading(*device);
     bool ret = reply.WriteBool(result);
     if (!ret) {
@@ -180,7 +208,10 @@ ErrCode BluetoothPbapPceStub::IsDownloadingInner(MessageParcel &data, MessagePar
 ErrCode BluetoothPbapPceStub::AbortDownloadingInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = AbortDownloading(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -193,7 +224,10 @@ ErrCode BluetoothPbapPceStub::AbortDownloadingInner(MessageParcel &data, Message
 ErrCode BluetoothPbapPceStub::SetDevicePasswordInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     const std::string password = data.ReadString();
     const std::string userId = data.ReadString();
     int result = SetDevicePassword(*device, password, userId);
@@ -208,7 +242,10 @@ ErrCode BluetoothPbapPceStub::SetDevicePasswordInner(MessageParcel &data, Messag
 ErrCode BluetoothPbapPceStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = Disconnect(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -221,7 +258,10 @@ ErrCode BluetoothPbapPceStub::DisconnectInner(MessageParcel &data, MessageParcel
 ErrCode BluetoothPbapPceStub::SetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t strategy = data.ReadInt32();
     int result = SetConnectionStrategy(*device, strategy);
     bool ret = reply.WriteInt32(result);
@@ -235,7 +275,10 @@ ErrCode BluetoothPbapPceStub::SetConnectionStrategyInner(MessageParcel &data, Me
 ErrCode BluetoothPbapPceStub::GetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetConnectionStrategy(*device);
     bool ret = reply.WriteInt32(result);
     if (!ret) {

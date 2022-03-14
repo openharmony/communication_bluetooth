@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,7 +81,7 @@ struct PbapServer::impl {
     ~impl()
     {
         if (proxy_ != nullptr) {
-            proxy_->DeregisterObserver(&serviceObserver_);
+            proxy_->DeregisterObserver(serviceObserver_);
             proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
         }
     }
@@ -208,7 +208,7 @@ struct PbapServer::impl {
 private:
     std::mutex mutex_;
     BluetoothObserverList<PbapObserver> observers_;
-    BluetoothPbapPseObserverImp serviceObserver_;
+    sptr<BluetoothPbapPseObserverImp> serviceObserver_;
 };
 
 class PbapServer::impl::BluetoothPbapPseDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -230,7 +230,8 @@ private:
 
 PbapServer::impl::impl()
 {
-    serviceObserver_.SetObserver(&observers_);
+    serviceObserver_ = new BluetoothPbapPseObserverImp();
+    serviceObserver_->SetObserver(&observers_);
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
@@ -253,7 +254,7 @@ PbapServer::impl::impl()
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 
     if (proxy_ != nullptr) {
-        proxy_->RegisterObserver(&serviceObserver_);
+        proxy_->RegisterObserver(serviceObserver_);
     }
 }
 

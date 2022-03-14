@@ -68,7 +68,10 @@ int BluetoothBleCentralManagerCallBackStub::OnRemoteRequest(
 
 ErrCode BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothBleScanResult> result = data.ReadParcelable<BluetoothBleScanResult>();
+    std::shared_ptr<BluetoothBleScanResult> result(data.ReadParcelable<BluetoothBleScanResult>());
+    if (!result) {
+        return TRANSACTION_ERR;
+    }
     OnScanCallback(*result);
     return NO_ERROR;
 }

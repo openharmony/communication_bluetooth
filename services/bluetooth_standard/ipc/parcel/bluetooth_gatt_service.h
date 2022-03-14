@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,13 +34,9 @@ public:
 
     static BluetoothGattService *Unmarshalling(Parcel &parcel);
 
-    bool writeToParcel(Parcel &parcel);
+    bool WriteToParcel(Parcel &parcel);
 
-    bool readFromParcel(Parcel &parcel);
-
-    bool ServiceIteratorWrite(const std::vector<Service> &service, Parcel &parcel, int length) const;
-
-    static bool ServiceIteratorRead(std::vector<Service> &service, Parcel &parcel, int length);
+    bool ReadFromParcel(Parcel &parcel);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

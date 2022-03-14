@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -237,11 +237,11 @@ int32_t BluetoothAvrcpTgServer::Disconnect(const BluetoothRawAddress &addr)
     return result;
 }
 
-std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgServer::GetConnectedDevices()
+std::vector<BluetoothRawAddress> BluetoothAvrcpTgServer::GetConnectedDevices()
 {
     HILOGD("%{public}s start.", __func__);
 
-    std::vector<sptr<BluetoothRawAddress>> results;
+    std::vector<BluetoothRawAddress> results;
     
     if (!pimpl->IsEnabled()) {
         HILOGE("%{public}s: service is null or disable ", __func__);
@@ -251,21 +251,20 @@ std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgServer::GetConnectedDevic
     std::vector<RawAddress> devices;
     devices = pimpl->service_->GetConnectedDevices();
     for (auto device : devices) {
-        sptr<BluetoothRawAddress> rawAddrSptr = new BluetoothRawAddress(device);
-        if (rawAddrSptr != nullptr) {
-            results.emplace_back(rawAddrSptr);
-        }
+        BluetoothRawAddress rawAddr = BluetoothRawAddress(device);
+        results.emplace_back(rawAddr);
+        
     }
     HILOGD("%{public}s end.", __func__);
 
     return results;
 }
 
-std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgServer::GetDevicesByStates(const std::vector<int32_t> &states)
+std::vector<BluetoothRawAddress> BluetoothAvrcpTgServer::GetDevicesByStates(const std::vector<int32_t> &states)
 {
     HILOGD("%{public}s start.", __func__);
 
-    std::vector<sptr<BluetoothRawAddress>> results;
+    std::vector<BluetoothRawAddress> results;
 
     if (!pimpl->IsEnabled()) {
         HILOGE("%{public}s: service is null or disable ", __func__);
@@ -281,10 +280,8 @@ std::vector<sptr<BluetoothRawAddress>> BluetoothAvrcpTgServer::GetDevicesByState
         
     devices = pimpl->service_->GetDevicesByStates(convertStates);
     for (auto device : devices) {
-        sptr<BluetoothRawAddress> rawAddrSptr = new BluetoothRawAddress(device);
-        if (rawAddrSptr != nullptr) {
-            results.emplace_back(rawAddrSptr);
-        }
+        BluetoothRawAddress rawAddr = BluetoothRawAddress(device);
+        results.emplace_back(rawAddr);
     }
     HILOGD("%{public}s end.", __func__);
 

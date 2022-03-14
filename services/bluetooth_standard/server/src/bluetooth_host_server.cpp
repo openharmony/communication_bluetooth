@@ -905,7 +905,7 @@ long BluetoothHostServer::GetBtDiscoveryEndMillis()
     return INVALID_VALUE;
 }
 
-std::vector<sptr<BluetoothRawAddress>> BluetoothHostServer::GetPairedDevices(int32_t transport)
+std::vector<BluetoothRawAddress> BluetoothHostServer::GetPairedDevices(int32_t transport)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     std::vector<RawAddress> rawAddrVec;
@@ -919,18 +919,12 @@ std::vector<sptr<BluetoothRawAddress>> BluetoothHostServer::GetPairedDevices(int
             __FUNCTION__);
     }
 
-    std::vector<sptr<BluetoothRawAddress>> rawAddrSptrVec;
+    std::vector<BluetoothRawAddress> rawAddrRetVec;
     for (auto it = rawAddrVec.begin(); it != rawAddrVec.end(); ++it) {
-        sptr<BluetoothRawAddress> rawAddrSptr = new BluetoothRawAddress(*it);
-        if (rawAddrSptr == nullptr) {
-            HILOGE("[%{public}s]: %{public}s() %d: Failed to create BluetoothRawAddress ptr!",
-                __FILE__,
-                __FUNCTION__,
-                __LINE__);
-        }
-        rawAddrSptrVec.emplace_back(rawAddrSptr);
+        BluetoothRawAddress rawAddr = BluetoothRawAddress(*it);
+        rawAddrRetVec.emplace_back(rawAddr);
     }
-    return rawAddrSptrVec;
+    return rawAddrRetVec;
 }
 
 bool BluetoothHostServer::RemovePair(int32_t transport, const sptr<BluetoothRawAddress> &device)

@@ -99,18 +99,18 @@ ErrCode BluetoothBleAdvertiserStub::DeregisterBleAdvertiserCallbackInner(Message
 
 ErrCode BluetoothBleAdvertiserStub::StartAdvertisingInner(MessageParcel &data, MessageParcel &reply)
 {
-    sptr<BluetoothBleAdvertiserSettings> settings = data.ReadParcelable<BluetoothBleAdvertiserSettings>();
+    std::shared_ptr<BluetoothBleAdvertiserSettings> settings(data.ReadParcelable<BluetoothBleAdvertiserSettings>());
     if (settings == nullptr) {
         HILOGW("[StartAdvertisingInner] fail: read settings failed");
         return TRANSACTION_ERR;
     }
 
-    sptr<BluetoothBleAdvertiserData> advData = data.ReadParcelable<BluetoothBleAdvertiserData>();
+    std::shared_ptr<BluetoothBleAdvertiserData> advData(data.ReadParcelable<BluetoothBleAdvertiserData>());
     if (advData == nullptr) {
         HILOGW("[StartAdvertisingInner] fail: read advData failed");
         return TRANSACTION_ERR;
     }
-    sptr<BluetoothBleAdvertiserData> scanResponse = data.ReadParcelable<BluetoothBleAdvertiserData>();
+    std::shared_ptr<BluetoothBleAdvertiserData> scanResponse(data.ReadParcelable<BluetoothBleAdvertiserData>());
     if (scanResponse == nullptr) {
         HILOGW("[StartAdvertisingInner] fail: read scanResponse failed");
         return TRANSACTION_ERR;

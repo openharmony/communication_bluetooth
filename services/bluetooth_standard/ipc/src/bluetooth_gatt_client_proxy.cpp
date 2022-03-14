@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -348,9 +348,12 @@ void BluetoothGattClientProxy::GetAllDevice(std::vector<BluetoothGattDevice> &de
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::GetAllDevice done fail, error: %d", error);
     }
-    int dev_num = reply.ReadInt32();
-    for (int i = dev_num; i > 0; i--) {
-        std::unique_ptr<BluetoothGattDevice> dev(reply.ReadParcelable<BluetoothGattDevice>());
+    int DevNum = reply.ReadInt32();
+    for (int i = DevNum; i > 0; i--) {
+        std::shared_ptr<BluetoothGattDevice> dev(reply.ReadParcelable<BluetoothGattDevice>());
+        if (!dev) {
+            return;
+        }
         device.push_back(*dev);
     }
 }
@@ -404,9 +407,12 @@ void BluetoothGattClientProxy::GetServices(int32_t appId, std::vector<BluetoothG
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::GetServices done fail, error: %d", error);
     }
-    int dev_num = reply.ReadInt32();
-    for (int i = dev_num; i > 0; i--) {
-        std::unique_ptr<BluetoothGattService> dev(reply.ReadParcelable<BluetoothGattService>());
+    int DevNum = reply.ReadInt32();
+    for (int i = DevNum; i > 0; i--) {
+        std::shared_ptr<BluetoothGattService> dev(reply.ReadParcelable<BluetoothGattService>());
+        if (!dev) {
+            return;
+        }
         service.push_back(*dev);
     }
 }

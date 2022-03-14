@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,8 +78,14 @@ int BluetoothGattServerCallbackStub::OnRemoteRequest(
 };
 ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
-    const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
 
     OnCharacteristicReadRequest(*device, *characteristic);
 
@@ -87,7 +93,11 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(Messag
 }
 ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    
     int32_t ret = data.ReadInt32();
     int32_t state = data.ReadInt32();
     OnConnectionStateChanged(*device, ret, state);
@@ -97,16 +107,27 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessagePa
 ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t ret = data.ReadInt32();
-    const BluetoothGattService *service = data.ReadParcelable<BluetoothGattService>();
+    std::shared_ptr<BluetoothGattService> service(data.ReadParcelable<BluetoothGattService>());
+    if (!service) {
+        return TRANSACTION_ERR;
+    }
 
     OnAddService(ret, *service);
+
+    service = nullptr;
 
     return NO_ERROR;
 }
 ErrCode BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
-    const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
     bool needRespones = data.ReadBool();
 
     OnCharacteristicWriteRequest(*device, *characteristic, needRespones);
@@ -115,8 +136,14 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner(Messa
 }
 ErrCode BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
-    const BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothGattDescriptor> descriptor(data.ReadParcelable<BluetoothGattDescriptor>());
+    if (!descriptor) {
+        return TRANSACTION_ERR;
+    }
 
     OnDescriptorReadRequest(*device, *descriptor);
 
@@ -124,8 +151,14 @@ ErrCode BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner(MessagePar
 }
 ErrCode BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
-    const BluetoothGattDescriptor *descriptor = data.ReadParcelable<BluetoothGattDescriptor>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothGattDescriptor> descriptor(data.ReadParcelable<BluetoothGattDescriptor>());
+    if (!descriptor) {
+        return TRANSACTION_ERR;
+    }
 
     OnDescriptorWriteRequest(*device, *descriptor);
 
@@ -133,7 +166,10 @@ ErrCode BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner(MessagePa
 }
 ErrCode BluetoothGattServerCallbackStub::OnMtuChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t mtu = data.ReadInt32();
 
     OnMtuChanged(*device, mtu);
@@ -142,8 +178,14 @@ ErrCode BluetoothGattServerCallbackStub::OnMtuChangedInner(MessageParcel &data, 
 }
 ErrCode BluetoothGattServerCallbackStub::OnNotifyConfirmInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
-    const BluetoothGattCharacteristic *characteristic = data.ReadParcelable<BluetoothGattCharacteristic>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
+    if (!characteristic) {
+        return TRANSACTION_ERR;
+    }
     int32_t result = data.ReadInt32();
 
     OnNotifyConfirm(*device, *characteristic, result);
@@ -152,7 +194,10 @@ ErrCode BluetoothGattServerCallbackStub::OnNotifyConfirmInner(MessageParcel &dat
 }
 ErrCode BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothGattDevice *device = data.ReadParcelable<BluetoothGattDevice>();
+    std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t interval = data.ReadInt32();
     int32_t latency = data.ReadInt32();
     int32_t timeout = data.ReadInt32();

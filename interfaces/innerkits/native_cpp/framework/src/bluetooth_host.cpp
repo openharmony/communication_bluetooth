@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -738,13 +738,11 @@ std::vector<BluetoothRemoteDevice> BluetoothHost::GetPairedDevices(int transport
         HILOGE("BluetoothHost::GetPairedDevices fails: no proxy");
         return pairedDevices;
     }
-    std::vector<sptr<BluetoothRawAddress>> pairedAddr = pimpl->proxy_->GetPairedDevices(transport);
+    std::vector<BluetoothRawAddress> pairedAddr = pimpl->proxy_->GetPairedDevices(transport);
 
     for (auto it = pairedAddr.begin(); it != pairedAddr.end(); it++) {
-        if (*it != nullptr) {
-            BluetoothRemoteDevice device((*it)->GetAddress(), transport);
-            pairedDevices.emplace_back(device);
-        }
+        BluetoothRemoteDevice device((*it).GetAddress(), transport);
+        pairedDevices.emplace_back(device);
     }
     return pairedDevices;
 }

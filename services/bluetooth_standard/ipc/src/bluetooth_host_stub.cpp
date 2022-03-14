@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -774,14 +774,14 @@ ErrCode BluetoothHostStub::GetPairStateInner(MessageParcel &data, MessageParcel 
 ErrCode BluetoothHostStub::GetPairedDevicesInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
-    std::vector<sptr<BluetoothRawAddress>> result = GetPairedDevices(transport);
+    std::vector<BluetoothRawAddress> result = GetPairedDevices(transport);
     bool ret = true;
     if (!reply.WriteInt32(result.size())) {
         HILOGE("BluetoothHostStub: reply writing failed in: %{public}s.", __func__);
         ret = false;
     } else {
         for (auto device : result) {
-            reply.WriteStrongParcelable(device);
+            reply.WriteParcelable(&device);
         }
     }
     if (!ret) {

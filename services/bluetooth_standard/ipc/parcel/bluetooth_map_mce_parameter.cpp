@@ -65,20 +65,19 @@ BluetoothIProfileMapAction *BluetoothIProfileMapAction::Unmarshalling(Parcel &pa
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
 bool BluetoothIProfileMapAction::ReadFromParcel(Parcel &parcel)
 {
     bool status;
-    int tempInt;
+    int action;
 
-    status = parcel.ReadInt32(tempInt);
+    status = parcel.ReadInt32(action);
     if (!status) {
         return status;
     }
-    action_ = ::bluetooth::MapActionType(tempInt);
+    action_ = ::bluetooth::MapActionType(action);
 
     status = parcel.ReadInt32(supportedFeatures_);
     if (!status) {
@@ -118,22 +117,22 @@ bool BluetoothIProfileMasInstanceInfoList::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    ::bluetooth::IProfileMasInstanceInfo tempInfo;
+    ::bluetooth::IProfileMasInstanceInfo info;
     for (auto it = masInfoList.begin(); it != masInfoList.end(); it++) {
-        tempInfo = *it;
-        status = parcel.WriteString(tempInfo.OwnerUCI);
+        info = *it;
+        status = parcel.WriteString(info.OwnerUCI);
         if (!status)
             return status;
 
-        status = parcel.WriteString(tempInfo.MASInstanceInformation);
+        status = parcel.WriteString(info.MASInstanceInformation);
         if (!status)
             return status;
 
-        status = parcel.WriteInt32(tempInfo.supportedMsgTypes_);
+        status = parcel.WriteInt32(info.supportedMsgTypes_);
         if (!status)
             return status;
 
-        status = parcel.WriteInt32(tempInfo.instanceId);
+        status = parcel.WriteInt32(info.instanceId);
         if (!status)
             return status;
     }
@@ -152,7 +151,6 @@ BluetoothIProfileMasInstanceInfoList *BluetoothIProfileMasInstanceInfoList::Unma
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -574,7 +572,6 @@ BluetoothIProfileSendMessageParameters *BluetoothIProfileSendMessageParameters::
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -677,7 +674,6 @@ BluetoothIProfileSetOwnerStatusParameters *BluetoothIProfileSetOwnerStatusParame
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -765,14 +761,15 @@ bool BluetoothIProfileGetConversationListingParameters::WriteToParcel(Parcel &pa
     return Marshalling(parcel);
 }
 
-BluetoothIProfileGetConversationListingParameters *BluetoothIProfileGetConversationListingParameters::Unmarshalling(Parcel &parcel)
+BluetoothIProfileGetConversationListingParameters *BluetoothIProfileGetConversationListingParameters::Unmarshalling(
+    Parcel &parcel)
 {
-    BluetoothIProfileGetConversationListingParameters *obj = new BluetoothIProfileGetConversationListingParameters();
+    BluetoothIProfileGetConversationListingParameters *obj =
+        new BluetoothIProfileGetConversationListingParameters();
     if (obj != nullptr && !obj->ReadFromParcel(parcel)) {
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -853,7 +850,6 @@ BluetoothIProfileGetMessageParameters *BluetoothIProfileGetMessageParameters::Un
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -961,14 +957,14 @@ bool BluetoothIProfileGetMessagesListingParameters::WriteToParcel(Parcel &parcel
     return Marshalling(parcel);
 }
 
-BluetoothIProfileGetMessagesListingParameters *BluetoothIProfileGetMessagesListingParameters::Unmarshalling(Parcel &parcel)
+BluetoothIProfileGetMessagesListingParameters *BluetoothIProfileGetMessagesListingParameters::Unmarshalling(
+    Parcel &parcel)
 {
     BluetoothIProfileGetMessagesListingParameters *obj = new BluetoothIProfileGetMessagesListingParameters();
     if (obj != nullptr && !obj->ReadFromParcel(parcel)) {
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -1084,7 +1080,6 @@ BluetoothIProfileBMessage *BluetoothIProfileBMessage::Unmarshalling(Parcel &parc
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -1242,7 +1237,6 @@ BluetoothIProfileMessagesListing *BluetoothIProfileMessagesListing::Unmarshallin
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -1751,7 +1745,6 @@ BluetoothIProfileConversationListing *BluetoothIProfileConversationListing::Unma
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 
@@ -1933,7 +1926,6 @@ BluetoothIProfileMapEventReport *BluetoothIProfileMapEventReport::Unmarshalling(
         delete obj;
         obj = nullptr;
     }
-
     return obj;
 }
 

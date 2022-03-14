@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,11 +82,13 @@ ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel 
 ErrCode BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    BluetoothA2dpCodecInfo info = *data.ReadParcelable<BluetoothA2dpCodecInfo>();
+    std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
+    if (!info) {
+        return TRANSACTION_ERR;
+    }
     int error = data.ReadInt32();
 
-    OnConfigurationChanged(RawAddress(addr), info, error);
-
+    OnConfigurationChanged(RawAddress(addr), *info, error);
     return NO_ERROR;
 }
 }  // namespace Bluetooth

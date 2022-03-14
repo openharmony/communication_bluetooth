@@ -52,6 +52,8 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
         } 
     );           
 }
@@ -121,6 +123,8 @@ void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int r
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
         } 
     );
 }

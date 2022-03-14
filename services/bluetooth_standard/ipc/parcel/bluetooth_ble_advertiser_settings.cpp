@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,26 +57,25 @@ bool BluetoothBleAdvertiserSettings::WriteToParcel(Parcel &parcel)
 
 bool BluetoothBleAdvertiserSettings::ReadFromParcel(Parcel &parcel)
 {
-    bool noError = true;
     if (!parcel.ReadBool(connectable_)) {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadBool(legacyMode_)) {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadUint16(interval_)) {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadUint8(txPower_)) {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadInt32(primaryPhy_)) {
-        noError = false;
+        return false;
     }
     if (!parcel.ReadInt32(secondaryPhy_)) {
-        noError = false;
+        return false;
     }
-    return noError;
+    return true;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

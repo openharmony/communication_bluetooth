@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -113,8 +113,10 @@ ErrCode BluetoothAvrcpTgStub::UnregisterObserverInner(MessageParcel &data, Messa
 ErrCode BluetoothAvrcpTgStub::SetActiveDeviceInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothAvrcpTgStub::SetActiveDeviceInner starts");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
-
+    std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
     SetActiveDevice(*addr);
     return NO_ERROR;
 }
@@ -123,7 +125,10 @@ ErrCode BluetoothAvrcpTgStub::SetActiveDeviceInner(MessageParcel &data, MessageP
 ErrCode BluetoothAvrcpTgStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothAvrcpTgStub::ConnectInner starts");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
 
     int result = Connect(*addr);
     bool ret = reply.WriteInt32(result);
@@ -137,9 +142,13 @@ ErrCode BluetoothAvrcpTgStub::ConnectInner(MessageParcel &data, MessageParcel &r
 ErrCode BluetoothAvrcpTgStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothAvrcpTgStub::DisconnectInner starts");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
 
     int result = Disconnect(*addr);
+
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothAvrcpTgStub: reply writing failed in: %{public}s.", __func__);
@@ -151,13 +160,13 @@ ErrCode BluetoothAvrcpTgStub::DisconnectInner(MessageParcel &data, MessageParcel
 ErrCode BluetoothAvrcpTgStub::GetConnectedDevicesInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothAvrcpTgStub::GetConnectedDevicesInner starts");
-    std::vector<sptr<BluetoothRawAddress>> result = GetConnectedDevices();
+    std::vector<BluetoothRawAddress> result = GetConnectedDevices();
     if (!reply.WriteInt32(result.size())) {
         HILOGE("BluetoothHostStub: reply writing failed in: %{public}s.", __func__);
         return TRANSACTION_ERR;
     } else {
         for (auto device : result) {
-            reply.WriteStrongParcelable(device);
+            reply.WriteParcelable(&device);
         }
     }
     return NO_ERROR;
@@ -172,13 +181,13 @@ ErrCode BluetoothAvrcpTgStub::GetDevicesByStatesInner(MessageParcel &data, Messa
         states.push_back(state);
     }
 
-    std::vector<sptr<BluetoothRawAddress>> result = GetDevicesByStates(states);
+    std::vector<BluetoothRawAddress> result = GetDevicesByStates(states);
     if (!reply.WriteInt32(result.size())) {
         HILOGE("BluetoothHostStub: reply writing failed in: %{public}s.", __func__);
         return TRANSACTION_ERR;
     } else {
         for (auto device : result) {
-            reply.WriteStrongParcelable(device);
+            reply.WriteParcelable(&device);
         }
     }
     return NO_ERROR;
@@ -187,7 +196,10 @@ ErrCode BluetoothAvrcpTgStub::GetDevicesByStatesInner(MessageParcel &data, Messa
 ErrCode BluetoothAvrcpTgStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothAvrcpTgStub::GetDeviceStateInner starts");
-    const BluetoothRawAddress *addr = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
+    if (!addr) {
+        return TRANSACTION_ERR;
+    }
 
     int result = GetDeviceState(*addr);
     bool ret = reply.WriteInt32(result);

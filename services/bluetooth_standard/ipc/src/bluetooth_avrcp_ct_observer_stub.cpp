@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -516,8 +516,11 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetMediaPlayersInner(MessageParcel &data
     std::vector<BluetoothAvrcpMpItem> items {};
     int32_t itemsSize = data.ReadInt32();
     for (int i = 0; i < itemsSize; i++) {
-        BluetoothAvrcpMpItem item = *(data.ReadParcelable<BluetoothAvrcpMpItem>());
-        items.push_back(item);
+        std::shared_ptr<BluetoothAvrcpMpItem> item(data.ReadParcelable<BluetoothAvrcpMpItem>());
+        if (!item) {
+            return TRANSACTION_ERR;
+        }
+        items.push_back(*item);
     }
     int result = data.ReadInt32();
     int detail = data.ReadInt32();
@@ -533,8 +536,11 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetFolderItemsInner(MessageParcel &data,
     std::vector<BluetoothAvrcpMeItem> items {};
     int32_t itemsSize = data.ReadInt32();
     for (int i = 0; i < itemsSize; i++) {
-        BluetoothAvrcpMeItem item = *(data.ReadParcelable<BluetoothAvrcpMeItem>());
-        items.push_back(item);
+        std::shared_ptr<BluetoothAvrcpMeItem> item(data.ReadParcelable<BluetoothAvrcpMeItem>());
+        if (!item) {
+            return TRANSACTION_ERR;
+        }
+        items.push_back(*item);
     }
     int result = data.ReadInt32();
     int detail = data.ReadInt32();

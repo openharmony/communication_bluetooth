@@ -19,49 +19,37 @@ namespace OHOS {
 namespace Bluetooth {
 bool BluetoothAvrcpMeItem::Marshalling(Parcel &parcel) const
 {
-    bool status = parcel.WriteUint8(itemType_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteUint8(itemType_)) {
+        return false;
     }
-    status = parcel.WriteUint64(uid_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteUint64(uid_)) {
+        return false;
     }
-    status = parcel.WriteUint8(type_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteUint8(type_)) {
+        return false;
     }
-    status = parcel.WriteUint8(playable_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteUint8(playable_)) {
+        return false;
     }
-    status = parcel.WriteString(name_);
-    if (!status) {
-        return status;
+    if (!parcel.WriteString(name_)) {
+        return false;
     }
-
-    status = parcel.WriteInt32(attributes_.size());
-    if (!status) {
+    if (!parcel.WriteUint32(attributes_.size())) {
         return false;
     }
     for (auto &attribute : attributes_) {
-        status = parcel.WriteUint32(attribute);
-        if (!status) {
+        if (!parcel.WriteUint32(attribute)) {
             return false;
         }
     }
-
-    status = parcel.WriteInt32(values_.size());
-    if (!status) {
+    if (!parcel.WriteUint32(values_.size())) {
         return false;
     }
     for (auto &value : values_) {
-       status = parcel.WriteString(value);
-        if (!status) {
-            return status;
+        if (!parcel.WriteString(value)) {
+            return false;
         }
     }
-
     return true;
 }
 
@@ -72,78 +60,52 @@ bool BluetoothAvrcpMeItem::WriteToParcel(Parcel &parcel)
 
 BluetoothAvrcpMeItem *BluetoothAvrcpMeItem::Unmarshalling(Parcel &parcel)
 {
-    BluetoothAvrcpMeItem *avrcpData = new BluetoothAvrcpMeItem();
+    BluetoothAvrcpMeItem* avrcpData = new BluetoothAvrcpMeItem();
     if (avrcpData != nullptr && !avrcpData->ReadFromParcel(parcel)) {
         delete avrcpData;
         avrcpData = nullptr;
     }
-
     return avrcpData;
 }
 
 bool BluetoothAvrcpMeItem::ReadFromParcel(Parcel &parcel)
 {
-    uint8_t value = 0;
-    bool status = parcel.ReadUint8(value);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint8(itemType_)) {
+        return false;
     }
-    itemType_ = value;
-
-    uint64_t uid = 0;
-    status = parcel.ReadUint64(uid);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint64(uid_)) {
+        return false;
     }
-    uid_ = uid;
-
-    value = 0;
-    status = parcel.ReadUint8(value);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint8(type_)) {
+        return false;
     }
-    type_ = value;
-
-    value = 0;
-    status = parcel.ReadUint8(value);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint8(playable_)) {
+        return false;
     }
-    playable_ = value;
-
-    status = parcel.ReadString(name_);
-    if (!status) {
-        return status;
+    if (!parcel.ReadString(name_)) {
+        return false;
     }
-
-    int featureSize = 0;
-    int32_t myFeature;
-    status = parcel.ReadInt32(featureSize);
-    if (!status) {
-        return status;
+    uint32_t size = 0;
+    if (!parcel.ReadUint32(size)) {
+        return false;
     }
-    for (int i = 0; i < featureSize; ++i) {
-        status = parcel.ReadInt32(myFeature);
-        if (!status) {
-            return status;
+    for (size_t i = 0; i < size; i++) {
+        uint32_t attribute = 0;
+        if (!parcel.ReadUint32(attribute)) {
+            return false;
         }
-        attributes_.push_back(myFeature);
+        attributes_.push_back(attribute);
     }
-
-    int valueSize = 0;
-    std::string myValue;
-    status = parcel.ReadInt32(valueSize);
-    if (!status) {
-        return status;
+    if (!parcel.ReadUint32(size)) {
+        return false;
     }
-    for (int i = 0; i < valueSize; ++i) {
-        status = parcel.ReadString(myValue);
-        if (!status) {
-            return status;
+    for (size_t i = 0; i < size; i++) {
+        std::string value;
+        if (!parcel.ReadString(value)) {
+            return false;
         }
-        values_.push_back(myValue);
+        values_.push_back(value);
     }
-
     return true;
 }
 

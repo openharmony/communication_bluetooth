@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -117,9 +117,11 @@ ErrCode BluetoothMapMceStub::DeregisterObserverInner(MessageParcel &data, Messag
 ErrCode BluetoothMapMceStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::ConnectInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = Connect(*device);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -131,9 +133,11 @@ ErrCode BluetoothMapMceStub::ConnectInner(MessageParcel &data, MessageParcel &re
 ErrCode BluetoothMapMceStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::DisconnectInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = Disconnect(*device);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -145,9 +149,11 @@ ErrCode BluetoothMapMceStub::DisconnectInner(MessageParcel &data, MessageParcel 
 ErrCode BluetoothMapMceStub::IsConnectedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::IsConnectedInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = IsConnected(*device);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -198,9 +204,11 @@ ErrCode BluetoothMapMceStub::GetDevicesByStatesInner(MessageParcel &data, Messag
 ErrCode BluetoothMapMceStub::GetConnectionStateInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetConnectionStateInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetConnectionState(*device);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -212,10 +220,12 @@ ErrCode BluetoothMapMceStub::GetConnectionStateInner(MessageParcel &data, Messag
 ErrCode BluetoothMapMceStub::SetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::SetConnectionStrategyInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t strategy = data.ReadInt32();
     int result = SetConnectionStrategy(*device, strategy);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -227,9 +237,11 @@ ErrCode BluetoothMapMceStub::SetConnectionStrategyInner(MessageParcel &data, Mes
 ErrCode BluetoothMapMceStub::GetConnectionStrategyInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetConnectionStrategyInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetConnectionStrategy(*device);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -241,11 +253,13 @@ ErrCode BluetoothMapMceStub::GetConnectionStrategyInner(MessageParcel &data, Mes
 ErrCode BluetoothMapMceStub::GetUnreadMessagesInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetUnreadMessagesInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t msgType = data.ReadInt32();
     int32_t max = data.ReadInt32();
     int result = GetUnreadMessages(*device, msgType, max);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -257,9 +271,11 @@ ErrCode BluetoothMapMceStub::GetUnreadMessagesInner(MessageParcel &data, Message
 ErrCode BluetoothMapMceStub::GetSupportedFeaturesInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetSupportedFeaturesInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int result = GetSupportedFeatures(*device);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -271,11 +287,14 @@ ErrCode BluetoothMapMceStub::GetSupportedFeaturesInner(MessageParcel &data, Mess
 ErrCode BluetoothMapMceStub::SendMessageInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::SendMessageInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileSendMessageParameters *msg = data.ReadParcelable<BluetoothIProfileSendMessageParameters>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileSendMessageParameters> msg(
+        data.ReadParcelable<BluetoothIProfileSendMessageParameters>());
     int result = SendMessage(*device, *msg);
-    delete device;
-    delete msg;
+
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -287,10 +306,12 @@ ErrCode BluetoothMapMceStub::SendMessageInner(MessageParcel &data, MessageParcel
 ErrCode BluetoothMapMceStub::SetNotificationFilterInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::SetNotificationFilterInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t mask = data.ReadInt32();
     int result = SetNotificationFilter(*device, mask);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -302,12 +323,13 @@ ErrCode BluetoothMapMceStub::SetNotificationFilterInner(MessageParcel &data, Mes
 ErrCode BluetoothMapMceStub::GetMessagesListingInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetMessagesListingInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileGetMessagesListingParameters *msg =
-        data.ReadParcelable<BluetoothIProfileGetMessagesListingParameters>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileGetMessagesListingParameters> msg(
+        data.ReadParcelable<BluetoothIProfileGetMessagesListingParameters>());
     int result = GetMessagesListing(*device, *msg);
-    delete device;
-    delete msg;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -319,14 +341,15 @@ ErrCode BluetoothMapMceStub::GetMessagesListingInner(MessageParcel &data, Messag
 ErrCode BluetoothMapMceStub::GetMessageInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetMessagesListingInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t msgType = data.ReadInt32();
     const std::u16string msgHandle = data.ReadString16();
-    const BluetoothIProfileGetMessageParameters *msg =
-        data.ReadParcelable<BluetoothIProfileGetMessageParameters>();
+    std::shared_ptr<BluetoothIProfileGetMessageParameters> msg(
+        data.ReadParcelable<BluetoothIProfileGetMessageParameters>());
     int result = GetMessage(*device, msgType, msgHandle, *msg);
-    delete device;
-    delete msg;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -338,10 +361,12 @@ ErrCode BluetoothMapMceStub::GetMessageInner(MessageParcel &data, MessageParcel 
 ErrCode BluetoothMapMceStub::UpdateInboxInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::UpdateInboxInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t msgType = data.ReadInt32();
     int result = UpdateInbox(*device, msgType);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -353,12 +378,13 @@ ErrCode BluetoothMapMceStub::UpdateInboxInner(MessageParcel &data, MessageParcel
 ErrCode BluetoothMapMceStub::GetConversationListingInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetConversationListingInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileGetConversationListingParameters *msg =
-        data.ReadParcelable<BluetoothIProfileGetConversationListingParameters>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileGetConversationListingParameters> msg(
+        data.ReadParcelable<BluetoothIProfileGetConversationListingParameters>());
     int result = GetConversationListing(*device, *msg);
-    delete device;
-    delete msg;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -370,14 +396,16 @@ ErrCode BluetoothMapMceStub::GetConversationListingInner(MessageParcel &data, Me
 ErrCode BluetoothMapMceStub::SetMessageStatusInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::SetMessageStatusInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     int32_t msgType = data.ReadInt32();
     const std::u16string msgHandle = data.ReadString16();
     int32_t statusIndicator = data.ReadInt32();
     int32_t statusValue = data.ReadInt32();
     const std::string extendedData = data.ReadString();
     int result = SetMessageStatus(*device, msgType, msgHandle, statusIndicator, statusValue, extendedData);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -389,12 +417,13 @@ ErrCode BluetoothMapMceStub::SetMessageStatusInner(MessageParcel &data, MessageP
 ErrCode BluetoothMapMceStub::SetOwnerStatusInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::SetOwnerStatusInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    const BluetoothIProfileSetOwnerStatusParameters *msg =
-        data.ReadParcelable<BluetoothIProfileSetOwnerStatusParameters>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    std::shared_ptr<BluetoothIProfileSetOwnerStatusParameters> msg (
+        data.ReadParcelable<BluetoothIProfileSetOwnerStatusParameters>());
     int result = SetOwnerStatus(*device, *msg);
-    delete device;
-    delete msg;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -406,10 +435,12 @@ ErrCode BluetoothMapMceStub::SetOwnerStatusInner(MessageParcel &data, MessagePar
 ErrCode BluetoothMapMceStub::GetOwnerStatusInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::SetOwnerStatusInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     const std::string conversationId = data.ReadString();
     int result = GetOwnerStatus(*device, conversationId);
-    delete device;
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
@@ -421,10 +452,12 @@ ErrCode BluetoothMapMceStub::GetOwnerStatusInner(MessageParcel &data, MessagePar
 ErrCode BluetoothMapMceStub::GetMasInstanceInfoInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothMapMceStub::GetMasInstanceInfoInner Triggered!");
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
     BluetoothIProfileMasInstanceInfoList result;
     GetMasInstanceInfo(*device, result);
-    delete device;
     bool ret = reply.WriteParcelable(&result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);
