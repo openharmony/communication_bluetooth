@@ -114,8 +114,6 @@ void ConvertDescriptorReadReqToJS(
 void ConvertDescriptorWriteReqToJS(
     napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
-void ConvertBLEConnectStateChangeToJS(napi_env env, napi_value result, int connectState, int ret);
-void ConvertBLEConnectStateChangeToJS(napi_env env, napi_value result, const BluetoothRemoteDevice &device, int state);
 
 void GetServiceVectorFromJS(napi_env env, napi_value object, std::vector<GattService> &services,
     std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
