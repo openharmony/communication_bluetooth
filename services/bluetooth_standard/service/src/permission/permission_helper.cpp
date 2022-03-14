@@ -25,7 +25,16 @@ using namespace Security::AccessToken;
 int PermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
 {
     auto callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    int result;
+
+    if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_NATIVE) {
+        result = Security::AccessToken::AccessTokenKit::VerifyNativeToken(callerToken, permissionName);
+    } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_HAP) {
+        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    } else {
+        LOG_INFO("callerToken=0x%{public}x is invalid token", pid);
+        return PERMISSION_DENIED;
+    }
     if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
         return PERMISSION_GRANTED;
     } else {
