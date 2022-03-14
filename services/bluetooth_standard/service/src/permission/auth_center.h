@@ -22,7 +22,7 @@ public:
 
     /**
      * @Description Verify where the app has the permission to use bluetooth
-     * 
+     *
      * @param pid the app's process id.
      * @param uid the app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
@@ -31,7 +31,7 @@ public:
 
     /**
      * @Description Verify where the app has the permission to discover bluetooth
-     * 
+     *
      * @param pid the app's process id.
      * @param uid the app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
@@ -40,7 +40,7 @@ public:
 
     /**
      * @Description Verify where the app has the permission to manager bluetooth
-     * 
+     *
      * @param pid the app's process id.
      * @param uid the app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "auth_center.h"
-#include <stdbool.h>
+#include "stdbool.h"
 #include "accesstoken_kit.h"
 #include "permission_helper.h"
 
