@@ -29,9 +29,10 @@ public:
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
      */
     static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid);
+
     /**
      * @Description Verify where the app has the permission to use bluetooth
-     * 
+     *
      * @param pid The app's process id.
      * @param uid The app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
@@ -40,7 +41,7 @@ public:
 
     /**
      * @Description Verify where the app has the permission to discover bluetooth
-     * 
+     *
      * @param pid The app's process id.
      * @param uid The app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
@@ -49,7 +50,7 @@ public:
 
     /**
      * @Description Verify where the app has the permission to manager bluetooth
-     * 
+     *
      * @param pid The app's process id.
      * @param uid The app id.
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
