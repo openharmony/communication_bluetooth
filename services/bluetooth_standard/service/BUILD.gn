@@ -356,8 +356,6 @@ ohos_shared_library("btservice") {
     "//utils/native/base:utilsecurec_shared",
   ]
 
-  defines = [ "PERMISSION_ALWAYS_GRANT" ]
-
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
