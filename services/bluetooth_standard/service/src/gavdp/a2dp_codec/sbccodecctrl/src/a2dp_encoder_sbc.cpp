@@ -529,48 +529,66 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
 void A2dpSbcEncoder::EnqueuePacket(
     Packet *pkt, size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const
 {
-    LOG_INFO("[EnqueuePacket][frameSize:%hu][FrameNum:%zu], mtu[%hu]", frameSize, frames, a2dpSbcEncoderCb_.mtuSize);
-
-    LOG_INFO("[EnqueuePacket] totalSize[%u]", PacketSize(pkt));
-    uint16_t blocksXsubbands
-        = a2dpSbcEncoderCb_.sbcEncoderParams.subBands * a2dpSbcEncoderCb_.sbcEncoderParams.numOfBlocks;
-
+    LOG_INFO("[EnqueuePacket][frameSize:%hu][FrameNum:%zu], mtu[%hu], totalSize[%u]",
+        frameSize, frames, a2dpSbcEncoderCb_.mtuSize, PacketSize(pkt));
     if (PacketSize(pkt) < static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize)) {
         Buffer *header = PacketHead(pkt);
         uint8_t *p = static_cast<uint8_t*>(BufferPtr(header));
         *p = frames;
         observer_->EnqueuePacket(pkt, frames, bytes, timeStamp);  // Enqueue Packet.
     } else {
-        int8_t count = 1;
-        uint32_t pktLen = 0;
-        uint8_t frameNum = 0;
-        if ((static_cast<uint16_t>(frames) / FRAGMENT_SIZE_TWO  + 1) * frameSize  < (a2dpSbcEncoderCb_.mtuSize)) {
-            count = FRAGMENT_SIZE_TWO;
-            pktLen = (frames / count) * frameSize;
-        } else {
-            count = FRAGMENT_SIZE_THREE;
-            pktLen = (frames / count) * frameSize;
-            if (pktLen > static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize) ||
-                (frames - frames / count * FRAGMENT_SIZE_TWO) * frameSize  >
-                static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize)) {
-                LOG_ERROR("mtu size isn't enough.[frameSize:%u] mtu[%u]", pktLen, a2dpSbcEncoderCb_.mtuSize);
-            }
+        EnqueuePacketFragment(pkt, frames, bytes, timeStamp, frameSize);
+    }
+}
+
+void A2dpSbcEncoder::EnqueuePacketFragment(
+    Packet *pkt, size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const
+{
+    int8_t count = 1;
+    uint32_t pktLen = 0;
+    uint8_t frameNum = 0;
+    uint16_t blocksXsubbands
+        = a2dpSbcEncoderCb_.sbcEncoderParams.subBands * a2dpSbcEncoderCb_.sbcEncoderParams.numOfBlocks;
+    bool frameFragmented = false;
+    if ((static_cast<uint16_t>(frames) / FRAGMENT_SIZE_TWO  + 1) * frameSize  < (a2dpSbcEncoderCb_.mtuSize)) {
+        count = FRAGMENT_SIZE_TWO;
+        pktLen = (frames / count) * frameSize;
+    } else {
+        count = FRAGMENT_SIZE_THREE;
+        pktLen = (frames / count) * frameSize;
+        if (pktLen > static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize) ||
+            (frames - frames / count * FRAGMENT_SIZE_TWO) * frameSize  >
+            static_cast<uint32_t>(a2dpSbcEncoderCb_.mtuSize)) {
+            frameFragmented = true;
+            LOG_ERROR("mtu size isn't enough.[frameSize:%u] mtu[%u]", pktLen, a2dpSbcEncoderCb_.mtuSize);
         }
-        frameNum = frames / count;
-        LOG_INFO("[EnqueuePacket][FragmentNum:%u][FrameNum:%u]", count, frameNum);
+    }
+    frameNum = frames / count;
+    if (!frameFragmented) {
+        size_t remainFrames = frames;
+        uint16_t offset = 0;
         do {
-            Packet *mediaPacket = PacketMalloc(0, 0, 0);
+            Packet *mediaPacket = PacketMalloc(A2DP_SBC_FRAGMENT_HEADER, 0, 0);
             if (count == 1) {
-                frameNum = frames;
+                frameNum = remainFrames;
                 pktLen = frameNum * frameSize;
             }
             count--;
             LOG_INFO("[EnqueuePacket] [pktLen:%u] [sFrameNum:%u] [remain:%u]", pktLen, frameNum, PacketSize(pkt));
-            PacketFragment(pkt, mediaPacket, pktLen);
-            frames = frames - frameNum;
-            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp-frames * blocksXsubbands);
+            Buffer *header = PacketHead(mediaPacket);
+            uint8_t *p = static_cast<uint8_t*>(BufferPtr(header));
+            *p = frameNum;
+            uint8_t bufferFra[1024];
+            size_t encoded = pktLen;
+            PacketPayloadRead(pkt, bufferFra, offset, pktLen);
+            offset += pktLen;
+            Buffer *encBuf = BufferMalloc(encoded);
+            (void)memcpy_s(BufferPtr(encBuf), encoded, bufferFra, encoded);
+            PacketPayloadAddLast(mediaPacket, encBuf);
+            BufferFree(encBuf);
+            remainFrames = remainFrames - frameNum;
+            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp - remainFrames * blocksXsubbands);
             PacketFree(mediaPacket);
-            LOG_INFO("[EnqueuePacket][sendNum:%u][remainFrameNum:%zu], [DataLen:%u]", frameNum, frames, pktLen);
         } while (count > 0);
     }
 }

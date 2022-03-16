@@ -151,6 +151,8 @@ private:
     void ConvertBitpoolParamToSBCParam(void);
     void EnqueuePacket(Packet *pkt,
         size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const;
+    void EnqueuePacketFragment(Packet *pkt,
+        size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const;
     A2dpSbcEncoderCb a2dpSbcEncoderCb_ {};
     bool isFirstTimeToReadData_ = false;
     DISALLOW_COPY_AND_ASSIGN(A2dpSbcEncoder);
