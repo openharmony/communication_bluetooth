@@ -261,6 +261,12 @@ ServiceUtilSrc = [
   "src/util/xml_parse.cpp",
 ]
 
+ServicePermissionSrc = [
+  "src/permission/auth_center.cpp",
+  "src/permission/permission_helper.cpp",
+  "src/permission/permission_utils.cpp",
+]
+
 config("btservice_public_config") {
   include_dirs = [
     "include",
@@ -275,6 +281,7 @@ config("btservice_config") {
     "$BT_SERVICE_DIR/src",
     "$BT_SERVICE_DIR/src/base",
     "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/permission",
     "$BT_SERVICE_DIR/src/util",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/aaccodecctrl_l2/include",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbccodecctrl/include",
@@ -330,6 +337,7 @@ ohos_shared_library("btservice") {
   sources += ServiceSockSrc
   sources += ServiceTransportSrc
   sources += ServiceDISrc
+  sources += ServicePermissionSrc
 
   deps = [
     "$PART_DIR/external:btdummy",
@@ -339,7 +347,11 @@ ohos_shared_library("btservice") {
     "//utils/native/base:utilsecurec_shared",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 
   subsystem_name = "communication"
   part_name = "bluetooth_standard"
