@@ -43,22 +43,11 @@ ohos_unittest("btfw_gatt_spp_unit_test") {
   module_out_path = module_output_path
 
   sources = [
-    "a2dp/a2dp_snk_test.cpp",
-    "a2dp/a2dp_src_test.cpp",
-    "avrcp/avrcp_ct_test.cpp",
-    "avrcp/avrcp_tg_test.cpp",
     "gatt/gatt_client_test.cpp",
     "gatt/gatt_descriptor_test.cpp",
     "gatt/gatt_manager_test.cpp",
     "gatt/gatt_server_test.cpp",
     "gatt/gatt_service_test.cpp",
-    "hfp/hf_call_test.cpp",
-    "hfp/hfp_ag_test.cpp",
-    "hfp/hfp_hf_test.cpp",
-    "map/map_mce_test.cpp",
-    "map/map_mse_test.cpp",
-    "pbap/pbap_client_test.cpp",
-    "pbap/pbap_server_test.cpp",
     "spp/spp_test.cpp",
   ]
 
