@@ -219,13 +219,13 @@ bool HidHost::Disconnect(const BluetoothRemoteDevice &device)
 
 void HidHost::RegisterObserver(HidHostObserver *observer)
 {
-    std::shared_ptr<HidHostObserver> observerPtr(observer);
+    std::shared_ptr<HidHostObserver> observerPtr(observer, [](HidHostObserver *) {});
     return pimpl->RegisterObserver(observerPtr);
 }
 
 void HidHost::DeregisterObserver(HidHostObserver *observer)
 {
-    std::shared_ptr<HidHostObserver> observerPtr(observer);
+    std::shared_ptr<HidHostObserver> observerPtr(observer, [](HidHostObserver *) {});
     return pimpl->DeregisterObserver(observerPtr);
 }
 }  // namespace Bluetooth
