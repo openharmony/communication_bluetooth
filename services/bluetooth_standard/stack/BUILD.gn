@@ -186,6 +186,7 @@ config("btstack_public_config") {
   include_dirs = [
     "include",
     "//third_party/openssl/include",
+    "//third_party/bounds_checking_function/include",
   ]
 }
 
@@ -217,8 +218,8 @@ ohos_shared_library("btstack") {
   deps = [
     "$PART_DIR/external:btdummy",
     "$PART_DIR/hardware:bluetooth_hdi_adapter",
+    "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/openssl:libcrypto_static",
-    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
