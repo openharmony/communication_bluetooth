@@ -27,6 +27,7 @@ config("module_private_config") {
   include_dirs = [
     "mock/include",
     "//third_party/json/include",
+    "//third_party/bounds_checking_function/include",
     "//utils/system/safwk/native/include",
     "//foundation/communication/bluetooth/services/bluetooth_standard/service/src/common",
     "//foundation/communication/bluetooth/services/bluetooth_standard/service/src/",
@@ -48,10 +49,10 @@ ohos_moduletest("btsvr_module_test") {
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//foundation/communication/bluetooth/services/bluetooth_standard/server:bluetooth_server",
     "//foundation/communication/bluetooth/services/bluetooth_standard/service:btservice",
+    "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [

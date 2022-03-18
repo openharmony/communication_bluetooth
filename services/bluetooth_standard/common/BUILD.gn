@@ -15,7 +15,10 @@ import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 
 config("btcommon_public_config") {
-  include_dirs = [ "." ]
+  include_dirs = [
+    ".",
+    "//third_party/bounds_checking_function/include",
+  ]
 }
 
 ohos_static_library("btcommon") {
@@ -34,7 +37,7 @@ ohos_static_library("btcommon") {
   cflags_cc = [ "-fvisibility=hidden" ]
 
   deps = [
+    "//third_party/bounds_checking_function:libsec_shared",
     "//utils/native/base:utils",
-    "//utils/native/base:utilsecurec_shared",
   ]
 }

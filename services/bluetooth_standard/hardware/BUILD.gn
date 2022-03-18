@@ -22,6 +22,7 @@ ohos_shared_library("bluetooth_hdi_adapter") {
     "$bt_hdi_path",
     "$bt_hdi_path/ohos/hardware/bt/v1_0",
     "$bt_hdi_path/ohos/hardware/bt/v1_0/client",
+    "//third_party/bounds_checking_function/include",
   ]
 
   cflags = [ "-fPIC" ]
@@ -37,8 +38,8 @@ ohos_shared_library("bluetooth_hdi_adapter") {
     "$hdf_uhdf_path/host:libhdf_host",
     "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
     "$hdf_uhdf_path/utils:libhdf_utils",
+    "//third_party/bounds_checking_function:libsec_shared",
     "//utils/native/base:utils",
-    "//utils/native/base:utilsecurec_shared",
   ]
 
   if (is_standard_system) {

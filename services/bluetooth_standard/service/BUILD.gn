@@ -281,6 +281,7 @@ config("btservice_public_config") {
     "$PART_DIR/ipc/common",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework/include",
+    "//third_party/bounds_checking_function/include",
   ]
 }
 
@@ -352,8 +353,8 @@ ohos_shared_library("btservice") {
     "$PART_DIR/external:btdummy",
     "$PART_DIR/stack:btstack",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
+    "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/libxml2:xml2",
-    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [
@@ -376,7 +377,7 @@ ohos_shared_library("btsbc") {
 
   deps = [
     "$PART_DIR/external:btdummy",
-    "//utils/native/base:utilsecurec_shared",
+    "//third_party/bounds_checking_function:libsec_shared",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
