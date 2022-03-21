@@ -974,7 +974,10 @@ static void SMP_RecvSignInfoProcessSlave(const Buffer *buffer)
         return;
     }
 
-    (void)memcpy_s(SMP_GetPairMng()->peer.CSRK, SMP_CSRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_CSRK_LEN);
+    if (memcpy_s(SMP_GetPairMng()->peer.CSRK, SMP_CSRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_CSRK_LEN) != EOK) {
+        LOG_ERROR("%{public}s, memcpy_s fail", __FUNCTION__);
+        return;
+    }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_SIGN_INFO);
     if (SMP_GetPairMng()->peer.keyDistCmdFlag == 0x00) {

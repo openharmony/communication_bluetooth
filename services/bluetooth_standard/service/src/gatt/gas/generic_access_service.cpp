@@ -252,7 +252,10 @@ std::unique_ptr<uint8_t[]> GenericAccessService::GetAppearance() const
     AdapterDeviceConfig::GetInstance()->GetValue(SECTION_HOST, PROPERTY_BLE_APPEARANCE, appearance);
 
     std::unique_ptr<uint8_t[]> result = std::make_unique<uint8_t[]>(APPEARANCE_DATE_LENGTH);
-    memcpy_s(result.get(), APPEARANCE_DATE_LENGTH, &appearance, APPEARANCE_DATE_LENGTH);
+    if (memcpy_s(result.get(), APPEARANCE_DATE_LENGTH, &appearance, APPEARANCE_DATE_LENGTH) != EOK) {
+        LOG_DEBUG("%{public}s:%{public}d:%{public}s : memcpy_s fail", __FILE__, __LINE__, __FUNCTION__);
+        return NULL;
+    }
 
     return result;
 }

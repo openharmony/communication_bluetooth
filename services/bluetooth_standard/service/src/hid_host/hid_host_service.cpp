@@ -194,7 +194,10 @@ int HidHostService::HidHostSetReport(std::string device, uint8_t type, uint16_t 
     HidHostMessage event(HID_HOST_API_WRITE_DEV_EVT);
     Packet *pkt = PacketMalloc(0, 0, 0);
     Buffer *buf = BufferMalloc(size);
-    (void)memcpy_s((uint8_t *)BufferPtr(buf), size, report, size);
+    if (memcpy_s((uint8_t *)BufferPtr(buf), size, report, size) != EOK) {
+        LOG_DEBUG("[HIDH Service]%{public}s(): memcpy_s fail", __FUNCTION__);
+        return HID_HOST_FAILURE;
+    }
     PacketPayloadAddLast(pkt, buf);
     BufferFree(buf);
     event.dev_ = device;
