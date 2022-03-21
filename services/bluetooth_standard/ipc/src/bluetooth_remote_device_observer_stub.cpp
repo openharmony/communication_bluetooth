@@ -18,6 +18,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+constexpr int32_t UUID_SIZE_MAX = 1024;
 const std::map<uint32_t, std::function<ErrCode(BluetoothRemoteDeviceObserverstub *, MessageParcel &, MessageParcel &)>>
     BluetoothRemoteDeviceObserverstub::memberFuncMap_ = {
         {IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS,
@@ -89,6 +90,10 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner(MessageP
         return TRANSACTION_ERR;
     }
     int32_t uuidSize = data.ReadInt32();
+    if (uuidSize > UUID_SIZE_MAX || uuidSize < 0) {
+        HILOGE("%{public}s, uuidSize = %{public}d exceeds the maximum 512.", __func__, uuidSize);
+        return TRANSACTION_ERR;
+    }
     std::vector<bluetooth::Uuid> uuids;
     for (int i = 0; i < uuidSize; ++i) {
         bluetooth::Uuid uuid = ParcelBtUuid::ReadFromParcel(data);
