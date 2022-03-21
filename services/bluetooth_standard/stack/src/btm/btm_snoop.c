@@ -151,7 +151,7 @@ static void BtmOnHciTransmission(uint8_t type, const uint8_t *data, uint16_t len
     BtmSnoopOutput(type, data, length);
 }
 
-static void BtmWriteSnoopFileHeader()
+static void BtmWriteSnoopFileHeader(void)
 {
     BtmSnoopFileHeader header = {
         .identificationPattern = SNOOP_INDENTIFICATION_PATTERN,
@@ -179,7 +179,7 @@ static bool BtmIsFileExists(const char *path)
     return exists;
 }
 
-static void BtmPrepareSnoopFile()
+static void BtmPrepareSnoopFile(void)
 {
     if (g_hciLogOuput) {
         bool exists = BtmIsFileExists(HCI_LOG_PATH);
@@ -201,13 +201,16 @@ static void BtmPrepareSnoopFile()
         if (exists) {
             const int length = strlen(g_outputPath) + strlen(SNOOP_LAST_FILE_TAIL) + 1;
             char *bakPath = MEM_CALLOC.alloc(length);
-            if (bakPath != NULL) {
-                (void)strcpy_s(bakPath, length, g_outputPath);
-                (void)strcat_s(bakPath, length, SNOOP_LAST_FILE_TAIL);
-                rename(g_outputPath, bakPath);
-
-                MEM_CALLOC.free(bakPath);
+            if (bakPath == NULL) {
+                return;
             }
+            if (strcpy_s(bakPath, length, g_outputPath) != EOK) {
+                return;
+            }
+            (void)strcat_s(bakPath, length, SNOOP_LAST_FILE_TAIL);
+            rename(g_outputPath, bakPath);
+
+            MEM_CALLOC.free(bakPath);
         }
 
         g_outputFile = fopen(g_outputPath, "w");
@@ -219,7 +222,7 @@ static void BtmPrepareSnoopFile()
     }
 }
 
-static void BtmCloseSnoopFile()
+static void BtmCloseSnoopFile(void)
 {
     if (g_outputFile != NULL) {
         fclose(g_outputFile);
@@ -250,7 +253,7 @@ int BTM_EnableSnoopFileOutput(bool filter)
     return BT_NO_ERROR;
 }
 
-int BTM_DisableSnoopFileOutput()
+int BTM_DisableSnoopFileOutput(void)
 {
     if (g_output) {
         BtmDisableSnoopFilter();
@@ -259,7 +262,7 @@ int BTM_DisableSnoopFileOutput()
     return BT_NO_ERROR;
 }
 
-void BtmStartSnoopOutput()
+void BtmStartSnoopOutput(void)
 {
     if (g_hciLogOuput || (g_output && g_outputPath != NULL)) {
         BtmPrepareSnoopFile();
@@ -269,20 +272,20 @@ void BtmStartSnoopOutput()
     }
 }
 
-void BtmStopSnoopOutput()
+void BtmStopSnoopOutput(void)
 {
     HCI_DisableTransmissionCapture();
 
     BtmCloseSnoopFile();
 }
 
-void BtmInitSnoop()
+void BtmInitSnoop(void)
 {
     g_outputMutex = MutexCreate();
     BtmInitSnoopFilter();
 }
 
-void BtmCloseSnoop()
+void BtmCloseSnoop(void)
 {
     g_output = false;
     g_hciLogOuput = false;
@@ -311,7 +314,7 @@ int BTM_EnableHciLogOutput(bool filter)
     return BT_NO_ERROR;
 }
 
-int BTM_DisableHciLogOutput()
+int BTM_DisableHciLogOutput(void)
 {
     if (g_hciLogOuput) {
         BtmDisableSnoopFilter();

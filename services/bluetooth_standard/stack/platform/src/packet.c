@@ -268,7 +268,10 @@ static uint32_t PacketCopyToBuffer(Payload *start, const Payload *end, uint8_t *
     uint32_t retSize;
     uint32_t remain = BufferGetSize(start->buf) - offset;
     if (remain >= size) {
-        (void)memcpy_s(buffer, size, (uint8_t *)BufferPtr(start->buf) + offset, size);
+        if (memcpy_s(buffer, size, (uint8_t *)BufferPtr(start->buf) + offset, size) != EOK) {
+            LOG_ERROR("PacketCopyToBuffer, memcpy_s fail");
+            return 0;
+        }
         return size;
     } else {
         retSize = remain;
@@ -299,7 +302,10 @@ static uint32_t PacketCopyFromBuffer(
     uint32_t retSize;
     uint32_t remain = BufferGetSize(start->buf) - offset;
     if (remain >= size) {
-        (void)memcpy_s((uint8_t *)BufferPtr(start->buf) + offset, size, buffer, size);
+        if (memcpy_s((uint8_t *)BufferPtr(start->buf) + offset, size, buffer, size) != EOK) {
+            LOG_ERROR("PacketCopyFromBuffer, memcpy_s fail");
+            return 0;
+        }
         return size;
     } else {
         retSize = remain;

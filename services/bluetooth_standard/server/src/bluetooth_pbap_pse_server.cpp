@@ -198,8 +198,7 @@ void BluetoothPbapPseServer::GrantPermission(const BluetoothRawAddress& device, 
 int BluetoothPbapPseServer::SetDevicePassword(const BluetoothRawAddress& device, const std::string &password,
     const std::string &userId)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter! password: %{public}s userId: %{public}s", __FILE__, __FUNCTION__,
-        password.c_str(), userId.c_str());
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (pimpl->pbapPseService_) {
         std::string pwdTmp = password;
         std::string usrIdTmp = userId;
