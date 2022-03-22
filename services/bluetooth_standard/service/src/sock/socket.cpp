@@ -557,6 +557,8 @@ void Socket::ProcessDisconnection(Socket &socket, DataTransport *transport)
         }
     } else {
         socket.state_ = DISCONNECTED;
+        socketGapClient_->UnregisterSecurity(remoteAddr_, scn_, serviceId_);
+        FreeServiceId(serviceId_);
         SocketThread::GetInstance().DeleteSocket(*this);
         socket.CloseSocketFd();
         std::lock_guard<std::recursive_mutex> lk(Socket::g_socketMutex);
@@ -583,6 +585,8 @@ void Socket::CloseSocket(bool isDisable)
     if (isServer_ && (!isNewSocket_)) {
         RFCOMM_FreeServerNum(scn_);
         sdpServer_->UnregisterSdpService();
+        socketGapServer_->UnregisterSecurity(remoteAddr_, scn_, serviceId_);
+        FreeServiceId(serviceId_);
         if (isDisable) {
             sockTransport_->RemoveServer(true);
         } else {

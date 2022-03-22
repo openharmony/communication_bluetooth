@@ -56,7 +56,7 @@ public:
     }
     ~NapiGattServer() = default;
 
-    static napi_value constructor_;
+    static thread_local napi_ref consRef_;
 
 private:
     std::shared_ptr<GattServer> server_ = nullptr;

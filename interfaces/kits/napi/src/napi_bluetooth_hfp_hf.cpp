@@ -21,6 +21,7 @@ namespace Bluetooth {
 using namespace std;
 
 NapiHandsFreeUnitObserver NapiHandsFreeUnit::observer_;
+bool NapiHandsFreeUnit::isRegistered_ = false;
 
 void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
 {
@@ -45,8 +46,6 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_HANDS_FREE_UNIT, napiProfile);
-    HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
-    profile->RegisterObserver(&observer_);
     HILOGI("DefineHandsFreeUnitJSClass finished");
 }
 
@@ -92,6 +91,12 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
     observer_.callbackInfos_[type] = callbackInfo;
 
     HILOGI("%{public}s is registered", type.c_str());
+
+    if (!isRegistered_) {
+        HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
+        profile->RegisterObserver(&observer_);
+        isRegistered_ = true;
+    }
 
     return ret;
 }
@@ -168,7 +173,7 @@ napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info in
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, GetProfileConnectionState(state), &result);
     return result;
 }
 
@@ -199,7 +204,7 @@ napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetScoState(device);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, GetScoConnectionState(state), &result);
     return result;
 }
 
