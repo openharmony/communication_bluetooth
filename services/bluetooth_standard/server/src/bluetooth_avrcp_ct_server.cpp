@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// #include <list>
 #include <mutex>
 #include "bluetooth_avrcp_ct_server.h"
 #include "bluetooth_log.h"

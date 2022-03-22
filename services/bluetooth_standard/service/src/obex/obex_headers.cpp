@@ -215,7 +215,10 @@ void ObexHeader::ParseUnicodeText(const uint8_t &headerId, const uint8_t *buf, u
     pos += UINT16_LENGTH;
     if (bytesLen > 0) {
         auto tmpBuf = std::make_unique<uint8_t[]>(bytesLen);
-        (void)memcpy_s(tmpBuf.get(), bytesLen, &buf[pos], bytesLen);
+        if (memcpy_s(tmpBuf.get(), bytesLen, &buf[pos], bytesLen) != EOK) {
+            OBEX_LOG_ERROR("ParseUnicodeText, memcpy_s fail");
+            return;
+        }
         if (!ObexUtils::SysIsBigEndian()) {
             ObexUtils::DataReverse(tmpBuf.get(), bytesLen, UINT16_LENGTH);
         }

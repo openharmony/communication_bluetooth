@@ -126,9 +126,14 @@ static void HciCopySupportedVendorSpecificCodecs(
 {
     int offset = 0;
     for (int i = 0; i < count; i++) {
-        (void)memcpy_s(&vendorSpecificCodecs[i].companyID, sizeof(uint16_t), buf + offset, sizeof(uint16_t));
+        if (memcpy_s(&vendorSpecificCodecs[i].companyID, sizeof(uint16_t), buf + offset, sizeof(uint16_t)) != EOK) {
+            return;
+        }
         offset += sizeof(uint16_t);
-        (void)memcpy_s(&vendorSpecificCodecs[i].vendorDefinedCodecID, sizeof(uint16_t), buf + offset, sizeof(uint16_t));
+        if (memcpy_s(
+            &vendorSpecificCodecs[i].vendorDefinedCodecID, sizeof(uint16_t), buf + offset, sizeof(uint16_t)) != EOK) {
+            return;
+        }
         offset += sizeof(uint16_t);
     }
 }

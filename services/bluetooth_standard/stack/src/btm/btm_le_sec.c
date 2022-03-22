@@ -312,6 +312,9 @@ void BTM_AddLePairedDevice(const BtmLePairedDevice *device)
     }
 
     BtmLePairedDeviceBlock *block = BtmAllocLePairedDeviceBlock(device);
+    if (block == NULL) {
+        return;
+    }
     ListAddLast(g_lePairedDevices, block);
 
     if (g_deviceCountInResolvingList < g_resolvingListSize) {

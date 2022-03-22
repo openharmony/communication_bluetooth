@@ -233,7 +233,9 @@ static void HciParseLeDirectedAdvertisingReport(
     report->addressType = param[*offset];
     *offset += sizeof(uint8_t);
 
-    (void)memcpy_s(report->address.raw, BT_ADDRESS_SIZE, param + *offset, BT_ADDRESS_SIZE);
+    if (memcpy_s(report->address.raw, BT_ADDRESS_SIZE, param + *offset, BT_ADDRESS_SIZE) != EOK) {
+        return;
+    }
     *offset += BT_ADDRESS_SIZE;
 
     report->directAddressType = param[*offset];
@@ -309,7 +311,9 @@ static void HciParseLeExtendedAdvertisingReport(
     report->addressType = param[*offset];
     *offset += sizeof(uint8_t);
 
-    (void)memcpy_s(report->address.raw, BT_ADDRESS_SIZE, param + *offset, BT_ADDRESS_SIZE);
+    if (memcpy_s(report->address.raw, BT_ADDRESS_SIZE, param + *offset, BT_ADDRESS_SIZE) != EOK) {
+        return;
+    }
     *offset += BT_ADDRESS_SIZE;
 
     report->primaryPHY = param[*offset];

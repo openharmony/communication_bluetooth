@@ -1509,7 +1509,9 @@ void GattServerProfile::impl::AssembleAttFindInforRspDescPackage(
 void GattServerProfile::impl::AssembleDataPackage(
     uint8_t *dest, uint8_t destMax, uint8_t *offset, uint8_t *src, uint8_t size)
 {
-    (void)memcpy_s((dest + *offset), destMax, src, size);
+    if (memcpy_s((dest + *offset), destMax, src, size) != EOK) {
+        return;
+    }
     *offset = *offset + size;
 }
 /**
@@ -1617,7 +1619,11 @@ AttError GattServerProfile::impl::WriteDescriptorProcess(uint16_t connectHandle,
         if (BufferGetSize(value) > sizeof(uint16_t)) {
             errorData.errorCode = ATT_ATTRIBUTE_NOT_LONG;
         } else {
-            (void)memcpy_s(&cccVal, sizeof(uint16_t), BufferPtr(value), BufferGetSize(value));
+            if (memcpy_s(&cccVal, sizeof(uint16_t), BufferPtr(value), BufferGetSize(value)) != EOK) {
+                LOG_ERROR("%{public}s: memcpy_s fail", __FUNCTION__);
+                errorData.errorCode = ATT_UNLIKELY_ERROR;
+                return errorData;
+            }
             AddCccdValue(connectHandle, attHandle, cccVal);
             ATT_WriteResponse(connectHandle);
         }
