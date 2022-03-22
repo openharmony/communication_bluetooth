@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,6 +59,9 @@ struct BleAdapter::impl {
             if (GattStatus::GATT_SUCCESS == ret) {
                 std::string name(characteristic.value_.get(), characteristic.value_.get() + characteristic.length_);
                 bleAdapter_.pimpl->remoteDeviceName_ = name;
+                bleAdapter_.pimpl->readCharacteristicFlag_ = true;
+            } else {
+                bleAdapter_.pimpl->readCharacteristicFlag_ = false;
             }
             bleAdapter_.pimpl->cvfull_.notify_all();
         }
@@ -122,6 +125,7 @@ struct BleAdapter::impl {
     std::string remoteDeviceName_ {};
     std::map<std::string, BlePeripheralDevice> peerConnDeviceList_ {};
     bool btmEnableFlag_ = false;
+    bool readCharacteristicFlag_ = false;
 
     std::unique_ptr<BleAdvertiserImpl> bleAdvertiser_ = nullptr;
     std::unique_ptr<BleCentralManagerImpl> bleCentralManager_ = nullptr;
@@ -539,9 +543,11 @@ std::string BleAdapter::ReadRemoteDeviceNameByGatt(const RawAddress &addr, int a
 
     auto it = pimpl->peerConnDeviceList_.find(addr.GetAddress());
     if (it != pimpl->peerConnDeviceList_.end()) {
+        LOG_DEBUG("[BleAdapter] isAclConnect %{public}d ", it->second.IsAclConnected());
         if (it->second.IsAclConnected()) {
             std::unique_lock<std::mutex> lock(pimpl->mutexRemoteName_);
             // Device name
+            LOG_DEBUG("Get device name from gatt. %{public}d", appID);
             Uuid uuid = Uuid::ConvertFrom16Bits(GATT_UUID_GAP_DEVICE_NAME);
             pimpl->gattClientService_->Connect(appID, true);
             pimpl->gattClientService_->ReadCharacteristicByUuid(appID, uuid);
@@ -551,7 +557,9 @@ std::string BleAdapter::ReadRemoteDeviceNameByGatt(const RawAddress &addr, int a
                 pimpl->gattClientService_->Disconnect(appID);
                 return name;
             }
-            pimpl->gattClientService_->Disconnect(appID);
+            if (pimpl->readCharacteristicFlag_) {
+                pimpl->gattClientService_->Disconnect(appID);
+            }
             return pimpl->remoteDeviceName_;
         }
     }
@@ -1245,7 +1253,7 @@ void BleAdapter::LeConnectionComplete(
 void BleAdapter::LeConnectionCompleteTask(
     uint8_t status, uint16_t connectionHandle, const BtAddr &addr, uint8_t role) const
 {
-    LOG_DEBUG("[BleAdapter] %{public}s", __func__);
+    LOG_DEBUG("[BleAdapter] %{public}s, handle is %{public}d", __func__, connectionHandle);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if ((pimpl->bleAdvertiser_ != nullptr) && (!BleFeature::GetInstance().IsLeExtendedAdvertisingSupported()) &&
@@ -1297,11 +1305,12 @@ void BleAdapter::LeDisconnectionComplete(uint8_t status, uint16_t connectionHand
 
 void BleAdapter::LeDisconnectionCompleteTask(uint8_t status, uint16_t connectionHandle, uint8_t reason) const
 {
-    LOG_DEBUG("[BleAdapter] %{public}s", __func__);
+    LOG_DEBUG("[BleAdapter] %{public}s, handle is %{public}d", __func__, connectionHandle);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     for (auto it = pimpl->peerConnDeviceList_.begin(); it != pimpl->peerConnDeviceList_.end(); it++) {
         if (connectionHandle == it->second.GetConnectionHandle()) {
+            LOG_DEBUG("[BleAdapter] handle is %{public}d disconnect ", connectionHandle);
             it->second.SetAclConnectState(BLE_CONNECTION_STATE_DISCONNECTED);
             break;
         }

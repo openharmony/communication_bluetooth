@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,9 @@
  */
 
 #include "bluetooth_socket_stub.h"
+#include "bluetooth_bt_uuid.h"
 #include "bluetooth_log.h"
 #include "ipc_types.h"
-#include "parcel_bt_uuid.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -61,11 +61,15 @@ ErrCode BluetoothSocketStub::ConnectInner(MessageParcel &data, MessageParcel &re
 {
     HILOGI("BluetoothSocketStub: ConnectInner starts");
     std::string addr = data.ReadString();
-    bluetooth::Uuid uuid = ParcelBtUuid::ReadFromParcel(data);
+    std::shared_ptr<BluetoothUuid> uuid(data.ReadParcelable<BluetoothUuid>());
+    if (uuid == nullptr) {
+        HILOGE("BluetoothSocketStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
     int32_t securityFlag = data.ReadInt32();
     int32_t type = data.ReadInt32();
 
-    int fd = Connect(addr, uuid, securityFlag, type);
+    int fd = Connect(addr, *uuid, securityFlag, type);
 
     bool ret = reply.WriteFileDescriptor(fd);
     if (!ret) {
@@ -80,11 +84,15 @@ ErrCode BluetoothSocketStub::ListenInner(MessageParcel &data, MessageParcel &rep
 {
     HILOGI("BluetoothSocketStub: ListenInner starts");
     std::string name = data.ReadString();
-    bluetooth::Uuid uuid = ParcelBtUuid::ReadFromParcel(data);
+    std::shared_ptr<BluetoothUuid> uuid(data.ReadParcelable<BluetoothUuid>());
+    if (uuid == nullptr) {
+        HILOGE("BluetoothSocketStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
     int32_t securityFlag = data.ReadInt32();
     int32_t type = data.ReadInt32();
 
-    int fd = Listen(name, uuid, securityFlag, type);
+    int fd = Listen(name, *uuid, securityFlag, type);
 
     bool ret = reply.WriteFileDescriptor(fd);
     if (!ret) {

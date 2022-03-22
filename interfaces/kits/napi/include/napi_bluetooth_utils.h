@@ -114,6 +114,7 @@ void ConvertDescriptorReadReqToJS(
 void ConvertDescriptorWriteReqToJS(
     napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
+void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 
 void GetServiceVectorFromJS(napi_env env, napi_value object, std::vector<GattService> &services,
     std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
@@ -136,6 +137,9 @@ void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName,
 napi_value NapiGetNull(napi_env env);
 napi_value RegisterObserver(napi_env env, napi_callback_info info);
 napi_value DeregisterObserver(napi_env env, napi_callback_info info);
+
+int GetProfileConnectionState(int state);
+int GetScoConnectionState(int state);
 
 struct AsyncCallbackInfo {
     napi_env env_;
@@ -281,6 +285,13 @@ enum ProfileConnectionState {
     STATE_CONNECTING = 1,    // the current profile is being connected
     STATE_CONNECTED = 2,     // the current profile is connected
     STATE_DISCONNECTING = 3  // the current profile is being disconnected
+};
+
+enum ScoState {
+    SCO_DISCONNECTED,
+    SCO_CONNECTING,
+    SCO_DISCONNECTING,
+    SCO_CONNECTED
 };
 
 enum class BluetoothState {

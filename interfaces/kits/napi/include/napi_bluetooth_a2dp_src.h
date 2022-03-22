@@ -38,6 +38,7 @@ public:
     static napi_value Disconnect(napi_env env, napi_callback_info info);
 
     static NapiA2dpSourceObserver observer_;
+    static bool isRegistered_;
 };
 
 

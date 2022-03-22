@@ -25,13 +25,15 @@ namespace Bluetooth {
 using namespace std;
 
 std::vector<std::string> NapiGattServer::deviceList;
-napi_value NapiGattServer::constructor_ = nullptr;
+thread_local napi_ref NapiGattServer::consRef_ = nullptr;
 
 napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info info)
 {
     HILOGI("CreateGattServer called");
     napi_value result;
-    napi_new_instance(env, constructor_, 0, nullptr, &result);
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, consRef_, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &result);
 
     HILOGI("CreateGattServer finished");
     return result;
@@ -51,8 +53,10 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("off", Off),
     };
 
+    napi_value constructor = nullptr;
     napi_define_class(env, "GattServer", NAPI_AUTO_LENGTH, GattServerConstructor, nullptr,
-        sizeof(gattserverDesc) / sizeof(gattserverDesc[0]), gattserverDesc, &constructor_);
+        sizeof(gattserverDesc) / sizeof(gattserverDesc[0]), gattserverDesc, &constructor);
+    napi_create_reference(env, constructor, 1, &consRef_);
 }
 
 napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_info info)
