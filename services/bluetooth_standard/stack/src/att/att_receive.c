@@ -236,10 +236,13 @@ static void AttFindInformationResAssign(uint16_t inforNum, AttFind *attFindObj, 
                 ((uint16_t *)(data + STEP_THREE + index * inforLen))[0];
         } else if (attFindObj->findInforRsponse.format == HANDLEAND128BITUUID) {
             attFindObj->findInforRsponse.handleUuidPairs[index].uuid.type = BT_UUID_128;
-            (void)memcpy_s(&(attFindObj->findInforRsponse.handleUuidPairs[index].uuid.uuid128),
+            if (memcpy_s(&(attFindObj->findInforRsponse.handleUuidPairs[index].uuid.uuid128),
                 UUID128LEN,
                 data + STEP_THREE + index * inforLen,
-                UUID128LEN);
+                UUID128LEN) != EOK) {
+                    LOG_ERROR("%{public}s enter, memcpy_s fail", __FUNCTION__);
+                    return;
+                }
         }
     }
 

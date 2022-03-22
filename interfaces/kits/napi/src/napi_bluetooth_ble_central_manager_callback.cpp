@@ -202,10 +202,13 @@ void NapiBluetoothBleCentralManagerCallback::ConvertScanResult(
         uint8_t *native = nullptr;
         napi_value buffer = nullptr;
         napi_create_arraybuffer(env, bleScanResult.GetPayload().size(), reinterpret_cast<void **>(&native), &buffer);
-        memcpy_s(native,
+        if (memcpy_s(native,
             bleScanResult.GetPayload().size(),
             bleScanResult.GetPayload().data(),
-            bleScanResult.GetPayload().size());
+            bleScanResult.GetPayload().size()) != EOK) {
+                HILOGE("NapiBluetoothBleCentralManagerCallback::ConvertScanResult memcpy_s fail");
+                return;
+            }
         napi_create_typedarray(env, napi_uint8_array, bleScanResult.GetPayload().size(), buffer, 0, &value);
         napi_set_named_property(env, result, "data", value);
         napi_set_element(env, scanResultArray, count, result);

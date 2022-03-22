@@ -162,7 +162,10 @@ int HidHostUhid::SendGetReportReplyUhid(int fd, int id, uint16_t err, uint8_t* r
         LOG_WARN("[UHID]%{public}s(): Report size greater than allowed size", __FUNCTION__);
         return E_LEN_VAL;
     }
-    memcpy_s(ev.u.feature_answer.data, sizeof(ev.u.feature_answer.data), rpt, len);
+    if (memcpy_s(ev.u.feature_answer.data, sizeof(ev.u.feature_answer.data), rpt, len) != EOK) {
+        LOG_WARN("[UHID]%{public}s(): memcpy_s fail", __FUNCTION__);
+        return E_ERR_NULL;
+    }
     return WriteUhid(fd, &ev);
 }
 
@@ -191,7 +194,10 @@ int HidHostUhid::SendHidInfo(const char* devName, PnpInformation pnpInf, HidInfo
     ev.type = UHID_CREATE;
     BtAddr btAddr;
     RawAddress(address_).ConvertToUint8(btAddr.addr);
-    strncpy_s((char*)ev.u.create.name, sizeof(ev.u.create.name), devName, sizeof(ev.u.create.name));
+    if (strncpy_s((char*)ev.u.create.name, sizeof(ev.u.create.name), devName, sizeof(ev.u.create.name)) != EOK) {
+        LOG_ERROR("[UHID]%{public}s(): strncpy_s name fail", __FUNCTION__);
+        return E_ERR_NULL;
+    }
     int uniqLength = snprintf_s((char*)ev.u.create.uniq, sizeof(ev.u.create.uniq), sizeof(btAddr.addr),
         "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X", btAddr.addr[HID_HOST_NUMBER_5], btAddr.addr[HID_HOST_NUMBER_4],
         btAddr.addr[HID_HOST_NUMBER_3], btAddr.addr[HID_HOST_NUMBER_2], btAddr.addr[HID_HOST_NUMBER_1],
@@ -265,7 +271,10 @@ int HidHostUhid::WritePackUhid(int fd, uint8_t* rpt, uint16_t len)
         LOG_WARN("[UHID]%{public}s(): Report size greater than allowed size", __FUNCTION__);
         return E_LEN_VAL;
     }
-    memcpy_s(ev.u.input.data, sizeof(ev.u.input.data), rpt, len);
+    if (memcpy_s(ev.u.input.data, sizeof(ev.u.input.data), rpt, len) != EOK) {
+        LOG_WARN("[UHID]%{public}s(): memcpy_s fail", __FUNCTION__);
+        return E_LEN_VAL;
+    }
     return WriteUhid(fd, &ev);
 }
 
@@ -348,9 +357,7 @@ void HidHostUhid::SetUhidNonBlocking(int fd)
         LOG_DEBUG("[UHID]%{public}s(): Getting flags failed (%{public}s)", __FUNCTION__,
             strerror(errno));
 
-    opts |= O_NONBLOCK;
-
-    if (fcntl(fd, F_SETFL, opts) < 0)
+    if (fcntl(fd, F_SETFL, opts | O_NONBLOCK) < 0)
         LOG_DEBUG("[UHID]%{public}s(): Setting non-blocking flag failed (%{public}s)", __FUNCTION__,
             strerror(errno));
 }
