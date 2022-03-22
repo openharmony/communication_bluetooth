@@ -469,7 +469,10 @@ Packet *L2capBuildSignalPacket(uint16_t cid, const L2capSignalHeader *signal, co
     L2capCpuToLe16(buff + L2CAP_OFFSET_6, signal->length);
 
     if (signal->length > 0) {
-        (void)memcpy_s(buff + L2CAP_HEADER_LENGTH + L2CAP_SIGNAL_HEADER_LENGTH, signal->length, data, signal->length);
+        if (memcpy_s(
+            buff + L2CAP_HEADER_LENGTH + L2CAP_SIGNAL_HEADER_LENGTH, signal->length, data, signal->length) != EOK) {
+            LOG_ERROR("L2capBuildSignalPacket memcpy_s failed");
+        }
     }
 
     return pkt;

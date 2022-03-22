@@ -337,10 +337,13 @@ void AttFindInformationResponsePacketDataAssign(
             ((uint16_t *)(data + STEP_TWO))[0] =
                 findInforPtr->attFindInformationResContext.handleUuidPairs[index].uuid.uuid16;
         } else if (findInforPtr->attFindInformationResContext.format == HANDLEAND128BITUUID) {
-            (void)memcpy_s(data + STEP_TWO,
+            if (memcpy_s(data + STEP_TWO,
                 UUID128BITTYPELEN,
                 findInforPtr->attFindInformationResContext.handleUuidPairs[index].uuid.uuid128,
-                UUID128BITTYPELEN);
+                UUID128BITTYPELEN) != EOK) {
+                    LOG_ERROR("%{public}s memcpy_s fail", __FUNCTION__);
+                    return;
+                }
         }
         data += dataLen;
     }

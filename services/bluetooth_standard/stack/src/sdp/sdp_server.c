@@ -962,7 +962,10 @@ static uint16_t SdpAddAttributeForString(uint8_t *buffer, uint16_t offset, const
     if (nameLen > SDP_MAX_ATTRIBUTE_LEN - offset) {
         nameLen = SDP_MAX_ATTRIBUTE_LEN - offset;
     }
-    (void)memcpy_s(buffer + offset, nameLen, name, nameLen);
+    if (memcpy_s(buffer + offset, nameLen, name, nameLen) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail", __FUNCTION__, __LINE__);
+        return offset;
+    }
     offset += nameLen;
 
     return offset;
@@ -1019,7 +1022,10 @@ static int SdpAddAttributeToServiceRecord(
         }
     }
     /// Data element var
-    (void)memcpy_s(attributeValue + offset, attributeLength, value, attributeLength);
+    if (memcpy_s(attributeValue + offset, attributeLength, value, attributeLength) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail", __FUNCTION__, __LINE__);
+        return BT_OPERATION_FAILED;
+    }
     offset += attributeLength;
 
     item->attributeItem[item->attributeNumber].attributeLength = offset;
@@ -1355,7 +1361,9 @@ static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, uint
     /// continuation state yes or no (is 0)
     if (continuationStateLen != 0) {
         uint8_t continuationState[SDP_MAX_CONTINUATION_LEN] = {0};
-        (void)memcpy_s(continuationState, continuationStateLen, buffer + offset, continuationStateLen);
+        if (memcpy_s(continuationState, SDP_MAX_CONTINUATION_LEN, buffer + offset, continuationStateLen) != EOK) {
+            return;
+        }
         SdpSendAttributeFragmentResponse(
             lcid, SDP_SERVICE_ATTRIBUTE_RESPONSE, transactionId, maximumAttributeByteCount, NULL);
         return;
@@ -1657,7 +1665,10 @@ static bool CompareUuid(const uint8_t *uuid1, uint16_t length1, const uint8_t *u
     } else if (length2 == SDP_UUID32_LENGTH) {
         // uuid2 length is 4
         (void)memcpy_s(value2, SDP_UUID128_LENGTH, G_BASE_UUID, SDP_UUID128_LENGTH);
-        (void)memcpy_s(value2, SDP_UUID32_LENGTH, uuid2, SDP_UUID32_LENGTH);
+        if (memcpy_s(value2, SDP_UUID128_LENGTH, uuid2, SDP_UUID32_LENGTH) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+            return false;
+        }
     } else {
         (void)memcpy_s(value2, SDP_UUID128_LENGTH, uuid2, SDP_UUID128_LENGTH);
     }

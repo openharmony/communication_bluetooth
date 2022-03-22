@@ -1348,7 +1348,10 @@ static void L2capProcessConfigurationReqWithContinue(
             return;
         }
 
-        (void)memcpy_s(chan->part.options + chan->part.length, optLength, data, optLength);
+        if (memcpy_s(chan->part.options + chan->part.length, optLength, data, optLength) != EOK) {
+            LOG_ERROR("L2capProcessConfigurationReqWithContinue memcpy_s failed");
+            return;
+        }
         chan->part.length += optLength;
     }
 

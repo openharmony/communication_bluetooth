@@ -1295,7 +1295,11 @@ void GattClientProfile::impl::DiscoverPrimaryServiceByUuidParsing(
         parameter.handleRange.startHandle = endHandle + MIN_ATTRIBUTE_HANDLE;
         parameter.handleRange.endHandle = MAX_ATTRIBUTE_HANDLE;
         parameter.attType = UUID_PRIMARY_SERVICE;
-        (void)memcpy_s(BufferPtr(serviceUuid), uuidType, &(iter->second.uuid_), uuidType);
+        if (memcpy_s(BufferPtr(serviceUuid), uuidType, &(iter->second.uuid_), uuidType) != EOK) {
+            LOG_ERROR("%{public}s Call memcpy_s fail", __FUNCTION__);
+            BufferFree(serviceUuid);
+            return;
+        }
         requestList_.emplace_back(connectHandle, GattRequestInfo(iter->second.uuid_, DISCOVER_SERVICE_BY_UUID, reqId));
         ATT_FindByTypeValueRequest(connectHandle, &parameter, serviceUuid);
     }

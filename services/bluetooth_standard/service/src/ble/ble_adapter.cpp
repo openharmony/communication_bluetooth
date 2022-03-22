@@ -428,7 +428,10 @@ int BleAdapter::SetLocalIrkAndIdentityAddrToBtm() const
     std::vector<uint8_t> vec;
     BleUtils::ConvertHexStringToInt(irk, vec);
     BtmKey btmKey;
-    memcpy_s(btmKey.key, KEY_SIZE, &vec[0], vec.size());
+    if (memcpy_s(btmKey.key, KEY_SIZE, &vec[0], vec.size()) != EOK) {
+        LOG_DEBUG("[BleAdapter] %{public}s:memcpy_s btmKey failed!", __func__);
+        return BT_OPERATION_FAILED;
+    }
     BTM_SetLocalIdentityResolvingKey(&btmKey);
     /// check public address
     std::string addr = BleConfig::GetInstance().GetLocalAddress();

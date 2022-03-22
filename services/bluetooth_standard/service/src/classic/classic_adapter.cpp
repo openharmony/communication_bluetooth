@@ -2143,7 +2143,10 @@ void ClassicAdapter::SetLinkKey(const BtAddr &addr)
     uint8_t accept = GAP_NOT_ACCEPT;
     if (keyType != PAIR_INVALID_LINK_KEY_TYPE) {
         std::vector<uint8_t> linkKey = remoteDevice->GetLinkKey();
-        (void)memcpy_s(key, linkKey.size(), &linkKey[0], linkKey.size());
+        if (memcpy_s(key, linkKey.size(), &linkKey[0], linkKey.size()) != EOK) {
+            LOG_DEBUG("[ClassicAdapter]::%{public}s, memcpy_s fail", __func__);
+            return;
+        }
         accept = GAP_ACCEPT;
     }
 

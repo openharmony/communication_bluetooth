@@ -74,7 +74,10 @@ static uint16_t SdpBuildAttributeList(SdpAttributeIdList attributeIdList, uint8_
         pos += SDP_UINT16_LENGTH;
         *(uint16_t *)(idRange + pos) = H2BE_16(attributeIdList.attributeIdRange.end);
         pos += SDP_UINT16_LENGTH;
-        (void)memcpy_s(buffer + offset, pos, idRange, pos);
+        if (memcpy_s(buffer + offset, pos, idRange, pos) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s failed", __FUNCTION__, __LINE__);
+            return offset;
+        }
         offset += pos;
     } else {
         if (attributeIdList.attributeIdList.attributeIdNumber > SDP_ATTRIBUTE_ID_LIST_MAX_COUNT) {

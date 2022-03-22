@@ -202,7 +202,6 @@ private:
 
 BluetoothPbapPceServer::impl::impl()
 {
-    // systemStateObserver_ = new SystemStateObserver(this);
     systemStateObserver_ = std::make_unique<SystemStateObserver>(this);
     bluetooth::IAdapterManager::GetInstance()->RegisterSystemStateObserver(*systemStateObserver_);
 }
@@ -334,8 +333,7 @@ int BluetoothPbapPceServer::AbortDownloading(const BluetoothRawAddress &device)
 int BluetoothPbapPceServer::SetDevicePassword(const BluetoothRawAddress &device,
     const std::string &password, const std::string &userId)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter! password: %{public}s  userId: %{public}s", __FILE__, __FUNCTION__,
-        password.c_str(), userId.c_str());
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (pimpl->pbapPceService_) {
         std::string pwdTmp = password;
         std::string usrIdTmp = userId;
