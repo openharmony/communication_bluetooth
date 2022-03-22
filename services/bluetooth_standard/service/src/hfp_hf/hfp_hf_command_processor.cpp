@@ -826,7 +826,10 @@ void HfpHfCommandProcessor::SendAtCommand(
         Packet *packet = PacketMalloc(0, 0, CmdLength);
         Buffer *buf = PacketContinuousPayload(packet);
         void *data = BufferPtr(buf);
-        (void)memcpy_s(data, CmdLength, fullCommand.c_str(), CmdLength);
+        if (memcpy_s(data, CmdLength, fullCommand.c_str(), CmdLength) != EOK) {
+            LOG_DEBUG("[HFP HF]%{public}s(): memcpy_s fail", __FUNCTION__);
+            return;
+        }
         dataConn.WriteData(*packet);
         PacketFree(packet);
         respTimer_->Start(RESPOND_TIMEOUT_MS, false);

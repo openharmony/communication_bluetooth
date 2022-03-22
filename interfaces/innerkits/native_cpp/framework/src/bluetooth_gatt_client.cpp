@@ -357,6 +357,9 @@ void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> 
     }
     for (auto &svc : src) {
         GattService *ptr = FindService(svc.handle_);
+        if (ptr == NULL) {
+            return;
+        }
         for (auto &isvc : svc.includeServices_) {
             GattService *iptr = FindService(isvc.startHandle_);
             ptr->AddService(*iptr);

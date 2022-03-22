@@ -1466,7 +1466,9 @@ static int GapLinkKeyRequestReply(const BtAddr *addr, const uint8_t *linkKey)
 {
     HciLinkKeyRequestReplyParam hciCmdParam;
     (void)memcpy_s(hciCmdParam.bdAddr.raw, BT_ADDRESS_SIZE, addr->addr, BT_ADDRESS_SIZE);
-    (void)memcpy_s(hciCmdParam.linkKey, GAP_LINKKEY_SIZE, linkKey, GAP_LINKKEY_SIZE);
+    if (memcpy_s(hciCmdParam.linkKey, GAP_LINKKEY_SIZE, linkKey, GAP_LINKKEY_SIZE) != EOK) {
+        return GAP_STATUS_FAILED;
+    }
 
     return HCI_LinkKeyRequestReply(&hciCmdParam);
 }

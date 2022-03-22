@@ -439,9 +439,9 @@ static void ProcessL2capConnectionRequest(
         }
         if (l2capInfo != NULL) {
             l2capInfo->isInitiator = (type == TRANSMISSON_TYPE_H2C_DATA);
-        }
-        if (*psm == L2CAP_AVDTP_PSM && ExistL2capConnIsAvdtpSignal(aclInfo->handle)) {
-            l2capInfo->isAvdtpMedia = true;
+            if (*psm == L2CAP_AVDTP_PSM && ExistL2capConnIsAvdtpSignal(aclInfo->handle)) {
+                l2capInfo->isAvdtpMedia = true;
+            }
         }
     }
 }

@@ -162,10 +162,13 @@ static void GapLeSecureConnectionOOBProcess(
             GapOOBData oobData;
             const uint8_t *data = displayValue;
             (void)memcpy_s(oobData.R, GAP_OOB_DATA_RANDOM_SIZE, data + BT_ADDRESS_SIZE, GAP_OOB_DATA_RANDOM_SIZE);
-            (void)memcpy_s(oobData.C,
+            if (memcpy_s(oobData.C,
                 GAP_OOB_DATA_CONFIRM_SIZE,
                 data + BT_ADDRESS_SIZE + GAP_OOB_DATA_RANDOM_SIZE,
-                GAP_OOB_DATA_CONFIRM_SIZE);
+                GAP_OOB_DATA_CONFIRM_SIZE) != EOK) {
+                    LOG_WARN("%{public}s: memcpy_s fail.", __FUNCTION__);
+                    return;
+                }
             g_lePairCallback.callback.lePairScOobNotification(addr, &oobData, g_lePairCallback.context);
         } else {
             accept = false;
