@@ -485,10 +485,24 @@ void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::str
     napi_set_named_property(env, result, "deviceId", deviceId);
     HILOGI("ConvertStateChangeParamToJS deviceId is %{public}s", device.c_str());
 
-    napi_value statue = nullptr;
-    napi_create_int32(env, state, &statue);
-    napi_set_named_property(env, result, "state", statue);
+    napi_value profileState = nullptr;
+    napi_create_int32(env, GetProfileConnectionState(state), &profileState);
+    napi_set_named_property(env, result, "state", profileState);
     HILOGI("ConvertStateChangeParamToJS state is %{public}d", state);
+}
+
+void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state)
+{
+    HILOGI("ConvertScoStateChangeParamToJS called");
+    napi_value deviceId = nullptr;
+    napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
+    napi_set_named_property(env, result, "deviceId", deviceId);
+    HILOGI("ConvertScoStateChangeParamToJS deviceId is %{public}s", device.c_str());
+
+    napi_value profileState = nullptr;
+    napi_create_int32(env, GetScoConnectionState(state), &profileState);
+    napi_set_named_property(env, result, "state", profileState);
+    HILOGI("ConvertScoStateChangeParamToJS state is %{public}d", state);
 }
 
 void GetServiceVectorFromJS(napi_env env, napi_value object, vector<GattService>& services,
@@ -951,6 +965,58 @@ void SetRssiValueCallbackInfo(std::shared_ptr<GattGetRssiValueCallbackInfo> &cal
 std::shared_ptr<GattGetRssiValueCallbackInfo> GetRssiValueCallbackInfo()
 {
     return callbackInfo;
+}
+
+int GetProfileConnectionState(int state)
+{
+    int32_t profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
+    switch (state) {
+        case static_cast<int32_t>(BTConnectState::CONNECTING):
+            HILOGD("BTConnectState connecting");
+            profileConnectionState = ProfileConnectionState::STATE_CONNECTING;
+            break;
+        case static_cast<int32_t>(BTConnectState::CONNECTED):
+            HILOGD("BTConnectState connected");
+            profileConnectionState = ProfileConnectionState::STATE_CONNECTED;
+            break;
+        case static_cast<int32_t>(BTConnectState::DISCONNECTING):
+            HILOGD("BTConnectState disconnecting");
+            profileConnectionState = ProfileConnectionState::STATE_DISCONNECTING;
+            break;
+        case static_cast<int32_t>(BTConnectState::DISCONNECTED):
+            HILOGD("BTConnectState disconnected");
+            profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
+            break;
+        default:
+            break;
+    }
+    return profileConnectionState;
+}
+
+int GetScoConnectionState(int state)
+{
+    int32_t scoState = ScoState::SCO_DISCONNECTED;
+    switch (state) {
+        case static_cast<int32_t>(HfpScoConnectState::SCO_CONNECTING):
+            HILOGD("BTConnectState connecting");
+            scoState = ScoState::SCO_CONNECTING;
+            break;
+        case static_cast<int32_t>(HfpScoConnectState::SCO_CONNECTED):
+            HILOGD("BTConnectState connected");
+            scoState = ScoState::SCO_CONNECTED;
+            break;
+        case static_cast<int32_t>(HfpScoConnectState::SCO_DISCONNECTING):
+            HILOGD("BTConnectState disconnecting");
+            scoState = ScoState::SCO_DISCONNECTING;
+            break;
+        case static_cast<int32_t>(HfpScoConnectState::SCO_DISCONNECTED):
+            HILOGD("BTConnectState disconnected");
+            scoState = ScoState::SCO_DISCONNECTED;
+            break;
+        default:
+            break;
+    }
+    return scoState;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

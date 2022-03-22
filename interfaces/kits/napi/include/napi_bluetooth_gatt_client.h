@@ -73,7 +73,7 @@ public:
     }
     ~NapiGattClient() = default;
 
-    static napi_value constructor_;
+    static thread_local napi_ref consRef_;
     ReadCharacteristicValueCallbackInfo *readCharacteristicValueCallbackInfo_;
     ReadDescriptorValueCallbackInfo *readDescriptorValueCallbackInfo_;
     DiscoverServicesCallbackInfo *discoverServicesCallbackInfo_;

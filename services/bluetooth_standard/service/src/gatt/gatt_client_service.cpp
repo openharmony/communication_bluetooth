@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -617,6 +617,7 @@ void GattClientService::impl::Connect(int appId, bool autoConnect)
 
 void GattClientService::impl::Disconnect(int appId)
 {
+    bool needDisconnect = true;
     auto client = GetValidApplication(appId);
     if (client.has_value()) {
         auto &manager = GattConnectionManager::GetInstance();
@@ -626,15 +627,15 @@ void GattClientService::impl::Disconnect(int appId)
         auto map = handleMap_.find(client.value()->second.connection_.GetHandle());
         if (map != handleMap_.end()) {
             map->second.erase(appId);
-        }
-
-        bool needDisconnect = true;
-        for (auto aid : handleMap_.find(client.value()->second.connection_.GetHandle())->second) {
-            auto app = GetValidApplication(aid);
-            if (app.has_value() && app.value()->second.connState_ != (int)BTConnectState::DISCONNECTED) {
-                needDisconnect = false;
-                break;
+            for (auto aid : map->second) {
+                auto app = GetValidApplication(aid);
+                if (app.has_value() && app.value()->second.connState_ != (int)BTConnectState::DISCONNECTED) {
+                    needDisconnect = false;
+                    break;
+                }
             }
+        } else {
+            needDisconnect = false;
         }
 
         if (!needDisconnect) {
@@ -703,6 +704,7 @@ void GattClientService::impl::ReadCharacteristicByUuid(int appId, const Uuid &uu
     if (it.has_value()) {
         auto &client = it.value()->second;
         if (handleMap_.find(client.connection_.GetHandle()) == handleMap_.end()) {
+            LOG_DEBUG("%{public}s: %{public}hu: is not found in the map", __func__, client.connection_.GetHandle());
             client.callback_.OnCharacteristicRead(GattStatus::REQUEST_NOT_SUPPORT, Characteristic(0));
             return;
         }

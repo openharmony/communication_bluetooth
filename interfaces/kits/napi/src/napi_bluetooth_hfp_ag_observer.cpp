@@ -88,7 +88,7 @@ void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteD
             BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
-            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);
+            ConvertScoStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);
             napi_value callback = nullptr;
             napi_value undefined = nullptr;
             napi_value callResult = nullptr;
