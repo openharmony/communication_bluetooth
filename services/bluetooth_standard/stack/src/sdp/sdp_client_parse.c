@@ -859,7 +859,10 @@ static int SdpGetString(uint8_t *buffer, char *name, SdpDescriptorType nameType)
     if (length >= SDP_MAX_ATTRIBUTE_LEN - 1) {
         length = SDP_MAX_ATTRIBUTE_LEN;
     }
-    (void)memcpy_s(name, length, buffer + offset, length);
+    if (memcpy_s(name, length, buffer + offset, length) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail", __FUNCTION__, __LINE__);
+        return BT_OPERATION_FAILED;
+    }
     name[length] = '\0';
     offset += length;
 

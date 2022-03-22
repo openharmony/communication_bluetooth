@@ -863,15 +863,21 @@ static void AttReadByGroupTypeRequestDataAssign(
     ((uint16_t *)(data + STEP_THREE))[0] = attReadByGroupRequestAsyncPtr->attReadGroupContext.handleRange.endHandle;
 
     if (attReadByGroupRequestAsyncPtr->attReadGroupContext.uuid->type == BT_UUID_16) {
-        (void)memcpy_s(data + STEP_FIVE,
+        if (memcpy_s(data + STEP_FIVE,
             attrGroupTypeLen,
             &(attReadByGroupRequestAsyncPtr->attReadGroupContext.uuid->uuid16),
-            attrGroupTypeLen);
+            attrGroupTypeLen) != EOK) {
+                LOG_ERROR("%{public}s BT_UUID_16 memcpy_s fail", __FUNCTION__);
+                return;
+            }
     } else if (attReadByGroupRequestAsyncPtr->attReadGroupContext.uuid->type == BT_UUID_128) {
-        (void)memcpy_s(data + STEP_FIVE,
+        if (memcpy_s(data + STEP_FIVE,
             attrGroupTypeLen,
             attReadByGroupRequestAsyncPtr->attReadGroupContext.uuid->uuid128,
-            attrGroupTypeLen);
+            attrGroupTypeLen) != EOK) {
+                LOG_ERROR("%{public}s BT_UUID_128 memcpy_s fail", __FUNCTION__);
+                return;
+            }
     }
 
     return;

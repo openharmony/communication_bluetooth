@@ -113,6 +113,9 @@ static void ThreadStop(Thread *thread)
 Thread *ThreadCreate(const char *name)
 {
     Thread *thread = (Thread *)calloc(1, (sizeof(Thread)));
+    if (thread == NULL) {
+        return NULL;
+    }
 
     thread->reactor = ReactorCreate();
     if (thread->reactor == NULL) {
