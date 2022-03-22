@@ -50,6 +50,7 @@ A2dpSbcEncoder::A2dpSbcEncoder(
     : A2dpEncoder(config, observer)
 {
     LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
+    dataSize_ = 0;
     a2dpSbcEncoderCb_.isPeerEdr = peerParams->isPeerEdr;
     a2dpSbcEncoderCb_.peerSupports3mbps = peerParams->peerSupports3mbps;
     a2dpSbcEncoderCb_.peerMtu = peerParams->peermtu;
@@ -511,8 +512,9 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
             frameIter++;
         }
         uint16_t encodePacketSize = PacketSize(pkt);
-        (void)memset_s(a2dpSbcEncoderCb_.pcmBuffer, A2DP_SBC_MAX_PACKET_SIZE, 0, sizeof(a2dpSbcEncoderCb_.pcmBuffer));
-        (void)memcpy_s(a2dpSbcEncoderCb_.pcmBuffer, A2DP_SBC_MAX_PACKET_SIZE,
+        (void)memset_s(a2dpSbcEncoderCb_.pcmBuffer, A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE,
+            0, sizeof(a2dpSbcEncoderCb_.pcmBuffer));
+        (void)memcpy_s(a2dpSbcEncoderCb_.pcmBuffer, A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE,
             a2dpSbcEncoderCb_.pcmRemain, a2dpSbcEncoderCb_.offsetPCM);
         (void)memset_s(a2dpSbcEncoderCb_.pcmRemain, A2DP_SBC_MAX_PACKET_SIZE, 0, sizeof(a2dpSbcEncoderCb_.pcmRemain));
         if (encodePacketSize > 0) {
@@ -544,7 +546,7 @@ void A2dpSbcEncoder::EnqueuePacket(
 void A2dpSbcEncoder::EnqueuePacketFragment(
     Packet *pkt, size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const
 {
-    int8_t count = 1;
+    uint8_t count = 1;
     uint32_t pktLen = 0;
     uint8_t frameNum = 0;
     uint16_t blocksXsubbands
@@ -583,7 +585,10 @@ void A2dpSbcEncoder::EnqueuePacketFragment(
             PacketPayloadRead(pkt, bufferFra, offset, pktLen);
             offset += pktLen;
             Buffer *encBuf = BufferMalloc(encoded);
-            (void)memcpy_s(BufferPtr(encBuf), encoded, bufferFra, encoded);
+            if (memcpy_s(BufferPtr(encBuf), encoded, bufferFra, encoded) != EOK) {
+                LOG_ERROR("[EnqueuePacket] memcpy_s fail");
+                return;
+            }
             PacketPayloadAddLast(mediaPacket, encBuf);
             BufferFree(encBuf);
             remainFrames = remainFrames - frameNum;

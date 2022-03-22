@@ -222,7 +222,10 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
     uint8_t* valueData = characteristic.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
     napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-    memcpy_s(bufferData, valueSize, valueData, valueSize);
+    if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+        HILOGE("ConvertBLECharacteristicToJS memcpy_s failed");
+        return;
+    }
     napi_set_named_property(env, result, "characteristicValue", value);
 
     napi_value descriptors;
