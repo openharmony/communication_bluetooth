@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "securec.h"
 #include "bluetooth_bt_uuid.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_log.h"
@@ -70,11 +71,18 @@ bool BluetoothGattDescriptor::ReadFromParcel(Parcel &parcel)
         return false;
     }
     length_ = length;
+    uint8_t value[length_];
     for (size_t i = 0; i < length_; i++) {
-        if (!parcel.ReadUint8(value_[i])) {
+        if (!parcel.ReadUint8(value[i])) {
             return false;
         }
     }
+    value_ = std::make_unique<uint8_t[]>(length);
+    if (memcpy_s(value_.get(), length_, value, length_) != EOK) {
+        HILOGE("BluetoothGattDescriptor::ReadFromParcel error");
+        return false;
+    }
+
     std::shared_ptr<BluetoothUuid> uuid(parcel.ReadParcelable<BluetoothUuid>());
     if (!uuid) {
         return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +14,8 @@
  */
 
 #include "bluetooth_socket_proxy.h"
+#include "bluetooth_bt_uuid.h"
 #include "bluetooth_log.h"
-#include "parcel_bt_uuid.h"
 #include "bluetooth_errorcode.h"
 
 namespace OHOS {
@@ -34,7 +34,8 @@ int BluetoothSocketProxy::Connect(std::string &addr, bluetooth::Uuid &uuid, int3
         return ERROR;
     }
 
-    if (!ParcelBtUuid::WriteToParcel(data, uuid)) {
+    BluetoothUuid btUuid(uuid);
+    if (!data.WriteParcelable(&btUuid)) {
         HILOGE("BluetoothSocketProxy::Connect write uuid error");
         return ERROR;
     }
@@ -76,8 +77,8 @@ int BluetoothSocketProxy::Listen(std::string &name, bluetooth::Uuid &uuid, int32
         HILOGE("BluetoothSocketProxy::Listen write name error");
         return ERROR;
     }
-
-    if (!ParcelBtUuid::WriteToParcel(data, uuid)) {
+    BluetoothUuid btUuid(uuid);
+    if (!data.WriteParcelable(&btUuid)) {
         HILOGE("BluetoothSocketProxy::Listen write uuid error");
         return ERROR;
     }
