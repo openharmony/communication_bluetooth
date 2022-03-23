@@ -481,6 +481,8 @@ napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
         napi_typeof(env, argv[PARAM0], &valueType);
         if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
+            delete callbackInfo;
+            callbackInfo = nullptr;
             return ret;
         }
         napi_create_reference(env, argv[PARAM0], 1, &callbackInfo->callback_);

@@ -60,6 +60,8 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         napi_typeof(env, argv[PARAM2], &valueType);
         if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
+            delete callbackInfo;
+            callbackInfo = nullptr;
             return ret;
         }
         napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);

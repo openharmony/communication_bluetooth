@@ -82,6 +82,7 @@ void AvdtSendFragPacket(uint16_t lcid, Packet *pkt, uint16_t peerMtu)
     uint8_t signal = *(p + 1);
     if (peerMtu <= AVDT_BUFFER_END) {
         LOG_ERROR("[AVDT]%{public}s: The MTU is too small ", __func__);
+        PacketFree(fragmentPacket);
         return;
     }
     uint8_t number = (PacketLen - (peerMtu - AVDT_BUFFER_START)) / (peerMtu - AVDT_BUFFER_END) + 1;

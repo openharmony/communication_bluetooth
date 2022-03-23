@@ -396,6 +396,10 @@ void AvrcTgGcPacket::AssembleCompanies(Packet *pkt)
     LOG_DEBUG("[AVRCP CT] BufferMalloc[%zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgGcPacket::AssembleCompanies BufferMalloc fail");
+        return;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -434,6 +438,10 @@ void AvrcTgGcPacket::AssembleEvents(Packet *pkt)
     LOG_DEBUG("[AVRCP CT] BufferMalloc[%zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgGcPacket::AssembleEvents BufferMalloc fail");
+        return;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -509,6 +517,10 @@ Packet *AvrcTgLpasaPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgLpasaPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -613,6 +625,10 @@ Packet *AvrcTgLpasvPacket::AssembleParameters(Packet *pkt)
         LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
         auto buffer = BufferMalloc(bufferSize);
+        if (buffer == nullptr) {
+            LOG_ERROR("[AVRCP TG] AvrcTgLpasvPacket::AssembleParameters BufferMalloc fail");
+            return pkt;
+        }
         auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
         uint16_t offset = 0x0000;
@@ -773,6 +789,10 @@ Packet *AvrcTgGcpasvPacket::AssembleParameters(Packet *pkt)
         LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
         auto buffer = BufferMalloc(bufferSize);
+        if (buffer == nullptr) {
+            LOG_ERROR("[AVRCP TG] AvrcTgGcpasvPacket::AssembleParameters BufferMalloc fail");
+            return pkt;
+        }
         auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
         uint16_t offset = 0x0000;
@@ -946,6 +966,10 @@ Packet *AvrcTgSpasvPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgSpasvPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -1115,6 +1139,10 @@ Packet *AvrcTgGpasatPacket ::AssembleParameters(Packet *pkt)
     size_t bufferSize = parameterLength_ + AVRC_TG_GPASAT_PARAMETER_LENGTH_SIZE;
     LOG_DEBUG("[AVRCP CT] BufferMalloc[%{public}zu]", bufferSize);
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgGpasatPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -1485,6 +1513,10 @@ Packet *AvrcTgGeaPacket::AssembleParameters(Packet *pkt)
     size_t bufferSize = parameterLength_ + AVRC_TG_GEA_PARAMETER_LENGTH_SIZE;
     LOG_DEBUG("[AVRCP CT] BufferMalloc[%{public}zu]", bufferSize);
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgGeaPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -1675,6 +1707,10 @@ Packet *AvrcTgGpsPacket::AssembleParameters(Packet *pkt)
 
     auto buffer = BufferMalloc(
         AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_GPS_PARAMETER_LENGTH);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgGpsPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_GPS_PARAMETER_LENGTH));
@@ -1829,6 +1865,10 @@ Packet *AvrcTgAcrPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] AvrcTgAcrPacket::%{public}s", __func__);
 
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgAcrPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE));
@@ -1924,6 +1964,10 @@ Packet *AvrcTgSapPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgSapPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -2022,6 +2066,10 @@ Packet *AvrcTgPiPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgPiPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -2126,6 +2174,10 @@ Packet *AvrcTgAtnpPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgAtnpPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
@@ -2239,6 +2291,10 @@ Packet *AvrcTgSavPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP TG] AvrcTgSavPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
