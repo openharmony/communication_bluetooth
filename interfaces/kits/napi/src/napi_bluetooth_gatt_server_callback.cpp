@@ -136,8 +136,8 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
             if (*it == device.GetDeviceAddr()) {
                 HILOGI("NapiGattServerCallback::OnConnectionStateUpdate romove devices start");
                 NapiGattServer::deviceList.erase(it);
-                break;
                 HILOGI("NapiGattServerCallback::OnConnectionStateUpdate romove devices end");
+                break;
             }
         }
     }

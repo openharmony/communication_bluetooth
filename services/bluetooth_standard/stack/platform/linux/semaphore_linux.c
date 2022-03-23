@@ -46,6 +46,12 @@ Semaphore *SemaphoreCreate(uint32_t val)
     }
 
     Semaphore *semaphore = (Semaphore *)malloc(sizeof(Semaphore));
+    if (semaphore == NULL) {
+        close(efd);
+        MutexDelete(mutex);
+        LOG_ERROR("SemaphoreCreate: create Semaphore failed.");
+        return NULL;
+    }
     semaphore->fd = efd;
     semaphore->mutex = mutex;
 

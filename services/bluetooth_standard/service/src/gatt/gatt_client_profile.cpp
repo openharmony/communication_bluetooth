@@ -2319,6 +2319,9 @@ uint8_t *GattClientProfile::impl::GetReadValueCache(uint16_t connectHandle, uint
     for (iter = readValCache_.begin(); iter != readValCache_.end(); iter++) {
         if (connectHandle == iter->first && handle == iter->second.handle_) {
             buffer = (uint8_t *)malloc(PacketSize(iter->second.data_));
+            if (buffer == nullptr) {
+                break;
+            }
             PacketRead(iter->second.data_, buffer, 0, PacketSize(iter->second.data_));
             PacketFree(iter->second.data_);
             readValCache_.erase(iter);
