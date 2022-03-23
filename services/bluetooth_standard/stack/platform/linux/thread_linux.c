@@ -140,9 +140,9 @@ Thread *ThreadCreate(const char *name)
     }
 
     if (name != NULL) {
-        (void)strncpy_s(promise->name, THREAD_NAME_SIZE, name, THREAD_NAME_SIZE);
+        (void)strncpy_s(promise->name, THREAD_NAME_SIZE + 1, name, THREAD_NAME_SIZE);
     } else {
-        (void)strncpy_s(promise->name, THREAD_NAME_SIZE, THREAD_DEFAULT_NAME, THREAD_NAME_SIZE);
+        (void)strncpy_s(promise->name, THREAD_NAME_SIZE + 1, THREAD_DEFAULT_NAME, THREAD_NAME_SIZE);
     }
 
     (void)pthread_create(&thread->pthread, NULL, ThreadStartFunc, promise);
@@ -158,8 +158,8 @@ ERROR:
         ReactorDelete(thread->reactor);
         QueueDelete(thread->taskQueue, free);
         MutexDelete(thread->apiMutex);
+        free(thread);
     }
-    free(thread);
     return NULL;
 }
 
@@ -183,6 +183,9 @@ void ThreadPostTask(Thread *thread, TaskFunc func, void *context)
     ASSERT(func);
 
     TaskItem *task = (TaskItem *)malloc(sizeof(TaskItem));
+    if (task == NULL) {
+        return;
+    }
     task->func = func;
     task->context = context;
     QueueEnqueue(thread->taskQueue, task);

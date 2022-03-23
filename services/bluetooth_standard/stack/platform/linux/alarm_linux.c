@@ -102,9 +102,9 @@ Alarm *AlarmCreate(const char *name, const bool isPeriodic)
     }
 
     if (name != NULL) {
-        (void)strncpy_s(alarm->name, ALARM_NAME_SIZE, name, ALARM_NAME_SIZE);
+        (void)strncpy_s(alarm->name, ALARM_NAME_SIZE + 1, name, ALARM_NAME_SIZE);
     } else {
-        (void)strncpy_s(alarm->name, ALARM_NAME_SIZE, g_defaultName, ALARM_NAME_SIZE);
+        (void)strncpy_s(alarm->name, ALARM_NAME_SIZE + 1, g_defaultName, ALARM_NAME_SIZE);
     }
 
     int timerFd = timerfd_create(BT_CLOCK_MONOTONIC, TFD_NONBLOCK);

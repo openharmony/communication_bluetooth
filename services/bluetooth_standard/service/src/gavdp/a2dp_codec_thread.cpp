@@ -94,7 +94,9 @@ void A2dpCodecThread::ProcessMessage(utility::Message msg, const A2dpEncoderInit
             if (msg.arg2_ != nullptr && decoder_ != nullptr) {
                 decoder_->DecodePacket((uint8_t *)msg.arg2_, msg.arg1_);
             }
-            free((uint8_t *)msg.arg2_);
+            if (msg.arg2_ != nullptr) {
+                free((uint8_t *)msg.arg2_);
+            }
             break;
         case A2DP_PCM_ENCODED:
             if (config == nullptr) {
