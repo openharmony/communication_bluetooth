@@ -293,7 +293,7 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
     NAPI_ASSERT(env, isArray, "Wrong argument type. Array expected.");
     uint32_t length = 0;
     napi_get_array_length(env, result, &length);
-    if (length < 0) {
+    if (length == 0) {
         HILOGE("ParseManufactureDataParameters,The array is empty.");
         return NapiGetNull(env);
     }
@@ -340,7 +340,7 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
     NAPI_ASSERT(env, isArray, "Wrong argument type. Array expected.");
     uint32_t length = 0;
     napi_get_array_length(env, result, &length);
-    if (length < 0) {
+    if (length == 0) {
         HILOGE("ParseServiceDataParameters,The array is empty.");
         return NapiGetNull(env);
     }

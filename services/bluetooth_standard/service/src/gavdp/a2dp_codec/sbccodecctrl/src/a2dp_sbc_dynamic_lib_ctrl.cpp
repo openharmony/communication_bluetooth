@@ -94,8 +94,8 @@ void A2dpSBCDynamicLibCtrl::UnloadCodecSbcLib(CODECSbcLib *lib) const
                 dlclose(lib->lib);
                 lib->lib = nullptr;
             }
+            delete lib;
         }
-        delete lib;
     } else {
         if (lib != nullptr) {
             lib->sbcDecoder.createSbcDecode = nullptr;
@@ -104,8 +104,8 @@ void A2dpSBCDynamicLibCtrl::UnloadCodecSbcLib(CODECSbcLib *lib) const
                 dlclose(lib->lib);
                 lib->lib = nullptr;
             }
+            delete lib;
         }
-        delete lib;
     }
 }
 }  // namespace bluetooth

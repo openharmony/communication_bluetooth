@@ -37,6 +37,7 @@ void AVDT_Register(const AvdtRegisterParam *reg)
     AvdtRegisterTskParam *param = malloc(sizeof(AvdtRegisterTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return;
     }
     (void)memset_s(param, sizeof(AvdtRegisterTskParam), 0, sizeof(AvdtRegisterTskParam));
@@ -99,6 +100,7 @@ uint16_t AVDT_CreateStream(const BtAddr *bdAddr, uint16_t *handle, uint16_t code
     AvdtCreateStreamTskParam *param = malloc(sizeof(AvdtCreateStreamTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtCreateStreamTskParam), 0, sizeof(AvdtCreateStreamTskParam));
@@ -178,6 +180,7 @@ uint16_t AVDT_RegisterLocalSEP(AvdtStreamConfig *avdtStreamConfig, uint8_t numbe
     AvdtRegisterLocalSEPTskParam *param = malloc(sizeof(AvdtRegisterLocalSEPTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtRegisterLocalSEPTskParam), 0, sizeof(AvdtRegisterLocalSEPTskParam));
@@ -249,6 +252,7 @@ uint16_t AVDT_DiscoverReq(const BtAddr *bdAddr, uint8_t maxSeps, uint8_t *transL
     AvdtDiscoverReqTskParam *param = malloc(sizeof(AvdtDiscoverReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtDiscoverReqTskParam), 0, sizeof(AvdtDiscoverReqTskParam));
@@ -351,6 +355,7 @@ uint16_t AVDT_GetCapReq(const BtAddr *bdAddr, uint8_t acpSeid, uint8_t *transLab
     AvdtGetCapReqTskParam *param = malloc(sizeof(AvdtGetCapReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtGetCapReqTskParam), 0, sizeof(AvdtGetCapReqTskParam));
@@ -423,6 +428,7 @@ uint16_t AVDT_GetCapRsp(const BtAddr *bdAddr, uint8_t transLabel, uint8_t errCod
     AvdtGetCapRspTskParam *param = malloc(sizeof(AvdtGetCapRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtGetCapRspTskParam), 0, sizeof(AvdtGetCapRspTskParam));
@@ -490,6 +496,7 @@ uint16_t AVDT_GetAllCapReq(const BtAddr *bdAddr, uint8_t acpSeid, uint8_t *trans
     AvdtGetAllCapReqTskParam *param = malloc(sizeof(AvdtGetAllCapReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtGetAllCapReqTskParam), 0, sizeof(AvdtGetAllCapReqTskParam));
@@ -562,6 +569,7 @@ uint16_t AVDT_GetAllCapRsp(const BtAddr *bdAddr, uint8_t transLabel, uint8_t err
     AvdtGetAllCapRspTskParam *param = malloc(sizeof(AvdtGetAllCapRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtGetAllCapRspTskParam), 0, sizeof(AvdtGetAllCapRspTskParam));
@@ -623,6 +631,7 @@ uint16_t AVDT_DelayReq(uint16_t handle, uint8_t *transLabel, uint16_t delayValue
     AvdtDelayReqTskParam *param = malloc(sizeof(AvdtDelayReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtDelayReqTskParam), 0, sizeof(AvdtDelayReqTskParam));
@@ -691,6 +700,7 @@ uint16_t AVDT_DelayRsp(uint16_t handle, uint8_t transLabel, uint8_t errCode)
     AvdtDelayRspTskParam *param = malloc(sizeof(AvdtDelayRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtDelayRspTskParam), 0, sizeof(AvdtDelayRspTskParam));
@@ -760,6 +770,7 @@ uint16_t AVDT_OpenReq(uint16_t handle, uint8_t *transLabel)
     AvdtOpenReqTskParam *param = malloc(sizeof(AvdtOpenReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtOpenReqTskParam), 0, sizeof(AvdtOpenReqTskParam));
@@ -848,6 +859,7 @@ uint16_t AVDT_SetConfigReq(uint16_t handle, uint8_t seid, AvdtSepConfig *sepConf
     AvdtSetConfigReqTskParam *param = malloc(sizeof(AvdtSetConfigReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtSetConfigReqTskParam), 0, sizeof(AvdtSetConfigReqTskParam));
@@ -931,6 +943,7 @@ uint16_t AVDT_SetConfigRsp(uint16_t handle, uint8_t transLabel, AvdtCatetory cat
     AvdtSetConfigRspTskParam *param = malloc(sizeof(AvdtSetConfigRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtSetConfigRspTskParam), 0, sizeof(AvdtSetConfigRspTskParam));
@@ -996,6 +1009,7 @@ uint16_t AVDT_GetConfigReq(uint16_t handle, uint8_t *transLabel)
     AvdtGetConfigReqTskParam *param = malloc(sizeof(AvdtGetConfigReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtGetConfigReqTskParam), 0, sizeof(AvdtGetConfigReqTskParam));
@@ -1065,6 +1079,7 @@ uint16_t AVDT_StartReq(const uint16_t *handles, uint8_t numHandles, uint8_t *tra
     AvdtStartReqTskParam *param = malloc(sizeof(AvdtStartReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtStartReqTskParam), 0, sizeof(AvdtStartReqTskParam));
@@ -1138,6 +1153,7 @@ uint16_t AVDT_StartRsp(uint16_t firstHandle, uint8_t transLabel, uint16_t firstF
     AvdtStartRspTskParam *param = malloc(sizeof(AvdtStartRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtStartRspTskParam), 0, sizeof(AvdtStartRspTskParam));
@@ -1215,6 +1231,7 @@ uint16_t AVDT_SuspendReq(const uint16_t *handles, uint8_t numHandles, uint8_t *t
     AvdtSuspendReqTskParam *param = malloc(sizeof(AvdtSuspendReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtSuspendReqTskParam), 0, sizeof(AvdtSuspendReqTskParam));
@@ -1284,6 +1301,7 @@ uint16_t AVDT_SuspendRsp(uint16_t firstHandle, uint8_t transLabel, uint16_t firs
     AvdtSuspendRspTskParam *param = malloc(sizeof(AvdtSuspendRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtSuspendRspTskParam), 0, sizeof(AvdtSuspendRspTskParam));
@@ -1356,6 +1374,7 @@ uint16_t AVDT_CloseReq(uint16_t handle)
     AvdtCloseReqTskParam *param = malloc(sizeof(AvdtCloseReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtCloseReqTskParam), 0, sizeof(AvdtCloseReqTskParam));
@@ -1422,6 +1441,7 @@ uint16_t AVDT_CloseRsp(uint16_t handle, uint8_t transLabel, uint8_t errCode)
     AvdtCloseRspTskParam *param = malloc(sizeof(AvdtCloseRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtCloseRspTskParam), 0, sizeof(AvdtCloseRspTskParam));
@@ -1489,6 +1509,7 @@ uint16_t AVDT_AbortReq(uint16_t handle, uint8_t *transLabel)
     AvdtAbortReqTskParam *param = malloc(sizeof(AvdtAbortReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtAbortReqTskParam), 0, sizeof(AvdtAbortReqTskParam));
@@ -1555,6 +1576,7 @@ uint16_t AVDT_AbortRsp(uint16_t handle, uint8_t transLabel, uint8_t errCode)
     AvdtAbortRspTskParam *param = malloc(sizeof(AvdtAbortRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtAbortRspTskParam), 0, sizeof(AvdtAbortRspTskParam));
@@ -1627,6 +1649,7 @@ uint16_t AVDT_ReconfigReq(uint16_t handle, AvdtSepConfig *cfg, uint8_t *transLab
     AvdtReconfigReqTskParam *param = malloc(sizeof(AvdtReconfigReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtReconfigReqTskParam), 0, sizeof(AvdtReconfigReqTskParam));
@@ -1697,6 +1720,7 @@ uint16_t AVDT_ReconfigRsp(uint16_t handle, uint8_t transLabel, AvdtCatetory cate
     AvdtReconfigRspTskParam *param = malloc(sizeof(AvdtReconfigRspTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtReconfigRspTskParam), 0, sizeof(AvdtReconfigRspTskParam));
@@ -1772,6 +1796,7 @@ uint16_t AVDT_WriteReq(uint16_t handle, const Packet *pkt, uint32_t timeStamp, u
     AvdtWriteReqTskParam *param = malloc(sizeof(AvdtWriteReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtWriteReqTskParam), 0, sizeof(AvdtWriteReqTskParam));
@@ -1874,6 +1899,7 @@ uint16_t AVDT_ConnectReq(const BtAddr *bdAddr, uint8_t role)
     AvdtConnectReqTskParam *param = malloc(sizeof(AvdtConnectReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtConnectReqTskParam), 0, sizeof(AvdtConnectReqTskParam));
@@ -1944,6 +1970,7 @@ uint16_t AVDT_DisconnectReq(const BtAddr *bdAddr)
     AvdtDisconnectReqTskParam *param = malloc(sizeof(AvdtDisconnectReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return Ret;
     }
     (void)memset_s(param, sizeof(AvdtDisconnectReqTskParam), 0, sizeof(AvdtDisconnectReqTskParam));

@@ -61,6 +61,10 @@ Packet *AvrcCtNotifyPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP CT] BufferMalloc[%{public}zu]", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
+    if (buffer == nullptr) {
+        LOG_ERROR("[AVRCP CT] AvrcCtNotifyPacket::AssembleParameters BufferMalloc fail");
+        return pkt;
+    }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
