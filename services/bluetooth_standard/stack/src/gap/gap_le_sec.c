@@ -88,10 +88,9 @@ void GapDoLeSecurityCallback(const void *data)
 
     if (deviceInfo != NULL) {
         encryptionStatus = deviceInfo->encryptionStatus;
-    }
-
-    if (callback != NULL) {
-        callback(&deviceInfo->addr, result, encryptionStatus, context);
+        if (callback != NULL) {
+            callback(&deviceInfo->addr, result, encryptionStatus, context);
+        }
     }
 }
 

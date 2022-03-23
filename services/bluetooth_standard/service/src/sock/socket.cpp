@@ -319,6 +319,9 @@ void Socket::impl::SockRfcFcOn(Socket &socket, DataTransport *transport)
         void *buffer = BufferPtr(wPayloadBuf);
         (void)memcpy_s(buffer, socketTmp->sendBufLen_, socketTmp->sendDataBuf_, socketTmp->sendBufLen_);
         if (wPayloadBuf == nullptr) {
+            if (wPkt != nullptr) {
+                PacketFree(wPkt);
+            }
             return;
         }
         int ret = socketTmp->TransportWrite(wPkt);
@@ -756,7 +759,7 @@ void Socket::WriteDataToAPP(const uint8_t *buffer, size_t len)
         case SOCKET_SEND_PARTIAL:
             LOG_INFO("[sock]%{public}s SOCKET_SEND_PARTIAL", __func__);
             this->isCanRead_ = false;
-            (void)memcpy_s(this->recvDataBuf_, len, buffer, len);
+            (void)memcpy_s(this->recvDataBuf_, SOCK_DEF_RFC_MTU, buffer, len);
             this->recvBufLen_ = len;
             SocketThread::GetInstance().AddSocket(this->transportFd_, 1, *this);
             break;
