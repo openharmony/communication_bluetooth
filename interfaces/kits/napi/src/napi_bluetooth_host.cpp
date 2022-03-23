@@ -310,29 +310,9 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t state = host->GetBtConnectionState();
     HILOGD("GetBtConnectionState start state %{public}d", state);
-    int32_t profileConnectionState = ProfileConnectionState::STATE_DISCONNECTING;
-    switch (state) {
-        case static_cast<int32_t>(BTConnectState::CONNECTING):
-            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState connecting");
-            profileConnectionState = ProfileConnectionState::STATE_CONNECTING;
-            break;
-        case static_cast<int32_t>(BTConnectState::CONNECTED):
-            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState connected");
-            profileConnectionState = ProfileConnectionState::STATE_CONNECTED;
-            break;
-        case static_cast<int32_t>(BTConnectState::DISCONNECTING):
-            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState disconnecting");
-            profileConnectionState = ProfileConnectionState::STATE_DISCONNECTING;
-            break;
-        case static_cast<int32_t>(BTConnectState::DISCONNECTED):
-            HILOGD("NapiBluetoothHostObserver::GetBtConnectionState BTConnectState disconnected");
-            profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
-            break;
-        default:
-            break;
-    }
+    
     napi_value result = nullptr;
-    napi_create_int32(env, profileConnectionState, &result);
+    napi_create_int32(env, GetProfileConnectionState(state), &result);
     HILOGI("GetBtConnectionState end");
     return result;
 }

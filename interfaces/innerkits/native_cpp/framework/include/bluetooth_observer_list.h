@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,9 +49,6 @@ BluetoothObserverList<T>::~BluetoothObserverList()
 {
     HILOGI("BluetoothObserverList<T>::~BluetoothObserverList() called");
     std::lock_guard<std::mutex> lock(lock_);
-    for (auto it = observers_.begin(); it != observers_.end(); ++it) {
-        observers_.erase(it);
-    }
     observers_.clear();
 }
 
@@ -90,7 +87,9 @@ void BluetoothObserverList<T>::ForEach(const std::function<void(std::shared_ptr<
     HILOGI("BluetoothObserverList<T>::ForEach called");
     std::lock_guard<std::mutex> lock(lock_);
     for (const auto &it : observers_) {
-        observer(it);
+        if (it != nullptr) {
+            observer(it);
+        }
     }
 }
 }  // namespace Bluetooth

@@ -68,8 +68,6 @@ RemoteObserverList<T>::~RemoteObserverList()
     std::lock_guard<std::mutex> lock(lock_);
     for (auto it = observers_.begin(); it != observers_.end(); ++it) {
         sptr<ObserverDeathRecipient> dr = it->second;
-        observers_.erase(it);
-
         if (!dr->GetObserver()->AsObject()->RemoveDeathRecipient(dr)) {
             HILOGE("Failed to unlink death recipient from observer");
         }
@@ -84,7 +82,7 @@ bool RemoteObserverList<T>::Register(const sptr<T> &observer)
     std::lock_guard<std::mutex> lock(lock_);
 
     for (const auto &it : observers_) {
-        if (it.first->AsObject() == observer->AsObject()) {
+        if (it.first != nullptr && it.first->AsObject() == observer->AsObject()) {
             HILOGW("Observer list already contains given observer");
             return false;
         }
@@ -109,7 +107,7 @@ bool RemoteObserverList<T>::Deregister(const sptr<T> &observer)
     std::lock_guard<std::mutex> lock(lock_);
 
     for (auto it = observers_.begin(); it != observers_.end(); ++it) {
-        if (it->first->AsObject() == observer->AsObject()) {
+        if (it->first != nullptr && it->first->AsObject() == observer->AsObject()) {
             return UnregisterInternal(it);
         }
     }
