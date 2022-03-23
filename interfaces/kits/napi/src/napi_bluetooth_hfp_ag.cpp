@@ -21,6 +21,7 @@ namespace Bluetooth {
 using namespace std;
 
 NapiHandsFreeAudioGatewayObserver NapiHandsFreeAudioGateway::observer_;
+bool NapiHandsFreeAudioGateway::isRegistered_ = false;
 
 void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
 {
@@ -47,8 +48,6 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
-    HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-    profile->RegisterObserver(&observer_);
     HILOGI("DefineHandsFreeAudioGatewayJSClass finished");
 }
 
@@ -92,6 +91,12 @@ napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info)
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     observer_.callbackInfos_[type] = callbackInfo;
     HILOGI("%{public}s is registered", type.c_str());
+
+    if (!isRegistered_) {
+        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+        profile->RegisterObserver(&observer_);
+        isRegistered_ = true;
+    }
     
     return ret;
 }
@@ -167,7 +172,7 @@ napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, GetProfileConnectionState(state), &result);
     return result;
 }
 
@@ -198,7 +203,7 @@ napi_value NapiHandsFreeAudioGateway::GetScoState(napi_env env, napi_callback_in
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetScoState(device);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, GetScoConnectionState(state), &result);
     return result;
 }
 

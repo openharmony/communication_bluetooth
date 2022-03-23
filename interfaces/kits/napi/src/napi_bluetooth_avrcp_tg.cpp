@@ -21,6 +21,7 @@ namespace Bluetooth {
 using namespace std;
 
 NapiAvrcpTargetObserver NapiAvrcpTarget::observer_;
+bool NapiAvrcpTarget::isRegistered_ = false;
 
 void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env)
 {
@@ -41,8 +42,6 @@ void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_AVRCP_TG, napiProfile);
-    AvrcpTarget *profile = AvrcpTarget::GetProfile();
-    profile->RegisterObserver(&observer_);
     HILOGI("DefineAvrcpTargetJSClass finished");
 }
 
@@ -55,6 +54,7 @@ napi_value NapiAvrcpTarget::AvrcpTargetConstructor(napi_env env, napi_callback_i
 
 napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info) {
     HILOGI("On called");
+    
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -84,6 +84,12 @@ napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info) {
     }
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     observer_.callbackInfos_[type] = callbackInfo;
+
+    if (!isRegistered_) {
+        AvrcpTarget *profile = AvrcpTarget::GetProfile();
+        profile->RegisterObserver(&observer_);
+        isRegistered_ = true;
+    }
 
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
@@ -162,7 +168,7 @@ napi_value NapiAvrcpTarget::GetDeviceState(napi_env env, napi_callback_info info
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, GetProfileConnectionState(state), &result);
     return result;
 }
 

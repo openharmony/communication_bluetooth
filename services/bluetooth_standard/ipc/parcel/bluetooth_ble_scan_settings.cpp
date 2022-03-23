@@ -51,7 +51,7 @@ bool BluetoothBleScanSettings::WriteToParcel(Parcel &parcel)
 
 bool BluetoothBleScanSettings::ReadFromParcel(Parcel &parcel)
 {
-    int64_t reportDelayMillis;
+    int64_t reportDelayMillis = 0;
     if (parcel.ReadInt64(reportDelayMillis)) {
         BluetoothBleScanSettings::SetReportDelay(reportDelayMillis);
     } else {
