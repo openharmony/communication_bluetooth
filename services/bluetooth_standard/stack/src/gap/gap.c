@@ -89,6 +89,7 @@ static void GapInitialize(int traceLevel)
     GapInitializeParam *ctx = MEM_MALLOC.alloc(sizeof(GapInitializeParam));
     if (ctx == NULL) {
         LOG_ERROR("%{public}s: Alloc error.", __FUNCTION__);
+        return;
     }
 
     int ret = GapRunTaskBlockProcess(GapInitializeTask, ctx);

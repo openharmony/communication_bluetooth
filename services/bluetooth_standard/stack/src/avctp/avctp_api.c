@@ -44,6 +44,7 @@ void AVCT_Register(uint16_t mtu, uint16_t mtuBr, uint16_t role)
     AvctRegisterTskParam *param = malloc(sizeof(AvctRegisterTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return;
     }
     (void)memset_s(param, sizeof(AvctRegisterTskParam), 0, sizeof(AvctRegisterTskParam));
@@ -96,6 +97,7 @@ void AVCT_Deregister(void)
     AvctDeregisterTskParam *param = malloc(sizeof(AvctDeregisterTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return;
     }
     (void)memset_s(param, sizeof(AvctDeregisterTskParam), 0, sizeof(AvctDeregisterTskParam));
@@ -151,12 +153,13 @@ uint16_t AVCT_ConnectReq(uint8_t *connId, const AvctConnectParam *connParam, con
     AvctConnectReqTskParam *param = malloc(sizeof(AvctConnectReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return ret;
     }
     (void)memset_s(param, sizeof(AvctConnectReqTskParam), 0, sizeof(AvctConnectReqTskParam));
     param->event = event;
     param->connId = *connId;
-    (void)memcpy_s(&param->connParam, sizeof(AvctConnectReqTskParam), connParam, sizeof(AvctConnectParam));
+    (void)memcpy_s(&param->connParam, sizeof(AvctConnectParam), connParam, sizeof(AvctConnectParam));
     (void)memcpy_s(&param->peerAddr, sizeof(BtAddr), peerAddr, sizeof(BtAddr));
     if (!AvctAsyncProcess(AvctConnectReqTsk, param)) {
         EventWait(event, WAIT_TIME);
@@ -215,6 +218,7 @@ uint16_t AVCT_DisconnectReq(uint8_t connId)
     AvctDisconnectReqTskParam *param = malloc(sizeof(AvctDisconnectReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return ret;
     }
     (void)memset_s(param, sizeof(AvctDisconnectReqTskParam), 0, sizeof(AvctDisconnectReqTskParam));
@@ -266,6 +270,7 @@ uint16_t AVCT_SendMsgReq(uint8_t connId, uint8_t label, uint8_t cr, const Packet
     AvctSendMsgReqTskParam *param = malloc(sizeof(AvctSendMsgReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return ret;
     }
     (void)memset_s(param, sizeof(AvctSendMsgReqTskParam), 0, sizeof(AvctSendMsgReqTskParam));
@@ -360,6 +365,7 @@ uint16_t AVCT_BrConnectReq(uint8_t connId, uint8_t role)
     AvctBrConnectReqTskParam *param = malloc(sizeof(AvctBrConnectReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return ret;
     }
     (void)memset_s(param, sizeof(AvctBrConnectReqTskParam), 0, sizeof(AvctBrConnectReqTskParam));
@@ -414,6 +420,7 @@ uint16_t AVCT_BrDisconnectReq(uint8_t connId)
     AvctBrDisconnectReqTskParam *param = malloc(sizeof(AvctBrDisconnectReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return ret;
     }
     (void)memset_s(param, sizeof(AvctBrDisconnectReqTskParam), 0, sizeof(AvctBrDisconnectReqTskParam));
@@ -464,6 +471,7 @@ uint16_t AVCT_BrSendMsgReq(uint8_t connId, uint8_t label, uint8_t cr, const Pack
     AvctBrSendMsgReqTskParam *param = malloc(sizeof(AvctBrSendMsgReqTskParam));
     if (param == NULL) {
         LOG_ERROR("[AVCT] %{public}s: memory malloc failed", __func__);
+        EventDelete(event);
         return ret;
     }
     (void)memset_s(param, sizeof(AvctBrSendMsgReqTskParam), 0, sizeof(AvctBrSendMsgReqTskParam));

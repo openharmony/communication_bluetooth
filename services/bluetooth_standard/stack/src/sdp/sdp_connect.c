@@ -1304,6 +1304,8 @@ void SdpSendSearchFragmentResponse(uint16_t lcid, uint16_t transactionId, uint16
         transactionId, size, totalServiceRecordCount, currentServiceRecordCount, fragmentPacket);
     if (sendPacket == NULL) {
         SdpSendErrorResponse(lcid, transactionId, SDP_INVALID_CONT_STATE);
+        PacketFree(fragmentPacket);
+        fragmentPacket = NULL;
         return;
     }
 
