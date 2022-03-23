@@ -21,6 +21,7 @@ namespace Bluetooth {
 using namespace std;
 
 NapiPbapPceObserver NapiPbapClient::observer_;
+bool NapiPbapClient::isRegistered_ = false;
 
 void NapiPbapClient::DefinePbapClientJSClass(napi_env env)
 {
@@ -41,8 +42,6 @@ void NapiPbapClient::DefinePbapClientJSClass(napi_env env)
     napi_value NapiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &NapiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_PBAP_CLIENT, NapiProfile);
-    PbapClient *profile = PbapClient::GetProfile();
-    profile->RegisterObserver(&observer_);
     HILOGI("DefinePbapClientJSClass finished");
 }
 
@@ -85,6 +84,12 @@ napi_value NapiPbapClient::On(napi_env env, napi_callback_info info)
     }
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     observer_.callbackInfos_[type] = callbackInfo;
+
+    if (!isRegistered_) {
+        PbapClient *profile = PbapClient::GetProfile();
+        profile->RegisterObserver(&observer_);
+        isRegistered_ = true;
+    }
 
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
@@ -164,7 +169,7 @@ napi_value NapiPbapClient::GetDeviceState(napi_env env, napi_callback_info info)
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, GetProfileConnectionState(state), &result);
     return result;
 }
 

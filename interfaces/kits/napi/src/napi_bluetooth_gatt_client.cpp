@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-napi_value NapiGattClient::constructor_ = nullptr;
+thread_local napi_ref NapiGattClient::consRef_ = nullptr;
 
 
 napi_value NapiGattClient::CreateGattClientDevice(napi_env env, napi_callback_info info)
@@ -39,7 +39,9 @@ napi_value NapiGattClient::CreateGattClientDevice(napi_env env, napi_callback_in
     NAPI_ASSERT(env, argc == expectedArgsCount, "Requires 1 arguments.");
 
     napi_value result;
-    napi_new_instance(env, constructor_, argc, argv, &result);
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, consRef_, &constructor);
+    napi_new_instance(env, constructor, argc, argv, &result);
 
     return result;
 }
@@ -63,8 +65,12 @@ void NapiGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("off", Off),
     };
 
+    napi_value constructor = nullptr;
+
     napi_define_class(env, "GattClientDevice", NAPI_AUTO_LENGTH, GattClientConstructor, nullptr,
-        sizeof(properties) / sizeof(properties[0]), properties, &constructor_);
+        sizeof(properties) / sizeof(properties[0]), properties, &constructor);
+    
+    napi_create_reference(env, constructor, 1, &consRef_);
 }
 
 napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_info info)
