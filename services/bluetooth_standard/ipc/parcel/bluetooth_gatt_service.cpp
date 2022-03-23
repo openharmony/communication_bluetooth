@@ -35,7 +35,7 @@ bool BluetoothGattService::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUint16(endHandle_)) {
         return false;
     }
-    BluetoothUuid uuid = BluetoothUuid(uuid_);
+    BluetoothUuid uuid(uuid_);
     if (!parcel.WriteParcelable(&uuid)) {
         return false;
     }

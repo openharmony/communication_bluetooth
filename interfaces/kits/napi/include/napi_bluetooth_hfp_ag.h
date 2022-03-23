@@ -44,6 +44,7 @@ public:
     static napi_value Disconnect(napi_env env, napi_callback_info info);
 
     static NapiHandsFreeAudioGatewayObserver observer_;
+    static bool isRegistered_;
 };
 
 }  // namespace Bluetooth

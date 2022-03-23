@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1742,21 +1742,21 @@ void GattClientProfile::impl::SplitReadByTypeRsp(
     uint16_t connectHandle, AttEventData *data, std::list<std::pair<uint16_t, GattRequestInfo>>::iterator iter)
 {
     LOG_INFO("%{public}s: connectHandle is %hu, respType is %{public}d.", __FUNCTION__, connectHandle, iter->second.reqType_);
-    switch (data->attReadByTypeResponse.readHandleListNum.len) {
-        case DISCOVER_CHARACTERISTIC_LENGTH_16BIT:
-        case DISCOVER_CHARACTERISTIC_LENGTH_128BIT:
-            if (iter->second.reqType_ == DISCOVER_ALL_CHARACTERISTIC) {
-                DiscoverAllCharacteristicOfServiceParsing(connectHandle, data, false, iter);
-            } else if (iter->second.reqType_ == DISCOVER_CHARACTERISTIC_BY_UUID) {
-                DiscoverCharacteristicByUUIDParsing(connectHandle, data, iter);
-            }
+    switch (iter->second.reqType_) {
+        case DISCOVER_ALL_CHARACTERISTIC:
+            DiscoverAllCharacteristicOfServiceParsing(connectHandle, data, false, iter);
             break;
-        case FIND_INCLUDE_SERVICE_LENGTH_16BIT:
-        case FIND_INCLUDE_SERVICE_LENGTH_128BIT:
+        case DISCOVER_CHARACTERISTIC_BY_UUID:
+            DiscoverCharacteristicByUUIDParsing(connectHandle, data, iter);
+            break;
+        case FIND_INCLUDE_SERVICE:
             FindIncludeServicesParsing(connectHandle, data, iter);
             break;
-        default:
+        case READ_USING_CHARACTERISTIC_UUID:
             ReadUsingCharacteristicByUuidParsing(connectHandle, data, iter);
+            break;
+        default:
+            LOG_ERROR("data len is %{public}d.", data->attReadByTypeResponse.readHandleListNum.len);
             break;
     }
 }
