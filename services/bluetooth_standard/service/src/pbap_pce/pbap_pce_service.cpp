@@ -75,7 +75,6 @@ int PbapPceService::SetConnectionStrategy(const RawAddress &device, int strategy
         default:
             PBAP_PCE_LOG_ERROR("%{public}s end, save strategy invalid value.", __PRETTY_FUNCTION__);
             return RET_BAD_PARAM;
-            break;
     }
 
     // Adjoint action

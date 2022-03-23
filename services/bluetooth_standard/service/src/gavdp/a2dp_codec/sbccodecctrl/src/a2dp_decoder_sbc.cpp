@@ -31,8 +31,9 @@ A2dpSbcDecoder::A2dpSbcDecoder(A2dpDecoderObserver *observer) : A2dpDecoder(obse
     codecSbcDecoderLib_ = codecLib_->LoadCodecSbcLib();
     if (codecSbcDecoderLib_ == nullptr) {
         LOG_ERROR("[SbcDecoder] %{public}s load sbc lib failed\n", __func__);
+    } else {
+        sbcDecoder_ = codecSbcDecoderLib_->sbcDecoder.createSbcDecode();
     }
-    sbcDecoder_ = codecSbcDecoderLib_->sbcDecoder.createSbcDecode();
 }
 
 A2dpSbcDecoder::~A2dpSbcDecoder()

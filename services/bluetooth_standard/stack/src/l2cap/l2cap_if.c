@@ -684,6 +684,7 @@ void L2CIF_Startup()
     ctx = L2capAlloc(sizeof(L2cifContext));
     if (ctx == NULL) {
         LOG_WARN("malloc failed");
+        SemaphoreDelete(sem);
         return;
     }
 
@@ -727,6 +728,7 @@ void L2CIF_Shutdown()
     ctx = L2capAlloc(sizeof(L2cifContext));
     if (ctx == NULL) {
         LOG_WARN("malloc failed");
+        SemaphoreDelete(sem);
         return;
     }
     ctx->sem = sem;

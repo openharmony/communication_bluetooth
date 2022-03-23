@@ -1375,7 +1375,6 @@ void BleAdvertiserImpl::GapAdvStopCompleteEvt(int status) const
                 LOG_ERROR("[BleAdvertiserImpl] %{public}s:Stop advertising failed! %{public}d.", __func__, status);
             }
             return;
-            break;
         default:
             break;
     }

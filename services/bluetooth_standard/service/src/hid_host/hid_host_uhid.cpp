@@ -194,7 +194,7 @@ int HidHostUhid::SendHidInfo(const char* devName, PnpInformation pnpInf, HidInfo
     ev.type = UHID_CREATE;
     BtAddr btAddr;
     RawAddress(address_).ConvertToUint8(btAddr.addr);
-    if (strncpy_s((char*)ev.u.create.name, sizeof(ev.u.create.name), devName, sizeof(ev.u.create.name)) != EOK) {
+    if (strncpy_s((char*)ev.u.create.name, sizeof(ev.u.create.name), devName, strlen(devName)) != EOK) {
         LOG_ERROR("[UHID]%{public}s(): strncpy_s name fail", __FUNCTION__);
         return E_ERR_NULL;
     }

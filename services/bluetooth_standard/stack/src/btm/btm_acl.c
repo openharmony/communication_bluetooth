@@ -452,8 +452,10 @@ int BTM_AclConnect(const BtAddr *addr)
                 connection->state = CONNECTING;
 
                 ListAddLast(g_aclList, connection);
+            } else {
+                MutexUnlock(g_aclListLock);
+                return BT_NO_MEMORY;
             }
-
             result = BtmAclCreateConnection(addr);
             if (result != BT_NO_ERROR) {
                 ListRemoveNode(g_aclList, connection);
