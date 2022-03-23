@@ -513,6 +513,10 @@ void GattServerProfile::impl::FindIncludedServiceResponse(
             uint8_t len = sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint16_t);
             valueList[0].attHandle.attHandle = isvc->handle_;
             valueList[0].attributeValue = (uint8_t *)malloc(len);
+            if (valueList[0].attributeValue == nullptr) {
+                LOG_ERROR("%{public}s, malloc fail", __FUNCTION__);
+                return;
+            }
             AssembleDataPackage(
                 valueList[0].attributeValue, len, &offset, (uint8_t *)&(isvc->startHandle_), sizeof(uint16_t));
             AssembleDataPackage(

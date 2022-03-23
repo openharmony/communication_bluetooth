@@ -306,7 +306,6 @@ bool PceConnectingState::Dispatch(const utility::Message &msg)
             break;
         default:
             return false;
-            break;
     }
 
     PBAP_PCE_LOG_INFO("%{public}s end, msg.what_=[%{public}d]", __PRETTY_FUNCTION__, msg.what_);

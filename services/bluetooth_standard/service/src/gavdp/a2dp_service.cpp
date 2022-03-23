@@ -1100,7 +1100,7 @@ void A2dpService::SetOptionalCodecsSupportState(const RawAddress &device, int st
     if (state == (int)A2DP_OPTIONAL_SUPPORT_UNKNOWN) {
         config->RemoveProperty(device.GetAddress(), SECTION_CODE_CS_SUPPORT, PROPERTY_A2DP_SUPPORTS_OPTIONAL_CODECS);
     } else {
-        LOG_INFO("[A2dpService] %{public}s ProfileConfig SetValue state（%{public}d）\n", __func__, state);
+        LOG_INFO("[A2dpService] %{public}s ProfileConfig SetValue state(%{public}d)\n", __func__, state);
         config->SetValue(device.GetAddress(), SECTION_CODE_CS_SUPPORT, PROPERTY_A2DP_SUPPORTS_OPTIONAL_CODECS, state);
     }
 }
