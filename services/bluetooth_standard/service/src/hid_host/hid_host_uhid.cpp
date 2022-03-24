@@ -357,7 +357,7 @@ void HidHostUhid::SetUhidNonBlocking(int fd)
         LOG_DEBUG("[UHID]%{public}s(): Getting flags failed (%{public}s)", __FUNCTION__,
             strerror(errno));
 
-    if (fcntl(fd, F_SETFL, opts | O_NONBLOCK) < 0)
+    if (fcntl(fd, F_SETFL, (unsigned int)opts | O_NONBLOCK) < 0)
         LOG_DEBUG("[UHID]%{public}s(): Setting non-blocking flag failed (%{public}s)", __FUNCTION__,
             strerror(errno));
 }
