@@ -1196,7 +1196,10 @@ void BleAdapter::SavePeerDevices2BTM(const std::map<std::string, BlePeripheralDe
         if (!irk.empty()) {
             std::vector<uint8_t> vec;
             BleUtils::ConvertHexStringToInt(irk, vec);
-            (void)memcpy_s(pairedDevice.remoteIdentityResolvingKey.key, KEY_SIZE, &vec[0], vec.size());
+            if (memcpy_s(pairedDevice.remoteIdentityResolvingKey.key, KEY_SIZE, &vec[0], vec.size()) != EOK) {
+                LOG_ERROR("[BleAdapter] %{public}s:SavePeerDevices2BTM memcpy_s failed!", __func__);
+                return;
+            }
         }
         devices.push_back(pairedDevice);
     }
