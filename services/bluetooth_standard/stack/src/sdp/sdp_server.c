@@ -936,7 +936,10 @@ static uint16_t SdpAddAttributeForUrl(uint8_t *buffer, uint16_t offset, const ui
     if (urlLen > (SDP_MAX_ATTRIBUTE_LEN - offset)) {
         urlLen = SDP_MAX_ATTRIBUTE_LEN - offset;
     }
-    (void)memcpy_s(buffer + offset, urlLen, url, urlLen);
+    if (memcpy_s(buffer + offset, urlLen, url, urlLen) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail", __FUNCTION__, __LINE__);
+        return offset;
+    }
     offset += urlLen;
 
     return offset;
@@ -1190,7 +1193,10 @@ static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, uint8_t
     /// continuation state yes or no (is 0)
     if (continuationStateLen != 0) {
         uint8_t continuationState[SDP_MAX_CONTINUATION_LEN] = {0};
-        (void)memcpy_s(continuationState, continuationStateLen, buffer + offset, continuationStateLen);
+        if (memcpy_s(continuationState, SDP_MAX_CONTINUATION_LEN, buffer + offset, continuationStateLen) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+            return;
+        }
         SdpSendSearchFragmentResponse(lcid, transactionId, maximumServiceRecordCount, NULL);
         return;
     }
@@ -1231,10 +1237,13 @@ static int BuildAttributeListByIdRange(uint32_t handle, uint8_t *buffer, uint8_t
             if ((item->attributeItem[i].attributeLength + offset) >= (SDP_MAX_LIST_BYTE_COUNT - SDP_RESERVE_LENGTH)) {
                 return BT_BAD_PARAM;
             }
-            (void)memcpy_s(attributeList + offset,
+            if (memcpy_s(attributeList + offset,
                 item->attributeItem[i].attributeLength,
                 item->attributeItem[i].attributeValue,
-                item->attributeItem[i].attributeLength);
+                item->attributeItem[i].attributeLength) != EOK) {
+                    LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+                    return BT_NO_MEMORY;
+                }
             offset += item->attributeItem[i].attributeLength;
         }
     }
@@ -1309,7 +1318,11 @@ static void SdpCreateAttributeResponse(
         SdpSendErrorResponse(lcid, transactionId, SDP_INVALID_PDU_SIZE);
         return;
     }
-    (void)memcpy_s(buffer + offset, length, attributeList, length);
+    if (memcpy_s(buffer + offset, length, attributeList, length) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        MEM_MALLOC.free(buffer);
+        return;
+    }
     offset += length;
 
     packet = PacketMalloc(0, 0, offset);
@@ -1405,15 +1418,24 @@ static int BuildServiceRecordHandleList(const uint8_t *buffer, uint16_t pos, uin
         type = *(buffer + pos);
         if (type == 0x19) {
             /// UUID 2 bytes (0x19)
-            (void)memcpy_s(uuidArray + uuidNum, SDP_UUID16_LENGTH + 1, buffer + pos, SDP_UUID16_LENGTH + 1);
+            if (memcpy_s(uuidArray + uuidNum, SDP_UUID16_LENGTH + 1, buffer + pos, SDP_UUID16_LENGTH + 1) != EOK) {
+                LOG_ERROR("[%{public}s][%{public}d] memcpy_s SDP_UUID16 fail.", __FUNCTION__, __LINE__);
+                return BT_NO_MEMORY;
+            }
             pos += SDP_UUID16_LENGTH + 1;
         } else if (type == 0x1A) {
             /// UUID 4 bytes (0x1A)
-            (void)memcpy_s(uuidArray + uuidNum, SDP_UUID32_LENGTH + 1, buffer + pos, SDP_UUID32_LENGTH + 1);
+            if (memcpy_s(uuidArray + uuidNum, SDP_UUID32_LENGTH + 1, buffer + pos, SDP_UUID32_LENGTH + 1) != EOK) {
+                LOG_ERROR("[%{public}s][%{public}d] memcpy_s SDP_UUID32 fail.", __FUNCTION__, __LINE__);
+                return BT_NO_MEMORY;
+            }
             pos += SDP_UUID32_LENGTH + 1;
         } else if (type == 0x1C) {
             /// UUID 16 bytes (0x1C)
-            (void)memcpy_s(uuidArray + uuidNum, SDP_UUID128_LENGTH + 1, buffer + pos, SDP_UUID128_LENGTH + 1);
+            if (memcpy_s(uuidArray + uuidNum, SDP_UUID128_LENGTH + 1, buffer + pos, SDP_UUID128_LENGTH + 1) != EOK) {
+                LOG_ERROR("[%{public}s][%{public}d] memcpy_s SDP_UUID128 fail.", __FUNCTION__, __LINE__);
+                return BT_NO_MEMORY;
+            }
             pos += SDP_UUID128_LENGTH + 1;
         } else {
             LOG_ERROR("The type [0x%02x] is wrong.", type);
@@ -1439,13 +1461,21 @@ static Packet *BuildAttributeListArrayCommon(int offset, uint8_t *attributeList,
         bufferPtr = BufferPtr(newBuffer);
         bufferPtr[0] = (DE_TYPE_DES << SDP_DESCRIPTOR_SIZE_BIT) | DE_SIZE_VAR_8;
         bufferPtr[1] = offset;
-        (void)memcpy_s(bufferPtr + SDP_UINT8_LENGTH + 1, offset, attributeList, offset);
+        if (memcpy_s(bufferPtr + SDP_UINT8_LENGTH + 1, offset, attributeList, offset) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+            BufferFree(newBuffer);
+            return NULL;
+        }
     } else if (offset <= 0xFFFF) {
         newBuffer = BufferMalloc(offset + SDP_UINT16_LENGTH + 1);
         bufferPtr = BufferPtr(newBuffer);
         bufferPtr[0] = (DE_TYPE_DES << SDP_DESCRIPTOR_SIZE_BIT) | DE_SIZE_VAR_16;
         *(uint16_t *)(bufferPtr + 1) = H2BE_16(offset);
-        (void)memcpy_s(bufferPtr + SDP_UINT16_LENGTH + 1, (uint16_t)offset, attributeList, (uint16_t)offset);
+        if (memcpy_s(bufferPtr + SDP_UINT16_LENGTH + 1, (uint16_t)offset, attributeList, (uint16_t)offset) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+            BufferFree(newBuffer);
+            return NULL;
+        }
     } else {
         return NULL;
     }
@@ -1533,7 +1563,10 @@ static uint16_t SdpParseSearchAttributeRequestCommon(
     /// continuation state yes or no (is 0)
     if (continuationStateLen != 0) {
         uint8_t continuationState[SDP_MAX_CONTINUATION_LEN] = {0};
-        (void)memcpy_s(continuationState, continuationStateLen, buffer + offset, continuationStateLen);
+        if (memcpy_s(continuationState, SDP_MAX_CONTINUATION_LEN, buffer + offset, continuationStateLen) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+            return 0;
+        }
         SdpSendAttributeFragmentResponse(
             lcid, SDP_SERVICE_SEARCH_ATTRIBUTE_RESPONSE, transactionId, maximumAttributeByteCount, NULL);
         return 0;
