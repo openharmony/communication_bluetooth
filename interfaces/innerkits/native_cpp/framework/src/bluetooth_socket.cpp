@@ -483,12 +483,15 @@ struct SppServerSocket::impl {
         uint8_t recvBuf[rv];
         memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
         if (memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv) != EOK) {
-            HILOGE("[sock] RecvSocketFd, memcpy_s fail");
+            HILOGE("[sock] RecvSocketFd, recvBuf memcpy_s fail");
             return BtStatus::BT_FAILURE;
         }
 
         uint8_t buf[6] = {0};
-        memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf));
+        if (memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf)) != EOK) {
+            HILOGE("[sock] RecvSocketFd, buf memcpy_s fail");
+            return BtStatus::BT_FAILURE;
+        }
 
         char token[LENGTH] = {0};
         (void)sprintf_s(token,
