@@ -258,13 +258,19 @@ static void SMP_ReceivePairingResponse(uint16_t handle, const Buffer *buffer)
     SMP_PairParam pairParamTemp;
 
     LOG_INFO("%{public}s", __FUNCTION__);
-    (void)memcpy_s(&pairParamTemp, sizeof(SMP_PairParam), (uint8_t *)BufferPtr(buffer), sizeof(SMP_PairParam));
+    if (memcpy_s(&pairParamTemp, sizeof(SMP_PairParam), (uint8_t *)BufferPtr(buffer), sizeof(SMP_PairParam)) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] pairParamTemp memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
     if (SMP_RecvPairRspJudgeException(handle, &pairParamTemp)) {
         return;
     }
     AlarmCancel(SMP_GetPairMng()->alarm);
-    (void)memcpy_s(
-        &SMP_GetPairMng()->peer.pairParam, sizeof(SMP_PairParam), (uint8_t *)BufferPtr(buffer), sizeof(SMP_PairParam));
+    if (memcpy_s(&SMP_GetPairMng()->peer.pairParam,
+        sizeof(SMP_PairParam), (uint8_t *)BufferPtr(buffer), sizeof(SMP_PairParam)) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] peer.pairParam memcpy_s fail.", __FUNCTION__, __LINE__);
+            return;
+        }
     AlarmSet(SMP_GetPairMng()->alarm, SMP_PAIR_WAIT_TIME, SMP_PairTimeout, NULL);
     SMP_NotifyCbPairRsp(handle, &pairParamTemp);
 }
@@ -638,7 +644,10 @@ static void SMP_RecvEncInfoProcessMaster(const Buffer *buffer)
         LOG_ERROR("It's invalid step.");
         return;
     }
-    (void)memcpy_s(SMP_GetPairMng()->peer.LTK, SMP_LTK_LEN, (uint8_t *)BufferPtr(buffer), SMP_LTK_LEN);
+    if (memcpy_s(SMP_GetPairMng()->peer.LTK, SMP_LTK_LEN, (uint8_t *)BufferPtr(buffer), SMP_LTK_LEN) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_ENC_INFO);
     if ((SMP_GetPairMng()->peer.keyDistCmdFlag != 0x00) ||
@@ -685,7 +694,10 @@ static void SMP_RecvEncInfoProcessSlave(const Buffer *buffer)
         return;
     }
 
-    (void)memcpy_s(SMP_GetPairMng()->peer.LTK, SMP_LTK_LEN, (uint8_t *)BufferPtr(buffer), SMP_LTK_LEN);
+    if (memcpy_s(SMP_GetPairMng()->peer.LTK, SMP_LTK_LEN, (uint8_t *)BufferPtr(buffer), SMP_LTK_LEN) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_ENC_INFO);
     if (SMP_GetPairMng()->peer.keyDistCmdFlag == 0x00) {
@@ -776,7 +788,10 @@ static void SMP_RecvIdentInfoProcessMaster(const Buffer *buffer)
         LOG_ERROR("It's invalid step.");
         return;
     }
-    (void)memcpy_s(SMP_GetPairMng()->peer.IRK, SMP_IRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_IRK_LEN);
+    if (memcpy_s(SMP_GetPairMng()->peer.IRK, SMP_IRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_IRK_LEN) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_IDENT_INFO);
     if ((SMP_GetPairMng()->peer.keyDistCmdFlag != 0x00) ||
@@ -825,7 +840,10 @@ static void SMP_RecvIdentInfoProcessSlave(const Buffer *buffer)
         return;
     }
 
-    (void)memcpy_s(SMP_GetPairMng()->peer.IRK, SMP_IRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_IRK_LEN);
+    if (memcpy_s(SMP_GetPairMng()->peer.IRK, SMP_IRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_IRK_LEN) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_IDENT_INFO);
     if (SMP_GetPairMng()->peer.keyDistCmdFlag == 0x00) {
@@ -848,7 +866,10 @@ static void SMP_RecvIdentAddrInfoProcessMaster(const Buffer *buffer)
         return;
     }
     SMP_GetPairMng()->peer.identityAddr.type = pData1[0x00];
-    (void)memcpy_s(SMP_GetPairMng()->peer.identityAddr.addr, BT_ADDRESS_SIZE, &(pData1[0x01]), BT_ADDRESS_SIZE);
+    if (memcpy_s(SMP_GetPairMng()->peer.identityAddr.addr, BT_ADDRESS_SIZE, &(pData1[0x01]), BT_ADDRESS_SIZE) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_IDENT_ADDR);
     if ((SMP_GetPairMng()->peer.keyDistCmdFlag != 0x00) ||
@@ -901,10 +922,13 @@ static void SMP_RecvIdentAddrInfoProcessSlave(const Buffer *buffer)
 
     pData2 = (uint8_t *)BufferPtr(buffer);
     SMP_GetPairMng()->peer.identityAddr.type = pData2[0x00];
-    (void)memcpy_s(SMP_GetPairMng()->peer.identityAddr.addr,
+    if (memcpy_s(SMP_GetPairMng()->peer.identityAddr.addr,
         sizeof(SMP_GetPairMng()->peer.identityAddr.addr),
         &(pData2[0x01]),
-        sizeof(SMP_GetPairMng()->peer.identityAddr.addr));
+        sizeof(SMP_GetPairMng()->peer.identityAddr.addr)) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+            return;
+        }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_IDENT_ADDR);
     if (SMP_GetPairMng()->peer.keyDistCmdFlag == 0x00) {
@@ -925,7 +949,10 @@ static void SMP_RecvSignInfoProcessMaster(const Buffer *buffer)
         LOG_ERROR("It's invalid step.");
         return;
     }
-    (void)memcpy_s(SMP_GetPairMng()->peer.CSRK, SMP_CSRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_CSRK_LEN);
+    if (memcpy_s(SMP_GetPairMng()->peer.CSRK, SMP_CSRK_LEN, (uint8_t *)BufferPtr(buffer), SMP_CSRK_LEN) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
     SMP_GetPairMng()->peer.keyDistCmdFlag =
         SMP_GetPairMng()->peer.keyDistCmdFlag & (~SMP_KEY_DIST_CMD_FLAG_BIT_SIGN_INFO);
     if ((SMP_GetPairMng()->peer.keyDistCmdFlag != 0x00) ||

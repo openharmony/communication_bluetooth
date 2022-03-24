@@ -1237,10 +1237,18 @@ Buffer *GattServerProfile::impl::AssembleServicePackage(uint16_t attHandle)
     Buffer *value = BufferMalloc(db_.GetService(attHandle)->uuid_.GetUuidType());
     if (db_.GetService(attHandle)->uuid_.GetUuidType() == UUID_16BIT_LEN) {
         uint16_t uuid16Bit = db_.GetService(attHandle)->uuid_.ConvertTo16Bits();
-        (void)memcpy_s(BufferPtr(value), BufferGetSize(value), &uuid16Bit, UUID_16BIT_LEN);
+        if (memcpy_s(BufferPtr(value), BufferGetSize(value), &uuid16Bit, UUID_16BIT_LEN) != EOK) {
+            LOG_ERROR("%{public}s: memcpy_s uuid16Bit fail", __FUNCTION__);
+            BufferFree(value);
+            value = nullptr;
+        }
     } else if (db_.GetService(attHandle)->uuid_.GetUuidType() == UUID_128BIT_LEN) {
         db_.GetService(attHandle)->uuid_.ConvertToBytesLE(uuid128Bit, UUID_128BIT_LEN);
-        (void)memcpy_s(BufferPtr(value), BufferGetSize(value), uuid128Bit, UUID_128BIT_LEN);
+        if (memcpy_s(BufferPtr(value), BufferGetSize(value), uuid128Bit, UUID_128BIT_LEN) != EOK) {
+            LOG_ERROR("%{public}s: memcpy_s uuid128Bit fail", __FUNCTION__);
+            BufferFree(value);
+            value = nullptr;
+        }
     } else {
         BufferFree(value);
         value = nullptr;

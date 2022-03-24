@@ -259,7 +259,10 @@ std::unique_ptr<uint8_t[]> GenericAttributeService::BuildValue(uint16_t startHan
     std::unique_ptr<uint8_t[]> value = std::make_unique<uint8_t[]>(SERVICE_CHANGED_VALUE_LENGTH);
 
     static const size_t doubleByte = 2;
-    memcpy_s(value.get(), SERVICE_CHANGED_VALUE_LENGTH, &startHandle, doubleByte);
+    if (memcpy_s(value.get(), SERVICE_CHANGED_VALUE_LENGTH, &startHandle, doubleByte) != EOK) {
+        LOG_ERROR("%{public}s:%{public}d:%{public}s::memcpy_s Failed!", __FILE__, __LINE__, __FUNCTION__);
+        return NULL;
+    }
     if (memcpy_s(value.get() + doubleByte, SERVICE_CHANGED_VALUE_LENGTH - doubleByte, &endHandle, doubleByte) != EOK) {
         LOG_ERROR("%{public}s:%{public}d:%{public}s::memcpy_s Failed!", __FILE__, __LINE__, __FUNCTION__);
         return NULL;
