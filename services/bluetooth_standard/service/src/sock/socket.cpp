@@ -500,7 +500,7 @@ int Socket::AddSocketInternal(BtAddr addr, DataTransport *transport, uint16_t se
     utility::Message msg(SOCKET_ACCEPT_NEW);
     msg.arg1_ = socketPair[0];
     msg.arg2_ = it.first->second.get();
-    SocketService *socketService = 
+    SocketService *socketService =
         static_cast<SocketService *>(IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP));
     if (socketService != nullptr) {
             socketService->ProcessMessage(msg);
@@ -657,7 +657,7 @@ void Socket::OnSocketWriteReady(Socket &sock)
         return;
     }
 
-    SocketService *socketService = 
+    SocketService *socketService =
         static_cast<SocketService *>(IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP));
     if (socketService != nullptr) {
         socketService->GetDispatcher()->PostTask(std::bind(&Socket::OnSocketWriteReadyNative, &sock, std::ref(sock)));
@@ -864,7 +864,7 @@ void Socket::OnSocketException(Socket &sock)
 {
     LOG_INFO("[sock]%{public}s", __func__);
 
-    SocketService *socketService = 
+    SocketService *socketService =
         static_cast<SocketService *>(IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP));
     if (socketService != nullptr) {
         socketService->GetDispatcher()->PostTask(std::bind(&Socket::OnSocketExceptionNative, &sock, std::ref(sock)));
@@ -941,7 +941,7 @@ void Socket::NotifyServiceDeleteSocket(Socket &sock)
 
     utility::Message msg(SOCKET_CLOSE);
     msg.arg2_ = &sock;
-    SocketService *socketService = 
+    SocketService *socketService =
         static_cast<SocketService *>(IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP));
     if (socketService != nullptr) {
         socketService->ProcessMessage(msg);
@@ -994,7 +994,7 @@ void Socket::CloseSocketFd()
 utility::Dispatcher *Socket::GetDispatchter()
 {
     LOG_INFO("[sock]%{public}s", __func__);
-    SocketService *socketService = 
+    SocketService *socketService =
         static_cast<SocketService *>(IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP));
     if (socketService == nullptr) {
         return nullptr;
