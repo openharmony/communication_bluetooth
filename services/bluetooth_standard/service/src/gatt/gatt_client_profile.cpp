@@ -1379,7 +1379,10 @@ void GattClientProfile::impl::FindIncludeServicesParsing(uint16_t connectHandle,
         for (auto &isvc : *isvcs) {
             if (isvc.handle_ == handle) {
                 uint8_t uuid128Bit[UUID_128BIT_LEN] = {0};
-                (void)memcpy_s(uuid128Bit, UUID_128BIT_LEN, BufferPtr(buffer), BufferGetSize(buffer));
+                if (memcpy_s(uuid128Bit, UUID_128BIT_LEN, BufferPtr(buffer), BufferGetSize(buffer)) != EOK) {
+                    LOG_ERROR("%{public}s: memcpy_s fail.", __FUNCTION__);
+                    break;
+                }
                 isvc.uuid_.ConvertFromBytesLE(uuid128Bit, UUID_128BIT_LEN);
                 break;
             }
@@ -2115,7 +2118,10 @@ uint8_t GattClientProfile::impl::SplitDataPackageToUint8(const uint8_t *src, uin
 void GattClientProfile::impl::SplitDataPackage(
     uint8_t *dest, uint8_t destMax, uint8_t *offset, uint8_t *src, uint8_t size)
 {
-    (void)memcpy_s(dest, destMax, (src + *offset), size);
+    if (memcpy_s(dest, destMax, (src + *offset), size) != EOK) {
+        LOG_INFO("%{public}s: memcpy_s fail.", __FUNCTION__);
+        return;
+    }
     *offset = *offset + size;
 }
 /**

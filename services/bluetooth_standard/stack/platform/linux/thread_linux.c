@@ -96,10 +96,20 @@ static void *ThreadStartFunc(void *promise)
     return NULL;
 }
 
+int32_t ThreadIsSelf(const Thread *thread)
+{
+    ASSERT(thread);
+    if (pthread_equal(thread->pthread, pthread_self()) != 0) {
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
 static void ThreadStop(Thread *thread)
 {
     MutexLock(thread->apiMutex);
-    if (ThreadIsSelf(thread) == 0) {
+    if (ThreadIsSelf((const Thread *)thread) == 0) {
         LOG_ERROR("ThreadStop: Cannot stop thread by itself.");
     }
     if (!thread->isStopped) {
@@ -189,16 +199,6 @@ void ThreadPostTask(Thread *thread, TaskFunc func, void *context)
     task->func = func;
     task->context = context;
     QueueEnqueue(thread->taskQueue, task);
-}
-
-int32_t ThreadIsSelf(const Thread *thread)
-{
-    ASSERT(thread);
-    if (pthread_equal(thread->pthread, pthread_self()) != 0) {
-        return 0;
-    } else {
-        return -1;
-    }
 }
 
 Reactor *ThreadGetReactor(const Thread *thread)
