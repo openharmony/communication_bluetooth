@@ -346,9 +346,12 @@ bool A2dpSbcEncoder::A2dpSbcReadFeeding(uint32_t *bytesRead)
     uint16_t actualReadPcmData = dataSize_;
     if (actualReadPcmData) {
         LOG_INFO("[Feeding][offsetPCM:%u][readBytes:%u]", a2dpSbcEncoderCb_.offsetPCM, actualReadPcmData);
-        (void)memcpy_s(((uint8_t *)&a2dpSbcEncoderCb_.pcmBuffer[a2dpSbcEncoderCb_.offsetPCM]), 
+        if (memcpy_s(((uint8_t *)&a2dpSbcEncoderCb_.pcmBuffer[a2dpSbcEncoderCb_.offsetPCM]), 
             A2DP_SBC_MAX_PACKET_SIZE,
-            data_, actualReadPcmData);
+            data_, actualReadPcmData) != EOK) {
+            LOG_ERROR("[Feeding] A2dpSbcReadFeeding memcpy_s fail");
+            return false;
+        }
         *bytesRead = actualReadPcmData;
         dataSize_ = 0;
         return true;
@@ -480,7 +483,6 @@ void A2dpSbcEncoder::CalculateSbcPCMRemain(uint16_t codecSize, uint32_t bytesNum
 
 void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
 {
-    LOG_INFO("[A2dpSbcEncoder] %{public}s\n", __func__);
     size_t encoded = 0;
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     uint16_t blocksXsubbands = encParams->subBands * encParams->numOfBlocks;
@@ -498,14 +500,17 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
         while (numOfFrame) {
             uint8_t outputBuf[A2DP_SBC_HQ_DUAL_BP_53_FRAME_SIZE] = {};
             int16_t outputLen = sbcEncoder_->SBCEncode(g_sbcEncode, &a2dpSbcEncoderCb_.pcmBuffer[pcmOffset],
-                                                       blocksXsubbands * channelMode, outputBuf,
-                                                       sizeof(outputBuf), &encoded);
+                blocksXsubbands * channelMode, outputBuf, sizeof(outputBuf), &encoded);
             if (outputLen < 0) {
                 LOG_ERROR("err occur.");
             }
             pcmOffset += blocksXsubbands * channelMode * CHANNEL_TWO;
             Buffer *encBuf = BufferMalloc(encoded);
-            (void)memcpy_s(BufferPtr(encBuf), encoded, outputBuf, encoded);
+            if (memcpy_s(BufferPtr(encBuf), encoded, outputBuf, encoded) != EOK) {
+                BufferFree(encBuf);
+                PacketFree(pkt);
+                return;
+            }
             PacketPayloadAddLast(pkt, encBuf);
             BufferFree(encBuf);
             numOfFrame--;
@@ -514,15 +519,17 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
         uint16_t encodePacketSize = PacketSize(pkt);
         (void)memset_s(a2dpSbcEncoderCb_.pcmBuffer, A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE,
             0, sizeof(a2dpSbcEncoderCb_.pcmBuffer));
-        (void)memcpy_s(a2dpSbcEncoderCb_.pcmBuffer, A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE,
-            a2dpSbcEncoderCb_.pcmRemain, a2dpSbcEncoderCb_.offsetPCM);
+        if (memcpy_s(a2dpSbcEncoderCb_.pcmBuffer, A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE,
+            a2dpSbcEncoderCb_.pcmRemain, a2dpSbcEncoderCb_.offsetPCM) != EOK) {
+                PacketFree(pkt);
+                return;
+            }
         (void)memset_s(a2dpSbcEncoderCb_.pcmRemain, A2DP_SBC_MAX_PACKET_SIZE, 0, sizeof(a2dpSbcEncoderCb_.pcmRemain));
         if (encodePacketSize > 0) {
             uint32_t pktTimeStamp = a2dpSbcEncoderCb_.timestamp;
             a2dpSbcEncoderCb_.timestamp += frameIter * blocksXsubbands;
             a2dpSbcEncoderCb_.sendDataSize += codecSize;
             EnqueuePacket(pkt, frameIter, encodePacketSize, pktTimeStamp, (uint16_t)encoded);  // Enqueue Packet.
-            LOG_INFO("[EnqueuePacket][encoded:%{public}zu][frameIter:%u]", encoded, frameIter);
         }
     }
     PacketFree(pkt);

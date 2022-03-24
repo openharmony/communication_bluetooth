@@ -156,7 +156,7 @@ private:
     A2dpSbcEncoderCb a2dpSbcEncoderCb_ {};
     bool isFirstTimeToReadData_ = false;
     DISALLOW_COPY_AND_ASSIGN(A2dpSbcEncoder);
-    uint8_t data_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO];
+    uint8_t data_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO] {0};
     uint16_t dataSize_;
 };
 }  // namespace bluetooth

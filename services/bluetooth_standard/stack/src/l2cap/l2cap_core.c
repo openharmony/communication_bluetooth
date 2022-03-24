@@ -491,7 +491,11 @@ static Packet *L2capBuildSFrame(const L2capChannel *chan, const L2capErfcSContro
 
     L2capCpuToLe16(header + 0, tailLength + L2CAP_SIZE_2);
     L2capCpuToLe16(header + L2CAP_OFFSET_2, chan->rcid);
-    (void)memcpy_s(header + L2CAP_HEADER_LENGTH, sizeof(L2capErfcSControl), sCtrl, sizeof(L2capErfcSControl));
+    if (memcpy_s(header + L2CAP_HEADER_LENGTH, sizeof(L2capErfcSControl), sCtrl, sizeof(L2capErfcSControl)) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        PacketFree(spkt);
+        return NULL;
+    }
 
     if (chan->lcfg.fcs == 0x01) {
         L2capAddCrc(spkt);
@@ -1286,7 +1290,10 @@ static void L2capConfigurationRspUnknownOptions(
     L2capCpuToLe16(buff + L2CAP_OFFSET_2, (uint16_t)0);  // continuation flag
     L2capCpuToLe16(buff + L2CAP_OFFSET_4, (uint16_t)L2CAP_UNKNOWN_OPTIONS);
 
-    (void)memcpy_s(buff + L2CAP_OFFSET_6, L2CAP_SIGNAL_MTU - L2CAP_OFFSET_6, unknown->options, unknown->length);
+    if (memcpy_s(buff + L2CAP_OFFSET_6, L2CAP_SIGNAL_MTU - L2CAP_OFFSET_6, unknown->options, unknown->length) != EOK) {
+        LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+        return;
+    }
 
     signal.length = L2CAP_SIZE_6 + unknown->length;
     signal.code = L2CAP_CONFIGURATION_RESPONSE;
@@ -1371,7 +1378,10 @@ static int L2capProcessConfigurationReqContinueOption(
     }
 
     if (optLength > 0) {
-        (void)memcpy_s(chan->part.options + chan->part.length, optLength, data, optLength);
+        if (memcpy_s(chan->part.options + chan->part.length, optLength, data, optLength) != EOK) {
+            LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
+            return BT_NO_MEMORY;
+        }
         chan->part.length += optLength;
     }
 
