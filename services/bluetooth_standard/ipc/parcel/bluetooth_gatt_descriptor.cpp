@@ -77,10 +77,12 @@ bool BluetoothGattDescriptor::ReadFromParcel(Parcel &parcel)
             return false;
         }
     }
-    value_ = std::make_unique<uint8_t[]>(length);
-    if (memcpy_s(value_.get(), length_, value, length_) != EOK) {
-        HILOGE("BluetoothGattDescriptor::ReadFromParcel error");
-        return false;
+    if (length != 0) {
+        value_ = std::make_unique<uint8_t[]>(length);
+        if (memcpy_s(value_.get(), length, value, length_) != EOK) {
+            HILOGE("BluetoothGattDescriptor::ReadFromParcel error");
+            return false;
+        }
     }
 
     std::shared_ptr<BluetoothUuid> uuid(parcel.ReadParcelable<BluetoothUuid>());

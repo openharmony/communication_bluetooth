@@ -165,13 +165,13 @@ void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
         rssi,
         status);
     std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = GetRssiValueCallbackInfo();
+    if (callbackInfo == nullptr) {
+        return;
+    }
     std::unique_lock<std::mutex> lock(callbackInfo->mutexRssi);
     if (status == 0) {
         callbackInfo->promise.errorCode = CODE_SUCCESS;
         callbackInfo->rssi = rssi;
-        napi_value result = nullptr;
-        napi_create_int32(callbackInfo->env, callbackInfo->rssi, &result);
-        callbackInfo->result = result;
     } else {
         callbackInfo->promise.errorCode = CODE_FAILED;
     }
