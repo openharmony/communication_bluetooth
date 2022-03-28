@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -42,22 +42,18 @@ config("module_private_config") {
 ohos_unittest("btfw_gatt_service_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "gatt_service_test.cpp",
-  ]
+  sources = [ "gatt_service_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -69,22 +65,18 @@ ohos_unittest("btfw_gatt_service_unit_test") {
 ohos_unittest("btfw_gatt_client_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "gatt_client_test.cpp",
-  ]
+  sources = [ "gatt_client_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -96,23 +88,19 @@ ohos_unittest("btfw_gatt_client_unit_test") {
 ohos_unittest("btfw_gatt_server_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "gatt_server_test.cpp",
-  ]
+  sources = [ "gatt_server_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/server:bluetooth_server",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/server:bluetooth_server",
   ]
 
   external_deps = [
@@ -124,22 +112,18 @@ ohos_unittest("btfw_gatt_server_unit_test") {
 ohos_unittest("btfw_gatt_manager_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "gatt_manager_test.cpp",
-  ]
+  sources = [ "gatt_manager_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -148,27 +132,22 @@ ohos_unittest("btfw_gatt_manager_unit_test") {
   ]
 }
 
-
 ohos_unittest("btfw_gatt_descriptor_unit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "gatt_descriptor_test.cpp",
-  ]
+  sources = [ "gatt_descriptor_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/server:bluetooth_server",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/server:bluetooth_server",
   ]
 
   external_deps = [
@@ -180,26 +159,21 @@ ohos_unittest("btfw_gatt_descriptor_unit_test") {
 ohos_unittest("btfw_gatt_characteristic_unit_test") {
   module_out_path = module_output_path
 
-  include_dirs = [
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/include",
-  ]
-  
-  sources = [
-    "gatt_characteristic_test.cpp",
-  ]
+  include_dirs =
+      [ "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/include" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  sources = [ "gatt_characteristic_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -207,7 +181,6 @@ ohos_unittest("btfw_gatt_characteristic_unit_test") {
     "ipc:ipc_core",
   ]
 }
-
 
 ################################################################################
 group("unittest") {
@@ -217,12 +190,12 @@ group("unittest") {
 
   if (is_phone_product) {
     deps += [
-      ":btfw_gatt_service_unit_test",
-      ":btfw_gatt_server_unit_test",
-      ":btfw_gatt_client_unit_test",
-      ":btfw_gatt_manager_unit_test",
       ":btfw_gatt_characteristic_unit_test",
+      ":btfw_gatt_client_unit_test",
       ":btfw_gatt_descriptor_unit_test",
+      ":btfw_gatt_manager_unit_test",
+      ":btfw_gatt_server_unit_test",
+      ":btfw_gatt_service_unit_test",
     ]
   }
 }
