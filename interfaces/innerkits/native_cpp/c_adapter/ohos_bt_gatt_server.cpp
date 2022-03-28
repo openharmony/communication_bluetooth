@@ -394,7 +394,6 @@ int BleGattsUnRegister(int serverId)
         if (GATTSERVER(serverId) != NULL) {
             delete GATTSERVER(serverId);
             GATTSERVER(serverId) = NULL;
-            //TODO delete services;
             return OHOS_BT_STATUS_SUCCESS;
         }
     }
