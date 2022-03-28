@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,6 +15,7 @@ import("//build/test.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 module_output_path = "bluetooth_standard/framework_test/spp/"
+
 #SUBSYSTEM_DIR = "//foundation/communication"
 
 ###############################################################################
@@ -40,22 +41,18 @@ config("module_private_config") {
 
 ohos_unittest("btfw_spp_test") {
   module_out_path = module_output_path
-  sources = [
-    "spp_test.cpp",
-  ]
+  sources = [ "spp_test.cpp" ]
 
-  configs = [
-    ":module_private_config",
-  ]
+  configs = [ ":module_private_config" ]
 
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/common:btcommon",
   ]
 
   external_deps = [
@@ -64,7 +61,6 @@ ohos_unittest("btfw_spp_test") {
   ]
 }
 
-
 ################################################################################
 group("unittest") {
   testonly = true
@@ -72,8 +68,6 @@ group("unittest") {
   deps = []
 
   if (is_phone_product) {
-    deps += [
-      ":btfw_spp_test",
-    ]
+    deps += [ ":btfw_spp_test" ]
   }
 }
