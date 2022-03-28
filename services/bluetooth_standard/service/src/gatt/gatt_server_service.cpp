@@ -1014,7 +1014,7 @@ void GattServerService::impl::OnIndicationEvent(uint16_t connectionHandle, uint1
 
 void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
 {
-    if (role == 0) { // only slave
+    if (role == 0) {
         return;
     }
     if (GattStatus::GATT_SUCCESS == ret) {

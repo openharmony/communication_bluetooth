@@ -53,7 +53,7 @@ static const int BLUETOOTH_DATA_TYPE_DEVICE_ID = 0x10;
 static const int BLUETOOTH_DATA_TYPE_SECURITY_MANAGER_TK_VALUE = 0x10;
 /// Security Manager Out of Band Flags
 static const int BLUETOOTH_DATA_TYPE_SECURITY_MANAMGER_OUT_OF_BAND_FLAGS = 0x11;
-/// Slave Connection Interval Range
+/// Connection Interval Range
 static const int BLUETOOTH_DATA_TYPE_SLAVE_CONNECTION_INTERVAL_RANGE = 0x12;
 /// List of 16-bit Service Solicitation UUIDs
 static const int BLUETOOTH_DATA_TYPE_LIST_OF_16_BIT_SERVICE_SOLICITATION_UUIDS = 0x14;
