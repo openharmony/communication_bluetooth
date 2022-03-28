@@ -2372,7 +2372,7 @@ class GattClientProfile::impl::GattConnectionObserverImplement : public GattConn
 public:
     void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
-        if (role == 1) { // slave role.
+        if (role == 1) {
             return;
         }
         this->clientProfile_.pimpl->CreateCache(connectionHandle, device);
