@@ -60,7 +60,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NapiPbapServer::DefinePbapServerJSClass(env);
     NapiAvrcpController::DefineAvrcpControllerJSClass(env);
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
-    NapiHidHost::DefineHidHostJSClass(env);
+    NapiBluetoothHidHost::DefineHidHostJSClass(env);
     HILOGI("-----Init end------");
     return exports;
 }

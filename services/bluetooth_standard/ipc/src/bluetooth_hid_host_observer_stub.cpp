@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "bluetooth_hid_host_observer_stub.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -24,6 +25,12 @@ int BluetoothHidHostObserverStub::OnRemoteRequest(
 {
     switch (code) {
         case COMMAND_ON_CONNECTION_STATE_CHANGED: {
+            std::u16string descriptor = BluetoothHidHostObserverStub::GetDescriptor();
+            std::u16string remoteDescriptor = data.ReadInterfaceToken();
+            if (descriptor != remoteDescriptor) {
+                HILOGE("local descriptor is not equal to remote");
+                return IPC_INVOKER_TRANSLATE_ERR;
+            }
             const BluetoothRawAddress *address = data.ReadParcelable<BluetoothRawAddress>();
             int state = data.ReadInt32();
             OnConnectionStateChanged(*address, state);
