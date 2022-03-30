@@ -60,7 +60,7 @@ public:
             [&characteristic](Characteristic &ccc) {
             return ccc.handle_ == characteristic.handle_;
         });
-        
+
         if (cIt != service_.instance_->characteristics_.end()) {
             Characteristic result(characteristic.handle_, cIt->value_.get(), cIt->length_);
             service_.serverService_.RespondCharacteristicRead(device, result, GattStatus::GATT_SUCCESS);

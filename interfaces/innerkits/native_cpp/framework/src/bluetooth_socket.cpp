@@ -85,7 +85,7 @@ struct SppClientSocket::impl {
         }
         bool state = recvStateBuf[0];
 
-        uint8_t buf[6] = {0};
+        uint8_t buf[6] = {0}; // addr buffer len
 #ifdef DARWIN_PLATFORM
         int recvAddrSize = recv(fd_, buf, sizeof(buf), 0);
 #else
@@ -454,7 +454,7 @@ struct SppServerSocket::impl {
         char buffer[10];
         struct iovec io = {.iov_base = buffer, .iov_len = sizeof(buffer)};
         struct msghdr msg;
-        memset_s(&msg, sizeof(msg), 0, sizeof(msg));
+        (void)memset_s(&msg, sizeof(msg), 0, sizeof(msg));
         msg.msg_control = ccmsg;
         msg.msg_controllen = sizeof(ccmsg);
         msg.msg_iov = &io;
@@ -481,7 +481,7 @@ struct SppServerSocket::impl {
             return BtStatus::BT_FAILURE;
         }
         uint8_t recvBuf[rv];
-        memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
+        (void)memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
         if (memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv) != EOK) {
             HILOGE("[sock] RecvSocketFd, recvBuf memcpy_s fail");
             return BtStatus::BT_FAILURE;
@@ -592,7 +592,9 @@ SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType ty
     HILOGI("SppServerSocket::impl:impl() remote obtained");
 
     proxy_ = iface_cast<IBluetoothSocket>(remote);
-
+    if (proxy_ == nullptr) {
+        return;
+    }
     deathRecipient_ = new BluetoothServerSocketDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }

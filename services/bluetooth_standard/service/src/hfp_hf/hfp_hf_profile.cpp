@@ -423,10 +423,10 @@ bool HfpHfProfile::ReportHfIndicator(int indicator, int value)
     auto it = std::find_if(dataConn_.remoteHfIndicators_.begin(),
         dataConn_.remoteHfIndicators_.end(),
         [&](const HfpHfDataConnection::HfIndicator &hfIndicator) {
-            return (hfIndicator.anum == indicator && 
-                    (hfIndicator.isEnabled == false || hfIndicator.isSupported == false));
+            return (hfIndicator.anum == indicator &&
+                (hfIndicator.isEnabled == false || hfIndicator.isSupported == false));
         });
-    
+
     if (it != dataConn_.remoteHfIndicators_.end()) {
         LOG_INFO("[HFP HF]%{public}s():Remote device not support/enable indicator[%{public}d]", __FUNCTION__, indicator);
         return true;

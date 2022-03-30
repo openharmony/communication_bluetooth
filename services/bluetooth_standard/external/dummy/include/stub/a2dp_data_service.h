@@ -109,6 +109,7 @@ public:
     {
         return -1;
     }
+
 private:
     A2dpService() = default;
     ~A2dpService() = default;

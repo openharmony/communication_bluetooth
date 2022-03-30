@@ -50,7 +50,7 @@ const int MOVE_BIT32 = 32;
 const int MIN__HEADER_SIZE = 4;
 const int INDEX_VALUE3 = 3;
 
-const uint8_t  SBC_CRC_TABLE [256] = {
+const uint8_t SBC_CRC_TABLE [256] = {
     0x00, 0x1D, 0x3A, 0x27, 0x74, 0x69, 0x4E, 0x53,
     0xE8, 0xF5, 0xD2, 0xCF, 0x9C, 0x81, 0xA6, 0xBB,
     0xCD, 0xD0, 0xF7, 0xEA, 0xB9, 0xA4, 0x83, 0x9E,
@@ -90,7 +90,7 @@ uint8_t Frame::SbcCrc8(const uint8_t* data, size_t len)
     uint8_t crc = 0x0f;
     int index = VALUE_ZERO;
     for (index = 0; index < static_cast<int>(len / VALUE8); index++) {
-        crc =  SBC_CRC_TABLE [crc ^ data[index]];
+        crc = SBC_CRC_TABLE [crc ^ data[index]];
     }
 
     uint8_t octet = static_cast<int>(len % VALUE8) ? data[index] : 0;
@@ -119,7 +119,7 @@ int Frame::SbcCalculateLoudness(const Frame& frame, int channel, int subband)
 void Frame::SbcCalculateBitsNormal(const Frame& frame, int (*bits)[VALUE8])
 {
     int subbands = (frame.subbands_ == SUBBAND_FOUR) ? SUBBAND_FOUR : SUBBAND_EIGHT;
-    int bitNeed[CHANNEL_TWO][VALUE8] = {};    
+    int bitNeed[CHANNEL_TWO][VALUE8] = {};
     for (int channel = 0; channel < frame.channels_; channel++) {
         int bitSlice = SbcCalculateBitsMax(frame, channel, subbands, bitNeed);
         int bitCount = SbcCalculateBitsSliceNormal(frame.bitpool_, subbands, bitNeed, channel, &bitSlice);
@@ -270,7 +270,7 @@ void Frame::SbcCalculateBitsSliceStereo(const uint8_t bitPool, const int subband
     if ((*bitCount) + sliceCount == bitPool) {
         (*bitCount) += sliceCount;
         (*bitSlice)--;
-    }   
+    }
 }
 
 void Frame::SbcCalculateBitsInnerStereo(const int subbands, int bitSlice,
@@ -300,7 +300,7 @@ void Frame::SbcCalculateBitsStereo(const Frame& frame, int (*bits)[VALUE8])
     int bitSlice = SbcCalculateBitsMaxStereo(frame, subbands, bitNeed);
     SbcCalculateBitsSliceStereo(frame.bitpool_, subbands, bitNeed, &bitCount, &bitSlice);
     SbcCalculateBitsInnerStereo(subbands, bitSlice, bitNeed, bits);
-   
+
     int channel = VALUE_ZERO;
     int subband = VALUE_ZERO;
 
@@ -449,7 +449,7 @@ int Frame::UnpackFrameStream(Frame& frame, const uint8_t* bufStream, size_t len)
             for (uint8_t subband = 0; subband < frame.subbands_; subband++) {
                 if (frame.joint_ & (0x01 << subband)) {
                     uint32_t val = frame.samples_[blk][0][subband] + frame.samples_[blk][1][subband];
-                    frame.samples_[blk][1][subband] = 
+                    frame.samples_[blk][1][subband] =
                         frame.samples_[blk][0][subband] - frame.samples_[blk][1][subband];
                     frame.samples_[blk][0][subband] = val;
                 }
@@ -561,9 +561,9 @@ void Frame::SbcCaculateLevelsAndSampleDelta(const Frame& frame, int (*bits)[VALU
 {
     for (int channel = 0; channel < frame.channels_; channel++) {
         for (int subband = 0; subband < frame.subbands_; subband++) {
-            levels[channel][subband] = ((1 << bits[channel][subband]) - 1) 
+            levels[channel][subband] = ((1 << bits[channel][subband]) - 1)
                 << (MOVE_BIT32 - (frame.scaleFactor_[channel][subband] + SCALE_OUT_BITS + MOVE_BIT2));
-            sampleDelta[channel][subband] = static_cast<uint32_t> (1 
+            sampleDelta[channel][subband] = static_cast<uint32_t> (1
                 << (frame.scaleFactor_[channel][subband] + SCALE_OUT_BITS + 1));
         }
     }

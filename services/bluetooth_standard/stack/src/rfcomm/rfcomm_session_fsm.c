@@ -156,7 +156,7 @@ int RfcommRecvReqConnectRslt(RfcommSessionInfo *session, const void *data)
         }
         // Accept peer's connection request.
         return RfcommAcceptPeerConnectReq(session);
-    } 
+    }
 
     if ((connectRslt.result != RFCOMM_SUCCESS) || (connectRslt.lcid == 0)) {
         // Notify all channels on the session that connection failed.
@@ -212,8 +212,8 @@ int RfcommRecvConnectRsp(RfcommSessionInfo *session, const void *data)
         RfcommRemoveSession(session);
 
         return RFCOMM_SUCCESS;
-    } 
-   
+    }
+
     if (session->pendingL2capId != 0) {
         RfcommStopSessionTimer(session);
         RfcommSendConnectRsp(session->pendingL2capId, session->pendingId, L2CAP_NO_RESOURCES_AVAILABLE, 0);

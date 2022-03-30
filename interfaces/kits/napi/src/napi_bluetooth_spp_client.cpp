@@ -308,6 +308,9 @@ void NapiSppClient::Off(napi_env env, napi_callback_info info)
 void NapiSppClient::sppRead(int id)
 {
     HILOGI("sppRead is called");
+    if (clientMap[id] == nullptr) {
+        return;
+    }
     OHOS::Bluetooth::InputStream inputStream = clientMap[id]->client_->GetInputStream();
     char buf[1024];
     int ret = 0;
@@ -320,7 +323,7 @@ void NapiSppClient::sppRead(int id)
         isRead = clientMap[id]->sppReadFlag;
         HILOGI("inputStream.Read start");
         while (true) {
-            memset_s(buf, sizeof(buf), 0, sizeof(buf));
+            (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
             ret = inputStream.Read(buf, sizeof(buf));
             HILOGI("inputStream.Read end");
             if (ret <= 0) {
@@ -333,7 +336,7 @@ void NapiSppClient::sppRead(int id)
                     std::static_pointer_cast<BufferCallbackInfo>(clientMap[id]->callbackInfos_[STR_BT_SPP_READ]);
                 
                 callbackInfo->info_ = ret;
-                memcpy_s(callbackInfo->buffer_, sizeof(callbackInfo->buffer_), buf, ret);
+                (void)memcpy_s(callbackInfo->buffer_, sizeof(callbackInfo->buffer_), buf, ret);
 
                 uv_loop_s *loop = nullptr;
                 napi_get_uv_event_loop(callbackInfo->env_, &loop);
@@ -348,11 +351,11 @@ void NapiSppClient::sppRead(int id)
                         BufferCallbackInfo *callbackInfo = (BufferCallbackInfo *)work->data;
                         int size = callbackInfo->info_;
                         uint8_t* totalBuf = (uint8_t*) malloc(size);
-                        memcpy_s(totalBuf, size, callbackInfo->buffer_, size);
+                        (void)memcpy_s(totalBuf, size, callbackInfo->buffer_, size);
                         napi_value result = nullptr;
                         uint8_t* bufferData = nullptr;
                         napi_create_arraybuffer(callbackInfo->env_ , size, (void**)&bufferData, &result);
-                        memcpy_s(bufferData, size, totalBuf, size);
+                        (void)memcpy_s(bufferData, size, totalBuf, size);
                         free(totalBuf);
 
                         napi_value callback = nullptr;

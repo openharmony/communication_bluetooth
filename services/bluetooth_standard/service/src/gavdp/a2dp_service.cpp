@@ -200,7 +200,7 @@ A2dpService::A2dpService(const std::string& name, const std::string version, con
     role_ = role;
     int value = 0;
 
-    profileId_ = PROFILE_ID_A2DP_SRC;  
+    profileId_ = PROFILE_ID_A2DP_SRC;
     profileObserver_ = ObserverProfile(role);
     connectManager_ = A2dpConnectManager(role);
     if (role == A2DP_ROLE_SOURCE) {
@@ -367,9 +367,10 @@ std::list<RawAddress> A2dpService::GetConnectDevices()
     std::lock_guard<std::recursive_mutex> lock(g_a2dpServiceMutex);
 
     for (auto it = a2dpDevices_.begin(); it != a2dpDevices_.end(); it++) {
-        if (it->second != nullptr) {
-            connectionState = it->second->GetConnectState();
+        if (it->second == nullptr) {
+            continue;
         }
+        connectionState = it->second->GetConnectState();
         if (connectionState == static_cast<int>(BTConnectState::CONNECTED)) {
             devList.push_back(RawAddress::ConvertToString(it->second->GetDevice().addr));
         }

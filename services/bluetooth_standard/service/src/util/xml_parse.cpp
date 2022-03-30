@@ -71,7 +71,7 @@ xmlNodePtr XmlParse::impl::IntHasProperty(
     const std::string &section, const std::string &subSection, const std::string &property)
 {
     xmlNodePtr sectionNode = IntHasSection(section, subSection);
-    if ((sectionNode != NULL) && (sectionNode->children)) {      
+    if ((sectionNode != NULL) && (sectionNode->children)) {
         for (xmlNodePtr btPropertyNode = sectionNode->children; btPropertyNode;
                 btPropertyNode = btPropertyNode->next) {
             xmlChar *btPropertyNodeProp = xmlGetProp(btPropertyNode, BAD_CAST "property");
@@ -147,7 +147,7 @@ xmlNodePtr XmlParse::impl::FindOrCreatePropertyNode(
         }
         ConstructPropertyNode(subSectionNode, propertyNode, property);
     } else {
-        ConstructPropertyNode(sectionNode, propertyNode, property);        
+        ConstructPropertyNode(sectionNode, propertyNode, property);
     }
     return propertyNode;
 }
@@ -191,7 +191,7 @@ bool XmlParse::impl::GetValue(xmlNodePtr node, bool &value)
     xmlChar *nodeContent = xmlNodeGetContent(node->children);
     if (nodeContent == NULL) {
         return false;
-    }    
+    }
     bool retVal = true;
     std::string sValue = (char *)nodeContent;
     if (sValue == "true") {

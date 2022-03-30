@@ -85,10 +85,10 @@ uint16_t AvdtActDiscoverRsp(AvdtSigCtrl *sigCtrl, const AvdtEventData *data)
  */
 uint16_t AvdtActDiscoverInd(AvdtSigCtrl *sigCtrl, const AvdtEventData *data)
 {
-    LOG_DEBUG("[AVDT]%{public}s: sigCtrl->state(%hhu)", __func__, sigCtrl->state);
     if (sigCtrl == NULL) {
         return AVDT_SUCCESS;
     }
+    LOG_DEBUG("[AVDT]%{public}s: sigCtrl->state(%hhu)", __func__, sigCtrl->state);
     uint16_t Ret = AVDT_SUCCESS;
     AvdtEventData event = {0};
     event.msg.discoverRsp.numSeps = 0;
@@ -334,10 +334,10 @@ uint16_t AvdtActGetAllCapRsp(AvdtSigCtrl *sigCtrl, const AvdtEventData *data)
  ******************************************************************************/
 uint16_t AvdtActGetAllCapInd(AvdtSigCtrl *sigCtrl, const AvdtEventData *data)
 {
-    LOG_DEBUG("[AVDT]%{public}s: seid(0x%x)", __func__, data->msg.single.seid);
     if (sigCtrl == NULL || data == NULL) {
         return AVDT_SUCCESS;
     }
+    LOG_DEBUG("[AVDT]%{public}s: seid(0x%x)", __func__, data->msg.single.seid);
     AvdtSepConfig capability = {0};
     AvdtEventData event = {0};
     if (AVDT_SEID_INVLID <= data->msg.single.seid || data->msg.single.seid <= AVDT_SEID_FORBID) {
@@ -1094,10 +1094,10 @@ uint16_t AvdtActCloseRsp(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
  */
 uint16_t AvdtActCloseInd(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
 {
-    LOG_DEBUG("[AVDT]%{public}s: streamCtrl->state(%hhu)", __func__, streamCtrl->state);
     if (streamCtrl == NULL || data == NULL) {
         return AVDT_SUCCESS;
     }
+    LOG_DEBUG("[AVDT]%{public}s: streamCtrl->state(%hhu)", __func__, streamCtrl->state);
     uint16_t Ret = AVDT_SUCCESS;
     AvdtSigCtrl *sigCtrl = AvdtGetSigCtrlByHandle(streamCtrl->sigHandle);
     AvdtCtrlData confirmData = {0};

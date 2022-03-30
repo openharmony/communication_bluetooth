@@ -119,7 +119,7 @@ std::string MapMseFolder::GetData(uint16_t offset, uint16_t count) const
     }
 
     for (int i = static_cast<int>(offset); i < limit; i++) {
-        xmlNodePtr node=xmlNewNode(NULL, BAD_CAST"folder");
+        xmlNodePtr node = xmlNewNode(NULL, BAD_CAST"folder");
         xmlAddChild(root_node, node);
         xmlNewProp(node, BAD_CAST"name", BAD_CAST folderNames[i].c_str());
     }

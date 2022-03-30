@@ -365,12 +365,12 @@ MapClient::impl::impl()
     HILOGI("MapClient::impl:impl() remote obtained");
 
     proxy_ = iface_cast<IBluetoothMapMce>(remote);
-
+    if (proxy_ == nullptr) {
+        return;
+    }
     deathRecipient_ = new BluetoothMapMceDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    if (proxy_ != nullptr) {
-        proxy_->RegisterObserver(observerImp_);
-    }
+    proxy_->RegisterObserver(observerImp_);
 }
 
 MapClient *MapClient::GetProfile()

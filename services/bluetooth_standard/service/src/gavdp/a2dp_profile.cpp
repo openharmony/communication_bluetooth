@@ -844,7 +844,9 @@ A2dpProfilePeer *A2dpProfile::FindOrCreatePeer(const BtAddr &peerAddress, uint8_
     } else {
         LOG_ERROR("[A2dpProfile]%{public}s Connected device is max(%u)", __func__, GetConnectedPeerDevice());
     }
-    peer->SetInitSide(true);
+    if (peer != nullptr) {
+        peer->SetInitSide(true);
+    }
     return peer;
 }
 

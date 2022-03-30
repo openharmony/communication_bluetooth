@@ -459,16 +459,17 @@ struct AfterWorkCallbackData {
 template<typename T>
 void AfterWorkCallback(uv_work_t *work, int status)
 {
+    if (work == nullptr) {
+        return;
+    }
     T data = static_cast<T>(work->data);
     (data->object->*(data->function))(work, data->data);
-    if (work != nullptr) {
-        if (work->data != nullptr) {
-            delete data;
-            work->data = nullptr;
-        }
-        delete work;
-        work = nullptr;
+    if (work->data != nullptr) {
+        delete data;
+        work->data = nullptr;
     }
+    delete work;
+    work = nullptr;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

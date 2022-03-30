@@ -471,7 +471,7 @@ void HfpHfCommandProcessor::ProcessListHfIndicators(
             [&anum](const HfpHfDataConnection::HfIndicator &indicator) {
                 return indicator.anum == anum;
             });
-        
+
         if (it != dataConn.remoteHfIndicators_.end()) {
             isExist = true;
         }
@@ -568,7 +568,7 @@ void HfpHfCommandProcessor::ProcessCiev(HfpHfDataConnection &dataConn, const std
         [&index](const HfpHfDataConnection::AgIndicator &indicator) {
             return indicator.index == index;
         });
-    
+
     if (it != dataConn.remoteAgIndicators_.end()) {
         ProcessIndicator(dataConn, *it, value);
     }

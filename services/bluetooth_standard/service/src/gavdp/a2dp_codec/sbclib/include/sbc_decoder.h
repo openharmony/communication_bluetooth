@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef SBC_DECODER_H
 #define SBC_DECODER_H
 
@@ -42,5 +42,5 @@ private:
     bool initialized_ {};
     Frame frame_ {};
 };
-} // namespace sbc 
+} // namespace sbc
 #endif // SBC_DECODER_H

@@ -53,8 +53,8 @@ Queue *QueueCreate(uint32_t capacity)
         }
         queue->list = ListCreate(NULL);
         if (queue->list == NULL) {
-            goto ERROR;             
-        } 
+            goto ERROR;          
+        }
     }
     return queue;
 ERROR:

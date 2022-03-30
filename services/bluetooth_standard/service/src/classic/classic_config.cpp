@@ -205,7 +205,7 @@ int ClassicConfig::GetRemoteDeviceType(const std::string &subSection) const
 }
 
 int ClassicConfig::GetRemoteLinkkeyType(const std::string &subSection) const
-{ 
+{
     int type = 0;
     if (!config_->GetValue(SECTION_BREDR_PAIRED_LIST, subSection, PROPERTY_LINK_KEY_TYPE, type)) {
         LOG_INFO("[ClassicConfig]::%{public}s failed!", __func__);

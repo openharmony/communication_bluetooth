@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef SBC_CONSTANT_H
 #define SBC_CONSTANT_H
 
@@ -94,5 +94,5 @@ enum SbcAllocation {
     SBC_ALLOCATION_LOUDNESS = 0x00,
     SBC_ALLOCATION_SNR = 0x01,
 };
-} // namespace sbc 
+} // namespace sbc
 #endif //  SBC_CONSTANT_H

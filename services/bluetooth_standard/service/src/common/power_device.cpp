@@ -103,7 +103,7 @@ void PowerDevice::SetSniffMode(PowerInfo requestPower)
     // it exits the sniff first, and then delays to enter the sniff.
     PowerModeLevel controlPowerMode = GetControlPowerLevel().second;
     if (requestPower.powerMode_ != controlPowerMode &&
-        (controlPowerMode == PowerModeLevel::LEVEL_LOW || 
+        (controlPowerMode == PowerModeLevel::LEVEL_LOW ||
         controlPowerMode == PowerModeLevel::LEVEL_MID ||
         controlPowerMode == PowerModeLevel::LEVEL_HIG)) {
         LOG_DEBUG("PM_:::SetSniffMode() contorl is in sniff state, to reset the sniff parameter, you need to exit "

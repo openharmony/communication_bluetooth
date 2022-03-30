@@ -564,7 +564,7 @@ BTSTACK_API uint16_t AVDT_OpenReq(uint16_t handle, uint8_t *transLabel);
 /**
  *
  * @brief       Function AVDT_OpenRsp(Retain)
- * @details     Respond to a open request from ACP.
+ * @details     Respond to an open request from ACP.
  *              AVDTP.ICS #Table 11-1, 11b-1 Open stream response
  * @param[in]   handle        Handle of stream
  * @param[in]   transLabel    Label of this message

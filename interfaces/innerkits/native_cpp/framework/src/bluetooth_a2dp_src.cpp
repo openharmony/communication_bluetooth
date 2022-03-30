@@ -130,6 +130,10 @@ A2dpSource::impl::impl()
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 
     observerImp_ = new (std::nothrow) BluetoothA2dpSourceObserverImp(*this);
+    if (observerImp_ == nullptr) {
+        HILOGI("A2dpSource::get proxy_observerImp_ failed");
+        return;
+    }
     proxy_->RegisterObserver(observerImp_);
 };
 

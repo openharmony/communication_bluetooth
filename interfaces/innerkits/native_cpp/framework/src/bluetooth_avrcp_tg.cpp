@@ -391,5 +391,5 @@ AvrcpTarget::~AvrcpTarget(void)
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     pimpl = nullptr;
 }
-} // namespace ohos
-} // namespace bluetooth
+} // namespace Bluetooth
+} // namespace OHOS

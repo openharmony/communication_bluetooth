@@ -403,7 +403,7 @@ bool AvrcCtLpasvPacket::DisassembleParameters(uint8_t *buffer)
     isValid_ = false;
 
     receivedFragments_++;
-    LOG_DEBUG("[AVRCP CT] receivedFragments_[%{public}d]", receivedFragments_);
+    LOG_DEBUG("[AVRCP CT] receivedFragments_[%{public}hhu]", receivedFragments_);
 
     uint16_t offset = AVRC_CT_VENDOR_PARAMETER_LENGTH_OFFSET;
     uint64_t payload = 0x00;

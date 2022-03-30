@@ -33,7 +33,7 @@ Mutex *MutexCreate()
         if (pthread_mutex_init(&mutex->mutex, &attr) != 0) {
             free(mutex);
             return NULL;
-        }        
+        }
     }
     return mutex;
 }

@@ -39,8 +39,8 @@ A2dpSbcDecoder::A2dpSbcDecoder(A2dpDecoderObserver *observer) : A2dpDecoder(obse
 A2dpSbcDecoder::~A2dpSbcDecoder()
 {
     LOG_INFO("[SbcDecoder] %{public}s\n", __func__);
-    codecSbcDecoderLib_->sbcDecoder.destroySbcDecode(sbcDecoder_);
     if (codecSbcDecoderLib_ != nullptr) {
+        codecSbcDecoderLib_->sbcDecoder.destroySbcDecode(sbcDecoder_);
         codecLib_->UnloadCodecSbcLib(codecSbcDecoderLib_);
     }
 }

@@ -177,7 +177,7 @@ ssize_t Encoder::SBCEncode(const CodecParam &codecParam, const uint8_t* in, size
         frameLen = frame_.Pack(out, frame_, j);
     } else {
         CalculateScalefactors(frame_.audioSamples_, frame_.scaleFactor_, frame_.blocks_,
-                              frame_.channels_, frame_.subbands_ );
+                              frame_.channels_, frame_.subbands_);
         frameLen = frame_.Pack(out, frame_, VALUE_0);
     }
 
@@ -286,7 +286,7 @@ void Encoder::AnalyzeEightForScaling(int32_t *temp1, int16_t *temp2)
 
 void Encoder::AnalyzeEightForCosTransform(int32_t *temp1, int16_t *temp2, const int16_t *consts)
 {
-    temp1[VALUE_0] = temp1[VALUE_1] = temp1[VALUE_2] = temp1[VALUE_3] = temp1[VALUE_4] = 
+    temp1[VALUE_0] = temp1[VALUE_1] = temp1[VALUE_2] = temp1[VALUE_3] = temp1[VALUE_4] =
         temp1[VALUE_5] = temp1[VALUE_6] = temp1[VALUE_7] = VALUE_0;
     for (int i = VALUE_0; i < VALUE_4; i++) {
         temp1[VALUE_0] += static_cast<int32_t>(temp2[i * VALUE_2 + VALUE_0] *
@@ -329,7 +329,7 @@ void Encoder::AnalyzeEightFunction(const int16_t *inData, int32_t *outData, cons
     int32_t t1[VALUE_8] = {};
     int16_t t2[VALUE_8] = {};
 
-    t1[VALUE_0] = t1[VALUE_1] = t1[VALUE_2] = t1[VALUE_3] = t1[VALUE_4] = 
+    t1[VALUE_0] = t1[VALUE_1] = t1[VALUE_2] = t1[VALUE_3] = t1[VALUE_4] =
         t1[VALUE_5] = t1[VALUE_6] = t1[VALUE_7] = static_cast<int32_t>(VALUE_1 << (PROTO_BAND8_SCALE - VALUE_1));
     AnalyzeEightForPolyphaseFilter(t1, inData, consts);
     AnalyzeEightForScaling(t1, t2);
@@ -703,4 +703,4 @@ int Encoder::CalculateScalefactorsJoint(void)
     CalculateScalefactorsJointForTheRestSubband(x, y, tmp0, tmp1, joint);
     return joint;
 }
-} // namespace sbc 
+} // namespace sbc

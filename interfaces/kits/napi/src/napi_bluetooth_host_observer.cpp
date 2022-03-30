@@ -342,6 +342,9 @@ void NapiBluetoothHostObserver::DealBlePairComfirmed(const std::string &addr, co
             OnPairConfirmedCallBack(addr, number);
             break;
         }
+        default:
+            HILOGD("DealBlePairComfirmed default.");
+            break;
     }
 }
 

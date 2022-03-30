@@ -357,7 +357,7 @@ AvrcTgStateMachineManager::StateMachine::CtConnecting::CtConnecting(
     LOG_DEBUG("[AVRCP TG] CtConnecting::%{public}s", __func__);
 }
 
-void AvrcTgStateMachineManager::StateMachine::CtConnecting::Entry(void) 
+void AvrcTgStateMachineManager::StateMachine::CtConnecting::Entry(void)
 {
     LOG_DEBUG("[AVRCP TG] CtConnecting::%{public}s", __func__);
 

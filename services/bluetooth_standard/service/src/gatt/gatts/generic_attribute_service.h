@@ -40,6 +40,7 @@ public:
     void DeregisterSDP() const;
 
     DISALLOW_COPY_AND_ASSIGN(GenericAttributeService);
+
 private:
     static const size_t CLIENT_CHARACTERISTIC_CONFIGURATION_VALUE_LENGTH;
     static const size_t SERVICE_CHANGED_VALUE_LENGTH;

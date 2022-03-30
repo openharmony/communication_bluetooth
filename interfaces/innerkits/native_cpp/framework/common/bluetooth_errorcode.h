@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Bluetooth {
 
-/* Bluetooth errcode defines*/
+/* Bluetooth errcode defines */
 enum ErrCode {
     NO_ERROR = 0,
     ERR_INVALID_STATE,

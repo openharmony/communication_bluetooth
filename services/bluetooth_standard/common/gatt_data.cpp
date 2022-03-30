@@ -19,19 +19,19 @@
 
 namespace bluetooth {
 GattDevice::GattDevice(const RawAddress& addr, uint8_t type, uint8_t transport)
-    : isEncryption_((transport == GATT_TRANSPORT_TYPE_CLASSIC) ? true : false), 
+    : isEncryption_((transport == GATT_TRANSPORT_TYPE_CLASSIC) ? true : false),
     transport_(transport), addressType_(type), connectState_(0), addr_(addr)
 {
 }
 
 GattDevice::GattDevice(const RawAddress& addr, uint8_t type, uint8_t transport, int state)
-    : isEncryption_((transport == GATT_TRANSPORT_TYPE_CLASSIC) ? true : false), 
+    : isEncryption_((transport == GATT_TRANSPORT_TYPE_CLASSIC) ? true : false),
     transport_(transport), addressType_(type), connectState_(state), addr_(addr)
 {
 }
 
-GattDevice::GattDevice(const RawAddress& addr, uint8_t transport) 
-    : isEncryption_((transport == GATT_TRANSPORT_TYPE_CLASSIC) ? true : false), 
+GattDevice::GattDevice(const RawAddress& addr, uint8_t transport)
+    : isEncryption_((transport == GATT_TRANSPORT_TYPE_CLASSIC) ? true : false),
     transport_(transport), addressType_(0), connectState_(0), addr_(addr) {}
 
 Descriptor::Descriptor(const Uuid &uuid, uint16_t handle, int permissions, const uint8_t *value, size_t length)
@@ -58,7 +58,7 @@ Descriptor::Descriptor(const Descriptor& src)
     }
 }
 
-Descriptor::Descriptor(uint16_t handle, const uint8_t *value, size_t length) 
+Descriptor::Descriptor(uint16_t handle, const uint8_t *value, size_t length)
     : handle_(handle), permissions_(0), value_(nullptr), length_(length), uuid_()
 {
     value_ = std::make_unique<uint8_t[]>(length_);
@@ -110,4 +110,4 @@ void Characteristic::SetValue(const uint8_t *value, size_t length)
     value_ = std::make_unique<uint8_t[]>(length_);
     (void)memcpy_s(value_.get(), length_, value, length_);
 }
-} // namespace bluetooth 
+} // namespace bluetooth

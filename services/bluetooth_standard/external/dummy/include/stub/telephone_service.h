@@ -152,7 +152,7 @@ public:
     {}
     void NotifyHfEnhancedDriverSafety(int status)
     {}
-    void SetPhoneState(int numActive, int numHeld, int callState, 
+    void SetPhoneState(int numActive, int numHeld, int callState,
         const std::string &number, int type, const std::string &name)
     {}
     void SetCurrentCalls(CurrentCalls &call)
@@ -207,6 +207,7 @@ public:
     {}
     void NotifyVolumeChangedForAutotest(int type, int volume)
     {}
+
 private:
     TelephoneService() = default;
     ~TelephoneService() = default;
