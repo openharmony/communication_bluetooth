@@ -839,7 +839,7 @@ const Packet *AvrcTgGiaPacket::AssemblePacket(void)
         LOG_DEBUG("[AVRCP TG] value[%{public}s]", values_.at(i).c_str());
     }
 
-    LOG_DEBUG("[AVRCP TG] offset[%{public}d]", offset);
+    LOG_DEBUG("[AVRCP TG] offset[%{public}hu]", offset);
 
     return pkt_;
 }

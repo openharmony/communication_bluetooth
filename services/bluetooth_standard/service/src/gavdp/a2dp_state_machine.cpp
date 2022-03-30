@@ -745,11 +745,12 @@ void A2dpStateOpen::ProcessTimeout(BtAddr addr, uint8_t role)
 void A2dpStateStreaming::Entry()
 {
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
+    if (codecThread == nullptr) {
+        return;
+    }
     if (codecThread->GetInitStatus()) {
     } else {
-        if (codecThread != nullptr) {
-            codecThread->StartA2dpCodecThread();
-        }
+        codecThread->StartA2dpCodecThread();
     }
 }
 

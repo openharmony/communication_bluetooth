@@ -823,7 +823,7 @@ uint16_t AvdtOpenReq(uint16_t handle, uint8_t *transLabel)
  *
  * @brief          AVDT_OpenRsp
  *
- * @details        Respond to a open request from ACP.  This function must be
+ * @details        Respond to an open request from ACP.  This function must be
  *                 called if the application receives an AVDT_OPEN_IND_EVT
  *                 through its control callback.
  *                 AVDTP.ICS #Table 11-1, 11b-1 Open stream response

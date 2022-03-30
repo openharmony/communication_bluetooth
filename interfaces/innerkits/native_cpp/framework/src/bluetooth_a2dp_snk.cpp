@@ -108,6 +108,10 @@ A2dpSink::impl::impl()
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 
     observerImp_ = new (std::nothrow) BluetoothA2dpSinkObserverImp(*this);
+    if (observerImp_ == nullptr) {
+        HILOGI("A2dpSink::get observerImp_ failed");
+        return;
+    }
     proxy_->RegisterObserver(observerImp_);
 };
 
@@ -190,12 +194,11 @@ int A2dpSink::GetDeviceState(const BluetoothRemoteDevice &device) const
         return RET_BAD_STATUS;
     }
 
-    int ret = RET_NO_ERROR;
+    int ret = RET_BAD_STATUS;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->GetDeviceState(RawAddress(device.GetDeviceAddr()));
     } else {
         HILOGI("[A2dpSink] proxy or bt disable.");
-        ret = RET_BAD_STATUS;
     }
 
     return ret;
@@ -238,12 +241,11 @@ int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device) const
         return RET_BAD_STATUS;
     }
 
-    int ret = RET_NO_ERROR;
+    int ret = RET_BAD_STATUS;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->GetPlayingState(RawAddress(device.GetDeviceAddr()));
     } else {
         HILOGI("[A2dpSink] proxy or bt disable.");
-        ret = RET_BAD_STATUS;
     }
 
     return ret;

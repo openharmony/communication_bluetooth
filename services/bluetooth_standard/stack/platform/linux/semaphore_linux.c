@@ -20,6 +20,7 @@
 #include <sys/eventfd.h>
 #include "platform/include/mutex.h"
 #include "platform/include/platform_def.h"
+#include "securec.h"
 
 #if !defined(EFD_SEMAPHORE)
 #define EFD_SEMAPHORE (1 << 0)
@@ -52,6 +53,7 @@ Semaphore *SemaphoreCreate(uint32_t val)
         LOG_ERROR("SemaphoreCreate: create Semaphore failed.");
         return NULL;
     }
+    (void)memset_s(semaphore, sizeof(Semaphore), 0, sizeof(Semaphore));
     semaphore->fd = efd;
     semaphore->mutex = mutex;
 

@@ -239,4 +239,4 @@ void Decoder::Synthesize8(const Frame &frame, int ch, int blk)
                                                                         PROTO_8_80M1[idx +INDEX_4]))))))))))));
     }
 }
-} // namespace sbc 
+} // namespace sbc

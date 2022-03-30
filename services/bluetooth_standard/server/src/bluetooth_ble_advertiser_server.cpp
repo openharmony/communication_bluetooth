@@ -222,7 +222,7 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
 {
     HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
 
-    if (callback == nullptr) {
+    if (callback == nullptr || pimpl == nullptr) {
         HILOGE("BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback:DeregisterBleAdvertiserCallback called "
                "with NULL binder."
                "Ignoring.");
@@ -232,11 +232,9 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
         HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
         if ((*iter)->AsObject() == callback->AsObject()) {
             HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
-            if (pimpl != nullptr) {
-                pimpl->observers_.Deregister(*iter);
-                pimpl->advCallBack_.erase(iter);
-                break;
-            }
+            pimpl->observers_.Deregister(*iter);
+            pimpl->advCallBack_.erase(iter);
+            break;
         }
     }
 }

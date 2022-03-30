@@ -17,8 +17,8 @@
  * @addtogroup Bluetooth
  * @{
  *
- * @brief Defines ble advertiser, peripheral deviceand central manager functions,
- *  including scan settings and filters, advertise settings and data etc.
+ * @brief Defines BLE advertiser, peripheral deviceand central manager functions,
+ *  including scan settings and filters, advertising settings and data etc.
  *
  * @since 6
  */
@@ -63,7 +63,7 @@ public:
     ~BleScanSettingsImpl(){};
 
     /**
-     * @brief Set repport delay time.
+     * @brief Set report delay time.
      *
      * @param reportDelayMillis Repport delay time.
      * @since 6
@@ -71,9 +71,9 @@ public:
     void SetReportDelay(long reportDelayMillis = 0);
 
     /**
-     * @brief Get repport delay time.
+     * @brief Get report delay time.
      *
-     * @return Returns Repport delay time.
+     * @return Report delay time.
      * @since 6
      */
     long GetReportDelayMillisValue() const;
@@ -82,7 +82,6 @@ public:
      * @brief Set scan mode.
      *
      * @param scanMode Scan mode.
-     * @return If the scanMode is invalid.
      * @since 6
      */
     void SetScanMode(int scanMode);
@@ -98,7 +97,7 @@ public:
     /**
      * @brief Set legacy flag.
      *
-     * @param legacy Legacy value.
+     * @param legacy Legacy flag.
      * @since 6
      */
     void SetLegacy(bool legacy);

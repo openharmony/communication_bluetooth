@@ -30,7 +30,7 @@
 #include "timer.h"
 
 namespace bluetooth {
-void AvrcpTgService::ObserverImpl::OnConnectionStateChanged(const std::string &addr, int state) 
+void AvrcpTgService::ObserverImpl::OnConnectionStateChanged(const std::string &addr, int state)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
     LOG_DEBUG("[AVRCP TG] addr[%{public}s], state[%{public}d]", addr.c_str(), state);
@@ -1017,7 +1017,7 @@ void AvrcpTgService::GetCapabilities(const RawAddress &rawAddr, uint8_t label)
  * PLAYER APPLICATION SETTINGS                                    *
  ******************************************************************/
 
-void AvrcpTgService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr, uint8_t label) const 
+void AvrcpTgService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr, uint8_t label) const
 {
     LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 

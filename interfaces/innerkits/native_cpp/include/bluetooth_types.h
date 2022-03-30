@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-    
+
 #define BLUETOOTH_DECLARE_IMPL() \
     struct impl;                 \
     std::unique_ptr<impl> pimpl

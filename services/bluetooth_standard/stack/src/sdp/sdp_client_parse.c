@@ -55,6 +55,9 @@ uint16_t SdpGetTransactionId()
 
 static void SdpFreeClientRequest(void *data)
 {
+    if (data == NULL) {
+        return;
+    }
     SdpClientRequest *request = (SdpClientRequest *)data;
     if (request->packet != NULL) {
         PacketFree(request->packet);

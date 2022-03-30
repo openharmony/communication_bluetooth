@@ -57,8 +57,8 @@ public:
      * @param serviceNum The serviceNum is number of services discovered.
      * @param context The context is used to send the event in the callback.
      */
-    static void SdpSearchCallback(const BtAddr *addr, const SdpService *serviceAry, 
-                                  uint16_t serviceNum, void *context);
+    static void SdpSearchCallback(const BtAddr *addr, const SdpService *serviceAry,
+        uint16_t serviceNum, void *context);
 
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketSdpClient);

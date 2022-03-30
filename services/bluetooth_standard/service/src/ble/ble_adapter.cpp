@@ -380,7 +380,7 @@ void BleAdapter::GenResPriAddrResult(uint8_t result, const uint8_t addr[BT_ADDRE
     auto *adapter = static_cast<BleAdapter *>(context);
     std::unique_lock<std::mutex> lock(adapter->pimpl->mutexRpa_);
     BtAddr btAddr;
-    memcpy_s(&btAddr.addr, BT_ADDRESS_SIZE, addr, BT_ADDRESS_SIZE);
+    (void)memcpy_s(&btAddr.addr, BT_ADDRESS_SIZE, addr, BT_ADDRESS_SIZE);
     btAddr.type = BLE_ADDR_TYPE_RANDOM;
     int ret = BTM_SetLeRandomAddress(&btAddr);
     if (ret != BT_NO_ERROR) {

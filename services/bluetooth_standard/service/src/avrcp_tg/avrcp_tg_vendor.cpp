@@ -22,12 +22,12 @@ namespace bluetooth {
  * AvrcTgVendorPacket                                             *
  ******************************************************************/
 
-AvrcTgVendorPacket::AvrcTgVendorPacket() : AvrcTgPacket(), status_(AVRC_ES_CODE_INVALID),label_(AVRC_INVALID_LABEL)
+AvrcTgVendorPacket::AvrcTgVendorPacket() : AvrcTgPacket(), status_(AVRC_ES_CODE_INVALID), label_(AVRC_INVALID_LABEL)
 {
     LOG_DEBUG("[AVRCP TG] AvrcTgVendorPacket::%{public}s", __func__);
 }
 
-AvrcTgVendorPacket::AvrcTgVendorPacket(uint8_t pduId, uint8_t status, uint8_t label) : status_(status),label_(label)
+AvrcTgVendorPacket::AvrcTgVendorPacket(uint8_t pduId, uint8_t status, uint8_t label) : status_(status), label_(label)
 {
     LOG_DEBUG("[AVRCP TG] AvrcTgVendorPacket::%{public}s", __func__);
 
@@ -149,7 +149,7 @@ uint16_t AvrcTgVendorPacket::GetNumberOfPackets(void)
     return AVRC_TG_VENDOR_PACKET_TYPE;
 }
 
-Packet *AvrcTgVendorPacket::PopAssembledPacket(void) 
+Packet *AvrcTgVendorPacket::PopAssembledPacket(void)
 {
     LOG_DEBUG("[AVRCP TG] AvrcTgVendorPacket::%{public}s", __func__);
 
@@ -883,7 +883,7 @@ uint16_t AvrcTgGcpasvPacket::GetNumberOfPackets(void)
         crCode_ = AVRC_TG_RSP_CODE_NOT_IMPLEMENTED;
     }
 
-    LOG_DEBUG("[AVRCP TG] numOfPkts[%{public}d]", numOfPkts);
+    LOG_DEBUG("[AVRCP TG] numOfPkts[%{public}hu]", numOfPkts);
 
     return numOfPkts;
 }

@@ -213,7 +213,7 @@ HWTEST_F(GattCharacteristicTest, GattCharacteristic_UnitTest_GetValue, TestSize.
     pGattCharacteristic->SetValue(values_Set, length_Set);
 
     std::unique_ptr<uint8_t[]> values_Get = std::make_unique<uint8_t[]>(length_Get);
-    memcpy_s(values_Get.get(), length_Get, pGattCharacteristic->GetValue(plength_Get).get(), length_Get);
+    (void)memcpy_s(values_Get.get(), length_Get, pGattCharacteristic->GetValue(plength_Get).get(), length_Get);
     const uint8_t *values = static_cast<uint8_t *>(values_Get.get());
     uint8_t resultValuesArray = values[0];
     uint8_t resultValuesPointer = *values;

@@ -45,7 +45,7 @@ void ModuleInit(const char *name, int traceLevel)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
-        module->init(traceLevel);        
+        module->init(traceLevel);  
     }
 }
 
@@ -53,7 +53,7 @@ void ModuleStartup(const char *name)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
-        module->startup();        
+        module->startup();  
     }
 }
 
@@ -61,7 +61,7 @@ void ModuleShutdown(const char *name)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
-        module->shutdown();        
+        module->shutdown();
     }
 }
 
@@ -69,6 +69,6 @@ void ModuleCleanup(const char *name)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
-        module->cleanup();        
+        module->cleanup();
     }
 }

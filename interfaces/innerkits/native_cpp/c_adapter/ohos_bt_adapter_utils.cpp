@@ -29,7 +29,7 @@ namespace OHOS {
 namespace Bluetooth {
 void ConvertAddr(const unsigned char in[6], std::string &out)
 {
-    char temp[18] = {0};
+    char temp[18] = {0}; // convert addr len.
     int ret = sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
         in[0], in[1], in[2], in[3], in[4], in[5]);
     if (ret == -1) {
@@ -57,7 +57,7 @@ int GetGattcResult(int ret)
 void GetAddrFromByte(unsigned char in[6], std::string &out)
 {
     char temp[18] = {0};
-    sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
+    (void)sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
         in[0], in[1], in[2], in[3], in[4], in[5]);
     out = string(temp);
 }

@@ -107,7 +107,7 @@ void MapMceInstanceClient::SetObexConfig()
     BtUuid btUuid;
     btAddr.type = BT_PUBLIC_DEVICE_ADDRESS;
     btUuid.type = BT_PUBLIC_DEVICE_ADDRESS;
-    (void)memcpy_s(btUuid.uuid128, MAX_OF_MASCLIENT_OBEX_UUID_TBL, 
+    (void)memcpy_s(btUuid.uuid128, MAX_OF_MASCLIENT_OBEX_UUID_TBL,
         mceClientUuidTbl_, MAX_OF_MASCLIENT_OBEX_UUID_TBL);
     RawAddress rawAddr(((MapMceInstanceStm &)instanceStm_).GetBtDevice());
     rawAddr.ConvertToUint8(btAddr.addr, sizeof(btAddr.addr));

@@ -135,6 +135,7 @@ public:
      * @param context socket object.
      */
     static void OnSocketException(Socket &sock);
+
 private:
     // remote device address.
     BtAddr remoteAddr_ {{0}, 0};

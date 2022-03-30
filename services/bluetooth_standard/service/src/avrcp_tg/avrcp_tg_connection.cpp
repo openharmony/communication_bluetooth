@@ -161,7 +161,7 @@ std::list<std::string> AvrcTgConnectManager::GetDeviceAddresses(void)
     std::lock_guard<std::mutex> lock(mutex_);
 
     std::list<std::string> addrs;
-    std::transform(infos_.begin(), infos_.end(), std::inserter(addrs, addrs.end()), 
+    std::transform(infos_.begin(), infos_.end(), std::inserter(addrs, addrs.end()),
         [](const std::pair<std::string, AvrcTgConnectInfo>& info){return info.second.btAddr_;});
     return addrs;
 }
@@ -333,7 +333,7 @@ void AvrcTgConnectManager::EnableNotifyState(const RawAddress &rawAddr, uint8_t 
 void AvrcTgConnectManager::DisableNotifyState(const RawAddress &rawAddr, uint8_t notification)
 {
     LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] notification[%{public}d]", notification);
+    LOG_DEBUG("[AVRCP TG] notification[%{public}hhu]", notification);
 
     std::lock_guard<std::mutex> lock(mutex_);
 

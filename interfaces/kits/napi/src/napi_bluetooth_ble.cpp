@@ -364,7 +364,7 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
         bool isArrayBuffer = false;
         napi_is_arraybuffer(env, result, &isArrayBuffer);
         NAPI_ASSERT(env, isArrayBuffer, "Array buffer expected.");
-        uint8_t *arrayBufferData;
+        uint8_t *arrayBufferData = nullptr;
         size_t arrayBufferTotal;
         napi_get_arraybuffer_info(env, result, reinterpret_cast<void **>(&arrayBufferData), &arrayBufferTotal);
         std::string serviceDataStr(arrayBufferData, arrayBufferData + arrayBufferTotal);

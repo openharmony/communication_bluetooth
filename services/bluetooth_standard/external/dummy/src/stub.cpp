@@ -52,13 +52,13 @@ MessageDigest *MessageDigestFactory::GetInstance(const std::string &type)
 MapService *MapService::GetInstance()
 {
     static MapService instance;
-    return &instance;   
+    return &instance;
 }
 
 MediaService *MediaService::GetInstance()
 {
     static MediaService instance;
-    return &instance;     
+    return &instance;
 }
 
 TelePhoneClientService &TelePhoneClientService::GetInstance()
@@ -76,6 +76,6 @@ TelephoneService *TelephoneService::GetInstance()
 A2dpService *A2dpService::GetInstance()
 {
     static A2dpService instance;
-    return &instance; 
+    return &instance;
 }
 } // namespace stub

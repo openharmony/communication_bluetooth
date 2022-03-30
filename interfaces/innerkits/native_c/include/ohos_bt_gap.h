@@ -29,7 +29,7 @@ typedef struct {
 } PairedDeviceInfo;
 
 /* Bluetooth stack state */
-typedef enum { 
+typedef enum {
     OHOS_GAP_STATE_TURNING_ON = 0x0,
     OHOS_GAP_STATE_TURN_ON,
     OHOS_GAP_STATE_TURNING_OFF,
@@ -45,9 +45,9 @@ typedef enum {
 } GapAclState;
 
 /* bondable mode */
-typedef enum { 
-    OHOS_GAP_BONDABLE_MODE_OFF = 0x00, 
-    OHOS_GAP_BONDABLE_MODE_ON = 0x01 
+typedef enum {
+    OHOS_GAP_BONDABLE_MODE_OFF = 0x00,
+    OHOS_GAP_BONDABLE_MODE_ON = 0x01
 } GapBtBondableMode;
 
 typedef enum {

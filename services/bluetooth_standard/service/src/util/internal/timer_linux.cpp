@@ -76,7 +76,7 @@ TimerManager::~TimerManager()
         close(epollFd_);
     }
     if (stopFd_ != -1) {
-        close(stopFd_);       
+        close(stopFd_);
     }
 }
 

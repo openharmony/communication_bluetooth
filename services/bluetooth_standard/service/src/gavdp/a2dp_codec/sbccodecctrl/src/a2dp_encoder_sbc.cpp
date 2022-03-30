@@ -69,8 +69,8 @@ A2dpSbcEncoder::A2dpSbcEncoder(
 A2dpSbcEncoder::~A2dpSbcEncoder()
 {
     LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
-    codecSbcEncoderLib_->sbcEncoder.destroySbcEncode(sbcEncoder_);
     if (codecSbcEncoderLib_ != nullptr) {
+        codecSbcEncoderLib_->sbcEncoder.destroySbcEncode(sbcEncoder_);
         codecLib_->UnloadCodecSbcLib(codecSbcEncoderLib_);
         codecSbcEncoderLib_ = nullptr;
     }

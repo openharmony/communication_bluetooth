@@ -133,7 +133,7 @@ public:
         }
 
         if (i == MAXIMUM_NUMBER_GATTSERVICE) {
-            HILOGE("add service failed, invalid srvcHandle: %d", Service->GetHandle());
+            HILOGE("add service failed, invalid srvcHandle: %{public}u", Service->GetHandle());
             err = OHOS_BT_STATUS_FAIL;
         }
 

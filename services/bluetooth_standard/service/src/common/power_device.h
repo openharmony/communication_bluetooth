@@ -106,6 +106,7 @@ public:
      * @since 6
      */
     void SniffSubratingCompleteCallback(uint8_t status) const;
+
 private:
     /**
      * @brief Send SetActiveMode message to power state machine.

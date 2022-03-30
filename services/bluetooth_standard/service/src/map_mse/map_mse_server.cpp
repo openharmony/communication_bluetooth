@@ -362,7 +362,6 @@ void MapMseServer::MseObexServer::OnSetPath(ObexServerSession &session, const Ob
 int MapMseServer::Enable(void)
 {
     MSE_LOG_INFO("%{public}s Enter", __PRETTY_FUNCTION__);
-    
     LoadAdapterConfig();
     ObexServerConfig obexSrvConfig = {
         .useRfcomm_ = true,
