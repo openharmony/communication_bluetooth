@@ -23,9 +23,9 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
-NapiHidHostObserver NapiHidHost::observer_;
+NapiBluetoothHidHostObserver NapiBluetoothHidHost::observer_;
 
-void NapiHidHost::DefineHidHostJSClass(napi_env env)
+void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
@@ -37,9 +37,9 @@ void NapiHidHost::DefineHidHostJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
     };
 
-    napi_define_class(env, "NapiHidHost", NAPI_AUTO_LENGTH, HidHostConstructor, nullptr,
+    napi_define_class(env, "NapiBluetoothHidHost", NAPI_AUTO_LENGTH, HidHostConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-    
+
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_HID_HOST, napiProfile);
@@ -48,14 +48,14 @@ void NapiHidHost::DefineHidHostJSClass(napi_env env)
     HILOGI("DefineHidHostJSClass finished");
 }
 
-napi_value NapiHidHost::HidHostConstructor(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothHidHost::HidHostConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
-napi_value NapiHidHost::On(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothHidHost::On(napi_env env, napi_callback_info info)
 {
     HILOGI("On called");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
@@ -92,7 +92,7 @@ napi_value NapiHidHost::On(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NapiHidHost::Off(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothHidHost::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("Off called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -113,6 +113,11 @@ napi_value NapiHidHost::Off(napi_env env, napi_callback_info info)
         HILOGE("string expected.");
         return ret;
     }
+
+    if (observer_.callbackInfos_[type] != nullptr) {
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_.callbackInfos_[type];
+    napi_delete_reference(env, callbackInfo->callback_);
+    }
     observer_.callbackInfos_[type] = nullptr;
 
     HILOGI("%{public}s is unregistered", type.c_str());
@@ -120,7 +125,7 @@ napi_value NapiHidHost::Off(napi_env env, napi_callback_info info)
     return ret;
 }
 
-napi_value NapiHidHost::GetConnectionDevices(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothHidHost::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
@@ -136,7 +141,7 @@ napi_value NapiHidHost::GetConnectionDevices(napi_env env, napi_callback_info in
     return ret;
 }
 
-napi_value NapiHidHost::GetDeviceState(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
 
@@ -167,7 +172,7 @@ napi_value NapiHidHost::GetDeviceState(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiHidHost::Connect(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothHidHost::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
 
@@ -198,7 +203,7 @@ napi_value NapiHidHost::Connect(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiHidHost::Disconnect(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothHidHost::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
 

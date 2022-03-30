@@ -23,10 +23,10 @@ namespace OHOS {
 namespace Bluetooth {
 const std::string STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
-class NapiHidHostObserver : public HidHostObserver {
+class NapiBluetoothHidHostObserver : public HidHostObserver {
 public:
-    NapiHidHostObserver() = default;
-    virtual ~NapiHidHostObserver() = default;
+    NapiBluetoothHidHostObserver() = default;
+    virtual ~NapiBluetoothHidHostObserver() = default;
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 
