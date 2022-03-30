@@ -21,6 +21,10 @@ namespace Bluetooth {
 ErrCode BluetoothHidHostProxy::Connect(const BluetoothRawAddress &device, bool& result)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::Connect WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
     if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothHidHostProxy::Connect write device error");
         return INVALID_DATA;
@@ -37,13 +41,17 @@ ErrCode BluetoothHidHostProxy::Connect(const BluetoothRawAddress &device, bool& 
         return error;
     }
 
-    result = reply.ReadInt32() == 1 ? true : false;
+    result = reply.ReadInt32() == NO_ERROR ? true : false;
     return ERR_OK;
 }
 
 ErrCode BluetoothHidHostProxy::Disconnect(const BluetoothRawAddress &device, bool& result)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::Disconnect WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
     if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothHidHostProxy::Disconnect write device error");
         return INVALID_DATA;
@@ -60,13 +68,17 @@ ErrCode BluetoothHidHostProxy::Disconnect(const BluetoothRawAddress &device, boo
         return error;
     }
 
-    result = reply.ReadInt32() == 1 ? true : false;
+    result = reply.ReadInt32() == NO_ERROR ? true : false;
     return ERR_OK;
 }
 
 ErrCode BluetoothHidHostProxy::GetDeviceState(const BluetoothRawAddress &device, int& result)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::GetDeviceState WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
     if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothHidHostProxy::GetDeviceState write device error");
         return INVALID_DATA;
@@ -96,6 +108,10 @@ ErrCode BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &st
     std::vector<BluetoothRawAddress>& result)
 {
     MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::GetDevicesByStates WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
     if (!WriteParcelableInt32Vector(states, data)) {
         HILOGE("[GetDevicesByStates] fail: write result failed");
         return INVALID_DATA;
@@ -120,7 +136,11 @@ ErrCode BluetoothHidHostProxy::RegisterObserver(
     const sptr<IBluetoothHidHostObserver> observer)
 {
     MessageParcel data;
-if (!data.WriteRemoteObject(observer->AsObject())) {
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::RegisterObserver WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
         HILOGE("BluetoothHidHostProxy::RegisterObserver error");
         return INVALID_DATA;
     }
@@ -142,7 +162,11 @@ ErrCode BluetoothHidHostProxy::DeregisterObserver(
     const sptr<IBluetoothHidHostObserver> observer)
 {
     MessageParcel data;
-if (!data.WriteRemoteObject(observer->AsObject())) {
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::DeregisterObserver WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
         HILOGE("BluetoothHidHostProxy::DeregisterObserver error");
         return INVALID_DATA;
     }

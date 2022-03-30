@@ -23,18 +23,18 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void NapiHidHostObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("NapiHidHostObserver::OnConnectionStateChanged called");
+    HILOGI("NapiBluetoothHidHostObserver::OnConnectionStateChanged called");
     if (!callbackInfos_[STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE]) {
-        HILOGW("NapiHidHostObserver::OnConnectionStateChanged: This callback is not registered by ability.");
+        HILOGW("NapiBluetoothHidHostObserver::OnConnectionStateChanged: This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiHidHostObserver::OnConnectionStateChanged: %{public}s is registered by ability",
+    HILOGI("NapiBluetoothHidHostObserver::OnConnectionStateChanged: %{public}s is registered by ability",
         STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE];
-    
+
     callbackInfo->state_ = state;
     callbackInfo->deviceId_ = device.GetDeviceAddr();
     uv_loop_s *loop = nullptr;
