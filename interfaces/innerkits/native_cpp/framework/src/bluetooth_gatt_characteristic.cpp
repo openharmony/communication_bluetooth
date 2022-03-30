@@ -65,7 +65,7 @@ GattCharacteristic::GattCharacteristic(const GattCharacteristic &src)
 {
     if (nullptr != src.value_ && 0 != length_) {
         value_ = std::make_unique<uint8_t[]>(length_);
-        memcpy_s(value_.get(), length_, src.value_.get(), length_);
+        (void)memcpy_s(value_.get(), length_, src.value_.get(), length_);
     } else {
         value_.reset(nullptr);
         length_ = 0;
@@ -89,7 +89,7 @@ GattCharacteristic &GattCharacteristic::operator=(const GattCharacteristic &src)
 
         if (nullptr != src.value_ && 0 != length_) {
             value_ = std::make_unique<uint8_t[]>(length_);
-            memcpy_s(value_.get(), length_, src.value_.get(), length_);
+            (void)memcpy_s(value_.get(), length_, src.value_.get(), length_);
         } else {
             value_.reset(nullptr);
             length_ = 0;
@@ -200,7 +200,7 @@ void GattCharacteristic::SetValue(const uint8_t *values, const size_t length)
     }
     value_ = std::make_unique<uint8_t[]>(length);
     length_ = length;
-    memcpy_s(value_.get(), length, values, length);
+    (void)memcpy_s(value_.get(), length, values, length);
 }
 
 }  // namespace Bluetooth

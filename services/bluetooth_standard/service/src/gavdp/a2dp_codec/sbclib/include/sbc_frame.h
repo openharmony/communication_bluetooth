@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef SBC_FRAME_H
 #define SBC_FRAME_H
 
@@ -51,6 +51,7 @@ public:
     bool IsValid() const;
     int Unpack(const uint8_t* bufStream, size_t size);
     ssize_t Pack(uint8_t* bufStream, const Frame& frame, int joint);
+
 private:
     ssize_t PackFrameInternal(const Frame& frame, uint8_t* bufStream, int subbands, int channels, int joint);
     int UnpackFrameStream(Frame& frame, const uint8_t* bufStream, size_t len);
@@ -75,5 +76,5 @@ private:
     int32_t GetSbcAudioSample(int audioSample, uint32_t scale, uint32_t level);
     uint8_t CalculateSbcCrc(Frame &frame, const uint8_t *bufStream, sbcInnerInfo sbcInnerInfo, uint &consumed, uint &crcpos);
 };
-} // namespace sbc 
+} // namespace sbc
 #endif // SBC_FRAME_H

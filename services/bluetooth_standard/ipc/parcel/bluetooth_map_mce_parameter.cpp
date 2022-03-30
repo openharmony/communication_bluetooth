@@ -172,20 +172,24 @@ bool BluetoothIProfileMasInstanceInfoList::ReadFromParcel(Parcel &parcel)
     ::bluetooth::IProfileMasInstanceInfo tempInfo;
     for (int i = 0; i < tempInt; i++) {
         status = parcel.ReadString(tempInfo.OwnerUCI);
-        if (!status)
+        if (!status) {
             return status;
+        }
 
         status = parcel.ReadString(tempInfo.MASInstanceInformation);
-        if (!status)
+        if (!status) {
             return status;
+        }
 
         status = parcel.ReadInt32(tempInfo.supportedMsgTypes_);
-        if (!status)
+        if (!status) {
             return status;
+        }
 
         status = parcel.ReadInt32(tempInfo.instanceId);
-        if (!status)
+        if (!status) {
             return status;
+        }
 
         masInfoList.push_back(tempInfo);
     }

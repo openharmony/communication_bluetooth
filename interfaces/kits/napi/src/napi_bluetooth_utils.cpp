@@ -16,8 +16,6 @@
 #include "napi_bluetooth_utils.h"
 #include <functional>
 #include <optional>
-#include <string>
-#include <vector>
 #include "bluetooth_log.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -286,7 +284,7 @@ void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor& d
     uint8_t* valueData = descriptor.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
     napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-    memcpy_s(bufferData, valueSize, valueData, valueSize);
+    (void)memcpy_s(bufferData, valueSize, valueData, valueSize);
     napi_set_named_property(env, result, "descriptorValue", value);
 }
 
@@ -402,7 +400,7 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     uint8_t* valueData = characteristic.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
     napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-    memcpy_s(bufferData, valueSize, valueData, valueSize);
+    (void)memcpy_s(bufferData, valueSize, valueData, valueSize);
     napi_set_named_property(env, result, "value", value);
 
     napi_value characteristicUuid;
@@ -453,7 +451,7 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     uint8_t* valueData = descriptor.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
     napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-    memcpy_s(bufferData, valueSize, valueData, valueSize);
+    (void)memcpy_s(bufferData, valueSize, valueData, valueSize);
     napi_set_named_property(env, result, "value", value);
 
     napi_value descriptorUuid;
@@ -554,7 +552,7 @@ GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<G
         serviceType = GattServiceType::SECONDARY;
     }
 
-    GattService* service;
+    GattService* service = nullptr;
     if (server == nullptr && client == nullptr) {
         service =  new GattService(UUID::FromString(serviceUuid), serviceType);
 

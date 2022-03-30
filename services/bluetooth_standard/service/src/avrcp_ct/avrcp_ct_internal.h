@@ -53,7 +53,7 @@ void AvrcpCtSafeDelete(T *p)
     }
 }
 
-/// The macro used to safely delete the pointer to a array of the object created by[new].
+/// The macro used to safely delete the pointer to an array of the object created by[new].
 template<typename T>
 void AvrcpCtSafeDeleteArray(T *p, int length)
 {

@@ -86,7 +86,7 @@ public:
      *                        0 0 0 0 | 0 0 0 0     other operands                                      n octets<br>
      * @return The frame packet.
      */
-    virtual Packet *AssembleParameters(Packet *pkt) = 0 ;
+    virtual Packet *AssembleParameters(Packet *pkt) = 0;
 
     /**
      * @brief Assembles the packet of the frame.

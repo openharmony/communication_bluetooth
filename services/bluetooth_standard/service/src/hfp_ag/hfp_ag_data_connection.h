@@ -244,7 +244,7 @@ private:
     std::vector<HfIndicator> localHfIndicators_ = {
         {1, 0, 0, 1, true, true},   /* Enhanced Driver Status */
         {2, 0, 0, 100, true, true}  /* Battery Level Status */
-    };                                         
+    };
     std::vector<HfIndicator> remoteHfIndicators_ {};
     HfpAgRfcommConnection rfcommConnection_ {&HfpAgDataConnection::DataConnectionCallback};
 

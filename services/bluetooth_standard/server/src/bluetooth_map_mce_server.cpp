@@ -28,7 +28,7 @@ namespace Bluetooth {
  */
 class BluetoothMapMceObserverImpl : public IProfileMapMceObserver {
 public:
-    BluetoothMapMceObserverImpl(RemoteObserverList<IBluetoothMapMceObserver> *observerList);
+    explicit BluetoothMapMceObserverImpl(RemoteObserverList<IBluetoothMapMceObserver> *observerList);
     ~BluetoothMapMceObserverImpl();
     void OnMapActionCompleted(
         const RawAddress &deviceAddress, const IProfileMapAction &action, MapExecuteStatus status) override;

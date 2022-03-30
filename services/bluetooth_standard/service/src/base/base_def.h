@@ -59,7 +59,6 @@
 /**
  * @brief Bluetooth system config path.
  */
-//const std::string BT_CONFIG_PATH = "./";
 const std::string BT_CONFIG_PATH_BASE = "/system/etc/bluetooth/";
 const std::string BT_CONFIG_PATH = "/data/bluetooth/";
 

@@ -78,6 +78,7 @@ public:
     {}
     void NotifyVolumeChangedForAutotest(int type, int volume)
     {}
+
 private:
     TelePhoneClientService() = default;
     ~TelePhoneClientService() = default;

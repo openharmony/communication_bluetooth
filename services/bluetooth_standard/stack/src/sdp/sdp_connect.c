@@ -87,8 +87,10 @@ void SdpDeregisterToL2cap()
 
 static void SdpFreeConnectInfo(const void *data)
 {
+    if (data == NULL) {
+        return;
+    }
     SdpConnectInfo *connect = (SdpConnectInfo *)data;
-
     if (connect->timer != NULL) {
         AlarmDelete(connect->timer);
         connect->timer = NULL;

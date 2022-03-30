@@ -360,7 +360,7 @@ public:
     {
         vCardSelector_ = selector;
     }
-    
+
     uint8_t GetvCardSelectorOp() const
     {
         return vCardSelectorOp_;
@@ -370,7 +370,7 @@ public:
     {
         vCardSelectorOp_ = op;
     }
-    
+
     uint64_t GetSpecifiedBitset() const
     {
         return specifiedBitset_;

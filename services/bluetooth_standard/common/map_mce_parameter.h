@@ -138,7 +138,7 @@ struct IProfileMessageOutline {
     int attachment_size = 0;  // The overall size of the attachments in bytes.
     MapBoolType text =
         MapBoolType::INVALID;   // Value "yes" indicates the original message or (in case of multipart-messages) that a
-                                // part of the message includes textual content; "no" indicates that the message has 
+                                // part of the message includes textual content; "no" indicates that the message has
                                 // no textual content, only binary.
     MapMessageStatus read =
         MapMessageStatus::INVALID;  // Value "yes" indicates that the message has already been read on the MSE; "no"

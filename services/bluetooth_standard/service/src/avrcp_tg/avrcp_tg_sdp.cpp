@@ -122,7 +122,7 @@ int AvrcTgSdpManager::FindCtService(const RawAddress &rawAddr,
     classIdList[0].type = BT_UUID_16;
     classIdList[0].uuid16 = AVRC_TG_AV_REMOTE_CONTROL_CONTROLLER;
     SdpUuid sdpUuid = {
-        .uuidNum = AVRC_SERVICE_CLASS_ID_LIST_NUMBER, 
+        .uuidNum = AVRC_SERVICE_CLASS_ID_LIST_NUMBER,
         .uuid = classIdList
     };
     int result = SDP_ServiceSearch(&btAddr, &sdpUuid, nullptr, callback);

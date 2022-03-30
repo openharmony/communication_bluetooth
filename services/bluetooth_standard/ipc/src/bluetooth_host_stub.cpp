@@ -306,7 +306,7 @@ ErrCode BluetoothHostStub::BluetoothFactoryResetInner(MessageParcel &data, Messa
 {
     HILOGI("BluetoothHostStub::BluetoothFactoryResetInner starts");
     bool result = BluetoothFactoryReset();
-    bool ret = reply.ReadBool(result);
+    bool ret = reply.WriteBool(result);
     if (!ret) {
         HILOGE("BluetoothHostStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;

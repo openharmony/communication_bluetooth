@@ -112,12 +112,12 @@ MapServer::impl::impl()
     HILOGI("MapServer::impl:impl() remote obtained");
 
     proxy_ = iface_cast<IBluetoothMapMse>(remote);
-
+    if (proxy_ == nullptr) {
+        return;
+    }
     deathRecipient_ = new BluetoothMapMseDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    if (proxy_ != nullptr) {
-        proxy_->RegisterObserver(serviceObserver_);
-    }
+    proxy_->RegisterObserver(serviceObserver_);
 }
 
 MapServer::MapServer() : pimpl(nullptr)

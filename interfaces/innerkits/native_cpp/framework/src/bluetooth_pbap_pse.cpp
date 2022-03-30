@@ -148,8 +148,7 @@ struct PbapServer::impl {
             return false;
         }
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            int32_t ret = RET_NO_SUPPORT;
-            ret = proxy_->Disconnect(bluetooth::RawAddress(device.GetDeviceAddr()));
+            int32_t ret = proxy_->Disconnect(bluetooth::RawAddress(device.GetDeviceAddr()));
             return ret == RET_NO_ERROR;
         }
         return false;
@@ -162,8 +161,7 @@ struct PbapServer::impl {
             return false;
         }
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            int32_t ret = RET_NO_SUPPORT;
-            ret = proxy_->SetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()), strategy);
+            int32_t ret = proxy_->SetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()), strategy);
             return ret == RET_NO_ERROR;
         }
         return false;
@@ -249,13 +247,12 @@ PbapServer::impl::impl()
     HILOGI("PbapServer::impl:impl() remote obtained");
 
     proxy_ = iface_cast<IBluetoothPbapPse>(remote);
-
+    if (proxy_ == nullptr) {
+        return;
+    }
     deathRecipient_ = new BluetoothPbapPseDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-
-    if (proxy_ != nullptr) {
-        proxy_->RegisterObserver(serviceObserver_);
-    }
+    proxy_->RegisterObserver(serviceObserver_);
 }
 
 PbapServer *PbapServer::GetProfile()

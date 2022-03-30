@@ -911,7 +911,7 @@ int MapMceService::GetFolderListing(const RawAddress &device, uint16_t maxOfList
     return ret;
 }
 
-int MapMceService::SetPath(const RawAddress &device, const uint8_t flags, 
+int MapMceService::SetPath(const RawAddress &device, const uint8_t flags,
     const std::u16string &folder, std::vector<std::u16string> &folderList)
 {
     LOG_INFO("%{public}s enter", __PRETTY_FUNCTION__);

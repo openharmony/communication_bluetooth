@@ -35,7 +35,7 @@ declare namespace bluetooth {
     function getState(): BluetoothState;
 
     /**
-     * Get the local device connection state to any profile of any remote device.
+     * Get the status of the local device connection to any profile of any remote device.
      *
      * @return One of {@link ProfileConnectionState#STATE_DISCONNECTED},
      * {@link ProfileConnectionState#STATE_CONNECTING}, {@link ProfileConnectionState#STATE_CONNECTED},
