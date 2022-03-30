@@ -22,6 +22,10 @@ ErrCode BluetoothHidHostObserverProxy::OnConnectionStateChanged(const BluetoothR
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
+    if (!data.WriteInterfaceToken(BluetoothHidHostObserverProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostObserverProxy::OnConnectionStateChanged WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
     data.WriteParcelable(&device);
     data.WriteInt16(state);
     int32_t st = Remote()->SendRequest(COMMAND_ON_CONNECTION_STATE_CHANGED, data, reply, option);

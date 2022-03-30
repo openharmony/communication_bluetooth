@@ -45,6 +45,12 @@ int BluetoothHidHostStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothHidHostStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    std::u16string descriptor = BluetoothHidHostStub::GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (descriptor != remoteDescriptor) {
+        HILOGE("local descriptor is not equal to remote");
+        return IPC_INVOKER_TRANSLATE_ERR;
+    }
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -64,7 +70,9 @@ ErrCode BluetoothHidHostStub::ConnectInner(MessageParcel &data, MessageParcel &r
     ErrCode ec = Connect(*device, result);
     reply.WriteInt32(ec);
     if (SUCCEEDED(ec)) {
-        reply.WriteInt32(result ? 1 : 0);
+        if (result == NO_ERROR) {
+            reply.WriteInt32(NO_ERROR);
+        }
     }
     return ERR_NONE;
 }
@@ -77,7 +85,9 @@ ErrCode BluetoothHidHostStub::DisconnectInner(MessageParcel &data, MessageParcel
     ErrCode ec = Disconnect(*device, result);
     reply.WriteInt32(ec);
     if (SUCCEEDED(ec)) {
-        reply.WriteInt32(result ? 1 : 0);
+        if (result == NO_ERROR) {
+            reply.WriteInt32(NO_ERROR);
+        }
     }
     return ERR_NONE;
 }
