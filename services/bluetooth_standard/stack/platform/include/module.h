@@ -44,7 +44,6 @@ void ModuleCleanup(const char *name);
     {                                                               \
         ModuleRegister(&module);                                    \
     }
-
 #ifdef __cplusplus
 }
 #endif

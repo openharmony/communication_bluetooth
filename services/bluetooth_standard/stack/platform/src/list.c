@@ -45,7 +45,7 @@ List *ListCreate(FreeDataCb cb)
     List *newList = (List *)calloc(1, (sizeof(List)));
     if (newList != NULL) {
         DL_ListInit(&newList->dlList);
-        newList->cb = cb;        
+        newList->cb = cb;
     }
     return newList;
 }
@@ -101,7 +101,7 @@ void ListAddFirst(List *list, void *data)
         node->data = data;
         node->list = list;
         DL_ListHeadInsert(&list->dlList, &node->node);
-        list->len++;        
+        list->len++;
     }
 }
 
@@ -114,7 +114,7 @@ void ListAddLast(List *list, void *data)
         node->data = data;
         node->list = list;
         DL_ListTailInsert(&list->dlList, &node->node);
-        list->len++;        
+        list->len++;
     }
 }
 

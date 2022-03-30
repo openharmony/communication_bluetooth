@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef SBC_ENCODER_H
 #define SBC_ENCODER_H
 
@@ -31,6 +31,7 @@ public:
     virtual ~Encoder();
     ssize_t SBCEncode(const CodecParam& codecParam, const uint8_t* in, size_t iLength, uint8_t* out,
                    size_t oLength, size_t* written) override;
+
 private:
     void Init(const Frame& frame);
     static size_t CalculateFrameLength(const CodecParam& codecParam);
@@ -71,5 +72,5 @@ private:
     uint8_t increment_ {};
     int16_t x_[2][BUFFER_SIZE] {};
 };
-} // namespace sbc 
+} // namespace sbc
 #endif // SBC_ENCODER_H

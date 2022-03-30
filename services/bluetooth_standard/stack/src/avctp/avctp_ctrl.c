@@ -65,7 +65,7 @@ uint16_t AvctCbCtrlEvt(AvctCbDev *cbDev, uint8_t event, const AvctEvtData *data)
     uint8_t action = AvctGetEvtAction(curSt, event);
     /* Set next state */
     cbCtrl->stState = nextSt;
-    
+
     /* excute actoin */
     if (action != AVCT_IGNORE) {
         ret = (*C_AVCT_CTRL_ACTION[action])(cbDev, data);

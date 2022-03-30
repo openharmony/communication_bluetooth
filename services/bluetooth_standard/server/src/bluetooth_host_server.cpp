@@ -616,17 +616,15 @@ void BluetoothHostServer::RegisterObserver(const sptr<IBluetoothHostObserver> &o
 
 void BluetoothHostServer::DeregisterObserver(const sptr<IBluetoothHostObserver> &observer)
 {
-    if (observer == nullptr) {
+    if (observer == nullptr || pimpl == nullptr) {
         HILOGE("BluetoothHostServer: DeregisterObserver observer is null");
         return;
     }
     for (auto iter = pimpl->hostObservers_.begin(); iter != pimpl->hostObservers_.end(); ++iter) {
         if ((*iter)->AsObject() == observer->AsObject()) {
-            if (pimpl != nullptr) {
-                pimpl->observers_.Deregister(*iter);
-                pimpl->hostObservers_.erase(iter);
-                break;
-            }
+            pimpl->observers_.Deregister(*iter);
+            pimpl->hostObservers_.erase(iter);
+            break;
         }
     }
 }
@@ -1270,17 +1268,15 @@ void BluetoothHostServer::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemo
 void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    if (observer == nullptr) {
+    if (observer == nullptr || pimpl == nullptr) {
         HILOGE("[%{public}s]: %{public}s() observer is nullptr!", __FILE__, __FUNCTION__);
         return;
     }
     for (auto iter = pimpl->remoteDeviceObservers_.begin(); iter != pimpl->remoteDeviceObservers_.end(); ++iter) {
         if ((*iter)->AsObject() == observer->AsObject()) {
-            if (pimpl != nullptr) {
-                pimpl->remoteObservers_.Deregister(*iter);
-                pimpl->remoteDeviceObservers_.erase(iter);
-                break;
-            }
+            pimpl->remoteObservers_.Deregister(*iter);
+            pimpl->remoteDeviceObservers_.erase(iter);
+            break;
         }
     }
 }
@@ -1306,17 +1302,15 @@ void BluetoothHostServer::DeregisterBleAdapterObserver(const sptr<IBluetoothHost
 {
     HILOGI("BluetoothHostServer::DeregisterBleAdapterObserver start.");
 
-    if (observer == nullptr) {
+    if (observer == nullptr || pimpl == nullptr) {
         HILOGE("[%{public}s]: %{public}s() observer is nullptr!", __FILE__, __FUNCTION__);
         return;
     }
     for (auto iter = pimpl->bleAdapterObservers_.begin(); iter != pimpl->bleAdapterObservers_.end(); ++iter) {
         if ((*iter)->AsObject() == observer->AsObject()) {
-            if (pimpl != nullptr) {
-                pimpl->bleObservers_.Deregister(*iter);
-                pimpl->bleAdapterObservers_.erase(iter);
-                break;
-            }
+            pimpl->bleObservers_.Deregister(*iter);
+            pimpl->bleAdapterObservers_.erase(iter);
+            break;
         }
     }
 }

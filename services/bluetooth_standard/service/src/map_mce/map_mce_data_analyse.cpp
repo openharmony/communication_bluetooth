@@ -93,7 +93,7 @@ void MceCombineNode::NodeEnd()
     }
 }
 
-void MceCombineNode::AddParamStr(const std::string &param,const std::string &value)
+void MceCombineNode::AddParamStr(const std::string &param, const std::string &value)
 {
     stream_ << param << value << "\r\n";
 }
@@ -259,7 +259,7 @@ int MceBMessageNode::GetSize() const
 }
 
 MceBmessageParamMakeStringObject::MceBmessageParamMakeStringObject(const IProfileBMessageStruct &param)
-    :msgParam_(param) 
+    :msgParam_(param)
 {
     combineNode_.NodeBegin("BMSG");
     MakeBMessageProperty();

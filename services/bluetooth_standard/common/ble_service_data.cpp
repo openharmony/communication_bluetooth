@@ -30,7 +30,7 @@ void BleScanSettingsImpl::SetReportDelay(long reportDelayMillis)
 }
 
 /**
- * @brief Get repport delay time.
+ * @brief Get the report delay time.
  *
  * @return Returns Repport delay time.
  * @since 6
@@ -71,10 +71,10 @@ int BleScanSettingsImpl::GetPhy() const
 }
 
 /**
- * @brief Check if device service is connectable.
+ * @brief Check if the device service is connectable.
  *
  * @return Returns <b>true</b> if device service is connectable;
- *         returns <b>false</b> if device service is not connectable.
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BleAdvertiserSettingsImpl::IsConnectable() const
@@ -83,9 +83,9 @@ bool BleAdvertiserSettingsImpl::IsConnectable() const
 }
 
 /**
- * @brief Set connectable.
+ * @brief Set whether the device service is connectable.
  *
- * @param connectable Whether it is connectable.
+ * @param connectable Whether the device service is connectable.
  * @since 6
  */
 void BleAdvertiserSettingsImpl::SetConnectable(bool connectable)
@@ -94,10 +94,10 @@ void BleAdvertiserSettingsImpl::SetConnectable(bool connectable)
 }
 
 /**
- * @brief Check if advertiser is legacy mode.
+ * @brief Check if the advertiser is in legacy mode.
  *
- * @return Returns <b>true</b> if advertiser is legacy mode;
- *         returns <b>false</b> if advertiser is not legacy mode.
+ * @return Returns <b>true</b> if the advertiser is in legacy mode;
+ *         Returns <b>false</b> otherwisee.
  * @since 6
  */
 bool BleAdvertiserSettingsImpl::IsLegacyMode() const
@@ -106,9 +106,9 @@ bool BleAdvertiserSettingsImpl::IsLegacyMode() const
 }
 
 /**
- * @brief Set legacyMode.
+ * @brief Set whether to enable the legacy mode.
  *
- * @param connectable Whether it is legacyMode.
+ * @param connectable Whether to enable the legacy mode
  * @since 6
  */
 void BleAdvertiserSettingsImpl::SetLegacyMode(bool legacyMode)
@@ -119,7 +119,7 @@ void BleAdvertiserSettingsImpl::SetLegacyMode(bool legacyMode)
 /**
  * @brief Get advertise interval.
  *
- * @return Returns advertise interval.
+ * @return Returns the advertising interval.
  * @since 6
  */
 int BleAdvertiserSettingsImpl::GetInterval() const
@@ -139,7 +139,7 @@ void BleAdvertiserSettingsImpl::SetInterval(int interval)
 }
 
 /**
- * @brief Get advertiser Tx power.
+ * @brief Get the advertiser Tx power.
  *
  * @return Returns advertiser Tx power.
  * @since 6
@@ -150,9 +150,9 @@ int BleAdvertiserSettingsImpl::GetTxPower() const
 }
 
 /**
- * @brief Set advertiser Tx power.
+ * @brief Set the advertiser Tx power.
  *
- * @param txPower Advertiser Tx power.
+ * @param txPowerthe advertiser Tx power.
  * @since 6
  */
 int BleAdvertiserSettingsImpl::SetTxPower(int txPower)
@@ -182,9 +182,9 @@ int BleAdvertiserSettingsImpl::SetTxPower(int txPower)
 }
 
 /**
- * @brief Get primary phy.
+ * @brief Get the primary phy.
  *
- * @return Returns primary phy.
+ * @return Returns the primary phy.
  * @since 6
  */
 int BleAdvertiserSettingsImpl::GetPrimaryPhy() const
@@ -193,7 +193,7 @@ int BleAdvertiserSettingsImpl::GetPrimaryPhy() const
 }
 
 /**
- * @brief Set primary phy.
+ * @brief Set the primary phy.
  *
  * @param primaryPhy Primary phy.
  * @since 6
@@ -204,7 +204,7 @@ void BleAdvertiserSettingsImpl::SetPrimaryPhy(int primaryPhy)
 }
 
 /**
- * @brief Get second phy.
+ * @brief Get the secondary Phy.
  *
  * @return Returns primary phy.
  * @since 6
@@ -215,9 +215,9 @@ int BleAdvertiserSettingsImpl::GetSecondaryPhy() const
 }
 
 /**
- * @brief Set second phy.
+ * @brief Set the secondary phy.
  *
- * @param secondaryPhy Second phy.
+ * @param secondaryPhy Secondary Phy.
  * @since 6
  */
 void BleAdvertiserSettingsImpl::SetSecondaryPhy(int secondaryPhy)
@@ -234,10 +234,10 @@ BleAdvertiserDataImpl::BleAdvertiserDataImpl() : payload_()
 {}
 
 /**
- * @brief Add manufacture data.
+ * @brief Add manufacturer data.
  *
- * @param manufacturerId Manufacture Id which addad data.
- * @param data Manufacture data
+ * @param manufacturerId manufacturer Id which addad data.
+ * @param data manufacturer data
  * @since 6
  */
 int BleAdvertiserDataImpl::AddManufacturerData(uint16_t manufacturerId, const std::string &data)
@@ -300,8 +300,8 @@ void BleAdvertiserDataImpl::AddServiceData(const Uuid &uuid, const std::string &
 /**
  * @brief Add characteristic value.
  *
- * @param adtype Type of the field.
- * @param data Field data.
+ * @param advertiser type of the field.
+ * @param advertiser data.
  * @since 6
  */
 void BleAdvertiserDataImpl::AddCharacteristicValue(uint8_t adtype, const std::string &data)
@@ -406,9 +406,9 @@ uint8_t BleAdvertiserDataImpl::GetFlags() const
 }
 
 /**
- * @brief Set manufacture data.
+ * @brief Set manufacturer data.
  *
- * @param data Manufacture data.
+ * @param data manufacturer data.
  * @since 6
  */
 void BleAdvertiserDataImpl::SetManufacturerData(const std::string &data)
@@ -497,7 +497,7 @@ void BleAdvertiserDataImpl::SetLongName(const std::string &name)
 }
 
 /**
- * @brief Set advertiser data short name
+ * @brief Set advertiser data short name.
  *
  * @param name Bluetooth device name.
  * @since 6
@@ -547,9 +547,9 @@ RawAddress BlePeripheralDevice::GetRawAddress() const
 }
 
 /**
- * @brief Get device Appearance.
+ * @brief Get device appearance.
  *
- * @return Returns device Appearance.
+ * @return Returns the device appearance.
  * @since 6
  */
 uint16_t BlePeripheralDevice::GetAppearance() const
@@ -558,9 +558,9 @@ uint16_t BlePeripheralDevice::GetAppearance() const
 }
 
 /**
- * @brief Get Manufacturer Data.
+ * @brief Get the manufacturer data.
  *
- * @return Returns Manufacturer Data.
+ * @return Returns the manufacturer data.
  * @since 6
  */
 std::map<uint16_t, std::string> BlePeripheralDevice::GetManufacturerData() const
@@ -569,7 +569,7 @@ std::map<uint16_t, std::string> BlePeripheralDevice::GetManufacturerData() const
 }
 
 /**
- * @brief Get device Name.
+ * @brief the device name.
  *
  * @return Returns device Name.
  * @since 6
@@ -591,7 +591,7 @@ int8_t BlePeripheralDevice::GetRSSI() const
 }
 
 /**
- * @brief Get service Data.
+ * @brief Get service data.
  *
  * @return Returns service data.
  * @since 6
@@ -638,7 +638,7 @@ Uuid BlePeripheralDevice::GetServiceDataUUID(int index) const
 }
 
 /**
- * @brief Get serviceU UUID.
+ * @brief Get the service UUID.
  *
  * @return Returns service UUID.
  * @since 6
@@ -684,10 +684,10 @@ void BlePeripheralDevice::SetAddressType(int type)
 }
 
 /**
- * @brief Check if include manufacture data.
+ * @brief Check if manufacturer data is included.
  *
- * @return Returns <b>true</b> if include manufacture data;
- *         returns <b>false</b> if do not include manufacture data.
+ * @return Returns <b>true</b> if manufacturer data is included;
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::IsManufacturerData() const
@@ -696,10 +696,10 @@ bool BlePeripheralDevice::IsManufacturerData() const
 }
 
 /**
- * @brief Check if include device rssi.
+ * @brief Check if the device RSSI is included.
  *
  * @return Returns <b>true</b> if include device rssi;
- *         returns <b>false</b> if do not include device rssi.
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::IsRSSI() const
@@ -708,10 +708,10 @@ bool BlePeripheralDevice::IsRSSI() const
 }
 
 /**
- * @brief Check if include service data.
+ * @brief Check if service data is included.
  *
  * @return Returns <b>true</b> if include service data;
- *         returns <b>false</b> if do not include service data.
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::IsServiceData() const
@@ -720,10 +720,10 @@ bool BlePeripheralDevice::IsServiceData() const
 }
 
 /**
- * @brief Check if include service UUID.
+ * @brief Check if the service UUID is included.
  *
- * @return Returns <b>true</b> if include service UUID;
- *         returns <b>false</b> if do not include service UUID.
+ * @return Returns <b>true</b> if the service UUID is included;
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::IsServiceUUID() const
@@ -732,7 +732,7 @@ bool BlePeripheralDevice::IsServiceUUID() const
 }
 
 /**
- * @brief set device address.
+ * @brief Set device address.
  *
  * @param address device address.
  * @since 6
@@ -743,9 +743,9 @@ void BlePeripheralDevice::SetAddress(const RawAddress &address)
 }
 
 /**
- * @brief set rssi value.
+ * @brief Set RSSI value.
  *
- * @param rssi rssi value.
+ * @param RSSI value.
  * @since 6
  */
 void BlePeripheralDevice::SetRSSI(int8_t rssi)
@@ -754,28 +754,30 @@ void BlePeripheralDevice::SetRSSI(int8_t rssi)
     isRSSI_ = true;
 }
 /**
- * @brief set rssi value.
+ * @brief Check whether device is connectable.
  *
  * @param [in] rssi value.
+ * return Returns <b>true</b> if device is connectable.
+ *        Returns <b>false</b> otherwisee.
  */
 bool BlePeripheralDevice::IsConnectable() const
 {
     return connectable_;
 }
 /**
- * @brief set rssi value.
+ * @brief Sets whether the peer device is connectable.
  *
- * @param [in] rssi value.
+ * @param peer device's connectable.
  */
 void BlePeripheralDevice::SetConnectable(bool connectable)
 {
     connectable_ = connectable;
 }
 /**
- * @brief Parse advertisement data.
+ * @brief Parse advertisement packets.
  *
  * @param payload Advertisement packet.
- * @param total_len Advertisement packet len.
+ * @param total_len Advertisement packet length.
  * @since 6
  */
 void BlePeripheralDevice::ParseAdvertiserment(BlePeripheralDeviceParseAdvData &parseAdvData)
@@ -956,9 +958,9 @@ void BlePeripheralDevice::SetBondedFromLocal(bool flag)
 }
 
 /**
- * @brief Set acl connect state.
+ * @brief Set acl connection state.
  *
- * @param connectState Acl connect state.
+ * @param connectState Acl connection state.
  * @since 6
  */
 void BlePeripheralDevice::SetAclConnectState(int connectState)
@@ -978,10 +980,10 @@ void BlePeripheralDevice::SetConnectionHandle(const int handle)
 }
 
 /**
- * @brief Check if device acl connected.
+ * @brief Check if device acl is connected.
  *
- * @return Returns <b>true</b> if device acl connected;
- *         returns <b>false</b> if device does not acl connect.
+ * @return Returns <b>true</b> if device acl is connected;
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::IsAclConnected() const
@@ -996,8 +998,8 @@ bool BlePeripheralDevice::IsAclConnected() const
 /**
  * @brief Check if device acl Encrypted.
  *
- * @return Returns <b>true</b> if device acl Encrypted;
- *         returns <b>false</b> if device does not acl Encrypt.
+ * @return Returns <b>true</b> if device acl is Encrypted;
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::IsAclEncrypted() const
@@ -1013,7 +1015,7 @@ bool BlePeripheralDevice::IsAclEncrypted() const
  * @brief Check if device was bonded from local.
  *
  * @return Returns <b>true</b> if device was bonded from local;
- *         returns <b>false</b> if device was not bonded from local.
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::IsBondedFromLocal() const
@@ -1073,7 +1075,7 @@ uint8_t BlePeripheralDevice::GetPairedStatus() const
  *
  * @param status Paired status.
  * @return Returns <b>true</b> if the operation is successful;
- *         returns <b>false</b> if the operation fails.
+ *         Returns <b>false</b> otherwise.
  * @since 6
  */
 bool BlePeripheralDevice::SetPairedStatus(uint8_t status)
@@ -1144,9 +1146,9 @@ void BlePeripheralDevice::SetAdFlag(uint8_t adFlag)
 }
 
 /**
- * @brief Set appearance.
+ * @brief Set device appearance.
  *
- * @param appearance Appearance.
+ * @param device Appearance.
  * @since 6
  */
 void BlePeripheralDevice::SetAppearance(uint16_t appearance)
@@ -1193,9 +1195,9 @@ void BlePeripheralDevice::SetServiceDataUUID(Uuid uuid, std::string data)
 }
 
 /**
- * @brief Set service  UUID.
+ * @brief Set service UUID.
  *
- * @param serviceUUID Service  UUID.
+ * @param serviceUUID Service UUID.
  * @since 6
  */
 void BlePeripheralDevice::SetServiceUUID(Uuid serviceUUID)

@@ -92,4 +92,4 @@ void HandsFreeUnitCalls::SetMultiParty(bool multiParty)
 {
     multiParty_ = multiParty;
 }
-}
+} // namespace OHOS

@@ -36,7 +36,7 @@ public:
     void SetUp();
     void TearDown();
 
-    BluetoothRemoteDevice *pbluetoothRomote_;
+    BluetoothRemoteDevice *pbluetoothRomote_ = nullptr;
     UUID randomUuid_;
     UUID insecureUuid_;
 
@@ -65,7 +65,9 @@ void SocketTest::SetUp()
 void SocketTest::TearDown()
 {
     delete pbluetoothRomote_;
+    pbluetoothRomote_ = nullptr;
     delete sppClientSocket_;
+    sppClientSocket_ = nullptr;
 }
 
 /**

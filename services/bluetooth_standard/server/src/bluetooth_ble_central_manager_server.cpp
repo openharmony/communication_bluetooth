@@ -281,18 +281,16 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
 {
     HILOGI("BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback start.");
 
-    if (callback == nullptr) {
+    if (callback == nullptr || pimpl == nullptr) {
         HILOGI(
             "BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback called with NULL binder. Ignoring.");
         return;
     }
     for (auto iter = pimpl->scanCallback_.begin(); iter != pimpl->scanCallback_.end(); ++iter) {
         if ((*iter)->AsObject() == callback->AsObject()) {
-            if (pimpl != nullptr) {
-                pimpl->observers_.Deregister(*iter);
-                pimpl->scanCallback_.erase(iter);
-                break;
-            }
+            pimpl->observers_.Deregister(*iter);
+            pimpl->scanCallback_.erase(iter);
+            break;
         }
     }
 }

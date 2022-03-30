@@ -17,7 +17,6 @@
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "napi_bluetooth_ble.h"
-#include "napi_bluetooth_gatt_server.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {

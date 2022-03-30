@@ -697,7 +697,7 @@ public:
      *
      * @details You can use this constructor when wants to initialize the [label].
      */
-    AvrcTgGpasvtPacket(uint8_t crCode, const std::vector<uint8_t> &values, 
+    AvrcTgGpasvtPacket(uint8_t crCode, const std::vector<uint8_t> &values,
     const std::vector<std::string> &valueName, uint8_t label);
 
     /**

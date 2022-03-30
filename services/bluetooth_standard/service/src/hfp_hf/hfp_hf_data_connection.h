@@ -40,7 +40,7 @@ class HfpHfDataConnection {
         bool isEnabled {false};
     } AgIndicator;
 
-    typedef struct { 
+    typedef struct {
         uint16_t anum {0};
         uint32_t value {0};
         uint32_t minVal {0};

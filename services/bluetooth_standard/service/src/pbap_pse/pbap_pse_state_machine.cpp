@@ -656,7 +656,7 @@ std::u16string PseConnected::GetFullPath(const std::vector<std::u16string> &path
         [](std::u16string strRet, std::u16string str)->std::u16string {
             return strRet + u"/" + str;
         });
-    
+
     return currentPath;
 }
 

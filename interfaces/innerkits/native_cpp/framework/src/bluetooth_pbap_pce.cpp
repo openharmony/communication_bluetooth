@@ -524,8 +524,7 @@ struct PbapClient::impl {
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         if (proxy_ != nullptr) {
-            int ret = RET_NO_ERROR;
-            ret = proxy_->Connect(bluetooth::RawAddress(device.GetDeviceAddr()));
+            int ret = proxy_->Connect(bluetooth::RawAddress(device.GetDeviceAddr()));
             return ret == RET_NO_ERROR;
         } else {
             return false;
@@ -597,8 +596,7 @@ struct PbapClient::impl {
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         if (proxy_ != nullptr) {
-            int ret = RET_NO_ERROR;
-            ret = proxy_->Disconnect(bluetooth::RawAddress(device.GetDeviceAddr()));
+            int ret = proxy_->Disconnect(bluetooth::RawAddress(device.GetDeviceAddr()));
             return ret == RET_NO_ERROR;
         } else {
             return false;
@@ -609,8 +607,7 @@ struct PbapClient::impl {
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         if (proxy_ != nullptr) {
-            int ret = RET_NO_ERROR;
-            ret = proxy_->SetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()), strategy);
+            int ret = proxy_->SetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()), strategy);
             return ret == RET_NO_ERROR;
         } else {
             return false;
@@ -682,12 +679,12 @@ PbapClient::impl::impl()
     HILOGI("PbapClient::impl:impl() remote obtained");
 
     proxy_ = iface_cast<IBluetoothPbapPce>(remote);
-
+    if (proxy_ == nullptr) {
+        return;
+    }
     deathRecipient_ = new BluetoothPbapPceDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    if (proxy_ != nullptr) {
-        proxy_->RegisterObserver(serviceObserverImpl_);
-    }
+    proxy_->RegisterObserver(serviceObserverImpl_);
 }
 PbapClient *PbapClient::GetProfile()
 {

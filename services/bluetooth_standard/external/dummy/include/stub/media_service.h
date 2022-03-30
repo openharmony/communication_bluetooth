@@ -285,6 +285,7 @@ public:
     {}
     void ResponseNotification(uint16_t events)
     {}
+
 private:
     MediaService() = default;
     ~MediaService() = default;

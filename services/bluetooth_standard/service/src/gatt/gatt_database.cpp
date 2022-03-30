@@ -206,7 +206,7 @@ bool GattDatabase::IsReferenced(uint16_t handle) const
     return std::any_of(services_.begin(), services_.end(), [&handle](auto &svc) {
         return std::any_of(svc.second.includeServices_.begin(),
             svc.second.includeServices_.end(),
-            [&handle](auto &iSvc) { return handle == iSvc.startHandle_; 
+            [&handle](auto &iSvc) { return handle == iSvc.startHandle_;
         });
     });
 }
@@ -231,7 +231,7 @@ const GattDatabase::IncludeService *GattDatabase::GetIncludeService(uint16_t ser
         auto it = std::find_if(svc.second.includeServices_.begin(),
             svc.second.includeServices_.end(),
             [&serviceHandle](auto &iSvc) { return iSvc.handle_ == serviceHandle; });
-        
+
         if (it != svc.second.includeServices_.end()) {
             return it.base();
         }

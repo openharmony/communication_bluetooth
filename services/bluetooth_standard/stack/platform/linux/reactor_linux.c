@@ -189,7 +189,7 @@ ReactorItem *ReactorRegister(
     if (item->lock == NULL) {
         goto ERROR;
     }
-        
+
     item->fd = fd;
     item->context = context;
     item->reactor = reactor;

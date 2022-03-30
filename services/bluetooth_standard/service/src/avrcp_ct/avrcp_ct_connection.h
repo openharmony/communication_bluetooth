@@ -435,7 +435,7 @@ public:
      * @param[in] rawAddr The address of the bluetooth device.
      * @param[in] pkt     The shared pointer of the frame packet.
      */
-    void PushUnitQueue(const RawAddress &rawAddr,const  std::shared_ptr<AvrcCtUnitPacket> &pkt);
+    void PushUnitQueue(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtUnitPacket> &pkt);
 
     /**
      * @brief Popes the packet of the <b>UNIT INFO</b> and <b>SUB UNIT INFO</b> command from the cache queue.

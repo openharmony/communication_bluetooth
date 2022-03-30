@@ -139,6 +139,10 @@ struct GattClientProfile::impl {
 GattClientProfile::GattClientProfile(GattClientProfileCallback *pClientCallbackFunc, utility::Dispatcher *dispatcher)
     : pimpl(new (std::nothrow)GattClientProfile::impl(pClientCallbackFunc, dispatcher, *this))
 {
+    if (pimpl == nullptr) {
+        LOG_ERROR("GattClientProfile get pimpl nullptr.");
+        return;
+    }
     pimpl->RegisterCallbackToConnectManager();
 }
 /**

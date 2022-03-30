@@ -495,7 +495,7 @@ void BTSTACK_API ATT_ConnectRsp(uint16_t connectHandle, uint16_t result, uint16_
 void BTSTACK_API ATT_DisconnectReq(uint16_t connectHandle);
 
 /**
- * @brief Send a error response.
+ * @brief Send an error response.
  *
  * @param1 connectHandle Indicates the connect handle.
  * @param2 ATTErrorPtr Indicates the pointer to const error response parameter.
@@ -503,7 +503,7 @@ void BTSTACK_API ATT_DisconnectReq(uint16_t connectHandle);
 void BTSTACK_API ATT_ErrorResponse(uint16_t connectHandle, const AttError *ATTErrorPtr);
 
 /**
- * @brief Send a exchange MTU request .
+ * @brief Send an exchange MTU request .
  *
  * @param1 connectHandle Indicates the connect handle.
  * @param2 clientRxMTU Indicates the client receive MTU size.
@@ -511,7 +511,7 @@ void BTSTACK_API ATT_ErrorResponse(uint16_t connectHandle, const AttError *ATTEr
 void BTSTACK_API ATT_ExchangeMTURequest(uint16_t connectHandle, uint16_t clientRxMTU);
 
 /**
- * @brief Send a exchange MTU response.
+ * @brief Send an exchange MTU response.
  *
  * @param1 connectHandle Indicates the connect handle.
  * @param2 serverRxMTU Indicates the attribute server receive MTU size.

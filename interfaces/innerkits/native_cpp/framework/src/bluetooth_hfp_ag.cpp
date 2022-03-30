@@ -342,9 +342,10 @@ HandsFreeAudioGateway::impl::impl()
 HandsFreeAudioGateway::impl::~impl()
 {
     HILOGD("[hfpag]: %{public}s(): Enter!", __FUNCTION__);
-    if (proxy_ != nullptr) {
-        proxy_->DeregisterObserver(serviceObserver_);
+    if (proxy_ == nullptr) {
+        return;
     }
+    proxy_->DeregisterObserver(serviceObserver_);
     proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }
 

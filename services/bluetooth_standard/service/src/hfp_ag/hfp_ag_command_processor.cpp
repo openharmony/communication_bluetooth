@@ -173,7 +173,7 @@ void HfpAgCommandProcessor::SendAtCommand(const HfpAgDataConnection &dataConn, c
 }
 
 void HfpAgCommandProcessor::Handle(
-    HfpAgDataConnection &dataConn, const std::string &cmd, const std::string &arg, int cmdType) 
+    HfpAgDataConnection &dataConn, const std::string &cmd, const std::string &arg, int cmdType)
 {
     LOG_DEBUG("[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], Type[%{public}d]", __FUNCTION__, cmd.c_str(), arg.c_str(), cmdType);
     auto it = g_atCmdMap.find(cmd);

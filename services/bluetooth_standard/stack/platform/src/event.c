@@ -33,7 +33,7 @@ Event *EventCreate(bool isAutoClear)
         pthread_mutex_init(&event->mutex, NULL);
         pthread_cond_init(&event->cond, 0);
         event->autoClear = isAutoClear;
-        event->signal = false;        
+        event->signal = false;
     }
     return event;
 }

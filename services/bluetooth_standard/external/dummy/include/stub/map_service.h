@@ -230,6 +230,7 @@ public:
     {}
     void EventSendComplete(const std::string &addr)
     {}
+
 private:
     MapService() = default;
     ~MapService() = default;

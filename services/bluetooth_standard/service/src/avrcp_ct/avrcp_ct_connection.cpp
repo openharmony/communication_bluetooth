@@ -94,12 +94,11 @@ AvrcCtConnectInfo::~AvrcCtConnectInfo()
     }
 }
 
-AvrcCtConnectManager *AvrcCtConnectManager::GetInstance(void) 
+AvrcCtConnectManager *AvrcCtConnectManager::GetInstance(void)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
 
     if (g_instance == nullptr) {
-       
         g_instance = new (std::nothrow) AvrcCtConnectManager();
     }
 
@@ -402,7 +401,7 @@ std::shared_ptr<AvrcCtPassPacket> AvrcCtConnectManager::GetPassPacket(const RawA
     return pkt;
 }
 
-void AvrcCtConnectManager::SetPassPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtPassPacket> &pkt) 
+void AvrcCtConnectManager::SetPassPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtPassPacket> &pkt)
 {
     LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
     std::lock_guard<std::recursive_mutex> lock(mutex_);

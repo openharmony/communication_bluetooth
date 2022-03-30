@@ -196,7 +196,7 @@ void PceConnectingState::SetObexClientConfigDetail(ObexClientConfig &obexConfig)
         obexConfig.mtu_ = stm_.GetPceService().GetPceConfig().rfcommMtu_;
     }
     const int len = PBAP_PCE_SERVICE_UUID_LEN;
-    memcpy_s(&obexConfig.serviceUUID_.uuid128, len, PBAP_PCE_SERVICE_UUID, len);
+    (void)memcpy_s(&obexConfig.serviceUUID_.uuid128, len, PBAP_PCE_SERVICE_UUID, len);
 }
 
 void PceConnectingState::ProcessObexConnected(const utility::Message &msg)

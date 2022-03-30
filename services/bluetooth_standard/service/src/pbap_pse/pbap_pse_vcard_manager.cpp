@@ -64,7 +64,7 @@ public:
         }
         result.phoneBookSize_ = count;
     }
-    
+
     static void SetPullvCardListing(const std::unique_ptr<DataAccess> &dataAccess, const std::u16string &folderId,
         PbapPseVcardManager::PhoneBookResult &result, const PbapPseAppParams &pbapAppParams)
     {

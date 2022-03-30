@@ -141,6 +141,10 @@ GattServerProfile::GattServerProfile(
     GattServerProfileCallback *pServerCallbackFunc, utility::Dispatcher *dispatcher, uint16_t maxMtu)
     : pimpl(new (std::nothrow)GattServerProfile::impl(pServerCallbackFunc, dispatcher, maxMtu, *this))
 {
+    if (pimpl == nullptr) {
+        LOG_ERROR("GattServerProfile get pimpl error");
+        return;
+    }
     pimpl->RegisterCallbackToConnectManager();
 }
 /**
