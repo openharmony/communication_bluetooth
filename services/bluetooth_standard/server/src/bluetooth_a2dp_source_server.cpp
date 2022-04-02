@@ -296,9 +296,13 @@ BluetoothA2dpCodecStatus BluetoothA2dpSourceServer::GetCodecStatus(const RawAddr
 
 int BluetoothA2dpSourceServer::SetCodecPreference(const RawAddress &device, const BluetoothA2dpCodecInfo &info)
 {
-    HILOGI("BluetoothA2dpSourceServer::SetCodecPreference starts, codecPriority = %{public}u, codecPriority = %{public}u, sampleRate = %{public}u, bitsPerSample = %{public}d, channelMode = %{public}d, codecSpecific1 = %{public}llu, codecSpecific2 = %{public}llu, codecSpecific3 = %{public}llu, codecSpecific4 = %{public}llu",
-          info.codecPriority, info.codecType, info.sampleRate, info.bitsPerSample, info.channelMode, info.codecSpecific1
-          , info.codecSpecific2, info.codecSpecific3, info.codecSpecific4);
+    HILOGI("BluetoothA2dpSourceServer::SetCodecPreference starts, codecPriority = %{public}u,"
+           "codecPriority = %{public}u, sampleRate = %{public}u, bitsPerSample = %{public}d, "
+           "channelMode = %{public}d, codecSpecific1 = %{public}llu, codecSpecific2 = %{public}llu, "
+           "codecSpecific3 = %{public}llu, codecSpecific4 = %{public}llu",
+           info.codecPriority, info.codecType, info.sampleRate, info.bitsPerSample, info.channelMode,
+           (unsigned long long)info.codecSpecific1, (unsigned long long)info.codecSpecific2,
+           (unsigned long long)info.codecSpecific3, (unsigned long long)info.codecSpecific4);
     bluetooth::A2dpSrcCodecInfo setInfo;
 
     setInfo.bitsPerSample = info.bitsPerSample;
