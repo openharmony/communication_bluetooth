@@ -70,14 +70,14 @@ public:
      *
      * @return Returns the PnpInformation.
      */
-    PnpInformation GetRemoteSdpPnpInfo();
+    PnpInformation& GetRemoteSdpPnpInfo();
 
     /**
      * @brief Get the Remote Sdp hid Info.
      *
      * @return Returns the HidInformation.
      */
-    HidInformation GetRemoteSdpHidInfo();
+    HidInformation& GetRemoteSdpHidInfo();
 
     bool CheckIsSdpDone();
 
@@ -93,10 +93,10 @@ private:
     // Current remote device address
     std::string currentAddr_ {""};
 
-    PnpInformation pnpInf {};
-    HidInformation hidInf {};
-    bool isSdpDone = false;
-    bool isPnpSdpDone = false;
+    PnpInformation pnpInf_ {};
+    HidInformation hidInf_ {};
+    bool isSdpDone_ = false;
+    bool isPnpSdpDone_ = false;
 
     DISALLOW_COPY_AND_ASSIGN(HidHostSdpClient);
 };

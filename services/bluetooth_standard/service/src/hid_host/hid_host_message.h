@@ -20,16 +20,60 @@
 
 #include "hid_host_defines.h"
 #include "message.h"
+#include "securec.h"
 
 namespace bluetooth {
 class HidHostMessage : public utility::Message {
 public:
     explicit HidHostMessage(int what = 0, int arg1 = 0, void *arg2 = nullptr) : utility::Message(what, arg1, arg2)
     {}
+    HidHostMessage(const HidHostMessage &src) : utility::Message(src.what_, src.arg1_, src.arg2_),
+        dev_(src.dev_),
+        sendData_(src.sendData_),
+        l2capInfo_(src.l2capInfo_),
+        data_(nullptr),
+        dataLength_(src.dataLength_)
+    {
+        if ((dataLength_ > 0) && (src.data_ != nullptr)) {
+            data_ = std::make_unique<uint8_t[]>(dataLength_);
+            if (memcpy_s(data_.get(), dataLength_, src.data_.get(), dataLength_) != EOK) {
+                data_.reset(nullptr);
+                dataLength_ = 0;
+            }
+        } else {
+            data_.reset(nullptr);
+            dataLength_ = 0;
+        }
+    }
     ~HidHostMessage() = default;
     std::string dev_ {""};
-    SendHidData sendData;
-    HidHostL2capConnectionInfo l2capInfo;
+    SendHidData sendData_ {};
+    HidHostL2capConnectionInfo l2capInfo_ {};
+    std::unique_ptr<uint8_t[]> data_ = nullptr;
+    int dataLength_ = 0;
+
+    HidHostMessage operator=(const HidHostMessage &src)
+    {
+        if (this != &src) {
+            dev_ = src.dev_;
+            sendData_ = src.sendData_;
+            l2capInfo_ = src.l2capInfo_;
+            data_ = nullptr;
+            dataLength_ = src.dataLength_;
+
+            if ((dataLength_ > 0) && (src.data_ != nullptr)) {
+                data_ = std::make_unique<uint8_t[]>(dataLength_);
+                if (memcpy_s(data_.get(), dataLength_, src.data_.get(), dataLength_) != EOK) {
+                    data_.reset(nullptr);
+                    dataLength_ = 0;
+                }
+            } else {
+                data_.reset(nullptr);
+                dataLength_ = 0;
+            }
+        }
+        return *this;
+    }
 };
 }  // namespace bluetooth
 #endif // HID_HOST_MESSAGE_H

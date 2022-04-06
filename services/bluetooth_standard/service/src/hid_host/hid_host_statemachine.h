@@ -19,11 +19,15 @@
 #include <memory>
 #include <string>
 
+#include "interface_adapter_manager.h"
+#include "interface_adapter_classic.h"
+#include "interface_adapter_ble.h"
 #include "state_machine.h"
 #include "hid_host_defines.h"
 #include "hid_host_l2cap_connection.h"
 #include "hid_host_sdp_client.h"
 #include "hid_host_uhid.h"
+#include "hid_host_hogp.h"
 #include "timer.h"
 
 namespace bluetooth {
@@ -74,7 +78,11 @@ public:
 
     uint16_t GetDeviceInterruptLcid();
 
+    int GetDeviceType();
+
     void ProcessL2capConnectionEvent(const HidHostMessage &event);
+
+    void ProcessHogpEvent(const HidHostMessage &event);
 
     void ConnectionTimeout() const;
     void DisonnectionTimeout() const;
@@ -99,6 +107,15 @@ public:
     void ProcessSdpComplete(const HidHostMessage &msg);
     void ProcessOpenComplete(const HidHostMessage &msg);
 
+    void ProcessBleOpenDeviceReq(const HidHostMessage &msg);
+    void ProcessBleCloseDeviceReq(const HidHostMessage &msg);
+    void ProcessBleCloseDevice(const HidHostMessage &msg);
+    void ProcessBleReciveData(const HidHostMessage &msg);
+    void ProcessBleReciveControlData(const HidHostMessage &msg);
+    void ProcessBleReciveHandshake(const HidHostMessage &msg);
+    void ProcessBleWriteData(const HidHostMessage &msg);
+    void ProcessBleOpenComplete(const HidHostMessage &msg);
+
     inline static const std::string DISCONNECTED = "Disconnected";
     inline static const std::string CONNECTING = "Connecting";
     inline static const std::string DISCONNECTING = "Disconnecting";
@@ -109,15 +126,19 @@ private:
     std::string address_;
     bool isRemoving_ {false};
     int preState_ {0};
+    int deviceType_ {HID_HOST_DEVICE_TYPE_UNKNOWN};
     std::list<HidHostMessage> deferMsgs_ {};
     std::unique_ptr<utility::Timer> connTimer_ {nullptr};
     std::unique_ptr<utility::Timer> disconnTimer_ {nullptr};
     inline static const int CONNECTION_TIMEOUT_MS {60000};  // 60s
     inline static const int DISCONNECTION_TIMEOUT_MS {60000};
 
-    HidHostL2capConnection l2capConnection_;
+    std::unique_ptr<HidHostL2capConnection> l2capConnection_ {nullptr};
     HidHostUhid uhid_;
-    HidHostSdpClient sdpClient_;
+    std::unique_ptr<HidHostSdpClient> sdpClient_ {nullptr};
+    std::unique_ptr<HidHostHogp> hogp_ {nullptr};
+
+    void SetDeviceType();
 
     DISALLOW_COPY_AND_ASSIGN(HidHostStateMachine);
 };
@@ -141,7 +162,7 @@ public:
     }
 
 protected:
-    int stateInt_ {HID_HOST_STATE::HID_HOST_STATE_DISCONNECTED};
+    int stateInt_ {HID_HOST_STATE_DISCONNECTED};
     HidHostStateMachine &stateMachine_;
 };
 
@@ -157,6 +178,8 @@ public:
 
 private:
     bool isReentry_ {false};
+
+    bool DispatchBle(const utility::Message &msg);
 };
 
 class HidHostConnectingState : public HidHostState {
@@ -168,6 +191,9 @@ public:
     virtual void Entry() override;
     virtual void Exit() override;
     virtual bool Dispatch(const utility::Message &msg) override;
+
+private:
+    bool DispatchBle(const utility::Message &msg);
 };
 
 class HidHostDisconnectingState : public HidHostState {
@@ -179,6 +205,9 @@ public:
     virtual void Entry() override;
     virtual void Exit() override;
     virtual bool Dispatch(const utility::Message &msg) override;
+
+private:
+    bool DispatchBle(const utility::Message &msg);
 };
 
 class HidHostConnectedState : public HidHostState {
@@ -190,6 +219,9 @@ public:
     virtual void Entry() override;
     virtual void Exit() override;
     virtual bool Dispatch(const utility::Message &msg) override;
+
+private:
+    bool DispatchBle(const utility::Message &msg);
 };
 }  // namespace bluetooth
-#endif // HID_HOST_STATEMACHINE_H
+#endif  // HID_HOST_STATEMACHINE_H

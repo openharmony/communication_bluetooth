@@ -21,29 +21,15 @@
 #include <poll.h>
 #include <unistd.h>
 #include <string>
+#include <linux/uhid.h>
 #include "hid_host_defines.h"
 #include "base_def.h"
 #include "raw_address.h"
-#include <linux/uhid.h>
 
 namespace bluetooth {
-enum ErrVal {
-    E_NO_ERR = 0,
-    E_ERR_NULL,
-    E_RD_INVDAT,
-    E_ERR_CREATE_PTHREAD,
-    E_LEN_VAL,
-    E_ERR_ARGV,
-    E_ERR_OPEN,
-    E_NO_FOUND,
-    E_FULL,
-    E_ERR_CREATE_THREAD,
-    E_ERR_WRITE
-};
-
-#define MAX_POLLING_ATTEMPTS 10
-#define POLLING_SLEEP_DURATION_US 5000
-#define POLL_TIMEOUT 50
+static constexpr int MAX_POLLING_ATTEMPTS = 10;
+static constexpr int POLLING_SLEEP_DURATION_US = 5000;
+static constexpr int POLL_TIMEOUT = 50;
 
 /**
  * @brief Class for l2cap connection.
@@ -54,7 +40,7 @@ public:
     ~HidHostUhid();
 
     int Destroy();
-    int SendHidInfo(const char* devName, PnpInformation pnpInf, HidInformation hidInf);
+    int SendHidInfo(const char* devName, PnpInformation& pnpInf, HidInformation& hidInf);
     int SendData(uint8_t* pRpt, uint16_t len);
     int SendControlData(uint8_t* pRpt, uint16_t len);
     int SendHandshake(uint16_t err);
