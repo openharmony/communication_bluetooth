@@ -26,10 +26,6 @@ HidHostSdpClient::HidHostSdpClient(std::string address)
 
 HidHostSdpClient::~HidHostSdpClient()
 {
-    if (hidInf.descInfo != nullptr) {
-        free(hidInf.descInfo);
-        hidInf.descInfo = nullptr;
-    }
 }
 
 void HidHostSdpClient::SdpCallback(const BtAddr *addr, const SdpService *serviceAry, uint16_t serviceNum, void *context)
@@ -53,19 +49,19 @@ void HidHostSdpClient::SdpCallback_(const BtAddr *addr, const SdpService *servic
     std::string address = RawAddress::ConvertToString(addr->addr).GetAddress();
     if (serviceNum > 0) {
         if (serviceAry[0].serviceName != nullptr) {
-            hidInf.serviceName = serviceAry[0].serviceName;
+            hidInf_.serviceName = serviceAry[0].serviceName;
         } else {
-            hidInf.serviceName = "";
+            hidInf_.serviceName = "";
         }
         if (serviceAry[0].serviceDescription != nullptr) {
-            hidInf.serviceDescription = serviceAry[0].serviceDescription;
+            hidInf_.serviceDescription = serviceAry[0].serviceDescription;
         } else {
-            hidInf.serviceDescription = "";
+            hidInf_.serviceDescription = "";
         }
         if (serviceAry[0].providerName != nullptr) {
-            hidInf.providerName = serviceAry[0].providerName;
+            hidInf_.providerName = serviceAry[0].providerName;
         } else {
-            hidInf.providerName = "";
+            hidInf_.providerName = "";
         }
         if (!ParseHidDescInfo(serviceAry)) {
             return;
@@ -74,13 +70,13 @@ void HidHostSdpClient::SdpCallback_(const BtAddr *addr, const SdpService *servic
             SdpAttribute attribute = serviceAry[0].attribute[i];
             if (attribute.attributeId == ATTR_ID_HID_COUNTRY_CODE &&
                 attribute.attributeValueLength == HID_HOST_ATTRIBUTE_LENGTH_UINT8) {
-                hidInf.ctryCode = *static_cast<uint8_t*>(serviceAry[0].attribute[i].attributeValue);
-            }else {
+                hidInf_.ctryCode = *static_cast<uint8_t*>(serviceAry[0].attribute[i].attributeValue);
+            } else {
                 LOG_ERROR("[HIDH SDP]%{public}s() attribute length is error!", __FUNCTION__);
             }
         }
         result = HID_HOST_SDP_SUCCESS;
-        isSdpDone = true;
+        isSdpDone_ = true;
         printHidSdpInfo();
     }
     SendSdpComplete(result);
@@ -98,36 +94,26 @@ bool HidHostSdpClient::ParseHidDescInfo(const SdpService *serviceAry)
             uint8_t size = attributeValue[0] & SDP_SIZE_MASK;
             uint16_t descLength = 0;
             offset = 0;
-            if (type  == SDP_DE_TYPE_STRING) {
-                if (size == SDP_DE_SIZE_VAR_8) {
-                    descLength = attributeValue[1];
-                    offset = SDP_UINT8_LENGTH + 1;
-                } else if (size == SDP_DE_SIZE_VAR_16) {
-                    offset = 1;
-                    descLength = (attributeValue[offset] << ONE_BYTE_OFFSET) | attributeValue[offset + 1];
-                    offset = SDP_UINT16_LENGTH + 1;
-                } else {
-                    LOG_ERROR("[HIDH SDP]%{public}s() error size!", __FUNCTION__);
-                    SendSdpComplete(result);
-                    return false;
-                }
-                if (descLength <= 0) {
-                    LOG_ERROR("[HIDH SDP]%{public}s() length is 0!", __FUNCTION__);
-                    SendSdpComplete(result);
-                    return false;
-                }
-                if (hidInf.descInfo != nullptr) {
-                    free(hidInf.descInfo);
-                    hidInf.descInfo = nullptr;
-                }
-                hidInf.descInfo = (uint8_t *) malloc (descLength);
-                (void)memcpy_s(hidInf.descInfo, descLength, attributeValue + offset, descLength);
-                hidInf.descLength = descLength;
+            if ((type  == SDP_DE_TYPE_STRING) && (size == SDP_DE_SIZE_VAR_8)) {
+                descLength = attributeValue[1];
+                offset = SDP_UINT8_LENGTH + 1;
+            } else if ((type  == SDP_DE_TYPE_STRING) && (size == SDP_DE_SIZE_VAR_16)) {
+                offset = 1;
+                descLength = (attributeValue[offset] << ONE_BYTE_OFFSET) | attributeValue[offset + 1];
+                offset = SDP_UINT16_LENGTH + 1;
             } else {
-                LOG_ERROR("[HIDH SDP]%{public}s() error type!", __FUNCTION__);
+                LOG_ERROR("[HIDH SDP]%{public}s() error type or size!", __FUNCTION__);
                 SendSdpComplete(result);
                 return false;
             }
+            if (descLength <= 0) {
+                LOG_ERROR("[HIDH SDP]%{public}s() length is 0!", __FUNCTION__);
+                SendSdpComplete(result);
+                return false;
+            }
+            hidInf_.descInfo = std::make_unique<uint8_t[]>(descLength);
+            (void)memcpy_s(hidInf_.descInfo.get(), descLength, attributeValue + offset, descLength);
+            hidInf_.descLength = descLength;
         } else {
             return false;
         }
@@ -150,7 +136,7 @@ uint8_t HidHostSdpClient::CheckAttributeValueLengthAvalid(SdpSequenceAttribute a
                 SendSdpComplete(result);
                 return offset;
             }
-        }else {
+        } else {
             LOG_ERROR("[HIDH SDP]%{public}s() attribute length is error!", __FUNCTION__);
             SendSdpComplete(result);
             return offset;
@@ -172,11 +158,11 @@ void HidHostSdpClient::printHidSdpInfo()
 {
     LOG_DEBUG("[HIDH SDP]%{public}s()", __FUNCTION__);
     LOG_DEBUG("[HIDH SDP]supTimeout:0x%{public}x,MaxLatency:0x%{public}x,MinTout:0x%{public}x,hparsVer:0x%{public}x",
-    hidInf.supTimeout, hidInf.ssrMaxLatency, hidInf.ssrMinTout, hidInf.hparsVer);
+        hidInf_.supTimeout, hidInf_.ssrMaxLatency, hidInf_.ssrMinTout, hidInf_.hparsVer);
     LOG_DEBUG("[HIDH SDP]relNum:0x%{public}x,ctryCode:0x%{public}x,subClass:0x%{public}x,descLength:%{public}d",
-        hidInf.relNum, hidInf.ctryCode, hidInf.subClass, hidInf.descLength);
+        hidInf_.relNum, hidInf_.ctryCode, hidInf_.subClass, hidInf_.descLength);
     LOG_DEBUG("[HIDH SDP]serviceName:%{public}s,serviceDescription:%{public}s,providerName:%{public}s",
-        hidInf.serviceName.c_str(), hidInf.serviceDescription.c_str(), hidInf.providerName.c_str());
+        hidInf_.serviceName.c_str(), hidInf_.serviceDescription.c_str(), hidInf_.providerName.c_str());
 }
 
 void HidHostSdpClient::SdpPnpCallback(const BtAddr *addr, const SdpService *serviceAry,
@@ -205,32 +191,24 @@ void HidHostSdpClient::SdpPnpCallback_(const BtAddr *addr, const SdpService *ser
             SdpAttribute attribute = serviceAry[0].attribute[i];
             if (attribute.attributeId == SDP_ATTRIBUTE_VENDOR_ID &&
                 attribute.attributeValueLength == HID_HOST_ATTRIBUTE_LENGTH_UINT16) {
-                pnpInf.vendorId = *static_cast<uint16_t*>(serviceAry[0].attribute[i].attributeValue);
-                LOG_DEBUG("[HIDH SDP]%{public}s():vendorId = 0x%{public}x", __FUNCTION__, pnpInf.vendorId);
-            } else {
-                LOG_ERROR("[HIDH SDP]%{public}s():VENDOR_ID attribute length is error length = %{public}d",
-                    __FUNCTION__, attribute.attributeValueLength);
+                pnpInf_.vendorId = *static_cast<uint16_t*>(serviceAry[0].attribute[i].attributeValue);
+                LOG_DEBUG("[HIDH SDP]%{public}s():vendorId = 0x%{public}x", __FUNCTION__, pnpInf_.vendorId);
             }
 
             if (attribute.attributeId == SDP_ATTRIBUTE_PRODUCT_ID &&
                 attribute.attributeValueLength == HID_HOST_ATTRIBUTE_LENGTH_UINT16) {
-                pnpInf.productId = *static_cast<uint16_t*>(serviceAry[0].attribute[i].attributeValue);
-                LOG_DEBUG("[HIDH SDP]%{public}s():productId = 0x%{public}x", __FUNCTION__, pnpInf.productId);
-            } else {
-                LOG_ERROR("[HIDH SDP]%{public}s():PRODUCT_ID attribute length is error length = %{public}d",
-                    __FUNCTION__, attribute.attributeValueLength);
+                pnpInf_.productId = *static_cast<uint16_t*>(serviceAry[0].attribute[i].attributeValue);
+                LOG_DEBUG("[HIDH SDP]%{public}s():productId = 0x%{public}x", __FUNCTION__, pnpInf_.productId);
             }
+
             if (attribute.attributeId == SDP_ATTRIBUTE_VERSION &&
                 attribute.attributeValueLength == HID_HOST_ATTRIBUTE_LENGTH_UINT16) {
-                pnpInf.version = *static_cast<uint16_t*>(serviceAry[0].attribute[i].attributeValue);
-                LOG_DEBUG("[HIDH SDP]%{public}s():version = 0x%{public}x", __FUNCTION__, pnpInf.version);
-            } else {
-                LOG_ERROR("[HIDH SDP]%{public}s():VERSION attribute length is error length = %{public}d",
-                    __FUNCTION__, attribute.attributeValueLength);
+                pnpInf_.version = *static_cast<uint16_t*>(serviceAry[0].attribute[i].attributeValue);
+                LOG_DEBUG("[HIDH SDP]%{public}s():version = 0x%{public}x", __FUNCTION__, pnpInf_.version);
             }
         }
         result = HID_HOST_SDP_SUCCESS;
-        isPnpSdpDone = true;
+        isPnpSdpDone_ = true;
     }
     HidHostMessage event(HID_HOST_SDP_CMPL_EVT, result);
     event.dev_ = currentAddr_;
@@ -239,7 +217,7 @@ void HidHostSdpClient::SdpPnpCallback_(const BtAddr *addr, const SdpService *ser
 
 int HidHostSdpClient::DoDiscovery(const std::string &remoteAddr)
 {
-    if (isPnpSdpDone) {
+    if (isPnpSdpDone_) {
         return DoHidDiscovery(remoteAddr);
     }
     return DoPnpDiscovery(remoteAddr);
@@ -289,9 +267,12 @@ int HidHostSdpClient::DoHidDiscovery(const std::string &remoteAddr)
     SdpAttributeIdList attributeIdList;
     attributeIdList.type = SDP_TYPE_LIST;
     int attributeIdNumber = 0;
-    attributeIdList.attributeIdList.attributeId[attributeIdNumber++] = SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_PROVIDER_NAME;
-    attributeIdList.attributeIdList.attributeId[attributeIdNumber++] = SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_SERVICE_NAME;
-    attributeIdList.attributeIdList.attributeId[attributeIdNumber++] = SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_DESCRIPTOR;
+    attributeIdList.attributeIdList.attributeId[attributeIdNumber++] =
+        SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_PROVIDER_NAME;
+    attributeIdList.attributeIdList.attributeId[attributeIdNumber++] =
+        SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_SERVICE_NAME;
+    attributeIdList.attributeIdList.attributeId[attributeIdNumber++] =
+        SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_DESCRIPTOR;
     attributeIdList.attributeIdList.attributeId[attributeIdNumber++] = ATTR_ID_HID_COUNTRY_CODE;
     attributeIdList.attributeIdList.attributeId[attributeIdNumber++] = ATTR_ID_HID_DESCRIPTOR_LIST;
     attributeIdList.attributeIdList.attributeIdNumber = attributeIdNumber;
@@ -305,16 +286,16 @@ int HidHostSdpClient::DoHidDiscovery(const std::string &remoteAddr)
 
 bool HidHostSdpClient::CheckIsSdpDone()
 {
-    return isSdpDone;
+    return isSdpDone_;
 }
 
-PnpInformation HidHostSdpClient::GetRemoteSdpPnpInfo()
+PnpInformation& HidHostSdpClient::GetRemoteSdpPnpInfo()
 {
-    return pnpInf;
+    return pnpInf_;
 }
 
-HidInformation HidHostSdpClient::GetRemoteSdpHidInfo()
+HidInformation& HidHostSdpClient::GetRemoteSdpHidInfo()
 {
-    return hidInf;
+    return hidInf_;
 }
 }  // namespace bluetooth

@@ -267,6 +267,7 @@ ServiceHidHostSrc = [
   "src/hid_host/hid_host_l2cap_connection.cpp",
   "src/hid_host/hid_host_statemachine.cpp",
   "src/hid_host/hid_host_uhid.cpp",
+  "src/hid_host/hid_host_hogp.cpp",
 ]
 
 ServicePermissionSrc = [
