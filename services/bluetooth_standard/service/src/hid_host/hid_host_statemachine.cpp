@@ -18,7 +18,7 @@
 
 namespace bluetooth {
 HidHostStateMachine::HidHostStateMachine(const std::string &address)
-    : address_(address), l2capConnection_(address), uhid_(address), sdpClient_(address)
+    : address_(address), uhid_(address)
 {}
 
 void HidHostStateMachine::Init()
@@ -44,6 +44,41 @@ void HidHostStateMachine::Init()
     Move(connectedState);
 
     InitState(DISCONNECTED);
+    SetDeviceType();
+}
+
+void HidHostStateMachine::SetDeviceType()
+{
+    IAdapterClassic *adapterClassic = (IAdapterClassic *)(IAdapterManager::GetInstance()->
+        GetAdapter(ADAPTER_BREDR));
+    if (adapterClassic != nullptr) {
+        std::vector<RawAddress> devices = adapterClassic->GetPairedDevices();
+        if (std::find(devices.begin(), devices.end(), RawAddress(address_)) != devices.end()) {
+            deviceType_ = HID_HOST_DEVICE_TYPE_BREDR;
+            l2capConnection_ = std::make_unique<HidHostL2capConnection>(address_);
+            sdpClient_ = std::make_unique<HidHostSdpClient>(address_);
+            LOG_DEBUG("[HIDH Machine]%{public}s():Device is br/edr device", __FUNCTION__);
+            return;
+        }
+    }
+
+    IAdapterBle *adapterBle = (IAdapterBle *)(IAdapterManager::GetInstance()->GetAdapter(ADAPTER_BLE));
+    if (adapterBle != nullptr) {
+        std::vector<RawAddress> devices = adapterBle->GetPairedDevices();
+        if (std::find(devices.begin(), devices.end(), RawAddress(address_)) != devices.end()) {
+            deviceType_ = HID_HOST_DEVICE_TYPE_BLE;
+            hogp_ = std::make_unique<HidHostHogp>(address_);
+            LOG_DEBUG("[HIDH Machine]%{public}s():Device is ble device", __FUNCTION__);
+            return;
+        }
+    }
+    deviceType_ = HID_HOST_DEVICE_TYPE_UNKNOWN;
+    LOG_ERROR("[HIDH Machine]%{public}s():Unknown device!", __FUNCTION__);
+}
+
+int HidHostStateMachine::GetDeviceType()
+{
+    return deviceType_;
 }
 
 bool HidHostStateMachine::IsRemoving() const
@@ -58,18 +93,24 @@ void HidHostStateMachine::SetRemoving(bool isRemoving)
 
 uint16_t HidHostStateMachine::GetDeviceControlLcid()
 {
-    return l2capConnection_.GetControlLcid();
+    return l2capConnection_->GetControlLcid();
 }
 
 uint16_t HidHostStateMachine::GetDeviceInterruptLcid()
 {
-    return l2capConnection_.GetInterruptLcid();
+    return l2capConnection_->GetInterruptLcid();
 }
 
 void HidHostStateMachine::ProcessL2capConnectionEvent(
     const HidHostMessage &event)
 {
-    l2capConnection_.ProcessEvent(event);
+    l2capConnection_->ProcessEvent(event);
+}
+
+void HidHostStateMachine::ProcessHogpEvent(
+    const HidHostMessage &event)
+{
+    hogp_->ProcessEvent(event);
 }
 
 std::string HidHostStateMachine::GetDeviceAdress()
@@ -100,6 +141,15 @@ void HidHostDisconnectedState::Exit()
 
 bool HidHostDisconnectedState::Dispatch(const utility::Message &msg)
 {
+    int deviceType = stateMachine_.GetDeviceType();
+    if (deviceType == HID_HOST_DEVICE_TYPE_UNKNOWN) {
+        LOG_ERROR("[HIDH Machine]%{public}s():[Disconnected]Unknown device!", __FUNCTION__);
+        HidHostService::GetService()->RemoveStateMachine(stateMachine_.GetDeviceAdress());
+        return false;
+    }
+    if (deviceType == HID_HOST_DEVICE_TYPE_BLE) {
+        return DispatchBle(msg);
+    }
     HidHostMessage &event = (HidHostMessage &)msg;
     LOG_DEBUG("[HIDH Machine]%{public}s():[Disconnected][%{public}s]",
         __FUNCTION__, HidHostStateMachine::GetEventName(event.what_).c_str());
@@ -107,8 +157,6 @@ bool HidHostDisconnectedState::Dispatch(const utility::Message &msg)
         case HID_HOST_API_OPEN_EVT:
             stateMachine_.ProcessStartSdp(event);
             Transition(HidHostStateMachine::CONNECTING);
-            break;
-        case HID_HOST_API_CLOSE_EVT:
             break;
         case HID_HOST_INT_OPEN_EVT:
             stateMachine_.ProcessOpenDevice(event);
@@ -118,19 +166,10 @@ bool HidHostDisconnectedState::Dispatch(const utility::Message &msg)
             stateMachine_.ProcessCloseDevice(event);
             break;
         case HID_HOST_INT_DATA_EVT:
-            PacketFree(event.l2capInfo.pkt);
             break;
         case HID_HOST_INT_CTRL_DATA:
-            PacketFree(event.l2capInfo.pkt);
-            break;
-        case HID_HOST_INT_HANDSK_EVT:
-            break;
-        case HID_HOST_SDP_CMPL_EVT:
             break;
         case HID_HOST_API_WRITE_DEV_EVT:
-            PacketFree(event.l2capInfo.pkt);
-            break;
-        case HID_HOST_API_GET_DSCP_EVT:
             break;
         case HID_HOST_OPEN_CMPL_EVT:
             stateMachine_.ProcessOpenComplete(event);
@@ -138,6 +177,42 @@ bool HidHostDisconnectedState::Dispatch(const utility::Message &msg)
             break;
         case HID_HOST_L2CAP_CONNECT_REQ_EVT:
             Transition(HidHostStateMachine::CONNECTING);
+            break;
+        default:
+            break;
+    }
+    return true;
+}
+
+bool HidHostDisconnectedState::DispatchBle(const utility::Message &msg)
+{
+    HidHostMessage &event = (HidHostMessage &)msg;
+    LOG_DEBUG("[HIDH Machine]%{public}s():[Disconnected][%{public}s]",
+        __FUNCTION__, HidHostStateMachine::GetEventName(event.what_).c_str());
+    switch (event.what_) {
+        case HID_HOST_API_OPEN_EVT:
+            stateMachine_.ProcessBleOpenDeviceReq(event);
+            Transition(HidHostStateMachine::CONNECTING);
+            break;
+        case HID_HOST_API_CLOSE_EVT:
+            break;
+        case HID_HOST_INT_OPEN_EVT:
+            break;
+        case HID_HOST_INT_CLOSE_EVT:
+            break;
+        case HID_HOST_INT_DATA_EVT:
+            break;
+        case HID_HOST_INT_CTRL_DATA:
+            break;
+        case HID_HOST_INT_HANDSK_EVT:
+            break;
+        case HID_HOST_SDP_CMPL_EVT:
+            break;
+        case HID_HOST_API_WRITE_DEV_EVT:
+            break;
+        case HID_HOST_OPEN_CMPL_EVT:
+            stateMachine_.ProcessBleOpenComplete(event);
+            Transition(HidHostStateMachine::CONNECTED);
             break;
         default:
             break;
@@ -157,6 +232,14 @@ void HidHostConnectingState::Exit()
 
 bool HidHostConnectingState::Dispatch(const utility::Message &msg)
 {
+    int deviceType = stateMachine_.GetDeviceType();
+    if (deviceType == HID_HOST_DEVICE_TYPE_UNKNOWN) {
+        LOG_ERROR("[HIDH Machine]%{public}s():[Connecting]Unknown device!", __FUNCTION__);
+        return false;
+    }
+    if (deviceType == HID_HOST_DEVICE_TYPE_BLE) {
+        return DispatchBle(msg);
+    }
     HidHostMessage &event = (HidHostMessage &)msg;
     LOG_DEBUG("[HIDH Machine]%{public}s():[Connecting][%{public}s]", __FUNCTION__,
         HidHostStateMachine::GetEventName(event.what_).c_str());
@@ -173,10 +256,8 @@ bool HidHostConnectingState::Dispatch(const utility::Message &msg)
             Transition(HidHostStateMachine::DISCONNECTED);
             break;
         case HID_HOST_INT_DATA_EVT:
-            PacketFree(event.l2capInfo.pkt);
             break;
         case HID_HOST_INT_CTRL_DATA:
-            PacketFree(event.l2capInfo.pkt);
             break;
         case HID_HOST_INT_HANDSK_EVT:
             break;
@@ -184,12 +265,46 @@ bool HidHostConnectingState::Dispatch(const utility::Message &msg)
             stateMachine_.ProcessSdpComplete(event);
             break;
         case HID_HOST_API_WRITE_DEV_EVT:
-            PacketFree(event.l2capInfo.pkt);
-            break;
-        case HID_HOST_API_GET_DSCP_EVT:
             break;
         case HID_HOST_OPEN_CMPL_EVT:
             stateMachine_.ProcessOpenComplete(event);
+            Transition(HidHostStateMachine::CONNECTED);
+            break;
+        case HID_HOST_CONNECTION_TIMEOUT_EVT:
+            Transition(HidHostStateMachine::DISCONNECTED);
+            break;
+        default:
+            break;
+    }
+    return true;
+}
+
+bool HidHostConnectingState::DispatchBle(const utility::Message &msg)
+{
+    HidHostMessage &event = (HidHostMessage &)msg;
+    LOG_DEBUG("[HIDH Machine]%{public}s():[Connecting][%{public}s]", __FUNCTION__,
+        HidHostStateMachine::GetEventName(event.what_).c_str());
+    switch (event.what_) {
+        case HID_HOST_API_OPEN_EVT:
+            break;
+        case HID_HOST_API_CLOSE_EVT:
+            stateMachine_.AddDeferredMessage(event);
+            break;
+        case HID_HOST_INT_OPEN_EVT:
+            break;
+        case HID_HOST_INT_CLOSE_EVT:
+            Transition(HidHostStateMachine::DISCONNECTED);
+            break;
+        case HID_HOST_INT_DATA_EVT:
+            break;
+        case HID_HOST_INT_CTRL_DATA:
+            break;
+        case HID_HOST_INT_HANDSK_EVT:
+            break;
+        case HID_HOST_API_WRITE_DEV_EVT:
+            break;
+        case HID_HOST_OPEN_CMPL_EVT:
+            stateMachine_.ProcessBleOpenComplete(event);
             Transition(HidHostStateMachine::CONNECTED);
             break;
         case HID_HOST_CONNECTION_TIMEOUT_EVT:
@@ -214,6 +329,50 @@ void HidHostDisconnectingState::Exit()
 
 bool HidHostDisconnectingState::Dispatch(const utility::Message &msg)
 {
+    int deviceType = stateMachine_.GetDeviceType();
+    if (deviceType == HID_HOST_DEVICE_TYPE_UNKNOWN) {
+        LOG_ERROR("[HIDH Machine]%{public}s():[Disconnecting]Unknown device!", __FUNCTION__);
+        return false;
+    }
+    if (deviceType == HID_HOST_DEVICE_TYPE_BLE) {
+        return DispatchBle(msg);
+    }
+    HidHostMessage &event = (HidHostMessage &)msg;
+    LOG_DEBUG("[HIDH Machine]%{public}s():[Disconnecting][%{public}s]", __FUNCTION__,
+        HidHostStateMachine::GetEventName(event.what_).c_str());
+    switch (event.what_) {
+        case HID_HOST_API_OPEN_EVT:
+            stateMachine_.AddDeferredMessage(event);
+            break;
+        case HID_HOST_INT_OPEN_EVT:
+            stateMachine_.ProcessOpenDevice(event);
+            Transition(HidHostStateMachine::CONNECTING);
+            break;
+        case HID_HOST_INT_CLOSE_EVT:
+            stateMachine_.ProcessCloseDevice(event);
+            Transition(HidHostStateMachine::DISCONNECTED);
+            break;
+        case HID_HOST_INT_DATA_EVT:
+            break;
+        case HID_HOST_INT_CTRL_DATA:
+            break;
+        case HID_HOST_API_WRITE_DEV_EVT:
+            break;
+        case HID_HOST_OPEN_CMPL_EVT:
+            stateMachine_.ProcessOpenComplete(event);
+            Transition(HidHostStateMachine::CONNECTED);
+            break;
+        case HID_HOST_DISCONNECTION_TIMEOUT_EVT:
+            Transition(HidHostStateMachine::CONNECTED);
+            break;
+        default:
+            break;
+    }
+    return true;
+}
+
+bool HidHostDisconnectingState::DispatchBle(const utility::Message &msg)
+{
     HidHostMessage &event = (HidHostMessage &)msg;
     LOG_DEBUG("[HIDH Machine]%{public}s():[Disconnecting][%{public}s]", __FUNCTION__,
         HidHostStateMachine::GetEventName(event.what_).c_str());
@@ -224,29 +383,21 @@ bool HidHostDisconnectingState::Dispatch(const utility::Message &msg)
         case HID_HOST_API_CLOSE_EVT:
             break;
         case HID_HOST_INT_OPEN_EVT:
-            stateMachine_.ProcessOpenDevice(event);
             break;
         case HID_HOST_INT_CLOSE_EVT:
-            stateMachine_.ProcessCloseDevice(event);
+            stateMachine_.ProcessBleCloseDevice(event);
             Transition(HidHostStateMachine::DISCONNECTED);
             break;
         case HID_HOST_INT_DATA_EVT:
-            PacketFree(event.l2capInfo.pkt);
             break;
         case HID_HOST_INT_CTRL_DATA:
-            PacketFree(event.l2capInfo.pkt);
             break;
         case HID_HOST_INT_HANDSK_EVT:
             break;
-        case HID_HOST_SDP_CMPL_EVT:
-            break;
         case HID_HOST_API_WRITE_DEV_EVT:
-            PacketFree(event.l2capInfo.pkt);
-            break;
-        case HID_HOST_API_GET_DSCP_EVT:
             break;
         case HID_HOST_OPEN_CMPL_EVT:
-            stateMachine_.ProcessOpenComplete(event);
+            stateMachine_.ProcessBleOpenComplete(event);
             Transition(HidHostStateMachine::CONNECTED);
             break;
         case HID_HOST_DISCONNECTION_TIMEOUT_EVT:
@@ -270,6 +421,14 @@ void HidHostConnectedState::Exit()
 
 bool HidHostConnectedState::Dispatch(const utility::Message &msg)
 {
+    int deviceType = stateMachine_.GetDeviceType();
+    if (deviceType == HID_HOST_DEVICE_TYPE_UNKNOWN) {
+        LOG_ERROR("[HIDH Machine]%{public}s():[Connected]Unknown device!", __FUNCTION__);
+        return false;
+    }
+    if (deviceType == HID_HOST_DEVICE_TYPE_BLE) {
+        return DispatchBle(msg);
+    }
     HidHostMessage &event = (HidHostMessage &)msg;
     LOG_DEBUG("[HIDH Machine]%{public}s():[Connected][%{public}s]", __FUNCTION__,
         HidHostStateMachine::GetEventName(event.what_).c_str());
@@ -308,31 +467,69 @@ bool HidHostConnectedState::Dispatch(const utility::Message &msg)
     return true;
 }
 
+bool HidHostConnectedState::DispatchBle(const utility::Message &msg)
+{
+    HidHostMessage &event = (HidHostMessage &)msg;
+    LOG_DEBUG("[HIDH Machine]%{public}s():[Connected][%{public}s]", __FUNCTION__,
+        HidHostStateMachine::GetEventName(event.what_).c_str());
+    switch (event.what_) {
+        case HID_HOST_API_OPEN_EVT:
+            break;
+        case HID_HOST_API_CLOSE_EVT:
+            stateMachine_.ProcessBleCloseDeviceReq(event);
+            Transition(HidHostStateMachine::DISCONNECTING);
+            break;
+        case HID_HOST_INT_OPEN_EVT:
+            break;
+        case HID_HOST_INT_CLOSE_EVT:
+            stateMachine_.ProcessBleCloseDevice(event);
+            Transition(HidHostStateMachine::DISCONNECTED);
+            break;
+        case HID_HOST_INT_DATA_EVT:
+            stateMachine_.ProcessBleReciveData(event);
+            break;
+        case HID_HOST_INT_CTRL_DATA:
+            stateMachine_.ProcessBleReciveControlData(event);
+            break;
+        case HID_HOST_INT_HANDSK_EVT:
+            stateMachine_.ProcessBleReciveHandshake(event);
+            break;
+        case HID_HOST_API_WRITE_DEV_EVT:
+            stateMachine_.ProcessBleWriteData(event);
+            break;
+        case HID_HOST_OPEN_CMPL_EVT:
+            break;
+        default:
+            break;
+    }
+    return true;
+}
+
 void HidHostStateMachine::ProcessStartSdp(const HidHostMessage &msg)
 {
-    if (sdpClient_.CheckIsSdpDone()) {
+    if (sdpClient_->CheckIsSdpDone()) {
         HidHostMessage event(HID_HOST_SDP_CMPL_EVT, HID_HOST_SDP_SUCCESS);
         event.dev_ = address_;
         HidHostService::GetService()->PostEvent(event);
     } else {
-        sdpClient_.DoDiscovery(address_);
+        sdpClient_->DoDiscovery(address_);
     }
 }
 
 void HidHostStateMachine::ProcessOpenDevice(const HidHostMessage &msg)
 {
-    if (sdpClient_.CheckIsSdpDone()) {
+    if (sdpClient_->CheckIsSdpDone()) {
         HidHostMessage event(HID_HOST_OPEN_CMPL_EVT);
         event.dev_ = address_;
         HidHostService::GetService()->PostEvent(event);
     } else {
-        sdpClient_.DoDiscovery(address_);
+        sdpClient_->DoDiscovery(address_);
     }
 }
 
 void HidHostStateMachine::ProcessCloseDeviceReq(const HidHostMessage &msg)
 {
-    l2capConnection_.Disconnect();
+    l2capConnection_->Disconnect();
 }
 
 void HidHostStateMachine::ProcessCloseDevice(const HidHostMessage &msg)
@@ -343,38 +540,12 @@ void HidHostStateMachine::ProcessCloseDevice(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessReciveData(const HidHostMessage &msg)
 {
-    uint16_t dataLength = PacketSize(msg.l2capInfo.pkt);
-    uint8_t *data = nullptr;
-    if (dataLength > 0) {
-        data = (uint8_t *)malloc(dataLength);
-    }
-    if (data != nullptr) {
-        (void)memset_s(data, dataLength, 0, dataLength);
-        PacketRead(msg.l2capInfo.pkt, data, 0, dataLength);
-        uhid_.SendData(data, dataLength);
-        free(data);
-    }
-
-    PacketFree(msg.l2capInfo.pkt);
+    uhid_.SendData(msg.data_.get(), msg.dataLength_);
 }
 
 void HidHostStateMachine::ProcessReciveControlData(const HidHostMessage &msg)
 {
-    uint16_t dataLength = PacketSize(msg.l2capInfo.pkt);
-    uint8_t *data = nullptr;
-    if (dataLength > 0) {
-        data = (uint8_t *)malloc(dataLength);
-    }
-    if (data != nullptr) {
-        (void)memset_s(data, dataLength, 0, dataLength);
-        PacketRead(msg.l2capInfo.pkt, data, 0, dataLength);
-        uhid_.SendControlData(data, dataLength);
-        free(data);
-    } else {
-        LOG_INFO("[HIDH Machine]%{public}s():data is null", __FUNCTION__);
-        uhid_.SendControlData(nullptr, 0);
-    }
-    PacketFree(msg.l2capInfo.pkt);
+    uhid_.SendControlData(msg.data_.get(), msg.dataLength_);
 }
 
 void HidHostStateMachine::ProcessReciveHandshake(const HidHostMessage &msg)
@@ -384,28 +555,76 @@ void HidHostStateMachine::ProcessReciveHandshake(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessWriteData(const HidHostMessage &msg)
 {
-    l2capConnection_.SendData(msg.sendData.type, msg.sendData.param,
-        msg.sendData.data, msg.sendData.reportId, msg.l2capInfo.pkt);
-    PacketFree(msg.l2capInfo.pkt);
+    l2capConnection_->SendData(msg.sendData_, msg.dataLength_, msg.data_.get());
 }
 
 void HidHostStateMachine::ProcessSdpComplete(const HidHostMessage &msg)
 {
     LOG_INFO("[HIDH Machine]%{public}s():result=%{public}d", __FUNCTION__, msg.arg1_);
-    if ((msg.arg1_ == HID_HOST_SDP_SUCCESS) && sdpClient_.CheckIsSdpDone()) {
-        l2capConnection_.Connect();
-    } else if ((msg.arg1_ == HID_HOST_SDP_SUCCESS) && !sdpClient_.CheckIsSdpDone()) {
-        sdpClient_.DoDiscovery(address_);
+    if ((msg.arg1_ == HID_HOST_SDP_SUCCESS) && sdpClient_->CheckIsSdpDone()) {
+        l2capConnection_->Connect();
+    } else if ((msg.arg1_ == HID_HOST_SDP_SUCCESS) && !sdpClient_->CheckIsSdpDone()) {
+        sdpClient_->DoDiscovery(address_);
     } else {
-        l2capConnection_.Disconnect();
+        l2capConnection_->Disconnect();
     }
 }
 
 void HidHostStateMachine::ProcessOpenComplete(const HidHostMessage &msg)
 {
     uhid_.Open();
-    PnpInformation pnpInf = sdpClient_.GetRemoteSdpPnpInfo();
-    HidInformation hidInf = sdpClient_.GetRemoteSdpHidInfo();
+    PnpInformation& pnpInf = sdpClient_->GetRemoteSdpPnpInfo();
+    HidInformation& hidInf = sdpClient_->GetRemoteSdpHidInfo();
+
+    char cachedName[] = { "Bluetooth HID" };
+    LOG_INFO("[HIDH Machine]%{public}s():cachedName[%{public}s],vendorId[%{public}d],productId[%{public}d]",
+        __FUNCTION__, cachedName, pnpInf.vendorId, pnpInf.productId);
+    LOG_INFO("[HIDH Machine]%{public}s():version[%{public}d],ctryCode[%{public}d],descLength[%{public}d]",
+        __FUNCTION__, pnpInf.version, hidInf.ctryCode, hidInf.descLength);
+    uhid_.SendHidInfo(cachedName, pnpInf, hidInf);
+}
+
+void HidHostStateMachine::ProcessBleOpenDeviceReq(const HidHostMessage &msg)
+{
+    hogp_->Connect();
+}
+
+void HidHostStateMachine::ProcessBleCloseDeviceReq(const HidHostMessage &msg)
+{
+    hogp_->Disconnect();
+}
+
+void HidHostStateMachine::ProcessBleCloseDevice(const HidHostMessage &msg)
+{
+    uhid_.Close();
+    uhid_.Destroy();
+}
+
+void HidHostStateMachine::ProcessBleReciveData(const HidHostMessage &msg)
+{
+    uhid_.SendData(msg.data_.get(), msg.dataLength_);
+}
+
+void HidHostStateMachine::ProcessBleReciveControlData(const HidHostMessage &msg)
+{
+    uhid_.SendControlData(msg.data_.get(), msg.dataLength_);
+}
+
+void HidHostStateMachine::ProcessBleReciveHandshake(const HidHostMessage &msg)
+{
+    uhid_.SendHandshake(msg.arg1_);
+}
+
+void HidHostStateMachine::ProcessBleWriteData(const HidHostMessage &msg)
+{
+    hogp_->SendData(msg);
+}
+
+void HidHostStateMachine::ProcessBleOpenComplete(const HidHostMessage &msg)
+{
+    uhid_.Open();
+    PnpInformation& pnpInf = hogp_->GetRemotePnpInfo();
+    HidInformation& hidInf = hogp_->GetRemoteHidInfo();
 
     char cachedName[] = { "Bluetooth HID" };
     LOG_INFO("[HIDH Machine]%{public}s():cachedName[%{public}s],vendorId[%{public}d],productId[%{public}d]",
@@ -483,8 +702,6 @@ std::string HidHostStateMachine::GetEventName(int what)
             return "HID_HOST_SDP_CMPL_EVT";
         case HID_HOST_API_WRITE_DEV_EVT:
             return "HID_HOST_API_WRITE_DEV_EVT";
-        case HID_HOST_API_GET_DSCP_EVT:
-            return "HID_HOST_API_GET_DSCP_EVT";
         case HID_HOST_OPEN_CMPL_EVT:
             return "HID_HOST_OPEN_CMPL_EVT";
         case HID_HOST_L2CAP_CONNECT_REQ_EVT:
