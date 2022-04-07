@@ -1607,7 +1607,7 @@ void GattClientProfile::impl::ReadLongCharacteristicValueParsing(
         data = GetReadValueCache(connectHandle, iter->second.startHandle_);
         auto sharedPtr = GattServiceBase::BuildGattValue(data, totalSize);
         pClientCallBack_->OnReadCharacteristicValueEvent(
-            reqId, iter->second.startHandle_, sharedPtr, BufferGetSize(buffer), GATT_SUCCESS);
+            reqId, iter->second.startHandle_, sharedPtr, totalSize, GATT_SUCCESS);
         free(data);
     }
 }

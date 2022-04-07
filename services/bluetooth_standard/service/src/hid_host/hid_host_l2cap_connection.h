@@ -65,15 +65,13 @@ public:
 
     /**
      * @brief This function used to send data to remote device.
-     * @param type The data type.
-     * @param param The parameter.
-     * @param param User data.
-     * @param report_id Report id.
+     * @param sendData The data information.
+     * @param length The data length.
      * @param pkt The send data.
      *
      * @return Returns the result.
      */
-    int SendData(uint8_t type, uint8_t param, uint16_t data, uint8_t report_id, const Packet *pkt);
+    int SendData(SendHidData sendData, int length, uint8_t* pkt);
 
     /**
      * @brief This function used to get the control channel's local cid.
@@ -248,6 +246,8 @@ private:
     static uint8_t HidHostGetType(uint8_t type);
     static uint8_t HidHostGetParam(uint8_t type);
     int SendGapRequestSecurity(bool isIncoming, uint16_t lcid, uint8_t id);
+    void SendGetReport(SendHidData sendData);
+    void SendSetReport(SendHidData sendData, int length, uint8_t* pkt);
 
     // Regist l2cap callback
     static constexpr L2capService L2CAP_HID_Host_CALLBACK = {

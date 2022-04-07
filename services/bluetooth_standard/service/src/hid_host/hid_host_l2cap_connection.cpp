@@ -22,8 +22,8 @@ int HidHostL2capConnection::Startup()
     GapServiceSecurityInfo securityInfo = {INCOMING, HID_HOST, SEC_PROTOCOL_L2CAP,
         { .l2capPsm = HID_CONTROL_PSM }};
     if (GAPIF_RegisterServiceSecurity(nullptr, &securityInfo,
-            GAP_SEC_IN_ENCRYPTION | GAP_SEC_IN_AUTHENTICATION |
-            GAP_SEC_OUT_ENCRYPTION | GAP_SEC_OUT_AUTHENTICATION)) {
+        GAP_SEC_IN_ENCRYPTION | GAP_SEC_IN_AUTHENTICATION |
+        GAP_SEC_OUT_ENCRYPTION | GAP_SEC_OUT_AUTHENTICATION)) {
         LOG_ERROR("[HIDH L2CAP] %{public}s:GAPIF_RegisterServiceSecurity INCOMING failed.", __func__);
         return RET_BAD_STATUS;
     }
@@ -232,60 +232,77 @@ int HidHostL2capConnection::Disconnect()
     return BT_NO_ERROR;
 }
 
-int HidHostL2capConnection::SendData(uint8_t type, uint8_t param, uint16_t data,
-    uint8_t report_id, const Packet *pkt)
+int HidHostL2capConnection::SendData(SendHidData sendData, int length, uint8_t* pkt)
 {
-    Packet *packet = nullptr;
-    uint8_t *buf = nullptr;
-    uint16_t lcid = 0;
-    uint8_t offset = 0;
-    uint8_t packetLength = 0;
-
-    switch (type) {
+    switch (sendData.type) {
         case HID_HOST_DATA_TYPE_GET_REPORT:
-            lcid = ctrlLcid_;
-            packetLength = sizeof(uint8_t);
-            if (report_id != 0) {
-                packetLength += sizeof(uint8_t);
-            }
-            if (data > 0) {
-                packetLength += sizeof(uint16_t);
-            }
-            packet = PacketMalloc(0, 0, packetLength);
-            buf = (uint8_t *)BufferPtr(PacketContinuousPayload(packet));
-            if (data > 0) {
-                buf[offset] = (type << HID_HOST_SHIFT_OPRATURN_4) | ((param | 0x08) & 0x0f);
-                offset++;
-                if (report_id != 0) {
-                    buf[offset] = report_id;
-                    offset++;
-                }
-                buf[offset] = data & 0xff;
-                offset++;
-                buf[offset] = (data >> HID_HOST_SHIFT_OPRATURN_8) & 0xff;
-            } else {
-                buf[offset] = (type << HID_HOST_SHIFT_OPRATURN_4) | (param & 0x0f);
-                offset++;
-                if (report_id != 0) {
-                    buf[offset] = report_id;
-                }
-            }
-            lcid = ctrlLcid_;
+            SendGetReport(sendData);
             break;
         case HID_HOST_DATA_TYPE_SET_REPORT:
-            packet = PacketInheritMalloc(pkt, HID_HOST_PDU_HEADER_LENGTH, 0);
-            buf = (uint8_t *)BufferPtr(PacketHead(packet));
-            buf[0] = (type << HID_HOST_SHIFT_OPRATURN_4) | (param & 0x0f);
-            lcid = ctrlLcid_;
+            SendSetReport(sendData, length, pkt);
             break;
         default:
             return RET_BAD_PARAM;
     }
 
+    return BT_NO_ERROR;
+}
+
+void HidHostL2capConnection::SendGetReport(SendHidData sendData)
+{
+    Packet *packet = nullptr;
+    uint8_t *buf = nullptr;
+    uint16_t lcid = 0;
+    uint8_t offset = 0;
+    uint8_t packetLength = sizeof(uint8_t);
+    if (sendData.reportId != 0) {
+        packetLength += sizeof(uint8_t);
+    }
+    // If have max buff size,add the buff size to last
+    if (sendData.data > 0) {
+        packetLength += sizeof(uint16_t);
+    }
+    packet = PacketMalloc(packetLength, 0, 0);
+    buf = (uint8_t *)BufferPtr(PacketHead(packet));
+    if (sendData.data > 0) {
+        buf[offset] = (sendData.type << HID_HOST_SHIFT_OPRATURN_4) | ((sendData.param | 0x08) & 0x0f);
+        offset++;
+        if (sendData.reportId != 0) {
+            buf[offset] = sendData.reportId;
+            offset++;
+        }
+        buf[offset] = sendData.data & 0xff;
+        offset++;
+        buf[offset] = (sendData.data >> HID_HOST_SHIFT_OPRATURN_8) & 0xff;
+    } else {
+        buf[offset] = (sendData.type << HID_HOST_SHIFT_OPRATURN_4) | (sendData.param & 0x0f);
+        offset++;
+        if (sendData.reportId != 0) {
+            buf[offset] = sendData.reportId;
+        }
+    }
+    lcid = ctrlLcid_;
+
     L2CIF_SendData(lcid, packet, nullptr);
     PacketFree(packet);
     packet = nullptr;
-    return BT_NO_ERROR;
+}
+
+void HidHostL2capConnection::SendSetReport(SendHidData sendData, int length, uint8_t* pkt)
+{
+    Packet *packet = nullptr;
+    uint8_t *buf = nullptr;
+    uint16_t lcid = 0;
+
+    packet = PacketMalloc(length + HID_HOST_PDU_HEADER_LENGTH, 0, 0);
+    buf = (uint8_t *)BufferPtr(PacketHead(packet));
+    buf[0] = (sendData.type << HID_HOST_SHIFT_OPRATURN_4) | (sendData.param & 0x0f);
+    memcpy_s(buf + 1, length, pkt, length);
+    lcid = ctrlLcid_;
+
+    L2CIF_SendData(lcid, packet, nullptr);
+    PacketFree(packet);
+    packet = nullptr;
 }
 
 uint16_t HidHostL2capConnection::GetControlLcid()
@@ -343,7 +360,7 @@ void HidHostL2capConnection::HidHostRecvConnectionReqCallback(
     l2capInfo.id = id;
     l2capInfo.lpsm = lpsm;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     HidHostService::GetService()->PostEvent(event);
 }
 
@@ -364,7 +381,7 @@ void HidHostL2capConnection::HidHostRecvConnectionRspCallback(
     l2capInfo.lcid = lcid;
     l2capInfo.result = result;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     HidHostService::GetService()->PostEvent(event);
 }
 
@@ -397,7 +414,7 @@ void HidHostL2capConnection::HidHostRecvConfigReqCallback(
     l2capInfo.id = id;
     l2capInfo.cfg = l2capConfigInfo;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     service->PostEvent(event);
 }
 
@@ -429,7 +446,7 @@ void HidHostL2capConnection::HidHostRecvConfigRspCallback(
     l2capInfo.result = result;
     l2capInfo.cfg = l2capConfigInfo;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     service->PostEvent(event);
 }
 
@@ -458,7 +475,7 @@ void HidHostL2capConnection::HidHostRecvDisconnectionReqCallback(
     l2capInfo.lcid = lcid;
     l2capInfo.id = id;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     service->PostEvent(event);
 }
 
@@ -486,7 +503,7 @@ void HidHostL2capConnection::HidHostRecvDisconnectionRspCallback(
 
     l2capInfo.lcid = lcid;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     service->PostEvent(event);
 }
 
@@ -515,7 +532,7 @@ void HidHostL2capConnection::HidHostDisconnectAbnormalCallback(
     l2capInfo.lcid = lcid;
     l2capInfo.reason = reason;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     service->PostEvent(event);
 }
 
@@ -530,17 +547,11 @@ void HidHostL2capConnection::HidHostRecvDataCallback(
     }
 
     uint8_t header[HID_HOST_PDU_HEADER_LENGTH] = {0};
-    Packet *packet = nullptr;
+    uint16_t dataLength;
     uint16_t offset = 0;
     HidHostMessage event;
 
-    packet = PacketRefMalloc(pkt);
-    if (packet == nullptr) {
-        LOG_ERROR("[HIDH L2CAP]%{public}s point to NULL", __func__);
-        return;
-    }
-
-    PacketExtractHead(packet, header, sizeof(header));
+    PacketExtractHead(pkt, header, sizeof(header));
     uint8_t type = HidHostGetType(header[offset]);
     uint8_t param = HidHostGetParam(header[offset]);
 
@@ -555,7 +566,6 @@ void HidHostL2capConnection::HidHostRecvDataCallback(
 
         case HID_HOST_DATA_TYPE_CONTROL:
             LOG_INFO("[HIDH L2CAP]%{public}s CONTROL lcid:%{public}hu", __func__, lcid);
-            PacketFree(packet);
             break;
 
         case HID_HOST_DATA_TYPE_DATA:
@@ -567,12 +577,16 @@ void HidHostL2capConnection::HidHostRecvDataCallback(
                 event.what_ = HID_HOST_INT_CTRL_DATA;
             }
             event.dev_ = address;
-            event.l2capInfo.pkt = packet;
+            dataLength = PacketSize(pkt);
+            if (dataLength > 0) {
+                event.data_ = std::make_unique<uint8_t[]>(dataLength);
+                PacketRead(pkt, event.data_.get(), 0, dataLength);
+            }
+            event.dataLength_ = dataLength;
             HidHostService::GetService()->PostEvent(event);
             break;
         default:
             LOG_INFO("[HIDH L2CAP]%{public}s other data lcid:%{public}hu", __func__, lcid);
-            PacketFree(packet);
             break;
     }
 }
@@ -602,7 +616,7 @@ void HidHostL2capConnection::HidHostRemoteBusyCallback(
     l2capInfo.lcid = lcid;
     l2capInfo.isBusy = isBusy;
     event.dev_ = address;
-    event.l2capInfo = l2capInfo;
+    event.l2capInfo_ = l2capInfo;
     service->PostEvent(event);
 }
 
@@ -891,29 +905,29 @@ void HidHostL2capConnection::ProcessEvent(
 
     switch (event.what_) {
         case HID_HOST_L2CAP_CONNECT_REQ_EVT:
-            HidHostRecvConnectionReqCallbackTask(event.l2capInfo.lcid, event.l2capInfo.id, event.l2capInfo.lpsm);
+            HidHostRecvConnectionReqCallbackTask(event.l2capInfo_.lcid, event.l2capInfo_.id, event.l2capInfo_.lpsm);
             break;
         case HID_HOST_L2CAP_CONNECT_RSP_EVT:
             HidHostRecvConnectionRspCallbackTask(
-                event.l2capInfo.lcid, event.l2capInfo.result);
+                event.l2capInfo_.lcid, event.l2capInfo_.result);
             break;
         case HID_HOST_L2CAP_CONFIG_REQ_EVT:
-            HidHostRecvConfigReqCallbackTask(event.l2capInfo.lcid, event.l2capInfo.id, event.l2capInfo.cfg);
+            HidHostRecvConfigReqCallbackTask(event.l2capInfo_.lcid, event.l2capInfo_.id, event.l2capInfo_.cfg);
             break;
         case HID_HOST_L2CAP_CONFIG_RSP_EVT:
-            HidHostRecvConfigRspCallbackTask(event.l2capInfo.lcid, event.l2capInfo.cfg, event.l2capInfo.result);
+            HidHostRecvConfigRspCallbackTask(event.l2capInfo_.lcid, event.l2capInfo_.cfg, event.l2capInfo_.result);
             break;
         case HID_HOST_L2CAP_DISCONNECT_REQ_EVT:
-            HidHostRecvDisconnectionReqCallbackTask(event.l2capInfo.lcid, event.l2capInfo.id);
+            HidHostRecvDisconnectionReqCallbackTask(event.l2capInfo_.lcid, event.l2capInfo_.id);
             break;
         case HID_HOST_L2CAP_DISCONNECT_RSP_EVT:
-            HidHostRecvDisconnectionRspCallbackTask(event.l2capInfo.lcid);
+            HidHostRecvDisconnectionRspCallbackTask(event.l2capInfo_.lcid);
             break;
         case HID_HOST_L2CAP_DISCONNECT_ABNORMAL_EVT:
-            HidHostDisconnectAbnormalCallbackTask(event.l2capInfo.lcid, event.l2capInfo.reason);
+            HidHostDisconnectAbnormalCallbackTask(event.l2capInfo_.lcid, event.l2capInfo_.reason);
             break;
         case HID_HOST_L2CAP_REMOTE_BUSY_EVT:
-            HidHostRemoteBusyCallbackTask(event.l2capInfo.lcid, event.l2capInfo.isBusy);
+            HidHostRemoteBusyCallbackTask(event.l2capInfo_.lcid, event.l2capInfo_.isBusy);
             break;
         case HID_HOST_L2CAP_SECURITY_RESULT_EVT:
             HidHostSecurityCheckTask(event.arg1_);

@@ -156,7 +156,7 @@ int HidHostService::Connect(const RawAddress &device)
 
     if (GetConnectionsDeviceNum() >= maxConnectionsNum_) {
         LOG_INFO("[HIDH Service]%{public}s():Max connection number has reached!", __FUNCTION__);
-        return HID_HOST_SUCCESS;
+        return HID_HOST_FAILURE;
     }
 
     HidHostMessage event(HID_HOST_API_OPEN_EVT);
@@ -192,20 +192,16 @@ int HidHostService::Disconnect(const RawAddress &device)
 int HidHostService::HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t* report)
 {
     HidHostMessage event(HID_HOST_API_WRITE_DEV_EVT);
-    Packet *pkt = PacketMalloc(0, 0, 0);
-    Buffer *buf = BufferMalloc(size);
-    if (memcpy_s((uint8_t *)BufferPtr(buf), size, report, size) != EOK) {
-        LOG_DEBUG("[HIDH Service]%{public}s(): memcpy_s fail", __FUNCTION__);
-        return HID_HOST_FAILURE;
-    }
-    PacketPayloadAddLast(pkt, buf);
-    BufferFree(buf);
     event.dev_ = device;
-    event.sendData.type = HID_HOST_DATA_TYPE_SET_REPORT;
-    event.sendData.param = type;
-    event.sendData.data = 0;
-    event.sendData.reportId = 0;
-    event.l2capInfo.pkt = pkt;
+    event.sendData_.type = HID_HOST_DATA_TYPE_SET_REPORT;
+    event.sendData_.param = type;
+    event.sendData_.data = 0;
+    event.sendData_.reportId = 0;
+    if ((size > 0) && (report != nullptr)) {
+        event.dataLength_ = size;
+        event.data_ = std::make_unique<uint8_t[]>(size);
+        memcpy_s(event.data_.get(), size, report, size);
+    }
     PostEvent(event);
     return HID_HOST_SUCCESS;
 }
@@ -214,10 +210,10 @@ int HidHostService::HidHostGetReport(std::string device, uint8_t id, uint16_t si
 {
     HidHostMessage event(HID_HOST_API_WRITE_DEV_EVT);
     event.dev_ = device;
-    event.sendData.type = HID_HOST_DATA_TYPE_GET_REPORT;
-    event.sendData.param = type;
-    event.sendData.data = size;
-    event.sendData.reportId = id;
+    event.sendData_.type = HID_HOST_DATA_TYPE_GET_REPORT;
+    event.sendData_.param = type;
+    event.sendData_.data = size;
+    event.sendData_.reportId = id;
     PostEvent(event);
     return HID_HOST_SUCCESS;
 }
@@ -434,12 +430,13 @@ void HidHostService::ProcessDefaultEvent(const HidHostMessage &event) const
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         if ((event.what_ > HID_HOST_L2CAP_START_EVT) && (event.what_ < HID_HOST_L2CAP_END_EVT)) {
             it->second->ProcessL2capConnectionEvent(event);
+        } else if ((event.what_ > HID_HOST_HOGP_START_EVT) && (event.what_ < HID_HOST_HOGP_END_EVT)) {
+            it->second->ProcessHogpEvent(event);
         } else {
             it->second->ProcessMessage(event);
         }
     } else {
         LOG_ERROR("[HIDH Service]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
-        PacketFree(event.l2capInfo.pkt);
     }
 }
 REGISTER_CLASS_CREATOR(HidHostService);
