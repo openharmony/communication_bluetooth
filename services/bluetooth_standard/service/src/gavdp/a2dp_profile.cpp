@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -559,6 +559,7 @@ void A2dpProfile::ProcessSDPCallback(const BtAddr &addr, uint8_t result)
         }
         peer->GetStateMachine()->ProcessMessage(msg);
         peer->SetCurrentCmd(EVT_CONNECT_REQ);
+        peer->SetInitSide(true);
     }
     if (rawAddr.GetAddress() == "" || rawAddr.GetAddress() == A2DP_IDLE_ADDRESS) {
         SetActivePeer(addr);
@@ -843,9 +844,6 @@ A2dpProfilePeer *A2dpProfile::FindOrCreatePeer(const BtAddr &peerAddress, uint8_
         LOG_INFO("[A2dpProfile]%{public}s addr(%{public}s)End\n", __func__, addr.c_str());
     } else {
         LOG_ERROR("[A2dpProfile]%{public}s Connected device is max(%u)", __func__, GetConnectedPeerDevice());
-    }
-    if (peer != nullptr) {
-        peer->SetInitSide(true);
     }
     return peer;
 }

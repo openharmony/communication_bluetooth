@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -232,6 +232,7 @@ public:
 
     void OnConnectionStateChanged(const BluetoothGattDevice &device, int32_t ret, int32_t state) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         if (state == static_cast<int>(BTConnectState::CONNECTED)) {
             std::lock_guard<std::mutex> lck(server_.pimpl->deviceListMutex_);
             server_.pimpl->devices_.push_back((bluetooth::GattDevice)device);

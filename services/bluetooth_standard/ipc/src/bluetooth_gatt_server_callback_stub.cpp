@@ -93,8 +93,10 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(Messag
 }
 ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
+    HILOGI("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner Triggered!");
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
+        HILOGE("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner device is null");
         return TRANSACTION_ERR;
     }
     

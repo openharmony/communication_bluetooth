@@ -291,7 +291,7 @@ ErrCode BluetoothHostStub::GetProfileInner(MessageParcel &data, MessageParcel &r
 
 ErrCode BluetoothHostStub::GetBleRemoteInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothHostStub::GetProfileInner starts");
+    HILOGI("BluetoothHostStub::GetBleRemoteInner starts");
     std::string name = data.ReadString();
     sptr<IRemoteObject> result = GetBleRemote(name);
     bool ret = reply.WriteStrongParcelable(result);

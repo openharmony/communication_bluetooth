@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1627,7 +1627,6 @@ void GapOnEncryptionChangeEvent(const HciEncryptionChangeEventParam *eventParam)
     devInfo = ListForEachData(
         connectionInfoBlock->devicelist, GapFindConnectionDeviceByHandle, (void *)&eventParam->connectionHandle);
     if (devInfo != NULL) {
-        devInfo->encryptionStatus = GAP_ENC_STATUS_IDLE;
         (void)memcpy_s(&addr, sizeof(BtAddr), &devInfo->addr, sizeof(BtAddr));
         if (eventParam->status == HCI_SUCCESS) {
             if (eventParam->encryptionEnabled) {
@@ -1639,9 +1638,10 @@ void GapOnEncryptionChangeEvent(const HciEncryptionChangeEventParam *eventParam)
         } else {
             GapUpdateSecurityRequest(devInfo, GAP_SEC_EVENT_ENC_FAILED, eventParam->status);
         }
-        devInfo->actionReq = NULL;
-        if (devInfo->status == GAP_DEV_SEC_STATUS_ACTION) {
+        if (devInfo->status == GAP_DEV_SEC_STATUS_ACTION && devInfo->encryptionStatus == GAP_ENC_STATUS_ACTION) {
+            devInfo->actionReq = NULL;
             devInfo->status = GAP_DEV_SEC_STATUS_WAIT_DISC;
+            devInfo->encryptionStatus = GAP_ENC_STATUS_IDLE;
         }
     }
 
@@ -1678,16 +1678,16 @@ void GapOnEncryptionKeyRefreshComplete(const HciEncryptionKeyRefreshCompleteEven
     devInfo = ListForEachData(
         connectionInfoBlock->devicelist, GapFindConnectionDeviceByHandle, (void *)&eventParam->connectionHandle);
     if (devInfo != NULL) {
-        devInfo->encryptionStatus = GAP_ENC_STATUS_IDLE;
         (void)memcpy_s(&addr, sizeof(BtAddr), &devInfo->addr, sizeof(BtAddr));
         if (eventParam->status == HCI_SUCCESS) {
             GapUpdateSecurityRequest(devInfo, GAP_SEC_EVENT_ENC_SUCCESS, eventParam->status);
         } else {
             GapUpdateSecurityRequest(devInfo, GAP_SEC_EVENT_ENC_FAILED, eventParam->status);
         }
-        devInfo->actionReq = NULL;
-        if (devInfo->status == GAP_DEV_SEC_STATUS_ACTION) {
+        if (devInfo->status == GAP_DEV_SEC_STATUS_ACTION && devInfo->encryptionStatus == GAP_ENC_STATUS_ACTION) {
+            devInfo->actionReq = NULL;
             devInfo->status = GAP_DEV_SEC_STATUS_WAIT_DISC;
+            devInfo->encryptionStatus = GAP_ENC_STATUS_IDLE;
         }
     }
     GapRequestSecurityProcess();
