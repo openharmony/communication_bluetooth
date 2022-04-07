@@ -147,6 +147,18 @@ static bool IsSameBtAddr(const BtAddr *addr1, const BtAddr *addr2)
     return isSame;
 }
 
+static bool IsZeroAddress(const uint8_t addr[BT_ADDRESS_SIZE])
+{
+    bool isZeroAddress = true;
+    for (uint8_t i = 0; i < BT_ADDRESS_SIZE; i++) {
+        if (addr[i] != 0) {
+            isZeroAddress = false;
+            break;
+        }
+    }
+    return isZeroAddress;
+}
+
 static BtmLePairedDeviceBlock *BtmFindLePairedDeviceBlockByAddress(const BtAddr *addr)
 {
     BtmLePairedDeviceBlock *block = NULL;
@@ -273,6 +285,11 @@ void BTM_SetLePairedDevices(const BtmLePairedDevice *pairedDevices, uint16_t cou
 
         ListAddLast(g_lePairedDevices, block);
 
+        if (IsZeroAddress(block->pairedInfo.remoteIdentityAddress.addr)) {
+            block->inResolvingList = false;
+            continue;
+        }
+
         if (BTM_IsControllerSupportLlPrivacy() && g_deviceCountInResolvingList < g_resolvingListSize) {
             BtmAddToResolvingList(pairedDevices + i);
             block->inResolvingList = true;
@@ -305,19 +322,27 @@ void BTM_AddLePairedDevice(const BtmLePairedDevice *device)
 
     MutexLock(g_lePairedDevicesLock);
 
-    BtmStopAutoConnection();
-
-    if (BTM_IsControllerSupportLlPrivacy()) {
-        BtmDisableAddressResolution();
-    }
-
     BtmLePairedDeviceBlock *block = BtmAllocLePairedDeviceBlock(device);
     if (block == NULL) {
+        MutexUnlock(g_lePairedDevicesLock);
         return;
     }
     ListAddLast(g_lePairedDevices, block);
 
-    if (g_deviceCountInResolvingList < g_resolvingListSize) {
+    bool addToResolvingList = false;
+    if (IsZeroAddress(block->pairedInfo.remoteIdentityAddress.addr)) {
+        addToResolvingList = false;
+    } else {
+        if (g_deviceCountInResolvingList < g_resolvingListSize) {
+            addToResolvingList = true;
+        }
+    }
+
+    if (addToResolvingList && BTM_IsControllerSupportLlPrivacy()) {
+        BtmStopAutoConnection();
+
+        BtmDisableAddressResolution();
+
         BtmAddToResolvingList(device);
         block->inResolvingList = true;
         g_deviceCountInResolvingList++;
@@ -325,13 +350,11 @@ void BTM_AddLePairedDevice(const BtmLePairedDevice *device)
         if (BtmIsControllerSupportedLeSetPrivacyMode()) {
             BtmSetPrivacyMode(device);
         }
-    }
 
-    if (BTM_IsControllerSupportLlPrivacy()) {
         BtmEnableAddressResolution();
-    }
 
-    BtmStartAutoConnection();
+        BtmStartAutoConnection();
+    }
 
     MutexUnlock(g_lePairedDevicesLock);
 }

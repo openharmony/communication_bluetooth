@@ -571,7 +571,6 @@ static void GetRssiValueSyncWorkStart(const napi_env env, GattGetRssiValueCallba
     bool isResult = BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceId, BT_TRANSPORT_BLE).ReadRemoteRssiValue();
     if (!isResult) {
         asynccallbackinfo->promise.errorCode = CODE_FAILED;
-        asynccallbackinfo->result = NapiGetNull(env);
     } else {
         std::unique_lock<std::mutex> lock(asynccallbackinfo->mutexRssi);
         asynccallbackinfo->env = env;
@@ -594,8 +593,8 @@ void AsyncCompleteCallbackGetRssiValue(napi_env env, napi_status status, void *d
     } else {
         HILOGD("GetRssiValue success.");
         napi_value result = nullptr;
-        napi_create_int32(callbackInfo->env, callbackInfo->rssi, &result);
-        callbackInfo->result = result;
+        napi_create_int32(asynccallbackinfo->env, asynccallbackinfo->rssi, &result);
+        asynccallbackinfo->result = result;
     }
 
     ReturnCallbackPromise(env, asynccallbackinfo->promise, asynccallbackinfo->result);
