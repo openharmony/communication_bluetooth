@@ -245,7 +245,7 @@ int HidHostHogp::ReceiveControlData(Characteristic character, uint8_t reportId)
         HidHostService::GetService()->PostEvent(event);
         return BT_NO_ERROR;
     } else {
-        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}d", __FUNCTION__, character.length_);
+        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}zd", __FUNCTION__, character.length_);
         ReceiveHandShake(HID_HOST_HANDSHAKE_ERROR);
     }
     return RET_BAD_STATUS;
@@ -484,7 +484,7 @@ void HidHostHogp::GetHidReport(Characteristic character)
 int HidHostHogp::SavePnpInformation(Characteristic character)
 {
     if (character.length_ != HID_HOST_PNP_ID_SIZE) {
-        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}d",
+        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}zd",
             __func__, character.length_);
         return RET_BAD_STATUS;
     }
