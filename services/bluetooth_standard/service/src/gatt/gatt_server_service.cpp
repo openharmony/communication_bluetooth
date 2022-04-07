@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -626,7 +626,7 @@ int GattServerService::impl::DeregisterApplicationImpl(int appId)
     auto server = GetValidApplication(appId);
     if (server.has_value()) {
         ClearServices(appId);
-        servers_.erase(server.value());
+        servers_.erase(appId);
     } else {
         LOG_ERROR("%{public}s:%{public}d:%{public}s() %{public}s", __FILE__, __LINE__, __FUNCTION__, "Invalid application Id");
     }
