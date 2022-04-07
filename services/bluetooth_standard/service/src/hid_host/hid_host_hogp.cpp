@@ -245,7 +245,7 @@ int HidHostHogp::ReceiveControlData(Characteristic character, uint8_t reportId)
         HidHostService::GetService()->PostEvent(event);
         return BT_NO_ERROR;
     } else {
-        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}zd", __FUNCTION__, character.length_);
+        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}zu", __FUNCTION__, character.length_);
         ReceiveHandShake(HID_HOST_HANDSHAKE_ERROR);
     }
     return RET_BAD_STATUS;
@@ -484,7 +484,7 @@ void HidHostHogp::GetHidReport(Characteristic character)
 int HidHostHogp::SavePnpInformation(Characteristic character)
 {
     if (character.length_ != HID_HOST_PNP_ID_SIZE) {
-        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}zd",
+        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}zu",
             __func__, character.length_);
         return RET_BAD_STATUS;
     }
@@ -504,7 +504,7 @@ int HidHostHogp::SavePnpInformation(Characteristic character)
 int HidHostHogp::SaveHidInformation(Characteristic character)
 {
     if (character.length_ != HID_HOST_HID_INFORMATION_SIZE) {
-        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}d",
+        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}zu",
             __func__, character.length_);
         return RET_BAD_STATUS;
     }
@@ -516,7 +516,7 @@ int HidHostHogp::SaveHidInformation(Characteristic character)
 int HidHostHogp::SaveReportMap(Characteristic character)
 {
     if (character.length_ <= 0) {
-        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}d",
+        LOG_ERROR("[HOGP] %{public}s:character length_ is error length=%{public}zu",
             __func__, character.length_);
         return RET_BAD_STATUS;
     }
@@ -540,7 +540,7 @@ void HidHostHogp::SaveReport(Characteristic character, Descriptor descriptor, De
         return;
     }
     if (descriptor.length_ != HID_HOST_REPORT_REFERENCE_SIZE) {
-        LOG_ERROR("[HOGP] %{public}s:descriptor length_ is error length=%{public}d",
+        LOG_ERROR("[HOGP] %{public}s:descriptor length_ is error length=%{public}zu",
             __func__, character.length_);
         return;
     }
@@ -684,7 +684,7 @@ void HidHostHogp::HogpGattClientCallback::OnCharacteristicChanged(const Characte
             characteristic.value_.get(), characteristic.length_);
         HidHostService::GetService()->PostEvent(event);
     } else {
-        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}d", __FUNCTION__, characteristic.length_);
+        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}zu", __FUNCTION__, characteristic.length_);
     }
 }
 
