@@ -522,7 +522,7 @@ public:
     void OnGetFolderItems(
         const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMeItem> &items, int result, int detail)
     {
-        HILOGD("%{public}s start items.size = %{public}d.", __func__, items.size());
+        HILOGD("%{public}s start items.size = %{public}zu.", __func__, items.size());
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
