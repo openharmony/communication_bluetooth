@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 namespace bluetooth {
 const int MEDIA_CATEGORY = 7;
 const int CATEGORY_NOT_SUPPORTED = 0x29;
+const int CATEGORY_NO_MEANING = 0x00;
 A2dpAvdtp::A2dpAvdtp(const uint8_t role)
 {
     peerRole_ = role;
@@ -341,6 +342,12 @@ uint8_t A2dpAvdtp::ParseAvdtpConfigureInd(
         LOG_ERROR("[A2dpAvdtp] %{public}s Failed to get peer instance \n", __func__);
         return EVT_CONNECT_IND;
     }
+    if (peer->GetInitSide()) {
+        LOG_INFO("[A2dpAvdtp] %{public}s it's initSide, reject the AVDT_CONFIG_IND_EVT \n", __func__);
+        AvdtCatetory category = {.errCode = AVDT_ERR_BAD_STATE, .category = CATEGORY_NO_MEANING};
+        SetConfigureRsp(handle, data.configInd.hdr.label, category);
+        return EVT_CONNECT_IND;
+    }
 
     msg.a2dpMsg.configRsp.addr = bdAddr;
     msg.a2dpMsg.configRsp.handle = (uint8_t)handle;
@@ -538,6 +545,11 @@ uint8_t A2dpAvdtp::ParseAvdtpConnectCFM(
         LOG_ERROR("[A2dpAvdtp] %{public}s Failed to get peer instance \n", __func__);
         return EVT_CONNECT_IND;
     }
+    if (data.connectCfm.errCode) {
+        LOG_ERROR("[A2dpAvdtp] %{public}s Peer reject the connect req!!\n", __func__);
+        peer->SetInitSide(false);
+        return EVT_CONNECT_IND;
+    }
     peer->SetCurrentCmd(EVT_DISCOVER_REQ);
     peer->SetSignalingTimer(A2DP_ACCEPT_SIGNALLING_TIMEOUT_MS, false);
     peer->UpdatePeerMtu(data.connectCfm.mtu);
@@ -638,6 +650,7 @@ uint8_t A2dpAvdtp::ParseAvdtpGetCapabilityCFM(
             peer->SetCurrentCmd(EVT_SETCONFIG_REQ);
         } else if (!peer->GetInitSide()) {
             evt = EVT_CONNECT_IND;
+            return evt;
         }
     }
     peer->SetSignalingTimer(A2DP_ACCEPT_SIGNALLING_TIMEOUT_MS, false);

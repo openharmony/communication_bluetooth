@@ -76,48 +76,61 @@ public:
     void OnCharacteristicReadRequest(
         const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnCharacteristicReadRequest(
             (BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic);
     }
     void OnCharacteristicReadByUuidRequest(
         const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override
-    {}
+    {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
+    }
     void OnCharacteristicWriteRequest(const bluetooth::GattDevice &device,
         const bluetooth::Characteristic &characteristic, bool needRespones) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnCharacteristicWriteRequest(
             (BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic, needRespones);
     }
     void OnDescriptorReadRequest(const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnDescriptorReadRequest((BluetoothGattDevice)device, (BluetoothGattDescriptor)descriptor);
     }
     void OnDescriptorWriteRequest(const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnDescriptorWriteRequest((BluetoothGattDevice)device, (BluetoothGattDescriptor)descriptor);
     }
     void OnNotifyConfirm(
         const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic, int result) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnNotifyConfirm((BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic, result);
     }
     void OnConnectionStateChanged(const bluetooth::GattDevice &device, int ret, int state) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnConnectionStateChanged((BluetoothGattDevice)device, ret, state);
     }
     void OnMtuChanged(const bluetooth::GattDevice &device, int mtu) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnMtuChanged((BluetoothGattDevice)device, mtu);
     }
     void OnAddService(int ret, const bluetooth::Service &services) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnAddService(ret, (BluetoothGattService)services);
     }
     void OnServiceChanged(const bluetooth::Service &services) override
-    {}
+    {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
+    }
     void OnConnectionParameterChanged(
         const bluetooth::GattDevice &device, int interval, int latency, int timeout, int status) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnConnectionParameterChanged((BluetoothGattDevice)device, interval, latency, timeout, status);
     }
 

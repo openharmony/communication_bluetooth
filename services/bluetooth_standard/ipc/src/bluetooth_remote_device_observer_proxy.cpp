@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_remote_device_observer_proxy.h"
+#include "bluetooth_bt_uuid.h"
 #include "bluetooth_log.h"
 
 namespace OHOS {
@@ -69,17 +70,23 @@ void BluetoothRemoteDeviceObserverproxy::OnRemoteUuidChanged(
     }
 
     if (!data.WriteParcelable(&device)) {
-        HILOGE("[OnRemoteNameChanged] fail: write device failed");
+        HILOGE("[OnRemoteUuidChanged] fail: write device failed");
         return;
     }
 
-    if (!data.WriteInt32(uuids.size())) {
-        HILOGE("[OnRemoteNameChanged] fail: write uuids size failed");
+    size_t uuidSize = uuids.size();
+    if (uuidSize > UINT16_MAX) {
+        HILOGE("[OnRemoteUuidChanged], uuidSize = %{public}zu exceeds the maximum number.", uuidSize);
+        return;
+    }
+    if (!data.WriteUint16(uuidSize)) {
+        HILOGE("[OnRemoteUuidChanged] fail: write uuids size failed");
         return;
     }
     for (auto uuid : uuids) {
-        if (!ParcelBtUuid::WriteToParcel(data, uuid)) {
-            HILOGE("OnRemoteNameChanged faild: write uuid error");
+        BluetoothUuid btUuid = BluetoothUuid(uuid);
+        if (!data.WriteParcelable(&btUuid)) {
+            HILOGE("[OnRemoteUuidChanged] faild: write uuid error");
             return;
         }
     }
@@ -88,7 +95,7 @@ void BluetoothRemoteDeviceObserverproxy::OnRemoteUuidChanged(
     int32_t error =
         InnerTransact(IBluetoothRemoteDeviceObserver::Code::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID, option, data, reply);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothRemoteDeviceObserverproxy::OnPairStatusChanged done fail, error: %{public}d", error);
+        HILOGE("BluetoothRemoteDeviceObserverproxy::OnRemoteUuidChanged done fail, error: %{public}d", error);
         return;
     }
 }
