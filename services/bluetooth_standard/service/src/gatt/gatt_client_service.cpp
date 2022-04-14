@@ -1117,6 +1117,7 @@ void GattClientService::impl::OnConnect(const GattDevice &device, uint16_t conne
 
 void GattClientService::impl::OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret)
 {
+    LOG_INFO("%{public}s: client service dev_role: %{public}d, ret: %{public}d", __FUNCTION__, device.role_, ret);
     handleMap_.erase(connectionHandle);
     for (auto &it : clients_) {
         if (it.second.connection_.GetDevice() == device) {
