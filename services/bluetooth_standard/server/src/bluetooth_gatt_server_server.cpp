@@ -77,48 +77,61 @@ public:
     void OnCharacteristicReadRequest(
         const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnCharacteristicReadRequest(
             (BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic);
     }
     void OnCharacteristicReadByUuidRequest(
         const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic) override
-    {}
+    {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
+    }
     void OnCharacteristicWriteRequest(const bluetooth::GattDevice &device,
         const bluetooth::Characteristic &characteristic, bool needRespones) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnCharacteristicWriteRequest(
             (BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic, needRespones);
     }
     void OnDescriptorReadRequest(const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnDescriptorReadRequest((BluetoothGattDevice)device, (BluetoothGattDescriptor)descriptor);
     }
     void OnDescriptorWriteRequest(const bluetooth::GattDevice &device, const bluetooth::Descriptor &descriptor) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnDescriptorWriteRequest((BluetoothGattDevice)device, (BluetoothGattDescriptor)descriptor);
     }
     void OnNotifyConfirm(
         const bluetooth::GattDevice &device, const bluetooth::Characteristic &characteristic, int result) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnNotifyConfirm((BluetoothGattDevice)device, (BluetoothGattCharacteristic)characteristic, result);
     }
     void OnConnectionStateChanged(const bluetooth::GattDevice &device, int ret, int state) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnConnectionStateChanged((BluetoothGattDevice)device, ret, state);
     }
     void OnMtuChanged(const bluetooth::GattDevice &device, int mtu) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnMtuChanged((BluetoothGattDevice)device, mtu);
     }
     void OnAddService(int ret, const bluetooth::Service &services) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnAddService(ret, (BluetoothGattService)services);
     }
     void OnServiceChanged(const bluetooth::Service &services) override
-    {}
+    {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
+    }
     void OnConnectionParameterChanged(
         const bluetooth::GattDevice &device, int interval, int latency, int timeout, int status) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         callback_->OnConnectionParameterChanged((BluetoothGattDevice)device, interval, latency, timeout, status);
     }
 
@@ -200,6 +213,7 @@ BluetoothGattServerServer::impl::~impl()
 
 int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService *services)
 {
+    HILOGI("BluetoothGattServerServer::AddService enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
@@ -211,6 +225,7 @@ int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService *s
 
 void BluetoothGattServerServer::ClearServices(int appId)
 {
+    HILOGI("BluetoothGattServerServer::ClearServices enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return;
@@ -220,6 +235,7 @@ void BluetoothGattServerServer::ClearServices(int appId)
 
 void BluetoothGattServerServer::CancelConnection(const BluetoothGattDevice &device)
 {
+    HILOGI("BluetoothGattServerServer::CancelConnection enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return;
@@ -244,6 +260,7 @@ int BluetoothGattServerServer::NotifyClient(
 
 int BluetoothGattServerServer::RemoveService(int32_t appId, const BluetoothGattService &services)
 {
+    HILOGI("BluetoothGattServerServer::RemoveService enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
@@ -308,6 +325,7 @@ int BluetoothGattServerServer::RespondDescriptorWrite(
 
 int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback)
 {
+    HILOGI("BluetoothGattServerServer::RegisterApplication enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     pimpl->serverService_ = pimpl->GetServicePtr();
     if (!pimpl->serverService_) {
@@ -322,6 +340,7 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
 
 int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
 {
+    HILOGI("BluetoothGattServerServer::DeregisterApplication enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;

@@ -43,6 +43,7 @@ BluetoothRemoteDevice::BluetoothRemoteDevice(const std::string &addr, const int 
 
 int BluetoothRemoteDevice::GetDeviceType() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     int type = 0;
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGI("Invalid remote device.");
@@ -78,6 +79,7 @@ int BluetoothRemoteDevice::GetTransportType() const
 
 int BluetoothRemoteDevice::GetPhonebookPermission() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return INVALID_VALUE;
@@ -93,6 +95,7 @@ int BluetoothRemoteDevice::GetPhonebookPermission() const
 
 bool BluetoothRemoteDevice::SetPhonebookPermission(int permission)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -107,6 +110,7 @@ bool BluetoothRemoteDevice::SetPhonebookPermission(int permission)
 
 int BluetoothRemoteDevice::GetMessagePermission() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return INVALID_VALUE;
@@ -121,6 +125,7 @@ int BluetoothRemoteDevice::GetMessagePermission() const
 
 bool BluetoothRemoteDevice::SetMessagePermission(int permission)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -135,6 +140,7 @@ bool BluetoothRemoteDevice::SetMessagePermission(int permission)
 
 int BluetoothRemoteDevice::GetPowerMode(void) const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return INVALID_VALUE;
@@ -149,6 +155,7 @@ int BluetoothRemoteDevice::GetPowerMode(void) const
 
 std::string BluetoothRemoteDevice::GetDeviceName() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return INVALID_NAME;
@@ -163,6 +170,7 @@ std::string BluetoothRemoteDevice::GetDeviceName() const
 
 std::string BluetoothRemoteDevice::GetDeviceAlias() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return INVALID_NAME;
@@ -177,6 +185,7 @@ std::string BluetoothRemoteDevice::GetDeviceAlias() const
 
 bool BluetoothRemoteDevice::SetDeviceAlias(const std::string &aliasName)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -191,6 +200,7 @@ bool BluetoothRemoteDevice::SetDeviceAlias(const std::string &aliasName)
 
 int BluetoothRemoteDevice::GetDeviceBatteryLevel() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return INVALID_VALUE;
@@ -205,6 +215,7 @@ int BluetoothRemoteDevice::GetDeviceBatteryLevel() const
 
 int BluetoothRemoteDevice::GetPairState() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return INVALID_VALUE;
@@ -219,6 +230,7 @@ int BluetoothRemoteDevice::GetPairState() const
 
 bool BluetoothRemoteDevice::StartPair()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -233,6 +245,7 @@ bool BluetoothRemoteDevice::StartPair()
 
 bool BluetoothRemoteDevice::CancelPairing()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -247,6 +260,7 @@ bool BluetoothRemoteDevice::CancelPairing()
 
 bool BluetoothRemoteDevice::IsBondedFromLocal() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -261,6 +275,7 @@ bool BluetoothRemoteDevice::IsBondedFromLocal() const
 
 bool BluetoothRemoteDevice::IsAclConnected() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -275,6 +290,7 @@ bool BluetoothRemoteDevice::IsAclConnected() const
 
 bool BluetoothRemoteDevice::IsAclEncrypted() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -289,6 +305,7 @@ bool BluetoothRemoteDevice::IsAclEncrypted() const
 
 BluetoothDeviceClass BluetoothRemoteDevice::GetDeviceClass() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return BluetoothDeviceClass(0);
@@ -304,6 +321,7 @@ BluetoothDeviceClass BluetoothRemoteDevice::GetDeviceClass() const
 
 std::vector<ParcelUuid> BluetoothRemoteDevice::GetDeviceUuids() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     std::vector<ParcelUuid> parcelUuids;
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
@@ -324,6 +342,7 @@ std::vector<ParcelUuid> BluetoothRemoteDevice::GetDeviceUuids() const
 
 bool BluetoothRemoteDevice::SetDevicePin(const std::string &pin)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -338,6 +357,7 @@ bool BluetoothRemoteDevice::SetDevicePin(const std::string &pin)
 
 bool BluetoothRemoteDevice::SetDevicePairingConfirmation(bool accept)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -352,6 +372,7 @@ bool BluetoothRemoteDevice::SetDevicePairingConfirmation(bool accept)
 
 bool BluetoothRemoteDevice::SetDevicePasskey(int passkey, bool accept)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -366,6 +387,7 @@ bool BluetoothRemoteDevice::SetDevicePasskey(int passkey, bool accept)
 
 bool BluetoothRemoteDevice::PairRequestReply(bool accept)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;
@@ -380,6 +402,7 @@ bool BluetoothRemoteDevice::PairRequestReply(bool accept)
 
 bool BluetoothRemoteDevice::ReadRemoteRssiValue()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("%s::Invalid remote device.", __FUNCTION__);
         return false;

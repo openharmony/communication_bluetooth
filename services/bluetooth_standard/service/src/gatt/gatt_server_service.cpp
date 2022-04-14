@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -153,6 +153,7 @@ int GattServerService::Disconnect(const RawAddress &device)
 
 int GattServerService::CancelConnection(const GattDevice &device)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -164,6 +165,7 @@ int GattServerService::CancelConnection(const GattDevice &device)
 
 int GattServerService::SetCharacteristicValue(const Characteristic &characteristic)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -179,6 +181,7 @@ int GattServerService::SetCharacteristicValue(const Characteristic &characterist
 int GattServerService::SetCharacteristicPermission(
     const Characteristic &characteristic, uint8_t properties, uint8_t permission)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -191,12 +194,16 @@ int GattServerService::SetCharacteristicPermission(
 
 int GattServerService::AddService(int appId, Service &service)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
+        LOG_ERROR("%{public}s:%{public}d:%{public}s InRunningState false ", __FILE__, __LINE__, __FUNCTION__);
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
 
     int result = pimpl->profile_->CheckLegalityOfServiceDefinition(service);
     if (GattStatus::GATT_SUCCESS != result) {
+        LOG_ERROR("%{public}s:%{public}d:%{public}s CheckLegalityOfServiceDefinition failed, result = %{public}d",
+            __FILE__, __LINE__, __FUNCTION__, result);
         return result;
     }
 
@@ -207,7 +214,9 @@ int GattServerService::AddService(int appId, Service &service)
 
 int GattServerService::RemoveService(int appId, const Service &service)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
+        LOG_ERROR("%{public}s:%{public}d:%{public}s InRunningState false ", __FILE__, __LINE__, __FUNCTION__);
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
 
@@ -222,6 +231,7 @@ int GattServerService::RemoveService(int appId, const Service &service)
 
 int GattServerService::ClearServices(int appId)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -233,6 +243,7 @@ int GattServerService::ClearServices(int appId)
 
 int GattServerService::NotifyClient(const GattDevice &device, Characteristic &characteristic, bool needConfirm)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -259,6 +270,7 @@ int GattServerService::NotifyClient(const GattDevice &device, Characteristic &ch
 
 int GattServerService::RespondCharacteristicRead(const GattDevice &device, Characteristic &characteristic, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -286,6 +298,7 @@ int GattServerService::RespondCharacteristicRead(const GattDevice &device, Chara
 int GattServerService::RespondCharacteristicReadByUuid(
     const GattDevice &device, Characteristic &characteristic, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -313,6 +326,7 @@ int GattServerService::RespondCharacteristicReadByUuid(
 int GattServerService::RespondCharacteristicWrite(
     const GattDevice &device, const Characteristic &characteristic, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -325,6 +339,7 @@ int GattServerService::RespondCharacteristicWrite(
 
 int GattServerService::RespondDescriptorRead(const GattDevice &device, Descriptor &descriptor, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -346,6 +361,7 @@ int GattServerService::RespondDescriptorRead(const GattDevice &device, Descripto
 
 int GattServerService::RespondDescriptorWrite(const GattDevice &device, const Descriptor &descriptor, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -361,6 +377,7 @@ int GattServerService::RespondDescriptorWrite(const GattDevice &device, const De
 
 int GattServerService::RegisterApplication(IGattServerCallback &callback)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -375,6 +392,7 @@ int GattServerService::RegisterApplication(IGattServerCallback &callback)
 
 int GattServerService::DeregisterApplication(int appId)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -388,6 +406,7 @@ int GattServerService::DeregisterApplication(int appId)
 
 int GattServerService::RegisterApplicationSync(IGattServerCallback &callback) const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -397,6 +416,7 @@ int GattServerService::RegisterApplicationSync(IGattServerCallback &callback) co
 
 int GattServerService::DeregisterApplicationSync(int appId) const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -406,6 +426,7 @@ int GattServerService::DeregisterApplicationSync(int appId) const
 
 int GattServerService::AddServiceSync(int appId, Service &service) const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     int result = pimpl->profile_->CheckLegalityOfServiceDefinition(service);
     if (GattStatus::GATT_SUCCESS != result) {
         return result;
@@ -444,12 +465,14 @@ public:
     void OnConnectionParameterChanged(
         const GattDevice &device, int interval, int latency, int timeout, int status) override
     {
+        LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
         service_.GetDispatcher()->PostTask(std::bind(
             &impl::OnConnectionParameterChanged, service_.pimpl.get(), device, interval, latency, timeout, status));
     }
 
     void OnShutDown() override
     {
+        LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
         service_.GetDispatcher()->PostTask(std::bind(&impl::OnConnetionManagerShutDown, service_.pimpl.get()));
     }
 
@@ -606,6 +629,7 @@ GattServerService::impl::~impl()
 
 int GattServerService::impl::RegisterApplicationImpl(IGattServerCallback &callback)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (servers_.size() >= MAXIMUM_NUMBER_APPLICATION) {
         return GattStatus::MAX_APPLICATIONS;
     }
@@ -623,6 +647,7 @@ int GattServerService::impl::RegisterApplicationImpl(IGattServerCallback &callba
 
 int GattServerService::impl::DeregisterApplicationImpl(int appId)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto server = GetValidApplication(appId);
     if (server.has_value()) {
         ClearServices(appId);
@@ -637,16 +662,19 @@ int GattServerService::impl::DeregisterApplicationImpl(int appId)
 void GattServerService::impl::RegisterApplication(
     IGattServerCallback &callback, std::promise<int> &promise)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     promise.set_value(RegisterApplicationImpl(callback));
 }
 
 void GattServerService::impl::DeregisterApplication(int appId, std::promise<int> &promise)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     promise.set_value(DeregisterApplicationImpl(appId));
 }
 
 int GattServerService::impl::AddService(int appId, Service &service, bool IsAsync)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto server = GetValidApplication(appId);
     int result = GattStatus::GATT_FAILURE;
     if (server.has_value()) {
@@ -658,6 +686,7 @@ int GattServerService::impl::AddService(int appId, Service &service, bool IsAsyn
         }
 
         if (IsAsync) {
+            LOG_INFO("%{public}s:%{public}d:%{public}s: call OnAddService ", __FILE__, __LINE__, __FUNCTION__);
             server.value()->second.callback_.OnAddService(result, service);
         }
     }
@@ -666,6 +695,7 @@ int GattServerService::impl::AddService(int appId, Service &service, bool IsAsyn
 
 int GattServerService::impl::RemoveService(int appId, uint16_t handle)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto server = GetValidApplicationService(appId, handle);
     if (!server.has_value()) {
         LOG_INFO("%{public}s:%{public}d:%{public}s() %{public}s",
@@ -705,6 +735,7 @@ int GattServerService::impl::RemoveService(int appId, uint16_t handle)
 
 int GattServerService::impl::ClearServices(int appId)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto server = GetValidApplication(appId);
     int result = GattStatus::GATT_SUCCESS;
     if (server.has_value()) {
@@ -726,6 +757,7 @@ int GattServerService::impl::ClearServices(int appId)
 void GattServerService::impl::NotifyClient(
     const GattDevice &device, uint16_t valueHandle, const GattValue &value, size_t length, bool needConfirm)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s:Confirm:%{public}d", __FILE__, __LINE__, __FUNCTION__, needConfirm);
     auto handle = FindDeviceConnetionHandle(device);
     if (handle.has_value()) {
         auto connectionHandle = handle.value();
@@ -744,6 +776,7 @@ void GattServerService::impl::NotifyClient(
 void GattServerService::impl::RespondCharacteristicRead(
     const GattDevice &device, uint16_t valueHandle, const GattValue &value, size_t length, int ret, bool isUsingUuid)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto handle = GetValidDeviceConnetionHandle(device);
     if (handle.has_value()) {
         auto connectionHandle = handle.value();
@@ -758,6 +791,7 @@ void GattServerService::impl::RespondCharacteristicRead(
 void GattServerService::impl::RespondCharacteristicWrite(
     const GattDevice &device, uint16_t characteristicHandle, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto handle = GetValidDeviceConnetionHandle(device);
     if (handle.has_value()) {
         auto connectionHandle = handle.value();
@@ -768,6 +802,7 @@ void GattServerService::impl::RespondCharacteristicWrite(
 void GattServerService::impl::RespondDescriptorRead(
     const GattDevice &device, uint16_t valueHandle, const GattValue &value, size_t length, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto handle = GetValidDeviceConnetionHandle(device);
     if (handle.has_value()) {
         auto connectionHandle = handle.value();
@@ -777,6 +812,7 @@ void GattServerService::impl::RespondDescriptorRead(
 
 void GattServerService::impl::RespondDescriptorWrite(const GattDevice &device, uint16_t DescriptorHandle, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto handle = GetValidDeviceConnetionHandle(device);
     if (handle.has_value()) {
         auto connectionHandle = handle.value();
@@ -786,6 +822,7 @@ void GattServerService::impl::RespondDescriptorWrite(const GattDevice &device, u
 
 void GattServerService::impl::CancelConnection(const GattDevice &device)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto &manager = GattConnectionManager::GetInstance();
     auto result = manager.Disconnect(device);
     if (GattStatus::GATT_SUCCESS != result) {
@@ -812,6 +849,7 @@ void GattServerService::impl::SetCharacteristicValue(uint16_t valueHandle, GattV
 
 void GattServerService::impl::SetCharacteristicPermission(uint16_t valueHandle, uint8_t properties, uint8_t permission)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto ccc = profile_->GetCharacteristic(valueHandle);
     if (ccc != nullptr) {
         ccc->properties_ = properties;
@@ -824,6 +862,7 @@ void GattServerService::impl::SetCharacteristicPermission(uint16_t valueHandle, 
 
 void GattServerService::impl::OnExchangeMtuEvent(uint16_t connectionHandle, uint16_t rxMtu)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto remote = remotes_.find(connectionHandle);
     if (remote != remotes_.end()) {
         if (remote->second.GetDevice().transport_ == GATT_TRANSPORT_TYPE_CLASSIC) {
@@ -840,6 +879,7 @@ void GattServerService::impl::OnExchangeMtuEvent(uint16_t connectionHandle, uint
 void GattServerService::impl::OnReadCharacteristicValueEvent(
     uint16_t connectionHandle, uint16_t valueHandle, bool isUsingUuid)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto appId = attHandleMap_.find(valueHandle);
     if (appId == attHandleMap_.end()) {
         LOG_ERROR("%{public}s:%{public}d:%{public}s() %{public}s", __FILE__, __LINE__, __FUNCTION__, "Attribute map error!");
@@ -880,6 +920,7 @@ void GattServerService::impl::OnReadCharacteristicValueEvent(
 void GattServerService::impl::OnWriteCharacteristicEvent(
     uint16_t connectionHandle, uint16_t valueHandle, GattValue &value, size_t length, bool needRespones)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto appId = attHandleMap_.find(valueHandle);
     if (appId == attHandleMap_.end()) {
         LOG_ERROR("%{public}s:%{public}d:%{public}s() %{public}s", __FILE__, __LINE__, __FUNCTION__, "Attribute map error!");
@@ -917,6 +958,7 @@ void GattServerService::impl::OnWriteCharacteristicEvent(
 
 void GattServerService::impl::OnDescriptorReadEvent(uint16_t connectionHandle, uint16_t valueHandle)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto appId = attHandleMap_.find(valueHandle);
     if (appId == attHandleMap_.end()) {
         LOG_ERROR("%{public}s:%{public}d:%{public}s() %{public}s", __FILE__, __LINE__, __FUNCTION__, "Attribute map error!");
@@ -952,6 +994,7 @@ void GattServerService::impl::OnDescriptorReadEvent(uint16_t connectionHandle, u
 void GattServerService::impl::OnDescriptorWriteEvent(
     uint16_t connectionHandle, uint16_t valueHandle, GattValue &value, size_t length)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto appId = attHandleMap_.find(valueHandle);
     if (appId == attHandleMap_.end()) {
         LOG_ERROR("%{public}s:%{public}d:%{public}s() %{public}s", __FILE__, __LINE__, __FUNCTION__, "Attribute map error!");
@@ -981,6 +1024,7 @@ void GattServerService::impl::OnDescriptorWriteEvent(
 
 void GattServerService::impl::OnIndicationEvent(uint16_t connectionHandle, uint16_t valueHandle, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto appId = attHandleMap_.find(valueHandle);
     if (appId == attHandleMap_.end()) {
         LOG_ERROR("%{public}s:%{public}d:%{public}s() %{public}s", __FILE__, __LINE__, __FUNCTION__, "Attribute map error!");
@@ -1035,6 +1079,7 @@ void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t conne
 
 void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     bool findDevice = false;
     auto remote = remotes_.find(connectionHandle);
     if (remote != remotes_.end()) {
@@ -1068,6 +1113,7 @@ void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t co
 
 void GattServerService::impl::OnConnectionChanged(const GattDevice &device, int state)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (state == static_cast<int>(BTConnectState::CONNECTED)) {
         return;
     }
@@ -1079,6 +1125,7 @@ void GattServerService::impl::OnConnectionChanged(const GattDevice &device, int 
 void GattServerService::impl::OnConnectionParameterChanged(
     const GattDevice &device, int interval, int latency, int timeout, int status)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     for (auto &server : servers_) {
         server.second.callback_.OnConnectionParameterChanged(device, interval, latency, timeout, status);
     }
@@ -1192,10 +1239,12 @@ std::optional<AppIterator> GattServerService::impl::GetValidApplicationService(i
 
 void GattServerService::impl::NotifyServiceChanged(int appId, const Service &service)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     for (auto& server : servers_) {
         if (server.first == appId) {
             continue;
         }
+        LOG_INFO("%{public}d:%{public}s: call OnServiceChanged", __LINE__, __FUNCTION__);
         server.second.callback_.OnServiceChanged(service);
     }
 }
