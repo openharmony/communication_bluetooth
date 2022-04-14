@@ -54,6 +54,7 @@ public:
 
     void OnServiceChanged(const Service &service) override
     {
+        LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
         service_.dispatcher_.PostTask(
             std::bind(&GenericAttributeService::NotifyAllDevices, &service_, service.handle_, service.endHandle_));
     }
@@ -209,6 +210,7 @@ std::unique_ptr<Service> GenericAttributeService::BuildService()
 
 void GenericAttributeService::NotifyAllDevices(uint16_t startHandle, uint16_t endHandle)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     Characteristic ccc(instance_->characteristics_[0].handle_);
     ccc.value_ = BuildValue(startHandle, endHandle);
     ccc.length_ = SERVICE_CHANGED_VALUE_LENGTH;
@@ -227,11 +229,13 @@ void GenericAttributeService::NotifyAllDevices(uint16_t startHandle, uint16_t en
 
 void GenericAttributeService::NotifyServiceChanged(const GattDevice& device, Characteristic& characteristic) const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     serverService_.NotifyClient(device, characteristic, true);
 }
 
 void GenericAttributeService::ConnectIncoming(const GattDevice& device)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto dev = devices_.emplace(device, NotifyInformation());
     if (!dev.second && !dev.first->second.isNotified) {
         if (GattConnectionManager::GetInstance().GetEncryptionInfo(device)) {
@@ -248,6 +252,7 @@ void GenericAttributeService::ConnectIncoming(const GattDevice& device)
 
 void GenericAttributeService::Disconnected(const GattDevice& device)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     auto dev = devices_.find(device);
     if (dev != devices_.end() && dev->second.isNotified) {
         devices_.erase(device);
@@ -256,6 +261,7 @@ void GenericAttributeService::Disconnected(const GattDevice& device)
 
 std::unique_ptr<uint8_t[]> GenericAttributeService::BuildValue(uint16_t startHandle, uint16_t endHandle) const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     std::unique_ptr<uint8_t[]> value = std::make_unique<uint8_t[]>(SERVICE_CHANGED_VALUE_LENGTH);
 
     static const size_t doubleByte = 2;
