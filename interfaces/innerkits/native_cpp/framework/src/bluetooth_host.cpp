@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -351,6 +351,7 @@ void BluetoothHost::DeregisterObserver(BluetoothHostObserver &observer)
 
 bool BluetoothHost::EnableBt()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::EnableBt fails: no pimpl");
         return false;
@@ -365,6 +366,7 @@ bool BluetoothHost::EnableBt()
 
 bool BluetoothHost::DisableBt()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::DisableBt fails: no pimpl");
         return false;
@@ -378,6 +380,7 @@ bool BluetoothHost::DisableBt()
 
 int BluetoothHost::GetBtState() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetBtState fails: no pimpl");
         return INVALID_VALUE;
@@ -391,6 +394,7 @@ int BluetoothHost::GetBtState() const
 
 bool BluetoothHost::BluetoothFactoryReset()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::BluetoothFactoryReset fails: no pimpl");
         return false;
@@ -435,8 +439,7 @@ BluetoothRemoteDevice BluetoothHost::GetRemoteDevice(const std::string &addr, in
 
 bool BluetoothHost::EnableBle()
 {
-    HILOGD("BluetoothHost::Enable BLE starts");
-
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::Enable BLE fails: no pimpl");
         return false;
@@ -450,6 +453,7 @@ bool BluetoothHost::EnableBle()
 
 bool BluetoothHost::DisableBle()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::DisableBle BLE fails: no pimpl");
         return false;
@@ -463,6 +467,7 @@ bool BluetoothHost::DisableBle()
 
 bool BluetoothHost::IsBleEnabled() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::IsBleEnabled BLE fails: no pimpl");
         return false;
@@ -476,6 +481,7 @@ bool BluetoothHost::IsBleEnabled() const
 
 std::string BluetoothHost::GetLocalAddress() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetLocalAddress BLE fails: no pimpl");
         return std::string();
@@ -489,6 +495,7 @@ std::string BluetoothHost::GetLocalAddress() const
 
 std::vector<uint32_t> BluetoothHost::GetProfileList() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     std::vector<uint32_t> profileList;
     if (!pimpl) {
         HILOGE("BluetoothHost::GetProfileList BLE fails: no pimpl");
@@ -504,6 +511,7 @@ std::vector<uint32_t> BluetoothHost::GetProfileList() const
 
 int BluetoothHost::GetMaxNumConnectedAudioDevices() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetMaxNumConnectedAudioDevices BLE fails: no pimpl");
         return INVALID_VALUE;
@@ -517,6 +525,7 @@ int BluetoothHost::GetMaxNumConnectedAudioDevices() const
 
 int BluetoothHost::GetBtConnectionState() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetBtConnectionState BLE fails: no pimpl");
         return INVALID_VALUE;
@@ -530,6 +539,7 @@ int BluetoothHost::GetBtConnectionState() const
 
 int BluetoothHost::GetBtProfileConnState(uint32_t profileId) const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetBtProfileConnState BLE fails: no pimpl");
         return INVALID_VALUE;
@@ -543,6 +553,7 @@ int BluetoothHost::GetBtProfileConnState(uint32_t profileId) const
 
 void BluetoothHost::GetLocalSupportedUuids(std::vector<ParcelUuid> &uuids)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetLocalSupportedUuids BLE fails: no pimpl");
         return;
@@ -571,6 +582,7 @@ void BluetoothHost::Stop()
 
 BluetoothDeviceClass BluetoothHost::GetLocalDeviceClass() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetLocalDeviceClass BLE fails: no pimpl");
         return BluetoothDeviceClass(0);
@@ -585,6 +597,7 @@ BluetoothDeviceClass BluetoothHost::GetLocalDeviceClass() const
 
 bool BluetoothHost::SetLocalDeviceClass(const BluetoothDeviceClass &deviceClass)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::SetLocalDeviceClass BLE fails: no pimpl");
         return false;
@@ -599,6 +612,7 @@ bool BluetoothHost::SetLocalDeviceClass(const BluetoothDeviceClass &deviceClass)
 
 std::string BluetoothHost::GetLocalName() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetLocalName BLE fails: no pimpl");
         return std::string();
@@ -612,6 +626,7 @@ std::string BluetoothHost::GetLocalName() const
 
 bool BluetoothHost::SetLocalName(const std::string &name)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::SetLocalName BLE fails: no pimpl");
         return false;
@@ -625,6 +640,7 @@ bool BluetoothHost::SetLocalName(const std::string &name)
 
 int BluetoothHost::GetBtScanMode() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetBtScanMode BLE fails: no pimpl");
         return INVALID_VALUE;
@@ -638,6 +654,7 @@ int BluetoothHost::GetBtScanMode() const
 
 bool BluetoothHost::SetBtScanMode(int mode, int duration)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::SetBtScanMode BLE fails: no pimpl");
         return false;
@@ -651,6 +668,7 @@ bool BluetoothHost::SetBtScanMode(int mode, int duration)
 
 int BluetoothHost::GetBondableMode(int transport) const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetBondableMode BLE fails: no pimpl");
         return INVALID_VALUE;
@@ -664,6 +682,7 @@ int BluetoothHost::GetBondableMode(int transport) const
 
 bool BluetoothHost::SetBondableMode(int transport, int mode)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::SetBondableMode BLE fails: no pimpl");
         return false;
@@ -677,6 +696,7 @@ bool BluetoothHost::SetBondableMode(int transport, int mode)
 
 bool BluetoothHost::StartBtDiscovery()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::StartBtDiscovery BLE fails: no pimpl");
         return false;
@@ -690,6 +710,7 @@ bool BluetoothHost::StartBtDiscovery()
 
 bool BluetoothHost::CancelBtDiscovery()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::CancelBtDiscovery BLE fails: no pimpl");
         return false;
@@ -703,6 +724,7 @@ bool BluetoothHost::CancelBtDiscovery()
 
 bool BluetoothHost::IsBtDiscovering(int transport) const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::IsBtDiscovering BLE fails: no pimpl");
         return false;
@@ -716,6 +738,7 @@ bool BluetoothHost::IsBtDiscovering(int transport) const
 
 long BluetoothHost::GetBtDiscoveryEndMillis() const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::GetBtDiscoveryEndMillis BLE fails: no pimpl");
         return 0;
@@ -729,6 +752,7 @@ long BluetoothHost::GetBtDiscoveryEndMillis() const
 
 std::vector<BluetoothRemoteDevice> BluetoothHost::GetPairedDevices(int transport) const
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     std::vector<BluetoothRemoteDevice> pairedDevices;
     if (!pimpl) {
         HILOGE("BluetoothHost::GetPairedDevices BLE fails: no pimpl");
@@ -751,6 +775,7 @@ std::vector<BluetoothRemoteDevice> BluetoothHost::GetPairedDevices(int transport
 
 bool BluetoothHost::RemovePair(const BluetoothRemoteDevice &device)
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("RemovePair::Invalid remote device.");
         return false;
@@ -769,6 +794,7 @@ bool BluetoothHost::RemovePair(const BluetoothRemoteDevice &device)
 
 bool BluetoothHost::RemoveAllPairs()
 {
+    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (!pimpl) {
         HILOGE("BluetoothHost::RemoveAllPairs BLE fails: no pimpl");
         return false;
