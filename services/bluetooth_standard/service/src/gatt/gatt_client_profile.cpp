@@ -2372,6 +2372,7 @@ class GattClientProfile::impl::GattConnectionObserverImplement : public GattConn
 public:
     void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
+        LOG_INFO("%{public}s: gatt_client connect role is %{public}d", __FUNCTION__, role);
         if (role == 1) {
             return;
         }
@@ -2391,6 +2392,7 @@ public:
 
     void OnReconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
+        LOG_INFO("%{public}s gatt client service", __FUNCTION__);
         if (role == 1) { // slave role.
             return;
         }

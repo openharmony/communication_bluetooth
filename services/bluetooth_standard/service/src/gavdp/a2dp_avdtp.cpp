@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -270,7 +270,7 @@ uint16_t A2dpAvdtp::ReconfigureReq(const uint16_t handle, const AvdtSepConfig &c
 {
     uint16_t ret = AVDT_ReconfigReq(handle, &const_cast<AvdtSepConfig &>(cfg), &label);
     if (ret == A2DP_SUCCESS) {
-        LOG_ERROR("[A2dpAvdtp] %{public}s Success to AVDT_ReconfigReq() \n", __func__);
+        LOG_DEBUG("[A2dpAvdtp] %{public}s Success to AVDT_ReconfigReq() \n", __func__);
     } else {
         LOG_ERROR("[A2dpAvdtp] %{public}s Failed to AVDT_ReconfigReq() \n", __func__);
     }
