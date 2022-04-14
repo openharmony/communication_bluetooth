@@ -378,7 +378,7 @@ void AvdtBuildDiscoverCmd(AvdtSigCtrl *sigCtrl, uint8_t sigId, const AvdtMsg *av
  */
 void AvdtBuildDiscoverRsp(AvdtSigCtrl *sigCtrl, uint8_t sigId, const AvdtMsg *avdtMsgData)
 {
-    if (avdtMsgData == NULL || avdtMsgData == NULL) {
+    if (sigCtrl == NULL || avdtMsgData == NULL) {
         return;
     }
     LOG_DEBUG("[AVDT]%{public}s: signal(0x%x),sepnumber(%hhu)", __func__, sigId, avdtMsgData->discoverRsp.numSeps);
