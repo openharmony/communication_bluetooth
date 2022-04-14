@@ -58,7 +58,8 @@ BluetoothGattServerCallbackStub::~BluetoothGattServerCallbackStub()
 int BluetoothGattServerCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothGattServerCallbackStub::OnRemoteRequest, cmd = %d, flags= %d", code, option.GetFlags());
+    HILOGD("BluetoothGattServerCallbackStub::OnRemoteRequest, cmd = %{public}u, flags= %{public}d",
+        code, option.GetFlags());
     std::u16string descriptor = BluetoothGattServerCallbackStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
@@ -96,6 +97,7 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessagePa
 }
 ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(MessageParcel &data, MessageParcel &reply)
 {
+    HILOGI("BluetoothGattServerCallbackStub::OnAddServiceInner Triggered!");
     int32_t ret = data.ReadInt32();
     const BluetoothGattService *service = data.ReadParcelable<BluetoothGattService>();
 

@@ -1805,6 +1805,7 @@ class GattServerProfile::impl::GattConnectionObserverImplement : public GattConn
 public:
     void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
+        LOG_INFO("%{public}s: gatt_server connect role is %{public}d", __FUNCTION__, role);
         if (ret == GATT_SUCCESS && role == 1) { // only role is slave.
             this->serverProfile_.pimpl->dispatcher_->PostTask(
                 std::bind(&impl::AddDeviceList, serverProfile_.pimpl.get(), connectionHandle, device));
@@ -1813,6 +1814,7 @@ public:
 
     void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
     {
+        LOG_INFO("%{public}s: gatt_server connect role is %{public}d", __FUNCTION__, role);
         if (role == 0) {
             return;
         }
