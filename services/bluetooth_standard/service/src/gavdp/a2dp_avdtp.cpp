@@ -271,7 +271,7 @@ uint16_t A2dpAvdtp::ReconfigureReq(const uint16_t handle, const AvdtSepConfig &c
 {
     uint16_t ret = AVDT_ReconfigReq(handle, &const_cast<AvdtSepConfig &>(cfg), &label);
     if (ret == A2DP_SUCCESS) {
-        LOG_ERROR("[A2dpAvdtp] %{public}s Success to AVDT_ReconfigReq() \n", __func__);
+        LOG_DEBUG("[A2dpAvdtp] %{public}s Success to AVDT_ReconfigReq() \n", __func__);
     } else {
         LOG_ERROR("[A2dpAvdtp] %{public}s Failed to AVDT_ReconfigReq() \n", __func__);
     }

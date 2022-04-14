@@ -212,6 +212,7 @@ BluetoothGattServerServer::impl::~impl()
 
 int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService *services)
 {
+    HILOGI("BluetoothGattServerServer::AddService enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
@@ -223,6 +224,7 @@ int BluetoothGattServerServer::AddService(int32_t appId, BluetoothGattService *s
 
 void BluetoothGattServerServer::ClearServices(int appId)
 {
+    HILOGI("BluetoothGattServerServer::ClearServices enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return;
@@ -232,6 +234,7 @@ void BluetoothGattServerServer::ClearServices(int appId)
 
 void BluetoothGattServerServer::CancelConnection(const BluetoothGattDevice &device)
 {
+    HILOGI("BluetoothGattServerServer::CancelConnection enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return;
@@ -256,6 +259,7 @@ int BluetoothGattServerServer::NotifyClient(
 
 int BluetoothGattServerServer::RemoveService(int32_t appId, const BluetoothGattService &services)
 {
+    HILOGI("BluetoothGattServerServer::RemoveService enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
@@ -320,6 +324,7 @@ int BluetoothGattServerServer::RespondDescriptorWrite(
 
 int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback)
 {
+    HILOGI("BluetoothGattServerServer::RegisterApplication enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     pimpl->serverService_ = pimpl->GetServicePtr();
     if (!pimpl->serverService_) {
@@ -334,6 +339,7 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
 
 int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
 {
+    HILOGI("BluetoothGattServerServer::DeregisterApplication enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (!pimpl->serverService_) {
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;

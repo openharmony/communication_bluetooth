@@ -80,6 +80,7 @@ bool BluetoothHostProxy::EnableBt()
 
 bool BluetoothHostProxy::DisableBt()
 {
+    HILOGI("BluetoothHostProxy::DisableBt starts");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::DisableBt WriteInterfaceToken error");
@@ -157,6 +158,7 @@ bool BluetoothHostProxy::BluetoothFactoryReset()
 
 int32_t BluetoothHostProxy::GetBtState()
 {
+    HILOGI("BluetoothHostProxy::GetBtState starts");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::GetBtState WriteInterfaceToken error");
