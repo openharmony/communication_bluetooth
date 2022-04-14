@@ -124,6 +124,7 @@ public:
     void OnCharacteristicReadRequest(
         const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
         auto gattcharacter = server_.pimpl->FindCharacteristic(characteristic.handle_);
         if (gattcharacter.has_value()) {
@@ -147,6 +148,7 @@ public:
     void OnCharacteristicWriteRequest(const BluetoothGattDevice &device,
         const BluetoothGattCharacteristic &characteristic, bool needRespones) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
         auto gattcharacter = server_.pimpl->FindCharacteristic(characteristic.handle_);
         if (gattcharacter.has_value()) {
@@ -175,6 +177,7 @@ public:
 
     void OnDescriptorReadRequest(const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
         auto gattdesc = server_.pimpl->FindDescriptor(descriptor.handle_);
         if (gattdesc.has_value()) {
@@ -198,6 +201,7 @@ public:
 
     void OnDescriptorWriteRequest(const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
         auto gattdesc = server_.pimpl->FindDescriptor(descriptor.handle_);
         if (gattdesc.has_value()) {
@@ -223,6 +227,7 @@ public:
     void OnNotifyConfirm(
         const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int result) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         server_.pimpl->callback_.OnNotificationCharacteristicChanged(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
@@ -245,7 +250,7 @@ public:
                 }
             }
         }
-
+        HILOGI("%{public}s:%{public}s:%{public}d OnConnectionStateUpdate called", __FILE__, __FUNCTION__, __LINE__);
         server_.pimpl->callback_.OnConnectionStateUpdate(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
@@ -256,6 +261,7 @@ public:
 
     void OnMtuChanged(const BluetoothGattDevice &device, int32_t mtu) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         server_.pimpl->callback_.OnMtuUpdate(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
@@ -265,6 +271,7 @@ public:
 
     void OnAddService(int32_t ret, const BluetoothGattService &service) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         GattService *ptr = nullptr;
         if (GattStatus::GATT_SUCCESS == ret) {
             GattService gattSvc = server_.pimpl->BuildService(service);
@@ -275,6 +282,7 @@ public:
                 ptr = &(*it);
             }
         }
+        HILOGI("%{public}s:%{public}s:%{public}d OnServiceAdded called", __FILE__, __FUNCTION__, __LINE__);
         server_.pimpl->callback_.OnServiceAdded(ptr, ret);
         return;
     }
@@ -282,6 +290,7 @@ public:
     void OnConnectionParameterChanged(
         const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status) override
     {
+        HILOGI("%{public}s:%{public}s:%{public}d entry", __FILE__, __FUNCTION__, __LINE__);
         server_.pimpl->callback_.OnConnectionParameterChanged(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
@@ -703,11 +712,12 @@ int GattServer::SendResponse(
 
 GattServer::~GattServer()
 {
-    HILOGI("GattServer::~GattServer called");
+    HILOGI("GattServer::~GattServer start");
     if (pimpl->isRegisterSucceeded_) {
         pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
     }
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
+    HILOGI("GattServer::~GattServer end");
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

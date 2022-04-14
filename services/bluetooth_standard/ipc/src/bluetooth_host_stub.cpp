@@ -218,7 +218,7 @@ BluetoothHostStub::~BluetoothHostStub()
 int32_t BluetoothHostStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothHostStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    HILOGD("BluetoothHostStub::OnRemoteRequest, cmd = %{public}u, flags= %{public}d", code, option.GetFlags());
     std::u16string descriptor = BluetoothHostStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
