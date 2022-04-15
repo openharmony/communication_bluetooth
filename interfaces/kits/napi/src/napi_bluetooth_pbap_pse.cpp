@@ -25,10 +25,9 @@ bool NapiPbapServer::isRegistered_ = false;
 
 void NapiPbapServer::DefinePbapServerJSClass(napi_env env)
 {
-    
     napi_value constructor;
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
@@ -37,7 +36,6 @@ void NapiPbapServer::DefinePbapServerJSClass(napi_env env)
 
     napi_define_class(env, "PbapServer", NAPI_AUTO_LENGTH, PbapServerConstructor, nullptr, 
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-    
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_PBAP_SERVER, napiProfile);
@@ -109,22 +107,19 @@ napi_value NapiPbapServer::Off(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
         return ret;
     }
     observer_.callbackInfos_[type] = nullptr;
-
     HILOGI("%{public}s is unregistered", type.c_str());
-
     return ret;
 }
 
 napi_value NapiPbapServer::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
@@ -143,7 +138,6 @@ napi_value NapiPbapServer::GetConnectionDevices(napi_env env, napi_callback_info
 napi_value NapiPbapServer::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -174,7 +168,6 @@ napi_value NapiPbapServer::GetDeviceState(napi_env env, napi_callback_info info)
 napi_value NapiPbapServer::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};

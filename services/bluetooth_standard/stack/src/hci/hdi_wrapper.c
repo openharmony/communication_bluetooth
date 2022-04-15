@@ -28,7 +28,7 @@
 
 HDILib *LoadHdiLib()
 {
-    HDILib *lib = MEM_CALLOC.alloc(sizeof(HDI_LIB));
+    HDILib *lib = MEM_CALLOC.alloc(sizeof(HDILib));
     if (lib != NULL) {
         do {
             lib->lib = dlopen(HDI_LIB, RTLD_LAZY | RTLD_NODELETE);

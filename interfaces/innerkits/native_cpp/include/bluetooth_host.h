@@ -34,7 +34,6 @@
 #define BLUETOOTH_HOST_H
 
 #include <string>
-#include <vector>
 
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"

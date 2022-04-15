@@ -121,7 +121,7 @@ struct Characteristic {
 };
 
 struct Service {
-    Service() 
+    Service()
         :isPrimary_(false), handle_(0), startHandle_(0), endHandle_(0), uuid_(), includeServices_(), characteristics_()
     {
     }

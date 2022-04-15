@@ -87,7 +87,6 @@ napi_value NapiBluetoothHidHost::On(napi_env env, napi_callback_info info)
     }
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     observer_.callbackInfos_[type] = callbackInfo;
-
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
 }
@@ -119,9 +118,7 @@ napi_value NapiBluetoothHidHost::Off(napi_env env, napi_callback_info info)
     napi_delete_reference(env, callbackInfo->callback_);
     }
     observer_.callbackInfos_[type] = nullptr;
-
     HILOGI("%{public}s is unregistered", type.c_str());
-
     return ret;
 }
 
@@ -144,7 +141,6 @@ napi_value NapiBluetoothHidHost::GetConnectionDevices(napi_env env, napi_callbac
 napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -175,7 +171,6 @@ napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info
 napi_value NapiBluetoothHidHost::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -206,7 +201,6 @@ napi_value NapiBluetoothHidHost::Connect(napi_env env, napi_callback_info info)
 napi_value NapiBluetoothHidHost::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};

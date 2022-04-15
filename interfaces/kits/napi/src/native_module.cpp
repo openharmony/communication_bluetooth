@@ -42,6 +42,7 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
+    HILOGI("-----Init start------");
     napi_property_descriptor desc[] = {};
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
