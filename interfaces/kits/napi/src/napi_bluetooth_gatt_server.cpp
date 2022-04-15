@@ -119,7 +119,6 @@ napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
     gattServer->GetCallback().SetCallbackInfo(type, callbackInfo);
 
     HILOGI("%{public}s is registered", type.c_str());
-
     return ret;
 }
 
@@ -145,7 +144,6 @@ napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 
     napi_unwrap(env, thisVar, (void **)&GattServer);
     GattServer->GetCallback().SetCallbackInfo(type, nullptr);
-
     return ret;
 }
 
@@ -214,7 +212,7 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
     UUID serviceUuid = UUID::FromString(uuid);
 
     std::optional<std::reference_wrapper<GattService>> gattService =
-                                                                gattServer->GetServer()->GetService(serviceUuid, true);
+        gattServer->GetServer()->GetService(serviceUuid, true);
     if (gattService != std::nullopt) {
         if (gattServer->GetServer()->RemoveGattService(*gattService) == GattStatus::GATT_SUCCESS) {
         isOK = true;

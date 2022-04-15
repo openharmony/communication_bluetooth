@@ -19,7 +19,6 @@
 #include <vector>
 #include "napi_bluetooth_hfp_hf_observer.h"
 
-
 namespace OHOS {
 namespace Bluetooth {
 class NapiHandsFreeUnit {

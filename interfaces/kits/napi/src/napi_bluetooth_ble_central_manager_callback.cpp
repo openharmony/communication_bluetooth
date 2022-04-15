@@ -24,7 +24,6 @@ void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback(
     uv_work_t *work, std::shared_ptr<BleScanResult> &result)
 {
     HILOGI("OnScanCallback uv_work_t start");
-
     if (work == nullptr) {
         HILOGE("work is null");
         return;

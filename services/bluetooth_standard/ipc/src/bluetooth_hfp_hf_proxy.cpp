@@ -84,8 +84,8 @@ int BluetoothHfpHfProxy::GetDevicesByStates(const std::vector<int> &states, std:
         HILOGE("BluetoothHfpHfProxy::GetDevicesByStates done fail, error: %{public}d", error);
         return ERROR;
     }
-    int devNum = reply.ReadInt32();
-    for (int i = devNum; i > 0; i--) {
+    uint32_t devNum = reply.ReadUint32();
+    for (uint32_t i = 0; i < devNum; i++) {
         std::shared_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
         if (!dev) {
             return TRANSACTION_ERR;
@@ -280,8 +280,8 @@ int BluetoothHfpHfProxy::GetCurrentCallList(const BluetoothRawAddress &device, s
         HILOGE("BluetoothHfpHfProxy::GetCurrentCallList done fail, error: %{public}d", error);
         return ERROR;
     }
-    int callNum = reply.ReadInt32();
-    for (int i = callNum; i > 0; i--) {
+    uint32_t callNum = reply.ReadUint32();
+    for (uint32_t i = 0; i < callNum; i++) {
         std::shared_ptr<BluetoothHfpHfCall> call(reply.ReadParcelable<BluetoothHfpHfCall>());
         if (!call) {
             return TRANSACTION_ERR;

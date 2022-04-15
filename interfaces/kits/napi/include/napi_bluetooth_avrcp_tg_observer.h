@@ -22,8 +22,6 @@
 namespace OHOS {
 namespace Bluetooth {
 const std::string STR_BT_AVRCP_TG_CONNECTION_STATE_CHANGE = "connectionStateChange";
-
-
 class NapiAvrcpTargetObserver : public AvrcpTarget::IObserver{
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;

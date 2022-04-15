@@ -53,7 +53,7 @@ void NapiA2dpSourceObserver::OnConnectionStateChanged(const BluetoothRemoteDevic
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
+        }
     );
 }
 

@@ -22,15 +22,15 @@ namespace Bluetooth {
 void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
 {
     HILOGI("NapiGattClientCallback::OnCharacteristicChanged called");
-    
     if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]) {
         HILOGW("NapiGattClientCallback::OnCharacteristicChanged: This callback is not registered by ability.");
         return;
     }
     HILOGI("NapiGattClientCallback::OnCharacteristicChanged: %{public}s is registered by ability",
         STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE.c_str());
-    std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo = 
-        std::static_pointer_cast<GattCharacteristicCallbackInfo>(callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]);
+    std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
+        std::static_pointer_cast<GattCharacteristicCallbackInfo>(
+            callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]);
     HILOGI("uuid is %{public}s", characteristic.GetUuid().ToString().c_str());
     callbackInfo->characteristic_ = characteristic;
     uv_loop_s *loop = nullptr;
@@ -54,14 +54,13 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
-    );           
+        }
+    );
 }
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
 {
     HILOGI("NapiGattClientCallback::OnCharacteristicChanged called");
-
     ReadCharacteristicValueCallbackInfo *callbackInfo = client_->readCharacteristicValueCallbackInfo_;
     if (!callbackInfo) {
         return;
@@ -76,7 +75,6 @@ void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic
 void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
 {
     HILOGI("NapiGattClientCallback::OnDescriptorReadResult called");
-
     ReadDescriptorValueCallbackInfo *callbackInfo = client_->readDescriptorValueCallbackInfo_;
     if (!callbackInfo) {
         return;
@@ -91,7 +89,6 @@ void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descri
 void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
 {
     HILOGI("NapiGattClientCallback::OnConnectionStateChanged called");
-
     if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE]) {
         HILOGW("NapiGattClientCallback::OnConnectionStateChanged: This callback is not registered by ability.");
         return;
@@ -125,7 +122,7 @@ void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int r
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
+        }
     );
 }
 

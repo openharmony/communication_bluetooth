@@ -41,8 +41,6 @@ public:
     static bool isRegistered_;
 };
 
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_A2DP_SRC_H_ */

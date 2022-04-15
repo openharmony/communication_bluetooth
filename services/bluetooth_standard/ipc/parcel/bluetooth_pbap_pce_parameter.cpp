@@ -406,7 +406,7 @@ BluetoothIPbapPhoneBookData::BluetoothIPbapPhoneBookData(const BluetoothIPbapPho
 bool BluetoothIPbapPhoneBookData::Marshalling(Parcel &parcel) const
 {
     bool status = false;
-    status = parcel.WriteInt32(phoneBookSize_);
+    status = parcel.WriteUint16(phoneBookSize_);
     if (!status) {
         return status;
     }
@@ -441,7 +441,7 @@ bool BluetoothIPbapPhoneBookData::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    status = parcel.WriteInt32(resultLoaded_);
+    status = parcel.WriteUint16(resultLoaded_);
     if (!status) {
         return status;
     }
@@ -458,12 +458,10 @@ bool BluetoothIPbapPhoneBookData::WriteToParcel(Parcel &parcel)
 bool BluetoothIPbapPhoneBookData::ReadFromParcel(Parcel &parcel)
 {
     bool status = false;
-    int32_t val = 0;
-    status = parcel.ReadInt32(val);
+    status = parcel.ReadUint16(phoneBookSize_);
     if (!status) {
         return status;
     }
-    phoneBookSize_ = val;
 
     status = parcel.ReadUInt8Vector(&primaryFolderVersion_);
     if (!status) {
@@ -492,18 +490,10 @@ bool BluetoothIPbapPhoneBookData::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    status = parcel.ReadInt32(val);
+    status = parcel.ReadUint16(resultLoaded_);
     if (!status) {
         return status;
     }
-    resultLoaded_ = val;
-
-    int size = 0;
-    status = parcel.ReadInt32(val);
-    if (!status) {
-        return status;
-    }
-    size = val;
 
     status = parcel.ReadUInt8Vector(&result_);
     return status;
