@@ -99,10 +99,8 @@ static void SdpFreeConnectInfo(const void *data)
         PacketFree(connect->packet);
         connect->packet = NULL;
     }
-    if (connect != NULL) {
-        MEM_MALLOC.free(connect);
-        connect = NULL;
-    }
+    MEM_MALLOC.free(connect);
+    connect = NULL;
 }
 
 void SdpCreateConnectList()

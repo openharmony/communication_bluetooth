@@ -25,7 +25,6 @@ bool NapiAvrcpTarget::isRegistered_ = false;
 
 void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env)
 {
-    
     napi_value constructor;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("connect", Connect),       
@@ -36,9 +35,8 @@ void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
     };
 
-    napi_define_class(env, "AvrcpTarget", NAPI_AUTO_LENGTH, AvrcpTargetConstructor, nullptr, 
+    napi_define_class(env, "AvrcpTarget", NAPI_AUTO_LENGTH, AvrcpTargetConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-    
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_AVRCP_TG, napiProfile);
@@ -54,7 +52,6 @@ napi_value NapiAvrcpTarget::AvrcpTargetConstructor(napi_env env, napi_callback_i
 
 napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info) {
     HILOGI("On called");
-    
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -67,7 +64,7 @@ napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info) {
     if (argc != expectedArgsCount) {
         HILOGE("Requires 2 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
@@ -90,7 +87,6 @@ napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info) {
         profile->RegisterObserver(&observer_);
         isRegistered_ = true;
     }
-
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
 }
@@ -110,22 +106,19 @@ napi_value NapiAvrcpTarget::Off(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
         return ret;
     }
     observer_.callbackInfos_[type] = nullptr;
-
     HILOGI("%{public}s is unregistered", type.c_str());
-
     return ret;
 }
 
 napi_value NapiAvrcpTarget::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
@@ -144,7 +137,6 @@ napi_value NapiAvrcpTarget::GetConnectionDevices(napi_env env, napi_callback_inf
 napi_value NapiAvrcpTarget::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -175,7 +167,6 @@ napi_value NapiAvrcpTarget::GetDeviceState(napi_env env, napi_callback_info info
 napi_value NapiAvrcpTarget::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -207,7 +198,6 @@ napi_value NapiAvrcpTarget::Connect(napi_env env, napi_callback_info info)
 napi_value NapiAvrcpTarget::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};

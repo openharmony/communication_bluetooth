@@ -25,10 +25,9 @@ bool NapiHandsFreeUnit::isRegistered_ = false;
 
 void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
 {
-    
     napi_value constructor;
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
@@ -40,7 +39,7 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("sendDTMF", SendDTMF),
     };
 
-    napi_define_class(env, "HandsFreeUnit", NAPI_AUTO_LENGTH, HandsFreeUnitConstructor, nullptr, 
+    napi_define_class(env, "HandsFreeUnit", NAPI_AUTO_LENGTH, HandsFreeUnitConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
 
     napi_value napiProfile;
@@ -72,7 +71,7 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 2 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
@@ -97,7 +96,6 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
         profile->RegisterObserver(&observer_);
         isRegistered_ = true;
     }
-
     return ret;
 }
 
@@ -116,22 +114,19 @@ napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
         return ret;
     }
     observer_.callbackInfos_[type] = nullptr;
-
     HILOGI("%{public}s is unregistered", type.c_str());
-
     return ret;
 }
 
 napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
@@ -149,7 +144,6 @@ napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_i
 napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -180,7 +174,6 @@ napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info in
 napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -211,7 +204,6 @@ napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
 napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -242,7 +234,6 @@ napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info)
 napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -273,7 +264,6 @@ napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info)
 napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info)
 {
     HILOGI("ConnectSco called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -304,7 +294,6 @@ napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info)
 napi_value NapiHandsFreeUnit::DisconnectSco(napi_env env, napi_callback_info info)
 {
     HILOGI("DisconnectSco called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -335,7 +324,6 @@ napi_value NapiHandsFreeUnit::DisconnectSco(napi_env env, napi_callback_info inf
 napi_value NapiHandsFreeUnit::SendDTMF(napi_env env, napi_callback_info info)
 {
     HILOGI("SendDTMF called");
-
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};

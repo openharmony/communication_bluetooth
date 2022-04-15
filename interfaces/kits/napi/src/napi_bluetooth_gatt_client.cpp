@@ -24,8 +24,6 @@ namespace Bluetooth {
 using namespace std;
 
 thread_local napi_ref NapiGattClient::consRef_ = nullptr;
-
-
 napi_value NapiGattClient::CreateGattClientDevice(napi_env env, napi_callback_info info)
 {
     HILOGI("CreateGattClientDevice called");
@@ -66,10 +64,8 @@ void NapiGattClient::DefineGattClientJSClass(napi_env env)
     };
 
     napi_value constructor = nullptr;
-
     napi_define_class(env, "GattClientDevice", NAPI_AUTO_LENGTH, GattClientConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-    
     napi_create_reference(env, constructor, 1, &consRef_);
 }
 
@@ -86,7 +82,7 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
 
     string deviceId;
     ParseString(env, deviceId, argv[PARAM0]);
-    SetGattClinetDeviceId(deviceId);
+    SetGattClientDeviceId(deviceId);
 
     NapiGattClient *gattClient = new NapiGattClient(deviceId);
 
@@ -101,7 +97,6 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
 
     return thisVar;
 }
-
 
 napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
 {
@@ -165,10 +160,8 @@ napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
 
     string type;
     ParseString(env, type, argv[PARAM0]);
-
     napi_unwrap(env, thisVar, (void **)&gattClient);
     gattClient->GetCallback().SetCallbackInfo(type, nullptr);
-
     return ret;
 }
 
@@ -230,7 +223,6 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
-
     gattClient->readCharacteristicValueCallbackInfo_ = new ReadCharacteristicValueCallbackInfo();
     ReadCharacteristicValueCallbackInfo *callbackInfo = gattClient->readCharacteristicValueCallbackInfo_;
     callbackInfo->env_ = env;
@@ -300,7 +292,6 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
 
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_object(env, &result[PARAM1]);
-
                 ConvertBLECharacteristicToJS(env, result[PARAM1],
                     const_cast<GattCharacteristic&>(*(callbackInfo->outputCharacteristic_)));
             } else {
@@ -327,9 +318,7 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
         },
         (void*)callbackInfo,
         &callbackInfo->asyncWork_);
-    
     napi_queue_async_work(env, callbackInfo->asyncWork_);
-
     return promise;
 }
 
@@ -352,7 +341,6 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
-
     gattClient->readDescriptorValueCallbackInfo_ = new ReadDescriptorValueCallbackInfo();
     ReadDescriptorValueCallbackInfo *callbackInfo = gattClient->readDescriptorValueCallbackInfo_;
     callbackInfo->env_ = env;
@@ -420,7 +408,6 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
 
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_object(env, &result[PARAM1]);
-
                 ConvertBLEDescriptorToJS(env, result[PARAM1],
                     const_cast<GattDescriptor&>(*(callbackInfo->outputDescriptor_)));
             } else {
@@ -449,7 +436,6 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
         &callbackInfo->asyncWork_);
 
     napi_queue_async_work(env, callbackInfo->asyncWork_);
-
     return promise;
 }
 
@@ -474,7 +460,6 @@ napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
     GetServiceCallbackInfo *callbackInfo = new GetServiceCallbackInfo();
-
     callbackInfo->env_ = env;
     callbackInfo->client_ = gattClient->GetClient();
 
@@ -552,7 +537,6 @@ napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
         &callbackInfo->asyncWork_);
 
     napi_queue_async_work(env, callbackInfo->asyncWork_);
-
     return promise;
 }
 

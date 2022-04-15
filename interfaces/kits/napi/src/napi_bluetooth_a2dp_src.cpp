@@ -27,7 +27,7 @@ void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
@@ -36,9 +36,9 @@ void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
     };
 
-    napi_define_class(env, "A2dpSource", NAPI_AUTO_LENGTH, A2dpSourceConstructor, nullptr, 
+    napi_define_class(env, "A2dpSource", NAPI_AUTO_LENGTH, A2dpSourceConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-    
+
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_A2DP_SOURCE, napiProfile);
@@ -67,7 +67,7 @@ napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 2 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");

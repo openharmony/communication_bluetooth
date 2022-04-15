@@ -25,10 +25,9 @@ bool NapiPbapClient::isRegistered_ = false;
 
 void NapiPbapClient::DefinePbapClientJSClass(napi_env env)
 {
-    
     napi_value constructor;
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
@@ -36,9 +35,8 @@ void NapiPbapClient::DefinePbapClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
     };
 
-    napi_define_class(env, "PbapClient", NAPI_AUTO_LENGTH, PbapClientConstructor, nullptr, 
+    napi_define_class(env, "PbapClient", NAPI_AUTO_LENGTH, PbapClientConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-    
     napi_value NapiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &NapiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_PBAP_CLIENT, NapiProfile);
@@ -67,7 +65,7 @@ napi_value NapiPbapClient::On(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 2 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
@@ -90,10 +88,8 @@ napi_value NapiPbapClient::On(napi_env env, napi_callback_info info)
         profile->RegisterObserver(&observer_);
         isRegistered_ = true;
     }
-
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
-
 }
 
 napi_value NapiPbapClient::Off(napi_env env, napi_callback_info info)
@@ -111,7 +107,7 @@ napi_value NapiPbapClient::Off(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
     string type;
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
@@ -126,7 +122,6 @@ napi_value NapiPbapClient::Off(napi_env env, napi_callback_info info)
 
 napi_value NapiPbapClient::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
@@ -145,7 +140,6 @@ napi_value NapiPbapClient::GetConnectionDevices(napi_env env, napi_callback_info
 napi_value NapiPbapClient::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -176,7 +170,6 @@ napi_value NapiPbapClient::GetDeviceState(napi_env env, napi_callback_info info)
 napi_value NapiPbapClient::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -208,7 +201,6 @@ napi_value NapiPbapClient::Connect(napi_env env, napi_callback_info info)
 napi_value NapiPbapClient::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};

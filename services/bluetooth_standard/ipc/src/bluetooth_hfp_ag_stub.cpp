@@ -101,12 +101,12 @@ int BluetoothHfpAgStub::OnRemoteRequest(
 ErrCode BluetoothHfpAgStub::GetConnectDevicesInner(MessageParcel &data, MessageParcel &reply) {
     std::vector<BluetoothRawAddress> devices;
     GetConnectDevices(devices);
-    int DevNum = devices.size();
-    if (!reply.WriteInt32(DevNum)) {
+    uint32_t DevNum = devices.size();
+    if (!reply.WriteUint32(DevNum)) {
         HILOGE("BluetoothHfpAgStub:WriteInt32 failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
-    for (int i = 0; i < DevNum; i++) {
+    for (uint32_t i = 0; i < DevNum; i++) {
         if (!reply.WriteParcelable(&devices[i])) {
             HILOGE("BluetoothHfpAgStub:WriteParcelable failed in: %{public}s.", __func__);
             return ERR_INVALID_VALUE;
@@ -120,12 +120,12 @@ ErrCode BluetoothHfpAgStub::GetDevicesByStatesInner(MessageParcel &data, Message
     std::vector<int> states;
     data.ReadInt32Vector(&states);
     GetDevicesByStates(states, devices);
-    int DevNum = devices.size();
-    if (!reply.WriteInt32(DevNum)) {
+    uint32_t DevNum = devices.size();
+    if (!reply.WriteUint32(DevNum)) {
         HILOGE("BluetoothHfpAgStub:WriteInt32 failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }
-    for (int i = 0; i < DevNum; i++) {
+    for (uint32_t i = 0; i < DevNum; i++) {
         if (!reply.WriteParcelable(&devices[i])) {
             HILOGE("BluetoothHfpAgStub:WriteParcelable failed in: %{public}s.", __func__);
             return ERR_INVALID_VALUE;

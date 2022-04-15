@@ -48,7 +48,7 @@ napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
     if (argc != expectedArgsCount) {
         HILOGE("Requires 1 argument.");
         return ret;
-    } 
+    }
     int profile_code;
     if (!ParseInt32(env, profile_code, argv[PARAM0])) {
         HILOGE("False type! Int32 required.");

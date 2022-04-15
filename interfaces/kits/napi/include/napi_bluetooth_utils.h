@@ -245,7 +245,7 @@ std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = nullptr;
 std::string deviceAddr;
 }  // namespace
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
-void SetGattClinetDeviceId(const std::string &deviceId);
+void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
 
 void SetRssiValueCallbackInfo(std::shared_ptr<GattGetRssiValueCallbackInfo> &callback);

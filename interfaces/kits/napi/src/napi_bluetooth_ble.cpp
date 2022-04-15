@@ -177,7 +177,6 @@ static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &arg
             }
         }
     }
-
     return NapiGetNull(env);
 }
 

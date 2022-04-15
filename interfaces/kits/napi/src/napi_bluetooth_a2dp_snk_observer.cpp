@@ -42,7 +42,7 @@ void NapiA2dpSinkObserver::OnConnectionStateChanged(const BluetoothRemoteDevice 
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
-            napi_value result = nullptr;    
+            napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);
             napi_value callback = nullptr;
@@ -53,7 +53,7 @@ void NapiA2dpSinkObserver::OnConnectionStateChanged(const BluetoothRemoteDevice 
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
+        }
     );
 }
 

@@ -974,7 +974,7 @@ void BlePeripheralDevice::SetAclConnectState(int connectState)
  * @param handle Acl connection handle.
  * @since 6
  */
-void BlePeripheralDevice::SetConnectionHandle(const int handle)
+void BlePeripheralDevice::SetConnectionHandle(int handle)
 {
     connectionHandle_ = handle;
 }
