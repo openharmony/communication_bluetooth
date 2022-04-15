@@ -26,7 +26,6 @@ void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
     uv_work_t *work, std::pair<std::string, int> &data)
 {
     HILOGI("OnPairStatusChanged uv_work_t start");
-
     if (work == nullptr) {
         HILOGE("work is null");
         return;

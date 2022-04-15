@@ -28,7 +28,6 @@ void NapiHandsFreeUnitObserver::OnConnectionStateChanged(const BluetoothRemoteDe
         STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE];
-    
     callbackInfo->state_ = state;
     callbackInfo->deviceId_ = device.GetDeviceAddr();
     uv_loop_s *loop = nullptr;
@@ -53,7 +52,7 @@ void NapiHandsFreeUnitObserver::OnConnectionStateChanged(const BluetoothRemoteDe
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
+        }
     );
 }
 
@@ -94,7 +93,7 @@ void NapiHandsFreeUnitObserver::OnScoStateChanged(const BluetoothRemoteDevice &d
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
+        }
     );
 }
 

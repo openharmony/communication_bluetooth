@@ -358,7 +358,7 @@ void ConvertDescriptorReadReqToJS(napi_env env, napi_value result, const std::st
 
         if (descriptor.GetCharacteristic()->GetService() != nullptr) {
             napi_value serviceUuid;
-            napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str(), 
+            napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str(),
                 NAPI_AUTO_LENGTH, &serviceUuid);
             napi_set_named_property(env, result, "serviceUuid", serviceUuid);
             HILOGI("ConvertDescriptorReadReqToJS serviceUuid is %{public}s",
@@ -385,7 +385,6 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     napi_create_int32(env, 0, &offset);
     napi_set_named_property(env, result, "offset", offset);
     HILOGI("ConvertCharacteristicWriteReqToJS offset is %{public}d", 0);
-
 
     napi_value isPrep;
     napi_get_boolean(env, false, &isPrep);
@@ -629,7 +628,7 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
     string characteristicUuid;
     uint8_t *characteristicValue = nullptr;
     size_t characteristicValueSize = 0;
-    
+
     napi_value propertyNameValue = nullptr;
     napi_value value = nullptr;
     bool hasProperty = false;
@@ -660,8 +659,8 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
             GetDescriptorVectorFromJS(env, value, descriptors);
             for (auto& descriptor : descriptors) {
                 characteristic->AddDescriptor(descriptor);
+            }
         }
-    }
     } else {
         if (server != nullptr) {
             service = server->GetService(UUID::FromString(serviceUuid), true);
@@ -671,7 +670,6 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
         } else if (client != nullptr) {
             service = client->GetService(UUID::FromString(serviceUuid));
         }
-        
         if (service == std::nullopt) {
             return nullptr;
         } else {
@@ -690,7 +688,6 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
         HILOGI("characteristicValue is %{public}d", characteristicValue[0]);
     }
     characteristic->SetValue(characteristicValue, characteristicValueSize);
-    
     return characteristic;
 }
 
@@ -729,7 +726,6 @@ napi_value RegisterObserver(napi_env env, napi_callback_info info)
         NAPI_ASSERT(env, valueType == napi_function, "Wrong argument type. Function expected.");
         napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_);
         g_Observer[type] = pCallbackInfo;
-
         HILOGI("%{public}s is registered", type.c_str());
     }
     napi_value ret = nullptr;
@@ -786,7 +782,6 @@ std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver()
 void GetDescriptorVectorFromJS(napi_env env, napi_value object, vector<GattDescriptor>& descriptors)
 {
     HILOGI("GetDescriptorVectorFromJS called");
-
     size_t idx = 0;
     bool hasElement = false;
     napi_has_element(env, object, idx, &hasElement);
@@ -809,7 +804,6 @@ GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared
     std::shared_ptr<GattClient> client)
 {
     HILOGI("GetDescriptorFromJS called");
-    
     string serviceUuid;
     string characteristicUuid;
     string descriptorUuid;
@@ -833,7 +827,7 @@ GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared
     napi_get_property(env, object, propertyNameValue, &value);
     ParseString(env, descriptorUuid, value);
     HILOGI("descriptorUuid is %{public}s", descriptorUuid.c_str());
-    
+
     GattDescriptor* descriptor = nullptr;
     GattCharacteristic* characteristic = nullptr;
     std::optional<std::reference_wrapper<GattService>> service = nullopt;
@@ -850,7 +844,7 @@ GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared
         } else if (client != nullptr) {
             service = client->GetService(UUID::FromString(serviceUuid));
         }
-        
+
         if (service == std::nullopt) {
             return nullptr;
         } else {
@@ -917,7 +911,6 @@ ServerResponse GetServerResponseFromJS(napi_env env, napi_value object)
         HILOGI("value is %{public}d", values[0]);
     }
     serverResponse.SetValue(values, valuesSize);
-
     return serverResponse;
 }
 
@@ -944,11 +937,10 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     ParseInt32(env, type, value);
     sppOption->type_ = SppSocketType(type);
     HILOGI("type is %{public}d", sppOption->type_);
-
     return sppOption;
 }
 
-void SetGattClinetDeviceId(const std::string &deviceId)
+void SetGattClientDeviceId(const std::string &deviceId)
 {
     deviceAddr = deviceId;
 }
@@ -973,19 +965,19 @@ int GetProfileConnectionState(int state)
     int32_t profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
     switch (state) {
         case static_cast<int32_t>(BTConnectState::CONNECTING):
-            HILOGD("BTConnectState connecting");
+            HILOGD("STATE_CONNECTING(1)");
             profileConnectionState = ProfileConnectionState::STATE_CONNECTING;
             break;
         case static_cast<int32_t>(BTConnectState::CONNECTED):
-            HILOGD("BTConnectState connected");
+            HILOGD("STATE_CONNECTED(2)");
             profileConnectionState = ProfileConnectionState::STATE_CONNECTED;
             break;
         case static_cast<int32_t>(BTConnectState::DISCONNECTING):
-            HILOGD("BTConnectState disconnecting");
+            HILOGD("STATE_DISCONNECTING(3)");
             profileConnectionState = ProfileConnectionState::STATE_DISCONNECTING;
             break;
         case static_cast<int32_t>(BTConnectState::DISCONNECTED):
-            HILOGD("BTConnectState disconnected");
+            HILOGD("STATE_DISCONNECTED(0)");
             profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
             break;
         default:
@@ -999,19 +991,19 @@ int GetScoConnectionState(int state)
     int32_t scoState = ScoState::SCO_DISCONNECTED;
     switch (state) {
         case static_cast<int32_t>(HfpScoConnectState::SCO_CONNECTING):
-            HILOGD("BTConnectState connecting");
+            HILOGD("SCO_CONNECTING(1)");
             scoState = ScoState::SCO_CONNECTING;
             break;
         case static_cast<int32_t>(HfpScoConnectState::SCO_CONNECTED):
-            HILOGD("BTConnectState connected");
+            HILOGD("SCO_CONNECTED(3)");
             scoState = ScoState::SCO_CONNECTED;
             break;
         case static_cast<int32_t>(HfpScoConnectState::SCO_DISCONNECTING):
-            HILOGD("BTConnectState disconnecting");
+            HILOGD("SCO_DISCONNECTING(2)");
             scoState = ScoState::SCO_DISCONNECTING;
             break;
         case static_cast<int32_t>(HfpScoConnectState::SCO_DISCONNECTED):
-            HILOGD("BTConnectState disconnected");
+            HILOGD("SCO_DISCONNECTED(0)");
             scoState = ScoState::SCO_DISCONNECTED;
             break;
         default:

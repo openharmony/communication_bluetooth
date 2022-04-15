@@ -21,15 +21,14 @@ void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const Bluetooth
 {
     HILOGI("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged called");
     if (!callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE]) {
-        HILOGW("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged: This callback is not registered by ability.");
+        HILOGW("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged: callback is not registered by ability.");
         return;
     }
     HILOGI("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged: %{public}s is registered by ability",
         STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
-    
+
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE];
-    
     callbackInfo->state_ = state;
     callbackInfo->deviceId_ = device.GetDeviceAddr();
     uv_loop_s *loop = nullptr;
@@ -54,7 +53,7 @@ void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const Bluetooth
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
+        }
     );
 }
 
@@ -97,7 +96,7 @@ void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteD
             napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
             delete work;
             work = nullptr;
-        } 
+        }
     );
 }
 

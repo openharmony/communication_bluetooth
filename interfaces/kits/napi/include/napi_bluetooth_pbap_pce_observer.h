@@ -23,7 +23,6 @@ namespace OHOS {
 namespace Bluetooth {
 const std::string STR_BT_PBAP_PCE_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
-
 class NapiPbapPceObserver : public PbapClientObserver{
 public:
     void OnServiceConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
@@ -33,7 +32,7 @@ public:
     void OnActionCompleted(
         const BluetoothRemoteDevice &device, int respCode, int actionType, const PbapPhoneBookData &result) override
     {}
-    
+
     NapiPbapPceObserver() = default;
     virtual ~NapiPbapPceObserver() = default;
 

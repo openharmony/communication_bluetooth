@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -208,7 +208,6 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 
     if (clientMap[id]) {
         OHOS::Bluetooth::OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
-
         while (totalSize) {
             int result = outputStream.Write(totalBuf, totalSize);
             if (result > 0) {
@@ -226,10 +225,10 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     napi_get_boolean(env, isOK, &ret);
     return ret;
 }
+
 void NapiSppClient::On(napi_env env, napi_callback_info info)
 {
     HILOGI("On is called");
-
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_THREE] = {0};
@@ -363,7 +362,8 @@ void NapiSppClient::sppRead(int id)
                         napi_value callResult = nullptr;
                         napi_get_undefined(callbackInfo->env_, &undefined);
                         napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-                        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+                        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result,
+                            &callResult);
                         delete work;
                         work = nullptr;
                     }

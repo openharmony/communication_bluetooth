@@ -52,7 +52,6 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
         DECLARE_NAPI_FUNCTION("on", RegisterObserverToHost),
         DECLARE_NAPI_FUNCTION("off", DeregisterObserverToHost),
-        
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     HILOGI("BluetoothHostInit end");
@@ -267,40 +266,39 @@ napi_value StopBluetoothDiscovery(napi_env env, napi_callback_info info)
 
 napi_value GetState(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetState start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t state = host->GetBtState();
     int32_t status = 0;
     switch (state) {
         case BTStateID::STATE_TURNING_ON:
-            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning on");
+            HILOGD("STATE_TURNING_ON(1)");
             status = static_cast<int32_t>(BluetoothState::STATE_TURNING_ON);
             break;
         case BTStateID::STATE_TURN_ON:
-            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn on");
+            HILOGD("STATE_ON(2)");
             status = static_cast<int32_t>(BluetoothState::STATE_ON);
             break;
         case BTStateID::STATE_TURNING_OFF:
-            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning off");
+            HILOGD("STATE_TURNING_OFF(3)");
             status = static_cast<int32_t>(BluetoothState::STATE_TURNING_OFF);
             break;
         case BTStateID::STATE_TURN_OFF:
-            HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn off");
+            HILOGD("STATE_OFF(0)");
             status = static_cast<int32_t>(BluetoothState::STATE_OFF);
             break;
         default:
+            HILOGE("get state failed");
             break;
     }
 
     bool enableBle = host->IsBleEnabled();
     if (enableBle && (status == BTStateID::STATE_TURN_OFF)) {
+        HILOGD("STATE_BLE_ON(5)");
         status = static_cast<int32_t>(BluetoothState::STATE_BLE_ON);
     }
 
     napi_value result = nullptr;
-    HILOGD("GetState start state %{public}d", status);
     napi_create_int32(env, status, &result);
-    HILOGI("GetState end");
     return result;
 }
 
@@ -428,7 +426,6 @@ static void PaddingCallbackPromiseInfo(
     const napi_env &env, const napi_ref &callback, CallbackPromiseInfo &info, napi_value &promise)
 {
     HILOGI("PaddingCallbackPromiseInfo enter");
-
     if (callback) {
         info.callback = callback;
         info.isCallback = true;
@@ -444,7 +441,6 @@ static void PaddingCallbackPromiseInfo(
 static void ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInfo &info, const napi_value &result)
 {
     HILOGI("ReturnCallbackPromise enter");
-
     if (info.isCallback) {
         SetCallback(env, info.callback, info.errorCode, result);
     } else {
@@ -587,6 +583,10 @@ void AsyncCompleteCallbackGetRssiValue(napi_env env, napi_status status, void *d
 {
     HILOGD("GetRssiValue napi_create_async_work complete start");
     GattGetRssiValueCallbackInfo *asynccallbackinfo = (GattGetRssiValueCallbackInfo *)data;
+    if (asynccallbackinfo == nullptr) {
+        HILOGW("AsyncCompleteCallbackGetRssiValue, the asynccallbackinfo is nullptr");
+        return;
+    }
     if (asynccallbackinfo->promise.errorCode != CODE_SUCCESS) {
         HILOGE("GetRssiValue failed.");
         asynccallbackinfo->result = NapiGetNull(env);
@@ -603,10 +603,9 @@ void AsyncCompleteCallbackGetRssiValue(napi_env env, napi_status status, void *d
     }
 
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
+
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
     HILOGD("GetRssiValue napi_create_async_work complete end");
 }
 
@@ -944,7 +943,6 @@ napi_value MajorMinorClassOfDeviceInit(napi_env env)
 napi_value GetProfileConnState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetProfileConnState start");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};

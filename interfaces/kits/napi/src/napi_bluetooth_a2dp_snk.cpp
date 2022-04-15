@@ -23,7 +23,7 @@ using namespace std;
 NapiA2dpSinkObserver NapiA2dpSink::observer_;
 bool NapiA2dpSink::isRegistered_ = false;
 
-void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env) 
+void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
@@ -38,21 +38,20 @@ void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env)
 
     napi_define_class(env, "A2dpSink", NAPI_AUTO_LENGTH, A2dpSinkConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-    
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_A2DP_SINK, napiProfile);
     HILOGI("DefineA2dpSinkJSClass finished");
 }
 
-napi_value NapiA2dpSink::A2dpSinkConstructor(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::A2dpSinkConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
-napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 {
     HILOGI("On called");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
@@ -90,12 +89,11 @@ napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
         profile->RegisterObserver(&observer_);
         isRegistered_ = true;
     }
-
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
 }
 
-napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("Off called");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -117,13 +115,11 @@ napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
         return ret;
     }
     observer_.callbackInfos_[type] = nullptr;
-
     HILOGI("%{public}s is unregistered", type.c_str());
-
     return ret;
 }
 
-napi_value NapiA2dpSink::GetConnectionDevices(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
     HILOGI("GetConnectionDevices called");
     napi_value ret = nullptr;
@@ -140,10 +136,9 @@ napi_value NapiA2dpSink::GetConnectionDevices(napi_env env, napi_callback_info i
     return ret;
 }
 
-napi_value NapiA2dpSink::GetDeviceState(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("GetDeviceState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -171,10 +166,9 @@ napi_value NapiA2dpSink::GetDeviceState(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiA2dpSink::Connect(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("Connect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -203,10 +197,9 @@ napi_value NapiA2dpSink::Connect(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiA2dpSink::Disconnect(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -235,10 +228,9 @@ napi_value NapiA2dpSink::Disconnect(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiA2dpSink::getPlayingState(napi_env env, napi_callback_info info) 
+napi_value NapiA2dpSink::getPlayingState(napi_env env, napi_callback_info info)
 {
     HILOGI("getPlayingState called");
-
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
