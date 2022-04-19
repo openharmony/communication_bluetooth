@@ -265,7 +265,8 @@ void HidHostL2capConnection::SendGetReport(SendHidData sendData)
     packet = PacketMalloc(packetLength, 0, 0);
     buf = (uint8_t *)BufferPtr(PacketHead(packet));
     if (sendData.data > 0) {
-        buf[offset] = (sendData.type << HID_HOST_SHIFT_OPRATURN_4) | ((sendData.param | 0x08) & 0x0f);
+        buf[offset] = static_cast<uint8_t>(sendData.type << HID_HOST_SHIFT_OPRATURN_4) |
+            ((sendData.param | 0x08) & 0x0f);
         offset++;
         if (sendData.reportId != 0) {
             buf[offset] = sendData.reportId;
@@ -296,8 +297,11 @@ void HidHostL2capConnection::SendSetReport(SendHidData sendData, int length, uin
 
     packet = PacketMalloc(length + HID_HOST_PDU_HEADER_LENGTH, 0, 0);
     buf = (uint8_t *)BufferPtr(PacketHead(packet));
-    buf[0] = (sendData.type << HID_HOST_SHIFT_OPRATURN_4) | (sendData.param & 0x0f);
-    memcpy_s(buf + 1, length, pkt, length);
+    buf[0] = static_cast<uint8_t>(sendData.type << HID_HOST_SHIFT_OPRATURN_4) | (sendData.param & 0x0f);
+    if (memcpy_s(buf + 1, length, pkt, length) != EOK) {
+        LOG_ERROR("[HIDH L2CAP] %{public}s:memcpy error.", __func__);
+        return;
+    }
     lcid = ctrlLcid_;
 
     L2CIF_SendData(lcid, packet, nullptr);
@@ -547,7 +551,7 @@ void HidHostL2capConnection::HidHostRecvDataCallback(
     }
 
     uint8_t header[HID_HOST_PDU_HEADER_LENGTH] = {0};
-    uint16_t dataLength;
+    int dataLength;
     uint16_t offset = 0;
     HidHostMessage event;
 
@@ -577,7 +581,7 @@ void HidHostL2capConnection::HidHostRecvDataCallback(
                 event.what_ = HID_HOST_INT_CTRL_DATA;
             }
             event.dev_ = address;
-            dataLength = PacketSize(pkt);
+            dataLength = static_cast<int>(PacketSize(pkt));
             if (dataLength > 0) {
                 event.data_ = std::make_unique<uint8_t[]>(dataLength);
                 PacketRead(pkt, event.data_.get(), 0, dataLength);
