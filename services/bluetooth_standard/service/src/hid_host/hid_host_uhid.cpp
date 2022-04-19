@@ -159,7 +159,10 @@ int HidHostUhid::SendGetReportReplyUhid(int fd, int id, uint16_t err, uint8_t* r
         LOG_WARN("[UHID]%{public}s(): Report size greater than allowed size", __FUNCTION__);
         return HID_HOST_FAILURE;
     }
-    memcpy_s(ev.u.feature_answer.data, sizeof(ev.u.feature_answer.data), rpt, len);
+    if (memcpy_s(ev.u.feature_answer.data, sizeof(ev.u.feature_answer.data), rpt, len) != EOK) {
+        LOG_ERROR("[UHID] %{public}s() memcpy error", __FUNCTION__);
+        return HID_HOST_FAILURE;
+    }
     return WriteUhid(fd, &ev);
 }
 
@@ -186,7 +189,10 @@ int HidHostUhid::SendHidInfo(const char* devName, PnpInformation& pnpInf, HidInf
     // Create and send hid descriptor to kernel
     memset_s(&ev, sizeof(ev), 0, sizeof(ev));
     ev.type = UHID_CREATE;
-    strncpy_s((char*)ev.u.create.name, sizeof(ev.u.create.name), devName, sizeof(ev.u.create.name));
+    if (strncpy_s((char*)ev.u.create.name, sizeof(ev.u.create.name), devName, sizeof(ev.u.create.name) - 1)
+        != EOK) {
+        LOG_ERROR("[UHID]%{public}s(): memcpy error", __FUNCTION__);
+    }
     int uniqLength = snprintf_s((char*)ev.u.create.uniq, sizeof(ev.u.create.uniq), address_.length(),
         "%s", address_.c_str());
     if (uniqLength < 0) {
@@ -258,7 +264,10 @@ int HidHostUhid::WritePackUhid(int fd, uint8_t* rpt, uint16_t len)
         LOG_WARN("[UHID]%{public}s(): Report size greater than allowed size", __FUNCTION__);
         return HID_HOST_FAILURE;
     }
-    memcpy_s(ev.u.input.data, sizeof(ev.u.input.data), rpt, len);
+    if (memcpy_s(ev.u.input.data, sizeof(ev.u.input.data), rpt, len) != EOK) {
+        LOG_ERROR("[UHID]%{public}s(): memcpy error", __FUNCTION__);
+        return HID_HOST_FAILURE;
+    }
     return WriteUhid(fd, &ev);
 }
 

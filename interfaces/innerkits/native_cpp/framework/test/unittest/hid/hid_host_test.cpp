@@ -122,7 +122,7 @@ HWTEST_F(HidHostTest, HID_ModuleTest_GetDeviceState_00100, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GetDeviceState function test";
 
-    int sucess = 0;
+    int sucess = static_cast<int>(BTConnectState::DISCONNECTED);
     BluetoothRemoteDevice device;
     profile_ = HidHost::GetProfile();
     EXPECT_EQ(sucess, profile_->GetDeviceState(device));
@@ -143,7 +143,7 @@ HWTEST_F(HidHostTest, HID_ModuleTest_Connect_00100, TestSize.Level1)
 
     BluetoothRemoteDevice device;
     profile_ = HidHost::GetProfile();
-    EXPECT_TRUE(profile_->Connect(device));
+    EXPECT_FALSE(profile_->Connect(device));
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_Connect_00100 end";
 }
@@ -161,7 +161,7 @@ HWTEST_F(HidHostTest, HID_ModuleTest_Disconnect_00100, TestSize.Level1)
 
     BluetoothRemoteDevice device;
     profile_ = HidHost::GetProfile();
-    EXPECT_TRUE(profile_->Disconnect(device));
+    EXPECT_FALSE(profile_->Disconnect(device));
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_Disconnect_00100 end";
 }

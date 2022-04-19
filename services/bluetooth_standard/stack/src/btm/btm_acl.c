@@ -1829,7 +1829,7 @@ int BTM_ReadRssi(const BtAddr *addr)
 
     MutexLock(g_aclListLock);
     BtmAclConnection *connection = BtmAclFindLeConnectionByAddr(addr);
-    if (connection != NULL) {
+    if (connection != NULL && connection->state == CONNECTED) {
         handle = connection->connectionHandle;
     } else {
         MutexUnlock(g_aclListLock);

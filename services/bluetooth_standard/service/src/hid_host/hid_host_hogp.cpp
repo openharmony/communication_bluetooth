@@ -199,7 +199,7 @@ int HidHostHogp::SendSetReport(Characteristic character, int length, uint8_t* pk
     }
     std::unique_lock<std::mutex> lock(mutexWaitGattCallback_);
     // Delete report id from the data
-    character.length_ = length - 1;
+    character.length_ = static_cast<size_t>(length - 1);
     character.value_ = std::make_unique<uint8_t[]>(character.length_);
     if (memcpy_s(character.value_.get(), length - 1, pkt + 1, length - 1) != EOK) {
         LOG_ERROR("[HOGP] %{public}s:character copy error", __func__);
@@ -237,15 +237,18 @@ int HidHostHogp::ReceiveControlData(Characteristic character, uint8_t reportId)
         HidHostMessage event(HID_HOST_INT_CTRL_DATA);
         event.dev_ = address_;
         // Add report id as the first byte of the report before sending it to uhid
-        event.dataLength_ = character.length_ + 1;
+        event.dataLength_ = static_cast<int>(character.length_ + 1);
         event.data_ = std::make_unique<uint8_t[]>(event.dataLength_);
         event.data_[0] = reportId;
-        (void)memcpy_s(event.data_.get() + 1, character.length_,
-            character.value_.get(), character.length_);
+        if (memcpy_s(event.data_.get() + 1, character.length_,
+            character.value_.get(), character.length_) != EOK) {
+            LOG_ERROR("[HOGP]%{public}s():memcpy error", __FUNCTION__);
+            return RET_BAD_STATUS;
+        }
         HidHostService::GetService()->PostEvent(event);
         return BT_NO_ERROR;
     } else {
-        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}zu", __FUNCTION__, character.length_);
+        LOG_ERROR("[HOGP]%{public}s():data is null length_=%{public}zu", __FUNCTION__, character.length_);
         ReceiveHandShake(HID_HOST_HANDSHAKE_ERROR);
     }
     return RET_BAD_STATUS;
@@ -490,11 +493,14 @@ int HidHostHogp::SavePnpInformation(Characteristic character)
     }
     uint8_t *data = character.value_.get();
     int offset = 1;
-    pnpInf_.vendorId = data[offset] + (data[offset + 1] << HID_HOST_SHIFT_OPRATURN_8);
+    pnpInf_.vendorId = static_cast<uint16_t>(data[offset]) +
+        static_cast<uint16_t>(static_cast<uint16_t>(data[offset + 1]) << HID_HOST_SHIFT_OPRATURN_8);
     offset += sizeof(uint16_t);
-    pnpInf_.productId = data[offset] + (data[offset + 1] << HID_HOST_SHIFT_OPRATURN_8);
+    pnpInf_.productId = static_cast<uint16_t>(data[offset]) +
+        static_cast<uint16_t>(static_cast<uint16_t>(data[offset + 1]) << HID_HOST_SHIFT_OPRATURN_8);
     offset += sizeof(uint16_t);
-    pnpInf_.version = data[offset] + (data[offset + 1] << HID_HOST_SHIFT_OPRATURN_8);
+    pnpInf_.version = static_cast<uint16_t>(data[offset]) +
+        static_cast<uint16_t>(static_cast<uint16_t>(data[offset + 1]) << HID_HOST_SHIFT_OPRATURN_8);
     LOG_DEBUG(
         "[HOGP]%{public}s():vendorId = 0x%{public}x,productId = 0x%{public}x,version = 0x%{public}x",
         __FUNCTION__, pnpInf_.vendorId, pnpInf_.productId, pnpInf_.version);
@@ -665,26 +671,29 @@ void HidHostHogp::HogpGattClientCallback::OnCharacteristicWrite(int ret, const C
 void HidHostHogp::HogpGattClientCallback::OnCharacteristicChanged(const Characteristic &characteristic)
 {
     LOG_DEBUG("[HOGP]%{public}s", __FUNCTION__);
-    int reportId = 0;
+    uint8_t reportId = 0;
     auto it = hogp_->reports_.find(characteristic.handle_);
     if ((it != hogp_->reports_.end()) && (it->second != nullptr)) {
         reportId = it->second->reportId;
     } else {
-        LOG_ERROR("[HIOGP]%{public}s():not find Characteristic[%{public}d]", __FUNCTION__, characteristic.handle_);
+        LOG_ERROR("[HOGP]%{public}s():not find Characteristic[%{public}d]", __FUNCTION__, characteristic.handle_);
         return;
     }
 
     if ((characteristic.value_ != nullptr) && (characteristic.length_ != 0)) {
         HidHostMessage event(HID_HOST_INT_DATA_EVT);
         event.dev_ = hogp_->address_;
-        event.dataLength_ = characteristic.length_ + 1;
+        event.dataLength_ = static_cast<int>(characteristic.length_ + 1);
         event.data_ = std::make_unique<uint8_t[]>(event.dataLength_);
         event.data_[0] = reportId;
-        (void)memcpy_s(event.data_.get() + 1, characteristic.length_,
-            characteristic.value_.get(), characteristic.length_);
+        if (memcpy_s(event.data_.get() + 1, characteristic.length_,
+            characteristic.value_.get(), characteristic.length_) != EOK) {
+            LOG_ERROR("[HOGP]%{public}s():memcpy error", __FUNCTION__);
+            return;
+        }
         HidHostService::GetService()->PostEvent(event);
     } else {
-        LOG_ERROR("[HIOGP]%{public}s():data is null length_=%{public}zu", __FUNCTION__, characteristic.length_);
+        LOG_ERROR("[HOGP]%{public}s():data is null length_=%{public}zu", __FUNCTION__, characteristic.length_);
     }
 }
 
