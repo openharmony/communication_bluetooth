@@ -198,9 +198,12 @@ int HidHostService::HidHostSetReport(std::string device, uint8_t type, uint16_t 
     event.sendData_.data = 0;
     event.sendData_.reportId = 0;
     if ((size > 0) && (report != nullptr)) {
-        event.dataLength_ = size;
+        event.dataLength_ = static_cast<int>(size);
         event.data_ = std::make_unique<uint8_t[]>(size);
-        memcpy_s(event.data_.get(), size, report, size);
+        if (memcpy_s(event.data_.get(), size, report, size) != EOK) {
+            LOG_ERROR("[HIDH Service]%{public}s():memcpy error", __FUNCTION__);
+            return HID_HOST_FAILURE;
+        }
     }
     PostEvent(event);
     return HID_HOST_SUCCESS;
