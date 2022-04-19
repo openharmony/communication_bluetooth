@@ -112,13 +112,18 @@ bool HidHostSdpClient::ParseHidDescInfo(const SdpService *serviceAry)
                 return false;
             }
             hidInf_.descInfo = std::make_unique<uint8_t[]>(descLength);
-            (void)memcpy_s(hidInf_.descInfo.get(), descLength, attributeValue + offset, descLength);
+            if (memcpy_s(hidInf_.descInfo.get(), descLength, attributeValue + offset, descLength) != EOK) {
+                LOG_ERROR("[HIDH SDP]%{public}s() memcpy error", __FUNCTION__);
+                SendSdpComplete(result);
+                return false;
+            }
             hidInf_.descLength = descLength;
-        } else {
-            return false;
+            return true;
         }
     }
-    return true;
+    LOG_ERROR("[HIDH SDP]%{public}s() not find hid descriptor list!", __FUNCTION__);
+    SendSdpComplete(result);
+    return false;
 }
 
 uint8_t HidHostSdpClient::CheckAttributeValueLengthAvalid(SdpSequenceAttribute attribute)

@@ -193,13 +193,12 @@ struct CallbackPromiseInfo {
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
     bool isCallback = false;
-    int errorCode = 0;
+    int errorCode = CODE_FAILED;
 };
 
 struct GattGetDeviceNameCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
-    napi_value result = nullptr;
     std::string deviceId = "";
     CallbackPromiseInfo promise;
 };
@@ -207,7 +206,6 @@ struct GattGetDeviceNameCallbackInfo {
 struct GattGetRssiValueCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
-    napi_value result = nullptr;
     int32_t rssi = 0;
     std::mutex mutexRssi {};
     std::condition_variable cvfull {};

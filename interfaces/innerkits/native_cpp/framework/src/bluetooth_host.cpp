@@ -230,7 +230,7 @@ public:
     void OnReadRemoteRssiEvent(const BluetoothRawAddress &device, int rssi, int status) override
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
+        BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BLE);
         host_.remoteObservers_.ForEach(
             [remoteDevice, rssi, status](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
                 observer->OnReadRemoteRssiEvent(remoteDevice, rssi, status);
