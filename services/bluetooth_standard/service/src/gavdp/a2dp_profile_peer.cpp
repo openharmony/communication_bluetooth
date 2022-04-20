@@ -1018,7 +1018,7 @@ void A2dpProfilePeer::UpdatePeerMtu(uint16_t mtu)
 {
     std::lock_guard<std::recursive_mutex> lock(g_peerMutex);
     LOG_INFO("[A2dpProfilePeer]%{public}s peer mtu size(%u) mtu_(%u)\n", __func__, mtu, mtu_);
-    if (mtu_ == 0) {
+    if ((mtu >= 0) && (mtu < A2DP_MAX_AVDTP_MTU_SIZE)) {
         mtu_ = mtu;
     }
 }
