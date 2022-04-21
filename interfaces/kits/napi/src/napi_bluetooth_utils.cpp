@@ -1011,5 +1011,15 @@ int GetScoConnectionState(int state)
     }
     return scoState;
 }
+
+void SetCurrentAppOperate(const bool &isCurrentApp)
+{
+    isCurrentAppOperate.store(isCurrentApp);
+}
+
+bool GetCurrentAppOperate()
+{
+    return isCurrentAppOperate.load();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
