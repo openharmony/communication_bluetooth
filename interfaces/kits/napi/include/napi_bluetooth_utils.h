@@ -25,6 +25,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <stdint.h>
@@ -241,6 +242,7 @@ namespace {
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> g_Observer;
 std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = nullptr;
 std::string deviceAddr;
+std::atomic<bool> isCurrentAppOperate(false);
 }  // namespace
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
 void SetGattClientDeviceId(const std::string &deviceId);
@@ -248,6 +250,9 @@ std::string GetGattClientDeviceId();
 
 void SetRssiValueCallbackInfo(std::shared_ptr<GattGetRssiValueCallbackInfo> &callback);
 std::shared_ptr<GattGetRssiValueCallbackInfo> GetRssiValueCallbackInfo();
+
+void SetCurrentAppOperate(const bool &isCurrentApp);
+bool GetCurrentAppOperate();
 
 struct ScanFilter {
     std::string deviceId;     // The name of a BLE peripheral device

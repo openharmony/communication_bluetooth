@@ -53,8 +53,7 @@ napi_value MajorClassOfDeviceInit(napi_env env);
 napi_value MajorMinorClassOfDeviceInit(napi_env env);
 napi_value NapiGetRemoteDeviceAddr(napi_env env, napi_callback_info info, napi_value addrArgv);
 
-napi_value RegisterObserverToHost(napi_env env, napi_callback_info info);
-napi_value DeregisterObserverToHost(napi_env env, napi_callback_info info);
+void RegisterObserverToHost();
 napi_value GetProfileConnState(napi_env env, napi_callback_info info);
 }  // namespace Bluetooth
 }  // namespace OHOS
