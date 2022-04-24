@@ -14,6 +14,7 @@
  */
 #include "napi_bluetooth_host_observer.h"
 
+#include "bluetooth_host.h"
 #include "bluetooth_log.h"
 
 #include "napi/native_api.h"
@@ -54,6 +55,11 @@ void NapiBluetoothHostObserver::UvQueueWorkOnStateChanged(uv_work_t *work, Bluet
 void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int status)
 {
     HILOGD("NapiBluetoothHostObserver::OnStateChanged called");
+    BluetoothState state;
+    if (!DealStateChange(transport, status, state)) {
+        return;
+    }
+
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
     if (!observers[REGISTER_STATE_CHANGE_TYPE]) {
         HILOGE("NapiBluetoothHostObserver::OnStateChanged: This callback is not registered by ability.");
@@ -67,9 +73,6 @@ void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int st
         HILOGE("loop instance is nullptr");
         return;
     }
-
-    BluetoothState state;
-    DealStateChange(transport, status, state);
 
     auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothHostObserver,
         decltype(&NapiBluetoothHostObserver::UvQueueWorkOnStateChanged),
@@ -243,53 +246,84 @@ void NapiBluetoothHostObserver::OnDeviceAddrChanged(const std::string &address)
     HILOGI("NapiBluetoothHostObserver::OnDeviceAddrChanged called, address is %{public}s", address.c_str());
 }
 
-void NapiBluetoothHostObserver::DealStateChange(const int transport, const int status, BluetoothState &state)
+void NapiBluetoothHostObserver::EnableBt()
 {
+    HILOGI("EnableBluetooth BREDR");
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    bool enabled = host->EnableBt();
+    if (!enabled) {
+        HILOGE("EnableBt BREDR failed.");
+    }
+    SetCurrentAppOperate(false);
+}
+
+void NapiBluetoothHostObserver::DisableBle()
+{
+    HILOGI("DisableBluetooth BLE");
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    bool enabled = host->DisableBle();
+    if (!enabled) {
+        HILOGE("Disable BLE failed.");
+    }
+    SetCurrentAppOperate(false);
+}
+
+bool NapiBluetoothHostObserver::DealStateChange(const int transport, const int status, BluetoothState &state)
+{
+    HILOGD("transport is %{public}d, status is %{public}d", transport, status);
+    bool isCallback = true;
     if (transport == BT_TRANSPORT_BREDR) {
         switch (status) {
             case BTStateID::STATE_TURNING_ON:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning on");
+                HILOGD("STATE_TURNING_ON(1)");
                 state = BluetoothState::STATE_TURNING_ON;
                 break;
             case BTStateID::STATE_TURN_ON:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn on");
+                HILOGD("STATE_ON(2)");
                 state = BluetoothState::STATE_ON;
                 break;
             case BTStateID::STATE_TURNING_OFF:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turning off");
+                HILOGD("STATE_TURNING_OFF(3)");
                 state = BluetoothState::STATE_TURNING_OFF;
                 break;
-            case BTStateID::STATE_TURN_OFF:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BREDR Turn off");
-                state = BluetoothState::STATE_OFF;
+            case BTStateID::STATE_TURN_OFF: {
+                HILOGD("STATE_OFF(0)");
+                isCallback = false;
+                BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+                if (host->IsBleEnabled() && GetCurrentAppOperate()) {
+                    DisableBle();
+                }
                 break;
+            }
             default:
                 break;
         }
     } else if (transport == BT_TRANSPORT_BLE) {
         switch (status) {
             case BTStateID::STATE_TURNING_ON:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turning on");
+                HILOGD("STATE_BLE_TURNING_ON(4)");
                 state = BluetoothState::STATE_BLE_TURNING_ON;
                 break;
             case BTStateID::STATE_TURN_ON:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turn on");
+                HILOGD("STATE_BLE_ON(5)");
                 state = BluetoothState::STATE_BLE_ON;
+                if (GetCurrentAppOperate()) {
+                    EnableBt();
+                }
                 break;
             case BTStateID::STATE_TURNING_OFF:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turning off");
+                HILOGD("STATE_BLE_TURNING_OFF(6)");
                 state = BluetoothState::STATE_BLE_TURNING_OFF;
                 break;
             case BTStateID::STATE_TURN_OFF:
-                HILOGD("NapiBluetoothHostObserver::OnStateChanged BLE Turn off");
+                HILOGD("STATE_OFF(0)");
                 state = BluetoothState::STATE_OFF;
                 break;
             default:
                 break;
         }
-    } else {
-        HILOGD("NapiBluetoothHostObserver::OnStateChanged error");
     }
+    return isCallback;
 }
 
 void NapiBluetoothHostObserver::DealBredrPairComfirmed(const std::string &addr, const int reqType, const int number)

@@ -1113,6 +1113,11 @@ void ClassicAdapter::ReceiveRemoteName(uint8_t status, const BtAddr &addr, const
             receiveInquiryComplete_ = false;
         }
     }
+
+    if (isDisable_) {
+        DisablePairProcess();
+        return;
+    }
 }
 
 bool ClassicAdapter::CancelGetRemoteName() const

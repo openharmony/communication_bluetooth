@@ -35,7 +35,7 @@ public:
     void OnDeviceAddrChanged(const std::string &address) override;
 
 private:
-    void DealStateChange(const int transport, const int status, BluetoothState &state);
+    bool DealStateChange(const int transport, const int status, BluetoothState &state);
     void DealBredrPairComfirmed(const std::string &addr, const int reqType, const int number);
     void DealBlePairComfirmed(const std::string &addr, const int reqType, const int number);
     void OnPairConfirmedCallBack(const std::string &addr, const int number);
@@ -43,6 +43,9 @@ private:
     void UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state);
     void UvQueueWorkOnDiscoveryResult(uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device);
     void UvQueueWorkOnPairConfirmedCallBack(uv_work_t *work, std::pair<std::string, int> &data);
+
+    void EnableBt();
+    void DisableBle();
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
