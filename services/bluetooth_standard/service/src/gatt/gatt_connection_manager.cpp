@@ -79,7 +79,7 @@ struct GattConnectionManager::impl : public GattServiceBase {
     void ClearDeviceList();
     void RemoveDevice(const GattDevice &device);
     void DisconnectAllDevice();
-    void NotifyObserver(const GattDevice &device, uint8_t event, uint16_t connectionHandle, uint8_t role, int ret);
+    void NotifyObserver(const GattDevice &device, uint8_t event, uint16_t connectionHandle, int ret);
     int DoConnect(GattConnectionManager::Device &device);
     int DoConnectComplete(GattConnectionManager::Device &device, const utility::Message &msg);
     static void DoDisconnect(uint16_t handle);
@@ -511,22 +511,23 @@ void GattConnectionManager::impl::DisconnectAllDevice()
     for (auto &device : devices_) {
         std::lock_guard<std::mutex> lock(device->DeviceRWMutex());
         device->AutoConnect() = false;
+        device->Info().role_ = GATT_ROLE_MASTER;
         device->ProcessMessage(Device::StateMachine::MSG_DISCONNECT);
     }
 }
 
 void GattConnectionManager::impl::NotifyObserver(
-    const GattDevice &device, uint8_t event, uint16_t connectionHandle, uint8_t role, int ret)
+    const GattDevice &device, uint8_t event, uint16_t connectionHandle, int ret)
 {
     std::lock_guard<std::mutex> lck(registerMutex_);
     for (auto &item : observers_) {
         if (item.first) {
             switch (event) {
                 case OBSERVER_EVENT_CONNECTED:
-                    item.second->OnConnect(device, connectionHandle, role, ret);
+                    item.second->OnConnect(device, connectionHandle, ret);
                     break;
                 case OBSERVER_EVENT_DISCONNECTED:
-                    item.second->OnDisconnect(device, connectionHandle, role, ret);
+                    item.second->OnDisconnect(device, connectionHandle, ret);
                     break;
                 case OBSERVER_EVENT_CONNECTING:
                     item.second->OnConnectionChanged(device,
@@ -540,11 +541,11 @@ void GattConnectionManager::impl::NotifyObserver(
                     item.second->OnConnectionChanged(device,
                         connectionHandle, static_cast<int>(BTConnectState::CONNECTED));
                     item.second->OnReconnect(device,
-                        connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
+                        connectionHandle, static_cast<int>(BTConnectState::CONNECTED));
                     break;
                 case OBSERVER_EVENT_DISCONNECTED_INTER:
                     item.second->OnDisconnectInter(device,
-                        connectionHandle, role, static_cast<int>(BTConnectState::CONNECTED));
+                        connectionHandle, static_cast<int>(BTConnectState::CONNECTED));
                     break;
                 default:
                     break;
@@ -738,6 +739,7 @@ int GattConnectionManager::impl::DoConnect(GattConnectionManager::Device &device
     }
 
     if (device.Info().transport_ == GATT_TRANSPORT_TYPE_CLASSIC) {
+        device.Info().role_ = GATT_ROLE_MASTER;
         device.Info().addressType_ = addr.type = BT_PUBLIC_DEVICE_ADDRESS;
         connectionParameter.bredrConnParaVar.mtu = instance.pimpl->connectionParameter_.mtu_;
         connectionParameter.bredrConnParaVar.mode = instance.pimpl->connectionParameter_.mode_;
@@ -746,6 +748,7 @@ int GattConnectionManager::impl::DoConnect(GattConnectionManager::Device &device
     } else if (device.Info().transport_ == GATT_TRANSPORT_TYPE_LE) {
         IAdapterBle *adapter = (IAdapterBle *)(IAdapterManager::GetInstance()->GetAdapter(ADAPTER_BLE));
         if (adapter != nullptr && adapter->GetPeerDeviceAddrType(device.Info().addr_) <= BLE_ADDR_TYPE_RANDOM) {
+            device.Info().role_ = GATT_ROLE_MASTER;
             device.Info().addressType_ = addr.type = adapter->GetPeerDeviceAddrType(device.Info().addr_);
             connectionParameter.leConnParaVar.connIntervalMin = instance.pimpl->connectionParameter_.connIntervalMin_;
             connectionParameter.leConnParaVar.connIntervalMax = instance.pimpl->connectionParameter_.connIntervalMax_;
@@ -759,9 +762,11 @@ int GattConnectionManager::impl::DoConnect(GattConnectionManager::Device &device
             }
             ATT_ConnectReq(ConvertTransport(GATT_TRANSPORT_TYPE_LE), &connectionParameter, &addr, &device.Handle());
         } else {
+            device.Info().role_ = GATT_ROLE_INVALID;
             result = GattStatus::REQUEST_NOT_SUPPORT;
         }
     } else {
+        device.Info().role_ = GATT_ROLE_INVALID;
         result = GattStatus::INTERNAL_ERROR;
         LOG_ERROR("%{public}s: Call - Connect - Fail!  - Return: %{public}d - Parameter(1): transportType: %{public}d",
             __FUNCTION__,
@@ -780,14 +785,17 @@ int GattConnectionManager::impl::DoConnectComplete(GattConnectionManager::Device
         ((AttBredrConnectCallback *)msg.arg2_)->status == BREDR_CONNECT_SUCCESS) {
         device.Handle() = msg.arg1_;
         device.MTU() = ((AttBredrConnectCallback *)msg.arg2_)->mtu;
+        if (device.Info().role_ != GATT_ROLE_MASTER) {
+            device.Info().role_ = GATT_ROLE_SLAVE;
+        }
 
         result = GattStatus::GATT_SUCCESS;
     } else if (GATT_TRANSPORT_TYPE_LE == device.Info().transport_ &&
                ((AttLeConnectCallback *)msg.arg2_)->status == LE_CONNECT_SUCCESS) {
         device.Handle() = msg.arg1_;
-        device.Role() = ((AttLeConnectCallback *)msg.arg2_)->role;
+        device.Info().role_ = ((AttLeConnectCallback *)msg.arg2_)->role;
 
-        if (!device.AutoConnect() && device.Role() == 0) {
+        if (device.Info().role_ == GATT_ROLE_MASTER && !device.AutoConnect()) {
             device.DirectConnect().Stop();
             ChangeConnectionMode(false);
         }
@@ -869,6 +877,7 @@ void GattConnectionManager::impl::ConnectionInComming(
         Device->Info().addressType_ = addr.type;
         Device->ProcessMessage(Device::StateMachine::MSG_CONNECT_COMPLETE, connectHandle, data);
     } else {
+        Device->Info().role_ = GATT_ROLE_MASTER;
         instance.pimpl->DoDisconnect(connectHandle);
         LOG_INFO("%{public}s: The maximum number of device connections has been reached", __FUNCTION__);
     }
@@ -935,6 +944,7 @@ void GattConnectionManager::impl::DoShutDown()
         if (state == GattConnectionManager::Device::STATE_CONNECTED) {
             std::unique_lock<std::mutex> devLock;
             dev->AutoConnect() = false;
+            dev->Info().role_ = GATT_ROLE_MASTER;
             dev->ProcessMessage(Device::StateMachine::MSG_DISCONNECT);
         }
 
@@ -1315,7 +1325,7 @@ void GattConnectionManager::Device::StateMachine::Connecting::Entry()
         device_.Info().transport_,
         "Connecting");
     GattConnectionManager::GetInstance().pimpl->NotifyObserver(
-        device_.Info(), OBSERVER_EVENT_CONNECTING, device_.handle_, device_.role_, GattStatus::GATT_SUCCESS);
+        device_.Info(), OBSERVER_EVENT_CONNECTING, device_.handle_, GattStatus::GATT_SUCCESS);
 }
 
 bool GattConnectionManager::Device::StateMachine::Connecting::Dispatch(const utility::Message &msg)
@@ -1373,7 +1383,7 @@ void GattConnectionManager::Device::StateMachine::Connected::Entry()
     device_.CheckEncryption();
 
     GattConnectionManager::GetInstance().pimpl->NotifyObserver(
-        device_.Info(), OBSERVER_EVENT_CONNECTED, device_.handle_, device_.role_, GattStatus::GATT_SUCCESS);
+        device_.Info(), OBSERVER_EVENT_CONNECTED, device_.handle_, GattStatus::GATT_SUCCESS);
 }
 
 bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const utility::Message &msg)
@@ -1417,8 +1427,7 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
             break;
         case MSG_RECONNECT_CAUSE_0X3E:
             GattConnectionManager::GetInstance().pimpl->NotifyObserver(
-                device_.Info(), OBSERVER_EVENT_DISCONNECTED_INTER, device_.handle_,
-                device_.role_, GattStatus::GATT_SUCCESS);
+                device_.Info(), OBSERVER_EVENT_DISCONNECTED_INTER, device_.handle_, GattStatus::GATT_SUCCESS);
             if (GattConnectionManager::GetInstance().pimpl->DoConnect(device_) == GattStatus::GATT_SUCCESS) {
                 result = true;
             }
@@ -1429,8 +1438,7 @@ bool GattConnectionManager::Device::StateMachine::Connected::Dispatch(const util
                 Transition(STATE_DISCONNECTED);
             } else {
                 GattConnectionManager::GetInstance().pimpl->NotifyObserver(
-                    device_.Info(), OBSERVER_EVENT_RECONNECTED, device_.handle_,
-                    device_.role_, GattStatus::GATT_SUCCESS);
+                    device_.Info(), OBSERVER_EVENT_RECONNECTED, device_.handle_, GattStatus::GATT_SUCCESS);
             }
             result = true;
             break;
@@ -1458,7 +1466,7 @@ void GattConnectionManager::Device::StateMachine::Disconnecting::Entry()
         "Disconnecting");
 
     GattConnectionManager::GetInstance().pimpl->NotifyObserver(
-        device_.Info(), OBSERVER_EVENT_DISCONNECTING, device_.handle_, device_.role_, GattStatus::GATT_SUCCESS);
+        device_.Info(), OBSERVER_EVENT_DISCONNECTING, device_.handle_, GattStatus::GATT_SUCCESS);
 }
 
 bool GattConnectionManager::Device::StateMachine::Disconnecting::Dispatch(const utility::Message &msg)
@@ -1505,7 +1513,7 @@ void GattConnectionManager::Device::StateMachine::Disconnected::Entry()
     device_.CheckEncryption();
 
     GattConnectionManager::GetInstance().pimpl->NotifyObserver(
-        device_.Info(), OBSERVER_EVENT_DISCONNECTED, device_.handle_, device_.role_, GattStatus::GATT_SUCCESS);
+        device_.Info(), OBSERVER_EVENT_DISCONNECTED, device_.handle_, GattStatus::GATT_SUCCESS);
 
     device_.mtu_ = GATT_DEFAULT_MTU;
     device_.handle_ = 0;

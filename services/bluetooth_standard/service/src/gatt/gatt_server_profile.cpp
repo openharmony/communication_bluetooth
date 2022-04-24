@@ -1810,21 +1810,18 @@ uint16_t GattServerProfile::impl::GetCccdValue(uint16_t connectHandle, uint16_t 
  */
 class GattServerProfile::impl::GattConnectionObserverImplement : public GattConnectionObserver {
 public:
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
         LOG_INFO("%{public}s: gatt_server connect role is %{public}d", __FUNCTION__, device.role_);
-        if (ret == GATT_SUCCESS && role == 1) { // only role is slave.
+        if (ret == GATT_SUCCESS) {
             this->serverProfile_.pimpl->dispatcher_->PostTask(
                 std::bind(&impl::AddDeviceList, serverProfile_.pimpl.get(), connectionHandle, device));
         }
     }
 
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
         LOG_INFO("%{public}s: gatt_server connect role is %{public}d", __FUNCTION__, device.role_);
-        if (role == 0) {
-            return;
-        }
         if (device.isEncryption_ == false) {
             this->serverProfile_.pimpl->dispatcher_->PostTask(
                 std::bind(&impl::DeleteCccdValue, serverProfile_.pimpl.get(), connectionHandle));

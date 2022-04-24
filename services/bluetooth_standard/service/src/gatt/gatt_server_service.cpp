@@ -87,8 +87,8 @@ struct GattServerService::impl : public GattServiceBase {
     void OnDescriptorReadEvent(uint16_t connectionHandle, uint16_t valueHandle);
     void OnDescriptorWriteEvent(uint16_t connectionHandle, uint16_t valueHandle, GattValue &value, size_t length);
     void OnIndicationEvent(uint16_t connectionHandle, uint16_t valueHandle, int ret);
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret);
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret);
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret);
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret);
     void OnConnectionChanged(const GattDevice &device, int state);
     void OnConnectionParameterChanged(const GattDevice &device, int interval, int latency, int timeout, int status);
     void OnConnetionManagerShutDown();
@@ -442,18 +442,18 @@ const std::string GattServerService::GetDatabaseHash() const
 
 class GattServerService::impl::GattConnectionObserverImplement : public GattConnectionObserver {
 public:
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
-            std::bind(&impl::OnConnect, service_.pimpl.get(), device, connectionHandle, role, ret));
+            std::bind(&impl::OnConnect, service_.pimpl.get(), device, connectionHandle, ret));
     }
 
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s : %{public}s ret: %{public}d", __FILE__, __LINE__, __FUNCTION__, device.addr_.GetAddress().c_str(), ret);
         service_.GetDispatcher()->PostTask(
-            std::bind(&impl::OnDisconnect, service_.pimpl.get(), device, connectionHandle, role, ret));
+            std::bind(&impl::OnDisconnect, service_.pimpl.get(), device, connectionHandle, ret));
     }
 
     void OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state) override
@@ -1056,12 +1056,9 @@ void GattServerService::impl::OnIndicationEvent(uint16_t connectionHandle, uint1
     }
 }
 
-void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
+void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret)
 {
     LOG_INFO("%{public}s: server service dev_role: %{public}d, ret: %{public}d", __FUNCTION__, device.role_, ret);
-    if (role == 0) {
-        return;
-    }
     if (GattStatus::GATT_SUCCESS == ret) {
         std::lock_guard<std::mutex> lck(remotesMutex_);
         remotes_.emplace(connectionHandle, GattConnection(device, 0, connectionHandle));
@@ -1071,14 +1068,15 @@ void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t conne
                 RequestStatus::CONNECT_ON, PROFILE_NAME_GATT_SERVER, device.addr_);
         }
     }
-
-    for (auto &server : servers_) {
-        LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
-        server.second.callback_.OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::CONNECTED));
+    if (device.role_ == GATT_ROLE_SLAVE) {
+        for (auto &server : servers_) {
+            LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            server.second.callback_.OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::CONNECTED));
+        }
     }
 }
 
-void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret)
+void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret)
 {
     LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     bool findDevice = false;
@@ -1106,9 +1104,13 @@ void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t co
             RequestStatus::CONNECT_OFF, PROFILE_NAME_GATT_SERVER, device.addr_);
     }
 
-    for (auto &server : servers_) {
-        LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
-        server.second.callback_.OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::DISCONNECTED));
+    if (device.role_ == GATT_ROLE_SLAVE) {
+        LOG_INFO("%{public}s: server service dev_role: %{public}d", __FUNCTION__, device.role_);
+        for (auto &server : servers_) {
+            LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            server.second.callback_.OnConnectionStateChanged(
+                device, ret, static_cast<int>(BTConnectState::DISCONNECTED));
+        }
     }
 }
 
