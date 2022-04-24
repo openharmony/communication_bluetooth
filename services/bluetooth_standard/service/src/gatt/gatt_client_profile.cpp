@@ -2374,41 +2374,29 @@ void GattClientProfile::impl::DeleteList(uint16_t connectHandle)
  */
 class GattClientProfile::impl::GattConnectionObserverImplement : public GattConnectionObserver {
 public:
-    void OnConnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
         LOG_INFO("%{public}s: gatt_client connect role is %{public}d", __FUNCTION__, device.role_);
-        if (role == 1) {
-            return;
-        }
         this->clientProfile_.pimpl->CreateCache(connectionHandle, device);
     }
 
-    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
-        if (role == 1) {
-            LOG_INFO("%{public}s device role is slave", __FUNCTION__);
-            return;
-        }
+        LOG_INFO("%{public}s: gatt_client connect role is %{public}d", __FUNCTION__, device.role_);
         this->clientProfile_.pimpl->DeleteList(connectionHandle);
         this->clientProfile_.pimpl->SetMtuInformation(connectionHandle, false, GATT_DEFAULT_MTU);
         this->clientProfile_.pimpl->DeleteCache(connectionHandle, device);
     }
 
-    void OnReconnect(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnReconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
         LOG_INFO("%{public}s gatt client service", __FUNCTION__);
-        if (role == 1) { // slave role.
-            return;
-        }
         this->clientProfile_.pimpl->CreateCache(connectionHandle, device);
     }
 
-    void OnDisconnectInter(const GattDevice &device, uint16_t connectionHandle, uint8_t role, int ret) override
+    void OnDisconnectInter(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
-        if (role == 1) {
-            LOG_INFO("%{public}s device role is slave", __FUNCTION__);
-            return;
-        }
+        LOG_INFO("%{public}s gatt client service", __FUNCTION__);
         this->clientProfile_.pimpl->DeleteCache(connectionHandle, device);
     }
 
