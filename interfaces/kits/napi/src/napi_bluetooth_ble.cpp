@@ -27,11 +27,222 @@
 namespace OHOS {
 namespace Bluetooth {
 namespace {
+struct SysStopBLEContext {
+    napi_async_work work = nullptr;
+    napi_ref callbackSuccess = nullptr;
+    napi_ref callbackFail = nullptr;
+    napi_ref callbackComplete = nullptr;
+};
+
 NapiBluetoothBleCentralManagerCallback bleCentralMangerCallback;
 NapiBluetoothBleAdvertiseCallback bleAdvertiseCallback;
 BleAdvertiser bleAdvertiser;
 std::unique_ptr<BleCentralManager> bleCentralManager = std::make_unique<BleCentralManager>(bleCentralMangerCallback);
-}  // namespace
+
+napi_value GetPropertyValueByNamed(napi_env env, napi_value object, std::string_view propertyName, napi_valuetype type)
+{
+    napi_value value = nullptr;
+    bool hasProperty = false;
+    napi_valuetype paraType = napi_undefined;
+
+    NAPI_CALL(env, napi_has_named_property(env, object, propertyName.data(), &hasProperty));
+    if (hasProperty) {
+        NAPI_CALL(env, napi_get_named_property(env, object, propertyName.data(), &value));
+        NAPI_CALL(env, napi_typeof(env, value, &paraType));
+        if (paraType != type) {
+            return NapiGetNull(env);
+        }
+    }
+    return value;
+}
+
+void RegisterBLEObserver(napi_env env, napi_value val, int32_t callbackIndex, const std::string &type)
+{
+    std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
+    pCallbackInfo->env_ = env;
+    napi_create_reference(env, val, 1, &pCallbackInfo->callback_);
+    RegisterSysBLEObserver(pCallbackInfo, callbackIndex, type);
+}
+
+bool ParseScanParameters(napi_env env, napi_value arg, ScanOptions &info)
+{
+    napi_value interval = GetPropertyValueByNamed(env, arg, "interval", napi_number);
+    if (interval) {
+        napi_get_value_int32(env, interval, &info.interval);
+        HILOGD("StartBLEScan interval is %{public}d", info.interval);
+    } else {
+        info.interval = 0;
+    }
+
+    std::array<std::string, ARGS_SIZE_THREE> funcArray {"success", "fail", "complete"};
+
+    for (size_t i = 0; i < funcArray.size(); i++) {
+        napi_value value = GetPropertyValueByNamed(env, arg, funcArray[i], napi_function);
+        if (value) {
+            RegisterBLEObserver(env, value, i, REGISTER_SYS_BLE_SCAN_TYPE);
+        } else {
+            UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
+            return false;
+        }
+    }
+    return true;
+}
+
+napi_value SysStartBLEScan(napi_env env, napi_callback_info info)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    if (argc != 1) {
+        return NapiGetNull(env);
+    }
+
+    napi_valuetype valueType = napi_undefined;
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valueType));
+    if (valueType != napi_object) {
+        return NapiGetNull(env);
+    }
+    ScanOptions scanOptions;
+    if (!ParseScanParameters(env, argv[PARAM0], scanOptions)) {
+        HILOGE("SysStartBLEScan Input parameter parsing failed!");
+        return NapiGetNull(env);
+    }
+
+    BleScanSettings settinngs;
+    settinngs.SetReportDelay(scanOptions.interval);
+    settinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
+
+    bleCentralManager->StartScan(settinngs);
+    return NapiGetNull(env);
+}
+
+void SysStopBLEScanExec(napi_env env, void *data)
+{
+    HILOGI("SysStopBLEScanExec");
+    bleCentralManager->StopScan();
+    UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
+}
+
+void SysStopBLEScanComplete(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<SysStopBLEContext> context(static_cast<SysStopBLEContext *>(data));
+
+    napi_value undefine = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &undefine));
+    napi_value funcComplete = nullptr;
+    napi_value funcSuccess = nullptr;
+    napi_value callbackResult = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, context->callbackSuccess, &funcSuccess));
+    NAPI_CALL_RETURN_VOID(env, napi_call_function(env, undefine, funcSuccess, 0, nullptr, &callbackResult));
+    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, context->callbackComplete, &funcComplete));
+    NAPI_CALL_RETURN_VOID(env, napi_call_function(env, undefine, funcComplete, 0, nullptr, &callbackResult));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context->callbackSuccess));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context->callbackComplete));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context->callbackFail));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context->work));
+    HILOGI("SysStopBLEScanComplete end");
+}
+
+napi_value SysStopBLEScan(napi_env env, napi_callback_info info)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    if (argc != 1) {
+        return NapiGetNull(env);
+    }
+
+    napi_valuetype valueType = napi_undefined;
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valueType));
+    if (valueType != napi_object) {
+        return NapiGetNull(env);
+    }
+
+    std::unique_ptr<SysStopBLEContext> context = std::make_unique<SysStopBLEContext>();
+
+    std::array<std::string, ARGS_SIZE_THREE> funcArray {"success", "fail", "complete"};
+    for (size_t i = 0; i < funcArray.size(); i++) {
+        napi_value value = GetPropertyValueByNamed(env, argv[PARAM0], funcArray[i], napi_function);
+        if (value) {
+            napi_create_reference(env, value, 1,
+                &(i == PARAM0 ? context->callbackSuccess :
+                                (i == PARAM1 ? context->callbackFail : context->callbackComplete)));
+        } else {
+            HILOGE("SysStopBLEScan Input parameter parsing failed!");
+            return NapiGetNull(env);
+        }
+    }
+
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, "SysStopBLEScan", NAPI_AUTO_LENGTH, &resourceName));
+    SysStopBLEContext *pContext = context.release();
+    napi_status status = napi_create_async_work(env, nullptr, resourceName, SysStopBLEScanExec,
+        SysStopBLEScanComplete, static_cast<void *>(pContext), &pContext->work);
+    if (status != napi_ok) {
+        delete pContext;
+    }
+
+    if (napi_queue_async_work(env, pContext->work) != napi_ok) {
+        delete pContext;
+    }
+    return NapiGetNull(env);
+}
+
+bool ParseDeviceFoundParameters(napi_env env, napi_value arg)
+{
+    std::array<std::string, ARGS_SIZE_TWO> funcArray {"success", "fail"};
+
+    for (size_t i = 0; i < funcArray.size(); i++) {
+        napi_value value = GetPropertyValueByNamed(env, arg, funcArray[i], napi_function);
+        if (value) {
+            RegisterBLEObserver(env, value, i, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
+        } else {
+            UnregisterSysBLEObserver(REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
+            return false;
+        }
+    }
+    return true;
+}
+
+napi_value SysSubscribeBLEFound(napi_env env, napi_callback_info info)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    if (argc != 1) {
+        return NapiGetNull(env);
+    }
+
+    napi_valuetype valueType = napi_undefined;
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valueType));
+    if (valueType != napi_object) {
+        return NapiGetNull(env);
+    }
+    if (!ParseDeviceFoundParameters(env, argv[PARAM0])) {
+        HILOGE("SysSubscribeBLEFound Input parameter parsing failed!");
+    }
+    return NapiGetNull(env);
+}
+
+napi_value SysUnsubscribeBLEFound(napi_env env, napi_callback_info info)
+{
+    UnregisterSysBLEObserver(REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
+    return NapiGetNull(env);
+}
+} // namespace
+
+void DefineSystemBLEInterface(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_FUNCTION("startBLEScan", SysStartBLEScan),
+        DECLARE_NAPI_FUNCTION("stopBLEScan", SysStopBLEScan),
+        DECLARE_NAPI_FUNCTION("subscribeBLEFound", SysSubscribeBLEFound),
+        DECLARE_NAPI_FUNCTION("unsubscribeBLEFound", SysUnsubscribeBLEFound),
+    };
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+    HILOGI("DefineSystemBLEInterface init");
+}
 
 void DefineBLEJSObject(napi_env env, napi_value exports)
 {
