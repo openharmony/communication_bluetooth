@@ -67,10 +67,9 @@ static void SdpFreeClientRequest(void *data)
         PacketFree(request->assemblePacket);
         request->assemblePacket = NULL;
     }
-    if (request != NULL) {
-        MEM_MALLOC.free(request);
-        request = NULL;
-    }
+
+    MEM_MALLOC.free(request);
+    request = NULL;
 }
 
 void SdpCreateRequestList()
