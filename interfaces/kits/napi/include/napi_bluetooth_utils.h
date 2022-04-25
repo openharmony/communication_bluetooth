@@ -84,6 +84,8 @@ const std::string REGISTER_STATE_CHANGE_TYPE = "stateChange";
 const std::string REGISTER_PIN_REQUEST_TYPE = "pinRequired";
 const std::string REGISTER_BONE_STATE_TYPE = "bondStateChange";
 const std::string REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
+const std::string REGISTER_SYS_BLE_SCAN_TYPE = "sysBLEScan";
+const std::string REGISTER_SYS_BLE_FIND_DEVICE_TYPE = "sysBLEDeviceFonud";
 
 bool ParseString(napi_env env, std::string &param, napi_value args);
 bool ParseInt32(napi_env env, int32_t &param, napi_value args);
@@ -239,12 +241,15 @@ struct BufferCallbackInfo : public BluetoothCallbackInfo {
 };
 
 namespace {
+using sysBLEMap = std::map<std::string, std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE>>;
+sysBLEMap g_sysBLEObserver;
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> g_Observer;
 std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = nullptr;
 std::string deviceAddr;
 std::atomic<bool> isCurrentAppOperate(false);
 }  // namespace
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
+const sysBLEMap &GetSysBLEObserver();
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
 
@@ -253,6 +258,8 @@ std::shared_ptr<GattGetRssiValueCallbackInfo> GetRssiValueCallbackInfo();
 
 void SetCurrentAppOperate(const bool &isCurrentApp);
 bool GetCurrentAppOperate();
+void RegisterSysBLEObserver(const std::shared_ptr<BluetoothCallbackInfo> &, int32_t, const std::string &);
+void UnregisterSysBLEObserver(const std::string &);
 
 struct ScanFilter {
     std::string deviceId;     // The name of a BLE peripheral device
