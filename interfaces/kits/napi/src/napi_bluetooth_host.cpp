@@ -516,10 +516,8 @@ void AsyncCompleteCallbackGetDeviceName(napi_env env, napi_status status, void *
         napi_delete_reference(env, asynccallbackinfo->promise.callback);
     }
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
     HILOGD("GetDeviceName napi_create_async_work complete end");
 }
 
