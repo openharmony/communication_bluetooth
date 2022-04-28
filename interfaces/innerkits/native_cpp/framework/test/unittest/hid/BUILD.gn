@@ -45,7 +45,7 @@ ohos_moduletest("btfw_hid_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth_standard/ipc:btipc_static",
-    "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
+    "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework:btframework",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
