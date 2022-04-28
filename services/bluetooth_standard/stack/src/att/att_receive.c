@@ -798,7 +798,10 @@ void AttReadByTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
     attReadObj.readHandleListNum.len = *(uint8_t *)BufferPtr(buffer);
     len = attReadObj.readHandleListNum.len;
     LOG_INFO("%{public}s callback para : len = %hhu", __FUNCTION__, len);
-    if ((dataLen - 1) % len) {
+    if (len == 0) {
+        LOG_ERROR("%{public}s len is 0", __FUNCTION__);
+        attReadObj.readHandleListNum.valueNum = 0;
+    } else if ((dataLen - 1) % len) {
         AttReadByTypeResErrorAssign(&attErrorObj, connect);
         attClientDataCallback->attClientCallback(
             connect->retGattConnectHandle, ATT_ERROR_RESPONSE_ID, &attErrorObj, NULL, attClientDataCallback->context);
@@ -810,7 +813,7 @@ void AttReadByTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
     data = (uint8_t *)BufferPtr(buffer) + 1;
     attReadObj.readHandleListNum.valueList =
         MEM_MALLOC.alloc(sizeof(AttReadByTypeRspDataList) * attReadObj.readHandleListNum.valueNum);
-    for (; indexNum < attReadObj.readHandleListNum.valueNum; ++indexNum) {
+    for (; (indexNum < attReadObj.readHandleListNum.valueNum) && (len > STEP_TWO); ++indexNum) {
         attReadObj.readHandleListNum.valueList[indexNum].attributeValue = MEM_MALLOC.alloc(len - STEP_TWO);
         (void)memcpy_s(
             &attReadObj.readHandleListNum.valueList[indexNum], sizeof(AttReadByTypeRspDataList), data, STEP_TWO);
@@ -1177,7 +1180,10 @@ void AttReadByGroupTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
     data = ((uint8_t *)BufferPtr(buffer) + 1);
     attReadObj.readGroupResponse.length = *(uint8_t *)BufferPtr(buffer);
     len = attReadObj.readGroupResponse.length;
-    if ((dataLen - 1) % len) {
+    if (len == 0) {
+        LOG_ERROR("%{public}s len is 0", __FUNCTION__);
+        attReadObj.readGroupResponse.num = 0;
+    } else if ((dataLen - 1) % len) {
         ReadByGroupTypeResponseErrorAssign(&attErrorObj, connect);
         attClientDataCallback->attClientCallback(
             connect->retGattConnectHandle, ATT_ERROR_RESPONSE_ID, &attErrorObj, NULL, attClientDataCallback->context);
@@ -1375,7 +1381,11 @@ void AttSignedWriteCommand(AttConnectInfo *connect, const Buffer *buffer)
     data = (uint8_t *)BufferPtr(bufferallPtr);
     AttSignWriteCommConfDataAssign(data, dataBuffer, buffSize, signature);
     gapSignatureDataObj.data = data;
-    gapSignatureDataObj.dataLen = buffSize + 1 - sizeof(signature);
+    if (buffSize < (sizeof(signature) - 1)) {
+        LOG_ERROR("%{public}s buffSize is invalid", __FUNCTION__);
+        goto ATTSIGNEDWRITECOMMAND_END;
+    }
+    gapSignatureDataObj.dataLen = buffSize - (sizeof(signature) - 1);
     sigedWriteBuffPtr = BufferMalloc(sizeof(SigedWriteCommandConfirmationContext));
     sigedWriteCommandConfirmContextPtr = (SigedWriteCommandConfirmationContext *)BufferPtr(sigedWriteBuffPtr);
     AttSignWriteCommConfContextAssign(sigedWriteCommandConfirmContextPtr, connect, data, bufferallPtr, buffSize);
