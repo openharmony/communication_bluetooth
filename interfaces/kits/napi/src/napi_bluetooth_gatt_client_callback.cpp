@@ -111,7 +111,7 @@ void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int r
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
-            napi_value result = nullptr;    
+            napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);      
             napi_value callback = nullptr;
