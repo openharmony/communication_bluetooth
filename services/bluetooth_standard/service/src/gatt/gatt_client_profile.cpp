@@ -1320,7 +1320,11 @@ void GattClientProfile::impl::DiscoverPrimaryServiceByUuidParsing(
 void GattClientProfile::impl::FindIncludeServicesParsing(
     uint16_t connectHandle, AttEventData *data, std::list<std::pair<uint16_t, GattRequestInfo>>::iterator iter)
 {
-    LOG_INFO("%{public}s: connectHandle is %hu.", __FUNCTION__, connectHandle);
+    LOG_INFO("%{public}s: connectHandle is %{public}hu.", __FUNCTION__, connectHandle);
+    if (data == nullptr || data->attReadByTypeResponse.readHandleListNum.valueNum == 0) {
+        LOG_ERROR("%{public}s: invalid params.", __FUNCTION__);
+        return;
+    }
     uint8_t offset = 0;
     int reqId = iter->second.reqId_;
     uint8_t len = data->attReadByTypeResponse.readHandleListNum.len;
@@ -1405,7 +1409,11 @@ void GattClientProfile::impl::FindIncludeServicesParsing(uint16_t connectHandle,
 void GattClientProfile::impl::DiscoverAllCharacteristicOfServiceParsing(uint16_t connectHandle, AttEventData *data,
     bool isByUuid, std::list<std::pair<uint16_t, GattRequestInfo>>::iterator iter)
 {
-    LOG_INFO("%{public}s: connectHandle is %hu.", __FUNCTION__, connectHandle);
+    LOG_INFO("%{public}s: connectHandle is %{public}hu.", __FUNCTION__, connectHandle);
+    if (data == nullptr || data->attReadByTypeResponse.readHandleListNum.valueNum == 0) {
+        LOG_ERROR("%{public}s: invalid params.", __FUNCTION__);
+        return;
+    }
     Uuid uuid;
     uint8_t properties = 0;
     uint16_t startHandle = 0;

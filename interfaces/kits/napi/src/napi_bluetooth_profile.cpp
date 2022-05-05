@@ -21,7 +21,7 @@ std::map<ProfileCode, napi_value> NapiProfile::profiles_;
 
 void DefineProfileFunctions(napi_env env, napi_value exports)
 {
-    napi_property_descriptor desc[] = {  
+    napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getProfile", NapiProfile::GetProfile),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
