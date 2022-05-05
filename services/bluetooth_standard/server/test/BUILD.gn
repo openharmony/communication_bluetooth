@@ -46,7 +46,7 @@ ohos_moduletest("btsvr_module_test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
+    "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//foundation/communication/bluetooth/services/bluetooth_standard/server:bluetooth_server",
     "//foundation/communication/bluetooth/services/bluetooth_standard/service:btservice",
     "//third_party/bounds_checking_function:libsec_shared",
