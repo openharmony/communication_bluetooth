@@ -130,7 +130,7 @@ typedef void (*free_callback)(void* buf);
  *  HCI Command packet. For example, opcode = 0x0c03 for the HCI_RESET command
  *  packet.
  */
-typedef uint8_t (*cmd_xmit_callback)(uint16_t opcode, void* p_buf);
+typedef size_t (*cmd_xmit_callback)(uint16_t opcode, void* p_buf);
 
 typedef struct {
     /**
