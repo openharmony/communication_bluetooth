@@ -1132,7 +1132,7 @@ static void SdpReceiveDataTask(uint16_t lcid, const Packet *packet, void *contex
         LOG_ERROR("[%{public}s][%{public}d] Recv connect with unknown cid [0x%02x]", __FUNCTION__, __LINE__, lcid);
         return;
     }
-    if ((connect->outConnState = SDP_STATE_CONNECTED) && (connect->inConnState = SDP_STATE_CONNECTED)) {
+    if ((connect->outConnState == SDP_STATE_CONNECTED) && (connect->inConnState == SDP_STATE_CONNECTED)) {
         if (connect->flag) {
             SdpParseServerResponse(&connect->addr, lcid, packet);
             request = SdpFindRemainRequestByAddress(&connect->addr, &flag);
