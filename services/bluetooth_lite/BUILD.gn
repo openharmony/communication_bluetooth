@@ -11,10 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos/sa_profile/sa_profile.gni")
+import("//build/lite/config/component/lite_component.gni")
 
-ohos_sa_profile("communication_bluetooth_sa_profile") {
-  sources = [ "1130.xml" ]
-
-  part_name = "bluetooth"
+lite_component("bluetooth") {
+  deps = [
+    "$ohos_board_adapter_dir/hals/communication/bluetooth/services:btservice",
+  ]
 }

@@ -11,10 +11,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos/sa_profile/sa_profile.gni")
+import("//build/ohos.gni")
 
-ohos_sa_profile("communication_bluetooth_sa_profile") {
-  sources = [ "1130.xml" ]
+config("btdummy_config") {
+  cflags_cc = [
+    "-fPIC",
+    "-fexceptions",
+    "-Wno-unused-private-field",
+    "-Wno-format-nonliteral",
+  ]
+}
 
+config("btdummy_public_config") {
+  include_dirs = [ "dummy/include" ]
+}
+
+ohos_shared_library("btdummy") {
+  configs = [ ":btdummy_config" ]
+  public_configs = [ ":btdummy_public_config" ]
+  sources = [ "dummy/src/stub.cpp" ]
+
+  subsystem_name = "communication"
   part_name = "bluetooth"
 }
