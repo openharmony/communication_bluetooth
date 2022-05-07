@@ -779,6 +779,10 @@ ATTREADBYTYPEREQUEST_END:
 void AttReadByTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
 {
     LOG_INFO("%{public}s enter", __FUNCTION__);
+    if (connect == NULL) {
+        LOG_ERROR("%{public}s connect is NULL", __FUNCTION__);
+        return;
+    }
 
     size_t dataLen;
     AttRead attReadObj;
@@ -828,10 +832,8 @@ void AttReadByTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
     AttReadFree(&attReadObj, attReadObj.readHandleListNum.valueNum, READBYTYPERESPONSEFREE);
 
 ATTREADBYTYPERESPONSE_END:
-    if (connect != NULL) {
-        ListRemoveFirst(connect->instruct);
-        AttReceiveSequenceScheduling(connect);
-    }
+    ListRemoveFirst(connect->instruct);
+    AttReceiveSequenceScheduling(connect);
     return;
 }
 
@@ -1160,6 +1162,10 @@ static void ReadByGroupTypeResponseErrorAssign(AttError *attErrorObjPtr, const A
 void AttReadByGroupTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
 {
     LOG_INFO("%{public}s enter", __FUNCTION__);
+    if (connect == NULL) {
+        LOG_ERROR("%{public}s connect is NULL", __FUNCTION__);
+        return;
+    }
 
     size_t dataLen;
     AttRead attReadObj;
@@ -1202,11 +1208,8 @@ void AttReadByGroupTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
     AttReadFree(&attReadObj, attReadObj.readGroupResponse.num, READBYGROUPTYPERESPONSEFREE);
 
 ATTREADBYGROUPTYPERESPONSE_END:
-    if (connect != NULL) {
-        LOG_INFO("%{public}s return connect != NULL", __FUNCTION__);
-        ListRemoveFirst(connect->instruct);
-        AttReceiveSequenceScheduling(connect);
-    }
+    ListRemoveFirst(connect->instruct);
+    AttReceiveSequenceScheduling(connect);
     return;
 }
 
