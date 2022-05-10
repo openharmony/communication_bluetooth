@@ -375,7 +375,7 @@ private:
     IAdapterBle *bleAdapter_ = nullptr;
     utility::Dispatcher *dispatcher_ = nullptr;
 
-    DISALLOW_COPY_AND_ASSIGN(BleAdvertiserImpl);
+    BT_DISALLOW_COPY_AND_ASSIGN(BleAdvertiserImpl);
     DECLARE_IMPL();
 };
 }  // namespace bluetooth

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,8 @@
 #include "gap_if.h"
 #include "interface_profile_a2dp_src.h"
 #include "message.h"
+#include "a2dp_shared_buffer.h"
+#include "../stack/platform/include/queue.h"
 
 namespace bluetooth {
 /**
@@ -146,7 +148,7 @@ public:
      * @return 0 Success; Otherwise is failed to connect
      * @since 6.0
      */
-    int Stop(const uint16_t handle, const bool suspend) const;
+    int Stop(const uint16_t handle, const bool suspend);
 
     /**
      * @brief A function used to start the stream
@@ -165,6 +167,44 @@ public:
      * @since 6.0
      */
     int Close(const uint16_t handle) const;
+
+    /**
+     * @brief True if it has a streaming channel
+     *
+     * @return True if it has a streaming channel, Otherwise false.
+     * @since 6.0
+     */
+    bool HasStreaming();
+
+    /**
+     * @brief True if it has a open channel
+     *
+     * @return True if it has a open channel, Otherwise false.
+     * @since 6.0
+     */
+    bool HasOpen();
+
+    /**
+     * @brief Set the tag of the disalbe.
+     *
+     * @since 6.0
+     */
+    void SetDisalbeTag(bool tag);
+
+    /**
+     * @brief Get the tag of the disalbe.
+     *
+    * @return True if bt is disalbe, Otherwise false.
+     * @since 6.0
+     */
+    bool GetDisalbeTag();
+
+    /**
+     * @brief A function used to close all the stream
+     *
+     * @since 6.0
+     */
+    void CloseAll();
 
     /**
      * @brief A function used to feedback close the stream for pts
@@ -430,16 +470,6 @@ public:
     bool EnableOptionalCodec(const BtAddr &addr, bool value);
 
     /**
-     * @brief Set audio configure.
-     * @param[in] addr: The address of peer device
-     * @param[in] sampleRate: Audio pcm sample rate
-     * @param[in] bits: Audio pcm bits
-     * @param[in] channel: Number of audio pcm channel
-     * @since 6.0
-     */
-    void SetAudioConfigure(const BtAddr &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel);
-
-    /**
      * @brief Notify to encoder pcm data.
      * @param[in] addr: The address of peer device
      * @since 6.0
@@ -454,15 +484,51 @@ public:
     void NotifyDecoder(const BtAddr &addr) const;
 
     /**
-     * @brief Update the status of audio data.
-     * @param[in] The data of audio is ready or not
+     * @brief Get the information of the current rendered position.
+     * @param[out] dalayValue is the delayed time
+     * @param[out] sendDataSize is the data size that has been sent
+     * @param[out] timeStamp is the current time stamp
      * @since 6.0
      */
-    void UpdateAudioData(bool dataReady);
-
-    bool WriteFrame(const uint8_t *data, uint32_t size);
-
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp);
+
+    /**
+     * @brief Enqueue the frame packet to the packet queue.
+     * @param[in] packet Pointer of the packet
+     * @param[in] frames Number of frames
+     * @param[in] bytes Size of bytes
+     * @param[in] pktTimeStamp The current time stamp
+     * @since 6.0
+     */
+    void EnqueuePacket(const Packet *packet, size_t frames, uint32_t bytes, uint32_t pktTimeStamp);
+
+    /**
+     * @brief Dequeue the frame packet to the peer.
+     * @since 6.0
+     */
+    void DequeuePacket();
+    
+    /**
+     * @brief Set the pcm data to the shared buffer.
+     * @param buf The pointer of the data.
+     * @param size The size of the data
+     * @since 6.0
+     */
+    uint32_t SetPcmData(const uint8_t *buf, uint32_t size);
+
+    /**
+     * @brief Get the pcm data from the shared buffer.
+     * @param buf The pointer of the data.
+     * @param size The size of the data
+     * @since 6.0
+     */
+    uint32_t GetPcmData(uint8_t *buf, uint32_t size);
+
+    /**
+     * @brief It is called when audio data is ready to be fetched by the packet queue.
+     * @since 6.0
+     */
+    void AudioDataReady();
 
 private:
     /**
@@ -472,14 +538,6 @@ private:
      * @since 6.0
      */
     A2dpSdpManager GetSDPInstance(void) const;
-
-    /**
-     * @brief Get the status of audio data is ready or not.
-     *
-     * @return return to the status of audio data
-     * @since 6.0
-     */
-    bool GetStatusAudioDataReady(void) const;
 
     /**
      * @brief A function to update the number of peer device.
@@ -545,7 +603,7 @@ private:
      */
     static int DeregisterServiceSecurity(GAP_ServiceConnectDirection direction, GAP_Service serviceId);
 
-    DISALLOW_COPY_AND_ASSIGN(A2dpProfile);
+    BT_DISALLOW_COPY_AND_ASSIGN(A2dpProfile);
     A2dpProfile() = delete;
     bool enable_ = false;
     uint8_t role_ = A2DP_ROLE_SOURCE;
@@ -556,7 +614,9 @@ private:
     ConfigureStream configureStream_ = {};
     A2dpSdpManager sdpInstance_ {};
     A2dpProfileObserver *a2dpSvcCBack_ {nullptr};
-    bool audioDataReady_ = false;
+    Queue *packetQueue_ = nullptr; // queue of packets to be sent
+    A2dpSharedBuffer *buffer_ = nullptr;
+    bool isDoDisable_ = false;
 };
 /**
  * @brief A function to receive stream data.
@@ -569,5 +629,14 @@ private:
  * @since 6.0
  */
 void ProcessSinkStream(uint16_t handle, Packet *pkt, uint32_t timeStamp, uint8_t pt, uint16_t streamHandle);
+
+void CleanPacketData(void *data);
+
+struct PacketData {
+    Packet *packet;
+    size_t frames;
+    uint32_t bytes;
+    uint32_t pktTimeStamp;
+};
 }  // namespace bluetooth
 #endif  // A2DP_PROFILE_H

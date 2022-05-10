@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -510,6 +510,14 @@ private:
      */
     void ProcessSuspendCfm(A2dpAvdtMsgData msgData, uint8_t role);
 
+     /**
+     * @brief Process the confirm of writting data.
+     * @param[in] msgData The information of message
+     * @param[in] role The role of local profile
+     * @since 6.0
+     */
+    void ProcessWriteCfm(A2dpAvdtMsgData msgData, uint8_t role);
+
     /**
      * @brief Process the confirm of suspend.
      * @param[in] handle The handle of stream
@@ -525,6 +533,14 @@ private:
      * @since 6.0
      */
     void ProcessSuspendInd(A2dpAvdtMsgData msgData, uint8_t role);
+
+     /**
+     * @brief Process the audio data ready command
+     * @param[in] msgData The information of message
+     * @param[in] role The role of local profile
+     * @since 6.0
+     */
+    void ProcessAudioDataReady(A2dpAvdtMsgData msgData, uint8_t role);
 
     /**
      * @brief Set current state

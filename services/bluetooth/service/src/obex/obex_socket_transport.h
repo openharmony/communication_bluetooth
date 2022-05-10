@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,7 @@ private:
     uint16_t sendMtu_ = 0;
     uint16_t recvMtu_ = 0;
     RawAddress remoteBtAddr_ {""};
-    DISALLOW_COPY_AND_ASSIGN(ObexSocketTransport);
+    BT_DISALLOW_COPY_AND_ASSIGN(ObexSocketTransport);
 };
 
 class ObexClientSocketTransport : public ObexClientTransport {
@@ -117,7 +117,7 @@ private:
         void ProcessOnDataBusy(uint8_t isBusy);
         // The event is triggered when process is failed.
         void ProcessOnTransportError(int errType);
-        DISALLOW_COPY_AND_ASSIGN(TransportObserver);
+        BT_DISALLOW_COPY_AND_ASSIGN(TransportObserver);
     };
     std::string MakeTransportKey(bool isGoepL2capPSM, uint16_t scn);
     std::unique_ptr<TransportObserver> transportObserver_ = nullptr;
@@ -128,7 +128,7 @@ private:
     uint16_t recvMtu_ = 0;
     utility::Dispatcher &dispatcher_;
     RawAddress remoteBtAddr_ {""};
-    DISALLOW_COPY_AND_ASSIGN(ObexClientSocketTransport);
+    BT_DISALLOW_COPY_AND_ASSIGN(ObexClientSocketTransport);
 };
 class ObexServerSocketTransport : public ObexServerTransport {
 public:
@@ -193,7 +193,7 @@ private:
         void ProcessOnDataBusy(DataTransport *transport, uint8_t isBusy);
         // The event is triggered when process is failed.
         void ProcessOnTransportError(DataTransport *transport, int errType);
-        DISALLOW_COPY_AND_ASSIGN(TransportObserver);
+        BT_DISALLOW_COPY_AND_ASSIGN(TransportObserver);
     };
     static std::string MakeTransportKey(bool isGoepL2capPSM, uint16_t scn);
     std::unique_ptr<TransportObserver> transportObserver_ = nullptr;
@@ -204,7 +204,7 @@ private:
     std::string tranKey_ = "";
     std::atomic_bool isOnListening_ {false};
     utility::Dispatcher &dispatcher_;
-    DISALLOW_COPY_AND_ASSIGN(ObexServerSocketTransport);
+    BT_DISALLOW_COPY_AND_ASSIGN(ObexServerSocketTransport);
 };
 class ObexServerIncomingConnect : public ObexIncomingConnect {
 public:
@@ -224,7 +224,7 @@ private:
     RawAddress btAddr_ {""};
     uint16_t port_ = 0;
     bool operDone_ = false;
-    DISALLOW_COPY_AND_ASSIGN(ObexServerIncomingConnect);
+    BT_DISALLOW_COPY_AND_ASSIGN(ObexServerIncomingConnect);
 };
 }  // namespace bluetooth
 #endif  // OBEX_SOCKET_TRANSPORT_H

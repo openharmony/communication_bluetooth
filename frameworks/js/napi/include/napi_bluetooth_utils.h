@@ -215,11 +215,6 @@ struct GattGetRssiValueCallbackInfo {
     CallbackPromiseInfo promise;
 };
 
-struct DiscoverServicesCallbackInfo {
-    int asyncState_ = ASYNC_IDLE;
-    int status_;
-};
-
 struct BluetoothCallbackInfo {
     napi_env env_;
     napi_ref callback_ = 0;

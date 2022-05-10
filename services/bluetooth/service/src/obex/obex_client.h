@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -284,7 +284,7 @@ protected:
         void HandleDataAvailableSession(const ObexHeader &resp);
         void HandleDataAvailableAbort(const ObexHeader &resp);
         void HandleDataAvailableAction(const ObexHeader &resp);
-        DISALLOW_COPY_AND_ASSIGN(ObexClientTransportObserver);
+        BT_DISALLOW_COPY_AND_ASSIGN(ObexClientTransportObserver);
     };
 
     int ProcessAbort();
@@ -314,7 +314,7 @@ protected:
     bool isProcessing_ = false;
     std::string clientId_ = "";
     utility::Dispatcher &dispatcher_;
-    DISALLOW_COPY_AND_ASSIGN(ObexClient);
+    BT_DISALLOW_COPY_AND_ASSIGN(ObexClient);
 };
 }  // namespace bluetooth
 #endif  // OBEX_CLIENT_H

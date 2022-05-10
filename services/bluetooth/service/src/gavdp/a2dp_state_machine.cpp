@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -190,9 +190,7 @@ void A2dpStateIdle::ProcessSetConfigInd(A2dpAvdtMsgData msgData, uint8_t role)
     avdtp.SetConfigureRsp(msgData.configRsp.handle, msgData.configRsp.label, msgData.configRsp.category);
     profile->ConnectStateChangedNotify(msgData.configRsp.addr, STREAM_CONNECTING, (void *)&param);
     if (role == A2DP_ROLE_SOURCE) {
-        uint8_t label = 0;
         ret = codecFactory->SetCodecConfig(pCodecInfo, pResultConfig);
-        avdtp.DiscoverReq(msgData.configRsp.addr, AVDT_NUM_SEPS, label);
         LOG_INFO("[A2dpStateIdle]%{public}s SetConfig result(%{public}d)\n", __func__, ret);
     } else {
         if (codecFactory->FindSourceCodec(pCodecInfo) == nullptr ||
@@ -706,6 +704,9 @@ void A2dpStateOpen::ProcessCloseCfm(BtAddr addr, uint8_t role)
     }
 
     SetStateName(A2DP_PROFILE_IDLE);
+    if (!profile->HasOpen() && profile->GetDisalbeTag()) {
+        profile->Disable();
+    }
     if (profile->FindPeerByAddress(addr)->GetRestart()) {
         profile->FindPeerByAddress(addr)->UpdateConfigure();
     }
@@ -744,20 +745,26 @@ void A2dpStateOpen::ProcessTimeout(BtAddr addr, uint8_t role)
 
 void A2dpStateStreaming::Entry()
 {
+    LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
     if (codecThread == nullptr) {
         return;
     }
     if (codecThread->GetInitStatus()) {
+        codecThread->StartTimer();
     } else {
-        codecThread->StartA2dpCodecThread();
+        if (codecThread != nullptr) {
+            codecThread->StartA2dpCodecThread();
+        }
     }
 }
 
 void A2dpStateStreaming::Exit()
 {
+    LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
     if (codecThread->GetInitStatus()) {
+        codecThread->StopTimer();
     }
 }
 
@@ -765,7 +772,6 @@ bool A2dpStateStreaming::Dispatch(const utility::Message &msg)
 {
     LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
     if (msg.arg2_ == nullptr) {
-        LOG_ERROR("[A2dpStateStreaming]%{public}s input error parameter\n", __func__);
         return false;
     }
     A2dpAvdtMsgData msgData = (static_cast<A2dpAvdtMsg*>(msg.arg2_))->a2dpMsg;
@@ -804,6 +810,12 @@ bool A2dpStateStreaming::Dispatch(const utility::Message &msg)
             break;
         case EVT_SUSPEND_CFM:
             ProcessSuspendCfm(msgData, role);
+            break;
+        case EVT_WRITE_CFM:
+            ProcessWriteCfm(msgData, role);
+            break;
+        case EVT_AUDIO_DATA_READY:
+            ProcessAudioDataReady(msgData, role);
             break;
         default:
             break;
@@ -849,16 +861,40 @@ void A2dpStateStreaming::ProcessSuspendCfm(A2dpAvdtMsgData msgData, uint8_t role
     }
 
     if (role == A2DP_ROLE_SOURCE) {
-        IPowerManager::GetInstance().StatusUpdate(RequestStatus::IDLE,
+        IPowerManager::GetInstance().StatusUpdate(RequestStatus::CONNECT_ON,
             PROFILE_NAME_A2DP_SRC,
             bluetooth::RawAddress::ConvertToString(msgData.stream.addr.addr));
     }
     SetStateName(A2DP_PROFILE_OPEN);
     profile->AudioStateChangedNotify(msgData.stream.addr, A2DP_NOT_PLAYING, (void *)&gavdpRole);
+    A2dpService *service = GetServiceInstance(role);
+    if (service != nullptr) {
+        std::string addr = service->GetActiveSinkDevice().GetAddress();
+        if (strcmp(addr.c_str(), RawAddress::ConvertToString(msgData.stream.addr.addr).GetAddress().c_str()) != 0) {
+            service->ActiveDevice();
+        }
+    }
+    if (profile->GetDisalbeTag()) {
+        profile->CloseAll();
+    }
     if (profile->FindPeerByAddress(msgData.stream.addr)->GetRestart()) {
         avdtp.ReconfigureReq(
             msgData.stream.handle, profile->FindPeerByAddress(msgData.stream.addr)->GetReconfig(), label_);
     }
+}
+
+void A2dpStateStreaming::ProcessWriteCfm(A2dpAvdtMsgData msgData, uint8_t role)
+{
+    LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
+    A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
+    profile->DequeuePacket();
+}
+
+void A2dpStateStreaming::ProcessAudioDataReady(A2dpAvdtMsgData msgData, uint8_t role)
+{
+    LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
+    A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
+    profile->DequeuePacket();
 }
 
 void A2dpStateStreaming::ProcessDisconnectReq(BtAddr addr, uint8_t role)
@@ -960,8 +996,6 @@ void A2dpStateClosing::SetStateName(std::string state)
 void A2dpStateClosing::ProcessCloseStreamInd(BtAddr addr, uint16_t handle, uint8_t role)
 {
     LOG_INFO("[A2dpStateClosing]%{public}s\n", __func__);
-
-    CallbackParameter param = {A2DP_ROLE_ACP, false, handle};
     A2dpProfile *profile = GetProfileInstance(role);
     if (profile == nullptr) {
         LOG_ERROR("[A2dpStateClosing]%{public}s Failed to get profile instance\n", __func__);
@@ -969,7 +1003,13 @@ void A2dpStateClosing::ProcessCloseStreamInd(BtAddr addr, uint16_t handle, uint8
     }
 
     SetStateName(A2DP_PROFILE_IDLE);
-    profile->ConnectStateChangedNotify(addr, STREAM_DISCONNECT, (void *)&param);
+    A2dpProfilePeer *peer = profile->FindOrCreatePeer(addr, role);
+    if (peer == nullptr) {
+        LOG_ERROR("[A2dpStateClosing]%{public}s Failed to get profile Peer\n", __func__);
+        return;
+    }
+    peer->SetCurrentCmd(EVT_DISCONNECT_IND);
+    peer->SetSignalingTimer(A2DP_ACCEPT_SIGNALLING_TIMEOUT_MS, false);
 }
 
 void A2dpStateClosing::ProcessDisconnectInd(BtAddr addr, uint16_t handle, uint8_t role)

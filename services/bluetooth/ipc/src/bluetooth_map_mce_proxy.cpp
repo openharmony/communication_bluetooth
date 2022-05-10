@@ -647,34 +647,37 @@ int BluetoothMapMceProxy::GetOwnerStatus(
     return reply.ReadInt32();
 }
 
-void BluetoothMapMceProxy::GetMasInstanceInfo(
-    const BluetoothRawAddress &device, BluetoothIProfileMasInstanceInfoList &list)
+BluetoothIProfileMasInstanceInfoList BluetoothMapMceProxy::GetMasInstanceInfo(
+    const BluetoothRawAddress &device)
 {
     HILOGI("BluetoothMapMceProxy::GetMasInstanceInfo Triggered!");
+    BluetoothIProfileMasInstanceInfoList list;
+    list.isValid = false;
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothMapMceProxy::GetDescriptor())) {
         HILOGE("BluetoothMapMceProxy::GetMasInstanceInfo WriteInterfaceToken error");
-        return;
+        return list;
     }
     if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothMapMceProxy::GetMasInstanceInfo error");
-        return;
+        return list;
     }
     MessageParcel reply;
     MessageOption option {
-        MessageOption::TF_ASYNC
+        MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
         IBluetoothMapMce::Code::MCE_GET_MAS_INSTANCE_INFO, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMceProxy::GetMasInstanceInfo done fail, error: %{public}d", error);
-        return;
+        return list;
     }
-    std::shared_ptr<BluetoothIProfileMasInstanceInfoList> infoList(
+    std::shared_ptr<BluetoothIProfileMasInstanceInfoList> listPtr(
         reply.ReadParcelable<BluetoothIProfileMasInstanceInfoList>());
-    if (!infoList) {
-        list = *infoList;
+    if (!listPtr) {
+        return list;
     }
+    return *listPtr;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

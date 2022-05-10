@@ -17,9 +17,11 @@
 #include <cstring>
 #include "a2dp_avdtp.h"
 #include "a2dp_codec_thread.h"
+#include "a2dp_encoder_sbc.h"
 #include "a2dp_service.h"
 #include "a2dp_sink.h"
 #include "a2dp_source.h"
+#include "adapter_config.h"
 #include "log.h"
 #include "profile_service_manager.h"
 #include "raw_address.h"
@@ -70,6 +72,14 @@ A2dpProfile::~A2dpProfile()
 
     for (const auto &it : peers_) {
         delete it.second;
+    }
+    if (packetQueue_ != nullptr) {
+        QueueDelete(packetQueue_, CleanPacketData);
+        packetQueue_ = nullptr;
+    }
+    if (buffer_ != nullptr) {
+        delete buffer_;
+        buffer_ = nullptr;
     }
     peers_.clear();
 }
@@ -150,6 +160,9 @@ void A2dpProfile::Enable()
 
     GetSDPInstance().RegisterService();
     SetProfileEnable(true);
+
+    packetQueue_ = QueueCreate(MAX_PCM_FRAME_NUM_PER_TICK * FRAME_THREE);
+    buffer_ = new A2dpSharedBuffer();
 }
 
 void A2dpProfile::ProcessAvdtpCallback(const BtAddr &addr, const utility::Message &message)
@@ -189,7 +202,6 @@ void A2dpProfile::ConnectStateChangedNotify(const BtAddr &addr, const int state,
             DeletePeer(addr);
             if (IsActiveDevice(addr)) {
                 ClearActiveDevice();
-                UpdateAudioData(false);
             }
             break;
         default:
@@ -226,6 +238,7 @@ void A2dpProfile::CodecChangedNotify(const BtAddr &addr, void *context) const
 
 int A2dpProfile::SetUserCodecConfigure(const BtAddr &addr, const A2dpSrcCodecInfo &info)
 {
+    LOG_INFO("[A2dpProfile] %{public}s", __func__);
     int ret;
     uint8_t role = GetRole();
     A2dpProfile *profile = GetProfileInstance(role);
@@ -243,10 +256,6 @@ int A2dpProfile::SetUserCodecConfigure(const BtAddr &addr, const A2dpSrcCodecInf
     }
 
     ret = peer->SetUserCodecConfigure(info);
-
-    if (IsActiveDevice(addr)) {
-        UpdateAudioData(false);
-    }
 
     return ret;
 }
@@ -284,42 +293,16 @@ bool A2dpProfile::EnableOptionalCodec(const BtAddr &addr, bool value)
         LOG_ERROR("[A2dpProfile] %{public}s Can't get the device of peer\n", __func__);
     }
 
-    if (IsActiveDevice(addr)) {
-        UpdateAudioData(false);
-    }
-
     return ret;
 }
 
-void A2dpProfile::SetAudioConfigure(const BtAddr &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel)
-{
-    LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
-
-    A2dpProfilePeer *peer = FindPeerByAddress(addr);
-    if (peer != nullptr) {
-        peer->SetAudioConfigure(sampleRate, bits, channel);
-        UpdateAudioData(true);
-    } else {
-        LOG_ERROR("[A2dpProfile] %{public}s Can't get the device of peer\n", __func__);
-    }
-}
-
-bool A2dpProfile::GetStatusAudioDataReady(void) const
-{
-    LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
-    std::lock_guard<std::mutex> lock(g_profileMutex);
-
-    return audioDataReady_;
-}
 
 void A2dpProfile::NotifyEncoder(const BtAddr &addr) const
 {
     LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
     A2dpProfilePeer *peer = FindPeerByAddress(addr);
     if (peer != nullptr) {
-        if (GetStatusAudioDataReady()) {
-            peer->NotifyEncoder();
-        }
+        peer->NotifyEncoder();
     } else {
         LOG_ERROR("[A2dpProfile] %{public}s Can't get the device of peer\n", __func__);
     }
@@ -337,23 +320,42 @@ void A2dpProfile::NotifyDecoder(const BtAddr &addr) const
     }
 }
 
-void A2dpProfile::UpdateAudioData(bool dataReady)
+uint32_t A2dpProfile::SetPcmData(const uint8_t *buf, uint32_t size)
 {
-    LOG_INFO("[A2dpProfile] %{public}s AudiodataReady(%{public}d)\n", __func__, dataReady);
+    LOG_INFO("[A2dpProfile] %{public}s %{public}u\n", __func__, size);
 
-    std::lock_guard<std::mutex> lock(g_profileMutex);
-    audioDataReady_ = dataReady;
+    uint32_t actualWrittenBytes = buffer_->Write(buf, size);
+    LOG_INFO("[A2dpProfile] %{public}s expectedWrittenBytes(%{public}u) actualWrittenBytes(%{public}u)\n",
+        __func__, size, actualWrittenBytes);
+    if (actualWrittenBytes == 0) {
+        LOG_ERROR("[A2dpProfile] %{public}s failed\n", __func__);
+    }
+    return actualWrittenBytes;
 }
 
-bool A2dpProfile::WriteFrame(const uint8_t *data, uint32_t size)
+uint32_t A2dpProfile::GetPcmData(uint8_t *buf, uint32_t size)
 {
     LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
 
-    A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
-    if(!codecThread->WriteFrame(data, size)) {
+    uint32_t actualReadBytes = buffer_->Read(buf, size);
+    LOG_INFO("[A2dpProfile] %{public}s expectedReadBytes(%{public}u) actualReadBytes(%{public}u)\n",
+        __func__, size, actualReadBytes);
+    if (actualReadBytes == 0) {
+        LOG_ERROR("[A2dpProfile] %{public}s failed\n", __func__);
         return false;
     }
-    return true;
+    return actualReadBytes;
+}
+
+void A2dpProfile::AudioDataReady()
+{
+    LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
+    A2dpAvdtMsg msgData = {};
+    utility::Message msg(EVT_AUDIO_DATA_READY, 0, &msgData);
+    LOG_INFO("[A2dpProfile] %{public}s cmd(%u)\n", __func__, EVT_AUDIO_DATA_READY);
+
+    A2dpProfilePeer *peer = FindOrCreatePeer(activePeer_, A2DP_ROLE_SOURCE);
+    peer->GetStateMachine()->ProcessMessage(msg);
 }
 
 void A2dpProfile::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
@@ -362,6 +364,53 @@ void A2dpProfile::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize
 
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
     codecThread->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+}
+
+void A2dpProfile::DequeuePacket()
+{
+    LOG_INFO("[A2dpProfile] %{public}s \n", __func__);
+    A2dpProfilePeer *peer = FindOrCreatePeer(activePeer_, A2DP_ROLE_SOURCE);
+    if (peer != nullptr) {
+        uint32_t count = QueueGetSize(packetQueue_);
+        LOG_INFO("[A2dpProfile] %{public}s QueueTryDequeue starts, count %{public}u \n", __func__, count);
+        PacketData *packetData = (PacketData *)QueueTryDequeue(packetQueue_);
+        if (packetData == nullptr) {
+            LOG_ERROR("[A2dpProfile] %{public}s no data\n", __func__);
+            return;
+        }
+        count = QueueGetSize(packetQueue_);
+        LOG_INFO("[A2dpProfile] %{public}s  packetData is not null, QueueTryDequeue ends, count %{public}u\n",
+            __func__, count);
+        peer->SendPacket(packetData->packet, packetData->frames, packetData->bytes, packetData->pktTimeStamp);
+        PacketFree(packetData->packet);
+        free(packetData);
+        packetData = nullptr;
+    } else {
+        LOG_ERROR("[A2dpProfile] %{public}s no peer\n", __func__);
+    }
+}
+
+void A2dpProfile::EnqueuePacket(const Packet *packet, size_t frames, uint32_t bytes, uint32_t pktTimeStamp)
+{
+    Packet *refpkt = nullptr;
+    PacketData *packetData = nullptr;
+    uint32_t count = QueueGetSize(packetQueue_);
+    LOG_INFO("[A2dpProfile] %{public}s, frame %{public}u, count %{public}u \n", __func__, bytes, count);
+    if (count >= MAX_PCM_FRAME_NUM_PER_TICK * FRAME_THREE) {
+        QueueFlush(packetQueue_, CleanPacketData);
+    }
+    count = QueueGetSize(packetQueue_);
+    LOG_INFO("[A2dpProfile] %{public}s, after flush count %{public}u \n", __func__, count);
+    refpkt = PacketRefMalloc((Packet *)packet);
+    packetData = (PacketData *)malloc(sizeof(PacketData));
+    packetData->packet = refpkt;
+    packetData->frames = frames;
+    packetData->bytes = bytes;
+    packetData->pktTimeStamp = pktTimeStamp;
+    
+    QueueEnqueue(packetQueue_, (void *)packetData);
+    count = QueueGetSize(packetQueue_);
+    LOG_INFO("[A2dpProfile] %{public}s ends count %{public}u \n", __func__, count);
 }
 
 void A2dpProfile::CreateSEPConfigureInfo(uint8_t role)
@@ -479,9 +528,13 @@ void A2dpProfile::Disable()
         DeregisterServiceSecurity(OUTGOING, GAVDP_INT);
     }
 
-    UpdateAudioData(false);
     GetSDPInstance().UnregisterService();
     ClearNumberPeerDevice();
+
+    QueueDelete(packetQueue_, CleanPacketData);
+    packetQueue_ = nullptr;
+    delete buffer_;
+    buffer_ = nullptr;
 }
 
 A2dpSdpManager A2dpProfile::GetSDPInstance(void) const
@@ -592,7 +645,7 @@ int A2dpProfile::Disconnect(const BtAddr &device)
     return ret;
 }
 
-int A2dpProfile::Stop(const uint16_t handle, const bool suspend) const
+int A2dpProfile::Stop(const uint16_t handle, const bool suspend)
 {
     LOG_INFO("[A2dpProfile]%{public}s handle(%u) suspend(%{public}d)\n", __func__, handle, suspend);
     int ret = RET_NO_ERROR;
@@ -619,6 +672,9 @@ int A2dpProfile::Stop(const uint16_t handle, const bool suspend) const
         ret = AVDT_ERR_UNSUPPORTED_COMMAND;
     }
 
+    QueueFlush(packetQueue_, CleanPacketData);
+    buffer_->Reset();
+
     return ret;
 }
 
@@ -642,7 +698,7 @@ int A2dpProfile::Start(const uint16_t handle)
     }
     if (strcmp(A2DP_PROFILE_STREAMING.c_str(), peer->GetStateMachine()->GetStateName().c_str()) == 0) {
         LOG_INFO("[A2dpProfile]%{public}s The state of stream is streaming now\n", __func__);
-        if (role == A2DP_ROLE_SOURCE && GetStatusAudioDataReady()) {
+        if (role == A2DP_ROLE_SOURCE) {
             peer->NotifyEncoder();
         } else if (role == A2DP_ROLE_SINK) {
             peer->NotifyDecoder();
@@ -703,6 +759,61 @@ int A2dpProfile::Close(const uint16_t handle) const
         ret = AVDT_ERR_UNSUPPORTED_COMMAND;
     }
     return ret;
+}
+
+
+bool A2dpProfile::HasStreaming()
+{
+    A2dpProfilePeer *peer = nullptr;
+    for (const auto &it : peers_) {
+        LOG_INFO("[A2dpProfile]%{public}s handle(%u)\n", __func__, it.second->GetStreamHandle());
+        peer = it.second;
+        if (peer != nullptr) {
+            if (strcmp(A2DP_PROFILE_STREAMING.c_str(), peer->GetStateMachine()->GetStateName().c_str()) == 0) {
+                LOG_INFO("[A2dpProfile]%{public}s streaming exited now\n", __func__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool A2dpProfile::HasOpen()
+{
+    A2dpProfilePeer *peer = nullptr;
+    for (const auto &it : peers_) {
+        LOG_INFO("[A2dpProfile]%{public}s \n", __func__);
+        peer = it.second;
+        if (peer != nullptr) {
+            if (strcmp(A2DP_PROFILE_OPEN.c_str(), peer->GetStateMachine()->GetStateName().c_str()) == 0) {
+                LOG_INFO("[A2dpProfile]%{public}s open exited now\n", __func__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void A2dpProfile::SetDisalbeTag(bool tag)
+{
+    LOG_INFO("[A2dpProfile]%{public}s isDoDisable(%u)\n", __func__, tag);
+    isDoDisable_ = tag;
+}
+
+bool A2dpProfile::GetDisalbeTag()
+{
+    LOG_INFO("[A2dpProfile]%{public}s isDoDisable(%u)\n", __func__, isDoDisable_);
+    return isDoDisable_;
+}
+
+void A2dpProfile::CloseAll()
+{
+    for (const auto &it : peers_) {
+        LOG_INFO("[A2dpProfile]%{public}s handle(%u)\n", __func__, it.second->GetStreamHandle());
+        if (it.second != nullptr) {
+            Close(it.second->GetStreamHandle());
+        }
+    }
 }
 
 int A2dpProfile::SendDelay(const uint16_t handle, const uint16_t delayValue)
@@ -976,7 +1087,14 @@ void ProcessSinkStream(uint16_t handle, Packet *pkt, uint32_t timeStamp, uint8_t
         PacketRead(pkt, frameData, 0, packetSize);
         A2dpEncoderInitPeerParams peerParams = {};
         utility::Message msg(A2DP_FRAME_READY, packetSize, frameData);
-        codecThread->PostMessage(msg, peerParams, nullptr, nullptr, nullptr);
+        codecThread->PostMessage(msg, peerParams, nullptr, nullptr);
     }
+}
+
+void CleanPacketData(void *data)
+{
+    PacketData *packetData = (PacketData *)data;
+    PacketFree(packetData->packet);
+    free(packetData);
 }
 }  // namespace bluetooth

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@
 #include <deque>
 #include <vector>
 #include <string>
-
+#include "log.h"
 namespace stub {
 #define MEDIA_SERVICE_DISALLOW_COPY_AND_ASSIGN(TypeName) \
     TypeName(const TypeName &) = delete;                 \
@@ -136,25 +136,33 @@ public:
      * REGISTER / UNREGISTER OBSERVER                                 *
      ******************************************************************/
     void RegisterObserver(MediaService::IObserver *observer)
-    {}
+    {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
+    }
     void UnregisterObserver(MediaService::IObserver *observer)
-    {}
+    {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
+    }
 
     /******************************************************************
      * CONNECTION                                                     *
      ******************************************************************/
     void SetActiveDevice(const std::string &addr)
-    {}
+    {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
+    }
 
     /******************************************************************
      * BUTTON OPERATION                                               *
      ******************************************************************/
     int PressButton(const std::string &addr, uint8_t button, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int ReleaseButton(const std::string &addr, uint8_t button, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
 
@@ -163,10 +171,12 @@ public:
      ******************************************************************/
     int SetAddressedPlayer(const std::string &addr, uint16_t playerId, uint16_t uidCounter, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int SetBrowsedPlayer(const std::string &addr, uint16_t playerId, uint16_t uidCounter, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
 
@@ -175,6 +185,7 @@ public:
      ******************************************************************/
     std::vector<uint8_t> GetCapabilities(const std::string &addr, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         std::vector<uint8_t> tmp;
         return tmp;
     }
@@ -184,30 +195,36 @@ public:
      ******************************************************************/
     int GetPlayerAppSettingAttributes(const std::string &addr, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetPlayerAppSettingValues(const std::string &addr, uint8_t attribute, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetPlayerAppSettingCurrentValue(
         const std::string &addr, const std::deque<uint8_t> &attributes, uint8_t label, uint8_t context)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int SetPlayerAppSettingCurrentValue(const std::string &addr, const std::deque<uint8_t> &attributes,
         const std::deque<uint8_t> &values, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetPlayerAppSettingAttributeText(
         const std::string &addr, const std::vector<uint8_t> &attributes, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetPlayerAppSettingValueText(
         const std::string &addr, uint8_t attribute, const std::vector<uint8_t> &values, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
 
@@ -217,6 +234,7 @@ public:
     int GetElementAttributes(
         const std::string &addr, uint64_t identifier, const std::vector<uint32_t> &attributes, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
 
@@ -225,14 +243,17 @@ public:
      ******************************************************************/
     int GetPlayStatus(const std::string &addr, uint8_t label, uint8_t context)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int PlayItem(const std::string &addr, uint8_t scope, uint64_t uid, uint16_t uidCounter, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int AddToNowPlaying(const std::string &addr, uint8_t scope, uint64_t uid, uint16_t uidCounter, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
 
@@ -241,20 +262,24 @@ public:
      ******************************************************************/
     int ChangePath(const std::string &addr, uint16_t uidCounter, uint8_t direction, uint64_t folderUid, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetFolderItems(const std::string &addr, uint8_t scope, uint32_t startItem, uint32_t endItem,
         const std::vector<uint32_t> &attributes, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetItemAttributes(const std::string &addr, uint8_t scope, uint64_t uid, uint16_t uidCounter,
         const std::vector<uint32_t> &attributes, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetTotalNumberOfItems(const std::string &addr, uint8_t scope, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
 
@@ -263,28 +288,37 @@ public:
      ******************************************************************/
     int SetAbsoluteVolume(const std::string &addr, uint8_t volume, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetSelectedTrack(const std::string addr, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetAddressedPlayer(const std::string &addr, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetUidCounter(const std::string &addr, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     int GetCurrentAbsoluteVolume(const std::string &addr, uint8_t label)
     {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
         return -1;
     }
     void SetPlaybackInterval(const std::string &addr, uint32_t interval)
-    {}
+    {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
+    }
     void ResponseNotification(uint16_t events)
-    {}
+    {
+        LOG_DEBUG("[AVRCP TG] MediaService::%{public}s", __func__);
+    }
 
 private:
     MediaService() = default;

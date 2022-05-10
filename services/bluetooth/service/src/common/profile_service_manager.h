@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -214,7 +214,7 @@ private:
     bool IsAllDisabled(const BTTransport transport) const;
     void CheckWaitEnableProfiles(const std::string &name, const BTTransport transport) const;
 
-    DISALLOW_COPY_AND_ASSIGN(ProfileServiceManager);
+    BT_DISALLOW_COPY_AND_ASSIGN(ProfileServiceManager);
     DECLARE_IMPL();
 };
 }  // namespace bluetooth

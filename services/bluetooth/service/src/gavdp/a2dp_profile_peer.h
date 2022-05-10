@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@
 #include "interface_profile_a2dp_src.h"
 #include "sdp.h"
 #include "timer.h"
+#include "../stack/platform/include/queue.h"
 
 namespace bluetooth {
 /**
@@ -140,18 +141,6 @@ private:
     AvdtSepConfig peerCapability_ {};
     CodecInfo codecInfo_ {};
     bool peerCap_ = false;
-};
-
-class A2dpCodecEncoderObserver : public A2dpEncoderObserver {
-public:
-    explicit A2dpCodecEncoderObserver(uint16_t streamHandle);
-    ~A2dpCodecEncoderObserver() = default;
-    uint32_t Read(uint8_t **buf, uint32_t size) override;
-    // pktTimeStamp will be added in packet's head.
-    bool EnqueuePacket(const Packet *packet, size_t frames, uint32_t bytes, uint32_t pktTimeStamp) const override;
-
-private:
-    uint16_t streamHandle_ = 0;
 };
 
 class A2dpCodecDecoderObserver : public A2dpDecoderObserver {
@@ -430,15 +419,6 @@ public:
     uint8_t GetCurrentCmd() const;
 
     /**
-     * @brief Set audio configure.
-     * @param[in] sampleRate: Audio pcm sample rate
-     * @param[in] bits: Audio pcm bits
-     * @param[in] channel: Number of audio pcm channel
-     * @since 6.0
-     */
-    void SetAudioConfigure(uint32_t sampleRate, uint32_t bits, uint8_t channel);
-
-    /**
      * @brief A function to process timeout this class
      *
      * @param[in] info: User configure information
@@ -496,6 +476,18 @@ public:
      * @since 6.0
      */
     void SetRestart(bool value);
+
+    /**
+     * @brief Get the reconfig tag status.
+     * @since 6.0
+     */
+    bool GetReconfigTag() const;
+
+    /**
+     * @brief Set the reconfig tag status.
+     * @since 6.0
+     */
+    void SetReconfigTag(bool value);
 
     /**
      * @brief A function to get the codec status.
@@ -595,8 +587,10 @@ public:
      */
     void UpdatePeerEdr(uint8_t edr);
 
+    bool SendPacket(const Packet *packet, size_t frames, uint32_t bytes, uint32_t pktTimeStamp) const;
+    
 private:
-    DISALLOW_COPY_AND_ASSIGN(A2dpProfilePeer);
+    BT_DISALLOW_COPY_AND_ASSIGN(A2dpProfilePeer);
     /**
      * @brief Reconfigure
      * @param[in] The information of reconfigure
@@ -714,11 +708,11 @@ private:
     uint16_t mtu_ = 0;
     bool isInitSide_ = false;
     bool disconnectInd_ = false;
-    std::unique_ptr<A2dpEncoderObserver> encoderObserver_ = nullptr;
     std::unique_ptr<A2dpDecoderObserver> decoderObserver_ = nullptr;
     uint8_t capNumber_ = 0;
     uint8_t edr_ = 0;
     bool codecAACConfig = false;
+    bool reconfigTag_ = false;
 };
 }  // namespace bluetooth
 #endif  // A2DP_PROFILE_PEER_H

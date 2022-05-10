@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -439,9 +439,21 @@ void A2dpService::DisableService()
         LOG_WARN("[A2dpService] %{public}s Failed to get profile instance\n", __func__);
         return;
     }
-
+    instance->SetDisalbeTag(true);
     isDoDisable = true;
-    instance->Disable();
+
+    if (instance->HasStreaming()) {
+        auto curDevice = a2dpDevices_.find(activeDevice_.GetAddress().c_str());
+        if (curDevice != a2dpDevices_.end()) {
+            instance->Stop(curDevice->second->GetHandle(), true);
+        }
+    } else {
+        if (instance->HasOpen()) {
+            instance->CloseAll();
+        } else {
+            instance->Disable();
+        }
+    }
 
     if (GetConnectState() != PROFILE_STATE_DISCONNECTED) {
         return;
@@ -458,6 +470,7 @@ void A2dpService::DisableService()
     instance->DeregisterObserver(&profileObserver_);
     GetContext()->OnDisable(name_, ret);
     isDoDisable = false;
+    instance->SetDisalbeTag(false);
 }
 
 std::vector<RawAddress> A2dpService::GetDevicesByStates(std::vector<int>& states) const
@@ -547,19 +560,34 @@ int A2dpService::SetActiveSinkDevice(const RawAddress &device)
     auto curDevice = a2dpDevices_.find(activeDevice_.GetAddress().c_str());
     if (strcmp(device.GetAddress().c_str(), activeDevice_.GetAddress().c_str()) == 0) {
         LOG_ERROR("[A2dpService]The device is already active");
-        if (curDevice != a2dpDevices_.end()) {
-            pflA2dp->Start(curDevice->second->GetHandle());
-        }
+        pflA2dp->Start(curDevice->second->GetHandle());
     } else {
-        if (curDevice != a2dpDevices_.end()) {
-            pflA2dp->Stop(curDevice->second->GetHandle(), true);
+        if (curDevice != a2dpDevices_.end() && curDevice->second != nullptr) {
+            if (pflA2dp->Stop(curDevice->second->GetHandle(), true)) {
+                pflA2dp->Start(iter->second->GetHandle());
+            }
+        } else {
+            pflA2dp->Start(iter->second->GetHandle());
         }
         pflA2dp->SetActivePeer(btAddr);
-        pflA2dp->Start(iter->second->GetHandle());
         UpdateActiveDevice(rawAddr);
     }
 
     return RET_NO_ERROR;
+}
+
+void A2dpService::ActiveDevice()
+{
+    std::lock_guard<std::recursive_mutex> lock(g_a2dpServiceMutex);
+    A2dpProfile *pflA2dp = GetProfileInstance(role_);
+    if (pflA2dp == nullptr) {
+        LOG_ERROR("[A2dpService] %{public}s Failed to get profile instance\n", __func__);
+        return;
+    }
+    auto curDevice = a2dpDevices_.find(activeDevice_.GetAddress().c_str());
+    if (curDevice != a2dpDevices_.end()) {
+        pflA2dp->Start(curDevice->second->GetHandle());
+    }
 }
 
 const RawAddress &A2dpService::GetActiveSinkDevice() const
@@ -660,6 +688,7 @@ A2dpSrcCodecStatus A2dpService::GetCodecStatus(const RawAddress &device) const
 
 int A2dpService::SetCodecPreference(const RawAddress &device, const A2dpSrcCodecInfo &info)
 {
+    LOG_INFO("[A2dpService] %{public}s\n", __func__);
     std::string addr = device.GetAddress();
 
     if (!strcmp(INVALID_MAC_ADDRESS.c_str(), device.GetAddress().c_str())) {
@@ -672,15 +701,17 @@ int A2dpService::SetCodecPreference(const RawAddress &device, const A2dpSrcCodec
 
     A2dpSrcCodecStatus codecStatus = GetCodecStatus(RawAddress(addr));
     A2dpSrcCodecInfo currentInfo = codecStatus.codecInfo;
-    if (!IsConfirmedCodecInfo(codecStatus, info)) {
-        LOG_ERROR("[A2dpService] %{public}s : device's confirmed info doesn't include codecinfo \n", __func__);
-        return RET_BAD_STATUS;
+    if (!IsLocalCodecInfo(codecStatus, info)) {
+        LOG_ERROR("[A2dpService] %{public}s : device's local info doesn't include codecinfo \n", __func__);
+        return RET_BAD_PARAM;
     }
 
-    if ((IsSimilarCodecConfig(currentInfo, info)) && (currentInfo.codecPriority == info.codecPriority)) {
+    if ((IsSimilarCodecConfig(currentInfo, info))) {
         LOG_ERROR("[A2dpService] %{public}s : current codec information doesn't change \n", __func__);
-        return RET_NO_ERROR;
+        return RET_BAD_PARAM;
     }
+
+    LOG_INFO("[A2dpService] %{public}s codec information is valid\n", __func__);
 
     A2dpProfile *pflA2dp = GetProfileInstance(role_);
     BtAddr btAddr = {};
@@ -850,28 +881,15 @@ void A2dpService::DeregisterObserver(IA2dpObserver *observer)
     a2dpFramworkCallback_.Deregister(*observer);
 }
 
-void A2dpService::SetAudioConfigure(const RawAddress &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel)
-{
-    BtAddr peerAddress = {};
-    addr.ConvertToUint8(peerAddress.addr);
-
-    A2dpProfile *profile = GetProfileInstance(role_);
-    if (profile != nullptr) {
-        profile->SetAudioConfigure(peerAddress, sampleRate, bits, channel);
-    } else {
-        LOG_ERROR("[A2dpService] %{public}s Can't find the profile instance\n", __func__);
-    }
-}
-
 int A2dpService::WriteFrame(const uint8_t *data, uint32_t size)
 {
     LOG_INFO("[A2dpService] %{public}s\n", __func__);
 
     A2dpProfile *profile = GetProfileInstance(role_);
     if (profile != nullptr) {
-        if(!profile->WriteFrame(data, size)) {
+        if (profile->SetPcmData(data, size) == 0) {
             LOG_ERROR("[A2dpService] %{public}s Failed to write frame. role_(%u)\n", __func__, role_);
-            return RET_BAD_STATUS;
+            return RET_NO_SPACE;
         }
     } else {
         LOG_ERROR("[A2dpService] %{public}s Failed to get profile instance. role_(%u)\n", __func__, role_);
@@ -1082,6 +1100,7 @@ void A2dpService::CheckDisable()
 
         instance->DeregisterObserver(&profileObserver_);
         GetContext()->OnDisable(name_, true);
+        instance->SetDisalbeTag(false);
     }
 }
 
@@ -1108,6 +1127,8 @@ void A2dpService::SetOptionalCodecsSupportState(const RawAddress &device, int st
 
 bool A2dpService::IsSimilarCodecConfig(A2dpSrcCodecInfo codecInfo, A2dpSrcCodecInfo newInfo) const
 {
+    LOG_INFO("[A2dpService] %{public}s\n", __func__);
+
     if (newInfo.codecType != codecInfo.codecType) {
         return false;
     }
@@ -1128,28 +1149,31 @@ bool A2dpService::IsSimilarCodecConfig(A2dpSrcCodecInfo codecInfo, A2dpSrcCodecI
 
     if ((newInfo.sampleRate == codecInfo.sampleRate) && (newInfo.bitsPerSample == codecInfo.bitsPerSample) &&
         (newInfo.channelMode == codecInfo.channelMode)) {
+        LOG_INFO("[A2dpService] %{public}s similar config\n", __func__);
         return true;
     }
 
     return false;
 }
 
-bool A2dpService::IsConfirmedCodecInfo(A2dpSrcCodecStatus codecStatus, A2dpSrcCodecInfo codecInformation) const
+bool A2dpService::IsLocalCodecInfo(A2dpSrcCodecStatus codecStatus, A2dpSrcCodecInfo codecInformation) const
 {
     LOG_INFO("[A2dpService] %{public}s\n", __func__);
 
-    LOG_INFO("[A2dpService] %{public}s Set codecType(%u)\n", __func__, codecInformation.codecType);
-    LOG_INFO("[A2dpService] %{public}s Set sampleRate(%u)\n", __func__, codecInformation.sampleRate);
-    LOG_INFO("[A2dpService] %{public}s Set bitsPerSample(%u)\n", __func__, codecInformation.bitsPerSample);
-    LOG_INFO("[A2dpService] %{public}s Set channelMode(%u)\n", __func__, codecInformation.channelMode);
+    LOG_INFO("[A2dpService] %{public}s Set codecType(%{public}u)\n", __func__, codecInformation.codecType);
+    LOG_INFO("[A2dpService] %{public}s Set sampleRate(%{public}u)\n", __func__, codecInformation.sampleRate);
+    LOG_INFO("[A2dpService] %{public}s Set bitsPerSample(%{public}u)\n", __func__, codecInformation.bitsPerSample);
+    LOG_INFO("[A2dpService] %{public}s Set channelMode(%{public}u)\n", __func__, codecInformation.channelMode);
 
-    for (A2dpSrcCodecInfo info : codecStatus.codecInfoConfirmedCap) {
-        LOG_INFO("[A2dpService] %{public}s codecType(%u)\n", __func__, info.codecType);
-        LOG_INFO("[A2dpService] %{public}s sampleRate(%u)\n", __func__, info.sampleRate);
-        LOG_INFO("[A2dpService] %{public}s bitsPerSample(%u)\n", __func__, info.bitsPerSample);
-        LOG_INFO("[A2dpService] %{public}s channelMode(%u)\n", __func__, info.channelMode);
-        if ((info.codecType == codecInformation.codecType) && ((info.sampleRate & codecInformation.sampleRate) != 0) &&
-            ((info.channelMode & codecInformation.channelMode)) != 0) {
+    for (A2dpSrcCodecInfo info : codecStatus.codecInfoLocalCap) {
+        LOG_INFO("[A2dpService] %{public}s codecType(%{public}u)\n", __func__, info.codecType);
+        LOG_INFO("[A2dpService] %{public}s sampleRate(%{public}u)\n", __func__, info.sampleRate);
+        LOG_INFO("[A2dpService] %{public}s bitsPerSample(%{public}u)\n", __func__, info.bitsPerSample);
+        LOG_INFO("[A2dpService] %{public}s channelMode(%{public}u)\n", __func__, info.channelMode);
+        if ((info.codecType == codecInformation.codecType)
+            && ((info.sampleRate & codecInformation.sampleRate) == codecInformation.sampleRate)
+            && ((info.bitsPerSample & codecInformation.bitsPerSample) == codecInformation.bitsPerSample)
+            && ((info.channelMode & codecInformation.channelMode) == codecInformation.channelMode)) {
             return true;
         }
     }

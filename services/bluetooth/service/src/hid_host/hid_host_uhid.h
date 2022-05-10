@@ -71,7 +71,7 @@ private:
     int task_id_ = 0;
     int task_type_ = -1;
 
-    DISALLOW_COPY_AND_ASSIGN(HidHostUhid);
+    BT_DISALLOW_COPY_AND_ASSIGN(HidHostUhid);
 };
 }  // namespace bluetooth
 #endif // HID_HOST_UHID_H

@@ -366,7 +366,7 @@ int BluetoothA2dpSrcProxy::SetCodecPreference(const RawAddress &device, const Bl
         return ERROR;
     }
 
-    return NO_ERROR;
+    return reply.ReadInt32();
 }
 
 void BluetoothA2dpSrcProxy::SwitchOptionalCodecs(const RawAddress &device, bool isEnable)
@@ -499,42 +499,6 @@ int BluetoothA2dpSrcProxy::StopPlaying(const RawAddress &device)
     }
 
     return reply.ReadInt32();
-}
-
-void BluetoothA2dpSrcProxy::SetAudioConfigure(const RawAddress &device, int32_t sampleRate, int32_t bits, int32_t channel)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSrcProxy::SetAudioConfigure WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSrcProxy::SetAudioConfigure write device error");
-        return;
-    }
-    if (!data.WriteInt32(sampleRate)) {
-        HILOGW("BluetoothA2dpSrcProxy::SetAudioConfigure write sampleRate error");
-        return;
-    }
-    if (!data.WriteInt32(bits)) {
-        HILOGW("BluetoothA2dpSrcProxy::SetAudioConfigure write bits error");
-        return;
-    }
-    if (!data.WriteInt32(channel)) {
-        HILOGW("BluetoothA2dpSrcProxy::SetAudioConfigure write channel error");
-        return;
-    }
-
-    MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_SET_AUDIO_CONFIGURE, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSrcProxy::SetAudioConfigure done fail, error: %{public}d", error);
-        return;
-    }
 }
 
 int BluetoothA2dpSrcProxy::WriteFrame(const uint8_t *data, uint32_t size)

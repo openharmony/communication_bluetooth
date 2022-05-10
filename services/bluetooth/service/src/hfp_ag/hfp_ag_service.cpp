@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,55 +23,9 @@
 #include "stub/telephone_service.h"
 
 namespace bluetooth {
-class TelephoneAgObserver : public stub::TelephoneServiceObserver {
-public:
-    explicit TelephoneAgObserver(HfpAgService& service) : service_(service)
-    {
-    }
-    ~TelephoneAgObserver() = default;
-
-    void OnRegistrationStatusChanged(int status) override
-    {
-        LOG_DEBUG("[HFP AG]%{public}s() status[%{public}d]", __PRETTY_FUNCTION__, status);
-        service_.NotifyRegistrationStatusChanged(status);
-    }
-    void OnSignalStrengthChanged(int signalStrength) override
-    {
-        LOG_DEBUG("[HFP AG]%{public}s() signalStrength[%{public}d]", __PRETTY_FUNCTION__, signalStrength);
-        service_.NotifySignalStrengthChanged(signalStrength);
-    }
-    void OnRoamingStatusChanged(int status) override
-    {
-        LOG_DEBUG("[HFP AG]%{public}s() status[%{public}d]", __PRETTY_FUNCTION__, status);
-        service_.NotifyRoamingStatusChanged(status);
-    }
-    void OnBatteryLevelChanged(int batteryLevel) override
-    {
-        LOG_DEBUG("[HFP AG]%{public}s() batteryLevel[%{public}d]", __PRETTY_FUNCTION__, batteryLevel);
-        service_.NotifyBatteryLevelChanged(batteryLevel);
-    }
-    void OnVolumeChanged(int type, int volume) override
-    {
-        LOG_DEBUG("[HFP AG]%{public}s() type[%{public}d], volume[%{public}d]", __PRETTY_FUNCTION__, type, volume);
-        service_.NotifyVolumeChanged(type, volume);
-    }
-
-private:
-    HfpAgService& service_;
-    DISALLOW_COPY_AND_ASSIGN(TelephoneAgObserver);
-};
-
-struct HfpAgService::impl {
-    explicit impl(HfpAgService& service) : observer_(service)
-    {
-    }
-    TelephoneAgObserver observer_;
-};
-
-HfpAgService::HfpAgService() : utility::Context(PROFILE_NAME_HFP_AG, "1.7.1"), pimpl(nullptr)
+HfpAgService::HfpAgService() : utility::Context(PROFILE_NAME_HFP_AG, "1.7.1")
 {
     LOG_INFO("[HFP AG]ProfileService:%{public}s Create", Name().c_str());
-    pimpl = std::make_unique<impl>(*this);
 }
 
 HfpAgService::~HfpAgService()
@@ -93,7 +47,6 @@ HfpAgService *HfpAgService::GetService()
 void HfpAgService::Enable()
 {
     LOG_DEBUG("[HFP AG]%{public}s():==========<enter>==========", __FUNCTION__);
-    stub::TelephoneService::GetInstance()->RegisterObserver(&pimpl->observer_);
     HfpAgMessage event(HFP_AG_SERVICE_STARTUP_EVT);
     PostEvent(event);
 }
@@ -101,7 +54,6 @@ void HfpAgService::Enable()
 void HfpAgService::Disable()
 {
     LOG_DEBUG("[HFP AG]%{public}s():==========<enter>==========", __FUNCTION__);
-    stub::TelephoneService::GetInstance()->DeregisterObserver(&pimpl->observer_);
     HfpAgMessage event(HFP_AG_SERVICE_SHUTDOWN_EVT);
     PostEvent(event);
 }

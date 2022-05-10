@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,6 @@ public:
     int StartPlaying(const RawAddress &device) override;
     int SuspendPlaying(const RawAddress &device) override;
     int StopPlaying(const RawAddress &device) override;
-    void SetAudioConfigure(const RawAddress &device, int sample, int bits, int channel) override;
     int WriteFrame(const uint8_t *data, uint32_t size) override;
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
 

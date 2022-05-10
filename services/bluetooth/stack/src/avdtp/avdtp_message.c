@@ -1436,6 +1436,7 @@ void AvdtParseSignalRej(AvdtSigCtrl *sigCtrl, uint8_t sigId, uint8_t label, Pack
 {
     uint8_t data = 0;
     uint8_t errCode = 0;
+    uint8_t stEvent = AvdtGetEventBySigidCfm(sigId);
     switch (sigId) {
         case AVDT_SIG_DISCOVER:
         case AVDT_SIG_GET_ALLCAP:
@@ -1457,6 +1458,16 @@ void AvdtParseSignalRej(AvdtSigCtrl *sigCtrl, uint8_t sigId, uint8_t label, Pack
     }
     LOG_DEBUG("[AVDT]%{public}s: sigId(%hhu) errCode(0x%x) categoryOrSeid(%hhu)", __func__, sigId, errCode, data);
     /* Do nothing, the timer of a2dp will be triggered */
+    if (stEvent == AVDT_RECONFIGURE_CMD_CFM_EVENT) {
+        AvdtStreamCtrl *streamCtrl = AvdtGetStreamCtrlByHandle(sigCtrl->streamHandle);
+        if (streamCtrl != NULL) {
+            AvdtEventData eventData = {0};
+            eventData.errCode = errCode;
+            AvdtStreamProcEvent(streamCtrl, stEvent, &eventData);
+        } else {
+            LOG_ERROR("[AVDT]%{public}s:AvdtGetStreamCtrlByHandle(%hu) Failed!", __func__, sigCtrl->streamHandle);
+        }
+    }
     return;
 }
 

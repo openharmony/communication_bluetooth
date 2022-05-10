@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,22 +30,22 @@
 #define ASSERT(x)
 #endif
 
-#ifndef DISALLOW_COPY
-#define DISALLOW_COPY(TypeName) TypeName(const TypeName &) = delete
+#ifndef BT_DISALLOW_COPY
+#define BT_DISALLOW_COPY(TypeName) TypeName(const TypeName &) = delete
 #endif
 
-#ifndef DISALLOW_ASSIGN
-#define DISALLOW_ASSIGN(TypeName) TypeName &operator=(const TypeName &) = delete
+#ifndef BT_DISALLOW_ASSIGN
+#define BT_DISALLOW_ASSIGN(TypeName) TypeName &operator=(const TypeName &) = delete
 #endif
 
-#ifndef DISALLOW_COPY_AND_ASSIGN
-#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-    DISALLOW_COPY(TypeName);               \
-    DISALLOW_ASSIGN(TypeName)
+#ifndef BT_DISALLOW_COPY_AND_ASSIGN
+#define BT_DISALLOW_COPY_AND_ASSIGN(TypeName) \
+    BT_DISALLOW_COPY(TypeName);               \
+    BT_DISALLOW_ASSIGN(TypeName)
 #endif
 
-#ifndef DISALLOW_MOVE_AND_ASSIGN
-#define DISALLOW_MOVE_AND_ASSIGN(TypeName)   \
+#ifndef BT_DISALLOW_MOVE_AND_ASSIGN
+#define BT_DISALLOW_MOVE_AND_ASSIGN(TypeName)   \
     TypeName(TypeName &&) noexcept = delete; \
     TypeName &operator=(TypeName &&) noexcept = delete
 #endif

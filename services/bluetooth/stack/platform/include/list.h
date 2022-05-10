@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -155,6 +155,15 @@ bool ListRemoveFirst(List *list);
  * @since 6
  */
 bool ListRemoveLast(List *list);
+
+/**
+ * @brief Check if the list is empty.
+ *
+ * @param list List pointer.
+ * @return true: The list is empty. false: The list is not empty.
+ * @since 6
+ */
+bool ListIsEmpty(const List* list);
 
 #ifdef __cplusplus
 }

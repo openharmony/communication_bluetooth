@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,7 +171,7 @@ const UUID &GattCharacteristic::GetUuid() const
 
 const std::unique_ptr<uint8_t[]> &GattCharacteristic::GetValue(size_t *size) const
 {
-    HILOGI("GattCharacteristic::GetValue starts");
+    HILOGI("value size: %{public}zu", length_);
     *size = length_;
     return value_;
 }

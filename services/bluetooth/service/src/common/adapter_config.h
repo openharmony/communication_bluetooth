@@ -113,6 +113,9 @@ const std::string PROPERTY_MAP_MAX_OF_GET_UREAD = "MaxOfGetUreadMessage";
 const std::string PROPERTY_CODEC_SBC = "CodecSbc";
 const std::string PROPERTY_CODEC_AAC = "CodecAac";
 
+const std::string PROPERTY_CODEC_SBC_SUPPORT = "CodecSbcSupport";
+const std::string PROPERTY_CODEC_AAC_SUPPORT = "CodecAacSupport";
+
 class IAdapterConfig {
 public:
     virtual ~IAdapterConfig() = default;

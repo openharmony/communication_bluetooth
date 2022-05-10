@@ -288,7 +288,7 @@ napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callba
         return ret;
     }
     if (gattServer->GetServer()->NotifyCharacteristicChanged(
-        remoteDevice, *characteristic, true) == GattStatus::GATT_SUCCESS) {
+        remoteDevice, *characteristic, false) == GattStatus::GATT_SUCCESS) {
         isOK = true;
     }
 

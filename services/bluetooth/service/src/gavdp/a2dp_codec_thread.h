@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,7 +106,7 @@ public:
      * @since 6.0
      */
     bool PostMessage(const utility::Message msg, const A2dpEncoderInitPeerParams &peerParams, A2dpCodecConfig *config,
-        A2dpEncoderObserver *observer, A2dpDecoderObserver *decObserver) const;
+        A2dpDecoderObserver *decObserver) const;
 
     /**
      * @brief process the message of codec thread.
@@ -114,15 +114,32 @@ public:
      * @since 6.0
      */
     void ProcessMessage(utility::Message msg, const A2dpEncoderInitPeerParams &peerParams, A2dpCodecConfig *config,
-        A2dpEncoderObserver *observer, A2dpDecoderObserver *decObserver);
+        A2dpDecoderObserver *decObserver);
+    /**
+     * @brief Start the timer
+     * @since 6.0
+     */
+    void StartTimer() const;
+
+    /**
+     * @brief Stop the timer
+     * @since 6.0
+     */
+    void StopTimer() const;
+
     /**
      * @brief Get the init status
      * @since 6.0
      */
     bool GetInitStatus() const;
 
-    bool WriteFrame(const uint8_t *data, uint16_t size) const;
-
+    /**
+     * @brief Get the information of the current rendered position.
+     * @param[out] dalayValue is the delayed time
+     * @param[out] sendDataSize is the data size that has been sent
+     * @param[out] timeStamp is the current time stamp
+     * @since 6.0
+     */
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) const;
 
 private:
@@ -131,8 +148,7 @@ private:
      *
      * @since 6.0
      */
-    void SourceEncode(const A2dpEncoderInitPeerParams &peerParams, const A2dpCodecConfig &config,
-        const A2dpEncoderObserver &observer);
+    void SourceEncode(const A2dpEncoderInitPeerParams &peerParams, const A2dpCodecConfig &config);
 
     /**
      * @brief Source side  encode
@@ -141,10 +157,18 @@ private:
      */
     void SinkDecode(const A2dpCodecConfig &config, A2dpDecoderObserver &observer);
 
+    /**
+     * @brief Timer to push pcm data
+     *
+     * @since 6.0
+     */
+    void SignalingTimeoutCallback() const;
+
     std::string name_ {};
     std::unique_ptr<Dispatcher> dispatcher_ {};
     std::unique_ptr<A2dpEncoder> encoder_ = nullptr;
     std::unique_ptr<A2dpDecoder> decoder_ = nullptr;
+    std::unique_ptr<utility::Timer> signalingTimer_ = nullptr;
     static A2dpCodecThread *g_instance;
     bool threadInit = false;
     bool isSbc_ = false;

@@ -175,6 +175,10 @@ ErrCode BluetoothAvrcpTgStub::GetConnectedDevicesInner(MessageParcel &data, Mess
 ErrCode BluetoothAvrcpTgStub::GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t statesSize = data.ReadInt32();
+    if (IsInvalidAttributesSize(statesSize)) {
+        HILOGE("BluetoothAvrcpTgStub::GetDevicesByStatesInner Invalid MessageParcel device states");
+        return ERR_INVALID_VALUE;
+    }
     std::vector<int32_t> states;
     for (int i = 0; i < statesSize; ++i) {
         int32_t state = data.ReadInt32();
@@ -261,6 +265,10 @@ ErrCode BluetoothAvrcpTgStub::NotifyPlayerAppSettingChangedInner(MessageParcel &
 {
     HILOGI("BluetoothAvrcpTgStub::NotifyPlayerAppSettingChangedInner starts");
     int32_t attributesSize = data.ReadInt32();
+    if (IsInvalidAttributesSize(attributesSize)) {
+        HILOGE("BluetoothAvrcpTgStub::NotifyPlayerAppSettingChangedInner Invalid MessageParcel attributes");
+        return ERR_INVALID_VALUE;
+    }
     std::vector<int32_t> attributes;
     for (int i = 0; i < attributesSize; ++i) {
         int32_t attribute = data.ReadInt32();
@@ -268,6 +276,10 @@ ErrCode BluetoothAvrcpTgStub::NotifyPlayerAppSettingChangedInner(MessageParcel &
     }
 
     int32_t valuesSize = data.ReadInt32();
+    if (IsInvalidAttributesSize(valuesSize)) {
+        HILOGE("BluetoothAvrcpTgStub::NotifyPlayerAppSettingChangedInner Invalid MessageParcel values");
+        return ERR_INVALID_VALUE;
+    }
     std::vector<int32_t> values;
     for (int i = 0; i < valuesSize; ++i) {
         int32_t value = data.ReadInt32();
@@ -322,5 +334,24 @@ ErrCode BluetoothAvrcpTgStub::NotifyVolumeChangedInner(MessageParcel &data, Mess
     return NO_ERROR;
 }
 
+bool BluetoothAvrcpTgStub::IsInvalidAttributesSize(int32_t attributesSize)
+{
+    bool ret = false;
+    const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = 255;
+    if (attributesSize > COUNT_OF_AVRC_PLAYER_ATTRIBUTE) {
+        ret =  true;
+    }
+    return ret;
+}
+
+bool BluetoothAvrcpTgStub::IsInvalidDeviceStatesSize(int32_t statesSize)
+{
+    bool ret = false;
+    const int32_t COUNT_OF_DEVICE_STATE = 4;
+    if (statesSize > COUNT_OF_DEVICE_STATE) {
+        ret =  true;
+    }
+    return ret;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

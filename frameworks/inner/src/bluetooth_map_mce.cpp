@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -847,18 +847,17 @@ MapMasInstanceInfoList MapClient::GetMasInstanceInfo(const BluetoothRemoteDevice
     // process
     if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
         BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        pimpl->proxy_->GetMasInstanceInfo(rawDevice, infoList);
+        BluetoothIProfileMasInstanceInfoList infoList = pimpl->proxy_->GetMasInstanceInfo(rawDevice);
 
+        HILOGD("%{public}s(): Test!",  __FUNCTION__);
         if (infoList.isValid == true) {
-            IProfileMasInstanceInfo profileInfo;
             MapMasInstanceInfo info;
             frameworkMasInfoList.isValid = true;
             for (auto it = infoList.masInfoList.begin(); it != infoList.masInfoList.end(); it++) {
-                profileInfo = *it;
-                info.OwnerUCI = profileInfo.OwnerUCI;
-                info.MASInstanceInformation = profileInfo.MASInstanceInformation;
-                info.supportedMsgTypes_ = profileInfo.supportedMsgTypes_;
-                info.instanceId = profileInfo.instanceId;
+                info.OwnerUCI = it->OwnerUCI;
+                info.MASInstanceInformation = it->MASInstanceInformation;
+                info.supportedMsgTypes_ = it->supportedMsgTypes_;
+                info.instanceId = it->instanceId;
                 frameworkMasInfoList.masInfoList.push_back(info);
             }
         }

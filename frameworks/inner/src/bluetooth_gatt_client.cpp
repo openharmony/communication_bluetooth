@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -337,6 +337,7 @@ void GattClient::impl::DiscoverComplete(int state)
 
 void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> &src)
 {
+    HILOGI("starts");
     for (auto &svc : src) {
         GattService svcTmp(UUID::ConvertFrom128Bits(svc.uuid_.ConvertTo128Bits()),
             svc.handle_,
@@ -353,6 +354,7 @@ void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> 
             }
             svcTmp.AddCharacteristic(std::move(characterTmp));
         }
+        HILOGI("svcTmp is %{public}s", svcTmp.GetUuid().ToString().c_str());
         gattServices_.emplace_back(std::move(svcTmp));
     }
     for (auto &svc : src) {
@@ -379,14 +381,17 @@ GattService *GattClient::impl::FindService(uint16_t handle)
 
 void GattClient::impl::GetServices()
 {
+    HILOGI("start");
     std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
     while (discoverInformation_.isDiscovering_) {
         discoverInformation_.condition_.wait(lock);
     }
     if (isGetServiceYet_) {
+        HILOGI("isGetServiceYet_");
         return;
     }
     if (!isRegisterSucceeded_) {
+        HILOGI("isRegisterSucceeded_");
         return;
     }
     gattServices_.clear();
@@ -528,6 +533,7 @@ int GattClient::DiscoverServices()
 
 std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const UUID &uuid)
 {
+    HILOGI("start");
     pimpl->GetServices();
     for (auto &svc : pimpl->gattServices_) {
         if (svc.GetUuid().Equals(uuid)) {

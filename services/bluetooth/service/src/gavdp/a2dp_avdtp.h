@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -583,6 +583,19 @@ private:
      * @since 6.0
      */
     static uint8_t ParseAvdtpAbortCFM(const uint16_t handle, const BtAddr bdAddr,
+        const uint8_t role, const A2dpAvdtMsg &msg, const AvdtCtrlData &data);
+
+    /**
+     * @brief A function to parse write confirm from avdtp
+     *
+     * @param[in] handle The handle of stream(after configured)
+     * @param[in] bdAddr The address of peer device
+     * @param[in] data The detail information matched event
+     * @param[in] role The role of local profile(Acceptor: is confirmed after configure)
+     * @param[in] msg The message sent to a2dp profile state machine
+     * @since 6.0
+     */
+    static uint8_t ParseAvdtpWriteCFM(const uint16_t handle, const BtAddr bdAddr,
         const uint8_t role, const A2dpAvdtMsg &msg, const AvdtCtrlData &data);
     A2dpAvdtp() = delete;
     uint8_t peerRole_ = 0;

@@ -269,7 +269,7 @@ private:
     uint16_t intrLcid_;
     uint8_t connFlags_;
 
-    DISALLOW_COPY_AND_ASSIGN(HidHostL2capConnection);
+    BT_DISALLOW_COPY_AND_ASSIGN(HidHostL2capConnection);
 };
 }  // namespace bluetooth
 #endif // HID_HOST_L2CAP_CONNECTION_H

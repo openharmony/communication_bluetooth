@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@
 #ifndef CLASSIC_BLUETOOTH_DATA_H
 #define CLASSIC_BLUETOOTH_DATA_H
 
-#include <stdint.h>
+#include <cstdlib>
 #include <vector>
 #include "base_def.h"
 #include "classic_data_structure.h"
@@ -93,7 +93,7 @@ private:
     int offset_ {};
     int maxLength_ {};
 
-    DISALLOW_COPY_AND_ASSIGN(ClassicBluetoothData);
+    BT_DISALLOW_COPY_AND_ASSIGN(ClassicBluetoothData);
 };
 }  // namespace bluetooth
 #endif  /// CLASSIC_BLUETOOTH_DATA_H
