@@ -61,6 +61,7 @@ ohos_shared_library("bluetooth_server") {
   ]
 
   external_deps = [
+    "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -231,8 +231,8 @@ private:
     std::map<uint16_t, std::pair<uint16_t, uint16_t>> valueHandleMap_ = {};
     std::set<uint16_t> restrictedGattBasedService_ = {};
 
-    DISALLOW_COPY_AND_ASSIGN(GattDatabase);
-    DISALLOW_MOVE_AND_ASSIGN(GattDatabase);
+    BT_DISALLOW_COPY_AND_ASSIGN(GattDatabase);
+    BT_DISALLOW_MOVE_AND_ASSIGN(GattDatabase);
 };
 }  // namespace bluetooth
 

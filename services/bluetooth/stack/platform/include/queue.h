@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,6 +97,33 @@ int32_t QueueGetEnqueueFd(const Queue *queue);
  * @since 6
  */
 int32_t QueueGetDequeueFd(const Queue *queue);
+
+/**
+ * @brief Flush all data of the queue.
+ *
+ * @param queue Queue pointer.
+ * @param cb Free queue node callback.
+ * @since 6
+ */
+void QueueFlush(Queue *queue, NodeDataFreeCb cb);
+
+/**
+ * @brief Check if the queue is empty.
+ *
+ * @param list Queue pointer.
+ * @return true: The queue is empty. false: The queue is not empty.
+ * @since 6
+ */
+bool QueueIsEmpty(Queue *queue);
+
+/**
+ * @brief Get the size of the queue.
+ *
+ * @param list Queue pointer.
+ * @return The size of the queue.
+ * @since 6
+ */
+int32_t QueueGetSize(Queue *queue);
 
 #ifdef __cplusplus
 }

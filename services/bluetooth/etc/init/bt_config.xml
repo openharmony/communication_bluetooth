@@ -26,33 +26,35 @@
 		<T1 property="IsValid">true</T1>
 	</T1>
 	<T1 section="ClassicAdapter">
-		<T1 property="A2dpSnkService">true</T1>
+		<T1 property="A2dpSnkService">false</T1>
 		<T1 property="A2dpSrcService">true</T1>
 		<T1 property="AvrcpCtService">true</T1>
 		<T1 property="AvrcpTgService">true</T1>
 		<T1 property="GattClientService">true</T1>
 		<T1 property="GattServerService">true</T1>
 		<T1 property="HfpAgService">true</T1>
-		<T1 property="HfpHfService">true</T1>
+		<T1 property="HfpHfService">false</T1>
 		<T1 property="IsValid">true</T1>
-		<T1 property="MapMceService">true</T1>
-		<T1 property="MapMseService">true</T1>
-		<T1 property="PbapPceService">true</T1>
-		<T1 property="PbapPseService">true</T1>
+		<T1 property="MapMceService">false</T1>
+		<T1 property="MapMseService">false</T1>
+		<T1 property="PbapPceService">false</T1>
+		<T1 property="PbapPseService">false</T1>
 		<T1 property="SocketService">true</T1>
 		<T1 property="DIService">true</T1>
 		<T1 property="HidHostService">true</T1>
 	</T1>
 	<T1 section="A2dpSrcService">
 		<T1 property="MaxConnectedDevices">0x06</T1>
-		<T1 property="CodecAac">0x01</T1>
-		<T1 property="CodecSbc">0x02</T1>
+		<T1 property="CodecSbc">0x01</T1>
+		<T1 property="CodecAac">0x02</T1>
+		<T1 property="CodecSbcSupport">0x01</T1>
+		<T1 property="CodecAacSupport">0x00</T1>
 	</T1>
 	<T1 section="A2dpSnkService">
-		<T1 property="CodecAac">0x01</T1>
-		<T1 property="CodecSbc">0x02</T1>
-
-
+		<T1 property="CodecSbc">0x01</T1>
+		<T1 property="CodecAac">0x02</T1>
+		<T1 property="CodecSbcSupport">0x01</T1>
+		<T1 property="CodecAacSupport">0x00</T1>
 	</T1>
 	<T1 section="GattService">
 		<T1 property="GattProfileMaxMtu">0x0200</T1>

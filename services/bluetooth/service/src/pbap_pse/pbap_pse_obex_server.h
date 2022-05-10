@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -143,14 +143,14 @@ private:
 
     private:
         PbapPseObexServer &pseObexServer_;  // pse obex server
-        DISALLOW_COPY_AND_ASSIGN(PseObexObserver);
+        BT_DISALLOW_COPY_AND_ASSIGN(PseObexObserver);
     };
     ObexServerConfig obexConfig_;                       // obex config
     std::unique_ptr<ObexServer> obexServer_ = nullptr;  // obex observer
 
     PbapPseService &pbapPseService_;                              // pse service
     std::unique_ptr<PseObexObserver> pseObexObserver_ = nullptr;  // pse obex observer
-    DISALLOW_COPY_AND_ASSIGN(PbapPseObexServer);
+    BT_DISALLOW_COPY_AND_ASSIGN(PbapPseObexServer);
 };
 }  // namespace bluetooth
 #endif  // PBAP_PSE_OBEX_SERVER_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -714,8 +714,7 @@ private:
         {HFP_AG_STATE_CONNECTED, static_cast<int>(BTConnectState::CONNECTED)}
     };
 
-    DISALLOW_COPY_AND_ASSIGN(HfpAgService);
-    DECLARE_IMPL();
+    BT_DISALLOW_COPY_AND_ASSIGN(HfpAgService);
 };
 }  // namespace bluetooth
 #endif // HFP_AG_SERVICE_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,7 +99,7 @@ protected:
         void HandleDataAvailableConnect(ObexServerSession &serverSession, const ObexHeader &req);
         ObexPrivateServer &obexServer_;
         std::unique_ptr<bluetooth::ObexHeader> GetObexHeaderFromPacket(ObexPacket &obexPacket) const;
-        DISALLOW_COPY_AND_ASSIGN(ObexServerTransportObserver);
+        BT_DISALLOW_COPY_AND_ASSIGN(ObexServerTransportObserver);
     };
     virtual void HandleTransportDataBusy(ObexServerSession &serverSession, uint8_t isBusy);
     virtual void HandlePutRequest(ObexServerSession &session, ObexHeader &req) const;
@@ -121,7 +121,7 @@ protected:
     std::list<std::unique_ptr<ObexServerSession>> invalidSessions_ {};
     utility::Dispatcher &dispatcher_;
     static const uint16_t MAX_TRASH_SESSION_COUNT;
-    DISALLOW_COPY_AND_ASSIGN(ObexPrivateServer);
+    BT_DISALLOW_COPY_AND_ASSIGN(ObexPrivateServer);
 };
 class ObexServer {
 public:

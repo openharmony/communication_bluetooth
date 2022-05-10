@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,7 @@
 namespace bluetooth {
 class A2dpAacEncoder : public A2dpEncoder {
 public:
-    A2dpAacEncoder(const A2dpEncoderInitPeerParams *peerParams, A2dpCodecConfig *config, A2dpEncoderObserver *observer)
-        : A2dpEncoder(config, observer)
+    A2dpAacEncoder(const A2dpEncoderInitPeerParams *peerParams, A2dpCodecConfig *config) : A2dpEncoder(config)
     {}
     ~A2dpAacEncoder() = default;
     void ResetFeedingState(void) override
@@ -34,8 +33,6 @@ public:
     {}
     void UpdateEncoderParam() override
     {}
-    bool SetPcmData(const uint8_t *data, uint16_t dataSize) override 
-    {return false;}
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override
     {}
 };

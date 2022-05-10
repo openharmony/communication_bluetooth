@@ -31,9 +31,12 @@
 
 namespace bluetooth {
 struct ServerApplication {
-    explicit ServerApplication(IGattServerCallback &callback) : callback_(callback), services_() {};
+    explicit ServerApplication(IGattServerCallback &callback) : services_()
+    {
+        callback_ = &callback;
+    }
 
-    IGattServerCallback &callback_;
+    IGattServerCallback *callback_;
     // service handle set of application
     std::set<uint16_t> services_;
 };
@@ -685,9 +688,9 @@ int GattServerService::impl::AddService(int appId, Service &service, bool IsAsyn
             NotifyServiceChanged(appId, service);
         }
 
-        if (IsAsync) {
+        if (IsAsync && server.value()->second.callback_ != nullptr) {
             LOG_INFO("%{public}s:%{public}d:%{public}s: call OnAddService ", __FILE__, __LINE__, __FUNCTION__);
-            server.value()->second.callback_.OnAddService(result, service);
+            server.value()->second.callback_->OnAddService(result, service);
         }
     }
     return result;
@@ -832,8 +835,10 @@ void GattServerService::impl::CancelConnection(const GattDevice &device)
         }
 
         for (auto &server : servers_) {
-            server.second.callback_.OnConnectionStateChanged(
-                device, result, ConvertConnectionState(manager.GetDeviceState(device)));
+            if (server.second.callback_ != nullptr) {
+                server.second.callback_->OnConnectionStateChanged(
+                    device, result, ConvertConnectionState(manager.GetDeviceState(device)));
+            }
         }
     }
 }
@@ -871,7 +876,9 @@ void GattServerService::impl::OnExchangeMtuEvent(uint16_t connectionHandle, uint
 
         remote->second.SetMtu(rxMtu);
         for (auto &server : servers_) {
-            server.second.callback_.OnMtuChanged(remote->second.GetDevice(), rxMtu);
+            if (server.second.callback_ != nullptr) {
+                server.second.callback_->OnMtuChanged(remote->second.GetDevice(), rxMtu);
+            }
         }
     }
 }
@@ -907,12 +914,14 @@ void GattServerService::impl::OnReadCharacteristicValueEvent(
             return;
         }
 
-        if (!isUsingUuid) {
-            server->second.callback_.OnCharacteristicReadRequest(
-                remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_));
-        } else {
-            server->second.callback_.OnCharacteristicReadByUuidRequest(
-                remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_));
+        if (server->second.callback_ != nullptr) {
+            if (!isUsingUuid) {
+                server->second.callback_->OnCharacteristicReadRequest(
+                    remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_));
+            } else {
+                server->second.callback_->OnCharacteristicReadByUuidRequest(
+                    remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_));
+            }
         }
     }
 }
@@ -951,8 +960,9 @@ void GattServerService::impl::OnWriteCharacteristicEvent(
         Characteristic gattCCC(ccc->uuid_, ccc->handle_, ccc->properties_);
         gattCCC.length_ = length;
         gattCCC.value_ = std::move(*value);
-
-        server->second.callback_.OnCharacteristicWriteRequest(remote->second.GetDevice(), gattCCC, needRespones);
+        if (server->second.callback_ != nullptr) {
+            server->second.callback_->OnCharacteristicWriteRequest(remote->second.GetDevice(), gattCCC, needRespones);
+        }
     }
 }
 
@@ -985,9 +995,11 @@ void GattServerService::impl::OnDescriptorReadEvent(uint16_t connectionHandle, u
                 __FUNCTION__);
             return;
         }
-
-        server->second.callback_.OnDescriptorReadRequest(
-            remote->second.GetDevice(), Descriptor(descriptor->handle_, descriptor->uuid_, descriptor->permissions_));
+        if (server->second.callback_ != nullptr) {
+            server->second.callback_->OnDescriptorReadRequest(
+                remote->second.GetDevice(), Descriptor(descriptor->handle_, descriptor->uuid_,
+                descriptor->permissions_));
+        }
     }
 }
 
@@ -1017,8 +1029,9 @@ void GattServerService::impl::OnDescriptorWriteEvent(
         Descriptor gattDescriptor(descriptor->handle_, descriptor->uuid_, descriptor->permissions_);
         gattDescriptor.length_ = length;
         gattDescriptor.value_ = std::move(*value);
-
-        server->second.callback_.OnDescriptorWriteRequest(remote->second.GetDevice(), gattDescriptor);
+        if (server->second.callback_ != nullptr) {
+            server->second.callback_->OnDescriptorWriteRequest(remote->second.GetDevice(), gattDescriptor);
+        }
     }
 }
 
@@ -1051,8 +1064,10 @@ void GattServerService::impl::OnIndicationEvent(uint16_t connectionHandle, uint1
                 __FUNCTION__);
             return;
         }
-        server->second.callback_.OnNotifyConfirm(
-            remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_), ret);
+        if (server->second.callback_ != nullptr) {
+            server->second.callback_->OnNotifyConfirm(
+                remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_), ret);
+        }
     }
 }
 
@@ -1071,7 +1086,10 @@ void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t conne
     if (device.role_ == GATT_ROLE_SLAVE) {
         for (auto &server : servers_) {
             LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
-            server.second.callback_.OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::CONNECTED));
+            if (server.second.callback_ != nullptr) {
+                server.second.callback_->OnConnectionStateChanged(device, ret,
+                    static_cast<int>(BTConnectState::CONNECTED));
+            }
         }
     }
 }
@@ -1108,8 +1126,10 @@ void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t co
         LOG_INFO("%{public}s: server service dev_role: %{public}d", __FUNCTION__, device.role_);
         for (auto &server : servers_) {
             LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
-            server.second.callback_.OnConnectionStateChanged(
-                device, ret, static_cast<int>(BTConnectState::DISCONNECTED));
+            if (server.second.callback_ != nullptr) {
+                server.second.callback_->OnConnectionStateChanged(device, ret,
+                    static_cast<int>(BTConnectState::DISCONNECTED));
+            }
         }
     }
 }
@@ -1121,7 +1141,9 @@ void GattServerService::impl::OnConnectionChanged(const GattDevice &device, int 
         return;
     }
     for (auto &server : servers_) {
-        server.second.callback_.OnConnectionStateChanged(device, GattStatus::GATT_SUCCESS, state);
+        if (server.second.callback_ != nullptr) {
+            server.second.callback_->OnConnectionStateChanged(device, GattStatus::GATT_SUCCESS, state);
+        }
     }
 }
 
@@ -1130,7 +1152,9 @@ void GattServerService::impl::OnConnectionParameterChanged(
 {
     LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     for (auto &server : servers_) {
-        server.second.callback_.OnConnectionParameterChanged(device, interval, latency, timeout, status);
+        if (server.second.callback_ != nullptr) {
+            server.second.callback_->OnConnectionParameterChanged(device, interval, latency, timeout, status);
+        }
     }
 }
 
@@ -1248,7 +1272,9 @@ void GattServerService::impl::NotifyServiceChanged(int appId, const Service &ser
             continue;
         }
         LOG_INFO("%{public}d:%{public}s: call OnServiceChanged", __LINE__, __FUNCTION__);
-        server.second.callback_.OnServiceChanged(service);
+        if (server.second.callback_ != nullptr) {
+            server.second.callback_->OnServiceChanged(service);
+        }
     }
 }
 

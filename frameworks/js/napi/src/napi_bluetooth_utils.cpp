@@ -215,17 +215,18 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
         napi_set_named_property(env, result, "serviceUuid", serviceUuid);
     }
 
-    napi_value value;
-    size_t valueSize;
+    size_t valueSize = 0;
     uint8_t* valueData = characteristic.GetValue(&valueSize).get();
-    uint8_t* bufferData = nullptr;
-    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-    if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
-        HILOGE("ConvertBLECharacteristicToJS memcpy_s failed");
-        return;
+    if (valueSize != 0) {
+        napi_value value = nullptr;
+        uint8_t* bufferData = nullptr;
+        napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
+        if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+            HILOGE("ConvertBLECharacteristicToJS memcpy_s failed");
+            return;
+        }
+        napi_set_named_property(env, result, "characteristicValue", value);
     }
-    napi_set_named_property(env, result, "characteristicValue", value);
-
     napi_value descriptors;
     napi_create_array(env, &descriptors);
     ConvertBLEDescriptorVectorToJS(env, descriptors, characteristic.GetDescriptors());
@@ -649,7 +650,8 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
     if (server == nullptr && client == nullptr) {
         characteristic = new GattCharacteristic(UUID::FromString(characteristicUuid),
             (GattCharacteristic::Permission::READABLE | GattCharacteristic::Permission::WRITEABLE),
-                GattCharacteristic::Propertie::NOTIFY);
+                GattCharacteristic::Propertie::NOTIFY | GattCharacteristic::Propertie::READ
+                | GattCharacteristic::Propertie::WRITE);
 
         napi_create_string_utf8(env, "descriptors", NAPI_AUTO_LENGTH, &propertyNameValue);
         napi_has_property(env, object, propertyNameValue, &hasProperty);
@@ -671,6 +673,7 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
             service = client->GetService(UUID::FromString(serviceUuid));
         }
         if (service == std::nullopt) {
+            HILOGI("GetCharacteristicFromJS service is null");
             return nullptr;
         } else {
             characteristic = service->get().GetCharacteristic(UUID::FromString(characteristicUuid));
@@ -678,6 +681,7 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
     }
  
     if (characteristic == nullptr) {
+        HILOGI("GetCharacteristicFromJS characteristic is null");
         return nullptr;
     }
     napi_create_string_utf8(env, "characteristicValue", NAPI_AUTO_LENGTH, &propertyNameValue);

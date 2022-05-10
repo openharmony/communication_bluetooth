@@ -128,6 +128,7 @@ ServiceGavdpSrc = [
   "src/gavdp/a2dp_codec/sbccodecctrl/src/a2dp_decoder_sbc.cpp",
   "src/gavdp/a2dp_codec/sbccodecctrl/src/a2dp_encoder_sbc.cpp",
   "src/gavdp/a2dp_codec/sbccodecctrl/src/a2dp_sbc_dynamic_lib_ctrl.cpp",
+  "src/gavdp/a2dp_shared_buffer.cpp",
 ]
 
 ServiceHfpAgSrc = [
@@ -295,6 +296,9 @@ config("btservice_config") {
     "$BT_SERVICE_DIR/src/util",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/aaccodecctrl_l2/include",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbccodecctrl/include",
+    "//base/telephony/state_registry/frameworks/native/observer/include",
+    "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiocommon/include",
+    "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiomanager/include",
   ]
 
   cflags_cc = [
@@ -354,12 +358,20 @@ ohos_shared_library("btservice") {
     "$PART_DIR/external:btdummy",
     "$PART_DIR/stack:btstack",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
+    "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
+    "//base/telephony/state_registry/frameworks/native/observer:tel_state_registry_api",
+    "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiomanager:audio_client",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/libxml2:xml2",
+    "//utils/native/base:utilsecurec_shared",
   ]
 
+  defines = [ "PERMISSION_ALWAYS_GRANT" ]
+
   external_deps = [
+    "ability_base:want",
     "access_token:libaccesstoken_sdk",
+    "core_service:tel_core_service_api",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
@@ -379,6 +391,7 @@ ohos_shared_library("btsbc") {
   deps = [
     "$PART_DIR/external:btdummy",
     "//third_party/bounds_checking_function:libsec_shared",
+    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

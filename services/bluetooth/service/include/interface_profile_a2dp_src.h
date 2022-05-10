@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -295,16 +295,6 @@ public:
      * @since 6.0
      */
     virtual void DeregisterObserver(IA2dpObserver *observer) = 0;
-
-    /**
-     * @brief Set audio configure.
-     * @param[in] addr: The address of peer device
-     * @param[in] sampleRate: Audio pcm sample rate
-     * @param[in] bits: Audio pcm bits
-     * @param[in] channel: Number of audio pcm channel
-     * @since 6.0
-     */
-    virtual void SetAudioConfigure(const RawAddress &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel) = 0;
 
     /**
      * @brief Send frame data.

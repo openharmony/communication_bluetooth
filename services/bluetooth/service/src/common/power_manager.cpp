@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,7 +94,7 @@ public:
     void DisconnectionCompleteCallBackProcess(uint8_t status, uint16_t connectionHandle, uint8_t reason);
     static void DisconnectionCompleteCallBack(uint8_t status, uint16_t connectionHandle, uint8_t reason, void *context);
 
-    DISALLOW_COPY_AND_ASSIGN(impl);
+    BT_DISALLOW_COPY_AND_ASSIGN(impl);
 };
 
 PowerManager::PowerManager(utility::Dispatcher &dispatcher) : pimpl(std::make_unique<PowerManager::impl>(dispatcher))

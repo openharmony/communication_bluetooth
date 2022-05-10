@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,7 +94,7 @@ public:
         State* parent_ {nullptr};
 
         friend class StateMachine;
-        DISALLOW_COPY_AND_ASSIGN(State);
+        BT_DISALLOW_COPY_AND_ASSIGN(State);
     };
 
     /**
@@ -147,7 +147,7 @@ private:
     std::array<State*, STACK_DEPTH> stack_ {};
     std::map<std::string, std::unique_ptr<State>> states_ {};
 
-    DISALLOW_COPY_AND_ASSIGN(StateMachine);
+    BT_DISALLOW_COPY_AND_ASSIGN(StateMachine);
 };
 }  // namespace utility
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,22 +25,11 @@
 #include "packet.h"
 
 namespace bluetooth {
-// A2dpEncoderObserver represent a2dp sink or source that is responsible of
-// reading audio data for encoding, or enque a2dp source packet for
-// transmission.
-class A2dpEncoderObserver {
-public:
-    virtual ~A2dpEncoderObserver() = default;
-    virtual uint32_t Read(uint8_t **buf, uint32_t size) = 0;
-    // pktTimeStamp will be added in packet's head.
-    virtual bool EnqueuePacket(const Packet *packet, size_t frames, uint32_t bytes, uint32_t pktTimeStamp) const = 0;
-};
-
 // A2dp encoder interface
 class A2dpEncoder {
 public:
-    A2dpEncoder(A2dpCodecConfig *config, A2dpEncoderObserver *observer)
-        : config_(config), observer_(observer), transmitQueueLength_(0)
+    explicit A2dpEncoder(A2dpCodecConfig *config)
+        : config_(config), transmitQueueLength_(0)
     {}
     virtual ~A2dpEncoder() = default;
     virtual void ResetFeedingState(void) = 0;
@@ -50,13 +39,11 @@ public:
     }
     virtual void SendFrames(uint64_t timeStampUs) = 0;
     virtual void UpdateEncoderParam() = 0;
-    virtual bool SetPcmData(const uint8_t *data, uint16_t dataSize) = 0;
     virtual void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) = 0;
 
 protected:
-    DISALLOW_COPY_AND_ASSIGN(A2dpEncoder);
+    BT_DISALLOW_COPY_AND_ASSIGN(A2dpEncoder);
     A2dpCodecConfig *config_;
-    A2dpEncoderObserver *observer_;
     size_t transmitQueueLength_;
 };
 
@@ -77,7 +64,7 @@ public:
     virtual bool DecodePacket(uint8_t *data, uint16_t size) = 0;
 
 protected:
-    DISALLOW_COPY_AND_ASSIGN(A2dpDecoder);
+    BT_DISALLOW_COPY_AND_ASSIGN(A2dpDecoder);
     A2dpDecoderObserver *observer_;
 };
 }  // namespace bluetooth

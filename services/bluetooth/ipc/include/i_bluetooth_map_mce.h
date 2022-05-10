@@ -78,7 +78,7 @@ public:
     virtual int SetOwnerStatus(const BluetoothRawAddress &device,
         const BluetoothIProfileSetOwnerStatusParameters &para) = 0;
     virtual int GetOwnerStatus(const BluetoothRawAddress &device, const std::string &conversationId) = 0;
-    virtual void GetMasInstanceInfo(const BluetoothRawAddress &device, BluetoothIProfileMasInstanceInfoList &list) = 0;
+    virtual BluetoothIProfileMasInstanceInfoList GetMasInstanceInfo(const BluetoothRawAddress &device) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

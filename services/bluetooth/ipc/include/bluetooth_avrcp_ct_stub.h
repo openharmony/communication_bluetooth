@@ -65,6 +65,9 @@ private:
     ErrCode SetBrowsedPlayerInner(MessageParcel &data, MessageParcel &reply);
     ErrCode GetMeidaPlayerListInner(MessageParcel &data, MessageParcel &reply);
 
+    bool IsInvalidAttributesSize(int32_t attributesSize);
+    bool IsInvalidDeviceStatesSize(int32_t statesSize);
+
     using BluetoothAvrcpCtStubFunc = ErrCode (BluetoothAvrcpCtStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothAvrcpCtStubFunc> memberFuncMap_;
 

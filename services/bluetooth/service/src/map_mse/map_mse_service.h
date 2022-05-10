@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -117,7 +117,7 @@ private:
         void OnDisconnected() override;
         // Reference to the Mse Service
         MapMseService &mseService_;
-        DISALLOW_COPY_AND_ASSIGN(MnsCallback);
+        BT_DISALLOW_COPY_AND_ASSIGN(MnsCallback);
     };
     std::unique_ptr<MnsCallback> mnsObserver_ = nullptr;
     class Observer : public MapObserver {
@@ -154,11 +154,11 @@ private:
 
         // Reference to the Mse Service
         MapMseService &mseService_;
-        DISALLOW_COPY_AND_ASSIGN(Observer);
+        BT_DISALLOW_COPY_AND_ASSIGN(Observer);
     };
     std::unordered_map<int, std::unique_ptr<Observer>> observerMap_ {};
     BaseObserverList<IMapMseObserver> mapMseObservers_ {};
-    DISALLOW_COPY_AND_ASSIGN(MapMseService);
+    BT_DISALLOW_COPY_AND_ASSIGN(MapMseService);
 };
 }  // namespace bluetooth
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,7 +81,7 @@ private:
     std::unique_ptr<Semaphore> dequeue_ {};
     size_t capacity_ {20};
 
-    DISALLOW_COPY_AND_ASSIGN(FixedQueue);
+    BT_DISALLOW_COPY_AND_ASSIGN(FixedQueue);
 };
 
 template<class T>

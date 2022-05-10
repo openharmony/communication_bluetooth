@@ -54,7 +54,7 @@ public:
     int SetOwnerStatus(const BluetoothRawAddress &device,
         const BluetoothIProfileSetOwnerStatusParameters &para) override;
     int GetOwnerStatus(const BluetoothRawAddress &device, const std::string &conversationId) override;
-    void GetMasInstanceInfo(const BluetoothRawAddress &device, BluetoothIProfileMasInstanceInfoList &list) override;
+    BluetoothIProfileMasInstanceInfoList GetMasInstanceInfo(const BluetoothRawAddress &device) override;
 
 private:
     static inline BrokerDelegator<BluetoothMapMceProxy> delegator_;

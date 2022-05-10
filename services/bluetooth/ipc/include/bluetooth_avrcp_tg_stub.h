@@ -52,6 +52,9 @@ private:
     ErrCode NotifyUidChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode NotifyVolumeChangedInner(MessageParcel &data, MessageParcel &reply);
 
+    bool IsInvalidAttributesSize(int32_t attributesSize);
+    bool IsInvalidDeviceStatesSize(int32_t statesSize);
+
     using BluetoothHostFunc = ErrCode (BluetoothAvrcpTgStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHostFunc> memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothAvrcpTgStub);

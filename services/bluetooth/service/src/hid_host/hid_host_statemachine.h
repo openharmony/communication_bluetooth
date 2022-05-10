@@ -140,7 +140,7 @@ private:
 
     void SetDeviceType();
 
-    DISALLOW_COPY_AND_ASSIGN(HidHostStateMachine);
+    BT_DISALLOW_COPY_AND_ASSIGN(HidHostStateMachine);
 };
 
 class HidHostState : public utility::StateMachine::State {

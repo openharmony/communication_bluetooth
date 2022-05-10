@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -123,7 +123,7 @@ private:
     BaseObserverList<IPbapPseObserver> &observerMgrList_;
     std::unique_ptr<utility::Timer> timer_ = nullptr;
     std::function<uint32_t()> getNextConnectIdFun_ {};
-    DISALLOW_COPY_AND_ASSIGN(PbapPseStateMachine);
+    BT_DISALLOW_COPY_AND_ASSIGN(PbapPseStateMachine);
 };
 
 /**
@@ -234,7 +234,7 @@ public:
 
 private:
     PbapPseStateMachine &stm_;
-    DISALLOW_COPY_AND_ASSIGN(PseWaitingForConnect);
+    BT_DISALLOW_COPY_AND_ASSIGN(PseWaitingForConnect);
 };
 /**
  * @brief Connecting statemachine
@@ -290,7 +290,7 @@ private:
     BaseObserverList<IPbapPseObserver> &observerMgrList_;
     ObexIncomingConnect *incomeConnect_ = nullptr;
     std::function<uint32_t()> &getNextConnectIdFun_;
-    DISALLOW_COPY_AND_ASSIGN(PseConnecting);
+    BT_DISALLOW_COPY_AND_ASSIGN(PseConnecting);
 };
 
 class PseConnected : public utility::StateMachine::State {

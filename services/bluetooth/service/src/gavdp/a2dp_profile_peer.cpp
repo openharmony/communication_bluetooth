@@ -114,44 +114,9 @@ void A2dpStream::SetAcpSeid(uint8_t seid)
     acpSeid_ = seid;
 }
 
-uint32_t A2dpCodecEncoderObserver::Read(uint8_t **buf, uint32_t size)
-{
-    LOG_INFO("[A2dpStream] %{public}s \n", __func__);
-    bool ret = false;
-
-    *buf = (uint8_t *)stub::A2dpService::GetInstance()->getPCMStream(size, ret);
-    if (ret) {
-        return size;
-    } else {
-        return 0;
-    }
-}
-
-A2dpCodecEncoderObserver::A2dpCodecEncoderObserver(uint16_t streamHandle)
-{
-    streamHandle_ = streamHandle;
-}
-
-bool A2dpCodecEncoderObserver::EnqueuePacket(const Packet *packet, size_t frames, uint32_t bytes,
-    uint32_t pktTimeStamp) const
-{
-    LOG_INFO("[A2dpStream] %{public}s \n", __func__);
-    bool ret = false;
-    uint8_t payloadType = 0x0e;
-    uint8_t marker = 0;
-    A2dpAvdtp avdtp(A2DP_ROLE_SOURCE);
-
-    if (avdtp.WriteStream(streamHandle_, const_cast<Packet *>(packet), pktTimeStamp, payloadType, marker) ==
-        A2DP_SUCCESS) {
-        ret = true;
-    }
-
-    return ret;
-}
-
 void A2dpCodecDecoderObserver::DataAvailable(uint8_t *buf, uint32_t size)
 {
-    LOG_INFO("[A2dpStream] %{public}s )\n", __func__);
+    LOG_INFO("[A2dpCodecDecoderObserver] %{public}s )\n", __func__);
     /// Read encoder data
     stub::A2dpService::GetInstance()->setPCMStream((char *)buf, size);
 }
@@ -192,10 +157,23 @@ void A2dpProfilePeer::RegisterSEPConfigureInfo(const BtAddr &addr, uint8_t role)
 
     if (role == A2DP_ROLE_SOURCE) {
         for (int i = A2DP_SOURCE_CODEC_INDEX_SBC; i < A2DP_SOURCE_CODEC_INDEX_MAX; i++) {
+            int value = 0x01;
             if (i == A2DP_SOURCE_CODEC_INDEX_SBC) {
-                A2dpProfile::BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_SBC, codecInfo);
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_SBC_SUPPORT, value);
+                LOG_INFO("[A2dpProfilePeer] %{public}s SBC value[%{public}d] \n", __func__, value);
+                if (value) {
+                    A2dpProfile::BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_SBC, codecInfo);
+                } else {
+                    continue;
+                }
             } else if (i == A2DP_SOURCE_CODEC_INDEX_AAC && codecAACConfig) {
-                A2dpProfile::BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_AAC, codecInfo);
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_AAC_SUPPORT, value);
+                LOG_INFO("[A2dpProfilePeer] %{public}s AAC value[%{public}d] \n", __func__, value);
+                if (value) {
+                    A2dpProfile::BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_AAC, codecInfo);
+                } else {
+                    continue;
+                }
             } else {
                 LOG_INFO("[A2dpProfilePeer] %{public}s AAC configure[%{public}d] \n", __func__, codecAACConfig);
                 break;
@@ -210,10 +188,23 @@ void A2dpProfilePeer::RegisterSEPConfigureInfo(const BtAddr &addr, uint8_t role)
         }
     } else {
         for (int i = 0; i < (A2DP_CODEC_INDEX_MAX - A2DP_SINK_CODEC_INDEX_MIN); i++) {
+            int value = 0x01;
             if ((i + A2DP_SINK_CODEC_INDEX_MIN) == A2DP_SINK_CODEC_INDEX_SBC) {
-                A2dpProfile::BuildCodecInfo(A2DP_SINK_CODEC_INDEX_SBC, codecInfo);
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SNK_SERVICE, PROPERTY_CODEC_SBC_SUPPORT, value);
+                LOG_INFO("[A2dpProfilePeer] %{public}s sink SBC value[%{public}d] \n", __func__, value);
+                if (value) {
+                    A2dpProfile::BuildCodecInfo(A2DP_SINK_CODEC_INDEX_SBC, codecInfo);
+                } else {
+                    continue;
+                }
             } else if ((i + A2DP_SINK_CODEC_INDEX_MIN) == A2DP_SINK_CODEC_INDEX_AAC && codecAACConfig) {
-                A2dpProfile::BuildCodecInfo(A2DP_SINK_CODEC_INDEX_AAC, codecInfo);
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SNK_SERVICE, PROPERTY_CODEC_AAC_SUPPORT, value);
+                LOG_INFO("[A2dpProfilePeer] %{public}s sink AAC value[%{public}d] \n", __func__, value);
+                if (value) {
+                    A2dpProfile::BuildCodecInfo(A2DP_SINK_CODEC_INDEX_AAC, codecInfo);
+                } else {
+                    continue;
+                }
             } else {
                 LOG_INFO("[A2dpProfilePeer] %{public}s AAC configure[%{public}d] \n", __func__, codecAACConfig);
                 break;
@@ -664,56 +655,9 @@ uint8_t A2dpProfilePeer::GetCurrentCmd() const
     return currentCmd_;
 }
 
-void A2dpProfilePeer::SetAudioConfigure(uint32_t sampleRate, uint32_t bits, uint8_t channel)
-{
-    A2dpCodecCapability audio = {};
-    uint8_t gavdpRole = A2DP_ROLE_INT;
-    uint8_t capability[A2DP_CODEC_SIZE] = {0};
-    uint8_t resultConfigure[A2DP_CODEC_SIZE] = {0};
-    uint8_t *resConfigInfo = resultConfigure;
-    bool reconfig = false;
-    uint8_t *codecInfo = capability;
-    A2dpProfile *profile = GetProfileInstance(localRole_);
-    A2dpCodecConfig *config = codecConfig_->GetCodecConfig();
-    config->CopyOutOtaCodecConfig(codecInfo);
-    audio.sampleRate_ = sampleRate;
-    audio.bitsPerSample = bits;
-    audio.channelMode_ = channel;
-
-    if (config->GetCodecIndex() == A2DP_SOURCE_CODEC_INDEX_SBC) {
-        *(codecInfo + CODEC_SBC_SAMPLE_INDEX) = (sampleRate | channel);
-        codecReconfig_.numCodec = A2DP_CODEC_SBC_INFO_LEN;
-        LOG_INFO("[A2dpProfilePeer]%{public}s  SBC Freq&chan(%u)\n", __func__, *(codecInfo + CODEC_SBC_SAMPLE_INDEX));
-    } else {
-        codecReconfig_.numCodec = A2DP_CODEC_AAC_INFO_LEN;
-        *(codecInfo + CODEC_AAC_SAMPLE4) = sampleRate;
-        *(codecInfo + CODEC_AAC_SAMPLE5) = (((sampleRate >> CODEC_BIT_MOVE8) & 0xF0) | (channel & 0x0C));
-        *(codecInfo + CODEC_AAC_BIT6) = bits >> CODEC_BIT_MOVE16;
-        *(codecInfo + CODEC_AAC_BIT7) = bits >> CODEC_BIT_MOVE8;
-        *(codecInfo + CODEC_AAC_BIT8) = bits;
-        LOG_INFO("[A2dpProfilePeer]%{public}s  AAC Freq(%u)\n", __func__, *(codecInfo + CODEC_AAC_SAMPLE4));
-        LOG_INFO("[A2dpProfilePeer]%{public}s  AAC Freq&chan(%u)\n", __func__, *(codecInfo + CODEC_AAC_SAMPLE5));
-    }
-
-    codecConfig_->SetCodecAudioConfig(audio, codecInfo, resConfigInfo, &reconfig);
-    if (reconfig) {
-        (void)memcpy_s(codecReconfig_.codecInfo, A2DP_CODEC_SIZE, resultConfigure, A2DP_CODEC_SIZE);
-        codecReconfig_.mediaType = A2DP_MEDIA_TYPE_AUDIO;
-        codecReconfig_.pscMask = AVDT_PSC_MSK_CODEC;
-        Reconfigure(false);
-        NotifyAudioConfigChanged();
-    } else if (strcmp(GetStateMachine()->GetStateName().c_str(), A2DP_PROFILE_STREAMING.c_str()) == 0) {
-        NotifyEncoder();
-        if (profile != nullptr) {
-            profile->AudioStateChangedNotify(peerAddress_, A2DP_IS_PLAYING, (void *)&gavdpRole);
-        }
-    } else {
-        LOG_ERROR("[A2dpProfilePeer]%{public}s  codec is not changed \n", __func__);
-    }
-}
-
 int A2dpProfilePeer::SetUserCodecConfigure(const A2dpSrcCodecInfo &info)
 {
+    LOG_INFO("[A2dpProfilePeer]%{public}s\n", __func__);
     int ret;
     A2dpCodecCapability userConfig = {};
     uint8_t capability[A2DP_CODEC_SIZE] = {0};
@@ -769,6 +713,7 @@ int A2dpProfilePeer::SetUserCodecConfigure(const A2dpSrcCodecInfo &info)
 void A2dpProfilePeer::ChangeUserConfigureInfo(
     A2dpCodecCapability &userConfig, uint8_t *codecInfo, const A2dpSrcCodecInfo info)
 {
+    LOG_INFO("[A2dpProfilePeer]%{public}s\n", __func__);
     A2dpCodecIndex sourceCodecIndex = A2DP_SOURCE_CODEC_INDEX_SBC;
 
     if (A2DP_CODEC_TYPE_AAC == info.codecType) {
@@ -795,8 +740,9 @@ void A2dpProfilePeer::ChangeUserConfigureInfo(
                 *(codecInfo + CODEC_AAC_BIT6) = userConfig.bitsPerSample >> CODEC_BIT_MOVE16;
                 *(codecInfo + CODEC_AAC_BIT7) = userConfig.bitsPerSample >> CODEC_BIT_MOVE8;
                 *(codecInfo + CODEC_AAC_BIT8) = userConfig.bitsPerSample;
-                LOG_INFO("[A2dpProfilePeer]%{public}s  SBC Freq(%u)\n", __func__, *(codecInfo + CODEC_AAC_SAMPLE4));
-                LOG_INFO("[A2dpProfilePeer]%{public}s  SBC Freq&chan(%u)\n", __func__, *(codecInfo + CODEC_AAC_SAMPLE5));
+                LOG_INFO("[A2dpProfilePeer]%{public}s  AAC Freq(%u)\n", __func__, *(codecInfo + CODEC_AAC_SAMPLE4));
+                LOG_INFO("[A2dpProfilePeer]%{public}s  AAC Freq&chan(%u)\n", __func__,
+                    *(codecInfo + CODEC_AAC_SAMPLE5));
             }
             break;
         }
@@ -896,10 +842,7 @@ void A2dpProfilePeer::NotifyEncoder()
         config = codecConfig_->GetCodecConfig();
         LOG_INFO("[A2dpProfilePeer]%{public}s edr(%{public}d) 3Mb(%{public}d) \n", __func__, peerParams.isPeerEdr,
             peerParams.peerSupports3mbps);
-        if (encoderObserver_ == nullptr) {
-            encoderObserver_ = std::make_unique<A2dpCodecEncoderObserver>(GetStreamHandle());
-        }
-        codecThread->ProcessMessage(msg, peerParams, config, encoderObserver_.get(), nullptr);
+        codecThread->ProcessMessage(msg, peerParams, config, nullptr);
     } else {
         LOG_ERROR("[A2dpProfilePeer]%{public}s Can't find the instance of codec \n", __func__);
     }
@@ -917,7 +860,7 @@ void A2dpProfilePeer::NotifyDecoder()
         if (decoderObserver_ == nullptr) {
             decoderObserver_ = std::make_unique<A2dpCodecDecoderObserver>();
         }
-        codecThread->ProcessMessage(msg, peerParams, config, nullptr, decoderObserver_.get());
+        codecThread->ProcessMessage(msg, peerParams, config, decoderObserver_.get());
     } else {
         LOG_ERROR("[A2dpProfilePeer]%{public}s Can't find the instance of codec \n", __func__);
     }
@@ -931,7 +874,7 @@ void A2dpProfilePeer::NotifyAudioConfigChanged() const
     A2dpEncoderInitPeerParams peerParams = {};
 
     if (codecThread != nullptr) {
-        codecThread->ProcessMessage(msg, peerParams, nullptr, nullptr, nullptr);
+        codecThread->ProcessMessage(msg, peerParams, nullptr, nullptr);
     } else {
         LOG_ERROR("[A2dpProfilePeer]%{public}s Can't find the instance of codec \n", __func__);
     }
@@ -971,6 +914,20 @@ void A2dpProfilePeer::SetRestart(bool value)
     std::lock_guard<std::recursive_mutex> lock(g_peerMutex);
     LOG_INFO("[A2dpProfilePeer]%{public}s value(%{public}d)\n", __func__, value);
     restart_ = value;
+}
+
+bool A2dpProfilePeer::GetReconfigTag() const
+{
+    std::lock_guard<std::recursive_mutex> lock(g_peerMutex);
+    LOG_INFO("[A2dpProfilePeer]%{public}s reconfigTag_(%{public}d)\n", __func__, reconfigTag_);
+    return reconfigTag_;
+}
+
+void A2dpProfilePeer::SetReconfigTag(bool value)
+{
+    std::lock_guard<std::recursive_mutex> lock(g_peerMutex);
+    LOG_INFO("[A2dpProfilePeer]%{public}s value(%{public}d)\n", __func__, value);
+    reconfigTag_ = value;
 }
 
 const ConfigureStream &A2dpProfilePeer::GetConfigure() const
@@ -1020,6 +977,8 @@ void A2dpProfilePeer::UpdatePeerMtu(uint16_t mtu)
     LOG_INFO("[A2dpProfilePeer]%{public}s peer mtu size(%u) mtu_(%u)\n", __func__, mtu, mtu_);
     if ((mtu >= 0) && (mtu < A2DP_MAX_AVDTP_MTU_SIZE)) {
         mtu_ = mtu;
+    } else {
+        mtu_ = A2DP_MAX_AVDTP_MTU_SIZE;
     }
 }
 
@@ -1284,5 +1243,23 @@ void A2dpProfilePeer::CreateDefaultCodecPriority()
         defaultCodecPriorities_.insert(
             std::make_pair(A2DP_SINK_CODEC_INDEX_AAC, A2dpCodecPriority(value * PRIORITY_DEFAULT + 1)));
     }
+}
+
+bool A2dpProfilePeer::SendPacket(const Packet *packet, size_t frames, uint32_t bytes,
+    uint32_t pktTimeStamp) const
+{
+    LOG_INFO("[A2dpProfilePeer] %{public}s \n", __func__);
+
+    bool ret = false;
+    uint8_t payloadType = 0x0e;
+    uint8_t marker = 0;
+    A2dpAvdtp avdtp(A2DP_ROLE_SOURCE);
+
+    if (avdtp.WriteStream(streamHandle_, const_cast<Packet *>(packet), pktTimeStamp, payloadType, marker) ==
+        A2DP_SUCCESS) {
+        ret = true;
+    }
+
+    return ret;
 }
 }  // namespace bluetooth

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,17 +16,50 @@
 #include "bluetooth_ble_central_manager_server.h"
 #include "ble_service_data.h"
 #include "bluetooth_log.h"
+#include "event_handler.h"
+#include "event_runner.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
+#include "ipc_skeleton.h"
 #include "remote_observer_list.h"
 #include <string>
 
 namespace OHOS {
 namespace Bluetooth {
 using namespace bluetooth;
-class BleCentralManagerCallback : public IBleCentralManagerCallback {
+struct BluetoothBleCentralManagerServer::impl {
+    impl();
+    ~impl();
+
+    /// sys state observer
+    class SystemStateObserver;
+    std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
+
+    RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
+    class BleCentralManagerCallback;
+    std::unique_ptr<BleCentralManagerCallback> observerImp_ = std::make_unique<BleCentralManagerCallback>(this);
+    IAdapterBle *bleService_ = nullptr;
+
+    struct ScanCallbackInfo;
+    std::vector<ScanCallbackInfo> scanCallbackInfo_;
+
+    BleScanSettingsImpl scanSettingImpl_;
+    bool isScanning;
+
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
+};
+
+struct BluetoothBleCentralManagerServer::impl::ScanCallbackInfo {
+    int pid_;
+    int uid_;
+    bool isStart_;
+    sptr<IBluetoothBleCentralManagerCallback> callback_;
+};
+
+class BluetoothBleCentralManagerServer::impl::BleCentralManagerCallback : public IBleCentralManagerCallback {
 public:
-    BleCentralManagerCallback() = default;
+    explicit BleCentralManagerCallback(BluetoothBleCentralManagerServer::impl *pimpl) : pimpl_(pimpl) {};
     ~BleCentralManagerCallback() override = default;
 
     void OnScanCallback(const BleScanResultImpl &result) override
@@ -137,8 +170,22 @@ public:
     void OnStartScanFailed(int resultCode) override
     {
         HILOGI("BleCentralManageCallback::OnStartScanFailed start.");
-        observers_->ForEach(
-            [resultCode](IBluetoothBleCentralManagerCallback *observer) { observer->OnStartScanFailed(resultCode); });
+
+        pimpl_->eventHandler_->PostTask([=]() {
+            pimpl_->bleService_ =
+                static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+            if (pimpl_->bleService_ != nullptr && !pimpl_->bleService_->IsBtDiscovering()) {
+                for (auto iter = pimpl_->scanCallbackInfo_.begin(); iter != pimpl_->scanCallbackInfo_.end(); ++iter) {
+                    if (iter->isStart_) {
+                        pimpl_->bleService_->StartScan(pimpl_->scanSettingImpl_);
+                        return;
+                    }
+                }
+            }
+            observers_->ForEach([resultCode](IBluetoothBleCentralManagerCallback *observer) {
+                observer->OnStartScanFailed(resultCode);
+            });
+        });
     }
 
     void SetObserver(RemoteObserverList<IBluetoothBleCentralManagerCallback> *observers)
@@ -148,20 +195,7 @@ public:
 
 private:
     RemoteObserverList<IBluetoothBleCentralManagerCallback> *observers_;
-};
-
-struct BluetoothBleCentralManagerServer::impl {
-    impl();
-    ~impl();
-
-    /// sys state observer
-    class SystemStateObserver;
-    std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
-
-    RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
-    std::unique_ptr<BleCentralManagerCallback> observerImp_ = std::make_unique<BleCentralManagerCallback>();
-    IAdapterBle *bleService_ = nullptr;
-    std::vector<sptr<IBluetoothBleCentralManagerCallback>> scanCallback_;
+    BluetoothBleCentralManagerServer::impl *pimpl_ = nullptr;
 };
 
 class BluetoothBleCentralManagerServer::impl::SystemStateObserver : public ISystemStateObserver {
@@ -190,7 +224,10 @@ private:
 };
 
 BluetoothBleCentralManagerServer::impl::impl()
-{}
+{
+    eventRunner_ = AppExecFwk::EventRunner::Create("bt central manager server");
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(eventRunner_);
+}
 
 BluetoothBleCentralManagerServer::impl::~impl()
 {
@@ -203,96 +240,166 @@ BluetoothBleCentralManagerServer::impl::~impl()
 BluetoothBleCentralManagerServer::BluetoothBleCentralManagerServer()
 {
     pimpl = std::make_unique<impl>();
-    pimpl->observerImp_->SetObserver(&(pimpl->observers_));
-    pimpl->systemStateObserver_ = std::make_unique<impl::SystemStateObserver>(pimpl.get());
-    IAdapterManager::GetInstance()->RegisterSystemStateObserver(*(pimpl->systemStateObserver_));
 
-    pimpl->bleService_ =
-        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
-    if (pimpl->bleService_ != nullptr) {
-        pimpl->bleService_->RegisterBleCentralManagerCallback(*pimpl->observerImp_.get());
-    }
+    pimpl->eventHandler_->PostSyncTask(
+        [&]() {
+            pimpl->observerImp_->SetObserver(&(pimpl->observers_));
+            pimpl->systemStateObserver_ = std::make_unique<impl::SystemStateObserver>(pimpl.get());
+            IAdapterManager::GetInstance()->RegisterSystemStateObserver(*(pimpl->systemStateObserver_));
+
+            pimpl->bleService_ =
+                static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+            if (pimpl->bleService_ != nullptr) {
+                pimpl->bleService_->RegisterBleCentralManagerCallback(*pimpl->observerImp_.get());
+            }
+        },
+        AppExecFwk::EventQueue::Priority::HIGH);
 }
 
 BluetoothBleCentralManagerServer::~BluetoothBleCentralManagerServer()
 {
-    IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->systemStateObserver_));
+    pimpl->eventHandler_->PostSyncTask(
+        [&]() { IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->systemStateObserver_)); },
+        AppExecFwk::EventQueue::Priority::HIGH);
 }
 
 void BluetoothBleCentralManagerServer::StartScan()
 {
-    HILOGI("BluetoothBleCentralManagerServer::StartScan start.");
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    HILOGI("BluetoothBleCentralManagerServer::StartScan start. pid:%{public}d uid:%{public}d", pid, uid);
 
-    pimpl->bleService_ =
-        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+    pimpl->eventHandler_->PostSyncTask([&]() {
+        pimpl->bleService_ =
+            static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
 
-    if (pimpl->bleService_ != nullptr) {
-        pimpl->bleService_->StartScan();
-    }
+        for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
+            if (iter->pid_ == pid && iter->uid_ == uid) {
+                iter->isStart_ = true;
+            }
+        }
+
+        if (pimpl->bleService_ != nullptr) {
+            if (!pimpl->isScanning) {
+                pimpl->bleService_->StartScan();
+            }
+        }
+        pimpl->isScanning = true;
+    });
 }
 
 void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings &settings)
 {
-    HILOGI("BluetoothBleCentralManagerServer::StartScan with settings start.");
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    HILOGI("BluetoothBleCentralManagerServer::StartScan with settings start. pid:%{public}d uid:%{public}d", pid, uid);
 
-    pimpl->bleService_ =
-        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+    pimpl->eventHandler_->PostSyncTask([&]() {
+        pimpl->bleService_ =
+            static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
 
-    if (pimpl->bleService_ != nullptr) {
-        BleScanSettingsImpl settingsImpl;
-        settingsImpl.SetReportDelay(settings.GetReportDelayMillisValue());
-        settingsImpl.SetScanMode(settings.GetScanMode());
-        settingsImpl.SetLegacy(settings.GetLegacy());
-        settingsImpl.SetPhy(settings.GetPhy());
-        pimpl->bleService_->StartScan(settingsImpl);
-    }
+        for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
+            if (iter->pid_ == pid && iter->uid_ == uid) {
+                iter->isStart_ = true;
+            }
+        }
+
+        if (pimpl->bleService_ != nullptr) {
+            if (!pimpl->isScanning) {
+                pimpl->scanSettingImpl_.SetReportDelay(settings.GetReportDelayMillisValue());
+                pimpl->scanSettingImpl_.SetScanMode(settings.GetScanMode());
+                pimpl->scanSettingImpl_.SetLegacy(settings.GetLegacy());
+                pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
+                pimpl->bleService_->StartScan(pimpl->scanSettingImpl_);
+                pimpl->isScanning = true;
+            } else if (pimpl->scanSettingImpl_.GetReportDelayMillisValue() != settings.GetReportDelayMillisValue() ||
+                       pimpl->scanSettingImpl_.GetScanMode() != settings.GetScanMode() ||
+                       pimpl->scanSettingImpl_.GetLegacy() != settings.GetLegacy() ||
+                       pimpl->scanSettingImpl_.GetPhy() != settings.GetPhy()) {
+                pimpl->scanSettingImpl_.SetReportDelay(settings.GetReportDelayMillisValue());
+                pimpl->scanSettingImpl_.SetScanMode(settings.GetScanMode());
+                pimpl->scanSettingImpl_.SetLegacy(settings.GetLegacy());
+                pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
+                pimpl->bleService_->StopScan();
+                pimpl->isScanning = false;
+            }
+        }
+    });
 }
 
 void BluetoothBleCentralManagerServer::StopScan()
 {
-    HILOGI("BluetoothBleCentralManagerServer::StopScan start.");
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    HILOGI("BluetoothBleCentralManagerServer::StopScan start. pid:%{public}d uid:%{public}d", pid, uid);
 
-    pimpl->bleService_ =
-        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+    pimpl->eventHandler_->PostSyncTask([&]() {
+        pimpl->bleService_ =
+            static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
 
-    if (pimpl->bleService_ != nullptr) {
-        pimpl->bleService_->StopScan();
-    }
+        bool doStop = true;
+        for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
+            if (iter->pid_ == pid && iter->uid_ == uid) {
+                iter->isStart_ = false;
+            }
+            doStop = iter->isStart_ ? false : doStop;
+        }
+
+        if (pimpl->bleService_ != nullptr) {
+            if (doStop) {
+                pimpl->bleService_->StopScan();
+                pimpl->isScanning = false;
+            }
+        }
+    });
 }
 
 void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
-    HILOGI("BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback start.");
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    HILOGI("BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback start. pid:%{public}d uid:%{public}d",
+        pid,
+        uid);
 
     if (callback == nullptr) {
-        HILOGI(
-            "BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback called with NULL binder. Ignoring.");
+        HILOGI("BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback called with NULL binder. "
+               "Ignoring.");
         return;
     }
-    if (pimpl != nullptr) {
-        pimpl->observers_.Register(callback);
-        pimpl->scanCallback_.push_back(callback);
-    }
+
+    pimpl->eventHandler_->PostSyncTask([&]() {
+        if (pimpl != nullptr) {
+            pimpl->observers_.Register(callback);
+            impl::ScanCallbackInfo info;
+            info.pid_ = pid;
+            info.uid_ = uid;
+            info.isStart_ = false;
+            info.callback_ = callback;
+            pimpl->scanCallbackInfo_.push_back(info);
+        }
+    });
 }
 
 void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     HILOGI("BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback start.");
-
-    if (callback == nullptr || pimpl == nullptr) {
-        HILOGI(
-            "BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback called with NULL binder. Ignoring.");
-        return;
-    }
-    for (auto iter = pimpl->scanCallback_.begin(); iter != pimpl->scanCallback_.end(); ++iter) {
-        if ((*iter)->AsObject() == callback->AsObject()) {
-            pimpl->observers_.Deregister(*iter);
-            pimpl->scanCallback_.erase(iter);
-            break;
+    pimpl->eventHandler_->PostSyncTask([&]() {
+        if (callback == nullptr || pimpl == nullptr) {
+            HILOGI("BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback called with NULL binder. "
+                   "Ignoring.");
+            return;
         }
-    }
+        for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
+            if (iter->callback_->AsObject() == callback->AsObject()) {
+                pimpl->observers_.Deregister(iter->callback_);
+                pimpl->scanCallbackInfo_.erase(iter);
+                break;
+            }
+        }
+    });
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

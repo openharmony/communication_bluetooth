@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,11 @@ typedef struct {
     int result;
     void *context;
 } AvdtStreamConnectReqTskParam;
+
+typedef struct {
+    uint16_t lcid;
+    int result;
+} AvdtStreamSendDataTskParam;
 
 /* Signal  action functions */
 extern uint16_t AvdtActConnReq(AvdtSigCtrl *sigCtrl, const AvdtEventData *data);
@@ -123,6 +128,9 @@ void AvdtSignalConnectReq(const BtAddr *addr, uint16_t lcid, int result, void *c
 void AvdtStreamConnectReqCallback(const BtAddr *addr, uint16_t lcid, int result, void *context);
 void AvdtStreamConnectReqTsk(void *context);
 void AvdtStreamConnectReq(const BtAddr *addr, uint16_t lcid, int result, void *context);
+void AvdtStreamSendDataCallback(uint16_t lcid, int result);
+void AvdtStreamSendDataTsk(void *context);
+void AvdtStreamSendData(uint16_t lcid, int result);
 AvdtSepConfig AvdtGetSepConfig(AvdtSigCtrl *sigCtrl, uint16_t handle);
 AvdtSepConfig AvdtGetConfig(AvdtSigCtrl *sigCtrl, uint16_t handle);
 #endif /* AVDTP_IMPL_H */
