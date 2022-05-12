@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -128,6 +128,7 @@ BluetoothA2dpSourceServer::impl::~impl()
 
 BluetoothA2dpSourceServer::BluetoothA2dpSourceServer()
 {
+    HILOGI("BluetoothA2dpSourceServer::BluetoothA2dpSourceServer() starts");
     pimpl = std::make_unique<impl>();
     pimpl->observerImp_->SetObserver(&(pimpl->observers_));
     pimpl->systemStateObserver_ = std::make_unique<impl::SystemStateObserver>(pimpl.get());
@@ -144,6 +145,7 @@ BluetoothA2dpSourceServer::BluetoothA2dpSourceServer()
 
 BluetoothA2dpSourceServer::~BluetoothA2dpSourceServer()
 {
+    HILOGI("BluetoothA2dpSourceServer::~BluetoothA2dpSourceServer() starts");
     IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->systemStateObserver_));
     if (pimpl->a2dpSrcService_ != nullptr) {
         pimpl->a2dpSrcService_->DeregisterObserver(pimpl->observerImp_.get());
@@ -346,13 +348,6 @@ int BluetoothA2dpSourceServer::StopPlaying(const RawAddress &device)
 {
     HILOGI("BluetoothA2dpSourceServer::StopPlaying starts");
     return pimpl->a2dpSrcService_->StopPlaying(device);
-}
-
-void BluetoothA2dpSourceServer::SetAudioConfigure(const RawAddress &device, int sample, int bits, int channel)
-{
-    HILOGI("BluetoothA2dpSourceServer::SetAudioConfigure starts, sample = %{public}d, bits = %{public}d, channel = %{public}d",
-           sample, bits, channel);
-    pimpl->a2dpSrcService_->SetAudioConfigure(device, (uint32_t)sample, (uint32_t)bits, (uint8_t)channel);
 }
 
 int BluetoothA2dpSourceServer::WriteFrame(const uint8_t *data, uint32_t size)

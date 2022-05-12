@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -399,7 +399,7 @@ private:
 
     static std::map<uint16_t, L2capTransport *> g_clientTransportMap;
 
-    DISALLOW_COPY_AND_ASSIGN(L2capTransport);
+    BT_DISALLOW_COPY_AND_ASSIGN(L2capTransport);
 };
 }  // namespace bluetooth
 #endif  // TRANSPORT_L2CAP_H

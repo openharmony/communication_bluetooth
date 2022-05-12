@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,7 @@ namespace bluetooth {
 constexpr int A2DP_SBC_MAX_PACKET_SIZE = 6144;
 constexpr int MAX_2MBPS_SBC_PAYLOAD_MTU = 655;
 constexpr int MAX_3MBPS_SBC_PAYLOAD_MTU = 997;
-
+constexpr int MAX_PCM_FRAME_NUM_PER_TICK = 14;
 /* AVDP media headsize. */
 constexpr int A2DP_SBC_PACKET_HEAD_SIZE = 23;
 constexpr int A2DP_SBC_MEDIA_PAYLOAD_HEAD_SIZE = 1;
@@ -114,15 +114,12 @@ struct A2dpSbcEncoderCb {
 
 class A2dpSbcEncoder : public A2dpEncoder {
 public:
-    A2dpSbcEncoder(const A2dpEncoderInitPeerParams *peerParams, A2dpCodecConfig *config,
-        A2dpEncoderObserver *observer);
+    A2dpSbcEncoder(const A2dpEncoderInitPeerParams *peerParams, A2dpCodecConfig *config);
     ~A2dpSbcEncoder() override;
     void ResetFeedingState(void) override;
     void SendFrames(uint64_t timeStampUs) override;
     void UpdateEncoderParam() override;
-    bool SetPcmData(const uint8_t *data, uint16_t dataSize) override;
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
-
 private:
     sbc::IEncoderBase* sbcEncoder_ = nullptr;
     std::unique_ptr<A2dpSBCDynamicLibCtrl> codecLib_ = nullptr;
@@ -154,10 +151,7 @@ private:
     void EnqueuePacketFragment(Packet *pkt,
         size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const;
     A2dpSbcEncoderCb a2dpSbcEncoderCb_ {};
-    bool isFirstTimeToReadData_ = false;
-    DISALLOW_COPY_AND_ASSIGN(A2dpSbcEncoder);
-    uint8_t data_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO] {0};
-    uint16_t dataSize_;
+    BT_DISALLOW_COPY_AND_ASSIGN(A2dpSbcEncoder);
 };
 }  // namespace bluetooth
 

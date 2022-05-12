@@ -48,7 +48,6 @@ public:
     int StartPlaying(const RawAddress &device) override;
     int SuspendPlaying(const RawAddress &device) override;
     int StopPlaying(const RawAddress &device) override;
-    void SetAudioConfigure(const RawAddress &device, int32_t sampleRate, int32_t bits, int32_t channel) override;
     int WriteFrame(const uint8_t *data, uint32_t size) override;
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
 

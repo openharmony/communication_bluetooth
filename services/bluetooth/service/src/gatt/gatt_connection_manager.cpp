@@ -128,7 +128,7 @@ struct GattConnectionManager::impl : public GattServiceBase {
     static void ChangeConnectionMode(bool isDirect);
     void DirectConnectTimeout(const GattDevice &device);
 
-    DISALLOW_COPY_AND_ASSIGN(impl);
+    BT_DISALLOW_COPY_AND_ASSIGN(impl);
 };
 
 GattConnectionManager::GattConnectionManager() : pimpl(std::make_unique<impl>())
@@ -877,7 +877,6 @@ void GattConnectionManager::impl::ConnectionInComming(
         Device->Info().addressType_ = addr.type;
         Device->ProcessMessage(Device::StateMachine::MSG_CONNECT_COMPLETE, connectHandle, data);
     } else {
-        Device->Info().role_ = GATT_ROLE_MASTER;
         instance.pimpl->DoDisconnect(connectHandle);
         LOG_INFO("%{public}s: The maximum number of device connections has been reached", __FUNCTION__);
     }

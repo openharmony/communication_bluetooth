@@ -21,6 +21,7 @@
 #include "log.h"
 #include "packet.h"
 #include "securec.h"
+#include "../../../a2dp_service.h"
 
 namespace bluetooth {
 const int BIT_SBC_NUMBER_PER_SAMPLE = 8;
@@ -46,18 +47,15 @@ sbc::CodecParam g_sbcEncode = {};
 
 std::recursive_mutex g_sbcMutex {};
 A2dpSbcEncoder::A2dpSbcEncoder(
-    const A2dpEncoderInitPeerParams *peerParams, A2dpCodecConfig *config, A2dpEncoderObserver *observer)
-    : A2dpEncoder(config, observer)
+    const A2dpEncoderInitPeerParams *peerParams, A2dpCodecConfig *config) : A2dpEncoder(config)
 {
     LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
-    dataSize_ = 0;
     a2dpSbcEncoderCb_.isPeerEdr = peerParams->isPeerEdr;
     a2dpSbcEncoderCb_.peerSupports3mbps = peerParams->peerSupports3mbps;
     a2dpSbcEncoderCb_.peerMtu = peerParams->peermtu;
     a2dpSbcEncoderCb_.dalayValue = 0;
     a2dpSbcEncoderCb_.timestamp = 0;
     a2dpSbcEncoderCb_.sendDataSize = 0;
-    isFirstTimeToReadData_ = true;
     codecLib_ = std::make_unique<A2dpSBCDynamicLibCtrl>(true);
     codecSbcEncoderLib_ = codecLib_->LoadCodecSbcLib();
     if (codecSbcEncoderLib_ == nullptr) {
@@ -85,27 +83,13 @@ void A2dpSbcEncoder::ResetFeedingState(void)
         a2dpSbcEncoderCb_.feedingParams.sampleRate * a2dpSbcEncoderCb_.feedingParams.bitsPerSample /
         BIT_SBC_NUMBER_PER_SAMPLE * a2dpSbcEncoderCb_.feedingParams.channelCount * A2DP_SBC_ENCODER_INTERVAL_MS /
         MS_TO_US;
-
-    isFirstTimeToReadData_ = true;
+    LOG_INFO("[SbcEncoder] %{public}s, sampleRate %{public}u, bitsPerSample %{public}u channelCount %{public}u\n",
+        __func__, a2dpSbcEncoderCb_.feedingParams.sampleRate, a2dpSbcEncoderCb_.feedingParams.bitsPerSample,
+        a2dpSbcEncoderCb_.feedingParams.channelCount);
+    
     a2dpSbcEncoderCb_.dalayValue = 0;
     a2dpSbcEncoderCb_.timestamp = 0;
     a2dpSbcEncoderCb_.sendDataSize = 0;
-}
-
-bool A2dpSbcEncoder::SetPcmData(const uint8_t *data, uint16_t dataSize)
-{
-    std::lock_guard<std::recursive_mutex> lock(g_sbcMutex);
-    LOG_INFO("[A2dpSbcEncoder] %{public}s, data = %{public}s, dataSize = %{public}hd\n", __func__, data, dataSize);
-    if(dataSize > A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO) {
-        LOG_ERROR("[A2dpSbcEncoder] %{public}s dataSize too large\n", __func__);
-        return false;
-    }
-    if(memcpy_s(data_, A2DP_SBC_MAX_PACKET_SIZE * FRAME_TWO, data, dataSize) != EOK) {
-        LOG_ERROR("[A2dpSbcEncoder] %{public}s copy error\n", __func__);
-        return false;
-    }
-    dataSize_ = dataSize;
-    return true;
 }
 
 void A2dpSbcEncoder::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
@@ -343,26 +327,34 @@ void A2dpSbcEncoder::UpdateEncoderParam(void)
 
 bool A2dpSbcEncoder::A2dpSbcReadFeeding(uint32_t *bytesRead)
 {
-    uint16_t actualReadPcmData = dataSize_;
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
+    
+    uint32_t expectedReadPcmData = a2dpSbcEncoderCb_.feedingState.bytesPerTick;
+    
+    if (expectedReadPcmData + a2dpSbcEncoderCb_.offsetPCM > FRAME_THREE * A2DP_SBC_MAX_PACKET_SIZE) {
+        LOG_ERROR("[Feeding] buffer no space");
+        return false;
+    }
+    A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
+    uint32_t actualReadPcmData = profile->GetPcmData(&a2dpSbcEncoderCb_.pcmBuffer[a2dpSbcEncoderCb_.offsetPCM],
+        expectedReadPcmData);
+    LOG_INFO("[ReadA2dpSharedBuffer][expectedReadPcmData:%u][actualReadPcmData:%u]",
+        expectedReadPcmData, actualReadPcmData);
+
+    *bytesRead = actualReadPcmData;
+
     if (actualReadPcmData) {
         LOG_INFO("[Feeding][offsetPCM:%u][readBytes:%u]", a2dpSbcEncoderCb_.offsetPCM, actualReadPcmData);
-        if (memcpy_s(((uint8_t *)&a2dpSbcEncoderCb_.pcmBuffer[a2dpSbcEncoderCb_.offsetPCM]), 
-            A2DP_SBC_MAX_PACKET_SIZE,
-            data_, actualReadPcmData) != EOK) {
-            LOG_ERROR("[Feeding] A2dpSbcReadFeeding memcpy_s fail");
-            return false;
-        }
-        *bytesRead = actualReadPcmData;
-        dataSize_ = 0;
         return true;
     } else {
-        LOG_INFO("[Feeding][read no data][readBytes:%u]", actualReadPcmData);
+        LOG_ERROR("[Feeding][read no data][readBytes:%u]", actualReadPcmData);
         return false;
     }
 }
 
 void A2dpSbcEncoder::ConvertFreqParamToSBCParam(void)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     switch (encParams->samplingFreq) {
         case SBC_SAMPLE_RATE_16000:
@@ -385,6 +377,7 @@ void A2dpSbcEncoder::ConvertFreqParamToSBCParam(void)
 
 void A2dpSbcEncoder::ConvertModeParamToSBCParam(void)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     switch (encParams->channelMode) {
         case SBC_MONO:
@@ -407,6 +400,7 @@ void A2dpSbcEncoder::ConvertModeParamToSBCParam(void)
 
 void A2dpSbcEncoder::ConvertSubbandsParamToSBCParam(void)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     switch (encParams->subBands) {
         case SBC_SUBBAND_4:
@@ -423,6 +417,7 @@ void A2dpSbcEncoder::ConvertSubbandsParamToSBCParam(void)
 
 void A2dpSbcEncoder::ConvertBlockParamToSBCParam(void)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     switch (encParams->numOfBlocks) {
         case SBC_BLOCKS_4:
@@ -445,6 +440,7 @@ void A2dpSbcEncoder::ConvertBlockParamToSBCParam(void)
 
 void A2dpSbcEncoder::ConvertAllocationParamToSBCParam(void)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     switch (encParams->allocationMethod) {
         case SBC_LOUDNESS:
@@ -461,12 +457,14 @@ void A2dpSbcEncoder::ConvertAllocationParamToSBCParam(void)
 
 void A2dpSbcEncoder::ConvertBitpoolParamToSBCParam(void)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     g_sbcEncode.bitpool = encParams->bitPool;
 }
 
 void A2dpSbcEncoder::CalculateSbcPCMRemain(uint16_t codecSize, uint32_t bytesNum, uint8_t *numOfFrame)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     if (codecSize != 0) {
         LOG_INFO("[offset:%u][bytes:%u][codecSize:%u]", a2dpSbcEncoderCb_.offsetPCM, bytesNum, codecSize);
         *numOfFrame = (a2dpSbcEncoderCb_.offsetPCM + bytesNum) / codecSize;
@@ -483,6 +481,7 @@ void A2dpSbcEncoder::CalculateSbcPCMRemain(uint16_t codecSize, uint32_t bytesNum
 
 void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     size_t encoded = 0;
     SBCEncoderParams *encParams = &a2dpSbcEncoderCb_.sbcEncoderParams;
     uint16_t blocksXsubbands = encParams->subBands * encParams->numOfBlocks;
@@ -501,6 +500,8 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
             uint8_t outputBuf[A2DP_SBC_HQ_DUAL_BP_53_FRAME_SIZE] = {};
             int16_t outputLen = sbcEncoder_->SBCEncode(g_sbcEncode, &a2dpSbcEncoderCb_.pcmBuffer[pcmOffset],
                 blocksXsubbands * channelMode, outputBuf, sizeof(outputBuf), &encoded);
+            LOG_INFO("[SbcEncoder] %{public}s encoded %{public}zu, pcmOffset%{public}u\n",
+                __func__, encoded, pcmOffset);
             if (outputLen < 0) {
                 LOG_ERROR("err occur.");
             }
@@ -544,7 +545,8 @@ void A2dpSbcEncoder::EnqueuePacket(
         Buffer *header = PacketHead(pkt);
         uint8_t *p = static_cast<uint8_t*>(BufferPtr(header));
         *p = frames;
-        observer_->EnqueuePacket(pkt, frames, bytes, timeStamp);  // Enqueue Packet.
+        A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
+        profile->EnqueuePacket(pkt, frames, bytes, timeStamp);  // Enqueue Packet.
     } else {
         EnqueuePacketFragment(pkt, frames, bytes, timeStamp, frameSize);
     }
@@ -553,6 +555,7 @@ void A2dpSbcEncoder::EnqueuePacket(
 void A2dpSbcEncoder::EnqueuePacketFragment(
     Packet *pkt, size_t frames, const uint32_t bytes, uint32_t timeStamp, const uint16_t frameSize) const
 {
+    LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
     uint8_t count = 1;
     uint32_t pktLen = 0;
     uint8_t frameNum = 0;
@@ -599,7 +602,11 @@ void A2dpSbcEncoder::EnqueuePacketFragment(
             PacketPayloadAddLast(mediaPacket, encBuf);
             BufferFree(encBuf);
             remainFrames = remainFrames - frameNum;
-            observer_->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp - remainFrames * blocksXsubbands);
+
+            A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
+            profile->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp - remainFrames * blocksXsubbands);
+            // Enqueue Packet.
+
             PacketFree(mediaPacket);
         } while (count > 0);
     }

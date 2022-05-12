@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 #include "hfp_hf_data_connection_server.h"
 #include "hfp_hf_service.h"
 #include "power_manager.h"
-#include "stub/telephone_client_service.h"
+#include "audio_system_manager.h"
 
 namespace bluetooth {
 HfpHfStateMachine::HfpHfStateMachine(const std::string &address)
@@ -429,6 +429,7 @@ bool HfpHfAudioConnected::Dispatch(const utility::Message &msg)
 void HfpHfAudioConnected::ProcessDisconnect(const HfpHfMessage &event)
 {
     profile_.ReleaseAudioConnection();
+    stateMachine_.routeHfAudio(false);
     stateMachine_.AddDeferredMessage(event);
 }
 
@@ -554,6 +555,10 @@ void HfpHfStateMachine::ProcessAcceptCall(int flag)
     } else {
         LOG_DEBUG("[HFP HF]%{public}s():No call to accept", __FUNCTION__);
     }
+
+    if (flag == HFP_HF_ACCEPT_CALL_ACTION_HOLD) {
+        routeHfAudio(true);
+    }
     return;
 }
 
@@ -664,13 +669,20 @@ void HfpHfStateMachine::ProcessAudioDisconnected()
 void HfpHfStateMachine::SyncScoEvents(int state)
 {
     if (state == HFP_HF_AUDIO_STATE_CONNECTED) {
-        int spkVolume = stub::TelePhoneClientService::GetInstance().GetStreamVolume(HFP_HF_VOLUME_TYPE_SPK);
-        int micVolume = stub::TelePhoneClientService::GetInstance().GetStreamVolume(HFP_HF_VOLUME_TYPE_MIC);
+        int spkVolume = OHOS::AudioStandard::AudioSystemManager::GetInstance()->GetVolume(
+            OHOS::AudioStandard::AudioSystemManager::STREAM_VOICE_CALL);
+        int micVolume = OHOS::AudioStandard::AudioSystemManager::GetInstance()->GetVolume(
+            OHOS::AudioStandard::AudioSystemManager::STREAM_VOICE_CALL);
         profile_.SetHfVolume(spkVolume, HFP_HF_VOLUME_TYPE_SPK);
         profile_.SetHfVolume(micVolume, HFP_HF_VOLUME_TYPE_MIC);
+
+        routeHfAudio(true);
+        OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetAudioParameter(
+            "hfp_volume", std::to_string(spkVolume));
     }
 
     if (state == HFP_HF_AUDIO_STATE_DISCONNECTED) {
+        routeHfAudio(false);
         if (voiceRecognitionStatus_ == HFP_HF_VR_STATE_OPENED) {
             NotifyVoiceRecognitionStatusChanged(HFP_HF_VR_STATE_CLOSED);
         }
@@ -821,9 +833,10 @@ void HfpHfStateMachine::ProcessCurrentCallEvent(const HfpHfMessage &event) const
 void HfpHfStateMachine::ProcessSetVolumeEvent(const HfpHfMessage &event) const
 {
     if (event.arg1_ == HFP_HF_VOLUME_TYPE_SPK) {
-        stub::TelePhoneClientService::GetInstance().SetStreamVolume(event.arg1_, event.arg3_);
+        OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetVolume(
+            OHOS::AudioStandard::AudioSystemManager::STREAM_VOICE_CALL, event.arg3_);
     } else if (event.arg1_ == HFP_HF_VOLUME_TYPE_MIC) {
-        stub::TelePhoneClientService::GetInstance().SetStreamVolume(event.arg1_, event.arg3_);
+        OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetMicrophoneMute(event.arg3_ == 0);
     } else {
         LOG_ERROR("[HFP HF]%{public}s():the error volume type!", __FUNCTION__);
     }
@@ -865,6 +878,18 @@ void HfpHfStateMachine::NotifyVoiceRecognitionStatusChanged(int status)
         RawAddress device(address_);
         service->NotifyVoiceRecognitionStatusChanged(device, voiceRecognitionStatus_);
     }
+}
+
+void HfpHfStateMachine::routeHfAudio(bool state)
+{
+    if (state) {
+        if (!isAudioRouted_) {
+            OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetAudioParameter("hfp_enable", "true");
+        }
+    } else {
+        OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetAudioParameter("hfp_enable", "false");
+    }
+    isAudioRouted_ = state;
 }
 
 void HfpHfStateMachine::ProcessVrChangedEvent(const HfpHfMessage &event)

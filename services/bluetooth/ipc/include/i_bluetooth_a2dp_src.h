@@ -73,7 +73,6 @@ public:
     virtual int StartPlaying(const RawAddress &device) = 0;
     virtual int SuspendPlaying(const RawAddress &device) = 0;
     virtual int StopPlaying(const RawAddress &device) = 0;
-    virtual void SetAudioConfigure(const RawAddress &device, int32_t sampleRate, int32_t bits, int32_t channel) = 0;
     virtual int WriteFrame(const uint8_t *data, uint32_t size) = 0;
     virtual void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) = 0;
 };

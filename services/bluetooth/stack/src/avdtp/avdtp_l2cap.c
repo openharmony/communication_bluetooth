@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -401,10 +401,17 @@ void AvdtConfigureIndication(uint16_t lcid, uint8_t id, const L2capConfigInfo *c
 {
     LOG_INFO("[AVDT]%{public}s ", __func__);
     if (cfg->rfc.mode == L2CAP_BASIC_MODE) {
-        transTable->peerMtu = cfg->mtu;
+        L2capConfigInfo l2capCfg = {0};
+        (void)memcpy_s(&l2capCfg, sizeof(L2capConfigInfo), cfg, sizeof(L2capConfigInfo));
+        if (cfg->mtu > AvdtGetMtu()) {
+            transTable->peerMtu = AvdtGetMtu();
+            l2capCfg.mtu = AvdtGetMtu();
+        } else {
+            transTable->peerMtu = cfg->mtu;
+        }
         transTable->peerFlushTo = cfg->flushTimeout;
         transTable->state = AVDT_TRANS_ST_CFG;
-        L2CIF_ConfigRsp(lcid, id, cfg, L2CAP_SUCCESS, NULL);
+        L2CIF_ConfigRsp(lcid, id, &l2capCfg, L2CAP_SUCCESS, NULL);
         transTable->cfgFlags |= AVDT_CFG_IND;
         if (transTable->cfgFlags == AVDT_CFG_END) {
             AvdtConfigComplete(transTable);

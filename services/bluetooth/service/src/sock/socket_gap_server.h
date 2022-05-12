@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,7 @@ public:
     static int UnregisterSecurity(const BtAddr addr, uint8_t scn, GAP_Service serviceId);
 
 private:
-    DISALLOW_COPY_AND_ASSIGN(SocketGapServer);
+    BT_DISALLOW_COPY_AND_ASSIGN(SocketGapServer);
 };
 }  // namespace bluetooth
 #endif  // SOCKET_GAP_SERVER_H

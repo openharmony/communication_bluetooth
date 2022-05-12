@@ -256,7 +256,7 @@ int BluetoothGattClientServer::RegisterApplication(
     }
     auto it = pimpl->callbacks_.emplace(
         pimpl->callbacks_.begin(), std::make_unique<impl::GattClientCallbackImpl>(callback, *this));
-    int appId = pimpl->clientService_->RegisterApplication(*it->get(), (RawAddress)addr, transport);
+    int appId = pimpl->clientService_->RegisterSharedApplication(*it->get(), (RawAddress)addr, transport);
     (*it)->SetAppId(appId);
     return appId;
 }

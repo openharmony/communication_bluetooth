@@ -43,7 +43,7 @@ struct GattServerProfile::impl {
     uint16_t mtu_ = 0;
     GattServerProfile *profile_ = nullptr;
     int connectionObserverId_ = 0;
-    DISALLOW_COPY_AND_ASSIGN(impl);
+    BT_DISALLOW_COPY_AND_ASSIGN(impl);
 
     static void ReceiveData(uint16_t connectHandle, uint16_t event, void *eventData, Buffer *buffer, void *context);
     static void ReceiveResponseResult(uint16_t connectHandle, int result, void *context);
@@ -1721,10 +1721,12 @@ void GattServerProfile::impl::DeleteList(uint16_t connectHandle)
  */
 void GattServerProfile::impl::AddDeviceList(uint16_t connectHandle, GattDevice device)
 {
+    LOG_INFO("%{public}s: entry", __FUNCTION__);
     for (auto iter = devList_.begin(); iter != devList_.end(); iter++) {
         if (iter->second.device_.addr_.operator==(device.addr_) &&
             iter->second.device_.transport_ == device.transport_) {
             iter->first = connectHandle;
+            LOG_INFO("%{public}s: Device already exists", __FUNCTION__);
             return;
         }
     }
@@ -1749,16 +1751,21 @@ void GattServerProfile::impl::AddCccdValue(uint16_t connectHandle, uint16_t attH
         }
     }
     if (iter == devList_.end()) {
+        LOG_INFO("%{public}s: Device does not exist", __FUNCTION__);
         return;
     }
     for (uint8_t num = 0; num < GATT_CCCD_NUM_MAX; num++) {
         if (iter->second.cccd_[num].valHandle_ == attHandle) {
             iter->second.cccd_[num].value_ = value;
+            LOG_INFO("cccd valid handle: %hu, value: %hu", attHandle, value);
             return;
         } else if (iter->second.cccd_[num].valHandle_ == INVALID_ATTRIBUTE_HANDLE) {
             iter->second.cccd_[num].valHandle_ = attHandle;
             iter->second.cccd_[num].value_ = value;
+            LOG_INFO("cccd invalid handle: %hu, value: %hu", attHandle, value);
             return;
+        } else {
+            LOG_ERROR("%{public}s: CCCD does not exist", __FUNCTION__);
         }
     }
 }
@@ -1812,7 +1819,7 @@ class GattServerProfile::impl::GattConnectionObserverImplement : public GattConn
 public:
     void OnConnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
-        LOG_INFO("%{public}s: gatt_server connect role is %{public}d", __FUNCTION__, device.role_);
+        LOG_INFO("%{public}s: gatt_server connect ret is %{public}d", __FUNCTION__, ret);
         if (ret == GATT_SUCCESS) {
             this->serverProfile_.pimpl->dispatcher_->PostTask(
                 std::bind(&impl::AddDeviceList, serverProfile_.pimpl.get(), connectionHandle, device));
@@ -1821,7 +1828,7 @@ public:
 
     void OnDisconnect(const GattDevice &device, uint16_t connectionHandle, int ret) override
     {
-        LOG_INFO("%{public}s: gatt_server connect role is %{public}d", __FUNCTION__, device.role_);
+        LOG_INFO("%{public}s: gatt_server connect ret is %{public}d", __FUNCTION__, ret);
         if (device.isEncryption_ == false) {
             this->serverProfile_.pimpl->dispatcher_->PostTask(
                 std::bind(&impl::DeleteCccdValue, serverProfile_.pimpl.get(), connectionHandle));
@@ -2008,6 +2015,8 @@ void GattServerProfile::SendNotification(
             ATT_HandleValueNotification(connectHandle, handle, buffer);
             BufferFree(buffer);
         }
+    } else {
+        LOG_ERROR("%{public}s: GATT_NOTIFICATION_VALUE is invalid", __FUNCTION__);
     }
 }
 /**
@@ -2031,6 +2040,7 @@ void GattServerProfile::SendIndication(
             BufferFree(buffer);
         }
     } else {
+        LOG_ERROR("%{public}s: GATT_INDICATION_VALUE is invalid", __FUNCTION__);
         pimpl->pServerCallBack_->OnIndicationEvent(connectHandle, handle, GATT_FAILURE);
     }
 }

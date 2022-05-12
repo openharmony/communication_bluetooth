@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,6 @@
 #include <list>
 #include <mutex>
 #include <memory>
-#include <functional>
 #include "base_def.h"
 
 template<typename T>
@@ -37,7 +36,7 @@ private:
     std::mutex lock_ = {};
     std::list<T *> observers_ = {};
 
-    DISALLOW_COPY_AND_ASSIGN(BaseObserverList);
+    BT_DISALLOW_COPY_AND_ASSIGN(BaseObserverList);
 };
 
 template<typename T>

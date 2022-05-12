@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,7 +151,10 @@ ErrCode BluetoothAvrcpCtStub::GetDevicesByStatesInner(MessageParcel &data, Messa
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
-
+    if (IsInvalidDeviceStatesSize(stateSize)) {
+        HILOGE("BluetoothAvrcpCtStub::GetDevicesByStatesInner Invalid MessageParcel device states");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < stateSize; i++) {
         int32_t state = data.ReadInt32();
         states.push_back(state);
@@ -262,7 +265,10 @@ ErrCode BluetoothAvrcpCtStub::GetPlayerAppSettingCurrentValueInner(MessageParcel
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> attributes = {};
     int32_t attributesSize = data.ReadInt32();
-
+    if (IsInvalidAttributesSize(attributesSize)) {
+        HILOGE("BluetoothAvrcpCtStub::GetPlayerAppSettingCurrentValueInner Invalid MessageParcel attributes");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         attributes.push_back(attribute);
@@ -278,7 +284,10 @@ ErrCode BluetoothAvrcpCtStub::SetPlayerAppSettingCurrentValueInner(MessageParcel
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> attributes = {};
     int32_t attributesSize = data.ReadInt32();
-
+    if (IsInvalidAttributesSize(attributesSize)) {
+        HILOGE("BluetoothAvrcpCtStub::SetPlayerAppSettingCurrentValueInner Invalid MessageParcel attributes");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         attributes.push_back(attribute);
@@ -286,7 +295,10 @@ ErrCode BluetoothAvrcpCtStub::SetPlayerAppSettingCurrentValueInner(MessageParcel
 
     std::vector<int32_t> values = {};
     int32_t valuesSize = data.ReadInt32();
-
+    if (IsInvalidAttributesSize(valuesSize)) {
+        HILOGE("BluetoothAvrcpCtStub::SetPlayerAppSettingCurrentValueInner Invalid MessageParcel values");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < valuesSize; i++) {
         int32_t value = data.ReadInt32();
         values.push_back(value);
@@ -303,7 +315,10 @@ ErrCode BluetoothAvrcpCtStub::GetPlayerAppSettingAttributeTextInner(MessageParce
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> attributes = {};
     int32_t attributesSize = data.ReadInt32();
-
+    if (IsInvalidAttributesSize(attributesSize)) {
+        HILOGE("BluetoothAvrcpCtStub::GetPlayerAppSettingAttributeTextInner Invalid MessageParcel attributes");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         attributes.push_back(attribute);
@@ -320,7 +335,10 @@ ErrCode BluetoothAvrcpCtStub::GetPlayerAppSettingValueTextInner(MessageParcel &d
     int32_t attributes = data.ReadInt32();
     std::vector<int32_t> values = {};
     int32_t valuesSize = data.ReadInt32();
-
+    if (IsInvalidAttributesSize(valuesSize)) {
+        HILOGE("BluetoothAvrcpCtStub::GetPlayerAppSettingValueTextInner Invalid MessageParcel values");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < valuesSize; i++) {
         int32_t value = data.ReadInt32();
         values.push_back(value);
@@ -337,7 +355,10 @@ ErrCode BluetoothAvrcpCtStub::GetElementAttributesInner(MessageParcel &data, Mes
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> attributes = {};
     int32_t attributesSize = data.ReadInt32();
-
+    if (IsInvalidAttributesSize(attributesSize)) {
+        HILOGE("BluetoothAvrcpCtStub::GetElementAttributesInner Invalid MessageParcel attributes");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         attributes.push_back(attribute);
@@ -373,6 +394,10 @@ ErrCode BluetoothAvrcpCtStub::GetFolderItemsInner(MessageParcel &data, MessagePa
     int32_t endItem = data.ReadInt32();
     std::vector<int32_t> attributes = {};
     int32_t attributesSize = data.ReadInt32();
+    if (IsInvalidAttributesSize(attributesSize)) {
+        HILOGE("BluetoothAvrcpCtStub::GetFolderItemsInner Invalid MessageParcel attributes");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         attributes.push_back(attribute);
@@ -477,6 +502,26 @@ ErrCode BluetoothAvrcpCtStub::GetMeidaPlayerListInner(MessageParcel &data, Messa
     reply.WriteInt32(result);
 
     return NO_ERROR;
+}
+
+bool BluetoothAvrcpCtStub::IsInvalidAttributesSize(int32_t attributesSize)
+{
+    bool ret = false;
+    const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = 255;
+    if (attributesSize > COUNT_OF_AVRC_PLAYER_ATTRIBUTE) {
+        ret =  true;
+    }
+    return ret;
+}
+
+bool BluetoothAvrcpCtStub::IsInvalidDeviceStatesSize(int32_t statesSize)
+{
+    bool ret = false;
+    const int32_t COUNT_OF_DEVICE_STATE = 4;
+    if (statesSize > COUNT_OF_DEVICE_STATE) {
+        ret =  true;
+    }
+    return ret;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

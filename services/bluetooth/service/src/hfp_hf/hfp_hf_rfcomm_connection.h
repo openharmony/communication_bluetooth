@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -164,7 +164,7 @@ private:
         RFCOMM_CHANNEL_EV_CONNECT_SUCCESS | RFCOMM_CHANNEL_EV_CONNECT_FAIL | RFCOMM_CHANNEL_EV_DISCONNECTED |
         RFCOMM_CHANNEL_EV_DISCONNECT_SUCCESS | RFCOMM_CHANNEL_EV_DISCONNECT_FAIL | RFCOMM_CHANNEL_EV_REV_DATA;
 
-    DISALLOW_COPY_AND_ASSIGN(HfpHfRfcommConnection);
+    BT_DISALLOW_COPY_AND_ASSIGN(HfpHfRfcommConnection);
 };
 }  // namespace bluetooth
 #endif // HFP_HF_RFCOMM_CONNECTION_H

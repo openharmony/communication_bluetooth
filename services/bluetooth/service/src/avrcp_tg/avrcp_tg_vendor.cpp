@@ -1430,22 +1430,22 @@ bool AvrcTgGpasvtPacket::IsValidAttributeAndValue(void) const
 
     switch (attributeId_) {
         case AVRC_PLAYER_ATTRIBUTE_EQUALIZER:
-            if(any_of(values_.begin(), values_.end(), [](int value){return (value < AVRC_EQUALIZER_OFF || value > AVRC_EQUALIZER_ON);})){
+            if (any_of(values_.begin(), values_.end(), [](int value){return (value < AVRC_EQUALIZER_OFF || value > AVRC_EQUALIZER_ON);})){
                 result = false;
             }
             break;
         case AVRC_PLAYER_ATTRIBUTE_REPEAT:
-            if(any_of(values_.begin(), values_.end(), [](int value){return (value < AVRC_REPEAT_OFF || value > AVRC_REPEAT_GROUP);})){
+            if (any_of(values_.begin(), values_.end(), [](int value){return (value < AVRC_REPEAT_OFF || value > AVRC_REPEAT_GROUP);})){
                 result = false;
             }
             break;
         case AVRC_PLAYER_ATTRIBUTE_SHUFFLE:
-            if(any_of(values_.begin(), values_.end(), [](int value){return (value < AVRC_SHUFFLE_OFF || value > AVRC_SHUFFLE_GROUP);})){
+            if (any_of(values_.begin(), values_.end(), [](int value){return (value < AVRC_SHUFFLE_OFF || value > AVRC_SHUFFLE_GROUP);})){
                 result = false;
             }
             break;
         case AVRC_PLAYER_ATTRIBUTE_SCAN:
-        	if(any_of(values_.begin(), values_.end(),[](int value){return (value < AVRC_SCAN_OFF || value > AVRC_SCAN_GROUP);})){
+        	if (any_of(values_.begin(), values_.end(),[](int value){return (value < AVRC_SCAN_OFF || value > AVRC_SCAN_GROUP);})){
                 result = false;
             }
             break;

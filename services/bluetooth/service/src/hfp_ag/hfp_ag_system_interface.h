@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +17,9 @@
 #define HFP_AG_SYSTEM_INTERFACE_H
 
 #include <string>
-
+#include "base_def.h"
 #include "hfp_ag_defines.h"
+#include "telephony_observer.h"
 
 namespace bluetooth {
 /**
@@ -48,7 +49,7 @@ public:
      *
      * @param address The address of the bluetooth device.
      */
-    void RejectCall(const std::string &address);
+    void RejectCall(const std::string &address) const;
 
     /**
      * @brief Receive the command from HF and dial out the call with the number.
@@ -94,21 +95,21 @@ public:
      *
      * @return Returns the name of the network operator.
      */
-    std::string GetNetworkOperator() const;
+    std::string GetNetworkOperator();
 
     /**
      * @brief Receives the command of HF and get the number of the phone from the telecom.
      *
      * @return Returns the number of the phone.
      */
-    std::string GetSubscriberNumber() const;
+    std::string GetSubscriberNumber();
 
     /**
      * @brief Receives the command of HF and asks the telecom to respone the current list through the CLCC.
      *
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      */
-    bool QueryCurrentCallsList() const;
+    bool QueryCurrentCallsList();
 
     /**
      * @brief Receives the command of HF and asks the telecom to respone the current call state.
@@ -153,35 +154,35 @@ public:
      *
      * @return Returns the last dialed number.
      */
-    std::string GetLastDialNumber() const;
+    std::string GetLastDialNumber();
 
     /**
      * @brief Get the service state object.
      *
      * @return Returns the value of the state.
      */
-    int GetServiceState() const;
+    int GetServiceState();
 
     /**
      * @brief Get the signal strength.
      *
      * @return Returns the value of the signal.
      */
-    int GetSignalStrength() const;
+    int GetSignalStrength();
 
     /**
      * @brief Get the roaming state.
      *
      * @return Returns the value of the roaming.
      */
-    int GetRoamState() const;
+    int GetRoamState();
 
     /**
      * @brief Get the battery level.
      *
      * @return Returns the value of the battery level.
      */
-    int GetBatteryLevel() const;
+    int GetBatteryLevel();
 
     /**
      * @brief Notify ag indicator from the phone.
@@ -312,6 +313,27 @@ private:
      */
     void SendBatteryLevelToService() const;
 
+    /**
+     * @brief Register a TelephonyObserver to the telephony subsystem.
+     */
+    void RegisterObserver();
+
+    /**
+     * @brief Unregister a TelephonyObserver to the telephony subsystem.
+     */
+    void UnregisterObserver();
+    
+    /**
+     * @brief Convert from string to u16string
+     */
+
+    inline std::u16string Str8ToStr16(const std::string& str) const;
+
+    /**
+     * @brief Convert from u16string to string
+     */
+    inline std::string Str16ToStr8(const std::u16string& str) const;
+
     // The state of the service.
     int serviceState_ {0};
 
@@ -332,6 +354,49 @@ private:
 
     // The status of the call.
     int callState_ {HFP_AG_CALL_STATE_DISCONNECTED};
+
+    // The primary slot Id
+    int slotId_ {0};
+
+    // The number of the sim card
+    std::string subscriberNumber_ {""};
+
+    // The vendor name
+    std::string operatorName_ {""};
+
+    class AgTelephonyObserver;
+
+     // The observer that implements TelephonyObserver
+    OHOS::sptr<AgTelephonyObserver> observer_ {nullptr};
+};
+class HfpAgSystemInterface::AgTelephonyObserver : public OHOS::Telephony::TelephonyObserver {
+public:
+    explicit AgTelephonyObserver(HfpAgSystemInterface &interface) : interface_(interface)
+    {}
+    ~AgTelephonyObserver() override
+    {}
+
+    void OnCellularDataConnectStateUpdated(int32_t slotId, int32_t dataState, int32_t networkType) override
+    {}
+    void OnCallStateUpdated(int32_t slotId, int32_t callState, const std::u16string &phoneNumber) override
+    {}
+    void OnSignalInfoUpdated(int32_t slotId,
+        const std::vector<OHOS::sptr<OHOS::Telephony::SignalInformation>> &vec) override;
+        
+    void OnNetworkStateUpdated(int32_t slotId, const OHOS::sptr<OHOS::Telephony::NetworkState> &networkState) override;
+
+    void OnCellInfoUpdated(int32_t slotId,
+        const std::vector<OHOS::sptr<OHOS::Telephony::CellInformation>> &vec) override
+    {}
+    void OnSimStateUpdated(int32_t slotId, OHOS::Telephony::CardType type, OHOS::Telephony::SimState state,
+        OHOS::Telephony::LockReason reason) override
+    {}
+    void OnCellularDataFlowUpdated(int32_t slotId, int32_t dataFlowType) override
+    {}
+
+private:
+    HfpAgSystemInterface &interface_;
+    BT_DISALLOW_COPY_AND_ASSIGN(AgTelephonyObserver);
 };
 }  // namespace bluetooth
 #endif // HFP_AG_SYSTEM_INTERFACE_H
