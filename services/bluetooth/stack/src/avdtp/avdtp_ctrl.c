@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -746,7 +746,7 @@ const uint8_t AVDT_SIG_ST_IDLE[][AVDT_STREAM_NUM_COLS] = {
     /* AVDT_DISCONNECT_CMD_RSP_EVENT */
     {AVDT_SSM_IGNORE, AVDT_SIG_IDLE_ST},
     /* AVDT_DISCONNECT_CMD_IND_EVENT */
-    {AVDT_SSM_IGNORE, AVDT_SIG_IDLE_ST},
+    {AVDT_DISCONNECT_IND, AVDT_SIG_IDLE_ST},
     /* AVDT_DISCONNECT_CMD_CFM_EVENT */
     {AVDT_SSM_IGNORE, AVDT_SIG_IDLE_ST},
     /* AVDT_SND_MSG_EVENT */

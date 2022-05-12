@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -191,7 +191,7 @@ private:
         void OnBusy(ObexServerSession &session, bool isBusy) const override;
 
         MapMseServer *mseServer_;
-        DISALLOW_COPY_AND_ASSIGN(MseObexServer);
+        BT_DISALLOW_COPY_AND_ASSIGN(MseObexServer);
     };
 
     std::unique_ptr<MseObexServer> mseObexServer_ = nullptr;
@@ -276,7 +276,7 @@ private:
 
     int l2capMtu_ = 0;
 
-    DISALLOW_COPY_AND_ASSIGN(MapMseServer);
+    BT_DISALLOW_COPY_AND_ASSIGN(MapMseServer);
 };
 }  // namespace bluetooth
 

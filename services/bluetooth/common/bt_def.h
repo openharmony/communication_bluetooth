@@ -30,6 +30,7 @@ constexpr int RET_NO_ERROR = 0;
 constexpr int RET_NO_SUPPORT = -1;
 constexpr int RET_BAD_PARAM = -2;
 constexpr int RET_BAD_STATUS = -3;
+constexpr int RET_NO_SPACE = -4;
 
 /*********************************************
  *

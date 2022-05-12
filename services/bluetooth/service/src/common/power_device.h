@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -283,7 +283,7 @@ private:
 #define NS_PER_MS 1000000
 
         uint64_t deadLineMs_ = 0;
-        DISALLOW_COPY_AND_ASSIGN(PowerTimer);
+        BT_DISALLOW_COPY_AND_ASSIGN(PowerTimer);
     };
 
     friend class PowerActiveActivingState;
@@ -292,7 +292,7 @@ private:
     friend class PowerSniffSniffingState;
     friend class PowerSniffState;
 
-    DISALLOW_COPY_AND_ASSIGN(PowerDevice);
+    BT_DISALLOW_COPY_AND_ASSIGN(PowerDevice);
     DECLARE_IMPL();
 };
 }  // namespace bluetooth

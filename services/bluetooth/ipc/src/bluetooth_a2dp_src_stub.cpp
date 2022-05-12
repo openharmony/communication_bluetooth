@@ -61,8 +61,6 @@ BluetoothA2dpSrcStub::BluetoothA2dpSrcStub()
         &BluetoothA2dpSrcStub::SuspendPlayingInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_STOP_PLAYING)] =
         &BluetoothA2dpSrcStub::StopPlayingInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_SET_AUDIO_CONFIGURE)] =
-        &BluetoothA2dpSrcStub::SetAudioConfigureInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_WRITE_FRAME)] =
         &BluetoothA2dpSrcStub::WriteFrameInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_RENDER_POSITION)] =
@@ -345,16 +343,6 @@ ErrCode BluetoothA2dpSrcStub::StopPlayingInner(MessageParcel &data, MessageParce
         return TRANSACTION_ERR;
     }
 
-    return NO_ERROR;
-}
-
-ErrCode BluetoothA2dpSrcStub::SetAudioConfigureInner(MessageParcel &data, MessageParcel &reply)
-{
-    std::string addr = data.ReadString();
-    int32_t sampleRate = data.ReadInt32();
-    int32_t bits = data.ReadInt32();
-    int32_t channel = data.ReadInt32();
-    SetAudioConfigure(RawAddress(addr), sampleRate, bits, channel);
     return NO_ERROR;
 }
 

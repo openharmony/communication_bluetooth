@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -376,18 +376,15 @@ public:
      */
     void DeregisterObserver(IA2dpObserver *observer) override;
 
-    /**
-     * @brief Set audio configure.
-     * @param[in] addr: The address of peer device
-     * @param[in] sampleRate: Audio pcm sample rate
-     * @param[in] bits: Audio pcm bits
-     * @param[in] channel: Number of audio pcm channel
-     * @since 6.0
-     */
-    void SetAudioConfigure(const RawAddress &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel) override;
-
     int WriteFrame(const uint8_t *data, uint32_t size) override;
 
+    /**
+     * @brief Get the information of the current rendered position.
+     * @param[out] dalayValue is the delayed time
+     * @param[out] sendDataSize is the data size that has been sent
+     * @param[out] timeStamp is the current time stamp
+     * @since 6.0
+     */
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
     /**
      * @brief Get boject pointer of A2dpConnectManager.
@@ -495,6 +492,13 @@ public:
      */
     void CheckDisable();
 
+    /**
+     * @brief  Activate remote device
+     *
+     * @since 6.0
+     */
+    void ActiveDevice();
+
 private:
     /**
      * @brief Process the events.
@@ -578,15 +582,15 @@ private:
     bool IsSimilarCodecConfig(A2dpSrcCodecInfo codecInfo, A2dpSrcCodecInfo newInfo) const;
 
     /**
-     * @brief Check if the codec information matches confirmed information.
+     * @brief Check if the codec information matches local information.
      *
      * @param codecInfo The codec information.
-     * @param codecStatus The codec status information of connected device.
+     * @param codecStatus The codec status information of local device.
      * @return Returns <b>true</b> codec information matches confirmed information.
-     *         Returns <b>false</b> codec information doesn't match confirmed information.
+     *         Returns <b>false</b> codec information doesn't match local information.
      * @since 6.0
      */
-    bool IsConfirmedCodecInfo(A2dpSrcCodecStatus codecStatus, A2dpSrcCodecInfo codecInformation) const;
+    bool IsLocalCodecInfo(A2dpSrcCodecStatus codecStatus, A2dpSrcCodecInfo codecInformation) const;
 
     int maxConnectNumSnk_ = A2DP_CONNECT_NUM_MAX;             // max number of connected peer device
     uint8_t role_ = A2DP_ROLE_SOURCE;                         // A2DP role

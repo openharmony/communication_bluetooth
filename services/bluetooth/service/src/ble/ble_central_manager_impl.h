@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -252,14 +252,14 @@ private:
     void GapScanDelayReportResultEvt() const;
     void GapScanStartCompleteEvt(int status) const;
     void GapScanStopCompleteEvt(int status) const;
-    void GapScanResolvingCompletEvt(int status) const;
+    void GapScanResolvingCompletEvt(int status, bool isStart) const;
 
     void GapExScanParamSetCompleteEvt(int status) const;
     void GapExScanResultEvt() const;
     void GapExScanDelayReportResultEvt() const;
     void GapExScanStartCompleteEvt(int status) const;
     void GapExScanStopCompleteEvt(int status) const;
-    void GapExScanResolvingCompletEvt(int status) const;
+    void GapExScanResolvingCompletEvt(int status, bool isStart) const;
     bool SetScanParamOrExScanParamToGap() const;
     bool SetLegacyScanParamToGap() const;
     bool SetExtendScanParamToGap() const;
@@ -278,7 +278,7 @@ private:
     utility::Dispatcher *dispatcher_ = nullptr;
     std::map<std::string, std::vector<uint8_t>> incompleteData_{};
 
-    DISALLOW_COPY_AND_ASSIGN(BleCentralManagerImpl);
+    BT_DISALLOW_COPY_AND_ASSIGN(BleCentralManagerImpl);
     DECLARE_IMPL();
 };
 }  // namespace bluetooth

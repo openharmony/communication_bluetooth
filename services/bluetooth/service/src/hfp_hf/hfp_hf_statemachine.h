@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -313,6 +313,13 @@ public:
      */
     void NotifyVoiceRecognitionStatusChanged(int status);
 
+    /**
+     * @brief Route hf audio state.
+     *
+     * @param flag The state to toute.
+     */
+    void routeHfAudio(bool state);
+
     inline static const std::string DISCONNECTED = "Disconnected";
     inline static const std::string CONNECTING = "Connecting";
     inline static const std::string DISCONNECTING = "Disconnecting";
@@ -339,8 +346,9 @@ private:
     std::unique_ptr<utility::Timer> connTimer_ {nullptr};
     inline static const int CONNECTION_TIMEOUT_MS {60000};  // 60s
     bool isRemoving_ {false};
+    bool isAudioRouted_ {false};
 
-    DISALLOW_COPY_AND_ASSIGN(HfpHfStateMachine);
+    BT_DISALLOW_COPY_AND_ASSIGN(HfpHfStateMachine);
 };
 
 class HfpHfState : public utility::StateMachine::State {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1752,8 +1752,10 @@ uint16_t AvdtActDisconnInd(AvdtSigCtrl *sigCtrl, const AvdtEventData *data)
     AvdtCtrlData confirmData = {0};
     AvdtStreamCtrlDeallocAll(sigCtrl);
     confirmData.hdr.errCode = AVDT_SUCCESS;
-    AvdtCtrlEvtCallback(
-        sigCtrl, sigCtrl->handle, &sigCtrl->peerAddress, AVDT_DISCONNECT_IND_EVT, &confirmData, sigCtrl->role);
+    if (sigCtrl->state != AVDT_SIG_IDLE_ST) {
+        AvdtCtrlEvtCallback(
+            sigCtrl, sigCtrl->handle, &sigCtrl->peerAddress, AVDT_DISCONNECT_IND_EVT, &confirmData, sigCtrl->role);
+    }
     AvdtFreeSigCtrlByHandle(sigCtrl->handle);
     return Ret;
 }
@@ -1995,4 +1997,62 @@ void AvdtPktDataPrint(const Packet *pkt)
         LOG_DEBUG("%02X ", buf[i]);
     }
     return;
+}
+
+void AvdtStreamSendDataCallback(uint16_t lcid, int result)
+{
+    LOG_INFO("[AVDT]%{public}s:result(%{public}d), lcid(0x%x)", __func__, result, lcid);
+    AvdtStreamSendDataTskParam *param = malloc(sizeof(AvdtStreamSendDataTskParam));
+    if (param == NULL) {
+        LOG_ERROR("[AVDT] %{public}s: memory malloc failed", __func__);
+        return;
+    }
+    (void)memset_s(param, sizeof(AvdtStreamSendDataTskParam), 0, sizeof(AvdtStreamSendDataTskParam));
+    param->lcid = lcid;
+    param->result = result;
+    if (AvdtAsyncProcess(AvdtStreamSendDataTsk, param)) {
+        free(param);
+    }
+    return;
+}
+
+void AvdtStreamSendDataTsk(void *context)
+{
+    LOG_INFO("[AVDT]%{public}s", __func__);
+
+    AvdtStreamSendDataTskParam *param = (AvdtStreamSendDataTskParam *)context;
+    AvdtStreamSendData(param->lcid, param->result);
+    free(context);
+    return;
+}
+
+void AvdtStreamSendData(uint16_t lcid, int result)
+{
+    LOG_INFO("[AVDT]%{public}s:result(%{public}d), lcid(0x%x)", __func__, result, lcid);
+
+    AvdtTransChannel *transTable = AvdtGetTransChTabByLcid(lcid);
+    if (transTable == NULL) {
+        LOG_ERROR("[AVDT]%{public}s:AvdtGetTransChTabByLcid(0x%x) Failed!!", __func__, lcid);
+        return;
+    }
+
+    LOG_DEBUG("[AVDT]%{public}s:transTable->type(%hhu), transTable->streamHandle(%hu),transTable->sigHandle(%hu) ",
+        __func__,
+        transTable->type,
+        transTable->streamHandle,
+        transTable->sigHandle);
+
+    AvdtSigCtrl *sigCtrl = AvdtGetSigCtrlByHandle(transTable->sigHandle);
+    if (sigCtrl == NULL) {
+        LOG_ERROR("[AVDT]%{public}s:AvdtGetSigCtrlByHandle(%hu) Failed", __func__, transTable->sigHandle);
+        return;
+    }
+
+    AvdtCtrlData confirmData = {0};
+    if (result != BT_NO_ERROR) {
+        confirmData.hdr.errCode = AVDT_FAILED;
+    }
+
+    AvdtCtrlEvtCallback(
+        sigCtrl, sigCtrl->streamHandle, &(sigCtrl->peerAddress), AVDT_WRITE_CFM_EVT, &confirmData, sigCtrl->role);
 }

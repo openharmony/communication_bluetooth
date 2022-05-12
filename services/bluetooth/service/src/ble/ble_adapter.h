@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -203,7 +203,7 @@ private:
     static void OnReadRemoteRssiEvent(uint8_t status, const BtAddr *addr, int8_t rssi, void *context);
     static void GenResPriAddrResult(uint8_t result, const uint8_t addr[BT_ADDRESS_SIZE], void *context);
 
-    DISALLOW_COPY_AND_ASSIGN(BleAdapter);
+    BT_DISALLOW_COPY_AND_ASSIGN(BleAdapter);
     DECLARE_IMPL();
 };
 };  // namespace bluetooth

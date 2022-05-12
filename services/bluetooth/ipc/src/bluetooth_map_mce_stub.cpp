@@ -456,8 +456,7 @@ ErrCode BluetoothMapMceStub::GetMasInstanceInfoInner(MessageParcel &data, Messag
     if (!device) {
         return TRANSACTION_ERR;
     }
-    BluetoothIProfileMasInstanceInfoList result;
-    GetMasInstanceInfo(*device, result);
+    BluetoothIProfileMasInstanceInfoList result = GetMasInstanceInfo(*device);
     bool ret = reply.WriteParcelable(&result);
     if (!ret) {
         HILOGE("BluetoothMapMceStub: reply writing failed in: %{public}s.", __func__);

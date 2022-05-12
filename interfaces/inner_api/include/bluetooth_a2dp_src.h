@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -280,17 +280,25 @@ public:
     void DeregisterObserver(A2dpSourceObserver *observer);
 
     /**
-     * @brief Set audio configure.
-     * @param[in] addr: The address of peer device
-     * @param[in] sampleRate: Audio pcm sample rate
-     * @param[in] bits: Audio pcm bits
-     * @param[in] channel: Number of audio pcm channel
+     * @brief Write the pcm data to a2dp source profile.
+     *
+     * @param data Pointer of the data.
+     * @param size Size of the data
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>RET_BAD_PARAM</b> Input error.
+     *         Returns <b>RET_BAD_STATUS</b> if the operation fails.
+     *         Returns <b>RET_NO_SPACE</b> if the buffer of a2dp source profile is full.
      * @since 6.0
      */
-    void SetAudioConfigure(const BluetoothRemoteDevice &addr, uint32_t sampleRate, uint32_t bits, uint8_t channel);
-
     int WriteFrame(const uint8_t *data, uint32_t size);
     
+    /**
+     * @brief Get the information of the current rendered position.
+     * @param[out] dalayValue is the delayed time
+     * @param[out] sendDataSize is the data size that has been sent
+     * @param[out] timeStamp is the current time stamp
+     * @since 6.0
+     */
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp);
 
 private:

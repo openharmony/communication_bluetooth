@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -169,4 +169,36 @@ int32_t QueueGetDequeueFd(const Queue *queue)
 {
     ASSERT(queue);
     return SemaphoreGetfd(queue->dequeueSem);
+}
+
+void QueueFlush(Queue* queue, NodeDataFreeCb cb)
+{
+    ASSERT(queue);
+
+    while (!QueueIsEmpty(queue)) {
+        void* data = QueueTryDequeue(queue);
+        if (cb != NULL) {
+            cb(data);
+        }
+    }
+}
+
+bool QueueIsEmpty(Queue* queue)
+{
+    ASSERT(queue);
+    bool ret = false;
+    MutexLock(queue->mutex);
+    ret = ListIsEmpty(queue->list);
+    MutexUnlock(queue->mutex);
+    return ret;
+}
+
+int32_t QueueGetSize(Queue *queue)
+{
+    ASSERT(queue);
+    int32_t ret = 0;
+    MutexLock(queue->mutex);
+    ret = ListGetSize(queue->list);
+    MutexUnlock(queue->mutex);
+    return ret;
 }

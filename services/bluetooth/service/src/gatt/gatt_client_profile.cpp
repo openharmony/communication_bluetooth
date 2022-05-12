@@ -40,7 +40,7 @@ struct GattClientProfile::impl {
           dispatcher_(dispatcher),
           connectionCallBack_(std::make_unique<GattConnectionObserverImplement>(profile))
     {}
-    DISALLOW_COPY_AND_ASSIGN(impl);
+    BT_DISALLOW_COPY_AND_ASSIGN(impl);
 
     static void ReceiveData(uint16_t connectHandle, uint16_t event, void *eventData, Buffer *buffer, void *context);
     static void ReceiveRequestResult(uint16_t connectHandle, int result, void *context);
@@ -646,7 +646,8 @@ void bluetooth::GattClientProfile::WriteCharacteristicValue(
         if (buffer != nullptr) {
             pimpl->requestList_.emplace_back(
                 connectHandle, GattRequestInfo(WRITE_CHARACTERISTIC_VALUE, handle, reqId));
-            LOG_DEBUG("%{public}s: Add requestList_: WRITE_CHARACTERISTIC_VALUE", __FUNCTION__);
+            LOG_DEBUG("%{public}s: handle: %{public}d, len: %{public}zu, value: %{public}d",
+                __FUNCTION__, handle, len, *(value->get()));
             ATT_WriteRequest(connectHandle, handle, buffer);
             BufferFree(buffer);
         }
@@ -702,7 +703,8 @@ void GattClientProfile::WriteDescriptorValue(
         if (buffer != nullptr) {
             pimpl->requestList_.emplace_back(
                 connectHandle, GattRequestInfo(WRITE_CHARACTERISTIC_DESCRIPTOR, handle, reqId));
-            LOG_DEBUG("%{public}s: Add requestList_: WRITE_CHARACTERISTIC_DESCRIPTOR", __FUNCTION__);
+            LOG_DEBUG("%{public}s: handle: %{public}d, len: %{public}zu, value: %{public}d",
+                __FUNCTION__, handle, len, *(value->get()));
             ATT_WriteRequest(connectHandle, handle, buffer);
             BufferFree(buffer);
         }

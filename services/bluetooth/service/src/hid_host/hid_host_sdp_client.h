@@ -98,7 +98,7 @@ private:
     bool isSdpDone_ = false;
     bool isPnpSdpDone_ = false;
 
-    DISALLOW_COPY_AND_ASSIGN(HidHostSdpClient);
+    BT_DISALLOW_COPY_AND_ASSIGN(HidHostSdpClient);
 };
 }  // namespace bluetooth
 #endif // HID_HOST_SDP_CLIENT_H

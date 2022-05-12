@@ -362,6 +362,7 @@ uint8_t A2dpAvdtp::ParseAvdtpConfigureInd(
         peer->SetInitSide(false);
         peer->SetIntSeid(handle);
         peer->SetAcpSeid(data.configInd.acpSeid);
+        peer->SetPeerCapInfo(handle, peer->GetAcpSeid(), data.configInd.cfg, role);
     }
 
     return EVT_SETCONFIG_IND;
@@ -548,7 +549,7 @@ uint8_t A2dpAvdtp::ParseAvdtpConnectCFM(
     if (data.connectCfm.errCode) {
         LOG_ERROR("[A2dpAvdtp] %{public}s Peer reject the connect req!!\n", __func__);
         peer->SetInitSide(false);
-        return EVT_CONNECT_IND;
+        return EVT_DISCONNECT_CFM;
     }
     peer->SetCurrentCmd(EVT_DISCOVER_REQ);
     peer->SetSignalingTimer(A2DP_ACCEPT_SIGNALLING_TIMEOUT_MS, false);
@@ -641,6 +642,7 @@ uint8_t A2dpAvdtp::ParseAvdtpGetCapabilityCFM(
     if (msg.a2dpMsg.stream.acpSeid != 0 && !capabilityComplete) {
         peer->UpdateSepIndex();
         peer->SetAcpSeid(msg.a2dpMsg.stream.acpSeid);
+        peer->SetSignalingTimer(A2DP_ACCEPT_SIGNALLING_TIMEOUT_MS, false);
     } else {
         if (peer->JudgeCapabilityMatched(role) && peer->GetInitSide()) {
             peer->SetConfigure();
@@ -648,20 +650,18 @@ uint8_t A2dpAvdtp::ParseAvdtpGetCapabilityCFM(
             (void)memcpy_s(&msg.a2dpMsg.configStream, sizeof(ConfigureStream),
                 (&peer->GetConfigure()), sizeof(ConfigureStream));
             peer->SetCurrentCmd(EVT_SETCONFIG_REQ);
+            peer->SetSignalingTimer(A2DP_ACCEPT_SIGNALLING_TIMEOUT_MS, false);
         } else if (!peer->GetInitSide()) {
             evt = EVT_CONNECT_IND;
-            return evt;
         }
     }
-    peer->SetSignalingTimer(A2DP_ACCEPT_SIGNALLING_TIMEOUT_MS, false);
-
     return evt;
 }
 
 uint8_t A2dpAvdtp::ParseAvdtpGetALLCapCFM(
     const uint16_t handle, const BtAddr bdAddr, const uint8_t role, A2dpAvdtMsg &msg, const AvdtCtrlData &data)
 {
-    uint8_t evt = EVT_GET_ALLCAP_REQ;
+    uint8_t evt = EVT_CONNECT_IND;
     A2dpProfile *profile = GetProfileInstance(role);
     bool capabilityComplete = false;
     if (profile == nullptr) {
@@ -687,6 +687,7 @@ uint8_t A2dpAvdtp::ParseAvdtpGetALLCapCFM(
     if (msg.a2dpMsg.stream.acpSeid != 0 && !capabilityComplete) {
         peer->UpdateSepIndex();
         peer->SetAcpSeid(msg.a2dpMsg.stream.acpSeid);
+        evt = EVT_GET_ALLCAP_REQ;
     } else {
         if (peer->JudgeCapabilityMatched(role) && peer->GetInitSide()) {
             peer->SetConfigure();
@@ -761,6 +762,24 @@ uint8_t A2dpAvdtp::ParseAvdtpReconfigureCFM(
     }
 
     peer->StopSignalingTimer();
+    if (data.reconfigCfm.hdr.errCode) {
+        peer->SetRestart(false);
+        if (peer->GetReconfigTag()) {
+            peer->SetReconfigTag(false);
+            return EVT_CONNECT_IND;
+        }
+        peer->SetReconfigTag(true);
+        A2dpService *service = GetServiceInstance(role);
+        if (service != nullptr) {
+            A2dpSrcCodecStatus codecStatus = service->GetCodecStatus(RawAddress::ConvertToString(bdAddr.addr));
+            profile->SetUserCodecConfigure(bdAddr, codecStatus.codecInfo);
+        }
+        LOG_ERROR("[A2dpAvdtp] %{public}s errCode(0x%x)\n", __func__, data.reconfigCfm.hdr.errCode);
+        return EVT_CONNECT_IND;
+    }
+    if (peer->GetReconfigTag()) {
+        peer->SetReconfigTag(false);
+    }
     peer->SetIntSeid(static_cast<uint8_t>(handle));
     peer->SetStreamHandle(handle);
     msg.a2dpMsg.stream.addr = bdAddr;
@@ -874,6 +893,23 @@ uint8_t A2dpAvdtp::ParseAvdtpAbortCFM(const uint16_t handle, const BtAddr bdAddr
     return EVT_ABORT_CFM;
 }
 
+uint8_t A2dpAvdtp::ParseAvdtpWriteCFM(const uint16_t handle, const BtAddr bdAddr,
+    const uint8_t role, const A2dpAvdtMsg &msg, const AvdtCtrlData &data)
+{
+    LOG_INFO("[A2dpAvdtp] %{public}s role(%u)\n", __func__, role);
+    A2dpProfile *profile = GetProfileInstance(role);
+    if (profile == nullptr) {
+        LOG_ERROR("[A2dpAvdtp] %{public}s Failed to get profile instance \n", __func__);
+        return EVT_CONNECT_IND;
+    }
+    A2dpProfilePeer *peer = profile->FindPeerByAddress(bdAddr);
+    if (peer == nullptr) {
+        LOG_ERROR("[A2dpAvdtp] %{public}s Failed to get peer instance \n", __func__);
+        return EVT_CONNECT_IND;
+    }
+    return EVT_WRITE_CFM;
+}
+
 A2dpAvdtMsg *A2dpAvdtp::ParseAvdtpCallbackContent(const uint16_t handle, const BtAddr bdAddr,
     const uint8_t event, const AvdtCtrlData &data, const uint8_t role) const
 {
@@ -946,6 +982,9 @@ A2dpAvdtMsg *A2dpAvdtp::ParseAvdtpCallbackContent(const uint16_t handle, const B
             break;
         case AVDT_ABORT_CFM_EVT:
             avdtEvent = ParseAvdtpAbortCFM(handle, bdAddr, role, *msg.get(), data);
+            break;
+        case AVDT_WRITE_CFM_EVT:
+            avdtEvent = ParseAvdtpWriteCFM(handle, bdAddr, role, *msg.get(), data);
             break;
         default:
             break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -184,7 +184,7 @@ private:
     private:
         std::unique_ptr<utility::Timer> timer_ = nullptr;
         MapMseInstance &masInstance_;
-        DISALLOW_COPY_AND_ASSIGN(NativeData);
+        BT_DISALLOW_COPY_AND_ASSIGN(NativeData);
     };
     std::unordered_map<std::string, std::unique_ptr<NativeData>> nativeMap_ {};
     utility::Dispatcher &dispatcher_;
@@ -212,7 +212,7 @@ private:
     std::atomic_uint64_t conversationVersionCounter_ = ATOMIC_VAR_INIT();
     bool shutDownEnable_ = false;
     DECLARE_IMPL();
-    DISALLOW_COPY_AND_ASSIGN(MapMseInstance);
+    BT_DISALLOW_COPY_AND_ASSIGN(MapMseInstance);
 };
 }  // namespace bluetooth
 

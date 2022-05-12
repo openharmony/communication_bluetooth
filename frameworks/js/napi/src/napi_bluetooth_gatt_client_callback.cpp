@@ -129,14 +129,6 @@ void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int r
 void NapiGattClientCallback::OnServicesDiscovered(int status)
 {
     HILOGI("NapiGattClientCallback::OnServicesDiscovered called");
-    DiscoverServicesCallbackInfo *callbackInfo = client_->discoverServicesCallbackInfo_;
-    if (!callbackInfo) {
-        return;
-    }
-    if (callbackInfo->asyncState_ == ASYNC_START) {
-        callbackInfo->status_ = status;
-        callbackInfo->asyncState_ = ASYNC_DONE;
-    }
 }
 } // namespace Bluetooth
 } // namespace OHOS

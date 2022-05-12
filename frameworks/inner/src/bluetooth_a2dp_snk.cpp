@@ -208,25 +208,19 @@ std::vector<BluetoothRemoteDevice> A2dpSink::GetDevicesByStates(std::vector<int>
 {
     HILOGI("[A2dpSink] %{public}s\n", __func__);
     std::vector<BluetoothRemoteDevice> devices;
-    std::vector<BluetoothRawAddress> devicesRaw;
-
-    for (int state : states) {
-        if ((static_cast<int>(BTConnectState::CONNECTED) != state) &&
-            (static_cast<int>(BTConnectState::CONNECTING) != state) &&
-            (static_cast<int>(BTConnectState::DISCONNECTING) != state) &&
-            (static_cast<int>(BTConnectState::DISCONNECTED) != state)) {
-            HILOGI("[A2dpSink] input parameter error.");
-            return devices;
-        }
-    }
 
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetDevicesByStates(states);
-    }
+        std::vector<int32_t> convertStates;
+        for (auto state : states) {
+            convertStates.push_back(static_cast<int32_t>(state));
+        }
+        std::vector<RawAddress> rawAddrs;
+        rawAddrs = pimpl->proxy_->GetDevicesByStates(convertStates);
 
-    for (RawAddress it : devicesRaw) {
-        BluetoothRemoteDevice remoteDevice(it.GetAddress(), 0);
-        devices.push_back(remoteDevice);
+        for (auto rawAddr : rawAddrs) {
+            BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
+            devices.push_back(device);
+        }
     }
 
     return devices;

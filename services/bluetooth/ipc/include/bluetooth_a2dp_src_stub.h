@@ -49,7 +49,6 @@ private:
     ErrCode StartPlayingInner(MessageParcel &data, MessageParcel &reply);
     ErrCode SuspendPlayingInner(MessageParcel &data, MessageParcel &reply);
     ErrCode StopPlayingInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode SetAudioConfigureInner(MessageParcel &data, MessageParcel &reply);
     ErrCode WriteFrameInner(MessageParcel &data, MessageParcel &reply);
     ErrCode GetRenderPositionInner(MessageParcel &data, MessageParcel &reply);
 

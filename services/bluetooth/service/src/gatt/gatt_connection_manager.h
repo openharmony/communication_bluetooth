@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -139,8 +139,8 @@ public:
         utility::Timer directConnect_;
         void CopyAddress(const uint8_t *addr, size_t length);
         Device() = delete;
-        DISALLOW_COPY_AND_ASSIGN(Device);
-        DISALLOW_MOVE_AND_ASSIGN(Device);
+        BT_DISALLOW_COPY_AND_ASSIGN(Device);
+        BT_DISALLOW_MOVE_AND_ASSIGN(Device);
     };
 
     static GattConnectionManager &GetInstance()
@@ -174,7 +174,7 @@ private:
     GattConnectionManager();
     DECLARE_IMPL();
 
-    DISALLOW_COPY_AND_ASSIGN(GattConnectionManager);
+    BT_DISALLOW_COPY_AND_ASSIGN(GattConnectionManager);
 };
 }  // namespace bluetooth
 

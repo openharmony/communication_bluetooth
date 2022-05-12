@@ -1541,6 +1541,10 @@ void ClassicAdapter::ReceiveLinkKeyNotification(
         remoteDevice->SetLinkKey(linkKeyVec);
         remoteDevice->SetLinkKeyType(keyType);
         remoteDevice->SetPairedStatus(PAIR_PAIRED);
+        if (remoteDevice != nullptr) {
+            adapterProperties_.SavePairedDeviceInfo(remoteDevice);
+            adapterProperties_.SaveConfigFile();
+        }
     } else {
         remoteDevice->SetPairedStatus(PAIR_NONE);
         LOG_WARN("ClassicAdapter::LinkKeyNotification -> Bondmode is off, so not save the link key");
@@ -1716,6 +1720,10 @@ void ClassicAdapter::SearchAttributeEnd(const RawAddress &device, const std::vec
     }
     std::shared_ptr<ClassicRemoteDevice> remoteDevice = FindRemoteDevice(device);
     SaveRemoteDeviceUuids(remoteDevice, uuids);
+    if (remoteDevice != nullptr) {
+        adapterProperties_.SavePairedDeviceInfo(remoteDevice);
+        adapterProperties_.SaveConfigFile();
+    }
     SendPairStatusChanged(ADAPTER_BREDR, device, PAIR_PAIRED);
 }
 

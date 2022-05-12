@@ -210,26 +210,21 @@ void A2dpSource::DeregisterObserver(A2dpSourceObserver *observer)
 std::vector<BluetoothRemoteDevice> A2dpSource::GetDevicesByStates(std::vector<int> states) const
 {
     HILOGI("[A2dpSource] %{public}s\n", __func__);
-    std::vector<BluetoothRemoteDevice> devices;
-    std::vector<BluetoothRawAddress> devicesRaw;
 
-    for (int state : states) {
-        if ((static_cast<int>(BTConnectState::CONNECTED) != state) &&
-            (static_cast<int>(BTConnectState::CONNECTING) != state) &&
-            (static_cast<int>(BTConnectState::DISCONNECTING) != state) &&
-            (static_cast<int>(BTConnectState::DISCONNECTED) != state)) {
-            HILOGI("[A2dpSource] input parameter error.");
-            return devices;
-        }
-    }
+    std::vector<BluetoothRemoteDevice> devices;
 
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetDevicesByStates(states);
-    }
+        std::vector<int32_t> convertStates;
+        for (auto state : states) {
+            convertStates.push_back(static_cast<int32_t>(state));
+        }
+        std::vector<RawAddress> rawAddrs;
+        rawAddrs = pimpl->proxy_->GetDevicesByStates(convertStates);
 
-    for (RawAddress it : devicesRaw) {
-        BluetoothRemoteDevice remoteDevice(it.GetAddress(), 0);
-        devices.push_back(remoteDevice);
+        for (auto rawAddr : rawAddrs) {
+            BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
+            devices.push_back(device);
+        }
     }
 
     return devices;
@@ -566,25 +561,6 @@ int A2dpSource::StopPlaying(const BluetoothRemoteDevice &device)
     }
 
     return ret;
-}
-
-void A2dpSource::SetAudioConfigure(
-    const BluetoothRemoteDevice &device, uint32_t sampleRate, uint32_t bits, uint8_t channel)
-{
-    HILOGI("[A2dpSource] %{public}s\n", __func__);
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGI("[A2dpSource] input parameter error.");
-        return;
-    }
-
-    if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        pimpl->proxy_->SetAudioConfigure(
-            RawAddress(device.GetDeviceAddr()), (int)sampleRate, (int)bits, (int)channel);
-    } else {
-        HILOGI("[A2dpSource] proxy or bt disable.");
-        return;
-    }
-    return;
 }
 
 int A2dpSource::WriteFrame(const uint8_t *data, uint32_t size)

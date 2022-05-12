@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -544,19 +544,21 @@ int BluetoothMapMceServer::SetOwnerStatus(const BluetoothRawAddress &device,
     return ret;
 }
 
-void BluetoothMapMceServer::GetMasInstanceInfo(const BluetoothRawAddress &device,
-    BluetoothIProfileMasInstanceInfoList &bluetoothlist)
+BluetoothIProfileMasInstanceInfoList BluetoothMapMceServer::GetMasInstanceInfo(const BluetoothRawAddress &device)
 {
     HILOGI("%{public}s start", __func__);
-    IProfileMasInstanceInfoList serviceInstanceList;
+    BluetoothIProfileMasInstanceInfoList bluetoothlist;
+    bluetoothlist.isValid = false;
     if (pimpl->mceService_ != nullptr) {
-        serviceInstanceList = pimpl->mceService_->GetMasInstanceInfo((RawAddress)device);
+        IProfileMasInstanceInfoList serviceInstanceList = pimpl->mceService_->GetMasInstanceInfo((RawAddress)device);
         bluetoothlist.isValid = serviceInstanceList.isValid;
-        bluetoothlist.masInfoList = serviceInstanceList.masInfoList;
+        for (auto &masInfo : serviceInstanceList.masInfoList) {
+            bluetoothlist.masInfoList.push_back(masInfo);
+        }
     } else {
         HILOGE("pimpl->mceService_ null %{public}s", __func__);
     }
-    HILOGI("%{public}s end", __func__);
+    return bluetoothlist;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
