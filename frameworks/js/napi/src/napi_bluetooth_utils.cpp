@@ -995,6 +995,48 @@ int GetProfileConnectionState(int state)
     return profileConnectionState;
 }
 
+uint32_t GetProfileId(int profile)
+{
+    uint32_t profileId = 0;
+    switch (profile) {
+        case static_cast<int32_t>(ProfileId::PROFILE_A2DP_SINK):
+            HILOGD("PROFILE_ID_A2DP_SINK");
+            profileId = PROFILE_ID_A2DP_SINK;
+            break;
+        case static_cast<int32_t>(ProfileId::PROFILE_A2DP_SOURCE):
+            HILOGD("PROFILE_ID_A2DP_SRC");
+            profileId = PROFILE_ID_A2DP_SRC;
+            break;
+        case static_cast<int32_t>(ProfileId::PROFILE_AVRCP_CT):
+            HILOGD("PROFILE_ID_AVRCP_CT");
+            profileId = PROFILE_ID_AVRCP_CT;
+            break;
+        case static_cast<int32_t>(ProfileId::PROFILE_AVRCP_TG):
+            HILOGD("PROFILE_ID_AVRCP_TG");
+            profileId = PROFILE_ID_AVRCP_TG;
+            break;
+        case static_cast<int32_t>(ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY):
+            HILOGD("PROFILE_ID_HFP_AG");
+            profileId = PROFILE_ID_HFP_AG;
+            break;
+        case static_cast<int32_t>(ProfileId::PROFILE_HANDS_FREE_UNIT):
+            HILOGD("PROFILE_ID_HFP_HF");
+            profileId = PROFILE_ID_HFP_HF;
+            break;
+        case static_cast<int32_t>(ProfileId::PROFILE_PBAP_CLIENT):
+            HILOGD("PROFILE_ID_PBAP_PCE");
+            profileId = PROFILE_ID_PBAP_PCE;
+            break;
+        case static_cast<int32_t>(ProfileId::PROFILE_PBAP_SERVER):
+            HILOGD("PROFILE_ID_PBAP_PSE");
+            profileId = PROFILE_ID_PBAP_PSE;
+            break;
+        default:
+            break;
+    }
+    return profileId;
+}
+
 int GetScoConnectionState(int state)
 {
     int32_t scoState = ScoState::SCO_DISCONNECTED;

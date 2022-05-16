@@ -17,18 +17,18 @@
 
 namespace OHOS {
 namespace Bluetooth {
-std::map<ProfileCode, napi_value> NapiProfile::profiles_;
+std::map<ProfileId, napi_value> NapiProfile::profiles_;
 
-void DefineProfileFunctions(napi_env env, napi_value exports)
+void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("getProfile", NapiProfile::GetProfile),
+        DECLARE_NAPI_FUNCTION("getProfile", GetProfile),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
-
+    ProfileEnumInit(env, exports);
 }
 
-void NapiProfile::SetProfile(ProfileCode code, napi_value profile)
+void NapiProfile::SetProfile(ProfileId code, napi_value profile)
 {
     profiles_[code] = profile;
 }
@@ -49,18 +49,70 @@ napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
         HILOGE("Requires 1 argument.");
         return ret;
     }
-    int profile_code;
-    if (!ParseInt32(env, profile_code, argv[PARAM0])) {
+    int32_t profileId;
+    if (!ParseInt32(env, profileId, argv[PARAM0])) {
         HILOGE("False type! Int32 required.");
         return ret;
     }
 
-    napi_value profile = profiles_[static_cast<ProfileCode>(profile_code)];
+    napi_value profile = profiles_[static_cast<ProfileId>(profileId)];
     if (!profile) {
         return ret;
     }
     return profile;
 }
 
+void NapiProfile::ProfileEnumInit(napi_env env, napi_value exports)
+{
+    HILOGI("ProfileEnumInit start");
+    napi_value sppTypeObj = SppTypeInit(env);
+    napi_value playingStateObj = PlayingStateInit(env);
+    napi_value profileIdObj = ProfileIdInit(env);
+    napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("SppType", sppTypeObj),
+        DECLARE_NAPI_PROPERTY("PlayingState", playingStateObj),
+        DECLARE_NAPI_PROPERTY("ProfileId", profileIdObj),
+    };
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    HILOGI("ProfileEnumInit end");
+}
+
+napi_value NapiProfile::SppTypeInit(napi_env env)
+{
+    HILOGI("SppTypeInit");
+    napi_value sppType = nullptr;
+    napi_create_object(env, &sppType);
+    SetNamedPropertyByInteger(env, sppType, SppType::SPP_RFCOMM, "SPP_RFCOMM");
+    return sppType;
+}
+
+napi_value NapiProfile::PlayingStateInit(napi_env env)
+{
+    HILOGI("PlayingStateInit");
+    napi_value playingState = nullptr;
+    napi_create_object(env, &playingState);
+    SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_NOT_PLAYING, "STATE_NOT_PLAYING");
+    SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_PLAYING, "STATE_PLAYING");
+    return playingState;
+}
+
+napi_value NapiProfile::ProfileIdInit(napi_env env)
+{
+    HILOGI("ProfileIdInit");
+    napi_value profileId = nullptr;
+    napi_create_object(env, &profileId);
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_A2DP_SINK, "PROFILE_A2DP_SINK");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_A2DP_SOURCE, "PROFILE_A2DP_SOURCE");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_AVRCP_CT, "PROFILE_AVRCP_CT");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_AVRCP_TG, "PROFILE_AVRCP_TG");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY,
+        "PROFILE_HANDS_FREE_AUDIO_GATEWAY");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HANDS_FREE_UNIT, "PROFILE_HANDS_FREE_UNIT");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HID_HOST, "PROFILE_HID_HOST");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PAN_NETWORK, "PROFILE_PAN_NETWORK");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_CLIENT, "PROFILE_PBAP_CLIENT");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_SERVER, "PROFILE_PBAP_SERVER");
+    return profileId;
+}
 } // namespace Bluetooth
 } // namespace OHOS

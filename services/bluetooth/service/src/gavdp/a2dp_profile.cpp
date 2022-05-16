@@ -420,35 +420,56 @@ void A2dpProfile::CreateSEPConfigureInfo(uint8_t role)
     uint8_t number = 0;
 
     for (int i = A2DP_SOURCE_CODEC_INDEX_SBC; i < A2DP_CODEC_INDEX_MAX; i++) {
+        int value = 0x01;
         LOG_INFO("[A2dpProfile]%{public}s index (%{public}d)\n", __func__, i);
         if (i < A2DP_SINK_CODEC_INDEX_MIN) {
-            cfg[i - 1].sepType = AVDT_ROLE_SRC;
-            cfg[i - 1].cfg.mediaType = A2DP_MEDIA_TYPE_AUDIO;
+            cfg[number].sepType = AVDT_ROLE_SRC;
+            cfg[number].cfg.mediaType = A2DP_MEDIA_TYPE_AUDIO;
             if (A2DP_SOURCE_CODEC_INDEX_SBC == i) {
-                BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_SBC, cfg[i - 1].cfg.codecInfo);
-                cfg[i - 1].cfg.numCodec = A2DP_CODEC_SBC_INFO_LEN;
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_SBC_SUPPORT, value);
+                LOG_INFO("[A2dpProfile] %{public}s SRC SBC value[%{public}d] \n", __func__, value);
+                if (!value) {
+                    continue;
+                }
+                BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_SBC, cfg[number].cfg.codecInfo);
+                cfg[number].cfg.numCodec = A2DP_CODEC_SBC_INFO_LEN;
             } else if (A2DP_SOURCE_CODEC_INDEX_AAC == i) {
-                BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_AAC, cfg[i - 1].cfg.codecInfo);
-                cfg[i - 1].cfg.numCodec = A2DP_CODEC_AAC_INFO_LEN;
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_AAC_SUPPORT, value);
+                LOG_INFO("[A2dpProfile] %{public}s SRC AAC value[%{public}d] \n", __func__, value);
+                if (!value) {
+                    continue;
+                }
+                BuildCodecInfo(A2DP_SOURCE_CODEC_INDEX_AAC, cfg[number].cfg.codecInfo);
+                cfg[number].cfg.numCodec = A2DP_CODEC_AAC_INFO_LEN;
             }
-            cfg[i - 1].codecIndex = i;
-            cfg[i - 1].sinkDataCback = ProcessSinkStream;
-            cfg[i - 1].cfg.pscMask = (AVDT_PSC_MSK_TRANS | AVDT_PSC_MSK_DELAY_RPT | AVDT_PSC_MSK_CODEC);
+            cfg[number].codecIndex = i;
+            cfg[number].sinkDataCback = ProcessSinkStream;
+            cfg[number].cfg.pscMask = (AVDT_PSC_MSK_TRANS | AVDT_PSC_MSK_DELAY_RPT | AVDT_PSC_MSK_CODEC);
         } else {
-            cfg[i - 1].sepType = AVDT_ROLE_SNK;
-            cfg[i - 1].cfg.mediaType = A2DP_MEDIA_TYPE_AUDIO;
+            cfg[number].sepType = AVDT_ROLE_SNK;
+            cfg[number].cfg.mediaType = A2DP_MEDIA_TYPE_AUDIO;
             if (A2DP_SINK_CODEC_INDEX_SBC == i) {
-                BuildCodecInfo(A2DP_SINK_CODEC_INDEX_SBC, cfg[i - 1].cfg.codecInfo);
-                cfg[i - 1].cfg.numCodec = A2DP_CODEC_SBC_INFO_LEN;
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SNK_SERVICE, PROPERTY_CODEC_SBC_SUPPORT, value);
+                LOG_INFO("[A2dpProfile] %{public}s SNK SBC value[%{public}d] \n", __func__, value);
+                if (!value) {
+                    continue;
+                }
+                BuildCodecInfo(A2DP_SINK_CODEC_INDEX_SBC, cfg[number].cfg.codecInfo);
+                cfg[number].cfg.numCodec = A2DP_CODEC_SBC_INFO_LEN;
             } else if (A2DP_SINK_CODEC_INDEX_AAC == i) {
-                BuildCodecInfo(A2DP_SINK_CODEC_INDEX_AAC, cfg[i - 1].cfg.codecInfo);
-                cfg[i - 1].cfg.numCodec = A2DP_CODEC_AAC_INFO_LEN;
+                AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SNK_SERVICE, PROPERTY_CODEC_AAC_SUPPORT, value);
+                LOG_INFO("[A2dpProfile] %{public}s SNK AAC value[%{public}d] \n", __func__, value);
+                if (!value) {
+                    continue;
+                }
+                BuildCodecInfo(A2DP_SINK_CODEC_INDEX_AAC, cfg[number].cfg.codecInfo);
+                cfg[number].cfg.numCodec = A2DP_CODEC_AAC_INFO_LEN;
             }
-            cfg[i - 1].codecIndex = i;
-            cfg[i - 1].sinkDataCback = ProcessSinkStream;
-            cfg[i - 1].cfg.pscMask = (AVDT_PSC_MSK_TRANS | AVDT_PSC_MSK_DELAY_RPT | AVDT_PSC_MSK_CODEC);
+            cfg[number].codecIndex = i;
+            cfg[number].sinkDataCback = ProcessSinkStream;
+            cfg[number].cfg.pscMask = (AVDT_PSC_MSK_TRANS | AVDT_PSC_MSK_DELAY_RPT | AVDT_PSC_MSK_CODEC);
         }
-        number = i;
+        number++;
     }
     avdtp.RegisterLocalSEP(cfg, number);
 }
@@ -673,8 +694,9 @@ int A2dpProfile::Stop(const uint16_t handle, const bool suspend)
     }
 
     QueueFlush(packetQueue_, CleanPacketData);
-    buffer_->Reset();
-
+    if (!suspend) {
+        buffer_->Reset();
+    }
     return ret;
 }
 

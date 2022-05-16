@@ -40,7 +40,7 @@ void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env)
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_A2DP_SINK, napiProfile);
+    NapiProfile::SetProfile(ProfileId::PROFILE_A2DP_SINK, napiProfile);
     HILOGI("DefineA2dpSinkJSClass finished");
 }
 
