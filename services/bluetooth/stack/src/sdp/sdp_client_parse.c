@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,13 +33,18 @@ static List *g_requestList = NULL;
 /// TransactionID
 static uint16_t g_transactionId = 0;
 
+typedef struct {
+    uint8_t *buffer;
+    uint16_t length;
+} BufferInfo;
+
 static void SdpCallbackError(const BtAddr *address, uint16_t transactionId);
 static void SdpParseErrorResponse(
     const BtAddr *addr, uint16_t transactionId, uint16_t parameterLength, const Packet *packet);
 static void SdpParseSearchResponse(const BtAddr *addr, uint16_t lcid, uint16_t transactionId, Packet *packet);
 static void SdpParseAttributeResponse(const BtAddr *addr, uint16_t lcid, uint16_t transactionId, Packet *packet);
 static void SdpParseSearchAttributeResponse(const BtAddr *addr, uint16_t lcid, uint16_t transactionId, Packet *packet);
-static int SdpParseAttributeValue(uint8_t *buffer, uint16_t attributeId, SdpService *service);
+static int SdpParseAttributeValue(BufferInfo *bufferInfo, uint16_t attributeId, SdpService *service);
 static void SdpFreeService(SdpService *service);
 static void SdpFreeServiceArray(SdpService *serviceArray, uint16_t serviceNum);
 
@@ -218,7 +223,8 @@ static void SdpCallbackError(const BtAddr *address, uint16_t transactionId)
 
     request = SdpFindRequestByTransactionId(transactionId);
     if (request == NULL) {
-        LOG_ERROR("[%{public}s][%{public}d] Cannot find client request [0x%04x]", __FUNCTION__, __LINE__, transactionId);
+        LOG_ERROR(
+            "[%{public}s][%{public}d] Cannot find client request [0x%04x]", __FUNCTION__, __LINE__, transactionId);
         return;
     }
     LOG_DEBUG("[%{public}s][%{public}d] ErrorCallback start", __FUNCTION__, __LINE__);
@@ -388,7 +394,8 @@ static uint16_t SdpParseServiceRecordHandleList(
     for (; handleNum < totalServiceRecordCount; handleNum++) {
         uint32_t handle = BE2H_32(*(uint32_t *)(buffer + handleNum * SDP_SERVICE_RECORD_HANDLE_BYTE));
         if (handle <= SDP_MAX_RESERVED_RECORD_HANDLE) {
-            LOG_ERROR("[%{public}s][%{public}d] Invalid Service Record Handle [0x%08x]", __FUNCTION__, __LINE__, handle);
+            LOG_ERROR(
+                "[%{public}s][%{public}d] Invalid Service Record Handle [0x%08x]", __FUNCTION__, __LINE__, handle);
             MEM_MALLOC.free(buffer);
             buffer = NULL;
             PacketFree(packet);
@@ -407,7 +414,7 @@ static uint16_t SdpParseServiceRecordHandleList(
     return handleNum;
 }
 
-static int SdpParseSingleAttributeList(uint8_t *buffer, SdpService *service)
+static int SdpParseSingleAttributeList(BufferInfo *bufferInfo, SdpService *service)
 {
     uint32_t attributeLength = 0;
     uint8_t type;
@@ -436,31 +443,41 @@ static int SdpParseSingleAttributeList(uint8_t *buffer, SdpService *service)
         sizeof(SdpSequenceAttribute) * SDP_SEQUENCE_ATTRIBUTE_COUNT);
 
     /// Descriptor type
-    type = buffer[offset];
+    type = bufferInfo->buffer[offset];
     offset++;
     /// Descriptor size
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
-        LOG_ERROR("[%{public}s][%{public}d] There is wrong type [0x%02x] with attribute list.", __FUNCTION__, __LINE__, type);
+        LOG_ERROR(
+            "[%{public}s][%{public}d] There is wrong type [0x%02x] with attribute list.", __FUNCTION__, __LINE__, type);
         return BT_BAD_PARAM;
     }
     /// Sequence length
-    pos = SdpGetLengthFromType(buffer + offset, type, &attributeLength);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &attributeLength);
+    if (bufferInfo->length < attributeLength) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     offset += pos;
-    uint8_t *bufferEnd = buffer + attributeLength;
+    uint8_t *bufferEnd = bufferInfo->buffer + attributeLength;
 
-    while (buffer + offset < bufferEnd) {
+    while (bufferInfo->buffer + offset < bufferEnd) {
         /// AttributeID
-        type = buffer[offset];
+        type = bufferInfo->buffer[offset];
         /// Data Element: Unsigned Integer 2 bytes (0x09)
         if (((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_UINT) || ((type & 0x07) != DE_SIZE_16)) {
-            LOG_ERROR("[%{public}s][%{public}d] The type [0x%02x] of AttributeID is wrong.", __FUNCTION__, __LINE__, type);
+            LOG_ERROR(
+                "[%{public}s][%{public}d] The type [0x%02x] of AttributeID is wrong.", __FUNCTION__, __LINE__, type);
             return BT_BAD_PARAM;
         }
         offset++;
-        uint16_t attributeId = BE2H_16(*(uint16_t *)(buffer + offset));
+        uint16_t attributeId = BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
         offset += SDP_UINT16_LENGTH;
         /// Attribute value
-        pos = SdpParseAttributeValue(buffer + offset, attributeId, service);
+        BufferInfo presBufferInfo = {
+            .buffer = bufferInfo->buffer + offset,
+            .length = attributeLength
+        };
+        pos = SdpParseAttributeValue(&presBufferInfo, attributeId, service);
         if (pos <= 0) {
             return BT_BAD_PARAM;
         }
@@ -477,6 +494,7 @@ static int SdpParseAttributeList(const BtAddr *addr, uint16_t transactionId, Pac
     uint8_t *buffer = NULL;
     uint16_t length;
     int result;
+    BufferInfo bufferInfo;
 
     request = SdpFindRequestByTransactionId(transactionId);
     if (request == NULL) {
@@ -498,8 +516,9 @@ static int SdpParseAttributeList(const BtAddr *addr, uint16_t transactionId, Pac
     }
     (void)memset_s(buffer, length, 0, length);
     PacketRead(packet, buffer, 0, length);
-
-    result = SdpParseSingleAttributeList(buffer, service);
+    bufferInfo.buffer = buffer;
+    bufferInfo.length = length;
+    result = SdpParseSingleAttributeList(&bufferInfo, service);
 
     MEM_MALLOC.free(buffer);
     PacketFree(packet);
@@ -532,6 +551,7 @@ static uint16_t SdpParseAttributeListArray(
     uint32_t totalLength;
     uint32_t length = 0;
     uint16_t offset = 0;
+    BufferInfo bufferInfo;
 
     SdpClientRequest *request = SdpFindRequestByTransactionId(transactionId);
     if ((request != NULL) && (request->assemblePacket != NULL)) {
@@ -551,16 +571,22 @@ static uint16_t SdpParseAttributeListArray(
     offset++;
     /// Descriptor size
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
-        LOG_ERROR("[%{public}s][%{public}d] There is wrong type [0x%02x] with attribute lists.", __FUNCTION__, __LINE__, type);
+        LOG_ERROR("[%{public}s][%{public}d] There is wrong type [0x%02x] with attribute lists.",
+            __FUNCTION__, __LINE__, type);
         SdpPacketAndBufferFree(buffer, packet, request);
         return 0;
     }
     /// Sequence length
     int pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    if (totalLength < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     offset += pos;
 
     if (length != (totalLength - offset)) {
-        LOG_ERROR("[%{public}s][%{public}d] total[%{public}d] current[%{public}d] offset[%{public}d]", __FUNCTION__, __LINE__, totalLength, length, offset);
+        LOG_ERROR("[%{public}s][%{public}d] total[%{public}d] current[%{public}d] offset[%{public}d]",
+            __FUNCTION__, __LINE__, totalLength, length, offset);
         SdpPacketAndBufferFree(buffer, packet, request);
         return 0;
     }
@@ -570,7 +596,9 @@ static uint16_t SdpParseAttributeListArray(
             LOG_INFO("The serviceNum is more than the specified number");
             break;
         }
-        pos = SdpParseSingleAttributeList(buffer + offset, &serviceArray[serviceNum]);
+        bufferInfo.buffer = buffer + offset;
+        bufferInfo.length = length;
+        pos = SdpParseSingleAttributeList(&bufferInfo, &serviceArray[serviceNum]);
         if (pos <= 0) {
             SdpFreeServiceArray(serviceArray, serviceNum + 1);
             SdpPacketAndBufferFree(buffer, packet, request);
@@ -598,9 +626,11 @@ static Packet *SdpParseResponseCommon(
 
     PacketExtractTail(packet, continuationState, length);
     continuationStateLen = continuationState[0];
-    LOG_INFO("[%{public}s][%{public}d] continuation state length [%{public}d].", __FUNCTION__, __LINE__, continuationStateLen);
+    LOG_INFO("[%{public}s][%{public}d] continuation state length [%{public}d].",
+        __FUNCTION__, __LINE__, continuationStateLen);
     if (continuationStateLen > SDP_MAX_CONTINUATION_LEN) {
-        LOG_ERROR("[%{public}s][%{public}d] continuationStateLen [%{public}d] exceed", __FUNCTION__, __LINE__, continuationStateLen);
+        LOG_ERROR("[%{public}s][%{public}d] continuationStateLen [%{public}d] exceed",
+            __FUNCTION__, __LINE__, continuationStateLen);
         SdpCallbackError(addr, transactionId);
         return NULL;
     }
@@ -654,7 +684,8 @@ static void SdpParseSearchResponse(const BtAddr *addr, uint16_t lcid, uint16_t t
     length = PacketSize(packet);
     if ((currentServiceRecordCount > totalServiceRecordCount) ||
         ((currentServiceRecordCount * SDP_SERVICE_RECORD_HANDLE_BYTE) >= length)) {
-        LOG_ERROR("current[%{public}d]， total[%{public}d] size[%{public}d]", totalServiceRecordCount, currentServiceRecordCount, length);
+        LOG_ERROR("current[%{public}d]， total[%{public}d] size[%{public}d]",
+            totalServiceRecordCount, currentServiceRecordCount, length);
         SdpCallbackError(addr, transactionId);
         return;
     }
@@ -707,7 +738,8 @@ static void SdpParseAttributeResponse(const BtAddr *addr, uint16_t lcid, uint16_
     length = PacketSize(packet);
     attributeListByteCount = BE2H_16(*(uint16_t *)buffer);
     if (attributeListByteCount >= length) {
-        LOG_ERROR("[%{public}s][%{public}d] Wrong attribute list count [%{public}d]", __FUNCTION__, __LINE__, attributeListByteCount);
+        LOG_ERROR("[%{public}s][%{public}d] Wrong attribute list count [%{public}d]",
+            __FUNCTION__, __LINE__, attributeListByteCount);
         SdpCallbackError(addr, transactionId);
         return;
     }
@@ -755,7 +787,8 @@ static void SdpParseSearchAttributeResponse(const BtAddr *addr, uint16_t lcid, u
     attributeListByteCount = BE2H_16(*(uint16_t *)buffer);
     if (attributeListByteCount >= length) {
         SdpCallbackError(addr, transactionId);
-        LOG_ERROR("[%{public}s][%{public}d] Wrong attribute list count [%{public}d]", __FUNCTION__, __LINE__, attributeListByteCount);
+        LOG_ERROR("[%{public}s][%{public}d] Wrong attribute list count [%{public}d]",
+            __FUNCTION__, __LINE__, attributeListByteCount);
         return;
     }
 
@@ -784,27 +817,31 @@ static void SdpParseSearchAttributeResponse(const BtAddr *addr, uint16_t lcid, u
     SdpRemoveRequestByTransactionId(transactionId);
 }
 
-static int SdpGetValue(uint8_t *buffer, uint32_t *value)
+static int SdpGetValue(BufferInfo *bufferInfo, uint32_t *value)
 {
     uint32_t length = 0;
     uint16_t offset = 0;
     uint16_t pos;
 
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     if (((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_UINT) || (length != SDP_UINT32_LENGTH)) {
         LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
         return BT_BAD_PARAM;
     }
 
-    *value = BE2H_32(*(uint32_t *)(buffer + offset));
+    *value = BE2H_32(*(uint32_t *)(bufferInfo->buffer + offset));
     offset += pos;
 
     return offset;
 }
 
-static int SdpGetALLValue(uint8_t *buffer, uint32_t *data, SdpDataType *dataType)
+static int SdpGetALLValue(BufferInfo *bufferInfo, uint32_t *data, SdpDataType *dataType)
 {
     uint32_t length = 0;
     uint16_t offset = 0;
@@ -812,9 +849,13 @@ static int SdpGetALLValue(uint8_t *buffer, uint32_t *data, SdpDataType *dataType
     uint32_t value = 0;
 
     /// Descriptor type
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
     offset++;
-    SdpGetLengthFromType(buffer + offset, type, &length);
+    SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_UINT) {
         LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
         return BT_BAD_PARAM;
@@ -823,15 +864,15 @@ static int SdpGetALLValue(uint8_t *buffer, uint32_t *data, SdpDataType *dataType
     switch (length) {
         case SDP_UINT8_LENGTH:
             valueType = SDP_TYPE_UINT_8;
-            value = buffer[offset];
+            value = bufferInfo->buffer[offset];
             break;
         case SDP_UINT16_LENGTH:
             valueType = SDP_TYPE_UINT_16;
-            value = BE2H_16(*(uint16_t *)(buffer + offset));
+            value = BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
             break;
         case SDP_UINT32_LENGTH:
             valueType = SDP_TYPE_UINT_32;
-            value = BE2H_32(*(uint32_t *)(buffer + offset));
+            value = BE2H_32(*(uint32_t *)(bufferInfo->buffer + offset));
             break;
         default:
             length = 0;
@@ -844,15 +885,19 @@ static int SdpGetALLValue(uint8_t *buffer, uint32_t *data, SdpDataType *dataType
     return offset;
 }
 
-static int SdpGetString(uint8_t *buffer, char *name, SdpDescriptorType nameType)
+static int SdpGetString(BufferInfo *bufferInfo, char *name, SdpDescriptorType nameType)
 {
     uint32_t length = 0;
     uint16_t offset = 0;
     uint16_t pos;
 
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != nameType) {
         LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
         return BT_BAD_PARAM;
@@ -861,7 +906,7 @@ static int SdpGetString(uint8_t *buffer, char *name, SdpDescriptorType nameType)
     if (length >= SDP_MAX_ATTRIBUTE_LEN - 1) {
         length = SDP_MAX_ATTRIBUTE_LEN;
     }
-    if (memcpy_s(name, length, buffer + offset, length) != EOK) {
+    if (memcpy_s(name, length, bufferInfo->buffer + offset, length) != EOK) {
         LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail", __FUNCTION__, __LINE__);
         return BT_OPERATION_FAILED;
     }
@@ -871,12 +916,12 @@ static int SdpGetString(uint8_t *buffer, char *name, SdpDescriptorType nameType)
     return offset;
 }
 
-static int SdpGetServiceRecordHandle(uint8_t *buffer, SdpService *service)
+static int SdpGetServiceRecordHandle(BufferInfo *bufferInfo, SdpService *service)
 {
-    return SdpGetValue(buffer, &service->handle);
+    return SdpGetValue(bufferInfo, &service->handle);
 }
 
-static uint16_t SdpGetServiceClassIdList(uint8_t *buffer, SdpService *service)
+static uint16_t SdpGetServiceClassIdList(BufferInfo *bufferInfo, SdpService *service)
 {
     uint16_t classIdNumber = 0;
     uint32_t length = 0;
@@ -892,9 +937,13 @@ static uint16_t SdpGetServiceClassIdList(uint8_t *buffer, SdpService *service)
     }
     (void)memset_s(service->classId, sizeof(BtUuid) * SDP_MAX_UUID_COUNT, 0, sizeof(BtUuid) * SDP_MAX_UUID_COUNT);
 
-    type = buffer[offset];
+    type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     offset += pos;
     pos = offset;
 
@@ -903,7 +952,7 @@ static uint16_t SdpGetServiceClassIdList(uint8_t *buffer, SdpService *service)
             offset = length + pos;
             break;
         }
-        pos = SdpGetUuid(buffer + offset, &service->classId[classIdNumber]);
+        pos = SdpGetUuid(bufferInfo->buffer + offset, &service->classId[classIdNumber]);
         i += pos;
         offset += pos;
         classIdNumber++;
@@ -913,9 +962,9 @@ static uint16_t SdpGetServiceClassIdList(uint8_t *buffer, SdpService *service)
     return offset;
 }
 
-static int SdpGetServiceRecordState(uint8_t *buffer, SdpService *service)
+static int SdpGetServiceRecordState(BufferInfo *bufferInfo, SdpService *service)
 {
-    return SdpGetValue(buffer, &service->state);
+    return SdpGetValue(bufferInfo, &service->state);
 }
 
 static int SdpGetServiceId(uint8_t *buffer, SdpService *service)
@@ -923,22 +972,30 @@ static int SdpGetServiceId(uint8_t *buffer, SdpService *service)
     return SdpGetUuid(buffer, &service->serviceId);
 }
 
-static int SdpGetCommonProtocolDescriptorEachList(
-    SdpProtocolDescriptor *descriptor, uint16_t descriptorNumber, uint32_t currentLength, uint8_t *buffer, int offset)
+static int SdpGetCommonProtocolDescriptorEachList(SdpProtocolDescriptor *descriptor, uint16_t descriptorNumber,
+    uint32_t currentLength, BufferInfo *bufferInfo, int offset)
 {
     uint16_t parameterNumber = 0;
     uint32_t length = 0;
     int pos;
 
     while (currentLength) {
-        if (buffer[offset] == 0x35) {
+        if (bufferInfo->buffer[offset] == 0x35) {
             uint8_t type = 0x35;
-            pos = SdpGetLengthFromType(buffer + offset + 1, type, &length);
+            pos = SdpGetLengthFromType(bufferInfo->buffer + offset + 1, type, &length);
+            if (bufferInfo->length < length) {
+                LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+                return BT_BAD_PARAM;
+            }
             offset = offset + length + SDP_UINT16_LENGTH;
             currentLength = currentLength - length - SDP_UINT16_LENGTH;
             continue;
         }
-        pos = SdpGetALLValue(buffer + offset,
+        BufferInfo presBufferInfo = {
+            .buffer = bufferInfo->buffer + offset,
+            .length = currentLength
+        };
+        pos = SdpGetALLValue(&presBufferInfo,
             &descriptor[descriptorNumber].parameter[parameterNumber].value,
             &descriptor[descriptorNumber].parameter[parameterNumber].type);
         if (pos <= 0) {
@@ -954,17 +1011,21 @@ static int SdpGetCommonProtocolDescriptorEachList(
 }
 
 static int SdpGetCommonProtocolDescriptorList(
-    uint8_t *buffer, SdpProtocolDescriptor *descriptor, uint16_t *protocolDescriptorNumber)
+    BufferInfo *bufferInfo, SdpProtocolDescriptor *descriptor, uint16_t *protocolDescriptorNumber)
 {
     uint16_t descriptorNumber = 0;
     uint32_t totalLength = 0;
     uint32_t currentLength = 0;
     int offset = 0;
     uint16_t pos;
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
 
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &totalLength);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &totalLength);
+    if (bufferInfo->length < totalLength) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
         LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
         return BT_BAD_PARAM;
@@ -975,21 +1036,26 @@ static int SdpGetCommonProtocolDescriptorList(
         if (descriptorNumber >= SDP_PROTOCOL_DESCRIPTOR_MAX) {
             break;
         }
-        type = buffer[offset];
+        type = bufferInfo->buffer[offset];
         totalLength--;
         offset++;
-        pos = SdpGetLengthFromType(buffer + offset, type, &currentLength);
+        pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &currentLength);
+        if (totalLength < currentLength) {
+            LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+            return BT_BAD_PARAM;
+        }
         if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
             LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
             return BT_BAD_PARAM;
         }
         totalLength = totalLength - pos;
         offset += pos;
-        pos = SdpGetUuid(buffer + offset, &descriptor[descriptorNumber].protocolUuid);
+        pos = SdpGetUuid(bufferInfo->buffer + offset, &descriptor[descriptorNumber].protocolUuid);
         totalLength = totalLength - currentLength;
         currentLength = currentLength - pos;
         offset += pos;
-        offset = SdpGetCommonProtocolDescriptorEachList(descriptor, descriptorNumber, currentLength, buffer, offset);
+        offset = SdpGetCommonProtocolDescriptorEachList(descriptor, descriptorNumber,
+		    currentLength, bufferInfo, offset);
         if (offset <= 0) {
             return offset;
         }
@@ -1000,7 +1066,7 @@ static int SdpGetCommonProtocolDescriptorList(
     return offset;
 }
 
-static int SdpGetProtocolDescriptorList(uint8_t *buffer, SdpService *service)
+static int SdpGetProtocolDescriptorList(BufferInfo *bufferInfo, SdpService *service)
 {
     int offset;
 
@@ -1014,20 +1080,24 @@ static int SdpGetProtocolDescriptorList(uint8_t *buffer, SdpService *service)
         0,
         sizeof(SdpProtocolDescriptor) * SDP_PROTOCOL_DESCRIPTOR_MAX);
 
-    offset = SdpGetCommonProtocolDescriptorList(buffer, service->descriptor, &service->descriptorNumber);
+    offset = SdpGetCommonProtocolDescriptorList(bufferInfo, service->descriptor, &service->descriptorNumber);
     return offset;
 }
 
-static int SdpGetAdditionalProtocolDescriptorList(uint8_t *buffer, SdpService *service)
+static int SdpGetAdditionalProtocolDescriptorList(BufferInfo *bufferInfo, SdpService *service)
 {
     uint16_t descriptorListNumber = 0;
     uint32_t descriptorLength = 0;
     uint16_t offset = 0;
     int pos;
 
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &descriptorLength);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &descriptorLength);
+    if (bufferInfo->length < descriptorLength) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
         LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
         return BT_BAD_PARAM;
@@ -1050,7 +1120,11 @@ static int SdpGetAdditionalProtocolDescriptorList(uint8_t *buffer, SdpService *s
             offset = descriptorLength + pos;
             break;
         }
-        pos = SdpGetCommonProtocolDescriptorList(buffer + offset,
+        BufferInfo presBufferInfo = {
+            .buffer = bufferInfo->buffer + offset,
+            .length = descriptorLength
+        };
+        pos = SdpGetCommonProtocolDescriptorList(&presBufferInfo,
             service->descriptorList[descriptorListNumber].parameter,
             &service->descriptorList[descriptorListNumber].protocolDescriptorNumber);
         if (pos <= 0) {
@@ -1065,16 +1139,20 @@ static int SdpGetAdditionalProtocolDescriptorList(uint8_t *buffer, SdpService *s
     return offset;
 }
 
-static int SdpGetBrowseGroupList(uint8_t *buffer, SdpService *service)
+static int SdpGetBrowseGroupList(BufferInfo *bufferInfo, SdpService *service)
 {
     uint16_t browseUuidNumber = 0;
     uint32_t length = 0;
     uint16_t offset = 0;
     uint16_t pos;
 
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     offset += pos;
 
     service->browseUuid = MEM_MALLOC.alloc(sizeof(BtUuid) * SDP_MAX_UUID_COUNT);
@@ -1088,7 +1166,7 @@ static int SdpGetBrowseGroupList(uint8_t *buffer, SdpService *service)
         if (browseUuidNumber >= SDP_MAX_UUID_COUNT) {
             break;
         }
-        pos = SdpGetUuid(buffer + offset, &service->browseUuid[browseUuidNumber]);
+        pos = SdpGetUuid(bufferInfo->buffer + offset, &service->browseUuid[browseUuidNumber]);
         length = length - pos;
         offset += pos;
         browseUuidNumber++;
@@ -1098,15 +1176,19 @@ static int SdpGetBrowseGroupList(uint8_t *buffer, SdpService *service)
     return offset;
 }
 
-static int SdpGetLanguageBaseAttributeIdList(uint8_t *buffer, SdpService *service)
+static int SdpGetLanguageBaseAttributeIdList(BufferInfo *bufferInfo, SdpService *service)
 {
     uint16_t baseAttributeIdNumber = 0;
     uint32_t length = 0;
     uint16_t offset = 0;
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
 
     offset++;
-    uint16_t pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    uint16_t pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
         return BT_BAD_PARAM;
     }
@@ -1121,34 +1203,36 @@ static int SdpGetLanguageBaseAttributeIdList(uint8_t *buffer, SdpService *servic
 
     while (length) {
         /// Language Code
-        type = buffer[offset];
+        type = bufferInfo->buffer[offset];
         offset++;
         if (((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_UINT) || ((type & 0x07) != DE_SIZE_16)) {
             LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
             return BT_BAD_PARAM;
         }
-        service->baseAttributeId[baseAttributeIdNumber].languageIdentifier = BE2H_16(*(uint16_t *)(buffer + offset));
+        service->baseAttributeId[baseAttributeIdNumber].languageIdentifier =
+            BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
         offset += SDP_UINT16_LENGTH;
 
         /// Language Encoding
-        type = buffer[offset];
+        type = bufferInfo->buffer[offset];
         offset++;
         if (((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_UINT) || ((type & 0x07) != DE_SIZE_16)) {
             LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
             return BT_BAD_PARAM;
         }
         service->baseAttributeId[baseAttributeIdNumber].characterEncodingIdentifier =
-            BE2H_16(*(uint16_t *)(buffer + offset));
+            BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
         offset += SDP_UINT16_LENGTH;
 
         /// Attribute Base
-        type = buffer[offset];
+        type = bufferInfo->buffer[offset];
         offset++;
         if (((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_UINT) || ((type & 0x07) != DE_SIZE_16)) {
             LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
             return BT_BAD_PARAM;
         }
-        service->baseAttributeId[baseAttributeIdNumber].baseAttributeId = BE2H_16(*(uint16_t *)(buffer + offset));
+        service->baseAttributeId[baseAttributeIdNumber].baseAttributeId =
+            BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
         offset += SDP_UINT16_LENGTH;
 
         length = length - SDP_LANGUAGE_ATTRIBUTE_LENGTH;
@@ -1159,9 +1243,9 @@ static int SdpGetLanguageBaseAttributeIdList(uint8_t *buffer, SdpService *servic
     return offset;
 }
 
-static int SdpGetServiceInfoTimeToLive(uint8_t *buffer, SdpService *service)
+static int SdpGetServiceInfoTimeToLive(BufferInfo *bufferInfo, SdpService *service)
 {
-    return SdpGetValue(buffer, &service->serviceInfoTimeToLive);
+    return SdpGetValue(bufferInfo, &service->serviceInfoTimeToLive);
 }
 
 static int SdpGetServiceAvailability(uint8_t *buffer, SdpService *service)
@@ -1180,16 +1264,20 @@ static int SdpGetServiceAvailability(uint8_t *buffer, SdpService *service)
     return offset;
 }
 
-static int SdpGetBluetoothProfileDescriptorList(uint8_t *buffer, SdpService *service)
+static int SdpGetBluetoothProfileDescriptorList(BufferInfo *bufferInfo, SdpService *service)
 {
     uint16_t profileDescriptorNumber = 0;
     uint32_t length = 0;
     uint32_t currentLength = 0;
     uint16_t offset = 0;
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
 
     offset++;
-    uint16_t pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    uint16_t pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
         return BT_BAD_PARAM;
     }
@@ -1203,17 +1291,22 @@ static int SdpGetBluetoothProfileDescriptorList(uint8_t *buffer, SdpService *ser
 
     while (length) {
         /// UUID
-        type = *(buffer + offset);
+        type = *(bufferInfo->buffer + offset);
         length--;
         offset++;
-        pos = SdpGetLengthFromType(buffer + offset, type, &currentLength);
+        pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &currentLength);
+        if (bufferInfo->length < length) {
+            LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+            return BT_BAD_PARAM;
+        }
         if ((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_DES) {
             LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
             return BT_BAD_PARAM;
         }
         length = length - pos;
         offset += pos;
-        pos = SdpGetUuid(buffer + offset, &service->profileDescriptor[profileDescriptorNumber].profileUuid);
+        pos = SdpGetUuid(bufferInfo->buffer + offset,
+            &service->profileDescriptor[profileDescriptorNumber].profileUuid);
         length = length - currentLength;
         offset += pos;
         if (currentLength == pos) {
@@ -1222,14 +1315,15 @@ static int SdpGetBluetoothProfileDescriptorList(uint8_t *buffer, SdpService *ser
         }
 
         /// Protocol Version
-        type = *(buffer + offset);
+        type = *(bufferInfo->buffer + offset);
         offset++;
-        pos = SdpGetLengthFromType(buffer + offset, type, &currentLength);
+        pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &currentLength);
         if (((type >> SDP_DESCRIPTOR_SIZE_BIT) != DE_TYPE_UINT) || (currentLength != SDP_UINT16_LENGTH)) {
             LOG_ERROR("[%{public}s][%{public}d] Wrong type [0x%02x]", __FUNCTION__, __LINE__, type);
             return BT_BAD_PARAM;
         }
-        service->profileDescriptor[profileDescriptorNumber].versionNumber = BE2H_16(*(uint16_t *)(buffer + offset));
+        service->profileDescriptor[profileDescriptorNumber].versionNumber =
+            BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
         offset += pos;
 
         profileDescriptorNumber++;
@@ -1239,7 +1333,7 @@ static int SdpGetBluetoothProfileDescriptorList(uint8_t *buffer, SdpService *ser
     return offset;
 }
 
-static int SdpGetDocumentationUrl(uint8_t *buffer, SdpService *service)
+static int SdpGetDocumentationUrl(BufferInfo *bufferInfo, SdpService *service)
 {
     service->documentationUrl = MEM_MALLOC.alloc(SDP_MAX_ATTRIBUTE_LEN);
     if (service->documentationUrl == NULL) {
@@ -1248,10 +1342,10 @@ static int SdpGetDocumentationUrl(uint8_t *buffer, SdpService *service)
     }
     (void)memset_s(service->documentationUrl, SDP_MAX_ATTRIBUTE_LEN, 0, SDP_MAX_ATTRIBUTE_LEN);
 
-    return SdpGetString(buffer, service->documentationUrl, DE_TYPE_URL);
+    return SdpGetString(bufferInfo, service->documentationUrl, DE_TYPE_URL);
 }
 
-static int SdpGetClientExecutableUrl(uint8_t *buffer, SdpService *service)
+static int SdpGetClientExecutableUrl(BufferInfo *bufferInfo, SdpService *service)
 {
     service->clientExecutableUrl = MEM_MALLOC.alloc(SDP_MAX_ATTRIBUTE_LEN);
     if (service->clientExecutableUrl == NULL) {
@@ -1260,10 +1354,10 @@ static int SdpGetClientExecutableUrl(uint8_t *buffer, SdpService *service)
     }
     (void)memset_s(service->clientExecutableUrl, SDP_MAX_ATTRIBUTE_LEN, 0, SDP_MAX_ATTRIBUTE_LEN);
 
-    return SdpGetString(buffer, service->clientExecutableUrl, DE_TYPE_URL);
+    return SdpGetString(bufferInfo, service->clientExecutableUrl, DE_TYPE_URL);
 }
 
-static int SdpGetIconUrl(uint8_t *buffer, SdpService *service)
+static int SdpGetIconUrl(BufferInfo *bufferInfo, SdpService *service)
 {
     service->iconUrl = MEM_MALLOC.alloc(SDP_MAX_ATTRIBUTE_LEN);
     if (service->iconUrl == NULL) {
@@ -1272,10 +1366,10 @@ static int SdpGetIconUrl(uint8_t *buffer, SdpService *service)
     }
     (void)memset_s(service->iconUrl, SDP_MAX_ATTRIBUTE_LEN, 0, SDP_MAX_ATTRIBUTE_LEN);
 
-    return SdpGetString(buffer, service->iconUrl, DE_TYPE_URL);
+    return SdpGetString(bufferInfo, service->iconUrl, DE_TYPE_URL);
 }
 
-static int SdpGetServiceName(uint8_t *buffer, SdpService *service)
+static int SdpGetServiceName(BufferInfo *bufferInfo, SdpService *service)
 {
     service->serviceName = MEM_MALLOC.alloc(SDP_MAX_ATTRIBUTE_LEN);
     if (service->serviceName == NULL) {
@@ -1284,10 +1378,10 @@ static int SdpGetServiceName(uint8_t *buffer, SdpService *service)
     }
     (void)memset_s(service->serviceName, SDP_MAX_ATTRIBUTE_LEN, 0, SDP_MAX_ATTRIBUTE_LEN);
 
-    return SdpGetString(buffer, service->serviceName, DE_TYPE_STRING);
+    return SdpGetString(bufferInfo, service->serviceName, DE_TYPE_STRING);
 }
 
-static int SdpGetServiceDescription(uint8_t *buffer, SdpService *service)
+static int SdpGetServiceDescription(BufferInfo *bufferInfo, SdpService *service)
 {
     service->serviceDescription = MEM_MALLOC.alloc(SDP_MAX_ATTRIBUTE_LEN);
     if (service->serviceDescription == NULL) {
@@ -1296,10 +1390,10 @@ static int SdpGetServiceDescription(uint8_t *buffer, SdpService *service)
     }
     (void)memset_s(service->serviceDescription, SDP_MAX_ATTRIBUTE_LEN, 0, SDP_MAX_ATTRIBUTE_LEN);
 
-    return SdpGetString(buffer, service->serviceDescription, DE_TYPE_STRING);
+    return SdpGetString(bufferInfo, service->serviceDescription, DE_TYPE_STRING);
 }
 
-static int SdpGetProviderName(uint8_t *buffer, SdpService *service)
+static int SdpGetProviderName(BufferInfo *bufferInfo, SdpService *service)
 {
     service->providerName = MEM_MALLOC.alloc(SDP_MAX_ATTRIBUTE_LEN);
     if (service->providerName == NULL) {
@@ -1308,10 +1402,10 @@ static int SdpGetProviderName(uint8_t *buffer, SdpService *service)
     }
     (void)memset_s(service->providerName, SDP_MAX_ATTRIBUTE_LEN, 0, SDP_MAX_ATTRIBUTE_LEN);
 
-    return SdpGetString(buffer, service->providerName, DE_TYPE_STRING);
+    return SdpGetString(bufferInfo, service->providerName, DE_TYPE_STRING);
 }
 
-static int SdpGetSequenceAttribute(uint16_t attributeId, uint8_t *buffer, SdpService *service)
+static int SdpGetSequenceAttribute(uint16_t attributeId, BufferInfo *bufferInfo, SdpService *service)
 {
     uint32_t length = 0;
     uint16_t offset = 0;
@@ -1321,9 +1415,13 @@ static int SdpGetSequenceAttribute(uint16_t attributeId, uint8_t *buffer, SdpSer
     if (service->sequenceAttributeNumber >= SDP_SEQUENCE_ATTRIBUTE_COUNT) {
         return BT_BAD_PARAM;
     }
-    type = buffer[offset];
+    type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return BT_BAD_PARAM;
+    }
     offset += pos;
 
     service->sequenceAttribute[service->sequenceAttributeNumber].attributeValue = MEM_MALLOC.alloc(length);
@@ -1335,8 +1433,8 @@ static int SdpGetSequenceAttribute(uint16_t attributeId, uint8_t *buffer, SdpSer
 
     service->sequenceAttribute[service->sequenceAttributeNumber].attributeId = attributeId;
     service->sequenceAttribute[service->sequenceAttributeNumber].attributeValueLength = length;
-    (void)memcpy_s(
-        service->sequenceAttribute[service->sequenceAttributeNumber].attributeValue, length, buffer + offset, length);
+    (void)memcpy_s(service->sequenceAttribute[service->sequenceAttributeNumber].attributeValue,
+        length, bufferInfo->buffer + offset, length);
     service->sequenceAttributeNumber++;
     offset += length;
 
@@ -1589,35 +1687,35 @@ static int SdpGetAttributeForUrl(uint8_t *buffer, uint8_t size, SdpService *serv
     return offset;
 }
 
-static int SdpGetAttribute(uint16_t attributeId, uint8_t *buffer, SdpService *service)
+static int SdpGetAttribute(uint16_t attributeId, BufferInfo *bufferInfo, SdpService *service)
 {
     int offset = 0;
     // Attribute type
-    uint8_t type = buffer[0] >> SDP_DESCRIPTOR_SIZE_BIT;
-    uint8_t size = buffer[0] & 0x07;
+    uint8_t type = bufferInfo->buffer[0] >> SDP_DESCRIPTOR_SIZE_BIT;
+    uint8_t size = bufferInfo->buffer[0] & 0x07;
 
     switch (type) {
         case DE_TYPE_UINT:
-            offset = SdpGetAttributeForUint(buffer, size, service);
+            offset = SdpGetAttributeForUint(bufferInfo->buffer, size, service);
             break;
         case DE_TYPE_INT:
-            offset = SdpGetAttributeForInt(buffer, size, service);
+            offset = SdpGetAttributeForInt(bufferInfo->buffer, size, service);
             break;
         case DE_TYPE_UUID:
-            offset = SdpGetAttributeForUuid(buffer, size, service);
+            offset = SdpGetAttributeForUuid(bufferInfo->buffer, size, service);
             break;
         case DE_TYPE_STRING:
-            offset = SdpGetAttributeForString(buffer, size, service);
+            offset = SdpGetAttributeForString(bufferInfo->buffer, size, service);
             break;
         case DE_TYPE_BOOL:
-            offset = SdpGetAttributeForBool(buffer, size, service);
+            offset = SdpGetAttributeForBool(bufferInfo->buffer, size, service);
             break;
         case DE_TYPE_DES:
         case DE_TYPE_DEA:
-            offset = SdpGetSequenceAttribute(attributeId, buffer, service);
+            offset = SdpGetSequenceAttribute(attributeId, bufferInfo, service);
             return offset;
         case DE_TYPE_URL:
-            offset = SdpGetAttributeForUrl(buffer, size, service);
+            offset = SdpGetAttributeForUrl(bufferInfo->buffer, size, service);
             break;
         default:
             break;
@@ -1631,47 +1729,47 @@ static int SdpGetAttribute(uint16_t attributeId, uint8_t *buffer, SdpService *se
     return offset;
 }
 
-static int SdpParseAttributeValue(uint8_t *buffer, uint16_t attributeId, SdpService *service)
+static int SdpParseAttributeValue(BufferInfo *bufferInfo, uint16_t attributeId, SdpService *service)
 {
     int offset;
     LOG_INFO("[%{public}s][%{public}d] attributeId [0x%04x]", __FUNCTION__, __LINE__, attributeId);
 
     if (attributeId == SDP_ATTRIBUTE_SERVICE_RECORD_HANDLE) {
-        offset = SdpGetServiceRecordHandle(buffer, service);
+        offset = SdpGetServiceRecordHandle(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_SERVICE_CLASS_ID_LIST) {
-        offset = SdpGetServiceClassIdList(buffer, service);
+        offset = SdpGetServiceClassIdList(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_SERVICE_RECORD_STATE) {
-        offset = SdpGetServiceRecordState(buffer, service);
+        offset = SdpGetServiceRecordState(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_SERVICE_ID) {
-        offset = SdpGetServiceId(buffer, service);
+        offset = SdpGetServiceId(bufferInfo->buffer, service);
     } else if (attributeId == SDP_ATTRIBUTE_PROTOCOL_DESCRIPTOR_LIST) {
-        offset = SdpGetProtocolDescriptorList(buffer, service);
+        offset = SdpGetProtocolDescriptorList(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_ADDITIONAL_PROTOCOL_DESCRIPTOR_LIST) {
-        offset = SdpGetAdditionalProtocolDescriptorList(buffer, service);
+        offset = SdpGetAdditionalProtocolDescriptorList(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_BROWSE_GROUP_LIST) {
-        offset = SdpGetBrowseGroupList(buffer, service);
+        offset = SdpGetBrowseGroupList(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_LANGUAGE_BASE_ATTRIBUTE_ID_LIST) {
-        offset = SdpGetLanguageBaseAttributeIdList(buffer, service);
+        offset = SdpGetLanguageBaseAttributeIdList(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_SERVICE_INFO_TIME_TO_LIVE) {
-        offset = SdpGetServiceInfoTimeToLive(buffer, service);
+        offset = SdpGetServiceInfoTimeToLive(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_SERVICE_AVAILABILITY) {
-        offset = SdpGetServiceAvailability(buffer, service);
+        offset = SdpGetServiceAvailability(bufferInfo->buffer, service);
     } else if (attributeId == SDP_ATTRIBUTE_BLUETOOTH_PROFILE_DESCRIPTOR_LIST) {
-        offset = SdpGetBluetoothProfileDescriptorList(buffer, service);
+        offset = SdpGetBluetoothProfileDescriptorList(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_DOCUMENTATION_URL) {
-        offset = SdpGetDocumentationUrl(buffer, service);
+        offset = SdpGetDocumentationUrl(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_CLIENT_EXECUTABLE_URL) {
-        offset = SdpGetClientExecutableUrl(buffer, service);
+        offset = SdpGetClientExecutableUrl(bufferInfo, service);
     } else if (attributeId == SDP_ATTRIBUTE_ICON_URL) {
-        offset = SdpGetIconUrl(buffer, service);
+        offset = SdpGetIconUrl(bufferInfo, service);
     } else if (attributeId == (SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_SERVICE_NAME)) {
-        offset = SdpGetServiceName(buffer, service);
+        offset = SdpGetServiceName(bufferInfo, service);
     } else if (attributeId == (SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_DESCRIPTOR)) {
-        offset = SdpGetServiceDescription(buffer, service);
+        offset = SdpGetServiceDescription(bufferInfo, service);
     } else if (attributeId == (SDP_ATTRIBUTE_PRIMARY_LANGUAGE_BASE + SDP_ATTRIBUTE_PROVIDER_NAME)) {
-        offset = SdpGetProviderName(buffer, service);
+        offset = SdpGetProviderName(bufferInfo, service);
     } else {
-        offset = SdpGetAttribute(attributeId, buffer, service);
+        offset = SdpGetAttribute(attributeId, bufferInfo, service);
     }
     return offset;
 }

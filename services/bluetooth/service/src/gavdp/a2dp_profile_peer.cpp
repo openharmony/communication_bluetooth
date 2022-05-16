@@ -493,6 +493,7 @@ bool A2dpProfilePeer::JudgeCapabilityMatched(uint8_t role)
 
 bool A2dpProfilePeer::FindCapabilityMatched(const A2dpCodecConfig &config, const uint8_t role)
 {
+    LOG_INFO("[A2dpProfilePeer]%{public}s", __func__);
     uint8_t resultConfig[A2DP_CODEC_SIZE] = {0};
     uint8_t *resConigInfo = &resultConfig[0];
     uint8_t cap[A2DP_CODEC_SIZE] = {0};
@@ -820,6 +821,7 @@ void A2dpProfilePeer::SelectCodecInfo(A2dpCodecCapability &userConfig, uint8_t *
 
 void A2dpProfilePeer::NotifyEncoder()
 {
+    LOG_INFO("[A2dpProfilePeer]%{public}s \n", __func__);
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
     utility::Message msg(A2DP_PCM_ENCODED, localRole_, nullptr);
     A2dpEncoderInitPeerParams peerParams = {};
@@ -1205,6 +1207,8 @@ void A2dpProfilePeer::CreateDefaultCodecPriority()
     int value = 0;
     bool result = false;
     result = AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_SBC, value);
+    LOG_INFO("[A2dpProfilePeer]%{public}s SourceSBC Config(%{public}d) priority(%{public}d) \n",
+        __func__, result, value);
     if (result) {
         defaultCodecPriorities_.insert(
             std::make_pair(A2DP_SOURCE_CODEC_INDEX_SBC, A2dpCodecPriority(value * PRIORITY_DEFAULT + 1)));
@@ -1225,6 +1229,8 @@ void A2dpProfilePeer::CreateDefaultCodecPriority()
 
     // get sink codec configure
     result = AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SNK_SERVICE, PROPERTY_CODEC_SBC, value);
+    LOG_INFO("[A2dpProfilePeer]%{public}s SinkSBC Config(%{public}d) priority(%{public}d) \n",
+        __func__, result, value);
     if (result) {
         defaultCodecPriorities_.insert(
             std::make_pair(A2DP_SINK_CODEC_INDEX_SBC, A2dpCodecPriority(value * PRIORITY_DEFAULT + 1)));

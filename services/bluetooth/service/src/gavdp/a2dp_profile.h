@@ -629,7 +629,12 @@ private:
  * @since 6.0
  */
 void ProcessSinkStream(uint16_t handle, Packet *pkt, uint32_t timeStamp, uint8_t pt, uint16_t streamHandle);
-
+/**
+ * @brief A function to clean packet data.
+ *
+ * @param[in] data The packet data to be deleted
+ * @since 6.0
+ */
 void CleanPacketData(void *data);
 
 struct PacketData {

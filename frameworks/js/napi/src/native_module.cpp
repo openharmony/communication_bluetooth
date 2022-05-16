@@ -51,7 +51,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NapiGattClient::DefineGattClientJSClass(env);
     DefineBLEJSObject(env, exports);
     DefineSppFunctions(env, exports);
-    DefineProfileFunctions(env, exports);
+    NapiProfile::DefineProfileFunctions(env, exports);
     NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(env);
     NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(env);
     BluetoothHostInit(env, exports);
