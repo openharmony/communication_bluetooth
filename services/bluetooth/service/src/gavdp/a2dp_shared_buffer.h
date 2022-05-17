@@ -29,8 +29,8 @@ public:
     ~A2dpSharedBuffer();
 private:
     uint32_t cap_;
-    uint8_t buf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE];
-    uint8_t shiftBuf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE];
+    uint8_t buf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE] = {};
+    uint8_t shiftBuf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE] = {};
     uint32_t size_;
     std::mutex mutex_;
 };
