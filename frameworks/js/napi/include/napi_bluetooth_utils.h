@@ -143,6 +143,7 @@ napi_value DeregisterObserver(napi_env env, napi_callback_info info);
 
 int GetProfileConnectionState(int state);
 int GetScoConnectionState(int state);
+uint32_t GetProfileId(int profile);
 
 struct AsyncCallbackInfo {
     napi_env env_;
@@ -450,6 +451,29 @@ enum MajorMinorClass {
     HEALTH_ANKLE_PROSTHESIS = 0x0934,
     HEALTH_GENERIC_HEALTH_MANAGER = 0x0938,
     HEALTH_PERSONAL_MOBILITY_DEVICE = 0x093C,
+};
+
+enum SppType {
+    /** RFCOMM */
+    SPP_RFCOMM = 0
+};
+
+enum PlayingState {
+    STATE_NOT_PLAYING = 0,
+    STATE_PLAYING = 1
+};
+
+enum ProfileId {
+    PROFILE_A2DP_SINK = 0,
+    PROFILE_A2DP_SOURCE = 1,
+    PROFILE_AVRCP_CT = 2,
+    PROFILE_AVRCP_TG = 3,
+    PROFILE_HANDS_FREE_AUDIO_GATEWAY = 4,
+    PROFILE_HANDS_FREE_UNIT = 5,
+    PROFILE_HID_HOST = 6,
+    PROFILE_PAN_NETWORK = 7,
+    PROFILE_PBAP_CLIENT = 8,
+    PROFILE_PBAP_SERVER = 9
 };
 
 template<typename T1, typename T2, typename T3>

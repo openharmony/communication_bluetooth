@@ -644,6 +644,8 @@ napi_value GetRssiValue(napi_env env, napi_callback_info info)
 napi_value PropertyValueInit(napi_env env, napi_value exports)
 {
     HILOGI("PropertyValueInit start");
+    napi_value scanDutyObject = ScanDutyInit(env);
+    napi_value matchModeObject = MatchModeInit(env);
     napi_value stateObj = StateChangeInit(env);
     napi_value profileStateObj = ProfileStateInit(env);
     napi_value scanModeObj = ScanModeInit(env);
@@ -651,6 +653,8 @@ napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value majorClassObj = MajorClassOfDeviceInit(env);
     napi_value majorMinorClassObj = MajorMinorClassOfDeviceInit(env);
     napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObject),
+        DECLARE_NAPI_PROPERTY("MatchMode", matchModeObject),
         DECLARE_NAPI_PROPERTY("BluetoothState", stateObj),
         DECLARE_NAPI_PROPERTY("ProfileConnectionState", profileStateObj),
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
@@ -661,6 +665,29 @@ napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     HILOGI("PropertyValueInit end");
     return exports;
+}
+
+napi_value ScanDutyInit(napi_env env)
+{
+    HILOGI("ScanDutyInit");
+    napi_value scanDuty = nullptr;
+    napi_create_object(env, &scanDuty);
+    SetNamedPropertyByInteger(env, scanDuty, static_cast<int>(ScanDuty::SCAN_MODE_LOW_POWER), "SCAN_MODE_LOW_POWER");
+    SetNamedPropertyByInteger(env, scanDuty, static_cast<int>(ScanDuty::SCAN_MODE_BALANCED), "SCAN_MODE_BALANCED");
+    SetNamedPropertyByInteger(env, scanDuty, static_cast<int>(ScanDuty::SCAN_MODE_LOW_LATENCY),
+        "SCAN_MODE_LOW_LATENCY");
+    return scanDuty;
+}
+
+napi_value MatchModeInit(napi_env env)
+{
+    HILOGI("MatchModeInit");
+    napi_value matchMode = nullptr;
+    napi_create_object(env, &matchMode);
+    SetNamedPropertyByInteger(env, matchMode, static_cast<int>(MatchMode::MATCH_MODE_AGGRESSIVE),
+        "MATCH_MODE_AGGRESSIVE");
+    SetNamedPropertyByInteger(env, matchMode, static_cast<int>(MatchMode::MATCH_MODE_STICKY), "MATCH_MODE_STICKY");
+    return matchMode;
 }
 
 napi_value StateChangeInit(napi_env env)
@@ -960,7 +987,7 @@ napi_value GetProfileConnState(napi_env env, napi_callback_info info)
     }
 
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    int state = host->GetBtProfileConnState(profileId);
+    int state = host->GetBtProfileConnState(GetProfileId(profileId));
     napi_create_int32(env, state, &ret);
     return ret;
 }
