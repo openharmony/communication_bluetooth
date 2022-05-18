@@ -710,6 +710,13 @@ napi_value NapiGetNull(napi_env env)
     return result;
 }
 
+napi_value NapiGetBooleanFalse(napi_env env)
+{
+    napi_value result = nullptr;
+    napi_get_boolean(env, false, &result);
+    return result;
+}
+
 napi_value RegisterObserver(napi_env env, napi_callback_info info)
 {
     HILOGI("RegisterObserver called");

@@ -138,6 +138,7 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName);
 napi_value NapiGetNull(napi_env env);
+napi_value NapiGetBooleanFalse(napi_env env);
 napi_value RegisterObserver(napi_env env, napi_callback_info info);
 napi_value DeregisterObserver(napi_env env, napi_callback_info info);
 
