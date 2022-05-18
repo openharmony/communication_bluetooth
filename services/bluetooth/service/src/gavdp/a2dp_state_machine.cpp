@@ -772,6 +772,7 @@ bool A2dpStateStreaming::Dispatch(const utility::Message &msg)
 {
     LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
     if (msg.arg2_ == nullptr) {
+        LOG_ERROR("[A2dpStateStreaming]%{public}s input error parameter\n", __func__);
         return false;
     }
     A2dpAvdtMsgData msgData = (static_cast<A2dpAvdtMsg*>(msg.arg2_))->a2dpMsg;

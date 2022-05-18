@@ -45,6 +45,8 @@ napi_value GetDeviceName(napi_env env, napi_callback_info info);
 napi_value GetRssiValue(napi_env env, napi_callback_info info);
 
 napi_value PropertyValueInit(napi_env env, napi_value exports);
+napi_value ScanDutyInit(napi_env env);
+napi_value MatchModeInit(napi_env env);
 napi_value StateChangeInit(napi_env env);
 napi_value ProfileStateInit(napi_env env);
 napi_value ScanModeInit(napi_env env);
