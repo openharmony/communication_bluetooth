@@ -104,22 +104,26 @@ napi_value DisableBluetooth(napi_env env, napi_callback_info info)
 
 napi_value SetLocalName(napi_env env, napi_callback_info info)
 {
-    HILOGI("SetLocalName start");
+    HILOGI("start");
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
     if (argc == 0) {
-        return NapiGetNull(env);
+        HILOGE("The argc is 0");
+        return NapiGetBooleanFalse(env);
     }
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
     size_t bufferSize = 0;
-    size_t strLength = 0;
     napi_get_value_string_utf8(env, argv[PARAM0], nullptr, 0, &bufferSize);
     HILOGD("local name writeChar bufferSize = %{public}d", (int)bufferSize);
+    if (bufferSize == 0) {
+        return NapiGetBooleanFalse(env);
+    }
     char buffer[bufferSize + 1];
+    size_t strLength = 0;
     napi_get_value_string_utf8(env, argv[PARAM0], buffer, bufferSize + 1, &strLength);
     std::string localName(buffer);
 
@@ -988,7 +992,7 @@ napi_value GetProfileConnState(napi_env env, napi_callback_info info)
 
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int state = host->GetBtProfileConnState(GetProfileId(profileId));
-    napi_create_int32(env, state, &ret);
+    napi_create_int32(env, GetProfileConnectionState(state), &ret);
     return ret;
 }
 }  // namespace Bluetooth

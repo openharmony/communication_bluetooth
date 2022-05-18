@@ -802,7 +802,7 @@ void AttReadByTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
     attReadObj.readHandleListNum.len = *(uint8_t *)BufferPtr(buffer);
     len = attReadObj.readHandleListNum.len;
     LOG_INFO("%{public}s callback para : len = %hhu", __FUNCTION__, len);
-    if (len == 0) {
+    if (len <= STEP_TWO) {
         LOG_ERROR("%{public}s len is 0", __FUNCTION__);
         attReadObj.readHandleListNum.valueNum = 0;
     } else if ((dataLen - 1) % len) {
@@ -817,7 +817,7 @@ void AttReadByTypeResponse(AttConnectInfo *connect, const Buffer *buffer)
     data = (uint8_t *)BufferPtr(buffer) + 1;
     attReadObj.readHandleListNum.valueList =
         MEM_MALLOC.alloc(sizeof(AttReadByTypeRspDataList) * attReadObj.readHandleListNum.valueNum);
-    for (; (indexNum < attReadObj.readHandleListNum.valueNum) && (len > STEP_TWO); ++indexNum) {
+    for (; indexNum < attReadObj.readHandleListNum.valueNum; ++indexNum) {
         attReadObj.readHandleListNum.valueList[indexNum].attributeValue = MEM_MALLOC.alloc(len - STEP_TWO);
         (void)memcpy_s(
             &attReadObj.readHandleListNum.valueList[indexNum], sizeof(AttReadByTypeRspDataList), data, STEP_TWO);
