@@ -21,6 +21,7 @@ A2dpSharedBuffer::A2dpSharedBuffer()
 {
     std::lock_guard<std::mutex> lock_(mutex_);
     cap_ = A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE;
+    size_ = 0;
     isValid_ = true;
 }
 
