@@ -194,7 +194,7 @@ public:
     }
 
 private:
-    RemoteObserverList<IBluetoothBleCentralManagerCallback> *observers_;
+    RemoteObserverList<IBluetoothBleCentralManagerCallback> *observers_ = nullptr;
     BluetoothBleCentralManagerServer::impl *pimpl_ = nullptr;
 };
 
@@ -227,6 +227,7 @@ BluetoothBleCentralManagerServer::impl::impl()
 {
     eventRunner_ = AppExecFwk::EventRunner::Create("bt central manager server");
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(eventRunner_);
+    isScanning = false;
 }
 
 BluetoothBleCentralManagerServer::impl::~impl()
