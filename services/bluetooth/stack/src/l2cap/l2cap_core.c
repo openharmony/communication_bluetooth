@@ -1230,7 +1230,8 @@ static int L2capParseConfiguration(const uint8_t *data, uint16_t length, L2capCo
                 cfg->fcs = data[offset + L2CAP_OFFSET_2];
                 break;
             case L2CAP_OPTION_QUALITY_OF_SERVICE:
-                if (data[offset + L2CAP_OFFSET_3] != 0x01) {  // Best Effort
+                if ((data[offset + L2CAP_OFFSET_3] != L2CAP_QOS_SERVICE_TYPE_BEST_EFFORT) &&
+                    (data[offset + L2CAP_OFFSET_3] != L2CAP_QOS_SERVICE_TYPE_GUARANTEED)) {
                     return BT_BAD_PARAM;
                 }
                 break;

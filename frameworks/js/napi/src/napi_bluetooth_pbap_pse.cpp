@@ -38,7 +38,7 @@ void NapiPbapServer::DefinePbapServerJSClass(napi_env env)
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_PBAP_SERVER, napiProfile);
+    NapiProfile::SetProfile(ProfileId::PROFILE_PBAP_SERVER, napiProfile);
     HILOGI("DefinePbapServerJSClass finished");
 }
 

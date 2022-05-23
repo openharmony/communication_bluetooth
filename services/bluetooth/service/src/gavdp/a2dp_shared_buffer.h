@@ -26,13 +26,15 @@ public:
     uint32_t Read(uint8_t *buf, uint32_t len);
     uint32_t Write(const uint8_t *buf, uint32_t len);
     void Reset();
+    void SetValid(bool isValid);
     ~A2dpSharedBuffer();
 private:
     uint32_t cap_;
-    uint8_t buf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE];
-    uint8_t shiftBuf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE];
+    uint8_t buf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE] = {};
+    uint8_t shiftBuf_[A2DP_SBC_MAX_PACKET_SIZE * FRAME_THREE] = {};
     uint32_t size_;
     std::mutex mutex_;
+    bool isValid_ = false;
 };
 }
 
