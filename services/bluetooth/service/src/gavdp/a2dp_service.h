@@ -376,6 +376,12 @@ public:
      */
     void DeregisterObserver(IA2dpObserver *observer) override;
 
+    /**
+     * @brief Write PCM data to A2dp Service
+     * @param[in] data is the address of the input data
+     * @param[in] size is the size of the input data
+     * @since 6.0
+     */
     int WriteFrame(const uint8_t *data, uint32_t size) override;
 
     /**
