@@ -44,7 +44,7 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileCode::CODE_BT_PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
+    NapiProfile::SetProfile(ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
     HILOGI("DefineHandsFreeAudioGatewayJSClass finished");
 }
 

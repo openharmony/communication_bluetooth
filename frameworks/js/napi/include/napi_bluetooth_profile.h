@@ -20,29 +20,21 @@
 #include <memory>
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
-enum ProfileCode {
-    CODE_BT_PROFILE_A2DP_SINK = 0,
-    CODE_BT_PROFILE_A2DP_SOURCE,
-    CODE_BT_PROFILE_AVRCP_CT,
-    CODE_BT_PROFILE_AVRCP_TG,
-    CODE_BT_PROFILE_HANDS_FREE_AUDIO_GATEWAY,
-    CODE_BT_PROFILE_HANDS_FREE_UNIT,
-    CODE_BT_PROFILE_HID_HOST,
-    CODE_BT_PROFILE_PAN_NETWORK,
-    CODE_BT_PROFILE_PBAP_CLIENT,
-    CODE_BT_PROFILE_PBAP_SERVER,
-};
-
-void DefineProfileFunctions(napi_env env, napi_value exports);
 
 class NapiProfile {
 public:
-    static std::map<ProfileCode, napi_value> profiles_;
-    static void SetProfile(ProfileCode code, napi_value profile);
+    static void DefineProfileFunctions(napi_env env, napi_value exports);
+    static std::map<ProfileId, napi_value> profiles_;
+    static void SetProfile(ProfileId code, napi_value profile);
     static napi_value GetProfile(napi_env env, napi_callback_info info);
+    static void ProfileEnumInit(napi_env env, napi_value exports);
+    static napi_value SppTypeInit(napi_env env);
+    static napi_value PlayingStateInit(napi_env env);
+    static napi_value ProfileIdInit(napi_env env);
 };
 
 }  // namespace Bluetooth

@@ -267,6 +267,11 @@ BluetoothHost::impl::impl()
 
     GetProxy();
 
+    if (proxy_ == nullptr) {
+        HILOGE("proxy_ is null");
+        return;
+    }
+
     proxy_->RegisterObserver(observerImp_);
     proxy_->RegisterBleAdapterObserver(bleObserverImp_);
     proxy_->RegisterRemoteDeviceObserver(remoteObserverImp_);
