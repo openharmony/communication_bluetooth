@@ -28,7 +28,7 @@ config("module_private_config") {
   include_dirs = [
     "mock/include",
     "//third_party/json/include",
-    "//utils/native/base/include",
+    "//third_party/bounds_checking_function/include",
     "//utils/system/safwk/native/include",
   ]
   defines = [
@@ -47,11 +47,11 @@ ohos_moduletest("btfw_hid_unit_test") {
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
+    "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/libxml2:xml2",
     "//utils/native/base:utils",
-    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [
