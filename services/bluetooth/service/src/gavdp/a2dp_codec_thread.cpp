@@ -88,6 +88,7 @@ void A2dpCodecThread::StopA2dpCodecThread()
 void A2dpCodecThread::ProcessMessage(utility::Message msg, const A2dpEncoderInitPeerParams &peerParams,
     A2dpCodecConfig *config, A2dpDecoderObserver *decObserver)
 {
+    LOG_INFO("[A2dpCodecThread]%{public}s msg is %{public}d\n", __func__, msg.what_);
     struct timeval tv = {};
     struct timezone tz = {};
     gettimeofday(&tv, &tz);

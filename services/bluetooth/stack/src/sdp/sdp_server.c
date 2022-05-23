@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,6 +45,11 @@ typedef struct {
     AttributeItem attributeItem[SDP_MAX_ATTRIBUTE_COUNT];  /// Attribute item
     bool flag;                                             /// 1-Register 0-Deregister
 } ServiceRecordItem;
+
+typedef struct {
+    uint8_t *buffer;
+    uint16_t length;
+} BufferInfo;
 /// Bluetooth Base UUID (00000000-0000-1000-8000-00805F9B34FB)
 static const uint8_t G_BASE_UUID[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
@@ -63,9 +68,9 @@ static uint16_t SdpAddAttributeForString(uint8_t *buffer, uint16_t offset, const
 static uint16_t SdpAddAttributeForUrl(uint8_t *buffer, uint16_t offset, const uint8_t *url, uint16_t urlLen);
 static int SdpAddAttributeToServiceRecord(
     uint32_t handle, uint16_t attributeId, uint8_t attributeType, uint32_t attributeLength, const uint8_t *value);
-static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, uint8_t *buffer);
-static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, uint8_t *buffer);
-static void SdpParseSearchAttributeRequest(uint16_t lcid, uint16_t transactionId, uint8_t *buffer);
+static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, BufferInfo *bufferInfo);
+static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, BufferInfo *bufferInfo);
+static void SdpParseSearchAttributeRequest(uint16_t lcid, uint16_t transactionId, BufferInfo *bufferInfo);
 static void SortForAttributeId(AttributeItem *attributeItem, uint16_t attributeNumber);
 static bool CompareUuid(const uint8_t *uuid1, uint16_t length1, const uint8_t *uuid2, uint16_t length2);
 static uint16_t GetRecordHandleArray(
@@ -1045,6 +1050,7 @@ void SdpParseClientRequest(uint16_t lcid, const Packet *data)
     Packet *packet = PacketRefMalloc(data);
     PacketExtractHead(packet, header, sizeof(header));
     size_t size = PacketSize(packet);
+    BufferInfo bufferInfo;
 
     /// PDU ID
     SdpPduId pduId = header[0];
@@ -1073,15 +1079,18 @@ void SdpParseClientRequest(uint16_t lcid, const Packet *data)
     }
     PacketRead(packet, buffer, 0, parameterLength);
 
+    bufferInfo.buffer = buffer;
+    bufferInfo.length = parameterLength;
+
     switch (pduId) {
         case SDP_SERVICE_SEARCH_REQUEST:
-            SdpParseSearchRequest(lcid, transactionId, buffer);
+            SdpParseSearchRequest(lcid, transactionId, &bufferInfo);
             break;
         case SDP_SERVICE_ATTRIBUTE_REQUEST:
-            SdpParseAttributeRequest(lcid, transactionId, buffer);
+            SdpParseAttributeRequest(lcid, transactionId, &bufferInfo);
             break;
         case SDP_SERVICE_SEARCH_ATTRIBUTE_REQUEST:
-            SdpParseSearchAttributeRequest(lcid, transactionId, buffer);
+            SdpParseSearchAttributeRequest(lcid, transactionId, &bufferInfo);
             break;
         default:
             LOG_ERROR("[%{public}s][%{public}d] Invalid PDU ID [%u]", __FUNCTION__, __LINE__, pduId);
@@ -1158,7 +1167,7 @@ static int SdpGetUuidArray(uint8_t *buffer, uint16_t pos, uint16_t length, uint8
     return uuidNum;
 }
 
-static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, uint8_t *buffer)
+static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, BufferInfo *bufferInfo)
 {
     uint8_t uuidArray[SDP_MAX_UUID_COUNT][20];
     int uuidNum;
@@ -1169,22 +1178,26 @@ static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, uint8_t
     uint16_t pos;
 
     /// ServiceSearchPattern
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return;
+    }
     offset += pos;
     pos = offset;
 
     /// MaximumServiceRecordCount - uint16_t
     offset += length;
-    maximumServiceRecordCount = BE2H_16(*(uint16_t *)(buffer + offset));
+    maximumServiceRecordCount = BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
     offset += SDP_UINT16_LENGTH;
     LOG_INFO("maxServiceRecordCount [%hu]", maximumServiceRecordCount);
 
     /// ContinuationState
-    continuationStateLen = buffer[offset];
+    continuationStateLen = bufferInfo->buffer[offset];
     offset++;
-    LOG_INFO("[%{public}s][%{public}d] continuation state Length [%hhu].", __FUNCTION__, __LINE__, continuationStateLen);
+    LOG_INFO("[%{public}s][%{public}d] continuationStateLen [%hhu].", __FUNCTION__, __LINE__, continuationStateLen);
     /// ContinuationStateLen
     if (continuationStateLen > SDP_MAX_CONTINUATION_LEN) {
         SdpSendErrorResponse(lcid, transactionId, SDP_INVALID_CONT_STATE);
@@ -1193,7 +1206,8 @@ static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, uint8_t
     /// continuation state yes or no (is 0)
     if (continuationStateLen != 0) {
         uint8_t continuationState[SDP_MAX_CONTINUATION_LEN] = {0};
-        if (memcpy_s(continuationState, SDP_MAX_CONTINUATION_LEN, buffer + offset, continuationStateLen) != EOK) {
+        if (memcpy_s(continuationState, SDP_MAX_CONTINUATION_LEN,
+            bufferInfo->buffer + offset, continuationStateLen) != EOK) {
             LOG_ERROR("[%{public}s][%{public}d] memcpy_s fail.", __FUNCTION__, __LINE__);
             return;
         }
@@ -1202,7 +1216,7 @@ static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, uint8_t
     }
 
     (void)memset_s(uuidArray, sizeof(uuidArray), 0, sizeof(uuidArray));
-    uuidNum = SdpGetUuidArray(buffer, pos, length, uuidArray);
+    uuidNum = SdpGetUuidArray(bufferInfo->buffer, pos, length, uuidArray);
     if (uuidNum < 0) {
         LOG_ERROR("[%{public}s][%{public}d] transactionId[%02x] Uuid is NULL.", __FUNCTION__, __LINE__, transactionId);
         SdpSendErrorResponse(lcid, transactionId, SDP_INVALID_REQ_SYNTAX);
@@ -1334,7 +1348,7 @@ static void SdpCreateAttributeResponse(
     packet = NULL;
 }
 
-static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, uint8_t *buffer)
+static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, BufferInfo *bufferInfo)
 {
     ServiceRecordItem *item = NULL;
     uint16_t maximumAttributeByteCount;
@@ -1347,23 +1361,27 @@ static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, uint
     int result;
 
     /// ServiceRecordHandle
-    uint32_t handle = BE2H_32(*(uint32_t *)(buffer + offset));
+    uint32_t handle = BE2H_32(*(uint32_t *)(bufferInfo->buffer + offset));
     offset += SDP_SERVICE_RECORD_HANDLE_BYTE;
 
     /// MaximumAttributeByteCount
-    maximumAttributeByteCount = BE2H_16(*(uint16_t *)(buffer + offset));
+    maximumAttributeByteCount = BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
     offset += SDP_UINT16_LENGTH;
 
     /// AttributeIDList
-    type = buffer[offset];
+    type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &length);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
+    if (bufferInfo->length < length) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return;
+    }
     offset += pos;
     pos = offset;
 
     /// ContinuationState
     offset += length;
-    continuationStateLen = buffer[offset];
+    continuationStateLen = bufferInfo->buffer[offset];
     offset++;
     LOG_INFO("[%{public}s][%{public}d] continuation state Length [%hhu].", __FUNCTION__, __LINE__, continuationStateLen);
     /// ContinuationStateLen
@@ -1374,7 +1392,8 @@ static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, uint
     /// continuation state yes or no (is 0)
     if (continuationStateLen != 0) {
         uint8_t continuationState[SDP_MAX_CONTINUATION_LEN] = {0};
-        if (memcpy_s(continuationState, SDP_MAX_CONTINUATION_LEN, buffer + offset, continuationStateLen) != EOK) {
+        if (memcpy_s(continuationState, SDP_MAX_CONTINUATION_LEN,
+            bufferInfo->buffer + offset, continuationStateLen) != EOK) {
             return;
         }
         SdpSendAttributeFragmentResponse(
@@ -1390,10 +1409,10 @@ static void SdpParseAttributeRequest(uint16_t lcid, uint16_t transactionId, uint
 
     if (length == (SDP_UINT32_LENGTH + 1)) {
         /// Range of attribute id
-        result = BuildAttributeListByIdRange(handle, buffer + pos, attributeList);
+        result = BuildAttributeListByIdRange(handle, bufferInfo->buffer + pos, attributeList);
     } else {
         /// List of attribute id
-        result = BuildAttributeListByIdList(handle, length, buffer + pos, attributeList);
+        result = BuildAttributeListByIdList(handle, length, bufferInfo->buffer + pos, attributeList);
     }
     if (result < 0) {
         SdpSendErrorResponse(lcid, transactionId, SDP_INVALID_REQ_SYNTAX);
@@ -1575,7 +1594,7 @@ static uint16_t SdpParseSearchAttributeRequestCommon(
     return offset;
 }
 
-static void SdpParseSearchAttributeRequest(uint16_t lcid, uint16_t transactionId, uint8_t *buffer)
+static void SdpParseSearchAttributeRequest(uint16_t lcid, uint16_t transactionId, BufferInfo *bufferInfo)
 {
     uint32_t serviceSearchPatternLength = 0;
     uint32_t attributeIDListLength = 0;
@@ -1583,28 +1602,37 @@ static void SdpParseSearchAttributeRequest(uint16_t lcid, uint16_t transactionId
     uint16_t offset = 0;
 
     /// ServiceSearchPattern
-    uint8_t type = buffer[offset];
+    uint8_t type = bufferInfo->buffer[offset];
     offset++;
-    uint16_t pos = SdpGetLengthFromType(buffer + offset, type, &serviceSearchPatternLength);
+    uint16_t pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &serviceSearchPatternLength);
+    if (bufferInfo->length < serviceSearchPatternLength) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return;
+    }
     offset += pos;
 
     uint16_t serviceSearchPatternPos = offset;
     offset += serviceSearchPatternLength;
 
     /// MaximumAttributeByteCount
-    uint16_t maximumAttributeByteCount = BE2H_16(*(uint16_t *)(buffer + offset));
+    uint16_t maximumAttributeByteCount = BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
     offset += SDP_UINT16_LENGTH;
 
     /// AttributeIDList
-    type = buffer[offset];
+    type = bufferInfo->buffer[offset];
     offset++;
-    pos = SdpGetLengthFromType(buffer + offset, type, &attributeIDListLength);
+    pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &attributeIDListLength);
+    if (bufferInfo->length < attributeIDListLength) {
+        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
+        return;
+    }
     offset += pos;
 
     attributeIDListPos = offset;
     offset += attributeIDListLength;
 
-    offset = SdpParseSearchAttributeRequestCommon(lcid, transactionId, maximumAttributeByteCount, buffer, offset);
+    offset = SdpParseSearchAttributeRequestCommon(lcid, transactionId, maximumAttributeByteCount,
+        bufferInfo->buffer, offset);
     if (offset == 0) {
         return;
     }
@@ -1615,20 +1643,22 @@ static void SdpParseSearchAttributeRequest(uint16_t lcid, uint16_t transactionId
         LOG_ERROR("point to NULL");
         return;
     }
-    uint8_t *bufferEnd = buffer + serviceSearchPatternPos + serviceSearchPatternLength;
+    uint8_t *bufferEnd = bufferInfo->buffer + serviceSearchPatternPos + serviceSearchPatternLength;
     (void)memset_s(handleArray, SDP_UINT32_LENGTH * size, 0, SDP_UINT32_LENGTH * size);
-    int handleNum = BuildServiceRecordHandleList(buffer, serviceSearchPatternPos, bufferEnd, handleArray);
+    int handleNum = BuildServiceRecordHandleList(bufferInfo->buffer, serviceSearchPatternPos, bufferEnd, handleArray);
     LOG_INFO("[%{public}s][%{public}d] handleNum = [%{public}d]", __FUNCTION__, __LINE__, handleNum);
 
     if (handleNum >= 0) {
         Packet *packet =
-            BuildAttributeListArray(buffer + attributeIDListPos, attributeIDListLength, handleArray, handleNum);
+            BuildAttributeListArray(bufferInfo->buffer + attributeIDListPos, attributeIDListLength,
+                handleArray, handleNum);
         if (packet != NULL) {
             SdpCreateSearchAttributeResponse(lcid, transactionId, packet, maximumAttributeByteCount);
             PacketFree(packet);
             packet = NULL;
         } else {
-            LOG_ERROR("[%{public}s][%{public}d] transactionId[%02x] packet is NULL.", __FUNCTION__, __LINE__, transactionId);
+            LOG_ERROR("[%{public}s][%{public}d] transactionId[%02x] packet is NULL.",
+                __FUNCTION__, __LINE__, transactionId);
             SdpSendErrorResponse(lcid, transactionId, SDP_INVALID_REQ_SYNTAX);
         }
     } else {
