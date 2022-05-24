@@ -363,7 +363,6 @@ ohos_shared_library("btservice") {
     "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiomanager:audio_client",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/libxml2:xml2",
-    "//utils/native/base:utilsecurec_shared",
   ]
 
   defines = [ "PERMISSION_ALWAYS_GRANT" ]
@@ -391,7 +390,6 @@ ohos_shared_library("btsbc") {
   deps = [
     "$PART_DIR/external:btdummy",
     "//third_party/bounds_checking_function:libsec_shared",
-    "//utils/native/base:utilsecurec_shared",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
