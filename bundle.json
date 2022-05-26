@@ -104,10 +104,8 @@
         }
       ],
       "test": [
-        "//foundation/communication/bluetooth/test/unittest/gatt:unittest",
         "//foundation/communication/bluetooth/test/unittest/spp:unittest",
         "//foundation/communication/bluetooth/test/unittest/host:unittest",
-        "//foundation/communication/bluetooth/test/unittest:unittest",
         "//foundation/communication/bluetooth/test/unittest/ble:unittest",
         "//foundation/communication/bluetooth/test/unittest/hid:unittest"
       ]
