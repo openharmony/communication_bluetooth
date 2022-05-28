@@ -37,6 +37,7 @@
 		<T1 property="IsValid">true</T1>
 		<T1 property="MapMceService">false</T1>
 		<T1 property="MapMseService">false</T1>
+		<T1 property="PanService">true</T1>
 		<T1 property="PbapPceService">false</T1>
 		<T1 property="PbapPseService">false</T1>
 		<T1 property="SocketService">true</T1>
@@ -126,5 +127,8 @@
 	</T1>
     <T1 section="HidHostService">
         <T1 property="MaxConnectedDevices">0x06</T1>
+    </T1>
+	<T1 section="PanService">
+        <T1 property="MaxConnectedDevices">0x07</T1>
     </T1>
 </config>

@@ -103,6 +103,7 @@ typedef enum {
     RFCOMM,
     SPP_ID_START,
     HID_HOST,
+    PAN_BNEP,
 } GAP_Service;
 
 /**

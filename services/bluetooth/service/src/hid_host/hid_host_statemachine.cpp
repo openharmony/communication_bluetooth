@@ -93,23 +93,37 @@ void HidHostStateMachine::SetRemoving(bool isRemoving)
 
 uint16_t HidHostStateMachine::GetDeviceControlLcid()
 {
+    if (l2capConnection_ == nullptr) {
+        return 0;
+    }
     return l2capConnection_->GetControlLcid();
 }
 
 uint16_t HidHostStateMachine::GetDeviceInterruptLcid()
 {
+    if (l2capConnection_ == nullptr) {
+        return 0;
+    }
     return l2capConnection_->GetInterruptLcid();
 }
 
 void HidHostStateMachine::ProcessL2capConnectionEvent(
     const HidHostMessage &event)
 {
+    if (l2capConnection_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): L2CAP IS NULL", __FUNCTION__);
+        return;
+    }
     l2capConnection_->ProcessEvent(event);
 }
 
 void HidHostStateMachine::ProcessHogpEvent(
     const HidHostMessage &event)
 {
+    if (hogp_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): HOGP IS NULL", __FUNCTION__);
+        return;
+    }
     hogp_->ProcessEvent(event);
 }
 
@@ -507,6 +521,10 @@ bool HidHostConnectedState::DispatchBle(const utility::Message &msg)
 
 void HidHostStateMachine::ProcessStartSdp(const HidHostMessage &msg)
 {
+    if (sdpClient_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): SDP IS NULL", __FUNCTION__);
+        return;
+    }
     if (sdpClient_->CheckIsSdpDone()) {
         HidHostMessage event(HID_HOST_SDP_CMPL_EVT, HID_HOST_SDP_SUCCESS);
         event.dev_ = address_;
@@ -518,6 +536,10 @@ void HidHostStateMachine::ProcessStartSdp(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessOpenDevice(const HidHostMessage &msg)
 {
+    if (sdpClient_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): SDP IS NULL", __FUNCTION__);
+        return;
+    }
     if (sdpClient_->CheckIsSdpDone()) {
         HidHostMessage event(HID_HOST_OPEN_CMPL_EVT);
         event.dev_ = address_;
@@ -529,6 +551,10 @@ void HidHostStateMachine::ProcessOpenDevice(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessCloseDeviceReq(const HidHostMessage &msg)
 {
+    if (l2capConnection_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): L2CAP IS NULL", __FUNCTION__);
+        return;
+    }
     l2capConnection_->Disconnect();
 }
 
@@ -555,11 +581,19 @@ void HidHostStateMachine::ProcessReciveHandshake(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessWriteData(const HidHostMessage &msg)
 {
+    if (l2capConnection_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): L2CAP IS NULL", __FUNCTION__);
+        return;
+    }
     l2capConnection_->SendData(msg.sendData_, msg.dataLength_, msg.data_.get());
 }
 
 void HidHostStateMachine::ProcessSdpComplete(const HidHostMessage &msg)
 {
+    if (l2capConnection_ == nullptr || sdpClient_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): L2CAP OR SDP IS NULL", __FUNCTION__);
+        return;
+    }
     LOG_INFO("[HIDH Machine]%{public}s():result=%{public}d", __FUNCTION__, msg.arg1_);
     if ((msg.arg1_ == HID_HOST_SDP_SUCCESS) && sdpClient_->CheckIsSdpDone()) {
         l2capConnection_->Connect();
@@ -572,6 +606,10 @@ void HidHostStateMachine::ProcessSdpComplete(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessOpenComplete(const HidHostMessage &msg)
 {
+    if (sdpClient_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): SDP IS NULL", __FUNCTION__);
+        return;
+    }
     uhid_.Open();
     PnpInformation& pnpInf = sdpClient_->GetRemoteSdpPnpInfo();
     HidInformation& hidInf = sdpClient_->GetRemoteSdpHidInfo();
@@ -586,11 +624,19 @@ void HidHostStateMachine::ProcessOpenComplete(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessBleOpenDeviceReq(const HidHostMessage &msg)
 {
+    if (hogp_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): HOGP IS NULL", __FUNCTION__);
+        return;
+    }
     hogp_->Connect();
 }
 
 void HidHostStateMachine::ProcessBleCloseDeviceReq(const HidHostMessage &msg)
 {
+    if (hogp_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): HOGP IS NULL", __FUNCTION__);
+        return;
+    }
     hogp_->Disconnect();
 }
 
@@ -617,11 +663,19 @@ void HidHostStateMachine::ProcessBleReciveHandshake(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessBleWriteData(const HidHostMessage &msg)
 {
+    if (hogp_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): HOGP IS NULL", __FUNCTION__);
+        return;
+    }
     hogp_->SendData(msg);
 }
 
 void HidHostStateMachine::ProcessBleOpenComplete(const HidHostMessage &msg)
 {
+    if (hogp_ == nullptr) {
+        LOG_ERROR("[HIDH Machine]%{public}s(): HOGP IS NULL", __FUNCTION__);
+        return;
+    }
     uhid_.Open();
     PnpInformation& pnpInf = hogp_->GetRemotePnpInfo();
     HidInformation& hidInf = hogp_->GetRemoteHidInfo();

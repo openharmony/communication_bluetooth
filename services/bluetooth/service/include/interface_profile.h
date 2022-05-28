@@ -59,6 +59,7 @@ const std::string PROFILE_NAME_HFP_AG = "HfpAgService";
 const std::string PROFILE_NAME_HFP_HF = "HfpHfService";
 const std::string PROFILE_NAME_MAP_MCE = "MapMceService";
 const std::string PROFILE_NAME_MAP_MSE = "MapMseService";
+const std::string PROFILE_NAME_PAN = "PanService";
 const std::string PROFILE_NAME_PBAP_PCE = "PbapPceService";
 const std::string PROFILE_NAME_PBAP_PSE = "PbapPseService";
 const std::string PROFILE_NAME_SPP = "SocketService";
