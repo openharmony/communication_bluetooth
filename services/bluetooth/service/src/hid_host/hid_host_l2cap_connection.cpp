@@ -291,6 +291,14 @@ void HidHostL2capConnection::SendGetReport(SendHidData sendData)
 
 void HidHostL2capConnection::SendSetReport(SendHidData sendData, int length, uint8_t* pkt)
 {
+    if ((pkt == nullptr) || (length <= 0)) {
+        LOG_ERROR("[HIDH L2CAP] %{public}s:data is null.", __func__);
+        HidHostMessage event(HID_HOST_INT_HANDSK_EVT, HID_HOST_HANDSHAKE_ERROR);
+        event.dev_ = address_;
+        HidHostService::GetService()->PostEvent(event);
+        return;
+    }
+
     Packet *packet = nullptr;
     uint8_t *buf = nullptr;
     uint16_t lcid = 0;
