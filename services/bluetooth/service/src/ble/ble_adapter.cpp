@@ -1535,6 +1535,27 @@ void BleAdapter::StopScan() const
     }
 }
 
+int BleAdapter::ConfigScanFilter(const int clientId, const std::vector<BleScanFilterImpl> &filters)
+{
+    LOG_DEBUG("[BleAdapter] %{public}s", __func__);
+
+    std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
+    if (pimpl->bleCentralManager_ != nullptr) {
+        return pimpl->bleCentralManager_->ConfigScanFilter(clientId, filters);
+    }
+    return 0;
+}
+
+void BleAdapter::RemoveScanFilter(const int clientId)
+{
+    LOG_DEBUG("[BleAdapter] %{public}s", __func__);
+
+    std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
+    if (pimpl->bleCentralManager_ != nullptr) {
+        pimpl->bleCentralManager_->RemoveScanFilter(clientId);
+    }
+}
+
 void BleAdapter::OnStartAdvertisingEvt() const
 {
     LOG_DEBUG("[BleAdapter] %{public}s", __func__);

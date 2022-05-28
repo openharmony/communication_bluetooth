@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <string>
 
 #include "bt_def.h"
+#include "bt_uuid.h"
 #include "gap_le_if.h"
 
 /*
@@ -80,6 +81,18 @@ const int BLE_THREAD_WAIT_TIMEOUT = 5;
 
 const int BLE_CHANGE_RPA_ADDRESS_INTERVAL = 15 * 60 * 1000;
 const uint16_t GATT_UUID_GAP_DEVICE_NAME = 0x2A00;
+
+const Uuid::UUID128Bit DEFAULT_UUID_MASK = {
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+};
+
+/// Filter status
+typedef enum {
+    BLE_SCAN_FILTER_STATUS_IDLE = 0,
+    BLE_SCAN_FILTER_STATUS_WORKING,
+    BLE_SCAN_FILTER_STATUS_BAD,
+} FILTER_STATUS;
 
 /// Advertising status
 typedef enum {

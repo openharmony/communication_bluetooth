@@ -344,8 +344,194 @@ static napi_value ParseScanParameters(
     return NapiGetNull(env);
 }
 
-static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &args)
+static napi_value ParseScanFilterDeviceIdParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
+    napi_value result;
+    bool hasProperty = false;
+    ScanFilter filter;
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "deviceId", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "deviceId", &result);
+        ParseString(env, filter.deviceId, result);
+        bleScanFilter.SetDeviceId(filter.deviceId);
+        HILOGD("StartBLEScan filter device id is %{public}s", filter.deviceId.c_str());
+    }
+    return NapiGetNull(env);
+}
+
+static napi_value ParseScanFilterLocalNameParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+{
+    napi_value result;
+    bool hasProperty = false;
+    ScanFilter filter;
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "name", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "name", &result);
+        ParseString(env, filter.name, result);
+        bleScanFilter.SetName(filter.name);
+        HILOGD("StartBLEScan filter name is %{public}s", filter.name.c_str());
+    }
+    return NapiGetNull(env);
+}
+
+static napi_value ParseScanFilterServiceUuidParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+{
+    napi_value result;
+    bool hasProperty = false;
+    ScanFilter filter;
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceUuid", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "serviceUuid", &result);
+        std::string serviceUuid;
+        ParseString(env, serviceUuid, result);
+        HILOGD("StartBLEScan filter serviceUuid is %{public}s", serviceUuid.c_str());
+        if (!serviceUuid.empty()) {
+            filter.serviceUuid = ParcelUuid::FromString(serviceUuid);
+            bleScanFilter.SetServiceUuid(filter.serviceUuid);
+        }
+    }
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceUuidMask", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "serviceUuidMask", &result);
+        std::string serviceUuidMask;
+        ParseString(env, serviceUuidMask, result);
+        HILOGD("StartBLEScan filter serviceUuidMask is %{public}s", serviceUuidMask.c_str());
+        if (!serviceUuidMask.empty()) {
+            filter.serviceUuidMask = ParcelUuid::FromString(serviceUuidMask);
+            bleScanFilter.SetServiceUuidMask(filter.serviceUuidMask);
+        }
+    }
+    return NapiGetNull(env);
+}
+
+static napi_value ParseScanFilterSolicitationUuidParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+{
+    napi_value result;
+    bool hasProperty = false;
+    ScanFilter filter;
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceSolicitationUuid", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "serviceSolicitationUuid", &result);
+        std::string serviceSolicitationUuid;
+        ParseString(env, serviceSolicitationUuid, result);
+        HILOGD("StartBLEScan filter serviceSolicitationUuid is %{public}s", serviceSolicitationUuid.c_str());
+        if (!serviceSolicitationUuid.empty()) {
+            filter.serviceSolicitationUuid = ParcelUuid::FromString(serviceSolicitationUuid);
+            bleScanFilter.SetServiceSolicitationUuid(filter.serviceSolicitationUuid);
+        }
+    }
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceSolicitationUuidMask", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "serviceSolicitationUuidMask", &result);
+        std::string serviceSolicitationUuidMask;
+        ParseString(env, serviceSolicitationUuidMask, result);
+        HILOGD("StartBLEScan filter serviceSolicitationUuidMask is %{public}s", serviceSolicitationUuidMask.c_str());
+        if (!serviceSolicitationUuidMask.empty()) {
+            filter.serviceSolicitationUuidMask = ParcelUuid::FromString(serviceSolicitationUuidMask);
+            bleScanFilter.SetServiceSolicitationUuidMask(filter.serviceSolicitationUuidMask);
+        }
+    }
+    return NapiGetNull(env);
+}
+
+static napi_value ParseScanFilterServiceDataParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+{
+    napi_value result;
+    bool hasProperty = false;
+    ScanFilter filter;
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceData", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "serviceData", &result);
+        bool isArrayBuffer = false;
+        napi_is_arraybuffer(env, result, &isArrayBuffer);
+        if (isArrayBuffer) {
+            uint8_t *arrayBufferData = nullptr;
+            size_t arrayBufferTotal = 0;
+            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            filter.serviceData = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
+        }
+        bleScanFilter.SetServiceData(filter.serviceData);
+    }
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceDataMask", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "serviceDataMask", &result);
+        bool isArrayBuffer = false;
+        napi_is_arraybuffer(env, result, &isArrayBuffer);
+        if (isArrayBuffer) {
+            uint8_t *arrayBufferData = nullptr;
+            size_t arrayBufferTotal = 0;
+            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            filter.serviceDataMask = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
+        }
+        bleScanFilter.SetServiceDataMask(filter.serviceDataMask);
+    }
+    return NapiGetNull(env);
+}
+
+static napi_value ParseScanFilterManufactureDataParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+{
+    napi_value result;
+    bool hasProperty = false;
+    ScanFilter filter;
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "manufacturerId", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "manufacturerId", &result);
+        int32_t manufacturerId = 0;
+        napi_get_value_int32(env, result, &manufacturerId);
+        filter.manufacturerId = manufacturerId;
+        bleScanFilter.SetManufacturerId(filter.manufacturerId);
+        HILOGD("StartBLEScan filter manufacturerId is %{public}d", filter.manufacturerId);
+    }
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "manufactureData", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "manufactureData", &result);
+        bool isArrayBuffer = false;
+        napi_is_arraybuffer(env, result, &isArrayBuffer);
+        if (isArrayBuffer) {
+            uint8_t *arrayBufferData = nullptr;
+            size_t arrayBufferTotal = 0;
+            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            filter.manufactureData = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
+        }
+        bleScanFilter.SetManufactureData(filter.manufactureData);
+    }
+
+    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "manufactureDataMask", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, scanFilter, "manufactureDataMask", &result);
+        bool isArrayBuffer = false;
+        napi_is_arraybuffer(env, result, &isArrayBuffer);
+        if (isArrayBuffer) {
+            uint8_t *arrayBufferData = nullptr;
+            size_t arrayBufferTotal = 0;
+            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            filter.manufactureDataMask =
+            std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
+        }
+        bleScanFilter.SetManufactureDataMask(filter.manufactureDataMask);
+    }
+    return NapiGetNull(env);
+}
+
+static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &args, std::vector<BleScanFilter> &params)
+{
+    HILOGI("%{public}s, enter", __func__);
     if (args == nullptr) {
         return NapiGetNull(env);
     }
@@ -355,37 +541,22 @@ static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &arg
     if (isArray) {
         uint32_t length = 0;
         napi_get_array_length(env, args, &length);
-        for (size_t i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; i++) {
             napi_value scanFilter;
-            napi_value result;
             napi_valuetype valuetype = napi_undefined;
             napi_get_element(env, args, i, &scanFilter);
             NAPI_CALL(env, napi_typeof(env, scanFilter, &valuetype));
             NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-            bool hasProperty = false;
-            NAPI_CALL(env, napi_has_named_property(env, scanFilter, "deviceId", &hasProperty));
-            if (hasProperty) {
-                napi_get_named_property(env, scanFilter, "deviceId", &result);
-                std::string deviceId;
-                ParseString(env, deviceId, result);
-                HILOGD("ParseScanFilterParameters::deviceId = %{public}s", deviceId.c_str());
-            }
 
-            NAPI_CALL(env, napi_has_named_property(env, scanFilter, "name", &hasProperty));
-            if (hasProperty) {
-                napi_get_named_property(env, scanFilter, "name", &result);
-                std::string name;
-                ParseString(env, name, result);
-                HILOGD("ParseScanFilterParameters::name = %{public}s", name.c_str());
-            }
+            BleScanFilter bleScanFilter;
+            ParseScanFilterDeviceIdParameters(env, scanFilter, bleScanFilter);
+            ParseScanFilterLocalNameParameters(env, scanFilter, bleScanFilter);
+            ParseScanFilterServiceUuidParameters(env, scanFilter, bleScanFilter);
+            ParseScanFilterSolicitationUuidParameters(env, scanFilter, bleScanFilter);
+            ParseScanFilterServiceDataParameters(env, scanFilter, bleScanFilter);
+            ParseScanFilterManufactureDataParameters(env, scanFilter, bleScanFilter);
 
-            NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceUuid", &hasProperty));
-            if (hasProperty) {
-                napi_get_named_property(env, scanFilter, "serviceUuid", &result);
-                std::string serviceUuid;
-                ParseString(env, serviceUuid, result);
-                HILOGD("ParseScanFilterParameters::serviceUuid = %{public}s", serviceUuid.c_str());
-            }
+            params.push_back(bleScanFilter);
         }
     }
     return NapiGetNull(env);
@@ -402,7 +573,11 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
 
-    ParseScanFilterParameters(env, argv[PARAM0]);
+    std::vector<BleScanFilter> scanfilters;
+    if (argv[PARAM0] != nullptr) {
+        ParseScanFilterParameters(env, argv[PARAM0], scanfilters);
+    }
+    bleCentralManager->ConfigScanFilter(scanfilters);
 
     BleScanSettings settinngs;
     if (argv[PARAM1] != nullptr) {

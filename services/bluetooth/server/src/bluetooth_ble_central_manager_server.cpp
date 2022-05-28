@@ -355,6 +355,56 @@ void BluetoothBleCentralManagerServer::StopScan()
     });
 }
 
+int BluetoothBleCentralManagerServer::ConfigScanFilter(
+    const int clientId, const std::vector<BluetoothBleScanFilter> &filters)
+{
+    HILOGI("BluetoothBleCentralManagerServer::ConfigScanFilter start.");
+
+    pimpl->bleService_ =
+        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+
+    if (pimpl->bleService_ != nullptr) {
+        std::vector<BleScanFilterImpl> filterImpls {};
+        for (auto filter : filters) {
+            BleScanFilterImpl filterImpl;
+            filterImpl.SetDeviceId(filter.GetDeviceId());
+            filterImpl.SetName(filter.GetName());
+            if (filter.HasServiceUuid()) {
+                filterImpl.SetServiceUuid(filter.GetServiceUuid());
+            }
+            if (filter.HasServiceUuidMask()) {
+                filterImpl.SetServiceUuidMask(filter.GetServiceUuidMask());
+            }
+            if (filter.HasSolicitationUuid()) {
+                filterImpl.SetServiceSolicitationUuid(filter.GetServiceSolicitationUuid());
+            }
+            if (filter.HasSolicitationUuidMask()) {
+                filterImpl.SetServiceSolicitationUuidMask(filter.GetServiceSolicitationUuidMask());
+            }
+            filterImpl.SetServiceData(filter.GetServiceData());
+            filterImpl.SetServiceDataMask(filter.GetServiceDataMask());
+            filterImpl.SetManufacturerId(filter.GetManufacturerId());
+            filterImpl.SetManufactureData(filter.GetManufactureData());
+            filterImpl.SetManufactureDataMask(filter.GetManufactureDataMask());
+            filterImpls.push_back(filterImpl);
+        }
+        return pimpl->bleService_->ConfigScanFilter(clientId, filterImpls);
+    }
+    return 0;
+}
+
+void BluetoothBleCentralManagerServer::RemoveScanFilter(const int clientId)
+{
+    HILOGI("BluetoothBleCentralManagerServer::RemoveScanFilter start.");
+
+    pimpl->bleService_ =
+        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+
+    if (pimpl->bleService_ != nullptr) {
+        pimpl->bleService_->RemoveScanFilter(clientId);
+    }
+}
+
 void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {

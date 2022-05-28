@@ -36,6 +36,12 @@ const std::map<uint32_t, std::function<ErrCode(BluetoothBleCentralManagerStub *,
         {IBluetoothBleCentralManager::Code::BLE_START_SCAN_WITH_SETTINGS,
             std::bind(&BluetoothBleCentralManagerStub::StartScanWithSettingsInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothBleCentralManager::Code::BLE_CONFIG_SCAN_FILTER,
+            std::bind(&BluetoothBleCentralManagerStub::ConfigScanFilterInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothBleCentralManager::Code::BLE_REMOVE_SCAN_FILTER,
+            std::bind(&BluetoothBleCentralManagerStub::RemoveScanFilterInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
         {IBluetoothBleCentralManager::Code::BLE_STOP_SCAN,
             std::bind(&BluetoothBleCentralManagerStub::StopScanInner, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
@@ -119,6 +125,32 @@ ErrCode BluetoothBleCentralManagerStub::StartScanWithSettingsInner(MessageParcel
 ErrCode BluetoothBleCentralManagerStub::StopScanInner(MessageParcel &data, MessageParcel &reply)
 {
     StopScan();
+    return NO_ERROR;
+}
+ErrCode BluetoothBleCentralManagerStub::ConfigScanFilterInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::vector<BluetoothBleScanFilter> filters {};
+    int32_t clientId = data.ReadInt32();
+    int32_t itemsSize = data.ReadInt32();
+    for (int i = 0; i < itemsSize; i++) {
+        BluetoothBleScanFilter item = *(data.ReadParcelable<BluetoothBleScanFilter>());
+        filters.push_back(item);
+    }
+
+    int result = ConfigScanFilter(clientId, filters);
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        HILOGE("BluetoothBleCentralManagerStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothBleCentralManagerStub::RemoveScanFilterInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t clientId = data.ReadInt32();
+
+    RemoveScanFilter(clientId);
     return NO_ERROR;
 }
 }  // namespace Bluetooth

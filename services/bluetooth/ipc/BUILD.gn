@@ -37,6 +37,7 @@ ohos_static_library("btipc_static") {
     "parcel/bluetooth_avrcp_mpItem.cpp",
     "parcel/bluetooth_ble_advertiser_data.cpp",
     "parcel/bluetooth_ble_advertiser_settings.cpp",
+    "parcel/bluetooth_ble_scan_filter.cpp",
     "parcel/bluetooth_ble_scan_result.cpp",
     "parcel/bluetooth_ble_scan_settings.cpp",
     "parcel/bluetooth_bt_uuid.cpp",

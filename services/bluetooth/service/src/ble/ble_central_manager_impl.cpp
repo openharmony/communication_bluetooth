@@ -15,6 +15,8 @@
 
 #include "ble_central_manager_impl.h"
 
+#include <dlfcn.h>
+
 #include "ble_adapter.h"
 #include "ble_feature.h"
 #include "ble_properties.h"
@@ -23,6 +25,8 @@
 #include "securec.h"
 
 namespace bluetooth {
+constexpr char BLE_SCAN_FILTER_LIB_NAME[] = "libble_scan_filter.z.so";
+
 struct BleCentralManagerImpl::impl {
     /**
      * @brief register scan callback to gap
@@ -62,6 +66,14 @@ struct BleCentralManagerImpl::impl {
     std::unique_ptr<utility::Timer> timer_ = nullptr;
     std::map<std::string, std::vector<uint8_t>> incompleteData_ {};
     BleCentralManagerImpl *bleCentralManagerImpl_ = nullptr;
+
+    std::map<uint8_t, BleScanFilterImpl> filters_;
+    std::list<uint8_t> releaseFiltIndex_;
+    std::queue<BleScanFilterImpl> waitFilters_;
+    int currentFilterClientId_ = 0;
+    uint8_t currentFiltIndex_ = 0;
+    uint8_t venderMaxFilterNumber_ = 0;
+    int filterStatus_ = BLE_SCAN_FILTER_STATUS_IDLE;
 
     /// Adv data cache
     class BleAdvertisingDataCache {
@@ -165,6 +177,7 @@ BleCentralManagerImpl::BleCentralManagerImpl(
     SetInterval(interval);
     uint16_t window = BLE_SCAN_MODE_LOW_POWER_WINDOW_MS;
     SetWindow(window);
+    LoadBleScanFilterLib();
 }
 
 BleCentralManagerImpl::~BleCentralManagerImpl()
@@ -175,6 +188,7 @@ BleCentralManagerImpl::~BleCentralManagerImpl()
         pimpl->timer_->Stop();
         pimpl->timer_ = nullptr;
     }
+    UnloadBleScanFilterLib();
 }
 
 int BleCentralManagerImpl::impl::RegisterCallbackToGap()
@@ -472,6 +486,99 @@ bool BleCentralManagerImpl::CheckBleScanMode(uint8_t falg)
             return false;
     }
     return true;
+}
+
+void BleCentralManagerImpl::AddBleScanFilterResult(uint8_t result, void *context)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    auto *centralManager = static_cast<BleCentralManagerImpl *>(context);
+    if ((centralManager != nullptr) && (centralManager->dispatcher_ != nullptr)) {
+        centralManager->dispatcher_->PostTask(std::bind(
+            &BleCentralManagerImpl::HandleAddBleScanFilterResult, centralManager, result));
+    }
+}
+
+void BleCentralManagerImpl::DeleteBleScanFilterResult(uint8_t result, void *context)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    auto *centralManager = static_cast<BleCentralManagerImpl *>(context);
+    if ((centralManager != nullptr) && (centralManager->dispatcher_ != nullptr)) {
+        centralManager->dispatcher_->PostTask(std::bind(
+            &BleCentralManagerImpl::HandleDeleteBleScanFilterResult, centralManager, result));
+    }
+}
+
+void BleCentralManagerImpl::StartBleScanFilterResult(uint8_t result, void *context)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    auto *centralManager = static_cast<BleCentralManagerImpl *>(context);
+    if ((centralManager != nullptr) && (centralManager->dispatcher_ != nullptr)) {
+        centralManager->dispatcher_->PostTask(std::bind(
+            &BleCentralManagerImpl::HandleStartBleScanFilterResult, centralManager, result));
+    }
+}
+
+void BleCentralManagerImpl::StopBleScanFilterResult(uint8_t result, void *context)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    auto *centralManager = static_cast<BleCentralManagerImpl *>(context);
+    if ((centralManager != nullptr) && (centralManager->dispatcher_ != nullptr)) {
+        centralManager->dispatcher_->PostTask(std::bind(
+            &BleCentralManagerImpl::HandleStopBleScanFilterResult, centralManager, result));
+    }
+}
+
+void BleCentralManagerImpl::HandleAddBleScanFilterResult(uint8_t result)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:", __func__);
+    std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
+    if (result != BLE_SCAN_FILTER_FINISHED) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s result is faild.", __func__);
+        DoFilterStatusBad();
+        return;
+    }
+    HandleWaitFilters();
+}
+
+void BleCentralManagerImpl::HandleDeleteBleScanFilterResult(uint8_t result)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:", __func__);
+    std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
+    if (result != BLE_SCAN_FILTER_FINISHED) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s result is faild.", __func__);
+        DoFilterStatusBad();
+        return;
+    }
+    HandleWaitFilters();
+}
+
+void BleCentralManagerImpl::HandleStartBleScanFilterResult(uint8_t result)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:", __func__);
+    std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
+    if (result != BLE_SCAN_FILTER_FINISHED) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s result is faild.", __func__);
+        DoFilterStatusBad();
+        return;
+    }
+    HandleWaitFilters();
+}
+
+void BleCentralManagerImpl::HandleStopBleScanFilterResult(uint8_t result)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:", __func__);
+    std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
+    if (result != BLE_SCAN_FILTER_FINISHED) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s result is faild.", __func__);
+
+        if (pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_BAD) {
+            LOG_ERROR("[BleCentralManagerImpl] %{public}s result is faild.", __func__);
+            return;
+        }
+        DoFilterStatusBad();
+    }
+
+    HandleWaitFilters();
 }
 
 void BleCentralManagerImpl::ScanSetParamResult(uint8_t status, void *context)
@@ -895,6 +1002,444 @@ bool BleCentralManagerImpl::SetScanParamOrExScanParamToGap() const
         ret = SetLegacyScanParamToGap();
     }
     return ret;
+}
+
+void BleCentralManagerImpl::LoadBleScanFilterLib()
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+
+    if (bleScanFilterLib_ == nullptr) {
+        bleScanFilterLib_ = dlopen(BLE_SCAN_FILTER_LIB_NAME, RTLD_LAZY | RTLD_NODELETE);
+    }
+    if (bleScanFilterLib_ == nullptr) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s Load lib failed", __func__);
+        return;
+    }
+    if (bleScanFilter_ != nullptr) {
+        LOG_DEBUG("[BleCentralManagerImpl] %{public}s bleScanFilter_ is not null.", __func__);
+        return;
+    }
+    createBleScanFilter createBleScanFilterFunc =
+        (createBleScanFilter)dlsym(bleScanFilterLib_, "CreateBleScanFilter");
+    if (createBleScanFilterFunc == nullptr) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s Load symbol CreateBleScanFilter failed", __func__);
+        if (bleScanFilterLib_ != nullptr) {
+            dlclose(bleScanFilterLib_);
+            bleScanFilterLib_ = nullptr;
+        }
+        return;
+    }
+    bleScanFilter_ = createBleScanFilterFunc();
+    if (bleScanFilter_ == nullptr) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s Load bleScanFilter failed", __func__);
+        if (bleScanFilterLib_ != nullptr) {
+            dlclose(bleScanFilterLib_);
+            bleScanFilterLib_ = nullptr;
+        }
+    }
+}
+
+void BleCentralManagerImpl::UnloadBleScanFilterLib()
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+
+    if (bleScanFilterLib_ != nullptr) {
+        destroyBleScanFilter destroyBleScanFilterFunc =
+            (destroyBleScanFilter)dlsym(bleScanFilterLib_, "DestroyBleScanFilter");
+        if (destroyBleScanFilterFunc == nullptr) {
+            LOG_ERROR("[BleCentralManagerImpl] %{public}s Load symbol DestroyBleScanFilter failed", __func__);
+        } else if (bleScanFilter_ != nullptr) {
+            destroyBleScanFilterFunc(bleScanFilter_);
+        }
+        dlclose(bleScanFilterLib_);
+        bleScanFilterLib_ = nullptr;
+    }
+    bleScanFilter_ = nullptr;
+}
+
+int BleCentralManagerImpl::ConfigScanFilter(const int oldClientId, const std::vector<BleScanFilterImpl> &filters)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:-> Config scan filter filterStatus_=%{public}d",
+        __func__, pimpl->filterStatus_);
+    std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
+
+    int clientId = 0;
+    if (!CheckScanFilterConfig(filters)) {
+        return clientId;
+    }
+
+    if (oldClientId != 0) {
+        clientId = oldClientId;
+    } else {
+        if (pimpl->currentFilterClientId_ >= INT_MAX) {
+            pimpl->currentFilterClientId_ = 0;
+        }
+        clientId = ++pimpl->currentFilterClientId_;
+    }
+
+    if (filters.empty()) {
+        BleScanFilterImpl filter;
+        PushFilterToWaitList(filter, clientId, FILTER_ACTION_ADD);
+    } else {
+        for (auto filter : filters) {
+            PushFilterToWaitList(filter, clientId, FILTER_ACTION_ADD);
+        }
+    }
+    PushStartOrStopAction(clientId, FILTER_ACTION_START);
+
+    if ((pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_BAD) &&
+        (pimpl->filters_.size() <= pimpl->venderMaxFilterNumber_)) {
+        TryConfigScanFilter(clientId);
+    }
+
+    if (pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_IDLE) {
+        HandleWaitFilters();
+    }
+
+    return clientId;
+}
+
+bool BleCentralManagerImpl::CheckScanFilterConfig(const std::vector<BleScanFilterImpl> &filters)
+{
+    if (bleScanFilter_ == nullptr) {
+        return false;
+    }
+
+    int status = AdapterManager::GetInstance()->GetState(BTTransport::ADAPTER_BLE);
+    if (status != BTStateID::STATE_TURN_ON) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s:%{public}s", __func__, "Bluetooth adapter is invalid.");
+        return false;
+    }
+
+    uint8_t filterSize;
+    if (filters.empty()) {
+        filterSize = 1;
+    } else {
+        filterSize = filters.size();
+    }
+
+    if ((filterSize + pimpl->filters_.size()) >= UCHAR_MAX) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s:%{public}s", __func__, "filter array is full.");
+        return false;
+    }
+
+    if (pimpl->venderMaxFilterNumber_ == 0) {
+        pimpl->venderMaxFilterNumber_ = bleScanFilter_->GetMaxFilterNumber();
+        LOG_DEBUG("[BleCentralManagerImpl] %{public}s:-> vender max filter number_ is %{public}d",
+            __func__, pimpl->venderMaxFilterNumber_);
+    }
+
+    if (pimpl->venderMaxFilterNumber_ <= 0) {
+        return false;
+    }
+
+    return true;
+}
+
+void BleCentralManagerImpl::PushFilterToWaitList(BleScanFilterImpl filter, int clientId, uint8_t action)
+{
+    filter.SetFilterAction(action);
+    if (action == FILTER_ACTION_ADD) {
+        filter.SetClientId(clientId);
+        if (pimpl->releaseFiltIndex_.empty()) {
+            filter.SetFiltIndex(pimpl->currentFiltIndex_++);
+        } else {
+            filter.SetFiltIndex(*pimpl->releaseFiltIndex_.begin());
+            pimpl->releaseFiltIndex_.remove(filter.GetFiltIndex());
+        }
+
+        pimpl->filters_[filter.GetFiltIndex()] = filter;
+    }
+
+    if (pimpl->filterStatus_ != BLE_SCAN_FILTER_STATUS_BAD) {
+        pimpl->waitFilters_.push(filter);
+    }
+}
+
+void BleCentralManagerImpl::PushStartOrStopAction(const int clientId, uint8_t action)
+{
+    BleScanFilterImpl filterImpl;
+    PushFilterToWaitList(filterImpl, clientId, action);
+}
+
+void BleCentralManagerImpl::HandleWaitFilters()
+{
+    if (pimpl->waitFilters_.empty()) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s:%{public}s", __func__, "there is no wait action.");
+        pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_IDLE;
+        return;
+    }
+
+    BleScanFilterImpl waitFilter = pimpl->waitFilters_.front();
+    pimpl->waitFilters_.pop();
+
+    uint8_t action = waitFilter.GetFilterAction();
+    LOG_ERROR("[BleCentralManagerImpl] %{public}s: wait action %{public}d", __func__, action);
+    switch (action) {
+        case FILTER_ACTION_ADD:
+            AddBleScanFilter(waitFilter);
+            break;
+        case FILTER_ACTION_DELETE:
+            DeleteBleScanFilter(waitFilter);
+            break;
+        case FILTER_ACTION_START:
+            StartBleScanFilter();
+            break;
+        case FILTER_ACTION_STOP:
+            if (pimpl->waitFilters_.empty() && pimpl->filters_.empty()) {
+                StopBleScanFilter();
+            }
+            break;
+        default: {
+            LOG_ERROR("[BleCentralManagerImpl] %{public}s: error action %{public}d", __func__, action);
+        }
+    }
+}
+
+void BleCentralManagerImpl::TryConfigScanFilter(int clientId)
+{
+    LOG_ERROR("[BleCentralManagerImpl] %{public}s: ", __func__);
+    pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_IDLE;
+
+    pimpl->currentFiltIndex_ = 0;
+    pimpl->releaseFiltIndex_.clear();
+    std::map<uint8_t, BleScanFilterImpl> filters;
+
+    for (auto it = pimpl->filters_.begin(); it != pimpl->filters_.end(); it++) {
+        BleScanFilterImpl filter = it->second;
+        filter.SetFiltIndex(pimpl->currentFiltIndex_++);
+        pimpl->waitFilters_.push(filter);
+        filters[filter.GetFiltIndex()] = filter;
+    }
+    pimpl->filters_ = filters;
+
+    PushStartOrStopAction(clientId, FILTER_ACTION_START);
+}
+
+void BleCentralManagerImpl::RemoveScanFilter(const int clientId)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:-> Remove scan filter", __func__);
+    std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
+
+    if (bleScanFilter_ == nullptr) {
+        return;
+    }
+
+    for (auto it = pimpl->filters_.begin(); it != pimpl->filters_.end();) {
+        if (it->second.GetClientId() == clientId) {
+            PushFilterToWaitList(it->second, clientId, FILTER_ACTION_DELETE);
+            pimpl->releaseFiltIndex_.push_back(it->first);
+            pimpl->filters_.erase(it++);
+        } else {
+            it++;
+        }
+    }
+    pimpl->releaseFiltIndex_.sort();
+    PushStartOrStopAction(clientId, FILTER_ACTION_STOP);
+
+    if (pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_IDLE) {
+        HandleWaitFilters();
+    }
+}
+
+void BleCentralManagerImpl::AddBleScanFilter(BleScanFilterImpl filter)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    if (bleScanFilter_ == nullptr) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s bleScanFilter_ is null.", __func__);
+        DoFilterStatusBad();
+        return;
+    }
+
+    pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_WORKING;
+
+    BleScanFilterParam filterParam;
+    filterParam.filtIndex = filter.GetFiltIndex();
+    BleScanFilterParamAddDeviceAddress(filterParam, filter);
+    BleScanFilterParamAddName(filterParam, filter);
+    BleScanFilterParamAddServiceUuid(filterParam, filter);
+    BleScanFilterParamAddSolicitationUuid(filterParam, filter);
+    BleScanFilterParamAddServiceData(filterParam, filter);
+    BleScanFilterParamAddManufactureData(filterParam, filter);
+
+    BleScanFilterCallback filterCallback;
+    filterCallback.addBleScanFilterResult = &AddBleScanFilterResult;
+    filterCallback.deleteBleScanFilterResult = nullptr;
+    filterCallback.startBleScanFilterResult = nullptr;
+    filterCallback.stopBleScanFilterResult = nullptr;
+    filterCallback.context = pimpl->bleCentralManagerImpl_;
+    bleScanFilter_->AddBleScanFilter(filterParam, filterCallback);
+}
+
+void BleCentralManagerImpl::DeleteBleScanFilter(BleScanFilterImpl filter)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    if (bleScanFilter_ == nullptr) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s bleScanFilter_ is null.", __func__);
+        DoFilterStatusBad();
+        return;
+    }
+
+    pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_WORKING;
+
+    BleScanFilterParam filterParam;
+    filterParam.filtIndex = filter.GetFiltIndex();
+
+    BleScanFilterCallback filterCallback;
+    filterCallback.addBleScanFilterResult = nullptr;
+    filterCallback.deleteBleScanFilterResult = &DeleteBleScanFilterResult;
+    filterCallback.startBleScanFilterResult = nullptr;
+    filterCallback.stopBleScanFilterResult = nullptr;
+    filterCallback.context = pimpl->bleCentralManagerImpl_;
+    bleScanFilter_->DeleteBleScanFilter(filterParam, filterCallback);
+}
+
+void BleCentralManagerImpl::BleScanFilterParamAddDeviceAddress(
+    BleScanFilterParam &filterParam, BleScanFilterImpl filter)
+{
+    std::string deviceId = filter.GetDeviceId();
+    if (!deviceId.empty()) {
+        BtAddr btAddr;
+        RawAddress(deviceId).ConvertToUint8(btAddr.addr);
+        btAddr.type = BT_DEVICE_ADDRESS_TYPE_ALL;
+        filterParam.address = btAddr;
+        filterParam.filterFlag |= FILTER_FLAG_ADDRESS;
+    }
+}
+
+void BleCentralManagerImpl::BleScanFilterParamAddName(
+    BleScanFilterParam &filterParam, BleScanFilterImpl filter)
+{
+    std::string name = filter.GetName();
+    if (!name.empty()) {
+        filterParam.name = name;
+        filterParam.filterFlag |= FILTER_FLAG_NAME;
+    }
+}
+
+void BleCentralManagerImpl::BleScanFilterParamAddServiceUuid(
+    BleScanFilterParam &filterParam, BleScanFilterImpl filter)
+{
+    if (filter.HasServiceUuid()) {
+        filterParam.serviceUuid = filter.GetServiceUuid();
+        if (filter.HasServiceUuidMask()) {
+            filterParam.serviceUuidMask = filter.GetServiceUuidMask();
+        } else {
+            filterParam.serviceUuidMask = Uuid::ConvertFrom128Bits(DEFAULT_UUID_MASK);
+        }
+        filterParam.filterFlag |= FILTER_FLAG_SERVICE_UUID;
+    }
+}
+
+void BleCentralManagerImpl::BleScanFilterParamAddSolicitationUuid(
+    BleScanFilterParam &filterParam, BleScanFilterImpl filter)
+{
+    if (filter.HasSolicitationUuid()) {
+        filterParam.solicitationUuid = filter.GetServiceSolicitationUuid();
+        if (filter.HasSolicitationUuidMask()) {
+            filterParam.solicitationUuidMask = filter.GetServiceSolicitationUuidMask();
+        } else {
+            filterParam.solicitationUuidMask = Uuid::ConvertFrom128Bits(DEFAULT_UUID_MASK);
+        }
+        filterParam.filterFlag |= FILTER_FLAG_SOLICIT_UUID;
+    }
+}
+
+void BleCentralManagerImpl::BleScanFilterParamAddServiceData(
+    BleScanFilterParam &filterParam, BleScanFilterImpl filter)
+{
+    std::vector<uint8_t> serviceData = filter.GetServiceData();
+    std::vector<uint8_t> serviceDataMask = filter.GetServiceDataMask();
+    if (!serviceData.empty()) {
+        if (serviceData.size() != serviceDataMask.size()) {
+            LOG_ERROR("[BleCentralManagerImpl] %{public}s:serviceDataMask size is different with serviceData",
+                __func__);
+            serviceDataMask.clear();
+            for (int i = 0; i < serviceData.size(); i++) {
+                serviceDataMask.push_back(0xFF);
+            }
+        }
+        filterParam.serviceData = serviceData;
+        filterParam.serviceDataMask = serviceDataMask;
+        filterParam.filterFlag |= FILTER_FLAG_SERVICE_DATA;
+    }
+}
+
+void BleCentralManagerImpl::BleScanFilterParamAddManufactureData(
+    BleScanFilterParam &filterParam, BleScanFilterImpl filter)
+{
+    uint16_t manufacturerId = filter.GetManufacturerId();
+    std::vector<uint8_t> manufactureData = filter.GetManufactureData();
+    std::vector<uint8_t> manufactureDataMask = filter.GetManufactureDataMask();
+    if (!manufactureData.empty()) {
+        if (manufactureData.size() != manufactureDataMask.size()) {
+            LOG_ERROR("[BleCentralManagerImpl] %{public}s:manufactureDataMask size is different with manufactureData",
+                __func__);
+            manufactureDataMask.clear();
+            for (int i = 0; i < manufactureData.size(); i++) {
+                manufactureDataMask.push_back(0xFF);
+            }
+        }
+        filterParam.manufacturerId = manufacturerId;
+        filterParam.manufacturerIdMask = 0xFFFF;
+        filterParam.manufacturerData = manufactureData;
+        filterParam.manufacturerDataMask = manufactureDataMask;
+        filterParam.filterFlag |= FILTER_FLAG_MANUFACTURER_DATA;
+    }
+}
+
+void BleCentralManagerImpl::StartBleScanFilter()
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+
+    if (bleScanFilter_ == nullptr) {
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s bleScanFilter_ is null.", __func__);
+        DoFilterStatusBad();
+        return;
+    }
+
+    pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_WORKING;
+    BleScanFilterCallback filterCallback {};
+    filterCallback.addBleScanFilterResult = nullptr;
+    filterCallback.deleteBleScanFilterResult = nullptr;
+    filterCallback.startBleScanFilterResult = &StartBleScanFilterResult;
+    filterCallback.stopBleScanFilterResult = nullptr;
+    filterCallback.context = pimpl->bleCentralManagerImpl_;
+    bleScanFilter_->StartBleScanFilter(filterCallback);
+}
+
+void BleCentralManagerImpl::StopBleScanFilter()
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+
+    if (bleScanFilter_ == nullptr) {
+        if (pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_BAD) {
+            return;
+        }
+        LOG_ERROR("[BleCentralManagerImpl] %{public}s bleScanFilter_ is null.", __func__);
+        DoFilterStatusBad();
+        return;
+    }
+
+    if (pimpl->filterStatus_ != BLE_SCAN_FILTER_STATUS_BAD) {
+        pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_WORKING;
+    }
+
+    BleScanFilterCallback filterCallback {};
+    filterCallback.addBleScanFilterResult = nullptr;
+    filterCallback.deleteBleScanFilterResult = nullptr;
+    filterCallback.startBleScanFilterResult = nullptr;
+    filterCallback.stopBleScanFilterResult = &StopBleScanFilterResult;
+    filterCallback.context = pimpl->bleCentralManagerImpl_;
+    bleScanFilter_->StopBleScanFilter(filterCallback);
+}
+
+void BleCentralManagerImpl::DoFilterStatusBad()
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_BAD;
+    pimpl->waitFilters_ = std::queue<BleScanFilterImpl>();
+    StopBleScanFilter();
 }
 
 bool BleCentralManagerImpl::Start(bool isContinue) const
