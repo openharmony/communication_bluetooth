@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -336,6 +336,97 @@ private:
 };
 
 /**
+ * @brief Represents Scan filter.
+ *
+ */
+class BLUETOOTH_API BleScanFilter {
+public:
+    /**
+     * @brief A constructor used to create a <b>BleScanFilter</b> instance.
+     *
+     */
+    BleScanFilter();
+
+    /**
+     * @brief A destructor used to delete the <b>BleScanFilter</b> instance.
+     *
+     */
+    ~BleScanFilter();
+
+    void SetDeviceId(std::string deviceId);
+
+    std::string GetDeviceId() const;
+
+    void SetName(std::string name);
+
+    std::string GetName() const;
+
+    void SetServiceUuid(const UUID &uuid);
+
+    bool HasServiceUuid();
+
+    UUID GetServiceUuid() const;
+
+    void SetServiceUuidMask(const UUID &serviceUuidMask);
+
+    bool HasServiceUuidMask();
+
+    UUID GetServiceUuidMask() const;
+
+    void SetServiceSolicitationUuid(const UUID &serviceSolicitationUuid);
+
+    bool HasSolicitationUuid();
+
+    UUID GetServiceSolicitationUuid() const;
+
+    void SetServiceSolicitationUuidMask(const UUID &erviceSolicitationUuidMask);
+
+    bool HasSolicitationUuidMask();
+
+    UUID GetServiceSolicitationUuidMask() const;
+
+    void SetServiceData(std::vector<uint8_t> serviceData);
+
+    std::vector<uint8_t> GetServiceData() const;
+
+    void SetServiceDataMask(std::vector<uint8_t> serviceDataMask);
+
+    std::vector<uint8_t> GetServiceDataMask() const;
+
+    void SetManufacturerId(uint16_t manufacturerId);
+
+    uint16_t GetManufacturerId() const;
+
+    void SetManufactureData(std::vector<uint8_t> manufactureData);
+
+    std::vector<uint8_t> GetManufactureData() const;
+
+    void SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask);
+
+    std::vector<uint8_t> GetManufactureDataMask() const;
+
+    private:
+        std::string deviceId_;
+        std::string name_;
+
+        UUID serviceUuid_;
+        UUID serviceUuidMask_;
+        UUID serviceSolicitationUuid_;
+        UUID serviceSolicitationUuidMask_;
+        bool hasServiceUuid_ = false;
+        bool hasServiceUuidMask_ = false;
+        bool hasSolicitationUuid_ = false;
+        bool hasSolicitationUuidMask_ = false;
+
+        std::vector<uint8_t> serviceData_;
+        std::vector<uint8_t> serviceDataMask_;
+
+        uint16_t manufacturerId_ = 0;
+        std::vector<uint8_t> manufactureData_;
+        std::vector<uint8_t> manufactureDataMask_;
+};
+
+/**
  * @brief Represents central manager.
  *
  * @since 6
@@ -379,8 +470,15 @@ public:
      */
     void StopScan();
 
+    /**
+     * @brief Config scan filter.
+     *
+     */
+    void ConfigScanFilter(const std::vector<BleScanFilter> &filter);
+
 private:
     BleCentralManagerCallback *callback_ = nullptr;
+    int clientId_ = 0;
 
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManager);
     BLUETOOTH_DECLARE_IMPL();

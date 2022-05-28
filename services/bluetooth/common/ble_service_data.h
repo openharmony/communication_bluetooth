@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -265,6 +265,114 @@ private:
     int primaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     /// Advertising secondaryPhy.
     int secondaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
+};
+
+/**
+ * @brief Represents scan filter.
+ *
+ */
+class BleScanFilterImpl {
+public:
+    BleScanFilterImpl() {}
+    ~BleScanFilterImpl() {}
+
+    /**
+     * @brief Set device id.
+     *
+     * @param deviceId filter device id.
+     */
+    void SetDeviceId(std::string deviceId);
+
+    /**
+     * @brief Get filter device id.
+     *
+     * @return Returns filter device id.
+     */
+    std::string GetDeviceId() const;
+
+    void SetName(std::string name);
+
+    std::string GetName() const;
+
+    void SetServiceUuid(const Uuid &serviceUuid);
+
+    bool HasServiceUuid() const;
+
+    Uuid GetServiceUuid() const;
+
+    void SetServiceUuidMask(const Uuid &serviceUuidMask);
+
+    bool HasServiceUuidMask() const;
+
+    Uuid GetServiceUuidMask() const;
+
+    void SetServiceSolicitationUuid(const Uuid &serviceSolicitationUuid);
+
+    bool HasSolicitationUuid() const;
+
+    Uuid GetServiceSolicitationUuid() const;
+
+    void SetServiceSolicitationUuidMask(const Uuid &serviceSolicitationUuidMask);
+
+    bool HasSolicitationUuidMask() const;
+
+    Uuid GetServiceSolicitationUuidMask() const;
+
+    void SetServiceData(std::vector<uint8_t> serviceData);
+
+    std::vector<uint8_t> GetServiceData() const;
+
+    void SetServiceDataMask(std::vector<uint8_t> serviceDataMask);
+
+    std::vector<uint8_t> GetServiceDataMask() const;
+
+    void SetManufacturerId(uint16_t manufacturerId);
+
+    uint16_t GetManufacturerId() const;
+
+    void SetManufactureData(std::vector<uint8_t> manufactureData);
+
+    std::vector<uint8_t> GetManufactureData() const;
+
+    void SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask);
+
+    std::vector<uint8_t> GetManufactureDataMask() const;
+
+    void SetClientId(int clientId);
+
+    int GetClientId() const;
+
+    void SetFiltIndex(uint8_t filtIndex);
+
+    uint8_t GetFiltIndex() const;
+
+    void SetFilterAction(uint8_t action);
+
+    uint8_t GetFilterAction() const;
+
+private:
+    std::string deviceId_;
+    std::string name_;
+
+    Uuid serviceUuid_;
+    Uuid serviceUuidMask_;
+    Uuid serviceSolicitationUuid_;
+    Uuid serviceSolicitationUuidMask_;
+    bool hasServiceUuid_ = false;
+    bool hasServiceUuidMask_ = false;
+    bool hasSolicitationUuid_ = false;
+    bool hasSolicitationUuidMask_ = false;
+
+    std::vector<uint8_t> serviceData_;
+    std::vector<uint8_t> serviceDataMask_;
+
+    uint16_t manufacturerId_ = 0;
+    std::vector<uint8_t> manufactureData_;
+    std::vector<uint8_t> manufactureDataMask_;
+
+    int clientId_ = 0;
+    uint8_t filtIndex_ = 0;
+    uint8_t action_ = -1;
 };
 
 /**

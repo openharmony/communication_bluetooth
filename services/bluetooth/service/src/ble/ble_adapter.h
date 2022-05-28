@@ -132,6 +132,8 @@ public:
     void StartScan() const override;
     void StartScan(const BleScanSettingsImpl &setting) const override;
     void StopScan() const override;
+    int ConfigScanFilter(const int clientId, const std::vector<BleScanFilterImpl> &filters) override;
+    void RemoveScanFilter(const int clientId) override;
     int GetAdvertisingStatus() const override;
     bool IsLlPrivacySupported() const override;
     void AddCharacteristicValue(uint8_t adtype, const std::string &data) const override;
