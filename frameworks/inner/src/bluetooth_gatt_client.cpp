@@ -612,6 +612,7 @@ int GattClient::RequestBleMtuSize(int mtu)
         HILOGI("GattClient::RequestBleMtuSize() proxy_ is null when used!");
         return GattStatus::GATT_FAILURE;
     }
+    HILOGI("GattClient::RequestBleMtuSize, applicationId_=%{public}d, mtu=%{public}d", pimpl->applicationId_, mtu);
     result = pimpl->proxy_->RequestExchangeMtu(pimpl->applicationId_, mtu);
     return result;
 }
@@ -642,6 +643,7 @@ int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool
         HILOGI("GattClient::SetNotifyCharacteristic() proxy_ is null when used!");
         return GattStatus::GATT_FAILURE;
     }
+    HILOGI("GattClient::SetNotifyCharacteristic, applicationId_=%{public}d", pimpl->applicationId_);
     result = pimpl->proxy_->WriteDescriptor(pimpl->applicationId_, &desc);
     if (GattStatus::GATT_SUCCESS == result) {
         pimpl->requestInformation_.type_ = REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS;
