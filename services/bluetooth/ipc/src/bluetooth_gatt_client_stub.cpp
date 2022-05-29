@@ -230,6 +230,7 @@ ErrCode BluetoothGattClientStub::WriteDescriptorInner(MessageParcel &data, Messa
         return TRANSACTION_ERR;
     }
     int result = WriteDescriptor(appId, descriptor.get());
+    HILOGI("appId=%{public}d, result=%{public}d", appId, result);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
@@ -244,6 +245,7 @@ ErrCode BluetoothGattClientStub::RequestExchangeMtuInner(MessageParcel &data, Me
     int32_t appId = data.ReadInt32();
     int32_t mtu = data.ReadInt32();
     int result = RequestExchangeMtu(appId, mtu);
+    HILOGI("appId=%{public}d, mtu=%{public}d, result=%{public}d", appId, mtu, result);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
