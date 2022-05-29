@@ -166,7 +166,7 @@ public:
      * @since 6
      *
      */
-    virtual int RegisterApplication(IGattServerCallback &callback) = 0;
+    virtual int RegisterApplication(std::shared_ptr<IGattServerCallback> callback) = 0;
     /**
      * @brief The function to deregister application.
      *
