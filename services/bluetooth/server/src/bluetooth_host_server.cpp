@@ -31,6 +31,7 @@
 #include "bluetooth_log.h"
 #include "bluetooth_map_mce_server.h"
 #include "bluetooth_map_mse_server.h"
+#include "bluetooth_pan_server.h"
 #include "bluetooth_pbap_pce_server.h"
 #include "bluetooth_pbap_pse_server.h"
 #include "bluetooth_socket_server.h"
@@ -535,6 +536,8 @@ void BluetoothHostServer::impl::createServers()
     sptr<BluetoothHidHostServer> hidHostServer = new BluetoothHidHostServer();
     servers_[PROFILE_HID_HOST_SERVER] = hidHostServer->AsObject();
 
+    sptr<BluetoothPanServer> panServer = new BluetoothPanServer();
+    servers_[PROFILE_PAN_SERVER] = panServer->AsObject();
 
     HILOGI("BluetoothHostServer::impl::Init servers_ constructed, size is %{public}zu", servers_.size());
 }

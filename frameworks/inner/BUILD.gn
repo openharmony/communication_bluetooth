@@ -68,6 +68,7 @@ ohos_shared_library("btframework") {
     "src/bluetooth_host.cpp",
     "src/bluetooth_map_mce.cpp",
     "src/bluetooth_map_mse.cpp",
+    "src/bluetooth_pan.cpp",
     "src/bluetooth_pbap_pce.cpp",
     "src/bluetooth_pbap_pse.cpp",
     "src/bluetooth_remote_device.cpp",

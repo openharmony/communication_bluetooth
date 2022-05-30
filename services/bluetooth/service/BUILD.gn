@@ -277,6 +277,14 @@ ServicePermissionSrc = [
   "src/permission/permission_utils.cpp",
 ]
 
+ServicePanSrc = [
+  "src/pan/pan_service.cpp",
+  "src/pan/pan_statemachine.cpp",
+  "src/pan/pan_sdp.cpp",
+  "src/pan/pan_bnep.cpp",
+  "src/pan/pan_network.cpp",
+]
+
 config("btservice_public_config") {
   include_dirs = [
     "include",
@@ -296,6 +304,7 @@ config("btservice_config") {
     "$BT_SERVICE_DIR/src/util",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/aaccodecctrl_l2/include",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbccodecctrl/include",
+    "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative/include/netsys",
     "//base/telephony/state_registry/frameworks/native/observer/include",
     "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiocommon/include",
     "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiomanager/include",
@@ -353,11 +362,13 @@ ohos_shared_library("btservice") {
   sources += ServiceDISrc
   sources += ServiceHidHostSrc
   sources += ServicePermissionSrc
+  sources += ServicePanSrc
 
   deps = [
     "$PART_DIR/external:btdummy",
     "$PART_DIR/stack:btstack",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
+    "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//base/telephony/state_registry/frameworks/native/observer:tel_state_registry_api",
     "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiomanager:audio_client",

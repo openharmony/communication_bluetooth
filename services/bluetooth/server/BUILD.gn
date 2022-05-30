@@ -43,6 +43,7 @@ ohos_shared_library("bluetooth_server") {
     "src/bluetooth_host_server.cpp",
     "src/bluetooth_map_mce_server.cpp",
     "src/bluetooth_map_mse_server.cpp",
+    "src/bluetooth_pan_server.cpp",
     "src/bluetooth_pbap_pce_server.cpp",
     "src/bluetooth_pbap_pse_server.cpp",
     "src/bluetooth_socket_server.cpp",
