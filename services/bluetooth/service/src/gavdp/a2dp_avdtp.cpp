@@ -496,15 +496,6 @@ uint8_t A2dpAvdtp::ParseAvdtpStartInd(
         LOG_ERROR("[A2dpAvdtp] %{public}s Failed to get profile instance \n", __func__);
         return EVT_CONNECT_IND;
     }
-    profile->SetActivePeer(bdAddr);
-
-    A2dpService *service = GetServiceInstance(role);
-    if (service == nullptr) {
-        LOG_ERROR("[A2dpAvdtp] %{public}s Failed to get service instance \n", __func__);
-        return EVT_CONNECT_IND;
-    }
-    RawAddress rawAddr = RawAddress::ConvertToString(bdAddr.addr);
-    service->UpdateActiveDevice(rawAddr);
 
     msg.a2dpMsg.stream.addr = bdAddr;
     msg.a2dpMsg.stream.handle = handle;

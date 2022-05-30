@@ -33,7 +33,7 @@ uint32_t A2dpSharedBuffer::Read(uint8_t *buf, uint32_t len)
 {
     std::lock_guard<std::mutex> lock_(mutex_);
     if (!isValid_) {
-        LOG_ERROR("[A2dpSharedBuffer] %{public}s: invalid!", __func__);
+        LOG_ERROR("[A2dpSharedBuffer] %{public}s: buffer not ready!", __func__);
         return 0;
     }
     LOG_INFO("[A2dpSharedBuffer] %{public}s: start size_ [%{public}u]  len[%{public}u] cap_ [%{public}u] \n",
@@ -61,7 +61,7 @@ uint32_t A2dpSharedBuffer::Write(const uint8_t *buf, uint32_t len)
 {
     std::lock_guard<std::mutex> lock_(mutex_);
     if (!isValid_) {
-        LOG_ERROR("[A2dpSharedBuffer] %{public}s: invalid!", __func__);
+        LOG_ERROR("[A2dpSharedBuffer] %{public}s: buffer not ready!", __func__);
         return 0;
     }
     LOG_INFO("[A2dpSharedBuffer] %{public}s: start size_ [%{public}u] len[%{public}u] cap_[%{public}u]\n",
@@ -84,14 +84,16 @@ void A2dpSharedBuffer::Reset()
 {
     std::lock_guard<std::mutex> lock_(mutex_);
     if (memset_s(buf_, cap_, 0, cap_) != EOK) {
-        LOG_ERROR("[A2dpSharedBuffer] %{public}s: memcpy_s failed\n", __func__);
+        LOG_ERROR("[A2dpSharedBuffer] %{public}s: memset_s failed\n", __func__);
     }
     size_ = 0;
+    isValid_ = false;
 }
 
 void A2dpSharedBuffer::SetValid(bool isValid)
 {
     std::lock_guard<std::mutex> lock_(mutex_);
+    LOG_ERROR("[A2dpSharedBuffer] %{public}s: isValid %{public}d\n", __func__, isValid);
     isValid_ = isValid;
 }
 } // namespace bluetooth

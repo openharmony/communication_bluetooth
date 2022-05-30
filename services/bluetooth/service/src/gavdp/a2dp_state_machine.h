@@ -534,14 +534,6 @@ private:
      */
     void ProcessSuspendInd(A2dpAvdtMsgData msgData, uint8_t role);
 
-     /**
-     * @brief Process the audio data ready command
-     * @param[in] msgData The information of message
-     * @param[in] role The role of local profile
-     * @since 6.0
-     */
-    void ProcessAudioDataReady(A2dpAvdtMsgData msgData, uint8_t role);
-
     /**
      * @brief Set current state
      *
