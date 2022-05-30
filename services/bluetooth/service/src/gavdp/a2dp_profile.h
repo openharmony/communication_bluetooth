@@ -524,12 +524,6 @@ public:
      */
     uint32_t GetPcmData(uint8_t *buf, uint32_t size);
 
-    /**
-     * @brief It is called when audio data is ready to be fetched by the packet queue.
-     * @since 6.0
-     */
-    void AudioDataReady();
-
 private:
     /**
      * @brief Get the instance of SDP.

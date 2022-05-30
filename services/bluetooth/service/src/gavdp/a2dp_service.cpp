@@ -63,7 +63,11 @@ void ObserverProfile::OnConnectStateChanged(const BtAddr &addr, const int state,
             RawAddress removeActive("");
             service->UpdateActiveDevice(removeActive);
         }
+    } else if (connectState == static_cast<int>(BTConnectState::CONNECTED)) {
+        LOG_INFO("[ObserverProfile] %{public}s Add the active device\n", __func__);
+        service->UpdateActiveDevice(btAddr);
     }
+    
     if ((connectState == static_cast<int>(BTConnectState::CONNECTED)) ||
         (connectState == static_cast<int>(BTConnectState::DISCONNECTED))) {
         service->ProcessConnectFrameworkCallback(connectState, btAddr);
@@ -1008,9 +1012,6 @@ void A2dpService::ProcessEvent(utility::Message event, RawAddress &device)
 
     switch (event.what_) {
         case A2DP_CONNECT_EVT:
-            if (GetActiveSinkDevice().GetAddress() == "") {
-                UpdateActiveDevice(device);
-            }
             if (connectManager_.A2dpConnect(device)) {
                 LOG_INFO("[A2dpService] Start connect peer\n");
             } else {

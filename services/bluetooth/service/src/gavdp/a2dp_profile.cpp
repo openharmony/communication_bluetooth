@@ -203,6 +203,11 @@ void A2dpProfile::ConnectStateChangedNotify(const BtAddr &addr, const int state,
             if (IsActiveDevice(addr)) {
                 ClearActiveDevice();
             }
+            QueueFlush(packetQueue_, CleanPacketData);
+            buffer_->Reset();
+            break;
+        case STREAM_CONNECT:
+            SetActivePeer(addr);
             break;
         default:
             break;
@@ -217,6 +222,11 @@ void A2dpProfile::ConnectStateChangedNotify(const BtAddr &addr, const int state,
 void A2dpProfile::AudioStateChangedNotify(const BtAddr &addr, const int state, void *context) const
 {
     LOG_INFO("[A2dpProfile] %{public}s state(%{public}d)\n", __func__, state);
+    if (state == A2DP_IS_PLAYING) {
+        buffer_->SetValid(true);
+    } else {
+        buffer_->SetValid(false);
+    }
     if (a2dpSvcCBack_ != nullptr) {
         a2dpSvcCBack_->OnAudioStateChanged(addr, state, context);
     } else {
@@ -345,17 +355,6 @@ uint32_t A2dpProfile::GetPcmData(uint8_t *buf, uint32_t size)
         return false;
     }
     return actualReadBytes;
-}
-
-void A2dpProfile::AudioDataReady()
-{
-    LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
-    A2dpAvdtMsg msgData = {};
-    utility::Message msg(EVT_AUDIO_DATA_READY, 0, &msgData);
-    LOG_INFO("[A2dpProfile] %{public}s cmd(%u)\n", __func__, EVT_AUDIO_DATA_READY);
-
-    A2dpProfilePeer *peer = FindOrCreatePeer(activePeer_, A2DP_ROLE_SOURCE);
-    peer->GetStateMachine()->ProcessMessage(msg);
 }
 
 void A2dpProfile::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
@@ -624,7 +623,7 @@ void A2dpProfile::ProcessSDPCallback(const BtAddr &addr, uint8_t result)
     A2dpAvdtMsg data = {};
     A2dpProfilePeer *peer = FindOrCreatePeer(addr, role);
     utility::Message msg(EVT_CONNECT_REQ, 0, &data);
-    RawAddress rawAddr = RawAddress::ConvertToString(GetActivePeer().addr);
+    
     data.a2dpMsg.connectInfo.addr = addr;
     data.role = role;
     msg.arg2_ = &data;
@@ -638,9 +637,6 @@ void A2dpProfile::ProcessSDPCallback(const BtAddr &addr, uint8_t result)
         peer->GetStateMachine()->ProcessMessage(msg);
         peer->SetCurrentCmd(EVT_CONNECT_REQ);
         peer->SetInitSide(true);
-    }
-    if (rawAddr.GetAddress() == "" || rawAddr.GetAddress() == A2DP_IDLE_ADDRESS) {
-        SetActivePeer(addr);
     }
 }
 
@@ -698,9 +694,7 @@ int A2dpProfile::Stop(const uint16_t handle, const bool suspend)
     }
 
     QueueFlush(packetQueue_, CleanPacketData);
-    if (!suspend) {
-        buffer_->Reset();
-    }
+    buffer_->Reset();
     return ret;
 }
 

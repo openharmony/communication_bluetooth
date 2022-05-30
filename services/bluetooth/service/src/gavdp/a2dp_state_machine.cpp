@@ -815,9 +815,6 @@ bool A2dpStateStreaming::Dispatch(const utility::Message &msg)
         case EVT_WRITE_CFM:
             ProcessWriteCfm(msgData, role);
             break;
-        case EVT_AUDIO_DATA_READY:
-            ProcessAudioDataReady(msgData, role);
-            break;
         default:
             break;
     }
@@ -891,13 +888,6 @@ void A2dpStateStreaming::ProcessWriteCfm(A2dpAvdtMsgData msgData, uint8_t role)
     profile->DequeuePacket();
 }
 
-void A2dpStateStreaming::ProcessAudioDataReady(A2dpAvdtMsgData msgData, uint8_t role)
-{
-    LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
-    A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
-    profile->DequeuePacket();
-}
-
 void A2dpStateStreaming::ProcessDisconnectReq(BtAddr addr, uint8_t role)
 {
     LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
@@ -926,6 +916,7 @@ void A2dpStateStreaming::ProcessDisconnectInd(BtAddr addr, uint16_t handle, uint
 
     CallbackParameter param = {A2DP_ROLE_ACP, false, handle};
     A2dpProfile *profile = GetProfileInstance(role);
+    uint8_t gavdpRole = A2DP_ROLE_ACP;
     if (profile == nullptr) {
         LOG_ERROR("[A2dpStateStreaming]%{public}s Failed to get profile instance\n", __func__);
         return;
@@ -936,6 +927,7 @@ void A2dpStateStreaming::ProcessDisconnectInd(BtAddr addr, uint16_t handle, uint
             RequestStatus::CONNECT_OFF, PROFILE_NAME_A2DP_SRC, bluetooth::RawAddress::ConvertToString(addr.addr));
     }
     SetStateName(A2DP_PROFILE_IDLE);
+    profile->AudioStateChangedNotify(addr, A2DP_NOT_PLAYING, (void *)&gavdpRole);
     profile->ConnectStateChangedNotify(addr, STREAM_DISCONNECT, (void *)&param);
 }
 
@@ -1038,6 +1030,7 @@ void A2dpStateClosing::ProcessDisconnectCfm(BtAddr addr, uint16_t handle, uint8_
     LOG_INFO("[A2dpStateClosing]%{public}s\n", __func__);
 
     CallbackParameter param = {A2DP_ROLE_INT, true, handle};
+    uint8_t gavdpRole = A2DP_ROLE_INT;
     A2dpProfile *profile = GetProfileInstance(role);
     if (profile == nullptr) {
         LOG_ERROR("[A2dpStateClosing]%{public}s Failed to get profile instance\n", __func__);
@@ -1050,6 +1043,7 @@ void A2dpStateClosing::ProcessDisconnectCfm(BtAddr addr, uint16_t handle, uint8_
     }
 
     SetStateName(A2DP_PROFILE_IDLE);
+    profile->AudioStateChangedNotify(addr, A2DP_NOT_PLAYING, (void *)&gavdpRole);
     profile->ConnectStateChangedNotify(addr, STREAM_DISCONNECT, (void *)&param);
 }
 

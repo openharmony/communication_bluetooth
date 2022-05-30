@@ -142,8 +142,7 @@ enum EventStream {
     EVT_ABORT_CFM,
     EVT_WRITE_CFM,
     EVT_TIME_OUT,
-    EVT_CLOSE_TRANS_IND,
-    EVT_AUDIO_DATA_READY
+    EVT_CLOSE_TRANS_IND
 };
 
 struct StreamInfo {
