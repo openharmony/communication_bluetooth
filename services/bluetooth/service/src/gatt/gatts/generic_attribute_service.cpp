@@ -31,7 +31,7 @@ const uint8_t GenericAttributeService::SERVICE_CHANGED_DEFAULT_VALUE[4] = {0};
 
 GenericAttributeService::GenericAttributeService(GattServerService &service, utility::Dispatcher &dispatcher)
     : serverService_(service), dispatcher_(dispatcher),
-    serviceCallback_(std::make_unique<GattServerCallbackImpl>(*this))
+    serviceCallback_(std::make_shared<GattServerCallbackImpl>(*this))
 {
     LoadNotifyInformation();
 }
@@ -78,7 +78,7 @@ private:
 
 int GenericAttributeService::RegisterService()
 {
-    appId_ = serverService_.RegisterApplicationSync(*serviceCallback_);
+    appId_ = serverService_.RegisterApplicationSync(serviceCallback_);
     if (appId_ < 0) {
         return appId_;
     }
@@ -94,6 +94,7 @@ int GenericAttributeService::RegisterService()
 
 void GenericAttributeService::DeregisterService() const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     serverService_.DeregisterApplicationSync(appId_);
 }
 
@@ -116,6 +117,7 @@ int GenericAttributeService::RegisterSDP()
 
 void GenericAttributeService::DeregisterSDP() const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (sdpRegister_ != nullptr) {
         static_cast<GattServiceOverBredrInterface *>(sdpRegister_.get())->DeregisterSDP();
     }
