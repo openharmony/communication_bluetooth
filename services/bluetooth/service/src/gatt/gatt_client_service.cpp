@@ -345,7 +345,9 @@ int GattClientService::ReadDescriptor(int appId, const Descriptor &descriptor)
 
 int GattClientService::WriteDescriptor(int appId, Descriptor &descriptor)
 {
+    LOG_INFO("%{public}s: appId=%{public}d", __FUNCTION__, appId);
     if (!pimpl->InRunningState()) {
+        LOG_ERROR("%{public}s: pimpl->InRunningState is false", __FUNCTION__);
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
 
@@ -362,7 +364,9 @@ int GattClientService::WriteDescriptor(int appId, Descriptor &descriptor)
 
 int GattClientService::RequestExchangeMtu(int appId, int mtu)
 {
+    LOG_INFO("%{public}s: appId=%{public}d, mtu=%{public}d", __FUNCTION__, appId, mtu);
     if (!pimpl->InRunningState()) {
+        LOG_ERROR("%{public}s: pimpl->InRunningState is false", __FUNCTION__);
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
 
@@ -758,6 +762,7 @@ void GattClientService::impl::ReadDescriptor(int appId, uint16_t handle)
 
 void GattClientService::impl::WriteDescriptor(int appId, uint16_t handle, const GattValue &value, int length)
 {
+    LOG_INFO("%{public}s: appId=%{public}d", __FUNCTION__, appId);
     auto it = GetValidApplication(appId);
     if (it.has_value()) {
         auto &client = it.value()->second;
@@ -771,10 +776,12 @@ void GattClientService::impl::WriteDescriptor(int appId, uint16_t handle, const 
 
 void GattClientService::impl::RequestExchangeMtu(int appId, int mtu)
 {
+    LOG_INFO("%{public}s: appId=%{public}d, mtu=%{public}d", __FUNCTION__, appId, mtu);
     auto it = GetValidApplication(appId);
     if (it.has_value()) {
         auto &client = it.value()->second;
-        if (handleMap_.find(client.connection_.GetHandle()) == handleMap_.end() || client.isShared_) {
+        if (handleMap_.find(client.connection_.GetHandle()) == handleMap_.end()) {
+            LOG_ERROR("%{public}s: failed and return REQUEST_NOT_SUPPORT(-18)", __FUNCTION__);
             client.callback_.OnMtuChanged(GattStatus::REQUEST_NOT_SUPPORT, mtu);
             return;
         }
@@ -784,10 +791,12 @@ void GattClientService::impl::RequestExchangeMtu(int appId, int mtu)
 
 void GattClientService::impl::RequestConnectionPriority(int appId, int connPriority)
 {
+    LOG_INFO("%{public}s: appId=%{public}d", __FUNCTION__, appId);
     auto it = GetValidApplication(appId);
     if (it.has_value()) {
         auto &client = it.value()->second;
-        if (handleMap_.find(client.connection_.GetHandle()) == handleMap_.end() || client.isShared_) {
+        if (handleMap_.find(client.connection_.GetHandle()) == handleMap_.end()) {
+            LOG_ERROR("%{public}s: failed and return REQUEST_NOT_SUPPORT(-18)", __FUNCTION__);
             client.callback_.OnConnectionParameterChanged(0, 0, 0, GattStatus::REQUEST_NOT_SUPPORT);
             return;
         }
@@ -1136,6 +1145,11 @@ void GattClientService::impl::OnDisconnect(const GattDevice &device, uint16_t co
 
 void GattClientService::impl::OnConnectionChanged(const GattDevice &device, uint16_t connectionHandle, int state)
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
+    if (device.role_ != GATT_ROLE_MASTER) {
+        LOG_ERROR("%{public}s: device role is %{public}d", __FUNCTION__, device.role_);
+        return;
+    }
     for (auto &it : clients_) {
         if (it.second.connection_.GetDevice() == device) {
             if (it.second.connState_ == state) {
