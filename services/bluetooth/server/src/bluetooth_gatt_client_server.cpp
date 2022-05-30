@@ -359,7 +359,7 @@ int BluetoothGattClientServer::ReadDescriptor(int32_t appId, const BluetoothGatt
 
 int BluetoothGattClientServer::WriteDescriptor(int32_t appId, BluetoothGattDescriptor *descriptor)
 {
-    HILOGI("Bluetooth Gatt Client Server WriteDescriptor Triggered!");
+    HILOGI("start, appId=%{public}d", appId);
     Descriptor desc(descriptor->handle_);
     desc.length_ = descriptor->length_;
     desc.value_ = std::move(descriptor->value_);
@@ -374,7 +374,7 @@ int BluetoothGattClientServer::WriteDescriptor(int32_t appId, BluetoothGattDescr
 
 int BluetoothGattClientServer::RequestExchangeMtu(int32_t appId, int32_t mtu)
 {
-    HILOGI("Bluetooth Gatt Client Server RequestExchangeMtu Triggered!");
+    HILOGI("start, appId=%{public}d, mtu=%{public}d", appId, mtu);
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: RequestExchangeMtu request not support.");
