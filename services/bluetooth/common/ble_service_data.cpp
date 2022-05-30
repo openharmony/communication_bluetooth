@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,6 +68,170 @@ void BleScanSettingsImpl::SetPhy(int phy)
 int BleScanSettingsImpl::GetPhy() const
 {
     return phy_;
+}
+
+void BleScanFilterImpl::SetDeviceId(std::string deviceId)
+{
+    deviceId_ = deviceId;
+}
+
+std::string BleScanFilterImpl::GetDeviceId() const
+{
+    return deviceId_;
+}
+
+void BleScanFilterImpl::SetName(std::string name)
+{
+    name_ = name;
+}
+
+std::string BleScanFilterImpl::GetName() const
+{
+    return name_;
+}
+
+void BleScanFilterImpl::SetServiceUuid(const Uuid &serviceUuid)
+{
+    serviceUuid_ = serviceUuid;
+    hasServiceUuid_ = true;
+}
+
+bool BleScanFilterImpl::HasServiceUuid() const
+{
+    return hasServiceUuid_;
+}
+
+Uuid BleScanFilterImpl::GetServiceUuid() const
+{
+    return serviceUuid_;
+}
+
+void BleScanFilterImpl::SetServiceUuidMask(const Uuid &serviceUuidMask)
+{
+    serviceUuidMask_ = serviceUuidMask;
+    hasServiceUuidMask_ = true;
+}
+
+bool BleScanFilterImpl::HasServiceUuidMask() const
+{
+    return hasServiceUuidMask_;
+}
+
+Uuid BleScanFilterImpl::GetServiceUuidMask() const
+{
+    return serviceUuidMask_;
+}
+
+void BleScanFilterImpl::SetServiceSolicitationUuid(const Uuid &serviceSolicitationUuid)
+{
+    serviceSolicitationUuid_ = serviceSolicitationUuid;
+    hasSolicitationUuid_ = true;
+}
+
+bool BleScanFilterImpl::HasSolicitationUuid() const
+{
+    return hasSolicitationUuid_;
+}
+
+Uuid BleScanFilterImpl::GetServiceSolicitationUuid() const
+{
+    return serviceSolicitationUuid_;
+}
+
+void BleScanFilterImpl::SetServiceSolicitationUuidMask(const Uuid &serviceSolicitationUuidMask)
+{
+    serviceSolicitationUuidMask_ = serviceSolicitationUuidMask;
+    hasSolicitationUuidMask_ = true;
+}
+
+bool BleScanFilterImpl::HasSolicitationUuidMask() const
+{
+    return hasSolicitationUuidMask_;
+}
+
+Uuid BleScanFilterImpl::GetServiceSolicitationUuidMask() const
+{
+    return serviceSolicitationUuidMask_;
+}
+
+void BleScanFilterImpl::SetServiceData(std::vector<uint8_t> serviceData)
+{
+    serviceData_ = serviceData;
+}
+
+std::vector<uint8_t> BleScanFilterImpl::GetServiceData() const
+{
+    return serviceData_;
+}
+
+void BleScanFilterImpl::SetServiceDataMask(std::vector<uint8_t> serviceDataMask)
+{
+    serviceDataMask_ = serviceDataMask;
+}
+
+std::vector<uint8_t> BleScanFilterImpl::GetServiceDataMask() const
+{
+    return serviceDataMask_;
+}
+
+void BleScanFilterImpl::SetManufacturerId(uint16_t manufacturerId)
+{
+    manufacturerId_ = manufacturerId;
+}
+
+uint16_t BleScanFilterImpl::GetManufacturerId() const
+{
+    return manufacturerId_;
+}
+
+void BleScanFilterImpl::SetManufactureData(std::vector<uint8_t> manufactureData)
+{
+    manufactureData_ = manufactureData;
+}
+
+std::vector<uint8_t> BleScanFilterImpl::GetManufactureData() const
+{
+    return manufactureData_;
+}
+
+void BleScanFilterImpl::SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask)
+{
+    manufactureDataMask_ = manufactureDataMask;
+}
+
+std::vector<uint8_t> BleScanFilterImpl::GetManufactureDataMask() const
+{
+    return manufactureDataMask_;
+}
+
+void BleScanFilterImpl::SetClientId(int clientId)
+{
+    clientId_ = clientId;
+}
+
+int BleScanFilterImpl::GetClientId() const
+{
+    return clientId_;
+}
+
+void BleScanFilterImpl::SetFiltIndex(uint8_t filtIndex)
+{
+    filtIndex_ = filtIndex;
+}
+
+uint8_t BleScanFilterImpl::GetFiltIndex() const
+{
+    return filtIndex_;
+}
+
+void BleScanFilterImpl::SetFilterAction(uint8_t action)
+{
+    action_ = action;
+}
+
+uint8_t BleScanFilterImpl::GetFilterAction() const
+{
+    return action_;
 }
 
 /**
