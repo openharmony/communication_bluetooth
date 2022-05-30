@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -120,6 +120,62 @@ void BluetoothBleCentralManagerProxy::StopScan()
     ErrCode result = InnerTransact(BLE_STOP_SCAN, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[StopScan] fail: transact ErrCode=%{public}d", result);
+    }
+}
+
+int BluetoothBleCentralManagerProxy::ConfigScanFilter(
+    const int clientId, const std::vector<BluetoothBleScanFilter> &filters)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
+        HILOGW("[ConfigScanFilter] fail: write interface token failed.");
+        return 0;
+    }
+
+    if (!data.WriteInt32(clientId)) {
+        HILOGE("[ConfigScanFilter] fail: write clientId failed");
+        return 0;
+    }
+
+    if (!data.WriteInt32(filters.size())) {
+        HILOGE("[ConfigScanFilter] fail: write vector size failed");
+        return 0;
+    }
+    for (uint32_t i = 0; i < filters.size(); i++) {
+        if (!data.WriteParcelable(&filters[i])) {
+            HILOGE("[ConfigScanFilter] fail: write filter failed");
+            return 0;
+        }
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(BLE_CONFIG_SCAN_FILTER, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGW("[ConfigScanFilter] fail: transact ErrCode=%{public}d", result);
+        return 0;
+    }
+    return reply.ReadInt32();
+}
+
+void BluetoothBleCentralManagerProxy::RemoveScanFilter(const int clientId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
+        HILOGW("[RemoveScanFilter] fail: write interface token failed.");
+        return;
+    }
+
+    if (!data.WriteInt32(clientId)) {
+        HILOGE("[RemoveScanFilter] fail: write clientId failed");
+        return;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(BLE_REMOVE_SCAN_FILTER, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGW("[RemoveScanFilter] fail: transact ErrCode=%{public}d", result);
     }
 }
 

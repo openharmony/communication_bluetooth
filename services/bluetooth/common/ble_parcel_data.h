@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -642,6 +642,189 @@ public:
     int scanMode_ = 0;
     bool legacy_ = true;
     int phy_ = 255;
+};
+
+/**
+ * @brief Represents Scan filter.
+ *
+ */
+class ScanFilter {
+public:
+    /**
+     * @brief A constructor used to create a <b>BleScanFilter</b> instance.
+     *
+     */
+    ScanFilter() {}
+
+    /**
+     * @brief A destructor used to delete the <b>BleScanFilter</b> instance.
+     *
+     */
+    ~ScanFilter() {}
+
+    /**
+     * @brief Set device id.
+     *
+     * @param deviceId device id.
+     */
+    void SetDeviceId(std::string deviceId)
+    {
+        deviceId_ = deviceId;
+    }
+
+    /**
+     * @brief Get device id.
+     *
+     * @return Returns device id.
+     */
+    std::string GetDeviceId() const
+    {
+        return deviceId_;
+    }
+
+    void SetName(std::string name)
+    {
+        name_ = name;
+    }
+
+    std::string GetName() const
+    {
+        return name_;
+    }
+
+    void SetServiceUuid(const Uuid uuid)
+    {
+        serviceUuid_ = uuid;
+        hasServiceUuid_ = true;
+    }
+
+    bool HasServiceUuid()
+    {
+        return hasServiceUuid_;
+    }
+
+    Uuid GetServiceUuid() const
+    {
+        return serviceUuid_;
+    }
+
+    void SetServiceUuidMask(const Uuid serviceUuidMask)
+    {
+        serviceUuidMask_ = serviceUuidMask;
+        hasServiceUuidMask_ = true;
+    }
+
+    bool HasServiceUuidMask()
+    {
+        return hasServiceUuidMask_;
+    }
+
+    Uuid GetServiceUuidMask() const
+    {
+        return serviceUuidMask_;
+    }
+
+    void SetServiceSolicitationUuid(const Uuid serviceSolicitationUuid)
+    {
+        serviceSolicitationUuid_ = serviceSolicitationUuid;
+        hasSolicitationUuid_ = true;
+    }
+
+    bool HasSolicitationUuid()
+    {
+        return hasSolicitationUuid_;
+    }
+
+    Uuid GetServiceSolicitationUuid() const
+    {
+        return serviceSolicitationUuid_;
+    }
+
+    void SetServiceSolicitationUuidMask(const Uuid serviceSolicitationUuidMask)
+    {
+        serviceSolicitationUuidMask_ = serviceSolicitationUuidMask;
+        hasSolicitationUuidMask_ = true;
+    }
+
+    bool HasSolicitationUuidMask()
+    {
+        return hasSolicitationUuidMask_;
+    }
+
+    Uuid GetServiceSolicitationUuidMask() const
+    {
+        return serviceSolicitationUuidMask_;
+    }
+
+    void SetServiceData(std::vector<uint8_t> serviceData)
+    {
+        serviceData_ = serviceData;
+    }
+
+    std::vector<uint8_t> GetServiceData() const
+    {
+        return serviceData_;
+    }
+
+    void SetServiceDataMask(std::vector<uint8_t> serviceDataMask)
+    {
+        serviceDataMask_ = serviceDataMask;
+    }
+
+    std::vector<uint8_t> GetServiceDataMask() const
+    {
+        return serviceDataMask_;
+    }
+
+    void SetManufacturerId(uint16_t manufacturerId)
+    {
+        manufacturerId_ = manufacturerId;
+    }
+
+    uint16_t GetManufacturerId() const
+    {
+        return manufacturerId_;
+    }
+
+    void SetManufactureData(std::vector<uint8_t> manufactureData)
+    {
+        manufactureData_ = manufactureData;
+    }
+
+    std::vector<uint8_t> GetManufactureData() const
+    {
+        return manufactureData_;
+    }
+
+    void SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask)
+    {
+        manufactureDataMask_ = manufactureDataMask;
+    }
+
+    std::vector<uint8_t> GetManufactureDataMask() const
+    {
+        return manufactureDataMask_;
+    }
+
+public:
+    std::string deviceId_;
+    std::string name_;
+
+    Uuid serviceUuid_;
+    Uuid serviceUuidMask_;
+    Uuid serviceSolicitationUuid_;
+    Uuid serviceSolicitationUuidMask_;
+    bool hasServiceUuid_ = false;
+    bool hasServiceUuidMask_ = false;
+    bool hasSolicitationUuid_ = false;
+    bool hasSolicitationUuidMask_ = false;
+
+    std::vector<uint8_t> serviceData_;
+    std::vector<uint8_t> serviceDataMask_;
+
+    uint16_t manufacturerId_ = 0;
+    std::vector<uint8_t> manufactureData_;
+    std::vector<uint8_t> manufactureDataMask_;
 };
 }  // namespace bluetooth
 

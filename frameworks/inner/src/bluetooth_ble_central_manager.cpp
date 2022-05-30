@@ -28,6 +28,16 @@ struct BleCentralManager::impl {
     ~impl();
 
     void BindServer();
+    bool MatchesScanFilters(BluetoothBleScanResult result);
+    bool MatchesScanFilter(BluetoothBleScanFilter filter, BluetoothBleScanResult result);
+    bool MatchesAddrAndName(BluetoothBleScanFilter filter, BluetoothBleScanResult result);
+    bool MatchesServiceUuids(BluetoothBleScanFilter filter, BluetoothBleScanResult result);
+    bool MatchesUuid(bluetooth::Uuid filterUuid, bluetooth::Uuid uuid, bluetooth::Uuid uuidMask);
+    bool MatchesManufacturerDatas(BluetoothBleScanFilter filter, BluetoothBleScanResult result);
+    bool MatchesServiceDatas(BluetoothBleScanFilter filter, BluetoothBleScanResult result);
+    std::string ParseServiceData(bluetooth::Uuid uuid, std::string data);
+    bool MatchesData(std::vector<uint8_t> fData, std::string rData, std::vector<uint8_t> dataMask);
+
     class BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
     public:
         BluetoothBleCentralManagerCallbackImp(BleCentralManager::impl &bleCentralManger)
@@ -36,6 +46,13 @@ struct BleCentralManager::impl {
         void OnScanCallback(const BluetoothBleScanResult &result) override
         {
             HILOGD("BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp::OnScanCallback");
+
+            if (!bleCentralManger_.bleScanFilters_.empty() && bleCentralManger_.IsNeedFilterMatches_
+                && !bleCentralManger_.MatchesScanFilters(result)) {
+                HILOGE("::OnScanCallback the result does not matche the filter, ignore");
+                return;
+            }
+
             bleCentralManger_.callbacks_.ForEach([&result](std::shared_ptr<BleCentralManagerCallback> observer) {
                 BluetoothBleScanResult tempResult = result;
                 BleScanResult scanResult;
@@ -113,6 +130,9 @@ struct BleCentralManager::impl {
 
     sptr<IBluetoothBleCentralManager> proxy_ = nullptr;
     BluetoothObserverList<BleCentralManagerCallback> callbacks_;
+
+    std::vector<BluetoothBleScanFilter> bleScanFilters_;
+    bool IsNeedFilterMatches_ = true;
 };
 
 BleCentralManager::impl::impl()
@@ -145,6 +165,217 @@ BleCentralManager::impl::impl()
     }
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
     proxy_->RegisterBleCentralManagerCallback(callbackImp_);
+}
+
+bool BleCentralManager::impl::MatchesScanFilters(BluetoothBleScanResult result)
+{
+    HILOGE("[BLE SCAN FILTER]%{public}s ", __func__);
+    for (auto filter : bleScanFilters_) {
+        if (!MatchesScanFilter(filter, result)) {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool BleCentralManager::impl::MatchesScanFilter(BluetoothBleScanFilter filter, BluetoothBleScanResult result)
+{
+    if (!MatchesAddrAndName(filter, result)) {
+        return false;
+    }
+
+    if (filter.HasServiceUuid() && !MatchesServiceUuids(filter, result)) {
+        return false;
+    }
+
+    if (!MatchesManufacturerDatas(filter, result)) {
+        return false;
+    }
+
+    if (!MatchesServiceDatas(filter, result)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool BleCentralManager::impl::MatchesAddrAndName(BluetoothBleScanFilter filter, BluetoothBleScanResult result)
+{
+    std::string address = result.GetPeripheralDevice().GetAddress();
+    if (address.empty()) {
+        return false;
+    }
+
+    BluetoothRemoteDevice device(address, BT_TRANSPORT_BLE);
+
+    std::string deviceId = filter.GetDeviceId();
+    if (!deviceId.empty() && deviceId != address) {
+        return false;
+    }
+
+    std::string rName = device.GetDeviceName();
+    std::string name = filter.GetName();
+    if (!name.empty() && (rName.empty() || rName != name)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool BleCentralManager::impl::MatchesServiceUuids(BluetoothBleScanFilter filter, BluetoothBleScanResult result)
+{
+    std::vector<bluetooth::Uuid> rUuids = result.GetServiceUuids();
+    if (rUuids.empty()) {
+        return false;
+    }
+
+    bluetooth::Uuid filterUuid = filter.GetServiceUuid();
+    bool hasUuidMask = filter.HasServiceUuidMask();
+
+    for (auto &uuid : rUuids) {
+        if (!hasUuidMask) {
+            if (filterUuid.operator==(uuid)) {
+                return true;
+            }
+        } else {
+            bluetooth::Uuid uuidMask = filter.GetServiceUuidMask();
+            if (MatchesUuid(filterUuid, uuid, uuidMask)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool BleCentralManager::impl::MatchesUuid(bluetooth::Uuid filterUuid, bluetooth::Uuid uuid, bluetooth::Uuid uuidMask)
+{
+    uint8_t uuid128[bluetooth::Uuid::UUID128_BYTES_TYPE];
+    uint8_t uuidMask128[bluetooth::Uuid::UUID128_BYTES_TYPE];
+    uint8_t resultUuid128[bluetooth::Uuid::UUID128_BYTES_TYPE];
+    if (!filterUuid.ConvertToBytesLE(uuid128)) {
+        HILOGE("[BLE SCAN FILTER]%{public}s Convert filter uuid faild.", __func__);
+        return false;
+    }
+    if (!uuidMask.ConvertToBytesLE(uuidMask128)) {
+        HILOGE("[BLE SCAN FILTER]%{public}s Convert uuid mask faild.", __func__);
+        return false;
+    }
+    if (!uuid.ConvertToBytesLE(resultUuid128)) {
+        HILOGE("[BLE SCAN FILTER]%{public}s Convert result uuid faild.", __func__);
+        return false;
+    }
+    size_t maskLength = sizeof(uuidMask128);
+    if (maskLength <= 0) {
+        return false;
+    }
+
+    for (size_t i = 0; i < maskLength; i++) {
+        if ((uuid128[i] & uuidMask128[i]) != (resultUuid128[i] & uuidMask128[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool BleCentralManager::impl::MatchesManufacturerDatas(BluetoothBleScanFilter filter, BluetoothBleScanResult result)
+{
+    uint16_t manufacturerId = filter.GetManufacturerId();
+    std::vector<uint8_t> data = filter.GetManufactureData();
+    if (data.size() == 0) {
+        return true;
+    }
+
+    std::vector<uint8_t> dataMask = filter.GetManufactureDataMask();
+
+    for (auto &manufaturerData : result.GetManufacturerData()) {
+        if (manufacturerId != manufaturerData.first) {
+            continue;
+        }
+
+        if (MatchesData(data, manufaturerData.second, dataMask)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool BleCentralManager::impl::MatchesServiceDatas(BluetoothBleScanFilter filter, BluetoothBleScanResult result)
+{
+    std::vector<uint8_t> data = filter.GetServiceData();
+    if (data.size() == 0) {
+        return true;
+    }
+
+    std::vector<uint8_t> dataMask = filter.GetServiceDataMask();
+
+    for (auto &serviceData : result.GetServiceData()) {
+        std::string rSData = ParseServiceData(serviceData.first, serviceData.second);
+        if (MatchesData(data, rSData, dataMask)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string BleCentralManager::impl::ParseServiceData(bluetooth::Uuid uuid, std::string data)
+{
+    std::string tmpServcieData;
+    int uuidType = uuid.GetUuidType();
+    HILOGE("[BLE SCAN FILTER]%{public}s uuidType: %{public}d ", __func__, uuidType);
+    switch (uuidType) {
+        case bluetooth::Uuid::UUID16_BYTES_TYPE: {
+            uint16_t uuid16 = uuid.ConvertTo16Bits();
+            tmpServcieData = std::string(reinterpret_cast<char *>(&uuid16), BLE_UUID_LEN_16);
+            break;
+        }
+        case bluetooth::Uuid::UUID32_BYTES_TYPE: {
+            uint32_t uuid32 = uuid.ConvertTo32Bits();
+            tmpServcieData = std::string(reinterpret_cast<char *>(&uuid32), BLE_UUID_LEN_32);
+            break;
+        }
+        case bluetooth::Uuid::UUID128_BYTES_TYPE: {
+            uint8_t uuid128[bluetooth::Uuid::UUID128_BYTES_TYPE];
+            if (!uuid.ConvertToBytesLE(uuid128)) {
+                HILOGE("[BLE SCAN FILTER]%{public}s Convert filter uuid faild.", __func__);
+            }
+            tmpServcieData = std::string(reinterpret_cast<char *>(&uuid128), BLE_UUID_LEN_128);
+            break;
+        }
+        default:
+            HILOGE("[BLE SCAN FILTER]%{public}s error uuid type(%{public}d).", __func__, uuidType);
+            break;
+    }
+    return tmpServcieData + data;
+}
+
+bool BleCentralManager::impl::MatchesData(std::vector<uint8_t> fData, std::string rData, std::vector<uint8_t> dataMask)
+{
+    if (rData.empty()) {
+        return false;
+    }
+
+    size_t length = fData.size();
+    std::vector<uint8_t> vec(rData.begin(), rData.end());
+    if (vec.size() < length) {
+        return false;
+    }
+
+    if (dataMask.empty() || dataMask.size() != length) {
+        for (size_t i = 0; i < length; i++) {
+            if (fData[i] != vec[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    for (size_t i = 0; i < length; i++) {
+        if ((fData[i] & dataMask[i]) != (vec[i] & dataMask[i])) {
+            return false;
+        }
+    }
+    return true;
 }
 
 BleCentralManager::impl::~impl()
@@ -199,6 +430,54 @@ void BleCentralManager::StopScan()
 {
     if (pimpl->proxy_ != nullptr) {
         pimpl->proxy_->StopScan();
+        if (clientId_ != 0) {
+            pimpl->proxy_->RemoveScanFilter(clientId_);
+            clientId_ = 0;
+        }
+        pimpl->bleScanFilters_.clear();
+        pimpl->IsNeedFilterMatches_ = true;
+    }
+}
+
+void BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter>  &filters)
+{
+    if (pimpl->proxy_ != nullptr) {
+        std::vector<BluetoothBleScanFilter> bluetoothBleScanFilters;
+        for (auto filter : filters) {
+            BluetoothBleScanFilter scanFilter;
+            scanFilter.SetDeviceId(filter.GetDeviceId());
+            scanFilter.SetName(filter.GetName());
+            if (filter.HasServiceUuid()) {
+                scanFilter.SetServiceUuid(::bluetooth::Uuid::ConvertFromString(
+                    filter.GetServiceUuid().ToString()));
+            }
+            if (filter.HasServiceUuidMask()) {
+                scanFilter.SetServiceUuidMask(::bluetooth::Uuid::ConvertFromString(
+                    filter.GetServiceUuidMask().ToString()));
+            }
+            if (filter.HasSolicitationUuid()) {
+                scanFilter.SetServiceSolicitationUuid(::bluetooth::Uuid::ConvertFromString(
+                    filter.GetServiceSolicitationUuid().ToString()));
+            }
+            if (filter.HasSolicitationUuidMask()) {
+                scanFilter.SetServiceSolicitationUuidMask(::bluetooth::Uuid::ConvertFromString(
+                    filter.GetServiceSolicitationUuidMask().ToString()));
+            }
+            scanFilter.SetServiceData(filter.GetServiceData());
+            scanFilter.SetServiceDataMask(filter.GetServiceDataMask());
+            scanFilter.SetManufacturerId(filter.GetManufacturerId());
+            scanFilter.SetManufactureData(filter.GetManufactureData());
+            scanFilter.SetManufactureDataMask(filter.GetManufactureDataMask());
+            bluetoothBleScanFilters.push_back(scanFilter);
+            pimpl->bleScanFilters_.push_back(scanFilter);
+        }
+        clientId_ = pimpl->proxy_->ConfigScanFilter(clientId_, bluetoothBleScanFilters);
+
+        if (filters.empty()) {
+            pimpl->IsNeedFilterMatches_ = false;
+        }
+    } else {
+        HILOGE("BleCentralManager::ConfigScanFilter proxy_ is nullptr or filters is empty can not config");
     }
 }
 
@@ -337,6 +616,147 @@ void BleScanSettings::SetPhy(int phy)
 int BleScanSettings::GetPhy() const
 {
     return phy_;
+}
+
+BleScanFilter::BleScanFilter()
+{}
+
+BleScanFilter::~BleScanFilter()
+{}
+
+void BleScanFilter::SetDeviceId(std::string deviceId)
+{
+    deviceId_ = deviceId;
+}
+
+std::string BleScanFilter::GetDeviceId() const
+{
+    return deviceId_;
+}
+
+void BleScanFilter::SetName(std::string name)
+{
+    name_ = name;
+}
+
+std::string BleScanFilter::GetName() const
+{
+    return name_;
+}
+
+void BleScanFilter::SetServiceUuid(const UUID &uuid)
+{
+    serviceUuid_ = uuid;
+    hasServiceUuid_ = true;
+}
+
+bool BleScanFilter::HasServiceUuid()
+{
+    return hasServiceUuid_;
+}
+
+UUID BleScanFilter::GetServiceUuid() const
+{
+    return serviceUuid_;
+}
+
+void BleScanFilter::SetServiceUuidMask(const UUID &serviceUuidMask)
+{
+    serviceUuidMask_ = serviceUuidMask;
+    hasServiceUuidMask_ = true;
+}
+
+bool BleScanFilter::HasServiceUuidMask()
+{
+    return hasServiceUuidMask_;
+}
+
+UUID BleScanFilter::GetServiceUuidMask() const
+{
+    return serviceUuidMask_;
+}
+
+void BleScanFilter::SetServiceSolicitationUuid(const UUID &serviceSolicitationUuid)
+{
+    serviceSolicitationUuid_ = serviceSolicitationUuid;
+    hasSolicitationUuid_ = true;
+}
+
+bool BleScanFilter::HasSolicitationUuid()
+{
+    return hasSolicitationUuid_;
+}
+
+UUID BleScanFilter::GetServiceSolicitationUuid() const
+{
+    return serviceSolicitationUuid_;
+}
+
+void BleScanFilter::SetServiceSolicitationUuidMask(const UUID &serviceSolicitationUuidMask)
+{
+    serviceSolicitationUuidMask_ = serviceSolicitationUuidMask;
+    hasSolicitationUuidMask_ = true;
+}
+
+bool BleScanFilter::HasSolicitationUuidMask()
+{
+    return hasSolicitationUuidMask_;
+}
+
+UUID BleScanFilter::GetServiceSolicitationUuidMask() const
+{
+    return serviceSolicitationUuidMask_;
+}
+
+void BleScanFilter::SetServiceData(std::vector<uint8_t> serviceData)
+
+{
+    serviceData_ = serviceData;
+}
+
+std::vector<uint8_t> BleScanFilter::GetServiceData() const
+{
+    return serviceData_;
+}
+
+void BleScanFilter::SetServiceDataMask(std::vector<uint8_t> serviceDataMask)
+{
+    serviceDataMask_ = serviceDataMask;
+}
+
+std::vector<uint8_t> BleScanFilter::GetServiceDataMask() const
+{
+    return serviceDataMask_;
+}
+
+void BleScanFilter::SetManufacturerId(uint16_t manufacturerId)
+{
+    manufacturerId_ = manufacturerId;
+}
+
+uint16_t BleScanFilter::GetManufacturerId() const
+{
+    return manufacturerId_;
+}
+
+void BleScanFilter::SetManufactureData(std::vector<uint8_t> manufactureData)
+{
+    manufactureData_ = manufactureData;
+}
+
+std::vector<uint8_t> BleScanFilter::GetManufactureData() const
+{
+    return manufactureData_;
+}
+
+void BleScanFilter::SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask)
+{
+    manufactureDataMask_ = manufactureDataMask;
+}
+
+std::vector<uint8_t> BleScanFilter::GetManufactureDataMask() const
+{
+    return manufactureDataMask_;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

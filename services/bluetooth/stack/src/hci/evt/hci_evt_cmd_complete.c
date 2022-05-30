@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@
 #include "hci_evt_link_ctrl_cmd_complete.h"
 #include "hci_evt_link_policy_cmd_complete.h"
 #include "hci_evt_status_params_cmd_complete.h"
+#include "hci_vendor_if.h"
 
 void HciEventOnCommandCompleteEvent(Packet *packet)
 {
@@ -75,6 +76,9 @@ void HciEventOnCommandCompleteEvent(Packet *packet)
             break;
         case HCI_COMMAND_OGF_LE_CONTROLLER:
             HciEventOnLeCommandComplete(param->commandOpcode, returnParametes, returnParametesLength);
+            break;
+        case HCI_COMMAND_OGF_VENDOR_SPECIFIC:
+            HciEventOnVendorCommandComplete(param->commandOpcode, returnParametes, returnParametesLength);
             break;
         default:
             break;

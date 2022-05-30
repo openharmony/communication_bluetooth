@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@
 #include "hci_def.h"
 #include "hci_failure.h"
 #include "hci_internal.h"
+#include "hci_vendor_if.h"
 
 #define HCI_TX_QUEUE_SIZE INT32_MAX
 #define HCI_RX_QUEUE_SIZE INT32_MAX
@@ -158,6 +159,7 @@ int HCI_Initialize()
         HciInitCmd();
         HciInitEvent();
         HciInitAcl();
+        HciVendorInit();
 
         g_hciTxThread = ThreadCreate("HciTx");
         if (g_hciTxThread == NULL) {
@@ -190,6 +192,7 @@ int HCI_Initialize()
         HciCloseEvent();
         HciCloseAcl();
         HciCloseFailure();
+        HciVendorClose();
     }
     LOG_DEBUG("%{public}s end", __FUNCTION__);
     return result;
@@ -280,6 +283,7 @@ void HCI_Close()
     HciCloseEvent();
     HciCloseAcl();
     HciCloseFailure();
+    HciVendorClose();
 
     if (g_hdiLib != NULL) {
         UnloadHdiLib(g_hdiLib);

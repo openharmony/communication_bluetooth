@@ -261,7 +261,17 @@ void UnregisterSysBLEObserver(const std::string &);
 struct ScanFilter {
     std::string deviceId;     // The name of a BLE peripheral device
     std::string name;         // The name of a BLE peripheral device
-    std::string serviceUuid;  // The service UUID of a BLE peripheral device
+    UUID serviceUuid;  // The service UUID of a BLE peripheral device
+    UUID serviceUuidMask;
+    UUID serviceSolicitationUuid;
+    UUID serviceSolicitationUuidMask;
+
+    std::vector<uint8_t> serviceData;
+    std::vector<uint8_t> serviceDataMask;
+
+    uint16_t manufacturerId = 0;
+    std::vector<uint8_t> manufactureData;
+    std::vector<uint8_t> manufactureDataMask;
 };
 
 enum MatchMode {

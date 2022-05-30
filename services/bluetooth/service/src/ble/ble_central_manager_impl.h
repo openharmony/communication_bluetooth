@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "ble_defs.h"
+#include "ble_scan_filter/include/i_ble_scan_filter.h"
 #include "dispatcher.h"
 #include "gap_le_if.h"
 #include "interface_adapter_ble.h"
@@ -71,6 +72,21 @@ public:
      * @brief Start or stop Bluetooth LE scan
      */
     void StartOrStopScan(const STOP_SCAN_TYPE &scanType, bool isStartScan = false) const;
+
+    /**
+     * @brief config scan filter.
+     *
+     * @param [in] filter filter list
+     * @return @c client id
+     */
+    int ConfigScanFilter(const int clientId, const std::vector<BleScanFilterImpl> &filter);
+
+    /**
+     * @brief remove scan filter.
+     *
+     * @param [in] clientId client id
+     */
+    void RemoveScanFilter(const int clientId);
 
     /**
      * @brief Get device address type
@@ -270,6 +286,33 @@ private:
     bool ExtractIncompleteData(uint8_t advType, const std::string &advertisedAddress, const std::vector<uint8_t> &data,
         std::vector<uint8_t> &completeData) const;
 
+    static void AddBleScanFilterResult(uint8_t result, void *context);
+    static void StartBleScanFilterResult(uint8_t result, void *context);
+    static void DeleteBleScanFilterResult(uint8_t result, void *context);
+    static void StopBleScanFilterResult(uint8_t result, void *context);
+    void HandleAddBleScanFilterResult(uint8_t result);
+    void HandleDeleteBleScanFilterResult(uint8_t result);
+    void HandleStartBleScanFilterResult(uint8_t result);
+    void HandleStopBleScanFilterResult(uint8_t result);
+    void LoadBleScanFilterLib();
+    void UnloadBleScanFilterLib();
+    bool CheckScanFilterConfig(const std::vector<BleScanFilterImpl> &filters);
+    void PushFilterToWaitList(BleScanFilterImpl filter, int clientId, uint8_t action);
+    void PushStartOrStopAction(const int clientId, uint8_t action);
+    void AddBleScanFilter(BleScanFilterImpl filter);
+    void DeleteBleScanFilter(BleScanFilterImpl filter);
+    void StartBleScanFilter();
+    void StopBleScanFilter();
+    void HandleWaitFilters();
+    void DoFilterStatusBad();
+    void TryConfigScanFilter(int clientId);
+    void BleScanFilterParamAddDeviceAddress(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
+    void BleScanFilterParamAddName(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
+    void BleScanFilterParamAddServiceUuid(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
+    void BleScanFilterParamAddSolicitationUuid(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
+    void BleScanFilterParamAddServiceData(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
+    void BleScanFilterParamAddManufactureData(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
+
     /// scan callback
     IBleCentralManagerCallback *centralManagerCallbacks_ = nullptr;
     bool isDuplicates_ = false;
@@ -277,6 +320,14 @@ private:
     /// The dispatcher that is used to switch to the thread.
     utility::Dispatcher *dispatcher_ = nullptr;
     std::map<std::string, std::vector<uint8_t>> incompleteData_{};
+    IBleScanFilter* bleScanFilter_ = nullptr;
+    void *bleScanFilterLib_ = nullptr;
+
+    /// filter action
+    static const uint8_t FILTER_ACTION_ADD = 0x00;
+    static const uint8_t FILTER_ACTION_DELETE = 0x01;
+    static const uint8_t FILTER_ACTION_START = 0x02;
+    static const uint8_t FILTER_ACTION_STOP = 0x03;
 
     BT_DISALLOW_COPY_AND_ASSIGN(BleCentralManagerImpl);
     DECLARE_IMPL();
