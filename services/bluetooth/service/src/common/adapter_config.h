@@ -35,6 +35,7 @@ const std::string SECTION_AVRCP_TG_SERVICE = "AvrcpTgService";
 const std::string SECTION_SOCKET_SERVICE = "SocketService";
 const std::string SECTION_MAP_MCE_SERVICE = "MapMceService";
 const std::string SECTION_MAP_MSE_SERVICE = "MapMseService";
+const std::string SECTION_PAN_SERVICE = "PanService";
 const std::string SECTION_PBAP_PCE_SERVICE = "PbapPceService";
 const std::string SECTION_PBAP_PSE_SERVICE = "PbapPseService";
 const std::string SECTION_HID_HOST_SERVICE = "HidHostService";

@@ -44,6 +44,7 @@ const std::string PROFILE_DI = "DIServer";
 const std::string BLE_ADVERTISER_SERVER = "BleAdvertiserServer";
 const std::string BLE_CENTRAL_MANAGER_SERVER = "BleCentralMangerServer";
 const std::string PROFILE_HID_HOST_SERVER = "BluetoothHidHostServer";
+const std::string PROFILE_PAN_SERVER = "BluetoothPanServer";
 }  // namespace
 
 class IBluetoothHost : public OHOS::IRemoteBroker {
