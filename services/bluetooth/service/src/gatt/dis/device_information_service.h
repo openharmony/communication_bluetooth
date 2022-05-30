@@ -74,7 +74,7 @@ private:
     std::unique_ptr<DiServiceOverBredrInterface> sdpRegister_ = {nullptr};
     GattServerService &serverService_;
     int appId_ = -1;
-    std::unique_ptr<GattServerCallbackImpl> serviceCallback_;
+    std::shared_ptr<GattServerCallbackImpl> serviceCallback_;
 
     std::unique_ptr<Service> BuildService();
     static std::string GetSystemId();
