@@ -205,6 +205,7 @@ config("btstack_config") {
     "-Wpointer-arith",
     "-Wmissing-field-initializers",
     "-Wno-missing-braces",  #wait-for-fix
+    "-Wno-pragma-pack",
   ]
 }
 
