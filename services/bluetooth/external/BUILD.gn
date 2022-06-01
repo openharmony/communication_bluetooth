@@ -19,6 +19,7 @@ config("btdummy_config") {
     "-fexceptions",
     "-Wno-unused-private-field",
     "-Wno-format-nonliteral",
+    "-Wno-non-c-typedef-for-linkage",
   ]
 }
 

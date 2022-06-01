@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef SEMAPHORE_H
-#define SEMAPHORE_H
+#ifndef SEMAPHORE_UTILS_H
+#define SEMAPHORE_UTILS_H
 
 #include <condition_variable>
 #include <mutex>
@@ -74,4 +74,4 @@ private:
 };
 }  // namespace utility
 
-#endif  // SEMAPHORE_H
+#endif  // SEMAPHORE_UTILS_H
