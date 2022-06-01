@@ -25,7 +25,7 @@
 #include "gap_le_if.h"
 #include "interface_adapter_ble.h"
 #include "log.h"
-#include "semaphore.h"
+#include "semaphore_utils.h"
 #include "timer.h"
 
 /*

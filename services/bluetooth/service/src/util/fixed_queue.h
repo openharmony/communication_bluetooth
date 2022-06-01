@@ -19,7 +19,7 @@
 #include <memory>
 #include <mutex>
 #include <queue>
-#include "semaphore.h"
+#include "semaphore_utils.h"
 
 namespace utility {
 template<class T>

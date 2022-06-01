@@ -256,7 +256,7 @@ ServiceDISrc = [
 
 ServiceUtilSrc = [
   "src/util/dispatcher.cpp",
-  "src/util/semaphore.cpp",
+  "src/util/semaphore_utils.cpp",
   "src/util/state_machine.cpp",
   "src/util/timer.cpp",
   "src/util/xml_parse.cpp",
@@ -331,9 +331,8 @@ config("btservice_config") {
     "-Wuninitialized",
     "-Woverloaded-virtual",
     "-Wdangling-else",
-
-    #"-Wpessimizing-move",
     "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
   ]
 }
 
