@@ -473,11 +473,11 @@ static int SdpParseSingleAttributeList(BufferInfo *bufferInfo, SdpService *servi
         uint16_t attributeId = BE2H_16(*(uint16_t *)(bufferInfo->buffer + offset));
         offset += SDP_UINT16_LENGTH;
         /// Attribute value
-        BufferInfo presBufferInfo = {
+        BufferInfo parseBufferInfo = {
             .buffer = bufferInfo->buffer + offset,
-            .length = attributeLength
+            .length = bufferInfo->length
         };
-        pos = SdpParseAttributeValue(&presBufferInfo, attributeId, service);
+        pos = SdpParseAttributeValue(&parseBufferInfo, attributeId, service);
         if (pos <= 0) {
             return BT_BAD_PARAM;
         }
@@ -578,10 +578,6 @@ static uint16_t SdpParseAttributeListArray(
     }
     /// Sequence length
     int pos = SdpGetLengthFromType(buffer + offset, type, &length);
-    if (totalLength < length) {
-        LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
-        return BT_BAD_PARAM;
-    }
     offset += pos;
 
     if (length != (totalLength - offset)) {
@@ -597,7 +593,7 @@ static uint16_t SdpParseAttributeListArray(
             break;
         }
         bufferInfo.buffer = buffer + offset;
-        bufferInfo.length = length;
+        bufferInfo.length = totalLength;
         pos = SdpParseSingleAttributeList(&bufferInfo, &serviceArray[serviceNum]);
         if (pos <= 0) {
             SdpFreeServiceArray(serviceArray, serviceNum + 1);
@@ -942,7 +938,7 @@ static uint16_t SdpGetServiceClassIdList(BufferInfo *bufferInfo, SdpService *ser
     pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
     if (bufferInfo->length < length) {
         LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
-        return BT_BAD_PARAM;
+        return 0;
     }
     offset += pos;
     pos = offset;
@@ -991,11 +987,11 @@ static int SdpGetCommonProtocolDescriptorEachList(SdpProtocolDescriptor *descrip
             currentLength = currentLength - length - SDP_UINT16_LENGTH;
             continue;
         }
-        BufferInfo presBufferInfo = {
+        BufferInfo parseBufferInfo = {
             .buffer = bufferInfo->buffer + offset,
-            .length = currentLength
+            .length = bufferInfo->length
         };
-        pos = SdpGetALLValue(&presBufferInfo,
+        pos = SdpGetALLValue(&parseBufferInfo,
             &descriptor[descriptorNumber].parameter[parameterNumber].value,
             &descriptor[descriptorNumber].parameter[parameterNumber].type);
         if (pos <= 0) {
@@ -1120,11 +1116,11 @@ static int SdpGetAdditionalProtocolDescriptorList(BufferInfo *bufferInfo, SdpSer
             offset = descriptorLength + pos;
             break;
         }
-        BufferInfo presBufferInfo = {
+        BufferInfo parseBufferInfo = {
             .buffer = bufferInfo->buffer + offset,
-            .length = descriptorLength
+            .length = bufferInfo->length
         };
-        pos = SdpGetCommonProtocolDescriptorList(&presBufferInfo,
+        pos = SdpGetCommonProtocolDescriptorList(&parseBufferInfo,
             service->descriptorList[descriptorListNumber].parameter,
             &service->descriptorList[descriptorListNumber].protocolDescriptorNumber);
         if (pos <= 0) {
@@ -1295,7 +1291,7 @@ static int SdpGetBluetoothProfileDescriptorList(BufferInfo *bufferInfo, SdpServi
         length--;
         offset++;
         pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &currentLength);
-        if (bufferInfo->length < length) {
+        if (bufferInfo->length < currentLength) {
             LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
             return BT_BAD_PARAM;
         }

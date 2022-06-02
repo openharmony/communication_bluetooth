@@ -102,8 +102,6 @@ void A2dpCodecThread::ProcessMessage(utility::Message msg, const A2dpEncoderInit
         case A2DP_PCM_PUSH:
             if (encoder_ != nullptr) {
                 encoder_->SendFrames(tv.tv_usec);
-                A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
-                profile->AudioDataReady();
             }
             break;
         case A2DP_FRAME_READY:
@@ -205,6 +203,8 @@ void A2dpCodecThread::SourceEncode(
 void A2dpCodecThread::SignalingTimeoutCallback() const
 {
     LOG_INFO("[A2dpCodecThread]%{public}s", __func__);
+    A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
+    profile->DequeuePacket();
     utility::Message msg(A2DP_PCM_PUSH, 0, nullptr);
     A2dpEncoderInitPeerParams peerParams = {};
     PostMessage(msg, peerParams, nullptr, nullptr);

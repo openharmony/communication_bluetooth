@@ -33,13 +33,11 @@ namespace bluetooth {
 using utility::Dispatcher;
 using utility::Message;
 
-constexpr int A2DP_AUDIO_SUSPEND = 1;
-constexpr int A2DP_AUDIO_RECONFIGURE = 2;
-constexpr int A2DP_AUDIO_START = 3;
-constexpr int A2DP_PCM_ENCODED = 4;
-constexpr int A2DP_FRAME_DECODED = 5;
-constexpr int A2DP_FRAME_READY = 6;
-constexpr int A2DP_PCM_PUSH = 7;
+constexpr int A2DP_AUDIO_RECONFIGURE = 1;
+constexpr int A2DP_PCM_ENCODED = 2;
+constexpr int A2DP_FRAME_DECODED = 3;
+constexpr int A2DP_FRAME_READY = 4;
+constexpr int A2DP_PCM_PUSH = 5;
 
 class A2dpCodecThread {
 public:
