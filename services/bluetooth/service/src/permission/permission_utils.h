@@ -16,6 +16,7 @@
 #ifndef PERMISSION_UTILS_H
 #define PERMISSION_UTILS_H
 
+#include <cstdint>
 #include "accesstoken_kit.h"
 
 namespace bluetooth {
@@ -26,6 +27,10 @@ public:
     static int VerifyUseBluetoothPermission();
     static int VerifyDiscoverBluetoothPermission();
     static int VerifyManageBluetoothPermission();
+    static int VerifyLocationPermission();
+
+    static int VerifyUseBluetoothPermission(const std::uint32_t  &tokenID);
+    static int VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID);
 };
 }
 #endif

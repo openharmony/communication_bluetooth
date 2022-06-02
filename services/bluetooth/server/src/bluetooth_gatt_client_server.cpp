@@ -26,6 +26,8 @@
 #include "interface_profile_manager.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "ipc_skeleton.h"
+#include "permission_utils.h"
 
 using namespace bluetooth;
 namespace OHOS {
@@ -81,12 +83,20 @@ public:
     void OnConnectionStateChanged(int state, int newState) override
     {
         HILOGI("Bluetooth Gatt Client Server OnConnectionStateChanged Triggered!");
+        if (PermissionUtils::VerifyUseBluetoothPermission(tokenId_) == PERMISSION_DENIED) {
+            HILOGE("OnConnectionStateChanged() false, check permission failed");
+            return;
+        }
         callback_->OnConnectionStateChanged(state, newState);
     }
 
     void OnCharacteristicChanged(const Characteristic &characteristic) override
     {
         HILOGI("Bluetooth Gatt Client Server OnCharacteristicChanged Triggered!");
+        if (PermissionUtils::VerifyUseBluetoothPermission(tokenId_) == PERMISSION_DENIED) {
+            HILOGE("OnCharacteristicChanged() false, check permission failed");
+            return;
+        }
         callback_->OnCharacteristicChanged((BluetoothGattCharacteristic)characteristic);
     }
 
@@ -188,6 +198,7 @@ private:
     sptr<IBluetoothGattClientCallback> callback_;
     sptr<CallbackDeathRecipient> deathRecipient_;
     int applicationId_;
+    uint32_t tokenId_;
 };
 
 BluetoothGattClientServer::impl::GattClientCallbackImpl::GattClientCallbackImpl(
@@ -197,6 +208,7 @@ BluetoothGattClientServer::impl::GattClientCallbackImpl::GattClientCallbackImpl(
     if (!callback_->AsObject()->AddDeathRecipient(deathRecipient_)) {
         HILOGE("Failed to link death recipient to callback");
     }
+    tokenId_ = IPCSkeleton::GetCallingTokenID();
 }
 
 BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecipient::CallbackDeathRecipient(
@@ -264,6 +276,10 @@ int BluetoothGattClientServer::RegisterApplication(
 int BluetoothGattClientServer::DeregisterApplication(int32_t appId)
 {
     HILOGI("Bluetooth Gatt Client Server DeregisterApplication Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("DeregisterApplication() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: DeregisterApplication request not support.");
@@ -275,6 +291,10 @@ int BluetoothGattClientServer::DeregisterApplication(int32_t appId)
 int BluetoothGattClientServer::Connect(int32_t appId, bool autoConnect)
 {
     HILOGI("Bluetooth Gatt Client Server Connect Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Connect() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: Connect request not support.");
@@ -286,6 +306,10 @@ int BluetoothGattClientServer::Connect(int32_t appId, bool autoConnect)
 int BluetoothGattClientServer::Disconnect(int32_t appId)
 {
     HILOGI("Bluetooth Gatt Client Server Disconnect Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Disconnect() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: Disconnect request not support.");
@@ -308,6 +332,10 @@ int BluetoothGattClientServer::DiscoveryServices(int32_t appId)
 int BluetoothGattClientServer::ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic &characteristic)
 {
     HILOGI("Bluetooth Gatt Client Server ReadCharacteristic Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("ReadCharacteristic() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: ReadCharacteristic request not support.");
@@ -320,6 +348,10 @@ int BluetoothGattClientServer::WriteCharacteristic(
     int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond)
 {
     HILOGI("Bluetooth Gatt Client Server WriteCharacteristic Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("WriteCharacteristic() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     Characteristic character(characteristic->handle_);
     character.length_ = characteristic->length_;
     character.value_ = std::move(characteristic->value_);
@@ -349,6 +381,10 @@ int BluetoothGattClientServer::SignedWriteCharacteristic(int32_t appId, Bluetoot
 int BluetoothGattClientServer::ReadDescriptor(int32_t appId, const BluetoothGattDescriptor &descriptor)
 {
     HILOGI("Bluetooth Gatt Client Server ReadDescriptor Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("ReadDescriptor() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: ReadDescriptor request not support.");
@@ -360,6 +396,11 @@ int BluetoothGattClientServer::ReadDescriptor(int32_t appId, const BluetoothGatt
 int BluetoothGattClientServer::WriteDescriptor(int32_t appId, BluetoothGattDescriptor *descriptor)
 {
     HILOGI("start, appId=%{public}d", appId);
+    HILOGI("Bluetooth Gatt Client Server WriteDescriptor Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("WriteDescriptor() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     Descriptor desc(descriptor->handle_);
     desc.length_ = descriptor->length_;
     desc.value_ = std::move(descriptor->value_);
@@ -375,6 +416,11 @@ int BluetoothGattClientServer::WriteDescriptor(int32_t appId, BluetoothGattDescr
 int BluetoothGattClientServer::RequestExchangeMtu(int32_t appId, int32_t mtu)
 {
     HILOGI("start, appId=%{public}d, mtu=%{public}d", appId, mtu);
+    HILOGI("Bluetooth Gatt Client Server RequestExchangeMtu Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("RequestExchangeMtu() false, check permission failed");
+        return REQUEST_NOT_SUPPORT;
+    }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: RequestExchangeMtu request not support.");
@@ -408,6 +454,10 @@ int BluetoothGattClientServer::RequestConnectionPriority(int32_t appId, int32_t 
 void BluetoothGattClientServer::GetServices(int32_t appId, ::std::vector<BluetoothGattService> &service)
 {
     HILOGI("Bluetooth Gatt Client Server GetServices Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetServices() false, check permission failed");
+        return;
+    }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         return;

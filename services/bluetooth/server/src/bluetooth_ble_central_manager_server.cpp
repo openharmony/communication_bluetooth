@@ -22,6 +22,7 @@
 #include "interface_adapter_manager.h"
 #include "ipc_skeleton.h"
 #include "remote_observer_list.h"
+#include "permission_utils.h"
 #include <string>
 
 namespace OHOS {
@@ -36,6 +37,7 @@ struct BluetoothBleCentralManagerServer::impl {
     std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
     RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
+    std::map<sptr<IRemoteObject>, uint32_t>     observersToken_;
     class BleCentralManagerCallback;
     std::unique_ptr<BleCentralManagerCallback> observerImp_ = std::make_unique<BleCentralManagerCallback>(this);
     IAdapterBle *bleService_ = nullptr;
@@ -65,49 +67,52 @@ public:
     void OnScanCallback(const BleScanResultImpl &result) override
     {
         HILOGI("BleCentralManageCallback::OnScanCallback start.");
-
-        observers_->ForEach([result](IBluetoothBleCentralManagerCallback *observer) {
+        observers_->ForEach([this, result](IBluetoothBleCentralManagerCallback *observer) {
             HILOGI("BleCentralManageCallback::OnScanCallback:Address= %{public}s",
                 result.GetPeripheralDevice().GetRawAddress().GetAddress().c_str());
-
-            BluetoothBleScanResult bleScanResult;
-            if (result.GetPeripheralDevice().IsRSSI()) {
-                bleScanResult.SetRssi(result.GetPeripheralDevice().GetRSSI());
-            }
-
-            bleScanResult.SetAdvertiseFlag(result.GetPeripheralDevice().GetAdFlag());
-
-            if (result.GetPeripheralDevice().IsManufacturerData()) {
-                std::map<uint16_t, std::string> manuData = result.GetPeripheralDevice().GetManufacturerData();
-                for (auto it = manuData.begin(); it != manuData.end(); it++) {
-                    bleScanResult.AddManufacturerData(it->first, it->second);
+            uint32_t  tokenId = this->pimpl_->observersToken_[observer->AsObject()];
+            if (PermissionUtils::VerifyUseBluetoothPermission(tokenId) == PERMISSION_DENIED) {
+                HILOGE("OnScanCallback() false, check permission failed");
+            } else {
+                BluetoothBleScanResult bleScanResult;
+                if (result.GetPeripheralDevice().IsRSSI()) {
+                    bleScanResult.SetRssi(result.GetPeripheralDevice().GetRSSI());
                 }
-            }
 
-            bleScanResult.SetConnectable(result.GetPeripheralDevice().IsConnectable());
+                bleScanResult.SetAdvertiseFlag(result.GetPeripheralDevice().GetAdFlag());
 
-            if (result.GetPeripheralDevice().IsServiceUUID()) {
-                std::vector<Uuid> uuids = result.GetPeripheralDevice().GetServiceUUID();
-                for (auto iter = uuids.begin(); iter != uuids.end(); iter++) {
-                    bleScanResult.AddServiceUuid(*iter);
+                if (result.GetPeripheralDevice().IsManufacturerData()) {
+                    std::map<uint16_t, std::string> manuData = result.GetPeripheralDevice().GetManufacturerData();
+                    for (auto it = manuData.begin(); it != manuData.end(); it++) {
+                        bleScanResult.AddManufacturerData(it->first, it->second);
+                    }
                 }
-            }
 
-            if (result.GetPeripheralDevice().IsServiceData()) {
-                std::vector<Uuid> uuids = result.GetPeripheralDevice().GetServiceDataUUID();
-                int index = 0;
-                for (auto iter = uuids.begin(); iter != uuids.end(); iter++) {
-                    bleScanResult.AddServiceData(*iter, result.GetPeripheralDevice().GetServiceData(index));
-                    ++index;
+                bleScanResult.SetConnectable(result.GetPeripheralDevice().IsConnectable());
+
+                if (result.GetPeripheralDevice().IsServiceUUID()) {
+                    std::vector<Uuid> uuids = result.GetPeripheralDevice().GetServiceUUID();
+                    for (auto iter = uuids.begin(); iter != uuids.end(); iter++) {
+                        bleScanResult.AddServiceUuid(*iter);
+                    }
                 }
-            }
 
-            bleScanResult.SetPeripheralDevice(result.GetPeripheralDevice().GetRawAddress());
+                if (result.GetPeripheralDevice().IsServiceData()) {
+                    std::vector<Uuid> uuids = result.GetPeripheralDevice().GetServiceDataUUID();
+                    int index = 0;
+                    for (auto iter = uuids.begin(); iter != uuids.end(); iter++) {
+                        bleScanResult.AddServiceData(*iter, result.GetPeripheralDevice().GetServiceData(index));
+                        ++index;
+                    }
+                }
 
-            bleScanResult.SetPayload(std::string(result.GetPeripheralDevice().GetPayload(),
+                bleScanResult.SetPeripheralDevice(result.GetPeripheralDevice().GetRawAddress());
+
+                bleScanResult.SetPayload(std::string(result.GetPeripheralDevice().GetPayload(),
                 result.GetPeripheralDevice().GetPayload() + result.GetPeripheralDevice().GetPayloadLen()));
 
-            observer->OnScanCallback(bleScanResult);
+                observer->OnScanCallback(bleScanResult);
+            }
         });
     }
 
@@ -269,6 +274,12 @@ void BluetoothBleCentralManagerServer::StartScan()
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
     HILOGI("BluetoothBleCentralManagerServer::StartScan start. pid:%{public}d uid:%{public}d", pid, uid);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED ||
+        PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED ||
+        PermissionUtils::VerifyLocationPermission() == PERMISSION_DENIED) {
+        HILOGE("StartScan error, check permission failed");
+        return;
+    }
 
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
@@ -294,6 +305,12 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
     HILOGI("BluetoothBleCentralManagerServer::StartScan with settings start. pid:%{public}d uid:%{public}d", pid, uid);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED ||
+        PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED ||
+        PermissionUtils::VerifyLocationPermission() == PERMISSION_DENIED) {
+        HILOGE("StartScan error, check permission failed");
+        return;
+    }
 
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
@@ -333,6 +350,10 @@ void BluetoothBleCentralManagerServer::StopScan()
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
     HILOGI("BluetoothBleCentralManagerServer::StopScan start. pid:%{public}d uid:%{public}d", pid, uid);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("StopScan error, check permission failed");
+        return;
+    }
 
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
@@ -422,6 +443,7 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
 
     pimpl->eventHandler_->PostSyncTask([&]() {
         if (pimpl != nullptr) {
+            pimpl->observersToken_[callback->AsObject()] = IPCSkeleton::GetCallingTokenID();
             pimpl->observers_.Register(callback);
             impl::ScanCallbackInfo info;
             info.pid_ = pid;
@@ -447,6 +469,12 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
             if (iter->callback_->AsObject() == callback->AsObject()) {
                 pimpl->observers_.Deregister(iter->callback_);
                 pimpl->scanCallbackInfo_.erase(iter);
+                break;
+            }
+        }
+        for (auto iter =  pimpl->observersToken_.begin(); iter !=  pimpl->observersToken_.end(); ++iter) {
+            if (iter->first == callback->AsObject()) {
+                pimpl->observersToken_.erase(iter);
                 break;
             }
         }

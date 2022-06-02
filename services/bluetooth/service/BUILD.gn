@@ -375,8 +375,6 @@ ohos_shared_library("btservice") {
     "//third_party/libxml2:xml2",
   ]
 
-  defines = [ "PERMISSION_ALWAYS_GRANT" ]
-
   external_deps = [
     "ability_base:want",
     "access_token:libaccesstoken_sdk",

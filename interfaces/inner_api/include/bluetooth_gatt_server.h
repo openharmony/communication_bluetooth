@@ -208,6 +208,14 @@ public:
      */
     void ClearServices();
     /**
+     * @brief The function to clear all services.
+     *
+     * @return int.
+     * @since 6
+     *
+     */
+    int Close();
+    /**
      * @brief The function to get service by UUID.
      *
      * @param uuid UUID of service.

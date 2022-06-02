@@ -21,6 +21,10 @@
 #include <map>
 #include <mutex>
 
+#include "refbase.h"
+#include "iremote_broker.h"
+#include "iremote_proxy.h"
+
 namespace OHOS {
 namespace Bluetooth {
 template <typename T>

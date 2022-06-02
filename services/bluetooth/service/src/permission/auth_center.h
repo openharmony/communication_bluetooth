@@ -15,6 +15,9 @@
 
 #ifndef AUTH_CENTER_H
 #define AUTH_CENTER_H
+
+#include <cstdint>
+
 namespace bluetooth {
 class AuthCenter {
 public:
@@ -46,6 +49,31 @@ public:
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
      */
     static int VerifyManageBluetoothPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description Verify where the app has the permission to Location
+     *
+     * @param pid the app's process id.
+     * @param uid the app id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyLocationPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description Verify where the app has the permission to use bluetooth
+     *
+     * @param tokenID the app's token id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyUseBluetoothPermission(const std::uint32_t  &tokenID);
+
+    /**
+     * @Description Verify where the app has the permission to discover bluetooth
+     *
+     * @param tokenID the app's token id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID);
 };
 }
 #endif
