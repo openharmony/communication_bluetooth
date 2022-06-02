@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
-#include "bluetooth_a2dp_sink_server.h"
+#include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "interface_profile_manager.h"
 #include "interface_profile_a2dp_snk.h"
 #include "remote_observer_list.h"
 #include "interface_adapter_manager.h"
+#include "permission_utils.h"
+#include "bluetooth_a2dp_sink_server.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -163,18 +165,26 @@ int BluetoothA2dpSinkServer::Disconnect(const RawAddress &device)
 int BluetoothA2dpSinkServer::GetDeviceState(const RawAddress &device)
 {
     HILOGI("BluetoothA2dpSinkServer::GetDeviceState starts");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDeviceState() false, check permission failed");
+        return BT_FAILURE;
+    }
     return pimpl->a2dpSnkService_->GetDeviceState(device);
 }
 
 std::vector<RawAddress> BluetoothA2dpSinkServer::GetDevicesByStates(const std::vector<int32_t> &states)
 {
     HILOGI("BluetoothA2dpSinkServer::GetDevicesByStates starts");
+    std::vector<RawAddress> rawDevices;
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDevicesByStates() false, check permission failed");
+        return rawDevices;
+    }
     std::vector<int> tmpStates;
     for (int32_t state : states) {
         HILOGD("state = %{public}d", state);
         tmpStates.push_back((int)state);
     }
-    std::vector<RawAddress> rawDevices;
 
     rawDevices = pimpl->a2dpSnkService_->GetDevicesByStates(tmpStates);
     return rawDevices;
@@ -183,6 +193,10 @@ std::vector<RawAddress> BluetoothA2dpSinkServer::GetDevicesByStates(const std::v
 int BluetoothA2dpSinkServer::GetPlayingState(const RawAddress &device)
 {
     HILOGI("BluetoothA2dpSinkServer::GetPlayingState starts");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetPlayingState() false, check permission failed");
+        return BT_FAILURE;
+    }
     return pimpl->a2dpSnkService_->GetPlayingState(device);
 }
 
