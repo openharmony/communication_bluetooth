@@ -529,8 +529,10 @@ void A2dpSbcEncoder::A2dpSbcEncodeFrames(void)
         if (encodePacketSize > 0) {
             uint32_t pktTimeStamp = a2dpSbcEncoderCb_.timestamp;
             a2dpSbcEncoderCb_.timestamp += frameIter * blocksXsubbands;
-            a2dpSbcEncoderCb_.sendDataSize += codecSize;
+            a2dpSbcEncoderCb_.sendDataSize += codecSize * frameIter;
             EnqueuePacket(pkt, frameIter, encodePacketSize, pktTimeStamp, (uint16_t)encoded);  // Enqueue Packet.
+            LOG_INFO("[SbcEncoder] %{public}s timestamp %{public}u, sendDataSize%{public}u\n",
+                __func__, a2dpSbcEncoderCb_.timestamp, a2dpSbcEncoderCb_.sendDataSize);
         }
     }
     PacketFree(pkt);
@@ -559,6 +561,7 @@ void A2dpSbcEncoder::EnqueuePacketFragment(
     uint8_t count = 1;
     uint32_t pktLen = 0;
     uint8_t frameNum = 0;
+    uint8_t sentFrameNum = 0;
     uint16_t blocksXsubbands
         = a2dpSbcEncoderCb_.sbcEncoderParams.subBands * a2dpSbcEncoderCb_.sbcEncoderParams.numOfBlocks;
     bool frameFragmented = false;
@@ -601,12 +604,14 @@ void A2dpSbcEncoder::EnqueuePacketFragment(
             }
             PacketPayloadAddLast(mediaPacket, encBuf);
             BufferFree(encBuf);
-            remainFrames = remainFrames - frameNum;
+            remainFrames -= frameNum;
 
+            uint16_t encodePacketSize = PacketSize(mediaPacket);
+            LOG_ERROR("[EnqueuePacket] encodePacketSize is ");
             A2dpProfile *profile = GetProfileInstance(A2DP_ROLE_SOURCE);
-            profile->EnqueuePacket(mediaPacket, frameNum, pktLen, timeStamp - remainFrames * blocksXsubbands);
+            profile->EnqueuePacket(mediaPacket, frameNum, encodePacketSize, timeStamp + sentFrameNum * blocksXsubbands);
             // Enqueue Packet.
-
+            sentFrameNum += frameNum;
             PacketFree(mediaPacket);
         } while (count > 0);
     }

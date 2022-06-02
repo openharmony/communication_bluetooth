@@ -1340,8 +1340,6 @@ uint16_t AvdtActWriteReq(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
         return AVDT_SUCCESS;
     }
     uint16_t Ret = AVDT_SUCCESS;
-    AvdtSigCtrl *sigCtrl = AvdtGetSigCtrlByHandle(streamCtrl->sigHandle);
-    AvdtCtrlData confirmData = {0};
     uint32_t ssrc = 0;
     AvdtStreamConfig *streamConfig = AvdtGetSepConfigByCodecIndex(streamCtrl->codecIndex);
     if (streamConfig != NULL) {
@@ -1371,9 +1369,7 @@ uint16_t AvdtActWriteReq(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
     }
     /* pkt data debug print */
     AvdtPktDataPrint(mediaPacket);
-    confirmData.hdr.errCode = (uint8_t)L2CIF_SendData(transTbl->lcid, mediaPacket, NULL);
-    AvdtCtrlEvtCallback(
-        sigCtrl, streamCtrl->handle, &(sigCtrl->peerAddress), AVDT_WRITE_CFM_EVT, &confirmData, sigCtrl->role);
+    L2CIF_SendData(transTbl->lcid, mediaPacket, AvdtStreamSendDataCallback);
     PacketFree(mediaPacket);
     return Ret;
 }
