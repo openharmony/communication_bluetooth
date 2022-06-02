@@ -39,7 +39,7 @@ namespace OHOS {
             }
         }
         BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-        HILOGI("name:%{public}s, size:%{public}lu", localName.c_str(), localName.length());
+        HILOGI("name:%{public}s", localName.c_str());
         result = host->SetLocalName(localName);
         HILOGI("result:%{public}d", result);
         return result;
