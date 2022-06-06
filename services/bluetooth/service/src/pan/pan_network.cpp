@@ -103,7 +103,7 @@ int PanNetwork::TunSetIff()
         return PAN_FAILURE;
     }
     ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
-    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, IFNAMSIZ - 1) != EOK) {
+    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, strlen(PAN_NETWORK_NAME)) != EOK) {
         LOG_ERROR("[Pan Network]%{public}s(): memcpy error", __FUNCTION__);
     }
     err = ioctl(fd_, TUNSETIFF, &ifr);
@@ -124,7 +124,7 @@ int PanNetwork::SetMacAddress(int inetSocket)
         LOG_ERROR("[Pan Network] %{public}s:memset error.", __func__);
         return PAN_FAILURE;
     }
-    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, IFNAMSIZ - 1) != EOK) {
+    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, strlen(PAN_NETWORK_NAME)) != EOK) {
         LOG_ERROR("[Pan Network]%{public}s(): memcpy error", __FUNCTION__);
         return PAN_FAILURE;
     }
@@ -164,7 +164,7 @@ int PanNetwork::SetIpAddress(int inetSocket)
         LOG_ERROR("[Pan Network] %{public}s:memset error.", __func__);
         return PAN_FAILURE;
     }
-    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, IFNAMSIZ - 1) != EOK) {
+    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, strlen(PAN_NETWORK_NAME)) != EOK) {
         LOG_ERROR("[Pan Network]%{public}s(): memcpy error", __FUNCTION__);
         return PAN_FAILURE;
     }
@@ -211,7 +211,7 @@ int PanNetwork::SetIffUp(int inetSocket)
         LOG_ERROR("[Pan Network] %{public}s:memset error.", __func__);
         return PAN_FAILURE;
     }
-    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, IFNAMSIZ - 1) != EOK) {
+    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, strlen(PAN_NETWORK_NAME)) != EOK) {
         LOG_ERROR("[Pan Network]%{public}s(): memcpy error", __FUNCTION__);
         return PAN_FAILURE;
     }
@@ -236,7 +236,7 @@ int PanNetwork::SetIffdown(int inetSocket)
         LOG_ERROR("[Pan Network] %{public}s:memset error.", __func__);
         return PAN_FAILURE;
     }
-    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, IFNAMSIZ - 1) != EOK) {
+    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, PAN_NETWORK_NAME, strlen(PAN_NETWORK_NAME)) != EOK) {
         LOG_ERROR("[Pan Network]%{public}s(): memcpy error", __FUNCTION__);
         return PAN_FAILURE;
     }
@@ -306,7 +306,7 @@ int PanNetwork::WriteData(EthernetHeader head, uint8_t *data, int len)
     ssize_t ret;
     uint8_t packet[PAN_MAX_NETWORK_PACKET_SIZE] = {0};
     head.protocol = htons(head.protocol);
-    if (memcpy_s(packet, sizeof(head), &head, sizeof(head)) != EOK) {
+    if (memcpy_s(packet, PAN_MAX_NETWORK_PACKET_SIZE, &head, sizeof(head)) != EOK) {
         LOG_ERROR("[Pan Network]%{public}s(): memcpy error", __FUNCTION__);
         return PAN_FAILURE;
     }

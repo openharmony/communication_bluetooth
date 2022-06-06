@@ -1032,7 +1032,7 @@ int PanBnep::ProcessBnepFilterNetTypeSet(uint8_t *data, int dataLength)
 {
     int offset = 0;
     int ret = 0;
-    int filterNum = 0;
+    uint16_t filterNum = 0;
     uint16_t responseMessage = BNEP_FILTER_SUCCESSFULL;
     if ((data == nullptr) || (dataLength < BNEP_UINT16_SIZE)) {
         LOG_ERROR("[PAN BNEP]%{public}s data is null!", __func__);
@@ -1059,7 +1059,7 @@ int PanBnep::ProcessBnepFilterNetTypeSet(uint8_t *data, int dataLength)
         return ret;
     }
     std::vector<BnepProtocolFilterRange> tempFilters_;
-    for (int i = 0; i < filterNum; i++) {
+    for (uint16_t i = 0; i < filterNum; i++) {
         BnepProtocolFilterRange range;
         range.start = be16toh(*(uint16_t *)(data + offset));
         range.end = be16toh(*(uint16_t *)(data + offset + BNEP_UINT16_SIZE));
