@@ -22,6 +22,7 @@
 
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
+#include "bluetooth_utils.h"
 
 #include <memory>
 namespace OHOS {
@@ -356,7 +357,7 @@ static napi_value ParseScanFilterDeviceIdParameters(
         napi_get_named_property(env, scanFilter, "deviceId", &result);
         ParseString(env, filter.deviceId, result);
         bleScanFilter.SetDeviceId(filter.deviceId);
-        HILOGD("StartBLEScan filter device id is %{public}s", filter.deviceId.c_str());
+        HILOGD("StartBLEScan filter device id is %{public}s", GetEncryptAddr(filter.deviceId).c_str());
     }
     return NapiGetNull(env);
 }
@@ -491,8 +492,8 @@ static napi_value ParseScanFilterManufactureDataParameters(
     NAPI_CALL(env, napi_has_named_property(env, scanFilter, "manufacturerId", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, scanFilter, "manufacturerId", &result);
-        int32_t manufacturerId = 0;
-        napi_get_value_int32(env, result, &manufacturerId);
+        uint32_t manufacturerId = 0;
+        napi_get_value_uint32(env, result, &manufacturerId);
         filter.manufacturerId = manufacturerId;
         bleScanFilter.SetManufacturerId(filter.manufacturerId);
         HILOGD("StartBLEScan filter manufacturerId is %{public}d", filter.manufacturerId);

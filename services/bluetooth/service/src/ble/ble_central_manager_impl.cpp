@@ -1355,7 +1355,7 @@ void BleCentralManagerImpl::BleScanFilterParamAddServiceData(
             LOG_ERROR("[BleCentralManagerImpl] %{public}s:serviceDataMask size is different with serviceData",
                 __func__);
             serviceDataMask.clear();
-            for (int i = 0; i < serviceData.size(); i++) {
+            for (size_t i = 0; i < serviceData.size(); i++) {
                 serviceDataMask.push_back(0xFF);
             }
         }
@@ -1376,7 +1376,7 @@ void BleCentralManagerImpl::BleScanFilterParamAddManufactureData(
             LOG_ERROR("[BleCentralManagerImpl] %{public}s:manufactureDataMask size is different with manufactureData",
                 __func__);
             manufactureDataMask.clear();
-            for (int i = 0; i < manufactureData.size(); i++) {
+            for (size_t i = 0; i < manufactureData.size(); i++) {
                 manufactureDataMask.push_back(0xFF);
             }
         }
