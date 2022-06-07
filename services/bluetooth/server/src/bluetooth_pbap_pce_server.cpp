@@ -19,11 +19,14 @@
 #include "interface_profile_manager.h"
 #include "interface_profile_pbap_pce.h"
 #include "bluetooth_log.h"
+#include "permission_utils.h"
 #include "remote_observer_list.h"
 #include "bluetooth_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
+using namespace bluetooth;
+
 class IPbapPullPhoneBookParamAdapter {
 public:
     IPbapPullPhoneBookParamAdapter() = default;
@@ -231,6 +234,10 @@ BluetoothPbapPceServer::~BluetoothPbapPceServer()
 int BluetoothPbapPceServer::GetDeviceState(const BluetoothRawAddress &device)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDeviceState() false, check permission failed");
+        return BT_FAILURE;
+    }
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->GetDeviceState(device);
     } else {
@@ -370,6 +377,10 @@ void BluetoothPbapPceServer::GetDevicesByStates(const ::std::vector<int32_t> sta
     std::vector<BluetoothRawAddress> &rawDevices)
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDevicesByStates() false, check permission failed");
+        return;
+    }
     if (pimpl->pbapPceService_ != nullptr) {
         std::vector<bluetooth::RawAddress> serviceDeviceList = pimpl->pbapPceService_->GetDevicesByStates(states);
         for (auto &device : serviceDeviceList) {

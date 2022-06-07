@@ -208,6 +208,15 @@ public:
     int Disconnect();
 
     /**
+     * @brief The function to close.
+     *
+     * @return int.
+     * @since 6
+     *
+     */
+    int Close();
+
+    /**
      * @brief The function to discover services.
      *
      * @return int    api accept status.

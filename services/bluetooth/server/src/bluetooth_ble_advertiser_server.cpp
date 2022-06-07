@@ -19,6 +19,7 @@
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
 #include "remote_observer_list.h"
+#include "permission_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -128,6 +129,10 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
     bool isRawData)
 {
     HILOGI("BluetoothBleAdvertiserServer::StartAdvertising");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("StartAdvertising error, check permission failed");
+        return;
+    }
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -181,6 +186,10 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
 void BluetoothBleAdvertiserServer::StopAdvertising(int32_t advHandle)
 {
     HILOGI("BluetoothBleAdvertiserServer::StopAdvertising");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("StopAdvertising error, check permission failed");
+        return;
+    }
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));

@@ -13,13 +13,16 @@
  * limitations under the License.
  */
 
-#include "bluetooth_hid_host_server.h"
+#include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "interface_profile.h"
 #include "interface_profile_hid_host.h"
 #include "i_bluetooth_host_observer.h"
+#include "permission_utils.h"
 #include "remote_observer_list.h"
 #include "hilog/log.h"
+#include "permission_utils.h"
+#include "bluetooth_hid_host_server.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -170,6 +173,10 @@ ErrCode BluetoothHidHostServer::GetDevicesByStates(
     std::vector<BluetoothRawAddress>& result)
 {
     HILOGI("Bluetooth Hid Host Server GetDevicesByStates Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDevicesByStates() false, check permission failed");
+        return false;
+    }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("BluetoothHidHostServer: GetDevicesByStates not init.");
         return ERR_NO_INIT;
@@ -187,6 +194,10 @@ ErrCode BluetoothHidHostServer::GetDeviceState(const BluetoothRawAddress &device
     int& result)
 {
     HILOGI("Bluetooth Hid Host Server GetDeviceState Triggered!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDeviceState() false, check permission failed");
+        return BT_FAILURE;
+    }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("BluetoothHidHostServer: GetDevicesByStates not init.");
         return ERR_NO_INIT;
@@ -200,6 +211,10 @@ ErrCode BluetoothHidHostServer::Connect(
     bool& result)
 {
     HILOGI("Bluetooth Hid Host Server Connect Triggered!");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Connect error, check permission failed");
+        return ERR_INVALID_VALUE;
+    }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("BluetoothHidHostServer: Connect not init.");
         return ERR_NO_INIT;
@@ -213,6 +228,10 @@ ErrCode BluetoothHidHostServer::Disconnect(
     bool& result)
 {
     HILOGI("Bluetooth Hid Host Server Disconnect Triggered!");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Disconnect error, check permission failed");
+        return ERR_INVALID_VALUE;
+    }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("BluetoothHidHostServer: Disconnect not init.");
         return ERR_NO_INIT;

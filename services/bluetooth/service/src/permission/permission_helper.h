@@ -31,6 +31,15 @@ public:
     static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid);
 
     /**
+     * @Description Verify where the app has the permission.
+     *
+     * @param permissionName Permission name.
+     * @param callerToken The app's token id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyPermission(const std::string &permissionName, const std::uint32_t &callerToken);
+
+    /**
      * @Description Verify where the app has the permission to use bluetooth
      *
      * @param pid The app's process id.
@@ -56,6 +65,31 @@ public:
      * @return int PERMISSION_DENIED or PERMISSION_GRANTED
      */
     static int VerifyManageBluetoothPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description Verify where the app has the permission to location
+     *
+     * @param pid The app's process id.
+     * @param uid The app id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyLocationPermission(const int &pid, const int &uid);
+
+        /**
+     * @Description Verify where the app has the permission to use bluetooth
+     *
+     * @param tokenID The app's token id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyUseBluetoothPermission(const std::uint32_t  &tokenID);
+
+    /**
+     * @Description Verify where the app has the permission to discover bluetooth
+     *
+     * @param tokenID The app's token id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID);
 };
 }
 #endif

@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
-#include "bluetooth_a2dp_source_server.h"
+#include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "interface_profile_manager.h"
 #include "interface_profile_a2dp_src.h"
 #include "remote_observer_list.h"
 #include "interface_adapter_manager.h"
+#include "permission_utils.h"
+#include "bluetooth_a2dp_source_server.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -188,30 +190,46 @@ void BluetoothA2dpSourceServer::DeregisterObserver(const sptr<IBluetoothA2dpSour
 int BluetoothA2dpSourceServer::Connect(const RawAddress &device)
 {
     HILOGI("BluetoothA2dpSourceServer::Connect starts");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Connect error, check permission failed");
+        return BT_FAILURE;
+    }
     return pimpl->a2dpSrcService_->Connect(device);
 }
 
 int BluetoothA2dpSourceServer::Disconnect(const RawAddress &device)
 {
     HILOGI("BluetoothA2dpSourceServer::Disconnect starts");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Disconnect error, check permission failed");
+        return BT_FAILURE;
+    }
     return pimpl->a2dpSrcService_->Disconnect(device);
 }
 
 int BluetoothA2dpSourceServer::GetDeviceState(const RawAddress &device)
 {
     HILOGI("BluetoothA2dpSourceServer::GetDeviceState starts");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDeviceState() false, check permission failed");
+        return BT_FAILURE;
+    }
     return pimpl->a2dpSrcService_->GetDeviceState(device);
 }
 
 std::vector<RawAddress> BluetoothA2dpSourceServer::GetDevicesByStates(const std::vector<int32_t> &states)
 {
     HILOGI("BluetoothA2dpSourceServer::GetDevicesByStates starts");
+    std::vector<RawAddress> rawDevices;
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDevicesByStates() false, check permission failed");
+        return rawDevices;
+    }
     std::vector<int> tmpStates;
     for (int32_t state : states) {
         HILOGD("state = %{public}d", state);
         tmpStates.push_back((int)state);
     }
-    std::vector<RawAddress> rawDevices;
 
     rawDevices = pimpl->a2dpSrcService_->GetDevicesByStates(tmpStates);
     return rawDevices;
@@ -220,6 +238,10 @@ std::vector<RawAddress> BluetoothA2dpSourceServer::GetDevicesByStates(const std:
 int BluetoothA2dpSourceServer::GetPlayingState(const RawAddress &device)
 {
     HILOGI("BluetoothA2dpSourceServer::GetPlayingState starts");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetPlayingState() false, check permission failed");
+        return BT_FAILURE;
+    }
     return pimpl->a2dpSrcService_->GetPlayingState(device);
 }
 

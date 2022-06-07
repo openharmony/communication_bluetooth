@@ -453,7 +453,7 @@ GattClient::~GattClient()
 {
     if (pimpl->isRegisterSucceeded_) {
         if (!pimpl->proxy_) {
-            HILOGI("GattClient::~GattClient() proxy_ is null when used!");
+            HILOGI("proxy_ is null when used!!");
         } else {
             pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
         }
@@ -520,6 +520,23 @@ int GattClient::Disconnect()
     }
     result = pimpl->proxy_->Disconnect(pimpl->applicationId_);
     return result;
+}
+
+int GattClient::Close()
+{
+    if (pimpl->isRegisterSucceeded_) {
+        if (!pimpl->proxy_) {
+            HILOGI("GattClient::Close() proxy_ is null when used!");
+            return GattStatus::REQUEST_NOT_SUPPORT;
+        } else {
+            int32_t result = pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
+            if (result == RET_NO_ERROR) {
+                pimpl->isRegisterSucceeded_ = false;
+            }
+            return result;
+        }
+    }
+    return GattStatus::REQUEST_NOT_SUPPORT;
 }
 
 int GattClient::DiscoverServices()

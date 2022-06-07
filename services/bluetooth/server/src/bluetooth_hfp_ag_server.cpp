@@ -22,6 +22,7 @@
 #include "interface_profile.h"
 #include "interface_adapter_manager.h"
 #include "remote_observer_list.h"
+#include "permission_utils.h"
 
 
 namespace OHOS {
@@ -146,6 +147,10 @@ BluetoothHfpAgServer::~BluetoothHfpAgServer()
 
 int BluetoothHfpAgServer::GetConnectDevices(std::vector<BluetoothRawAddress> &devices) {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetConnectDevices() false, check permission failed");
+        return BT_FAILURE;
+    }
     std::list<RawAddress> deviceList;
     if (pimpl->HfpAgService_  != nullptr) {
         deviceList = pimpl->HfpAgService_ ->GetConnectDevices();
@@ -178,8 +183,13 @@ int BluetoothHfpAgServer::GetDevicesByStates(const std::vector<int> &states,
     }
     return BT_SUCCESS;
 }
+
 int BluetoothHfpAgServer::GetDeviceState(const BluetoothRawAddress &device) {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDeviceState() false, check permission failed");
+        return BT_FAILURE;
+    }
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpAgService_ ) {
         return pimpl->HfpAgService_ ->GetDeviceState(addr);
@@ -191,6 +201,10 @@ int BluetoothHfpAgServer::GetDeviceState(const BluetoothRawAddress &device) {
 
 int BluetoothHfpAgServer::Connect(const BluetoothRawAddress &device) {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Connect error, check permission failed");
+        return BT_FAILURE;
+    }
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpAgService_ != nullptr) {
         return pimpl->HfpAgService_->Connect(addr);
@@ -200,6 +214,10 @@ int BluetoothHfpAgServer::Connect(const BluetoothRawAddress &device) {
 
 int BluetoothHfpAgServer::Disconnect(const BluetoothRawAddress &device) {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Disconnect error, check permission failed");
+        return BT_FAILURE;
+    }
      RawAddress addr(device.GetAddress());
     if (pimpl->HfpAgService_ != nullptr) {
         return pimpl->HfpAgService_ ->Disconnect(addr);

@@ -37,4 +37,20 @@ int PermissionUtils::VerifyManageBluetoothPermission()
     return AuthCenter::GetInstance().VerifyManageBluetoothPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
+
+int PermissionUtils::VerifyLocationPermission()
+{
+    return AuthCenter::GetInstance().VerifyLocationPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int PermissionUtils::VerifyUseBluetoothPermission(const std::uint32_t  &tokenID)
+{
+    return AuthCenter::GetInstance().VerifyUseBluetoothPermission(tokenID);
+}
+
+int PermissionUtils::VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID)
+{
+    return AuthCenter::GetInstance().VerifyDiscoverBluetoothPermission(tokenID);
+}
 }

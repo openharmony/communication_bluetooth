@@ -571,6 +571,24 @@ void GattServer::ClearServices()
     pimpl->proxy_->ClearServices(int(appId));
     pimpl->gattServices_.clear();
 }
+
+int GattServer::Close()
+{
+    if (pimpl->isRegisterSucceeded_) {
+        if (!pimpl->proxy_) {
+            HILOGI("GattServer::Close() proxy_ is null when used!");
+            return GattStatus::REQUEST_NOT_SUPPORT;
+        } else {
+            int32_t result = pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
+            if (result == RET_NO_ERROR) {
+                pimpl->isRegisterSucceeded_ = false;
+            }
+            return result;
+        }
+    }
+    return GattStatus::REQUEST_NOT_SUPPORT;
+}
+
 void GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 {
     HILOGI("start.");

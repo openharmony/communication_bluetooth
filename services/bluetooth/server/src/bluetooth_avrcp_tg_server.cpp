@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include <mutex>
+#include "bluetooth_def.h"
 #include "bluetooth_avrcp_tg_server.h"
 #include "bluetooth_log.h"
 
@@ -21,6 +22,7 @@
 #include "interface_profile_avrcp_tg.h"
 #include "interface_profile_manager.h"
 #include "remote_observer_list.h"
+#include "permission_utils.h"
 
 
 namespace OHOS {
@@ -266,6 +268,10 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgServer::GetDevicesByStates(cons
 
     std::vector<BluetoothRawAddress> results;
 
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDevicesByStates() false, check permission failed");
+        return results;
+    }
     if (!pimpl->IsEnabled()) {
         HILOGE("%{public}s: service is null or disable ", __func__);
         return results;
@@ -291,7 +297,10 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgServer::GetDevicesByStates(cons
 int32_t BluetoothAvrcpTgServer::GetDeviceState(const BluetoothRawAddress &addr)
 {
     HILOGD("%{public}s start.", __func__);
-
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("GetDeviceState() false, check permission failed");
+        return BT_FAILURE;
+    }
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {

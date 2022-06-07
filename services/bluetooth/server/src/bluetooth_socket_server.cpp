@@ -18,6 +18,7 @@
 #include "bt_def.h"
 #include "interface_profile_manager.h"
 #include "interface_profile_socket.h"
+#include "permission_utils.h"
 
 using namespace bluetooth;
 
@@ -26,6 +27,10 @@ namespace Bluetooth {
 int BluetoothSocketServer::Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
 {
     HILOGI("BluetoothSocketServer: Connect starts");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Connect() false, check permission failed");
+        return RET_NO_SUPPORT;
+    }
     int ret = RET_NO_SUPPORT;
     IProfileSocket *socket = (IProfileSocket *)IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP);
     if (socket != nullptr) {
@@ -38,6 +43,10 @@ int BluetoothSocketServer::Connect(std::string &addr, bluetooth::Uuid &uuid, int
 int BluetoothSocketServer::Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
 {
     HILOGI("BluetoothSocketServer: Listen starts");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Listen() false, check permission failed");
+        return RET_NO_SUPPORT;
+    }
     int ret = RET_NO_SUPPORT;
     IProfileSocket *socket = (IProfileSocket *)IProfileManager::GetInstance()->GetProfileService(PROFILE_NAME_SPP);
     if (socket != nullptr) {
