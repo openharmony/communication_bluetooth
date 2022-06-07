@@ -64,6 +64,9 @@ A2dpProfile::A2dpProfile(const uint8_t role)
 
     role_ = role;
     sdpInstance_.SetProfileRole(role_);
+
+    packetQueue_ = QueueCreate(MAX_PCM_FRAME_NUM_PER_TICK * FRAME_THREE);
+    buffer_ = new A2dpSharedBuffer();
 }
 
 A2dpProfile::~A2dpProfile()
@@ -160,9 +163,6 @@ void A2dpProfile::Enable()
 
     GetSDPInstance().RegisterService();
     SetProfileEnable(true);
-
-    packetQueue_ = QueueCreate(MAX_PCM_FRAME_NUM_PER_TICK * FRAME_THREE);
-    buffer_ = new A2dpSharedBuffer();
 }
 
 void A2dpProfile::ProcessAvdtpCallback(const BtAddr &addr, const utility::Message &message)
@@ -555,10 +555,8 @@ void A2dpProfile::Disable()
     GetSDPInstance().UnregisterService();
     ClearNumberPeerDevice();
 
-    QueueDelete(packetQueue_, CleanPacketData);
-    packetQueue_ = nullptr;
-    delete buffer_;
-    buffer_ = nullptr;
+    QueueFlush(packetQueue_, CleanPacketData);
+    buffer_->Reset();
 }
 
 A2dpSdpManager A2dpProfile::GetSDPInstance(void) const
