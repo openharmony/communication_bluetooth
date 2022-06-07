@@ -487,10 +487,6 @@ void A2dpStateOpening::ProcessOpenCfm(A2dpAvdtMsgData msgData, uint8_t role)
                 bluetooth::RawAddress::ConvertToString(msgData.stream.addr.addr));
         }
         profile->ConnectStateChangedNotify(msgData.stream.addr, STREAM_CONNECT, (void *)&param);
-        if (profile->IsActiveDevice(msgData.stream.addr)) {
-            uint8_t label = 0;
-            avdtp.StartReq(param.handle, label);
-        }
     }
 }
 
