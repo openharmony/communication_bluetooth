@@ -57,4 +57,28 @@ int AuthCenter::VerifyManageBluetoothPermission(const int &pid, const int &uid)
     }
     return PermissionHelper::VerifyManageBluetoothPermission(pid, uid);
 }
+
+int AuthCenter::VerifyLocationPermission(const int &pid, const int &uid)
+{
+    if (g_permissionAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int AuthCenter::VerifyUseBluetoothPermission(const std::uint32_t  &tokenID)
+{
+    if (g_permissionAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return PermissionHelper::VerifyUseBluetoothPermission(tokenID);
+}
+
+int AuthCenter::VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID)
+{
+    if (g_permissionAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return PermissionHelper::VerifyDiscoverBluetoothPermission(tokenID);
+}
 }

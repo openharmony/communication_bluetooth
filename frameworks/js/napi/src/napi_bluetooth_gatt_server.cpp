@@ -186,7 +186,11 @@ napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattServer);
 
-    delete gattServer;
+    int err = gattServer->GetServer()->Close();
+    if (err == RET_NO_ERROR) {
+        HILOGI("NapiGattServer::Close() succeed");
+        delete gattServer;
+    }
 
     napi_value ret = nullptr;
     napi_get_boolean(env, isOK, &ret);

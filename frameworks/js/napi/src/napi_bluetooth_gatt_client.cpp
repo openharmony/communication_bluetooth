@@ -550,7 +550,11 @@ napi_value NapiGattClient::Close(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
-    delete gattClient;
+    int err = gattClient->GetClient()->Close();
+    if (err == RET_NO_ERROR) {
+        HILOGI("NapiGattClient::Close() succeed");
+        delete gattClient;
+    }
 
     napi_value ret = nullptr;
     napi_get_boolean(env, isOK, &ret);
