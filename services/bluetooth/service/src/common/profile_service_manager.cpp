@@ -539,11 +539,6 @@ std::vector<uint32_t> ProfileServiceManager::GetProfileServicesList() const
 BTConnectState ProfileServiceManager::GetProfileServiceConnectState(const uint32_t profileID) const
 {
     std::string profileName = SupportProfilesInfo::IdToName(profileID);
-    if (profileName == PROFILE_NAME_GATT_CLIENT || profileName == PROFILE_NAME_GATT_SERVER ||
-        profileName == PROFILE_NAME_SPP) {
-        LOG_INFO("%{public}s is not supported.", profileName.c_str());
-        return BTConnectState::DISCONNECTED;
-    }
     IProfile *profile = nullptr;
     if (!pimpl->startedProfiles_.Find(profileName, profile)) {
         return BTConnectState::DISCONNECTED;
