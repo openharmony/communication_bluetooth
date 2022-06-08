@@ -349,7 +349,7 @@ bool SppClientSocket::IsConnected() const
 }
 
 struct SppServerSocket::impl {
-    impl(const std::string &name, UUID uuid, SppSocketType type, bool auth);
+    impl(const std::string &name, UUID uuid, SppSocketType type, bool encrypt);
     ~impl()
     {
         if (!proxy_) {
@@ -410,7 +410,7 @@ struct SppServerSocket::impl {
     int getSecurityFlags()
     {
         int flags = 0;
-        if (auth_) {
+        if (encrypt_) {
             flags |= FLAG_AUTH;
             flags |= FLAG_ENCRYPT;
         }
@@ -542,7 +542,7 @@ struct SppServerSocket::impl {
     sptr<IBluetoothSocket> proxy_;
     UUID uuid_;
     SppSocketType type_;
-    bool auth_;
+    bool encrypt_;
     int fd_;
     int socketStatus_;
     std::string name_ {
@@ -571,8 +571,8 @@ private:
     SppServerSocket::impl &host_;
 };
 
-SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType type, bool auth)
-    : uuid_(uuid), type_(type), auth_(auth), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
+SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType type, bool encrypt)
+    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
 {
     HILOGI("SppServerSocket::impl::impl(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -599,8 +599,8 @@ SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType ty
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
-SppServerSocket::SppServerSocket(const std::string &name, UUID uuid, SppSocketType type, bool auth)
-    : pimpl(new SppServerSocket::impl(name, uuid, type, auth))
+SppServerSocket::SppServerSocket(const std::string &name, UUID uuid, SppSocketType type, bool encrypt)
+    : pimpl(new SppServerSocket::impl(name, uuid, type, encrypt))
 {
     HILOGI("SppServerSocket::SppServerSocket(4 parameters) starts");
     int ret = pimpl->Listen();
