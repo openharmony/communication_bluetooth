@@ -39,6 +39,7 @@
 namespace OHOS {
 namespace Bluetooth {
 constexpr size_t CALLBACK_SIZE = 1;
+constexpr size_t ARGS_SIZE_ZERO = 0;
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr size_t ARGS_SIZE_THREE = 3;

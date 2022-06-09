@@ -100,20 +100,12 @@ bool PanDisconnectedState::Dispatch(const utility::Message &msg)
     LOG_DEBUG("[PAN Machine]%{public}s():[Disconnected][%{public}s]",
         __FUNCTION__, PanStateMachine::GetEventName(event.what_).c_str());
     switch (event.what_) {
-        case PAN_API_CLOSE_EVT:
-            break;
         case PAN_INT_OPEN_EVT:
             stateMachine_.ProcessOpenEvent(event);
             Transition(PanStateMachine::CONNECTING);
             break;
-        case PAN_INT_CLOSE_EVT:
-            break;
         case PAN_OPEN_CMPL_EVT:
             Transition(PanStateMachine::CONNECTED);
-            break;
-        case PAN_API_WRITE_DATA_EVT:
-            break;
-        case PAN_INT_DATA_EVT:
             break;
         default:
             break;
@@ -153,10 +145,6 @@ bool PanConnectingState::Dispatch(const utility::Message &msg)
             stateMachine_.ProcessOpenComplete(event);
             Transition(PanStateMachine::CONNECTED);
             break;
-        case PAN_API_WRITE_DATA_EVT:
-            break;
-        case PAN_INT_DATA_EVT:
-            break;
         default:
             break;
     }
@@ -180,8 +168,6 @@ bool PanDisconnectingState::Dispatch(const utility::Message &msg)
     LOG_DEBUG("[PAN Machine]%{public}s():[Disconnecting][%{public}s]", __FUNCTION__,
         PanStateMachine::GetEventName(event.what_).c_str());
     switch (event.what_) {
-        case PAN_API_CLOSE_EVT:
-            break;
         case PAN_INT_OPEN_EVT:
             stateMachine_.ProcessOpenEvent(event);
             Transition(PanStateMachine::CONNECTING);
@@ -192,10 +178,6 @@ bool PanDisconnectingState::Dispatch(const utility::Message &msg)
             break;
         case PAN_OPEN_CMPL_EVT:
             Transition(PanStateMachine::CONNECTED);
-            break;
-        case PAN_API_WRITE_DATA_EVT:
-            break;
-        case PAN_INT_DATA_EVT:
             break;
         case PAN_DISCONNECTION_TIMEOUT_EVT:
             Transition(PanStateMachine::CONNECTED);
@@ -226,13 +208,9 @@ bool PanConnectedState::Dispatch(const utility::Message &msg)
             stateMachine_.ProcessCloseReqEvent(event);
             Transition(PanStateMachine::DISCONNECTING);
             break;
-        case PAN_INT_OPEN_EVT:
-            break;
         case PAN_INT_CLOSE_EVT:
             stateMachine_.ProcessCloseEvent(event);
             Transition(PanStateMachine::DISCONNECTED);
-            break;
-        case PAN_OPEN_CMPL_EVT:
             break;
         case PAN_API_WRITE_DATA_EVT:
             stateMachine_.ProcessSendData(event);

@@ -172,7 +172,7 @@ ErrCode BluetoothPanProxy::SetTethering(
 
     MessageParcel reply;
     MessageOption option {
-        MessageOption::TF_ASYNC
+        MessageOption::TF_SYNC
     };
 
     int error = Remote()->SendRequest(COMMAND_SET_TETHERING, data, reply, option);
@@ -180,7 +180,12 @@ ErrCode BluetoothPanProxy::SetTethering(
         HILOGE("BluetoothPanProxy::SetTethering done fail, error: %{public}d", error);
         return INVALID_DATA;
     }
-    result = reply.ReadInt32() == NO_ERROR ? true : false;
+    ErrCode ec = reply.ReadInt32();
+    if (FAILED(ec)) {
+        return ec;
+    }
+
+    result = reply.ReadInt32();
     return error;
 }
 
@@ -195,7 +200,7 @@ ErrCode BluetoothPanProxy::IsTetheringOn(
 
     MessageParcel reply;
     MessageOption option {
-        MessageOption::TF_ASYNC
+        MessageOption::TF_SYNC
     };
 
     int error = Remote()->SendRequest(COMMAND_IS_TETHERING_ON, data, reply, option);
@@ -204,7 +209,12 @@ ErrCode BluetoothPanProxy::IsTetheringOn(
         return error;
     }
 
-    result = reply.ReadInt32() == NO_ERROR ? true : false;
+    ErrCode ec = reply.ReadInt32();
+    if (FAILED(ec)) {
+        return ec;
+    }
+
+    result = reply.ReadInt32();
     return ERR_OK;
 }
 
