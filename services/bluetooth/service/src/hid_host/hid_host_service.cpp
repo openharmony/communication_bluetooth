@@ -404,7 +404,7 @@ void HidHostService::ProcessConnectEvent(const HidHostMessage &event)
 
 std::string HidHostService::HidHostFindDeviceByLcid(uint16_t lcid, bool *isControlLcid)
 {
-    std::string ret = "";
+    std::string ret;
 
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
