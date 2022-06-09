@@ -46,7 +46,7 @@ public:
      * @brief deregister sdp
      * @details deregister sdp service
      */
-    void Deregister() const;
+    void Deregister();
 
 private:
     static const uint16_t NAP_UUID16 = 0X1116;                     /* PAN profile */
@@ -61,15 +61,19 @@ private:
     static const int UINT_DESC_TYPE = 1;
     static const int PAN_NET_ACCESS_TYPE_LENGTH = 2;
     static const int PAN_NET_ACCESS_RATE_LENGTH = 4;
-    int AddServiceClassIdList() const;
-    int AddAttributes();
-    int AddSequenceAttribute() const;
-    int AddBluetoothProfileDescriptorList() const;
-    int AddServiceName() const;
-    int AddLanguageBaseAttributeIdList() const;
-    int AddBrowseGroupList() const;
-    int AddServiceDescription() const;
-    int RegisterServiceRecord() const;
+    int AddServiceClassIdList();
+    int AddPanSecurityDescriptionId();
+    int AddPanNetAccessRate();
+    int AddPanNetAccessType();
+    int AddPanDescriptionList();
+    int AddBluetoothProfileDescriptorList();
+    int AddServiceName();
+    int AddLanguageBaseAttributeIdList();
+    int AddBrowseGroupList();
+    int AddServiceDescription();
+    int RegisterServiceRecord();
+    int RegisterNetInfo();
+    int RegisterServiceInfo();
     uint32_t sdpHandle_ = 0;  // sdp handler
 };
 }  // namespace bluetooth
