@@ -286,15 +286,19 @@ void BluetoothBleCentralManagerServer::StartScan()
             static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
 
         for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
+            HILOGI("BluetoothBleCentralManagerServer::StartScan baomin. iter->pid_:%{public}d iter->uid_:%{public}d", iter->pid_, iter->uid_);
             if (iter->pid_ == pid && iter->uid_ == uid) {
                 iter->isStart_ = true;
             }
         }
 
         if (pimpl->bleService_ != nullptr) {
+            HILOGI("BluetoothBleCentralManagerServer::StartScan baomin. pimpl->isScanning:%{public}d", pimpl->isScanning);
             if (!pimpl->isScanning) {
                 pimpl->bleService_->StartScan();
             }
+        } else {
+            HILOGI("BluetoothBleCentralManagerServer::StartScan baomin. pimpl->bleService_ is nullptr");
         }
         pimpl->isScanning = true;
     });
