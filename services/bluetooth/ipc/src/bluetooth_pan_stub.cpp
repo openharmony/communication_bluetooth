@@ -139,7 +139,7 @@ ErrCode BluetoothPanStub::SetTetheringInner(MessageParcel &data, MessageParcel &
     ErrCode ec = SetTethering(value, result);
     reply.WriteInt32(ec);
     if (SUCCEEDED(ec)) {
-        reply.WriteInt32(NO_ERROR);
+        reply.WriteInt32(result);
     }
     return ERR_NONE;
 }
@@ -151,7 +151,7 @@ ErrCode BluetoothPanStub::IsTetheringOnInner(MessageParcel &data, MessageParcel 
     ErrCode ec = IsTetheringOn(result);
     reply.WriteInt32(ec);
     if (SUCCEEDED(ec)) {
-        reply.WriteInt32(NO_ERROR);
+        reply.WriteInt32(result);
     }
     return ERR_NONE;
 }
