@@ -78,6 +78,7 @@ void HidHostStateMachine::SetDeviceType()
 
 int HidHostStateMachine::GetDeviceType()
 {
+    LOG_DEBUG("[HIDH Machine]%{public}s(), deviceType_:%{public}d", __FUNCTION__, deviceType_);
     return deviceType_;
 }
 

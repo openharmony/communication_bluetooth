@@ -13,16 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_UTILS_H
-#define BLUETOOTH_UTILS_H
+#ifndef BLUETOOTH_UTILS_SERVER_H
+#define BLUETOOTH_UTILS_SERVER_H
 
 #include <string>
 
 namespace OHOS {
 namespace Bluetooth {
 std::string GetEncryptAddr(std::string addr);
-#define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetDeviceAddr()).c_str())
+
+#define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetAddress()).c_str())
 }  // namespace Bluetooth
 }  // namespace OHOS
 
-#endif
+#endif // BLUETOOTH_UTILS_SERVER_H
