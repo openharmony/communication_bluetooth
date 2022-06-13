@@ -15,7 +15,7 @@
 #include "napi_bluetooth_hid_host_observer.h"
 
 #include "bluetooth_log.h"
-
+#include "bluetooth_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -25,13 +25,11 @@ namespace OHOS {
 namespace Bluetooth {
 void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("NapiBluetoothHidHostObserver::OnConnectionStateChanged called");
     if (!callbackInfos_[STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE]) {
-        HILOGW("NapiBluetoothHidHostObserver::OnConnectionStateChanged: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiBluetoothHidHostObserver::OnConnectionStateChanged: %{public}s is registered by ability",
-        STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
+    HILOGI("addr:%{public}s, state:%{public}d", GET_ENCRYPT_ADDR(device), state);
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE];
 

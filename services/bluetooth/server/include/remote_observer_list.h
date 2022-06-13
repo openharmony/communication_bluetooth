@@ -122,7 +122,6 @@ bool RemoteObserverList<T>::Deregister(const sptr<T> &observer)
 template <typename T>
 void RemoteObserverList<T>::ForEach(const std::function<void(sptr<T>)> &observer)
 {
-    HILOGI("RemoteObserverList<T>::ForEach called");
     std::lock_guard<std::mutex> lock(lock_);
     for (const auto &it : observers_) {
         if (it.first != nullptr) {
