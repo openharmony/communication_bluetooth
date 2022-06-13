@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 
-module_output_path = "bluetooth_standard/framework_test/pan"
+module_output_path = "bluetooth/framework_test/pan"
 SUBSYSTEM_DIR = "//foundation/communication"
 
 ###############################################################################

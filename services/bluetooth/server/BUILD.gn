@@ -48,6 +48,7 @@ ohos_shared_library("bluetooth_server") {
     "src/bluetooth_pbap_pce_server.cpp",
     "src/bluetooth_pbap_pse_server.cpp",
     "src/bluetooth_socket_server.cpp",
+    "src/bluetooth_utils_server.cpp",
   ]
 
   deps = [

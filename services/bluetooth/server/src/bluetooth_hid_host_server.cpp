@@ -15,6 +15,7 @@
 
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils_server.h"
 #include "interface_profile.h"
 #include "interface_profile_hid_host.h"
 #include "i_bluetooth_host_observer.h"
@@ -33,7 +34,8 @@ public:
 
     void OnConnectionStateChanged(const RawAddress &device, int state) override
     {
-        HILOGI("BluetoothHidHostCallback::OnConnectionStateChanged start.");
+        // Reference "BTConnectState"
+        HILOGI("addr:%{public}s, state:%{public}d", GET_ENCRYPT_ADDR(device), state);
         observers_->ForEach([device, state](sptr<IBluetoothHidHostObserver> observer) {
             observer->OnConnectionStateChanged(device, state);
         });
@@ -52,7 +54,6 @@ struct BluetoothHidHostServer::impl {
     impl();
     ~impl();
 
-    /// sys state observer
     class SystemStateObserver;
     std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
@@ -76,6 +77,7 @@ public:
     explicit SystemStateObserver(BluetoothHidHostServer::impl *pimpl) : pimpl_(pimpl) {};
     void OnSystemStateChange(const BTSystemState state) override
     {
+        HILOGI("start, BTSystemState:%{public}d", state);
         switch (state) {
             case BTSystemState::ON:
                 pimpl_->hidHostService_ = pimpl_->GetServicePtr();
@@ -97,16 +99,17 @@ private:
 
 BluetoothHidHostServer::impl::impl()
 {
-    HILOGI("BluetoothHidHostServer::impl::impl() starts");
+    HILOGI("enter");
 }
 
 BluetoothHidHostServer::impl::~impl()
 {
-    HILOGI("BluetoothHidHostServer::impl::~impl() starts");
+    HILOGI("enter");
 }
 
 BluetoothHidHostServer::BluetoothHidHostServer()
 {
+    HILOGI("start");
     pimpl = std::make_unique<impl>();
     pimpl->observerImp_->SetObserver(&(pimpl->observers_));
     pimpl->systemStateObserver_ = std::make_unique<impl::SystemStateObserver>(pimpl.get());
@@ -120,6 +123,7 @@ BluetoothHidHostServer::BluetoothHidHostServer()
 
 BluetoothHidHostServer::~BluetoothHidHostServer()
 {
+    HILOGI("start");
     IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->systemStateObserver_));
     if (pimpl->hidHostService_ != nullptr) {
         pimpl->hidHostService_->DeregisterObserver(*pimpl->observerImp_.get());
@@ -128,14 +132,14 @@ BluetoothHidHostServer::~BluetoothHidHostServer()
 
 ErrCode BluetoothHidHostServer::RegisterObserver(const sptr<IBluetoothHidHostObserver> observer)
 {
-    HILOGI("BluetoothHidHostServer::RegisterObserver");
+    HILOGI("start");
 
     if (observer == nullptr) {
-        HILOGE("BluetoothHidHostServer::RegisterObserver observer is null");
+        HILOGE("observer is null");
         return ERR_INVALID_VALUE;
     }
     if (pimpl == nullptr) {
-        HILOGE("BluetoothHidHostServer::RegisterObserver pimpl is null");
+        HILOGE("pimpl is null");
         return ERR_NO_INIT;
     }
 
@@ -146,13 +150,13 @@ ErrCode BluetoothHidHostServer::RegisterObserver(const sptr<IBluetoothHidHostObs
 
 ErrCode BluetoothHidHostServer::DeregisterObserver(const sptr<IBluetoothHidHostObserver> observer)
 {
-    HILOGI("BluetoothHidHostServer::DeregisterObserver");
+    HILOGI("start");
     if (observer == nullptr) {
-        HILOGE("BluetoothHidHostServer::DeregisterObserver observer is null");
+        HILOGE("observer is null");
         return ERR_INVALID_VALUE;
     }
     if (pimpl == nullptr) {
-        HILOGE("BluetoothHidHostServer::DeregisterObserver pimpl is null");
+        HILOGE("pimpl is null");
         return ERR_NO_INIT;
     }
     for (auto iter = pimpl->advCallBack_.begin(); iter != pimpl->advCallBack_.end(); ++iter) {
@@ -169,16 +173,15 @@ ErrCode BluetoothHidHostServer::DeregisterObserver(const sptr<IBluetoothHidHostO
 }
 
 ErrCode BluetoothHidHostServer::GetDevicesByStates(
-    const std::vector<int32_t> &states,
-    std::vector<BluetoothRawAddress>& result)
+    const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result)
 {
-    HILOGI("Bluetooth Hid Host Server GetDevicesByStates Triggered!");
+    HILOGI("start");
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDevicesByStates() false, check permission failed");
+        HILOGE("check permission failed");
         return false;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
-        HILOGI("BluetoothHidHostServer: GetDevicesByStates not init.");
+        HILOGI("hidHostService_ is null");
         return ERR_NO_INIT;
     }
 
@@ -186,57 +189,56 @@ ErrCode BluetoothHidHostServer::GetDevicesByStates(
     for (auto &device : serviceDeviceList) {
         BluetoothRawAddress bluetoothDevice(device.GetAddress());
         result.push_back(bluetoothDevice);
+        HILOGD("%{public}s", GET_ENCRYPT_ADDR(bluetoothDevice));
     }
     return ERR_OK;
 }
 
-ErrCode BluetoothHidHostServer::GetDeviceState(const BluetoothRawAddress &device,
-    int& result)
+ErrCode BluetoothHidHostServer::GetDeviceState(const BluetoothRawAddress &device, int& result)
 {
-    HILOGI("Bluetooth Hid Host Server GetDeviceState Triggered!");
+    HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDeviceState() false, check permission failed");
+        HILOGE("check permission failed");
         return BT_FAILURE;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
-        HILOGI("BluetoothHidHostServer: GetDevicesByStates not init.");
+        HILOGI("hidHostService_ is null");
         return ERR_NO_INIT;
     }
     result = pimpl->hidHostService_->GetDeviceState(device);
+    HILOGI("end, result:%{public}d", result);
     return ERR_OK;
 }
 
-ErrCode BluetoothHidHostServer::Connect(
-    const BluetoothRawAddress &device,
-    bool& result)
+ErrCode BluetoothHidHostServer::Connect(const BluetoothRawAddress &device, bool& result)
 {
-    HILOGI("Bluetooth Hid Host Server Connect Triggered!");
+    HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("Connect error, check permission failed");
+        HILOGE("check permission failed");
         return ERR_INVALID_VALUE;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
-        HILOGI("BluetoothHidHostServer: Connect not init.");
+        HILOGE("hidHostService_ is null");
         return ERR_NO_INIT;
     }
     result = pimpl->hidHostService_->Connect(device);
+    HILOGI("end, result:%{public}d", result);
     return ERR_OK;
 }
 
-ErrCode BluetoothHidHostServer::Disconnect(
-    const BluetoothRawAddress &device,
-    bool& result)
+ErrCode BluetoothHidHostServer::Disconnect(const BluetoothRawAddress &device, bool& result)
 {
-    HILOGI("Bluetooth Hid Host Server Disconnect Triggered!");
+    HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("Disconnect error, check permission failed");
+        HILOGE("check permission failed");
         return ERR_INVALID_VALUE;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
-        HILOGI("BluetoothHidHostServer: Disconnect not init.");
+        HILOGI("hidHostService_ is null");
         return ERR_NO_INIT;
     }
     result = pimpl->hidHostService_->Disconnect(device);
+    HILOGI("end, result:%{public}d", result);
     return ERR_OK;
 }
 }  // namespace Bluetooth

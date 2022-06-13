@@ -12,17 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "bluetooth_utils_server.h"
+#include "bluetooth_def.h"
+#include "bluetooth_log.h"
 
-#ifndef BLUETOOTH_UTILS_H
-#define BLUETOOTH_UTILS_H
-
-#include <string>
+using namespace std;
 
 namespace OHOS {
 namespace Bluetooth {
-std::string GetEncryptAddr(std::string addr);
-#define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetDeviceAddr()).c_str())
+constexpr int startPos = 6;
+constexpr int endPos = 13;
+std::string GetEncryptAddr(std::string addr)
+{
+    if (addr.empty() || addr.length() != ADDRESS_LENGTH) {
+        HILOGE("addr is invalid.");
+        return std::string("");
+    }
+    std::string tmp = "**:**:**:**:**:**";
+    std::string out = addr;
+    // 00:01:**:**:**:05
+    for (int i = startPos; i <= endPos; i++) {
+        out[i] = tmp[i];
+    }
+    return out;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
-
-#endif
