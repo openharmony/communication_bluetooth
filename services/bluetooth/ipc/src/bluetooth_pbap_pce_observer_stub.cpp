@@ -79,7 +79,7 @@ ErrCode BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner(MessageParc
         return TRANSACTION_ERR;
     }
     std::vector<uint8_t>* des = nullptr;
-    if (!data.ReadUInt8Vector(des)) {
+    if (!data.ReadUInt8Vector(des) || des == nullptr) {
         HILOGW("BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner: get description failed.");
         return INVALID_DATA;
     }

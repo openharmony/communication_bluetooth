@@ -391,7 +391,6 @@ void BtmFilterCheckAndSaveAclConnInfo(const uint8_t **data, uint16_t originalLen
         case HCI_LE_META_EVENT: {
             uint16_t offset = sizeof(HciEventHeader);
             const uint8_t *subEventCode = *data + offset;
-            offset += sizeof(uint8_t);
 
             switch (*subEventCode) {
                 case HCI_LE_CONNECTION_COMPLETE_EVENT:
@@ -755,8 +754,7 @@ static bool RfcommDataFilterUseOther(
 static bool IsL2capSignalingChannelData(const uint8_t *data, uint16_t originalLength)
 {
     uint16_t offset = 0;
-    uint16_t len = *(uint16_t *)(data + offset);
-    offset += sizeof(len);
+    offset += sizeof(uint16_t);
     uint16_t channelID = *(uint16_t *)(data + offset);
     if (channelID == L2CAP_SIGNALING_CHANNEL) {
         return true;
@@ -790,7 +788,6 @@ static bool L2capDataFilterUseRfcomm(uint8_t type, const uint8_t **data, uint16_
     L2capBasicHeader *l2capHeader = (L2capBasicHeader *)(*data + offset);
     offset += l2capInfo->headerLength;
     const uint8_t *address = *data + offset;
-    offset += sizeof(uint8_t);
 
     uint8_t dlci = *address >> RFCOMM_SHIFT_DLCI;
     if (dlci == 0) {

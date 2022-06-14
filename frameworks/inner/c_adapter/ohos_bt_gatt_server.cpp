@@ -203,6 +203,7 @@ public:
         writeInfo.value = characteristic.GetValue(&length).get();
         writeInfo.length = length;
         writeInfo.needRsp = true;
+        writeInfo.isPrep = false;
         HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d, valueLen: %{public}d",
             iter->first, requestId, writeInfo.attrHandle, writeInfo.length);
         if (g_GattsCallback != NULL && g_GattsCallback->requestWriteCb != NULL) {
@@ -259,6 +260,7 @@ public:
         writeInfo.value = descriptor.GetValue(&length).get();
         writeInfo.length = length;
         writeInfo.needRsp = true;
+        writeInfo.isPrep = false;
         if (g_GattsCallback != NULL && g_GattsCallback->requestWriteCb != NULL) {
             g_GattsCallback->requestWriteCb(writeInfo);
         }
@@ -328,10 +330,6 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
         }
 
         std::vector<GattCharacteristic> &gattCharacteristics = gattService->GetCharacteristics();
-        int tempHandle = attrHandle;
-        if (isOffset) {
-            tempHandle -= GATTSERVICES(serverId, i).handleOffset;
-        }
 
         for (auto &character : gattCharacteristics) {
             if (character.GetHandle() == attrHandle) {

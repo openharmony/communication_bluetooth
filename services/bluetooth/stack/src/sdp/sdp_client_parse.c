@@ -680,7 +680,7 @@ static void SdpParseSearchResponse(const BtAddr *addr, uint16_t lcid, uint16_t t
     length = PacketSize(packet);
     if ((currentServiceRecordCount > totalServiceRecordCount) ||
         ((currentServiceRecordCount * SDP_SERVICE_RECORD_HANDLE_BYTE) >= length)) {
-        LOG_ERROR("current[%{public}d]， total[%{public}d] size[%{public}d]",
+        LOG_ERROR("current[%{public}d], total[%{public}d] size[%{public}d]",
             totalServiceRecordCount, currentServiceRecordCount, length);
         SdpCallbackError(addr, transactionId);
         return;
@@ -978,7 +978,7 @@ static int SdpGetCommonProtocolDescriptorEachList(SdpProtocolDescriptor *descrip
     while (currentLength) {
         if (bufferInfo->buffer[offset] == 0x35) {
             uint8_t type = 0x35;
-            pos = SdpGetLengthFromType(bufferInfo->buffer + offset + 1, type, &length);
+            SdpGetLengthFromType(bufferInfo->buffer + offset + 1, type, &length);
             if (bufferInfo->length < length) {
                 LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
                 return BT_BAD_PARAM;

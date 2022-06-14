@@ -58,7 +58,7 @@ const Packet *AvrcCtPassPacket::AssemblePacket(void)
     offset += PushOctets1((buffer + offset), (subunitType_ << AVRC_CT_PASS_MOVE_BIT_3) | subunitId_);
     offset += PushOctets1((buffer + offset), opCode_);
     offset += PushOctets1((buffer + offset), (stateFlag_ << AVRC_CT_PASS_MOVE_BIT_7) | operationId_);
-    offset += PushOctets1((buffer + offset), operationDataFieldLength_);
+    PushOctets1((buffer + offset), operationDataFieldLength_);
 
     return pkt_;
 }
@@ -74,12 +74,12 @@ bool AvrcCtPassPacket::DisassemblePacket(Packet *pkt)
 
         uint16_t offset = 0x00;
         uint64_t payload = 0x00;
-        offset += PopOctets1((buffer + offset), payload);
+        PopOctets1((buffer + offset), payload);
         crCode_ = static_cast<uint8_t>(payload) & 0b00001111;
 
         /// Gets the company ID, because other operands are the default values.
         offset = AVRC_CT_PASS_OPERATION_ID_OFFSET;
-        offset += PopOctets1((buffer + offset), payload);
+        PopOctets1((buffer + offset), payload);
         stateFlag_ = (static_cast<uint8_t>(payload) >> AVRC_CT_PASS_MOVE_BIT_7);
         operationId_ = (static_cast<uint8_t>(payload) & 0b01111111);
 

@@ -74,7 +74,7 @@ Packet *AvrcCtNotifyPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets1((bufferPtr + offset), eventId_);
     LOG_DEBUG("[AVRCP CT] eventId_[%x]", eventId_);
 
-    offset += PushOctets4((bufferPtr + offset), interval_);
+    PushOctets4((bufferPtr + offset), interval_);
     LOG_DEBUG("[AVRCP CT] interval_[%{public}d]", interval_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -97,7 +97,7 @@ bool AvrcCtNotifyPacket::DisassembleParameters(uint8_t *buffer)
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
     payload = 0x00;
-    offset += PopOctets1((buffer + offset), payload);
+    PopOctets1((buffer + offset), payload);
     eventId_ = static_cast<uint8_t>(payload);
     LOG_DEBUG("[AVRCP CT] eventId_[%x]", eventId_);
 
@@ -147,7 +147,7 @@ bool AvrcCtNotifyPacket::DisassemblePlaybackStatus(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_NOTIFY_EVENT_ID_OFFSET + AVRC_CT_NOTIFY_EVENT_ID_SIZE;
     uint64_t payload = 0x00;
-    offset += PopOctets1((buffer + offset), payload);
+    PopOctets1((buffer + offset), payload);
     playStatus_ = static_cast<uint8_t>(payload);
     LOG_DEBUG("[AVRCP CT] playStatus_[%x]", playStatus_);
 
@@ -164,7 +164,7 @@ bool AvrcCtNotifyPacket::DisassembleTrackChanged(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_NOTIFY_EVENT_ID_OFFSET + AVRC_CT_NOTIFY_EVENT_ID_SIZE;
     uint64_t payload = 0x00;
-    offset += PopOctets8((buffer + offset), payload);
+    PopOctets8((buffer + offset), payload);
     uid_ = payload;
     LOG_DEBUG("[AVRCP CT] uid_[%jx]", uid_);
 
@@ -181,7 +181,7 @@ bool AvrcCtNotifyPacket::DisassemblePlaybackPosChanged(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_NOTIFY_EVENT_ID_OFFSET + AVRC_CT_NOTIFY_EVENT_ID_SIZE;
     uint64_t payload = 0x00;
-    offset += PopOctets4((buffer + offset), payload);
+    PopOctets4((buffer + offset), payload);
     playbackPos_ = static_cast<uint32_t>(payload);
     LOG_DEBUG("[AVRCP CT] playbackPos_[%{public}d]", playbackPos_);
 
@@ -232,7 +232,7 @@ bool AvrcCtNotifyPacket::DisassembleAddressedPlayerChanged(uint8_t *buffer)
     LOG_DEBUG("[AVRCP CT] playerId_[%x]", playerId_);
 
     payload = 0x00;
-    offset += PopOctets2((buffer + offset), payload);
+    PopOctets2((buffer + offset), payload);
     uidCounter_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] uidCounter_[%x]", uidCounter_);
 
@@ -249,7 +249,7 @@ bool AvrcCtNotifyPacket::DisassembleUidsChanged(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_NOTIFY_EVENT_ID_OFFSET + AVRC_CT_NOTIFY_EVENT_ID_SIZE;
     uint64_t payload = 0x00;
-    offset += PopOctets2((buffer + offset), payload);
+    PopOctets2((buffer + offset), payload);
     uidCounter_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] uidCounter_[%x]", uidCounter_);
 
@@ -266,7 +266,7 @@ bool AvrcCtNotifyPacket::DisassembleVolumeChanged(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_NOTIFY_EVENT_ID_OFFSET + AVRC_CT_NOTIFY_EVENT_ID_SIZE;
     uint64_t payload = 0x00;
-    offset += PopOctets1((buffer + offset), payload);
+    PopOctets1((buffer + offset), payload);
     volume_ = static_cast<uint8_t>(payload) & 0b01111111;
     LOG_DEBUG("[AVRCP CT] volume_[%{public}d]", volume_);
 
