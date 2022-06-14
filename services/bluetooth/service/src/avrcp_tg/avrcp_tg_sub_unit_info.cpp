@@ -63,7 +63,7 @@ const Packet *AvrcTgSubUnitPacket::AssemblePacket(void)
     offset += PushOctets1((buffer + offset), AVRC_TG_SUB_UNIT_OCTET_4);
     offset += PushOctets1((buffer + offset), AVRC_TG_SUB_UNIT_OCTET_4);
     offset += PushOctets1((buffer + offset), AVRC_TG_SUB_UNIT_OCTET_4);
-    offset += PushOctets1((buffer + offset), AVRC_TG_SUB_UNIT_OCTET_4);
+    PushOctets1((buffer + offset), AVRC_TG_SUB_UNIT_OCTET_4);
 
     return pkt_;
 }

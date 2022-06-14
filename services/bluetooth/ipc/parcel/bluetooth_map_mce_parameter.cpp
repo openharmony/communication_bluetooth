@@ -442,7 +442,7 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     }
 
     if (tempInt != 0) {
-        status = ReadFromParcelIProfileMapVcard(parcel, vcard);
+        ReadFromParcelIProfileMapVcard(parcel, vcard);
         msgStruct.originator_.push_back(vcard);
     }
 
@@ -452,7 +452,7 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     }
 
     for (i = 0; i < tempInt; i++) {
-        status = ReadFromParcelIProfileMapVcard(parcel, vcard);
+        ReadFromParcelIProfileMapVcard(parcel, vcard);
         msgStruct.envelope_.recipientLevel1_.push_back(vcard);
     }
 
@@ -462,7 +462,7 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     }
 
     for (i = 0; i < tempInt; i++) {
-        status = ReadFromParcelIProfileMapVcard(parcel, vcard);
+        ReadFromParcelIProfileMapVcard(parcel, vcard);
         msgStruct.envelope_.recipientLevel2_.push_back(vcard);
     }
 
@@ -472,7 +472,7 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     }
 
     for (i = 0; i < tempInt; i++) {
-        status = ReadFromParcelIProfileMapVcard(parcel, vcard);
+        ReadFromParcelIProfileMapVcard(parcel, vcard);
         msgStruct.envelope_.recipientLevel3_.push_back(vcard);
     }
 

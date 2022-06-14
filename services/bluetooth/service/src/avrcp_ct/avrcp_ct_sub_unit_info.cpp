@@ -63,7 +63,7 @@ const Packet *AvrcCtSubUnitPacket::AssemblePacket(void)
     offset += PushOctets1((buffer + offset), AVRC_CT_SUB_UNIT_OCTET_4);
     offset += PushOctets1((buffer + offset), AVRC_CT_SUB_UNIT_OCTET_4);
     offset += PushOctets1((buffer + offset), AVRC_CT_SUB_UNIT_OCTET_4);
-    offset += PushOctets1((buffer + offset), AVRC_CT_SUB_UNIT_OCTET_4);
+    PushOctets1((buffer + offset), AVRC_CT_SUB_UNIT_OCTET_4);
 
     return pkt_;
 }
@@ -79,7 +79,7 @@ bool AvrcCtSubUnitPacket::DisassemblePacket(Packet *pkt)
 
         uint16_t offset = AVRC_CT_AVC_COMMON_CTYPE_OFFSET;
         uint64_t payload = 0x00;
-        offset += PopOctets1((buffer + offset), payload);
+        PopOctets1((buffer + offset), payload);
         crCode_ = static_cast<uint8_t>(payload) & 0b00001111;
         isValid = true;
     } else {

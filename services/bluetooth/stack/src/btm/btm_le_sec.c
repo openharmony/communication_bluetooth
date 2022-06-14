@@ -615,7 +615,7 @@ int BTM_GetRemoteIdentityAddress(const BtAddr *addr, BtAddr *identityAddress)
 
 int BTM_GetPairdAddressFromRemoteIdentityAddress(const BtAddr *identityAddress, BtAddr *addr)
 {
-    if (addr == NULL && identityAddress == NULL) {
+    if (addr == NULL || identityAddress == NULL) {
         return BT_BAD_PARAM;
     }
 

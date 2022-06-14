@@ -96,7 +96,7 @@ const Packet *AvrcCtSbpPacket::AssemblePacket(void)
     offset += PushOctets2((buffer + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets2((buffer + offset), playerId_);
+    PushOctets2((buffer + offset), playerId_);
     LOG_DEBUG("[AVRCP CT] playerId_[%x]", playerId_);
 
     return pkt_;
@@ -232,7 +232,7 @@ const Packet *AvrcCtCpPacket::AssemblePacket(void)
     offset += PushOctets1((buffer + offset), direction_);
     LOG_DEBUG("[AVRCP CT] direction_[%x]", direction_);
 
-    offset += PushOctets8((buffer + offset), folderUid_);
+    PushOctets8((buffer + offset), folderUid_);
     LOG_DEBUG("[AVRCP CT] folderUid_[%jx]", folderUid_);
 
     return pkt_;
@@ -261,7 +261,7 @@ bool AvrcCtCpPacket::DisassemblePacket(Packet *pkt)
         status_ = static_cast<uint8_t>(payload);
         LOG_DEBUG("[AVRCP CT] status_[%x]", status_);
 
-        offset += PopOctets4((buffer + offset), payload);
+        PopOctets4((buffer + offset), payload);
         numOfItems_ = static_cast<uint32_t>(payload);
         LOG_DEBUG("[AVRCP CT] numOfItems_[%{public}d]", numOfItems_);
 
@@ -815,7 +815,7 @@ const Packet *AvrcCtGtnoiPacket::AssemblePacket(void)
     offset += PushOctets2((buffer + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets1((buffer + offset), scope_);
+    PushOctets1((buffer + offset), scope_);
     LOG_DEBUG("[AVRCP CT] scope_[%x]", scope_);
 
     return pkt_;
@@ -848,7 +848,7 @@ bool AvrcCtGtnoiPacket::DisassemblePacket(Packet *pkt)
         uidCounter_ = static_cast<uint16_t>(payload);
         LOG_DEBUG("[AVRCP CT] uidCounter_[%{public}d]", uidCounter_);
 
-        offset += PopOctets4((buffer + offset), payload);
+        PopOctets4((buffer + offset), payload);
         numOfItems_ = static_cast<uint32_t>(payload);
         LOG_DEBUG("[AVRCP CT] numOfItems_[%{public}d]", numOfItems_);
 

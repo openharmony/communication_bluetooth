@@ -1134,14 +1134,16 @@ static SignatureRequestInfo *GapAllocSignatureRequestInfo(
 int GAP_LeDataSignatureGeneration(
     const BtAddr *addr, GapSignatureData dataInfo, GAPSignatureGenerationResult callback, void *context)
 {
+    if (callback == NULL) {
+        return GAP_ERR_INVAL_PARAM;
+    }
     uint8_t signature[GAP_SIGNATURE_SIZE] = {0};
-
     if (GapIsLeEnable() == false) {
         callback(GAP_SIGNATURE_ERR_EXECUTION, signature, context);
         return GAP_ERR_NOT_ENABLE;
     }
 
-    if (callback == NULL || addr == NULL) {
+    if (addr == NULL) {
         callback(GAP_SIGNATURE_ERR_EXECUTION, signature, context);
         return GAP_ERR_INVAL_PARAM;
     }
@@ -1234,6 +1236,9 @@ static void GapDoCallbackSignCounterChange(SignatureRequestInfo *info)
         } else if (info->type == SIGNATURE_CONFIRMATION) {
             signKey = &deviceInfo->remoteSigningInfo;
             signCounterType = REMOTE_SIGN_COUNTER;
+        }
+        if (signKey == NULL) {
+            return;
         }
         signKey->counter = info->counter + 1;
 

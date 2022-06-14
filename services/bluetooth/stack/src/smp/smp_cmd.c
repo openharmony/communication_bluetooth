@@ -43,7 +43,6 @@ int SMP_SendPairingRequest(uint16_t handle, const SMP_PairParam *pairReqParam, S
     PacketPayloadWrite(pkt, &pairReqParam->initKeyDist, offset, sizeof(pairReqParam->initKeyDist));
     offset += sizeof(pairReqParam->initKeyDist);
     PacketPayloadWrite(pkt, &pairReqParam->respKeyDist, offset, sizeof(pairReqParam->respKeyDist));
-    offset += sizeof(pairReqParam->respKeyDist);
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -75,7 +74,6 @@ int SMP_SendPairingResponse(uint16_t handle, const SMP_PairParam *pairRspParam, 
     PacketPayloadWrite(pkt, &pairRspParam->initKeyDist, offset, sizeof(pairRspParam->initKeyDist));
     offset += sizeof(pairRspParam->initKeyDist);
     PacketPayloadWrite(pkt, &pairRspParam->respKeyDist, offset, sizeof(pairRspParam->respKeyDist));
-    offset += sizeof(pairRspParam->respKeyDist);
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -99,7 +97,6 @@ int SMP_SendPairingConfirm(uint16_t handle, const uint8_t *confirm, SMP_SendData
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, confirm, offset, SMP_CONFIRM_DATA_LEN);
-    offset += SMP_CONFIRM_DATA_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -124,7 +121,6 @@ int SMP_SendPairingRandom(uint16_t handle, const uint8_t *random, SMP_SendDataCb
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, random, offset, SMP_RANDOM_DATA_LEN);
-    offset += SMP_RANDOM_DATA_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -149,7 +145,6 @@ int SMP_SendPairingFailed(uint16_t handle, uint8_t reason, SMP_SendDataCb cb)
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, &reason, offset, sizeof(reason));
-    offset += sizeof(reason);
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -174,7 +169,6 @@ int SMP_SendPairingPublicKey(uint16_t handle, const uint8_t *publicKey, SMP_Send
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, publicKey, offset, SMP_PUBLICKEY_LEN);
-    offset += SMP_PUBLICKEY_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -199,7 +193,6 @@ int SMP_SendPairingDHKeyCheck(uint16_t handle, const uint8_t *dhKeyCheck, SMP_Se
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, dhKeyCheck, offset, SMP_DHKEY_CHECK_LEN);
-    offset += SMP_DHKEY_CHECK_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -224,7 +217,6 @@ int SMP_SendEncryptionInformation(uint16_t handle, const uint8_t *ltk, SMP_SendD
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, ltk, offset, SMP_LTK_LEN);
-    offset += SMP_LTK_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -254,7 +246,6 @@ int SMP_SendMasterIdentification(uint16_t handle, uint16_t ediv, const uint8_t *
     PacketPayloadWrite(pkt, edivBuf, offset, sizeof(edivBuf));
     offset += sizeof(edivBuf);
     PacketPayloadWrite(pkt, rand, offset, SMP_MASTER_RAND_LEN);
-    offset += SMP_MASTER_RAND_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -279,7 +270,6 @@ int SMP_SendIdentityInformation(uint16_t handle, const uint8_t *irk, SMP_SendDat
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, irk, offset, SMP_IRK_LEN);
-    offset += SMP_IRK_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -306,7 +296,6 @@ int SMP_SendIdentityAddressInformation(uint16_t handle, const BtAddr *addr, SMP_
     PacketPayloadWrite(pkt, &addr->type, offset, sizeof(addr->type));
     offset += sizeof(addr->type);
     PacketPayloadWrite(pkt, addr->addr, offset, BT_ADDRESS_SIZE);
-    offset += BT_ADDRESS_SIZE;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -331,7 +320,6 @@ int SMP_SendSigningInformation(uint16_t handle, const uint8_t *csrk, SMP_SendDat
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, csrk, offset, SMP_CSRK_LEN);
-    offset += SMP_CSRK_LEN;
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {
@@ -356,7 +344,6 @@ int SMP_SendSecurityRequest(uint16_t handle, uint8_t authReq, SMP_SendDataCb cb)
     PacketPayloadWrite(pkt, &code, offset, sizeof(code));
     offset += sizeof(code);
     PacketPayloadWrite(pkt, &authReq, offset, sizeof(authReq));
-    offset += sizeof(authReq);
 
     int ret = SMP_SendData(handle, pkt, cb);
     if (ret != SMP_SUCCESS) {

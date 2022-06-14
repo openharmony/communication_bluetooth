@@ -182,6 +182,7 @@ napi_value SysStopBLEScan(napi_env env, napi_callback_info info)
         SysStopBLEScanComplete, static_cast<void *>(pContext), &pContext->work);
     if (status != napi_ok) {
         delete pContext;
+        return NapiGetNull(env);
     }
 
     if (napi_queue_async_work(env, pContext->work) != napi_ok) {

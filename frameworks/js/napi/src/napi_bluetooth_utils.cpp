@@ -947,7 +947,7 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     ParseBool(env, sppOption->secure_, value);
     HILOGI("secure is %{public}d", sppOption->secure_);
 
-    int type;
+    int type = 0;
     napi_create_string_utf8(env, "type", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseInt32(env, type, value);

@@ -810,6 +810,9 @@ static void GapAuthenticationWaitRetryTimeout(void *parameter)
 
 void GapAuthenticationClearInfo(RequestSecInfo *reqInfo)
 {
+    if (reqInfo == NULL) {
+        return;
+    }
     if (reqInfo->waitRetryalarm != NULL) {
         AlarmCancel(reqInfo->waitRetryalarm);
         AlarmDelete(reqInfo->waitRetryalarm);
