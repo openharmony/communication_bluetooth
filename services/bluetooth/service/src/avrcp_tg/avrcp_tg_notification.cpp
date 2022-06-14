@@ -123,7 +123,7 @@ void AvrcTgNotifyPacket::AssemblePlaybackStatusChanged(Packet *pkt)
     offset += PushOctets1((bufferPtr + offset), eventId_);
     LOG_DEBUG("[AVRCP TG] eventId_[%hhx]", eventId_);
 
-    offset += PushOctets1((bufferPtr + offset), playStatus_);
+    PushOctets1((bufferPtr + offset), playStatus_);
     LOG_DEBUG("[AVRCP TG] playStatus_[%hhx]", playStatus_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -157,7 +157,7 @@ void AvrcTgNotifyPacket::AssembleTrackChanged(Packet *pkt)
     offset += PushOctets1((bufferPtr + offset), eventId_);
     LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
 
-    offset += PushOctets8((bufferPtr + offset), uid_);
+    PushOctets8((bufferPtr + offset), uid_);
     LOG_DEBUG("[AVRCP TG] uid_[%jx]", uid_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -191,7 +191,7 @@ void AvrcTgNotifyPacket::AssemblePlaybackPosChanged(Packet *pkt)
     offset += PushOctets1((bufferPtr + offset), eventId_);
     LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
 
-    offset += PushOctets4((bufferPtr + offset), playbackPos_);
+    PushOctets4((bufferPtr + offset), playbackPos_);
     LOG_DEBUG("[AVRCP TG] playbackPos_[%x]", playbackPos_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -283,7 +283,7 @@ void AvrcTgNotifyPacket::AssembleAddressedPlayerChanged(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), playerId_);
     LOG_DEBUG("[AVRCP TG] playerId_[%x]", playerId_);
 
-    offset += PushOctets2((bufferPtr + offset), uidCounter_);
+    PushOctets2((bufferPtr + offset), uidCounter_);
     LOG_DEBUG("[AVRCP TG] uidCounter_[%x]", uidCounter_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -317,7 +317,7 @@ void AvrcTgNotifyPacket::AssembleUidsChanged(Packet *pkt)
     offset += PushOctets1((bufferPtr + offset), eventId_);
     LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
 
-    offset += PushOctets2((bufferPtr + offset), uidCounter_);
+    PushOctets2((bufferPtr + offset), uidCounter_);
     LOG_DEBUG("[AVRCP TG] uidCounter_[%{public}d]", uidCounter_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -351,7 +351,7 @@ void AvrcTgNotifyPacket::AssembleVolumeChanged(Packet *pkt)
     offset += PushOctets1((bufferPtr + offset), eventId_);
     LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
 
-    offset += PushOctets1((bufferPtr + offset), volume_);
+    PushOctets1((bufferPtr + offset), volume_);
     LOG_DEBUG("[AVRCP TG] volume_[%x]", volume_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -378,7 +378,7 @@ void AvrcTgNotifyPacket::AssembleCommonChanged(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets1((bufferPtr + offset), eventId_);
+    PushOctets1((bufferPtr + offset), eventId_);
     LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -417,7 +417,7 @@ bool AvrcTgNotifyPacket::DisassembleParameters(uint8_t *buffer)
         }
 
         payload = 0x00;
-        offset += PopOctets4((buffer + offset), payload);
+        PopOctets4((buffer + offset), payload);
         interval_ = static_cast<uint32_t>(payload);
         LOG_DEBUG("[AVRCP TG] interval_[%u]", interval_);
 

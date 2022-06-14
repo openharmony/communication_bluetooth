@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1757,6 +1757,7 @@ uint8_t AvdtParseCategoryCodec(AvdtSepConfig *sepConfig, const Packet *pkt, uint
     offset += data;
     length += data;
     sepConfig->pscMask = (sepConfig->pscMask | AVDT_PSC_MSK_CODEC);
+    LOG_DEBUG("[AVDT]%{public}s:offset=%{public}d,length=%{public}d", __func__, offset, length);
     return length;
 }
 /**

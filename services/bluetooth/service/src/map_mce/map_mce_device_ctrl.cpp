@@ -177,9 +177,13 @@ void MapMceSdpSearchCb(
         return;
     }
     auto mceService = static_cast<MapMceService *>(serviceMgr->GetProfileService(PROFILE_NAME_MAP_MCE));
+    if (mceService == nullptr) {
+        LOG_ERROR("%{public}s mceService is nullptr", __PRETTY_FUNCTION__);
+        return;
+    }
     MapSdpMsgArgPrt *argPtr = new (std::nothrow)MapSdpMsgArgPrt;
-    if ((mceService == nullptr) || (argPtr == nullptr)) {
-        LOG_ERROR("%{public}s mceService is nullptr or argPtr is nullptr", __PRETTY_FUNCTION__);
+    if (argPtr == nullptr) {
+        LOG_ERROR("%{public}s argPtr is nullptr", __PRETTY_FUNCTION__);
         return;
     }
     MasSdpParam sdpSaveParam;

@@ -1308,13 +1308,11 @@ int AvrcpController::GetPlayerApplicationSettingAttributeText(
 
             for (auto attribute : attributes) {
                 if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
-                    result = RET_BAD_PARAM;
                     break;
                 }
 
                 if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN &&
                     attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
-                    result = RET_BAD_PARAM;
                     break;
                 }
 
