@@ -58,7 +58,7 @@ const Packet *AvrcTgBrowsePacket::AssemblePacket(void)
     offset += PushOctets2((buffer + offset), parameterLength_);
     LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets1((buffer + offset), status_);
+    PushOctets1((buffer + offset), status_);
     LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
 
     return pkt_;
@@ -85,7 +85,7 @@ bool AvrcTgBrowsePacket::IsValidParameterLength(Packet *pkt)
 
         uint16_t offset = AVRC_TG_BROWSE_PARAMETER_LENGTH_OFFSET;
         uint64_t payload = 0x00;
-        offset += PopOctets2((buffer + offset), payload);
+        PopOctets2((buffer + offset), payload);
         parameterLength_ = static_cast<uint32_t>(payload);
         LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
 
@@ -210,7 +210,7 @@ bool AvrcTgSbpPacket::DisassemblePacket(Packet *pkt)
                 parameterLength_ = static_cast<uint16_t>(payload);
                 LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
 
-                offset += PopOctets2((buffer + offset), payload);
+                PopOctets2((buffer + offset), payload);
                 playerId_ = static_cast<uint16_t>(payload);
                 LOG_DEBUG("[AVRCP TG] playerId_[%x]", playerId_);
 
@@ -272,7 +272,7 @@ const Packet *AvrcTgCpPacket::AssemblePacket(void)
     offset += PushOctets1((buffer + offset), status_);
     LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
 
-    offset += PushOctets4((buffer + offset), numOfItems_);
+    PushOctets4((buffer + offset), numOfItems_);
     LOG_DEBUG("[AVRCP TG] numOfItems_[%u]", numOfItems_);
 
     return pkt_;
@@ -315,7 +315,7 @@ bool AvrcTgCpPacket::DisassemblePacket(Packet *pkt)
                 break;
             }
 
-            offset += PopOctets8((buffer + offset), folderUid_);
+            PopOctets8((buffer + offset), folderUid_);
             LOG_DEBUG("[AVRCP TG] folderUid_[%jx]", folderUid_);
 
             isValid_ = true;
@@ -1008,7 +1008,7 @@ bool AvrcTgGtnoiPacket::DisassemblePacket(Packet *pkt)
             LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
 
             payload = 0x00;
-            offset += PopOctets1((buffer + offset), payload);
+            PopOctets1((buffer + offset), payload);
             scope_ = static_cast<uint8_t>(payload);
             LOG_DEBUG("[AVRCP TG] scope_[%x]", scope_);
             if (scope_ < AVRC_MEDIA_SCOPE_PLAYER_LIST || scope_ > AVRC_MEDIA_SCOPE_NOW_PLAYING) {

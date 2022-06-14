@@ -146,6 +146,7 @@ Thread *ThreadCreate(const char *name)
     promise->thread = thread;
     promise->sync = SemaphoreCreate(0);
     if (promise->sync == NULL) {
+        free(promise);
         goto ERROR;
     }
 

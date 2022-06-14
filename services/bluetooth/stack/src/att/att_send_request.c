@@ -1249,7 +1249,6 @@ static void AttSignedWriteCommandAsync(const void *context)
 
     uint16_t index = 0;
     int ret;
-    uint8_t signature[12] = {0};
     GapSignatureData gapSignatureDataObj;
     Buffer *sigedWriteBuffPtr = NULL;
     uint8_t *attValuePtr = NULL;
@@ -1271,7 +1270,7 @@ static void AttSignedWriteCommandAsync(const void *context)
         ClientCallbackBTBADPARAM(connect);
         goto ATTSIGNEDWRITECOMMAND_END;
     }
-
+    uint8_t signature[12] = {0};
     Packet *packet = PacketMalloc(0, 0, sizeof(uint8_t) + sizeof(uint16_t) + bufferSize + sizeof(signature));
     if (packet == NULL) {
         LOG_ERROR("point to NULL");

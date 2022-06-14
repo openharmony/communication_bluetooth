@@ -151,9 +151,6 @@ ssize_t Encoder::SBCEncode(const CodecParam &codecParam, const uint8_t* in, size
     UpdateCodecFormat(codecParam);
     int pcmSamples = frame_.subbands_ * frame_.blocks_;
 
-    if (iLength < frame_.codeSize_) {
-        iLength = 0;
-    }
     if (!out || oLength < frame_.length_) {
         return SBC_ERROR_INVALID_FRAME;
     }

@@ -95,7 +95,7 @@ uint16_t AvctBrConnectInitiate(AvctCbConn *cbConn)
             }
         }
     }
-    if (ret == AVCT_SUCCESS) {
+    if (ret == AVCT_SUCCESS && cbBr != NULL) {
         /* create br channel */
         AvctEvtData evtData;
         cbConn->cbDev->cbBr = cbBr;

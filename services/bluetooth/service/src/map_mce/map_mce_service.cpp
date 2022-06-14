@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,24 +73,23 @@ void MapMceGetSupportFeatureSdpSearchCb(
     int failedId = MSG_MCESERVICE_GET_SURPORT_FEATURES_FAILED;
     const SdpService *tempServicePointer = serviceAry;
     IProfileManager *serviceMgr = IProfileManager::GetInstance();
-    if ((serviceMgr == nullptr) || (addr == nullptr)) {
-        LOG_ERROR("%{public}s no service mgr:", __PRETTY_FUNCTION__);
+    if ((serviceMgr == nullptr) || (addr == nullptr) || (serviceNum == 0)) {
+        LOG_ERROR("%{public}s no service mgr, serviceNum= %{public}d", __PRETTY_FUNCTION__, int(serviceNum));
         return;
     }
     auto mnsService = static_cast<MapMceService *>(serviceMgr->GetProfileService(PROFILE_NAME_MAP_MCE));
+    if (mnsService == nullptr) {
+        LOG_ERROR("%{public}s mnsService is nullptr", __PRETTY_FUNCTION__);
+        return;
+    }
     BtAddr *argPrt = new (std::nothrow)BtAddr;
-    if ((mnsService == nullptr) || (argPrt == nullptr)) {
-        LOG_ERROR("%{public}s mnsService is nullptr or argPrt is nullptr", __PRETTY_FUNCTION__);
+    if (argPrt == nullptr) {
+        LOG_ERROR("%{public}s argPrt is nullptr", __PRETTY_FUNCTION__);
         return;
     }
     utility::Message msg(failedId);
     *argPrt = *addr;
     msg.arg2_ = (void *)argPrt;
-    if ((serviceAry == nullptr) || (serviceNum == 0)) {
-        mnsService->PostMessage(msg);
-        LOG_ERROR("%{public}s service error,serviceAry is NULL or serviceNum =%{public}d", __PRETTY_FUNCTION__, int(serviceNum));
-        return;
-    }
     for (int serviceCount = 0; serviceCount < serviceNum; serviceCount++, tempServicePointer++) {
         // check param array
         if (tempServicePointer->attributeNumber == 0) {
@@ -340,7 +339,7 @@ int MapMceService::GetSupportedFeatures(const RawAddress &device)
 int MapMceService::SendMessage(const RawAddress &device, const IProfileSendMessageParameters &msg)
 {
     LOG_INFO("%{public}s enter", __PRETTY_FUNCTION__);
-    // if version_property is 1.1 ， need check the device's version
+    // if version_property is 1.1, need check the device's version
     if ((msg.Charset == MapCharsetType::INVALID) || (msg.bmessage_.folder_property == u"")) {
         LOG_ERROR("%{public}s Charset or Folder null", __PRETTY_FUNCTION__);
         return RET_BAD_PARAM;

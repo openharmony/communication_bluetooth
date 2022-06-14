@@ -503,7 +503,7 @@ void PacketAssemble(const Packet *uplayer, const Packet *downlayer)
         upLast = upLast->next;
     }
 
-    if (upLast != NULL) {
+    if (upLast != NULL && refPacket->payload != NULL) {
         upLast->next = refPacket->payload;
         refPacket->payload->prev = upLast;
     }

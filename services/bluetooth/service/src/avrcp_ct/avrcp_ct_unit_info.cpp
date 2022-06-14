@@ -53,7 +53,7 @@ const Packet *AvrcCtUnitPacket::AssemblePacket(void)
     offset += PushOctets1((buffer + offset), AVRC_CT_UNIT_OCTET_3);
     offset += PushOctets1((buffer + offset), AVRC_CT_UNIT_OCTET_3);
     offset += PushOctets1((buffer + offset), AVRC_CT_UNIT_OCTET_3);
-    offset += PushOctets1((buffer + offset), AVRC_CT_UNIT_OCTET_3);
+    PushOctets1((buffer + offset), AVRC_CT_UNIT_OCTET_3);
 
     return pkt_;
 }
@@ -69,11 +69,11 @@ bool AvrcCtUnitPacket::DisassemblePacket(Packet *pkt)
 
         uint16_t offset = AVRC_CT_AVC_COMMON_CTYPE_OFFSET;
         uint64_t payload = 0x00;
-        offset += PopOctets1((buffer + offset), payload);
+        PopOctets1((buffer + offset), payload);
         crCode_ = static_cast<uint8_t>(payload) & 0b00001111;
 
         offset = AVRC_CT_UNIT_COMPANY_ID_OFFSET;
-        offset += PopOctets3((buffer + offset), payload);
+        PopOctets3((buffer + offset), payload);
         companyId_ = static_cast<uint32_t>(payload);
         isValid_ = true;
     } else {
