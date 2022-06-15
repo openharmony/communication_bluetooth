@@ -35,6 +35,7 @@
 #include "bluetooth_pbap_pce_server.h"
 #include "bluetooth_pbap_pse_server.h"
 #include "bluetooth_socket_server.h"
+#include "bluetooth_utils_server.h"
 #include "file_ex.h"
 #include "hisysevent.h"
 #include "interface_adapter_manager.h"
@@ -1023,15 +1024,17 @@ std::vector<BluetoothRawAddress> BluetoothHostServer::GetPairedDevices(int32_t t
 
 bool BluetoothHostServer::RemovePair(int32_t transport, const sptr<BluetoothRawAddress> &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr:%{public}s, transport:%{public}d", GET_ENCRYPT_ADDR(*device), transport);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("check permission failed");
+        return false;
+    }
     if ((transport == BTTransport::ADAPTER_BREDR) && IsBtEnabled()) {
         return pimpl->classicService_->RemovePair(*device);
     } else if ((transport == BTTransport::ADAPTER_BLE) && IsBleEnabled()) {
         return pimpl->bleService_->RemovePair(*device);
     } else {
-        HILOGE("[%{public}s]: %{public}s() Parameter::transport invalid or BT current state is not enabled!",
-            __FILE__,
-            __FUNCTION__);
+        HILOGE("transport invalid or BT/BLE current state is not enabled!");
     }
     return false;
 }
