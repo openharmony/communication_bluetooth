@@ -306,8 +306,8 @@ config("btservice_config") {
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbccodecctrl/include",
     "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative/include/netsys",
     "//base/telephony/state_registry/frameworks/native/observer/include",
-    "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiocommon/include",
-    "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiomanager/include",
+    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocommon/include",
+    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiomanager/include",
   ]
 
   cflags_cc = [
@@ -370,7 +370,7 @@ ohos_shared_library("btservice") {
     "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//base/telephony/state_registry/frameworks/native/observer:tel_state_registry_api",
-    "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audiomanager:audio_client",
+    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiomanager:audio_client",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/libxml2:xml2",
   ]
