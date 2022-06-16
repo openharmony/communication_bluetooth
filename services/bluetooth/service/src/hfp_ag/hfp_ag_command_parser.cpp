@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ void HfpAgCommandParser::Parse(HfpAgDataConnection &dataConn, std::vector<uint8_
     int cmdType = HFP_AG_CMD_UNKNOWN;
 
     if (data.empty() == true) {
-        LOG_DEBUG("[HFP AG]%{public}s():data is nullptr", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():data is nullptr", __FUNCTION__);
         return;
     }
 
@@ -79,7 +79,7 @@ int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
 {
     HfpAgCommandParser::CommandPosition position {0, 0, 0, 0, 0, false, false};
     GetCommandPosition(data, len, position);
-    LOG_DEBUG("[HFP AG]%{public}s():headValid[%{public}d], tailValid[%{public}d], startPos[%hu], setPos[%hu], getPos[%hu], endPos[%hu]",
+    LOG_INFO("[HFP AG]%{public}s():headValid[%{public}d], tailValid[%{public}d], startPos[%hu], setPos[%hu], getPos[%hu], endPos[%hu]",
         __FUNCTION__,
         position.headValid,
         position.tailValid,
@@ -91,7 +91,7 @@ int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
     if (!position.headValid || !position.tailValid || position.endPos < HFP_AG_AT_HEAD_SIZE ||
         (position.setPos >= position.endPos) || (position.getPos >= position.endPos)) {
         cmdLen = position.pos;
-        LOG_DEBUG("[HFP AG]%{public}s():HFP_AG_CMD_INVALID", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():HFP_AG_CMD_INVALID", __FUNCTION__);
         return HFP_AG_CMD_INVALID;
     }
 
@@ -121,7 +121,7 @@ int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
     } else {
         type = HFP_AG_CMD_UNKNOWN;
     }
-    LOG_DEBUG(
+    LOG_INFO(
         "[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], type[%{public}d], cmdLen[%zu]",
         __FUNCTION__, cmd.c_str(), arg.c_str(), type, cmdLen);
     return type;
@@ -168,6 +168,6 @@ void HfpAgCommandParser::ExtractArg(std::string &cmd, std::string &arg) const
             break;
         }
     }
-    LOG_DEBUG("[HFP AG]%{public}s():cmd[%{public}s] arg[%{public}s]", __FUNCTION__, cmd.c_str(), arg.c_str());
+    LOG_INFO("[HFP AG]%{public}s():cmd[%{public}s] arg[%{public}s]", __FUNCTION__, cmd.c_str(), arg.c_str());
 }
 }  // namespace bluetooth
