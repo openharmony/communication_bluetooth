@@ -549,9 +549,9 @@ public:
     ~ScanSettings(){};
 
     /**
-     * @brief Set repport delay time.
+     * @brief Set report delay time.
      *
-     * @param reportDelayMillis Repport delay time.
+     * @param reportDelayMillis Report delay time.
      * @since 6
      */
     void SetReportDelay(long reportDelayMillis)
@@ -560,9 +560,9 @@ public:
     }
 
     /**
-     * @brief Get repport delay time.
+     * @brief Get report delay time.
      *
-     * @return Returns Repport delay time.
+     * @return Returns Report delay time.
      * @since 6
      */
     long GetReportDelayMillisValue() const

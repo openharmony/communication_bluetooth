@@ -32,7 +32,7 @@ typedef struct Queue {
 Queue *QueueCreate(uint32_t capacity)
 {
     if (capacity == 0) {
-        LOG_WARN("[QueueCreate]queue capacity cant be 0 or less than 0");
+        LOG_WARN("[QueueCreate]queue capacity can't be 0 or less than 0");
         return NULL;
     }
     Queue *queue = (Queue *)calloc(1, (sizeof(Queue)));

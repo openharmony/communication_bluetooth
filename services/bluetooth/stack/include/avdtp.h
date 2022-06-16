@@ -23,7 +23,7 @@
 /**
  * @file avdtp.h
  *
- * @brief AVDT protocal Interface.
+ * @brief AVDT protocol Interface.
  *
  * @since 6.0
  */
@@ -151,7 +151,7 @@ extern "C" {
 #define AVDT_GETCONFIG_IND_EVT 27     // get Configuration indication
 #define AVDT_GET_ALLCAP_CFM_EVT 28    // Get all capabilities confirm
 #define AVDT_GET_ALLCAP_IND_EVT 29    // Get all capabilities indication
-#define AVDT_CLOSE_TRANS_IND_EVT 30   // Recevie transport released inication
+#define AVDT_CLOSE_TRANS_IND_EVT 30   // Receive transport released inication
 #define AVDT_MAX_EVT (AVDT_CLOSE_TRANS_IND_EVT)
 
 #define AVDT_PSM 0x0019  // PSM for AVDT
@@ -303,14 +303,14 @@ typedef union {
 } AvdtCtrlData;
 
 /**
- * @brief       Protocal Message data callback function
+ * @brief       Protocol Message data callback function
  * @details     This is the callback function used by AVDTP to report received AV control messages.
  * @param[in]   handle    Stream handle
  * @param[in]   bdAddr    Peer device address
  * @param[in]   event     Indication/Confirm event of message
  * @param[in]   data      Avdt event data
  * @param[in]   role      Local instance role
- * @reutrn      @c void
+ * @return      @c void
  */
 typedef void (*AvdtCtrlCallback)(
     uint16_t handle, const BtAddr *bdAddr, uint8_t event, const AvdtCtrlData *data, uint8_t role);
@@ -323,7 +323,7 @@ typedef void (*AvdtCtrlCallback)(
  * @param[in]   timeStamp       Timestamp of frame
  * @param[in]   pt              Packet type
  * @param[in]   streamHandle    Stream handle
- * @reutrn      @c void
+ * @return      @c void
  */
 typedef void (*AVDT_SinkDataCallback)(
     uint16_t handle, Packet *pkt, uint32_t timeStamp, uint8_t pt, uint16_t streamHandle);
