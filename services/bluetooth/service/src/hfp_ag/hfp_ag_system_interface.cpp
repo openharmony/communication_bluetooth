@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ HfpAgSystemInterface &HfpAgSystemInterface::GetInstance()
 
 void HfpAgSystemInterface::Start()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     QueryAgIndicator();
     RegisterObserver();
     DelayedSingleton<BluetoothCallClient>::GetInstance()->Init();
@@ -45,7 +45,7 @@ void HfpAgSystemInterface::Start()
 
 void HfpAgSystemInterface::Stop()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     UnregisterObserver();
     DelayedSingleton<BluetoothCallClient>::GetInstance()->UnInit();
     slotId_ = 0;
@@ -63,13 +63,13 @@ void HfpAgSystemInterface::Stop()
 
 void HfpAgSystemInterface::RegisterObserver()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     if (observer_ == nullptr) {
         observer_ = new (std::nothrow) AgTelephonyObserver(*this);
     }
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
         return;
     }
     TelephonyObserverClient::GetInstance().AddStateObserver(observer_, slotId_,
@@ -79,13 +79,13 @@ void HfpAgSystemInterface::RegisterObserver()
 
 void HfpAgSystemInterface::UnregisterObserver()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     if (observer_ == nullptr) {
         return;
     }
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
         return;
     }
     TelephonyObserverClient::GetInstance().RemoveStateObserver(slotId_,
@@ -94,13 +94,13 @@ void HfpAgSystemInterface::UnregisterObserver()
 
 void HfpAgSystemInterface::RejectCall(const std::string &address) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     DelayedSingleton<BluetoothCallClient>::GetInstance()->RejectCall();
 }
 
 void HfpAgSystemInterface::DialOutCall(const std::string &address, const std::string &number) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     AppExecFwk::PacMap extras;
     std::u16string u16number = Str8ToStr16(number);
     DelayedSingleton<CallManagerClient>::GetInstance()->DialCall(u16number, extras);
@@ -108,19 +108,19 @@ void HfpAgSystemInterface::DialOutCall(const std::string &address, const std::st
 
 void HfpAgSystemInterface::HangupCall(const std::string &address) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     DelayedSingleton<BluetoothCallClient>::GetInstance()->HangUpCall();
 }
 
 void HfpAgSystemInterface::AnswerCall(const std::string &address) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     DelayedSingleton<BluetoothCallClient>::GetInstance()->AnswerCall();
 }
 
 bool HfpAgSystemInterface::SendDtmf(int dtmf, const std::string &address) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     char str = dtmf + '0';
     if (!DelayedSingleton<BluetoothCallClient>::GetInstance()->StartDtmf(str)) {
         return false;
@@ -131,7 +131,7 @@ bool HfpAgSystemInterface::SendDtmf(int dtmf, const std::string &address) const
 
 bool HfpAgSystemInterface::HoldCall(int chld) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     if (!DelayedSingleton<BluetoothCallClient>::GetInstance()->HoldCall()) {
         return false;
     }
@@ -142,14 +142,14 @@ std::string HfpAgSystemInterface::GetNetworkOperator()
 {
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
         sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
         if (netWorkState != nullptr) {
             operatorName_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->GetLongOperatorName();
-            LOG_DEBUG("[HFP AG]%{public}s(): operatorName_ is %{public}s",  __FUNCTION__, operatorName_.c_str());
+            LOG_INFO("[HFP AG]%{public}s(): operatorName_ is %{public}s",  __FUNCTION__, operatorName_.c_str());
         } else {
-            LOG_DEBUG("[HFP AG]%{public}s(): netWorkState is nullptr",  __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s(): netWorkState is nullptr",  __FUNCTION__);
         }
     }
     return operatorName_;
@@ -159,17 +159,17 @@ std::string HfpAgSystemInterface::GetSubscriberNumber()
 {
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
         subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
-        LOG_DEBUG("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
+        LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
     return subscriberNumber_;
 }
 
 bool HfpAgSystemInterface::QueryCurrentCallsList()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     std::vector<CallAttributeInfo> callList;
     HfpAgService *service = HfpAgService::GetService();
     if (service == nullptr) {
@@ -196,32 +196,32 @@ bool HfpAgSystemInterface::QueryCurrentCallsList()
 
 void HfpAgSystemInterface::QueryPhoneState() const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     DelayedSingleton<BluetoothCallClient>::GetInstance()->GetCallState();
     return;
 }
 
 bool HfpAgSystemInterface::StartVoiceRecognition(const std::string &address) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     return stub::TelephoneService::GetInstance()->StartVoiceRecognition(address);
 }
 
 bool HfpAgSystemInterface::StopVoiceRecogition(const std::string &address) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     return stub::TelephoneService::GetInstance()->StopVoiceRecogition(address);
 }
 
 bool HfpAgSystemInterface::SetAudioParameters(const std::string &parameters) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     return stub::TelephoneService::GetInstance()->SetAudioParameters(parameters);
 }
 
 void HfpAgSystemInterface::SetStreamVolume(int streamType, int volume, int flag) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     stub::TelephoneService::GetInstance()->SetStreamVolume(streamType, volume, flag);
 }
 
@@ -235,9 +235,9 @@ std::string HfpAgSystemInterface::GetLastDialNumber()
 int HfpAgSystemInterface::GetServiceState()
 {
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
-    LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
+    LOG_INFO("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
         sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
         if (netWorkState != nullptr) {
@@ -250,17 +250,17 @@ int HfpAgSystemInterface::GetServiceState()
 
 int HfpAgSystemInterface::GetSignalStrength()
 {
-    LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
+    LOG_INFO("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
         if (!CoreServiceClient::GetInstance().GetSignalInfoList(slotId_).empty()) {
             signalStrength_ = CoreServiceClient::GetInstance().GetSignalInfoList(slotId_)[0]->GetSignalLevel();
         } else {
             signalStrength_ = 0;
-            LOG_DEBUG("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
         }
-        LOG_DEBUG("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
+        LOG_INFO("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
     }
     return signalStrength_;
 }
@@ -268,14 +268,14 @@ int HfpAgSystemInterface::GetSignalStrength()
 int HfpAgSystemInterface::GetRoamState()
 {
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
-    LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
+    LOG_INFO("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
         sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
         if (netWorkState != nullptr) {
             roamState_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->IsRoaming();
-            LOG_DEBUG("[HFP AG]%{public}s(): roamState_ is %{public}d",  __FUNCTION__, roamState_);
+            LOG_INFO("[HFP AG]%{public}s(): roamState_ is %{public}d",  __FUNCTION__, roamState_);
         }
     }
     return roamState_;
@@ -288,7 +288,7 @@ int HfpAgSystemInterface::GetBatteryLevel()
 
 void HfpAgSystemInterface::QueryAgIndicator()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     // No interface for querying battery level
     batteryLevel_ = 0;
     // query ag indicator for the other module.
@@ -298,32 +298,32 @@ void HfpAgSystemInterface::QueryAgIndicator()
     signalStrength_ = 0;
     subscriberNumber_ = "";
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
-    LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
+    LOG_INFO("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
     if (slotId_ < 0) {
-        LOG_DEBUG("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
         sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
         if (netWorkState != nullptr) {
             serviceState_ = static_cast<std::underlying_type<RegServiceState>::type>(netWorkState->GetRegStatus());
-            LOG_DEBUG("[HFP AG]%{public}s(): serviceState_ is %{public}d",  __FUNCTION__, serviceState_);
+            LOG_INFO("[HFP AG]%{public}s(): serviceState_ is %{public}d",  __FUNCTION__, serviceState_);
             roamState_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->IsRoaming();
-            LOG_DEBUG("[HFP AG]%{public}s(): roamState_ is %{public}d",  __FUNCTION__, roamState_);
+            LOG_INFO("[HFP AG]%{public}s(): roamState_ is %{public}d",  __FUNCTION__, roamState_);
             operatorName_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->GetLongOperatorName();
-            LOG_DEBUG("[HFP AG]%{public}s(): operatorName_ is %{public}s",  __FUNCTION__, operatorName_.c_str());
+            LOG_INFO("[HFP AG]%{public}s(): operatorName_ is %{public}s",  __FUNCTION__, operatorName_.c_str());
         } else {
-            LOG_DEBUG("[HFP AG]%{public}s(): netWorkState is nullptr",  __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s(): netWorkState is nullptr",  __FUNCTION__);
         }
         LOG_DEBUG("[HFP AG]%{public}s(): serviceState_ is %{public}d",  __FUNCTION__, serviceState_);
         if (!CoreServiceClient::GetInstance().GetSignalInfoList(slotId_).empty()) {
             signalStrength_ = CoreServiceClient::GetInstance().GetSignalInfoList(slotId_)[0]->GetSignalLevel();
         } else {
             signalStrength_ = 0;
-            LOG_DEBUG("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
         }
-        LOG_DEBUG("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
+        LOG_INFO("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
         
         subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
-        LOG_DEBUG("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
+        LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
     SendServiceStateToService();
     SendRoamStateToService();
@@ -335,7 +335,7 @@ void HfpAgSystemInterface::QueryAgIndicator()
 
 void HfpAgSystemInterface::SendHfIndicator(const std::string &address, int indId, int indValue) const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     RawAddress device(address);
     HfpAgService *service = HfpAgService::GetService();
     if (service == nullptr) {
@@ -348,7 +348,7 @@ void HfpAgSystemInterface::SendHfIndicator(const std::string &address, int indId
         service->NotifyHfBatteryLevel(device, indValue);
         stub::TelephoneService::GetInstance()->NotifyHfBatteryLevel(indValue);
     } else {
-        LOG_DEBUG("[HFP AG]%{public}s():HF Indicator id:%{public}d", __FUNCTION__, indId);
+        LOG_INFO("[HFP AG]%{public}s():HF Indicator id:%{public}d", __FUNCTION__, indId);
     }
     return;
 }

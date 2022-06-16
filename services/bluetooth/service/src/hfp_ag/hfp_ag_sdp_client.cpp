@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,12 +107,12 @@ bool HfpAgSdpClient::FindAttributes(const std::string &remoteAddr, int role)
 
     if (!FindProfileVersion(it->second.services[num].profileDescriptors, info.remoteVersion)) {
         info.remoteVersion = HFP_AG_HFP_VERSION_1_1;
-        LOG_DEBUG("[HFP AG]%{public}s():Not found peer HFP version, using default version[1.1]", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():Not found peer HFP version, using default version[1.1]", __FUNCTION__);
     }
 
     if (!FindProfileFeatures(it->second.services[num].attributes, info.remoteFeatures)) {
         info.remoteFeatures = HFP_AG_HF_FEATURES_NONE;
-        LOG_DEBUG("[HFP AG]%{public}s():Not found peer HFP features, using default features", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():Not found peer HFP features, using default features", __FUNCTION__);
     }
     if (info.remoteFeatures & HFP_AG_HF_FEATURES_SUPPORT_WBS) {
         info.remoteCodec = HFP_AG_CODEC_MSBC;
@@ -211,7 +211,7 @@ bool HfpAgSdpClient::FindProtocolRfcomm(const std::vector<SdpProtocolDescriptor>
         if ((protocols[num].protocolUuid.uuid16 == UUID_PROTOCOL_RFCOMM) &&
             (protocols[num].parameter[0].type == SDP_TYPE_UINT_8)) {
             scn = static_cast<uint8_t>(protocols[num].parameter[0].value);
-            LOG_DEBUG("[HFP AG]%{public}s():Found rfcomm scn is [%hhu]", __FUNCTION__, scn);
+            LOG_INFO("[HFP AG]%{public}s():Found rfcomm scn is [%hhu]", __FUNCTION__, scn);
             return true;
         }
         num++;
@@ -239,7 +239,7 @@ bool HfpAgSdpClient::FindProfileFeatures(const std::vector<HfpAgSdpAttribute> &a
     while (num < attributes.size()) {
         if (attributes[num].attributeId == HFP_AG_SDP_ATTRIBUTE_SUPPORTED_FEATURES) {
             features = HFP_AG_HF_FEATURES_BRSF_MASK & attributes[num].attributeValue;
-            LOG_DEBUG("[HFP AG]%{public}s():Found profile features are [%hu]", __FUNCTION__, features);
+            LOG_INFO("[HFP AG]%{public}s():Found profile features are [%hu]", __FUNCTION__, features);
             return true;
         }
         num++;
