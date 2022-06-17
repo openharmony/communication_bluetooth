@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -728,7 +728,7 @@ int HfpAgProfile::ProcessCurrentCallStateIncominging(
 
 int HfpAgProfile::ProcessCurrentCallStateIdle(int numActive, int numHeld)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():Pre-CallState[%{public}s]", __FUNCTION__, GetCallState(preCallState_).c_str());
+    LOG_INFO("[HFP AG]%{public}s():Pre-CallState[%{public}s]", __FUNCTION__, GetCallState(preCallState_).c_str());
     dataConn_.ringTimer_->Stop();
     dataConn_.clipNumber_ = "";
     dataConn_.clipType_ = 0;
@@ -751,7 +751,7 @@ int HfpAgProfile::ProcessCurrentCallStateIdle(int numActive, int numHeld)
 
     auto isAudioConnected = HfpAgAudioConnection::IsAudioConnected(address_);
     if (numActive == 0 && numHeld == 0 && isAudioConnected == true) {
-        LOG_DEBUG("[HFP AG]%{public}s(): No call exist , disconnect sco", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): No call exist , disconnect sco", __FUNCTION__);
         HfpAgProfileEventSender::GetInstance().UpdateScoConnectState(address_, HFP_AG_DISCONNECT_AUDIO_EVT);
     }
 
