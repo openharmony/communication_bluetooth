@@ -221,7 +221,7 @@ ohos_shared_library("btstack") {
     "$PART_DIR/external:btdummy",
     "$PART_DIR/hardware:bluetooth_hdi_adapter",
     "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/openssl:libcrypto_static",
+    "//third_party/openssl:libcrypto_shared",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
