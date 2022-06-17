@@ -63,7 +63,7 @@ typedef void (*GenResPriAddrResult)(uint8_t result, const uint8_t addr[BT_ADDRES
 #define GAP_ADVERTISING_USE_WL_FOR_CONNECTION (0x02)
 #define GAP_ADVERTISING_USE_WL_FOR_BOTH (0x03)
 
-/// Entended Advertising property
+/// Intended Advertising property
 #define GAP_ADVERTISING_PROPERTY_CONNECTABLE (1 << 0)
 #define GAP_ADVERTISING_PROPERTY_SCANABLE (1 << 1)
 #define GAP_ADVERTISING_PROPERTY_DIRECTED (1 << 2)
@@ -72,14 +72,14 @@ typedef void (*GenResPriAddrResult)(uint8_t result, const uint8_t addr[BT_ADDRES
 #define GAP_ADVERTISING_PROPERTY_ANONYMOUS (1 << 5)
 #define GAP_ADVERTISING_PROPERTY_INCLUDE_TXPOWER (1 << 6)
 
-/// Entended Advertising data operation
+/// Intended Advertising data operation
 #define GAP_ADVERTISING_DATA_OPERATION_INTERMEDIATE (0x00)
 #define GAP_ADVERTISING_DATA_OPERATION_FIRST (0x01)
 #define GAP_ADVERTISING_DATA_OPERATION_LAST (0x02)
 #define GAP_ADVERTISING_DATA_OPERATION_COMPLETE (0x03)
 #define GAP_ADVERTISING_DATA_OPERATION_UNCHANGED (0x04)
 
-/// Entended Advertising PHY
+/// Intended Advertising PHY
 #define GAP_ADVERTISEMENT_PHY_NONE (0x00)
 #define GAP_ADVERTISEMENT_PHY_1M (0x01)
 #define GAP_ADVERTISEMENT_PHY_2M (0x02)
@@ -287,7 +287,7 @@ typedef struct {
     uint8_t ioCapability;   /// IO Capability
     uint8_t oobDataFlag;    /// OOB Authentication data present
     uint8_t authReq;        /// Authentication requirements
-    uint8_t maxEncKeySize;  /// Maxinum of Long Term Key size
+    uint8_t maxEncKeySize;  /// Maximum of Long Term Key size
     uint8_t initKeyDis;     /// Initiator Key Distribution / Generation
     uint8_t respKeyDis;     /// Responder Key Distribution / Generation
 } GapLePairFeature;
@@ -463,8 +463,8 @@ BTSTACK_API int GAPIF_LeSetStaticIdentityAddr(uint8_t addr[BT_ADDRESS_SIZE]);
 BTSTACK_API int GAPIF_LeGenResPriAddr(GenResPriAddrResult callback, void *context);
 
 /**
- * @brief       Read the maximum length of entended advertising data supported by the Controller
- * @param[out]  len                length of entended advertising data or scan response data
+ * @brief       Read the maximum length of intended advertising data supported by the Controller
+ * @param[out]  len                length of intended advertising data or scan response data
  * @return      @c BT_NO_ERROR      : The function is executed successfully.
  *              @c otherwise        : The function is not executed successfully.
  */
@@ -506,7 +506,7 @@ BTSTACK_API int GAPIF_LeExAdvSetRandAddr(uint8_t advHandle, const uint8_t addr[B
 /**
  * @brief       Set the advertising parameter used by advertising.
  * @param[in]   advHandle           used to identify an advertising set (0x00-0xEF)
- * @param[in]   properties          entended Advertising property
+ * @param[in]   properties          intended Advertising property
  * @param[in]   txPower            advertising TX power
  * @param[in]   advExParam          advertising parameter
  * @return      @c BT_NO_ERROR      : The function is executed successfully.
@@ -518,7 +518,7 @@ BTSTACK_API int GAPIF_LeExAdvSetParam(
 /**
  * @brief       Set the advertising data used by advertising.
  * @param[in]   advHandle           used to identify an advertising set (0x00-0xEF)
- * @param[in]   operation           entended Advertising operation
+ * @param[in]   operation           intended Advertising operation
  * @param[in]   fragmentPreference  fragment preference
  * @param[in]   advDataLength       advertising data length
  * @param[in]   advData             advertising data
@@ -531,7 +531,7 @@ BTSTACK_API int GAPIF_LeExAdvSetData(
 /**
  * @brief       Set the scan response data used by advertising.
  * @param[in]   advHandle           used to identify an advertising set (0x00-0xEF)
- * @param[in]   operation           entended Advertising operation
+ * @param[in]   operation           intended Advertising operation
  * @param[in]   fragmentPreference  fragment preference
  * @param[in]   scanResponseDataLen scan response data length
  * @param[in]   scanResponseData    scan response data
@@ -830,8 +830,8 @@ BTSTACK_API int GAPIF_LePair(const BtAddr *addr);
 BTSTACK_API int GAPIF_LeCancelPair(const BtAddr *addr);
 
 /**
- * @brief       Set mininum of Long Term Key size
- * @param[in]   minSize             mininum of Long Term Key size
+ * @brief       Set minimum of Long Term Key size
+ * @param[in]   minSize             minimum of Long Term Key size
  * @return      @c BT_NO_ERROR      : The function is executed successfully.
  *              @c otherwise        : The function is not executed successfully.
  */

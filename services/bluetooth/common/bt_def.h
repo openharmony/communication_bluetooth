@@ -34,7 +34,7 @@ constexpr int RET_NO_SPACE = -4;
 
 /*********************************************
  *
- * Bluetoot UUID Macro Define
+ * Bluetooth UUID Macro Define
  *
  *********************************************/
 const std::string BLUETOOTH_UUID_BASE_UUID = "00000000-0000-1000-8000-00805F9B34FB";
@@ -314,7 +314,7 @@ const int8_t BLE_ADV_TX_POWER_LOW_VALUE = -15;
 const int8_t BLE_ADV_TX_POWER_MEDIUM_VALUE = -7;
 const int8_t BLE_ADV_TX_POWER_HIGH_VALUE = 1;
 
-// Entended Advertising PHY
+// Intended Advertising PHY
 const uint8_t BLE_ADVERTISEMENT_PHY_NONE = 0x00;
 const uint8_t BLE_ADVERTISEMENT_PHY_1M = 0x01;
 const uint8_t BLE_ADVERTISEMENT_PHY_2M = 0x02;
@@ -828,8 +828,8 @@ enum AvrcMediaScope : uint8_t {
 };
 
 /**
- * @brief This enumeration declares the values of the browseable items.
- * @see Audio/Video Remote Control 1.6.2 Section 6.10.2 Browseable items.
+ * @brief This enumeration declares the values of the browsable items.
+ * @see Audio/Video Remote Control 1.6.2 Section 6.10.2 Browsable items.
  *
  * @since 6
  */

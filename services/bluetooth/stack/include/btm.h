@@ -100,7 +100,7 @@ int BTSTACK_API BTM_DeregisterCallbacks(const BtmCallbacks *callbacks);
  */
 
 /**
- * @brief Create ACL connetion to BR/EDR device.
+ * @brief Create ACL connection to BR/EDR device.
  *
  * @param addr The address of BR/EDR device.
  * @return Returns <b>BT_NO_ERROR</b> if the operation is successful; returns others if the operation fails.
@@ -116,7 +116,7 @@ int BTSTACK_API BTM_AclConnect(const BtAddr *addr);
 int BTSTACK_API BTM_AclCancelConnect(const BtAddr *addr);
 
 /**
- * @brief Create ACL connetion to LE device.
+ * @brief Create ACL connection to LE device.
  *
  * @param addr The address of LE device.
  * @return Returns <b>BT_NO_ERROR</b> if the operation is successful; returns others if the operation fails.
@@ -146,16 +146,16 @@ int BTSTACK_API BTM_SetLeConnectionModeToFast();
 int BTSTACK_API BTM_SetLeConnectionModeToSlow();
 
 /**
- * @brief Disconnect an ACL connetion.
+ * @brief Disconnect an ACL connection.
  *
  * @param connectionHandle The connection handle.
- * @param reason The reason for peer devcie.
+ * @param reason The reason for peer device.
  * @return Returns <b>BT_NO_ERROR</b> if the operation is successful; returns others if the operation fails.
  */
 int BTSTACK_API BTM_AclDisconnect(uint16_t connectionHandle, uint8_t reason);
 
 /**
- * @brief Add a reference to the ACL connetion.
+ * @brief Add a reference to the ACL connection.
  *
  * @param connectionHandle The connection handle.
  * @return Returns <b>BT_NO_ERROR</b> if the operation is successful; returns others if the operation fails.
@@ -163,14 +163,14 @@ int BTSTACK_API BTM_AclDisconnect(uint16_t connectionHandle, uint8_t reason);
 int BTSTACK_API BTM_AclAddRef(uint16_t connectionHandle);
 
 /**
- * @brief Release the reference to the ACL connetion.
+ * @brief Release the reference to the ACL connection.
  *
  * @param connectionHandle The connection handle.
  */
 void BTSTACK_API BTM_AclRelease(uint16_t connectionHandle);
 
 /**
- * @brief Get the transpot type of the ACL connetion.
+ * @brief Get the transpot type of the ACL connection.
  *
  * @param connectionHandle The connection handle.
  * @return <b>TRANSPORT_BREDR</b> or <b>TRANSPORT_LE</b>.
@@ -715,7 +715,7 @@ typedef struct {
 /**
  * @brief Modify SCO connection.
  *
- * @param param The parameters of modifing SCO connection.
+ * @param param The parameters of modifying SCO connection.
  * @return Returns <b>BT_NO_ERROR</b> if the operation is successful; returns others if the operation fails.
  */
 int BTSTACK_API BTM_ModifyScoConnection(const BtmModifyScoConnectionParam *param);
@@ -787,7 +787,7 @@ typedef struct {
 /**
  * @brief Modify eSCO connection.
  *
- * @param param The parameters of modifing eSCO connection.
+ * @param param The parameters of modifying eSCO connection.
  * @return Returns <b>BT_NO_ERROR</b> if the operation is successful; returns others if the operation fails.
  */
 int BTSTACK_API BTM_ModifyEscoConnection(const BtmModifyEscoConnectionParam *param);

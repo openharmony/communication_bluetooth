@@ -32,7 +32,7 @@ void BleScanSettingsImpl::SetReportDelay(long reportDelayMillis)
 /**
  * @brief Get the report delay time.
  *
- * @return Returns Repport delay time.
+ * @return Returns Report delay time.
  * @since 6
  */
 long BleScanSettingsImpl::GetReportDelayMillisValue() const
