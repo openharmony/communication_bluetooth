@@ -73,7 +73,7 @@ void ReactorStop(const Reactor *reactor);
 void ReactorSetThreadId(Reactor *reactor, unsigned long threadId);
 
 /**
- * @brief Regist item into reactor
+ * @brief Register item into reactor
  *
  * @param reactor Reactor pointer.
  * @param fd Monitor fd.
