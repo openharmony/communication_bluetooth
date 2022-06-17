@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,7 @@ void HfpAgCommandProcessor::SendErrorCode(const HfpAgDataConnection &dataConn, i
 
 void HfpAgCommandProcessor::SendAtCommand(const HfpAgDataConnection &dataConn, const std::string &command)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():Send Command[%{public}s]", __FUNCTION__, command.c_str());
+    LOG_INFO("[HFP AG]%{public}s():Send Command[%{public}s]", __FUNCTION__, command.c_str());
     std::string fullCommand(HEAD + command + TAIL);
     std::size_t CmdLength = fullCommand.length();
     Packet *packet = PacketMalloc(0, 0, CmdLength);
@@ -175,7 +175,7 @@ void HfpAgCommandProcessor::SendAtCommand(const HfpAgDataConnection &dataConn, c
 void HfpAgCommandProcessor::Handle(
     HfpAgDataConnection &dataConn, const std::string &cmd, const std::string &arg, int cmdType)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], Type[%{public}d]", __FUNCTION__, cmd.c_str(), arg.c_str(), cmdType);
+    LOG_INFO("[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], Type[%{public}d]", __FUNCTION__, cmd.c_str(), arg.c_str(), cmdType);
     auto it = g_atCmdMap.find(cmd);
     if (it == g_atCmdMap.end()) {
         SendErrorCode(dataConn, HFP_AG_ERROR_AG_FAILURE);
@@ -197,10 +197,10 @@ void HfpAgCommandProcessor::Handle(
             (this->*(it->second.executer))(dataConn, arg);
             break;
         case HFP_AG_CMD_UNKNOWN:
-            LOG_DEBUG("[HFP AG]%{public}s():HFP_AG_CMD_UNKNOWN", __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s():HFP_AG_CMD_UNKNOWN", __FUNCTION__);
             break;
         default:
-            LOG_DEBUG("[HFP AG]%{public}s():default", __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s():default", __FUNCTION__);
             break;
     }
     return;
@@ -305,7 +305,7 @@ void HfpAgCommandProcessor::ChldTester(HfpAgDataConnection &dataConn, const std:
 void HfpAgCommandProcessor::ChupExecuter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
     if (HfpAgAudioConnection::GetActiveDevice().compare(dataConn.remoteAddr_) != 0) {
-        LOG_DEBUG("[HFP AG]%{public}s():AT+CHUP failed because of device is not active, activeAddr[%{public}s], remoteAddr_[%{public}s]",
+        LOG_INFO("[HFP AG]%{public}s():AT+CHUP failed because of device is not active, activeAddr[%{public}s], remoteAddr_[%{public}s]",
             __FUNCTION__,
             HfpAgAudioConnection::GetActiveDevice().c_str(),
             dataConn.remoteAddr_.c_str());
@@ -492,7 +492,7 @@ void HfpAgCommandProcessor::BiaSetter(HfpAgDataConnection &dataConn, const std::
         }
     }
 
-    LOG_DEBUG("[HFP AG]%{public}s(): i[%zu], ind_id[%{public}d], len[%zu]", __FUNCTION__, i, ind_id, len);
+    LOG_INFO("[HFP AG]%{public}s(): i[%zu], ind_id[%{public}d], len[%zu]", __FUNCTION__, i, ind_id, len);
 
     if (i == len) {
         SendAtCommand(dataConn, OK);
@@ -663,7 +663,7 @@ void HfpAgCommandProcessor::BacSetter(HfpAgDataConnection &dataConn, const std::
     }
 
     if (currentRemoteCodec != dataConn.remoteSupportCodecs_) {
-        LOG_DEBUG(
+        LOG_INFO(
             "[HFP AG]%{public}s():Remote support codecs updated, currentRemoteCodec[%{public}d], remoteSupportCodecs_[%{public}d]",
             __FUNCTION__,
             currentRemoteCodec,
@@ -678,7 +678,7 @@ void HfpAgCommandProcessor::BacSetter(HfpAgDataConnection &dataConn, const std::
     // the procedure shall end but may be restarted by the AG after re-selecting codec ID
     // based on the information in the just received AT+BAC.
     if (dataConn.codecNegotiating_) {
-        LOG_DEBUG("[HFP AG]%{public}s():Codec negotiation failed", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():Codec negotiation failed", __FUNCTION__);
         HfpAgProfileEventSender::GetInstance().UpdateScoConnectState(
             dataConn.remoteAddr_, HFP_AG_CODEC_NEGOTIATION_FAILED);
     }

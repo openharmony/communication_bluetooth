@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,21 +46,21 @@ HfpAgService *HfpAgService::GetService()
 
 void HfpAgService::Enable()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<enter>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<enter>==========", __FUNCTION__);
     HfpAgMessage event(HFP_AG_SERVICE_STARTUP_EVT);
     PostEvent(event);
 }
 
 void HfpAgService::Disable()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<enter>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<enter>==========", __FUNCTION__);
     HfpAgMessage event(HFP_AG_SERVICE_SHUTDOWN_EVT);
     PostEvent(event);
 }
 
 void HfpAgService::StartUp()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     if (isStarted_ == true) {
         GetContext()->OnEnable(PROFILE_NAME_HFP_AG, true);
         LOG_WARN("[HFP AG]%{public}s():HfpAgService has already been started before.", __FUNCTION__);
@@ -73,13 +73,13 @@ void HfpAgService::StartUp()
     GetContext()->OnEnable(PROFILE_NAME_HFP_AG, ret ? false : true);
     if (ret == 0) {
         isStarted_ = true;
-        LOG_DEBUG("[HFP AG]%{public}s():HfpAgService started", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():HfpAgService started", __FUNCTION__);
     }
 }
 
 void HfpAgService::ShutDown()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     if (isStarted_ == false) {
         GetContext()->OnDisable(PROFILE_NAME_HFP_AG, true);
         LOG_WARN("[HFP AG]%{public}s():HfpAgService has already been shutdown before.", __FUNCTION__);
@@ -102,7 +102,7 @@ void HfpAgService::ShutDown()
 
 void HfpAgService::ShutDownDone(bool isAllDisconnected)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     if (!isAllDisconnected) {
         for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
             if ((it->second != nullptr) && (it->second->GetStateInt() > HFP_AG_STATE_DISCONNECTED)) {
@@ -138,28 +138,28 @@ void HfpAgService::ShutDownDone(bool isAllDisconnected)
     GetContext()->OnDisable(PROFILE_NAME_HFP_AG, ret ? false : true);
     if (ret == 0) {
         isStarted_ = false;
-        LOG_DEBUG("[HFP AG]%{public}s():HfpAgService shutdown", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():HfpAgService shutdown", __FUNCTION__);
     }
     isShuttingDown_ = false;
 }
 
 int HfpAgService::Connect(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
     auto it = stateMachines_.find(address);
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         int state = it->second->GetStateInt();
         if ((state >= HFP_AG_STATE_CONNECTED) || (state == HFP_AG_STATE_CONNECTING)) {
-            LOG_DEBUG("[HFP AG]%{public}s():state:%{public}d", __FUNCTION__, state);
+            LOG_INFO("[HFP AG]%{public}s():state:%{public}d", __FUNCTION__, state);
             return HFP_AG_FAILURE;
         }
     }
 
     int size = GetConnectedDeviceNum();
     if (size >= maxConnectedNum_) {
-        LOG_DEBUG("[HFP AG]%{public}s():Max connection has reached!", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():Max connection has reached!", __FUNCTION__);
         return HFP_AG_FAILURE;
     }
 
@@ -171,7 +171,7 @@ int HfpAgService::Connect(const RawAddress &device)
 
 int HfpAgService::Disconnect(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
     auto it = stateMachines_.find(address);
@@ -224,12 +224,12 @@ int HfpAgService::GetConnectState()
 
 int HfpAgService::GetDeviceState(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_DEBUG("[HFP AG]%{public}s():the statemachine is not available", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():the statemachine is not available", __FUNCTION__);
         return stateMap_.at(HFP_AG_STATE_DISCONNECTED);
     }
 
@@ -254,7 +254,7 @@ void HfpAgService::PostEvent(const HfpAgMessage &event)
 void HfpAgService::ProcessEvent(const HfpAgMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
-    LOG_DEBUG("[HFP AG]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__, event.dev_.c_str(), event.what_);
+    LOG_INFO("[HFP AG]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__, event.dev_.c_str(), event.what_);
     switch (event.what_) {
         case HFP_AG_SERVICE_STARTUP_EVT:
             StartUp();
@@ -297,7 +297,7 @@ void HfpAgService::ProcessEvent(const HfpAgMessage &event)
 
 std::vector<RawAddress> HfpAgService::GetDevicesByStates(std::vector<int> states)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::vector<RawAddress> devices;
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
@@ -314,7 +314,7 @@ std::vector<RawAddress> HfpAgService::GetDevicesByStates(std::vector<int> states
 
 bool HfpAgService::ConnectSco()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string activeDevice = HfpAgProfile::GetActiveDevice();
     if (activeDevice == NULL_ADDRESS) {
@@ -327,7 +327,7 @@ bool HfpAgService::ConnectSco()
     }
 
     if (IsAudioConnected()) {
-        LOG_DEBUG("[HFP AG]%{public}s():Sco is not idle!", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():Sco is not idle!", __FUNCTION__);
         return false;
     }
 
@@ -340,7 +340,7 @@ bool HfpAgService::ConnectSco()
 bool HfpAgService::DisconnectSco()
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     bool ret = false;
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
         if ((it->second != nullptr) && (it->second->GetStateInt() > HFP_AG_AUDIO_STATE_DISCONNECTED) &&
@@ -357,7 +357,7 @@ bool HfpAgService::DisconnectSco()
 
 bool HfpAgService::DisconnectSingleSco(const std::string &address)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
         LOG_ERROR("[HFP AG]%{public}s():Invalid Device address:%{public}s", __FUNCTION__, address.c_str());
@@ -380,12 +380,12 @@ bool HfpAgService::DisconnectSingleSco(const std::string &address)
 
 int HfpAgService::GetScoState(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_DEBUG("[HFP AG]%{public}s():the statemachine is not available.", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():the statemachine is not available.", __FUNCTION__);
         return HFP_AG_AUDIO_STATE_DISCONNECTED;
     }
 
@@ -398,7 +398,7 @@ int HfpAgService::GetScoState(const RawAddress &device)
 
 bool HfpAgService::IsAudioConnected() const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
         if (it->second != nullptr) {
             auto audioState = it->second->GetStateInt();
@@ -442,7 +442,7 @@ void HfpAgService::SendEventToEachStateMachine(const HfpAgMessage &event) const
 void HfpAgService::PhoneStateChanged(
     int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (dialingOutTimeout_ != nullptr) {
         if ((callState == HFP_AG_CALL_STATE_ACTIVE) || (callState == HFP_AG_CALL_STATE_IDLE)) {
@@ -458,7 +458,7 @@ void HfpAgService::PhoneStateChanged(
 
     if ((numActive > 0) || (numHeld > 0) || (callState != HFP_AG_CALL_STATE_IDLE)) {
         if (isVrOpened_) {
-            LOG_DEBUG("[HFP AG]%{public}s():close the voice recognition", __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s():close the voice recognition", __FUNCTION__);
             CloseVoiceRecognition(RawAddress(HfpAgProfile::GetActiveDevice()));
         }
     }
@@ -480,7 +480,7 @@ void HfpAgService::PhoneStateChanged(
 void HfpAgService::ClccResponse(
     int index, int direction, int status, int mode, bool mpty, const std::string &number, int type)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (ResponseClccTimeout_ != nullptr) {
         ResponseClccTimeout_->Stop();
@@ -501,7 +501,7 @@ void HfpAgService::ClccResponse(
 
 void HfpAgService::SendOpenVoiceEvent(const std::string &address, bool isRequestByHf)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     if (isRequestByHf) {
         HfpAgMessage evt(HFP_AG_VOICE_RECOGNITION_RESULT_EVT, 1);
         evt.dev_ = address;
@@ -516,7 +516,7 @@ void HfpAgService::SendOpenVoiceEvent(const std::string &address, bool isRequest
 
 bool HfpAgService::OpenVoiceRecognition(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
     if (IsVoiceRecognitionAvailable(address) == false) {
@@ -538,10 +538,10 @@ bool HfpAgService::OpenVoiceRecognition(const RawAddress &device)
 
 bool HfpAgService::CloseVoiceRecognition(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (!isVrOpened_) {
-        LOG_DEBUG("[HFP AG]%{public}s():The VR is not opened!", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():The VR is not opened!", __FUNCTION__);
         return false;
     }
 
@@ -560,7 +560,7 @@ bool HfpAgService::CloseVoiceRecognition(const RawAddress &device)
 
 void HfpAgService::SendCloseVoiceEvent(const std::string &address)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     HfpAgMessage evt1(HFP_AG_CLOSE_VOICE_RECOGNITION_EVT);
     evt1.dev_ = address;
     PostEvent(evt1);
@@ -574,7 +574,7 @@ void HfpAgService::SendCloseVoiceEvent(const std::string &address)
 
 bool HfpAgService::SetActiveDevice(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
     if (address == NULL_ADDRESS) {
@@ -620,7 +620,7 @@ bool HfpAgService::IsIncall()
 
 std::string HfpAgService::GetActiveDevice()
 {
-    LOG_DEBUG("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     return HfpAgProfile::GetActiveDevice();
 }
@@ -662,7 +662,7 @@ void HfpAgService::DeregisterObserver(HfpAgServiceObserver &observer)
 
 void HfpAgService::NotifySlcStateChanged(const RawAddress &device, int toState)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():", __FUNCTION__);
     std::list<HfpAgServiceObserver *>::iterator iter;
     for (iter = observers_.begin(); iter != observers_.end(); ++iter) {
         (*iter)->OnConnectionStateChanged(device, stateMap_.at(toState));
@@ -671,7 +671,7 @@ void HfpAgService::NotifySlcStateChanged(const RawAddress &device, int toState)
 
 void HfpAgService::NotifyAudioStateChanged(const RawAddress &device, int toState)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():", __FUNCTION__);
     std::list<HfpAgServiceObserver *>::iterator iter;
     for (iter = observers_.begin(); iter != observers_.end(); ++iter) {
         (*iter)->OnScoStateChanged(device, toState);
@@ -680,7 +680,7 @@ void HfpAgService::NotifyAudioStateChanged(const RawAddress &device, int toState
 
 void HfpAgService::NotifyCurrentActiveDevice(const RawAddress &device)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():", __FUNCTION__);
     std::list<HfpAgServiceObserver *>::iterator iter;
     for (iter = observers_.begin(); iter != observers_.end(); ++iter) {
         (*iter)->OnActiveDeviceChanged(device);
@@ -689,7 +689,7 @@ void HfpAgService::NotifyCurrentActiveDevice(const RawAddress &device)
 
 void HfpAgService::NotifyHfEnhancedDriverSafety(const RawAddress &device, int indValue)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():", __FUNCTION__);
     std::list<HfpAgServiceObserver *>::iterator iter;
     for (iter = observers_.begin(); iter != observers_.end(); ++iter) {
         (*iter)->OnHfEnhancedDriverSafetyChanged(device, indValue);
@@ -698,7 +698,7 @@ void HfpAgService::NotifyHfEnhancedDriverSafety(const RawAddress &device, int in
 
 void HfpAgService::NotifyHfBatteryLevel(const RawAddress &device, int indValue)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():", __FUNCTION__);
     std::list<HfpAgServiceObserver *>::iterator iter;
     for (iter = observers_.begin(); iter != observers_.end(); ++iter) {
         (*iter)->OnHfBatteryLevelChanged(device, indValue);
@@ -720,7 +720,7 @@ bool HfpAgService::DialOutCallByHf(const std::string &address)
     dialingOutTimeout_ =
         std::make_unique<utility::Timer>(std::bind(&bluetooth::HfpAgService::DialOutCallTimeOut, this));
     dialingOutTimeout_->Start(DIALING_OUT_TIMEOUT_TIME);
-    LOG_DEBUG("[HFP AG]%{public}s():start dial timer!", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():start dial timer!", __FUNCTION__);
     return true;
 }
 
@@ -740,7 +740,7 @@ bool HfpAgService::OpenVoiceRecognitionByHf(const std::string &address)
 
     // VR opened or in call
     if (!IsAudioIdle()) {
-        LOG_DEBUG("[HFP AG]%{public}s():sco is not idle!", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():sco is not idle!", __FUNCTION__);
         return false;
     }
 
@@ -752,7 +752,7 @@ bool HfpAgService::OpenVoiceRecognitionByHf(const std::string &address)
     voiceRecognitionTimeout_ =
         std::make_unique<utility::Timer>(std::bind(&bluetooth::HfpAgService::VoiceRecognitionTimeOut, this));
     voiceRecognitionTimeout_->Start(VOICE_RECOGNITION_TIMEOUT_TIME);
-    LOG_DEBUG("[HFP AG]%{public}s():start open voice recognition timer!", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():start open voice recognition timer!", __FUNCTION__);
     return true;
 }
 
@@ -803,7 +803,7 @@ void HfpAgService::SetResponseClccTimer(const std::string &address)
         std::make_unique<utility::Timer>(std::bind(&bluetooth::HfpAgService::ResponseClccTimeOut, this));
     ResponseClccTimeout_->Start(RESPONSE_CLCC_TIMEOUT_TIME);
     queryClccAddress_ = address;
-    LOG_DEBUG("[HFP AG]%{public}s():start clcc timer!", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():start clcc timer!", __FUNCTION__);
 }
 
 void HfpAgService::ResponseClccTimeOut()
@@ -850,7 +850,7 @@ int HfpAgService::GetMaxConnectionDevicesNum() const
 {
     int number = MAX_DEFAULT_CONNECTIONS_NUM;
     if (!AdapterConfig::GetInstance()->GetValue(SECTION_HFP_AG_SERVICE, PROPERTY_MAX_CONNECTED_DEVICES, number)) {
-        LOG_DEBUG("[HFP HF]%{public}s():It's failed to get the max connection number", __FUNCTION__);
+        LOG_INFO("[HFP HF]%{public}s():It's failed to get the max connection number", __FUNCTION__);
     }
     return number;
 }
@@ -914,7 +914,7 @@ void HfpAgService::ProcessDefaultEvent(const HfpAgMessage &event) const
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         it->second->ProcessMessage(event);
     } else {
-        LOG_DEBUG("[HFP AG]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
+        LOG_INFO("[HFP AG]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
     }
 }
 
@@ -962,7 +962,7 @@ bool HfpAgService::IsVoiceRecognitionAvailable(const std::string &address) const
     }
 
     if (IsAudioIdle() == false) {
-        LOG_DEBUG("[HFP AG]%{public}s():sco is not idle!", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():sco is not idle!", __FUNCTION__);
         return false;
     }
     return true;
@@ -1008,7 +1008,7 @@ bool HfpAgService::IsActiveDevice(const std::string &address) const
 void HfpAgService::ModifyActiveDevice(const std::string &newAddress)
 {
     std::string preActiveDevice = HfpAgProfile::GetActiveDevice();
-    LOG_DEBUG("[HFP AG]%{public}s():preActiveDevice address:%{public}s, activeDevice newAddress:%{public}s",
+    LOG_INFO("[HFP AG]%{public}s():preActiveDevice address:%{public}s, activeDevice newAddress:%{public}s",
         __FUNCTION__, preActiveDevice.c_str(), newAddress.c_str());
 
     HfpAgProfile::SetActiveDevice(newAddress);
