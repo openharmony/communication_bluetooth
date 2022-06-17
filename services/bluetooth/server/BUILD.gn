@@ -16,7 +16,7 @@ import("//build/ohos_var.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 BT_ROOT = "//foundation/communication/bluetooth/services/bluetooth"
-hdf_uhdf_path = "//drivers/adapter/uhdf2"
+hdf_uhdf_path = "//drivers/hdf_core/adapter/uhdf2"
 
 ohos_shared_library("bluetooth_server") {
   include_dirs = [

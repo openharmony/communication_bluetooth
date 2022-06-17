@@ -159,8 +159,7 @@ ohos_unittest("btfw_gatt_descriptor_unit_test") {
 ohos_unittest("btfw_gatt_characteristic_unit_test") {
   module_out_path = module_output_path
 
-  include_dirs =
-      [ "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include" ]
+  include_dirs = [ "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include" ]
 
   sources = [ "gatt_characteristic_test.cpp" ]
 
