@@ -441,6 +441,67 @@ bool HfpHfService::RejectIncomingCall(const RawAddress &device)
     return true;
 }
 
+bool HfpHfService::HandleIncomingCall(const RawAddress &device, int flag)
+{
+    HILOGI("[HFP HF]:==========<start>==========");
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    std::string address = device.GetAddress();
+    if (IsConnected(address) == false) {
+        return false;
+    }
+
+    HfpHfMessage event(HFP_HF_HANDLE_INCOMING_CALL_EVT, flag);
+    event.dev_ = address;
+    PostEvent(event);
+    return true;
+}
+
+bool HfpHfService::HandleMultiCall(const RawAddress &device, int flag, int index)
+{
+    HILOGI("[HFP HF]:==========<start>==========");
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    std::string address = device.GetAddress();
+    if (IsConnected(address) == false) {
+        return false;
+    }
+
+    HfpHfMessage event(HFP_HF_HANDLE_MULTI_CALL_EVT, flag);
+    event.arg3_ = index;
+    event.dev_ = address;
+    PostEvent(event);
+    return true;
+}
+
+bool HfpHfService::DialLastNumber(const RawAddress &device)
+{
+    HILOGI("[HFP HF]:==========<start>==========");
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    std::string address = device.GetAddress();
+    if (IsConnected(address) == false) {
+        return false;
+    }
+
+    HfpHfMessage event(HFP_HF_DIAL_LAST_NUMBER);
+    event.dev_ = address;
+    PostEvent(event);
+    return true;
+}
+
+bool HfpHfService::DialMemory(const RawAddress &device, int index)
+{
+    HILOGI("[HFP HF]:==========<start>========== index = %{public}d", index);
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    std::string address = device.GetAddress();
+    if (IsConnected(address) == false) {
+        return false;
+    }
+
+    HfpHfMessage event(HFP_HF_DIAL_MEMORY, index);
+    event.dev_ = address;
+    PostEvent(event);
+    return true;
+}
+
 bool HfpHfService::FinishActiveCall(const RawAddress &device, const HandsFreeUnitCalls &call)
 {
     LOG_DEBUG("[HFP HF]%{public}s():==========<start>==========", __FUNCTION__);

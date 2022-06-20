@@ -370,6 +370,16 @@ bool HfpHfProfile::SendChup()
     return true;
 }
 
+bool HfpHfProfile::SendBtrh(int action)
+{
+    HFP_HF_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
+
+    std::string cmd("AT+BTRH");
+    cmd.append("=" + std::to_string(action));
+    commandProcessor_.SendAtCommand(dataConn_, cmd, HfpHfCommandProcessor::AT_CHLD_SETTER);
+    return true;
+}
+
 bool HfpHfProfile::SendBcc()
 {
     HFP_HF_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
