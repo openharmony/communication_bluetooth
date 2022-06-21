@@ -720,6 +720,12 @@ uint8_t A2dpAvdtp::ParseAvdtpConfigureCFM(
         return EVT_CONNECT_IND;
     }
 
+    if (role == A2DP_ROLE_SINK) {
+        LOG_INFO("[A2dpAvdtp] %{public}s role(%{public}u)  to send delay reporting\n", __func__, role);
+        uint8_t label = 0;
+        DelayReq(handle, label, 0);
+    }
+
     peer->StopSignalingTimer();
     msg.a2dpMsg.stream.handle = handle;
     msg.a2dpMsg.stream.addr = bdAddr;

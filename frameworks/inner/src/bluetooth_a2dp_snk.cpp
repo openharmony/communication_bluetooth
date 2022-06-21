@@ -329,5 +329,25 @@ int A2dpSink::GetConnectStrategy(const BluetoothRemoteDevice &device) const
     }
     return ret;
 }
+
+bool A2dpSink::SendDelay(const BluetoothRemoteDevice &device, uint16_t delayValue)
+{
+    HILOGI("[A2dpSink] %s", __func__);
+
+    if (!device.IsValidBluetoothRemoteDevice()) {
+        HILOGI("[A2dpSink] input parameter error.");
+        return false;
+    }
+
+    int ret = RET_NO_ERROR;
+    if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
+        ret = pimpl->proxy_->SendDelay(RawAddress(device.GetDeviceAddr()), (int32_t)delayValue);
+    } else {
+        HILOGI("[A2dpSink] proxy or bt disable.");
+        return false;
+    }
+
+    return (RET_NO_ERROR == ret);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

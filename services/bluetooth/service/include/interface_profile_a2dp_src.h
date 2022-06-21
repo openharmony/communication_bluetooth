@@ -212,6 +212,16 @@ public:
     virtual int GetConnectStrategy(const RawAddress &device) const = 0;
 
     /**
+     * @brief Send delay reporting.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param delayValue The delay value.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>RET_BAD_STATUS</b> if the operation fails.
+     */
+    virtual int SendDelay(const RawAddress &device, uint16_t delayValue) = 0;
+
+    /**
      * @brief Get codec status information of connected device.
      *
      * @param device The address of the bluetooth device.
