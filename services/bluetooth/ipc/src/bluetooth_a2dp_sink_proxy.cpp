@@ -256,6 +256,36 @@ int BluetoothA2dpSinkProxy::GetConnectStrategy(const RawAddress &device)
     return reply.ReadInt32();
 }
 
+int BluetoothA2dpSinkProxy::SendDelay(const RawAddress &device, int32_t delayValue)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay WriteInterfaceToken error");
+        return ERROR;
+    }
+    if (!data.WriteString(device.GetAddress())) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay write device error");
+        return ERROR;
+    }
+    if (!data.WriteInt32(delayValue)) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay write delayValue error");
+        return ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+
+    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_SEND_DELAY, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay done fail, error: %{public}d", error);
+        return ERROR;
+    }
+
+    return reply.ReadInt32();
+}
+
 bool BluetoothA2dpSinkProxy::WriteParcelableInt32Vector(
     const std::vector<int32_t> &parcelableVector, Parcel &reply)
 {

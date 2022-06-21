@@ -147,6 +147,16 @@ public:
     int GetConnectStrategy(const BluetoothRemoteDevice &device) const;
 
     /**
+     * @brief Send delay reporting.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param delayValue The delay value.
+     * @return Returns <b>true</b> Set delay reporting success.
+     *         Returns <b>false</b> Set delay reporting failed,
+     */
+    bool SendDelay(const BluetoothRemoteDevice &device, uint16_t delayValue);
+
+    /**
      * @brief Register callback function of framework.
      *
      * @param observer Reference to the a2dp sink observer.
