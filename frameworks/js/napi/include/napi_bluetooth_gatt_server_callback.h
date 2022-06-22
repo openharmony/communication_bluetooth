@@ -46,7 +46,7 @@ public:
 
     void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo)
     {
-        HILOGI("SetCallbackInfo called");
+        HILOGI("enter, type: %{public}s", type);
         callbackInfos_[type] = callbackInfo;
     }
 
