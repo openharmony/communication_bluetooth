@@ -639,7 +639,6 @@ static napi_value ParseAdvertisingSettingsParameters(
         HILOGI("connectable is %{public}d", connectable);
         settings.SetConnectable(connectable);
     }
-
     return NapiGetNull(env);
 }
 
@@ -663,7 +662,6 @@ static napi_value ParseServiceUuidParameters(const napi_env &env, const napi_val
         data.AddServiceUuid(ParcelUuid::FromString(serviceUuid));
         HILOGI("Service Uuid = %{public}s", serviceUuid.c_str());
     }
-
     return NapiGetNull(env);
 }
 
@@ -710,7 +708,6 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
             data.AddManufacturerData(manufactureId, manuData);
         }
     }
-
     return NapiGetNull(env);
 }
 
@@ -755,7 +752,6 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
         std::string serviceDataStr(arrayBufferData, arrayBufferData + arrayBufferTotal);
         data.AddServiceData(serviceUuid, serviceDataStr);
     }
-
     return NapiGetNull(env);
 }
 
@@ -776,7 +772,6 @@ static napi_value ParseAdvertisDataParameters(
     if (hasProperty) {
         ParseServiceDataParameters(env, args, data);
     }
-
     return NapiGetNull(env);
 }
 
@@ -801,7 +796,6 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
     }
 
     bleAdvertiser.StartAdvertising(settings, AdvData, ScanRespData, bleAdvertiseCallback);
-
     return NapiGetNull(env);
 }
 
@@ -820,7 +814,6 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
     napi_create_array(env, &result);
 
     ConvertStringVectorToJS(env, result, NapiGattServer::deviceList);
-
     return result;
 }
 
