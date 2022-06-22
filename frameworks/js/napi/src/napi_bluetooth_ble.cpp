@@ -597,7 +597,6 @@ napi_value StopBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     bleCentralManager->StopScan();
-
     return NapiGetNull(env);
 }
 

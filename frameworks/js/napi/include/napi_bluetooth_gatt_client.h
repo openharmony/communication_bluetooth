@@ -66,7 +66,7 @@ public:
 
     NapiGattClient(std::string &deviceId)
     {
-        HILOGI("enter, deviceId: %{public}s", deviceId);
+        HILOGI("enter");
         device_ = std::make_shared<BluetoothRemoteDevice>(deviceId, 1);
         client_ = std::make_shared<GattClient>(*device_);
         callback_.SetClient(this);

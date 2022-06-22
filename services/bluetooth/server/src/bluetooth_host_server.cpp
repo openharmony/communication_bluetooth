@@ -701,7 +701,6 @@ int32_t BluetoothHostServer::GetBtState()
         HILOGE("false, check permission failed");
         return INVALID_VALUE;
     }
-
     int32_t state = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BREDR);
     HILOGI("state: %{public}d", state);
     return state;
@@ -1422,7 +1421,6 @@ bool BluetoothHostServer::IsBtEnabled()
     } else {
         HILOGI("false");
     }
-    
     return isEnabled;
 }
 
