@@ -143,7 +143,6 @@ napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 
     napi_unwrap(env, thisVar, (void **)&GattServer);
     GattServer->GetCallback().SetCallbackInfo(type, nullptr);
-
     HILOGI("%{public}s is removed", type.c_str());
     return ret;
 }
@@ -267,7 +266,6 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
     napi_unwrap(env, thisVar, (void**)&gattServer);
     BluetoothRemoteDevice remoteDevice =
         BluetoothHost::GetDefaultHost().GetRemoteDevice(serverresponse.deviceId, 1);
-
     HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice))
     int status = gattServer->GetServer()->SendResponse(
                 remoteDevice, serverresponse.transId,
@@ -314,7 +312,6 @@ napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callba
         HILOGI("characteristic is nullptr");
         return ret;
     }
-
     int status = gattServer->GetServer()->NotifyCharacteristicChanged(remoteDevice, *characteristic, false);
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");

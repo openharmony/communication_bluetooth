@@ -394,7 +394,6 @@ int BluetoothHost::GetBtState() const
         HILOGE("failed: no proxy");
         return INVALID_VALUE;
     }
-
     int state = pimpl->proxy_->GetBtState();
     HILOGI("state: %{public}d", state);
     return state;
