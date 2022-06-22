@@ -24,13 +24,12 @@ using namespace std;
 void NapiGattServerCallback::OnCharacteristicReadRequest(
     const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId)
 {
-    HILOGI("NapiGattServerCallback::OnCharacteristicReadRequest called");
+    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ]) {
-        HILOGW("NapiGattServerCallback::OnCharacteristicReadRequest: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiGattServerCallback::OnCharacteristicReadRequest: %{public}s is registered by ability",
-        STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ.c_str());
+
     std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
         std::static_pointer_cast<GattCharacteristicCallbackInfo>(
             callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ]);
@@ -69,13 +68,11 @@ void NapiGattServerCallback::OnCharacteristicReadRequest(
 void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device,
     GattCharacteristic &characteristic, int requestId)
 {
-    HILOGI("NapiGattServerCallback::OnCharacteristicWriteRequest called");
+    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE]) {
-        HILOGW("NapiGattServerCallback::OnCharacteristicWriteRequest: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiGattServerCallback::OnCharacteristicWriteRequest: %{public}s is registered by ability",
-        STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE.c_str());
 
     std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
         std::static_pointer_cast<GattCharacteristicCallbackInfo>(
@@ -113,9 +110,9 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
 
 void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("NapiGattServerCallback::OnConnectionStateUpdate called");
+    HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
     if (state == static_cast<int>(BTConnectState::CONNECTED)) {
-        HILOGI("NapiGattServerCallback::OnConnectionStateUpdate connected");
+        HILOGI("connected");
         bool hasAddr = false;
         for (auto it = NapiGattServer::deviceList.begin(); it != NapiGattServer::deviceList.end(); ++it) {
             if (*it == device.GetDeviceAddr()) {
@@ -124,27 +121,25 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
             }
         }
         if (!hasAddr) {
-            HILOGI("NapiGattServerCallback::OnConnectionStateUpdate add devices");
+            HILOGI("add devices");
             NapiGattServer::deviceList.push_back(device.GetDeviceAddr());
         }
     } else if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
-        HILOGI("NapiGattServerCallback::OnConnectionStateUpdate disconnected");
+        HILOGI("disconnected");
         for (auto it = NapiGattServer::deviceList.begin(); it != NapiGattServer::deviceList.end(); ++it) {
             if (*it == device.GetDeviceAddr()) {
-                HILOGI("NapiGattServerCallback::OnConnectionStateUpdate romove devices start");
+                HILOGI("romove device");
                 NapiGattServer::deviceList.erase(it);
-                HILOGI("NapiGattServerCallback::OnConnectionStateUpdate romove devices end");
                 break;
             }
         }
     }
 
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE]) {
-        HILOGW("NapiGattServerCallback::OnConnectionStateUpdate: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiGattServerCallback::OnConnectionStateUpdate: %{public}s is registered by ability",
-        STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE.c_str());
+
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE];
 
@@ -179,13 +174,12 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
 void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
-    HILOGI("NapiGattServerCallback::OnDescriptorWriteRequest called");
+    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE]) {
-        HILOGW("NapiGattServerCallback::OnDescriptorWriteRequest: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiGattServerCallback::OnDescriptorWriteRequest: %{public}s is registered by ability",
-        STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE.c_str());
+
     std::shared_ptr<GattDescriptorCallbackInfo> callbackInfo =
         std::static_pointer_cast<GattDescriptorCallbackInfo>(
             callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE]);
@@ -224,13 +218,12 @@ void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevic
 void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
-    HILOGI("NapiGattServerCallback::OnDescriptorReadRequest called");
+    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ]) {
-        HILOGW("NapiGattServerCallback::OnDescriptorReadRequest: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiGattServerCallback::OnDescriptorReadRequest: %{public}s is registered by ability",
-        STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ.c_str());
+
     std::shared_ptr<GattDescriptorCallbackInfo> callbackInfo =
         std::static_pointer_cast<GattDescriptorCallbackInfo>(
             callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ]);

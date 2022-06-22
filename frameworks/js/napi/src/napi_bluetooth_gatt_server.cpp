@@ -28,13 +28,12 @@ thread_local napi_ref NapiGattServer::consRef_ = nullptr;
 
 napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info info)
 {
-    HILOGI("CreateGattServer called");
+    HILOGI("enter");
     napi_value result;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, consRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &result);
 
-    HILOGI("CreateGattServer finished");
     return result;
 }
 
@@ -78,7 +77,7 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
 
 napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("RegisterGattServerCallback called");
+    HILOGI("enter");
     NapiGattServer *gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -124,7 +123,7 @@ napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
 
 napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("DeregisterGattServerCallback called");
+    HILOGI("enter");
     NapiGattServer *GattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -144,12 +143,14 @@ napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 
     napi_unwrap(env, thisVar, (void **)&GattServer);
     GattServer->GetCallback().SetCallbackInfo(type, nullptr);
+
+    HILOGI("%{public}s is removed", type.c_str());
     return ret;
 }
 
 napi_value NapiGattServer::AddService(napi_env env, napi_callback_info info)
 {
-    HILOGI("AddService called");
+    HILOGI("enter");
     NapiGattServer *gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -167,29 +168,36 @@ napi_value NapiGattServer::AddService(napi_env env, napi_callback_info info)
     GattService* gattService = GetServiceFromJS(env, argv[PARAM0], nullptr, nullptr);
 
     napi_unwrap(env, thisVar, (void**)&gattServer);
-    if (gattServer->GetServer()->AddService(*gattService) == GattStatus::GATT_SUCCESS) {
+    int status = gattServer->GetServer()->AddService(*gattService);
+    if (status == GattStatus::GATT_SUCCESS) {
+        HILOGI("successful");
         isOK = true;
+    } else {
+        HILOGE("failed, status: %{public}d", status);
     }
-    delete gattService;
 
+    delete gattService;
     napi_get_boolean(env, isOK, &ret);
     return ret;
 }
 
 napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
 {
-    HILOGI("Close called");
+    HILOGI("enter");
     NapiGattServer* gattServer = nullptr;
-    bool isOK = true;
+    bool isOK = false;
     napi_value thisVar = nullptr;
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattServer);
 
-    int err = gattServer->GetServer()->Close();
-    if (err == RET_NO_ERROR) {
-        HILOGI("NapiGattServer::Close() succeed");
+    int status = gattServer->GetServer()->Close();
+    if (status == GattStatus::GATT_SUCCESS) {
+        HILOGI("successful");
+        isOK = true;
         delete gattServer;
+    } else {
+        HILOGE("failed, status: %{public}d", status);
     }
 
     napi_value ret = nullptr;
@@ -199,7 +207,7 @@ napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
 
 napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info info)
 {
-    HILOGI("RemoveGattService called");
+    HILOGI("enter");
     NapiGattServer* gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -218,14 +226,22 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
     std::optional<std::reference_wrapper<GattService>> gattService =
         gattServer->GetServer()->GetService(serviceUuid, true);
     if (gattService != std::nullopt) {
-        if (gattServer->GetServer()->RemoveGattService(*gattService) == GattStatus::GATT_SUCCESS) {
-        isOK = true;
+        int status = gattServer->GetServer()->RemoveGattService(*gattService);
+        if (status == GattStatus::GATT_SUCCESS) {
+            HILOGI("successful");
+            isOK = true;
+        } else {
+            HILOGE("failed, status: %{public}d", status);
         }
     }
     gattService = gattServer->GetServer()->GetService(serviceUuid, false);
     if (gattService != std::nullopt) {
+        int status = gattServer->GetServer()->RemoveGattService(*gattService);
         if (gattServer->GetServer()->RemoveGattService(*gattService) == GattStatus::GATT_SUCCESS) {
-        isOK = true;
+            HILOGI("successful");
+            isOK = true;
+        } else {
+            HILOGE("failed, status: %{public}d", status);
         }
     }
 
@@ -236,6 +252,7 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
 
 napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
 {
+    HILOGI("enter");
     NapiGattServer* gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -250,13 +267,19 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
     napi_unwrap(env, thisVar, (void**)&gattServer);
     BluetoothRemoteDevice remoteDevice =
         BluetoothHost::GetDefaultHost().GetRemoteDevice(serverresponse.deviceId, 1);
-    if (gattServer->GetServer()->SendResponse(
-        remoteDevice, serverresponse.transId,
-        serverresponse.status,
-        serverresponse.offset,
-        serverresponse.value,
-        serverresponse.length) == GattStatus::GATT_SUCCESS) {
+
+    HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice))
+    int status = gattServer->GetServer()->SendResponse(
+                remoteDevice, serverresponse.transId,
+                serverresponse.status,
+                serverresponse.offset,
+                serverresponse.value,
+                serverresponse.length);
+    if (status == GattStatus::GATT_SUCCESS) {
+        HILOGI("successful");
         isOK = true;
+    } else {
+        HILOGE("failed, status: %{public}d", status);
     }
 
     napi_value ret = nullptr;
@@ -266,7 +289,7 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
 
 napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callback_info info)
 {
-    HILOGI("NotifyCharacteristicChanged called");
+    HILOGI("enter");
     NapiGattServer* gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -291,9 +314,13 @@ napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callba
         HILOGI("characteristic is nullptr");
         return ret;
     }
-    if (gattServer->GetServer()->NotifyCharacteristicChanged(
-        remoteDevice, *characteristic, false) == GattStatus::GATT_SUCCESS) {
+
+    int status = gattServer->GetServer()->NotifyCharacteristicChanged(remoteDevice, *characteristic, false);
+    if (status == GattStatus::GATT_SUCCESS) {
+        HILOGI("successful");
         isOK = true;
+    } else {
+        HILOGE("failed, status: %{public}d", status);
     }
 
     napi_get_boolean(env, isOK, &ret);
