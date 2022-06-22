@@ -27,6 +27,7 @@ thread_local napi_ref NapiGattClient::consRef_ = nullptr;
 napi_value NapiGattClient::CreateGattClientDevice(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -161,9 +162,7 @@ napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
     ParseString(env, type, argv[PARAM0]);
     napi_unwrap(env, thisVar, (void **)&gattClient);
     gattClient->GetCallback().SetCallbackInfo(type, nullptr);
-    
     HILOGI("%{public}s is removed", type.c_str());
-    
     return ret;
 }
 
@@ -177,7 +176,6 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void **)&gattClient);
-
     int status = gattClient->GetClient()->Connect(gattClient->GetCallback(), true, GATT_TRANSPORT_TYPE_LE);
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
@@ -200,7 +198,6 @@ napi_value NapiGattClient::Disconnect(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattClient);
-
     int status = gattClient->GetClient()->Disconnect();
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
