@@ -85,6 +85,8 @@
           "pages/subManualApiTest/subProfileTest/a2dpProfileTest",
           "pages/subManualApiTest/subGattTest/gattClient",
           "pages/subManualApiTest/subGattTest/gattServer",
+          "pages/subManualApiTest/subSppTest/sppClientTest",
+          "pages/subManualApiTest/subSppTest/sppServerTest",
           "pages/subManualApiTest/subBrTest/BrInterfaceTest"
         ],
         "name": ".MainAbility",
