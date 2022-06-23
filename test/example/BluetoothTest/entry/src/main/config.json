@@ -77,9 +77,11 @@
           "pages/autoTest",
           "pages/confInfo",
           "pages/subManualApiTest/bleTest",
-          "pages/subManualApiTest/brTest",
           "pages/subManualApiTest/subBrTest/deviceName",
-          "pages/subManualApiTest/gattTest",
+          "pages/subManualApiTest/subBrTest/setScanMode",
+          "pages/subManualApiTest/subBrTest/deviceFound",
+          "pages/subManualApiTest/subBrTest/profileConnState",
+	  "pages/subManualApiTest/gattTest",
           "pages/subManualApiTest/sppTest",
           "pages/subManualApiTest/profileTest",
           "pages/subManualApiTest/subProfileTest/a2dpProfileTest",
@@ -87,8 +89,8 @@
           "pages/subManualApiTest/subGattTest/gattServer",
           "pages/subManualApiTest/subSppTest/sppClientTest",
           "pages/subManualApiTest/subSppTest/sppServerTest",
-          "pages/subManualApiTest/subBrTest/BrInterfaceTest"
-        ],
+          "pages/subManualApiTest/BrInterfaceTest"
+	],
         "name": ".MainAbility",
         "window": {
           "designWidth": 720,
