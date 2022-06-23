@@ -74,7 +74,7 @@ int HidHostUhid::SendData(uint8_t* pRpt, uint16_t len)
 
     if (fd_ >= 0) {
         uint32_t polling_attempts = 0;
-        while (!readyForData_ && polling_attempts++ < MAX_POLLING_ATTEMPTS) {
+        while (!readyForData_ && (polling_attempts++ < MAX_POLLING_ATTEMPTS)) {
             usleep(POLLING_SLEEP_DURATION_US);
         }
     }
@@ -95,7 +95,7 @@ int HidHostUhid::SendControlData(uint8_t* pRpt, uint16_t len)
 
     if (fd_ >= 0) {
         uint32_t polling_attempts = 0;
-        while (!readyForData_ && polling_attempts++ < MAX_POLLING_ATTEMPTS) {
+        while (!readyForData_ && (polling_attempts++ < MAX_POLLING_ATTEMPTS)) {
             usleep(POLLING_SLEEP_DURATION_US);
         }
     }
@@ -124,7 +124,7 @@ int HidHostUhid::SendHandshake(uint16_t err)
 
     if (fd_ >= 0) {
         uint32_t polling_attempts = 0;
-        while (!readyForData_ && polling_attempts++ < MAX_POLLING_ATTEMPTS) {
+        while (!readyForData_ && (polling_attempts++ < MAX_POLLING_ATTEMPTS)) {
             usleep(POLLING_SLEEP_DURATION_US);
         }
     }
