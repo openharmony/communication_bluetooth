@@ -37,7 +37,7 @@ export struct SubEntryComponent {
             .margin({left: $r('app.float.distance_8')})
             .textAlign(TextAlign.Start);
         }
-        Image('/res/image/ic_settings_arrow.svg')
+        Image(('app.media.ic_settings_arrow'))
           .width($r('app.float.wh_value_12'))
           .height($r('app.float.wh_value_24'))
           .margin({right: $r('app.float.distance_8')});

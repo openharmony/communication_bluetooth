@@ -146,6 +146,7 @@ export default class BluetoothDeviceController extends BaseSettingsController {
     const result = BluetoothModel.pairDevice(deviceId);
     LogUtil.log(this.TAG + 'bluetooth pairDevice result = ' + result);
     if (!result) {
+      AppStorage.SetOrCreate('pairedDeviceId', '');
       BluetoothModel.unsubscribePinRequired(() => LogUtil.log(this.TAG + 'available pinRequired unsubscribed.'));
       if (error) {
         error();

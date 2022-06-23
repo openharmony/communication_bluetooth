@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,19 +15,18 @@
 import ConfigData from '../../../../Utils/ConfigData';
 import HeadComponent from '../../../../Component/headComponent';
 import BluetoothModel from '../../../model/BluetoothModel';
-import Router from '@system.router';
-import InputMethod from '@ohos.inputmethod';
+import Router from '@system.router'
+import { TitleComponent } from '../../../../Component/titleComponent';
 
 /**
  * about phone
  */
 @Entry
 @Component
-struct DeviceName {
-  private deviceName: string = BluetoothModel.getLocalName();
-  //private deviceName: string = 'testName';
-  private deviceInfo: any = ''
-  private aboutDeviceList: any[] = []
+struct profileConnState {
+  @State message: string = "";
+  @State currentClick: number = -1;
+  @State profileId: number = -1;
 
   build() {
     Column(){
@@ -43,32 +42,51 @@ struct DeviceName {
           });
 
           Column() {
-            HeadComponent({ headName: $r('app.string.bt_device_name_title'), isActive: true })
+            HeadComponent({ headName: '选择PROFILE ID', isActive: true })
 
-            TextInput({ text: this.deviceName})
-              .placeholderFont({size: $r("app.float.font_18"), weight:FontWeight.Normal, style: FontStyle.Normal})
-              .type(InputType.Normal)
-              .enterKeyType(EnterKeyType.Done)
-              .caretColor(Color.Blue)
-              .padding({left: $r('sys.float.ohos_id_card_margin_start'), right: $r('sys.float.ohos_id_card_margin_end')})
-              .height($r("app.float.wh_value_40"))
-              .borderRadius(0)
-              .backgroundColor($r('app.color.color_00000000_transparent'))
-              .onChange((value: string) => {
-                console.info(ConfigData.TAG + 'device name changed to: ' + JSON.stringify(value));
-                this.deviceName = value;
-              })
-              .onSubmit((enterKey) => {
-                InputMethod.getInputMethodController().stopInput().then((ret) => {
-                  console.info( `${ConfigData.TAG}, enterType: ${enterKey}, stopInput: ${ret}`);
-                });
-              })
             Divider()
               .padding({left: $r('sys.float.ohos_id_card_margin_start'), right: $r('sys.float.ohos_id_card_margin_end')})
 
             Column(){
+
+              List() {
+                ListItem() {
+                  TitleComponent({
+                    title: "SELECT_PROFILE_ID",
+                    bgColor: $r('app.color.ab274f')});
+                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+                .onClick(() => {
+                })
+                ListItem() {
+                  TitleComponent({
+                    title: "A2DP_SOURCE",
+                    fontSize: '15vp',
+                    bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
+                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+                .onClick(() => {
+                  this.currentClick = 0;
+                  this.profileId = 1;
+                  AppStorage.SetOrCreate('profileId', 'A2DP_SOURCE');
+                })
+                ListItem() {
+                  TitleComponent({
+                    title: "HANDS_FREE_AUDIO_GATEWAY",
+                    fontSize: '15vp',
+                    bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
+                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+                .onClick(() => {
+                  this.currentClick = 1;
+                  this.profileId = 4;
+                  AppStorage.SetOrCreate('profileId', 'HANDS_FREE_AUDIO_GATEWAY');
+                })
+              }
               Blank()
-            }.height(ConfigData.WH_25_100)
+            }
+
+            Text(this.message)
+              .textAlign(TextAlign.Start)
+              .fontSize('20fp')
+              .backgroundColor($r("app.color.ab274f"))
 
             Flex({direction: FlexDirection.Row, justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }){
               Row(){
@@ -80,8 +98,13 @@ struct DeviceName {
               .margin({right: $r("app.float.distance_12")})
               Row(){
                 ButtonComponent({text: $r("app.string.confirm"), onClick: () => {
-                  let ret = BluetoothModel.setLocalName(this.deviceName);
-                  AppStorage.SetOrCreate('setLocalNameRet', ret);
+                  if(this.currentClick === -1) {
+                    this.message = '请点击选择SCAN MODE';
+                    return;
+                  }
+                  this.message = '';
+                  let ret = BluetoothModel.getProfileConnState(this.profileId);
+                  AppStorage.SetOrCreate('getProfileConnState', ret);
                   Router.back();
                 }})
               }.width($r("app.float.deviceName_button_width"))
@@ -96,6 +119,7 @@ struct DeviceName {
           });
 
           Column() {
+
           }
           .width(ConfigData.WH_100_100)
           .height(ConfigData.WH_100_100)
