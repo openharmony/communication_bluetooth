@@ -1415,12 +1415,8 @@ void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRe
 
 bool BluetoothHostServer::IsBtEnabled()
 {
-    bool isEnabled = GetBtState() == static_cast<int32_t>(bluetooth::BTStateID::STATE_TURN_ON);
-    if (isEnabled) {
-        HILOGI("true");
-    } else {
-        HILOGI("false");
-    }
+    bool isEnabled = (GetBtState() == static_cast<int32_t>(bluetooth::BTStateID::STATE_TURN_ON)) ? true : false;
+    HILOGI("%{public}s", isEnabled ? "true" : "false");
     return isEnabled;
 }
 
