@@ -34,6 +34,7 @@ struct SppClient {
   private sppOption: any = {uuid: '00001810-0000-1000-8000-00805F9B34FB', secure: false, type: 0};
   private serverNumber: number = -1;
   private clientNumber: number = -1;
+  private sppWriteText: string = '';
 
   build() {
     Row() {
@@ -80,6 +81,8 @@ struct SppClient {
           Text(this.message)
             .textAlign(TextAlign.Start)
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+
+          TitleComponent({ title: this.sppWriteText })
         }
         .visibility(Visibility.Visible);
       }
@@ -112,8 +115,10 @@ struct SppClient {
     );
     if (sppWriteSuccess) {
       console.log('sppWrite successfully');
+      this.sppWriteText = 'write success';
     } else {
       console.log('sppWrite failed');
+      this.sppWriteText = 'write false';
     }
   }
 
