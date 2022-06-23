@@ -608,7 +608,7 @@ napi_value NapiGattClient::WriteCharacteristicValue(napi_env env, napi_callback_
 
     GattCharacteristic* characteristic = GetCharacteristicFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
     if (characteristic != nullptr) {
-        HiLOGI("Client write characteristic");
+        HILOGI("Client write characteristic");
         int status = gattClient->GetClient()->WriteCharacteristic(*characteristic);
         if (status == GattStatus::GATT_SUCCESS) {
             HILOGI("successful");
@@ -645,7 +645,7 @@ napi_value NapiGattClient::WriteDescriptorValue(napi_env env, napi_callback_info
 
     GattDescriptor* descriptor = GetDescriptorFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
     if (descriptor != nullptr) {
-        HiLOGI("Client write descriptor");
+        HILOGI("Client write descriptor");
         int status = gattClient->GetClient()->WriteDescriptor(*descriptor);
         if (status == GattStatus::GATT_SUCCESS) {
             HILOGI("successful");
@@ -721,7 +721,7 @@ napi_value NapiGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_cal
     bool enableNotify = false;
     ParseBool(env, enableNotify, argv[PARAM1]);
 
-    int status = gattClient->GetClient()->SetNotifyCharacteristic(*characteristic, enableNotify)
+    int status = gattClient->GetClient()->SetNotifyCharacteristic(*characteristic, enableNotify);
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
         isOK = true;

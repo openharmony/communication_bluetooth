@@ -16,6 +16,7 @@
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_ble.h"
 #include "napi_bluetooth_utils.h"
 
@@ -236,7 +237,7 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
     gattService = gattServer->GetServer()->GetService(serviceUuid, false);
     if (gattService != std::nullopt) {
         int status = gattServer->GetServer()->RemoveGattService(*gattService);
-        if (gattServer->GetServer()->RemoveGattService(*gattService) == GattStatus::GATT_SUCCESS) {
+        if (status == GattStatus::GATT_SUCCESS) {
             HILOGI("successful");
             isOK = true;
         } else {
@@ -266,13 +267,13 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
     napi_unwrap(env, thisVar, (void**)&gattServer);
     BluetoothRemoteDevice remoteDevice =
         BluetoothHost::GetDefaultHost().GetRemoteDevice(serverresponse.deviceId, 1);
-    HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice))
+    HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice));
     int status = gattServer->GetServer()->SendResponse(
-                remoteDevice, serverresponse.transId,
-                serverresponse.status,
-                serverresponse.offset,
-                serverresponse.value,
-                serverresponse.length);
+        remoteDevice, serverresponse.transId,
+        serverresponse.status,
+        serverresponse.offset,
+        serverresponse.value,
+        serverresponse.length);
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
         isOK = true;

@@ -15,6 +15,7 @@
 #include "napi_bluetooth_ble_central_manager_callback.h"
 
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_utils.h"
 #include "securec.h"
 
@@ -275,7 +276,7 @@ void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEve
 
 void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results)
 {
-    HILOGI("enter, scan result size: %{public}d", results.size());
+    HILOGI("enter, scan result size: %{public}zu", results.size());
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
     if (!observers[REGISTER_BLE_FIND_DEVICE_TYPE]) {
         HILOGI("This callback is not registered by ability.");

@@ -14,6 +14,7 @@
  */
 #include <uv.h>
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_gatt_server.h"
 #include "napi_bluetooth_gatt_server_callback.h"
 
