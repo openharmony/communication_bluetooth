@@ -37,6 +37,13 @@
       "value": "SPP业务"
     },
     {
+      "name": "spp_client_test_title",
+      "value": "SPP_CLIENT业务"
+    },    {
+      "name": "spp_server_test_title",
+      "value": "SPP_SERVER业务"
+    },
+    {
       "name": "profile_test_title",
       "value": "Profile业务"
     },
