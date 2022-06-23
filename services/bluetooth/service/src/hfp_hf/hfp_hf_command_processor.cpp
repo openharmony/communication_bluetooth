@@ -375,7 +375,7 @@ void HfpHfCommandProcessor::ProcessCindGetter(HfpHfDataConnection &dataConn, std
     const char *buf = arg.c_str();
 
     for (; ;) {
-        auto res = sscanf_s(buf, "%d%n", &value, &offset);
+        auto res = sscanf_s(buf, "%u%n", &value, &offset);
         if (res != 1) {
             LOG_WARN("[HFP HF]%{public}s():invalid command buf[%{public}s]", __FUNCTION__, buf);
             return;
