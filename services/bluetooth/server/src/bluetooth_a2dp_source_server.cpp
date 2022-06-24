@@ -14,7 +14,9 @@
  */
 
 #include "bluetooth_def.h"
+#include "bluetooth_hitrace.h"
 #include "bluetooth_log.h"
+#include "hisysevent.h"
 #include "interface_profile_manager.h"
 #include "interface_profile_a2dp_src.h"
 #include "remote_observer_list.h"
@@ -31,6 +33,11 @@ public:
 
     void OnConnectionStateChanged(const RawAddress &device, int state) override
     {
+        if (state == static_cast<int>(BTConnectState::CONNECTED) ||
+            state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_A2DP_CONNECTED_STATE",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", state);
+        }
         observers_->ForEach([device, state](sptr<IBluetoothA2dpSourceObserver> observer) {
             observer->OnConnectionStateChanged(device, state);
         });
@@ -194,7 +201,10 @@ int BluetoothA2dpSourceServer::Connect(const RawAddress &device)
         HILOGE("Connect error, check permission failed");
         return BT_FAILURE;
     }
-    return pimpl->a2dpSrcService_->Connect(device);
+    OHOS::Bluetooth::BluetoothHiTrace::BluetoothStartAsyncTrace("A2DP_SRC_CONNECT", 1);
+    int result = pimpl->a2dpSrcService_->Connect(device);
+    OHOS::Bluetooth::BluetoothHiTrace::BluetoothFinishAsyncTrace("A2DP_SRC_CONNECT", 1);
+    return result;
 }
 
 int BluetoothA2dpSourceServer::Disconnect(const RawAddress &device)
