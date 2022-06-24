@@ -238,6 +238,13 @@ private:
      * @since 6.0
      */
     void SetStateName(std::string state);
+
+    /**
+     * @brief Process the indication of delay reporting.
+     * @param[in] msgData The information of message
+     * @param[in] role The role of local profile
+     */
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
 };
 
 class A2dpStateOpening : public utility::StateMachine::State {
@@ -311,6 +318,13 @@ private:
      * @since 6.0
      */
     void SetStateName(std::string state);
+
+    /**
+     * @brief Process the indication of delay reporting.
+     * @param[in] msgData The information of message
+     * @param[in] role The role of local profile
+     */
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
 };
 
 class A2dpStateOpen : public utility::StateMachine::State {
@@ -435,6 +449,13 @@ private:
      */
     void SetStateName(std::string state);
 
+    /**
+     * @brief Process the indication of delay reporting.
+     * @param[in] msgData The information of message
+     * @param[in] role The role of local profile
+     */
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
+
     uint8_t label_ = 0;
 };
 
@@ -540,6 +561,13 @@ private:
      * @since 6.0
      */
     void SetStateName(std::string state);
+
+    /**
+     * @brief Process the indication of delay reporting.
+     * @param[in] msgData The information of message
+     * @param[in] role The role of local profile
+     */
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
 
     uint8_t label_ = 0;
 };

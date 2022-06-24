@@ -189,12 +189,19 @@ struct ConnectReq {
     uint8_t errCode;
 };
 
+struct DelayReportInfo {
+    BtAddr addr;
+    uint16_t handle;
+    uint16_t delayValue;
+};
+
 union A2dpAvdtMsgData {
     StreamInfo stream;
     ConnectReq connectInfo;
     ConfigureStream configStream;
     ConfigrueRsp configRsp;
     GetConfigrueRsp getConfigureRsp;
+    DelayReportInfo delayReportInfo;
     AvdtSepInfo discoverData[AVDT_NUM_SEPS];
     SepDetail sepDetail;
     AvdtCtrlData msg;

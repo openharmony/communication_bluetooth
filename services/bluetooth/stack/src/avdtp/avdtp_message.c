@@ -1946,6 +1946,7 @@ uint8_t AvdtIndSeidCheck(AvdtSigCtrl *sigCtrl, uint8_t sigId, uint8_t data)
         case AVDT_SIG_SUSPEND:
         case AVDT_SIG_RECONFIG:
         case AVDT_SIG_SETCONFIG:
+        case AVDT_SIG_DELAY_RPT:
             seid = AvdtParseSeid(data);
             if (seid == AVDT_SEID_INVLID) {
                 LOG_ERROR("[AVDT]%{public}s:BAD SEID of the cmd!", __func__);
@@ -2030,7 +2031,8 @@ uint8_t AvdtServiceCapCheck(AvdtSigCtrl *sigCtrl, uint8_t sigId, uint8_t data)
         err = AVDT_ERR_BAD_SERV_CATEGORY;
     } else if (sigId == AVDT_SIG_RECONFIG && data != AVDT_PSC_CODEC) {
         err = AVDT_ERR_INVALID_CAPABILITIES;
-    } else if ((data != AVDT_PSC_TRANS) && (data != AVDT_PSC_CODEC) && (data != AVDT_PSC_DELAY_RPT)) {
+    } else if ((data != AVDT_PSC_TRANS) && (data != AVDT_PSC_CODEC) && (data != AVDT_PSC_DELAY_RPT)
+        && (data != AVDT_PSC_PROTECT)) {
         err = AVDT_ERR_INVALID_CAPABILITIES;
     }
     if (err != 0) {

@@ -109,7 +109,6 @@ struct A2dpSbcEncoderCb {
     uint8_t pcmRemain[A2DP_SBC_MAX_PACKET_SIZE];
     uint16_t offsetPCM;
     uint16_t sendDataSize;
-    uint16_t dalayValue;
 };
 
 class A2dpSbcEncoder : public A2dpEncoder {
@@ -119,7 +118,8 @@ public:
     void ResetFeedingState(void) override;
     void SendFrames(uint64_t timeStampUs) override;
     void UpdateEncoderParam() override;
-    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
+    void GetRenderPosition(uint16_t &sendDataSize, uint32_t &timeStamp) override;
+
 private:
     sbc::IEncoderBase* sbcEncoder_ = nullptr;
     std::unique_ptr<A2dpSBCDynamicLibCtrl> codecLib_ = nullptr;

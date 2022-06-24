@@ -293,6 +293,9 @@ bool A2dpStateConfigure::Dispatch(const utility::Message &msg)
             avdtp.DisconnectReq(msgData.stream.addr);
             SetStateName(A2DP_PROFILE_CLOSING);
             break;
+        case EVT_DELAY_IND:
+            ProcessDelayReportInd(msgData, role);
+            break;
         default:
             break;
     }
@@ -418,6 +421,25 @@ void A2dpStateConfigure::ProcessSetConfigInd(A2dpAvdtMsgData msgData, uint8_t ro
     avdtp.SetConfigureRsp(msgData.configRsp.handle, msgData.configRsp.label, msgData.configRsp.category);
 }
 
+void A2dpStateConfigure::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+{
+    LOG_INFO("[A2dpStateConfigure]%{public}s\n", __func__);
+    if (role == A2DP_ROLE_SINK) {
+        LOG_INFO("[A2dpStateConfigure]%{public}s sink role does not handle delay report ind return.", __func__);
+        return;
+    }
+
+    A2dpProfile *profile = GetProfileInstance(role);
+    if (profile == nullptr) {
+        LOG_ERROR("[A2dpStateConfigure]%{public}s Failed to get profile instance\n", __func__);
+        return;
+    }
+
+    BtAddr addr =  msgData.delayReportInfo.addr;
+    uint16_t value = msgData.delayReportInfo.delayValue;
+    profile->DelayReportNotify(addr, value, nullptr);
+}
+
 bool A2dpStateOpening::Dispatch(const utility::Message &msg)
 {
     LOG_INFO("[A2dpStateOpening]%{public}s\n", __func__);
@@ -450,6 +472,9 @@ bool A2dpStateOpening::Dispatch(const utility::Message &msg)
         case EVT_TIME_OUT:
             avdtp.DisconnectReq(msgData.stream.addr);
             SetStateName(A2DP_PROFILE_CLOSING);
+            break;
+        case EVT_DELAY_IND:
+            ProcessDelayReportInd(msgData, role);
             break;
         default:
             break;
@@ -521,6 +546,25 @@ void A2dpStateOpening::ProcessDisconnectInd(BtAddr addr, uint16_t handle, uint8_
     profile->ConnectStateChangedNotify(addr, STREAM_DISCONNECT, (void *)&param);
 }
 
+void A2dpStateOpening::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+{
+    LOG_INFO("[A2dpStateOpening]%{public}s\n", __func__);
+    if (role == A2DP_ROLE_SINK) {
+        LOG_INFO("[A2dpStateOpening]%{public}s sink role does not handle delay report ind return.", __func__);
+        return;
+    }
+
+    A2dpProfile *profile = GetProfileInstance(role);
+    if (profile == nullptr) {
+        LOG_ERROR("[A2dpStateOpening]%{public}s Failed to get profile instance\n", __func__);
+        return;
+    }
+
+    BtAddr addr =  msgData.delayReportInfo.addr;
+    uint16_t value = msgData.delayReportInfo.delayValue;
+    profile->DelayReportNotify(addr, value, nullptr);
+}
+
 bool A2dpStateOpen::Dispatch(const utility::Message &msg)
 {
     if (msg.arg2_ == nullptr) {
@@ -563,6 +607,9 @@ bool A2dpStateOpen::Dispatch(const utility::Message &msg)
             break;
         case EVT_START_CFM:
             ProcessStartCfm(msgData.stream.addr, role);
+            break;
+        case EVT_DELAY_IND:
+            ProcessDelayReportInd(msgData, role);
             break;
         default:
             ProcessSubOpenState(msgData, role, msg.what_);
@@ -730,6 +777,25 @@ void A2dpStateOpen::ProcessStartCfm(BtAddr addr, uint8_t role)
     }
 }
 
+void A2dpStateOpen::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+{
+    LOG_INFO("[A2dpStateOpen]%{public}s\n", __func__);
+    if (role == A2DP_ROLE_SINK) {
+        LOG_INFO("[A2dpStateOpen]%{public}s sink role does not handle delay report ind return.", __func__);
+        return;
+    }
+
+    A2dpProfile *profile = GetProfileInstance(role);
+    if (profile == nullptr) {
+        LOG_ERROR("[A2dpStateOpen]%{public}s Failed to get profile instance\n", __func__);
+        return;
+    }
+
+    BtAddr addr =  msgData.delayReportInfo.addr;
+    uint16_t value = msgData.delayReportInfo.delayValue;
+    profile->DelayReportNotify(addr, value, nullptr);
+}
+
 void A2dpStateOpen::ProcessTimeout(BtAddr addr, uint8_t role)
 {
     LOG_INFO("[A2dpStateOpen]%{public}s\n", __func__);
@@ -811,6 +877,9 @@ bool A2dpStateStreaming::Dispatch(const utility::Message &msg)
             break;
         case EVT_WRITE_CFM:
             ProcessWriteCfm(msgData, role);
+            break;
+        case EVT_DELAY_IND:
+            ProcessDelayReportInd(msgData, role);
             break;
         default:
             break;
@@ -947,6 +1016,25 @@ void A2dpStateStreaming::ProcessCloseCfm(BtAddr addr, uint8_t role)
     if (profile->FindPeerByAddress(addr)->GetRestart()) {
         profile->FindPeerByAddress(addr)->UpdateConfigure();
     }
+}
+
+void A2dpStateStreaming::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+{
+    LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
+    if (role == A2DP_ROLE_SINK) {
+        LOG_INFO("[A2dpStateStreaming]%{public}s sink role does not handle delay report ind return.", __func__);
+        return;
+    }
+
+    A2dpProfile *profile = GetProfileInstance(role);
+    if (profile == nullptr) {
+        LOG_ERROR("[A2dpStateStreaming]%{public}s Failed to get profile instance\n", __func__);
+        return;
+    }
+
+    BtAddr addr =  msgData.delayReportInfo.addr;
+    uint16_t value = msgData.delayReportInfo.delayValue;
+    profile->DelayReportNotify(addr, value, nullptr);
 }
 
 bool A2dpStateClosing::Dispatch(const utility::Message &msg)
