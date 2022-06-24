@@ -37,7 +37,7 @@ int BluetoothA2dpSinkProxy::Connect(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothA2dpSinkProxy::Connect done fail, error: %{public}d", error);
         return ERROR;
@@ -63,7 +63,7 @@ int BluetoothA2dpSinkProxy::Disconnect(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothA2dpSinkProxy::Disconnect done fail, error: %{public}d", error);
         return ERROR;
