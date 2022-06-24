@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,7 +197,7 @@ public:
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
                 HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BR_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_STATE", state);
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
             }
             if (state == BTStateID::STATE_TURN_ON) {
                 auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
@@ -226,7 +226,7 @@ public:
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
                 HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BLE_STATE", state);
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
             }
         }
     };
@@ -248,8 +248,8 @@ public:
         if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
             int32_t pid = IPCSkeleton::GetCallingPid();
             int32_t uid = IPCSkeleton::GetCallingUid();
-            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_SCAN_STATE",
-                HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_SCAN_STATE", status);
+            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_DISCOVERY_STATE",
+                HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", status);
         }
     }
 
