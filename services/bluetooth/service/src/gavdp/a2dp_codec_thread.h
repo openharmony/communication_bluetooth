@@ -133,12 +133,11 @@ public:
 
     /**
      * @brief Get the information of the current rendered position.
-     * @param[out] dalayValue is the delayed time
      * @param[out] sendDataSize is the data size that has been sent
      * @param[out] timeStamp is the current time stamp
      * @since 6.0
      */
-    void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) const;
+    void GetRenderPosition(uint16_t &sendDataSize, uint32_t &timeStamp) const;
 
 private:
     /**

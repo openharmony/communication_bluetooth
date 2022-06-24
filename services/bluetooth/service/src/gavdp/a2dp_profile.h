@@ -524,6 +524,14 @@ public:
      */
     uint32_t GetPcmData(uint8_t *buf, uint32_t size);
 
+    /**
+     * @brief A function to notify the delay report value changed.
+     *
+     * @param[in]   addr: The address of peer device
+     * @param[in]   delayValue: The delay value
+     * @param[in]   context: the detail information of this callback
+     */
+    void DelayReportNotify(const BtAddr &addr, const uint16_t delayValue, void *context);
 private:
     /**
      * @brief Get the instance of SDP.
@@ -597,6 +605,13 @@ private:
      */
     static int DeregisterServiceSecurity(GAP_ServiceConnectDirection direction, GAP_Service serviceId);
 
+    /**
+     * @brief A function to reset the delay report value.
+     *
+     * @param[in]   addr: The address of peer device
+     */
+    void ResetDelayValue(const BtAddr &device);
+
     BT_DISALLOW_COPY_AND_ASSIGN(A2dpProfile);
     A2dpProfile() = delete;
     bool enable_ = false;
@@ -611,6 +626,7 @@ private:
     Queue *packetQueue_ = nullptr; // queue of packets to be sent
     A2dpSharedBuffer *buffer_ = nullptr;
     bool isDoDisable_ = false;
+    uint16_t delayValue_ = 0;
 };
 /**
  * @brief A function to receive stream data.

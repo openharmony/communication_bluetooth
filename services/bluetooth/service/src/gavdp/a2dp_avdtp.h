@@ -423,6 +423,15 @@ private:
         const uint8_t role, A2dpAvdtMsg &msg, const AvdtCtrlData &data);
 
     /**
+     * @brief A function to parse delay report indication from avdtp
+     *
+     * @param[in] bdAddr The address of peer device
+     * @param[in] role The role of local profile(Acceptor: is confirmed after configure)
+     * @param[in] msg The message sent to a2dp profile state machine
+     */
+    static uint8_t ParseAvdtpDelayReportInd(const uint16_t handle, const BtAddr bdAddr,
+        const uint8_t role, A2dpAvdtMsg &msg, const AvdtCtrlData &data);
+    /**
      * @brief A function to parse connect confirm from avdtp
      *
      * @param[in] bdAddr The address of peer device

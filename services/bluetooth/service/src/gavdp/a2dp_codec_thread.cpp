@@ -162,11 +162,11 @@ bool A2dpCodecThread::GetInitStatus() const
 }
 
 
-void A2dpCodecThread::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) const
+void A2dpCodecThread::GetRenderPosition(uint16_t &sendDataSize, uint32_t &timeStamp) const
 {
     LOG_INFO("[A2dpCodecThread]%{public}s\n", __func__);
     if (encoder_ != nullptr) {
-        encoder_->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+        encoder_->GetRenderPosition(sendDataSize, timeStamp);
     }
 }
 
