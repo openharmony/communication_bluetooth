@@ -16,6 +16,7 @@
 #include "bluetooth_ble_central_manager_server.h"
 #include "ble_service_data.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils_server.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "interface_adapter_ble.h"
@@ -66,13 +67,12 @@ public:
 
     void OnScanCallback(const BleScanResultImpl &result) override
     {
-        HILOGI("BleCentralManageCallback::OnScanCallback start.");
+        HILOGI("Address: %{public}s",
+            GetEncryptAddr(result.GetPeripheralDevice().GetRawAddress().GetAddress()).c_str());
         observers_->ForEach([this, result](IBluetoothBleCentralManagerCallback *observer) {
-            HILOGI("BleCentralManageCallback::OnScanCallback:Address= %{public}s",
-                result.GetPeripheralDevice().GetRawAddress().GetAddress().c_str());
             uint32_t  tokenId = this->pimpl_->observersToken_[observer->AsObject()];
             if (PermissionUtils::VerifyUseBluetoothPermission(tokenId) == PERMISSION_DENIED) {
-                HILOGE("OnScanCallback() false, check permission failed");
+                HILOGE("OnScanCallback(): failed, check permission failed, tokenId: %{public}u", tokenId);
             } else {
                 BluetoothBleScanResult bleScanResult;
                 if (result.GetPeripheralDevice().IsRSSI()) {
@@ -118,15 +118,12 @@ public:
 
     void OnBleBatchScanResultsEvent(std::vector<BleScanResultImpl> &results) override
     {
-        HILOGI("BleCentralManageCallback::OnBleBatchScanResultsEvent start.");
+        HILOGI("enter");
 
         observers_->ForEach([results](IBluetoothBleCentralManagerCallback *observer) {
             std::vector<BluetoothBleScanResult> bleScanResults;
 
             for (auto iter = results.begin(); iter != results.end(); iter++) {
-                HILOGI("BleCentralManageCallback::OnScanCallback:Address= %{public}s",
-                    iter->GetPeripheralDevice().GetRawAddress().GetAddress().c_str());
-
                 BluetoothBleScanResult bleScanResult;
 
                 if (iter->GetPeripheralDevice().IsRSSI()) {
@@ -174,7 +171,7 @@ public:
 
     void OnStartScanFailed(int resultCode) override
     {
-        HILOGI("BleCentralManageCallback::OnStartScanFailed start.");
+        HILOGI("enter, code: %{public}d", resultCode);
 
         pimpl_->eventHandler_->PostTask([=]() {
             pimpl_->bleService_ =
@@ -273,11 +270,11 @@ void BluetoothBleCentralManagerServer::StartScan()
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
-    HILOGI("BluetoothBleCentralManagerServer::StartScan start. pid:%{public}d uid:%{public}d", pid, uid);
+    HILOGI("pid: %{public}d, uid: %{public}d", pid, uid);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyLocationPermission() == PERMISSION_DENIED) {
-        HILOGE("StartScan error, check permission failed");
+        HILOGE("check permission failed");
         return;
     }
 
@@ -304,11 +301,11 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
-    HILOGI("BluetoothBleCentralManagerServer::StartScan with settings start. pid:%{public}d uid:%{public}d", pid, uid);
+    HILOGI("pid: %{public}d, uid: %{public}d", pid, uid);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyLocationPermission() == PERMISSION_DENIED) {
-        HILOGE("StartScan error, check permission failed");
+        HILOGE("check permission failed");
         return;
     }
 
@@ -349,9 +346,9 @@ void BluetoothBleCentralManagerServer::StopScan()
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
-    HILOGI("BluetoothBleCentralManagerServer::StopScan start. pid:%{public}d uid:%{public}d", pid, uid);
+    HILOGI("pid: %{public}d, uid: %{public}d", pid, uid);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("StopScan error, check permission failed");
+        HILOGE("check permission failed");
         return;
     }
 
@@ -379,7 +376,7 @@ void BluetoothBleCentralManagerServer::StopScan()
 int BluetoothBleCentralManagerServer::ConfigScanFilter(
     const int clientId, const std::vector<BluetoothBleScanFilter> &filters)
 {
-    HILOGI("BluetoothBleCentralManagerServer::ConfigScanFilter start.");
+    HILOGI("enter, clientId: %{public}d", clientId);
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -416,7 +413,7 @@ int BluetoothBleCentralManagerServer::ConfigScanFilter(
 
 void BluetoothBleCentralManagerServer::RemoveScanFilter(const int clientId)
 {
-    HILOGI("BluetoothBleCentralManagerServer::RemoveScanFilter start.");
+    HILOGI("enter, clientId: %{public}d", clientId);
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -431,13 +428,10 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
-    HILOGI("BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback start. pid:%{public}d uid:%{public}d",
-        pid,
-        uid);
+    HILOGI("pid: %{public}d, uid: %{public}d", pid, uid);
 
     if (callback == nullptr) {
-        HILOGI("BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback called with NULL binder. "
-               "Ignoring.");
+        HILOGE("callback is null");
         return;
     }
 
@@ -458,11 +452,10 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
 void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
-    HILOGI("BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback start.");
+    HILOGI("enter");
     pimpl->eventHandler_->PostSyncTask([&]() {
         if (callback == nullptr || pimpl == nullptr) {
-            HILOGI("BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback called with NULL binder. "
-                   "Ignoring.");
+            HILOGE("DeregisterBleCentralManagerCallback(): callback is null, or pimpl is null");
             return;
         }
         for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
