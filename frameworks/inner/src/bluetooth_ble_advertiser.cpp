@@ -39,7 +39,7 @@ struct BleAdvertiser::impl {
 
         void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) override
         {
-            HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnStartResultEvent");
+            HILOGI("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
             BleAdvertiseCallback *observer = nullptr;
             if (opcode == bluetooth::BLE_ADV_START_FAILED_OP_CODE) {
                 observer = bleAdvertiser_.callbacks_.PopAdvertiserObserver(advHandle);
@@ -54,7 +54,7 @@ struct BleAdvertiser::impl {
 
         void OnAutoStopAdvEvent(int32_t advHandle) override
         {
-            HILOGD("BleAdvertiser::impl::BluetoothBleAdvertiserCallbackImp::OnAutoStopAdvEvent advHandle");
+            HILOGI("advHandle: %{public}d", advHandle);
             BleAdvertiseCallback *observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
             if (observer != nullptr) {
                 bleAdvertiser_.callbacks_.Deregister(observer);
@@ -73,31 +73,31 @@ struct BleAdvertiser::impl {
 
 BleAdvertiser::impl::impl()
 {
-    HILOGE("BleAdvertiser::impl::impl()");
+    HILOGI("enter");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
-        HILOGE("BleAdvertiser::impl::impl() error: no samgr");
+        HILOGE("samgr is null");
         return;
     }
 
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (!hostRemote) {
-        HILOGE("BleAdvertiser::impl::impl() error: no remote");
+        HILOGE("hostRemote is null");
         return;
     }
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     if (!hostProxy) {
-        HILOGE("BleAdvertiser::impl::impl() error: host no proxy");
+        HILOGE("hostProxy is null");
         return;
     }
     sptr<IRemoteObject> remote = hostProxy->GetBleRemote(BLE_ADVERTISER_SERVER);
     if (!remote) {
-        HILOGE("BleAdvertiser::impl::impl() error: no remote");
+        HILOGE("remote is null");
         return;
     }
     proxy_ = iface_cast<IBluetoothBleAdvertiser>(remote);
     if (!proxy_) {
-        HILOGE("BleAdvertiser::impl::impl() error: no proxy");
+        HILOGE("proxy is null");
         return;
     }
 
@@ -115,11 +115,11 @@ BleAdvertiser::BleAdvertiser() : pimpl(nullptr)
     if (pimpl == nullptr) {
         pimpl = std::make_unique<impl>();
         if (!pimpl) {
-            HILOGE("BleAdvertiser::BleAdvertiser fails: no pimpl");
+            HILOGE("failed, no pimpl");
         }
     }
 
-    HILOGD("BleAdvertiser::BleAdvertiser success");
+    HILOGI("successful");
 }
 
 BleAdvertiser::~BleAdvertiser()
@@ -128,7 +128,7 @@ BleAdvertiser::~BleAdvertiser()
 void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const BleAdvertiserData &advData,
     const BleAdvertiserData &scanResponse, BleAdvertiseCallback &callback)
 {
-    HILOGD("BleAdvertiser::StartAdvertising");
+    HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
         BluetoothBleAdvertiserSettings setting;
         setting.SetConnectable(settings.IsConnectable());
@@ -168,6 +168,7 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
         } else {
             advHandle = pimpl->proxy_->GetAdvertiserHandle();
             if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
+                HILOGE("Invalid advertising handle");
                 callback.OnStartResultEvent(BLE_INVALID_ADVERTISING_HANDLE);
                 return;
             }
@@ -180,7 +181,7 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
 void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
     const std::vector<uint8_t> &scanResponse, BleAdvertiseCallback &callback)
 {
-    HILOGD("BleAdvertiser::StartAdvertising");
+    HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
         BluetoothBleAdvertiserSettings setting;
         setting.SetConnectable(settings.IsConnectable());
@@ -204,6 +205,7 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
         } else {
             advHandle = pimpl->proxy_->GetAdvertiserHandle();
             if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
+                HILOGE("Invalid advertising handle");
                 callback.OnStartResultEvent(BLE_INVALID_ADVERTISING_HANDLE);
                 return;
             }
@@ -215,10 +217,11 @@ void BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, cons
 
 void BleAdvertiser::StopAdvertising(BleAdvertiseCallback &callback)
 {
-    HILOGD("BleAdvertiser::StopAdvertising");
+    HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
         uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(&callback);
         if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
+            HILOGE("Invalid advertising handle");
             return;
         }
 
@@ -233,7 +236,7 @@ void BleAdvertiser::StopAdvertising(BleAdvertiseCallback &callback)
 
 void BleAdvertiser::Close(BleAdvertiseCallback &callback)
 {
-    HILOGD("BleAdvertiser::Close");
+    HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
         uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(&callback);
         if (advHandle != BLE_INVALID_ADVERTISING_HANDLE) {
@@ -256,6 +259,7 @@ BleAdvertiserData::~BleAdvertiserData()
 void BleAdvertiserData::AddServiceData(const ParcelUuid &uuid, const std::string &serviceData)
 {
     if (serviceData.empty()) {
+        HILOGE("serviceData is empty");
         return;
     }
 
@@ -265,6 +269,7 @@ void BleAdvertiserData::AddServiceData(const ParcelUuid &uuid, const std::string
 void BleAdvertiserData::AddManufacturerData(uint16_t manufacturerId, const std::string &data)
 {
     if (data.empty()) {
+        HILOGE("serviceData is empty");
         return;
     }
 
