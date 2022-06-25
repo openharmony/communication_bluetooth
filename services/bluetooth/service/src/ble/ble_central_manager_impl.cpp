@@ -22,6 +22,7 @@
 #include "ble_properties.h"
 #include "ble_utils.h"
 #include "common/adapter_manager.h"
+#include "hisysevent.h"
 #include "securec.h"
 
 namespace bluetooth {
@@ -840,6 +841,9 @@ void BleCentralManagerImpl::SetScanModeDuration(int scanMode, int type) const
         default:
             break;
     }
+    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_DUTY_CYCLE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "WINDOW", pimpl->scanParams_.scanWindow,
+        "INTERVAL", pimpl->scanParams_.scanInterval, "TYPE", pimpl->callBackType_);
 }
 
 void BleCentralManagerImpl::TimerCallback(void *context)

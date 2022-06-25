@@ -16,7 +16,9 @@
 
 #include "bluetooth_def.h"
 #include "bluetooth_hfp_ag_server.h"
+#include "bluetooth_hitrace.h"
 #include "bluetooth_log.h"
+#include "hisysevent.h"
 #include "interface_profile_hfp_ag.h"
 #include "interface_profile_manager.h"
 #include "interface_profile.h"
@@ -37,6 +39,11 @@ public:
     void OnConnectionStateChanged(const RawAddress& device, int state) override
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        if (state == static_cast<int>(BTConnectState::CONNECTED) ||
+            state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_HFP_CONNECTED_STATE",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", state);
+        }
         observers_->ForEach([device, state](IBluetoothHfpAgObserver* observer) {
             observer->OnConnectionStateChanged(device, state);
         });
@@ -207,7 +214,10 @@ int BluetoothHfpAgServer::Connect(const BluetoothRawAddress &device) {
     }
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpAgService_ != nullptr) {
-        return pimpl->HfpAgService_->Connect(addr);
+        OHOS::Bluetooth::BluetoothHiTrace::BluetoothStartAsyncTrace("HFP_AG_CONNECT", 1);
+        int result = pimpl->HfpAgService_ ->Connect(addr);
+        OHOS::Bluetooth::BluetoothHiTrace::BluetoothFinishAsyncTrace("HFP_AG_CONNECT", 1);
+        return result;
     }
     return BT_FAILURE;
 }
