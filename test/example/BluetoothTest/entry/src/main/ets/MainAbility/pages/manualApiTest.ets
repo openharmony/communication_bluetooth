@@ -41,7 +41,7 @@ struct ManualApiTest {
             Column({space: '12vp'}){
               List() {
                 ListItem() {
-                  SubEntryComponent({targetPage: 'pages/subManualApiTest/brTest', title: $r("app.string.br_test_title")})
+                  SubEntryComponent({targetPage: 'pages/subManualApiTest/BrInterfaceTest', title: $r("app.string.br_test_title")})
                 }
                 .padding({top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2')})
                 ListItem() {

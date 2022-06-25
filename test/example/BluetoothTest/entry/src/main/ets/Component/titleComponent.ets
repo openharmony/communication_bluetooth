@@ -20,20 +20,29 @@ import ConfigData from '../Utils/ConfigData';
 @Component
 export struct TitleComponent {
   private title:string | Resource;
+  private fontSize:string = '20vp';
+  private stateChangeFlag: boolean = false;
+  private pinRequiredFlag: boolean = false;
+  private bondStateChangeFlag: boolean = false;
+  @State bgColor: string | Resource = '';
   @State isTouched:boolean = false;
+  @StorageLink('on_stateChange') state: string = 'on:stateChange';
+  @StorageLink('on_pinRequired') pin: string = 'on:pinRequired';
+  @StorageLink('on_bondStateChange') bondState: string = 'on:bondStateChange';
 
   build() {
     Column(){
       Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems:ItemAlign.Center }) {
-        Text(this.title)
+        Text(this.stateChangeFlag ? this.state : (this.pinRequiredFlag ? this.pin : (this.bondStateChangeFlag ? this.bondState : this.title)))
           .textAlign(TextAlign.Center)
           .width("100%")
-          .fontSize("20vp")
+          .fontSize(this.fontSize)
           .fontColor($r('app.color.font_color_182431'))
           .fontWeight(FontWeight.Medium)
       }
       .height(ConfigData.WH_100_100)
       .width(ConfigData.WH_100_100)
+      .backgroundColor(this.bgColor)
       .linearGradient(this.isTouched ? {
          angle: 90,
          direction: GradientDirection.Right,

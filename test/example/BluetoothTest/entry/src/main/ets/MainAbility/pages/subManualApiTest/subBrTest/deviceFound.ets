@@ -12,28 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ConfigData from '../../../Utils/ConfigData';
-import HeadComponent from '../../../component/headcomponent';
-import EntryComponent from '../../../component/EntryComponent';
-import LogUtil from '../../../Utils/LogUtil';
-import BluetoothDeviceController from '../../controller/BluetoothDeviceController';
-import BluetoothDevice from '../../model/BluetoothDevice'
+import ConfigData from '../../../../Utils/ConfigData';
+import HeadComponent from '../../../../component/headcomponent';
+import EntryComponent from '../../../../component/EntryComponent';
+import LogUtil from '../../../../Utils/LogUtil';
+import BluetoothDeviceController from '../../../controller/BluetoothDeviceController';
+import BluetoothDevice from '../../../model/BluetoothDevice'
 import Router from '@system.router';
-import { DeviceType, DeviceState } from '../../model/BluetoothModel';
-import ImageAnimatorComponent from '../../../component/ImageAnimatorComponent';
-import {SubEntryComponent} from '../../../component/subentrycomponent';
+import { DeviceType, DeviceState } from '../../../model/BluetoothModel';
+import ImageAnimatorComponent from '../../../../component/ImageAnimatorComponent';
 /**
  * BR Test Page Of Bluetooth test
  */
 const PAIRED_ITEM_NUMBER = 3;
-const PAGE_URI_DEVICE_NAME = 'pages/subManualApiTest/subBrTest/deviceName';
 const PAGE_URI_BLUETOOTH_PAIRED_DEVICE_INFO = 'pages/subManualApiTest/subBrTest/BluetoothPairedDeviceInfo';
-const PAGE_URI_A2DP = 'pages/subManualApiTest/subProfileTest/a2dpProfileTest';
-const PAGE_URI_PROFILE = 'pages/subManualApiTest/profileTest';
 
 @Entry
 @Component
-struct BrTest {
+struct deviceFound {
   private PAGE_TAG = ConfigData.TAG + 'Bluetooth page '
   private deviceController: BluetoothDeviceController = new BluetoothDeviceController();
   @State message: string = 'BrTest';
@@ -58,9 +54,9 @@ struct BrTest {
     LogUtil.log(this.PAGE_TAG + 'onPageShow out : localName = ' + this.localName )
   }
 
-  aboutToDisappear(): void {
-    this.deviceController.unsubscribe();
-  }
+//  aboutToDisappear(): void {
+//    this.deviceController.unsubscribe();
+//  }
 
   build() {
     Column() {
@@ -75,48 +71,7 @@ struct BrTest {
             md: { span: 0, offset: 0 }, lg: { span: 2, offset: 0 }
           });
           Column({space: '12vp'}) {
-            HeadComponent({ headName: $r('app.string.br_test_title'), isActive: true });
-
-            Row() {
-              Text($r("app.string.bt_switch_title"))
-                .fontColor($r('sys.color.ohos_fa_text_primary'))
-                .fontSize($r("app.float.font_16"))
-
-              Blank()
-
-              Stack({ alignContent: Alignment.Center }) {
-                Toggle({ type: ToggleType.Switch, isOn: this.isOn })
-                  .width($r('app.float.switch_toggle_width'))
-                  .height($r('app.float.switch_toggle_height'))
-                  .onChange(() => {
-                    LogUtil.log(this.PAGE_TAG + 'Toggle onClick: isOn = ' + this.isOn + ', enabled = ' + this.enabled )
-                    if (!this.enabled) return;
-                    this.deviceController.toggleValue(!this.isOn);
-                  });
-              }
-              .width($r('app.float.wh_value_48'))
-              .height($r('app.float.wh_value_48'))
-
-            }
-            .width(ConfigData.WH_100_100)
-            .height($r('app.float.wh_value_56'))
-            .backgroundColor($r("app.color.white_bg_color"))
-            .margin({ top: $r('sys.float.ohos_id_elements_margin_vertical_m') })
-            .padding({
-              left: $r('sys.float.ohos_id_default_padding_start'),
-              right: $r('sys.float.ohos_id_default_padding_end')
-            })
-            .alignItems(VerticalAlign.Center)
-            .borderRadius($r('app.float.distance_24'))
-            List() {
-              ListItem() {
-                SubEntryComponent({
-                  targetPage: "pages/subManualApiTest/subBrTest/BrInterfaceTest",
-                  title: $r("app.string.br_interface_test_title")
-                })
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-            }
+            HeadComponent({ headName: '扫描蓝牙设备', isActive: true });
 
             Text($r('app.string.bluetooth_visible_to_nearby'))
               .width(ConfigData.WH_100_100)
@@ -137,10 +92,9 @@ struct BrTest {
                 })
 
                 if (this.isOn) {
-
-                  PairedDeviceComponent({
-                    controller: this.deviceController
-                  })
+//                  PairedDeviceComponent({
+//                    controller: this.deviceController
+//                  })
 
                   AvailableDeviceComponent({
                     controller: this.deviceController
@@ -218,12 +172,7 @@ struct DeviceNameComponent {
     .height($r('app.float.wh_value_56'))
     .borderRadius($r("app.float.radius_24"))
     .padding($r('app.float.distance_4'))
-    .backgroundColor($r("app.color.white_bg_color"))
-    .onClick(() => {
-      if (this.enabled) {
-        Router.push({ uri: PAGE_URI_DEVICE_NAME });
-      }
-    });
+    .backgroundColor($r("app.color.white_bg_color"));
   }
 }
 
@@ -378,13 +327,6 @@ struct PairedDeviceComponent {
    */
   private pageType = Router.getParams().date;
   private itemClicked(item: BluetoothDevice) {
-    LogUtil.info(this.TAG_PAGE + 'xzyj itemClicked : ' + JSON.stringify(item));
-    let param = { 'deviceId': JSON.stringify(item.deviceId) }
-    Router.push({
-      uri: PAGE_URI_PROFILE,
-      params: param
-    });
-
     switch (item.connectionState) {
       case DeviceState.STATE_CONNECTED:
         this.showDisconnectDialog(item.deviceName, () => {
@@ -473,7 +415,7 @@ struct AvailableDeviceComponent {
   pairDialog: CustomDialogController = new CustomDialogController({
     builder: PairDialog({
       deviceName: this.pairingDevice.deviceName,
-      pinCode: $pairPinCode,
+      pinCode: this.pairPinCode,
       action: (accept: boolean) => {
         this.confirmPairing(accept);
       }
@@ -496,7 +438,6 @@ struct AvailableDeviceComponent {
 
   build() {
     Column() {
-
       Row() {
         // available devices title
         Text($r('app.string.bluetooth_available_devices'))
@@ -556,6 +497,7 @@ struct AvailableDeviceComponent {
               .backgroundColor($r("app.color.white_bg_color"))
               .onClick(() => {
                 LogUtil.info(this.TAG_PAGE + 'item on click : ' + JSON.stringify(item));
+                AppStorage.SetOrCreate('btDeviceController', this.controller);
                 this.pairDevice(item)
               })
             }
@@ -589,8 +531,10 @@ struct AvailableDeviceComponent {
     this.controller.pair(device.deviceId, (pinCode: string) => {
       LogUtil.info(this.TAG_PAGE + 'pairDevice success callback : pinCode = ' + pinCode);
       // show pair pin dialog
-      this.pairPinCode = pinCode
+      this.pairPinCode = pinCode;
       this.pairingDevice = device;
+      AppStorage.SetOrCreate('pairedDeviceInfo', device);
+      AppStorage.SetOrCreate('pairedDeviceId', device.deviceId);
       this.pairDialog.open();
       this.pairDeviceInfo = 'pairDeviceID: ' + device.deviceId  + ' true';
     }, () => {
