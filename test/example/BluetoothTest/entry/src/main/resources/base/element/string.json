@@ -199,6 +199,10 @@
     {
       "name": "bluetooth_visible_to_nearby",
       "value": "当前可被附近的蓝牙设备发现"
+    },
+    {
+      "name": "bluetooth_scan_mode_type",
+      "value": "设置扫描类型"
     }
   ]
 }

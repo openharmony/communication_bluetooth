@@ -76,6 +76,36 @@ enum BluetoothState {
     STATE_BLE_TURNING_OFF = 6
 }
 
+enum ScanMode {
+    /** Indicates the scan mode is none */
+    SCAN_MODE_NONE = 0,
+    /** Indicates the scan mode is connectable */
+    SCAN_MODE_CONNECTABLE = 1,
+    /** Indicates the scan mode is general discoverable */
+    SCAN_MODE_GENERAL_DISCOVERABLE = 2,
+    /** Indicates the scan mode is limited discoverable */
+    SCAN_MODE_LIMITED_DISCOVERABLE = 3,
+    /** Indicates the scan mode is connectable and general discoverable */
+    SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE = 4,
+    /** Indicates the scan mode is connectable and limited discoverable */
+    SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE = 5
+}
+
+enum ProfileId {
+    PROFILE_A2DP_SOURCE = 1,
+    PROFILE_HANDS_FREE_AUDIO_GATEWAY = 4,
+}
+
+enum ProfileConnectionState {
+    /** the current profile is disconnected */
+    STATE_DISCONNECTED = 0,
+    /** the current profile is being connected */
+    STATE_CONNECTING = 1,
+    /** the current profile is connected */
+    STATE_CONNECTED = 2,
+    /** the current profile is being disconnected */
+    STATE_DISCONNECTING = 3
+}
 
 export class BluetoothModel extends BaseModel{
 
@@ -102,6 +132,47 @@ export class BluetoothModel extends BaseModel{
         }
     }
 
+    getProfileConnState(profileId: ProfileId): string {
+        let state = bluetooth.getProfileConnState(profileId);
+        switch (state) {
+            case 0:
+                return 'STATE_DISCONNECTED';
+                break;
+            case 1:
+                return 'STATE_CONNECTING';
+                break;
+            case 2:
+                return 'STATE_CONNECTED';
+                break;
+            case 3:
+                return 'STATE_DISCONNECTING';
+                break;
+            default:
+                return '未知状态';
+                break;
+        }
+    }
+
+    getBtConnectionState(): string {
+        let connectionState = bluetooth.getBtConnectionState();
+        switch (connectionState) {
+            case 0:
+                return 'STATE_DISCONNECTED';
+                break;
+            case 1:
+                return 'STATE_CONNECTING';
+                break;
+            case 2:
+                return 'STATE_CONNECTED';
+                break;
+            case 3:
+                return 'STATE_DISCONNECTING';
+                break;
+            default:
+                return '未知状态';
+                break;
+        }
+    }
 
     /**
      * Get Bluetooth status
@@ -111,6 +182,10 @@ export class BluetoothModel extends BaseModel{
         let bluetoothState = bluetooth.getState();
         LogUtil.info(`${this.TAG} getState: bluetoothState = ${bluetoothState}`);
         return bluetoothState;
+    }
+
+    setBluetoothScanMode(mode: ScanMode, duration: number): boolean {
+        return bluetooth.setBluetoothScanMode(mode, duration);
     }
 
     getBluetoothScanMode() : string {
@@ -255,7 +330,12 @@ export class BluetoothModel extends BaseModel{
      * Stop Bluetooth discovery
      */
     stopBluetoothDiscovery(): boolean {
-        return bluetooth.stopBluetoothDiscovery();
+        let ret = bluetooth.stopBluetoothDiscovery();
+        this.unsubscribeStateChange();
+        this.unsubscribeBluetoothDeviceFind();
+        this.unsubscribeBondStateChange();
+        this.unsubscribeDeviceStateChange();
+        return ret;
     }
 
     /**
@@ -380,27 +460,27 @@ export class BluetoothModel extends BaseModel{
      * Get device type
      */
     getDeviceType(deviceId: string): string {
-        let deviceType = DeviceType.BLUETOOTH;
+        let deviceType = 'BLUETOOTH';
         let deviceClass = bluetooth.getRemoteDeviceClass(deviceId);
         switch (deviceClass.majorClass) {
             case 0x0100:
-                deviceType = DeviceType.COMPUTER;
+                deviceType = 'COMPUTER';
                 break;
             case 0x0400:
                 if (deviceClass.majorMinorClass === 0x0418 || deviceClass.majorMinorClass === 0x0404) {
-                    deviceType = DeviceType.HEADPHONE;
+                    deviceType = 'HEADPHONE';
                 }
                 break;
             case 0x0700:
                 if (deviceClass.majorMinorClass === 0x0704) {
-                    deviceType = DeviceType.WATCH;
+                    deviceType = 'WATCH';
                 }
                 break;
             case 0x0200:
-                deviceType = DeviceType.PHONE;
+                deviceType = 'PHONE';
                 break;
             default:
-                deviceType = DeviceType.BLUETOOTH;
+                deviceType = 'BLUETOOTH';
                 break;
         }
         return deviceType;
