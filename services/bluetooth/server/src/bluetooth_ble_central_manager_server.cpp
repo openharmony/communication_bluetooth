@@ -18,6 +18,7 @@
 #include "bluetooth_log.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "hisysevent.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
 #include "ipc_skeleton.h"
@@ -280,7 +281,9 @@ void BluetoothBleCentralManagerServer::StartScan()
         HILOGE("StartScan error, check permission failed");
         return;
     }
-
+    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid,
+        "SCAN_MODE", SCAN_MODE::SCAN_MODE_LOW_POWER);
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
             static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -342,6 +345,9 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
                 pimpl->isScanning = false;
             }
         }
+        OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid,
+            "SCAN_MODE", settings.GetScanMode());
     });
 }
 
@@ -354,7 +360,8 @@ void BluetoothBleCentralManagerServer::StopScan()
         HILOGE("StopScan error, check permission failed");
         return;
     }
-
+    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_STOP",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid);
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
             static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
