@@ -15,6 +15,7 @@
 #include "napi_bluetooth_ble_central_manager_callback.h"
 
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_utils.h"
 #include "securec.h"
 
@@ -39,7 +40,7 @@ struct SysBLEDeviceFoundCallbackData {
 void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env &env, napi_value &scanResultArray,
     bool isSysInterface = false)
 {
-    HILOGI("ConvertScanResult called");
+    HILOGI("enter");
     napi_create_array(env, &scanResultArray);
     size_t count = 0;
     for (auto bleScanResult : results) {
@@ -75,7 +76,6 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
         napi_set_element(env, scanResultArray, count, result);
         ++count;
     }
-    HILOGI("ConvertScanResult called end");
 }
 
 void AfterWorkCallbackToSysBLEScan(uv_work_t *work, int status)
@@ -168,7 +168,7 @@ void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
 void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback(
     uv_work_t *work, std::shared_ptr<BleScanResult> &result)
 {
-    HILOGI("OnScanCallback uv_work_t start");
+    HILOGI("enter");
     if (work == nullptr) {
         HILOGE("work is null");
         return;
@@ -194,7 +194,7 @@ void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback(
 
 void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
 {
-    HILOGI("NapiBluetoothBleCentralManagerCallback::OnScanCallback called");
+    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
     auto sysObservers = GetSysBLEObserver();
     if (sysObservers.find(REGISTER_SYS_BLE_FIND_DEVICE_TYPE) != sysObservers.end()) {
         SysOnScanCallBack(sysObservers, result);
@@ -202,11 +202,9 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
 
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
     if (!observers[REGISTER_BLE_FIND_DEVICE_TYPE]) {
-        HILOGE("NapiBluetoothHostObserver::OnStateChanged: This callback is not registered by ability.");
+        HILOGI("This callback is not registered by ability.");
         return;
     }
-    HILOGD("NapiBluetoothHostObserver::OnStateChanged: %{public}s is registered by ability",
-        REGISTER_BLE_FIND_DEVICE_TYPE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_BLE_FIND_DEVICE_TYPE];
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
@@ -252,7 +250,7 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
 void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEvent(
     uv_work_t *work, const std::vector<BleScanResult> &results)
 {
-    HILOGI("OnBleBatchScanResultsEvent uv_work_t start");
+    HILOGI("enter");
 
     if (work == nullptr) {
         HILOGE("work is null");
@@ -278,14 +276,12 @@ void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEve
 
 void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results)
 {
-    HILOGI("NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent called");
+    HILOGI("enter, scan result size: %{public}zu", results.size());
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
     if (!observers[REGISTER_BLE_FIND_DEVICE_TYPE]) {
-        HILOGE("NapiBluetoothHostObserver::OnStateChanged: This callback is not registered by ability.");
+        HILOGI("This callback is not registered by ability.");
         return;
     }
-    HILOGD("NapiBluetoothHostObserver::OnStateChanged: %{public}s is registered by ability",
-        REGISTER_BLE_FIND_DEVICE_TYPE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_BLE_FIND_DEVICE_TYPE];
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
@@ -330,7 +326,7 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
 
 void NapiBluetoothBleCentralManagerCallback::OnStartScanFailed(int resultCode)
 {
-    HILOGI("NapiBluetoothBleCentralManagerCallback::OnStartScanFailed called, resultCode is %{public}d", resultCode);
+    HILOGI("enter, resultCode is %{public}d", resultCode);
     auto observers = GetSysBLEObserver();
     if (observers.find(REGISTER_SYS_BLE_SCAN_TYPE) == observers.end()) {
         HILOGE("sys BEL callback is not registered by ability.");
@@ -364,7 +360,6 @@ void NapiBluetoothBleCentralManagerCallback::OnStartScanFailed(int resultCode)
     work->data = static_cast<void *>(data);
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEScan);
-    HILOGI("NapiBluetoothBleCentralManagerCallback::OnStartScanFailed called, resultCode is %{public}d", resultCode);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
