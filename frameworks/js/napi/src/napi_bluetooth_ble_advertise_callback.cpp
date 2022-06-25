@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Bluetooth {
 void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result)
 {
-    HILOGI("NapiBluetoothBleCentralManagerCallback::OnStartResultEvent called result %{public}d", result);
+    HILOGI("enter, result: %{public}d", result);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

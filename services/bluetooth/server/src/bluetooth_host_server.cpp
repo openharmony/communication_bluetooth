@@ -698,10 +698,12 @@ bool BluetoothHostServer::DisableBt()
 int32_t BluetoothHostServer::GetBtState()
 {
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetBtState() false, check permission failed");
+        HILOGE("false, check permission failed");
         return INVALID_VALUE;
     }
-    return IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BREDR);
+    int32_t state = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BREDR);
+    HILOGI("state: %{public}d", state);
+    return state;
 }
 
 sptr<IRemoteObject> BluetoothHostServer::GetProfile(const std::string &name)
@@ -1413,7 +1415,9 @@ void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRe
 
 bool BluetoothHostServer::IsBtEnabled()
 {
-    return GetBtState() == static_cast<int32_t>(bluetooth::BTStateID::STATE_TURN_ON) ? true : false;
+    bool isEnabled = (GetBtState() == static_cast<int32_t>(bluetooth::BTStateID::STATE_TURN_ON)) ? true : false;
+    HILOGI("%{public}s", isEnabled ? "true" : "false");
+    return isEnabled;
 }
 
 void BluetoothHostServer::RegisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer)

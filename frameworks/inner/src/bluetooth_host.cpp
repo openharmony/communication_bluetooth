@@ -385,16 +385,18 @@ bool BluetoothHost::DisableBt()
 
 int BluetoothHost::GetBtState() const
 {
-    HILOGI("%{public}s: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
     if (!pimpl) {
-        HILOGE("BluetoothHost::GetBtState fails: no pimpl");
+        HILOGE("failed: no pimpl");
         return INVALID_VALUE;
     }
     if (pimpl->proxy_ == nullptr) {
-        HILOGE("BluetoothHost::GetBtState fails: no proxy");
+        HILOGE("failed: no proxy");
         return INVALID_VALUE;
     }
-    return pimpl->proxy_->GetBtState();
+    int state = pimpl->proxy_->GetBtState();
+    HILOGI("state: %{public}d", state);
+    return state;
 }
 
 bool BluetoothHost::BluetoothFactoryReset()
