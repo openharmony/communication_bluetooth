@@ -263,17 +263,17 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
         nullptr,
         resource,
         [](napi_env env, void *data) {
-            HILOGI("execute");
+            HILOGI("ReadCharacteristicValue(): execute");
             ReadCharacteristicValueCallbackInfo* callbackInfo = (ReadCharacteristicValueCallbackInfo*)data;
             callbackInfo->asyncState_ = ASYNC_START;
             int status = -1;
             if (callbackInfo->inputCharacteristic_ != nullptr) {
-                HILOGI("Client read characteristic");
+                HILOGI("ReadCharacteristicValue(): Client read characteristic");
                 status = callbackInfo->client_->ReadCharacteristic(*(callbackInfo->inputCharacteristic_));
             }
 
             if (status == GattStatus::GATT_SUCCESS) {
-                HILOGI("successful");
+                HILOGI("ReadCharacteristicValue(): successful");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
                 int tryTime = 100;
                 while (callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
@@ -284,16 +284,16 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
                     tryTime--;
                 }
                 if (callbackInfo->asyncState_ != ASYNC_DONE) {
-                    HILOGE("failed, async not done");
+                    HILOGE("ReadCharacteristicValue(): failed, async not done");
                     callbackInfo->errorCode_ = CODE_FAILED;
                 }
             } else {
-                HILOGE("failed, status: %{public}d", status);
+                HILOGE("ReadCharacteristicValue(): failed, status: %{public}d", status);
                 callbackInfo->errorCode_ = CODE_FAILED;
             }
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOGI("execute back");
+            HILOGI("ReadCharacteristicValue(): execute back");
             ReadCharacteristicValueCallbackInfo* callbackInfo = (ReadCharacteristicValueCallbackInfo*)data;
             napi_value result[ARGS_SIZE_TWO] = {0};
             napi_value callback = 0;
@@ -301,7 +301,7 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
             napi_value callResult = 0;
             napi_get_undefined(env, &undefined);
 
-            HILOGI("errorCode: %{public}d", callbackInfo->errorCode_);
+            HILOGI("ReadCharacteristicValue(): errorCode: %{public}d", callbackInfo->errorCode_);
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_object(env, &result[PARAM1]);
                 ConvertBLECharacteristicToJS(env, result[PARAM1],
@@ -384,17 +384,17 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
     napi_create_async_work(
         env, nullptr, resource,
         [](napi_env env, void* data) {
-            HILOGI("execute");
+            HILOGI("ReadDescriptorValue(): execute");
             ReadDescriptorValueCallbackInfo* callbackInfo = (ReadDescriptorValueCallbackInfo*)data;
             callbackInfo->asyncState_ = ASYNC_START;
             int status = -1;
             if (callbackInfo->inputDescriptor_ != nullptr) {
-                HILOGI("Client read descriptor");
+                HILOGI("ReadDescriptorValue(): Client read descriptor");
                 status = callbackInfo->client_->ReadDescriptor(*(callbackInfo->inputDescriptor_));
             }
 
             if (status == GattStatus::GATT_SUCCESS) {
-                HILOGI("successful");
+                HILOGI("ReadDescriptorValue(): successful");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
                 int tryTime = 100;
                 while (callbackInfo->asyncState_ == ASYNC_START && tryTime > 0) {
@@ -405,16 +405,16 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
                     tryTime--;
                 }
                 if (callbackInfo->asyncState_ != ASYNC_DONE) {
-                    HILOGE("failed, async not done");
+                    HILOGE("ReadDescriptorValue(): failed, async not done");
                     callbackInfo->errorCode_ = CODE_FAILED;
                 }
             } else {
-                HILOGE("failed, status: %{public}d", status);
+                HILOGE("ReadDescriptorValue(): failed, status: %{public}d", status);
                 callbackInfo->errorCode_ = CODE_FAILED;
             }
         },
         [](napi_env env, napi_status status, void* data) {
-            HILOGI("execute back");
+            HILOGI("ReadDescriptorValue(): execute back");
             ReadDescriptorValueCallbackInfo* callbackInfo = (ReadDescriptorValueCallbackInfo*)data;
             napi_value result[ARGS_SIZE_TWO] = {0};
             napi_value callback = 0;
@@ -422,7 +422,7 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
             napi_value callResult = 0;
             napi_get_undefined(env, &undefined);
 
-            HILOGI("errorCode: %{public}d", callbackInfo->errorCode_);
+            HILOGI("ReadDescriptorValue(): errorCode: %{public}d", callbackInfo->errorCode_);
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_object(env, &result[PARAM1]);
                 ConvertBLEDescriptorToJS(env, result[PARAM1],
@@ -507,20 +507,20 @@ napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
     napi_create_async_work(
         env, nullptr, resource,
         [](napi_env env, void* data) {
-            HILOGI("execute");
+            HILOGI("GetServices(): execute");
             GetServiceCallbackInfo* callbackInfo = (GetServiceCallbackInfo*)data;
             int status = callbackInfo->client_->DiscoverServices();
             if (status != GattStatus::GATT_SUCCESS) {
-                HILOGE("failed, status: %{public}d", status);
+                HILOGE("GetServices(): failed, status: %{public}d", status);
                 callbackInfo->errorCode_ = CODE_FAILED;
             } else {
-                HILOGI("successful");
+                HILOGI("GetServices(): successful");
                 callbackInfo->services_ = callbackInfo->client_->GetService();
                 callbackInfo->errorCode_ = CODE_SUCCESS;
             }
         },
         [](napi_env env, napi_status status, void* data) {
-            HILOGI("execute back");
+            HILOGI("GetServices(): execute back");
             GetServiceCallbackInfo* callbackInfo = (GetServiceCallbackInfo*)data;
             napi_value result[ARGS_SIZE_TWO] = {0};
             napi_value callback = 0;
@@ -528,7 +528,7 @@ napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
             napi_value callResult = 0;
             napi_get_undefined(env, &undefined);
 
-            HILOGI("errorCode: %{public}d", callbackInfo->errorCode_);
+            HILOGI("GetServices(): errorCode: %{public}d", callbackInfo->errorCode_);
             if (callbackInfo->errorCode_ == CODE_SUCCESS) {
                 napi_create_array(env, &result[PARAM1]);
                 ConvertGattServiceVectorToJS(env, result[PARAM1], callbackInfo->services_);
