@@ -598,6 +598,26 @@ public:
      * @since 6
      */
     virtual void NotifyVolumeChanged(uint8_t volume, uint8_t label = AVRC_DEFAULT_LABEL) = 0;
+
+    /**
+     * @brief Notifies the AVSession is created.
+     */
+    virtual void OnSessionCreate(int32_t sessionId) = 0;
+
+    /**
+     * @brief Notifies the AVSession is release.
+     */
+    virtual void OnSessionRelease(int32_t sessionId) = 0;
+
+    /**
+     * @brief Notifies the TopAVSession is changed.
+     */
+
+    virtual void OnTopSessionChanged(int32_t sessionId) = 0;
+    /**
+     * @brief Notifies the playback state is changed.
+     */
+    virtual void OnPlaybackStateChange(int32_t state) = 0;
 };
 }  // namespace bluetooth
 

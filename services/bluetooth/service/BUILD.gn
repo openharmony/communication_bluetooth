@@ -17,6 +17,10 @@ SUBSYSTEM_DIR = "//foundation/communication"
 PART_DIR = "$SUBSYSTEM_DIR/bluetooth/services/bluetooth"
 BT_SERVICE_DIR = "$PART_DIR/service"
 
+declare_args() {
+  bluetooth_avrcp_avsession = false
+}
+
 ServiceA2dpSnkSrc = [ "src/a2dp_snk/a2dp_snk_service.cpp" ]
 
 ServiceA2dpSrcSrc = [ "src/a2dp_src/a2dp_src_service.cpp" ]
@@ -310,6 +314,10 @@ config("btservice_config") {
     "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiomanager/include",
   ]
 
+  if (bluetooth_avrcp_avsession) {
+    include_dirs += [ "//foundation/multimedia/av_session/interfaces/innerkits/native/session/include" ]
+  }
+
   cflags_cc = [
     "-fPIC",
     "-fexceptions",
@@ -339,6 +347,10 @@ config("btservice_config") {
 ohos_shared_library("btservice") {
   configs = [ ":btservice_config" ]
   public_configs = [ ":btservice_public_config" ]
+
+  if (bluetooth_avrcp_avsession) {
+    defines = [ "AVRCP_AVSESSION" ]
+  }
 
   sources = ServiceCommonSrc + ServiceUtilSrc
   sources += ServiceA2dpSnkSrc
@@ -375,6 +387,13 @@ ohos_shared_library("btservice") {
     "//third_party/libxml2:xml2",
   ]
 
+  if (bluetooth_avrcp_avsession) {
+    deps += [
+      "//foundation/multimedia/av_session/frameworks/innerkitsimpl/native/session:avsession_client",
+      "//utils/native/base:utils",
+    ]
+  }
+
   external_deps = [
     "ability_base:want",
     "access_token:libaccesstoken_sdk",
@@ -383,6 +402,14 @@ ohos_shared_library("btservice") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
+
+  if (bluetooth_avrcp_avsession) {
+    external_deps += [
+      "ability_runtime:wantagent_innerkits",
+      "input:libmmi-client",
+      "multimedia_image_standard:image_native",
+    ]
+  }
 
   subsystem_name = "communication"
   part_name = "bluetooth"
