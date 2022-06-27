@@ -39,21 +39,22 @@ HidHostService *HidHostService::GetService()
 
 void HidHostService::RegisterObserver(IHidHostObserver &hidHostObserver)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    LOG_DEBUG("[HIDH Service]%{public}s Enter", __FUNCTION__);
 
     hidHostObservers_.Register(hidHostObserver);
 }
 
 void HidHostService::DeregisterObserver(IHidHostObserver &hidHostObserver)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    LOG_DEBUG("[HIDH Service]%{public}s Enter", __FUNCTION__);
 
     hidHostObservers_.Deregister(hidHostObserver);
 }
 
 void HidHostService::NotifyStateChanged(const RawAddress &device, int state)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    // Reference "HID_HOST_STATE_CONNECTED"
+    LOG_DEBUG("[HIDH Service]%{public}s, state:%{public}d", __FUNCTION__, state);
     int newState = stateMap_.at(state);
 
     hidHostObservers_.ForEach([device, newState](IHidHostObserver &observer) {
@@ -63,7 +64,7 @@ void HidHostService::NotifyStateChanged(const RawAddress &device, int state)
 
 void HidHostService::Enable(void)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    LOG_DEBUG("[HIDH Service]%{public}s Enter", __FUNCTION__);
 
     HidHostMessage event(HID_HOST_SERVICE_STARTUP_EVT);
     PostEvent(event);
@@ -71,7 +72,7 @@ void HidHostService::Enable(void)
 
 void HidHostService::Disable(void)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    LOG_DEBUG("[HIDH Service]%{public}s Enter", __FUNCTION__);
 
     HidHostMessage event(HID_HOST_SERVICE_SHUTDOWN_EVT);
     PostEvent(event);
@@ -142,7 +143,7 @@ void HidHostService::ShutDownDone(bool isAllDisconnected)
 
 int HidHostService::Connect(const RawAddress &device)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    LOG_DEBUG("[HIDH Service]%{public}s Enter", __FUNCTION__);
 
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
@@ -167,7 +168,7 @@ int HidHostService::Connect(const RawAddress &device)
 
 int HidHostService::Disconnect(const RawAddress &device)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    LOG_DEBUG("[HIDH Service]%{public}s Enter", __FUNCTION__);
 
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
@@ -223,15 +224,15 @@ int HidHostService::HidHostGetReport(std::string device, uint8_t id, uint16_t si
 
 bool HidHostService::IsConnected(const std::string &address) const
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
+    LOG_INFO("[HIDH Service] IsConnected start");
 
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_ERROR("[HIDH Service]%{public}s():Invalid Device address:%{public}s", __FUNCTION__, address.c_str());
+        LOG_ERROR("[HIDH Service] IsConnected:Invalid Device address:%{public}s", address.c_str());
         return false;
     }
     if (it->second->GetDeviceStateInt() < HID_HOST_STATE_CONNECTED) {
-        LOG_DEBUG("[HIDH Service]%{public}s():It's not connected!", __FUNCTION__);
+        LOG_INFO("[HIDH Service] IsConnected:false");
         return false;
     }
     return true;
@@ -239,8 +240,7 @@ bool HidHostService::IsConnected(const std::string &address) const
 
 std::vector<RawAddress> HidHostService::GetDevicesByStates(std::vector<int> states)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
-
+    LOG_INFO("[HIDH Service] GetDevicesByStates Enter");
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::vector<RawAddress> devices;
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
@@ -257,26 +257,27 @@ std::vector<RawAddress> HidHostService::GetDevicesByStates(std::vector<int> stat
 
 int HidHostService::GetDeviceState(const RawAddress &device)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HIDH Service] GetDeviceState start");
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = device.GetAddress();
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_DEBUG("[HID HOST]%{public}s():The state machine is not available!", __FUNCTION__);
+        LOG_INFO("[HID HOST]GetDeviceState:The state machine is not available!");
         return stateMap_.at(HID_HOST_STATE_DISCONNECTED);
     }
 
-    if (it->second->GetDeviceStateInt() >= HID_HOST_STATE_CONNECTED) {
+    int state = it->second->GetDeviceStateInt();
+    LOG_INFO("[HIDH Service] GetDeviceState, state:%{public}d", state);
+    if (state >= HID_HOST_STATE_CONNECTED) {
         return stateMap_.at(HID_HOST_STATE_CONNECTED);
     } else {
-        return stateMap_.at(it->second->GetDeviceStateInt());
+        return stateMap_.at(state);
     }
 }
 
 std::list<RawAddress> HidHostService::GetConnectDevices(void)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
-
+    LOG_INFO("[HIDH Service] GetConnectDevices Enter");
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::list<RawAddress> devList;
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
@@ -289,8 +290,7 @@ std::list<RawAddress> HidHostService::GetConnectDevices(void)
 
 int HidHostService::GetConnectState(void)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
-
+    LOG_INFO("[HIDH Service] GetConnectState Enter");
     int result = 0;
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
@@ -306,14 +306,14 @@ int HidHostService::GetConnectState(void)
             result |= PROFILE_STATE_DISCONNECTED;
         }
     }
+    LOG_INFO("[HIDH Service] GetConnectState result:%{public}d", result);
     return result;
 }
 
 int HidHostService::GetMaxConnectNum(void)
 {
-    LOG_DEBUG("[HIDH Service]%{public}s Enter", __PRETTY_FUNCTION__);
-
     std::lock_guard<std::recursive_mutex> lk(mutex_);
+    LOG_INFO("[HIDH Service] GetMaxConnectNum:%{public}d", maxConnectionsNum_);
     return maxConnectionsNum_;
 }
 
@@ -335,7 +335,7 @@ int HidHostService::GetMaxConnectionsDeviceNum() const
 {
     int number = HID_HOST_MAX_DEFAULT_CONNECTIONS_NUMR;
     if (!AdapterConfig::GetInstance()->GetValue(SECTION_HID_HOST_SERVICE, PROPERTY_MAX_CONNECTED_DEVICES, number)) {
-        LOG_DEBUG("[HIDH Service]%{public}s():It's failed to get the max connection number", __FUNCTION__);
+        LOG_INFO("[HIDH Service] GetMaxConnectionsDeviceNum failed");
     }
     return number;
 }
@@ -356,8 +356,8 @@ void HidHostService::ProcessEvent(const HidHostMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = event.dev_;
-    LOG_DEBUG("[HIDH Service]%{public}s():address[%{public}s] event_no[%{public}d]",
-        __FUNCTION__, address.c_str(), event.what_);
+    LOG_INFO("[HIDH Service] ProcessEvent:address[%{public}s], event_no[%{public}d]",
+        address.c_str(), event.what_);
     switch (event.what_) {
         case HID_HOST_SERVICE_STARTUP_EVT:
             StartUp();
@@ -404,7 +404,7 @@ void HidHostService::ProcessConnectEvent(const HidHostMessage &event)
 
 std::string HidHostService::HidHostFindDeviceByLcid(uint16_t lcid, bool *isControlLcid)
 {
-    std::string ret = "";
+    std::string ret;
 
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
@@ -439,7 +439,7 @@ void HidHostService::ProcessDefaultEvent(const HidHostMessage &event) const
             it->second->ProcessMessage(event);
         }
     } else {
-        LOG_ERROR("[HIDH Service]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
+        LOG_ERROR("[HIDH Service] ProcessDefaultEvent:invalid address[%{public}s]", event.dev_.c_str());
     }
 }
 REGISTER_CLASS_CREATOR(HidHostService);

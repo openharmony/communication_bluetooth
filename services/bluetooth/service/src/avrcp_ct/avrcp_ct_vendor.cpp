@@ -58,19 +58,19 @@ bool AvrcCtVendorPacket::DisassemblePacket(Packet *pkt)
 
         uint16_t offset = AVRC_CT_VENDOR_CTYPE_OFFSET;
         uint64_t payload = 0x00;
-        offset += PopOctets1((buffer + offset), payload);
+        PopOctets1((buffer + offset), payload);
         crCode_ = static_cast<uint8_t>(payload);
         LOG_DEBUG("[AVRCP CT] crCode_[%x]", crCode_);
 
         offset = AVRC_CT_VENDOR_COMPANY_ID_OFFSET;
         payload = 0x00;
-        offset += PopOctets3((buffer + offset), payload);
+        PopOctets3((buffer + offset), payload);
         companyId_ = static_cast<uint32_t>(payload);
         LOG_DEBUG("[AVRCP CT] companyId_[%x]", companyId_);
 
         offset = AVRC_CT_VENDOR_PACKET_TYPE_OFFSET;
         payload = 0x00;
-        offset += PopOctets1((buffer + offset), payload);
+        PopOctets1((buffer + offset), payload);
         packetType_ = static_cast<uint8_t>(payload);
         LOG_DEBUG("[AVRCP CT] packetType_[%x]", packetType_);
 
@@ -79,7 +79,7 @@ bool AvrcCtVendorPacket::DisassemblePacket(Packet *pkt)
             isValid_ = false;
             offset = AVRC_CT_VENDOR_STATUS_OFFSET;
             payload = 0x00;
-            offset += PopOctets1((buffer + offset), payload);
+            PopOctets1((buffer + offset), payload);
             status_ = static_cast<uint8_t>(payload);
             LOG_DEBUG("[AVRCP CT] status_[%x]", status_);
         } else {
@@ -117,7 +117,7 @@ Packet *AvrcCtVendorPacket::AssembleFixedOperands(void)
     offset += PushOctets1((buffer + offset), pduId_);
     LOG_DEBUG("[AVRCP CT] pduId_[%x]", pduId_);
 
-    offset += PushOctets1((buffer + offset), packetType_);
+    PushOctets1((buffer + offset), packetType_);
     LOG_DEBUG("[AVRCP CT] packetType_[%x]", packetType_);
 
     return pkt_;
@@ -135,7 +135,7 @@ bool AvrcCtVendorPacket::IsValidParameterLength(Packet *pkt)
 
         uint16_t offset = AVRC_CT_VENDOR_PARAMETER_LENGTH_OFFSET;
         uint64_t payload = 0x00;
-        offset += PopOctets2((buffer + offset), payload);
+        PopOctets2((buffer + offset), payload);
         parameterLength_ = static_cast<uint32_t>(payload);
         LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
@@ -199,7 +199,7 @@ Packet *AvrcCtGcPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%hu]", parameterLength_);
 
-    offset += PushOctets1((bufferPtr + offset), capabilityId_);
+    PushOctets1((bufferPtr + offset), capabilityId_);
     LOG_DEBUG("[AVRCP CT] capabilityId_[%hhu]", capabilityId_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -295,7 +295,7 @@ Packet *AvrcCtLpasaPacket::AssembleParameters(Packet *pkt)
     LOG_DEBUG("[AVRCP CT] BufferMalloc[%{public}d]", (AVRC_CT_LPASA_PARAMETER_LENGTH_SIZE));
 
     uint16_t offset = 0x0000;
-    offset += PushOctets2((bufferPtr + offset), parameterLength_);
+    PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -384,7 +384,7 @@ Packet *AvrcCtLpasvPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets1((bufferPtr + offset), attribute_);
+    PushOctets1((bufferPtr + offset), attribute_);
     LOG_DEBUG("[AVRCP CT] attribute_[%x]", attribute_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -671,7 +671,7 @@ bool AvrcCtSpasvPacket::DisassembleParameters(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_VENDOR_PARAMETER_LENGTH_OFFSET;
     uint64_t payload = 0x00;
-    offset += PopOctets2((buffer + offset), payload);
+    PopOctets2((buffer + offset), payload);
     parameterLength_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
@@ -1161,7 +1161,7 @@ Packet *AvrcCtGpsPacket::AssembleParameters(Packet *pkt)
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
-    offset += PushOctets2((bufferPtr + offset), parameterLength_);
+    PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -1181,7 +1181,7 @@ bool AvrcCtGpsPacket::DisassembleParameters(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_VENDOR_PARAMETER_LENGTH_OFFSET;
     uint64_t payload = 0x00;
-    offset += PopOctets2((buffer + offset), payload);
+    PopOctets2((buffer + offset), payload);
     parameterLength_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
@@ -1209,7 +1209,7 @@ bool AvrcCtGpsPacket::DisassembleParameters(uint8_t *buffer)
             LOG_DEBUG("[AVRCP CT] songPosition_[%{public}d]", songPosition_);
 
             payload = 0x00;
-            offset += PopOctets1((buffer + offset), payload);
+            PopOctets1((buffer + offset), payload);
             playStatus_ = static_cast<uint8_t>(payload);
             LOG_DEBUG("[AVRCP CT] playStatus_[%x]", playStatus_);
 
@@ -1265,7 +1265,7 @@ Packet *AvrcCtRcrPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets1((bufferPtr + offset), continuePduId_);
+    PushOctets1((bufferPtr + offset), continuePduId_);
     LOG_DEBUG("[AVRCP CT] continuePduId_[%x]", continuePduId_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -1339,7 +1339,7 @@ Packet *AvrcCtAcrPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets1((bufferPtr + offset), continuePduId_);
+    PushOctets1((bufferPtr + offset), continuePduId_);
     LOG_DEBUG("[AVRCP CT] continuePduId_[%x]", continuePduId_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -1359,7 +1359,7 @@ bool AvrcCtAcrPacket::DisassembleParameters(uint8_t *buffer)
 
     uint16_t offset = AVRC_CT_VENDOR_PARAMETER_LENGTH_OFFSET;
     uint64_t payload = 0x00;
-    offset += PopOctets2((buffer + offset), payload);
+    PopOctets2((buffer + offset), payload);
     parameterLength_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
@@ -1413,7 +1413,7 @@ Packet *AvrcCtSapPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets2((bufferPtr + offset), playerId_);
+    PushOctets2((bufferPtr + offset), playerId_);
     LOG_DEBUG("[AVRCP CT] playerId_[%{public}d]", playerId_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -1437,7 +1437,7 @@ bool AvrcCtSapPacket::DisassembleParameters(uint8_t *buffer)
     parameterLength_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PopOctets1((buffer + offset), payload);
+    PopOctets1((buffer + offset), payload);
     status_ = static_cast<uint8_t>(payload);
     LOG_DEBUG("[AVRCP CT] status_[%x]", status_);
 
@@ -1502,7 +1502,7 @@ Packet *AvrcCtPiPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets8((bufferPtr + offset), uid_);
     LOG_DEBUG("[AVRCP CT] uid_[%jx]", uid_);
 
-    offset += PushOctets2((bufferPtr + offset), uidCounter_);
+    PushOctets2((bufferPtr + offset), uidCounter_);
     LOG_DEBUG("[AVRCP CT] uidCounter_[%{public}d]", uidCounter_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -1526,7 +1526,7 @@ bool AvrcCtPiPacket::DisassembleParameters(uint8_t *buffer)
     parameterLength_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PopOctets1((buffer + offset), payload);
+    PopOctets1((buffer + offset), payload);
     status_ = static_cast<uint8_t>(payload);
     LOG_DEBUG("[AVRCP CT] status_[%x]", status_);
 
@@ -1589,7 +1589,7 @@ Packet *AvrcCtAtnpPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets8((bufferPtr + offset), uid_);
     LOG_DEBUG("[AVRCP CT] uid_[%jx]", uid_);
 
-    offset += PushOctets2((bufferPtr + offset), uidCounter_);
+    PushOctets2((bufferPtr + offset), uidCounter_);
     LOG_DEBUG("[AVRCP CT] uidCounter_[%hu]", uidCounter_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -1613,7 +1613,7 @@ bool AvrcCtAtnpPacket::DisassembleParameters(uint8_t *buffer)
     parameterLength_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PopOctets1((buffer + offset), payload);
+    PopOctets1((buffer + offset), payload);
     status_ = static_cast<uint8_t>(payload);
     LOG_DEBUG("[AVRCP CT] status_[%x]", status_);
 
@@ -1669,7 +1669,7 @@ Packet *AvrcCtSavPacket::AssembleParameters(Packet *pkt)
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PushOctets1((bufferPtr + offset), volume_ & 0b01111111);
+    PushOctets1((bufferPtr + offset), volume_ & 0b01111111);
     LOG_DEBUG("[AVRCP CT] volume_[%x]", volume_);
 
     PacketPayloadAddLast(pkt, buffer);
@@ -1693,7 +1693,7 @@ bool AvrcCtSavPacket::DisassembleParameters(uint8_t *buffer)
     parameterLength_ = static_cast<uint16_t>(payload);
     LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
 
-    offset += PopOctets1((buffer + offset), payload);
+    PopOctets1((buffer + offset), payload);
     volume_ = static_cast<uint8_t>(payload) & 0b01111111;
     LOG_DEBUG("[AVRCP CT] volume_[%x]", volume_);
 

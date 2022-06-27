@@ -311,7 +311,9 @@ void Socket::impl::SockRfcFcOn(Socket &socket, DataTransport *transport)
     } else {
         socketTmp = &socket;
     }
-
+    if (socketTmp == nullptr) {
+        return;
+    }
     std::lock_guard<std::recursive_mutex> lk(socketTmp->writeMutex_);
     if (socketTmp->sendBufLen_ > 0) {
         Packet *wPkt = PacketMalloc(0, 0, socketTmp->sendBufLen_);

@@ -45,11 +45,11 @@ struct BleCentralManager::impl {
         ~BluetoothBleCentralManagerCallbackImp() override = default;
         void OnScanCallback(const BluetoothBleScanResult &result) override
         {
-            HILOGD("BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp::OnScanCallback");
+            HILOGI("enter");
 
             if (!bleCentralManger_.bleScanFilters_.empty() && bleCentralManger_.IsNeedFilterMatches_
                 && !bleCentralManger_.MatchesScanFilters(result)) {
-                HILOGE("::OnScanCallback the result does not matche the filter, ignore");
+                HILOGE("the result does not matche the filter, ignore");
                 return;
             }
 
@@ -82,7 +82,7 @@ struct BleCentralManager::impl {
         }
         void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) override
         {
-            HILOGD("BleCentralManager::impl::BluetoothBleCentralManagerCallbackImp::OnBleBatchScanResultsEvent");
+            HILOGI("enter");
             bleCentralManger_.callbacks_.ForEach([&results](std::shared_ptr<BleCentralManagerCallback> observer) {
                 std::vector<BleScanResult> scanResults;
                 for (auto &result : results) {
@@ -139,28 +139,28 @@ BleCentralManager::impl::impl()
 {
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
-        HILOGE("BleCentralManager::impl::impl() error: no samgr");
+        HILOGE("samgr is null");
         return;
     }
 
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (!hostRemote) {
-        HILOGE("BleCentralManager::impl::impl() error: host no remote");
+        HILOGE("hostRemote is null");
         return;
     }
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     if (!hostProxy) {
-        HILOGE("BleCentralManager::impl::impl() error: host no proxy");
+        HILOGE("hostProxy is null");
         return;
     }
     sptr<IRemoteObject> remote = hostProxy->GetBleRemote(BLE_CENTRAL_MANAGER_SERVER);
     if (!remote) {
-        HILOGE("BleCentralManager::impl::impl() error: no remote");
+        HILOGE("remote is null");
         return;
     }
     proxy_ = iface_cast<IBluetoothBleCentralManager>(remote);
     if (!proxy_) {
-        HILOGE("BleCentralManager::impl::impl() error: no proxy");
+        HILOGE("proxy_ is null");
         return;
     }
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
@@ -169,7 +169,7 @@ BleCentralManager::impl::impl()
 
 bool BleCentralManager::impl::MatchesScanFilters(BluetoothBleScanResult result)
 {
-    HILOGE("[BLE SCAN FILTER]%{public}s ", __func__);
+    HILOGI("enter");
     for (auto filter : bleScanFilters_) {
         if (!MatchesScanFilter(filter, result)) {
             continue;
@@ -250,19 +250,20 @@ bool BleCentralManager::impl::MatchesServiceUuids(BluetoothBleScanFilter filter,
 
 bool BleCentralManager::impl::MatchesUuid(bluetooth::Uuid filterUuid, bluetooth::Uuid uuid, bluetooth::Uuid uuidMask)
 {
+    HILOGI("enter");
     uint8_t uuid128[bluetooth::Uuid::UUID128_BYTES_TYPE];
     uint8_t uuidMask128[bluetooth::Uuid::UUID128_BYTES_TYPE];
     uint8_t resultUuid128[bluetooth::Uuid::UUID128_BYTES_TYPE];
     if (!filterUuid.ConvertToBytesLE(uuid128)) {
-        HILOGE("[BLE SCAN FILTER]%{public}s Convert filter uuid faild.", __func__);
+        HILOGE("Convert filter uuid faild.");
         return false;
     }
     if (!uuidMask.ConvertToBytesLE(uuidMask128)) {
-        HILOGE("[BLE SCAN FILTER]%{public}s Convert uuid mask faild.", __func__);
+        HILOGE("Convert uuid mask faild.");
         return false;
     }
     if (!uuid.ConvertToBytesLE(resultUuid128)) {
-        HILOGE("[BLE SCAN FILTER]%{public}s Convert result uuid faild.", __func__);
+        HILOGE("Convert result uuid faild.");
         return false;
     }
     size_t maskLength = sizeof(uuidMask128);
@@ -323,7 +324,7 @@ std::string BleCentralManager::impl::ParseServiceData(bluetooth::Uuid uuid, std:
 {
     std::string tmpServcieData;
     int uuidType = uuid.GetUuidType();
-    HILOGE("[BLE SCAN FILTER]%{public}s uuidType: %{public}d ", __func__, uuidType);
+    HILOGI("enter, uuidType: %{public}d ", uuidType);
     switch (uuidType) {
         case bluetooth::Uuid::UUID16_BYTES_TYPE: {
             uint16_t uuid16 = uuid.ConvertTo16Bits();
@@ -338,13 +339,12 @@ std::string BleCentralManager::impl::ParseServiceData(bluetooth::Uuid uuid, std:
         case bluetooth::Uuid::UUID128_BYTES_TYPE: {
             uint8_t uuid128[bluetooth::Uuid::UUID128_BYTES_TYPE];
             if (!uuid.ConvertToBytesLE(uuid128)) {
-                HILOGE("[BLE SCAN FILTER]%{public}s Convert filter uuid faild.", __func__);
+                HILOGE("Convert filter uuid faild.");
             }
             tmpServcieData = std::string(reinterpret_cast<char *>(&uuid128), BLE_UUID_LEN_128);
             break;
         }
         default:
-            HILOGE("[BLE SCAN FILTER]%{public}s error uuid type(%{public}d).", __func__, uuidType);
             break;
     }
     return tmpServcieData + data;
@@ -388,11 +388,11 @@ BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : call
     if (pimpl == nullptr) {
         pimpl = std::make_unique<impl>();
         if (pimpl == nullptr) {
-            HILOGE("BleCentralManager::BleCentralManager fails: no pimpl");
+            HILOGE("failed, no pimpl");
         }
     }
 
-    HILOGD("BleCentralManager::BleCentralManager success");
+    HILOGI("successful");
     std::shared_ptr<BleCentralManagerCallback> pointer(&callback, [](BleCentralManagerCallback *) {});
     bool ret = pimpl->callbacks_.Register(pointer);
     if (ret)
@@ -407,14 +407,15 @@ BleCentralManager::~BleCentralManager()
 
 void BleCentralManager::StartScan()
 {
+    HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
-        HILOGD("BleCentralManager::StartScan success");
         pimpl->proxy_->StartScan();
     }
 }
 
 void BleCentralManager::StartScan(const BleScanSettings &settings)
 {
+    HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
         BluetoothBleScanSettings setting;
         // not use report delay scan. settings.GetReportDelayMillisValue()
@@ -428,6 +429,7 @@ void BleCentralManager::StartScan(const BleScanSettings &settings)
 
 void BleCentralManager::StopScan()
 {
+    HILOGI("enter, clientId: %{public}d", clientId_);
     if (pimpl->proxy_ != nullptr) {
         pimpl->proxy_->StopScan();
         if (clientId_ != 0) {
@@ -441,6 +443,7 @@ void BleCentralManager::StopScan()
 
 void BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter>  &filters)
 {
+    HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
         std::vector<BluetoothBleScanFilter> bluetoothBleScanFilters;
         for (auto filter : filters) {
@@ -474,10 +477,11 @@ void BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter>  &filt
         clientId_ = pimpl->proxy_->ConfigScanFilter(clientId_, bluetoothBleScanFilters);
 
         if (filters.empty()) {
+            HILOGE("filters is empty can not config");
             pimpl->IsNeedFilterMatches_ = false;
         }
     } else {
-        HILOGE("BleCentralManager::ConfigScanFilter proxy_ is nullptr or filters is empty can not config");
+        HILOGI("proxy_ is nullptr");
     }
 }
 

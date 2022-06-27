@@ -17,6 +17,7 @@
 #include <string>
 
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_remote_device_observer.h"
 #include "napi_bluetooth_utils.h"
 
@@ -59,14 +60,12 @@ void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
 
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
 {
-    HILOGI("NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged called");
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
     if (!observers[REGISTER_BONE_STATE_TYPE]) {
-        HILOGW("NapiBluetoothHostObserver::OnPairStatusChanged: This callback is not registered by ability.");
+        HILOGI("This callback is not registered by ability.");
         return;
     }
-    HILOGD("NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged: %{public}s is registered by ability",
-        REGISTER_BONE_STATE_TYPE.c_str());
+    HILOGI("addr:%{public}s, status:%{public}d", GET_ENCRYPT_ADDR(device), status);
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_BONE_STATE_TYPE];
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
@@ -115,54 +114,38 @@ void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemot
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteUuidChanged(
     const BluetoothRemoteDevice &device, const std::vector<ParcelUuid> &uuids)
 {
-    HILOGI("NapiBluetoothRemoteDeviceObserver::OnRemoteUuidChanged called");
+    HILOGI("called");
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteNameChanged(
     const BluetoothRemoteDevice &device, const std::string &deviceName)
 {
-    HILOGI("NapiBluetoothRemoteDeviceObserver::OnRemoteNameChanged called, address is %{public}s, deviceName is "
-           "%{public}s",
-        device.GetDeviceAddr().c_str(),
-        deviceName.c_str());
+    HILOGI("addr:%{public}s, deviceName:%{public}s", GET_ENCRYPT_ADDR(device), deviceName.c_str());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteAliasChanged(
     const BluetoothRemoteDevice &device, const std::string &alias)
 {
-    HILOGI("NapiBluetoothRemoteDeviceObserver::OnRemoteAliasChanged called, address is %{public}s, alias is "
-           "%{public}s",
-        device.GetDeviceAddr().c_str(),
-        alias.c_str());
+    HILOGI("addr:%{public}s, deviceName:%{public}s", GET_ENCRYPT_ADDR(device), alias.c_str());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteCodChanged(
     const BluetoothRemoteDevice &device, const BluetoothDeviceClass &cod)
 {
-    HILOGI("NapiBluetoothRemoteDeviceObserver::OnRemoteCodChanged called, address is %{public}s, cod is "
-           "%{public}d",
-        device.GetDeviceAddr().c_str(),
-        cod.GetClassOfDevice());
+    HILOGI("addr:%{public}s, cod:%{public}d", GET_ENCRYPT_ADDR(device), cod.GetClassOfDevice());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryLevelChanged(
     const BluetoothRemoteDevice &device, int batteryLevel)
 {
-    HILOGI(
-        "NapiBluetoothRemoteDeviceObserver::OnRemoteBatteryLevelChanged called, address is %{public}s, batteryLevel is "
-        "%{public}d",
-        device.GetDeviceAddr().c_str(),
-        batteryLevel);
+    HILOGI("addr:%{public}s, batteryLevel:%{public}d", GET_ENCRYPT_ADDR(device), batteryLevel);
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
     const BluetoothRemoteDevice &device, int rssi, int status)
 {
-    HILOGI("NapiBluetoothRemoteDeviceObserver::OnReadRemoteRssiEvent called, address is %{public}s, rssi is "
-           "%{public}d, status is %{public}d",
-        device.GetDeviceAddr().c_str(),
-        rssi,
-        status);
+    HILOGI("addr:%{public}s, rssi:%{public}d, status is %{public}d",
+        GET_ENCRYPT_ADDR(device), rssi, status);
     std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = GetRssiValueCallbackInfo();
     if (callbackInfo == nullptr) {
         return;
@@ -177,18 +160,18 @@ void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
     callbackInfo->cvfull.notify_all();
 }
 
-void NapiBluetoothRemoteDeviceObserver::DealPairStatus(const int &status, int &boneStatus)
+void NapiBluetoothRemoteDeviceObserver::DealPairStatus(const int &status, int &bondStatus)
 {
-    HILOGI("NapiBluetoothRemoteDeviceObserver::DealPairStatus called, status is %{public}d", status);
+    HILOGI("status is %{public}d", status);
     switch (status) {
         case PAIR_NONE:
-            boneStatus = BondState::BOND_STATE_INVALID;
+            bondStatus = BondState::BOND_STATE_INVALID;
             break;
         case PAIR_PAIRING:
-            boneStatus = BondState::BOND_STATE_BONDING;
+            bondStatus = BondState::BOND_STATE_BONDING;
             break;
         case PAIR_PAIRED:
-            boneStatus = BondState::BOND_STATE_BONDED;
+            bondStatus = BondState::BOND_STATE_BONDED;
             break;
         default:
             break;

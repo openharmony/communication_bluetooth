@@ -127,7 +127,20 @@ napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
 napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
     HILOGI("GetConnectionDevices called");
+
+    size_t expectedArgsCount = ARGS_SIZE_ZERO;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ZERO] = {};
+    napi_value thisVar = nullptr;
+
     napi_value ret = nullptr;
+    napi_get_undefined(env, &ret);
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        HILOGE("No Requires argument.");
+        return ret;
+    }
     napi_create_array(env, &ret);
     Pan *profile = Pan::GetProfile();
     vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
@@ -166,8 +179,9 @@ napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info inf
     Pan *profile = Pan::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
+    int profileState = GetProfileConnectionState(state);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, profileState, &result);
     return result;
 }
 
@@ -235,7 +249,19 @@ napi_value NapiBluetoothPan::SetTethering(napi_env env, napi_callback_info info)
 napi_value NapiBluetoothPan::IsTetheringOn(napi_env env, napi_callback_info info)
 {
     HILOGI("IsTetheringOn called");
+    size_t expectedArgsCount = ARGS_SIZE_ZERO;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ZERO] = {};
+    napi_value thisVar = nullptr;
 
+    napi_value ret = nullptr;
+    napi_get_undefined(env, &ret);
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        HILOGE("No Requires argument.");
+        return ret;
+    }
     Pan *profile = Pan::GetProfile();
     bool isOK = profile->IsTetheringOn();
     napi_value result = nullptr;

@@ -42,11 +42,11 @@
 
 标准系统使用目录如下：
 
-interface/
+[interfaces/](https://gitee.com/openharmony/communication_bluetooth/tree/master/interfaces)
 
-sa\_profile/
+[sa\_profile/](https://gitee.com/openharmony/communication_bluetooth/tree/master/sa_profile)
 
-services/
+[services/](https://gitee.com/openharmony/communication_bluetooth/tree/master/services)
 
 ### 轻量或小型系统使用说明<a name="section223312597203"></a>
 

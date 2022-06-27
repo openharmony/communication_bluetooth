@@ -21,13 +21,11 @@ namespace OHOS {
 namespace Bluetooth {
 void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
 {
-    HILOGI("NapiGattClientCallback::OnCharacteristicChanged called");
+    HILOGI("enter");
     if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]) {
-        HILOGW("NapiGattClientCallback::OnCharacteristicChanged: This callback is not registered by ability.");
+        HILOGI("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiGattClientCallback::OnCharacteristicChanged: %{public}s is registered by ability",
-        STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE.c_str());
     std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
         std::static_pointer_cast<GattCharacteristicCallbackInfo>(
             callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]);
@@ -60,11 +58,13 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
 {
-    HILOGI("NapiGattClientCallback::OnCharacteristicChanged called");
+    HILOGI("enter");
     ReadCharacteristicValueCallbackInfo *callbackInfo = client_->readCharacteristicValueCallbackInfo_;
     if (!callbackInfo) {
+        HILOGE("CallbackInfo does not exist");
         return;
     }
+    HILOGI("asyncState: %{public}d", callbackInfo->asyncState_);
     if (callbackInfo->asyncState_ == ASYNC_START) {
         callbackInfo->ret = ret;
         callbackInfo->outputCharacteristic_ = &characteristic;
@@ -74,11 +74,13 @@ void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic
 
 void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
 {
-    HILOGI("NapiGattClientCallback::OnDescriptorReadResult called");
+    HILOGI("enter");
     ReadDescriptorValueCallbackInfo *callbackInfo = client_->readDescriptorValueCallbackInfo_;
     if (!callbackInfo) {
+        HILOGE("CallbackInfo does not exist");
         return;
     }
+    HILOGI("asyncState: %{public}d", callbackInfo->asyncState_);
     if (callbackInfo->asyncState_ == ASYNC_START) {
         callbackInfo->ret = ret;
         callbackInfo->outputDescriptor_ = &descriptor;
@@ -88,13 +90,11 @@ void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descri
 
 void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
 {
-    HILOGI("NapiGattClientCallback::OnConnectionStateChanged called");
+    HILOGI("enter");
     if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE]) {
-        HILOGW("NapiGattClientCallback::OnConnectionStateChanged: This callback is not registered by ability.");
+        HILOGI("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiGattClientCallback::OnConnectionStateChanged: %{public}s is registered by ability",
-        STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE];
 
@@ -128,7 +128,7 @@ void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int r
 
 void NapiGattClientCallback::OnServicesDiscovered(int status)
 {
-    HILOGI("NapiGattClientCallback::OnServicesDiscovered called");
+    HILOGI("enter");
 }
 } // namespace Bluetooth
 } // namespace OHOS

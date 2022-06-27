@@ -187,7 +187,7 @@ void PanBnep::BnepSecurityCheckDeviceConnectTask(uint16_t result)
     if ((result == BT_NO_ERROR) && (state_ == BNEP_CONN_STATE_SECURITY)) {
         LOG_INFO("[PAN BNEP]%{public}s start send connect response", __func__);
         state_ = BNEP_CONN_STATE_CONNECTING;
-        L2CIF_ConnectRsp(lcid_, id_, L2CAP_CONNECTION_SUCCESSFUL, 0, nullptr);
+        L2CIF_ConnectRsp(lcid_, id_, L2CAP_CONNECTION_SUCCESSFUL, L2CAP_NO_FURTHER_INFORMATION_AVAILABLE, nullptr);
 
         L2capConfigInfo l2capConfigInfo;
         (void)memset_s(&l2capConfigInfo, sizeof(L2capConfigInfo), 0x00, sizeof(L2capConfigInfo));
@@ -463,7 +463,7 @@ void PanBnep::BnepRecvConfigRspCallback(
         return;
     }
     std::string address = service->PanFindDeviceByLcid(lcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[PAN BNEP]%{public}s can not find device!", __func__);
         return;
     }
@@ -495,7 +495,7 @@ void PanBnep::BnepRecvDisconnectionReqCallback(
         return;
     }
     std::string address = service->PanFindDeviceByLcid(lcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[PAN BNEP]%{public}s can not find device!", __func__);
         return;
     }
@@ -521,7 +521,7 @@ void PanBnep::BnepRecvDisconnectionRspCallback(
         return;
     }
     std::string address = service->PanFindDeviceByLcid(lcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[PAN BNEP]%{public}s can not find device!", __func__);
         return;
     }
@@ -546,7 +546,7 @@ void PanBnep::BnepDisconnectAbnormalCallback(
         return;
     }
     std::string address = service->PanFindDeviceByLcid(lcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[PAN BNEP]%{public}s can not find device!", __func__);
         return;
     }
@@ -571,7 +571,7 @@ void PanBnep::BnepRecvDataCallback(
     }
 
     std::string address = PanService::GetService()->PanFindDeviceByLcid(lcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[PAN BNEP]%{public}s can not find device!", __func__);
         return;
     }
@@ -603,7 +603,7 @@ void PanBnep::BnepRemoteBusyCallback(
         return;
     }
     std::string address = service->PanFindDeviceByLcid(lcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[PAN BNEP]%{public}s can not find device!", __func__);
         return;
     }
@@ -630,7 +630,7 @@ void PanBnep::BnepRecvConnectionReqCallbackTask(
         isAccept = false;
     }
     if (!isAccept) {
-        L2CIF_ConnectRsp(lcid, id, L2CAP_NO_RESOURCES_AVAILABLE, 0, nullptr);
+        L2CIF_ConnectRsp(lcid, id, L2CAP_NO_RESOURCES_AVAILABLE, L2CAP_NO_FURTHER_INFORMATION_AVAILABLE, nullptr);
         return;
     }
 
@@ -714,7 +714,7 @@ void PanBnep::BnepRecvConfigReqCallbackTask(
     RawAddress(address_).ConvertToUint8(btAddr.addr);
     btAddr.type = BT_PUBLIC_DEVICE_ADDRESS;
 
-    if (L2CIF_ConfigRsp(lcid, id, &cfg, 0, nullptr)) {
+    if (L2CIF_ConfigRsp(lcid, id, &cfg, L2CAP_SUCCESS, nullptr)) {
         LOG_ERROR("[PAN BNEP] %{public}s:L2CIF_ConfigRsp failed.", __func__);
     }
     connFlags_ |= BNEP_CONN_FLAGS_HIS_CFG_DONE;

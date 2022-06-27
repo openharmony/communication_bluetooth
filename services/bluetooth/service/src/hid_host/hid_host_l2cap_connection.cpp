@@ -409,7 +409,7 @@ void HidHostL2capConnection::HidHostRecvConfigReqCallback(
     }
     bool isControlLcid = false;
     std::string address = service->HidHostFindDeviceByLcid(lcid, &isControlLcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[HIDH L2CAP]%{public}s can not find device!", __func__);
         L2CIF_ConfigRsp(lcid, id, cfg, L2CAP_REJECTED, nullptr);
         return;
@@ -442,7 +442,7 @@ void HidHostL2capConnection::HidHostRecvConfigRspCallback(
     }
     bool isControlLcid = false;
     std::string address = service->HidHostFindDeviceByLcid(lcid, &isControlLcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[HIDH L2CAP]%{public}s can not find device!", __func__);
         return;
     }
@@ -474,7 +474,7 @@ void HidHostL2capConnection::HidHostRecvDisconnectionReqCallback(
     }
     bool isControlLcid = false;
     std::string address = service->HidHostFindDeviceByLcid(lcid, &isControlLcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[HIDH L2CAP]%{public}s can not find device!", __func__);
         return;
     }
@@ -503,7 +503,7 @@ void HidHostL2capConnection::HidHostRecvDisconnectionRspCallback(
     }
     bool isControlLcid = false;
     std::string address = service->HidHostFindDeviceByLcid(lcid, &isControlLcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[HIDH L2CAP]%{public}s can not find device!", __func__);
         return;
     }
@@ -531,7 +531,7 @@ void HidHostL2capConnection::HidHostDisconnectAbnormalCallback(
     }
     bool isControlLcid = false;
     std::string address = service->HidHostFindDeviceByLcid(lcid, &isControlLcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[HIDH L2CAP]%{public}s can not find device!", __func__);
         return;
     }
@@ -553,7 +553,7 @@ void HidHostL2capConnection::HidHostRecvDataCallback(
 {
     bool isControlLcid = false;
     std::string address = HidHostService::GetService()->HidHostFindDeviceByLcid(lcid, &isControlLcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[HIDH L2CAP]%{public}s can not find device!", __func__);
         return;
     }
@@ -615,7 +615,7 @@ void HidHostL2capConnection::HidHostRemoteBusyCallback(
     }
     bool isControlLcid = false;
     std::string address = service->HidHostFindDeviceByLcid(lcid, &isControlLcid);
-    if (address == "") {
+    if (address.empty()) {
         LOG_ERROR("[HIDH L2CAP]%{public}s can not find device!", __func__);
         return;
     }
@@ -758,6 +758,16 @@ void HidHostL2capConnection::HidHostRecvConfigReqCallbackTask(
     BtAddr btAddr;
     RawAddress(address_).ConvertToUint8(btAddr.addr);
     btAddr.type = BT_PUBLIC_DEVICE_ADDRESS;
+
+    if (cfg.rfc.mode == L2CAP_ENHANCED_RETRANSMISSION_MODE) {
+        LOG_INFO("[HIDH L2CAP]%{public}s for PTS HCT/BI-01-C", __func__);
+        L2capConfigInfo l2capConfigInfo;
+        (void)memset_s(&l2capConfigInfo, sizeof(L2capConfigInfo), 0x00, sizeof(L2capConfigInfo));
+        l2capConfigInfo.mtu = HID_HOST_MTU;
+        l2capConfigInfo.flushTimeout = 0xFFFF;
+        L2CIF_ConfigRsp(lcid, id, &l2capConfigInfo, L2CAP_UNACCEPTABLE_PARAMETERS, nullptr);
+        return;
+    }
 
     if (L2CIF_ConfigRsp(lcid, id, &cfg, 0, nullptr)) {
         LOG_ERROR("[HIDH L2CAP] %{public}s:L2CIF_ConfigRsp failed.", __func__);

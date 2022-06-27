@@ -201,6 +201,7 @@ void A2dpStateIdle::ProcessSetConfigInd(A2dpAvdtMsgData msgData, uint8_t role)
             (codecFactory->FindSourceCodec(pCodecInfo)->GetCodecIndex() + A2DP_SINK_CODEC_INDEX_MIN -
             A2DP_SOURCE_CODEC_INDEX_SBC)) {
             ret = codecFactory->SetSinkCodecConfig(pCodecInfo, pResultConfig);
+            LOG_INFO("[A2dpStateIdle]%{public}s SetSinkCodecConfig result(%{public}d)\n", __func__, ret);
         } else {
             userConfig.codecIndex_ = codecFactory->FindSourceCodec(pCodecInfo)->GetCodecIndex();
             userConfig.codecPriority_ = A2DP_CODEC_PRIORITY_HIGHEST;

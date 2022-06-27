@@ -552,7 +552,7 @@ void BTSTACK_API ATT_FindByTypeValueRequest(
  * @brief Send a find by type value response.
  *
  * @param1 connectHandle Indicates the connect handle.
- * @param2 handleInfoList Indicates the pointer to const a list of 1 or more Handle Informations.
+ * @param2 handleInfoList Indicates the pointer to const a list of 1 or more Handle Information.
  * @param3 listNum Indicates the number of handles information list.
  */
 void BTSTACK_API ATT_FindByTypeValueResponse(

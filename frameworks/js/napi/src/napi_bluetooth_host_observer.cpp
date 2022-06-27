@@ -56,7 +56,7 @@ void NapiBluetoothHostObserver::UvQueueWorkOnStateChanged(uv_work_t *work, Bluet
 void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int status)
 {
     HILOGD("start");
-    BluetoothState state;
+    BluetoothState state = BluetoothState::STATE_OFF;
     if (!DealStateChange(transport, status, state)) {
         return;
     }

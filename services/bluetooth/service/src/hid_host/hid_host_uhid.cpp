@@ -38,19 +38,19 @@ int HidHostUhid::Open()
     pthread_t threadId;
 
     if (fd_ < 0) {
-        LOG_DEBUG("[UHID]%{public}s():fd is null,creat fd", __FUNCTION__);
+        LOG_INFO("[UHID]%{public}s():fd is null,creat fd", __FUNCTION__);
         fd_ = open(UHID_DEVICE_PATH, O_RDWR);
         if (fd_ < 0) {
             LOG_ERROR("[UHID]%{public}s():open %{public}s failed", __FUNCTION__, UHID_DEVICE_PATH);
             return HID_HOST_FAILURE;
         } else {
-            LOG_DEBUG("[UHID]%{public}s():uhid fd = %{public}d", __FUNCTION__, fd_);
+            LOG_INFO("[UHID]%{public}s():uhid fd = %{public}d", __FUNCTION__, fd_);
         }
 
-        LOG_DEBUG("[UHID]%{public}s():recreate thread", __FUNCTION__);
+        LOG_INFO("[UHID]%{public}s():recreate thread", __FUNCTION__);
         threadId = CreateThread(PollEventThread, this);
         if (threadId == static_cast<pthread_t>(-1)) {
-            LOG_DEBUG("[UHID]%{public}s():create thread failed", __FUNCTION__);
+            LOG_ERROR("[UHID]%{public}s():create thread failed", __FUNCTION__);
             return HID_HOST_FAILURE;
         } else {
             pollThreadId_ = threadId;
@@ -58,7 +58,7 @@ int HidHostUhid::Open()
         }
     }
 
-    LOG_DEBUG("[UHID]%{public}s():uhid fd is not null,fd = %{public}d", __FUNCTION__, fd_);
+    LOG_INFO("[UHID]%{public}s():uhid fd is not null,fd = %{public}d", __FUNCTION__, fd_);
     return HID_HOST_SUCCESS;
 }
 
@@ -70,19 +70,19 @@ int HidHostUhid::Close()
 
 int HidHostUhid::SendData(uint8_t* pRpt, uint16_t len)
 {
-    LOG_DEBUG("[UHID]%{public}s():", __FUNCTION__);
-
+    LOG_INFO("[UHID]%{public}s", __FUNCTION__);
     if (fd_ >= 0) {
         uint32_t polling_attempts = 0;
-        while (!readyForData_ && polling_attempts++ < MAX_POLLING_ATTEMPTS) {
+        while (!readyForData_ && polling_attempts < MAX_POLLING_ATTEMPTS) {
             usleep(POLLING_SLEEP_DURATION_US);
+            polling_attempts++;
         }
     }
     // Send the HID data to the kernel.
     if ((fd_ >= 0) && readyForData_) {
         WritePackUhid(fd_, pRpt, len);
     } else {
-        LOG_WARN("[UHID]%{public}s(): Error: fd = %{public}d, ready %{public}d, len = %{public}d",
+        LOG_ERROR("[UHID]%{public}s failed, fd_:%{public}d, readyForData_:%{public}d, len:%{public}d",
             __FUNCTION__, fd_, readyForData_, len);
         return HID_HOST_FAILURE;
     }
@@ -91,12 +91,12 @@ int HidHostUhid::SendData(uint8_t* pRpt, uint16_t len)
 
 int HidHostUhid::SendControlData(uint8_t* pRpt, uint16_t len)
 {
-    LOG_DEBUG("[UHID]%{public}s():", __FUNCTION__);
-
+    LOG_INFO("[UHID]%{public}s", __FUNCTION__);
     if (fd_ >= 0) {
         uint32_t polling_attempts = 0;
-        while (!readyForData_ && polling_attempts++ < MAX_POLLING_ATTEMPTS) {
+        while (!readyForData_ && polling_attempts < MAX_POLLING_ATTEMPTS) {
             usleep(POLLING_SLEEP_DURATION_US);
+            polling_attempts++;
         }
     }
     // Send the HID control data to the kernel.
@@ -106,12 +106,12 @@ int HidHostUhid::SendControlData(uint8_t* pRpt, uint16_t len)
         } else if (task_type_ == HID_HOST_DATA_TYPE_SET_REPORT) {
             SendSetReportReplyUhid(fd_, task_id_, HID_HOST_SUCCESS);
         } else {
-            LOG_ERROR("[UHID]%{public}s():Unknow task!", __FUNCTION__);
+            LOG_ERROR("[UHID]%{public}s, Unknow task_type_:%{public}d", __FUNCTION__, task_type_);
         }
         task_id_ = 0;
         task_type_ = -1;
     } else {
-        LOG_WARN("[UHID]%{public}s(): Error: fd = %{public}d, ready %{public}d, len = %{public}d",
+        LOG_ERROR("[UHID]%{public}s failed, fd_:%{public}d, readyForData_:%{public}d, len:%{public}d",
             __FUNCTION__, fd_, readyForData_, len);
         return HID_HOST_FAILURE;
     }
@@ -120,12 +120,12 @@ int HidHostUhid::SendControlData(uint8_t* pRpt, uint16_t len)
 
 int HidHostUhid::SendHandshake(uint16_t err)
 {
-    LOG_DEBUG("[UHID]%{public}s():", __FUNCTION__);
-
+    LOG_INFO("[UHID]%{public}s, err:%{public}d", __FUNCTION__, err);
     if (fd_ >= 0) {
         uint32_t polling_attempts = 0;
-        while (!readyForData_ && polling_attempts++ < MAX_POLLING_ATTEMPTS) {
+        while (!readyForData_ && polling_attempts < MAX_POLLING_ATTEMPTS) {
             usleep(POLLING_SLEEP_DURATION_US);
+            polling_attempts++;
         }
     }
     // Send the HID handshake to the kernel.
@@ -135,12 +135,12 @@ int HidHostUhid::SendHandshake(uint16_t err)
         } else if (task_type_ == HID_HOST_DATA_TYPE_SET_REPORT) {
             SendSetReportReplyUhid(fd_, task_id_, err);
         } else {
-            LOG_ERROR("[UHID]%{public}s():Unknow task!", __FUNCTION__);
+            LOG_ERROR("[UHID]%{public}s, Unknow task_type_:%{public}d", __FUNCTION__, task_type_);
         }
         task_id_ = 0;
         task_type_ = -1;
     } else {
-        LOG_WARN("[UHID]%{public}s(): Error: fd = %{public}d, ready %{public}d",
+        LOG_ERROR("[UHID]%{public}s failed, fd_:%{public}d, readyForData_:%{public}d",
             __FUNCTION__, fd_, readyForData_);
         return HID_HOST_FAILURE;
     }
@@ -207,8 +207,7 @@ int HidHostUhid::SendHidInfo(const char* devName, PnpInformation& pnpInf, HidInf
     ev.u.create.country = hidInf.ctryCode;
     ret = WriteUhid(fd_, &ev);
 
-    LOG_DEBUG(
-        "[UHID]%{public}s(): wrote descriptor to fd = %{public}d, dscp_len = %{public}d,result = %{public}d",
+    LOG_INFO("[UHID]%{public}s(): wrote descriptor to fd = %{public}d, dscp_len = %{public}d,result = %{public}d",
         __FUNCTION__, fd_, hidInf.descLength, ret);
 
     if (ret) {
@@ -230,7 +229,7 @@ int HidHostUhid::Destroy()
         ev.type = UHID_DESTROY;
 
         WriteUhid(fd_, &ev);
-        LOG_DEBUG("[UHID]%{public}s(): Closing fd=%{public}d", __FUNCTION__, fd_);
+        LOG_INFO("[UHID]%{public}s(): Closing fd=%{public}d", __FUNCTION__, fd_);
         close(fd_);
         fd_ = -1;
     }
@@ -273,7 +272,7 @@ int HidHostUhid::WritePackUhid(int fd, uint8_t* rpt, uint16_t len)
 
 int HidHostUhid::ClosePollThread()
 {
-    LOG_DEBUG("[UHID]%{public}s():", __FUNCTION__);
+    LOG_INFO("[UHID]%{public}s():", __FUNCTION__);
     readyForData_ = false;
     if (keepPolling_) {
         keepPolling_ = false;
@@ -285,7 +284,7 @@ int HidHostUhid::ClosePollThread()
 
 pthread_t HidHostUhid::CreateThread(void* (*startRoutine)(void*), void* arg)
 {
-    LOG_DEBUG("[UHID]%{public}s():create_thread: entered", __FUNCTION__);
+    LOG_INFO("[UHID]%{public}s():create_thread: entered", __FUNCTION__);
     pthread_attr_t threadAttr;
 
     pthread_attr_init(&threadAttr);
@@ -295,7 +294,7 @@ pthread_t HidHostUhid::CreateThread(void* (*startRoutine)(void*), void* arg)
         LOG_ERROR("[UHID]%{public}s():pthread_create : %{public}s", __FUNCTION__, strerror(errno));
         return static_cast<pthread_t>(-1);
     }
-    LOG_DEBUG("[UHID]%{public}s():%{public}lu: threadcreated successfully", __FUNCTION__, threadId);
+    LOG_INFO("[UHID]%{public}s():%{public}lu: threadcreated successfully", __FUNCTION__, threadId);
     return threadId;
 }
 
@@ -312,7 +311,7 @@ void* HidHostUhid::PollEventThread(void* arg)
 
 void HidHostUhid::PollEventThread_()
 {
-    LOG_DEBUG("[UHID]%{public}s(): Thread%d  fd%{public}d execute", __FUNCTION__, (int)pollThreadId_, fd_);
+    LOG_INFO("[UHID]%{public}s(): Thread:%{public}d, fd:%{public}d execute", __FUNCTION__, (int)pollThreadId_, fd_);
     struct pollfd pfds[1];
     keepPolling_ = true;
     pfds[0].fd = fd_;
@@ -331,14 +330,14 @@ void HidHostUhid::PollEventThread_()
             break;
         }
         if (pfds[0].revents & POLLIN) {
-            LOG_DEBUG("[UHID]%{public}s(): POLLIN", __FUNCTION__);
+            LOG_INFO("[UHID]%{public}s(): POLLIN", __FUNCTION__);
             ret = ReadUhidEvent();
             if (ret != 0) {
                 break;
             }
         }
     }
-    LOG_DEBUG("[UHID]%{public}s(): exit", __FUNCTION__);
+    LOG_INFO("[UHID]%{public}s(): exit", __FUNCTION__);
 
     pollThreadId_ = -1;
 }
@@ -370,30 +369,30 @@ int HidHostUhid::ReadUhidEvent()
         LOG_ERROR("[UHID]%{public}s():read err", __FUNCTION__);
         return HID_HOST_FAILURE;
     }
-    LOG_DEBUG("[UHID]%{public}s():ev.type:%{public}d", __FUNCTION__, ev.type);
+    LOG_INFO("[UHID]%{public}s():ev.type:%{public}d", __FUNCTION__, ev.type);
 
     switch (ev.type) {
         case UHID_START:
-            LOG_DEBUG("[UHID]%{public}s():UHID_START from uhid-dev", __FUNCTION__);
+            LOG_INFO("[UHID]%{public}s():UHID_START from uhid-dev", __FUNCTION__);
             readyForData_ = true;
             break;
         case UHID_STOP:
-            LOG_DEBUG("[UHID]%{public}s():UHID_STOP from uhid-dev", __FUNCTION__);
+            LOG_INFO("[UHID]%{public}s():UHID_STOP from uhid-dev", __FUNCTION__);
             readyForData_ = false;
             break;
         case UHID_OPEN:
-            LOG_DEBUG("[UHID]%{public}s():UHID_OPEN from uhid-dev", __FUNCTION__);
+            LOG_INFO("[UHID]%{public}s():UHID_OPEN from uhid-dev", __FUNCTION__);
             readyForData_ = true;
             break;
         case UHID_CLOSE:
-            LOG_DEBUG("[UHID]%{public}s():UHID_CLOSE from uhid-dev", __FUNCTION__);
+            LOG_INFO("[UHID]%{public}s():UHID_CLOSE from uhid-dev", __FUNCTION__);
             readyForData_ = false;
             break;
         case UHID_OUTPUT:
             ReadUhidOutPut(ev);
             break;
         case UHID_OUTPUT_EV:
-            LOG_DEBUG("[UHID]%{public}s():UHID_OUTPUT_EV from uhid-dev", __FUNCTION__);
+            LOG_INFO("[UHID]%{public}s():UHID_OUTPUT_EV from uhid-dev", __FUNCTION__);
             break;
         case UHID_FEATURE:
             ReadUhidFeature(ev);
@@ -402,7 +401,7 @@ int HidHostUhid::ReadUhidEvent()
             ReadUhidSetReport(ev);
             break;
         default:
-            LOG_DEBUG("[UHID]%{public}s():Invalid event from uhid-dev: %{public}u", __FUNCTION__, ev.type);
+            LOG_INFO("[UHID]%{public}s():Invalid event from uhid-dev: %{public}u", __FUNCTION__, ev.type);
     }
 
     return HID_HOST_SUCCESS;
@@ -424,7 +423,7 @@ void HidHostUhid::ReadUhidOutPut(uhid_event ev)
 
 void HidHostUhid::ReadUhidFeature(uhid_event ev)
 {
-    LOG_DEBUG("[UHID]%{public}s():UHID_FEATURE from uhid-dev id=%{public}d,rnum=%{public}d,rtype=%{public}d",
+    LOG_INFO("[UHID]%{public}s():UHID_FEATURE from uhid-dev id=%{public}d,rnum=%{public}d,rtype=%{public}d",
         __FUNCTION__, ev.u.feature.id, ev.u.feature.rnum, ev.u.feature.rtype);
     if (ev.u.feature.rtype == UHID_FEATURE_REPORT) {
         HidHostService::GetService()->HidHostGetReport(address_, ev.u.feature.rnum, 0,
@@ -442,7 +441,7 @@ void HidHostUhid::ReadUhidFeature(uhid_event ev)
 
 void HidHostUhid::ReadUhidSetReport(uhid_event ev)
 {
-    LOG_DEBUG("[UHID]%{public}s():UHID_SET_REPORT id=%{public}d,rnum=%{public}d,rtype=%{public}d,size=%{public}d",
+    LOG_INFO("[UHID]%{public}s():UHID_SET_REPORT id=%{public}d,rnum=%{public}d,rtype=%{public}d,size=%{public}d",
         __FUNCTION__, ev.u.set_report.id, ev.u.set_report.rnum, ev.u.set_report.rtype, ev.u.set_report.size);
     if (ev.u.set_report.rtype == UHID_FEATURE_REPORT) {
         HidHostService::GetService()->HidHostSetReport(address_, HID_HOST_FEATURE_REPORT, ev.u.set_report.size,
