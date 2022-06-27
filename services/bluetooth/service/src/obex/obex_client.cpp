@@ -113,7 +113,7 @@ void ObexClient::ObexClientTransportObserver::HandleDataAvailableAbort(const Obe
 {
     if (resp.GetFieldCode() == static_cast<uint8_t>(ObexRspCode::CONTINUE)) {
         // Skip unfinished get/put contniue packet
-        OBEX_LOG_DEBUG("abort request is sended, therefore skip unfinished get/put contniue packet");
+        OBEX_LOG_DEBUG("abort request is sended, thereforee skip unfinished get/put contniue packet");
         return;
     }
     obexClient_.AbortDataAvailable(resp);
