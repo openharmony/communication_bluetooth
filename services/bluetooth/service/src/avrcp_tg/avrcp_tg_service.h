@@ -27,7 +27,9 @@
 #include "interface_profile_avrcp_tg.h"
 #include "raw_address.h"
 #include "stub/media_service.h"
-
+#ifdef AVRCP_AVSESSION
+#include "avsession_manager.h"
+#endif
 namespace bluetooth {
 /**
  * @brief This enumeration declares the states of the AVRCP TG service.
@@ -335,7 +337,53 @@ public:
     private:
         IProfileAvrcpTg *GetService(void);
     };
+#ifdef AVRCP_AVSESSION
+     /**
+     * @brief This class implement the <b>SessionListender</b> interface for observing the state change.
+     */
+    class AVSessionObserverImpl : public OHOS::AVSession::SessionListener {
+    public:
+        /**
+         * @brief A constructor used to create an <b>AVSessionObserverImpl</b> instance.
+         */
+        AVSessionObserverImpl() = default;
 
+        /**
+         * @brief A destructor used to delete the <b>AVSessionObserverImpl</b> instance.
+         */
+        ~AVSessionObserverImpl() = default;
+
+        void OnSessionCreate(OHOS::AVSession::AVSessionDescriptor& descriptor) override;
+        void OnSessionRelease(OHOS::AVSession::AVSessionDescriptor& descriptor) override;
+        void OnTopSessionChanged(OHOS::AVSession::AVSessionDescriptor& descriptor) override;
+    private:
+        IProfileAvrcpTg *GetService(void);
+    };
+
+     /**
+     * @brief This class implement the <b>SessionListender</b> interface for observing the state change.
+     */
+    class AVControllerObserverImpl : public OHOS::AVSession::AVControllerCallback {
+    public:
+        /**
+         * @brief A constructor used to create an <b>AVControllerObserverImpl</b> instance.
+         */
+        AVControllerObserverImpl() = default;
+
+        /**
+         * @brief A destructor used to delete the <b>AVControllerObserverImpl</b> instance.
+         */
+        ~AVControllerObserverImpl() = default;
+
+        void OnSessionDestroy() override;
+        void OnPlaybackStateChange(const OHOS::AVSession::AVPlaybackState &state) override;
+        void OnMetaDataChange(const OHOS::AVSession::AVMetaData &data) override;
+        void OnActiveStateChange(bool isActive) override;
+        void OnValidCommandChange(const std::vector<int32_t> &cmds) override;
+    private:
+        IProfileAvrcpTg *GetService(void);
+    };
+#endif
     /**
      * @brief A constructor used to create an <b>AvrcpTgService</b> instance.
      */
@@ -886,6 +934,26 @@ public:
      */
     void NotifyVolumeChanged(uint8_t volume, uint8_t label = AVRC_DEFAULT_LABEL) override;
 
+    /**
+     * @brief Notifies the AVSession is created.
+     */
+    void OnSessionCreate(int32_t sessionId) override;
+
+    /**
+     * @brief Notifies the AVSession is released.
+     */
+    void OnSessionRelease(int32_t sessionId) override;
+
+    /**
+     * @brief Notifies the TopAVSession is changed.
+     */
+    void OnTopSessionChanged(int32_t sessionId) override;
+
+    /**
+     * @brief Notifies the playback state is changed.
+     */
+    void OnPlaybackStateChange(const int32_t state) override;
+
 private:
     /// The flag is used to indicate that the state of the AVRCP TG service.
     std::atomic_uint8_t state_ {AVRC_TG_SERVICE_STATE_DISABLED};
@@ -900,7 +968,19 @@ private:
 
     /// using a local lock_guard to lock mutex guarantees unlocking on destruction / exception:
     std::recursive_mutex mutex_ {};
+#ifdef AVRCP_AVSESSION
+    /// The pointer to the instance of the <b>SessionListener</b> struct.
+    std::shared_ptr<OHOS::AVSession::SessionListener> avSessionObserver_ {nullptr};
 
+    /// The pointer to the instance of the <b>AVControllerCallback</b> struct.
+    std::shared_ptr<OHOS::AVSession::AVControllerCallback> avControllerObserver_ {nullptr};
+
+    /// The instance of the <b>AVSessionDescriptor</b>.
+    std::vector<OHOS::AVSession::AVSessionDescriptor> avSessionDescriptor_ {};
+
+    /// The pointer to the instance of the <b>AVSessionController</b> class.
+    std::shared_ptr<OHOS::AVSession::AVSessionController> avSessionController_ {nullptr};
+#endif
     /// The unique pointer to the instance of the <b>stub::MedisService::IObserver</b> struct.
     std::unique_ptr<stub::MediaService::IObserver> mdObserver_ {nullptr};
 
@@ -1640,6 +1720,11 @@ private:
     void OnGetCurrentAbsoluteVolumeNative(const RawAddress &rawAddr, uint8_t volume, uint8_t label);
 
     /**
+     * AVSession
+     */
+    void OnPlaybackStateChangeNative(int32_t state);
+
+    /**
      * @brief Notifies the playback status is changed.
      *
      * @param[in] playStatus  The current status of playing. Refer to <b>AvrcPlayStatus</b>.
@@ -1799,6 +1884,8 @@ private:
             currentConn_ = 0;
         }
     }
+
+    uint8_t ConvertPlayState(const int32_t state) const;
 
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcpTgService);
 };

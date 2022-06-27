@@ -28,7 +28,7 @@
 	<T1 section="ClassicAdapter">
 		<T1 property="A2dpSnkService">false</T1>
 		<T1 property="A2dpSrcService">true</T1>
-		<T1 property="AvrcpCtService">true</T1>
+		<T1 property="AvrcpCtService">false</T1>
 		<T1 property="AvrcpTgService">true</T1>
 		<T1 property="GattClientService">true</T1>
 		<T1 property="GattServerService">true</T1>
