@@ -163,8 +163,9 @@ napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info
     HidHost *profile = HidHost::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
+    int profileState = GetProfileConnectionState(state);
     napi_value result = nullptr;
-    napi_create_int32(env, state, &result);
+    napi_create_int32(env, profileState, &result);
     return result;
 }
 

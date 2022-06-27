@@ -981,19 +981,19 @@ int GetProfileConnectionState(int state)
     int32_t profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
     switch (state) {
         case static_cast<int32_t>(BTConnectState::CONNECTING):
-            HILOGD("STATE_CONNECTING(1)");
+            HILOGI("STATE_CONNECTING(1)");
             profileConnectionState = ProfileConnectionState::STATE_CONNECTING;
             break;
         case static_cast<int32_t>(BTConnectState::CONNECTED):
-            HILOGD("STATE_CONNECTED(2)");
+            HILOGI("STATE_CONNECTED(2)");
             profileConnectionState = ProfileConnectionState::STATE_CONNECTED;
             break;
         case static_cast<int32_t>(BTConnectState::DISCONNECTING):
-            HILOGD("STATE_DISCONNECTING(3)");
+            HILOGI("STATE_DISCONNECTING(3)");
             profileConnectionState = ProfileConnectionState::STATE_DISCONNECTING;
             break;
         case static_cast<int32_t>(BTConnectState::DISCONNECTED):
-            HILOGD("STATE_DISCONNECTED(0)");
+            HILOGI("STATE_DISCONNECTED(0)");
             profileConnectionState = ProfileConnectionState::STATE_DISCONNECTED;
             break;
         default:
