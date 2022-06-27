@@ -19,6 +19,7 @@
 #include "bluetooth_gatt_server_server.h"
 #include "bluetooth_log.h"
 #include "gatt_data.h"
+#include "hisysevent.h"
 #include "i_bluetooth_gatt_server.h"
 #include "interface_adapter_manager.h"
 #include "interface_profile_gatt_server.h"
@@ -133,6 +134,13 @@ public:
         if (PermissionUtils::VerifyUseBluetoothPermission(tokenId_) == PERMISSION_DENIED) {
             HILOGE("OnConnectionStateChanged() false, check permission failed");
             return;
+        }
+        int32_t pid = IPCSkeleton::GetCallingPid();
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        if (state == static_cast<int>(BTConnectState::CONNECTED) ||
+            state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_GATT_CONNECTED_STATE",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
         }
         callback_->OnConnectionStateChanged((BluetoothGattDevice)device, ret, state);
     }

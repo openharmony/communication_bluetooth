@@ -59,7 +59,7 @@ const Packet *AvrcTgUnitPacket::AssemblePacket(void)
     offset += PushOctets1((buffer + offset), opCode_);
     offset += PushOctets1((buffer + offset), AVRC_TG_UNIT_OCTET_3);
     offset += PushOctets1((buffer + offset), (unit_type_ << AVRC_TG_OFFSET_THREE_BITS) | unit_);
-    offset += PushOctets3((buffer + offset), companyId_);
+    PushOctets3((buffer + offset), companyId_);
 
     return pkt_;
 }

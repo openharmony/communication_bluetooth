@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ void HfpAgDataConnectionServer::ProcessDataConnectionServerCallback(
     uint16_t handle, uint32_t eventId, const std::string &inComingAddr)
 {
     auto addr = HfpAgRfcommConnection::GetRemoteAddressByHandle(handle);
-    LOG_DEBUG("[HFP AG]%{public}s():Event from rfcomm device[%{public}s], handle[%hu], eventId[%u]",
+    LOG_INFO("[HFP AG]%{public}s():Event from rfcomm device[%{public}s], handle[%hu], eventId[%u]",
         __FUNCTION__,
         addr.c_str(),
         handle,
@@ -62,7 +62,7 @@ void HfpAgDataConnectionServer::ProcessDataConnectionServerCallback(
             event = HFP_AG_DATA_AVAILABLE_EVT;
             break;
         default:
-            LOG_DEBUG("[HFP AG]%{public}s():Invalid event from rfcomm eventId[%u]", __FUNCTION__, eventId);
+            LOG_INFO("[HFP AG]%{public}s():Invalid event from rfcomm eventId[%u]", __FUNCTION__, eventId);
             break;
     }
 
@@ -73,7 +73,7 @@ void HfpAgDataConnectionServer::ProcessDataConnectionServerCallback(
 void HfpAgDataConnectionServer::DataConnectionServerCallback(
     uint16_t handle, uint32_t eventId, const void *eventData, void *context)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():", __PRETTY_FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():", __PRETTY_FUNCTION__);
     std::string addr;
 
     if (eventId == RFCOMM_CHANNEL_EV_CONNECT_INCOMING) {

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@
 #include "bluetooth_pbap_pce_server.h"
 #include "bluetooth_pbap_pse_server.h"
 #include "bluetooth_socket_server.h"
+#include "bluetooth_utils_server.h"
 #include "file_ex.h"
 #include "hisysevent.h"
 #include "interface_adapter_manager.h"
@@ -196,7 +197,7 @@ public:
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
                 HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BR_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_STATE", state);
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
             }
             if (state == BTStateID::STATE_TURN_ON) {
                 auto devmgr = HDI::DeviceManager::V1_0::IDeviceManager::Get();
@@ -225,7 +226,7 @@ public:
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
                 HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BLE_STATE", state);
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
             }
         }
     };
@@ -247,8 +248,8 @@ public:
         if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
             int32_t pid = IPCSkeleton::GetCallingPid();
             int32_t uid = IPCSkeleton::GetCallingUid();
-            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_SCAN_STATE",
-                HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "BR_SCAN_STATE", status);
+            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_DISCOVERY_STATE",
+                HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", status);
         }
     }
 
@@ -697,10 +698,12 @@ bool BluetoothHostServer::DisableBt()
 int32_t BluetoothHostServer::GetBtState()
 {
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetBtState() false, check permission failed");
+        HILOGE("false, check permission failed");
         return INVALID_VALUE;
     }
-    return IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BREDR);
+    int32_t state = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BREDR);
+    HILOGI("state: %{public}d", state);
+    return state;
 }
 
 sptr<IRemoteObject> BluetoothHostServer::GetProfile(const std::string &name)
@@ -1023,15 +1026,17 @@ std::vector<BluetoothRawAddress> BluetoothHostServer::GetPairedDevices(int32_t t
 
 bool BluetoothHostServer::RemovePair(int32_t transport, const sptr<BluetoothRawAddress> &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr:%{public}s, transport:%{public}d", GET_ENCRYPT_ADDR(*device), transport);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("check permission failed");
+        return false;
+    }
     if ((transport == BTTransport::ADAPTER_BREDR) && IsBtEnabled()) {
         return pimpl->classicService_->RemovePair(*device);
     } else if ((transport == BTTransport::ADAPTER_BLE) && IsBleEnabled()) {
         return pimpl->bleService_->RemovePair(*device);
     } else {
-        HILOGE("[%{public}s]: %{public}s() Parameter::transport invalid or BT current state is not enabled!",
-            __FILE__,
-            __FUNCTION__);
+        HILOGE("transport invalid or BT/BLE current state is not enabled!");
     }
     return false;
 }
@@ -1410,7 +1415,9 @@ void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRe
 
 bool BluetoothHostServer::IsBtEnabled()
 {
-    return GetBtState() == static_cast<int32_t>(bluetooth::BTStateID::STATE_TURN_ON) ? true : false;
+    bool isEnabled = (GetBtState() == static_cast<int32_t>(bluetooth::BTStateID::STATE_TURN_ON)) ? true : false;
+    HILOGI("%{public}s", isEnabled ? "true" : "false");
+    return isEnabled;
 }
 
 void BluetoothHostServer::RegisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer)

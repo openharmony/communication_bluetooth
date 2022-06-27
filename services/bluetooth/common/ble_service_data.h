@@ -65,7 +65,7 @@ public:
     /**
      * @brief Set report delay time.
      *
-     * @param reportDelayMillis Repport delay time.
+     * @param reportDelayMillis Report delay time.
      * @since 6
      */
     void SetReportDelay(long reportDelayMillis = 0);

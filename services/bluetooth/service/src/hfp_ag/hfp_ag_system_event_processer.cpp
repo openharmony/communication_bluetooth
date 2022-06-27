@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ void HfpAgSystemEventProcesser::Stop()
 
 void HfpAgSystemEventProcesser::ExecuteEventProcess(const HfpAgMessage &event)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():[%{public}s]", __FUNCTION__, GetEventType(event.type_).c_str());
+    LOG_INFO("[HFP AG]%{public}s():[%{public}s]", __FUNCTION__, GetEventType(event.type_).c_str());
     switch (event.type_) {
         case HFP_AG_MSG_TYPE_ANSWER_CALL:
             ProcessAnswerCallEvent();
@@ -105,13 +105,13 @@ void HfpAgSystemEventProcesser::ExecuteEventProcess(const HfpAgMessage &event)
 
 void HfpAgSystemEventProcesser::ProcessAnswerCallEvent() const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():Answer call! address:%{public}s", __FUNCTION__, address_.c_str());
+    LOG_INFO("[HFP AG]%{public}s():Answer call! address:%{public}s", __FUNCTION__, address_.c_str());
     systemInterface_.AnswerCall(address_);
 }
 
 void HfpAgSystemEventProcesser::ProcessHangupCallEvent() const
 {
-    LOG_DEBUG("[HFP AG]%{public}s():Hang up call! address:%{public}s", __FUNCTION__, address_.c_str());
+    LOG_INFO("[HFP AG]%{public}s():Hang up call! address:%{public}s", __FUNCTION__, address_.c_str());
     systemInterface_.HangupCall(address_);
 }
 
@@ -119,7 +119,7 @@ void HfpAgSystemEventProcesser::ProcessHfVolumeChangedEvent(int type, int volume
 {
     // the devcie can't change SCO volume if it is not the active device.
     if (HfpAgProfile::GetActiveDevice() != address_) {
-        LOG_DEBUG("[HFP AG]%{public}s():This device is not active!", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():This device is not active!", __FUNCTION__);
         return;
     }
     int flag = 1;
@@ -309,7 +309,7 @@ void HfpAgSystemEventProcesser::SendHfIndicator(int indId, int indValue) const
 
 void HfpAgSystemEventProcesser::ProcessAtBiaEvent(const HfpAgMessage &event)
 {
-    LOG_DEBUG("[HFP AG]%{public}s(): BIA command is battery[%{public}d] roam[%{public}d] service[%{public}d] signal[%{public}d]",
+    LOG_INFO("[HFP AG]%{public}s(): BIA command is battery[%{public}d] roam[%{public}d] service[%{public}d] signal[%{public}d]",
         __FUNCTION__,
         event.data_.battery,
         event.data_.roam,

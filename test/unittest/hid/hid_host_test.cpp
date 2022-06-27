@@ -42,8 +42,6 @@ public:
     HidHostTest();
     ~HidHostTest();
 
-    HidHostObserverTest *hidHostObserverTest_;
-
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
@@ -56,7 +54,6 @@ private:
 
 HidHostTest::HidHostTest()
 {
-    hidHostObserverTest_ = new HidHostObserverTest();
 }
 
 HidHostTest::~HidHostTest()
@@ -178,7 +175,7 @@ HWTEST_F(HidHostTest, HID_ModuleTest_RegisterObserver_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "RegisterObserver function test";
 
     profile_ = HidHost::GetProfile();
-    profile_->RegisterObserver(hidHostObserverTest_);
+    profile_->RegisterObserver(&hidHostObserverTest);
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_RegisterObserver_00100 end";
 }
@@ -195,7 +192,7 @@ HWTEST_F(HidHostTest, HID_ModuleTest_DeregisterObserver_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeregisterObserver function test";
 
     profile_ = HidHost::GetProfile();
-    profile_->DeregisterObserver(hidHostObserverTest_);
+    profile_->DeregisterObserver(&hidHostObserverTest);
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_DeregisterObserver_00100 end";
 }

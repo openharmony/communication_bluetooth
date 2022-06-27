@@ -18,6 +18,7 @@
 #include <thread>
 
 #include "bluetooth_gatt_client_server.h"
+#include "bluetooth_hitrace.h"
 #include "bluetooth_log.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_classic.h"
@@ -300,7 +301,10 @@ int BluetoothGattClientServer::Connect(int32_t appId, bool autoConnect)
         HILOGI("BluetoothGattClientServer: Connect request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
-    return pimpl->clientService_->Connect(appId, autoConnect);
+    OHOS::Bluetooth::BluetoothHiTrace::BluetoothStartAsyncTrace("GATT_CLIENT_CONNECT", 1);
+    int result = pimpl->clientService_->Connect(appId, autoConnect);
+    OHOS::Bluetooth::BluetoothHiTrace::BluetoothFinishAsyncTrace("GATT_CLIENT_CONNECT", 1);
+    return result;
 }
 
 int BluetoothGattClientServer::Disconnect(int32_t appId)

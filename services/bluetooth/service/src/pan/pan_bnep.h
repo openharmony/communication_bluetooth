@@ -52,7 +52,7 @@ public:
     ~PanBnep();
 
     /**
-     * @brief This function used to connect peer device L2CAP channel after SDP discovery OK (Initiator).
+     * @brief This function used to connect peer device L2CAP channel.
      *
      * @return Returns the result of connect.
      */
@@ -76,7 +76,7 @@ public:
     int SendData(EthernetHeader ethernetHeader, uint8_t* pkt, int length);
 
     /**
-     * @brief This function used to get the control channel's local cid.
+     * @brief This function used to get the local cid.
      *
      * @return Returns the cid.
      */

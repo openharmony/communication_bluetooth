@@ -93,7 +93,6 @@ bool HidHostSdpClient::ParseHidDescInfo(const SdpService *serviceAry)
             uint8_t type = attributeValue[0] >> HID_SDP_DESCRIPTOR_SIZE_BIT;
             uint8_t size = attributeValue[0] & SDP_SIZE_MASK;
             uint16_t descLength = 0;
-            offset = 0;
             if ((type  == SDP_DE_TYPE_STRING) && (size == SDP_DE_SIZE_VAR_8)) {
                 descLength = attributeValue[1];
                 offset = SDP_UINT8_LENGTH + 1;
@@ -104,11 +103,13 @@ bool HidHostSdpClient::ParseHidDescInfo(const SdpService *serviceAry)
             } else {
                 LOG_ERROR("[HIDH SDP]%{public}s() error type or size!", __FUNCTION__);
                 SendSdpComplete(result);
+                offset = 0;
                 return false;
             }
             if (descLength <= 0) {
                 LOG_ERROR("[HIDH SDP]%{public}s() length is 0!", __FUNCTION__);
                 SendSdpComplete(result);
+                offset = 0;
                 return false;
             }
             hidInf_.descInfo = std::make_unique<uint8_t[]>(descLength);

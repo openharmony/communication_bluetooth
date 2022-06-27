@@ -51,10 +51,10 @@ int PermissionHelper::VerifyPermission(const std::string &permissionName, const 
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_NATIVE) {
         result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
     } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_HAP) {
-        result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
+        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     } else {
         LOG_INFO("callerToken=0x%{public}x is invalid token", pid);
-        return PERMISSION_GRANTED;
+        return PERMISSION_DENIED;
     }
     if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
         return PERMISSION_GRANTED;

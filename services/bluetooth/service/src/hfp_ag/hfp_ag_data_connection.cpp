@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ uint32_t HfpAgDataConnection::g_localFeatures {HFP_AG_FEATURES_DEFAULT};
 void HfpAgDataConnection::DataConnectionCallback(uint16_t handle, uint32_t eventId,
                                                  const void *eventData, void *context)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():", __PRETTY_FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():", __PRETTY_FUNCTION__);
     HfpAgProfileEventSender::GetInstance().GetDispatchter()->PostTask(
         std::bind(&HfpAgDataConnection::ProcessDataConnectionCallback, handle, eventId));
     return;
@@ -34,7 +34,7 @@ void HfpAgDataConnection::DataConnectionCallback(uint16_t handle, uint32_t event
 void HfpAgDataConnection::ProcessDataConnectionCallback(uint16_t handle, uint32_t eventId)
 {
     auto addr = HfpAgRfcommConnection::GetRemoteAddressByHandle(handle);
-    LOG_DEBUG("[HFP AG]%{public}s():Event from rfcomm device[%{public}s], handle[%hu], eventId[%u]",
+    LOG_INFO("[HFP AG]%{public}s():Event from rfcomm device[%{public}s], handle[%hu], eventId[%u]",
         __FUNCTION__,
         addr.c_str(),
         handle,
@@ -81,21 +81,21 @@ int HfpAgDataConnection::Init()
             if (pCodecs->supportedCodecs[i] == ANUM_MSBC) {
                 g_localFeatures |= HFP_AG_FEATURES_CODEC_NEGOTIATION;
                 g_localSupportCodecs |= HFP_AG_CODEC_MSBC;
-                LOG_DEBUG("[HFP AG]%{public}s(): Support MSBC", __FUNCTION__);
+                LOG_INFO("[HFP AG]%{public}s(): Support MSBC", __FUNCTION__);
             } else if (pCodecs->supportedCodecs[i] == ANUM_CVSD) {
                 g_localSupportCodecs |= HFP_AG_CODEC_CVSD;
-                LOG_DEBUG("[HFP AG]%{public}s(): Support CVSD", __FUNCTION__);
+                LOG_INFO("[HFP AG]%{public}s(): Support CVSD", __FUNCTION__);
             } else {
-                LOG_DEBUG("[HFP AG]%{public}s(): Support other codecId[%hhu]", __FUNCTION__, pCodecs->supportedCodecs[i]);
+                LOG_INFO("[HFP AG]%{public}s(): Support other codecId[%hhu]", __FUNCTION__, pCodecs->supportedCodecs[i]);
             }
         }
     } else {
-        LOG_DEBUG("[HFP AG]%{public}s(): Get local support codecs failed!", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): Get local support codecs failed!", __FUNCTION__);
     }
 
     if (BTM_IsControllerSupportEsco()) {
         g_localFeatures |= HFP_AG_FEATURES_SUPPORT_ESCO;
-        LOG_DEBUG("[HFP AG]%{public}s(): Support ESCO", __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s(): Support ESCO", __FUNCTION__);
     }
     return ret;
 }
