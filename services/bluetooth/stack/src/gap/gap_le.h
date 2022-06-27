@@ -431,8 +431,8 @@ int GAP_LePair(const BtAddr *addr);
 int GAP_LeCancelPair(const BtAddr *addr);
 
 /**
- * @brief       Set mininum of Long Term Key size
- * @param[in]   minSize             mininum of Long Term Key size
+ * @brief       Set minimum of Long Term Key size
+ * @param[in]   minSize             minimum of Long Term Key size
  * @return      @c BT_NO_ERROR      : The function is executed successfully.
  *              @c otherwise        : The function is not executed successfully.
  */
