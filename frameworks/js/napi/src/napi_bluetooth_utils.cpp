@@ -17,6 +17,7 @@
 #include <functional>
 #include <optional>
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_bluetooth_spp_client.h"
@@ -28,7 +29,7 @@ using namespace std;
 
 napi_value GetCallbackErrorValue(napi_env env, int errCode)
 {
-    HILOGE("GetCallbackErrorValue");
+    HILOGE("errCode: %{public}d", errCode);
     napi_value result = nullptr;
     napi_value eCode = nullptr;
     napi_create_int32(env, errCode, &eCode);
@@ -42,9 +43,8 @@ bool ParseString(napi_env env, string &param, napi_value args)
     napi_valuetype valuetype;
     napi_typeof(env, args, &valuetype);
 
-    HILOGI("param=%{public}d.", valuetype);
     if (valuetype != napi_string) {
-        HILOGE("Wrong argument type. String expected.");
+        HILOGE("Wrong argument type(%{public}d). String expected.", valuetype);
         return false;
     }
     size_t size = 0;
@@ -69,9 +69,8 @@ bool ParseInt32(napi_env env, int32_t &param, napi_value args)
     napi_valuetype valuetype;
     napi_typeof(env, args, &valuetype);
 
-    HILOGI("param=%{public}d.", valuetype);
     if (valuetype != napi_number) {
-        HILOGE("Wrong argument type. Int32 expected.");
+        HILOGE("Wrong argument type(%{public}d). Int32 expected.", valuetype);
         return false;
     }
     napi_get_value_int32(env, args, &param);
@@ -83,9 +82,8 @@ bool ParseBool(napi_env env, bool &param, napi_value args)
     napi_valuetype valuetype;
     napi_typeof(env, args, &valuetype);
 
-    HILOGI("param=%{public}d.", valuetype);
     if (valuetype != napi_boolean) {
-        HILOGE("Wrong argument type. bool expected.");
+        HILOGE("Wrong argument type(%{public}d). bool expected.", valuetype);
         return false;
     }
     napi_get_value_bool(env, args, &param);
@@ -99,9 +97,8 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
     napi_valuetype valuetype;
     napi_typeof(env, args, &valuetype);
 
-    HILOGI("param=%{public}d.", valuetype);
     if (valuetype != napi_object) {
-        HILOGE("Wrong argument type. object expected.");
+        HILOGE("Wrong argument type(%{public}d). object expected.", valuetype);
         return false;
     }
 
@@ -112,19 +109,18 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
         return false;
     }
     HILOGE("arraybuffer size is %{public}zu", size);
-    HILOGE("arraybuffer is %{public}d", (*data)[0]);
     return true;
 }
 
 void ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string>& stringVector)
 {
-    HILOGI("ConvertStringVectorToJS called");
+    HILOGI("vector size: %{public}zu", stringVector.size());
     size_t idx = 0;
 
     if (stringVector.empty()) {
         return;
     }
-    HILOGI("ConvertStringVectorToJS size is %{public}zu", stringVector.size());
+
     for (auto& str : stringVector) {
         napi_value obj = nullptr;
         napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &obj);
@@ -135,13 +131,13 @@ void ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::s
 
 void ConvertGattServiceVectorToJS(napi_env env, napi_value result, vector<GattService>& services)
 {
-    HILOGI("ConverGattServiceVectorToJS called");
+    HILOGI("enter");
     size_t idx = 0;
 
     if (services.empty()) {
         return;
     }
-    HILOGI("ConverGattServiceVectorToJS size is %{public}zu", services.size());
+    HILOGI("size: %{public}zu", services.size());
     for (auto& service : services) {
         napi_value obj = nullptr;
         napi_create_object(env, &obj);
@@ -153,17 +149,14 @@ void ConvertGattServiceVectorToJS(napi_env env, napi_value result, vector<GattSe
 
 void ConvertGattServiceToJS(napi_env env, napi_value result, GattService& service)
 {
-    HILOGI("ConvertGattServiceToJS called");
-
     napi_value serviceUuid;
     napi_create_string_utf8(env, service.GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH, &serviceUuid);
     napi_set_named_property(env, result, "serviceUuid", serviceUuid);
-    HILOGI("ConvertGattServiceToJS serviceUuid is %{public}s", service.GetUuid().ToString().c_str());
 
     napi_value isPrimary;
     napi_get_boolean(env, service.IsPrimary(), &isPrimary);
     napi_set_named_property(env, result, "isPrimary", isPrimary);
-    HILOGI("ConvertGattServiceToJS isPrimary is %{public}d", service.IsPrimary());
+    HILOGI("uuid: %{public}s, isPrimary: %{public}d", service.GetUuid().ToString().c_str(), service.IsPrimary());
 
     napi_value characteristics;
     napi_create_array(env, &characteristics);
@@ -184,7 +177,7 @@ void ConvertGattServiceToJS(napi_env env, napi_value result, GattService& servic
 void ConvertBLECharacteristicVectorToJS(napi_env env, napi_value result,
     vector<GattCharacteristic>& characteristics)
 {
-    HILOGI("ConvertBLECharacteristicVectorToJS called");
+    HILOGI("size: %{public}zu", characteristics.size());
     size_t idx = 0;
     if (characteristics.empty()) {
         return;
@@ -201,10 +194,8 @@ void ConvertBLECharacteristicVectorToJS(napi_env env, napi_value result,
 
 void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacteristic& characteristic)
 {
-    HILOGI("ConvertBLECharacteristicToJS called");
-    
     napi_value characteristicUuid;
-    HILOGI("ConvertBLECharacteristicToJS uuid is %{public}s", characteristic.GetUuid().ToString().c_str());
+    HILOGI("uuid: %{public}s", characteristic.GetUuid().ToString().c_str());
     napi_create_string_utf8(env, characteristic.GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH, &characteristicUuid);
     napi_set_named_property(env, result, "characteristicUuid", characteristicUuid);
 
@@ -222,7 +213,7 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
         uint8_t* bufferData = nullptr;
         napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
         if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
-            HILOGE("ConvertBLECharacteristicToJS memcpy_s failed");
+            HILOGE("memcpy_s failed");
             return;
         }
         napi_set_named_property(env, result, "characteristicValue", value);
@@ -236,13 +227,13 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
 
 void ConvertBLEDescriptorVectorToJS(napi_env env, napi_value result, vector<GattDescriptor>& descriptors)
 {
-    HILOGI("ConvertBLEDescriptorVectorToJS called");
+    HILOGI("size: %{public}zu", descriptors.size());
     size_t idx = 0;
 
     if (descriptors.empty()) {
         return;
     }
-    HILOGI("ConvertBLEDescriptorVectorToJS size is %{public}zu", descriptors.size());
+
     for (auto& descriptor : descriptors) {
         napi_value obj = nullptr;
         napi_create_object(env, &obj);
@@ -254,29 +245,23 @@ void ConvertBLEDescriptorVectorToJS(napi_env env, napi_value result, vector<Gatt
 
 void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor& descriptor)
 {
-    HILOGI("ConvertBLEDescriptorToJS called");
+    HILOGI("uuid: %{public}s", descriptor.GetUuid().ToString().c_str());
 
     napi_value descriptorUuid;
     napi_create_string_utf8(env, descriptor.GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH, &descriptorUuid);
     napi_set_named_property(env, result, "descriptorUuid", descriptorUuid);
-    HILOGI("ConvertBLEDescriptorToJS descriptorUuid is %{public}s", descriptor.GetUuid().ToString().c_str());
-    
+
     if (descriptor.GetCharacteristic() != nullptr) {
         napi_value characteristicUuid;
         napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH,
             &characteristicUuid);
         napi_set_named_property(env, result, "characteristicUuid", characteristicUuid);
 
-        HILOGI("ConvertBLEDescriptorToJS characteristicUuid is %{public}s",
-            descriptor.GetCharacteristic()->GetUuid().ToString().c_str());
-
         if (descriptor.GetCharacteristic()->GetService() != nullptr) {
             napi_value serviceUuid;
             napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str(),
                 NAPI_AUTO_LENGTH, &serviceUuid);
             napi_set_named_property(env, result, "serviceUuid", serviceUuid);
-            HILOGI("ConvertBLEDescriptorToJS serviceUuid is %{public}s", 
-                descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str());
         }
     }
 
@@ -292,78 +277,64 @@ void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor& d
 void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std::string &device,
     GattCharacteristic &characteristic, int requestId)
 {
-    HILOGI("ConvertCharacteristicReadReqToJS called");
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertCharacteristicReadReqToJS deviceId is %{public}s", device.c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
     napi_set_named_property(env, result, "transId", transId);
-    HILOGI("ConvertCharacteristicReadReqToJS transId is %{public}d", requestId);
 
     napi_value offset;
     napi_create_int32(env, 0, &offset);
     napi_set_named_property(env, result, "offset", offset);
-    HILOGI("ConvertCharacteristicReadReqToJS offset is %{public}d", 0);
+    HILOGI("offset is %{public}d", 0);
 
     napi_value characteristicUuid;
     napi_create_string_utf8(env, characteristic.GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH, &characteristicUuid);
     napi_set_named_property(env, result, "characteristicUuid", characteristicUuid);
-    HILOGI("ConvertCharacteristicReadReqToJS characteristicUuid is %{public}s",
-        characteristic.GetUuid().ToString().c_str());
+    HILOGI("characteristicUuid is %{public}s", characteristic.GetUuid().ToString().c_str());
 
     if (characteristic.GetService() != nullptr) {
         napi_value serviceUuid;
         napi_create_string_utf8(env, characteristic.GetService()->GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH,
             &serviceUuid);
         napi_set_named_property(env, result, "serviceUuid", serviceUuid);
-        HILOGI("ConvertCharacteristicReadReqToJS serviceUuid is %{public}s",
-            characteristic.GetService()->GetUuid().ToString().c_str());
     }
 }
 
 void ConvertDescriptorReadReqToJS(napi_env env, napi_value result, const std::string &device,
     GattDescriptor& descriptor, int requestId)
 {
-    HILOGI("ConvertDescriptorReadReqToJS called");
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertDescriptorReadReqToJS deviceId is %{public}s", device.c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
     napi_set_named_property(env, result, "transId", transId);
-    HILOGI("ConvertDescriptorReadReqToJS transId is %{public}d", requestId);
 
     napi_value offset;
     napi_create_int32(env, 0, &offset);
     napi_set_named_property(env, result, "offset", offset);
-    HILOGI("ConvertDescriptorReadReqToJS offset is %{public}d", 0);
+    HILOGI("offset is %{public}d", 0);
 
     napi_value descriptorUuid;
     napi_create_string_utf8(env, descriptor.GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH, &descriptorUuid);
     napi_set_named_property(env, result, "descriptorUuid", descriptorUuid);
-    HILOGI("ConvertDescriptorReadReqToJS descriptorUuid is %{public}s",
-        descriptor.GetUuid().ToString().c_str());
+    HILOGI("descriptorUuid is %{public}s", descriptor.GetUuid().ToString().c_str());
 
     if (descriptor.GetCharacteristic() != nullptr) {
     napi_value characteristicUuid;
     napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH,
         &characteristicUuid);
     napi_set_named_property(env, result, "characteristicUuid", characteristicUuid);
-    HILOGI("ConvertDescriptorReadReqToJS characteristicUuid is %{public}s",
-        descriptor.GetCharacteristic()->GetUuid().ToString().c_str());
 
         if (descriptor.GetCharacteristic()->GetService() != nullptr) {
             napi_value serviceUuid;
             napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str(),
                 NAPI_AUTO_LENGTH, &serviceUuid);
             napi_set_named_property(env, result, "serviceUuid", serviceUuid);
-            HILOGI("ConvertDescriptorReadReqToJS serviceUuid is %{public}s",
-                descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str());
         }
     }
 }
@@ -371,21 +342,18 @@ void ConvertDescriptorReadReqToJS(napi_env env, napi_value result, const std::st
 void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const std::string &device,
     GattCharacteristic& characteristic, int requestId)
 {
-    HILOGI("ConvertCharacteristicWriteReqToJS called");
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertCharacteristicWriteReqToJS deviceId is %{public}s", device.c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
     napi_set_named_property(env, result, "transId", transId);
-    HILOGI("ConvertCharacteristicWriteReqToJS transId is %{public}d", requestId);
 
     napi_value offset;
     napi_create_int32(env, 0, &offset);
     napi_set_named_property(env, result, "offset", offset);
-    HILOGI("ConvertCharacteristicWriteReqToJS offset is %{public}d", 0);
+    HILOGI("offset is %{public}d", 0);
 
     napi_value isPrep;
     napi_get_boolean(env, false, &isPrep);
@@ -406,37 +374,31 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     napi_value characteristicUuid;
     napi_create_string_utf8(env, characteristic.GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH, &characteristicUuid);
     napi_set_named_property(env, result, "characteristicUuid", characteristicUuid);
-    HILOGI("ConvertCharacteristicWriteReqToJS characteristicUuid is %{public}s",
-        characteristic.GetUuid().ToString().c_str());
+    HILOGI("characteristicUuid is %{public}s", characteristic.GetUuid().ToString().c_str());
 
     if (characteristic.GetService() != nullptr) {
         napi_value serviceUuid;
         napi_create_string_utf8(env, characteristic.GetService()->GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH,
             &serviceUuid);
         napi_set_named_property(env, result, "serviceUuid", serviceUuid);
-        HILOGI("ConvertCharacteristicWriteReqToJS serviceUuid is %{public}s",
-            characteristic.GetService()->GetUuid().ToString().c_str());
     }
 }
 
 void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::string &device,
     GattDescriptor &descriptor, int requestId)
 {
-    HILOGI("ConvertDescriptorWriteReqToJS called");
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertCharacteristicWriteReqToJS deviceId is %{public}s", device.c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
     napi_set_named_property(env, result, "transId", transId);
-    HILOGI("ConvertCharacteristicWriteReqToJS transId is %{public}d", requestId);
 
     napi_value offset;
     napi_create_int32(env, 0, &offset);
     napi_set_named_property(env, result, "offset", offset);
-    HILOGI("ConvertCharacteristicWriteReqToJS offset is %{public}d", 0);
+    HILOGI("offset is %{public}d", 0);
 
     napi_value isPrep;
     napi_get_boolean(env, false, &isPrep);
@@ -457,62 +419,50 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     napi_value descriptorUuid;
     napi_create_string_utf8(env, descriptor.GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH, &descriptorUuid);
     napi_set_named_property(env, result, "descriptorUuid", descriptorUuid);
-    HILOGI("ConvertDescriptorWriteReqToJS descriptorUuid is %{public}s",
-        descriptor.GetUuid().ToString().c_str());
+    HILOGI("descriptorUuid is %{public}s", descriptor.GetUuid().ToString().c_str());
 
     if (descriptor.GetCharacteristic() != nullptr) {
         napi_value characteristicUuid;
         napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetUuid().ToString().c_str(), NAPI_AUTO_LENGTH,
             &characteristicUuid);
         napi_set_named_property(env, result, "characteristicUuid", characteristicUuid);
-        HILOGI("ConvertDescriptorWriteReqToJS characteristicUuid is %{public}s",
-            descriptor.GetCharacteristic()->GetUuid().ToString().c_str());
+
         if (descriptor.GetCharacteristic()->GetService() != nullptr) {
             napi_value serviceUuid;
             napi_create_string_utf8(env, descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str(),
                 NAPI_AUTO_LENGTH, &serviceUuid);
             napi_set_named_property(env, result, "serviceUuid", serviceUuid);
-            HILOGI("ConvertDescriptorWriteReqToJS serviceUuid is %{public}s",
-                descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str());
         }
     }
 }
 
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state)
 {
-    HILOGI("ConvertStateChangeParamToJS called");
     napi_value deviceId = nullptr;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertStateChangeParamToJS deviceId is %{public}s", device.c_str());
 
     napi_value profileState = nullptr;
     napi_create_int32(env, GetProfileConnectionState(state), &profileState);
     napi_set_named_property(env, result, "state", profileState);
-    HILOGI("ConvertStateChangeParamToJS state is %{public}d", state);
 }
 
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state)
 {
-    HILOGI("ConvertScoStateChangeParamToJS called");
     napi_value deviceId = nullptr;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertScoStateChangeParamToJS deviceId is %{public}s", device.c_str());
 
     napi_value profileState = nullptr;
     napi_create_int32(env, GetScoConnectionState(state), &profileState);
     napi_set_named_property(env, result, "state", profileState);
-    HILOGI("ConvertScoStateChangeParamToJS state is %{public}d", state);
 }
 
 void GetServiceVectorFromJS(napi_env env, napi_value object, vector<GattService>& services,
     std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client)
 {
-    HILOGI("GetServiceVectorFromJS called");
     size_t idx = 0;
     bool hasElement = false;
-    HILOGI("GetServiceVectorFromJS size is %{public}zu", services.size());
     napi_has_element(env, object, idx, &hasElement);
     while (hasElement) {
         napi_value result = nullptr;
@@ -524,12 +474,12 @@ void GetServiceVectorFromJS(napi_env env, napi_value object, vector<GattService>
         idx++;
         napi_has_element(env, object, idx, &hasElement);
     }
+    HILOGI("services size is %{public}zu", services.size());
 }
 
 GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<GattServer> server,
     std::shared_ptr<GattClient> client)
 {
-    HILOGI("GetServiceFromJS called");
     string serviceUuid;
     bool isPrimary = false;
 
@@ -540,12 +490,11 @@ GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<G
     napi_create_string_utf8(env, "serviceUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseString(env, serviceUuid, value);
-    HILOGI("serviceUuid is %{public}s", serviceUuid.c_str());
 
     napi_create_string_utf8(env, "isPrimary", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseBool(env, isPrimary, value);
-    HILOGI("isPrimary is %{public}d", isPrimary);
+    HILOGI("serviceUuid: %{public}s, isPrimary: %{public}d", serviceUuid.c_str(), isPrimary);
 
     GattServiceType serviceType = GattServiceType::PRIMARY;
     if (!isPrimary) {
@@ -588,7 +537,7 @@ GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<G
                 return nullptr;
             }
         }
-        
+
         if (obtainedService == std::nullopt) {
             return nullptr;
         } else {
@@ -601,13 +550,11 @@ GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<G
 void GetCharacteristicVectorFromJS(napi_env env, napi_value object, vector<GattCharacteristic>& characteristics,
     std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client)
 {
-    HILOGI("GetCharacteristicVectorFromJS called");
     size_t idx = 0;
 
     bool hasElement = false;
     napi_has_element(env, object, idx, &hasElement);
-    HILOGI("GetCharacteristicVectorFromJS size is %{public}zu", characteristics.size());
-    while(hasElement) {
+    while (hasElement) {
         napi_value result = nullptr;
         napi_create_object(env, &result);
         napi_get_element(env, object, idx, &result);
@@ -619,12 +566,12 @@ void GetCharacteristicVectorFromJS(napi_env env, napi_value object, vector<GattC
         idx++;
         napi_has_element(env, object, idx, &hasElement);
     };
+    HILOGI("characteristics size is %{public}zu", characteristics.size());
 }
 
 GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std::shared_ptr<GattServer> server,
     std::shared_ptr<GattClient> client)
 {
-    HILOGI("GetCharacteristicFromJS called");
     string serviceUuid;
     string characteristicUuid;
     uint8_t *characteristicValue = nullptr;
@@ -673,23 +620,21 @@ GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std
             service = client->GetService(UUID::FromString(serviceUuid));
         }
         if (service == std::nullopt) {
-            HILOGI("GetCharacteristicFromJS service is null");
+            HILOGI("service is null");
             return nullptr;
         } else {
             characteristic = service->get().GetCharacteristic(UUID::FromString(characteristicUuid));
         }
     }
- 
+
     if (characteristic == nullptr) {
-        HILOGI("GetCharacteristicFromJS characteristic is null");
+        HILOGI("characteristic is null");
         return nullptr;
     }
     napi_create_string_utf8(env, "characteristicValue", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     if (!ParseArrayBuffer(env, &characteristicValue, characteristicValueSize, value)) {
         HILOGE("ParseArrayBuffer failed");
-    } else {
-        HILOGI("characteristicValue is %{public}d", characteristicValue[0]);
     }
     characteristic->SetValue(characteristicValue, characteristicValueSize);
     return characteristic;
@@ -719,11 +664,12 @@ napi_value NapiGetBooleanFalse(napi_env env)
 
 napi_value RegisterObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("RegisterObserver called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    HILOGI("argc: %{public}zu", argc);
     if (argc == expectedArgsCount + 1) {
         NapiSppClient::On(env, info);
     } else {
@@ -741,17 +687,17 @@ napi_value RegisterObserver(napi_env env, napi_callback_info info)
     }
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
-    HILOGI("RegisterObserver called end");
     return ret;
 }
 
 napi_value DeregisterObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("DeregisterObserver called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    HILOGI("argc: %{public}zu", argc);
     if (argc == expectedArgsCount + 1) {
         NapiSppClient::Off(env, info);
     } else {
@@ -781,7 +727,6 @@ napi_value DeregisterObserver(napi_env env, napi_callback_info info)
     }
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
-    HILOGI("DeregisterObserver called end");
     return ret;
 }
 
@@ -797,12 +742,9 @@ const sysBLEMap &GetSysBLEObserver()
 
 void GetDescriptorVectorFromJS(napi_env env, napi_value object, vector<GattDescriptor>& descriptors)
 {
-    HILOGI("GetDescriptorVectorFromJS called");
     size_t idx = 0;
     bool hasElement = false;
     napi_has_element(env, object, idx, &hasElement);
-
-    HILOGI("GetDescriptorVectorFromJS size is %{public}zu", descriptors.size());
 
     while (hasElement) {
         napi_value result = nullptr;
@@ -814,12 +756,12 @@ void GetDescriptorVectorFromJS(napi_env env, napi_value object, vector<GattDescr
         idx++;
         napi_has_element(env, object, idx, &hasElement);
     }
+    HILOGI("descriptors size: %{public}zu", descriptors.size());
 }
 
 GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared_ptr<GattServer> server,
     std::shared_ptr<GattClient> client)
 {
-    HILOGI("GetDescriptorFromJS called");
     string serviceUuid;
     string characteristicUuid;
     string descriptorUuid;
@@ -892,7 +834,6 @@ GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared
 
 ServerResponse GetServerResponseFromJS(napi_env env, napi_value object)
 {
-    HILOGI("GetServerResponseFromJS called");
     ServerResponse serverResponse;
     napi_value propertyNameValue = nullptr;
     napi_value value = nullptr;
@@ -902,29 +843,25 @@ ServerResponse GetServerResponseFromJS(napi_env env, napi_value object)
     napi_create_string_utf8(env, "deviceId", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseString(env, serverResponse.deviceId, value);
-    HILOGI("deviceId is %{public}s", serverResponse.deviceId.c_str());
 
     napi_create_string_utf8(env, "transId", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseInt32(env, serverResponse.transId, value);
-    HILOGI("transId is %{public}d", serverResponse.transId);
 
     napi_create_string_utf8(env, "status", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseInt32(env, serverResponse.status, value);
-    HILOGI("status is %{public}d", serverResponse.status);
+    HILOGI("deviceId: %{public}s, transId: %{public}d, status: %{public}d",
+        GetEncryptAddr(serverResponse.deviceId).c_str(), serverResponse.transId, serverResponse.status);
 
     napi_create_string_utf8(env, "offset", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseInt32(env, serverResponse.offset, value);
-    HILOGI("offset is %{public}d", serverResponse.offset);
 
     napi_create_string_utf8(env, "value", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     if (!ParseArrayBuffer(env, &values, valuesSize, value)) {
         HILOGE("ParseArrayBuffer failed");
-    } else {
-        HILOGI("value is %{public}d", values[0]);
     }
     serverResponse.SetValue(values, valuesSize);
     return serverResponse;
@@ -932,7 +869,6 @@ ServerResponse GetServerResponseFromJS(napi_env env, napi_value object)
 
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
 {
-    HILOGI("GetSppOptionFromJS called");
     std::shared_ptr<SppOption> sppOption = std::make_shared<SppOption>();
     napi_value propertyNameValue = nullptr;
     napi_value value = nullptr;
@@ -952,7 +888,8 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     napi_get_property(env, object, propertyNameValue, &value);
     ParseInt32(env, type, value);
     sppOption->type_ = SppSocketType(type);
-    HILOGI("type is %{public}d", sppOption->type_);
+    HILOGI("uuid: %{public}s, secure: %{public}d, type: %{public}d",
+        sppOption->uuid_.c_str(), sppOption->secure_, sppOption->type_);
     return sppOption;
 }
 
@@ -1086,7 +1023,7 @@ void RegisterSysBLEObserver(
     if (callbackIndex >= ARGS_SIZE_THREE) {
         return;
     }
-    HILOGI("RegisterSysBLEObserver:type = %{public}s, index = %{public}d", type.c_str(), callbackIndex);
+    HILOGI("type: %{public}s, index: %{public}d", type.c_str(), callbackIndex);
     g_sysBLEObserver[type][callbackIndex] = info;
 }
 
