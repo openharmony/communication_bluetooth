@@ -331,20 +331,21 @@ void NapiBluetoothHostObserver::DealBredrPairComfirmed(const std::string &addr, 
 {
     switch (reqType) {
         case PAIR_CONFIRM_TYPE_PIN_CODE:
-            HILOGD("PAIR_CONFIRM_TYPE_PIN_CODE(1)");
+            HILOGI("PAIR_CONFIRM_TYPE_PIN_CODE(1)");
             break;
         case PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY:
-            HILOGD("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY(2)");
+            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY(2)");
+            OnPairConfirmedCallBack(addr, number);
             break;
         case PAIR_CONFIRM_TYPE_PASSKEY_INPUT:
-            HILOGD("PAIR_CONFIRM_TYPE_PASSKEY_INPUT(3)");
+            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_INPUT(3)");
             break;
         case PAIR_CONFIRM_TYPE_NUMERIC:
-            HILOGD("PAIR_CONFIRM_TYPE_NUMERIC(4)");
+            HILOGI("PAIR_CONFIRM_TYPE_NUMERIC(4)");
             OnPairConfirmedCallBack(addr, number);
             break;
         case PAIR_CONFIRM_TYPE_CONSENT:
-            HILOGD("PAIR_CONFIRM_TYPE_CONSENT(5)");
+            HILOGI("PAIR_CONFIRM_TYPE_CONSENT(5)");
             OnPairConfirmedCallBack(addr, number);
             break;
         default:
