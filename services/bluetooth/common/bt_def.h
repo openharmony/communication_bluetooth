@@ -564,7 +564,7 @@ enum class MapExecuteStatus : int {
 // Bit i is 1 indicates that the parameter related to Bit i shall be present in the requested Conversation-Listing.
 // The reserved bits shall be set to 0 by the MCE and discarded by the MSE.
 // If Bit 5 has the value 0, the Conversation-Listing in the response shall not contain any participant element
-// and thereforee the Bits 6–14 do not have any impact.
+// and therefore the Bits 6–14 do not have any impact.
 // If Bit 5 has the value 1, then at least one of the Bits 6–14 shall also have the value 1.
 // If any of the Bits 6–14 has the value 1, Bit 5 shall have the value 1.
 #define MAP_GETCONV_PARAMETER_MASK_ALL_ON 0b000000000111111111111111
