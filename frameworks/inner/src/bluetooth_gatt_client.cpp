@@ -339,7 +339,7 @@ void GattClient::impl::DiscoverComplete(int state)
 
 void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> &src)
 {
-    HILOGI("starts");
+    HILOGI("enter");
     for (auto &svc : src) {
         GattService svcTmp(UUID::ConvertFrom128Bits(svc.uuid_.ConvertTo128Bits()),
             svc.handle_,
@@ -356,7 +356,6 @@ void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> 
             }
             svcTmp.AddCharacteristic(std::move(characterTmp));
         }
-        HILOGI("svcTmp is %{public}s", svcTmp.GetUuid().ToString().c_str());
         gattServices_.emplace_back(std::move(svcTmp));
     }
     for (auto &svc : src) {

@@ -32,9 +32,7 @@ GattCharacteristic::GattCharacteristic(const UUID uuid, int permissions, int pro
       length_(0),
       descriptors_(),
       uuid_(uuid)
-{
-    HILOGI("enter, (3 parameters)");
-}
+{}
 
 GattCharacteristic::GattCharacteristic(const UUID uuid, uint16_t handle, const int permissions, const int properties)
     : writeType_(properties & Propertie::AUTHENTICATED_SIGNED_WRITES ? WriteType::SIGNED
@@ -48,9 +46,7 @@ GattCharacteristic::GattCharacteristic(const UUID uuid, uint16_t handle, const i
       length_(0),
       descriptors_(),
       uuid_(uuid)
-{
-    HILOGI("enter, (4 parameters)");
-}
+{}
 
 GattCharacteristic::GattCharacteristic(const GattCharacteristic &src)
     : writeType_(src.writeType_),
@@ -118,13 +114,11 @@ GattCharacteristic::GattCharacteristic(GattCharacteristic &&src)
 
 void GattCharacteristic::AddDescriptor(const GattDescriptor &descriptor)
 {
-    HILOGI("enter");
     descriptors_.insert(descriptors_.end(), descriptor)->characteristic_ = this;
 }
 
 GattDescriptor *GattCharacteristic::GetDescriptor(const UUID &uuid)
 {
-    HILOGI("enter");
     for (auto &desc : descriptors_) {
         if (desc.GetUuid().Equals(uuid)) {
             return &desc;
@@ -135,56 +129,47 @@ GattDescriptor *GattCharacteristic::GetDescriptor(const UUID &uuid)
 
 std::vector<GattDescriptor> &GattCharacteristic::GetDescriptors()
 {
-    HILOGI("enter");
     return descriptors_;
 }
 
 uint16_t GattCharacteristic::GetHandle() const
 {
-    HILOGI("handle: 0x%{public}04X", handle_);
     return handle_;
 }
 
 int GattCharacteristic::GetPermissions() const
 {
-    HILOGI("permissions: %{public}d", permissions_);
     return permissions_;
 }
 
 int GattCharacteristic::GetProperties() const
 {
-    HILOGI("properties: %{public}d", properties_);
     return properties_;
 }
 
 GattService *GattCharacteristic::GetService() const
 {
-    HILOGI("enter");
     return service_;
 }
 
 const UUID &GattCharacteristic::GetUuid() const
 {
-    HILOGI("uuid: %{public}s", uuid_.ToString().c_str());
     return uuid_;
 }
 
 const std::unique_ptr<uint8_t[]> &GattCharacteristic::GetValue(size_t *size) const
 {
-    HILOGI("value size: %{public}zu", length_);
     *size = length_;
     return value_;
 }
 
 int GattCharacteristic::GetWriteType() const
 {
-    HILOGI("type: %{public}d", writeType_);
     return writeType_;
 }
 
 int GattCharacteristic::SetWriteType(int type)
 {
-    HILOGI("enter, type: %{public}d", type);
     if (type != WriteType::DEFAULT && type != WriteType::NO_RESPONSE && type != WriteType::SIGNED) {
         HILOGE("Invalid parameter");
         return GattStatus::INVALID_PARAMETER;
@@ -196,8 +181,8 @@ int GattCharacteristic::SetWriteType(int type)
 
 void GattCharacteristic::SetValue(const uint8_t *values, const size_t length)
 {
-    HILOGI("enter, value length: %{public}zu", length);
-    if (nullptr == values || 0 == length) {
+    if (values == nullptr || length == 0) {
+        HILOGE("values is nullptr, or length is 0");
         return;
     }
     value_ = std::make_unique<uint8_t[]>(length);
