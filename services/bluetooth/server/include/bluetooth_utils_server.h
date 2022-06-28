@@ -23,6 +23,7 @@ namespace Bluetooth {
 std::string GetEncryptAddr(std::string addr);
 
 #define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetAddress()).c_str())
+#define GET_ENCRYPT_GATT_ADDR(device) (GetEncryptAddr((device).addr_.GetAddress()).c_str())
 }  // namespace Bluetooth
 }  // namespace OHOS
 
