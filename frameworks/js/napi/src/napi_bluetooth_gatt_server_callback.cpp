@@ -25,7 +25,8 @@ using namespace std;
 void NapiGattServerCallback::OnCharacteristicReadRequest(
     const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId)
 {
-    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ]) {
         HILOGI("This callback is not registered by ability.");
         return;
@@ -68,7 +69,8 @@ void NapiGattServerCallback::OnCharacteristicReadRequest(
 void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device,
     GattCharacteristic &characteristic, int requestId)
 {
-    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE]) {
         HILOGI("This callback is not registered by ability.");
         return;
@@ -157,7 +159,7 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
             BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
-            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);      
+            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);
             napi_value callback = nullptr;
             napi_value undefined = nullptr;
             napi_value callResult = nullptr;
@@ -173,7 +175,8 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
 void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
-    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE]) {
         HILOGI("This callback is not registered by ability.");
         return;
@@ -216,7 +219,8 @@ void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevic
 void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
-    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
     if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ]) {
         HILOGI("This callback is not registered by ability.");
         return;
