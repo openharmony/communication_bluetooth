@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "bluetooth_gatt_client_server.h"
 #include "bluetooth_hitrace.h"
 #include "bluetooth_log.h"
+#include "hisysevent.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_classic.h"
 #include "interface_adapter_manager.h"
@@ -88,6 +89,13 @@ public:
         if (PermissionUtils::VerifyUseBluetoothPermission(tokenId_) == PERMISSION_DENIED) {
             HILOGE("check permission failed, tokenId: %{public}u", tokenId_);
             return;
+        }
+        int32_t pid = IPCSkeleton::GetCallingPid();
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        if (state == static_cast<int>(BTConnectState::CONNECTED) ||
+            state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_GATT_CLIENT_CONN_STATE",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
         }
         callback_->OnConnectionStateChanged(state, newState);
     }
