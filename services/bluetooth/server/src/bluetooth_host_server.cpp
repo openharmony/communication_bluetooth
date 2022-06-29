@@ -196,7 +196,7 @@ public:
             if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
-                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BR_STATE",
+                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BR_SWITCH_STATE",
                     HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
             }
             if (state == BTStateID::STATE_TURN_ON) {
