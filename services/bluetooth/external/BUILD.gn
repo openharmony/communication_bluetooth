@@ -13,6 +13,8 @@
 
 import("//build/ohos.gni")
 
+SUBSYSTEM_DIR = "//foundation/communication"
+
 config("btdummy_config") {
   cflags_cc = [
     "-fPIC",
@@ -31,6 +33,7 @@ ohos_shared_library("btdummy") {
   configs = [ ":btdummy_config" ]
   public_configs = [ ":btdummy_public_config" ]
   sources = [ "dummy/src/stub.cpp" ]
+  deps = [ "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon" ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   subsystem_name = "communication"
   part_name = "bluetooth"
