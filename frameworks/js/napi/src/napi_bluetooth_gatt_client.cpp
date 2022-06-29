@@ -717,7 +717,11 @@ napi_value NapiGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_cal
     napi_unwrap(env, thisVar, (void**)&gattClient);
 
     GattCharacteristic* characteristic = GetCharacteristicFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
-
+    if (characteristic == nullptr) {
+        HILOGI("characteristic is nullptr");
+        napi_get_boolean(env, false, &ret);
+        return ret;
+    }
     bool enableNotify = false;
     ParseBool(env, enableNotify, argv[PARAM1]);
 
