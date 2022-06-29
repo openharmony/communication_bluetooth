@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,7 +280,7 @@ void BluetoothBleCentralManagerServer::StartScan()
     }
     OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid,
-        "SCAN_MODE", SCAN_MODE::SCAN_MODE_LOW_POWER);
+        "TYPE", 0);
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
             static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -330,6 +330,12 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
                 pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
                 pimpl->bleService_->StartScan(pimpl->scanSettingImpl_);
                 pimpl->isScanning = true;
+                int8_t type = 0;
+                if (settings.GetReportDelayMillisValue() > 0) {
+                    type = 1;
+                }
+                OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
+                    OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "TYPE", type);
             } else if (pimpl->scanSettingImpl_.GetReportDelayMillisValue() != settings.GetReportDelayMillisValue() ||
                        pimpl->scanSettingImpl_.GetScanMode() != settings.GetScanMode() ||
                        pimpl->scanSettingImpl_.GetLegacy() != settings.GetLegacy() ||
@@ -342,9 +348,6 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
                 pimpl->isScanning = false;
             }
         }
-        OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
-            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid,
-            "SCAN_MODE", settings.GetScanMode());
     });
 }
 

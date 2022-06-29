@@ -13,51 +13,57 @@
 
 domain: BLUETOOTH
 
-BLUETOOTH_BR_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth br state message}
+BLUETOOTH_BR_SWITCH_STATE:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth br state message}
   PID: {type: INT32, desc: application pid}
   UID: {type: INT32, desc: application uid}
   STATE: {type: INT32, desc: br state}
 
 BLUETOOTH_BLE_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth ble state message}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth ble state message}
   PID: {type: INT32, desc: application pid}
   UID: {type: INT32, desc: application uid}
   STATE: {type: INT32, desc: ble state}
 
 BLUETOOTH_DISCOVERY_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth discovery state message}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth discovery state message}
   PID: {type: INT32, desc: application pid}
   UID: {type: INT32, desc: application uid}
   STATE: {type: INT32, desc: br discovery state}
 
 BLUETOOTH_A2DP_CONNECTED_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth a2dp profile connected state message}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth a2dp profile connected state message}
   STATE: {type: INT32, desc: a2dp profile connected state}
 
 BLUETOOTH_HFP_CONNECTED_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth hfp profile state message}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth hfp profile state message}
   STATE: {type: INT32, desc: hfp profile connected state}
 
-BLUETOOTH_GATT_CONNECTED_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth gatt profile state message}
+BLUETOOTH_GATT_SERVER_CONN_STATE:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth gatt server profile state message}
+  PID: {type: INT32, desc: application pid}
+  UID: {type: INT32, desc: application uid}
+  STATE: {type: INT32, desc: gatt profile connected state}
+  
+BLUETOOTH_GATT_CLIENT_CONN_STATE:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth gatt clinet profile state message}
   PID: {type: INT32, desc: application pid}
   UID: {type: INT32, desc: application uid}
   STATE: {type: INT32, desc: gatt profile connected state}
 
 BLUETOOTH_BLE_SCAN_START:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth scan start message}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth scan start message}
   PID: {type: INT32, desc: application pid}
   UID: {type: INT32, desc: application uid}
-  SCAN_MODE: {type: INT32, desc: scan mode}
+  TYPE: {type: INT32, desc: 1 is batch, 0 is not}
 
 BLUETOOTH_BLE_SCAN_STOP:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth scan stop message}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth scan stop message}
   PID: {type: INT32, desc: application pid}
   UID: {type: INT32, desc: application uid}
 
 BLUETOOTH_BLE_SCAN_DUTY_CYCLE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: bluetooth scan duly cycle message}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth scan duly cycle message}
   WINDOW: {type: INT32, desc: window}
   INTERVAL: {type: INT32, desc: interval}
   TYPE: {type: INT32, desc: type}
