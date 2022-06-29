@@ -187,12 +187,6 @@ int HCI_Initialize()
             ThreadDelete(g_hciTxThread);
             g_hciTxThread = NULL;
         }
-
-        HciCloseCmd();
-        HciCloseEvent();
-        HciCloseAcl();
-        HciCloseFailure();
-        HciVendorClose();
     }
     LOG_DEBUG("%{public}s end", __FUNCTION__);
     return result;

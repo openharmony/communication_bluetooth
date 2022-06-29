@@ -44,6 +44,10 @@ static void HCIVendorFreeCallbacksBlock(void *block)
 
 void HciVendorClosed(void)
 {
+    if (g_hciVendorCallbackListLock == NULL) {
+        LOG_ERROR("g_hciVendorCallbackListLock is null");
+        return;
+    }
     HCIVendorEventCallbackBlock *block = NULL;
     MutexLock(g_hciVendorCallbackListLock);
     ListNode *node = ListGetFirstNode(g_hciVendorCallbackList);
@@ -148,6 +152,10 @@ int HCIVIF_SendCmd(uint16_t opCode, const void *param, size_t paramLength)
 
 void HciEventOnVendorCommandComplete(uint16_t opCode, const void *param, uint8_t paramLength)
 {
+    if (g_hciVendorCallbackListLock == NULL) {
+        LOG_ERROR("g_hciVendorCallbackListLock is null");
+        return;
+    }
     HCIVendorEventCallbackBlock *block = NULL;
     MutexLock(g_hciVendorCallbackListLock);
     ListNode *node = ListGetFirstNode(g_hciVendorCallbackList);
