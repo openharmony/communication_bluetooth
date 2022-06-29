@@ -31,7 +31,7 @@ public:
 
     void OnStartResultEvent(int result, uint8_t advHandle, int opcode) override
     {
-        HILOGI("BleAdvertiserCallback::OnStartResultEvent start.");
+        HILOGI("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
 
         observers_->ForEach([result, advHandle, opcode](IBluetoothBleAdvertiseCallback *observer) {
             observer->OnStartResultEvent(result, advHandle, opcode);
@@ -40,7 +40,7 @@ public:
 
     void OnAutoStopAdvEvent(uint8_t advHandle) override
     {
-        HILOGI("BleAdvertiserCallback::OnAutoStopAdvEvent start.");
+        HILOGI("advHandle: %{public}d", advHandle);
 
         observers_->ForEach(
             [advHandle](IBluetoothBleAdvertiseCallback *observer) { observer->OnAutoStopAdvEvent(advHandle); });
@@ -128,9 +128,9 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
     const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle,
     bool isRawData)
 {
-    HILOGI("BluetoothBleAdvertiserServer::StartAdvertising");
+    HILOGI("enter");
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("StartAdvertising error, check permission failed");
+        HILOGE("check permission failed");
         return;
     }
 
@@ -185,9 +185,9 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
 
 void BluetoothBleAdvertiserServer::StopAdvertising(int32_t advHandle)
 {
-    HILOGI("BluetoothBleAdvertiserServer::StopAdvertising");
+    HILOGI("enter, advHandle: %{public}d", advHandle);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("StopAdvertising error, check permission failed");
+        HILOGE("check permission failed");
         return;
     }
 
@@ -201,7 +201,7 @@ void BluetoothBleAdvertiserServer::StopAdvertising(int32_t advHandle)
 
 void BluetoothBleAdvertiserServer::Close(int32_t advHandle)
 {
-    HILOGI("BluetoothBleAdvertiserServer::Close");
+    HILOGI("enter, advHandle: %{public}d", advHandle);
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -213,12 +213,10 @@ void BluetoothBleAdvertiserServer::Close(int32_t advHandle)
 
 void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback)
 {
-    HILOGI("BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback");
+    HILOGI("enter");
 
     if (callback == nullptr) {
-        HILOGE("BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback:RegisterBleAdvertiserCallback called with "
-               "NULL binder. "
-               "Ignoring.");
+        HILOGE("callback is null");
         return;
     }
     if (pimpl != nullptr) {
@@ -229,18 +227,15 @@ void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBlu
 
 void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback)
 {
-    HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
+    HILOGI("enter");
 
     if (callback == nullptr || pimpl == nullptr) {
-        HILOGE("BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback:DeregisterBleAdvertiserCallback called "
-               "with NULL binder."
-               "Ignoring.");
+        HILOGE("callback is null, or pimpl is null");
         return;
     }
     for (auto iter = pimpl->advCallBack_.begin(); iter != pimpl->advCallBack_.end(); ++iter) {
-        HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
         if ((*iter)->AsObject() == callback->AsObject()) {
-            HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
+            HILOGI("Deregister observer");
             pimpl->observers_.Deregister(*iter);
             pimpl->advCallBack_.erase(iter);
             break;
@@ -250,7 +245,7 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
 
 int32_t BluetoothBleAdvertiserServer::GetAdvertiserHandle()
 {
-    HILOGI("BluetoothBleAdvertiserServer::GetAdvertiserHandle");
+    HILOGI("enter");
 
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
 
