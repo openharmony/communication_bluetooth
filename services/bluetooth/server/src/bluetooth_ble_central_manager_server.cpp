@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,16 +175,31 @@ public:
         HILOGI("enter, code: %{public}d", resultCode);
 
         pimpl_->eventHandler_->PostTask([=]() {
+            // update the scan state to ensure that the state is the same as that of the service.
+            if (resultCode != 0) {
+                pimpl_->isScanning = !pimpl_->isScanning;
+            }
             pimpl_->bleService_ =
                 static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
-            if (pimpl_->bleService_ != nullptr && !pimpl_->bleService_->IsBtDiscovering()) {
+
+            if (!pimpl_->isScanning && resultCode == 0) {
+                // When updating params the scanning is stopped successfully and the scanning will be restarted.
                 for (auto iter = pimpl_->scanCallbackInfo_.begin(); iter != pimpl_->scanCallbackInfo_.end(); ++iter) {
                     if (iter->isStart_) {
                         pimpl_->bleService_->StartScan(pimpl_->scanSettingImpl_);
+                        pimpl_->isScanning = true;
                         return;
                     }
                 }
+            } else if (!pimpl_->isScanning && resultCode != 0) {
+                // When updating params the scanning is stopped successfully and the scanning restart failed.
+                for (auto iter = pimpl_->scanCallbackInfo_.begin(); iter != pimpl_->scanCallbackInfo_.end(); ++iter) {
+                    if (iter->isStart_) {
+                        iter->isStart_ = false;
+                    }
+                }
             }
+
             observers_->ForEach([resultCode](IBluetoothBleCentralManagerCallback *observer) {
                 observer->OnStartScanFailed(resultCode);
             });
@@ -318,17 +333,20 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
 
         for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
             if (iter->pid_ == pid && iter->uid_ == uid) {
+                // Indicates the process and thread for which scanning is started.
                 iter->isStart_ = true;
             }
         }
 
         if (pimpl->bleService_ != nullptr) {
             if (!pimpl->isScanning) {
+                HILOGI("start ble scan");
                 pimpl->scanSettingImpl_.SetReportDelay(settings.GetReportDelayMillisValue());
                 pimpl->scanSettingImpl_.SetScanMode(settings.GetScanMode());
                 pimpl->scanSettingImpl_.SetLegacy(settings.GetLegacy());
                 pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
                 pimpl->bleService_->StartScan(pimpl->scanSettingImpl_);
+                // Indicates the bluetooth service is scanning.
                 pimpl->isScanning = true;
                 int8_t type = 0;
                 if (settings.GetReportDelayMillisValue() > 0) {
@@ -340,11 +358,14 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
                        pimpl->scanSettingImpl_.GetScanMode() != settings.GetScanMode() ||
                        pimpl->scanSettingImpl_.GetLegacy() != settings.GetLegacy() ||
                        pimpl->scanSettingImpl_.GetPhy() != settings.GetPhy()) {
+                // Stop an ongoing ble scan, update parameters and restart the ble scan in OnStartScanFailed().
+                HILOGI("restart ble scan");
                 pimpl->scanSettingImpl_.SetReportDelay(settings.GetReportDelayMillisValue());
                 pimpl->scanSettingImpl_.SetScanMode(settings.GetScanMode());
                 pimpl->scanSettingImpl_.SetLegacy(settings.GetLegacy());
                 pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
                 pimpl->bleService_->StopScan();
+                // Indicates the bluetooth service is not scanning.
                 pimpl->isScanning = false;
             }
         }

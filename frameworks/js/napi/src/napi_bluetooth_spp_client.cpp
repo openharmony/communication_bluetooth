@@ -207,7 +207,7 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     }
 
     if (clientMap[id]) {
-        OHOS::Bluetooth::OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
+        OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
         while (totalSize) {
             int result = outputStream.Write(totalBuf, totalSize);
             if (result > 0) {
@@ -228,7 +228,7 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 
 void NapiSppClient::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("On is called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_THREE] = {0};
@@ -246,7 +246,8 @@ void NapiSppClient::On(napi_env env, napi_callback_info info)
     if (type.c_str() == STR_BT_SPP_READ) {
         callbackInfo = std::make_shared<BufferCallbackInfo>();
     } else {
-        callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+        HILOGE("Invalid type!");
+        return;
     }
     callbackInfo->env_ = env;
 
@@ -270,13 +271,14 @@ void NapiSppClient::On(napi_env env, napi_callback_info info)
     client->sppReadFlag = true;
     client->callbackInfos_[type] = callbackInfo;
     HILOGI("sppRead begin");
-    client->thread_ = std::make_shared<std::thread>(sppRead, id);
+    client->thread_ = std::make_shared<std::thread>(SppRead, id);
     client->thread_->detach();
     return;
 }
 
 void NapiSppClient::Off(napi_env env, napi_callback_info info)
 {
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_THREE] = {0};
@@ -295,7 +297,11 @@ void NapiSppClient::Off(napi_env env, napi_callback_info info)
     ParseInt32(env, id, argv[PARAM1]);
     std::shared_ptr<NapiSppClient> client = clientMap[id];
     if (!client) {
-        HILOGI("client is nullptr");
+        HILOGE("client is nullptr");
+        return;
+    }
+    if (type.c_str() != STR_BT_SPP_READ) {
+        HILOGE("type is wrong");
         return;
     }
     client->callbackInfos_[type] = nullptr;
@@ -304,71 +310,76 @@ void NapiSppClient::Off(napi_env env, napi_callback_info info)
     return;
 }
 
-void NapiSppClient::sppRead(int id)
+void NapiSppClient::SppRead(int id)
 {
-    HILOGI("sppRead is called");
-    if (clientMap[id] == nullptr) {
+    if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
+        clientMap[id]->callbackInfos_[STR_BT_SPP_READ] == nullptr) {
+        HILOGE("spp read thread start failed.");
         return;
     }
-    OHOS::Bluetooth::InputStream inputStream = clientMap[id]->client_->GetInputStream();
+    InputStream inputStream = clientMap[id]->client_->GetInputStream();
     char buf[1024];
     int ret = 0;
-    bool isRead = true;
-    while (isRead) {
-        if (clientMap[id] == nullptr) {
-            isRead = false;
-            break;
-        }
-        isRead = clientMap[id]->sppReadFlag;
+
+    while (true) {
+        HILOGI("spp read thread start.");
+        (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
         HILOGI("inputStream.Read start");
-        while (true) {
-            (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
-            ret = inputStream.Read(buf, sizeof(buf));
-            HILOGI("inputStream.Read end");
-            if (ret <= 0) {
-                HILOGI("inputStream.Read failed");
-                isRead = false;
-                break;
-            } else {
-                HILOGI("napi_call_function begin");
-                std::shared_ptr<BufferCallbackInfo> callbackInfo = 
-                    std::static_pointer_cast<BufferCallbackInfo>(clientMap[id]->callbackInfos_[STR_BT_SPP_READ]);
-                
-                callbackInfo->info_ = ret;
-                (void)memcpy_s(callbackInfo->buffer_, sizeof(callbackInfo->buffer_), buf, ret);
-
-                uv_loop_s *loop = nullptr;
-                napi_get_uv_event_loop(callbackInfo->env_, &loop);
-                uv_work_t *work = new uv_work_t;
-                work->data = (void*)callbackInfo.get();
-
-                uv_queue_work(
-                    loop,
-                    work,
-                    [](uv_work_t *work) {},
-                    [](uv_work_t *work, int status) {
-                        BufferCallbackInfo *callbackInfo = (BufferCallbackInfo *)work->data;
-                        int size = callbackInfo->info_;
-                        uint8_t* totalBuf = (uint8_t*) malloc(size);
-                        (void)memcpy_s(totalBuf, size, callbackInfo->buffer_, size);
-                        napi_value result = nullptr;
-                        uint8_t* bufferData = nullptr;
-                        napi_create_arraybuffer(callbackInfo->env_ , size, (void**)&bufferData, &result);
-                        (void)memcpy_s(bufferData, size, totalBuf, size);
-                        free(totalBuf);
-
-                        napi_value callback = nullptr;
-                        napi_value undefined = nullptr;
-                        napi_value callResult = nullptr;
-                        napi_get_undefined(callbackInfo->env_, &undefined);
-                        napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-                        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result,
-                            &callResult);
-                        delete work;
-                        work = nullptr;
-                    }
-                );
+        ret = inputStream.Read(buf, sizeof(buf));
+        HILOGI("inputStream.Read end");
+        if (ret <= 0) {
+            HILOGI("inputStream.Read failed, ret = %{public}d", ret);
+            return;
+        } else {
+            HILOGI("callback read data to jshap begin");
+            if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
+                clientMap[id]->callbackInfos_[STR_BT_SPP_READ] == nullptr) {
+                HILOGE("sppRead failed");
+                return;
             }
+            std::shared_ptr<BufferCallbackInfo> callbackInfo =
+                std::static_pointer_cast<BufferCallbackInfo>(clientMap[id]->callbackInfos_[STR_BT_SPP_READ]);
+
+            callbackInfo->info_ = ret;
+            if (memcpy_s(callbackInfo->buffer_, sizeof(callbackInfo->buffer_), buf, ret) != EOK) {
+                HILOGE("memcpy_s failed!");
+                return;
+            }
+
+            uv_loop_s *loop = nullptr;
+            napi_get_uv_event_loop(callbackInfo->env_, &loop);
+            uv_work_t *work = new uv_work_t;
+            work->data = (void*)callbackInfo.get();
+
+            uv_queue_work(
+                loop,
+                work,
+                [](uv_work_t *work) {},
+                [](uv_work_t *work, int status) {
+                    BufferCallbackInfo *callbackInfo = (BufferCallbackInfo *)work->data;
+                    int size = callbackInfo->info_;
+                    uint8_t* totalBuf = (uint8_t*) malloc(size);
+                    if (memcpy_s(totalBuf, size, callbackInfo->buffer_, size) != EOK) {
+                        HILOGE("memcpy_s failed!");
+                    }
+                    napi_value result = nullptr;
+                    uint8_t* bufferData = nullptr;
+                    napi_create_arraybuffer(callbackInfo->env_ , size, (void**)&bufferData, &result);
+                    if (memcpy_s(bufferData, size, totalBuf, size) != EOK) {
+                        HILOGE("memcpy_s failed!");
+                    }
+                    free(totalBuf);
+
+                    napi_value callback = nullptr;
+                    napi_value undefined = nullptr;
+                    napi_value callResult = nullptr;
+                    napi_get_undefined(callbackInfo->env_, &undefined);
+                    napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+                    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+                    delete work;
+                    work = nullptr;
+                }
+            );
         }
     }
     return;
