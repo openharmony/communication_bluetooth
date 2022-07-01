@@ -317,8 +317,8 @@ int HfpAgAudioConnection::AcceptByCvsd(const AudioDevice &dev, BtAddr btAddr) co
         ret = BTM_AcceptScoConnectionRequest(&param);
         HFP_AG_RETURN_IF_FAIL(ret);
     } else {
-        LOG_INFO("[HFP AG]%{public}s():CVSD ESCO connection fail,
-            linktype[%hhu] and escoSupport[%{public}d] are not matched!",
+        LOG_INFO("[HFP AG]%{public}s():CVSD ESCO connection fail, "
+            "linktype[%hhu] and escoSupport[%{public}d] are not matched!",
             __FUNCTION__,
             dev.linkType,
             escoSupport_);
@@ -340,8 +340,8 @@ int HfpAgAudioConnection::AcceptAudioConnection() const
             if (dev->linkType == LINK_TYPE_ESCO && escoSupport_) {
                 return AcceptByMsbc(btAddr);
             } else {
-                LOG_INFO("[HFP AG]%{public}s():MSBC ESCO connection fail,
-                    linktype[%hhu] and escoSupport[%{public}d] are not matched!",
+                LOG_INFO("[HFP AG]%{public}s():MSBC ESCO connection fail, "
+                    "linktype[%hhu] and escoSupport[%{public}d] are not matched!",
                     __FUNCTION__,
                     dev->linkType,
                     escoSupport_);
