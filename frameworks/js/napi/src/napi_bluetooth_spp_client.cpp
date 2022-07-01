@@ -364,7 +364,7 @@ void NapiSppClient::SppRead(int id)
                     }
                     napi_value result = nullptr;
                     uint8_t* bufferData = nullptr;
-                    napi_create_arraybuffer(callbackInfo->env_ , size, (void**)&bufferData, &result);
+                    napi_create_arraybuffer(callbackInfo->env_, size, (void**)&bufferData, &result);
                     if (memcpy_s(bufferData, size, totalBuf, size) != EOK) {
                         HILOGE("memcpy_s failed!");
                     }
