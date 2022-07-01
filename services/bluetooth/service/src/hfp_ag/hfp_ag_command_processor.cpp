@@ -175,7 +175,8 @@ void HfpAgCommandProcessor::SendAtCommand(const HfpAgDataConnection &dataConn, c
 void HfpAgCommandProcessor::Handle(
     HfpAgDataConnection &dataConn, const std::string &cmd, const std::string &arg, int cmdType)
 {
-    LOG_INFO("[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], Type[%{public}d]", __FUNCTION__, cmd.c_str(), arg.c_str(), cmdType);
+    LOG_INFO("[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], Type[%{public}d]", __FUNCTION__,
+        cmd.c_str(), arg.c_str(), cmdType);
     auto it = g_atCmdMap.find(cmd);
     if (it == g_atCmdMap.end()) {
         SendErrorCode(dataConn, HFP_AG_ERROR_AG_FAILURE);
@@ -305,7 +306,8 @@ void HfpAgCommandProcessor::ChldTester(HfpAgDataConnection &dataConn, const std:
 void HfpAgCommandProcessor::ChupExecuter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
     if (HfpAgAudioConnection::GetActiveDevice().compare(dataConn.remoteAddr_) != 0) {
-        LOG_INFO("[HFP AG]%{public}s():AT+CHUP failed because of device is not active, activeAddr[%{public}s], remoteAddr_[%{public}s]",
+        LOG_INFO("[HFP AG]%{public}s():AT+CHUP failed because of device is not active,
+            activeAddr[%{public}s], remoteAddr_[%{public}s]",
             __FUNCTION__,
             HfpAgAudioConnection::GetActiveDevice().c_str(),
             dataConn.remoteAddr_.c_str());

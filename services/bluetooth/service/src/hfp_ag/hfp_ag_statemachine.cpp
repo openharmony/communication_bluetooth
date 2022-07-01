@@ -190,7 +190,8 @@ void HfpAgDisconnected::Exit()
 bool HfpAgDisconnected::Dispatch(const utility::Message &msg)
 {
     HfpAgMessage &event = (HfpAgMessage &)msg;
-    LOG_INFO("[HFP AG]%{public}s():[Disconnected][%{public}s]", __FUNCTION__, HfpAgStateMachine::GetEventName(event.what_).c_str());
+    LOG_INFO("[HFP AG]%{public}s():[Disconnected][%{public}s]", __FUNCTION__,
+        HfpAgStateMachine::GetEventName(event.what_).c_str());
     switch (event.what_) {
         case HFP_AG_CONNECT_EVT:
             profile_.DoServiceDiscovery(HFP_AG_INITIATOR);
@@ -223,7 +224,8 @@ void HfpAgConnecting::Exit()
 bool HfpAgConnecting::Dispatch(const utility::Message &msg)
 {
     HfpAgMessage &event = (HfpAgMessage &)msg;
-    LOG_INFO("[HFP AG]%{public}s():[Connecting][%{public}s]", __FUNCTION__, HfpAgStateMachine::GetEventName(event.what_).c_str());
+    LOG_INFO("[HFP AG]%{public}s():[Connecting][%{public}s]", __FUNCTION__,
+        HfpAgStateMachine::GetEventName(event.what_).c_str());
     switch (event.what_) {
         case HFP_AG_AUDIO_CONNECT_REQUEST_EVT:
             profile_.ProcessAudioConnectRequest();
@@ -286,7 +288,8 @@ void HfpAgDisconnecting::Exit()
 bool HfpAgDisconnecting::Dispatch(const utility::Message &msg)
 {
     HfpAgMessage &event = (HfpAgMessage &)msg;
-    LOG_INFO("[HFP AG]%{public}s():[Disconnecting][%{public}s]", __FUNCTION__, HfpAgStateMachine::GetEventName(event.what_).c_str());
+    LOG_INFO("[HFP AG]%{public}s():[Disconnecting][%{public}s]", __FUNCTION__,
+        HfpAgStateMachine::GetEventName(event.what_).c_str());
     switch (event.what_) {
         case HFP_AG_CONNECT_EVT:
             stateMachine_.AddDeferredMessage(event);
@@ -323,7 +326,8 @@ void HfpAgConnected::Entry()
 bool HfpAgConnected::Dispatch(const utility::Message &msg)
 {
     HfpAgMessage &event = (HfpAgMessage &)msg;
-    LOG_INFO("[HFP AG]%{public}s():[Connected][%{public}s]", __FUNCTION__, HfpAgStateMachine::GetEventName(event.what_).c_str());
+    LOG_INFO("[HFP AG]%{public}s():[Connected][%{public}s]", __FUNCTION__,
+        HfpAgStateMachine::GetEventName(event.what_).c_str());
     switch (event.what_) {
         case HFP_AG_CONNECT_AUDIO_EVT:
             profile_.SetupCodecConnection();
