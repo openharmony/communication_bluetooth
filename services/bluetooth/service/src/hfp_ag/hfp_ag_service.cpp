@@ -254,7 +254,8 @@ void HfpAgService::PostEvent(const HfpAgMessage &event)
 void HfpAgService::ProcessEvent(const HfpAgMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
-    LOG_INFO("[HFP AG]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__, event.dev_.c_str(), event.what_);
+    LOG_INFO("[HFP AG]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__,
+        event.dev_.c_str(), event.what_);
     switch (event.what_) {
         case HFP_AG_SERVICE_STARTUP_EVT:
             StartUp();

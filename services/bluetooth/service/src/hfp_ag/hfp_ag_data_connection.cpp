@@ -86,7 +86,8 @@ int HfpAgDataConnection::Init()
                 g_localSupportCodecs |= HFP_AG_CODEC_CVSD;
                 LOG_INFO("[HFP AG]%{public}s(): Support CVSD", __FUNCTION__);
             } else {
-                LOG_INFO("[HFP AG]%{public}s(): Support other codecId[%hhu]", __FUNCTION__, pCodecs->supportedCodecs[i]);
+                LOG_INFO("[HFP AG]%{public}s(): Support other codecId[%hhu]",
+                    __FUNCTION__, pCodecs->supportedCodecs[i]);
             }
         }
     } else {
