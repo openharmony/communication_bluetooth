@@ -43,26 +43,26 @@ ClassicAdapter::ClassicAdapter()
       batteryObserverAg_(std::make_unique<ClassicBatteryObserverAg>(*GetDispatcher())),
       pimpl(std::make_unique<ClassicAdapter::impl>())
 {
-    LOG_DEBUG("Adapter:%{public}s Constructor", Name().c_str());
+    HILOGI("%{public}s Constructor", Name().c_str());
     discoveryState_ = DISCOVERY_STOPED;
     scanMode_ = SCAN_MODE_NONE;
 }
 
 ClassicAdapter::~ClassicAdapter()
 {
-    LOG_DEBUG("Adapter:%{public}s Destructor", Name().c_str());
+    HILOGI("%{public}s Destructor", Name().c_str());
 }
 
 void ClassicAdapter::Enable()
 {
-    LOG_DEBUG("Adapter:%{public}s Enable", Name().c_str());
+    HILOGI("%{public}s Enable", Name().c_str());
 
     GetDispatcher()->PostTask(std::bind(&ClassicAdapter::StartUp, this));
 }
 
 void ClassicAdapter::StartUp()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     isDisable_ = false;
     bool result = adapterProperties_.LoadConfigInfo();
@@ -95,14 +95,14 @@ void ClassicAdapter::StartUp()
 
 void ClassicAdapter::Disable()
 {
-    LOG_DEBUG("Adapter:%{public}s Disable", Name().c_str());
+    HILOGI("%{public}s Disable", Name().c_str());
 
     GetDispatcher()->PostTask(std::bind(&ClassicAdapter::ShutDown, this));
 }
 
 void ClassicAdapter::ShutDown()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     if (!btmEnableSuccess_) {
         GetContext()->OnDisable(ADAPTER_NAME_CLASSIC, true);
@@ -149,7 +149,7 @@ void ClassicAdapter::InitMode()
 
 void ClassicAdapter::DisablePairProcess()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     for (auto &device : devices_) {
         if (device.second->GetPairedStatus() == PAIR_PAIRING) {
             bool result =
@@ -166,7 +166,6 @@ void ClassicAdapter::DisablePairProcess()
 
 void ClassicAdapter::FreeMemory()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
     devices_.clear();
 
     hfService_ = nullptr;
@@ -198,14 +197,14 @@ void ClassicAdapter::DisableBTM()
 
 void ClassicAdapter::PostEnable()
 {
-    LOG_DEBUG("Adapter:%{public}s PostEnable", Name().c_str());
+    HILOGI("%{public}s PostEnable", Name().c_str());
 
     GetDispatcher()->PostTask(std::bind(&ClassicAdapter::ProcessPostEnable, this));
 }
 
 void ClassicAdapter::ProcessPostEnable()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     UpdateSupportedUuids();
 
@@ -222,7 +221,7 @@ void ClassicAdapter::ProcessPostEnable()
 
 void ClassicAdapter::UpdateSupportedUuids() const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     /// Get Supported UUID for AdapterManager.
     std::vector<std::string> stringUuids;
@@ -345,16 +344,16 @@ std::string ClassicAdapter::GetLocalName() const
 
 bool ClassicAdapter::SetLocalName(const std::string &name) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s name: %{public}s", __func__, name.c_str());
+    HILOGI("name: %{public}s", name.c_str());
 
     if (name.empty()) {
-        LOG_ERROR("%{public}s failed, because of name is NULL!", __func__);
+        HILOGE("failed, because of name is NULL!");
         return false;
     }
 
     std::string localName = adapterProperties_.GetLocalName();
     if (localName == name) {
-        LOG_WARN("%{public}s:: same name!", __func__);
+        HILOGW("same name!");
         return true;
     }
 
@@ -368,27 +367,25 @@ int ClassicAdapter::GetLocalDeviceClass() const
 
 bool ClassicAdapter::SetLocalDeviceClass(int deviceClass) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
     return adapterProperties_.SetLocalDeviceClass(deviceClass);
 }
 
 int ClassicAdapter::GetBtScanMode() const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
     return scanMode_;
 }
 
 bool ClassicAdapter::SetBtScanMode(int mode, int duration)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s mode: %{public}d, duration: %{public}d", __func__, mode, duration);
+    HILOGI("mode: %{public}d, duration: %{public}d", mode, duration);
 
     if (mode < SCAN_MODE_NONE || mode > SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE) {
-        LOG_ERROR("ClassicAdapter::%{public}s failed. Invalid Parameter[mode]", __func__);
+        HILOGE("failed. Invalid Parameter[mode]");
         return false;
     }
 
     if (INVALID_VALUE > duration) {
-        LOG_ERROR("ClassicAdapter::%{public}s failed. Invalid parameter[duration].", __func__);
+        HILOGE("failed. Invalid parameter[duration].");
         return false;
     }
 
@@ -453,7 +450,7 @@ bool ClassicAdapter::SetScanMode(int mode)
 
 void ClassicAdapter::SetScanModeResultCallback(uint8_t status, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     if (adapter != nullptr) {
@@ -463,10 +460,10 @@ void ClassicAdapter::SetScanModeResultCallback(uint8_t status, void *context)
 
 void ClassicAdapter::ReceiveSetScanModeCallback(uint8_t status)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     if (status != NOERROR) {
-        LOG_ERROR("ClassicAdapterProperties::%{public}s failed, status is %u", __func__, status);
+        HILOGE("failed, status is %{public}u", status);
         return;
     }
 
@@ -484,14 +481,14 @@ void ClassicAdapter::ReceiveSetScanModeCallback(uint8_t status)
 
 void ClassicAdapter::SendScanModeChanged(int mode) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s mode: %{public}d", __func__, mode);
+    HILOGI("mode: %{public}d", mode);
 
     pimpl->adapterObservers_.ForEach([mode](IAdapterClassicObserver &observer) { observer.OnScanModeChanged(mode); });
 }
 
 void ClassicAdapter::ScanModeTimeout()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     if (GetDispatcher() != nullptr) {
         GetDispatcher()->PostTask(std::bind(&ClassicAdapter::ResetScanMode, this));
@@ -518,7 +515,7 @@ void ClassicAdapter::ResetScanMode()
 
 void ClassicAdapter::HwProcessTimeout()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     if (GetDispatcher() != nullptr) {
         GetDispatcher()->PostTask(std::bind(&ClassicAdapter::HwTimeout, this));
@@ -527,26 +524,25 @@ void ClassicAdapter::HwProcessTimeout()
 
 void ClassicAdapter::HwTimeout()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     bool ret = CancelGetRemoteName();
     ClassicUtils::CheckReturnValue("ClassicAdapter", "CancelGetRemoteName", ret);
 }
 
 int ClassicAdapter::GetBondableMode() const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     return adapterProperties_.GetBondableMode();
 }
 
 bool ClassicAdapter::SetBondableMode(int mode) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, mode: %{public}d", __func__, mode);
+    HILOGI("mode: %{public}d", mode);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     for (auto &device : devices_) {
         if (device.second->GetPairedStatus() == PAIR_PAIRING) {
-            LOG_WARN("[ClassicAdapter]::%{public}s failed, because of PAIR_PAIRING.", __func__);
+            HILOGW("failed, because of PAIR_PAIRING.");
             return false;
         }
     }
@@ -556,11 +552,11 @@ bool ClassicAdapter::SetBondableMode(int mode) const
 
 bool ClassicAdapter::StartBtDiscovery()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (discoveryState_ == DISCOVERYING || discoveryState_ == DISCOVERY_STARTED) {
-        LOG_ERROR("%{public}s failed, because of DISCOVERYING or DISCOVERY_STARTED!", __func__);
+        HILOGE("failed, because of DISCOVERYING or DISCOVERY_STARTED!");
         return false;
     }
 
@@ -573,7 +569,7 @@ bool ClassicAdapter::StartBtDiscovery()
         discoveryEndMs_ = currentTime + DEFAULT_DISCOVERY_TIMEOUT_MS;
         SendDiscoveryStateChanged(discoveryState_);
     } else {
-        LOG_ERROR("%{public}s failed, because of GAPIF_Inquiry failed!", __func__);
+        HILOGE("failed, because of GAPIF_Inquiry failed!");
         return false;
     }
 
@@ -582,12 +578,12 @@ bool ClassicAdapter::StartBtDiscovery()
 
 bool ClassicAdapter::CancelBtDiscovery()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     bool ret = false;
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (discoveryState_ == DISCOVERY_STOPED) {
-        LOG_ERROR("%{public}s failed, because of DISCOVERY_STOPED!", __func__);
+        HILOGE("failed, because of DISCOVERY_STOPED!");
         return ret;
     }
     cancelDiscovery_ = true;
@@ -607,22 +603,20 @@ bool ClassicAdapter::CancelBtDiscovery()
 bool ClassicAdapter::IsBtDiscovering() const
 {
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, discoveryState %{public}d", __func__, discoveryState_);
+    HILOGI("discoveryState %{public}d", discoveryState_);
 
     return (DISCOVERY_STOPED > discoveryState_);
 }
 
 long ClassicAdapter::GetBtDiscoveryEndMillis() const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
-
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     return discoveryEndMs_;
 }
 
 void ClassicAdapter::InquiryResultCallback(const BtAddr *addr, uint32_t classOfDevice, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.iniquiryResultParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -637,7 +631,7 @@ void ClassicAdapter::InquiryResultCallback(const BtAddr *addr, uint32_t classOfD
 
 void ClassicAdapter::InquiryResultRssiCallback(const BtAddr *addr, uint32_t classOfDevice, int8_t rssi, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.iniquiryResultParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -654,7 +648,7 @@ void ClassicAdapter::InquiryResultRssiCallback(const BtAddr *addr, uint32_t clas
 void ClassicAdapter::ExtendedInquiryResultCallback(const BtAddr *addr, uint32_t classOfDevice, int8_t rssi,
     const uint8_t eir[MAX_EXTEND_INQUIRY_RESPONSE_LEN], void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.iniquiryResultParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -674,7 +668,7 @@ void ClassicAdapter::ExtendedInquiryResultCallback(const BtAddr *addr, uint32_t 
 
 void ClassicAdapter::InquiryCompleteCallback(uint8_t status, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     GapCallbackParam param = {};
     param.inquiryCompleteParam_.status = status;
@@ -689,7 +683,7 @@ void ClassicAdapter::InquiryCompleteCallback(uint8_t status, void *context)
 void ClassicAdapter::RemoteNameCallback(
     uint8_t status, const BtAddr *addr, const uint8_t name[MAX_LOC_BT_NAME_LEN], void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     param.remoteNameCallbackParam_.status = status;
@@ -705,7 +699,7 @@ void ClassicAdapter::RemoteNameCallback(
 
 void ClassicAdapter::UserConfirmReqCallback(const BtAddr *addr, uint32_t number, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.userConfirmReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -721,7 +715,7 @@ void ClassicAdapter::UserConfirmReqCallback(const BtAddr *addr, uint32_t number,
 
 void ClassicAdapter::UserPasskeyReqCallback(const BtAddr *addr, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.userConfirmReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -737,7 +731,7 @@ void ClassicAdapter::UserPasskeyReqCallback(const BtAddr *addr, void *context)
 
 void ClassicAdapter::UserPasskeyNotificationCallback(const BtAddr *addr, uint32_t number, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.userConfirmReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -753,7 +747,7 @@ void ClassicAdapter::UserPasskeyNotificationCallback(const BtAddr *addr, uint32_
 
 void ClassicAdapter::RemoteOobReqCallback(const BtAddr *addr, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     /// OOB Pair not support for current framework api.
     /// This is used for extending.
@@ -769,7 +763,7 @@ void ClassicAdapter::RemoteOobReqCallback(const BtAddr *addr, void *context)
 
 void ClassicAdapter::PinCodeReqCallback(const BtAddr *addr, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.pinCodeReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -783,7 +777,7 @@ void ClassicAdapter::PinCodeReqCallback(const BtAddr *addr, void *context)
 
 void ClassicAdapter::LinkKeyReqCallback(const BtAddr *addr, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.linkKeyReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -797,7 +791,7 @@ void ClassicAdapter::LinkKeyReqCallback(const BtAddr *addr, void *context)
 
 void ClassicAdapter::IoCapabilityReqCallback(const BtAddr *addr, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.ioCapabilityReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -811,7 +805,7 @@ void ClassicAdapter::IoCapabilityReqCallback(const BtAddr *addr, void *context)
 
 void ClassicAdapter::IoCapabilityRspCallback(const BtAddr *addr, uint8_t ioCapability, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.ioCapabilityRspParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -827,7 +821,7 @@ void ClassicAdapter::IoCapabilityRspCallback(const BtAddr *addr, uint8_t ioCapab
 void ClassicAdapter::LinkKeyNotification(
     const BtAddr *addr, const uint8_t linkKey[GAP_LINKKEY_SIZE], uint8_t keyType, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.linkKeyNotificationParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -843,7 +837,7 @@ void ClassicAdapter::LinkKeyNotification(
 
 void ClassicAdapter::SimplePairCompleteCallback(const BtAddr *addr, uint8_t status, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status = %u", __func__, status);
+    HILOGI("status = %{public}u", status);
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.simplePairCompleteParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -858,7 +852,7 @@ void ClassicAdapter::SimplePairCompleteCallback(const BtAddr *addr, uint8_t stat
 
 void ClassicAdapter::AuthenticationCompleteCallback(const BtAddr *addr, uint8_t status, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.authenticationCompleteParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -873,7 +867,7 @@ void ClassicAdapter::AuthenticationCompleteCallback(const BtAddr *addr, uint8_t 
 
 void ClassicAdapter::EncryptionChangeCallback(const BtAddr *addr, uint8_t status, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.encryptionChangeCallbackParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -888,7 +882,7 @@ void ClassicAdapter::EncryptionChangeCallback(const BtAddr *addr, uint8_t status
 
 void ClassicAdapter::AuthorizeIndCallback(const BtAddr *addr, GAP_Service service, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     GapCallbackParam param = {};
     (void)memcpy_s((void *)&param.authorizeIndParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
@@ -988,7 +982,7 @@ void ClassicAdapter::HandleSecurityEvent(GAP_CB_EVENT event, const GapCallbackPa
 void ClassicAdapter::HandleInquiryResult(
     const BtAddr &addr, uint32_t classOfDevice, std::vector<uint8_t> eir, int8_t rssi)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     discoveryState_ = DISCOVERYING;
@@ -1030,7 +1024,7 @@ std::shared_ptr<ClassicRemoteDevice> ClassicAdapter::FindRemoteDevice(const RawA
 
 void ClassicAdapter::HandleInquiryComplete(uint8_t status)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     receiveInquiryComplete_ = true;
@@ -1054,11 +1048,11 @@ void ClassicAdapter::HandleInquiryComplete(uint8_t status)
 
 bool ClassicAdapter::DiscoverRemoteName()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (cancelDiscovery_) {
-        LOG_DEBUG("[ClassicAdapter]::%{public}s failed, because of CancelDiscovery", __func__);
+        HILOGI("failed, because of CancelDiscovery");
         return false;
     }
 
@@ -1087,7 +1081,7 @@ BtAddr ClassicAdapter::ConvertToBtAddr(const RawAddress &device) const
 
 void ClassicAdapter::ReceiveRemoteName(uint8_t status, const BtAddr &addr, const uint8_t name[MAX_LOC_BT_NAME_LEN])
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     if (hwTimer_ != nullptr) {
         hwTimer_->Stop();
@@ -1122,7 +1116,7 @@ void ClassicAdapter::ReceiveRemoteName(uint8_t status, const BtAddr &addr, const
 
 bool ClassicAdapter::CancelGetRemoteName() const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     RawAddress rawAddr = RawAddress(remoteNameAddr_);
     BtAddr btAddr = ConvertToBtAddr(rawAddr);
@@ -1134,7 +1128,7 @@ bool ClassicAdapter::CancelGetRemoteName() const
 
 void ClassicAdapter::SendDiscoveryStateChanged(int discoveryState) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s state: %{public}d", __func__, discoveryState);
+    HILOGI("state: %{public}d", discoveryState);
 
     pimpl->adapterObservers_.ForEach(
         [discoveryState](IAdapterClassicObserver &observer) { observer.OnDiscoveryStateChanged(discoveryState); });
@@ -1142,7 +1136,7 @@ void ClassicAdapter::SendDiscoveryStateChanged(int discoveryState) const
 
 void ClassicAdapter::SendDiscoveryResult(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s", __func__, device.GetAddress().c_str());
+    HILOGI("address: %{public}s", device.GetAddress().c_str());
 
     pimpl->adapterObservers_.ForEach(
         [device](IAdapterClassicObserver &observer) { observer.OnDiscoveryResult(device); });
@@ -1150,7 +1144,7 @@ void ClassicAdapter::SendDiscoveryResult(const RawAddress &device) const
 
 void ClassicAdapter::SendRemoteCodChanged(const RawAddress &device, int cod) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s, cod: %{public}d", __func__, device.GetAddress().c_str(), cod);
+    HILOGI("address: %{public}s, cod: %{public}d", device.GetAddress().c_str(), cod);
 
     pimpl->remoteObservers_.ForEach(
         [device, cod](IClassicRemoteDeviceObserver &observer) { observer.OnRemoteCodChanged(device, cod); });
@@ -1158,7 +1152,7 @@ void ClassicAdapter::SendRemoteCodChanged(const RawAddress &device, int cod) con
 
 void ClassicAdapter::SSPConfirmReq(const BtAddr &addr, int reqType, int number)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s reqTyep: %{public}d", __func__, reqType);
+    HILOGI("reqTyep: %{public}d", reqType);
 
     RawAddress device = RawAddress::ConvertToString(addr.addr);
     std::shared_ptr<ClassicRemoteDevice> remoteDevice = FindRemoteDevice(device);
@@ -1177,7 +1171,7 @@ void ClassicAdapter::SSPConfirmReq(const BtAddr &addr, int reqType, int number)
 
 void ClassicAdapter::PinCodeReq(const BtAddr &addr)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     RawAddress device = RawAddress::ConvertToString(addr.addr);
     std::shared_ptr<ClassicRemoteDevice> remoteDevice = FindRemoteDevice(device);
@@ -1225,7 +1219,7 @@ void ClassicAdapter::PinCodeReq(const BtAddr &addr)
 
 void ClassicAdapter::SendPairConfirmed(const RawAddress &device, int reqType, int number) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, reqType = %{public}d, number = %{public}d", __func__, reqType, number);
+    HILOGI("reqType = %{public}d, number = %{public}d", reqType, number);
     BTTransport transport = ADAPTER_BREDR;
     pimpl->adapterObservers_.ForEach([transport, device, reqType, number](IAdapterClassicObserver &observer) {
         observer.OnPairConfirmed(transport, device, reqType, number);
@@ -1234,7 +1228,7 @@ void ClassicAdapter::SendPairConfirmed(const RawAddress &device, int reqType, in
 
 void ClassicAdapter::UserConfirmAutoReply(const RawAddress &device, int reqType, bool accept) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s, accept: %{public}d", __func__, device.GetAddress().c_str(), accept);
+    HILOGI("address: %{public}s, accept: %{public}d", device.GetAddress().c_str(), accept);
 
     auto it = devices_.find(device.GetAddress());
     if (it != devices_.end()) {
@@ -1245,29 +1239,29 @@ void ClassicAdapter::UserConfirmAutoReply(const RawAddress &device, int reqType,
     switch (reqType) {
         case PAIR_CONFIRM_TYPE_PIN_CODE: {
             std::string passkey = adapterProperties_.GetPasskey();
-            LOG_DEBUG("PAIR_CONFIRM_TYPE_PIN_CODE, value = %{public}s", passkey.c_str());
+            HILOGI("PAIR_CONFIRM_TYPE_PIN_CODE, value = %{public}s", passkey.c_str());
             std::vector<uint8_t> pinCode(passkey.begin(), passkey.end());
             SetPinCode(device, pinCode, accept);
             break;
         }
         case PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY: {
-            LOG_DEBUG("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY, do nothing!!");
+            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY, do nothing!!");
             break;
         }
         case PAIR_CONFIRM_TYPE_PASSKEY_INPUT: {
-            LOG_DEBUG("PAIR_CONFIRM_TYPE_PASSKEY_INPUT");
+            HILOGI("PAIR_CONFIRM_TYPE_PASSKEY_INPUT");
             int passkey = 0;
             SetDevicePasskey(device, passkey, accept);
             break;
         }
         case PAIR_CONFIRM_TYPE_NUMERIC:
         case PAIR_CONFIRM_TYPE_CONSENT: {
-            LOG_DEBUG("PAIR_CONFIRM_TYPE_NUMERIC");
+            HILOGI("PAIR_CONFIRM_TYPE_NUMERIC");
             SetDevicePairingConfirmation(device, accept);
             break;
         }
         default:
-            LOG_DEBUG("%{public}s::default case. reqType = %{public}d", __func__, reqType);
+            HILOGI("default case. reqType = %{public}d", reqType);
             break;
     }
 }
@@ -1332,7 +1326,7 @@ void ClassicAdapter::ParserEirData(std::shared_ptr<ClassicRemoteDevice> remote, 
 bool ClassicAdapter::ParserRemoteNameFromEir(
     std::shared_ptr<ClassicRemoteDevice> remote, int type, const std::vector<uint8_t> &value) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s type %{public}d", __func__, type);
+    HILOGI("type %{public}d", type);
 
     if (value.empty()) {
         return false;
@@ -1345,7 +1339,7 @@ bool ClassicAdapter::ParserRemoteNameFromEir(
     }
 
     std::string remoteName(value.begin(), value.end());
-    LOG_DEBUG("remoteName is %{public}s", remoteName.c_str());
+    HILOGI("remoteName is %{public}s", remoteName.c_str());
     if (remoteName != remote->GetRemoteName()) {
         remote->SetRemoteName(remoteName);
         SendRemoteNameChanged(RawAddress(remote->GetAddress()), remoteName);
@@ -1356,11 +1350,11 @@ bool ClassicAdapter::ParserRemoteNameFromEir(
 
 std::vector<Uuid> ClassicAdapter::ParserUuidFromEir(int type, const std::vector<uint8_t> &value) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<Uuid> uuids;
     if (value.empty()) {
-        LOG_INFO("ParserUuidFromEir invalid parameter.");
+        HILOGI("ParserUuidFromEir invalid parameter.");
         return uuids;
     }
 
@@ -1389,7 +1383,7 @@ std::vector<Uuid> ClassicAdapter::ParserUuidFromEir(int type, const std::vector<
 
 std::vector<Uuid> ClassicAdapter::Parser16BitUuidFromEir(const std::vector<uint8_t> &value) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<Uuid> uuids;
     uint8_t offset = 0;
@@ -1401,7 +1395,7 @@ std::vector<Uuid> ClassicAdapter::Parser16BitUuidFromEir(const std::vector<uint8
             Uuid uuid = Uuid::ConvertFrom16Bits(uuid16);
             if (uuid16 != 0) {
                 uuids.push_back(uuid);
-                LOG_DEBUG("remote 16bit UUID");
+                HILOGI("remote 16bit UUID");
             }
             offset += unitLen;
         } else {
@@ -1414,7 +1408,7 @@ std::vector<Uuid> ClassicAdapter::Parser16BitUuidFromEir(const std::vector<uint8
 
 std::vector<Uuid> ClassicAdapter::Parser32BitUuidFromEir(const std::vector<uint8_t> &value) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<Uuid> uuids;
     int offset = 0;
@@ -1426,7 +1420,7 @@ std::vector<Uuid> ClassicAdapter::Parser32BitUuidFromEir(const std::vector<uint8
             Uuid uuid = Uuid::ConvertFrom32Bits(uuid32);
             if (uuid32 != 0) {
                 uuids.push_back(uuid);
-                LOG_DEBUG("remote 32bit UUID");
+                HILOGI("remote 32bit UUID");
             }
             offset += unitLen;
         } else {
@@ -1439,7 +1433,7 @@ std::vector<Uuid> ClassicAdapter::Parser32BitUuidFromEir(const std::vector<uint8
 
 std::vector<Uuid> ClassicAdapter::Parser128BitUuidFromEir(const std::vector<uint8_t> &value) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<Uuid> uuids;
     int offset = 0;
@@ -1449,7 +1443,7 @@ std::vector<Uuid> ClassicAdapter::Parser128BitUuidFromEir(const std::vector<uint
             bluetooth::Uuid::UUID128Bit uuidCheck = {0};
             if (uuid.ConvertTo128Bits() != uuidCheck) {
                 uuids.push_back(uuid);
-                LOG_DEBUG("remote 128bit UUID");
+                HILOGI("remote 128bit UUID");
             }
             offset += UUID128_BYTES_TYPE;
         } else {
@@ -1463,7 +1457,7 @@ std::vector<Uuid> ClassicAdapter::Parser128BitUuidFromEir(const std::vector<uint
 void ClassicAdapter::SaveRemoteDeviceUuids(
     std::shared_ptr<ClassicRemoteDevice> remote, const std::vector<Uuid> &uuids) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     if ((remote == nullptr) || (uuids.empty())) {
         return;
@@ -1479,7 +1473,7 @@ void ClassicAdapter::SaveRemoteDeviceUuids(
 
 bool ClassicAdapter::IsUuidsEqual(const std::vector<Uuid> &uuids1, const std::vector<Uuid> &uuids2) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     if (uuids1.size() != uuids2.size()) {
         return false;
     }
@@ -1503,7 +1497,7 @@ bool ClassicAdapter::IsUuidsEqual(const std::vector<Uuid> &uuids1, const std::ve
 
 void ClassicAdapter::SendRemoteNameChanged(const RawAddress &device, const std::string &deviceName) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     pimpl->remoteObservers_.ForEach([device, deviceName](IClassicRemoteDeviceObserver &observer) {
         observer.OnRemoteNameChanged(device, deviceName);
     });
@@ -1511,7 +1505,7 @@ void ClassicAdapter::SendRemoteNameChanged(const RawAddress &device, const std::
 
 void ClassicAdapter::SendPairStatusChanged(const BTTransport transport, const RawAddress &device, int status) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %{public}d", __func__, status);
+    HILOGI("status: %{public}d", status);
     pimpl->remoteObservers_.ForEach([transport, device, status](IClassicRemoteDeviceObserver &observer) {
         observer.OnPairStatusChanged(transport, device, status);
     });
@@ -1520,7 +1514,7 @@ void ClassicAdapter::SendPairStatusChanged(const BTTransport transport, const Ra
 void ClassicAdapter::ReceiveLinkKeyNotification(
     const BtAddr &addr, const uint8_t linkKey[GAP_LINKKEY_SIZE], uint8_t keyType)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     /// Pairing success, save link key and sent notification to APP.
@@ -1547,13 +1541,13 @@ void ClassicAdapter::ReceiveLinkKeyNotification(
         }
     } else {
         remoteDevice->SetPairedStatus(PAIR_NONE);
-        LOG_WARN("ClassicAdapter::LinkKeyNotification -> Bondmode is off, so not save the link key");
+        HILOGW("Bondmode is off, so not save the link key");
     }
 }
 
 void ClassicAdapter::ReceiveSimplePairComplete(const BtAddr &addr, uint8_t status)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("status: %{public}u", status);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (status != SUCCESS) {
@@ -1582,7 +1576,7 @@ void ClassicAdapter::DeleteLinkKey(std::shared_ptr<ClassicRemoteDevice> remoteDe
 
 void ClassicAdapter::ReceiveAuthenticationComplete(const BtAddr &addr, uint8_t status)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     RawAddress device = RawAddress::ConvertToString(addr.addr);
@@ -1612,7 +1606,7 @@ void ClassicAdapter::ReceiveAuthenticationComplete(const BtAddr &addr, uint8_t s
 
 void ClassicAdapter::ReceiveEncryptionChange(const BtAddr &addr, uint8_t status)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     RawAddress device = RawAddress::ConvertToString(addr.addr);
@@ -1626,7 +1620,7 @@ void ClassicAdapter::ReceiveEncryptionChange(const BtAddr &addr, uint8_t status)
 
 bool ClassicAdapter::GetRemoteName(const BtAddr &addr) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     bool ret = (GAPIF_GetRemoteName(&addr) == BT_NO_ERROR);
     ClassicUtils::CheckReturnValue("ClassicAdapter", "GAPIF_GetRemoteName", ret);
@@ -1639,7 +1633,7 @@ bool ClassicAdapter::GetRemoteName(const BtAddr &addr) const
 
 std::string ClassicAdapter::GetDeviceName(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     std::string remoteName = "";
@@ -1653,7 +1647,7 @@ std::string ClassicAdapter::GetDeviceName(const RawAddress &device) const
 
 std::vector<Uuid> ClassicAdapter::GetDeviceUuids(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     std::vector<Uuid> uuids;
@@ -1683,14 +1677,14 @@ void ClassicAdapter::SearchRemoteUuids(const RawAddress &device, uint16_t uuid)
     attributeIdList.attributeIdRange.end = 0xFFFF;
     int ret = SDP_ServiceSearchAttribute(&btAddr, &uuidArray, attributeIdList, (void *)this, ServiceSearchAttributeCb);
     if (ret != BT_NO_ERROR) {
-        LOG_ERROR("SDP_ServiceSearchAttribute failed!");
+        HILOGE("SDP_ServiceSearchAttribute failed!");
     }
 }
 
 void ClassicAdapter::ServiceSearchAttributeCb(
     const BtAddr *addr, const SdpService *serviceArray, uint16_t serviceNum, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     for (int index = 0; index < serviceNum; index++) {
@@ -1743,16 +1737,12 @@ Uuid ClassicAdapter::GetUuidFromBtUuid(const BtUuid &inUuid) const
 
 void ClassicAdapter::SendRemoteUuidChanged(const RawAddress &device, const std::vector<Uuid> &uuids) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
-
     pimpl->remoteObservers_.ForEach(
         [device, uuids](IClassicRemoteDeviceObserver &observer) { observer.OnRemoteUuidChanged(device, uuids); });
 }
 
 bool ClassicAdapter::IsAclConnected(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
-
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     bool isAclConnected = false;
     auto it = devices_.find(device.GetAddress());
@@ -1760,13 +1750,12 @@ bool ClassicAdapter::IsAclConnected(const RawAddress &device) const
         isAclConnected = it->second->IsAclConnected();
     }
 
+    HILOGI("isAclConnected: %{public}d", isAclConnected);
     return isAclConnected;
 }
 
 bool ClassicAdapter::IsAclEncrypted(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
-
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     bool isAclEncrypted = false;
     auto it = devices_.find(device.GetAddress());
@@ -1774,6 +1763,7 @@ bool ClassicAdapter::IsAclEncrypted(const RawAddress &device) const
         isAclEncrypted = it->second->IsAclEncrypted();
     }
 
+    HILOGI("isAclEncrypted: %{public}d", isAclEncrypted);
     return isAclEncrypted;
 }
 
@@ -1784,8 +1774,6 @@ utility::Context *ClassicAdapter::GetContext()
 
 bool ClassicAdapter::IsBondedFromLocal(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
-
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     bool isBondedFromLocal = false;
     auto it = devices_.find(device.GetAddress());
@@ -1793,6 +1781,7 @@ bool ClassicAdapter::IsBondedFromLocal(const RawAddress &device) const
         isBondedFromLocal = it->second->IsBondedFromLocal();
     }
 
+    HILOGI("isBondedFromLocal: %{public}d", isBondedFromLocal);
     return isBondedFromLocal;
 }
 
@@ -1812,12 +1801,12 @@ std::vector<RawAddress> ClassicAdapter::GetPairedDevices() const
 
 bool ClassicAdapter::StartPair(const RawAddress &device)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::shared_ptr<ClassicRemoteDevice> remoteDevice = FindRemoteDevice(device);
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (remoteDevice->GetPairedStatus() == PAIR_PAIRING) {
-        LOG_ERROR("StartPair failed, because of PAIR_NONE or PAIRING!");
+        HILOGE("StartPair failed, because of PAIR_NONE or PAIRING!");
         return false;
     }
 
@@ -1829,7 +1818,7 @@ bool ClassicAdapter::StartPair(const RawAddress &device)
     BtAddr btAddr = ConvertToBtAddr(device);
     int ret = GAPIF_AuthenticationReq(&btAddr);
     if (ret != BT_NO_ERROR) {
-        LOG_ERROR("GAPIF_AuthenticationReq failed!");
+        HILOGE("GAPIF_AuthenticationReq failed!");
         return false;
     }
 
@@ -1842,12 +1831,12 @@ bool ClassicAdapter::StartPair(const RawAddress &device)
 
 bool ClassicAdapter::CancelPairing(const RawAddress &device)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
     if (it == devices_.end() || (it->second->GetPairedStatus() != PAIR_PAIRING)) {
-        LOG_ERROR("%{public}s failed, because of not in PAIR_PAIRING!", __func__);
+        HILOGE("failed, because of not in PAIR_PAIRING!");
         return false;
     }
 
@@ -1870,12 +1859,12 @@ bool ClassicAdapter::CancelPairing(const RawAddress &device)
 
 bool ClassicAdapter::RemovePair(const RawAddress &device)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address %{public}s", __func__, device.GetAddress().c_str());
+    HILOGI("address %{public}s", device.GetAddress().c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
     if ((it == devices_.end()) || (it->second->IsPaired() == false)) {
-        LOG_WARN("RemovePair failed, because of not find the paired device!");
+        HILOGW("RemovePair failed, because of not find the paired device!");
         return false;
     } else {
         it->second->SetPairedStatus(PAIR_NONE);
@@ -1897,7 +1886,7 @@ bool ClassicAdapter::RemovePair(const RawAddress &device)
 
 bool ClassicAdapter::RemoveAllPairs()
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     std::vector<RawAddress> removeDevices;
     for (auto it = devices_.begin(); it != devices_.end(); it++) {
@@ -1934,20 +1923,20 @@ int ClassicAdapter::GetPairState(const RawAddress &device) const
         pairState = it->second->GetPairedStatus();
     }
 
-    LOG_DEBUG("[ClassicAdapter]::%{public}s state: %{public}d", __func__, pairState);
+    HILOGI("state: %{public}d", pairState);
     return pairState;
 }
 
 bool ClassicAdapter::SetDevicePairingConfirmation(const RawAddress &device, bool accept) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, accept = %{public}d", __func__, accept);
+    HILOGI("accept = %{public}d", accept);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     bool ret = false;
     auto it = devices_.find(device.GetAddress());
     if ((it == devices_.end()) || (it->second->GetPairedStatus() == PAIR_PAIRED) ||
         (it->second->GetPairedStatus() == PAIR_NONE)) {
-        LOG_ERROR("[ClassicAdapter]::%{public}s failed, not in pairing state.", __func__);
+        HILOGE("failed, not in pairing state.");
         return ret;
     }
 
@@ -1967,14 +1956,14 @@ bool ClassicAdapter::SetDevicePairingConfirmation(const RawAddress &device, bool
 
 bool ClassicAdapter::SetDevicePasskey(const RawAddress &device, int passkey, bool accept) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     bool ret = false;
     auto it = devices_.find(device.GetAddress());
     if ((it == devices_.end()) || (it->second->GetPairedStatus() == PAIR_NONE) ||
         (it->second->GetPairedStatus() == PAIR_PAIRED)) {
-        LOG_ERROR("[ClassicAdapter]::%{public}s failed, not in pairing state.", __func__);
+        HILOGE("failed, not in pairing state.");
         return ret;
     }
 
@@ -1994,12 +1983,12 @@ bool ClassicAdapter::SetDevicePasskey(const RawAddress &device, int passkey, boo
 
 bool ClassicAdapter::PairRequestReply(const RawAddress &device, bool accept) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, accept = %{public}d", __func__, accept);
+    HILOGI("accept = %{public}d", accept);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
     if ((it == devices_.end()) || (it->second->GetPairedStatus() != PAIR_PAIRING)) {
-        LOG_ERROR("[ClassicAdapter]::%{public}s failed, not in pairing state.", __func__);
+        HILOGE("failed, not in pairing state.");
         return false;
     }
 
@@ -2013,7 +2002,7 @@ bool ClassicAdapter::PairRequestReply(const RawAddress &device, bool accept) con
 
 void ClassicAdapter::ConnectionComplete(const BtmAclConnectCompleteParam *param, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %{public}u", __func__, param->status);
+    HILOGI("status: %{public}u", param->status);
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     RawAddress device = RawAddress::ConvertToString(param->addr->addr);
@@ -2034,11 +2023,11 @@ void ClassicAdapter::ReceiveConnectionComplete(uint8_t status, uint16_t connecti
     uint32_t classOfDevice, bool encyptionEnabled)
 {
     if (status == BTM_ACL_CONNECT_PAGE_TIMEOUT) {
-        LOG_ERROR("[ClassicAdapter] ACL Connection failed. Reason: ACL Page Timeout!");
+        HILOGE("ACL Connection failed. Reason: ACL Page Timeout!");
     } else if (status == BTM_ACL_CONNECTION_TIMEOUT) {
-        LOG_ERROR("[ClassicAdapter] ACL Connection failed. Reason: ACL Supervision Timeout!");
+        HILOGE("ACL Connection failed. Reason: ACL Supervision Timeout!");
     } else {
-        LOG_DEBUG("[ClassicAdapter]::%{public}s ACL Connection result: %{public}u", __func__, status);
+        HILOGI("ACL Connection result: %{public}u", status);
     }
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
@@ -2048,7 +2037,7 @@ void ClassicAdapter::ReceiveConnectionComplete(uint8_t status, uint16_t connecti
     /// Passive pairing failed and pair mode is PinCode.
     if (status != SUCCESS) {
         bool bondFromLocal = remoteDevice->IsBondedFromLocal();
-        LOG_DEBUG("pinMode = %{public}d, bondFromLocal = %{public}d", pinMode_, bondFromLocal);
+        HILOGI("pinMode = %{public}d, bondFromLocal = %{public}d", pinMode_, bondFromLocal);
         if (pinMode_ == true && bondFromLocal == false) {
             pinMode_ = false;
             /// Passive pairing failed, delete the link key.
@@ -2076,11 +2065,11 @@ void ClassicAdapter::ReceiveConnectionComplete(uint8_t status, uint16_t connecti
 
 void ClassicAdapter::ReceiveDisconnectionComplete(uint8_t status, uint16_t connectionHandle, uint8_t reason)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (status != SUCCESS) {
-        LOG_WARN("ClassicAdapter::DisconnectionComplete failed");
+        HILOGW("failed");
         return;
     }
 
@@ -2090,7 +2079,7 @@ void ClassicAdapter::ReceiveDisconnectionComplete(uint8_t status, uint16_t conne
         }
         device.second->SetAclConnectState(CONNECTION_STATE_DISCONNECTED);
 
-        LOG_DEBUG("pinMode = %{public}d", pinMode_);
+        HILOGI("pinMode = %{public}d", pinMode_);
         /// Passive pairing failed and pair mode is PinCode.
         /// For 960 compatibility
         /// When ACL disconnect and current pari state is in PAIR_PAIRING or PAIR_CANCELING, set pair state to
@@ -2104,7 +2093,7 @@ void ClassicAdapter::ReceiveDisconnectionComplete(uint8_t status, uint16_t conne
             device.second->SetPairedStatus(PAIR_NONE);
             /// Send the failed notification to APP.
             bool bondFromLocal = device.second->IsBondedFromLocal();
-            LOG_DEBUG("bondFromLocal = %{public}d", bondFromLocal);
+            HILOGI("bondFromLocal = %{public}d", bondFromLocal);
             if (!bondFromLocal) {
                 RawAddress address(device.second->GetAddress());
                 SendPairStatusChanged(ADAPTER_BREDR, address, PAIR_NONE);
@@ -2116,7 +2105,7 @@ void ClassicAdapter::ReceiveDisconnectionComplete(uint8_t status, uint16_t conne
 
 void ClassicAdapter::DisconnectionComplete(uint8_t status, uint16_t connectionHandle, uint8_t reason, void *context)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s status: %u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     if (adapter != nullptr) {
@@ -2127,7 +2116,7 @@ void ClassicAdapter::DisconnectionComplete(uint8_t status, uint16_t connectionHa
 
 bool ClassicAdapter::RegisterClassicAdapterObserver(IAdapterClassicObserver &observer) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     adapterProperties_.RegisterClassicAdapterObserver(observer);
@@ -2136,7 +2125,7 @@ bool ClassicAdapter::RegisterClassicAdapterObserver(IAdapterClassicObserver &obs
 
 bool ClassicAdapter::DeregisterClassicAdapterObserver(IAdapterClassicObserver &observer) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     adapterProperties_.DeregisterClassicAdapterObserver(observer);
@@ -2145,7 +2134,7 @@ bool ClassicAdapter::DeregisterClassicAdapterObserver(IAdapterClassicObserver &o
 
 void ClassicAdapter::SetLinkKey(const BtAddr &addr)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     RawAddress device = RawAddress::ConvertToString(addr.addr);
     std::shared_ptr<ClassicRemoteDevice> remoteDevice = FindRemoteDevice(device);
@@ -2157,7 +2146,7 @@ void ClassicAdapter::SetLinkKey(const BtAddr &addr)
     if (keyType != PAIR_INVALID_LINK_KEY_TYPE) {
         std::vector<uint8_t> linkKey = remoteDevice->GetLinkKey();
         if (memcpy_s(key, linkKey.size(), &linkKey[0], linkKey.size()) != EOK) {
-            LOG_DEBUG("[ClassicAdapter]::%{public}s, memcpy_s fail", __func__);
+            HILOGI("memcpy_s fail");
             return;
         }
         accept = GAP_ACCEPT;
@@ -2170,14 +2159,14 @@ void ClassicAdapter::SetLinkKey(const BtAddr &addr)
 
 void ClassicAdapter::SendPairRequested(const BTTransport transport, const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     pimpl->adapterObservers_.ForEach(
         [transport, device](IAdapterClassicObserver &observer) { observer.OnPairRequested(transport, device); });
 }
 
 void ClassicAdapter::SetIoCapability(const BtAddr &addr)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     RawAddress rawAddr = RawAddress::ConvertToString(addr.addr);
@@ -2210,7 +2199,7 @@ void ClassicAdapter::SetIoCapability(const BtAddr &addr)
 
 void ClassicAdapter::SaveRemoteIoCapability(const BtAddr &addr, uint8_t ioCapability)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     RawAddress device = RawAddress::ConvertToString(addr.addr);
     std::shared_ptr<ClassicRemoteDevice> remoteDevice = FindRemoteDevice(device);
     remoteDevice->SetIoCapability(ioCapability);
@@ -2218,19 +2207,19 @@ void ClassicAdapter::SaveRemoteIoCapability(const BtAddr &addr, uint8_t ioCapabi
 
 bool ClassicAdapter::SetDevicePin(const RawAddress &device, const std::string &pinCode) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
     if ((it == devices_.end()) || (it->second->GetPairedStatus() == PAIR_NONE) ||
         (it->second->GetPairedStatus() == PAIR_PAIRED)) {
-        LOG_ERROR("[ClassicAdapter]::%{public}s failed, not in pairing state.", __func__);
+        HILOGE("failed, not in pairing state.");
         return false;
     }
 
     std::vector<uint8_t> pin(pinCode.begin(), pinCode.end());
     if (pin.empty()) {
-        LOG_WARN("ClassicAdapter::SetDevicePin => length is 0, reject it.");
+        HILOGW("length is 0, reject it.");
         return SetPinCode(device, pin, GAP_NOT_ACCEPT);
     }
 
@@ -2246,14 +2235,14 @@ bool ClassicAdapter::SetDevicePin(const RawAddress &device, const std::string &p
 
 bool ClassicAdapter::SetPinCode(const RawAddress &device, const std::vector<uint8_t> &pin, bool accept) const
 {
-    LOG_DEBUG("ClassicAdapter::%{public}s accept: %{public}d", __func__, accept);
+    HILOGI("accept: %{public}d", accept);
 
     BtAddr btAddr;
     device.ConvertToUint8(btAddr.addr);
     btAddr.type = BT_PUBLIC_DEVICE_ADDRESS;
     int result = GAPIF_PinCodeRsp(&btAddr, accept, pin.data(), pin.size());
     if (result != BT_NO_ERROR) {
-        LOG_ERROR("GAPIF_PinCodeRsp failed!");
+        HILOGE("GAPIF_PinCodeRsp failed!");
         return false;
     }
     return true;
@@ -2261,16 +2250,16 @@ bool ClassicAdapter::SetPinCode(const RawAddress &device, const std::vector<uint
 
 void ClassicAdapter::SetAuthorizeRes(const BtAddr &addr, GAP_Service service) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     int result = GAPIF_AuthorizeRes(&addr, service, true);
     if (result != BT_NO_ERROR) {
-        LOG_ERROR("GAPIF_AuthorizeRes failed!");
+        HILOGE("GAPIF_AuthorizeRes failed!");
     }
 }
 
 int ClassicAdapter::ClassicAdapter::GetDeviceType(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     int type = INVALID_VALUE;
@@ -2284,7 +2273,7 @@ int ClassicAdapter::ClassicAdapter::GetDeviceType(const RawAddress &device) cons
 
 int ClassicAdapter::GetDeviceClass(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     int cod = INVALID_VALUE;
@@ -2298,7 +2287,7 @@ int ClassicAdapter::GetDeviceClass(const RawAddress &device) const
 
 std::string ClassicAdapter::GetAliasName(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     std::string alias = INVALID_NAME;
@@ -2312,7 +2301,7 @@ std::string ClassicAdapter::GetAliasName(const RawAddress &device) const
 
 bool ClassicAdapter::SetAliasName(const RawAddress &device, const std::string &name) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     bool ret = false;
@@ -2321,7 +2310,7 @@ bool ClassicAdapter::SetAliasName(const RawAddress &device, const std::string &n
         if (name != it->second->GetAliasName()) {
             ret = it->second->SetAliasName(name);
             if (ret == false) {
-                LOG_ERROR("ClassicAdapter::SetAliasName failed");
+                HILOGE("failed");
             } else {
                 SendRemoteAliasChanged(device, name);
             }
@@ -2332,7 +2321,7 @@ bool ClassicAdapter::SetAliasName(const RawAddress &device, const std::string &n
 
 void ClassicAdapter::SendRemoteAliasChanged(const RawAddress &device, const std::string &aliasName) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     pimpl->remoteObservers_.ForEach([device, aliasName](IClassicRemoteDeviceObserver &observer) {
         observer.OnRemoteAliasChanged(device, aliasName);
@@ -2341,23 +2330,23 @@ void ClassicAdapter::SendRemoteAliasChanged(const RawAddress &device, const std:
 
 bool ClassicAdapter::RegisterRemoteDeviceObserver(IClassicRemoteDeviceObserver &observer) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     return pimpl->remoteObservers_.Register(observer);
 }
 
 bool ClassicAdapter::DeregisterRemoteDeviceObserver(IClassicRemoteDeviceObserver &observer) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
     return pimpl->remoteObservers_.Deregister(observer);
 }
 
 bool ClassicAdapter::CheckAutoReply(int remoteIo) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     bool autoReply = false;
     int localIo = adapterProperties_.GetIoCapability();
-    LOG_DEBUG("local io capability = %{public}d <==> remote io capability = %{public}d", localIo, remoteIo);
+    HILOGI("local io capability = %{public}d <==> remote io capability = %{public}d", localIo, remoteIo);
     switch (localIo) {
         case GAP_IO_DISPLAYONLY:
             autoReply = (remoteIo != GAP_IO_KEYBOARDONLY) ? true : false;
@@ -2376,11 +2365,12 @@ bool ClassicAdapter::CheckAutoReply(int remoteIo) const
 
 int ClassicAdapter::CheckSspConfirmType(int remoteIo, int type) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s", __func__);
+    HILOGI("enter");
 
     int confirmType = PAIR_CONFIRM_TYPE_CONSENT;
     int localIo = adapterProperties_.GetIoCapability();
-    LOG_INFO("local io capability = %{public}d <==> remote io capability = %{public}d, type = %{public}d", localIo, remoteIo, type);
+    HILOGI("local io capability = %{public}d <==> remote io capability = %{public}d, type = %{public}d",
+        localIo, remoteIo, type);
     if (type == PAIR_CONFIRM_TYPE_NUMERIC) {
         if ((localIo == GAP_IO_DISPLAYYESNO) && (remoteIo == GAP_IO_DISPLAYYESNO)) {
             confirmType = PAIR_CONFIRM_TYPE_NUMERIC;
@@ -2399,26 +2389,26 @@ int ClassicAdapter::GetDeviceBatteryLevel(const RawAddress &device) const
     if (it != devices_.end()) {
         batteryLevel = it->second->GetBatteryLevel();
     }
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, batteryLevel: %{public}d", __func__, batteryLevel);
+    HILOGI("batteryLevel: %{public}d", batteryLevel);
     return batteryLevel;
 }
 
 void ClassicAdapter::SetDeviceBatteryLevel(const RawAddress &device, int batteryLevel) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, addr: %{public}s, batteryLevel: %{public}d", __func__, device.GetAddress().c_str(), batteryLevel);
+    HILOGI("addr: %{public}s, batteryLevel: %{public}d", device.GetAddress().c_str(), batteryLevel);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
     if (it != devices_.end()) {
         it->second->SetBatteryLevel(batteryLevel);
     }
-    
+
     SendRemoteBatteryLevelChanged(device, batteryLevel);
 }
 
 void ClassicAdapter::SendRemoteBatteryLevelChanged(const RawAddress &device, int batteryLevel) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s addr: %{public}s, batteryLevel: %{public}d", __func__, device.GetAddress().c_str(), batteryLevel);
+    HILOGI("addr: %{public}s, batteryLevel: %{public}d", device.GetAddress().c_str(), batteryLevel);
 
     pimpl->remoteObservers_.ForEach([device, batteryLevel](IClassicRemoteDeviceObserver &observer) {
         observer.OnRemoteBatteryLevelChanged(device, batteryLevel);
