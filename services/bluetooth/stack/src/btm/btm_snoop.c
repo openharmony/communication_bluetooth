@@ -30,6 +30,7 @@
 
 #include "btm.h"
 #include "btm/btm_snoop_filter.h"
+#include "log.h"
 
 #define SNOOP_INDENTIFICATION_PATTERN                  \
     {                                                  \
@@ -131,6 +132,10 @@ static void BtmSnoopOutput(uint8_t type, const uint8_t *data, uint16_t length)
         .timestamp = H2BE_64(timestamp),
     };
 
+    if (g_outputFile == NULL) {
+        LOG_ERROR("%{public}s, g_outputFile is NULL", __FUNCTION__);
+        return;
+    }
     MutexLock(g_outputMutex);
 
     (void)fwrite(&header, 1, sizeof(BtmSnoopPacketHeader), g_outputFile);
@@ -159,6 +164,10 @@ static void BtmWriteSnoopFileHeader(void)
         .datalinkType = H2BE_32(SNOOP_DATALINK_TYPE_H4),
     };
 
+    if (g_outputFile == NULL) {
+        LOG_ERROR("%{public}s, g_outputFile is NULL", __FUNCTION__);
+        return;
+    }
     MutexLock(g_outputMutex);
 
     (void)fwrite(&header, 1, sizeof(BtmSnoopFileHeader), g_outputFile);
@@ -215,6 +224,7 @@ static void BtmPrepareSnoopFile(void)
 
         g_outputFile = fopen(g_outputPath, "w");
         if (g_outputFile == NULL) {
+            LOG_ERROR("%{public}s, g_outputFile is NULL:%{public}s", __FUNCTION__, strerror(errno));
             return;
         }
 
