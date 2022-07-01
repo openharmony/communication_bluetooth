@@ -124,7 +124,10 @@ int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
     }
     LOG_INFO(
         "[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], type[%{public}d], cmdLen[%zu]",
-            __FUNCTION__, cmd.c_str(), arg.c_str(), type, cmdLen);
+        __FUNCTION__,
+        cmd.c_str(),
+        arg.c_str(),
+        type, cmdLen);
     return type;
 }
 

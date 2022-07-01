@@ -172,8 +172,10 @@ int HfpHfAudioConnection::ConnectAudio() const
             cvsdEscoFailed = true;
         } else {
             LOG_INFO(
-                "[HFP HF]%{public}s():Audio device [%{public}s], lastParam[%{public}d]", __FUNCTION__,
-                    remoteAddr_.c_str(), dev->lastParam);
+                "[HFP HF]%{public}s():Audio device [%{public}s], lastParam[%{public}d]",
+                __FUNCTION__,
+                remoteAddr_.c_str(),
+                dev->lastParam);
         }
     }
 
@@ -246,8 +248,8 @@ int HfpHfAudioConnection::AcceptByCvsd(AudioDevice &dev, BtAddr btAddr) const
         HFP_HF_RETURN_IF_FAIL(ret);
     } else {
         LOG_INFO(
-            "[HFP HF]%{public}s():Can not cvsd e(sco) connection,
-                because linktype[%{public}d] and escoSupport[%{public}d] are not matched!",
+            "[HFP HF]%{public}s():Can not cvsd e(sco) connection, "
+            "because linktype[%{public}d] and escoSupport[%{public}d] are not matched!",
             __FUNCTION__,
             dev.linkType,
             escoSupport_);
@@ -268,8 +270,8 @@ int HfpHfAudioConnection::AcceptAudioConnection() const
             if (dev->linkType == LINK_TYPE_ESCO && escoSupport_) {
                 return AcceptByMsbc(btAddr);
             } else {
-                LOG_INFO("[HFP HF]%{public}s():Accpet MSBC ESCO connection failed,
-                    linktype[%hhu] and escoSupport[%{public}d] are not matched!",
+                LOG_INFO("[HFP HF]%{public}s():Accpet MSBC ESCO connection failed, "
+                    "linktype[%hhu] and escoSupport[%{public}d] are not matched!",
                     __FUNCTION__,
                     dev->linkType,
                     escoSupport_);
@@ -381,8 +383,10 @@ void HfpHfAudioConnection::ProcessOnConnectCompletedFail(
             HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(dev->addr, HFP_HF_AUDIO_CONNECT_FAILED_EVT);
         } else {
             LOG_INFO(
-                "[HFP HF]%{public}s():address[%{public}s] lastParam[%{public}d] is invalid", __FUNCTION__,
-                    address.c_str(), dev->lastParam);
+                "[HFP HF]%{public}s():address[%{public}s] lastParam[%{public}d] is invalid",
+                __FUNCTION__,
+                address.c_str(),
+                dev->lastParam);
         }
     } else {
         // As acceptor, report connect failed event to service directly.

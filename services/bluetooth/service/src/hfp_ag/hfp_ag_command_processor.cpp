@@ -306,8 +306,8 @@ void HfpAgCommandProcessor::ChldTester(HfpAgDataConnection &dataConn, const std:
 void HfpAgCommandProcessor::ChupExecuter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
     if (HfpAgAudioConnection::GetActiveDevice().compare(dataConn.remoteAddr_) != 0) {
-        LOG_INFO("[HFP AG]%{public}s():AT+CHUP failed because of device is not active,
-            activeAddr[%{public}s], remoteAddr_[%{public}s]",
+        LOG_INFO("[HFP AG]%{public}s():AT+CHUP failed because of device is not active, "
+            "activeAddr[%{public}s], remoteAddr_[%{public}s]",
             __FUNCTION__,
             HfpAgAudioConnection::GetActiveDevice().c_str(),
             dataConn.remoteAddr_.c_str());
