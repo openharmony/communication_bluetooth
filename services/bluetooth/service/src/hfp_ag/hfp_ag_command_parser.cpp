@@ -79,8 +79,8 @@ int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
 {
     HfpAgCommandParser::CommandPosition position {0, 0, 0, 0, 0, false, false};
     GetCommandPosition(data, len, position);
-    LOG_INFO("[HFP AG]%{public}s():headValid[%{public}d], tailValid[%{public}d],
-        startPos[%hu], setPos[%hu], getPos[%hu], endPos[%hu]",
+    LOG_INFO("[HFP AG]%{public}s():headValid[%{public}d], tailValid[%{public}d],"
+        " startPos[%hu], setPos[%hu], getPos[%hu], endPos[%hu]",
         __FUNCTION__,
         position.headValid,
         position.tailValid,
