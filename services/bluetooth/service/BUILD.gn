@@ -332,7 +332,6 @@ config("btservice_config") {
     "-Wmissing-field-initializers",
     "-Wparentheses-equality",
     "-Wparentheses",
-    "-Wnon-virtual-dtor",
     "-Wdelete-non-abstract-non-virtual-dtor",
     "-Wignored-qualifiers",
     "-Wdelete-abstract-non-virtual-dtor",
