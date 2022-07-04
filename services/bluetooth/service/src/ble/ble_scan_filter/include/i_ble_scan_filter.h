@@ -25,12 +25,11 @@
 
 namespace bluetooth {
 static const uint16_t FILTER_FLAG_ADDRESS = 0x0001;
-static const uint16_t FILTER_FLAG_SERVICE_DATA_CHANGED = 0x0002;
-static const uint16_t FILTER_FLAG_SERVICE_UUID = 0x0004;
-static const uint16_t FILTER_FLAG_SOLICIT_UUID = 0x0008;
-static const uint16_t FILTER_FLAG_NAME = 0x0010;
-static const uint16_t FILTER_FLAG_MANUFACTURER_DATA = 0x0020;
-static const uint16_t FILTER_FLAG_SERVICE_DATA = 0x0040;
+static const uint16_t FILTER_FLAG_SERVICE_UUID = 0x0002;
+static const uint16_t FILTER_FLAG_SOLICIT_UUID = 0x0004;
+static const uint16_t FILTER_FLAG_NAME = 0x0008;
+static const uint16_t FILTER_FLAG_MANUFACTURER_DATA = 0x0010;
+static const uint16_t FILTER_FLAG_SERVICE_DATA = 0x0020;
 
 static const uint8_t BLE_SCAN_FILTER_FINISHED = 0;
 static const uint8_t BLE_SCAN_FILTER_FAILD = 1;
