@@ -107,9 +107,7 @@ HWTEST_F(SocketTest, Spp_UnitTest_GetInputStream, TestSize.Level1)
 
     char receive[512];
     int DATASIZE = 1024;
-    size_t returnInput = 0;
-    
-    
+    ssize_t returnInput = 0;
     GTEST_LOG_(INFO) << "SppClientSocket::GetInputStream starts";
     InputStream input = pfd_SppClientSocket->GetInputStream();
     returnInput = input.Read(receive, DATASIZE);
