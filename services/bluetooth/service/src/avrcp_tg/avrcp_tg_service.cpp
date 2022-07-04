@@ -33,19 +33,19 @@ namespace bluetooth {
 void AvrcpTgService::ObserverImpl::OnConnectionStateChanged(const std::string &addr, int state)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] addr[%{public}s], state[%{public}d]", addr.c_str(), state);
+    LOG_INFO("[AVRCP TG] addr[%{public}s], state[%{public}d]", addr.c_str(), state);
 }
 
 void AvrcpTgService::ObserverImpl::OnPressButton(const std::string &addr, uint8_t button)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
+    LOG_INFO("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
 }
 
 void AvrcpTgService::ObserverImpl::OnReleaseButton(const std::string &addr, uint8_t button)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
+    LOG_INFO("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
 }
 
 void AvrcpTgService::ObserverImpl::OnSetAddressedPlayer(const std::string &addr, uint8_t label, int status)
@@ -329,12 +329,96 @@ IProfileAvrcpTg *AvrcpTgService::ObserverImpl::GetService(void)
 
     return static_cast<IProfileAvrcpTg *>(svManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
 }
+#ifdef AVRCP_AVSESSION
+void AvrcpTgService::AVSessionObserverImpl::OnSessionCreate(const OHOS::AVSession::AVSessionDescriptor& descriptor)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s", __func__);
 
+    IProfileAvrcpTg *service = GetService();
+    if (service != nullptr) {
+        service->OnSessionCreate(descriptor.sessionId_);
+    }
+}
+
+void AvrcpTgService::AVSessionObserverImpl::OnSessionRelease(const OHOS::AVSession::AVSessionDescriptor& descriptor)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s", __func__);
+
+    IProfileAvrcpTg *service = GetService();
+    if (service != nullptr) {
+        service->OnSessionRelease(descriptor.sessionId_);
+    }
+}
+
+void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChanged(const OHOS::AVSession::AVSessionDescriptor& descriptor)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s, sessionId:%{public}d",
+        __func__, descriptor.sessionId_);
+
+    IProfileAvrcpTg *service = GetService();
+    if (service != nullptr) {
+        service->OnTopSessionChanged(descriptor.sessionId_);
+    }
+}
+
+IProfileAvrcpTg *AvrcpTgService::AVSessionObserverImpl::GetService(void)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s", __func__);
+
+    auto svManager = IProfileManager::GetInstance();
+
+    return static_cast<IProfileAvrcpTg *>(svManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
+}
+
+void AvrcpTgService::AVControllerObserverImpl::OnSessionDestroy()
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+}
+
+void AvrcpTgService::AVControllerObserverImpl::OnPlaybackStateChange(const OHOS::AVSession::AVPlaybackState &state)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s, state:%{public}d",
+        __func__, state.GetState());
+
+    IProfileAvrcpTg *service = GetService();
+    if (service != nullptr) {
+        service->OnPlaybackStateChange(state.GetState());
+    }
+}
+
+void AvrcpTgService::AVControllerObserverImpl::OnMetaDataChange(const OHOS::AVSession::AVMetaData &data)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+}
+
+void AvrcpTgService::AVControllerObserverImpl::OnActiveStateChange(bool isActive)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+}
+
+void AvrcpTgService::AVControllerObserverImpl::OnValidCommandChange(const std::vector<int32_t> &cmds)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+}
+
+IProfileAvrcpTg *AvrcpTgService::AVControllerObserverImpl::GetService(void)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+
+    auto svManager = IProfileManager::GetInstance();
+
+    return static_cast<IProfileAvrcpTg *>(svManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
+}
+#endif
 AvrcpTgService::AvrcpTgService() : utility::Context(PROFILE_NAME_AVRCP_TG, "1.6.2")
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     mdObserver_ = std::make_unique<ObserverImpl>();
+#ifdef AVRCP_AVSESSION
+    avSessionObserver_ = std::make_shared<AVSessionObserverImpl>();
+    avControllerObserver_ = std::make_shared<AVControllerObserverImpl>();
+#endif
 
     InitFeatures();
 
@@ -376,21 +460,21 @@ AvrcpTgService::AvrcpTgService() : utility::Context(PROFILE_NAME_AVRCP_TG, "1.6.
 
 AvrcpTgService::~AvrcpTgService()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     myObserver_ = nullptr;
 }
 
 utility::Context *AvrcpTgService::GetContext()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     return this;
 }
 
 void AvrcpTgService::InitFeatures()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
 
     features_ |= AVRC_TG_FEATURE_CATEGORY_1;
     features_ |= AVRC_TG_FEATURE_CATEGORY_2;
@@ -415,7 +499,7 @@ void AvrcpTgService::InitFeatures()
 
 void AvrcpTgService::RegisterObserver(IObserver *observer)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -424,7 +508,7 @@ void AvrcpTgService::RegisterObserver(IObserver *observer)
 
 void AvrcpTgService::UnregisterObserver(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -465,12 +549,36 @@ void AvrcpTgService::Disable(void)
 
 void AvrcpTgService::EnableNative(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = RET_NO_ERROR;
 
     stub::MediaService::GetInstance()->RegisterObserver(mdObserver_.get());
+#ifdef AVRCP_AVSESSION
+    // register avSession observer
+    OHOS::AVSession::AVSessionManager::RegisterSessionListener(avSessionObserver_);
 
+    avSessionDescriptor_ = OHOS::AVSession::AVSessionManager::GetAllSessionDescriptors();
+    // parse top descriptor
+    int32_t sessionId = -1;
+    for (auto descriptor : avSessionDescriptor_) {
+        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, isTopSession:%{public}d", __func__, descriptor.isTopSession_);
+        if (descriptor.isTopSession_) {
+            sessionId = descriptor.sessionId_;
+        }
+    }
+
+    if (sessionId == -1) {
+        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, no valid avsession", __func__);
+    } else {
+        avSessionController_ = OHOS::AVSession::AVSessionManager::CreateController(sessionId);
+        if (avSessionController_ != NULL) {
+            avSessionController_->RegisterCallback(avControllerObserver_);
+        } else {
+            LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
+        }
+    }
+#endif
     IAdapterConfig *config = AdapterConfig::GetInstance();
     config->GetValue(SECTION_AVRCP_TG_SERVICE, PROPERTY_MAX_CONNECTED_DEVICES, maxConnection_);
 
@@ -502,7 +610,7 @@ void AvrcpTgService::EnableNative(void)
 
 void AvrcpTgService::DisableNative(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     if (DisableProfile() != RET_NO_ERROR) {
         OnProfileDisabled(RET_BAD_STATUS);
@@ -511,7 +619,7 @@ void AvrcpTgService::DisableNative(void)
 
 int AvrcpTgService::RegisterSecurity(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     gapManager_ = std::make_unique<AvrcTgGapManager>();
 
@@ -520,7 +628,7 @@ int AvrcpTgService::RegisterSecurity(void)
 
 int AvrcpTgService::UnregisterSecurity(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = gapManager_->UnregisterSecurity();
     gapManager_ = nullptr;
@@ -530,7 +638,7 @@ int AvrcpTgService::UnregisterSecurity(void)
 
 int AvrcpTgService::RegisterService(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     sdpManager_ = std::make_unique<AvrcTgSdpManager>(features_ & AVRC_TG_SDP_ALL_SUPPORTED_FEATURES);
 
@@ -539,7 +647,7 @@ int AvrcpTgService::RegisterService(void)
 
 int AvrcpTgService::UnregisterService(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = sdpManager_->UnregisterService();
     sdpManager_ = nullptr;
@@ -549,7 +657,7 @@ int AvrcpTgService::UnregisterService(void)
 
 int AvrcpTgService::EnableProfile(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     /// Gets the size of the MTU.
     int controlMtu = AVRC_TG_DEFAULT_CONTROL_MTU_SIZE;
@@ -573,14 +681,14 @@ int AvrcpTgService::EnableProfile(void)
 
 int AvrcpTgService::DisableProfile(void) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     return profile_->Disable();
 }
 
 void AvrcpTgService::OnProfileDisabled(int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     SetServiceState(AVRC_TG_SERVICE_STATE_DISABLED);
 
@@ -596,21 +704,23 @@ void AvrcpTgService::OnProfileDisabled(int result)
 
 bool AvrcpTgService::IsEnabled(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    bool enable = (state_ == AVRC_TG_SERVICE_STATE_ENABLED);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, enable:%{public}d", __func__, enable);
 
-    return (state_ == AVRC_TG_SERVICE_STATE_ENABLED);
+    return enable;
 }
 
 bool AvrcpTgService::IsDisabled(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    bool disable = (state_ == AVRC_TG_SERVICE_STATE_DISABLED);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, disable:%{public}d", __func__, disable);
 
-    return (state_ == AVRC_TG_SERVICE_STATE_DISABLED);
+    return disable;
 }
 
 void AvrcpTgService::SetServiceState(uint8_t state)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     state_ = state;
 }
@@ -657,8 +767,8 @@ std::vector<bluetooth::RawAddress> AvrcpTgService::GetDevicesByStates(const std:
 
 int AvrcpTgService::GetDeviceState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
 
     int result = static_cast<int>(BTConnectState::DISCONNECTED);
 
@@ -666,7 +776,7 @@ int AvrcpTgService::GetDeviceState(const RawAddress &rawAddr)
         result = profile_->GetDeviceState(rawAddr);
     }
 
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s: result[%{public}d]", __func__, result);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s: result[%{public}d]", __func__, result);
 
     return result;
 }
@@ -713,7 +823,7 @@ int AvrcpTgService::Connect(const RawAddress &rawAddr)
 
 void AvrcpTgService::ConnectNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
 
     AcceptActiveConnect(rawAddr);
 }
@@ -743,7 +853,7 @@ int AvrcpTgService::Disconnect(const RawAddress &rawAddr)
 
 void AvrcpTgService::DisconnectNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -755,7 +865,7 @@ void AvrcpTgService::DisconnectNative(RawAddress rawAddr)
         }
 
         if (profile_->Disconnect(rawAddr) != RET_NO_ERROR) {
-            LOG_DEBUG(
+            LOG_INFO(
                 "[AVRCP TG] Call - AvrcTgProfile::Disconnect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
         }
     } while (false);
@@ -776,8 +886,8 @@ int AvrcpTgService::GetConnectState(void)
 
 void AvrcpTgService::OnConnectionStateChanged(const RawAddress &rawAddr, int state)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] Address[%{public}s] - state[%{public}d]", rawAddr.GetAddress().c_str(), state);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] Address[%{public}s] - state[%{public}d]", rawAddr.GetAddress().c_str(), state);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (myObserver_ != nullptr) {
         myObserver_->OnConnectionStateChanged(rawAddr.GetAddress(), state);
@@ -786,7 +896,7 @@ void AvrcpTgService::OnConnectionStateChanged(const RawAddress &rawAddr, int sta
 
 void AvrcpTgService::AcceptActiveConnect(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpCtService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -798,14 +908,14 @@ void AvrcpTgService::AcceptActiveConnect(const RawAddress &rawAddr)
         }
 
         if (profile_->Connect(rawAddr) != RET_NO_ERROR) {
-            LOG_DEBUG("[AVRCP CT] Call - AvrcTgProfile::Connect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_INFO("[AVRCP TG] Call Connect Failed! Address[%{public}s]", rawAddr.GetAddress().c_str());
         }
     } while (false);
 }
 
 void AvrcpTgService::AcceptPassiveConnect(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -818,7 +928,7 @@ void AvrcpTgService::AcceptPassiveConnect(const RawAddress &rawAddr)
 
 void AvrcpTgService::RejectPassiveConnect(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -831,7 +941,7 @@ void AvrcpTgService::RejectPassiveConnect(const RawAddress &rawAddr)
 
 void AvrcpTgService::FindCtService(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     if (sdpManager_->FindCtService(rawAddr, FindCtServiceCallback) != RET_NO_ERROR) {
         RejectPassiveConnect(rawAddr);
@@ -841,7 +951,7 @@ void AvrcpTgService::FindCtService(const RawAddress &rawAddr)
 void AvrcpTgService::FindCtServiceCallback(
     const BtAddr *btAddr, const uint32_t *handleArray, uint16_t handleCount, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpTgService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
@@ -855,29 +965,82 @@ void AvrcpTgService::FindCtServiceCallback(
     }
 }
 
+#ifdef AVRCP_AVSESSION
 /******************************************************************
  * PASS THROUGH COMMAND                                           *
  ******************************************************************/
-
+static void SetAvControlCommand(uint8_t button, OHOS::AVSession::AVControlCommand &command, bool buttonStatus)
+{
+    switch (button) {
+        case AVRC_KEY_OPERATION_VOLUME_UP:
+            break;
+        case AVRC_KEY_OPERATION_VOLUME_DOWN:
+            break;
+        case AVRC_KEY_OPERATION_MUTE:
+            break;
+        case AVRC_KEY_OPERATION_PLAY:
+            command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_PLAY);
+            break;
+        case AVRC_KEY_OPERATION_STOP:
+            command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_STOP);
+            break;
+        case AVRC_KEY_OPERATION_PAUSE:
+            command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_PAUSE);
+            break;
+        case AVRC_KEY_OPERATION_REWIND:
+            if (!buttonStatus) {
+                command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_REWIND);
+            } else {
+                command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_PLAY);
+            }
+            break;
+        case AVRC_KEY_OPERATION_FAST_FORWARD:
+            if (!buttonStatus) {
+                command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_FAST_FORWARD);
+            } else {
+                command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_PLAY);
+            }
+            break;
+        case AVRC_KEY_OPERATION_FORWARD:
+            command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_PLAY_NEXT);
+            break;
+        case AVRC_KEY_OPERATION_BACKWARD:
+            command.SetCommand(OHOS::AVSession::AVControlCommand::SESSION_CMD_PLAY_PREVIOUS);
+            break;
+        default:
+            break;
+    }
+}
+#endif
 void AvrcpTgService::OnButtonPressed(const RawAddress &rawAddr, uint8_t button, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, button:%{public}d", __func__, button);
+#ifndef AVRCP_AVSESSION
     int result = stub::MediaService::GetInstance()->PressButton(rawAddr.GetAddress(), button, label);
     profile_->SendPressButtonRsp(rawAddr, button, label, result);
+#else
+    OHOS::AVSession::AVControlCommand command;
+    SetAvControlCommand(button, command, false);
+    profile_->SendPressButtonRsp(rawAddr, button, label, RET_NO_ERROR);
+#endif
 }
 
 void AvrcpTgService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, button:%{public}d", __func__, button);
+#ifndef AVRCP_AVSESSION
     int result = stub::MediaService::GetInstance()->ReleaseButton(rawAddr.GetAddress(), button, label);
+#else
+    OHOS::AVSession::AVControlCommand command;
+    SetAvControlCommand(button, command, true);
+    int result = OHOS::AVSession::AVSessionManager::SendSystemControlCommand(command);
+#endif
     profile_->SendReleaseButtonRsp(rawAddr, button, label, result);
 }
 
 void AvrcpTgService::HoldButton(const RawAddress &rawAddr, uint8_t button, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->PressButton(rawAddr.GetAddress(), button, label);
     profile_->SendPressButtonRsp(rawAddr, button, label, result);
@@ -890,7 +1053,7 @@ void AvrcpTgService::HoldButton(const RawAddress &rawAddr, uint8_t button, uint8
 void AvrcpTgService::SetAddressedPlayer(
     const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result =
         stub::MediaService::GetInstance()->SetAddressedPlayer(rawAddr.GetAddress(), playerId, uidCounter, label);
@@ -901,7 +1064,7 @@ void AvrcpTgService::SetAddressedPlayer(
 
 void AvrcpTgService::OnSetAddressedPlayer(const RawAddress &rawAddr, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -920,7 +1083,7 @@ void AvrcpTgService::OnSetAddressedPlayer(const RawAddress &rawAddr, uint8_t lab
 
 void AvrcpTgService::OnSetAddressedPlayerNative(RawAddress rawAddr, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -938,7 +1101,7 @@ void AvrcpTgService::OnSetAddressedPlayerNative(RawAddress rawAddr, uint8_t labe
 void AvrcpTgService::SetBrowsedPlayer(const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter,
     uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->SetBrowsedPlayer(rawAddr.GetAddress(), playerId, uidCounter, label);
     if (result != RET_NO_ERROR) {
@@ -950,7 +1113,7 @@ void AvrcpTgService::SetBrowsedPlayer(const RawAddress &rawAddr, uint16_t player
 void AvrcpTgService::OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems,
     const std::vector<std::string> &folderNames, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -976,7 +1139,7 @@ void AvrcpTgService::OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidC
 void AvrcpTgService::OnSetBrowsedPlayerNative(RawAddress rawAddr, uint16_t uidCounter, uint32_t numOfItems,
     std::vector<std::string> folderNames, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -996,10 +1159,14 @@ void AvrcpTgService::OnSetBrowsedPlayerNative(RawAddress rawAddr, uint16_t uidCo
  ******************************************************************/
 void AvrcpTgService::GetCapabilities(const RawAddress &rawAddr, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+#ifndef AVRCP_AVSESSION
     std::vector<uint8_t> events = stub::MediaService::GetInstance()->GetCapabilities(rawAddr.GetAddress(), label);
-
+#else
+    std::vector<uint8_t> events;
+    events.push_back(AVRC_EVENT_ID_PLAYBACK_STATUS_CHANGED);
+    events.push_back(AVRC_EVENT_ID_TRACK_CHANGED);
+#endif
     do {
         if (!IsEnabled()) {
             break;
@@ -1019,7 +1186,7 @@ void AvrcpTgService::GetCapabilities(const RawAddress &rawAddr, uint8_t label)
 
 void AvrcpTgService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingAttributes(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -1031,7 +1198,7 @@ void AvrcpTgService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr, ui
 void AvrcpTgService::OnGetPlayerAppSettingAttributes(
     const RawAddress &rawAddr, const std::deque<uint8_t> &attributes, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1051,7 +1218,7 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributes(
 void AvrcpTgService::OnGetPlayerAppSettingAttributesNative(
     RawAddress rawAddr, std::deque<uint8_t> attributes, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1068,7 +1235,7 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributesNative(
 
 void AvrcpTgService::GetPlayerAppSettingValues(const RawAddress &rawAddr, uint8_t attribute, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingValues(rawAddr.GetAddress(), attribute, label);
     if (result != RET_NO_ERROR) {
@@ -1080,7 +1247,7 @@ void AvrcpTgService::GetPlayerAppSettingValues(const RawAddress &rawAddr, uint8_
 void AvrcpTgService::OnGetPlayerAppSettingValues(
     const RawAddress &rawAddr, const std::deque<uint8_t> &values, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1099,7 +1266,7 @@ void AvrcpTgService::OnGetPlayerAppSettingValues(
 
 void AvrcpTgService::OnGetPlayerAppSettingValuesNative(RawAddress rawAddr, std::deque<uint8_t> values, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1117,7 +1284,7 @@ void AvrcpTgService::OnGetPlayerAppSettingValuesNative(RawAddress rawAddr, std::
 void AvrcpTgService::GetPlayerAppSettingCurrentValue(
     const RawAddress &rawAddr, const std::deque<uint8_t> &attributes, uint8_t label, uint8_t context) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingCurrentValue(
         rawAddr.GetAddress(), attributes, label, context);
@@ -1135,7 +1302,7 @@ void AvrcpTgService::GetPlayerAppSettingCurrentValue(
 void AvrcpTgService::OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::deque<uint8_t> &attributes,
     const std::deque<uint8_t> &values, uint8_t label, uint8_t context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1160,7 +1327,7 @@ void AvrcpTgService::OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr
 void AvrcpTgService::OnGetCurrentPlayerAppSettingValueNative(
     RawAddress rawAddr, std::deque<uint8_t> attributes, std::deque<uint8_t> values, uint8_t label, uint8_t context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1183,7 +1350,7 @@ void AvrcpTgService::SetPlayerAppSettingCurrentValue(
     const RawAddress &rawAddr, const std::deque<uint8_t> &attributes,
     const std::deque<uint8_t> &values, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->SetPlayerAppSettingCurrentValue(
         rawAddr.GetAddress(), attributes, values, label);
@@ -1194,7 +1361,7 @@ void AvrcpTgService::SetPlayerAppSettingCurrentValue(
 
 void AvrcpTgService::OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1213,7 +1380,7 @@ void AvrcpTgService::OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr
 
 void AvrcpTgService::OnSetPlayerAppSettingCurrentValueNative(RawAddress rawAddr, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1231,7 +1398,7 @@ void AvrcpTgService::OnSetPlayerAppSettingCurrentValueNative(RawAddress rawAddr,
 void AvrcpTgService::GetPlayerAppSettingAttributeText(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result =
         stub::MediaService::GetInstance()->GetPlayerAppSettingAttributeText(rawAddr.GetAddress(), attributes, label);
@@ -1243,7 +1410,7 @@ void AvrcpTgService::GetPlayerAppSettingAttributeText(
 void AvrcpTgService::OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr,
     const std::vector<uint8_t> &attributes, const std::vector<std::string> &attrStr, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1263,7 +1430,7 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributeText(const RawAddress &rawAdd
 void AvrcpTgService::OnGetPlayerAppSettingAttributeTextNative(
     RawAddress rawAddr, std::vector<uint8_t> attributes, std::vector<std::string> attrStr, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1281,7 +1448,7 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributeTextNative(
 void AvrcpTgService::GetPlayerAppSettingValueText(
     const RawAddress &rawAddr, uint8_t attributeId, const std::vector<uint8_t> &values, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingValueText(
         rawAddr.GetAddress(), attributeId, values, label);
@@ -1293,7 +1460,7 @@ void AvrcpTgService::GetPlayerAppSettingValueText(
 void AvrcpTgService::OnGetPlayerAppSettingValueText(const RawAddress &rawAddr, const std::vector<uint8_t> &values,
     const std::vector<std::string> &valueStr, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1313,7 +1480,7 @@ void AvrcpTgService::OnGetPlayerAppSettingValueText(const RawAddress &rawAddr, c
 void AvrcpTgService::OnGetPlayerAppSettingValueTextNative(
     RawAddress rawAddr, std::vector<uint8_t> values, std::vector<std::string> valueStr, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1335,7 +1502,7 @@ void AvrcpTgService::OnGetPlayerAppSettingValueTextNative(
 void AvrcpTgService::GetElementAttributes(
     const RawAddress &rawAddr, uint64_t identifier, const std::vector<uint32_t> &attributes, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
     int result =
         stub::MediaService::GetInstance()->GetElementAttributes(rawAddr.GetAddress(), identifier, attributes, label);
     if (result != RET_NO_ERROR) {
@@ -1347,7 +1514,7 @@ void AvrcpTgService::GetElementAttributes(
 void AvrcpTgService::OnGetElementAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues,
     const std::vector<std::string> &values, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1365,7 +1532,7 @@ void AvrcpTgService::OnGetElementAttributes(const RawAddress &rawAddr, const std
 void AvrcpTgService::OnGetElementAttributesNative(
     RawAddress rawAddr, std::vector<uint32_t> attributes, std::vector<std::string> values, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1386,8 +1553,8 @@ void AvrcpTgService::OnGetElementAttributesNative(
 
 void AvrcpTgService::GetPlayStatus(const RawAddress &rawAddr, uint8_t label, uint8_t context) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+#ifndef AVRCP_AVSESSION
     int result = stub::MediaService::GetInstance()->GetPlayStatus(rawAddr.GetAddress(), label, context);
     if (result != RET_NO_ERROR) {
         if (context == AVRC_ACTION_TYPE_GET_PLAY_STATUS) {
@@ -1402,13 +1569,34 @@ void AvrcpTgService::GetPlayStatus(const RawAddress &rawAddr, uint8_t label, uin
         } else if (context == AVRC_ACTION_TYPE_NOTIFY_PLAYBACK_POS_CHANGED) {
             profile_->SendPlaybackPosChangedRsp(true, AVRC_PLAY_STATUS_INVALID_SONG_POSITION, label, result);
         }
+#else
+    OHOS::AVSession::AVPlaybackState state;
+    if (avSessionController_ == NULL) {
+        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
+        return;
+    }
+    int32_t result = avSessionController_->GetAVPlaybackState(state);
+    uint8_t playstate = AvrcpTgService::ConvertPlayState(state.GetState());
+
+    if (context == AVRC_ACTION_TYPE_GET_PLAY_STATUS) {
+        profile_->SendGetPlayStatusRsp(rawAddr,
+            AVRC_PLAY_STATUS_INVALID_SONG_LENGTH,
+            AVRC_PLAY_STATUS_INVALID_SONG_POSITION,
+            AVRC_PLAY_STATUS_ERROR,
+            label,
+            result);
+    } else if (context == AVRC_ACTION_TYPE_NOTIFY_PLAYBACK_STATUS_CHANGED) {
+        profile_->SendPlaybackStatusChangedRsp(true, playstate, label, result);
+    } else if (context == AVRC_ACTION_TYPE_NOTIFY_PLAYBACK_POS_CHANGED) {
+        profile_->SendPlaybackPosChangedRsp(true, AVRC_PLAY_STATUS_INVALID_SONG_POSITION, label, result);
+#endif
     }
 }
 
 void AvrcpTgService::OnGetPlayStatus(const RawAddress &rawAddr, uint32_t songLength, uint32_t songPosition,
     uint8_t playStatus, uint8_t label, uint8_t context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1434,7 +1622,7 @@ void AvrcpTgService::OnGetPlayStatus(const RawAddress &rawAddr, uint32_t songLen
 void AvrcpTgService::OnGetPlayStatusNative(
     RawAddress rawAddr, uint32_t songLength, uint32_t songPosition, uint8_t playStatus, uint8_t label, uint8_t context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1458,7 +1646,7 @@ void AvrcpTgService::OnGetPlayStatusNative(
 void AvrcpTgService::PlayItem(
     const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->PlayItem(rawAddr.GetAddress(), scope, uid, uidCounter, label);
     if (result != RET_NO_ERROR) {
@@ -1468,7 +1656,7 @@ void AvrcpTgService::PlayItem(
 
 void AvrcpTgService::OnPlayItem(const RawAddress &rawAddr, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1484,7 +1672,7 @@ void AvrcpTgService::OnPlayItem(const RawAddress &rawAddr, uint8_t label, int st
 
 void AvrcpTgService::OnPlayItemNative(RawAddress rawAddr, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1502,7 +1690,7 @@ void AvrcpTgService::OnPlayItemNative(RawAddress rawAddr, uint8_t label, int sta
 void AvrcpTgService::AddToNowPlaying(
     const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result =
         stub::MediaService::GetInstance()->AddToNowPlaying(rawAddr.GetAddress(), scope, uid, uidCounter, label);
@@ -1513,7 +1701,7 @@ void AvrcpTgService::AddToNowPlaying(
 
 void AvrcpTgService::OnAddToNowPlaying(const RawAddress &rawAddr, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1531,7 +1719,7 @@ void AvrcpTgService::OnAddToNowPlaying(const RawAddress &rawAddr, uint8_t label,
 
 void AvrcpTgService::OnAddToNowPlayingNative(RawAddress rawAddr, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1553,7 +1741,7 @@ void AvrcpTgService::OnAddToNowPlayingNative(RawAddress rawAddr, uint8_t label, 
 void AvrcpTgService::ChangePath(
     const RawAddress &rawAddr, uint16_t uidCounter, uint8_t direction, uint64_t folderUid, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result =
         stub::MediaService::GetInstance()->ChangePath(rawAddr.GetAddress(), uidCounter, direction, folderUid, label);
@@ -1564,7 +1752,7 @@ void AvrcpTgService::ChangePath(
 
 void AvrcpTgService::OnChangePath(const RawAddress &rawAddr, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1583,7 +1771,7 @@ void AvrcpTgService::OnChangePath(const RawAddress &rawAddr, uint32_t numOfItems
 
 void AvrcpTgService::OnChangePathNative(RawAddress rawAddr, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1601,7 +1789,7 @@ void AvrcpTgService::OnChangePathNative(RawAddress rawAddr, uint32_t numOfItems,
 void AvrcpTgService::GetFolderItems(const RawAddress &rawAddr, uint8_t scope, uint32_t startItem, uint32_t endItem,
     const std::vector<uint32_t> &attributes, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetFolderItems(
         rawAddr.GetAddress(), scope, startItem, endItem, attributes, label);
@@ -1619,7 +1807,7 @@ void AvrcpTgService::GetFolderItems(const RawAddress &rawAddr, uint8_t scope, ui
 void AvrcpTgService::OnGetMediaPlayers(
     const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMpItem> &items, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1639,7 +1827,7 @@ void AvrcpTgService::OnGetMediaPlayers(
 void AvrcpTgService::OnGetMediaPlayersNative(
     RawAddress rawAddr, uint16_t uidCounter, std::vector<AvrcMpItem> items, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1657,7 +1845,7 @@ void AvrcpTgService::OnGetMediaPlayersNative(
 void AvrcpTgService::OnGetFolderItems(
     const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMeItem> &items, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1677,7 +1865,7 @@ void AvrcpTgService::OnGetFolderItems(
 void AvrcpTgService::OnGetFolderItemsNative(
     RawAddress rawAddr, uint16_t uidCounter, std::vector<AvrcMeItem> items, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1695,7 +1883,7 @@ void AvrcpTgService::OnGetFolderItemsNative(
 void AvrcpTgService::GetItemAttributes(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter,
     std::vector<uint32_t> attributes, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetItemAttributes(
         rawAddr.GetAddress(), scope, uid, uidCounter, attributes, label);
@@ -1709,7 +1897,7 @@ void AvrcpTgService::GetItemAttributes(const RawAddress &rawAddr, uint8_t scope,
 void AvrcpTgService::OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attributes,
     const std::vector<std::string> &values, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1729,7 +1917,7 @@ void AvrcpTgService::OnGetItemAttributes(const RawAddress &rawAddr, const std::v
 void AvrcpTgService::OnGetItemAttributesNative(
     RawAddress rawAddr, std::vector<uint32_t> attributes, std::vector<std::string> values, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1755,7 +1943,7 @@ void AvrcpTgService::GetTotalNumberOfItems(const RawAddress &rawAddr, uint8_t sc
 void AvrcpTgService::OnGetTotalNumberOfItems(
     const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1775,7 +1963,7 @@ void AvrcpTgService::OnGetTotalNumberOfItems(
 void AvrcpTgService::OnGetTotalNumberOfItemsNative(
     RawAddress rawAddr, uint16_t uidCounter, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1796,7 +1984,7 @@ void AvrcpTgService::OnGetTotalNumberOfItemsNative(
 
 void AvrcpTgService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->SetAbsoluteVolume(rawAddr.GetAddress(), volume, label);
     if (result != RET_NO_ERROR) {
@@ -1806,7 +1994,7 @@ void AvrcpTgService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume
 
 void AvrcpTgService::OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1824,7 +2012,7 @@ void AvrcpTgService::OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volu
 
 void AvrcpTgService::OnSetAbsoluteVolumeNative(RawAddress rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1845,7 +2033,7 @@ void AvrcpTgService::OnSetAbsoluteVolumeNative(RawAddress rawAddr, uint8_t volum
 
 void AvrcpTgService::GetSelectedTrack(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetSelectedTrack(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -1855,7 +2043,7 @@ void AvrcpTgService::GetSelectedTrack(const RawAddress &rawAddr, uint8_t label) 
 
 void AvrcpTgService::OnGetSelectedTrack(const RawAddress &rawAddr, uint64_t uid, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1873,7 +2061,7 @@ void AvrcpTgService::OnGetSelectedTrack(const RawAddress &rawAddr, uint64_t uid,
 
 void AvrcpTgService::OnGetSelectedTrackNative(RawAddress rawAddr, uint64_t uid, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1890,7 +2078,7 @@ void AvrcpTgService::OnGetSelectedTrackNative(RawAddress rawAddr, uint64_t uid, 
 
 void AvrcpTgService::GetAddressedPlayer(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetAddressedPlayer(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -1901,7 +2089,7 @@ void AvrcpTgService::GetAddressedPlayer(const RawAddress &rawAddr, uint8_t label
 void AvrcpTgService::OnGetAddressedPlayer(
     const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1921,7 +2109,7 @@ void AvrcpTgService::OnGetAddressedPlayer(
 void AvrcpTgService::OnGetAddressedPlayerNative(
     RawAddress rawAddr, uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1938,7 +2126,7 @@ void AvrcpTgService::OnGetAddressedPlayerNative(
 
 void AvrcpTgService::GetUidCounter(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetUidCounter(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -1948,7 +2136,7 @@ void AvrcpTgService::GetUidCounter(const RawAddress &rawAddr, uint8_t label) con
 
 void AvrcpTgService::OnGetUidCounter(const RawAddress &rawAddr, uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1966,7 +2154,7 @@ void AvrcpTgService::OnGetUidCounter(const RawAddress &rawAddr, uint16_t uidCoun
 
 void AvrcpTgService::OnGetUidCounterNative(const RawAddress &rawAddr, uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -1983,7 +2171,7 @@ void AvrcpTgService::OnGetUidCounterNative(const RawAddress &rawAddr, uint16_t u
 
 void AvrcpTgService::GetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     int result = stub::MediaService::GetInstance()->GetCurrentAbsoluteVolume(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -1993,7 +2181,7 @@ void AvrcpTgService::GetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8_t
 
 void AvrcpTgService::OnGetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2012,7 +2200,7 @@ void AvrcpTgService::OnGetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8
 
 void AvrcpTgService::OnGetCurrentAbsoluteVolumeNative(const RawAddress &rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2029,14 +2217,14 @@ void AvrcpTgService::OnGetCurrentAbsoluteVolumeNative(const RawAddress &rawAddr,
 
 void AvrcpTgService::SetPlaybackInterval(const RawAddress &rawAddr, uint32_t interval) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     stub::MediaService::GetInstance()->SetPlaybackInterval(rawAddr.GetAddress(), interval);
 }
 
 void AvrcpTgService::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2049,7 +2237,7 @@ void AvrcpTgService::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t pl
 }
 void AvrcpTgService::NotifyPlaybackStatusChangedNative(uint8_t playStatus, uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2063,7 +2251,7 @@ void AvrcpTgService::NotifyPlaybackStatusChangedNative(uint8_t playStatus, uint3
 
 void AvrcpTgService::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2076,7 +2264,7 @@ void AvrcpTgService::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos, uint
 
 void AvrcpTgService::NotifyTrackChangedNative(uint64_t uid, uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2090,7 +2278,7 @@ void AvrcpTgService::NotifyTrackChangedNative(uint64_t uid, uint32_t playbackPos
 
 void AvrcpTgService::NotifyTrackReachedEnd(uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2103,7 +2291,7 @@ void AvrcpTgService::NotifyTrackReachedEnd(uint32_t playbackPos, uint8_t label)
 
 void AvrcpTgService::NotifyTrackReachedEndNative(uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2117,7 +2305,7 @@ void AvrcpTgService::NotifyTrackReachedEndNative(uint32_t playbackPos, uint8_t l
 
 void AvrcpTgService::NotifyTrackReachedStart(uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2130,7 +2318,7 @@ void AvrcpTgService::NotifyTrackReachedStart(uint32_t playbackPos, uint8_t label
 
 void AvrcpTgService::NotifyTrackReachedStartNative(uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2144,7 +2332,7 @@ void AvrcpTgService::NotifyTrackReachedStartNative(uint32_t playbackPos, uint8_t
 
 void AvrcpTgService::NotifyPlaybackPosChanged(uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2157,7 +2345,7 @@ void AvrcpTgService::NotifyPlaybackPosChanged(uint32_t playbackPos, uint8_t labe
 
 void AvrcpTgService::NotifyPlaybackPosChangedNative(uint32_t playbackPos, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2171,7 +2359,7 @@ void AvrcpTgService::NotifyPlaybackPosChangedNative(uint32_t playbackPos, uint8_
 void AvrcpTgService::NotifyPlayerAppSettingChanged(
     const std::deque<uint8_t> &attributes, const std::deque<uint8_t> &values, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2186,7 +2374,7 @@ void AvrcpTgService::NotifyPlayerAppSettingChanged(
 void AvrcpTgService::NotifyPlayerAppSettingChangedNative(
     std::deque<uint8_t> attributes, std::deque<uint8_t> values, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2199,7 +2387,7 @@ void AvrcpTgService::NotifyPlayerAppSettingChangedNative(
 
 void AvrcpTgService::NotifyNowPlayingContentChanged(uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2212,7 +2400,7 @@ void AvrcpTgService::NotifyNowPlayingContentChanged(uint8_t label)
 
 void AvrcpTgService::NotifyNowPlayingContentChangedNative(uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2224,7 +2412,7 @@ void AvrcpTgService::NotifyNowPlayingContentChangedNative(uint8_t label)
 
 void AvrcpTgService::NotifyAvailablePlayersChanged(uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2237,7 +2425,7 @@ void AvrcpTgService::NotifyAvailablePlayersChanged(uint8_t label)
 
 void AvrcpTgService::NotifyAvailablePlayersChangedNative(uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2249,7 +2437,7 @@ void AvrcpTgService::NotifyAvailablePlayersChangedNative(uint8_t label)
 
 void AvrcpTgService::NotifyAddressedPlayerChanged(uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2263,7 +2451,7 @@ void AvrcpTgService::NotifyAddressedPlayerChanged(uint16_t playerId, uint16_t ui
 
 void AvrcpTgService::NotifyAddressedPlayerChangedNative(uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2284,7 +2472,7 @@ void AvrcpTgService::NotifyAddressedPlayerChangedNative(uint16_t playerId, uint1
 
 void AvrcpTgService::NotifyUidChanged(uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2297,7 +2485,7 @@ void AvrcpTgService::NotifyUidChanged(uint16_t uidCounter, uint8_t label)
 
 void AvrcpTgService::NotifyUidChangedNative(uint16_t uidCounter, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2311,7 +2499,7 @@ void AvrcpTgService::NotifyUidChangedNative(uint16_t uidCounter, uint8_t label)
 void AvrcpTgService::NotifyVolumeChanged(uint8_t volume, uint8_t label)
 {
     {
-        LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
         do {
             if (!IsEnabled()) {
@@ -2325,7 +2513,7 @@ void AvrcpTgService::NotifyVolumeChanged(uint8_t volume, uint8_t label)
 
 void AvrcpTgService::NotifyVolumeChangedNative(uint8_t volume, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     do {
         if (!IsEnabled()) {
@@ -2335,10 +2523,70 @@ void AvrcpTgService::NotifyVolumeChangedNative(uint8_t volume, uint8_t label)
     } while (false);
 }
 
+void AvrcpTgService::OnSessionCreate(int32_t sessionId)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}d", __func__, sessionId);
+}
+
+void AvrcpTgService::OnSessionRelease(int32_t sessionId)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}d", __func__, sessionId);
+#ifdef AVRCP_AVSESSION
+    if (avSessionController_ != NULL && avSessionController_->GetSessionId() == sessionId) {
+        avSessionController_->Destroy();
+        avSessionController_ = NULL;
+    }
+#endif
+}
+
+void AvrcpTgService::OnTopSessionChanged(int32_t sessionId)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}d", __func__, sessionId);
+#ifdef AVRCP_AVSESSION
+    if (avSessionController_ != NULL && avSessionController_->GetSessionId() == sessionId) {
+        return;
+    }
+    avSessionController_ = OHOS::AVSession::AVSessionManager::CreateController(sessionId);
+    if (avSessionController_ != NULL) {
+        avSessionController_->RegisterCallback(avControllerObserver_);
+        OHOS::AVSession::AVPlaybackState::PlaybackStateMaskType filter;
+        filter.set(OHOS::AVSession::AVPlaybackState::PLAYBACK_KEY_STATE);
+        avSessionController_->SetPlaybackFilter(filter);
+    } else {
+        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
+    }
+#endif
+}
+
+void AvrcpTgService::OnPlaybackStateChange(const int32_t state)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, state:%{public}d", __func__, state);
+
+    do {
+        if (!IsEnabled()) {
+            break;
+        }
+        GetDispatcher()->PostTask(
+            std::bind(&AvrcpTgService::OnPlaybackStateChangeNative, this, AvrcpTgService::ConvertPlayState(state)));
+    } while (false);
+}
+
+void AvrcpTgService::OnPlaybackStateChangeNative(int32_t state)
+{
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, state:%{public}d", __func__, state);
+    std::pair<bool, uint8_t> playback = profile_->GetNotificationLabel(AVRC_EVENT_ID_PLAYBACK_STATUS_CHANGED);
+    if (!playback.first) {
+        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, device is not register for playStatus updates", __func__);
+        return;
+    }
+
+    NotifyPlaybackStatusChanged(state, 0, playback.second);
+}
+
 void AvrcpTgService::ProcessChannelEvent(
     RawAddress rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     if (!IsDisabled()) {
         profile_->ProcessChannelEvent(rawAddr, connectId, event, result, context);
@@ -2348,7 +2596,7 @@ void AvrcpTgService::ProcessChannelEvent(
 void AvrcpTgService::ProcessChannelMessage(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     if (!IsDisabled()) {
         profile_->ProcessChannelMessage(connectId, label, crType, chType, pkt, context);
@@ -2358,7 +2606,7 @@ void AvrcpTgService::ProcessChannelMessage(
 void AvrcpTgService::ChannelEventCallback(
     uint8_t connectId, uint8_t event, uint16_t result, const BtAddr *btAddr, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpTgService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
@@ -2387,7 +2635,7 @@ void AvrcpTgService::ChannelEventCallback(
 void AvrcpTgService::ChannelMessageCallback(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
 
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpTgService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
@@ -2406,6 +2654,37 @@ bool AvrcpTgService::CheckConnectionNum()
     } else {
         return true;
     }
+}
+
+uint8_t AvrcpTgService::ConvertPlayState(const int32_t state) const
+{
+    uint8_t ret = AVRC_PLAY_STATUS_ERROR;
+#ifdef AVRCP_AVSESSION
+    switch (state) {
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_INITIAL:
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_PREPARING:
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_MAX:
+            break;
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_PLAYING:
+            ret = AVRC_PLAY_STATUS_PLAYING;
+            break;
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_PAUSED:
+            ret = AVRC_PLAY_STATUS_PAUSED;
+            break;
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_FAST_FORWARD:
+            ret = AVRC_PLAY_STATUS_FWD_SEEK;
+            break;
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_REWIND:
+            ret = AVRC_PLAY_STATUS_REV_SEEK;
+            break;
+        case OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_STOP:
+            ret = AVRC_PLAY_STATUS_STOPPED;
+            break;
+        default:
+            break;
+    }
+#endif
+    return ret;
 }
 REGISTER_CLASS_CREATOR(AvrcpTgService);
 }  // namespace bluetooth

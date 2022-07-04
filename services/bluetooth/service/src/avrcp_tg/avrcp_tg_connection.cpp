@@ -33,10 +33,10 @@ AvrcTgConnectInfo::AvrcTgConnectInfo(const std::string &btAddr, uint8_t connectI
       uidCounter_(uidCounter),
       btAddr_(btAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectInfo::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectInfo::%{public}s", __func__);
 
-    notes_.insert(std::make_pair(AVRC_EVENT_ID_PLAYBACK_STATUS_CHANGED, false));
-    notes_.insert(std::make_pair(AVRC_EVENT_ID_TRACK_CHANGED, false));
+    notes_.insert(std::make_pair(AVRC_EVENT_ID_PLAYBACK_STATUS_CHANGED, true));
+    notes_.insert(std::make_pair(AVRC_EVENT_ID_TRACK_CHANGED, true));
     notes_.insert(std::make_pair(AVRC_EVENT_ID_TRACK_REACHED_END, false));
     notes_.insert(std::make_pair(AVRC_EVENT_ID_TRACK_REACHED_START, false));
     notes_.insert(std::make_pair(AVRC_EVENT_ID_PLAYBACK_POS_CHANGED, false));
@@ -56,7 +56,7 @@ AvrcTgConnectInfo::AvrcTgConnectInfo(const std::string &btAddr, uint8_t connectI
 
 AvrcTgConnectInfo::~AvrcTgConnectInfo()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectInfo::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectInfo::%{public}s", __func__);
 
     if (ptInfo_.timer_ != nullptr) {
         ptInfo_.timer_->Stop();
@@ -77,7 +77,7 @@ AvrcTgConnectInfo::~AvrcTgConnectInfo()
 
 AvrcTgConnectManager *AvrcTgConnectManager::GetInstance(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     if (g_instance == nullptr) {
         g_instance = new (std::nothrow) AvrcTgConnectManager();
@@ -90,7 +90,7 @@ int AvrcTgConnectManager::Add(const RawAddress &rawAddr, uint8_t connectId, uint
     uint16_t browseMtu, uint32_t companyId, uint16_t uidCounter, AvctChannelEventCallback eventCallback,
     AvctMsgCallback msgCallback)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -109,7 +109,7 @@ int AvrcTgConnectManager::Add(const RawAddress &rawAddr, uint8_t connectId, uint
                 msgCallback)));
     } else {
         result = RET_BAD_PARAM;
-        LOG_DEBUG("[AVRCP TG] The connection information exists!");
+        LOG_INFO("[AVRCP TG] The connection information exists!");
     }
 
     return result;
@@ -117,7 +117,7 @@ int AvrcTgConnectManager::Add(const RawAddress &rawAddr, uint8_t connectId, uint
 
 void AvrcTgConnectManager::Delete(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -126,7 +126,7 @@ void AvrcTgConnectManager::Delete(const RawAddress &rawAddr)
 
 const AvrcTgConnectInfo *AvrcTgConnectManager::GetConnectInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     const AvrcTgConnectInfo *info = nullptr;
 
@@ -140,7 +140,7 @@ const AvrcTgConnectInfo *AvrcTgConnectManager::GetConnectInfo(const RawAddress &
 
 RawAddress AvrcTgConnectManager::GetRawAddress(uint8_t connectId) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::string addr(AVRC_TG_DEFAULT_BLUETOOTH_ADDRESS);
 
@@ -156,7 +156,7 @@ RawAddress AvrcTgConnectManager::GetRawAddress(uint8_t connectId) const
 
 std::list<std::string> AvrcTgConnectManager::GetDeviceAddresses(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -168,8 +168,8 @@ std::list<std::string> AvrcTgConnectManager::GetDeviceAddresses(void)
 
 void AvrcTgConnectManager::SetActiveDevice(const std::string addr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", addr.c_str());
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] rawAddr[%{public}s]", addr.c_str());
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -178,18 +178,18 @@ void AvrcTgConnectManager::SetActiveDevice(const std::string addr)
 
 const std::string &AvrcTgConnectManager::GetActiveDevice(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", activeAddr_.c_str());
+    LOG_INFO("[AVRCP TG] rawAddr[%{public}s]", activeAddr_.c_str());
 
     return activeAddr_;
 }
 
 void AvrcTgConnectManager::AddDisconnectedDevice(const std::string addr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -198,7 +198,7 @@ void AvrcTgConnectManager::AddDisconnectedDevice(const std::string addr)
 
 void AvrcTgConnectManager::DeleteDisconnectedDevice(const std::string addr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -211,7 +211,7 @@ void AvrcTgConnectManager::DeleteDisconnectedDevice(const std::string addr)
 
 const std::list<std::string> &AvrcTgConnectManager::GetAllDisconnectedDevices(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -220,14 +220,14 @@ const std::list<std::string> &AvrcTgConnectManager::GetAllDisconnectedDevices(vo
 
 bool AvrcTgConnectManager::IsConnectInfoEmpty(void) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     return infos_.empty();
 }
 
 uint8_t AvrcTgConnectManager::GetConnectId(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     uint8_t connectId = 0x00;
 
@@ -235,7 +235,7 @@ uint8_t AvrcTgConnectManager::GetConnectId(const RawAddress &rawAddr)
     if (info != nullptr) {
         connectId = info->connectId_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return connectId;
@@ -243,20 +243,20 @@ uint8_t AvrcTgConnectManager::GetConnectId(const RawAddress &rawAddr)
 
 void AvrcTgConnectManager::SetConnectId(const RawAddress &rawAddr, uint8_t connectId)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] connectId[%u]", connectId);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] connectId[%u]", connectId);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->connectId_ = connectId;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 uint16_t AvrcTgConnectManager::GetControlMtu(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     uint16_t mtu = AVRC_TG_DEFAULT_CONTROL_MTU_SIZE;
 
@@ -264,7 +264,7 @@ uint16_t AvrcTgConnectManager::GetControlMtu(const RawAddress &rawAddr)
     if (info != nullptr) {
         mtu = info->controlMtu_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return mtu;
@@ -272,20 +272,20 @@ uint16_t AvrcTgConnectManager::GetControlMtu(const RawAddress &rawAddr)
 
 void AvrcTgConnectManager::SetControlMtu(const RawAddress &rawAddr, uint16_t mtu)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] mtu[%u]", mtu);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] mtu[%u]", mtu);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->controlMtu_ = mtu;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 uint16_t AvrcTgConnectManager::GetBrowseMtu(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     uint16_t mtu = AVRC_TG_DEFAULT_BROWSE_MTU_SIZE;
 
@@ -293,7 +293,7 @@ uint16_t AvrcTgConnectManager::GetBrowseMtu(const RawAddress &rawAddr)
     if (info != nullptr) {
         mtu = info->browseMtu_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return mtu;
@@ -301,21 +301,21 @@ uint16_t AvrcTgConnectManager::GetBrowseMtu(const RawAddress &rawAddr)
 
 void AvrcTgConnectManager::SetBrowseMtu(const RawAddress &rawAddr, uint16_t mtu)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] mtu[%u]", mtu);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] mtu[%u]", mtu);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->browseMtu_ = mtu;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::EnableNotifyState(const RawAddress &rawAddr, uint8_t notification)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] notification[%u]", notification);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] notification[%u]", notification);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -326,14 +326,14 @@ void AvrcTgConnectManager::EnableNotifyState(const RawAddress &rawAddr, uint8_t 
             iter->second = true;
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::DisableNotifyState(const RawAddress &rawAddr, uint8_t notification)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] notification[%{public}hhu]", notification);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] notification[%{public}hhu]", notification);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -344,14 +344,13 @@ void AvrcTgConnectManager::DisableNotifyState(const RawAddress &rawAddr, uint8_t
             iter->second = false;
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 bool AvrcTgConnectManager::IsNotifyStateEnabled(const RawAddress &rawAddr, uint8_t notification)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] notification[%{public}d]", notification);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s, notification[%{public}d]", __func__, notification);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -364,17 +363,17 @@ bool AvrcTgConnectManager::IsNotifyStateEnabled(const RawAddress &rawAddr, uint8
             result = iter->second;
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s The connection information does not exist!", __func__);
     }
 
-    LOG_DEBUG("[AVRCP TG] result[%{public}d]", result);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s result[%{public}d]", __func__, result);
 
     return result;
 }
 
 uint32_t AvrcTgConnectManager::GetCompanyId(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     uint32_t companyId = AVRC_TG_DEFAULT_BLUETOOTH_SIG_COMPANY_ID;
 
@@ -382,7 +381,7 @@ uint32_t AvrcTgConnectManager::GetCompanyId(const RawAddress &rawAddr)
     if (info != nullptr) {
         companyId = info->companyId_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return companyId;
@@ -390,7 +389,7 @@ uint32_t AvrcTgConnectManager::GetCompanyId(const RawAddress &rawAddr)
 
 uint16_t AvrcTgConnectManager::GetUidCounter(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     uint16_t uidCounter = 0x00;
 
@@ -398,7 +397,7 @@ uint16_t AvrcTgConnectManager::GetUidCounter(const RawAddress &rawAddr)
     if (info != nullptr) {
         uidCounter = info->uidCounter_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return uidCounter;
@@ -406,14 +405,14 @@ uint16_t AvrcTgConnectManager::GetUidCounter(const RawAddress &rawAddr)
 
 void AvrcTgConnectManager::SetUidCounter(const RawAddress &rawAddr, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] uidCounter[%u]", uidCounter);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] uidCounter[%u]", uidCounter);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->uidCounter_ = uidCounter;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
@@ -423,7 +422,7 @@ void AvrcTgConnectManager::SetUidCounter(const RawAddress &rawAddr, uint16_t uid
 
 std::shared_ptr<AvrcTgPassPacket> AvrcTgConnectManager::GetPassPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgPassPacket> pkt = nullptr;
 
@@ -431,7 +430,7 @@ std::shared_ptr<AvrcTgPassPacket> AvrcTgConnectManager::GetPassPacket(const RawA
     if (info != nullptr) {
         pkt = info->ptInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return pkt;
@@ -439,19 +438,19 @@ std::shared_ptr<AvrcTgPassPacket> AvrcTgConnectManager::GetPassPacket(const RawA
 
 void AvrcTgConnectManager::SetPassPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcTgPassPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->ptInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 bool AvrcTgConnectManager::IsPassTimerEmpty(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     bool result = true;
 
@@ -459,7 +458,7 @@ bool AvrcTgConnectManager::IsPassTimerEmpty(const RawAddress &rawAddr)
     if (info != nullptr && info->ptInfo_.timer_ != nullptr) {
         result = false;
     } else {
-        LOG_DEBUG("[AVRCP TG] The PASS THROUGH timer is empty!");
+        LOG_INFO("[AVRCP TG] The PASS THROUGH timer is empty!");
     }
 
     return result;
@@ -468,32 +467,32 @@ bool AvrcTgConnectManager::IsPassTimerEmpty(const RawAddress &rawAddr)
 void AvrcTgConnectManager::SetPassTimer(
     const RawAddress &rawAddr, std::function<void()> callback, int ms, bool isPeriodic)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->ptInfo_.timer_ = std::make_shared<utility::Timer>(callback);
         info->ptInfo_.timer_->Start(ms, isPeriodic);
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearPassPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->ptInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearPassTimer(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
@@ -502,13 +501,13 @@ void AvrcTgConnectManager::ClearPassTimer(const RawAddress &rawAddr)
             info->ptInfo_.timer_ = nullptr;
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearPassInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     ClearPassTimer(rawAddr);
     ClearPassPacket(rawAddr);
@@ -520,7 +519,7 @@ void AvrcTgConnectManager::ClearPassInfo(const RawAddress &rawAddr)
 
 std::shared_ptr<AvrcTgUnitPacket> AvrcTgConnectManager::GetUnitPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgUnitPacket> pkt = nullptr;
 
@@ -528,7 +527,7 @@ std::shared_ptr<AvrcTgUnitPacket> AvrcTgConnectManager::GetUnitPacket(const RawA
     if (info != nullptr) {
         pkt = info->unInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return pkt;
@@ -536,31 +535,31 @@ std::shared_ptr<AvrcTgUnitPacket> AvrcTgConnectManager::GetUnitPacket(const RawA
 
 void AvrcTgConnectManager::SetUnitPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcTgUnitPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->unInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearUnitPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->unInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearUnitInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     ClearUnitPacket(rawAddr);
 }
@@ -571,7 +570,7 @@ void AvrcTgConnectManager::ClearUnitInfo(const RawAddress &rawAddr)
 
 std::shared_ptr<AvrcTgVendorPacket> AvrcTgConnectManager::GetVendorPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> pkt = nullptr;
 
@@ -579,7 +578,7 @@ std::shared_ptr<AvrcTgVendorPacket> AvrcTgConnectManager::GetVendorPacket(const 
     if (info != nullptr) {
         pkt = info->vdInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return pkt;
@@ -587,31 +586,31 @@ std::shared_ptr<AvrcTgVendorPacket> AvrcTgConnectManager::GetVendorPacket(const 
 
 void AvrcTgConnectManager::SetVendorPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcTgVendorPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcCtConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcCtConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->vdInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearVendorPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->vdInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearVendorInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     ClearVendorPacket(rawAddr);
 }
@@ -622,7 +621,7 @@ void AvrcTgConnectManager::ClearVendorInfo(const RawAddress &rawAddr)
 
 std::shared_ptr<AvrcTgBrowsePacket> AvrcTgConnectManager::GetBrowsePacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgBrowsePacket> pkt = nullptr;
 
@@ -630,7 +629,7 @@ std::shared_ptr<AvrcTgBrowsePacket> AvrcTgConnectManager::GetBrowsePacket(const 
     if (info != nullptr) {
         pkt = info->brInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 
     return pkt;
@@ -638,38 +637,38 @@ std::shared_ptr<AvrcTgBrowsePacket> AvrcTgConnectManager::GetBrowsePacket(const 
 
 void AvrcTgConnectManager::SetBrowsePacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcTgBrowsePacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->brInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearBrowsePacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->brInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP TG] The connection information does not exist!");
+        LOG_INFO("[AVRCP TG] The connection information does not exist!");
     }
 }
 
 void AvrcTgConnectManager::ClearBrowseInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     ClearBrowsePacket(rawAddr);
 }
 
 AvrcTgConnectManager::~AvrcTgConnectManager()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     infos_.clear();
 
@@ -678,7 +677,7 @@ AvrcTgConnectManager::~AvrcTgConnectManager()
 
 AvrcTgConnectInfo *AvrcTgConnectManager::GetConnectInfo(const std::string &btAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
 
     AvrcTgConnectInfo *info = nullptr;
 

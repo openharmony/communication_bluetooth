@@ -39,7 +39,7 @@ const std::string AVRC_TG_SM_STATE_DISABLE = "DISABLE";
 
 AvrcTgStateMachineManager *AvrcTgStateMachineManager::GetInstance(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     static AvrcTgStateMachineManager instance;
 
@@ -48,21 +48,21 @@ AvrcTgStateMachineManager *AvrcTgStateMachineManager::GetInstance(void)
 
 AvrcTgStateMachineManager::~AvrcTgStateMachineManager()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     stateMachines_.clear();
 }
 
 void AvrcTgStateMachineManager::ShutDown(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
     std::lock_guard<std::mutex> lock(mutex_);
     stateMachines_.clear();
 }
 
 int AvrcTgStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -76,7 +76,7 @@ int AvrcTgStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
         stateMachines_.insert(std::make_pair(rawAddr.GetAddress(), std::make_pair(std::move(statemachine), nullptr)));
     } else {
         result = RET_BAD_PARAM;
-        LOG_DEBUG("[AVRCP TG] The control state machine exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] The control state machine exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
     }
 
     return result;
@@ -84,7 +84,7 @@ int AvrcTgStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
 
 int AvrcTgStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -93,7 +93,7 @@ int AvrcTgStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
     StateMachinePair *pair = GetPairOfStateMachine(rawAddr.GetAddress());
     if (pair == nullptr) {
         result = RET_BAD_PARAM;
-        LOG_DEBUG(
+        LOG_INFO(
             "[AVRCP TG] The pair of state machines doest not exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
     } else if (pair->second == nullptr) {
         pair->second = std::make_unique<StateMachine>(StateMachine::Type::AVRC_TG_SM_TYPE_BROWSE, rawAddr);
@@ -101,7 +101,7 @@ int AvrcTgStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
         pair->second->InitState(AVRC_TG_SM_STATE_CONNECTING);
     } else {
         result = RET_BAD_PARAM;
-        LOG_DEBUG("[AVRCP TG] The browse state machine exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] The browse state machine exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
     }
 
     return result;
@@ -109,7 +109,7 @@ int AvrcTgStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
 
 void AvrcTgStateMachineManager::DeletePairOfStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -117,13 +117,13 @@ void AvrcTgStateMachineManager::DeletePairOfStateMachine(const RawAddress &rawAd
     if (pair != nullptr) {
         stateMachines_.erase(rawAddr.GetAddress());
     } else {
-        LOG_DEBUG("[AVRCP TG] The pair of state machines does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] The pair of state machines does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
     }
 }
 
 void AvrcTgStateMachineManager::DeleteBrowseStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -131,14 +131,14 @@ void AvrcTgStateMachineManager::DeleteBrowseStateMachine(const RawAddress &rawAd
     if (pair != nullptr && pair->second != nullptr) {
         pair->second = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP TG] The browse state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] The browse state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
     }
 }
 
 bool AvrcTgStateMachineManager::SendMessageToControlStateMachine(const RawAddress &rawAddr, const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] msg[%x]", msg.what_);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] msg[%x]", msg.what_);
     std::lock_guard<std::mutex> lock(mutex_);
     bool result = false;
 
@@ -146,10 +146,10 @@ bool AvrcTgStateMachineManager::SendMessageToControlStateMachine(const RawAddres
     if (pair != nullptr && pair->first != nullptr) {
         result = pair->first->ProcessMessage(msg);
         if (!result) {
-            LOG_DEBUG("[AVRCP TG] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, rawAddr.GetAddress().c_str());
+            LOG_INFO("[AVRCP TG] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, rawAddr.GetAddress().c_str());
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] The control state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] The control state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
     }
 
     return result;
@@ -157,8 +157,8 @@ bool AvrcTgStateMachineManager::SendMessageToControlStateMachine(const RawAddres
 
 void AvrcTgStateMachineManager::SendMessageToAllControlStateMachine(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] msg[%x]", msg.what_);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] msg[%x]", msg.what_);
     std::lock_guard<std::mutex> lock(mutex_);
 
     for (auto &pairSm : stateMachines_) {
@@ -170,8 +170,8 @@ void AvrcTgStateMachineManager::SendMessageToAllControlStateMachine(const utilit
 
 bool AvrcTgStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress &rawAddr, const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] msg[%x]", msg.what_);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] msg[%x]", msg.what_);
     std::lock_guard<std::mutex> lock(mutex_);
     bool result = false;
 
@@ -179,10 +179,10 @@ bool AvrcTgStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress
     if (pair != nullptr && pair->second != nullptr) {
         result = pair->second->ProcessMessage(msg);
         if (!result) {
-            LOG_DEBUG("[AVRCP TG] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, rawAddr.GetAddress().c_str());
+            LOG_INFO("[AVRCP TG] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, rawAddr.GetAddress().c_str());
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] The browse state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] The browse state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
     }
 
     return result;
@@ -190,8 +190,8 @@ bool AvrcTgStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress
 
 void AvrcTgStateMachineManager::SendMessageToAllBrowseStateMachine(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] msg[%x]", msg.what_);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] msg[%x]", msg.what_);
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto &pairSm : stateMachines_) {
         if (pairSm.second.second != nullptr) {
@@ -202,47 +202,47 @@ void AvrcTgStateMachineManager::SendMessageToAllBrowseStateMachine(const utility
 
 bool AvrcTgStateMachineManager::IsControlConnectingState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_CONNECTING);
 }
 
 bool AvrcTgStateMachineManager::IsControlConnectedState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_CONNECTED);
 }
 
 bool AvrcTgStateMachineManager::IsControlDisconnectingState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_DISCONNECTING);
 }
 
 bool AvrcTgStateMachineManager::IsControlContinuationState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_CONTINUATION);
 }
 
 bool AvrcTgStateMachineManager::IsControlDisableState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_DISABLE);
 }
 
 AvrcTgStateMachineManager::AvrcTgStateMachineManager()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 }
 
 AvrcTgStateMachineManager::StateMachinePair *AvrcTgStateMachineManager::GetPairOfStateMachine(const std::string &addr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     StateMachinePair *pair = nullptr;
 
@@ -256,7 +256,7 @@ AvrcTgStateMachineManager::StateMachinePair *AvrcTgStateMachineManager::GetPairO
 
 bool AvrcTgStateMachineManager::IsControlSpecifiedState(const std::string &addr, std::string stateName)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -268,7 +268,7 @@ bool AvrcTgStateMachineManager::IsControlSpecifiedState(const std::string &addr,
             result = true;
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] The pair of state machines does not exist!");
+        LOG_INFO("[AVRCP TG] The pair of state machines does not exist!");
     }
 
     return result;
@@ -277,12 +277,12 @@ bool AvrcTgStateMachineManager::IsControlSpecifiedState(const std::string &addr,
 AvrcTgStateMachineManager::StateMachine::StateMachine(Type type, const RawAddress &rawAddr)
     : type_(type), rawAddr_(rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::AddStates(void)
 {
-    LOG_DEBUG("[AVRCP TG] StateMachine::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] StateMachine::%{public}s", __func__);
 
     if (type_ == Type::AVRC_TG_SM_TYPE_CONTROL) {
         /// CONNECTING state.
@@ -319,7 +319,7 @@ void AvrcTgStateMachineManager::StateMachine::AddStates(void)
         Move(brConnectedPtr);
         Move(brConnectingPtr);
     } else {
-        LOG_DEBUG("[AVRCP TG] The type of the state machine is wrong!");
+        LOG_INFO("[AVRCP TG] The type of the state machine is wrong!");
     }
 }
 
@@ -331,19 +331,19 @@ AvrcTgStateMachineManager::StateMachine::State::State(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : utility::StateMachine::State(name, stateMachine, parent), rawAddr_(rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] State::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] State::%{public}s", __func__);
 }
 
 AvrcTgStateMachineManager::StateMachine::State::State(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : utility::StateMachine::State(name, stateMachine), rawAddr_(rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] State::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] State::%{public}s", __func__);
 }
 
 AvrcTgStateMachineManager::StateMachine::State::~State()
 {
-    LOG_DEBUG("[AVRCP TG] State::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] State::%{public}s", __func__);
 }
 
 /******************************************************************
@@ -354,12 +354,12 @@ AvrcTgStateMachineManager::StateMachine::CtConnecting::CtConnecting(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : State(name, stateMachine, rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnecting::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtConnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnecting::%{public}s", __func__);
 
     const AvrcTgConnectInfo *info = AvrcTgConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -373,18 +373,18 @@ void AvrcTgStateMachineManager::StateMachine::CtConnecting::Entry(void)
 
     if (AVCT_ConnectReq(&connectId, &param, &btAddr) != AVCT_SUCCESS) {
         info->eventCallback_(connectId, AVCT_CONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP CT] Call - AVCT_ConnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_INFO("[AVRCP CT] Call - AVCT_ConnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
     }
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtConnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnecting::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::CtConnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnecting::%{public}s", __func__);
 
     bool result = true;
 
@@ -410,22 +410,22 @@ AvrcTgStateMachineManager::StateMachine::CtConnected::CtConnected(const std::str
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnected::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtConnected::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnected::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtConnected::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnected::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::CtConnected::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] CtConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtConnected::%{public}s", __func__);
 
     bool result = true;
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -476,7 +476,7 @@ bool AvrcTgStateMachineManager::StateMachine::CtConnected::Dispatch(const utilit
 
 void AvrcTgStateMachineManager::StateMachine::CtConnected::ToPassThroughEvent()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -487,7 +487,7 @@ void AvrcTgStateMachineManager::StateMachine::CtConnected::ToPassThroughEvent()
 }
 void AvrcTgStateMachineManager::StateMachine::CtConnected::ToUnitInfoEvent()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -497,7 +497,7 @@ void AvrcTgStateMachineManager::StateMachine::CtConnected::ToUnitInfoEvent()
 }
 void AvrcTgStateMachineManager::StateMachine::CtConnected::ToCommonEvent()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -515,7 +515,7 @@ void AvrcTgStateMachineManager::StateMachine::CtConnected::ToCommonEvent()
 }
 void AvrcTgStateMachineManager::StateMachine::CtConnected::ToAbortContinuingEvent()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgStateMachineManager::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -536,12 +536,12 @@ AvrcTgStateMachineManager::StateMachine::CtDisconnecting::CtDisconnecting(const 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtDisconnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
 
     const AvrcTgConnectInfo *info = AvrcTgConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -549,18 +549,18 @@ void AvrcTgStateMachineManager::StateMachine::CtDisconnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP TG] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
     }
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtDisconnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::CtDisconnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisconnecting::%{public}s", __func__);
 
     bool result = true;
 
@@ -581,22 +581,22 @@ AvrcTgStateMachineManager::StateMachine::CtContinuation::CtContinuation(const st
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP TG] CtContinuation::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtContinuation::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtContinuation::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtContinuation::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtContinuation::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtContinuation::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtContinuation::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtContinuation::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::CtContinuation::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] CtContinuation::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtContinuation::%{public}s", __func__);
 
     bool result = true;
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -639,12 +639,12 @@ AvrcTgStateMachineManager::StateMachine::CtDisable::CtDisable(const std::string 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisable::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisable::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtDisable::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisable::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisable::%{public}s", __func__);
 
     AVCT_Deregister();
 
@@ -654,19 +654,19 @@ void AvrcTgStateMachineManager::StateMachine::CtDisable::Entry(void)
             BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
             rawAddr_.ConvertToUint8(btAddr.addr);
             info->eventCallback_(info->connectId_, AVCT_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-            LOG_DEBUG("[AVRCP TG] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+            LOG_INFO("[AVRCP TG] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
         }
     }
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtDisable::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisable::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisable::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::CtDisable::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] CtDisable::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] CtDisable::%{public}s", __func__);
 
     bool result = true;
 
@@ -687,12 +687,12 @@ AvrcTgStateMachineManager::StateMachine::BrConnecting::BrConnecting(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : State(name, stateMachine, rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnecting::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrConnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnecting::%{public}s", __func__);
 
     const AvrcTgConnectInfo *info = AvrcTgConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -700,18 +700,18 @@ void AvrcTgStateMachineManager::StateMachine::BrConnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_BR_CONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP CT] Call - AVCT_BrConnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_INFO("[AVRCP CT] Call - AVCT_BrConnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
     }
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrConnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnecting::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::BrConnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnecting::%{public}s", __func__);
 
     bool result = true;
 
@@ -738,22 +738,22 @@ AvrcTgStateMachineManager::StateMachine::BrConnected::BrConnected(const std::str
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnected::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrConnected::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnected::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrConnected::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnected::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::BrConnected::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] BrConnected::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrConnected::%{public}s", __func__);
 
     bool result = true;
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -796,12 +796,12 @@ AvrcTgStateMachineManager::StateMachine::BrDisconnecting::BrDisconnecting(const 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
 
     const AvrcTgConnectInfo *info = AvrcTgConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -809,18 +809,18 @@ void AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_BR_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP TG] Call - AVCT_BrDisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_INFO("[AVRCP TG] Call - AVCT_BrDisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
     }
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
 }
 
 bool AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] BrDisconnecting::%{public}s", __func__);
 
     bool result = true;
     switch (msg.what_) {
