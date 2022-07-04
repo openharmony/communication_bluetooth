@@ -236,6 +236,8 @@ int HidHostL2capConnection::SendData(SendHidData sendData, int length, uint8_t* 
 {
     switch (sendData.type) {
         case HID_HOST_DATA_TYPE_GET_REPORT:
+        case HID_HOST_DATA_TYPE_CONTROL:
+        case HID_HOST_DATA_TYPE_DATA:
             SendGetReport(sendData);
             break;
         case HID_HOST_DATA_TYPE_SET_REPORT:
@@ -282,8 +284,11 @@ void HidHostL2capConnection::SendGetReport(SendHidData sendData)
             buf[offset] = sendData.reportId;
         }
     }
-    lcid = ctrlLcid_;
-
+    if (sendData.type == HID_HOST_DATA_TYPE_DATA) {
+        lcid = intrLcid_;
+    } else {
+        lcid = ctrlLcid_;
+    }
     L2CIF_SendData(lcid, packet, nullptr);
     PacketFree(packet);
     packet = nullptr;

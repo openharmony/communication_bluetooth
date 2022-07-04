@@ -184,6 +184,178 @@ ErrCode BluetoothHidHostProxy::DeregisterObserver(
     return error;
 }
 
+ErrCode BluetoothHidHostProxy::HidHostVCUnplug(std::string &device,
+    uint8_t &id, uint16_t &size, uint8_t &type, int& result)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
+
+    if (!data.WriteString(device)) {
+        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(id)) {
+        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint16(size)) {
+        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(type)) {
+        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
+        return INVALID_DATA;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+
+    int error = Remote()->SendRequest(COMMAND_VCUN_PLUG, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug done fail, error: %{public}d", error);
+        return error;
+    }
+    result = reply.ReadInt32();
+    return ERR_OK;
+}
+
+ErrCode BluetoothHidHostProxy::HidHostSendData(std::string &device,
+    uint8_t &id, uint16_t &size, uint8_t &type, int& result)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::HidHostSendData WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
+
+    if (!data.WriteString(device)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(id)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint16(size)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(type)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
+        return INVALID_DATA;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+
+    int error = Remote()->SendRequest(COMMAND_SEND_DATA, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHidHostProxy::HidHostSendData done fail, error: %{public}d", error);
+        return error;
+    }
+    result = reply.ReadInt32();
+    return ERR_OK;
+}
+
+ErrCode BluetoothHidHostProxy::HidHostSetReport(std::string &device,
+    uint8_t &type, uint16_t &size, uint8_t &report, int& result)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::HidHostSetReport WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
+
+    if (!data.WriteString(device)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(type)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint16(size)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(report)) {
+        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
+        return INVALID_DATA;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+
+    int error = Remote()->SendRequest(COMMAND_SET_REPORT, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHidHostProxy::HidHostSetReport done fail, error: %{public}d", error);
+        return error;
+    }
+    result = reply.ReadInt32();
+    return ERR_OK;
+}
+
+ErrCode BluetoothHidHostProxy::HidHostGetReport(std::string &device,
+    uint8_t &id, uint16_t &size, uint8_t &type, int& result)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHidHostProxy::HidHostGetReport WriteInterfaceToken error");
+        return IPC_PROXY_TRANSACTION_ERR;
+    }
+
+    if (!data.WriteString(device)) {
+        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(id)) {
+        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint16(size)) {
+        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
+        return INVALID_DATA;
+    }
+
+    if (!data.WriteUint8(type)) {
+        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
+        return INVALID_DATA;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+
+    int error = Remote()->SendRequest(COMMAND_GET_REPORT, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHidHostProxy::HidHostGetReport done fail, error: %{public}d", error);
+        return error;
+    }
+    result = reply.ReadInt32();
+    return ERR_OK;
+}
+
 bool BluetoothHidHostProxy::WriteParcelableInt32Vector(
     const std::vector<int32_t> &parcelableVector, Parcel &reply)
 {

@@ -341,6 +341,9 @@ void HidHostHogp::OnServicesDiscoveredTask_(int status)
                 ret = GetPnpInformation(service);
             } else if (service.uuid_ == Uuid::ConvertFrom16Bits(HID_HOST_UUID_SERVCLASS_LE_HID)) {
                 ret = GetHidInformation(service);
+            } else if (service.uuid_ == Uuid::ConvertFrom16Bits(HID_HOST_UUID_BATTERY_SERVICE)) {
+                LOG_INFO("[HOGP] %{public}s:for pts to get battery level.", __func__);
+                GetBatteryInformation(service);
             }
             if (ret != BT_NO_ERROR) {
                 Disconnect();
@@ -421,6 +424,27 @@ int HidHostHogp::GetHidInformation(Service service)
     return BT_NO_ERROR;
 }
 
+void HidHostHogp::GetBatteryInformation(Service service)
+{
+    IProfileGattClient *gattClientService = GetGattClientService();
+    if (gattClientService == nullptr) {
+        LOG_ERROR("[HOGP] %{public}s:gattClientService is null.", __func__);
+        return;
+    }
+
+    for (auto &character : service.characteristics_) {
+        if (character.uuid_ == Uuid::ConvertFrom16Bits(HID_HOST_UUID_GATT_BATTERY_LEVEL)) {
+            std::unique_lock<std::mutex> lock(mutexWaitGattCallback_);
+            gattClientService->ReadCharacteristic(appId_, character);
+            if (cvfull_.wait_for(lock,
+                std::chrono::seconds(HOGP_GATT_THREAD_WAIT_TIMEOUT)) == std::cv_status::timeout) {
+                LOG_ERROR("[HOGP] %{public}s: GetBatteryInformation timeout", __func__);
+                return;
+            }
+        }
+    }
+}
+
 int HidHostHogp::GetHidReportMap(Characteristic character)
 {
     IProfileGattClient *gattClientService = GetGattClientService();
@@ -435,6 +459,9 @@ int HidHostHogp::GetHidReportMap(Characteristic character)
         LOG_ERROR("[HOGP] %{public}s:GetHidReportMap timeout", __func__);
         return RET_BAD_STATUS;
     }
+
+    GetExternalRptRefInfo(character);
+
     if ((characteristicTemp_ != nullptr) &&
         (character.handle_ == characteristicTemp_->handle_)) {
         int ret = SaveReportMap(*characteristicTemp_);
@@ -443,6 +470,28 @@ int HidHostHogp::GetHidReportMap(Characteristic character)
     }
     LOG_ERROR("[HOGP] %{public}s:handle_ is error", __func__);
     return RET_BAD_STATUS;
+}
+
+void HidHostHogp::GetExternalRptRefInfo(Characteristic character)
+{
+    IProfileGattClient *gattClientService = GetGattClientService();
+    if (gattClientService == nullptr) {
+        LOG_ERROR("[HOGP] %{public}s:gattClientService is null.", __func__);
+        return;
+    }
+
+    for (auto &descriptor : character.descriptors_) {
+        if (descriptor.uuid_ == Uuid::ConvertFrom16Bits(HID_HOST_UUID_GATT_EXT_RPT_REF)) {
+            LOG_INFO("[HOGP] %{public}s:for pts to get external report reference.", __func__);
+            std::unique_lock<std::mutex> lock(mutexWaitGattCallback_);
+            gattClientService->ReadDescriptor(appId_, descriptor);
+            if (cvfull_.wait_for(lock,
+                std::chrono::seconds(HOGP_GATT_THREAD_WAIT_TIMEOUT)) == std::cv_status::timeout) {
+                LOG_ERROR("[HOGP] %{public}s:GetExternalRptRefInfo timeout", __func__);
+                return;
+            }
+        }
+    }
 }
 
 void HidHostHogp::GetHidReport(Characteristic character)

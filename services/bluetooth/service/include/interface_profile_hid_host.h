@@ -83,6 +83,30 @@ public:
      * @return Returns the connection state of the remote device.
      */
     virtual int GetDeviceState(const RawAddress &device) = 0;
+
+    /**
+     * @brief Get Hid Host VCUnplug.
+     *
+     */
+    virtual int HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type) = 0;
+
+    /**
+     * @brief Hid Host Send Data.
+     *
+     */
+    virtual int HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type) = 0;
+
+    /**
+     * @brief Hid Host Set Report.
+     *
+     */
+    virtual int HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t* report) = 0;
+
+    /**
+     * @brief Hid Host Get Report.
+     *
+     */
+    virtual int HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type) = 0;
 };
 }  // namespace bluetooth
 #endif  // INTERFACE_PROFILE_HID_HOST_H

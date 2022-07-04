@@ -32,6 +32,14 @@ BluetoothHidHostStub::BluetoothHidHostStub()
         &BluetoothHidHostStub::RegisterObserverInner;
     memberFuncMap_[static_cast<uint32_t>(COMMAND_DEREGISTER_OBSERVER)] =
         &BluetoothHidHostStub::DeregisterObserverInner;
+    memberFuncMap_[static_cast<uint32_t>(COMMAND_VCUN_PLUG)] =
+        &BluetoothHidHostStub::HidHostVCUnplugInner;
+    memberFuncMap_[static_cast<uint32_t>(COMMAND_SEND_DATA)] =
+        &BluetoothHidHostStub::HidHostSendDataInner;
+    memberFuncMap_[static_cast<uint32_t>(COMMAND_SET_REPORT)] =
+        &BluetoothHidHostStub::HidHostSetReportInner;
+    memberFuncMap_[static_cast<uint32_t>(COMMAND_GET_REPORT)] =
+        &BluetoothHidHostStub::HidHostGetReportInner;
     HILOGD("%{public}s ends.", __func__);
 }
 
@@ -143,6 +151,66 @@ ErrCode BluetoothHidHostStub::DeregisterObserverInner(MessageParcel &data, Messa
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     const sptr<IBluetoothHidHostObserver> observer = OHOS::iface_cast<IBluetoothHidHostObserver>(remote);
     DeregisterObserver(observer);
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHidHostStub::HidHostVCUnplugInner(MessageParcel &data, MessageParcel &reply)
+{
+    HILOGD("BluetoothHidHostStub::HidHostVCUnplugInner");
+    std::string device = data.ReadString();
+    uint8_t id = data.ReadUint8();
+    uint16_t size = data.ReadUint16();
+    uint8_t type = data.ReadUint8();
+    int result;
+    ErrCode ec = HidHostVCUnplug(device, id, size, type, result);
+    if (SUCCEEDED(ec)) {
+        reply.WriteInt32(result);
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHidHostStub::HidHostSendDataInner(MessageParcel &data, MessageParcel &reply)
+{
+    HILOGD("BluetoothHidHostStub::HidHostSendDataInner");
+    std::string device = data.ReadString();
+    uint8_t id = data.ReadUint8();
+    uint16_t size = data.ReadUint16();
+    uint8_t type = data.ReadUint8();
+    int result;
+    ErrCode ec = HidHostSendData(device, id, size, type, result);
+    if (SUCCEEDED(ec)) {
+        reply.WriteInt32(result);
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHidHostStub::HidHostSetReportInner(MessageParcel &data, MessageParcel &reply)
+{
+    HILOGD("BluetoothHidHostStub::HidHostSetReportInner");
+    std::string device = data.ReadString();
+    uint8_t type = data.ReadUint8();
+    uint16_t size = data.ReadUint16();
+    uint8_t report = data.ReadUint8();
+    int result;
+    ErrCode ec = HidHostSetReport(device, type, size, report, result);
+    if (SUCCEEDED(ec)) {
+        reply.WriteInt32(result);
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHidHostStub::HidHostGetReportInner(MessageParcel &data, MessageParcel &reply)
+{
+    HILOGD("BluetoothHidHostStub::HidHostGetReportInner");
+    std::string device = data.ReadString();
+    uint8_t id = data.ReadUint8();
+    uint16_t size = data.ReadUint16();
+    uint8_t type = data.ReadUint8();
+    int result;
+    ErrCode ec = HidHostGetReport(device, id, size, type, result);
+    if (SUCCEEDED(ec)) {
+        reply.WriteInt32(result);
+    }
     return NO_ERROR;
 }
 } // Bluetooth
