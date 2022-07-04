@@ -95,6 +95,8 @@ public:
     int ReceiveRemoteBusy(bool isBusy);
     int PanSendData(EthernetHeader head, uint8_t *data, int len);
 
+    static void ReverseAddress(uint8_t *oldAddr, uint8_t *newAddr);
+
 private:
     /**
      * @brief Service startup.

@@ -135,10 +135,8 @@ int PanNetwork::SetMacAddress(int inetSocket)
     }
     BtAddr btAddr;
     RawAddress(PanService::GetLocalAddress()).ConvertToUint8(btAddr.addr);
-    if (memcpy_s(ifr.ifr_hwaddr.sa_data, sizeof(ifr.ifr_hwaddr.sa_data),
-        btAddr.addr, sizeof(btAddr.addr)) != EOK) {
-        LOG_ERROR("[UHID]%{public}s(): memcpy error", __FUNCTION__);
-        return PAN_FAILURE;
+    for (int i = 0; i < BT_ADDRESS_LENGTH; i++) {
+        ifr.ifr_hwaddr.sa_data[i] = btAddr.addr[BT_ADDRESS_LENGTH - i -1];
     }
     if (ifr.ifr_hwaddr.sa_data[0] & 0x01) {
         LOG_DEBUG("[Pan Network]%{public}s():use unicast MAC address", __FUNCTION__);
