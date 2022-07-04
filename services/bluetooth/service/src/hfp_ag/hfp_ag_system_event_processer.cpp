@@ -309,7 +309,8 @@ void HfpAgSystemEventProcesser::SendHfIndicator(int indId, int indValue) const
 
 void HfpAgSystemEventProcesser::ProcessAtBiaEvent(const HfpAgMessage &event)
 {
-    LOG_INFO("[HFP AG]%{public}s(): BIA command is battery[%{public}d] roam[%{public}d] service[%{public}d] signal[%{public}d]",
+    LOG_INFO("[HFP AG]%{public}s(): BIA command is battery[%{public}d], roam[%{public}d], "
+        "service[%{public}d], signal[%{public}d]",
         __FUNCTION__,
         event.data_.battery,
         event.data_.roam,

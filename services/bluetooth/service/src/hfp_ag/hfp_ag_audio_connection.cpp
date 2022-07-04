@@ -215,7 +215,8 @@ int HfpAgAudioConnection::ConnectAudio() const
         dev = GetDeviceByAddr(remoteAddr_);
         LOG_INFO("[HFP AG]%{public}s():Create Audio device for [%{public}s]", __FUNCTION__, remoteAddr_.c_str());
     } else {
-        LOG_INFO("[HFP AG]%{public}s():Audio device [%{public}s] already in device list ", __FUNCTION__, remoteAddr_.c_str());
+        LOG_INFO("[HFP AG]%{public}s():Audio device [%{public}s] already in device list ", __FUNCTION__,
+            remoteAddr_.c_str());
     }
 
     bool msbcEscoFailed = false;
@@ -243,7 +244,8 @@ int HfpAgAudioConnection::ConnectAudio() const
     } else if (inUseCodec_ == HFP_AG_CODEC_CVSD) {
         return ConnectByCvsd(*dev, btAddr, cvsdEscoFailed);
     } else {
-        LOG_INFO("[HFP AG]%{public}s():RemoteAddr [%{public}s], invalid codec[%{public}d]", __FUNCTION__, remoteAddr_.c_str(), inUseCodec_);
+        LOG_INFO("[HFP AG]%{public}s():RemoteAddr [%{public}s], invalid codec[%{public}d]", __FUNCTION__,
+            remoteAddr_.c_str(), inUseCodec_);
         return BT_BAD_PARAM;
     }
 
@@ -315,7 +317,8 @@ int HfpAgAudioConnection::AcceptByCvsd(const AudioDevice &dev, BtAddr btAddr) co
         ret = BTM_AcceptScoConnectionRequest(&param);
         HFP_AG_RETURN_IF_FAIL(ret);
     } else {
-        LOG_INFO("[HFP AG]%{public}s():CVSD ESCO connection fail, linktype[%hhu] and escoSupport[%{public}d] are not matched!",
+        LOG_INFO("[HFP AG]%{public}s():CVSD ESCO connection fail, "
+            "linktype[%hhu] and escoSupport[%{public}d] are not matched!",
             __FUNCTION__,
             dev.linkType,
             escoSupport_);
@@ -337,7 +340,8 @@ int HfpAgAudioConnection::AcceptAudioConnection() const
             if (dev->linkType == LINK_TYPE_ESCO && escoSupport_) {
                 return AcceptByMsbc(btAddr);
             } else {
-                LOG_INFO("[HFP AG]%{public}s():MSBC ESCO connection fail, linktype[%hhu] and escoSupport[%{public}d] are not matched!",
+                LOG_INFO("[HFP AG]%{public}s():MSBC ESCO connection fail, "
+                    "linktype[%hhu] and escoSupport[%{public}d] are not matched!",
                     __FUNCTION__,
                     dev->linkType,
                     escoSupport_);
@@ -396,7 +400,8 @@ void HfpAgAudioConnection::ProcessOnConnectRequest(HfpScoConnectionRequestParam 
         LOG_INFO("[HFP AG]%{public}s():Create Audio device for [%{public}s]", __FUNCTION__, address.c_str());
     } else {
         dev->linkType = parameters.linkType;
-        LOG_INFO("[HFP AG]%{public}s():Audio device [%{public}s] already in device list ", __FUNCTION__, address.c_str());
+        LOG_INFO("[HFP AG]%{public}s():Audio device [%{public}s] already in device list ", __FUNCTION__,
+            address.c_str());
     }
     HfpAgProfileEventSender::GetInstance().ScoConnectRequest(
         btAddr.GetAddress(), HFP_AG_AUDIO_CONNECT_REQUEST_EVT, parameters.linkType);
@@ -428,7 +433,8 @@ void HfpAgAudioConnection::ProcessOnConnectCompletedFail(
             LOG_INFO("[HFP AG]%{public}s():CVSD SCO failed, report fail event to service", __FUNCTION__);
             HfpAgProfileEventSender::GetInstance().UpdateScoConnectState(dev->addr, HFP_AG_AUDIO_CONNECT_FAILED_EVT);
         } else {
-            LOG_INFO("[HFP AG]%{public}s():Invalidaddress[%{public}s] lastParam[%{public}d]", __FUNCTION__, address.c_str(), dev->lastParam);
+            LOG_INFO("[HFP AG]%{public}s():Invalidaddress[%{public}s] lastParam[%{public}d]", __FUNCTION__,
+                address.c_str(), dev->lastParam);
         }
     } else {
         // As acceptor, report connect failed event to service directly.
@@ -477,11 +483,13 @@ void HfpAgAudioConnection::ProcessOnDisconnectCompleted(HfpScoDisconnectionCompl
     auto it = GetDeviceByHandle(parameters.connectionHandle);
     if (it != g_audioDevices.end()) {
         if (!parameters.status) {
-            LOG_INFO("[HFP AG]%{public}s(): Disconnect SCO from address[%{public}s] successfully.", __FUNCTION__, it->addr.c_str());
+            LOG_INFO("[HFP AG]%{public}s(): Disconnect SCO from address[%{public}s] successfully.", __FUNCTION__,
+                it->addr.c_str());
             HfpAgProfileEventSender::GetInstance().UpdateScoConnectState(it->addr, HFP_AG_AUDIO_DISCONNECTED_EVT);
             g_audioDevices.erase(it);
         } else {
-            LOG_INFO("[HFP AG]%{public}s(): Disconnect SCO from address[%{public}s] failed.", __FUNCTION__, it->addr.c_str());
+            LOG_INFO("[HFP AG]%{public}s(): Disconnect SCO from address[%{public}s] failed.", __FUNCTION__,
+                it->addr.c_str());
             HfpAgProfileEventSender::GetInstance().UpdateScoConnectState(
                 it->addr, HFP_AG_AUDIO_DISCONNECT_FAILED_EVT);
         }
