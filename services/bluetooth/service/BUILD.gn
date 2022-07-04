@@ -25,6 +25,8 @@ ServiceA2dpSnkSrc = [ "src/a2dp_snk/a2dp_snk_service.cpp" ]
 
 ServiceA2dpSrcSrc = [ "src/a2dp_src/a2dp_src_service.cpp" ]
 
+ServiceBleScanFilter = [ "src/ble/ble_scan_filter/src/ble_scan_filter_lsf.cpp" ]
+
 ServiceAvrcpCtSrc = [
   "src/avrcp_ct/avrcp_ct_connection.cpp",
   "src/avrcp_ct/avrcp_ct_gap.cpp",
@@ -306,6 +308,7 @@ config("btservice_config") {
     "$BT_SERVICE_DIR/src/common",
     "$BT_SERVICE_DIR/src/permission",
     "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/ble/ble_scan_filter",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/aaccodecctrl_l2/include",
     "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbccodecctrl/include",
     "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative/include/netsys",
@@ -356,6 +359,7 @@ ohos_shared_library("btservice") {
   sources += ServiceA2dpSrcSrc
   sources += ServiceAvrcpCtSrc
   sources += ServiceAvrcpTgSrc
+  sources += ServiceBleScanFilter
   sources += ServiceBleSrc
   sources += ServiceClassicSrc
   sources += ServiceGattSrc

@@ -23,6 +23,7 @@
 #include "ble_utils.h"
 #include "common/adapter_manager.h"
 #include "hisysevent.h"
+#include "ble_scan_filter/include/ble_scan_filter_lsf.h"
 #include "securec.h"
 
 namespace bluetooth {
@@ -178,7 +179,12 @@ BleCentralManagerImpl::BleCentralManagerImpl(
     SetInterval(interval);
     uint16_t window = BLE_SCAN_MODE_LOW_POWER_WINDOW_MS;
     SetWindow(window);
+
+#ifdef LSF_ENABLE
+    bleScanFilter_ = new BleScanFilterLsf();
+#else
     LoadBleScanFilterLib();
+#endif
 }
 
 BleCentralManagerImpl::~BleCentralManagerImpl()
@@ -189,7 +195,14 @@ BleCentralManagerImpl::~BleCentralManagerImpl()
         pimpl->timer_->Stop();
         pimpl->timer_ = nullptr;
     }
+
+#ifdef LSF_ENABLE
+    if (bleScanFilter_ != nullptr) {
+        delete bleScanFilter_;
+    }
+#else
     UnloadBleScanFilterLib();
+#endif
 }
 
 int BleCentralManagerImpl::impl::RegisterCallbackToGap()
@@ -1126,7 +1139,6 @@ bool BleCentralManagerImpl::CheckScanFilterConfig(const std::vector<BleScanFilte
         LOG_ERROR("[BleCentralManagerImpl] %{public}s:%{public}s", __func__, "filter array is full.");
         return false;
     }
-
     if (pimpl->venderMaxFilterNumber_ == 0) {
         pimpl->venderMaxFilterNumber_ = bleScanFilter_->GetMaxFilterNumber();
         LOG_DEBUG("[BleCentralManagerImpl] %{public}s:-> vender max filter number_ is %{public}d",
