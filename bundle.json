@@ -40,7 +40,9 @@
     "syscap": [
       "SystemCapability.Communication.Bluetooth.Core"
     ],
-    "features": [],
+    "features": [
+      "bluetooth_avrcp_avsession"
+    ],
     "adapted_system_type": [
       "standard"
     ],
