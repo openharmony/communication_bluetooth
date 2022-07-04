@@ -39,16 +39,20 @@ AvrcTgProfile::AvrcTgProfile(uint16_t features, uint32_t companyId, uint16_t con
       eventCallback_(eventCallback),
       msgCallback_(msgCallback)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     SetEnableFlag(false);
+    playStatusChanged = std::make_pair(false, 0);
+    trackChanged = std::make_pair(false, 0);
 }
 
 AvrcTgProfile::~AvrcTgProfile()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     SetEnableFlag(false);
+    playStatusChanged = std::make_pair(false, 0);
+    trackChanged = std::make_pair(false, 0);
 }
 
 /******************************************************************
@@ -57,14 +61,14 @@ AvrcTgProfile::~AvrcTgProfile()
 
 void AvrcTgProfile::RegisterObserver(AvrcTgProfile::Observer *observer)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     myObserver_ = observer;
 }
 
 void AvrcTgProfile::UnregisterObserver(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     myObserver_ = nullptr;
 }
@@ -75,7 +79,7 @@ void AvrcTgProfile::UnregisterObserver(void)
 
 int AvrcTgProfile::Enable(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     int result = RET_NO_ERROR;
 
@@ -94,7 +98,7 @@ int AvrcTgProfile::Enable(void)
 
 int AvrcTgProfile::Disable(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     do {
         std::lock_guard<std::recursive_mutex> lock(mutex_);
@@ -119,7 +123,7 @@ int AvrcTgProfile::Disable(void)
 
 void AvrcTgProfile::SetEnableFlag(bool isEnabled)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     g_isEnabled = isEnabled;
 }
@@ -130,8 +134,8 @@ void AvrcTgProfile::SetEnableFlag(bool isEnabled)
 
 void AvrcTgProfile::SetActiveDevice(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -141,7 +145,7 @@ void AvrcTgProfile::SetActiveDevice(const RawAddress &rawAddr)
 
 std::vector<bluetooth::RawAddress> AvrcTgProfile::GetConnectedDevices(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     std::vector<bluetooth::RawAddress> result;
@@ -159,7 +163,7 @@ std::vector<bluetooth::RawAddress> AvrcTgProfile::GetConnectedDevices(void)
 
 std::vector<RawAddress> AvrcTgProfile::GetDevicesByStates(const std::vector<int> &states)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -186,7 +190,7 @@ std::vector<RawAddress> AvrcTgProfile::GetDevicesByStates(const std::vector<int>
 
 int AvrcTgProfile::GetDeviceState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcTgStateMachineManager *smManager = AvrcTgStateMachineManager::GetInstance();
@@ -209,7 +213,7 @@ int AvrcTgProfile::GetDeviceState(const RawAddress &rawAddr)
 
 int AvrcTgProfile::GetMaxConnectNum(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     int result = 0x00;
@@ -228,7 +232,7 @@ int AvrcTgProfile::GetMaxConnectNum(void)
 
 int AvrcTgProfile::Connect(const RawAddress &rawAddr) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcCtProfile::%{public}s", __func__);
 
     uint8_t result = RET_NO_ERROR;
 
@@ -244,7 +248,7 @@ int AvrcTgProfile::Connect(const RawAddress &rawAddr) const
 
 int AvrcTgProfile::ConnectBr(const RawAddress &rawAddr) 
 {
-    LOG_DEBUG("[AVRCP CT] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgStateMachineManager *smManager = AvrcTgStateMachineManager::GetInstance();
 
@@ -253,7 +257,7 @@ int AvrcTgProfile::ConnectBr(const RawAddress &rawAddr)
 
 int AvrcTgProfile::Disconnect(const RawAddress &rawAddr) const 
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgStateMachineManager *smManager = AvrcTgStateMachineManager::GetInstance();
     utility::Message msg(AVRC_TG_SM_EVENT_TO_DISCONNECTING_STATE);
@@ -269,7 +273,7 @@ int AvrcTgProfile::Disconnect(const RawAddress &rawAddr) const
 
 int AvrcTgProfile::DisconnectBr(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     utility::Message msg(AVRC_TG_SM_EVENT_TO_DISCONNECTING_STATE);
     AvrcTgStateMachineManager::GetInstance()->SendMessageToBrowseStateMachine(rawAddr, msg);
@@ -279,7 +283,7 @@ int AvrcTgProfile::DisconnectBr(const RawAddress &rawAddr)
 
 int AvrcTgProfile::GetConnectState(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     int result = PROFILE_STATE_DISCONNECTED;
@@ -310,7 +314,7 @@ int AvrcTgProfile::GetConnectState(void)
 
 void AvrcTgProfile::AcceptPassiveConnect(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     utility::Message msg(AVRC_TG_SM_EVENT_TO_CONNECTED_STATE);
     AvrcTgStateMachineManager::GetInstance()->SendMessageToControlStateMachine(rawAddr, msg);
@@ -318,7 +322,7 @@ void AvrcTgProfile::AcceptPassiveConnect(const RawAddress &rawAddr)
 
 void AvrcTgProfile::RejectPassiveConnect(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AVCT_DisconnectReq(connectId_);
     DeleteResource(rawAddr);
@@ -330,7 +334,7 @@ void AvrcTgProfile::RejectPassiveConnect(const RawAddress &rawAddr)
 
 void AvrcTgProfile::SendPressButtonRsp(const RawAddress &rawAddr, uint8_t button, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgPassPacket> packet = std::make_shared<AvrcTgPassPacket>(button, AVRC_KEY_STATE_PRESS, label);
     packet->SetCrCode(ExplainResultToPassCrCode(result));
@@ -341,7 +345,7 @@ void AvrcTgProfile::SendPressButtonRsp(const RawAddress &rawAddr, uint8_t button
 
 void AvrcTgProfile::SendReleaseButtonRsp(const RawAddress &rawAddr, uint8_t button, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgPassPacket> packet =
         std::make_shared<AvrcTgPassPacket>(button, AVRC_KEY_STATE_RELEASE, label);
@@ -353,14 +357,14 @@ void AvrcTgProfile::SendReleaseButtonRsp(const RawAddress &rawAddr, uint8_t butt
 
 bool AvrcTgProfile::IsEnabled(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     return g_isEnabled;
 }
 
 bool AvrcTgProfile::IsSamePassPressCommand(const RawAddress &rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     bool result = false;
 
@@ -386,7 +390,7 @@ bool AvrcTgProfile::IsSamePassPressCommand(const RawAddress &rawAddr, uint8_t bu
 
 bool AvrcTgProfile::IsIgnorePassReleaseCommand(const RawAddress &rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     bool result = true;
 
@@ -418,7 +422,7 @@ bool AvrcTgProfile::IsIgnorePassReleaseCommand(const RawAddress &rawAddr, uint8_
 
 void AvrcTgProfile::SendPassRsp(const RawAddress &rawAddr, std::shared_ptr<AvrcTgPassPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -446,7 +450,7 @@ void AvrcTgProfile::SendPassRsp(const RawAddress &rawAddr, std::shared_ptr<AvrcT
 
 void AvrcTgProfile::ReceivePassCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgPassPacket> packet = std::make_shared<AvrcTgPassPacket>(pkt, label);
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -460,7 +464,7 @@ void AvrcTgProfile::ReceivePassCmd(const RawAddress &rawAddr, uint8_t label, Pac
     uint8_t key = packet->GetKeyOperation();
     uint8_t state = packet->GetKeyState();
 
-    LOG_DEBUG("[AVRCP TG] key[%x] - state[%x] - label[%u]", key, state, label);
+    LOG_INFO("[AVRCP TG] key[%x] - state[%x] - label[%u]", key, state, label);
 
     switch (state) {
         case AVRC_KEY_STATE_PRESS:
@@ -498,17 +502,17 @@ void AvrcTgProfile::ReceivePassCmd(const RawAddress &rawAddr, uint8_t label, Pac
 
             packet->SetCrCode(AVRC_TG_RSP_CODE_REJECTED);
             SendPassRsp(rawAddr, packet);
-            LOG_DEBUG("[AVRCP TG] The PASS THROUGH command is rejected! - key[%x] - state[%x]", state, label);
+            LOG_INFO("[AVRCP TG] The PASS THROUGH command is rejected! - key[%x] - state[%x]", state, label);
             break;
         default:
-            LOG_DEBUG("[AVRCP TG] The key state is incorrect!");
+            LOG_INFO("[AVRCP TG] The key state is incorrect!");
             break;
     }
 }
 
 void AvrcTgProfile::ProcessPassTimeout(RawAddress rawAddr, uint8_t button, uint8_t state, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     ASSERT(state == AVRC_KEY_STATE_PRESS);
 
@@ -520,8 +524,8 @@ void AvrcTgProfile::ProcessPassTimeout(RawAddress rawAddr, uint8_t button, uint8
 
 void AvrcTgProfile::PassTimeoutCallback(const RawAddress &rawAddr, uint8_t button, uint8_t state, uint8_t label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG]key[%x] - state[%x] - label[%x]", button, state, label);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG]key[%x] - state[%x] - label[%x]", button, state, label);
 
     if (IsEnabled()) {
         dispatcher_->PostTask(std::bind(&AvrcTgProfile::ProcessPassTimeout, this, rawAddr, button, state, label));
@@ -534,8 +538,8 @@ void AvrcTgProfile::PassTimeoutCallback(const RawAddress &rawAddr, uint8_t butto
 
 void AvrcTgProfile::SendUnitRsp(const RawAddress &rawAddr, std::shared_ptr<AvrcTgUnitPacket> &pkt, AvrcTgSmEvent event)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] event[%{public}d]", event);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] event[%{public}d]", event);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     cnManager->ClearUnitInfo(rawAddr);
@@ -547,7 +551,7 @@ void AvrcTgProfile::SendUnitRsp(const RawAddress &rawAddr, std::shared_ptr<AvrcT
 
 void AvrcTgProfile::ReceiveUnitCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgUnitPacket> packet = std::make_shared<AvrcTgUnitPacket>(pkt, label);
 
@@ -556,7 +560,7 @@ void AvrcTgProfile::ReceiveUnitCmd(const RawAddress &rawAddr, uint8_t label, Pac
 
 void AvrcTgProfile::ReceiveSubUnitCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgUnitPacket> packet = std::make_shared<AvrcTgSubUnitPacket>(pkt, label);
 
@@ -570,8 +574,7 @@ void AvrcTgProfile::ReceiveSubUnitCmd(const RawAddress &rawAddr, uint8_t label, 
 void AvrcTgProfile::SendVendorRsp(
     const RawAddress &rawAddr, std::shared_ptr<AvrcTgVendorPacket> &pkt, AvrcTgSmEvent event)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] event[%x]", event);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s, event[%x]", __func__, event);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     cnManager->ClearVendorInfo(rawAddr);
@@ -584,7 +587,7 @@ void AvrcTgProfile::SendVendorRsp(
 void AvrcTgProfile::SendGetCapabilitiesRsp(
     const RawAddress &rawAddr, const std::vector<uint32_t> &companies, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> packet =
         std::make_shared<AvrcTgGcPacket>(ExplainResultToStatusCrCode(result), companies, label);
@@ -594,7 +597,7 @@ void AvrcTgProfile::SendGetCapabilitiesRsp(
 void AvrcTgProfile::SendGetCapabilitiesRsp(
     const RawAddress &rawAddr, const std::vector<uint8_t> &events, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> packet =
         std::make_shared<AvrcTgGcPacket>(ExplainResultToStatusCrCode(result), events, label);
@@ -605,7 +608,7 @@ void AvrcTgProfile::SendGetCapabilitiesRsp(
 
 void AvrcTgProfile::ReceiveGetCapabilitiesCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgGcPacket> gcPkt = std::make_shared<AvrcTgGcPacket>(pkt, label);
 
@@ -628,7 +631,7 @@ void AvrcTgProfile::ReceiveGetCapabilitiesCmd(const RawAddress &rawAddr, uint8_t
 void AvrcTgProfile::SendListPlayerApplicationSettingAttributesRsp(
     const RawAddress &rawAddr, std::deque<uint8_t> attributes, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> packet =
         std::make_shared<AvrcTgLpasaPacket>(ExplainResultToStatusCrCode(result), attributes, label);
@@ -640,7 +643,7 @@ void AvrcTgProfile::SendListPlayerApplicationSettingAttributesRsp(
 void AvrcTgProfile::ReceiveListPlayerApplicationSettingAttributesCmd(
     const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgLpasaPacket> lpasaPkt = std::make_shared<AvrcTgLpasaPacket>(pkt, label);
 
@@ -655,7 +658,7 @@ void AvrcTgProfile::ReceiveListPlayerApplicationSettingAttributesCmd(
 void AvrcTgProfile::SendListPlayerApplicationSettingValuesRsp(
     const RawAddress &rawAddr, const std::deque<uint8_t> &values, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> packet =
         std::make_shared<AvrcTgLpasvPacket>(ExplainResultToStatusCrCode(result), values, label);
@@ -666,7 +669,7 @@ void AvrcTgProfile::SendListPlayerApplicationSettingValuesRsp(
 
 void AvrcTgProfile::ReceiveListPlayerApplicationSettingValuesCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgLpasvPacket> lpasvPkt = std::make_shared<AvrcTgLpasvPacket>(pkt, label);
 
@@ -681,7 +684,7 @@ void AvrcTgProfile::ReceiveListPlayerApplicationSettingValuesCmd(const RawAddres
 void AvrcTgProfile::SendGetCurrentPlayerApplicationSettingValueRsp(const RawAddress &rawAddr,
     const std::deque<uint8_t> &attributes, const std::deque<uint8_t> &values, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     std::shared_ptr<AvrcTgVendorPacket> packet = std::make_shared<AvrcTgGcpasvPacket>(
@@ -694,7 +697,7 @@ void AvrcTgProfile::SendGetCurrentPlayerApplicationSettingValueRsp(const RawAddr
 void AvrcTgProfile::ReceiveGetCurrentPlayerApplicationSettingValueCmd(
     const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgGcpasvPacket> gcpasvPkt = std::make_shared<AvrcTgGcpasvPacket>(pkt, label);
 
@@ -709,7 +712,7 @@ void AvrcTgProfile::ReceiveGetCurrentPlayerApplicationSettingValueCmd(
 
 void AvrcTgProfile::SendSetPlayerApplicationSettingValueRsp(const RawAddress &rawAddr, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> packet =
         std::make_shared<AvrcTgSpasvPacket>(ExplainResultToControlCrCode(result), label);
@@ -720,7 +723,7 @@ void AvrcTgProfile::SendSetPlayerApplicationSettingValueRsp(const RawAddress &ra
 
 void AvrcTgProfile::ReceiveSetPlayerApplicationSettingValueCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgSpasvPacket> spasvPkt = std::make_shared<AvrcTgSpasvPacket>(pkt, label);
     if (spasvPkt != nullptr) {
@@ -737,7 +740,7 @@ void AvrcTgProfile::ReceiveSetPlayerApplicationSettingValueCmd(const RawAddress 
 void AvrcTgProfile::SendGetPlayerApplicationSettingAttributeTextRsp(const RawAddress &rawAddr,
     const std::vector<uint8_t> &attributes, const std::vector<std::string> &attrStr, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     int crCode = ExplainResultToControlCrCode(result);
     if (crCode == AVRC_TG_RSP_CODE_ACCEPTED) {
@@ -754,7 +757,7 @@ void AvrcTgProfile::SendGetPlayerApplicationSettingAttributeTextRsp(const RawAdd
 void AvrcTgProfile::ReceiveGetPlayerApplicationSettingAttributeTextCmd(
     const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgGpasatPacket> gpasatPkt = std::make_shared<AvrcTgGpasatPacket>(pkt, label);
     if (gpasatPkt != nullptr) {
@@ -772,7 +775,7 @@ void AvrcTgProfile::ReceiveGetPlayerApplicationSettingAttributeTextCmd(
 void AvrcTgProfile::SendGetPlayerApplicationSettingValueTextRsp(const RawAddress &rawAddr,
     const std::vector<uint8_t> &values, const std::vector<std::string> &valueStr, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     int crCode = ExplainResultToControlCrCode(result);
     if (crCode == AVRC_TG_RSP_CODE_ACCEPTED) {
@@ -788,7 +791,7 @@ void AvrcTgProfile::SendGetPlayerApplicationSettingValueTextRsp(const RawAddress
 void AvrcTgProfile::ReceiveGetPlayerApplicationSettingValueTextCmd(
     const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgGpasvtPacket> gpasvtPkt = std::make_shared<AvrcTgGpasvtPacket>(pkt, label);
 
@@ -804,7 +807,7 @@ void AvrcTgProfile::ReceiveGetPlayerApplicationSettingValueTextCmd(
 void AvrcTgProfile::SendGetElementAttributesRsp(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues,
     const std::vector<std::string> &values, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     int crCode = ExplainResultToControlCrCode(result);
     if (crCode == AVRC_TG_RSP_CODE_ACCEPTED) {
         crCode = AVRC_TG_RSP_CODE_STABLE;
@@ -817,7 +820,7 @@ void AvrcTgProfile::SendGetElementAttributesRsp(const RawAddress &rawAddr, const
 
 void AvrcTgProfile::ReceiveGetElementAttributesCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgGeaPacket> geaPkt = std::make_shared<AvrcTgGeaPacket>(pkt, label);
     if (geaPkt != nullptr) {
@@ -833,7 +836,7 @@ void AvrcTgProfile::ReceiveGetElementAttributesCmd(const RawAddress &rawAddr, ui
 void AvrcTgProfile::SendGetPlayStatusRsp(const RawAddress &rawAddr, uint32_t songLength, uint32_t songPosition,
     uint8_t playStatus, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> packet = std::make_shared<AvrcTgGpsPacket>(
         ExplainResultToStatusCrCode(result), songLength, songPosition, playStatus, label);
@@ -844,7 +847,7 @@ void AvrcTgProfile::SendGetPlayStatusRsp(const RawAddress &rawAddr, uint32_t son
 
 void AvrcTgProfile::ReceiveGetPlayStatusCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgGpsPacket> gpsPkt = std::make_shared<AvrcTgGpsPacket>(pkt, label);
     if (gpsPkt != nullptr) {
@@ -859,7 +862,7 @@ void AvrcTgProfile::ReceiveGetPlayStatusCmd(const RawAddress &rawAddr, uint8_t l
 
 void AvrcTgProfile::ReceiveRequestContinuingResponseCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     std::shared_ptr<AvrcTgRcrPacket> rcrPkt = std::make_shared<AvrcTgRcrPacket>(pkt, label);
@@ -871,21 +874,21 @@ void AvrcTgProfile::ReceiveRequestContinuingResponseCmd(const RawAddress &rawAdd
         if (packet == nullptr) {
             cnManager->ClearVendorInfo(rawAddr);
             event = AVRC_TG_SM_EVENT_TO_CONNECTED_STATE;
-            LOG_DEBUG("[AVRCP TG] Receive the RequestContinuingResponse command, but the vendor packet is nullptr!");
+            LOG_INFO("[AVRCP TG] Receive the RequestContinuingResponse command, but the vendor packet is nullptr!");
             break;
         }
 
         if (!AvrcTgStateMachineManager::GetInstance()->IsControlContinuationState(rawAddr)) {
             cnManager->ClearVendorInfo(rawAddr);
             event = AVRC_TG_SM_EVENT_TO_CONNECTED_STATE;
-            LOG_DEBUG("[AVRCP TG] Receive the RequestContinuingResponse command, but current is not CONTINUATION!");
+            LOG_INFO("[AVRCP TG] Receive the RequestContinuingResponse command, but current is not CONTINUATION!");
             break;
         }
 
         if (packet->GetPduId() != rcrPkt->GetRequestContinuingPduId()) {
             cnManager->ClearVendorInfo(rawAddr);
             event = AVRC_TG_SM_EVENT_TO_CONNECTED_STATE;
-            LOG_DEBUG("[AVRCP TG] Receive the AbortContinuingResponse command, but pdu id is incorrect! - saved "
+            LOG_INFO("[AVRCP TG] Receive the AbortContinuingResponse command, but pdu id is incorrect! - saved "
                       "pduId[%x] - received pduId[%x]",
                 packet->GetPduId(),
                 rcrPkt->GetRequestContinuingPduId());
@@ -901,7 +904,7 @@ void AvrcTgProfile::ReceiveRequestContinuingResponseCmd(const RawAddress &rawAdd
 
 void AvrcTgProfile::ReceiveAbortContinuingResponseCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgAcrPacket> acrPkt = std::make_shared<AvrcTgAcrPacket>(pkt, label);
     std::shared_ptr<AvrcTgVendorPacket> packet = AvrcTgConnectManager::GetInstance()->GetVendorPacket(rawAddr);
@@ -909,19 +912,19 @@ void AvrcTgProfile::ReceiveAbortContinuingResponseCmd(const RawAddress &rawAddr,
     do {
         if (packet == nullptr) {
             acrPkt->SetCrCode(AVRC_TG_RSP_CODE_REJECTED);
-            LOG_DEBUG("[AVRCP TG] Receive the AbortContinuingResponse command, but the vendor packet is nullptr!");
+            LOG_INFO("[AVRCP TG] Receive the AbortContinuingResponse command, but the vendor packet is nullptr!");
             break;
         }
 
         if (!AvrcTgStateMachineManager::GetInstance()->IsControlContinuationState(rawAddr)) {
             acrPkt->SetCrCode(AVRC_TG_RSP_CODE_REJECTED);
-            LOG_DEBUG("[AVRCP TG] Receive the AbortContinuingResponse command, but current is not CONTINUATION!");
+            LOG_INFO("[AVRCP TG] Receive the AbortContinuingResponse command, but current is not CONTINUATION!");
             break;
         }
 
         if (packet->GetPduId() != acrPkt->GetRequestContinuingPduId()) {
             acrPkt->SetCrCode(AVRC_TG_RSP_CODE_REJECTED);
-            LOG_DEBUG("[AVRCP TG] Receive the AbortContinuingResponse command, but pdu id is incorrect! - saved "
+            LOG_INFO("[AVRCP TG] Receive the AbortContinuingResponse command, but pdu id is incorrect! - saved "
                       "pduId[%x] - received pduId[%x]",
                 packet->GetPduId(),
                 acrPkt->GetRequestContinuingPduId());
@@ -936,7 +939,7 @@ void AvrcTgProfile::ReceiveAbortContinuingResponseCmd(const RawAddress &rawAddr,
 
 void AvrcTgProfile::SendSetAddressedPlayerRsp(const RawAddress &rawAddr, int status, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     uint8_t crCode = ExplainResultToControlCrCode(result);
     if (status != AVRC_ES_CODE_NO_ERROR) {
@@ -951,7 +954,7 @@ void AvrcTgProfile::SendSetAddressedPlayerRsp(const RawAddress &rawAddr, int sta
 
 void AvrcTgProfile::ReceiveSetAddressedPlayerCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -966,7 +969,7 @@ void AvrcTgProfile::ReceiveSetAddressedPlayerCmd(const RawAddress &rawAddr, uint
 
 void AvrcTgProfile::SendPlayItemRsp(const RawAddress &rawAddr, int status, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     uint8_t crCode = ExplainResultToControlCrCode(result);
     if (status != AVRC_ES_CODE_NO_ERROR) {
@@ -981,7 +984,7 @@ void AvrcTgProfile::SendPlayItemRsp(const RawAddress &rawAddr, int status, uint8
 
 void AvrcTgProfile::ReceivePlayItemCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgPiPacket> piPkt = std::make_shared<AvrcTgPiPacket>(pkt, label);
     if (piPkt->IsValid()) {
@@ -994,7 +997,7 @@ void AvrcTgProfile::ReceivePlayItemCmd(const RawAddress &rawAddr, uint8_t label,
 
 void AvrcTgProfile::SendAddToNowPlayingRsp(const RawAddress &rawAddr, int status, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     uint8_t crCode = ExplainResultToControlCrCode(result);
     if (status != AVRC_ES_CODE_NO_ERROR) {
@@ -1009,7 +1012,7 @@ void AvrcTgProfile::SendAddToNowPlayingRsp(const RawAddress &rawAddr, int status
 
 void AvrcTgProfile::ReceiveAddToNowPlayingCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgAtnpPacket> atnpPkt = std::make_shared<AvrcTgAtnpPacket>(pkt, label);
     if (atnpPkt->IsValid()) {
@@ -1022,7 +1025,7 @@ void AvrcTgProfile::ReceiveAddToNowPlayingCmd(const RawAddress &rawAddr, uint8_t
 
 void AvrcTgProfile::SendSetAbsoluteVolumeRsp(const RawAddress &rawAddr, uint8_t volume, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgVendorPacket> packet =
         std::make_shared<AvrcTgSavPacket>(ExplainResultToControlCrCode(result), volume, label);
@@ -1033,7 +1036,7 @@ void AvrcTgProfile::SendSetAbsoluteVolumeRsp(const RawAddress &rawAddr, uint8_t 
 
 void AvrcTgProfile::ReceiveSetAbsoluteVolumeCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgSavPacket> savPkt = std::make_shared<AvrcTgSavPacket>(pkt, label);
     if (savPkt->IsValid()) {
@@ -1046,7 +1049,8 @@ void AvrcTgProfile::ReceiveSetAbsoluteVolumeCmd(const RawAddress &rawAddr, uint8
 
 void AvrcTgProfile::SendPlaybackStatusChangedRsp(bool isInterim, uint8_t playStatus, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s, isInterim:%{public}d, playStatus:%{public}d",
+        __func__, isInterim, playStatus);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1067,6 +1071,10 @@ void AvrcTgProfile::SendPlaybackStatusChangedRsp(bool isInterim, uint8_t playSta
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_TG, rawAddr);
         SendVendorRsp(rawAddr, packet, AVRC_TG_SM_EVENT_REGISTER_NOTIFICATION);
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::IDLE, PROFILE_NAME_AVRCP_TG, rawAddr);
+
+        if (!isInterim) {
+            playStatusChanged = std::make_pair(false, 0);
+        }
     }
 
     if (!isInterim) {
@@ -1076,7 +1084,7 @@ void AvrcTgProfile::SendPlaybackStatusChangedRsp(bool isInterim, uint8_t playSta
 
 void AvrcTgProfile::SendTrackChangedRsp(bool isInterim, uint64_t identifier, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1106,7 +1114,7 @@ void AvrcTgProfile::SendTrackChangedRsp(bool isInterim, uint64_t identifier, uin
 
 void AvrcTgProfile::SendTrackReachedEndRsp(bool isInterim, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1135,7 +1143,7 @@ void AvrcTgProfile::SendTrackReachedEndRsp(bool isInterim, uint8_t label, int re
 
 void AvrcTgProfile::SendTrackReachedStartRsp(bool isInterim, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1164,7 +1172,7 @@ void AvrcTgProfile::SendTrackReachedStartRsp(bool isInterim, uint8_t label, int 
 
 void AvrcTgProfile::SendPlaybackPosChangedRsp(bool isInterim, uint32_t playbackPos, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1195,7 +1203,7 @@ void AvrcTgProfile::SendPlaybackPosChangedRsp(bool isInterim, uint32_t playbackP
 void AvrcTgProfile::SendPlayerApplicationSettingChangedRsp(
     bool isInterim, const std::deque<uint8_t> &attributes, const std::deque<uint8_t> &values, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1225,7 +1233,7 @@ void AvrcTgProfile::SendPlayerApplicationSettingChangedRsp(
 
 void AvrcTgProfile::SendNowPlayingContentChangedRsp(bool isInterim, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1254,7 +1262,7 @@ void AvrcTgProfile::SendNowPlayingContentChangedRsp(bool isInterim, uint8_t labe
 
 void AvrcTgProfile::SendAvailablePlayersChangedRsp(bool isInterim, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1284,7 +1292,7 @@ void AvrcTgProfile::SendAvailablePlayersChangedRsp(bool isInterim, uint8_t label
 void AvrcTgProfile::SendAddressedPlayerChangedRsp(
     bool isInterim, uint16_t playerId, uint16_t uidCounter, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1314,7 +1322,7 @@ void AvrcTgProfile::SendAddressedPlayerChangedRsp(
 
 void AvrcTgProfile::SendUidsChangedRsp(bool isInterim, uint16_t uidCounter, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1344,7 +1352,7 @@ void AvrcTgProfile::SendUidsChangedRsp(bool isInterim, uint16_t uidCounter, uint
 
 void AvrcTgProfile::SendVolumeChangedRsp(bool isInterim, uint8_t volume, uint8_t label, int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     RawAddress rawAddr(cnManager->GetActiveDevice());
@@ -1374,34 +1382,37 @@ void AvrcTgProfile::SendVolumeChangedRsp(bool isInterim, uint8_t volume, uint8_t
 
 void AvrcTgProfile::ReceiveRegisterNotificationCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
     std::shared_ptr<AvrcTgNotifyPacket> notifyPkt = std::make_shared<AvrcTgNotifyPacket>(pkt, label);
     uint8_t event = notifyPkt->GetEventId();
     cnManager->EnableNotifyState(rawAddr, event);
-
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s, event:%{public}d", __func__, event);
     switch (event) {
         case AVRC_TG_EVENT_ID_PLAYBACK_STATUS_CHANGED:
             if (notifyPkt->IsValid()) {
+                SetNotificationLabel(AVRC_TG_EVENT_ID_PLAYBACK_STATUS_CHANGED, label);
                 myObserver_->getPlayStatus(rawAddr, label, AVRC_ACTION_TYPE_NOTIFY_PLAYBACK_STATUS_CHANGED);
             }
             break;
         case AVRC_TG_EVENT_ID_TRACK_CHANGED:
             if (notifyPkt->IsValid()) {
+                SetNotificationLabel(AVRC_TG_EVENT_ID_TRACK_CHANGED, label);
                 myObserver_->getSelectedTrack(rawAddr, label);
             }
             break;
         case AVRC_TG_EVENT_ID_TRACK_REACHED_END: {
+            SetNotificationLabel(AVRC_TG_EVENT_ID_TRACK_REACHED_END, label);
             SendTrackReachedEndRsp(true, label, RET_NO_ERROR);
             break;
         }
         case AVRC_TG_EVENT_ID_TRACK_REACHED_START:
+            SetNotificationLabel(AVRC_TG_EVENT_ID_TRACK_REACHED_START, label);
             SendTrackReachedStartRsp(true, label, RET_NO_ERROR);
             break;
         case AVRC_TG_EVENT_ID_PLAYBACK_POS_CHANGED:
             if (notifyPkt->IsValid()) {
+                SetNotificationLabel(AVRC_TG_EVENT_ID_PLAYBACK_POS_CHANGED, label);
                 myObserver_->setPlaybackInterval(rawAddr, notifyPkt->GetPlaybackInterval());
                 myObserver_->getPlayStatus(rawAddr, label, AVRC_ACTION_TYPE_NOTIFY_PLAYBACK_POS_CHANGED);
             }
@@ -1414,28 +1425,34 @@ void AvrcTgProfile::ReceiveRegisterNotificationCmd(const RawAddress &rawAddr, ui
                 AVRC_PLAYER_ATTRIBUTE_SHUFFLE,
                 AVRC_PLAYER_ATTRIBUTE_SCAN
                 };
+                SetNotificationLabel(AVRC_TG_EVENT_ID_PLAYER_APPLICATION_SETTING_CHANGED, label);
                 myObserver_->getCurrentPlayerApplicationSettingValue(
                     rawAddr, attributes, label, AVRC_ACTION_TYPE_NOTIFY_PLAYER_APPLICATION_SETTING_CHANGED);
             }
             break;
         case AVRC_TG_EVENT_ID_NOW_PLAYING_CONTENT_CHANGED:
+            SetNotificationLabel(AVRC_TG_EVENT_ID_NOW_PLAYING_CONTENT_CHANGED, label);
             SendNowPlayingContentChangedRsp(true, label, RET_NO_ERROR);
             break;
         case AVRC_TG_EVENT_ID_AVAILABLE_PLAYERS_CHANGED:
+            SetNotificationLabel(AVRC_TG_EVENT_ID_AVAILABLE_PLAYERS_CHANGED, label);
             SendAvailablePlayersChangedRsp(true, label, RET_NO_ERROR);
             break;
         case AVRC_TG_EVENT_ID_ADDRESSED_PLAYER_CHANGED:
             if (notifyPkt->IsValid()) {
+                SetNotificationLabel(AVRC_TG_EVENT_ID_ADDRESSED_PLAYER_CHANGED, label);
                 myObserver_->getAddressedPlayer(rawAddr, label);
             }
             break;
         case AVRC_TG_EVENT_ID_UIDS_CHANGED:
             if (notifyPkt->IsValid()) {
+                SetNotificationLabel(AVRC_TG_EVENT_ID_UIDS_CHANGED, label);
                 myObserver_->getUidCounter(rawAddr, label);
             }
             break;
         case AVRC_TG_EVENT_ID_VOLUME_CHANGED:
             if (notifyPkt->IsValid()) {
+                SetNotificationLabel(AVRC_TG_EVENT_ID_VOLUME_CHANGED, label);
                 myObserver_->getCurrentAbsoluteVolume(rawAddr, label);
             }
             break;
@@ -1448,9 +1465,8 @@ void AvrcTgProfile::ReceiveRegisterNotificationCmd(const RawAddress &rawAddr, ui
 
 void AvrcTgProfile::ReceiveVendorCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-
     uint8_t pduId = AvrcTgPacket::GetVendorPdu(pkt);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s, pduId:%{public}d", __func__, pduId);
     switch (pduId) {
         case AVRC_TG_PDU_ID_GET_CAPABILITIES:
             ReceiveGetCapabilitiesCmd(rawAddr, label, pkt);
@@ -1504,7 +1520,8 @@ void AvrcTgProfile::ReceiveVendorCmd(const RawAddress &rawAddr, uint8_t label, P
             std::shared_ptr<AvrcTgVendorPacket> packet =
                 std::make_shared<AvrcTgVendorPacket>(pduId, AVRC_ES_CODE_INVALID_COMMAND, label);
             SendVendorRsp(rawAddr, packet, AVRC_TG_SM_EVENT_GENERAL_REJECT);
-            LOG_DEBUG("[AVRCP TG] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]", rawAddr.GetAddress().c_str(), pduId);
+            LOG_INFO("[AVRCP TG] The PDU ID is wrong! Address[%{public}s], pduId[%x]",
+                rawAddr.GetAddress().c_str(), pduId);
             break;
     }
 }
@@ -1516,8 +1533,8 @@ void AvrcTgProfile::ReceiveVendorCmd(const RawAddress &rawAddr, uint8_t label, P
 void AvrcTgProfile::SendBrowseRsp(
     const RawAddress &rawAddr, std::shared_ptr<AvrcTgBrowsePacket> &pkt, AvrcTgSmEvent event)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] event[%x]", event);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] event[%x]", event);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     cnManager->ClearBrowseInfo(rawAddr);
@@ -1530,7 +1547,7 @@ void AvrcTgProfile::SendBrowseRsp(
 void AvrcTgProfile::SendSetBrowsedPlayerRsp(const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems,
     const std::vector<std::string> &folderNames, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     if (status == AVRC_ES_CODE_NO_ERROR) {
@@ -1546,7 +1563,7 @@ void AvrcTgProfile::SendSetBrowsedPlayerRsp(const RawAddress &rawAddr, uint16_t 
 
 void AvrcTgProfile::ReceiveSetBrowsedPlayerCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     uint16_t uidCounter = cnManager->GetUidCounter(rawAddr);
@@ -1561,7 +1578,7 @@ void AvrcTgProfile::ReceiveSetBrowsedPlayerCmd(const RawAddress &rawAddr, uint8_
 
 void AvrcTgProfile::SendChangePathRsp(const RawAddress &rawAddr, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgBrowsePacket> packet = std::make_shared<AvrcTgCpPacket>(status, numOfItems, label);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_TG, rawAddr);
@@ -1571,7 +1588,7 @@ void AvrcTgProfile::SendChangePathRsp(const RawAddress &rawAddr, uint32_t numOfI
 
 void AvrcTgProfile::ReceiveChangePathCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     uint16_t uidCounter = cnManager->GetUidCounter(rawAddr);
@@ -1588,7 +1605,7 @@ void AvrcTgProfile::ReceiveChangePathCmd(const RawAddress &rawAddr, uint8_t labe
 void AvrcTgProfile::SendGetFolderItemsRsp(
     const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMpItem> &items, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     if (status == AVRC_ES_CODE_NO_ERROR) {
@@ -1605,7 +1622,7 @@ void AvrcTgProfile::SendGetFolderItemsRsp(
 void AvrcTgProfile::SendGetFolderItemsRsp(
     const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMeItem> &items, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     if (status == AVRC_ES_CODE_NO_ERROR) {
@@ -1621,7 +1638,7 @@ void AvrcTgProfile::SendGetFolderItemsRsp(
 
 void AvrcTgProfile::ReceiveGetFolderItemsCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgBrowsePacket> packet = std::make_shared<AvrcTgGfiPacket>(pkt, label);
 
@@ -1637,7 +1654,7 @@ void AvrcTgProfile::ReceiveGetFolderItemsCmd(const RawAddress &rawAddr, uint8_t 
 void AvrcTgProfile::SendGetItemAttributesRsp(const RawAddress &rawAddr, const std::vector<uint32_t> &attributes,
     const std::vector<std::string> &values, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -1650,11 +1667,11 @@ void AvrcTgProfile::SendGetItemAttributesRsp(const RawAddress &rawAddr, const st
 
 void AvrcTgProfile::ReceiveGetItemAttributesCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     uint16_t uidCounter = cnManager->GetUidCounter(rawAddr);
-    LOG_DEBUG("[AVRCP TG] The saved uidCounter[%u]", uidCounter);
+    LOG_INFO("[AVRCP TG] The saved uidCounter[%u]", uidCounter);
 
     std::shared_ptr<AvrcTgBrowsePacket> packet = std::make_shared<AvrcTgGiaPacket>(pkt, uidCounter, label);
     if (packet->IsValid()) {
@@ -1669,7 +1686,7 @@ void AvrcTgProfile::ReceiveGetItemAttributesCmd(const RawAddress &rawAddr, uint8
 void AvrcTgProfile::SendGetTotalNumberOfItemsRsp(
     const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     if (status == AVRC_ES_CODE_NO_ERROR) {
@@ -1685,7 +1702,7 @@ void AvrcTgProfile::SendGetTotalNumberOfItemsRsp(
 
 void AvrcTgProfile::ReceiveGetTotalNumberOfItemsCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     std::shared_ptr<AvrcTgBrowsePacket> packet = std::make_shared<AvrcTgGtnoiPacket>(pkt, label);
 
@@ -1699,7 +1716,7 @@ void AvrcTgProfile::ReceiveGetTotalNumberOfItemsCmd(const RawAddress &rawAddr, u
 
 void AvrcTgProfile::ReceiveBrowseCmd(const RawAddress &rawAddr, uint8_t label, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     uint8_t pduId = AvrcTgPacket::GetBrowsePdu(pkt);
     switch (pduId) {
@@ -1722,7 +1739,8 @@ void AvrcTgProfile::ReceiveBrowseCmd(const RawAddress &rawAddr, uint8_t label, P
             std::shared_ptr<AvrcTgBrowsePacket> packet = std::make_shared<AvrcTgBrowsePacket>(
                 AVRC_TG_PDU_ID_GENERAL_REJECT, AVRC_ES_CODE_INVALID_COMMAND, label);
             SendBrowseRsp(rawAddr, packet, AVRC_TG_SM_EVENT_GENERAL_REJECT);
-            LOG_DEBUG("[AVRCP TG] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]", rawAddr.GetAddress().c_str(), pduId);
+            LOG_INFO("[AVRCP TG] The PDU ID is wrong! Address[%{public}s], pduId[%x]",
+                rawAddr.GetAddress().c_str(), pduId);
             break;
     }
 }
@@ -1730,45 +1748,45 @@ void AvrcTgProfile::ReceiveBrowseCmd(const RawAddress &rawAddr, uint8_t label, P
 void AvrcTgProfile::ProcessChannelEvent(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     switch (event) {
         case AVCT_CONNECT_IND_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_CONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
+            LOG_INFO("[AVRCP TG] Receive [AVCT_CONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
                 result,
                 rawAddr.GetAddress().c_str());
             ProcessChannelEventConnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_DISCONNECT_IND_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
+            LOG_INFO("[AVRCP TG] Receive [AVCT_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
                 result,
                 rawAddr.GetAddress().c_str());
             ProcessChannelEventDisconnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_DISCONNECT_CFM_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
+            LOG_INFO("[AVRCP TG] Receive [AVCT_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
                 rawAddr.GetAddress().c_str());
             ProcessChannelEventDisconnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_CONNECT_IND_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_CONNECT_IND_EVT] - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_CONNECT_IND_EVT] Address[%{public}s]", rawAddr.GetAddress().c_str());
             ProcessChannelEventBrConnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_CONNECT_CFM_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
+            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
                 rawAddr.GetAddress().c_str());
             ProcessChannelEventBrConnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_DISCONNECT_IND_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
+            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
                 result,
                 rawAddr.GetAddress().c_str());
 
             DeleteBrowseStateMachine(rawAddr);
             break;
         case AVCT_BR_DISCONNECT_CFM_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
+            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
                 rawAddr.GetAddress().c_str());
 
@@ -1776,13 +1794,13 @@ void AvrcTgProfile::ProcessChannelEvent(
             break;
         case AVCT_CONNECT_CFM_EVT:
             /// The AVCTP does not return this message when an passive connection is created.
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
+            LOG_INFO("[AVRCP TG] Receive [AVCT_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
                 rawAddr.GetAddress().c_str());
             ProcessChannelEventConnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         default:
-            LOG_DEBUG("[AVRCP TG] Unknown [%x]! - Address[%{public}s]", event, rawAddr.GetAddress().c_str());
+            LOG_INFO("[AVRCP TG] Unknown [%x]! - Address[%{public}s]", event, rawAddr.GetAddress().c_str());
             break;
     };
 }
@@ -1790,7 +1808,7 @@ void AvrcTgProfile::ProcessChannelEvent(
 void AvrcTgProfile::ProcessChannelEventConnectIndEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     myObserver_->onConnectionStateChanged(rawAddr, static_cast<int>(BTConnectState::CONNECTING));
 
@@ -1823,7 +1841,7 @@ void AvrcTgProfile::ProcessChannelEventConnectIndEvt(
 void AvrcTgProfile::ProcessChannelEventDisconnectIndEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     AvrcTgStateMachineManager *smManager = AvrcTgStateMachineManager::GetInstance();
@@ -1856,7 +1874,7 @@ void AvrcTgProfile::ProcessChannelEventDisconnectIndEvt(
 void AvrcTgProfile::ProcessChannelEventDisconnectCfmEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     AvrcTgStateMachineManager *smManager = AvrcTgStateMachineManager::GetInstance();
@@ -1889,7 +1907,7 @@ void AvrcTgProfile::ProcessChannelEventDisconnectCfmEvt(
 void AvrcTgProfile::ProcessChannelEventBrConnectIndEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgStateMachineManager *smManager = AvrcTgStateMachineManager::GetInstance();
     utility::Message msg(AVRC_TG_SM_EVENT_INVALID);
@@ -1910,7 +1928,7 @@ void AvrcTgProfile::ProcessChannelEventBrConnectIndEvt(
 void AvrcTgProfile::ProcessChannelEventBrConnectCfmEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     result = ExpainAvctResult(result);
 
@@ -1930,7 +1948,7 @@ void AvrcTgProfile::ProcessChannelEventBrConnectCfmEvt(
 void AvrcTgProfile::ProcessChannelEventConnectCfmEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
     AvrcTgStateMachineManager *smManager = AvrcTgStateMachineManager::GetInstance();
@@ -1959,8 +1977,8 @@ void AvrcTgProfile::ProcessChannelEventConnectCfmEvt(
 void AvrcTgProfile::ProcessChannelMessage(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] connectId[%u] - label[%u] - crType[%u] - chType[%u]", connectId, label, crType, chType);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] connectId[%u] - label[%u] - crType[%u] - chType[%u]", connectId, label, crType, chType);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
 
@@ -1971,7 +1989,7 @@ void AvrcTgProfile::ProcessChannelMessage(
     if (cnManager->GetActiveDevice().compare(addr) == 0x00) {
         if (chType == AVCT_DATA_CTRL) {
             uint8_t opCode = AvrcTgPacket::GetOpCode(pkt);
-            LOG_DEBUG("[AVRCP TG] opCode[%x]", opCode);
+            LOG_INFO("[AVRCP TG] opCode[%x]", opCode);
             switch (opCode) {
                 case AVRC_TG_OP_CODE_PASS_THROUGH:
                     ReceivePassCmd(rawAddr, label, pkt);
@@ -1986,16 +2004,16 @@ void AvrcTgProfile::ProcessChannelMessage(
                     ReceiveVendorCmd(rawAddr, label, pkt);
                     break;
                 default:
-                    LOG_DEBUG("[AVRCP TG] opCode[%x] is wrong! - ConnectId[%x]", opCode, connectId);
+                    LOG_INFO("[AVRCP TG] opCode[%x] is wrong! - ConnectId[%x]", opCode, connectId);
                     break;
             }
         } else if (chType == AVCT_DATA_BR) {
             ReceiveBrowseCmd(rawAddr, label, pkt);
         } else {
-            LOG_DEBUG("[AVRCP TG] chType[%x] is wrong! - ConnectId[%x]", chType, connectId);
+            LOG_INFO("[AVRCP TG] chType[%x] is wrong! - ConnectId[%x]", chType, connectId);
         }
     } else {
-        LOG_DEBUG("[AVRCP TG] Active device[%{public}s] - Request device[%{public}s]!",
+        LOG_INFO("[AVRCP TG] Active device[%{public}s] - Request device[%{public}s]!",
             cnManager->GetActiveDevice().c_str(),
             rawAddr.GetAddress().c_str());
     }
@@ -2006,7 +2024,7 @@ void AvrcTgProfile::ProcessChannelMessage(
 
 void AvrcTgProfile::DeleteResource(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgConnectManager::GetInstance()->Delete(rawAddr);
     AvrcTgStateMachineManager::GetInstance()->DeletePairOfStateMachine(rawAddr);
@@ -2014,14 +2032,14 @@ void AvrcTgProfile::DeleteResource(const RawAddress &rawAddr)
 
 void AvrcTgProfile::DeleteBrowseStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     AvrcTgStateMachineManager::GetInstance()->DeleteBrowseStateMachine(rawAddr);
 }
 
 int AvrcTgProfile::ExpainAvctResult(uint16_t avctRet)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     int result = RET_BAD_STATUS;
 
@@ -2039,7 +2057,7 @@ int AvrcTgProfile::ExpainAvctResult(uint16_t avctRet)
 
 uint8_t AvrcTgProfile::ExplainResultToPassCrCode(int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     uint8_t crCode = AVRC_TG_RSP_CODE_STABLE;
 
@@ -2062,7 +2080,7 @@ uint8_t AvrcTgProfile::ExplainResultToPassCrCode(int result)
 
 uint8_t AvrcTgProfile::ExplainResultToStatusCrCode(int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     uint8_t crCode = AVRC_TG_RSP_CODE_STABLE;
 
@@ -2085,7 +2103,7 @@ uint8_t AvrcTgProfile::ExplainResultToStatusCrCode(int result)
 
 uint8_t AvrcTgProfile::ExplainResultToControlCrCode(int result)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
     uint8_t crCode = AVRC_TG_RSP_CODE_STABLE;
 
@@ -2104,5 +2122,51 @@ uint8_t AvrcTgProfile::ExplainResultToControlCrCode(int result)
     }
 
     return crCode;
+}
+
+std::pair<bool, uint8_t> AvrcTgProfile::GetNotificationLabel(uint8_t event)
+{
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s, event:%{public}d", __func__, event);
+    switch (event) {
+        case AVRC_TG_EVENT_ID_PLAYBACK_STATUS_CHANGED:
+            return playStatusChanged;
+        case AVRC_TG_EVENT_ID_TRACK_CHANGED:
+            return trackChanged;
+        case AVRC_TG_EVENT_ID_TRACK_REACHED_END:
+        case AVRC_TG_EVENT_ID_TRACK_REACHED_START:
+        case AVRC_TG_EVENT_ID_PLAYBACK_POS_CHANGED:
+        case AVRC_TG_EVENT_ID_PLAYER_APPLICATION_SETTING_CHANGED:
+        case AVRC_TG_EVENT_ID_NOW_PLAYING_CONTENT_CHANGED:
+        case AVRC_TG_EVENT_ID_AVAILABLE_PLAYERS_CHANGED:
+        case AVRC_TG_EVENT_ID_ADDRESSED_PLAYER_CHANGED:
+        case AVRC_TG_EVENT_ID_UIDS_CHANGED:
+        case AVRC_TG_EVENT_ID_VOLUME_CHANGED:
+        default:
+            return std::make_pair(false, 0);
+    }
+}
+
+void AvrcTgProfile::SetNotificationLabel(uint8_t event, uint8_t label)
+{
+    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s, event:%{public}d, label:%{public}d", __func__, event, label);
+    switch (event) {
+        case AVRC_TG_EVENT_ID_PLAYBACK_STATUS_CHANGED:
+            playStatusChanged = std::make_pair(true, label);
+            break;
+        case AVRC_TG_EVENT_ID_TRACK_CHANGED:
+            trackChanged = std::make_pair(true, label);
+            break;
+        case AVRC_TG_EVENT_ID_TRACK_REACHED_END:
+        case AVRC_TG_EVENT_ID_TRACK_REACHED_START:
+        case AVRC_TG_EVENT_ID_PLAYBACK_POS_CHANGED:
+        case AVRC_TG_EVENT_ID_PLAYER_APPLICATION_SETTING_CHANGED:
+        case AVRC_TG_EVENT_ID_NOW_PLAYING_CONTENT_CHANGED:
+        case AVRC_TG_EVENT_ID_AVAILABLE_PLAYERS_CHANGED:
+        case AVRC_TG_EVENT_ID_ADDRESSED_PLAYER_CHANGED:
+        case AVRC_TG_EVENT_ID_UIDS_CHANGED:
+        case AVRC_TG_EVENT_ID_VOLUME_CHANGED:
+        default:
+            break;
+    }
 }
 }  // namespace bluetooth

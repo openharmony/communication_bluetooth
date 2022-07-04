@@ -978,6 +978,16 @@ public:
     void ProcessChannelMessage(
         uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context);
 
+    /**
+     * @brief get the label for notification changed event.
+     */
+    std::pair<bool, uint8_t> GetNotificationLabel(uint8_t event);
+
+    /**
+     * @brief set the label for notification changed event.
+     */
+    void SetNotificationLabel(uint8_t event, uint8_t label);
+
 private:
     /// The flag is used to indicate that the AVRCP TG profile is enabled or not.
     static bool g_isEnabled;
@@ -997,6 +1007,10 @@ private:
 
     /// The pointer to the observer of the <b>AvrcTgProfile</b> class.
     AvrcTgProfile::Observer *myObserver_ {nullptr};
+
+    /// Notification label trackers
+    std::pair<bool, uint8_t> playStatusChanged;
+    std::pair<bool, uint8_t> trackChanged;
 
     /// The callback function, which registers into the AVCTP for receiving the events.
     AvctChannelEventCallback eventCallback_ {nullptr};
