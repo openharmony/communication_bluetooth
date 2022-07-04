@@ -33,6 +33,14 @@ public:
     ErrCode GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result) override;
     ErrCode RegisterObserver(const sptr<IBluetoothHidHostObserver> observer) override;
     ErrCode DeregisterObserver(const sptr<IBluetoothHidHostObserver> observer) override;
+    ErrCode HidHostVCUnplug(std::string &device,
+        uint8_t &id, uint16_t &size, uint8_t &type, int& result) override;
+    ErrCode HidHostSendData(std::string &device,
+        uint8_t &id, uint16_t &size, uint8_t &type, int& result) override;
+    ErrCode HidHostSetReport(std::string &device,
+        uint8_t &type, uint16_t &size, uint8_t &report, int& reuslt) override;
+    ErrCode HidHostGetReport(std::string &device,
+        uint8_t &id, uint16_t &size, uint8_t &type, int& result) override;
 
 private:
     static inline BrokerDelegator<BluetoothHidHostProxy> delegator_;

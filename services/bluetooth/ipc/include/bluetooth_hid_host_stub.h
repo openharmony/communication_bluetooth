@@ -40,6 +40,10 @@ private:
     ErrCode GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RegisterObserverInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DeregisterObserverInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode HidHostVCUnplugInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode HidHostSendDataInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode HidHostSetReportInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode HidHostGetReportInner(MessageParcel &data, MessageParcel &reply);
 
     using BluetoothHidHostFunc = ErrCode (BluetoothHidHostStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHidHostFunc> memberFuncMap_;

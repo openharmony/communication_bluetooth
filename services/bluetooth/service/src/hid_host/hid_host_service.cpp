@@ -190,6 +190,30 @@ int HidHostService::Disconnect(const RawAddress &device)
     return HID_HOST_SUCCESS;
 }
 
+int HidHostService::HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type)
+{
+    HidHostMessage event(HID_HOST_API_WRITE_DEV_EVT);
+    event.dev_ = device;
+    event.sendData_.type = HID_HOST_DATA_TYPE_CONTROL;
+    event.sendData_.param = type;
+    event.sendData_.data = size;
+    event.sendData_.reportId = id;
+    PostEvent(event);
+    return HID_HOST_SUCCESS;
+}
+
+int HidHostService::HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type)
+{
+    HidHostMessage event(HID_HOST_API_WRITE_DEV_EVT);
+    event.dev_ = device;
+    event.sendData_.type = HID_HOST_DATA_TYPE_DATA;
+    event.sendData_.param = type;
+    event.sendData_.data = size;
+    event.sendData_.reportId = id;
+    PostEvent(event);
+    return HID_HOST_SUCCESS;
+}
+
 int HidHostService::HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t* report)
 {
     HidHostMessage event(HID_HOST_API_WRITE_DEV_EVT);

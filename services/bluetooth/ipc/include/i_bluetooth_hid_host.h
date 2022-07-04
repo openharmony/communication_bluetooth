@@ -37,6 +37,14 @@ public:
         std::vector<BluetoothRawAddress>& result) = 0;
     virtual ErrCode RegisterObserver(const sptr<IBluetoothHidHostObserver> observer) = 0;
     virtual ErrCode DeregisterObserver(const sptr<IBluetoothHidHostObserver> observer) = 0;
+    virtual ErrCode HidHostVCUnplug(std::string &device,
+        uint8_t &id, uint16_t &size, uint8_t &type, int& result) = 0;
+    virtual ErrCode HidHostSendData(std::string &device,
+        uint8_t &id, uint16_t &size, uint8_t &type, int& result) = 0;
+    virtual ErrCode HidHostSetReport(std::string &device,
+        uint8_t &type, uint16_t &size, uint8_t &report, int& reuslt) = 0;
+    virtual ErrCode HidHostGetReport(std::string &device,
+        uint8_t &id, uint16_t &size, uint8_t &type, int& result) = 0;
 
 protected:
     static constexpr int COMMAND_CONNECT = MIN_TRANSACTION_ID + 0;
@@ -45,6 +53,10 @@ protected:
     static constexpr int COMMAND_GET_DEVICES_BY_STATES = MIN_TRANSACTION_ID + 3;
     static constexpr int COMMAND_REGISTER_OBSERVER = MIN_TRANSACTION_ID + 4;
     static constexpr int COMMAND_DEREGISTER_OBSERVER = MIN_TRANSACTION_ID + 5;
+    static constexpr int COMMAND_VCUN_PLUG = MIN_TRANSACTION_ID + 6;
+    static constexpr int COMMAND_SEND_DATA = MIN_TRANSACTION_ID + 7;
+    static constexpr int COMMAND_SET_REPORT = MIN_TRANSACTION_ID + 8;
+    static constexpr int COMMAND_GET_REPORT = MIN_TRANSACTION_ID + 9;
 };
 } // Bluetooth
 } // OHOS
