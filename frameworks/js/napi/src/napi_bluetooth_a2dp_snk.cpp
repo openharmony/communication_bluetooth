@@ -53,7 +53,7 @@ napi_value NapiA2dpSink::A2dpSinkConstructor(napi_env env, napi_callback_info in
 
 napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("On called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -95,7 +95,7 @@ napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 
 napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("Off called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -121,7 +121,7 @@ napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
 
 napi_value NapiA2dpSink::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetConnectionDevices called");
+    HILOGI("enter");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
     A2dpSink *profile = A2dpSink::GetProfile();
@@ -138,7 +138,7 @@ napi_value NapiA2dpSink::GetConnectionDevices(napi_env env, napi_callback_info i
 
 napi_value NapiA2dpSink::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetDeviceState called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -162,13 +162,15 @@ napi_value NapiA2dpSink::GetDeviceState(napi_env env, napi_callback_info info)
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
     napi_value result = nullptr;
-    napi_create_int32(env, GetProfileConnectionState(state), &result);
+    int status = GetProfileConnectionState(state);
+    napi_create_int32(env, status, &result);
+    HILOGI("status: %{public}d", status);
     return result;
 }
 
 napi_value NapiA2dpSink::Connect(napi_env env, napi_callback_info info)
 {
-    HILOGI("Connect called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -194,12 +196,13 @@ napi_value NapiA2dpSink::Connect(napi_env env, napi_callback_info info)
 
     napi_value result = nullptr;
     napi_get_boolean(env, res, &result);
+    HILOGI("res: %{public}d", res);
     return result;
 }
 
 napi_value NapiA2dpSink::Disconnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("Disconnect called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -225,12 +228,13 @@ napi_value NapiA2dpSink::Disconnect(napi_env env, napi_callback_info info)
 
     napi_value result = nullptr;
     napi_get_boolean(env, res, &result);
+    HILOGI("res: %{public}d", res);
     return result;
 }
 
 napi_value NapiA2dpSink::getPlayingState(napi_env env, napi_callback_info info)
 {
-    HILOGI("getPlayingState called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -256,6 +260,7 @@ napi_value NapiA2dpSink::getPlayingState(napi_env env, napi_callback_info info)
 
     napi_value result = nullptr;
     napi_create_int32(env, res, &result);
+    HILOGI("res: %{public}d", res);
     return result;
 }
 
