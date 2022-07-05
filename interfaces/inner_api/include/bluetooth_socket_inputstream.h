@@ -71,7 +71,7 @@ public:
      *         Returns <b>-1</b> if the operation fails.
      * @since 6
      */
-    size_t Read(char *buf, const size_t length);
+    ssize_t Read(char *buf, const size_t length);
 
 private:
     int socketFd_;

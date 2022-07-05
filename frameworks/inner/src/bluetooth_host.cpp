@@ -281,6 +281,10 @@ BluetoothHost::impl::impl()
 BluetoothHost::impl::~impl()
 {
     HILOGD("BluetoothHost::impl::~impl  starts");
+    if (proxy_ == nullptr) {
+        HILOGE("proxy_ is null");
+        return;
+    }
     proxy_->DeregisterObserver(observerImp_);
     proxy_->DeregisterBleAdapterObserver(observerImp_);
     proxy_->DeregisterRemoteDeviceObserver(remoteObserverImp_);
