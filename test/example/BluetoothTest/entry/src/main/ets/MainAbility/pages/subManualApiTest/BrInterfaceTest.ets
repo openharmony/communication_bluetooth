@@ -26,25 +26,27 @@ const PAGE_URI_DEVICE_NAME = 'pages/subManualApiTest/subBrTest/deviceName';
 const PAGE_URI_SET_SCAN_MODE = 'pages/subManualApiTest/subBrTest/setScanMode';
 const PAGE_URI_DEVICE_FOUND_MODE = 'pages/subManualApiTest/subBrTest/deviceFound';
 const PAGE_URI_PROFILE_CONN_STATE = 'pages/subManualApiTest/subBrTest/profileConnState';
+const PAGE_URI_PAIRED_DEVICES = "pages/subManualApiTest/subBrTest/pairedDevices";
 
 @Entry
 @Component
 struct Index {
   private TAG_PAGE = ConfigData.TAG + 'Paired_Device ';
   @State message: string = "";
+  @State btStateMessage: string = "";
+  @State pinMessage: string = "";
+  @State bondStateMessage: string = "";
   @State btEnable: boolean = false;
   @State isConnection: boolean = false;
   @StorageLink('setLocalNameRet') setLocalNameRet: boolean = false;
   @StorageLink('setScanModeRet') setScanModeRet: boolean = false;
   private stateBT: string = "";
-  @State deviceId: string = "F0:5C:D5:8B:A5:8A";
+  @State deviceId: string = '';
   @State currentClick: number = -1;
-  @StorageLink('pairedDeviceInfo') pairingDevice: BluetoothDevice = undefined;
+  @StorageLink('pairedDeviceInfo') pairingDevice: BluetoothDevice = new BluetoothDevice;
   @StorageLink('pairedDeviceId') pairedDeviceId: string = '';
-  @StorageLink('btDeviceController') controller: BluetoothDeviceController = undefined;
+  @StorageLink('btDeviceController') controller: BluetoothDeviceController = new BluetoothDeviceController;
   @State pairPinCode: string = '';
-  @StorageLink('getProfileConnState') profileConnState: string = '';
-  @StorageLink('profileId') profileId: string = '';
   @State btOnState: string = 'on:stateChange';
   @State btPinRequired: string = 'on:pinRequired';
   @State btBondStateChange: string = 'on:bondStateChange';
@@ -55,7 +57,7 @@ struct Index {
   pairDialog: CustomDialogController = new CustomDialogController({
     builder: PairDialog({
       deviceName: this.pairingDevice.deviceName,
-      pinCode: $pairPinCode,
+      pinCode: this.pairPinCode,
       action: (accept: boolean) => {
         this.confirmPairing(accept);
       }
@@ -71,10 +73,22 @@ struct Index {
 
   build() {
     Row() {
-      Scroll() {
-        Column() {
-          HeadComponent({ headName: 'BR接口测试', isActive: true });
-          Stack().height("0.5vp").backgroundColor("#000000");
+      Column() {
+        HeadComponent({ headName: 'BR接口测试', isActive: true });
+        Stack().height("0.5vp").backgroundColor("#000000");
+        Row() {
+          Text("目标设备MAC：").fontSize("20vp")
+          TextInput( { text: this.deviceId, placeholder: "请输入即将连接的设备MAC" } )
+          .fontSize("20vp")
+          .onChange((str) => {
+            this.deviceId = str;
+          })
+          .width('70%')
+        }
+        .margin( { top: "20vp", left: "20vp", right: "20vp" } )
+        .alignItems(VerticalAlign.Center)
+
+        Scroll() {
           Column() {
             List({ space: 1 }) {
               ListItem() {
@@ -148,7 +162,7 @@ struct Index {
                     this.stateBT = 'STATE_BLE_TURNING_OFF';
                     break;
                   default:
-                    this.stateBT = '';
+                    this.stateBT = '未知状态';
                     break;
                 }
                 this.message = "当前蓝牙的状态是：" + this.stateBT;
@@ -208,7 +222,7 @@ struct Index {
                 this.currentClick = 6;
                 if (this.btEnable) {
                   Router.push({ uri: PAGE_URI_SET_SCAN_MODE });
-                  this.message = "设置蓝牙名称" + this.setLocalNameRet ? '成功' : '失败';
+                  this.message = "setBluetoothScanMode执行" + this.setLocalNameRet ? '成功' : '失败';
                 } else {
                   this.message = "蓝牙未使能";
                 }
@@ -235,6 +249,7 @@ struct Index {
               }
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
               .onClick(() => {
+                LogUtil.info(this.TAG_PAGE + 'startBluetoothDiscovery 111');
                 if (!this.btEnable) {
                   this.message = '蓝牙未使能';
                   return;
@@ -253,7 +268,7 @@ struct Index {
               .onClick(() => {
                 this.currentClick = 9;
                 let ret = BluetoothModel.stopBluetoothDiscovery();
-                this.message = "停止扫描执行结果: " + ret;
+                this.message = "stopBluetoothDiscovery 执行: " + ret;
               })
 
               ListItem() {
@@ -265,12 +280,16 @@ struct Index {
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
               .onClick(() => {
                 this.currentClick = 10;
-                if (this.pairedDeviceId == '') {
-                  this.message = "请在 startBluetoothDiscovery 选择配对一个设备";
+                if (!this.btEnable) {
+                  this.message = '蓝牙未使能';
                   return;
                 }
-                //this.pairDevice(this.pairingDevice);
-                this.message = this.pairedDeviceId + "已在startBluetoothDiscovery中配对完成";
+                if (this.deviceId == '') {
+                  this.message = "请输入目标设备的MAC";
+                  return;
+                } else {
+                  this.pairDevice(this.deviceId);
+                }
               })
 
               ListItem() {
@@ -282,12 +301,17 @@ struct Index {
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
               .onClick(() => {
                 this.currentClick = 11;
-                if (this.pairedDeviceId == '') {
-                  this.message = "请在 startBluetoothDiscovery 选择配对一个设备";
+                if (!this.btEnable) {
+                  this.message = '蓝牙未使能';
                   return;
                 }
-                let ret = BluetoothModel.getDeviceName(this.pairedDeviceId);
-                this.message = '配对设备为' + ret;
+                if (this.deviceId == '') {
+                  this.message = "请输入目标设备的MAC";
+                  return;
+                } else {
+                  let ret = BluetoothModel.getDeviceName(this.deviceId);
+                  this.message = '配对设备为' + ret;
+                }
               })
 
               ListItem() {
@@ -299,12 +323,17 @@ struct Index {
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
               .onClick(() => {
                 this.currentClick = 12;
-                if (this.pairedDeviceId == '') {
-                  this.message = "请在 startBluetoothDiscovery 选择配对一个设备";
+                if (!this.btEnable) {
+                  this.message = '蓝牙未使能';
                   return;
                 }
-                let ret = BluetoothModel.getDeviceType(this.pairedDeviceId);
-                this.message = '依据majorClass解析的设备类型是' + ret;
+                if (this.deviceId == '') {
+                  this.message = "请输入目标设备的MAC";
+                  return;
+                } else {
+                  let ret = BluetoothModel.getDeviceType(this.deviceId);
+                  this.message = '依据majorClass解析的设备类型是' + ret;
+                }
               })
 
               ListItem() {
@@ -321,11 +350,8 @@ struct Index {
                   this.message = '当前没有任何配对设备';
                   return;
                 }
-                this.message = '';
-                for (let index = 0; index < ret.length; index++) {
-                  const element = ret[index];
-                  this.message += '设备' + index + ':' + element + ' | ';
-                }
+                AppStorage.SetOrCreate('pairedDevices', ret);
+                Router.push({ uri: PAGE_URI_PAIRED_DEVICES })
               })
 
               ListItem() {
@@ -337,13 +363,17 @@ struct Index {
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
               .onClick(() => {
                 this.currentClick = 14;
-                if (this.pairedDeviceId == '') {
-                  this.message = "请在 startBluetoothDiscovery 选择配对一个设备";
+                if (!this.btEnable) {
+                  this.message = '蓝牙未使能';
                   return;
                 }
-                let ret = BluetoothModel.unpairDevice(this.pairedDeviceId);
-                this.message = '断开设备' + this.pairedDeviceId + '执行结果：' + ret;
-                this.pairedDeviceId = '';
+                if (this.deviceId == '') {
+                  this.message = "请输入目标设备的MAC";
+                  return;
+                } else {
+                  let ret = BluetoothModel.unpairDevice(this.deviceId);
+                  this.message = '设备 "' + this.deviceId + '" 断开：' + ret;
+                }
               })
 
               ListItem() {
@@ -355,12 +385,8 @@ struct Index {
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
               .onClick(() => {
                 this.currentClick = 15;
-                if (this.pairedDeviceId == '') {
-                  this.message = "请在 startBluetoothDiscovery 选择配对一个设备";
-                  return;
-                }
-                Router.push({ uri: PAGE_URI_PROFILE_CONN_STATE });
-                this.message = this.profileId + ' 的连接状态是 ' + this.profileConnState;
+                Router.push({ uri: PAGE_URI_PROFILE_CONN_STATE })
+                this.message = '';
               })
 
               ListItem() {
@@ -372,10 +398,6 @@ struct Index {
               }
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
               .onClick(() => {
-                if (!this.btEnable) {
-                  this.message = "蓝牙未使能";
-                  return;
-                }
                 if (this.isStateChangeClick) {
                   bluetooth.off('stateChange', () => {})
                   this.message = 'on:stateChange监听已关闭，再次点击将开启监听';
@@ -388,21 +410,37 @@ struct Index {
                 this.currentClick = 16;
                 this.btOnState = 'off:stateChange'
                 AppStorage.SetOrCreate('on_stateChange', this.btOnState);
+                this.btStateMessage = 'STATE: ';
                 bluetooth.on('stateChange', (data) => {
-                  this.btOnState = 'off:stateChange'
+                  this.btStateMessage = 'STATE: ';
                   switch (data) {
-                    case 2:
-                      this.btOnState += ' | STATE_ON'
-                      break;
                     case 0:
-                      this.btOnState += ' | STATE_OFF'
+                      this.btStateMessage += 'STATE_OFF';
+                      break;
+                    case 1:
+                      this.btStateMessage += 'STATE_TURNING_ON';
+                      break;
+                    case 2:
+                      this.btStateMessage += 'STATE_ON';
+                      break;
+                    case 3:
+                      this.btStateMessage += 'STATE_TURNING_OFF';
+                      break;
+                    case 4:
+                      this.btStateMessage += 'STATE_BLE_TURNING_ON';
+                      break;
+                    case 5:
+                      this.btStateMessage += 'STATE_BLE_ON';
+                      break;
+                    case 6:
+                      this.btStateMessage += 'STATE_BLE_TURNING_OFF';
                       break;
                     default:
+                      this.btStateMessage += '未知状态';
                       break;
                   }
-                  AppStorage.SetOrCreate('on_stateChange', this.btOnState);
                 })
-                this.message = 'on:stateChange监听已启动，再次点击将关闭监听';
+                this.message = 'on:stateChange监听已启动，再次点击将关闭监听。';
               })
 
               ListItem() {
@@ -432,12 +470,12 @@ struct Index {
                 this.currentClick = 17;
                 this.btPinRequired = 'off:pinRequired';
                 AppStorage.SetOrCreate('on_pinRequired', this.btPinRequired);
+                this.pinMessage = 'PIN: ';
                 bluetooth.on('pinRequired', (data) => {
-                  this.btPinRequired = 'off:pinRequired';
-                  this.btPinRequired += '  |  ' + data.pinCode;
-                  AppStorage.SetOrCreate('on_pinRequired', this.btPinRequired);
+                  this.pinMessage = 'PIN: ';
+                  this.pinMessage += data.pinCode;
                 })
-                this.message = 'on:pinRequired监听已启动，再次点击将关闭监听';
+                this.message = 'on:pinRequired监听已启动，再次点击将关闭监听。';
               })
 
               ListItem() {
@@ -466,40 +504,41 @@ struct Index {
                 this.currentClick = 18;
                 this.btBondStateChange = 'off:bondStateChange'
                 AppStorage.SetOrCreate('on_bondStateChange', this.btBondStateChange);
+                this.bondStateMessage = 'bondState: ';
                 bluetooth.on('bondStateChange', (data) => {
-                  this.btBondStateChange = 'off:bondStateChange'
-                  this.btBondStateChange += '  |  ' + data.state;
-                  AppStorage.SetOrCreate('on_bondStateChange', this.btBondStateChange);
+                  this.bondStateMessage = 'bondState: ';
+                  this.bondStateMessage += data.state;
                 })
                 this.message = 'on:bondStateChange监听已启动，再次点击将关闭监听';
               })
 
-              //            ListItem() {
-              //              TitleComponent({
-              //                title: "setDevicePairingConfirmation",
-              //                bgColor: this.currentClick === 16 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-              //              });
-              //            }
-              //            .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              //            .onClick(() => {
-              //              this.currentClick = 16;
-              //              if (this.pairedDeviceId == '') {
-              //                this.message = "请在 startBluetoothDiscovery 选择配对一个设备";
-              //                return;
-              //              }
-              //              Router.push({ uri: PAGE_URI_PROFILE_CONN_STATE });
-              //              this.message = this.profileId + ' 的连接状态是 ' + this.profileConnState;
-              //            })
-
-            }.margin(20);
-            Text(this.message)
-              .textAlign(TextAlign.Start)
-              .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+            }
+            .margin(20)
           }
-          .visibility(Visibility.Visible);
+          .width('100%')
+          .visibility(Visibility.Visible)
         }
-        .width('100%')
+        .height('70%')
+
+        Text(this.message)
+          .fontSize('15vp')
+          .textAlign(TextAlign.Start)
+          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+          .padding({ top: $r('app.float.distance_12'), bottom: $r('app.float.distance_12') })
+        Text(this.btStateMessage)
+          .fontSize('15vp')
+          .textAlign(TextAlign.Start)
+          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+        Text(this.pinMessage)
+          .fontSize('15vp')
+          .textAlign(TextAlign.Start)
+          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+        Text(this.bondStateMessage)
+          .fontSize('15vp')
+          .textAlign(TextAlign.Start)
+          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
       }
+      .height('100%')
     }
     .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
     .height('100%')
@@ -510,12 +549,13 @@ struct Index {
  * Pair device
  * @param device
  */
-  pairDevice(device: BluetoothDevice) {
-    this.controller.pair(device.deviceId, (pinCode: string) => {
+  pairDevice(deviceId: string) {
+    this.controller.pair(deviceId, (pinCode: string) => {
       LogUtil.info(this.TAG_PAGE + 'pairDevice success callback : pinCode = ' + pinCode);
       // show pair pin dialog
       this.pairPinCode = pinCode
-      //this.pairingDevice = device;
+      this.pairingDevice.deviceId = deviceId;
+      this.pairingDevice.deviceName = deviceId;
       this.pairDialog.open();
     }, () => {
       LogUtil.info(this.TAG_PAGE + 'pairDevice error callback');

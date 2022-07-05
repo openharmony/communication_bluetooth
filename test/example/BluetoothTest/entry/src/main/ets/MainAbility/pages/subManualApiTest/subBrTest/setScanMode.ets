@@ -18,6 +18,7 @@ import BluetoothModel from '../../../model/BluetoothModel';
 import Router from '@system.router'
 import { TitleComponent } from '../../../../Component/titleComponent';
 import InputMethod from '@ohos.inputmethod';
+import bluetooth from '@ohos.bluetooth';
 /**
  * about phone
  */
@@ -26,9 +27,14 @@ import InputMethod from '@ohos.inputmethod';
 struct setScanMode {
   @State message: string = "";
   private duration: string = '0';
-  private deviceInfo: any = ''
-  private aboutDeviceList: any[] = []
+  private deviceInfo: any = '';
+  private aboutDeviceList: any[] = [];
+  private scanMode: number = 0;
   @State currentClick: number = -1;
+
+  onPageShow() : void {
+    this.currentClick = bluetooth.getBluetoothScanMode();
+  }
 
   build() {
     Column(){
@@ -55,7 +61,7 @@ struct setScanMode {
                 ListItem() {
                   TitleComponent({
                     title: "SCAN_MODE_SELECT",
-                    bgColor: $r('app.color.ab274f')});
+                    bgColor: $r('app.color.66ccff')});
                 }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
                 .onClick(() => {
                 })
@@ -147,7 +153,7 @@ struct setScanMode {
             Text(this.message)
               .textAlign(TextAlign.Start)
               .fontSize('20fp')
-              .backgroundColor($r("app.color.ab274f"))
+              .backgroundColor($r("app.color.66ccff"))
 
             Flex({direction: FlexDirection.Row, justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }){
               Row(){
@@ -164,7 +170,9 @@ struct setScanMode {
                     return;
                   }
                   this.message = '';
-                  let ret = BluetoothModel.setBluetoothScanMode(this.currentClick, 0);
+                  let dur = parseInt(this.duration);
+                  let parseRet = isNaN(dur);
+                  let ret = BluetoothModel.setBluetoothScanMode(this.currentClick, !parseRet ? dur : 0);
                   AppStorage.SetOrCreate('setScanModeRet', ret);
                   Router.back();
                 }})
