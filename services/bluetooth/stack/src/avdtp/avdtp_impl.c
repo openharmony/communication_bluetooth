@@ -1168,14 +1168,15 @@ uint16_t AvdtActDelayRptReq(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
  */
 uint16_t AvdtActDelayRptRsp(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
 {
-    LOG_DEBUG("[AVDT]%{public}s:", __func__);
+    LOG_INFO("[AVDT]%{public}s:", __func__);
     uint16_t Ret = AVDT_SUCCESS;
     if (streamCtrl == NULL || data == NULL) {
+        LOG_ERROR("[AVDT]%{public}s: streamCtrl or data is null", __func__);
         return AVDT_SUCCESS;
     }
     AvdtSigCtrl *sigCtrl = AvdtGetSigCtrlByHandle(streamCtrl->sigHandle);
     if (data->msg.single.errCode == AVDT_SUCCESS) {
-        AvdtMsgSendRsp(sigCtrl, NULL, AVDT_SIG_DELAY_RPT, NULL);
+        AvdtMsgSendRsp(sigCtrl, NULL, AVDT_SIG_DELAY_RPT, &data->msg);
     } else {
         AvdtMsgSendRej(sigCtrl, AVDT_SIG_DELAY_RPT, &data->msg);
     }
@@ -1198,6 +1199,7 @@ uint16_t AvdtActDelayRptInd(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
     if (streamCtrl == NULL || data == NULL) {
         return AVDT_SUCCESS;
     }
+    LOG_INFO("[AVDT]%{public}s: delay value is %{public}d ", __func__, data->msg.delayRptCmd.delay);
     uint16_t Ret = AVDT_SUCCESS;
     AvdtSigCtrl *sigCtrl = AvdtGetSigCtrlByHandle(streamCtrl->sigHandle);
     AvdtCtrlData confirmData = {0};
@@ -1205,6 +1207,7 @@ uint16_t AvdtActDelayRptInd(AvdtStreamCtrl *streamCtrl, AvdtEventData *data)
     confirmData.delayRptInd.hdr.seid = data->msg.delayRptCmd.hdr.seid;
     AvdtCtrlEvtCallback(
         sigCtrl, streamCtrl->handle, &(sigCtrl->peerAddress), AVDT_DELAY_REPORT_IND_EVT, &confirmData, sigCtrl->role);
+    AvdtStreamProcEvent(streamCtrl, AVDT_DELAY_CMD_RSP_EVENT, data);
     return Ret;
 }
 
