@@ -123,6 +123,34 @@ public:
     void DeregisterObserver(HidHostObserver *observer);
 
     /**
+     * @brief Hid Host VCUnplug.
+     *
+     * @param observer Hid Host device id size type.
+     */
+    void HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type);
+
+    /**
+     * @brief Hid Host Send Data.
+     *
+     * @param observer Hid Host device id size type.
+     */
+    void HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type);
+
+    /**
+     * @brief Hid Host Set Report.
+     *
+     * @param observer Hid Host device type size report.
+     */
+    void HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t report);
+
+    /**
+     * @brief Hid Host Get Report.
+     *
+     * @param observer Hid Host device id size type.
+     */
+    void HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type);
+
+    /**
      * @brief Static Hid Host observer instance.
      *
      */

@@ -55,7 +55,6 @@ private:
 struct HidHost::impl {
     impl();
     ~impl();
-
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states)
     {
         HILOGD("Enter!");
@@ -126,6 +125,42 @@ struct HidHost::impl {
     {
         HILOGI("Enter!");
         observers_.Deregister(observer);
+    }
+
+    void HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type)
+    {
+        HILOGD("Enter!");
+        int result;
+        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+            proxy_->HidHostVCUnplug(device, id, size, type, result);
+        }
+    }
+
+    void HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type)
+    {
+        HILOGD("Enter!");
+        int result;
+        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+            proxy_->HidHostSendData(device, id, size, type, result);
+        }
+    }
+
+    void HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t report)
+    {
+        HILOGD("Enter!");
+        int result;
+        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+            proxy_->HidHostSetReport(device, type, size, report, result);
+        }
+    }
+
+    void HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type)
+    {
+        HILOGD("Enter!");
+        int result;
+        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+            proxy_->HidHostGetReport(device, id, size, type, result);
+        }
     }
 
 private:
@@ -232,6 +267,26 @@ void HidHost::DeregisterObserver(HidHostObserver *observer)
 {
     std::shared_ptr<HidHostObserver> observerPtr(observer, [](HidHostObserver *) {});
     return pimpl->DeregisterObserver(observerPtr);
+}
+
+void HidHost::HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type)
+{
+    return pimpl->HidHostVCUnplug(device, id, size, type);
+}
+
+void HidHost::HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type)
+{
+    return pimpl->HidHostSendData(device, id, size, type);
+}
+
+void HidHost::HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t report)
+{
+    return pimpl->HidHostSetReport(device, type, size, report);
+}
+
+void HidHost::HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type)
+{
+    return pimpl->HidHostGetReport(device, id, size, type);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -83,8 +83,10 @@ public:
     void RemoveStateMachine(const std::string &device);
 
     std::string HidHostFindDeviceByLcid(uint16_t lcid, bool *isControlLcid);
-    int HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t* report);
-    int HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type);
+    int HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type) override;
+    int HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type) override;
+    int HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t* report) override;
+    int HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type) override;
 
 private:
     /**

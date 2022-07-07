@@ -112,6 +112,10 @@ private:
     void ReceiveHandShake(uint16_t err);
     int ReceiveControlData(Characteristic character, uint8_t reportId);
     HogpReport* FindReportByTypeAndId(uint8_t type, uint8_t reportId);
+
+    // For PTS
+    void GetBatteryInformation(Service service);
+    void GetExternalRptRefInfo(Characteristic character);
 };
 }  // namespace bluetooth
 #endif  // HID_HOST_HOGP_H
