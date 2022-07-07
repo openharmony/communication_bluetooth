@@ -138,7 +138,7 @@ struct Pan::impl {
 
 private:
     BluetoothObserverList<PanObserver> observers_;
-    PanInnerObserver innerObserver_ {PanInnerObserver(observers_)};
+    sptr<PanInnerObserver> innerObserver_;
     sptr<IBluetoothPan> proxy_;
     class PanDeathRecipient;
     sptr<PanDeathRecipient> deathRecipient_;
@@ -181,8 +181,10 @@ Pan::impl::impl()
     }
     HILOGI("Pan::impl:impl() remote obtained");
 
+    innerObserver_ = new PanInnerObserver(observers_);
+
     proxy_ = iface_cast<IBluetoothPan>(remote);
-    proxy_->RegisterObserver(&innerObserver_);
+    proxy_->RegisterObserver(innerObserver_);
     deathRecipient_ = new PanDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
@@ -191,7 +193,7 @@ Pan::impl::~impl()
 {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if (proxy_ != nullptr) {
-        proxy_->DeregisterObserver(&innerObserver_);
+        proxy_->DeregisterObserver(innerObserver_);
     }
     proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }

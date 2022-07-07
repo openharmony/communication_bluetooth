@@ -245,7 +245,9 @@ void PanService::WriteNetworkData(std::string address, EthernetHeader head, uint
             }
         }
     } else {
-        std::string destAddr = RawAddress::ConvertToString(head.destAddr).GetAddress();
+        uint8_t bluetoothDestAddr[BT_ADDRESS_LENGTH];
+        ReverseAddress(head.destAddr, bluetoothDestAddr);
+        std::string destAddr = RawAddress::ConvertToString(bluetoothDestAddr).GetAddress();
         auto it = stateMachines_.find(destAddr);
         if ((it != stateMachines_.end()) && (it->second == nullptr) &&
             (it->second->GetDeviceStateInt() == PAN_STATE_CONNECTED)) {
@@ -264,8 +266,12 @@ void PanService::WriteNetworkData(std::string address, EthernetHeader head, uint
 int PanService::PanSendData(EthernetHeader head, uint8_t *data, int len)
 {
     int isBroadcast = head.destAddr[0] & 1;
-    std::string destAddr = RawAddress::ConvertToString(head.destAddr).GetAddress();
-    std::string srcAddr = RawAddress::ConvertToString(head.srcAddr).GetAddress();
+    uint8_t bluetoothDestAddr[BT_ADDRESS_LENGTH];
+    uint8_t bluetoothSrcAddr[BT_ADDRESS_LENGTH];
+    ReverseAddress(head.destAddr, bluetoothDestAddr);
+    ReverseAddress(head.srcAddr, bluetoothSrcAddr);
+    std::string destAddr = RawAddress::ConvertToString(bluetoothDestAddr).GetAddress();
+    std::string srcAddr = RawAddress::ConvertToString(bluetoothSrcAddr).GetAddress();
 
     for (auto it = stateMachines_.begin(); it != stateMachines_.end(); it++) {
         if ((it->second->GetDeviceStateInt() == PAN_STATE_CONNECTED) &&
@@ -274,6 +280,13 @@ int PanService::PanSendData(EthernetHeader head, uint8_t *data, int len)
         }
     }
     return PAN_SUCCESS;
+}
+
+void PanService::ReverseAddress(uint8_t *oldAddr, uint8_t *newAddr)
+{
+    for (int i = 0; i < BT_ADDRESS_LENGTH; i++) {
+        newAddr[i] = oldAddr[BT_ADDRESS_LENGTH - i -1];
+    }
 }
 
 void PanService::PanSendData(std::string address, EthernetHeader head, uint8_t *data, int len)
