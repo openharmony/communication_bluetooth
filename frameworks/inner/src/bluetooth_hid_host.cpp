@@ -165,7 +165,7 @@ struct HidHost::impl {
 
 private:
     BluetoothObserverList<HidHostObserver> observers_;
-    HidHostInnerObserver innerObserver_ {HidHostInnerObserver(observers_)};
+    sptr<HidHostInnerObserver> innerObserver_;
     sptr<IBluetoothHidHost> proxy_;
     class HidHostDeathRecipient;
     sptr<HidHostDeathRecipient> deathRecipient_;
@@ -208,8 +208,10 @@ HidHost::impl::impl()
     }
     HILOGI("remote obtained");
 
+    innerObserver_ = new HidHostInnerObserver(observers_);
+
     proxy_ = iface_cast<IBluetoothHidHost>(remote);
-    proxy_->RegisterObserver(&innerObserver_);
+    proxy_->RegisterObserver(innerObserver_);
     deathRecipient_ = new HidHostDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
@@ -218,7 +220,7 @@ HidHost::impl::~impl()
 {
     HILOGD("Enter!");
     if (proxy_ != nullptr) {
-        proxy_->DeregisterObserver(&innerObserver_);
+        proxy_->DeregisterObserver(innerObserver_);
     }
     proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }

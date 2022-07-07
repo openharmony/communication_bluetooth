@@ -236,7 +236,11 @@ int PanBnep::SendData(EthernetHeader ethernetHeader, uint8_t* pkt, int length)
     if (!CheckBnepEthernetDataFilter(ethernetHeader, pkt, length)) {
         return BT_NO_ERROR;
     }
-    std::string destAddr = RawAddress::ConvertToString(ethernetHeader.destAddr).GetAddress();
+    uint8_t bluetoothDestAddr[BT_ADDRESS_LENGTH];
+    uint8_t bluetoothSrcAddr[BT_ADDRESS_LENGTH];
+    PanService::ReverseAddress(ethernetHeader.destAddr, bluetoothDestAddr);
+    PanService::ReverseAddress(ethernetHeader.srcAddr, bluetoothSrcAddr);
+    std::string destAddr = RawAddress::ConvertToString(bluetoothDestAddr).GetAddress();
     BtAddr localAddr;
     RawAddress(PanService::GetLocalAddress()).ConvertToUint8(localAddr.addr);
     Packet *packet = nullptr;
@@ -246,11 +250,11 @@ int PanBnep::SendData(EthernetHeader ethernetHeader, uint8_t* pkt, int length)
     uint8_t type = BNEP_COMPRESSED_ETHERNET;
     int packetLength = length;
 
-    if (localAddr.addr[0] & 0x01) {
+    if (localAddr.addr[BT_ADDRESS_LENGTH - 1] & 0x01) {
         LOG_DEBUG("[PAN BNEP]%{public}s():use unicast MAC address", __FUNCTION__);
-        localAddr.addr[0] &= ~0x01;
+        localAddr.addr[BT_ADDRESS_LENGTH - 1] &= ~0x01;
     }
-    if (memcmp(ethernetHeader.srcAddr, localAddr.addr, BT_ADDRESS_LENGTH) == 0) {
+    if (memcmp(bluetoothSrcAddr, localAddr.addr, BT_ADDRESS_LENGTH) == 0) {
         if (destAddr == address_) {
             type = BNEP_COMPRESSED_ETHERNET;
             packetLength += BNEP_COMPRESSED_ETHERNET_HEAD_LENGTH;
@@ -1282,7 +1286,9 @@ int PanBnep::ProcessBnepEthernetPacketHeader(uint8_t type, EthernetHeader &ether
         }
         offset += BT_ADDRESS_LENGTH;
     } else {
-        RawAddress(PanService::GetLocalAddress()).ConvertToUint8(ethernetHeader.destAddr);
+        uint8_t bluetoothDestAddr[BT_ADDRESS_LENGTH];
+        RawAddress(PanService::GetLocalAddress()).ConvertToUint8(bluetoothDestAddr);
+        PanService::ReverseAddress(bluetoothDestAddr, ethernetHeader.destAddr);
         if (ethernetHeader.destAddr[0] & 0x01) {
             LOG_DEBUG("[PAN BNEP]%{public}s():ethernetHeader.destAddr use unicast MAC address", __FUNCTION__);
             ethernetHeader.destAddr[0] &= ~0x01;
@@ -1301,7 +1307,9 @@ int PanBnep::ProcessBnepEthernetPacketHeader(uint8_t type, EthernetHeader &ether
         }
         offset += BT_ADDRESS_LENGTH;
     } else {
-        RawAddress(address_).ConvertToUint8(ethernetHeader.srcAddr);
+        uint8_t bluetoothSrcAddr[BT_ADDRESS_LENGTH];
+        RawAddress(address_).ConvertToUint8(bluetoothSrcAddr);
+        PanService::ReverseAddress(bluetoothSrcAddr, ethernetHeader.srcAddr);
     }
 
     if (dataLength < (BNEP_UINT16_SIZE + offset)) {
