@@ -683,10 +683,17 @@ void HidHostHogp::HogpGattClientCallback::OnCharacteristicChanged(const Characte
     if ((characteristic.value_ != nullptr) && (characteristic.length_ != 0)) {
         HidHostMessage event(HID_HOST_INT_DATA_EVT);
         event.dev_ = hogp_->address_;
-        event.dataLength_ = static_cast<int>(characteristic.length_ + 1);
-        event.data_ = std::make_unique<uint8_t[]>(event.dataLength_);
-        event.data_[0] = reportId;
-        if (memcpy_s(event.data_.get() + 1, characteristic.length_,
+        int offset = 0;
+        if (reportId != 0) {
+            offset++;
+            event.dataLength_ = static_cast<int>(characteristic.length_ + offset);
+            event.data_ = std::make_unique<uint8_t[]>(event.dataLength_);
+            event.data_[0] = reportId;
+        } else {
+            event.dataLength_ = static_cast<int>(characteristic.length_);
+            event.data_ = std::make_unique<uint8_t[]>(event.dataLength_);
+        }
+        if (memcpy_s(event.data_.get() + offset, characteristic.length_,
             characteristic.value_.get(), characteristic.length_) != EOK) {
             LOG_ERROR("[HOGP]%{public}s():memcpy error", __FUNCTION__);
             return;
