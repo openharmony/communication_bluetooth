@@ -51,6 +51,7 @@ struct deviceFound {
   onPageShow(): void {
     LogUtil.log(this.PAGE_TAG + 'onPageShow in : localName = ' + this.localName )
     this.deviceController.getLocalName();
+    AppStorage.SetOrCreate('btDeviceController', this.deviceController);
     LogUtil.log(this.PAGE_TAG + 'onPageShow out : localName = ' + this.localName )
   }
 
@@ -92,9 +93,9 @@ struct deviceFound {
                 })
 
                 if (this.isOn) {
-//                  PairedDeviceComponent({
-//                    controller: this.deviceController
-//                  })
+                  PairedDeviceComponent({
+                    controller: this.deviceController
+                  })
 
                   AvailableDeviceComponent({
                     controller: this.deviceController
@@ -191,7 +192,6 @@ struct PairedDeviceComponent {
 
   aboutToAppear(): void{
     if (this.controller) {
-
       // bind component and initialize
       this.controller.bindComponent(this)
         .bindProperties(["pairedDevices"])
@@ -201,7 +201,6 @@ struct PairedDeviceComponent {
 
   build() {
     Column() {
-
       if (this.pairedDevices && this.pairedDevices.length > 0) {
         // paired devices title
         Row() {
@@ -325,7 +324,6 @@ struct PairedDeviceComponent {
    * Item clicked
    * @param item device
    */
-  private pageType = Router.getParams().date;
   private itemClicked(item: BluetoothDevice) {
     switch (item.connectionState) {
       case DeviceState.STATE_CONNECTED:
@@ -497,7 +495,6 @@ struct AvailableDeviceComponent {
               .backgroundColor($r("app.color.white_bg_color"))
               .onClick(() => {
                 LogUtil.info(this.TAG_PAGE + 'item on click : ' + JSON.stringify(item));
-                AppStorage.SetOrCreate('btDeviceController', this.controller);
                 this.pairDevice(item)
               })
             }
