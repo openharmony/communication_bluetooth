@@ -213,5 +213,14 @@ int BluetoothA2dpSinkServer::GetConnectStrategy(const RawAddress &device)
     return pimpl->a2dpSnkService_->GetConnectStrategy(device);
 }
 
+int BluetoothA2dpSinkServer::SendDelay(const RawAddress &device, int32_t delayValue)
+{
+    HILOGI("BluetoothA2dpSinkServer::SendDelay starts, delayValue = %{public}d", delayValue);
+    if (pimpl->a2dpSnkService_ == nullptr) {
+        HILOGE("SendDelay but a2dpSnkService_ is nullptr return");
+        return BT_FAILURE;
+    }
+    return pimpl->a2dpSnkService_->SendDelay(device, (uint16_t)delayValue);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -39,6 +39,7 @@ public:
     int GetPlayingState(const RawAddress &device) override;
     int SetConnectStrategy(const RawAddress &device, int32_t strategy) override;
     int GetConnectStrategy(const RawAddress &device) override;
+    int SendDelay(const RawAddress &device, int32_t delayValue) override;
 
 private:
     static inline BrokerDelegator<BluetoothA2dpSinkProxy> delegator_;

@@ -41,6 +41,7 @@ public:
         BT_A2DP_SINK_GET_PLAYING_STATE,
         BT_A2DP_SINK_SET_CONNECT_STRATEGY,
         BT_A2DP_SINK_GET_CONNECT_STRATEGY,
+        BT_A2DP_SINK_SEND_DELAY,
     };
 
     virtual int Connect(const RawAddress &device) = 0;
@@ -52,6 +53,7 @@ public:
     virtual int GetPlayingState(const RawAddress &device) = 0;
     virtual int SetConnectStrategy(const RawAddress &device, int32_t strategy) = 0;
     virtual int GetConnectStrategy(const RawAddress &device) = 0;
+    virtual int SendDelay(const RawAddress &device, int32_t delayValue) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

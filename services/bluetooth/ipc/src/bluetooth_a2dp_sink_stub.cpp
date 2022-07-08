@@ -43,6 +43,8 @@ BluetoothA2dpSinkStub::BluetoothA2dpSinkStub()
         &BluetoothA2dpSinkStub::SetConnectStrategyInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_CONNECT_STRATEGY)] =
         &BluetoothA2dpSinkStub::GetConnectStrategyInner;
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSink::Code::BT_A2DP_SINK_SEND_DELAY)] =
+        &BluetoothA2dpSinkStub::SendDelayInner;
 }
 
 BluetoothA2dpSinkStub::~BluetoothA2dpSinkStub()
@@ -196,6 +198,22 @@ ErrCode BluetoothA2dpSinkStub::GetConnectStrategyInner(MessageParcel &data, Mess
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("BluetoothA2dpSinkStub: GetConnectStrategyInner reply writing failed in: %{public}s.", __func__);
+        return TRANSACTION_ERR;
+    }
+
+    return NO_ERROR;
+}
+
+ErrCode BluetoothA2dpSinkStub::SendDelayInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::string addr = data.ReadString();
+    int delayValue = data.ReadInt32();
+
+    int result = SendDelay(RawAddress(addr), delayValue);
+
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        HILOGE("BluetoothA2dpSinkStub: SendDelayInner reply writing failed in: %{public}s.", __func__);
         return TRANSACTION_ERR;
     }
 

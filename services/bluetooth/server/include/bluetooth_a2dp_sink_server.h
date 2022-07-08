@@ -41,6 +41,7 @@ public:
     int GetPlayingState(const RawAddress &device) override;
     int SetConnectStrategy(const RawAddress &device, int strategy) override;
     int GetConnectStrategy(const RawAddress &device) override;
+    int SendDelay(const RawAddress &device, int32_t delayValue) override;
 
 private:
     BLUETOOTH_DECLARE_IMPL();
