@@ -81,6 +81,7 @@
           "pages/subManualApiTest/subBrTest/setScanMode",
           "pages/subManualApiTest/subBrTest/deviceFound",
           "pages/subManualApiTest/subBrTest/profileConnState",
+          "pages/subManualApiTest/subBrTest/pairedDevices",
 	  "pages/subManualApiTest/gattTest",
           "pages/subManualApiTest/sppTest",
           "pages/subManualApiTest/profileTest",

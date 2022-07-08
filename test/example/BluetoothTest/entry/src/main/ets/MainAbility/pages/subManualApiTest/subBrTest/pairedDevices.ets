@@ -14,7 +14,6 @@
  */
 import ConfigData from '../../../../Utils/ConfigData';
 import HeadComponent from '../../../../Component/headComponent';
-import BluetoothModel from '../../../model/BluetoothModel';
 import Router from '@system.router'
 import { TitleComponent } from '../../../../Component/titleComponent';
 
@@ -23,11 +22,13 @@ import { TitleComponent } from '../../../../Component/titleComponent';
  */
 @Entry
 @Component
-struct profileConnState {
+struct pairedDevices {
   @State message: string = "";
-  @State currentClick: number = -1;
-  @State profileId: number = -1;
-  @State profileType: string = '';
+  private duration: string = '0';
+  private deviceInfo: any = '';
+  private aboutDeviceList: any[] = [];
+  private scanMode: number = 0;
+  @StorageLink('pairedDevices') pairedDevices: string[] = [];
 
   build() {
     Column(){
@@ -43,62 +44,21 @@ struct profileConnState {
           });
 
           Column() {
-            HeadComponent({ headName: '选择PROFILE ID', isActive: true })
+            HeadComponent({ headName: '已配对设备', isActive: true })
 
             Divider()
               .padding({left: $r('sys.float.ohos_id_card_margin_start'), right: $r('sys.float.ohos_id_card_margin_end')})
 
             Column(){
-
               List() {
-                ListItem() {
-                  TitleComponent({
-                    title: "SELECT_PROFILE_ID",
-                    bgColor: $r('app.color.ab274f')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                })
-
-                ListItem() {
-                  TitleComponent({
-                    title: "A2DP_SOURCE",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 0;
-                  this.profileId = 1;
-                })
-
-                ListItem() {
-                  TitleComponent({
-                    title: "HANDS_FREE_AUDIO_GATEWAY",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 1;
-                  this.profileId = 4;
-                })
-
-                ListItem() {
-                  TitleComponent({
-                    title: "HID_HOST",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 2;
-                  this.profileId = 6;
-                })
+                ForEach(this.pairedDevices, (item: string) => {
+                  ListItem() {
+                    TitleComponent({title: item});
+                  }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+                }, item => JSON.stringify(item));
               }
               Blank()
             }
-
-            Text(this.message)
-              .textAlign(TextAlign.Start)
-              .fontSize('20fp')
-              .backgroundColor($r("app.color.66ccff"))
 
             Flex({direction: FlexDirection.Row, justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }){
               Row(){
@@ -110,17 +70,7 @@ struct profileConnState {
               .margin({right: $r("app.float.distance_12")})
               Row(){
                 ButtonComponent({text: $r("app.string.confirm"), onClick: () => {
-                  if(this.currentClick === -1) {
-                    this.message = '请点击选择PROFILE TYPE';
-                    return;
-                  } else {
-                    this.profileType = this.currentClick == 0 ? 'A2DP_SOURCE' : (this.currentClick == 1 ? 'HANDS_FREE_AUDIO_GATEWAY' : 'HID_HOST');
-                  }
-                  this.message = '';
-                  let ret = BluetoothModel.getProfileConnState(this.profileId);
-                  AppStorage.SetOrCreate('getProfileConnState', ret);
-                  this.message = this.profileType + ' 的连接状态是 ' + ret;
-                  //Router.back();
+                  Router.back();
                 }})
               }.width($r("app.float.deviceName_button_width"))
             }
