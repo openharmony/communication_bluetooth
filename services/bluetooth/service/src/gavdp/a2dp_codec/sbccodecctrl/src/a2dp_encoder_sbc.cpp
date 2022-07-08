@@ -53,7 +53,6 @@ A2dpSbcEncoder::A2dpSbcEncoder(
     a2dpSbcEncoderCb_.isPeerEdr = peerParams->isPeerEdr;
     a2dpSbcEncoderCb_.peerSupports3mbps = peerParams->peerSupports3mbps;
     a2dpSbcEncoderCb_.peerMtu = peerParams->peermtu;
-    a2dpSbcEncoderCb_.dalayValue = 0;
     a2dpSbcEncoderCb_.timestamp = 0;
     a2dpSbcEncoderCb_.sendDataSize = 0;
     codecLib_ = std::make_unique<A2dpSBCDynamicLibCtrl>(true);
@@ -86,20 +85,18 @@ void A2dpSbcEncoder::ResetFeedingState(void)
     LOG_INFO("[SbcEncoder] %{public}s, sampleRate %{public}u, bitsPerSample %{public}u channelCount %{public}u\n",
         __func__, a2dpSbcEncoderCb_.feedingParams.sampleRate, a2dpSbcEncoderCb_.feedingParams.bitsPerSample,
         a2dpSbcEncoderCb_.feedingParams.channelCount);
-    
-    a2dpSbcEncoderCb_.dalayValue = 0;
+
     a2dpSbcEncoderCb_.timestamp = 0;
     a2dpSbcEncoderCb_.sendDataSize = 0;
 }
 
-void A2dpSbcEncoder::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
+void A2dpSbcEncoder::GetRenderPosition(uint16_t &sendDataSize, uint32_t &timeStamp)
 {
     std::lock_guard<std::recursive_mutex> lock(g_sbcMutex);
-    delayValue = a2dpSbcEncoderCb_.dalayValue;
     sendDataSize = a2dpSbcEncoderCb_.sendDataSize;
     timeStamp = a2dpSbcEncoderCb_.timestamp;
-    LOG_INFO("[A2dpSbcEncoder] %{public}s delayValue = %{public}hu, sendDataSize = %{public}hu, timeStamp = %{public}u\n",
-        __func__, delayValue, sendDataSize, timeStamp);
+    LOG_INFO("[A2dpSbcEncoder] %{public}s sendDataSize = %{public}hu, timeStamp = %{public}u\n",
+        __func__, sendDataSize, timeStamp);
 }
 
 void A2dpSbcEncoder::SendFrames(uint64_t timeStampUs)

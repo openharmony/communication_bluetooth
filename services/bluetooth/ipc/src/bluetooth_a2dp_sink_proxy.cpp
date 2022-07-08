@@ -37,7 +37,7 @@ int BluetoothA2dpSinkProxy::Connect(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothA2dpSinkProxy::Connect done fail, error: %{public}d", error);
         return ERROR;
@@ -63,7 +63,7 @@ int BluetoothA2dpSinkProxy::Disconnect(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothA2dpSinkProxy::Disconnect done fail, error: %{public}d", error);
         return ERROR;
@@ -250,6 +250,36 @@ int BluetoothA2dpSinkProxy::GetConnectStrategy(const RawAddress &device)
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_CONNECT_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothA2dpSinkProxy::GetConnectStrategy done fail, error: %{public}d", error);
+        return ERROR;
+    }
+
+    return reply.ReadInt32();
+}
+
+int BluetoothA2dpSinkProxy::SendDelay(const RawAddress &device, int32_t delayValue)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay WriteInterfaceToken error");
+        return ERROR;
+    }
+    if (!data.WriteString(device.GetAddress())) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay write device error");
+        return ERROR;
+    }
+    if (!data.WriteInt32(delayValue)) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay write delayValue error");
+        return ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+
+    int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_SEND_DELAY, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothA2dpSinkProxy::SendDelay done fail, error: %{public}d", error);
         return ERROR;
     }
 

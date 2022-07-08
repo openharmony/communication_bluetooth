@@ -39,7 +39,7 @@ public:
     }
     virtual void SendFrames(uint64_t timeStampUs) = 0;
     virtual void UpdateEncoderParam() = 0;
-    virtual void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) = 0;
+    virtual void GetRenderPosition(uint16_t &sendDataSize, uint32_t &timeStamp) = 0;
 
 protected:
     BT_DISALLOW_COPY_AND_ASSIGN(A2dpEncoder);

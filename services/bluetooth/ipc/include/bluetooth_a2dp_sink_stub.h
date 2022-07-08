@@ -40,6 +40,7 @@ private:
     ErrCode GetPlayingStateInner(MessageParcel &data, MessageParcel &reply);
     ErrCode SetConnectStrategyInner(MessageParcel &data, MessageParcel &reply);
     ErrCode GetConnectStrategyInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SendDelayInner(MessageParcel &data, MessageParcel &reply);
 
     using BluetoothA2dpSinkServerFunc = ErrCode (BluetoothA2dpSinkStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothA2dpSinkServerFunc> memberFuncMap_;

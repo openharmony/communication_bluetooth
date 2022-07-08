@@ -522,6 +522,18 @@ uint8_t A2dpAvdtp::ParseAvdtpSuspendInd(
     return EVT_SUSPEND_IND;
 }
 
+uint8_t A2dpAvdtp::ParseAvdtpDelayReportInd(
+    const uint16_t handle, const BtAddr bdAddr, const uint8_t role, A2dpAvdtMsg &msg, const AvdtCtrlData &data)
+{
+    LOG_INFO("[A2dpAvdtp] %{public}s role(%{public}u), delay(%{public}d)\n", __func__, role, data.delayRptInd.delay);
+
+    msg.a2dpMsg.delayReportInfo.addr = bdAddr;
+    msg.a2dpMsg.delayReportInfo.handle = handle;
+    msg.a2dpMsg.delayReportInfo.delayValue = data.delayRptInd.delay;
+
+    return EVT_DELAY_IND;
+}
+
 uint8_t A2dpAvdtp::ParseAvdtpConnectCFM(
     const BtAddr bdAddr, const uint8_t role, A2dpAvdtMsg &msg, const AvdtCtrlData &data)
 {
@@ -706,6 +718,12 @@ uint8_t A2dpAvdtp::ParseAvdtpConfigureCFM(
     if (peer == nullptr) {
         LOG_ERROR("[A2dpAvdtp] %{public}s Failed to get peer instance \n", __func__);
         return EVT_CONNECT_IND;
+    }
+
+    if (role == A2DP_ROLE_SINK) {
+        LOG_INFO("[A2dpAvdtp] %{public}s role(%{public}u)  to send delay reporting\n", __func__, role);
+        uint8_t label = 0;
+        DelayReq(handle, label, 0);
     }
 
     peer->StopSignalingTimer();
@@ -934,6 +952,9 @@ A2dpAvdtMsg *A2dpAvdtp::ParseAvdtpCallbackContent(const uint16_t handle, const B
             break;
         case AVDT_CLOSE_TRANS_IND_EVT:
             avdtEvent = ParseAvdtpCloseChannelInd(bdAddr, handle, role, *msg.get());
+            break;
+        case AVDT_DELAY_REPORT_IND_EVT:
+            avdtEvent = ParseAvdtpDelayReportInd(handle, bdAddr, role, *msg.get(), data);
             break;
         case AVDT_CONNECT_CFM_EVT:
             avdtEvent = ParseAvdtpConnectCFM(bdAddr, role, *msg.get(), data);

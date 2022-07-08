@@ -199,6 +199,7 @@ void A2dpProfile::ConnectStateChangedNotify(const BtAddr &addr, const int state,
     switch (state) {
         case STREAM_CONNECT_FAILED:
         case STREAM_DISCONNECT:
+            ResetDelayValue(addr);
             DeletePeer(addr);
             if (IsActiveDevice(addr)) {
                 ClearActiveDevice();
@@ -362,7 +363,8 @@ void A2dpProfile::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize
     LOG_INFO("[A2dpProfile] %{public}s\n", __func__);
 
     A2dpCodecThread *codecThread = A2dpCodecThread::GetInstance();
-    codecThread->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+    delayValue = delayValue_;
+    codecThread->GetRenderPosition(sendDataSize, timeStamp);
 }
 
 void A2dpProfile::DequeuePacket()
@@ -909,6 +911,33 @@ int A2dpProfile::Reconfigure(const uint16_t handle, uint8_t *codecInfo) const
     }
 
     return ret;
+}
+
+void A2dpProfile::DelayReportNotify(const BtAddr &device, const uint16_t delayValue, void *context)
+{
+    LOG_INFO("[A2dpProfile]%{public}s delayValue(%{public}u)\n", __func__, delayValue);
+
+    A2dpProfilePeer *peer = nullptr;
+    peer = FindPeerByAddress(device);
+    if (peer == nullptr) {
+        LOG_ERROR("[A2dpProfile]%{public}s Not resources", __func__);
+        return;
+    }
+
+    delayValue_ = delayValue;
+}
+
+void A2dpProfile::ResetDelayValue(const BtAddr &device)
+{
+    LOG_INFO("[A2dpProfile]%{public}s", __func__);
+
+    A2dpProfilePeer *peer = nullptr;
+    peer = FindPeerByAddress(device);
+    if (peer == nullptr) {
+        LOG_ERROR("[A2dpProfile]%{public}s Not resources", __func__);
+        return;
+    }
+    delayValue_ = 0;
 }
 
 void A2dpProfile::RegisterObserver(A2dpProfileObserver *observer)

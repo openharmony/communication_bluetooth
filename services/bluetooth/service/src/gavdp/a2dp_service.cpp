@@ -668,6 +668,31 @@ int A2dpService::GetConnectStrategy(const RawAddress &device) const
     }
 }
 
+int A2dpService::SendDelay(const RawAddress &device, uint16_t delayValue)
+{
+    LOG_INFO("[A2dpService] %{public}s\n", __func__);
+    uint16_t handle = 0;
+    std::lock_guard<std::recursive_mutex> lock(g_a2dpServiceMutex);
+
+    auto iter = a2dpDevices_.find(device.GetAddress().c_str());
+    if (iter == a2dpDevices_.end()) {
+        LOG_ERROR("[A2dpService]Can't find the statemachine");
+        return RET_BAD_STATUS;
+    } else {
+        handle = iter->second->GetHandle();
+        LOG_INFO("[A2dpService] %{public}s handle [%u]", __func__, handle);
+    }
+
+    A2dpProfile *pflA2dp = GetProfileInstance(role_);
+    if (pflA2dp == nullptr) {
+        LOG_ERROR("[A2dpService] %{public}s Failed to get profile instance. role_(%u)\n", __func__, role_);
+        return RET_BAD_STATUS;
+    }
+
+    int ret = pflA2dp->SendDelay(handle, delayValue);
+    return ret;
+}
+
 A2dpSrcCodecStatus A2dpService::GetCodecStatus(const RawAddress &device) const
 {
     A2dpSrcCodecStatus codecStatus;
