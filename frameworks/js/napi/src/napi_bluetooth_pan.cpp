@@ -45,7 +45,7 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env)
     NapiProfile::SetProfile(ProfileId::PROFILE_PAN_NETWORK, napiProfile);
     Pan *profile = Pan::GetProfile();
     profile->RegisterObserver(&NapiBluetoothPan::observer_);
-    HILOGI("DefinePanJSClass finished");
+    HILOGI("finished");
 }
 
 napi_value NapiBluetoothPan::PanConstructor(napi_env env, napi_callback_info info)
@@ -57,7 +57,7 @@ napi_value NapiBluetoothPan::PanConstructor(napi_env env, napi_callback_info inf
 
 napi_value NapiBluetoothPan::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("On called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -94,7 +94,7 @@ napi_value NapiBluetoothPan::On(napi_env env, napi_callback_info info)
 
 napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("Off called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -126,7 +126,7 @@ napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
 
 napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetConnectionDevices called");
+    HILOGI("enter");
 
     size_t expectedArgsCount = ARGS_SIZE_ZERO;
     size_t argc = expectedArgsCount;
@@ -155,7 +155,7 @@ napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_in
 
 napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetDeviceState called");
+    HILOGI("enter");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -182,12 +182,13 @@ napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info inf
     int profileState = GetProfileConnectionState(state);
     napi_value result = nullptr;
     napi_create_int32(env, profileState, &result);
+    HILOGI("profileState: %{public}d", profileState);
     return result;
 }
 
 napi_value NapiBluetoothPan::Disconnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("Disconnect called");
+    HILOGI("enter");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -210,15 +211,16 @@ napi_value NapiBluetoothPan::Disconnect(napi_env env, napi_callback_info info)
 
     Pan *profile = Pan::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
-    bool isOK = profile->Disconnect(device);
+    bool res = profile->Disconnect(device);
     napi_value result = nullptr;
-    napi_get_boolean(env, isOK, &result);
+    napi_get_boolean(env, res, &result);
+    HILOGI("res: %{public}d", res);
     return result;
 }
 
 napi_value NapiBluetoothPan::SetTethering(napi_env env, napi_callback_info info)
 {
-    HILOGI("SetTethering called");
+    HILOGI("enter");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -240,15 +242,16 @@ napi_value NapiBluetoothPan::SetTethering(napi_env env, napi_callback_info info)
     }
 
     Pan *profile = Pan::GetProfile();
-    bool isOK = profile->SetTethering(value);
+    bool res = profile->SetTethering(value);
     napi_value result = nullptr;
-    napi_get_boolean(env, isOK, &result);
+    napi_get_boolean(env, res, &result);
+    HILOGI("res: %{public}d", res);
     return result;
 }
 
 napi_value NapiBluetoothPan::IsTetheringOn(napi_env env, napi_callback_info info)
 {
-    HILOGI("IsTetheringOn called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ZERO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ZERO] = {};
@@ -263,9 +266,10 @@ napi_value NapiBluetoothPan::IsTetheringOn(napi_env env, napi_callback_info info
         return ret;
     }
     Pan *profile = Pan::GetProfile();
-    bool isOK = profile->IsTetheringOn();
+    bool res = profile->IsTetheringOn();
     napi_value result = nullptr;
-    napi_get_boolean(env, isOK, &result);
+    napi_get_boolean(env, res, &result);
+    HILOGI("res: %{public}d", res);
     return result;
 }
 }  // namespace Bluetooth
