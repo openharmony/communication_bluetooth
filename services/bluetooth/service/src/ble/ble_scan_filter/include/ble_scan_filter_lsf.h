@@ -179,11 +179,11 @@ private:
 
     uint8_t filtIndex_ = 0;
     BleScanFilterParam filterParam_ = {};
-    BleScanFilterCallback callback_;
+    BleScanFilterCallback callback_ = {};
     uint16_t filterFlag_ = 0;
     bool isBleScanFilterOngoing_ = false;
-    uint8_t ongoingOpcode_;
-    uint8_t ongoingTag_;
+    uint8_t ongoingOpcode_ = 0;
+    uint8_t ongoingTag_ = 0;
     bool isReady_ = false;
     std::recursive_mutex mutex_ {};
     std::condition_variable cvfull_;
