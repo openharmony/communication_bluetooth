@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,8 +91,7 @@ struct HidHost::impl {
     bool Connect(const BluetoothRemoteDevice &device)
     {
         HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && !BluetoothHost::GetDefaultHost().IsBtDiscovering() &&
-            device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
                 bool isOk;
                 proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);
                 HILOGI("end, result:%{public}d", isOk);

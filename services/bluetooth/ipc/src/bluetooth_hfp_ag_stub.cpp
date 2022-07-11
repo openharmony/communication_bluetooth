@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Bluetooth {
 BluetoothHfpAgStub::BluetoothHfpAgStub() {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("%{public}s start.", __func__);
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpAgStub::Code::BT_HFP_AG_GET_CONNECT_DEVICES)] =
         &BluetoothHfpAgStub::GetConnectDevicesInner;
@@ -69,17 +69,17 @@ BluetoothHfpAgStub::BluetoothHfpAgStub() {
         BluetoothHfpAgStub::Code::BT_HFP_AG_DEREGISTER_OBSERVER)] =
         &BluetoothHfpAgStub::DeregisterObserverInner;
 
-    HILOGD("%{public}s ends.", __func__);
+    HILOGI("%{public}s ends.", __func__);
 }
 
 BluetoothHfpAgStub::~BluetoothHfpAgStub() {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("%{public}s start.", __func__);
     memberFuncMap_.clear();
 }
 
 int BluetoothHfpAgStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
-    HILOGD("BluetoothHfpAgStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    HILOGI("BluetoothHfpAgStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
     std::u16string descriptor = BluetoothHfpAgStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
