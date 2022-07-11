@@ -381,7 +381,7 @@ int MapMceRequestGetMasInstanceInformation::ProcessResponse(
     if (masInfStream.str().size() != 0) {
         instancInfo.masInstanceInfoUtf8 = masInfStream.str();
     }
-    // Save instance infomation
+    // Save instance information
     instancInfo.isValid = true;
     clientInst.SaveMasInstanceInformation(instancInfo);
     LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
