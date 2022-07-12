@@ -29,6 +29,7 @@
 #include "base_def.h"
 #include "base_observer_list.h"
 #include "class_creator.h"
+#include "permission_utils.h"
 #include "power_manager.h"
 #include "profile_config.h"
 #include "profile_service_manager.h"
@@ -325,6 +326,11 @@ bool AdapterManager::Enable(const BTTransport transport) const
     LOG_DEBUG("%{public}s start transport is %{public}d", __PRETTY_FUNCTION__, transport);
     std::lock_guard<std::recursive_mutex> lock(pimpl->syncMutex_);
 
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        LOG_ERROR("Enable() false, check permission failed");
+        return false;
+    }
+
     if (GetSysState() != SYS_STATE_STARTED) {
         LOG_ERROR("AdapterManager system is stoped");
         return false;
@@ -353,6 +359,11 @@ bool AdapterManager::Disable(const BTTransport transport) const
     LOG_DEBUG("%{public}s start transport is %{public}d", __PRETTY_FUNCTION__, transport);
     std::lock_guard<std::recursive_mutex> lock(pimpl->syncMutex_);
 
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        LOG_ERROR("Disable() false, check permission failed");
+        return false;
+    }
+    
     if (pimpl->adapters_[transport] == nullptr) {
         LOG_INFO("%{public}s BTTransport not register", __PRETTY_FUNCTION__);
         return false;
