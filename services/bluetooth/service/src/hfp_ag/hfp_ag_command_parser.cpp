@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 
-#include "hfp_ag_command_parser.h"
-
 #include <cstring>
 #include <string>
-
-#include "hfp_ag_defines.h"
 #include "packet.h"
+#include "hfp_ag_defines.h"
+#include "hfp_ag_command_parser.h"
+
 
 namespace bluetooth {
 HfpAgCommandParser &HfpAgCommandParser::GetInstance()
@@ -54,7 +53,7 @@ void HfpAgCommandParser::Parse(HfpAgDataConnection &dataConn, std::vector<uint8_
     int cmdType = HFP_AG_CMD_UNKNOWN;
 
     if (data.empty() == true) {
-        LOG_INFO("[HFP AG]%{public}s():data is nullptr", __FUNCTION__);
+        HILOGI("data is nullptr");
         return;
     }
 
@@ -71,17 +70,13 @@ void HfpAgCommandParser::Parse(HfpAgDataConnection &dataConn, std::vector<uint8_
     return;
 }
 
-int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
-                                std::string &cmd,
-                                std::string &arg,
-                                size_t &cmdLen,
-                                size_t len) const
+int HfpAgCommandParser::Extract(std::vector<uint8_t> &data, std::string &cmd, std::string &arg,
+                                size_t &cmdLen, size_t len) const
 {
     HfpAgCommandParser::CommandPosition position {0, 0, 0, 0, 0, false, false};
     GetCommandPosition(data, len, position);
-    LOG_INFO("[HFP AG]%{public}s():headValid[%{public}d], tailValid[%{public}d],"
-        " startPos[%hu], setPos[%hu], getPos[%hu], endPos[%hu]",
-        __FUNCTION__,
+    HILOGI("headValid: %{public}d, tailValid: %{public}d,"
+        " startPos: %{public}hu, setPos: %{public}hu, getPos: %{public}hu, endPos: %{public}hu",
         position.headValid,
         position.tailValid,
         position.startPos,
@@ -92,7 +87,7 @@ int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
     if (!position.headValid || !position.tailValid || position.endPos < HFP_AG_AT_HEAD_SIZE ||
         (position.setPos >= position.endPos) || (position.getPos >= position.endPos)) {
         cmdLen = position.pos;
-        LOG_INFO("[HFP AG]%{public}s():HFP_AG_CMD_INVALID", __FUNCTION__);
+        HILOGI("HFP_AG_CMD_INVALID");
         return HFP_AG_CMD_INVALID;
     }
 
@@ -122,12 +117,9 @@ int HfpAgCommandParser::Extract(std::vector<uint8_t> &data,
     } else {
         type = HFP_AG_CMD_UNKNOWN;
     }
-    LOG_INFO(
-        "[HFP AG]%{public}s():cmd[%{public}s], arg[%{public}s], type[%{public}d], cmdLen[%zu]",
-        __FUNCTION__,
-        cmd.c_str(),
-        arg.c_str(),
-        type, cmdLen);
+    HILOGI(
+        "cmd: %{public}s, arg: %{public}s, type: %{public}d, cmdLen: %{public}zu",
+        cmd.c_str(), arg.c_str(), type, cmdLen);
     return type;
 }
 
@@ -172,6 +164,6 @@ void HfpAgCommandParser::ExtractArg(std::string &cmd, std::string &arg) const
             break;
         }
     }
-    LOG_INFO("[HFP AG]%{public}s():cmd[%{public}s] arg[%{public}s]", __FUNCTION__, cmd.c_str(), arg.c_str());
+    HILOGI("cmd: %{public}s arg: %{public}s", cmd.c_str(), arg.c_str());
 }
 }  // namespace bluetooth

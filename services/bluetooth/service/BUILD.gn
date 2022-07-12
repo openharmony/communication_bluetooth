@@ -266,6 +266,7 @@ ServiceUtilSrc = [
   "src/util/state_machine.cpp",
   "src/util/timer.cpp",
   "src/util/xml_parse.cpp",
+  "src/util/log_util.cpp",
 ]
 
 ServiceHidHostSrc = [
