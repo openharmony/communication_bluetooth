@@ -352,8 +352,8 @@ void AvrcpTgService::AVSessionObserverImpl::OnSessionRelease(const OHOS::AVSessi
 
 void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChanged(const OHOS::AVSession::AVSessionDescriptor& descriptor)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s, sessionId:%{public}d",
-        __func__, descriptor.sessionId_);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s, sessionId:%{public}s",
+        __func__, descriptor.sessionId_.c_str());
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -556,11 +556,11 @@ void AvrcpTgService::EnableNative(void)
     stub::MediaService::GetInstance()->RegisterObserver(mdObserver_.get());
 #ifdef AVRCP_AVSESSION
     // register avSession observer
-    OHOS::AVSession::AVSessionManager::RegisterSessionListener(avSessionObserver_);
+    OHOS::AVSession::AVSessionManager::GetInstance().RegisterSessionListener(avSessionObserver_);
 
-    avSessionDescriptor_ = OHOS::AVSession::AVSessionManager::GetAllSessionDescriptors();
+    avSessionDescriptor_ = OHOS::AVSession::AVSessionManager::GetInstance().GetAllSessionDescriptors();
     // parse top descriptor
-    int32_t sessionId = -1;
+    std::string sessionId;
     for (auto descriptor : avSessionDescriptor_) {
         LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, isTopSession:%{public}d", __func__, descriptor.isTopSession_);
         if (descriptor.isTopSession_) {
@@ -568,10 +568,10 @@ void AvrcpTgService::EnableNative(void)
         }
     }
 
-    if (sessionId == -1) {
+    if (sessionId.empty()) {
         LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, no valid avsession", __func__);
     } else {
-        avSessionController_ = OHOS::AVSession::AVSessionManager::CreateController(sessionId);
+        avSessionController_ = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId);
         if (avSessionController_ != NULL) {
             avSessionController_->RegisterCallback(avControllerObserver_);
         } else {
@@ -1033,7 +1033,7 @@ void AvrcpTgService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button,
 #else
     OHOS::AVSession::AVControlCommand command;
     SetAvControlCommand(button, command, true);
-    int result = OHOS::AVSession::AVSessionManager::SendSystemControlCommand(command);
+    int result = OHOS::AVSession::AVSessionManager::GetInstance().SendSystemControlCommand(command);
 #endif
     profile_->SendReleaseButtonRsp(rawAddr, button, label, result);
 }
@@ -2523,30 +2523,30 @@ void AvrcpTgService::NotifyVolumeChangedNative(uint8_t volume, uint8_t label)
     } while (false);
 }
 
-void AvrcpTgService::OnSessionCreate(int32_t sessionId)
+void AvrcpTgService::OnSessionCreate(std::string sessionId)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}d", __func__, sessionId);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
 }
 
-void AvrcpTgService::OnSessionRelease(int32_t sessionId)
+void AvrcpTgService::OnSessionRelease(std::string sessionId)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}d", __func__, sessionId);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
 #ifdef AVRCP_AVSESSION
-    if (avSessionController_ != NULL && avSessionController_->GetSessionId() == sessionId) {
+    if (avSessionController_ != NULL && avSessionController_->GetSessionId().compare(sessionId) == 0) {
         avSessionController_->Destroy();
         avSessionController_ = NULL;
     }
 #endif
 }
 
-void AvrcpTgService::OnTopSessionChanged(int32_t sessionId)
+void AvrcpTgService::OnTopSessionChanged(std::string sessionId)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}d", __func__, sessionId);
+    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
 #ifdef AVRCP_AVSESSION
-    if (avSessionController_ != NULL && avSessionController_->GetSessionId() == sessionId) {
+    if (avSessionController_ != NULL && avSessionController_->GetSessionId().compare(sessionId) == 0) {
         return;
     }
-    avSessionController_ = OHOS::AVSession::AVSessionManager::CreateController(sessionId);
+    avSessionController_ = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId);
     if (avSessionController_ != NULL) {
         avSessionController_->RegisterCallback(avControllerObserver_);
         OHOS::AVSession::AVPlaybackState::PlaybackStateMaskType filter;

@@ -937,17 +937,17 @@ public:
     /**
      * @brief Notifies the AVSession is created.
      */
-    void OnSessionCreate(int32_t sessionId) override;
+    void OnSessionCreate(std::string sessionId) override;
 
     /**
      * @brief Notifies the AVSession is released.
      */
-    void OnSessionRelease(int32_t sessionId) override;
+    void OnSessionRelease(std::string sessionId) override;
 
     /**
      * @brief Notifies the TopAVSession is changed.
      */
-    void OnTopSessionChanged(int32_t sessionId) override;
+    void OnTopSessionChanged(std::string sessionId) override;
 
     /**
      * @brief Notifies the playback state is changed.
