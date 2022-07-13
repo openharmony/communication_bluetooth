@@ -29,13 +29,13 @@ BleScanFilterLsf::~BleScanFilterLsf()
     }
 }
 
-void BleScanFilterLsf::StartCommandTimer()
+void BleScanFilterLsf::StartCommandTimer() const
 {
     cmdTimer_->Start(LSF_CMD_TIMEOUT_MS);
     LOG_DEBUG("[BLE SCAN FILTER]%{public}s():Start command timer!", __func__);
 }
 
-void BleScanFilterLsf::StopCommandTimer()
+void BleScanFilterLsf::StopCommandTimer() const
 {
     cmdTimer_->Stop();
     LOG_DEBUG("[BLE SCAN FILTER]%{public}s():Stop command timer!", __func__);
@@ -279,24 +279,24 @@ int BleScanFilterLsf::StopBleScanFilter(BleScanFilterCallback callback)
 int BleScanFilterLsf::ContinueBleScanFilter()
 {
     StopCommandTimer();
-    if (filterFlag_ & FILTER_FLAG_ADDRESS) {
+    if (static_cast<bool>(filterFlag_ &FILTER_FLAG_ADDRESS)) {
         filterFlag_ &= ~FILTER_FLAG_ADDRESS;
         return BleScanFilterAddressAdd(filterParam_.address);
-    } else if (filterFlag_ & FILTER_FLAG_SERVICE_UUID) {
+    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_SERVICE_UUID)) {
         filterFlag_ &= ~FILTER_FLAG_SERVICE_UUID;
         return BleScanFilterUuidAdd(filterParam_.serviceUuid, filterParam_.serviceUuidMask, LSF_TAG_SERVICE_UUID);
-    } else if (filterFlag_ & FILTER_FLAG_SOLICIT_UUID) {
+    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_SOLICIT_UUID)) {
         filterFlag_ &= ~FILTER_FLAG_SOLICIT_UUID;
         return BleScanFilterUuidAdd(filterParam_.solicitationUuid, filterParam_.solicitationUuidMask,
             LSF_TAG_SOLICIT_UUID);
-    } else if (filterFlag_ & FILTER_FLAG_NAME) {
+    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_NAME)) {
         filterFlag_ &= ~FILTER_FLAG_NAME;
         return BleScanFilterNameAdd(filterParam_.name);
-    } else if (filterFlag_ & FILTER_FLAG_MANUFACTURER_DATA) {
+    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_MANUFACTURER_DATA)) {
         filterFlag_ &= ~FILTER_FLAG_MANUFACTURER_DATA;
         return BleScanFilterManufacturerDataAdd(filterParam_.manufacturerId, filterParam_.manufacturerIdMask,
             filterParam_.manufacturerData, filterParam_.manufacturerDataMask);
-    } else if (filterFlag_ & FILTER_FLAG_SERVICE_DATA) {
+    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_SERVICE_DATA)) {
         filterFlag_ &= ~FILTER_FLAG_SERVICE_DATA;
         return BleScanFilterServiceDataAdd(filterParam_.serviceData, filterParam_.serviceDataMask);
     } else {
@@ -350,7 +350,7 @@ void BleScanFilterLsf::ClearCommand()
     filterFlag_ = 0;
 }
 
-int BleScanFilterLsf::BleScanFilterGetVendorCapabilities()
+int BleScanFilterLsf::BleScanFilterGetVendorCapabilities() const
 {
     uint16_t opCode = MakeVendorOpCode(HCI_VENDOR_OCF_GET_CAPABILITIES);
     uint8_t version = 0;
@@ -655,7 +655,7 @@ void BleScanFilterLsf::BleScanFilterCommandComplete(const void *param, uint8_t p
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (paramLength >= sizeof(VendorEventParamLSF) - 1) {
         VendorEventParamLSF eventParam = {};
-        uint8_t length = (sizeof(VendorEventParamLSF) < paramLength) ? sizeof(VendorEventParamLSF) : paramLength;
+        uint8_t length = (paramLength > sizeof(VendorEventParamLSF)) ? sizeof(VendorEventParamLSF) : paramLength;
         if (memcpy_s(&eventParam, sizeof(VendorEventParamLSF), param, length) != EOK) {
             LOG_ERROR("[BLE SCAN FILTER]%{public}s copy eventParam faild.", __func__);
             return;

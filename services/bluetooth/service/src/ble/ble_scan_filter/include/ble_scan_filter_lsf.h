@@ -160,7 +160,7 @@ private:
         std::vector<uint8_t> manufacturerData, std::vector<uint8_t> manufacturerDataMask);
     int BleScanFilterServiceDataAdd(std::vector<uint8_t> serviceData, std::vector<uint8_t> serviceDataMask);
     static uint16_t MakeVendorOpCode(uint16_t ocf);
-    int BleScanFilterGetVendorCapabilities();
+    int BleScanFilterGetVendorCapabilities() const;
     void BleScanFilterGetCapabilitiesComplete(const void *param, uint8_t paramLength);
 
     void CommandTimeout();
@@ -168,8 +168,8 @@ private:
     void HandleAddCommandResult(uint8_t tag, uint8_t status);
     void HandleDeleteCommandResult(uint8_t tag, uint8_t status);
     void HandleClearCommandResult(uint8_t tag, uint8_t status);
-    void StartCommandTimer();
-    void StopCommandTimer();
+    void StartCommandTimer() const;
+    void StopCommandTimer() const;
 
     // Regist vendor event callback
     static constexpr HCIVendorEventCallback VENDOR_EVENT_CALLBACK = {
