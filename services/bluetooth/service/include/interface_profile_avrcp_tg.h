@@ -602,18 +602,18 @@ public:
     /**
      * @brief Notifies the AVSession is created.
      */
-    virtual void OnSessionCreate(int32_t sessionId) = 0;
+    virtual void OnSessionCreate(std::string sessionId) = 0;
 
     /**
      * @brief Notifies the AVSession is release.
      */
-    virtual void OnSessionRelease(int32_t sessionId) = 0;
+    virtual void OnSessionRelease(std::string sessionId) = 0;
 
     /**
      * @brief Notifies the TopAVSession is changed.
      */
 
-    virtual void OnTopSessionChanged(int32_t sessionId) = 0;
+    virtual void OnTopSessionChanged(std::string sessionId) = 0;
     /**
      * @brief Notifies the playback state is changed.
      */
