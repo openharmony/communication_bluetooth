@@ -54,10 +54,10 @@ struct BleScanFilterParam {
 };
 
 struct BleScanFilterCallback {
-    void (*addBleScanFilterResult)(uint8_t result, void *context);
-    void (*deleteBleScanFilterResult)(uint8_t result, void *context);
-    void (*startBleScanFilterResult)(uint8_t result, void *context);
-    void (*stopBleScanFilterResult)(uint8_t result, void *context);
+    void (*addBleScanFilterResult)(uint8_t result, void *context) = nullptr;
+    void (*deleteBleScanFilterResult)(uint8_t result, void *context) = nullptr;
+    void (*startBleScanFilterResult)(uint8_t result, void *context) = nullptr;
+    void (*stopBleScanFilterResult)(uint8_t result, void *context) = nullptr;
     void *context;
 };
 

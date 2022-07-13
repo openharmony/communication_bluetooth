@@ -531,7 +531,7 @@ public:
      * @param[in]   delayValue: The delay value
      * @param[in]   context: the detail information of this callback
      */
-    void DelayReportNotify(const BtAddr &addr, const uint16_t delayValue, void *context);
+    void DelayReportNotify(const BtAddr &addr, const uint16_t delayValue);
 private:
     /**
      * @brief Get the instance of SDP.
