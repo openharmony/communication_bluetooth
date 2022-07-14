@@ -279,24 +279,24 @@ int BleScanFilterLsf::StopBleScanFilter(BleScanFilterCallback callback)
 int BleScanFilterLsf::ContinueBleScanFilter()
 {
     StopCommandTimer();
-    if (static_cast<bool>(filterFlag_ &FILTER_FLAG_ADDRESS)) {
+    if ((filterFlag_ &FILTER_FLAG_ADDRESS) != 0) {
         filterFlag_ &= ~FILTER_FLAG_ADDRESS;
         return BleScanFilterAddressAdd(filterParam_.address);
-    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_SERVICE_UUID)) {
+    } else if ((filterFlag_ &FILTER_FLAG_SERVICE_UUID) != 0) {
         filterFlag_ &= ~FILTER_FLAG_SERVICE_UUID;
         return BleScanFilterUuidAdd(filterParam_.serviceUuid, filterParam_.serviceUuidMask, LSF_TAG_SERVICE_UUID);
-    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_SOLICIT_UUID)) {
+    } else if ((filterFlag_ &FILTER_FLAG_SOLICIT_UUID) != 0) {
         filterFlag_ &= ~FILTER_FLAG_SOLICIT_UUID;
         return BleScanFilterUuidAdd(filterParam_.solicitationUuid, filterParam_.solicitationUuidMask,
             LSF_TAG_SOLICIT_UUID);
-    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_NAME)) {
+    } else if ((filterFlag_ &FILTER_FLAG_NAME) != 0) {
         filterFlag_ &= ~FILTER_FLAG_NAME;
         return BleScanFilterNameAdd(filterParam_.name);
-    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_MANUFACTURER_DATA)) {
+    } else if ((filterFlag_ &FILTER_FLAG_MANUFACTURER_DATA) != 0) {
         filterFlag_ &= ~FILTER_FLAG_MANUFACTURER_DATA;
         return BleScanFilterManufacturerDataAdd(filterParam_.manufacturerId, filterParam_.manufacturerIdMask,
             filterParam_.manufacturerData, filterParam_.manufacturerDataMask);
-    } else if (static_cast<bool>(filterFlag_ &FILTER_FLAG_SERVICE_DATA)) {
+    } else if ((filterFlag_ &FILTER_FLAG_SERVICE_DATA) != 0) {
         filterFlag_ &= ~FILTER_FLAG_SERVICE_DATA;
         return BleScanFilterServiceDataAdd(filterParam_.serviceData, filterParam_.serviceDataMask);
     } else {
