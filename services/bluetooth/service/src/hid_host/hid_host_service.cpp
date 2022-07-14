@@ -214,7 +214,7 @@ int HidHostService::HidHostSendData(std::string device, uint8_t id, uint16_t siz
     return HID_HOST_SUCCESS;
 }
 
-int HidHostService::HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t* report)
+int HidHostService::HidHostSetReport(std::string device, uint8_t type, uint16_t size, const uint8_t* report)
 {
     HidHostMessage event(HID_HOST_API_WRITE_DEV_EVT);
     event.dev_ = device;
