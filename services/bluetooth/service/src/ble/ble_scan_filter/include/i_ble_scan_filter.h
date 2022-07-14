@@ -58,7 +58,7 @@ struct BleScanFilterCallback {
     void (*deleteBleScanFilterResult)(uint8_t result, void *context) = nullptr;
     void (*startBleScanFilterResult)(uint8_t result, void *context) = nullptr;
     void (*stopBleScanFilterResult)(uint8_t result, void *context) = nullptr;
-    void *context;
+    void *context = nullptr;
 };
 
 class IBleScanFilter {

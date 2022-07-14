@@ -529,7 +529,6 @@ public:
      *
      * @param[in]   addr: The address of peer device
      * @param[in]   delayValue: The delay value
-     * @param[in]   context: the detail information of this callback
      */
     void DelayReportNotify(const BtAddr &addr, const uint16_t delayValue);
 private:
