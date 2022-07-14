@@ -421,7 +421,7 @@ void A2dpStateConfigure::ProcessSetConfigInd(A2dpAvdtMsgData msgData, uint8_t ro
     avdtp.SetConfigureRsp(msgData.configRsp.handle, msgData.configRsp.label, msgData.configRsp.category);
 }
 
-void A2dpStateConfigure::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+void A2dpStateConfigure::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const
 {
     LOG_INFO("[A2dpStateConfigure]%{public}s\n", __func__);
     if (role == A2DP_ROLE_SINK) {
@@ -437,7 +437,7 @@ void A2dpStateConfigure::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t 
 
     BtAddr addr =  msgData.delayReportInfo.addr;
     uint16_t value = msgData.delayReportInfo.delayValue;
-    profile->DelayReportNotify(addr, value, nullptr);
+    profile->DelayReportNotify(addr, value);
 }
 
 bool A2dpStateOpening::Dispatch(const utility::Message &msg)
@@ -546,7 +546,7 @@ void A2dpStateOpening::ProcessDisconnectInd(BtAddr addr, uint16_t handle, uint8_
     profile->ConnectStateChangedNotify(addr, STREAM_DISCONNECT, (void *)&param);
 }
 
-void A2dpStateOpening::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+void A2dpStateOpening::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const
 {
     LOG_INFO("[A2dpStateOpening]%{public}s\n", __func__);
     if (role == A2DP_ROLE_SINK) {
@@ -562,7 +562,7 @@ void A2dpStateOpening::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t ro
 
     BtAddr addr =  msgData.delayReportInfo.addr;
     uint16_t value = msgData.delayReportInfo.delayValue;
-    profile->DelayReportNotify(addr, value, nullptr);
+    profile->DelayReportNotify(addr, value);
 }
 
 bool A2dpStateOpen::Dispatch(const utility::Message &msg)
@@ -777,7 +777,7 @@ void A2dpStateOpen::ProcessStartCfm(BtAddr addr, uint8_t role)
     }
 }
 
-void A2dpStateOpen::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+void A2dpStateOpen::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const
 {
     LOG_INFO("[A2dpStateOpen]%{public}s\n", __func__);
     if (role == A2DP_ROLE_SINK) {
@@ -793,7 +793,7 @@ void A2dpStateOpen::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
 
     BtAddr addr =  msgData.delayReportInfo.addr;
     uint16_t value = msgData.delayReportInfo.delayValue;
-    profile->DelayReportNotify(addr, value, nullptr);
+    profile->DelayReportNotify(addr, value);
 }
 
 void A2dpStateOpen::ProcessTimeout(BtAddr addr, uint8_t role)
@@ -1018,7 +1018,7 @@ void A2dpStateStreaming::ProcessCloseCfm(BtAddr addr, uint8_t role)
     }
 }
 
-void A2dpStateStreaming::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role)
+void A2dpStateStreaming::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const
 {
     LOG_INFO("[A2dpStateStreaming]%{public}s\n", __func__);
     if (role == A2DP_ROLE_SINK) {
@@ -1034,7 +1034,7 @@ void A2dpStateStreaming::ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t 
 
     BtAddr addr =  msgData.delayReportInfo.addr;
     uint16_t value = msgData.delayReportInfo.delayValue;
-    profile->DelayReportNotify(addr, value, nullptr);
+    profile->DelayReportNotify(addr, value);
 }
 
 bool A2dpStateClosing::Dispatch(const utility::Message &msg)

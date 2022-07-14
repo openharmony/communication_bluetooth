@@ -85,7 +85,7 @@ public:
     std::string HidHostFindDeviceByLcid(uint16_t lcid, bool *isControlLcid);
     int HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type) override;
     int HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type) override;
-    int HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t* report) override;
+    int HidHostSetReport(std::string device, uint8_t type, uint16_t size, const uint8_t* report) override;
     int HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type) override;
 
 private:

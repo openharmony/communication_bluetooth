@@ -244,7 +244,7 @@ private:
      * @param[in] msgData The information of message
      * @param[in] role The role of local profile
      */
-    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const;
 };
 
 class A2dpStateOpening : public utility::StateMachine::State {
@@ -324,7 +324,7 @@ private:
      * @param[in] msgData The information of message
      * @param[in] role The role of local profile
      */
-    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const;
 };
 
 class A2dpStateOpen : public utility::StateMachine::State {
@@ -454,7 +454,7 @@ private:
      * @param[in] msgData The information of message
      * @param[in] role The role of local profile
      */
-    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const;
 
     uint8_t label_ = 0;
 };
@@ -567,7 +567,7 @@ private:
      * @param[in] msgData The information of message
      * @param[in] role The role of local profile
      */
-    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role);
+    void ProcessDelayReportInd(A2dpAvdtMsgData msgData, uint8_t role) const;
 
     uint8_t label_ = 0;
 };

@@ -249,7 +249,6 @@ int PanBnep::SendData(EthernetHeader ethernetHeader, uint8_t* pkt, int length)
     int ret;
     uint8_t type = BNEP_COMPRESSED_ETHERNET;
     int packetLength = length;
-
     if (localAddr.addr[BT_ADDRESS_LENGTH - 1] & 0x01) {
         LOG_DEBUG("[PAN BNEP]%{public}s():use unicast MAC address", __FUNCTION__);
         localAddr.addr[BT_ADDRESS_LENGTH - 1] &= ~0x01;
@@ -271,7 +270,6 @@ int PanBnep::SendData(EthernetHeader ethernetHeader, uint8_t* pkt, int length)
             packetLength += BNEP_GENERAL_ETHERNET_HEAD_LENGTH;
         }
     }
-
     packet = PacketMalloc(packetLength, 0, 0);
     buf = (uint8_t *)BufferPtr(PacketHead(packet));
     ret = BnepBuildEthernetPacketHeader(type, ethernetHeader, buf);
@@ -279,14 +277,12 @@ int PanBnep::SendData(EthernetHeader ethernetHeader, uint8_t* pkt, int length)
         return PAN_FAILURE;
     }
     offset += ret;
-
     if ((length > 0) && (pkt != nullptr)) {
         if (memcpy_s(buf + offset, length, pkt, length) != EOK) {
             LOG_ERROR("[PAN BNEP]%{public}s(): memcpy source Address error", __FUNCTION__);
             return PAN_FAILURE;
         }
     }
-
     AddPacketToWaitingSendDataList(packet);
     return BT_NO_ERROR;
 }
