@@ -16,7 +16,6 @@ import("//build/ohos_var.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 BT_ROOT = "//foundation/communication/bluetooth/services/bluetooth"
-hdf_uhdf_path = "//drivers/hdf_core/adapter/uhdf2"
 
 ohos_shared_library("bluetooth_server") {
   include_dirs = [
@@ -25,7 +24,6 @@ ohos_shared_library("bluetooth_server") {
     "//foundation/communication/bluetooth/interfaces/inner_api/include",
     "//foundation/communication/bluetooth/services/bluetooth/service/include",
     "//foundation/communication/bluetooth/services/bluetooth/service/src/permission",
-    "$hdf_uhdf_path/include/hdi",
   ]
 
   sources = [
@@ -57,7 +55,6 @@ ohos_shared_library("bluetooth_server") {
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/service:btservice",
-    "$hdf_uhdf_path/hdi:libhdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",

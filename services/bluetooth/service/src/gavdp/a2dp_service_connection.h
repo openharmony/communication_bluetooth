@@ -77,6 +77,14 @@ public:
     A2dpDeviceInfo *AddDevice(const RawAddress &device, int state);
 
     /**
+     * @brief Delete the peer bluetooth service from local device management list.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @return void
+     * @since 6.0
+     */
+    void DeleteDevice(const RawAddress &device);
+    /**
      * @brief Get local device's a2dp profile role.
      *
      * @return Returns <b>A2DP_ROLE_SOURCE</b> if local device is a2dp source role.
