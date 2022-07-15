@@ -110,6 +110,14 @@ private:
         RawAddress btAddr, A2dpDeviceInfo *deviceInfo, const int connectPolicy, const int state, const uint16_t handle);
 
     /**
+     * @brief Process the a2dp hdf load .
+     *
+     * @param[in] state The connection state
+     * @return void
+     * @since 6.0
+     */
+    void ProcessA2dpHdfLoad(const int state);
+    /**
      * @brief Update the stateinfo.
      *
      * @param[in] msgCMD The value of what for message
