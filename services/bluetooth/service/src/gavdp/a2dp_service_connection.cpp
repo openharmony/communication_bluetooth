@@ -141,6 +141,17 @@ A2dpDeviceInfo *A2dpConnectManager::AddDevice(const RawAddress &device, int stat
     return deviceInfo;
 }
 
+void A2dpConnectManager::DeleteDevice(const RawAddress &device)
+{
+    LOG_INFO("[A2dpConnectManager] %{public}s role[%u]\n", __func__, role_);
+    A2dpService *service = GetServiceInstance(role_);
+    if (service == nullptr) {
+        LOG_INFO("[A2dpConnectManager] %{public}s Can't get the instance of service\n", __func__);
+        return;
+    }
+    service->DeleteDeviceFromList(device);
+}
+
 bool A2dpConnectManager::JudgeConnectExit(const RawAddress &device, uint8_t role)
 {
     LOG_INFO("[A2dpConnectManager] %{public}s\n", __func__);

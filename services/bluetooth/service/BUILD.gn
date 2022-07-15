@@ -391,6 +391,7 @@ ohos_shared_library("btservice") {
     "ability_base:want",
     "access_token:libaccesstoken_sdk",
     "core_service:tel_core_service_api",
+    "hdf_core:libhdi",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
