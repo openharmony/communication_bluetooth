@@ -12,26 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "napi_bluetooth_pan_observer.h"
-
+#include <uv.h>
 #include "bluetooth_log.h"
-
+#include "bluetooth_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-
-#include <uv.h>
+#include "napi_bluetooth_pan_observer.h"
 
 namespace OHOS {
 namespace Bluetooth {
 void NapiBluetoothPanObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("NapiBluetoothPanObserver::OnConnectionStateChanged called");
+    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     if (!callbackInfos_[STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE]) {
-        HILOGW("NapiBluetoothPanObserver::OnConnectionStateChanged: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiBluetoothPanObserver::OnConnectionStateChanged: %{public}s is registered by ability",
-        STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
+    HILOGI("%{public}s is registered by ability", STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE];
 

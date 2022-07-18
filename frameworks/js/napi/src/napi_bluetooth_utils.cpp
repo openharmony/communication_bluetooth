@@ -108,7 +108,7 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
         (*data)[0] = -1;
         return false;
     }
-    HILOGE("arraybuffer size is %{public}zu", size);
+    HILOGI("arraybuffer size is %{public}zu", size);
     return true;
 }
 
