@@ -698,7 +698,16 @@ napi_value DeregisterObserver(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     HILOGI("argc: %{public}zu", argc);
-    if (argc == expectedArgsCount + 1) {
+    if (argc == ARGS_SIZE_ONE) {
+        std::string type;
+        ParseString(env, type, argv[PARAM0]);
+        if (g_Observer.find(type) != g_Observer.end()) {
+            g_Observer[type] = nullptr;
+            HILOGI("%{public}s is deregistered", type.c_str());
+        } else {
+            HILOGE("%{public}s has not been registered", type.c_str());
+        }
+    } else if (argc == expectedArgsCount + 1) {
         NapiSppClient::Off(env, info);
     } else {
         NAPI_ASSERT(env, argc == expectedArgsCount, "Requires 2 argument.");
