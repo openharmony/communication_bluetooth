@@ -285,7 +285,7 @@ int PanService::PanSendData(EthernetHeader head, uint8_t *data, int len)
 void PanService::ReverseAddress(uint8_t *oldAddr, uint8_t *newAddr)
 {
     for (int i = 0; i < BT_ADDRESS_LENGTH; i++) {
-        newAddr[i] = oldAddr[BT_ADDRESS_LENGTH - i -1];
+        newAddr[i] = oldAddr[BT_ADDRESS_LENGTH - i - 1];
     }
 }
 
