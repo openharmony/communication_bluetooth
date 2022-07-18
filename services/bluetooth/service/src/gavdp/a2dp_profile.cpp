@@ -913,7 +913,7 @@ int A2dpProfile::Reconfigure(const uint16_t handle, uint8_t *codecInfo) const
     return ret;
 }
 
-void A2dpProfile::DelayReportNotify(const BtAddr &device, const uint16_t delayValue, void *context)
+void A2dpProfile::DelayReportNotify(const BtAddr &device, const uint16_t delayValue)
 {
     LOG_INFO("[A2dpProfile]%{public}s delayValue(%{public}u)\n", __func__, delayValue);
 
