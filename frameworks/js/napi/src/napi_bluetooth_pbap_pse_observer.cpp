@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 #include <uv.h>
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_pbap_pse_observer.h"
 
 namespace OHOS {
 namespace Bluetooth {
 void NapiPbapPseObserver::OnServiceConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("NapiPbapPseObserver::OnServiceConnectionStateChanged called");
+    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     if (!callbackInfos_[STR_BT_PBAP_PSE_CONNECTION_STATE_CHANGE]) {
-        HILOGW("NapiPbapPseObserver::OnServiceConnectionStateChanged: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiPbapPseObserver::OnServiceConnectionStateChanged: %{public}s is registered by ability",
-        STR_BT_PBAP_PSE_CONNECTION_STATE_CHANGE.c_str());
+
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_PBAP_PSE_CONNECTION_STATE_CHANGE];
     callbackInfo->state_ = state;

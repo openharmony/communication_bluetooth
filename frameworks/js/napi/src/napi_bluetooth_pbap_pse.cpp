@@ -39,7 +39,7 @@ void NapiPbapServer::DefinePbapServerJSClass(napi_env env)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileId::PROFILE_PBAP_SERVER, napiProfile);
-    HILOGI("DefinePbapServerJSClass finished");
+    HILOGI("finished");
 }
 
 napi_value NapiPbapServer::PbapServerConstructor(napi_env env, napi_callback_info info)
@@ -51,7 +51,7 @@ napi_value NapiPbapServer::PbapServerConstructor(napi_env env, napi_callback_inf
 
 napi_value NapiPbapServer::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("On called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -94,7 +94,7 @@ napi_value NapiPbapServer::On(napi_env env, napi_callback_info info)
 
 napi_value NapiPbapServer::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("Off called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -120,7 +120,7 @@ napi_value NapiPbapServer::Off(napi_env env, napi_callback_info info)
 
 napi_value NapiPbapServer::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetConnectionDevices called");
+    HILOGI("enter");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
     PbapServer *profile = PbapServer::GetProfile();
@@ -137,7 +137,7 @@ napi_value NapiPbapServer::GetConnectionDevices(napi_env env, napi_callback_info
 
 napi_value NapiPbapServer::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetDeviceState called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -160,14 +160,16 @@ napi_value NapiPbapServer::GetDeviceState(napi_env env, napi_callback_info info)
     PbapServer *profile = PbapServer::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
+    int status = GetProfileConnectionState(state);
     napi_value result = nullptr;
-    napi_create_int32(env, GetProfileConnectionState(state), &result);
+    napi_create_int32(env, status, &result);
+    HILOGI("status: %{public}d", status);
     return result;
 }
 
 napi_value NapiPbapServer::Disconnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("Disconnect called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -193,6 +195,7 @@ napi_value NapiPbapServer::Disconnect(napi_env env, napi_callback_info info)
 
     napi_value result = nullptr;
     napi_get_boolean(env, res, &result);
+    HILOGI("res: %{public}d", res);
     return result;
 }
 
