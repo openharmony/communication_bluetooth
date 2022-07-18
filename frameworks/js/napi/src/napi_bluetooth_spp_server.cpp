@@ -37,7 +37,7 @@ void DefineSppFunctions(napi_env env, napi_value exports)
 
 napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 {
-    HILOGI("SppListen called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_THREE] = {0};
@@ -65,7 +65,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
     napi_value promise = nullptr;
 
     if (argc == expectedArgsCount) {
-        HILOGI("SppListen callback mode");
+        HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM2], &valueType);
         if (valueType != napi_function) {
@@ -77,7 +77,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
     } else {
-        HILOGI("SppListen promise mode");
+        HILOGI("promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
 
@@ -152,7 +152,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 
 napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
 {
-    HILOGI("SppAccept called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -184,7 +184,7 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
     napi_value promise = nullptr;
 
     if (argc == expectedArgsCount) {
-        HILOGI("SppAccept callback mode");
+        HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM1], &valueType);
         if (valueType != napi_function) {
@@ -196,7 +196,7 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
     } else {
-        HILOGI("SppAccept promise mode");
+        HILOGI("promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
 
@@ -260,7 +260,7 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
 
 napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info info)
 {
-    HILOGI("SppCloseServerSocket called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};

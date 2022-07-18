@@ -35,7 +35,7 @@ void NapiProfile::SetProfile(ProfileId code, napi_value profile)
 
 napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetProfile called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -64,7 +64,7 @@ napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
 
 void NapiProfile::ProfileEnumInit(napi_env env, napi_value exports)
 {
-    HILOGI("ProfileEnumInit start");
+    HILOGI("enter");
     napi_value sppTypeObj = SppTypeInit(env);
     napi_value playingStateObj = PlayingStateInit(env);
     napi_value profileIdObj = ProfileIdInit(env);
@@ -74,12 +74,12 @@ void NapiProfile::ProfileEnumInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ProfileId", profileIdObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    HILOGI("ProfileEnumInit end");
+    HILOGI("end");
 }
 
 napi_value NapiProfile::SppTypeInit(napi_env env)
 {
-    HILOGI("SppTypeInit");
+    HILOGI("enter");
     napi_value sppType = nullptr;
     napi_create_object(env, &sppType);
     SetNamedPropertyByInteger(env, sppType, SppType::SPP_RFCOMM, "SPP_RFCOMM");
@@ -88,7 +88,7 @@ napi_value NapiProfile::SppTypeInit(napi_env env)
 
 napi_value NapiProfile::PlayingStateInit(napi_env env)
 {
-    HILOGI("PlayingStateInit");
+    HILOGI("enter");
     napi_value playingState = nullptr;
     napi_create_object(env, &playingState);
     SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_NOT_PLAYING, "STATE_NOT_PLAYING");
@@ -98,7 +98,7 @@ napi_value NapiProfile::PlayingStateInit(napi_env env)
 
 napi_value NapiProfile::ProfileIdInit(napi_env env)
 {
-    HILOGI("ProfileIdInit");
+    HILOGI("enter");
     napi_value profileId = nullptr;
     napi_create_object(env, &profileId);
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_A2DP_SINK, "PROFILE_A2DP_SINK");
