@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,15 @@
 /**
  * SPP Test Page Of Bluetooth test
  */
+//import PromptDialog from './components/dialog/PromptDialog.ets'
 import { TitleComponent } from '../../../../Component/titleComponent';
 import HeadComponent from '../../../../component/headcomponent';
-import bluetooth from '@ohos.bluetooth';
+import ConfigData from '../../../../Utils/ConfigData';
 import LogUtil from '../../../../Utils/LogUtil';
+import bluetooth from '@ohos.bluetooth';
+import BluetoothModel from '../../../model/BluetoothModel';
+import BluetoothDevice from '../../../model/BluetoothDevice'
+import BluetoothDeviceController from '../../../controller/BluetoothDeviceController';
 
 let MODEL = "bluetoothModel:"
 
@@ -28,37 +33,196 @@ let MODEL = "bluetoothModel:"
 struct SppClient {
   @State message: string = "";
   @State isConnection: boolean = false;
+  @State btConnectionState: number = 0;
+  @State profileType: number = 0;
+  @State connectionStateInfo: string = "";
   private stateBT: string = "";
-//  @State deviceId: string = "08:FB:EA:1C:06:D7";
-  @State deviceId: string = "08:FB:EA:7A:68:53";
-  private sppOption: any = {uuid: '00001810-0000-1000-8000-00805F9B34FB', secure: false, type: 0};
+//  private sppOption: any = {uuid: '00001810-0000-1000-8000-00805F9B34FB', secure: false, type: 0};
+  private sppOption: any ={};
+  private uuid: string = AppStorage.Get('inputUuid');
+//  private uuid: string = '00001101-0000-1000-8000-00805F9B34FB';
   private serverNumber: number = -1;
   private clientNumber: number = -1;
   private sppWriteText: string = '';
+//  private deviceId = router.getParams().deviceId;
+  @State deviceId: string = AppStorage.Get('inputDeviceId');
+  @State writeData: any = '';
+  private TAG_PAGE = ConfigData.TAG + 'Paired_Device ';
+  @State btEnable: boolean = false;
+  @State currentClick: number = -1;
+  @StorageLink('pairedDeviceInfo') pairingDevice: BluetoothDevice = new BluetoothDevice;
+  @StorageLink('btDeviceController') controller: BluetoothDeviceController = new BluetoothDeviceController;
+  @State pairPinCode: string = '';
+
+  pairDialog: CustomDialogController = new CustomDialogController({
+    builder: PairDialog({
+      deviceName: this.pairingDevice.deviceName,
+      pinCode: this.pairPinCode,
+      action: (accept: boolean) => {
+        this.confirmPairing(accept);
+      }
+    }),
+    alignment: DialogAlignment.Bottom,
+    autoCancel: true
+  });
+
+  aboutToAppear() {
+    this.btEnable = BluetoothModel.isStateOn();
+    AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
+  }
 
   build() {
     Row() {
       Column() {
-        HeadComponent({headName: $r('app.string.spp_test_title'), isActive: true});
-        Stack().height("0.5vp").backgroundColor("#000000");
         Column() {
-          Text("请点击需要测试的方法")
-            .margin({top: "20vp"})
-            .padding("5vp")
-            .fontSize("15vp")
-            .fontColor("#4444444");
+          HeadComponent({ headName: $r('app.string.spp_client_test_title'), isActive: true });
+          Stack().height("0.5vp").backgroundColor("#000000");
+          Row() {
+            Text("目标设备MAC：").fontSize("20vp")
+//            TextInput( { text: this.deviceId, placeholder: "8C:7A:3D:7D:DF:DD" } )
+//            TextInput( { text: this.deviceId, placeholder: "54:EF:92:C0:9A:7B" } )
+//            TextInput( { text: this.deviceId, placeholder: "70:F7:54:95:F3:A1" } )
+//            TextInput( { text: this.deviceId, placeholder: "08:FB:EA:7A:67:ED" } )
+              TextInput( { text: this.deviceId, placeholder: "请输入mac地址" } )
+              .fontSize("20vp")
+              .onChange((str) => {
+                this.deviceId = str;
+                AppStorage.SetOrCreate('inputDeviceId', str)
+              })
+              .width('70%')
+          }
+          .margin( { top: "20vp", left: "20vp", right: "20vp" } )
+          .alignItems(VerticalAlign.Center)
+          Row() {
+            Text("目标设备UUID：").fontSize("20vp")
+            TextInput( { text: this.uuid, placeholder: "请输入uuid" } )
+              .fontSize("20vp")
+              .onChange((str) => {
+                this.uuid = str;
+                AppStorage.SetOrCreate('inputUuid', str)
+              })
+              .width('70%')
+          }
+          .margin( { top: "20vp", left: "20vp", right: "20vp" } )
+          .alignItems(VerticalAlign.Center)
+          Row() {
+            Text("写入目标设备数据：").fontSize("20vp")
+            TextInput( { text: this.writeData, placeholder: "请输入写入的数据" } )
+              .fontSize("20vp")
+              .onChange((str) => {this.writeData = this.strToArrayBuffer(str);})
+              .width('70%')
+          }
+          .margin( { top: "20vp", left: "20vp", right: "20vp" } )
+          .alignItems(VerticalAlign.Center)
 
-          List() {
-            //spp客户端
-            ListItem() {
-              TitleComponent({ title: "spp_client_test" });
+          List({ space: 1 }) {
+          ListItem() {
+            TitleComponent({
+              title: "enableBluetooth",
+              bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+            });
+          }
+          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+          .onClick(() => {
+            this.currentClick = 0;
+            if (this.btEnable) {
+              this.message = '蓝牙已经使能';
+              return;
             }
+            let ret = BluetoothModel.enableBluetooth();
+            this.btEnable = ret;
+            AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
+            this.message = "蓝牙使能执行结果：" + ret;
+          })
+
+          ListItem() {
+            TitleComponent({
+              title: "disableBluetooth",
+              bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+            });
+          }
+          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+          .onClick(() => {
+            this.currentClick = 1;
+            if (!this.btEnable) {
+              this.message = '蓝牙还未使能';
+              return;
+            }
+            let ret = BluetoothModel.disableBluetooth();
+            this.btEnable = false;
+            AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
+            this.message = "蓝牙去使能执行结果：" + ret;
+          })
+
+          ListItem() {
+            TitleComponent({
+              title: "getState",
+              bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+            });
+          }
+          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+          .onClick(() => {
+            this.currentClick = 2;
+            let ret = BluetoothModel.getState();
+            switch (ret) {
+              case 0:
+                this.stateBT = 'STATE_OFF';
+                break;
+              case 1:
+                this.stateBT = 'STATE_TURNING_ON';
+                break;
+              case 2:
+                this.stateBT = 'STATE_ON';
+                break;
+              case 3:
+                this.stateBT = 'STATE_TURNING_OFF';
+                break;
+              case 4:
+                this.stateBT = 'STATE_BLE_TURNING_ON';
+                break;
+              case 5:
+                this.stateBT = 'STATE_BLE_ON';
+                break;
+              case 6:
+                this.stateBT = 'STATE_BLE_TURNING_OFF';
+                break;
+              default:
+                this.stateBT = '未知状态';
+                break;
+            }
+            this.message = "当前蓝牙的状态是：" + this.stateBT;
+          })
+
+          ListItem() {
+            TitleComponent({
+              title: "getBtConnectionState",
+              bgColor: this.currentClick === 3 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+            });
+          }
+          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+          .onClick(() => {
+            this.currentClick = 3;
+            let ret = BluetoothModel.getBtConnectionState();
+            this.message = "当前连接状态是：" + ret;
+          })
+
             // 客户端连接
             ListItem() {
               TitleComponent({ title: "spp_client_connect" });
             }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
             .onClick(() => {
-              this.sppClientConnect()
+                bluetooth.sppConnect(this.deviceId, {
+                  uuid: this.uuid,
+                  secure: false,
+                  type: 0
+                }, (code, socketID) => {
+                  if (code.code != 0) {
+                    return;
+                  }
+                  this.acceptClientSocket(socketID);
+                  LogUtil.info(MODEL + 'sppConnect callback socketNumber: ' + socketID);
+                  this.message = "客户端连接成功!";
+                });
             })
 
             // 将设备ID传到服务端
@@ -66,7 +230,15 @@ struct SppClient {
               TitleComponent({ title: "spp_client_write" });
             }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
             .onClick(() => {
-              this.sppClientWrite()
+              LogUtil.info(MODEL + 'sppWrite clientNumber: ' + JSON.stringify(this.clientNumber));
+              const sppWriteSuccess = bluetooth.sppWrite(this.clientNumber, this.writeData);
+              if (sppWriteSuccess) {
+                console.log('sppWrite successfully');
+                this.message = "写入成功 ";
+              } else {
+                console.log('sppWrite failed');
+                this.message = "写入失败";
+              }
             })
 
             //关闭客户端
@@ -78,11 +250,10 @@ struct SppClient {
             })
 
           }.margin(20);
-          Text(this.message)
+          Text("接口调用结果： " + this.message)
             .textAlign(TextAlign.Start)
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
-
-          TitleComponent({ title: this.sppWriteText })
+//          TitleComponent({ title: this.sppWriteText })
         }
         .visibility(Visibility.Visible);
       }
@@ -93,38 +264,10 @@ struct SppClient {
     .alignItems(VerticalAlign.Top)
   }
 
-  sppClientConnect() {
-    bluetooth.sppConnect(
-      this.deviceId,
-      this.sppOption,
-      (code,socketID) => {
-        if (code.code != 0) {
-          return;
-        }
-        this.acceptClientSocket(socketID);
-        LogUtil.info(MODEL + 'sppConnect callback socketNumber: ' + socketID);
-      }
-    );
-  }
-
-  sppClientWrite() {
-    LogUtil.info(MODEL + 'sppWrite clientNumber: ' + JSON.stringify(this.clientNumber));
-    const sppWriteSuccess = bluetooth.sppWrite(
-      this.clientNumber,
-    this.strToArrayBuffer(this.deviceId)
-    );
-    if (sppWriteSuccess) {
-      console.log('sppWrite successfully');
-      this.sppWriteText = 'write success';
-    } else {
-      console.log('sppWrite failed');
-      this.sppWriteText = 'write false';
-    }
-  }
-
   sppClientClose() {
     LogUtil.info(MODEL + 'sppCloseClientSocket clientNumber: ' + JSON.stringify(this.clientNumber))
     bluetooth.sppCloseClientSocket(this.clientNumber);
+    this.message = '关闭成功 clientNumber' + this.clientNumber;
   }
 
   /**
@@ -142,11 +285,11 @@ struct SppClient {
     console.log('spp bluetooth read data is: ' + data[0]);
   }
 
-  /**
-  * 字符串转arrayBuffrt
-  * @param {*} str 需要转换的字符串
-  * @returns 返回 arrayBuffer
-  */
+/**
+* 字符串转arrayBuffer
+* @param {*} str 需要转换的字符串
+* @returns 返回 arrayBuffer
+*/
   strToArrayBuffer (str) {
     let array = new Uint8Array(str.length);
     for(var i = 0; i < str.length; i++) {
@@ -154,4 +297,220 @@ struct SppClient {
     }
     return array.buffer
   }
+
+  /**
+* Pair device
+* @param device
+*/
+  pairDevice(deviceId: string) {
+    this.controller.pair(this.deviceId, (pinCode: string) => {
+      LogUtil.info(this.TAG_PAGE + 'pairDevice success callback : pinCode = ' + pinCode);
+      // show pair pin dialog
+      this.pairPinCode = pinCode
+      this.pairingDevice.deviceId = this.deviceId;
+      this.pairingDevice.deviceName = this.deviceId;
+      this.pairDialog.open();
+    }, () => {
+      LogUtil.info(this.TAG_PAGE + 'pairDevice error callback');
+      this.showPairFailedDialog()
+    })
+  }
+
+  /**
+   * Confirm pairing
+   */
+  confirmPairing(accept: boolean) {
+    LogUtil.info(this.TAG_PAGE + 'confirmPairing : pairingDevice + ' + JSON.stringify(this.pairingDevice));
+    this.controller.confirmPairing(this.pairingDevice.deviceId, accept);
+  }
+
+  /**
+   * Show pair failed dialog
+   */
+  showPairFailedDialog() {
+    this.showPairingFailedDialog()
+  }
+
+  /**
+   * Show device illegal prompt dialog
+   */
+  private showDeviceIllegalPromptDialog(action) {
+    AlertDialog.show({
+      message: $r("app.string.bluetooth_address_error_msg"),
+      primaryButton: {
+        value: $r('app.string.cancel'),
+        action: () => {
+          LogUtil.info(this.TAG_PAGE + 'Closed callbacks');
+        }
+      },
+      secondaryButton: {
+        value: $r('app.string.bluetooth_pair_button'),
+        action: () => {
+          action();
+          LogUtil.info(this.TAG_PAGE + `AlertDialog success:`);
+        }
+      },
+      alignment: DialogAlignment.Bottom
+    })
+  }
+
+  /**
+   * Show connect Failed Dialog
+   */
+  private showConnectFailedDialog() {
+    showDialog(
+    $r("app.string.bluetooth_connect_failed"),
+    $r("app.string.bluetooth_connect_failed_msg"),
+    $r("app.string.bluetooth_know_button")
+    );
+  }
+
+  /**
+   * Show pairing failed title Dialog
+   */
+  private showPairingFailedDialog() {
+    showDialog(
+    $r("app.string.pairing_failed_title"),
+    $r("app.string.pairing_failed_message"),
+    $r("app.string.bluetooth_know_button")
+    );
+  }
+
 }
+
+/**
+ * Pair dialog
+ */
+@CustomDialog
+struct PairDialog {
+  dialogController: CustomDialogController;
+  action: (accept: boolean) => void;
+  private deviceName: string = undefined;
+  private pinCode: string;
+
+  aboutToAppear(): void {
+    LogUtil.log(ConfigData.TAG + `bluetooth PairDialog aboutToAppear pinCode = ${this.pinCode}`)
+  }
+
+  build() {
+    Column() {
+      Text($r('app.string.bluetooth_pairing_request'))
+        .fontSize($r('app.float.font_22'))
+        .height($r('app.float.wh_value_60'))
+        .width(ConfigData.WH_100_100)
+        .padding({
+          left: $r('app.float.distance_24'),
+          top: $r('app.float.distance_14'),
+          bottom: $r('app.float.distance_14')
+        })
+      Column() {
+        if (this.pinCode) {
+          Text($r('app.string.bluetooth_pairing_intelligent_device_hit', this.deviceName, this.deviceName))
+            .fontSize($r('app.float.font_16'))
+            .width(ConfigData.WH_100_100)
+            .margin({
+              top: $r('app.float.distance_14'),
+              bottom: $r('app.float.distance_14')
+            })
+
+          Text(`${this.pinCode}`)
+            .fontSize($r('app.float.pinCode_font_size'))
+            .fontWeight(FontWeight.Bolder)
+            .width(ConfigData.WH_100_100)
+            .textAlign(TextAlign.Center)
+            .margin({
+              top: $r('app.float.item_common_horizontal_margin'),
+              bottom: $r('app.float.item_common_horizontal_margin')
+            })
+
+        } else {
+          Text($r('app.string.bluetooth_pairing_media_device_hit'))
+            .fontSize($r('app.float.font_16'))
+            .width(ConfigData.WH_100_100)
+            .margin({
+              bottom: $r('app.float.switch_summary_margin')
+            })
+
+          Text(this.deviceName)
+            .fontSize($r('app.float.font_16'))
+            .width(ConfigData.WH_100_100)
+            .fontWeight(FontWeight.Bold)
+        }
+
+        // button
+        Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+
+          Button() {
+            Text($r('app.string.cancel'))
+              .fontSize($r('app.float.font_16'))
+              .fontColor(Color.Blue)
+          }
+          .backgroundColor($r("app.color.white_bg_color"))
+          .width($r("app.float.wh_value_160"))
+          .height($r("app.float.wh_value_40"))
+          .flexGrow(1)
+          .onClick(() => {
+            this.dialogController.close();
+            this.action(false);
+          })
+
+          Divider()
+            .height($r("app.float.wh_value_24"))
+            .strokeWidth(0.5)
+            .vertical(true)
+            .color(($r("app.color.color_E3E3E3_grey")))
+
+          Button() {
+            Text($r('app.string.bluetooth_pair_button'))
+              .fontSize($r('app.float.font_16'))
+              .fontColor(Color.Blue)
+          }
+          .backgroundColor($r("app.color.white_bg_color"))
+          .width($r("app.float.wh_value_160"))
+          .height($r("app.float.wh_value_40"))
+          .flexGrow(1)
+          .onClick(() => {
+            this.dialogController.close();
+            this.action(true);
+          })
+        }
+        .width(ConfigData.WH_100_100)
+        .height($r('app.float.wh_value_60'));
+      }
+      .width(ConfigData.WH_100_100)
+      .padding({
+        left: $r('app.float.distance_24'),
+        right: $r('app.float.distance_24')
+      })
+    }
+    .padding({
+      left: $r('app.float.distance_24'),
+      right: $r('app.float.distance_24')
+    })
+    .width(ConfigData.WH_100_100);
+  }
+}
+/**
+ * Pair mode prompt
+ * @param dialogTitle Dialog title
+ * @param dialogMessage Dialog message
+ * @param buttonValue Dialog buttonValue
+ */
+function showDialog(dialogTitle: string | Resource, dialogMessage: string | Resource, buttonValue: string | Resource){
+  AlertDialog.show({
+    title: dialogTitle,
+    message: dialogMessage,
+    confirm: {
+      value: buttonValue,
+      action: () => {
+        LogUtil.info('Button-clicking callback')
+      }
+    },
+    cancel: () => {
+      LogUtil.info('Closed callbacks')
+    },
+    alignment: DialogAlignment.Bottom
+  })
+}
+
+
