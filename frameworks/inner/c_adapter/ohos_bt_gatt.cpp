@@ -26,6 +26,7 @@
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 
 #include "securec.h"
 
@@ -81,9 +82,8 @@ public:
             strStream << token;
         }
         strStream >> strs;
-        HILOGI("address: %{public}02X:%{public}02X:***:%{public}02X,scan data: %{public}s",
-            scanResult.addr.addr[0], scanResult.addr.addr[1], scanResult.addr.addr[5], strs.c_str());
-
+        string address = result.GetPeripheralDevice().GetDeviceAddr();
+        HILOGI("device: %{public}s, scan data: %{public}s", GetEncryptAddr(address).c_str(), strs.c_str());
         g_AppCallback->scanResultCb(&scanResult);
     }
 

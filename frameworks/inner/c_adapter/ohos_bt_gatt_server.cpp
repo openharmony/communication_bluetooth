@@ -23,6 +23,7 @@
 #include "ohos_bt_adapter_utils.h"
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 
 #include "securec.h"
 
@@ -80,8 +81,7 @@ public:
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
-        HILOGI("device:%{public}02X:%{public}02X:***:%{public}02X, connect state: %{public}d",
-            dev.remoteAddr.addr[0], dev.remoteAddr.addr[1], dev.remoteAddr.addr[5], state);
+        HILOGI("device: %{public}s, connect state: %{public}d", GET_ENCRYPT_ADDR(device), state);
 
         if (state == static_cast<int>(BTConnectState::CONNECTED)) {
             std::map<int, struct ConnectedDevice>::iterator iter;
@@ -143,8 +143,7 @@ public:
                 item->GetHandle(), item->GetUuid().ToString().c_str());
             vector<GattDescriptor> &descriptors = item->GetDescriptors();
             for (auto des = descriptors.begin(); des != descriptors.end(); des++) {
-                HILOGI("    desHandle: %{public}d, uuid: %{public}s",
-                    des->GetHandle(), des->GetUuid().ToString().c_str());
+                HILOGI("desHandle: %{public}d, uuid: %{public}s", des->GetHandle(), des->GetUuid().ToString().c_str());
             }
         }
 
@@ -282,7 +281,7 @@ public:
 
     void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int result)
     {
-        HILOGI("result:%{public}d", result);
+        HILOGI("result: %{public}d", result);
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
@@ -297,7 +296,7 @@ public:
     void OnConnectionParameterChanged(
         const BluetoothRemoteDevice &device, int interval, int latency, int timeout, int status)
     {
-        HILOGI("");
+        HILOGI("enter");
     }
 
 private:
@@ -354,7 +353,7 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
  */
 int BleGattsRegister(BtUuid appUuid)
 {
-    HILOGI("BleGattsRegister enter");
+    HILOGI("enter");
     if (g_GattsCallback == NULL) {
         HILOGE("callback is null, call BleGattsRegisterCallbacks first");
         return OHOS_BT_STATUS_FAIL;
@@ -387,7 +386,7 @@ int BleGattsRegister(BtUuid appUuid)
  */
 int BleGattsUnRegister(int serverId)
 {
-    HILOGI("BleGattsUnRegister enter");
+    HILOGI("enter");
     if (serverId >= 0 && serverId < MAXIMUM_NUMBER_APPLICATION) {
         if (GATTSERVER(serverId) != NULL) {
             delete GATTSERVER(serverId);
@@ -411,7 +410,7 @@ int BleGattsUnRegister(int serverId)
  */
 int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
 {
-    HILOGI("BleGattsDisconnect enter");
+    HILOGI("enter");
     if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -447,7 +446,7 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
  */
 int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number)
 {
-    HILOGI("BleGattsAddService enter");
+    HILOGI("enter");
     string strUuid(srvcUuid.uuid);
     UUID uuid(UUID::FromString(strUuid));
 
@@ -519,7 +518,7 @@ static int ConvertPermissions(int permission)
 int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
                               int properties, int permissions)
 {
-    HILOGI("BleGattsAddCharacteristic, properties: %{public}d, permissions:%{public}d", properties, permissions);
+    HILOGI("properties: %{public}d, permissions:%{public}d", properties, permissions);
     string strUuid(characUuid.uuid);
     UUID uuid(UUID::FromString(strUuid));
 
@@ -555,7 +554,7 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
 int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int permissions)
 {
     string strUuid(descUuid.uuid);
-    HILOGI("BleGattsAddDescriptor, descUuid: %{public}s", strUuid.c_str());
+    HILOGI("descUuid: %{public}s", strUuid.c_str());
     UUID uuid(UUID::FromString(strUuid));
     GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
     int desHandle = GATTSERVICES(serverId, srvcHandle).index++;
@@ -584,7 +583,7 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
  */
 int BleGattsStartService(int serverId, int srvcHandle)
 {
-    HILOGI("BleGattsStartService, serverId: %{public}d, srvcHandle: %{public}d, uuid: %{public}s",
+    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, uuid: %{public}s",
         serverId, srvcHandle, GATTSERVICE(serverId, srvcHandle)->GetUuid().ToString().c_str());
     GATTSERVICES(serverId, srvcHandle).isAdding = true;
     GATTSERVER(serverId)->AddService(*GATTSERVICE(serverId, srvcHandle));
@@ -602,7 +601,7 @@ int BleGattsStartService(int serverId, int srvcHandle)
  */
 int BleGattsStopService(int serverId, int srvcHandle)
 {
-    HILOGI("BleGattsStopService, serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+    HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVICES(serverId, srvcHandle).isAdding = false;
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     if (g_GattsCallback != NULL && g_GattsCallback->serviceStopCb != NULL) {
@@ -622,7 +621,7 @@ int BleGattsStopService(int serverId, int srvcHandle)
  */
 int BleGattsDeleteService(int serverId, int srvcHandle)
 {
-    HILOGI("BleGattsDeleteService, serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+    HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     delete GATTSERVICE(serverId, srvcHandle);
     GATTSERVICE(serverId, srvcHandle) = NULL;
@@ -641,7 +640,7 @@ int BleGattsDeleteService(int serverId, int srvcHandle)
  * @since 6
  */
 int BleGattsClearServices(int serverId) {
-    HILOGI("BleGattsClearServices, serverId: %{public}d", serverId);
+    HILOGI("serverId: %{public}d", serverId);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -656,7 +655,7 @@ int BleGattsClearServices(int serverId) {
  */
 int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
 {
-    HILOGI("BleGattsSendResponse, serverId: %{public}d", serverId);
+    HILOGI("serverId: %{public}d", serverId);
     std::map<int, struct ConnectedDevice>::iterator iter;
     iter = g_MapConnectedDevice.find(param->connectId);
 
@@ -691,18 +690,15 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
  */
 int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 {
-    HILOGI("BleGattsSendIndication, serverId: %{public}d", serverId);
+    HILOGI("serverId: %{public}d", serverId);
     std::map<int, struct ConnectedDevice>::iterator iter;
     iter = g_MapConnectedDevice.find(param->connectId);
 
     struct ConnectedDevice value = iter->second;
 
-    HILOGI("device:%{public}02X:%{public}02X:%{public}02X:%{public}02X:%{public}02X:%{public}02X",
-            value.remoteAddr.addr[0], value.remoteAddr.addr[1], value.remoteAddr.addr[2],
-            value.remoteAddr.addr[3], value.remoteAddr.addr[4], value.remoteAddr.addr[5]);
-
     string strAddress;
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
+    HILOGI("device: %{public}s", GetEncryptAddr(strAddress).c_str());
     BluetoothRemoteDevice device(strAddress, 1);
 
     int srvcHandle = 0;
@@ -750,7 +746,7 @@ int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct) {
  */
 int BleGattsRegisterCallbacks(BtGattServerCallbacks *func)
 {
-    HILOGI("BleGattsRegisterCallbacks enter");
+    HILOGI("enter");
     if (func == NULL) {
         return OHOS_BT_STATUS_PARM_INVALID;
     }

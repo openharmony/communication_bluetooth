@@ -23,6 +23,7 @@
 #include "bluetooth_host.h"
 
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
@@ -54,19 +55,19 @@ public:
 
     void Register(std::shared_ptr<A2dpSinkObserver> &observer)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         a2dpSink_.observers_.Register(observer);
     }
 
     void Deregister(std::shared_ptr<A2dpSinkObserver> &observer)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         a2dpSink_.observers_.Deregister(observer);
     }
 
     void OnConnectionStateChanged(const RawAddress &device, int state) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("device: %{public}s, state: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), state);
         a2dpSink_.observers_.ForEach([device, state](std::shared_ptr<A2dpSinkObserver> observer) {
             observer->OnConnectionStateChanged(BluetoothRemoteDevice(device.GetAddress(), 0), state);
         });
@@ -86,7 +87,7 @@ public:
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
-        HILOGI("A2dpSink::impl::BluetoothA2dpSinkDeathRecipient::OnRemoteDied starts");
+        HILOGI("enter");
         a2dpSinkDeath_.proxy_->AsObject()->RemoveDeathRecipient(a2dpSinkDeath_.deathRecipient_);
         a2dpSinkDeath_.proxy_ = nullptr;
     }
@@ -97,10 +98,10 @@ private:
 
 A2dpSink::impl::impl()
 {
-    HILOGI("A2dpSink::impl::impl start");
+    HILOGI("start");
     GetProxy();
     if (proxy_ == nullptr) {
-        HILOGI("A2dpSink::get proxy_ failed");
+        HILOGI("get proxy_ failed");
         return;
     }
 
@@ -109,7 +110,7 @@ A2dpSink::impl::impl()
 
     observerImp_ = new (std::nothrow) BluetoothA2dpSinkObserverImp(*this);
     if (observerImp_ == nullptr) {
-        HILOGI("A2dpSink::get observerImp_ failed");
+        HILOGI("get observerImp_ failed");
         return;
     }
     proxy_->RegisterObserver(observerImp_);
@@ -117,7 +118,7 @@ A2dpSink::impl::impl()
 
 A2dpSink::impl::~impl()
 {
-    HILOGD("A2dpSink::impl::~impl  start");
+    HILOGI("start");
     if (proxy_ != nullptr) {
         proxy_->DeregisterObserver(observerImp_);
         proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
@@ -126,34 +127,34 @@ A2dpSink::impl::~impl()
 
 void A2dpSink::impl::GetProxy()
 {
-    HILOGI("A2dpSink::impl::GetProxy start");
+    HILOGI("start");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
-        HILOGE("A2dpSink::impl::GetProxy error: no samgr");
+        HILOGE("error: no samgr");
         return;
     }
 
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (!hostRemote) {
-        HILOGE("A2dpSink::impl:GetProxy failed: no hostRemote");
+        HILOGE("failed: no hostRemote");
         return;
     }
 
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     if (!hostProxy) {
-        HILOGE("A2dpSink::impl::GetProxy error: host no proxy");
+        HILOGE("error: host no proxy");
         return;
     }
 
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_A2DP_SINK);
     if (!remote) {
-        HILOGE("A2dpSink::impl::GetProxy error: no remote");
+        HILOGE("error: no remote");
         return;
     }
 
     proxy_ = iface_cast<IBluetoothA2dpSink>(remote);
     if (!proxy_) {
-        HILOGE("A2dpSink::impl::GetProxy error: no proxy");
+        HILOGE("error: no proxy");
         return;
     }
 }
@@ -162,35 +163,35 @@ A2dpSink::A2dpSink()
 {
     pimpl = std::make_unique<impl>();
     if (!pimpl) {
-        HILOGE("A2dpSink::A2dpSink fails: no pimpl");
+        HILOGE("fails: no pimpl");
     }
 }
 
 A2dpSink::~A2dpSink()
 {
-    HILOGI("A2dpSink::~A2dpSink start");
+    HILOGI("start");
 }
 
 void A2dpSink::RegisterObserver(A2dpSinkObserver *observer)
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter");
     std::shared_ptr<A2dpSinkObserver> pointer(observer, [](A2dpSinkObserver *) {});
     pimpl->observers_.Register(pointer);
 }
 
 void A2dpSink::DeregisterObserver(A2dpSinkObserver *observer)
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter");
     std::shared_ptr<A2dpSinkObserver> pointer(observer, [](A2dpSinkObserver *) {});
     pimpl->observers_.Deregister(pointer);
 }
 
 int A2dpSink::GetDeviceState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGI("[A2dpSink] input parameter error.");
+        HILOGI("input parameter error.");
         return RET_BAD_STATUS;
     }
 
@@ -198,7 +199,7 @@ int A2dpSink::GetDeviceState(const BluetoothRemoteDevice &device) const
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->GetDeviceState(RawAddress(device.GetDeviceAddr()));
     } else {
-        HILOGI("[A2dpSink] proxy or bt disable.");
+        HILOGI("proxy or bt disable.");
     }
 
     return ret;
@@ -206,7 +207,7 @@ int A2dpSink::GetDeviceState(const BluetoothRemoteDevice &device) const
 
 std::vector<BluetoothRemoteDevice> A2dpSink::GetDevicesByStates(std::vector<int> states) const
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter");
     std::vector<BluetoothRemoteDevice> devices;
 
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
@@ -228,10 +229,10 @@ std::vector<BluetoothRemoteDevice> A2dpSink::GetDevicesByStates(std::vector<int>
 
 int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGI("[A2dpSink] input parameter error.");
+        HILOGI("input parameter error.");
         return RET_BAD_STATUS;
     }
 
@@ -239,7 +240,7 @@ int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device) const
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->GetPlayingState(RawAddress(device.GetDeviceAddr()));
     } else {
-        HILOGI("[A2dpSink] proxy or bt disable.");
+        HILOGI("proxy or bt disable.");
     }
 
     return ret;
@@ -247,10 +248,10 @@ int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device) const
 
 bool A2dpSink::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGI("[A2dpSink] input parameter error.");
+        HILOGI("input parameter error.");
         return false;
     }
 
@@ -258,7 +259,7 @@ bool A2dpSink::Connect(const BluetoothRemoteDevice &device)
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->Connect(RawAddress(device.GetDeviceAddr()));
     } else {
-        HILOGI("[A2dpSink] proxy or bt disable.");
+        HILOGI("proxy or bt disable.");
         return false;
     }
     return (RET_NO_ERROR == ret);
@@ -266,10 +267,10 @@ bool A2dpSink::Connect(const BluetoothRemoteDevice &device)
 
 bool A2dpSink::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGI("[A2dpSink] input parameter error.");
+        HILOGI("input parameter error.");
         return false;
     }
 
@@ -277,7 +278,7 @@ bool A2dpSink::Disconnect(const BluetoothRemoteDevice &device)
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->Disconnect(RawAddress(device.GetDeviceAddr()));
     } else {
-        HILOGI("[A2dpSink] proxy or bt disable.");
+        HILOGI("proxy or bt disable.");
         return false;
     }
     return (RET_NO_ERROR == ret);
@@ -285,18 +286,18 @@ bool A2dpSink::Disconnect(const BluetoothRemoteDevice &device)
 
 A2dpSink *A2dpSink::GetProfile()
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter");
     static A2dpSink service;
     return &service;
 }
 
 bool A2dpSink::SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
 {
-    HILOGI("[A2dpSink] %s", __func__);
+    HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
 
     if ((!device.IsValidBluetoothRemoteDevice()) || (((int)BTStrategyType::CONNECTION_ALLOWED != strategy) &&
                                                         ((int)BTStrategyType::CONNECTION_FORBIDDEN != strategy))) {
-        HILOGI("[A2dpSink] input parameter error.");
+        HILOGI("input parameter error.");
         return false;
     }
 
@@ -304,7 +305,7 @@ bool A2dpSink::SetConnectStrategy(const BluetoothRemoteDevice &device, int strat
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->SetConnectStrategy(RawAddress(device.GetDeviceAddr()), strategy);
     } else {
-        HILOGI("[A2dpSink] proxy or bt disable.");
+        HILOGI("proxy or bt disable.");
         return false;
     }
 
@@ -313,10 +314,10 @@ bool A2dpSink::SetConnectStrategy(const BluetoothRemoteDevice &device, int strat
 
 int A2dpSink::GetConnectStrategy(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("[A2dpSink] %{public}s\n", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGI("[A2dpSink] input parameter error.");
+        HILOGI("input parameter error.");
         return RET_BAD_PARAM;
     }
 
@@ -324,7 +325,7 @@ int A2dpSink::GetConnectStrategy(const BluetoothRemoteDevice &device) const
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->GetConnectStrategy(RawAddress(device.GetDeviceAddr()));
     } else {
-        HILOGI("[A2dpSink] proxy or bt disable.");
+        HILOGI("proxy or bt disable.");
         return false;
     }
     return ret;
@@ -332,10 +333,10 @@ int A2dpSink::GetConnectStrategy(const BluetoothRemoteDevice &device) const
 
 bool A2dpSink::SendDelay(const BluetoothRemoteDevice &device, uint16_t delayValue)
 {
-    HILOGI("[A2dpSink] %s", __func__);
+    HILOGI("enter, device: %{public}s, delayValue: %{public}d", GET_ENCRYPT_ADDR(device), delayValue);
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGI("[A2dpSink] input parameter error.");
+        HILOGI("input parameter error.");
         return false;
     }
 
@@ -343,7 +344,7 @@ bool A2dpSink::SendDelay(const BluetoothRemoteDevice &device, uint16_t delayValu
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->SendDelay(RawAddress(device.GetDeviceAddr()), (int32_t)delayValue);
     } else {
-        HILOGI("[A2dpSink] proxy or bt disable.");
+        HILOGI("proxy or bt disable.");
         return false;
     }
 
