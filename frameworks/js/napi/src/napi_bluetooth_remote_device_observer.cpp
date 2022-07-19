@@ -26,7 +26,7 @@ namespace Bluetooth {
 void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
     uv_work_t *work, std::pair<std::string, int> &data)
 {
-    HILOGI("OnPairStatusChanged uv_work_t start");
+    HILOGI("uv_work_t start");
     if (work == nullptr) {
         HILOGE("work is null");
         return;
@@ -45,7 +45,7 @@ void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
     napi_value callResult = 0;
 
     napi_get_undefined(callbackData->env, &undefined);
-    HILOGD("UvQueueWorkOnPairStatusChanged Status is %{public}d", callbackData->data.second);
+    HILOGI("Status is %{public}d", callbackData->data.second);
     napi_create_object(callbackData->env, &result);
     napi_value device = 0;
     napi_create_string_utf8(

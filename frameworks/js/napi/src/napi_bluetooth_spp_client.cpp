@@ -26,7 +26,7 @@ int NapiSppClient::count = 0;
 
 napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("SppConnect called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_THREE] = {0};
@@ -55,7 +55,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
 
     if (argc == expectedArgsCount) {
         // Callback mode
-        HILOGI("SppConnect callback mode");
+        HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
         napi_typeof(env, argv[PARAM2], &valueType);
         if (valueType != napi_function) {
@@ -68,7 +68,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         napi_get_undefined(env, &promise);
     } else {
         // Promise mode
-        HILOGI("SppConnect promise mode");
+        HILOGI("promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
 
@@ -145,7 +145,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
 
 napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info info)
 {
-    HILOGI("SppCloseClientSocket called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -181,6 +181,7 @@ napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info 
 
 napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 {
+    HILOGI("enter");
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
     size_t expectedArgsCount = ARGS_SIZE_TWO;
@@ -314,7 +315,7 @@ void NapiSppClient::SppRead(int id)
 {
     if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
         clientMap[id]->callbackInfos_[STR_BT_SPP_READ] == nullptr) {
-        HILOGE("spp read thread start failed.");
+        HILOGE("thread start failed.");
         return;
     }
     InputStream inputStream = clientMap[id]->client_->GetInputStream();
@@ -322,7 +323,7 @@ void NapiSppClient::SppRead(int id)
     int ret = 0;
 
     while (true) {
-        HILOGI("spp read thread start.");
+        HILOGI("thread start.");
         (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
         HILOGI("inputStream.Read start");
         ret = inputStream.Read(buf, sizeof(buf));
@@ -334,7 +335,7 @@ void NapiSppClient::SppRead(int id)
             HILOGI("callback read data to jshap begin");
             if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
                 clientMap[id]->callbackInfos_[STR_BT_SPP_READ] == nullptr) {
-                HILOGE("sppRead failed");
+                HILOGE("failed");
                 return;
             }
             std::shared_ptr<BufferCallbackInfo> callbackInfo =
