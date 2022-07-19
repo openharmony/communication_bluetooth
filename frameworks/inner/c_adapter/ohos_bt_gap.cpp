@@ -23,6 +23,7 @@
 #include "bluetooth_host.h"
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,11 +56,11 @@ public:
         if (transport == BTTransport::ADAPTER_BREDR) {
             cvtTransport = OHOS_BT_TRANSPORT_BR_EDR;
         }
-        HILOGI("recv OnStateChanged, transport: %{public}d, status: %{public}d", cvtTransport, status);
+        HILOGI("transport: %{public}d, status: %{public}d", cvtTransport, status);
         if (g_GapCallback != NULL && g_GapCallback->stateChangeCallback != NULL) {
             g_GapCallback->stateChangeCallback(cvtTransport, status);
         } else {
-            HILOGD("OnStateChanged, callback func is null!");
+            HILOGI("callback func is null!");
         }
     }
 
@@ -95,12 +96,11 @@ public:
         } else if (transport == BT_TRANSPORT_BLE) {
             transport = OHOS_BT_TRANSPORT_LE;
         }
-        HILOGI("recv OnPairRequested, remoteAddr:%{public}02X:%{public}02X:*:*:*:%{public}02X, transport:%{public}d",
-            remoteAddr.addr[0], remoteAddr.addr[1], remoteAddr.addr[5], transport);
+        HILOGI("device: %{public}s, transport:%{public}d", GET_ENCRYPT_ADDR(device), transport);
         if (g_GapCallback != NULL && g_GapCallback->pairRequestedCallback != NULL) {
             g_GapCallback->pairRequestedCallback(&remoteAddr, transport);
         } else {
-            HILOGW("OnPairRequested, callback func is null!");
+            HILOGW("callback func is null!");
         }
     }
 
@@ -115,14 +115,13 @@ public:
     void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
     {
         int transport = device.GetTransportType();
-        HILOGI("recv OnPairConfirmed, reqType: %{public}d, number: %{public}d, transport: %{public}d",
+        HILOGI("reqType: %{public}d, number: %{public}d, transport: %{public}d",
             reqType, number, transport);
         BdAddr remoteAddr;
         GetAddrFromString(device.GetDeviceAddr(), remoteAddr.addr);
-        HILOGI("OnPairConfirmed, remoteAddr: %{public}02X:%{public}02X:*:*:*:%{public}02X",
-            remoteAddr.addr[0], remoteAddr.addr[1], remoteAddr.addr[5]);
+        HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (g_GapCallback == NULL || g_GapCallback->pairConfiremedCallback == NULL) {
-            HILOGW("OnPairConfirmed, callback func is null!");
+            HILOGW("callback func is null!");
             return;
         }
         if (transport == BT_TRANSPORT_BREDR) {
@@ -134,7 +133,7 @@ public:
                 g_GapCallback->pairConfiremedCallback(&remoteAddr, OHOS_BT_TRANSPORT_LE, reqType, number);
             }
         } else {
-            HILOGE("OnPairConfirmed, transport: %{public}d is invalid", transport);
+            HILOGE("transport: %{public}d is invalid", transport);
         }
     };
 
@@ -146,11 +145,11 @@ public:
      */
     void OnScanModeChanged(int mode)
     {
-        HILOGI("recv OnScanModeChanged, mode: %{public}d", mode);
+        HILOGI("mode: %{public}d", mode);
         if (g_GapCallback != NULL && g_GapCallback->scanModeChangedCallback != NULL) {
             g_GapCallback->scanModeChangedCallback(mode);
         } else {
-            HILOGW("OnScanModeChanged, mode: %{public}d, but callback is null!", mode);
+            HILOGW("mode: %{public}d, but callback is null!", mode);
         }
     };
 
@@ -175,7 +174,7 @@ static BluetoothHostObserverWapper g_HostObserver;
 
 bool EnableBle(void)
 {
-    HILOGI("EnableBle enter");
+    HILOGI("enter");
     if (g_BluetoothHost == NULL) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
@@ -192,7 +191,7 @@ bool EnableBle(void)
 
 bool DisableBle(void)
 {
-    HILOGI("DisableBle enter");
+    HILOGI("enter");
     if (g_BluetoothHost == NULL) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
@@ -209,7 +208,7 @@ bool DisableBle(void)
 
 bool EnableBt(void)
 {
-    HILOGI("EnableBt enter");
+    HILOGI("enter");
     if (g_BluetoothHost == NULL) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
@@ -227,7 +226,7 @@ bool EnableBt(void)
 
 bool DisableBt(void)
 {
-    HILOGI("DisableBt enter");
+    HILOGI("enter");
     if (g_BluetoothHost == NULL) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
@@ -245,7 +244,7 @@ bool DisableBt(void)
 
 int GetBtState()
 {
-    HILOGI("GetBtState enter");
+    HILOGI("enter");
     if (g_BluetoothHost == NULL) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
@@ -268,7 +267,7 @@ bool IsBleEnabled()
 
 bool GetLocalAddr(unsigned char *mac, unsigned int len)
 {
-    HILOGI("GetLocalAddr enter");
+    HILOGI("enter");
     if (mac == NULL || len < OHOS_BD_ADDR_LEN) {
         HILOGE("invalid param : mac:%{public}p, len:%{public}d", mac, len);
         return false;
@@ -279,13 +278,13 @@ bool GetLocalAddr(unsigned char *mac, unsigned int len)
 
     string localAddress = g_BluetoothHost->GetLocalAddress();
     GetAddrFromString(localAddress, mac);
-    HILOGI("address: %{public}02X:%{public}02X:*:*:*:%{public}02X", mac[0], mac[1], mac[5]);
+    HILOGI("device: %{public}s", GetEncryptAddr(localAddress).c_str());
     return true;
 }
 
 bool SetLocalName(unsigned char *localName, unsigned char length)
 {
-    HILOGI("SetLocalName enter");
+    HILOGI("enter");
     if (localName == NULL) {
         HILOGE("invalid param: localName(%{public}p)", localName);
         return false;
@@ -303,7 +302,7 @@ bool SetLocalName(unsigned char *localName, unsigned char length)
 
 bool SetBtScanMode(int mode, int duration)
 {
-    HILOGI("SetBtScanMode, mode: %{public}d, duration: %{public}d", mode, duration);
+    HILOGI("mode: %{public}d, duration: %{public}d", mode, duration);
     if (g_BluetoothHost == NULL) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
@@ -314,41 +313,39 @@ bool SetBtScanMode(int mode, int duration)
 
 bool PairRequestReply(const BdAddr *bdAddr, int transport, bool accept)
 {
-    HILOGI("PairRequestReply, address: %{public}02X:%{public}02X:*:*:*:%{public}02X",
-        bdAddr->addr[0], bdAddr->addr[1], bdAddr->addr[5]);
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
+    HILOGI("device: %{public}s", GetEncryptAddr(strAddress).c_str());
     BluetoothRemoteDevice remoteDevice;
     if (transport == OHOS_BT_TRANSPORT_BR_EDR) {
         remoteDevice = g_BluetoothHost->GetRemoteDevice(strAddress, BT_TRANSPORT_BREDR);
     } else if (transport == OHOS_BT_TRANSPORT_LE) {
         remoteDevice = g_BluetoothHost->GetRemoteDevice(strAddress, BT_TRANSPORT_BLE);
     } else {
-        HILOGE("PairRequestReply, transport: %{public}d is invalid", transport);
+        HILOGE("transport: %{public}d is invalid", transport);
         return false;
     }
     bool ret = remoteDevice.PairRequestReply(accept);
-    HILOGI("PairRequestReply, transport: %{public}d, accept: %{public}d, ret: %{public}d", transport, accept, ret);
+    HILOGI("transport: %{public}d, accept: %{public}d, ret: %{public}d", transport, accept, ret);
     return ret;
 }
 
 bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool accept)
 {
-    HILOGE("SetDevicePairingConfirmation, address: %{public}02X:%{public}02X:*:*:*:%{public}02X, accept: %{public}d",
-        bdAddr->addr[0], bdAddr->addr[1], bdAddr->addr[5], accept);
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
+    HILOGE("device: %{public}s, accept: %{public}d", GetEncryptAddr(strAddress).c_str(), accept);
     BluetoothRemoteDevice remoteDevice;
     if (transport == OHOS_BT_TRANSPORT_BR_EDR) {
         remoteDevice = g_BluetoothHost->GetRemoteDevice(strAddress, BT_TRANSPORT_BREDR);
     } else if (transport == OHOS_BT_TRANSPORT_LE) {
         remoteDevice = g_BluetoothHost->GetRemoteDevice(strAddress, BT_TRANSPORT_BLE);
     } else {
-        HILOGE("SetDevicePairingConfirmation, transport: %{public}d is invalid", transport);
+        HILOGE("transport: %{public}d is invalid", transport);
         return false;
     }
     bool ret = remoteDevice.SetDevicePairingConfirmation(accept);
-    HILOGI("SetDevicePairingConfirmation, ret: %{public}d", ret);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 

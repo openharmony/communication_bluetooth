@@ -23,6 +23,7 @@
 #include "bluetooth_socket.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,15 +62,15 @@ static std::map<int, std::shared_ptr<ClientSocketWrapper>> g_SppClientMap;
  */
 int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned int len)
 {
-    HILOGI("SppServerCreate start!");
+    HILOGI("start!");
     if (!IS_BT_ENABLED()) {
-        HILOGE("SppServerCreate fail,BR is not TURN_ON");
+        HILOGE("fail,BR is not TURN_ON");
         return BT_SPP_INVALID_ID;
     }
 
     if (socketPara->socketType != OHOS_SPP_SOCKET_RFCOMM || strlen(name) != len ||
         strlen(socketPara->uuid.uuid) != socketPara->uuid.uuidLen) {
-        HILOGI("SppServerCreate param invalid!");
+        HILOGI("param invalid!");
         return BT_SPP_INVALID_ID;
     }
 
@@ -82,7 +83,7 @@ int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned i
         ServerWrap->serverSocket = server;
     int serverId = g_ServerIncrease++;
     SPP_SERVER_MAP.insert(std::make_pair(serverId, ServerWrap));
-    HILOGI("SppServerCreate success, serverId: %{public}d", serverId);
+    HILOGI("success, serverId: %{public}d", serverId);
     return serverId;
 }
 
@@ -98,22 +99,22 @@ int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned i
  */
 int SppServerAccept(int serverId)
 {
-    HILOGI("SppServerAccept start, serverId: %{public}d", serverId);
+    HILOGI("start, serverId: %{public}d", serverId);
     SppServerIterator iter = SPP_SERVER_MAP.find(serverId);
     if (iter == SPP_SERVER_MAP.end()) {
-        HILOGE("SppServerAccept serverId is not exist!");
+        HILOGE("serverId is not exist!");
         return BT_SPP_INVALID_ID;
     }
 
     std::shared_ptr<SppServerSocket> server = iter->second->serverSocket;
     if (server == nullptr) {
-        HILOGE("SppServerAccept server is null!");
+        HILOGE("server is null!");
         return BT_SPP_INVALID_ID;
     }
 
     std::shared_ptr<SppClientSocket> client = server->Accept(0);
     if (client == nullptr) {
-        HILOGE("SppServerAccept client is null!");
+        HILOGE("client is null!");
         return BT_SPP_INVALID_ID;
     }
 
@@ -121,7 +122,7 @@ int SppServerAccept(int serverId)
     clientWrap->clientSocket = client;
     int clientId = g_ClientIncrease++;
     SPP_CLIENT_MAP.insert(std::make_pair(clientId, clientWrap));
-    HILOGI("SppServerAccept success, clientId: %{public}d", clientId);
+    HILOGI("success, clientId: %{public}d", clientId);
     return clientId;
 }
 
@@ -134,16 +135,16 @@ int SppServerAccept(int serverId)
  */
 int SppServerClose(int serverId)
 {
-    HILOGI("SppServerClose, serverId: %{public}d", serverId);
+    HILOGI("serverId: %{public}d", serverId);
     SppServerIterator iter = SPP_SERVER_MAP.find(serverId);
     if (iter == SPP_SERVER_MAP.end()) {
-        HILOGE("SppServerClose serverId is not exist!");
+        HILOGE("serverId is not exist!");
         return OHOS_BT_STATUS_FAIL;
     }
 
     std::shared_ptr<SppServerSocket> server = iter->second->serverSocket;
     if (server == nullptr) {
-        HILOGE("SppServerClose server is null!");
+        HILOGE("server is null!");
         return OHOS_BT_STATUS_FAIL;
     }
     server->Close();
@@ -159,7 +160,7 @@ int SppServerClose(int serverId)
  */
 int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
 {
-    HILOGI("SppConnect start!");
+    HILOGI("start!");
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
     std::shared_ptr<BluetoothRemoteDevice> device = std::make_shared<BluetoothRemoteDevice>(strAddress, 0);
@@ -174,10 +175,10 @@ int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
         clientWrap->clientSocket = client;
         int clientId = g_ClientIncrease++;
         SPP_CLIENT_MAP.insert(std::make_pair(clientId, clientWrap));
-        HILOGI("SppConnect success, clientId: %{public}d", clientId);
+        HILOGI("success, clientId: %{public}d", clientId);
         return clientId;
     } else {
-        HILOGE("SppConnect fail, result: %{public}d", result);
+        HILOGE("fail, result: %{public}d", result);
         return BT_SPP_INVALID_ID;
     }
 }
@@ -190,15 +191,15 @@ int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
  */
 int SppDisconnect(int clientId)
 {
-    HILOGI("SppDisconnect, clientId: %{public}d", clientId);
+    HILOGI("clientId: %{public}d", clientId);
     SppClientIterator iter = SPP_CLIENT_MAP.find(clientId);
     if (iter == SPP_CLIENT_MAP.end()) {
-        HILOGE("SppDisconnect clientId is not exist!");
+        HILOGE("clientId is not exist!");
         return OHOS_BT_STATUS_FAIL;
     }
     std::shared_ptr<SppClientSocket> client = iter->second->clientSocket;
     if (client == nullptr) {
-        HILOGE("SppDisconnect client is null!");
+        HILOGE("client is null!");
         return OHOS_BT_STATUS_FAIL;
     }
     client->Close();
@@ -215,21 +216,20 @@ int SppDisconnect(int clientId)
  */
 int SppGetRemoteAddr(int clientId, BdAddr *remoteAddr)
 {
-    HILOGI("SppGetRemoteAddr, clientId: %{public}d", clientId);
+    HILOGI("clientId: %{public}d", clientId);
     SppClientIterator iter = SPP_CLIENT_MAP.find(clientId);
     if (iter == SPP_CLIENT_MAP.end()) {
-        HILOGE("SppGetRemoteAddr clientId is not exist!");
+        HILOGE("clientId is not exist!");
         return OHOS_BT_STATUS_FAIL;
     }
     std::shared_ptr<SppClientSocket> client = iter->second->clientSocket;
     if (client == nullptr) {
-        HILOGE("SppGetRemoteAddr client is null!");
+        HILOGE("client is null!");
         return OHOS_BT_STATUS_FAIL;
     }
     string tmpAddr = client->GetRemoteDevice().GetDeviceAddr();
     GetAddrFromString(tmpAddr, remoteAddr->addr);
-    HILOGI("SppGetRemoteAddr, addr: %{public}02X:%{public}02X:*:*:*:%{public}02X",
-        remoteAddr->addr[0], remoteAddr->addr[1], remoteAddr->addr[5]);
+    HILOGI("device: %{public}s", GetEncryptAddr(tmpAddr).c_str());
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -243,16 +243,16 @@ bool IsSppConnected(int clientId)
 {
     SppClientIterator iter = SPP_CLIENT_MAP.find(clientId);
     if (iter == SPP_CLIENT_MAP.end()) {
-        HILOGE("IsSppConnected clientId is not exist, clientId: %{public}d", clientId);
+        HILOGE("clientId is not exist, clientId: %{public}d", clientId);
         return false;
     }
     std::shared_ptr<SppClientSocket> client = iter->second->clientSocket;
     if (client == nullptr) {
-        HILOGE("IsSppConnected client is null, clientId: %{public}d", clientId);
+        HILOGE("client is null, clientId: %{public}d", clientId);
         return false;
     }
     bool isConnected = client->IsConnected();
-    HILOGI("IsSppConnected, clientId: %{public}d, isConnected: %{public}d", clientId, isConnected);
+    HILOGI("clientId: %{public}d, isConnected: %{public}d", clientId, isConnected);
     return isConnected;
 }
 
@@ -293,19 +293,19 @@ int SppRead(int clientId, char *buf, const unsigned int bufLen)
  */
 int SppWrite(int clientId, const char *data, const unsigned int len)
 {
-    HILOGI("SppWrite start, clientId: %{public}d, len: %{public}d", clientId, len);
+    HILOGI("start, clientId: %{public}d, len: %{public}d", clientId, len);
     SppClientIterator iter = SPP_CLIENT_MAP.find(clientId);
     if (iter == SPP_CLIENT_MAP.end()) {
-        HILOGE("SppWrite clientId is not exist!");
+        HILOGE("clientId is not exist!");
         return OHOS_BT_STATUS_FAIL;
     }
     std::shared_ptr<SppClientSocket> client = iter->second->clientSocket;
     if (client == nullptr) {
-        HILOGE("SppWrite client is null!");
+        HILOGE("client is null!");
         return OHOS_BT_STATUS_FAIL;
     }
     int writeLen = client->GetOutputStream().Write(data, len);
-    HILOGI("SppWrite end, writeLen: %{public}d", writeLen);
+    HILOGI("end, writeLen: %{public}d", writeLen);
     return writeLen;
 }
 }  // namespace Bluetooth
