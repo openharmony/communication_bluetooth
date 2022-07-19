@@ -13,19 +13,18 @@
  * limitations under the License.
  */
 #include <uv.h>
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_hfp_ag_observer.h"
 
 namespace OHOS {
 namespace Bluetooth {
 void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged called");
+    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     if (!callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE]) {
-        HILOGW("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged: callback is not registered by ability.");
+        HILOGW("callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged: %{public}s is registered by ability",
-        STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
 
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE];
@@ -59,13 +58,12 @@ void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const Bluetooth
 
 void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("NapiHandsFreeAudioGatewayObserver::OnScoStateChanged called");
+    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     if (!callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE]) {
-        HILOGW("NapiHandsFreeAudioGatewayObserver::OnScoStateChanged: This callback is not registered by ability.");
+        HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("NapiHandsFreeAudioGatewayObserver::OnScoStateChanged: %{public}s is registered by ability",
-        STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE.c_str());
+
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
         callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE];
 

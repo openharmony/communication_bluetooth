@@ -45,7 +45,7 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
-    HILOGI("DefineHandsFreeUnitJSClass finished");
+    HILOGI("finished");
 }
 
 napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callback_info info)
@@ -58,7 +58,7 @@ napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callba
 
 napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("On called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -101,7 +101,7 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
 
 napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("Off called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -127,7 +127,7 @@ napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info)
 
 napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetConnectionDevices called");
+    HILOGI("enter");
     napi_value ret = nullptr;
     napi_create_array(env, &ret);
     HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
@@ -143,7 +143,7 @@ napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_i
 
 napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetDeviceState called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -166,14 +166,16 @@ napi_value NapiHandsFreeUnit::GetDeviceState(napi_env env, napi_callback_info in
     HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetDeviceState(device);
+    int status = GetProfileConnectionState(state);
     napi_value result = nullptr;
-    napi_create_int32(env, GetProfileConnectionState(state), &result);
+    napi_create_int32(env, status, &result);
+    HILOGI("status: %{public}d", status);
     return result;
 }
 
 napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetDeviceState called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -196,14 +198,16 @@ napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
     HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
     int state = profile->GetScoState(device);
+    int status = GetScoConnectionState(state);
     napi_value result = nullptr;
-    napi_create_int32(env, GetScoConnectionState(state), &result);
+    napi_create_int32(env, status, &result);
+    HILOGI("status: %{public}d", status);
     return result;
 }
 
 napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info)
 {
-    HILOGI("Connect called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -228,12 +232,13 @@ napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info)
     bool isOK = profile->Connect(device);
     napi_value result = nullptr;
     napi_get_boolean(env, isOK, &result);
+    HILOGI("res: %{public}d", isOK);
     return result;
 }
 
 napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("Disconnect called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -258,12 +263,13 @@ napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info)
     bool isOK = profile->Disconnect(device);
     napi_value result = nullptr;
     napi_get_boolean(env, isOK, &result);
+    HILOGI("res: %{public}d", isOK);
     return result;
 }
 
 napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info)
 {
-    HILOGI("ConnectSco called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -288,12 +294,13 @@ napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info)
     bool isOK = profile->ConnectSco(device);
     napi_value result = nullptr;
     napi_get_boolean(env, isOK, &result);
+    HILOGI("res: %{public}d", isOK);
     return result;
 }
 
 napi_value NapiHandsFreeUnit::DisconnectSco(napi_env env, napi_callback_info info)
 {
-    HILOGI("DisconnectSco called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -318,12 +325,13 @@ napi_value NapiHandsFreeUnit::DisconnectSco(napi_env env, napi_callback_info inf
     bool isOK = profile->DisconnectSco(device);
     napi_value result = nullptr;
     napi_get_boolean(env, isOK, &result);
+    HILOGI("res: %{public}d", isOK);
     return result;
 }
 
 napi_value NapiHandsFreeUnit::SendDTMF(napi_env env, napi_callback_info info)
 {
-    HILOGI("SendDTMF called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -353,6 +361,7 @@ napi_value NapiHandsFreeUnit::SendDTMF(napi_env env, napi_callback_info info)
     bool isOK = profile->SendDTMFTone(device, code);
     napi_value result = nullptr;
     napi_get_boolean(env, isOK, &result);
+    HILOGI("res: %{public}d", isOK);
     return result;
 }
 

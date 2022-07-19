@@ -45,7 +45,7 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env)
     NapiProfile::SetProfile(ProfileId::PROFILE_HID_HOST, napiProfile);
     HidHost *profile = HidHost::GetProfile();
     profile->RegisterObserver(&observer_);
-    HILOGI("DefineHidHostJSClass finished");
+    HILOGI("finished");
 }
 
 napi_value NapiBluetoothHidHost::HidHostConstructor(napi_env env, napi_callback_info info)
@@ -57,7 +57,7 @@ napi_value NapiBluetoothHidHost::HidHostConstructor(napi_env env, napi_callback_
 
 napi_value NapiBluetoothHidHost::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("On called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -93,7 +93,7 @@ napi_value NapiBluetoothHidHost::On(napi_env env, napi_callback_info info)
 
 napi_value NapiBluetoothHidHost::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("Off called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -124,7 +124,7 @@ napi_value NapiBluetoothHidHost::Off(napi_env env, napi_callback_info info)
 
 napi_value NapiBluetoothHidHost::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetConnectionDevices called");
+    HILOGI("enter");
 
     size_t expectedArgsCount = ARGS_SIZE_ZERO;
     size_t argc = expectedArgsCount;
@@ -153,7 +153,7 @@ napi_value NapiBluetoothHidHost::GetConnectionDevices(napi_env env, napi_callbac
 
 napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("GetDeviceState called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -179,12 +179,13 @@ napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info
     int profileState = GetProfileConnectionState(state);
     napi_value result = nullptr;
     napi_create_int32(env, profileState, &result);
+    HILOGI("profileState: %{public}d", profileState);
     return result;
 }
 
 napi_value NapiBluetoothHidHost::Connect(napi_env env, napi_callback_info info)
 {
-    HILOGI("Connect called");
+    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -209,6 +210,7 @@ napi_value NapiBluetoothHidHost::Connect(napi_env env, napi_callback_info info)
     bool isOK = profile->Connect(device);
     napi_value result = nullptr;
     napi_get_boolean(env, isOK, &result);
+    HILOGI("isOK: %{public}d", isOK);
     return result;
 }
 
@@ -239,6 +241,7 @@ napi_value NapiBluetoothHidHost::Disconnect(napi_env env, napi_callback_info inf
     bool isOK = profile->Disconnect(device);
     napi_value result = nullptr;
     napi_get_boolean(env, isOK, &result);
+    HILOGI("isOK: %{public}d", isOK);
     return result;
 }
 }  // namespace Bluetooth
