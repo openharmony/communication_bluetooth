@@ -22,6 +22,9 @@
 #include "profile_config.h"
 #include "profile_service_manager.h"
 #include "securec.h"
+#include "idevmgr_hdi.h"
+
+constexpr const char *AUDIO_BLUETOOTH_SERVICE_NAME = "audio_bluetooth_hdi_service";
 
 namespace bluetooth {
 std::recursive_mutex g_a2dpServiceMutex {};
@@ -63,6 +66,7 @@ void ObserverProfile::OnConnectStateChanged(const BtAddr &addr, const int state,
             RawAddress removeActive("");
             service->UpdateActiveDevice(removeActive);
         }
+        service->ConnectManager().DeleteDevice(btAddr);
     } else if (connectState == static_cast<int>(BTConnectState::CONNECTED)) {
         LOG_INFO("[ObserverProfile] %{public}s Add the active device\n", __func__);
         service->UpdateActiveDevice(btAddr);
@@ -71,10 +75,34 @@ void ObserverProfile::OnConnectStateChanged(const BtAddr &addr, const int state,
     if ((connectState == static_cast<int>(BTConnectState::CONNECTED)) ||
         (connectState == static_cast<int>(BTConnectState::DISCONNECTED))) {
         service->ProcessConnectFrameworkCallback(connectState, btAddr);
+        ProcessA2dpHdfLoad(connectState);
     }
 
     service->CheckDisable();
     return;
+}
+
+void ObserverProfile::ProcessA2dpHdfLoad(const int state)
+{
+    LOG_INFO("[ObserverProfile] %{public}s state:%{public}d \n", __func__, state);
+    A2dpService *service = GetServiceInstance(role_);
+    std::vector<int> states = {static_cast<int>(BTConnectState::CONNECTED)};
+    std::vector<RawAddress> devices = service->GetDevicesByStates(states);
+
+    if (state == static_cast<int>(BTConnectState::CONNECTED) && devices.size() == 1) {
+        auto devmgr = OHOS::HDI::DeviceManager::V1_0::IDeviceManager::Get();
+        if (devmgr != nullptr) {
+            LOG_INFO("[ObserverProfile] %{public}s, loadDevice of a2dp HDF", __func__);
+            devmgr->LoadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
+        }
+    }
+    if (state == static_cast<int>(BTConnectState::DISCONNECTED) && devices.size() == 0) {
+        auto devmgr = OHOS::HDI::DeviceManager::V1_0::IDeviceManager::Get();
+        if (devmgr != nullptr) {
+            LOG_INFO("[ObserverProfile] %{public}s, UnloadDevice of a2dp HDF", __func__);
+            devmgr->UnloadDevice(AUDIO_BLUETOOTH_SERVICE_NAME);
+        }
+    }
 }
 
 int ObserverProfile::ProcessConnectStateMessage(
