@@ -548,8 +548,8 @@ int GattClient::Close()
             return result;
         }
     }
-    HILOGE("isRegisterSucceeded_ is null");
-    return GattStatus::REQUEST_NOT_SUPPORT;
+    HILOGI("isRegisterSucceeded_ is false");
+    return GattStatus::GATT_SUCCESS;
 }
 
 int GattClient::DiscoverServices()
