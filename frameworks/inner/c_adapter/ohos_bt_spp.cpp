@@ -68,6 +68,11 @@ int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned i
         return BT_SPP_INVALID_ID;
     }
 
+    if (socketPara == nullptr || name == nullptr) {
+        HILOGE("socketPara is nullptr, or name is nullptr");
+        return BT_SPP_INVALID_ID;
+    }
+
     if (socketPara->socketType != OHOS_SPP_SOCKET_RFCOMM || strlen(name) != len ||
         strlen(socketPara->uuid.uuid) != socketPara->uuid.uuidLen) {
         HILOGI("param invalid!");
@@ -79,6 +84,7 @@ int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned i
     UUID serverUuid(UUID::FromString(tmpUuid));
     std::shared_ptr<SppServerSocket> server = std::make_shared<SppServerSocket>(serverName, serverUuid,
         SppSocketType(socketPara->socketType), socketPara->isEncrypt);
+    HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
     std::shared_ptr<ServerSocketWrapper> ServerWrap = std::make_shared<ServerSocketWrapper>();
         ServerWrap->serverSocket = server;
     int serverId = g_ServerIncrease++;
@@ -161,6 +167,11 @@ int SppServerClose(int serverId)
 int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
 {
     HILOGI("start!");
+    if (socketPara == nullptr || bdAddr == nullptr) {
+        HILOGE("socketPara is nullptr, or bdAddr is nullptr");
+        return BT_SPP_INVALID_ID;
+    }
+
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
     std::shared_ptr<BluetoothRemoteDevice> device = std::make_shared<BluetoothRemoteDevice>(strAddress, 0);
@@ -168,7 +179,7 @@ int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
     UUID serverUuid(UUID::FromString(tmpUuid));
     std::shared_ptr<SppClientSocket> client = std::make_shared<SppClientSocket>(*device, serverUuid,
         SppSocketType(socketPara->socketType), socketPara->isEncrypt);
-
+    HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
     int result = client->Connect();
     if (result == OHOS_BT_STATUS_SUCCESS) {
         std::shared_ptr<ClientSocketWrapper> clientWrap =  std::make_shared<ClientSocketWrapper>();

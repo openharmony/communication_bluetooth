@@ -121,7 +121,7 @@ private:
 
 A2dpSource::impl::impl()
 {
-    HILOGE("start");
+    HILOGI("start");
     GetProxy();
     if (proxy_ == nullptr) {
         HILOGI("get proxy_ failed");
@@ -140,7 +140,7 @@ A2dpSource::impl::impl()
 
 A2dpSource::impl::~impl()
 {
-    HILOGD("start");
+    HILOGI("start");
     if (proxy_ != nullptr) {
         proxy_->DeregisterObserver(observerImp_);
         proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
@@ -191,7 +191,7 @@ A2dpSource::A2dpSource()
 
 A2dpSource::~A2dpSource()
 {
-    HILOGE("start");
+    HILOGI("start");
 }
 
 void A2dpSource::RegisterObserver(A2dpSourceObserver *observer)
@@ -247,7 +247,7 @@ int A2dpSource::GetDeviceState(const BluetoothRemoteDevice &device) const
         HILOGI("proxy or bt disable.");
         return RET_BAD_STATUS;
     }
-
+    HILOGI("state: %{public}d", ret);
     return ret;
 }
 
@@ -267,7 +267,7 @@ int A2dpSource::GetPlayingState(const BluetoothRemoteDevice &device) const
         HILOGI("proxy or bt disable.");
         return RET_BAD_STATUS;
     }
-
+    HILOGI("state: %{public}d", ret);
     return ret;
 }
 
