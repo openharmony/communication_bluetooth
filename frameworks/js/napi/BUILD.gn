@@ -19,7 +19,7 @@ ohos_shared_library("bluetooth") {
     "include",
     "//third_party/node/src",
     "//native_engine",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
@@ -75,7 +75,6 @@ ohos_shared_library("bluetooth") {
     "//foundation/arkui/napi:ace_napi",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
     "//third_party/libuv:uv_static",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -83,6 +82,7 @@ ohos_shared_library("bluetooth") {
     "ability_runtime:ability_manager",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]

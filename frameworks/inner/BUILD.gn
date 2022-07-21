@@ -81,10 +81,10 @@ ohos_shared_library("btframework") {
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "samgr_standard:samgr_proxy",
   ]
