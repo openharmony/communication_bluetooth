@@ -36,8 +36,7 @@ ohos_static_library("btcommon") {
 
   cflags_cc = [ "-fvisibility=hidden" ]
 
-  deps = [
-    "//third_party/bounds_checking_function:libsec_shared",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
+  external_deps = [ "c_utils:utils" ]
 }
