@@ -124,8 +124,8 @@ public:
             return;
         }
 
-        HILOGI("clientId: %{public}d, status: %{public}d", clientId_, status);
-        HILOGI("interval: %{public}d, latency: %{public}d, timeout: %{public}d", interval, latency, timeout);
+        HILOGI("clientId: %{public}d, status: %{public}d, interval: %{public}d, latency: %{public}d, "
+            "timeout: %{public}d", clientId_, status, interval, latency, timeout);
         appCallback_->connectParaUpdateCb(clientId_, interval, latency, timeout, GetGattcResult(status));
     }
 

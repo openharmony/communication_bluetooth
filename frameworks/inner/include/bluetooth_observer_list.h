@@ -47,7 +47,6 @@ private:
 template <typename T>
 BluetoothObserverList<T>::~BluetoothObserverList()
 {
-    HILOGI("enter");
     std::lock_guard<std::mutex> lock(lock_);
     observers_.clear();
 }
@@ -55,7 +54,6 @@ BluetoothObserverList<T>::~BluetoothObserverList()
 template <typename T>
 bool BluetoothObserverList<T>::Register(std::shared_ptr<T> &observer)
 {
-    HILOGI("enter");
     std::lock_guard<std::mutex> lock(lock_);
     for (auto it = observers_.begin(); it != observers_.end(); ++it) {
         if (*it == observer) {
@@ -69,7 +67,6 @@ bool BluetoothObserverList<T>::Register(std::shared_ptr<T> &observer)
 template <typename T>
 bool BluetoothObserverList<T>::Deregister(std::shared_ptr<T> &observer)
 {
-    HILOGI("enter");
     std::lock_guard<std::mutex> lock(lock_);
     for (auto it = observers_.begin(); it != observers_.end(); ++it) {
         if (*it == observer) {
@@ -84,7 +81,6 @@ bool BluetoothObserverList<T>::Deregister(std::shared_ptr<T> &observer)
 template <typename T>
 void BluetoothObserverList<T>::ForEach(const std::function<void(std::shared_ptr<T>)> &observer)
 {
-    HILOGI("enter");
     std::lock_guard<std::mutex> lock(lock_);
     for (const auto &it : observers_) {
         if (it != nullptr) {

@@ -334,7 +334,7 @@ bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool acce
 {
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
-    HILOGE("device: %{public}s, accept: %{public}d", GetEncryptAddr(strAddress).c_str(), accept);
+    HILOGI("device: %{public}s, accept: %{public}d", GetEncryptAddr(strAddress).c_str(), accept);
     BluetoothRemoteDevice remoteDevice;
     if (transport == OHOS_BT_TRANSPORT_BR_EDR) {
         remoteDevice = g_BluetoothHost->GetRemoteDevice(strAddress, BT_TRANSPORT_BREDR);
