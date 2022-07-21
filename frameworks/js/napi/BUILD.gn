@@ -21,8 +21,8 @@ ohos_shared_library("bluetooth") {
     "//native_engine",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/adapter/interfaces/innerkits/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/communication/bluetooth/frameworks/inner/common",
   ]
