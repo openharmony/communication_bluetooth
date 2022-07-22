@@ -613,7 +613,7 @@ public:
      * @brief Notifies the TopAVSession is changed.
      */
 
-    virtual void OnTopSessionChanged(std::string sessionId) = 0;
+    virtual void OnTopSessionChange(std::string sessionId) = 0;
     /**
      * @brief Notifies the playback state is changed.
      */
