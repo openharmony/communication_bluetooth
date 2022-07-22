@@ -350,14 +350,14 @@ void AvrcpTgService::AVSessionObserverImpl::OnSessionRelease(const OHOS::AVSessi
     }
 }
 
-void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChanged(const OHOS::AVSession::AVSessionDescriptor& descriptor)
+void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChange(const OHOS::AVSession::AVSessionDescriptor& descriptor)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s, sessionId:%{public}s",
         __func__, descriptor.sessionId_.c_str());
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
-        service->OnTopSessionChanged(descriptor.sessionId_);
+        service->OnTopSessionChange(descriptor.sessionId_);
     }
 }
 
@@ -2539,7 +2539,7 @@ void AvrcpTgService::OnSessionRelease(std::string sessionId)
 #endif
 }
 
-void AvrcpTgService::OnTopSessionChanged(std::string sessionId)
+void AvrcpTgService::OnTopSessionChange(std::string sessionId)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
 #ifdef AVRCP_AVSESSION
