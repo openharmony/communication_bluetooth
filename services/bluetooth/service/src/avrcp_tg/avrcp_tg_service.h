@@ -355,7 +355,7 @@ public:
 
         void OnSessionCreate(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
         void OnSessionRelease(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
-        void OnTopSessionChanged(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
+        void OnTopSessionChange(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
     private:
         IProfileAvrcpTg *GetService(void);
     };
@@ -947,7 +947,7 @@ public:
     /**
      * @brief Notifies the TopAVSession is changed.
      */
-    void OnTopSessionChanged(std::string sessionId) override;
+    void OnTopSessionChange(std::string sessionId) override;
 
     /**
      * @brief Notifies the playback state is changed.
