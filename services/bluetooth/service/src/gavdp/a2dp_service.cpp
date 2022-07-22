@@ -82,7 +82,7 @@ void ObserverProfile::OnConnectStateChanged(const BtAddr &addr, const int state,
     return;
 }
 
-void ObserverProfile::ProcessA2dpHdfLoad(const int state)
+void ObserverProfile::ProcessA2dpHdfLoad(const int state) const
 {
     LOG_INFO("[ObserverProfile] %{public}s state:%{public}d \n", __func__, state);
     A2dpService *service = GetServiceInstance(role_);

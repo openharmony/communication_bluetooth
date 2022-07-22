@@ -142,13 +142,13 @@ void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
         HILOGE("loop instance is nullptr");
         return;
     }
-    uv_work_t *work = new uv_work_t;
+    uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         HILOGE("create uv_work_t failed!");
         return;
     }
 
-    SysBLEDeviceFoundCallbackData *data = new SysBLEDeviceFoundCallbackData();
+    SysBLEDeviceFoundCallbackData *data = new (std::nothrow) SysBLEDeviceFoundCallbackData();
     if (data == nullptr) {
         HILOGE("create SysBLECallbackData failed!");
         delete work;
@@ -339,13 +339,13 @@ void NapiBluetoothBleCentralManagerCallback::OnStartScanFailed(int resultCode)
         HILOGE("loop instance is nullptr");
         return;
     }
-    uv_work_t *work = new uv_work_t;
+    uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         HILOGE("create uv_work_t failed!");
         return;
     }
 
-    SysBLEStartScanCallbackData *data = new SysBLEStartScanCallbackData();
+    SysBLEStartScanCallbackData *data = new (std::nothrow) SysBLEStartScanCallbackData();
     if (data == nullptr) {
         HILOGE("create SysBLECallbackData failed!");
         delete work;
