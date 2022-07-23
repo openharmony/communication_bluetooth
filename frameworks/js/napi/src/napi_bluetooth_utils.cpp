@@ -690,6 +690,16 @@ napi_value RegisterObserver(napi_env env, napi_callback_info info)
     return ret;
 }
 
+static void RemoveObserver(std::string type)
+{
+    if (g_Observer.find(type) != g_Observer.end()) {
+        g_Observer[type] = nullptr;
+        HILOGI("%{public}s is deregistered", type.c_str());
+    } else {
+        HILOGE("%{public}s has not been registered", type.c_str());
+    }
+}
+
 napi_value DeregisterObserver(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -701,12 +711,7 @@ napi_value DeregisterObserver(napi_env env, napi_callback_info info)
     if (argc == ARGS_SIZE_ONE) {
         std::string type;
         ParseString(env, type, argv[PARAM0]);
-        if (g_Observer.find(type) != g_Observer.end()) {
-            g_Observer[type] = nullptr;
-            HILOGI("%{public}s is deregistered", type.c_str());
-        } else {
-            HILOGE("%{public}s has not been registered", type.c_str());
-        }
+        RemoveObserver(type);
     } else if (argc == expectedArgsCount + 1) {
         NapiSppClient::Off(env, info);
     } else {
@@ -730,9 +735,7 @@ napi_value DeregisterObserver(napi_env env, napi_callback_info info)
             napi_call_function(pCallbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
         }
 
-        if (g_Observer.find(type) != g_Observer.end()) {
-            g_Observer[type] = nullptr;
-        }
+        RemoveObserver(type);
     }
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
