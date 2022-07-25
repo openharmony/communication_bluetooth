@@ -642,7 +642,7 @@ static Packet *SdpParseResponseCommon(
 static void SdpParseErrorResponse(
     const BtAddr *addr, uint16_t transactionId, uint16_t parameterLength, const Packet *packet)
 {
-    if (PacketSize(packet) != parameterLength) {
+    if (PacketSize(packet) != parameterLength || parameterLength != SDP_UINT16_LENGTH) {
         LOG_ERROR("[%{public}s][%{public}d] Different length between [%u] and [%u].",
             __FUNCTION__,
             __LINE__,
@@ -651,9 +651,7 @@ static void SdpParseErrorResponse(
     } else {
         uint16_t errorCode;
         uint8_t buffer[2] = {0};
-        if (parameterLength <= 2) { // 2 is the buffer size
-            PacketPayloadRead(packet, buffer, 0, parameterLength);
-        }
+        PacketPayloadRead(packet, buffer, 0, parameterLength);
         errorCode = BE2H_16(*(uint16_t *)buffer);
         LOG_INFO("[%{public}s][%{public}d] Error Code [0x%04x].", __FUNCTION__, __LINE__, errorCode);
     }
