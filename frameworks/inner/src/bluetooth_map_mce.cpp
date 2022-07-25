@@ -336,7 +336,7 @@ public:
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
-        HILOGI("MapClient::impl::BluetoothMapMceDeathRecipient::OnRemoteDied starts");
+        HILOGI("starts");
         MapMce_.proxy_->AsObject()->RemoveDeathRecipient(MapMce_.deathRecipient_);
         MapMce_.proxy_ = nullptr;
     }
@@ -347,22 +347,22 @@ private:
 
 MapClient::impl::impl()
 {
-    HILOGI("MapClient::impl::impl starts");
+    HILOGI("starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
     if (!hostRemote) {
-        HILOGE("MapClient::impl:impl() failed: no hostRemote");
+        HILOGE("failed: no hostRemote");
         return;
     }
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_MAP_MCE);
 
     if (!remote) {
-        HILOGE("MapClient::impl:impl() failed: no remote");
+        HILOGE("failed: no remote");
         return;
     }
-    HILOGI("MapClient::impl:impl() remote obtained");
+    HILOGI("remote obtained");
 
     proxy_ = iface_cast<IBluetoothMapMce>(remote);
     if (proxy_ == nullptr) {
@@ -375,14 +375,14 @@ MapClient::impl::impl()
 
 MapClient *MapClient::GetProfile()
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     static MapClient mapClient;
     return &mapClient;
 }
 
 MapClient::MapClient() : pimpl(nullptr)
 {
-    HILOGI("%{public}s :excute", __func__);
+    HILOGI("excute");
     pimpl = std::make_unique<impl>();
 }
 
@@ -392,25 +392,25 @@ MapClient::~MapClient()
 
 void MapClient::RegisterObserver(MapClientObserver &observer)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     std::shared_ptr<MapClientObserver> pointer(&observer, [](MapClientObserver *) {});
     pimpl->mapClientObserverList_.Register(pointer);
 }
 
 void MapClient::DeregisterObserver(MapClientObserver &observer)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     std::shared_ptr<MapClientObserver> pointer(&observer, [](MapClientObserver *) {});
     pimpl->mapClientObserverList_.Deregister(pointer);
 }
 
 bool MapClient::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int retInt = RET_BAD_PARAM;
     bool ret = false;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     BluetoothRawAddress rawAddress(device.GetDeviceAddr());
@@ -425,11 +425,11 @@ bool MapClient::Connect(const BluetoothRemoteDevice &device)
 
 bool MapClient::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int retInt = RET_BAD_PARAM;
     bool ret = false;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     BluetoothRawAddress rawAddress(device.GetDeviceAddr());
@@ -444,10 +444,10 @@ bool MapClient::Disconnect(const BluetoothRemoteDevice &device)
 
 bool MapClient::IsConnected(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int retInt = 0;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return false;
     }
     BluetoothRawAddress rawDevice(device.GetDeviceAddr());
@@ -459,7 +459,7 @@ bool MapClient::IsConnected(const BluetoothRemoteDevice &device)
 
 std::vector<BluetoothRemoteDevice> MapClient::GetConnectedDevices() const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     std::vector<BluetoothRemoteDevice> btDeviceList;
     std::vector<BluetoothRawAddress> btDevice;
     if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
@@ -473,7 +473,7 @@ std::vector<BluetoothRemoteDevice> MapClient::GetConnectedDevices() const
 
 std::vector<BluetoothRemoteDevice> MapClient::GetDevicesByStates(const std::vector<int> &statesList) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     std::vector<BluetoothRemoteDevice> btDeviceList;
     std::vector<BluetoothRawAddress> btDevice;
     if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
@@ -487,10 +487,10 @@ std::vector<BluetoothRemoteDevice> MapClient::GetDevicesByStates(const std::vect
 
 int MapClient::GetConnectionState(const BluetoothRemoteDevice &device) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int retState = (int)BTConnectState::DISCONNECTED;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return retState;
     }
     BluetoothRawAddress rawDevice(device.GetDeviceAddr());
@@ -502,11 +502,11 @@ int MapClient::GetConnectionState(const BluetoothRemoteDevice &device) const
 
 bool MapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, const int strategy)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int retInt = RET_BAD_PARAM;
     bool ret = false;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -522,10 +522,10 @@ bool MapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, const
 
 int MapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = (int)BTStrategyType::CONNECTION_FORBIDDEN;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = (int)BTStrategyType::CONNECTION_FORBIDDEN;
@@ -538,10 +538,10 @@ int MapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 
 int MapClient::GetUnreadMessages(const BluetoothRemoteDevice &device, MapMessageType type, uint8_t max)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -554,10 +554,10 @@ int MapClient::GetUnreadMessages(const BluetoothRemoteDevice &device, MapMessage
 
 int MapClient::GetSupportedFeatures(const BluetoothRemoteDevice &device) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_STATUS;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     BluetoothRawAddress rawDevice(device.GetDeviceAddr());
@@ -570,7 +570,7 @@ int MapClient::GetSupportedFeatures(const BluetoothRemoteDevice &device) const
 
 IProfileMapVcard MapClient::impl::ConvertVcardToProfileFormat(MapVcard frameVcard)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     IProfileMapVcard serviceVcard;
     serviceVcard.VERSION = frameVcard.VERSION;    // shall be included
     serviceVcard.N = frameVcard.N;                // shall be included
@@ -585,7 +585,7 @@ IProfileMapVcard MapClient::impl::ConvertVcardToProfileFormat(MapVcard frameVcar
 void MapClient::impl::ConvertEnvelopeToProfileFormat(
     IProfileSendMessageParameters &iProfileMsg, const MapSendMessageParameters &msg)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     MapVcard frameVcard;
     IProfileMapVcard serviceVcard;
     if (msg.message.originator_.size() == 1) {
@@ -626,10 +626,10 @@ void MapClient::impl::ConvertEnvelopeToProfileFormat(
 
 int MapClient::SendMessage(const BluetoothRemoteDevice &device, const MapSendMessageParameters &msg)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_STATUS;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return RET_BAD_PARAM;
     }
     if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
@@ -657,10 +657,10 @@ int MapClient::SendMessage(const BluetoothRemoteDevice &device, const MapSendMes
 
 int MapClient::SetNotificationFilter(const BluetoothRemoteDevice &device, const int mask)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -673,10 +673,10 @@ int MapClient::SetNotificationFilter(const BluetoothRemoteDevice &device, const 
 
 int MapClient::GetMessagesListing(const BluetoothRemoteDevice &device, const GetMessagesListingParameters &para) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -705,11 +705,11 @@ int MapClient::GetMessagesListing(const BluetoothRemoteDevice &device, const Get
 int MapClient::GetMessage(const BluetoothRemoteDevice &device, MapMessageType type, const std::u16string &msgHandle,
     const GetMessageParameters &para) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     std::string u8Str;
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -728,10 +728,10 @@ int MapClient::GetMessage(const BluetoothRemoteDevice &device, MapMessageType ty
 
 int MapClient::UpdateInbox(const BluetoothRemoteDevice &device, MapMessageType type)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -745,10 +745,10 @@ int MapClient::UpdateInbox(const BluetoothRemoteDevice &device, MapMessageType t
 int MapClient::GetConversationListing(
     const BluetoothRemoteDevice &device, const GetConversationListingParameters &para) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -772,10 +772,10 @@ int MapClient::GetConversationListing(
 int MapClient::SetMessageStatus(
     const BluetoothRemoteDevice &device, MapMessageType type, const MapSetMessageStatus &msgStatus)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -794,10 +794,10 @@ int MapClient::SetMessageStatus(
 
 int MapClient::SetOwnerStatus(const BluetoothRemoteDevice &device, const SetOwnerStatusParameters &para)
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -818,10 +818,10 @@ int MapClient::SetOwnerStatus(const BluetoothRemoteDevice &device, const SetOwne
 
 int MapClient::GetOwnerStatus(const BluetoothRemoteDevice &device, const std::string &conversationId) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return ret;
     }
     ret = RET_BAD_STATUS;
@@ -834,14 +834,14 @@ int MapClient::GetOwnerStatus(const BluetoothRemoteDevice &device, const std::st
 
 MapMasInstanceInfoList MapClient::GetMasInstanceInfo(const BluetoothRemoteDevice &device) const
 {
-    HILOGD("%{public}s(): Enter!",  __FUNCTION__);
+    HILOGI("enter");
     MapMasInstanceInfoList frameworkMasInfoList;
     frameworkMasInfoList.isValid = false;
     BluetoothIProfileMasInstanceInfoList infoList;
     std::vector<MapMasInstanceInfo> instanceinfoList;
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("%{public}s :BluetoothRemoteDevice erro", __func__);
+        HILOGE("BluetoothRemoteDevice error");
         return frameworkMasInfoList;
     }
     // process
@@ -849,7 +849,7 @@ MapMasInstanceInfoList MapClient::GetMasInstanceInfo(const BluetoothRemoteDevice
         BluetoothRawAddress rawDevice(device.GetDeviceAddr());
         BluetoothIProfileMasInstanceInfoList infoList = pimpl->proxy_->GetMasInstanceInfo(rawDevice);
 
-        HILOGD("%{public}s(): Test!",  __FUNCTION__);
+        HILOGI("Test!");
         if (infoList.isValid == true) {
             MapMasInstanceInfo info;
             frameworkMasInfoList.isValid = true;
