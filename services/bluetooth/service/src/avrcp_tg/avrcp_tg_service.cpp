@@ -2543,8 +2543,11 @@ void AvrcpTgService::OnTopSessionChange(std::string sessionId)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
 #ifdef AVRCP_AVSESSION
-    if (avSessionController_ != NULL && avSessionController_->GetSessionId().compare(sessionId) == 0) {
-        return;
+    if (avSessionController_ != NULL) {
+        if (avSessionController_->GetSessionId().compare(sessionId) == 0) {
+            return;
+        }
+        avSessionController_->Destroy();
     }
     avSessionController_ = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId);
     if (avSessionController_ != NULL) {
