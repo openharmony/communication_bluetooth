@@ -651,7 +651,9 @@ static void SdpParseErrorResponse(
     } else {
         uint16_t errorCode;
         uint8_t buffer[2] = {0};
-        PacketPayloadRead(packet, buffer, 0, parameterLength);
+        if (parameterLength <= 2) { // 2 is the buffer size
+            PacketPayloadRead(packet, buffer, 0, parameterLength);
+        }
         errorCode = BE2H_16(*(uint16_t *)buffer);
         LOG_INFO("[%{public}s][%{public}d] Error Code [0x%04x].", __FUNCTION__, __LINE__, errorCode);
     }
