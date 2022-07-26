@@ -20,6 +20,8 @@
 #include "hfp_ag_profile_event_sender.h"
 #include "raw_address.h"
 
+#include "hfp_ag_service.h"
+
 namespace bluetooth {
 std::map<std::string, HfpAgRemoteSdpServiceArray> HfpAgSdpClient::g_remoteSdpServiceArrays;
 std::recursive_mutex HfpAgSdpClient::g_hfpSdpMutex;
@@ -41,6 +43,11 @@ void HfpAgSdpClient::SdpCallback(const BtAddr *addr, const SdpService *serviceAr
     if (serviceNum > 0) {
         CopySdpServiceArray(address, serviceAry, serviceNum);
         msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
+    } else {
+        HfpAgSdpClient *sdpClient = static_cast<HfpAgSdpClient *>(context);
+        HfpAgService::GetService()->GetDispatcher()->PostTask(
+            std::bind(&HfpAgSdpClient::DoHspDiscovery, sdpClient, address));
+        return;
     }
     HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
 }
@@ -81,10 +88,101 @@ int HfpAgSdpClient::DoDiscovery(const std::string &remoteAddr, int role)
             HFP_AG_SDP_ATTRIBUTE_SUPPORTED_FEATURES;
     }
 
-    int ret = SDP_ServiceSearchAttribute(&address, &sdpUUid, attributeIdList, nullptr, &HfpAgSdpClient::SdpCallback);
+    int ret = SDP_ServiceSearchAttribute(&address, &sdpUUid, attributeIdList, this, &HfpAgSdpClient::SdpCallback);
     HFP_AG_RETURN_IF_FAIL(ret);
     currentAddr_ = remoteAddr;
     return ret;
+}
+
+void HfpAgSdpClient::SdpHspCallback(const BtAddr *addr, const SdpService *serviceAry,
+                                    uint16_t serviceNum, void *context)
+{
+    int msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_FAIL;
+    std::string address = RawAddress::ConvertToString(addr->addr).GetAddress();
+    if (serviceNum > 0) {
+        CopySdpServiceArray(address, serviceAry, serviceNum);
+        msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
+    } else {
+        HfpAgSdpClient *sdpClient = static_cast<HfpAgSdpClient *>(context);
+        HfpAgService::GetService()->GetDispatcher()->PostTask(
+            std::bind(&HfpAgSdpClient::DoHspHsDiscovery, sdpClient, address));
+        return;
+    }
+    HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
+}
+
+void HfpAgSdpClient::DoHspDiscovery(const std::string &remoteAddr)
+{
+    BtAddr address;
+    address.type = BT_PUBLIC_DEVICE_ADDRESS;
+    RawAddress rawAddr(remoteAddr);
+    rawAddr.ConvertToUint8(address.addr);
+
+    BtUuid classid[HFP_AG_CLIENT_CLASSID_NUM];
+    classid[0].type = BT_UUID_16;
+    classid[0].uuid16 = HSP_UUID_SERVCLASS;
+    SdpUuid sdpUUid;
+    sdpUUid.uuidNum = HFP_AG_CLIENT_CLASSID_NUM;
+    sdpUUid.uuid = &classid[0];
+
+    SdpAttributeIdList attributeIdList;
+    attributeIdList.type = SDP_TYPE_LIST;
+    attributeIdList.attributeIdList.attributeIdNumber = HFP_AG_CLIENT_INITIATOR_ATTR_NUM;
+    attributeIdList.attributeIdList.attributeId[SERVICE_CLASS_ID_LIST_INDEX] =
+        SDP_ATTRIBUTE_SERVICE_CLASS_ID_LIST;
+    attributeIdList.attributeIdList.attributeId[PROTOCOL_DESCRIPTOR_LIST_INDEX] =
+        SDP_ATTRIBUTE_PROTOCOL_DESCRIPTOR_LIST;
+    attributeIdList.attributeIdList.attributeId[INITIATOR_PROFILE_DESCRIPTOR_LIST_INDEX] =
+        SDP_ATTRIBUTE_BLUETOOTH_PROFILE_DESCRIPTOR_LIST;
+    attributeIdList.attributeIdList.attributeId[INITIATOR_SUPPORTED_FEATURES_INDEX] =
+        HSP_AG_SDP_ATTRIBUTE_REMOTE_AUDIO_VOLUME_CONTROL;
+
+    SDP_ServiceSearchAttribute(&address, &sdpUUid, attributeIdList, this, &HfpAgSdpClient::SdpHspCallback);
+    currentAddr_ = remoteAddr;
+    return;
+}
+
+void HfpAgSdpClient::SdpHspHsCallback(const BtAddr *addr, const SdpService *serviceAry,
+    uint16_t serviceNum, void *context)
+{
+    int msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_FAIL;
+    std::string address = RawAddress::ConvertToString(addr->addr).GetAddress();
+    if (serviceNum > 0) {
+        CopySdpServiceArray(address, serviceAry, serviceNum);
+        msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
+    }
+    HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
+}
+
+void HfpAgSdpClient::DoHspHsDiscovery(const std::string &remoteAddr)
+{
+    BtAddr address;
+    address.type = BT_PUBLIC_DEVICE_ADDRESS;
+    RawAddress rawAddr(remoteAddr);
+    rawAddr.ConvertToUint8(address.addr);
+
+    BtUuid classid[HFP_AG_CLIENT_CLASSID_NUM];
+    classid[0].type = BT_UUID_16;
+    classid[0].uuid16 = HSP_HS_UUID_SERVCLASS;
+    SdpUuid sdpUUid;
+    sdpUUid.uuidNum = HFP_AG_CLIENT_CLASSID_NUM;
+    sdpUUid.uuid = &classid[0];
+
+    SdpAttributeIdList attributeIdList;
+    attributeIdList.type = SDP_TYPE_LIST;
+    attributeIdList.attributeIdList.attributeIdNumber = HFP_AG_CLIENT_INITIATOR_ATTR_NUM;
+    attributeIdList.attributeIdList.attributeId[SERVICE_CLASS_ID_LIST_INDEX] =
+        SDP_ATTRIBUTE_SERVICE_CLASS_ID_LIST;
+    attributeIdList.attributeIdList.attributeId[PROTOCOL_DESCRIPTOR_LIST_INDEX] =
+        SDP_ATTRIBUTE_PROTOCOL_DESCRIPTOR_LIST;
+    attributeIdList.attributeIdList.attributeId[INITIATOR_PROFILE_DESCRIPTOR_LIST_INDEX] =
+        SDP_ATTRIBUTE_BLUETOOTH_PROFILE_DESCRIPTOR_LIST;
+    attributeIdList.attributeIdList.attributeId[INITIATOR_SUPPORTED_FEATURES_INDEX] =
+        HSP_AG_SDP_ATTRIBUTE_REMOTE_AUDIO_VOLUME_CONTROL;
+
+    SDP_ServiceSearchAttribute(&address, &sdpUUid, attributeIdList, this, &HfpAgSdpClient::SdpHspHsCallback);
+    currentAddr_ = remoteAddr;
+    return;
 }
 
 bool HfpAgSdpClient::FindAttributes(const std::string &remoteAddr, int role)
@@ -226,6 +324,11 @@ bool HfpAgSdpClient::FindProfileVersion(const std::vector<SdpProfileDescriptor> 
         if (profiles[num].profileUuid.uuid16 == HFP_AG_UUID_SERVCLASS_HFP_HF) {
             version = profiles[num].versionNumber;
             LOG_DEBUG("[HFP AG]%{public}s():Found profile version is [%hu]", __FUNCTION__, version);
+            return true;
+        } else if (profiles[num].profileUuid.uuid16 == HSP_HS_UUID_SERVCLASS
+                    || profiles[num].profileUuid.uuid16 == HSP_UUID_SERVCLASS) {
+            version = profiles[num].versionNumber;
+            LOG_DEBUG("[HSP AG]%{public}s():Found profile version is [%hu]", __FUNCTION__, version);
             return true;
         }
         num++;

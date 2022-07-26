@@ -229,6 +229,13 @@ public:
     void SendRingAndClip(const std::string &device) const;
 
     /**
+     * @brief Process CKpd Event.
+     *
+     * @param device Remote bluetooth address.
+     */
+    void ProcessCKpdEvent(const std::string &device) const;
+
+    /**
      * @brief Get service dispatcher.
      *
      * @return service dispatcher.

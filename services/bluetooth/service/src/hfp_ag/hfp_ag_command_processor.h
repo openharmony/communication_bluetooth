@@ -349,6 +349,14 @@ public:
     void BtrhSetter(HfpAgDataConnection &dataConn, const std::string &arg);
 
     /**
+     * @brief CKPD Setter.
+     *
+     * @param dataConn Data connection.
+     * @param arg AT command argument
+     */
+    void CkpdSetter(HfpAgDataConnection &dataConn, const std::string &arg);
+
+    /**
      * @brief Handle specific AT command.
      *
      * @param dataConn Data connection.
