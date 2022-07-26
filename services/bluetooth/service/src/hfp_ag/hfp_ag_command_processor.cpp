@@ -130,7 +130,11 @@ std::unordered_map<std::string, HfpAgCommandProcessor::HfpAgAtHandler> HfpAgComm
     std::make_pair<std::string, HfpAgAtHandler>("AT+BTRH", {&HfpAgCommandProcessor::BtrhGetter,
                                                             &HfpAgCommandProcessor::BtrhSetter,
                                                             &HfpAgCommandProcessor::AtEmptyFn,
-                                                            &HfpAgCommandProcessor::AtEmptyFn})
+                                                            &HfpAgCommandProcessor::AtEmptyFn}),
+    std::make_pair<std::string, HfpAgAtHandler>("AT+CKPD", {&HfpAgCommandProcessor::AtEmptyFn,
+                                                            &HfpAgCommandProcessor::CkpdSetter,
+                                                            &HfpAgCommandProcessor::AtEmptyFn,
+                                                            &HfpAgCommandProcessor::AtEmptyFn}),
 };
 
 int HfpAgCommandProcessor::StoiTryCatch(HfpAgDataConnection &dataConn, const std::string &arg)
@@ -694,5 +698,11 @@ void HfpAgCommandProcessor::BtrhGetter(HfpAgDataConnection &dataConn, const std:
 void HfpAgCommandProcessor::BtrhSetter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
     SendErrorCode(dataConn, HFP_AG_ERROR_OPERATION_NOT_SUPPORTED);
+}
+
+void HfpAgCommandProcessor::CkpdSetter(HfpAgDataConnection &dataConn, const std::string &arg)
+{
+    SendAtCommand(dataConn, OK);
+    HfpAgProfileEventSender::GetInstance().ProcessCKpdEvent(dataConn.remoteAddr_);
 }
 }  // namespace bluetooth

@@ -171,6 +171,37 @@ void HfpAgStateMachine::ConnectionTimeout() const
     HfpAgService::GetService()->PostEvent(event);
 }
 
+void HfpAgStateMachine::ProcessKeyPressed(const RawAddress &device, const int &callState) const
+{
+    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    HfpAgSystemInterface& mSystemInterface = HfpAgSystemInterface::GetInstance();
+    if (mSystemInterface.IsRinging()) {
+        mSystemInterface.AnswerCall(device.GetAddress());
+    } else if (mSystemInterface.IsInCall()) {
+        if (GetStateInt() == HfpAgAudioState::HFP_AG_AUDIO_STATE_DISCONNECTED) {
+            if (!HfpAgService::GetService()->SetActiveDevice(device)) {
+                LOG_INFO("[HFP AG]%{public}s():[failed to set active device to][%{public}s]", __FUNCTION__,
+                    device.GetAddress().c_str());
+            }
+        } else {
+            mSystemInterface.HangupCall(device.GetAddress());
+        }
+    } else if (GetStateInt() != HfpAgAudioState::HFP_AG_AUDIO_STATE_DISCONNECTED) {
+        profile_.ReleaseAudioConnection();
+    } else {
+        if (callState == HFP_AG_CALL_STATE_DIALING) {
+            LOG_INFO("[HFP AG]%{public}s():already dialling!", __FUNCTION__);
+            return;
+        }
+        std::string dialNumber = mSystemInterface.GetLastDialNumber();
+        if (dialNumber.empty()) {
+            LOG_INFO("[HFP AG]%{public}s():last dial number null!", __FUNCTION__);
+            return;
+        }
+        mSystemInterface.DialOutCall(device.GetAddress(), dialNumber);
+    }
+}
+
 void HfpAgDisconnected::Entry()
 {
     stateMachine_.ProcessDeferredMessage();
@@ -259,6 +290,9 @@ bool HfpAgConnecting::Dispatch(const utility::Message &msg)
             break;
         case HFP_AG_SLC_ESTABLISHED_EVT:
             profile_.ProcessSlcEstablished();
+            Transition(HfpAgStateMachine::CONNECTED);
+            break;
+        case HFP_AG_CONNECTED_EVT:
             Transition(HfpAgStateMachine::CONNECTED);
             break;
         case HFP_AG_CONTROL_OTHER_MODULES_EVT:
@@ -368,6 +402,9 @@ bool HfpAgConnected::Dispatch(const utility::Message &msg)
         case HFP_AG_CLOSE_VOICE_RECOGNITION_EVT:
             profile_.DeactivateVoiceRecognition();
             break;
+        case HFP_AG_PROCESS_CKPD_EVT:
+            stateMachine_.ProcessKeyPressed(RawAddress(event.dev_), callState_);
+            break;
         case HFP_AG_VOICE_RECOGNITION_RESULT_EVT:
             ProcessVoiceRecognitionResult(event.arg1_);
             break;
@@ -375,6 +412,7 @@ bool HfpAgConnected::Dispatch(const utility::Message &msg)
             profile_.SendResultCode(HFP_AG_RESULT_ERROR);
             break;
         case HFP_AG_CALL_STATE_CHANGE:
+            callState_ = event.state_.callState;
             ProcessPhoneStateChange(event);
             break;
         case HFP_AG_SEND_CCLC_RESPONSE:
@@ -609,6 +647,8 @@ std::string HfpAgStateMachine::GetEventName(int what)
             return "HFP_AG_CONNECT_EVT";
         case HFP_AG_DISCONNECT_EVT:
             return "HFP_AG_DISCONNECT_EVT";
+        case HFP_AG_PROCESS_CKPD_EVT:
+            return "HFP_AG_PROCESS_CKPD_EVT";
         case HFP_AG_CONNECT_AUDIO_EVT:
             return "HFP_AG_CONNECT_AUDIO_EVT";
         case HFP_AG_DISCONNECT_AUDIO_EVT:
