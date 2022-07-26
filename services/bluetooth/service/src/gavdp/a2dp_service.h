@@ -116,7 +116,7 @@ private:
      * @return void
      * @since 6.0
      */
-    void ProcessA2dpHdfLoad(const int state);
+    void ProcessA2dpHdfLoad(const int state) const;
     /**
      * @brief Update the stateinfo.
      *
