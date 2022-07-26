@@ -23,6 +23,7 @@ void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getProfile", GetProfile),
+        DECLARE_NAPI_FUNCTION("getProfileInst", GetProfile),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     ProfileEnumInit(env, exports);
