@@ -15,6 +15,10 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_BLE_CENTRAL_MANAGER_SERVER_H
 #define OHOS_BLUETOOTH_STANDARD_BLE_CENTRAL_MANAGER_SERVER_H
 
+#include <cstdint>
+#include <mutex>
+#include <set>
+
 #include "bluetooth_ble_central_manager_stub.h"
 #include "bluetooth_types.h"
 #include "i_bluetooth_ble_central_manager.h"
@@ -37,10 +41,15 @@ public:
     virtual void StopScan() override;
     virtual int ConfigScanFilter(const int clientId, const std::vector<BluetoothBleScanFilter> &filters) override;
     virtual void RemoveScanFilter(const int clientId) override;
+    virtual bool ProxyUid(int32_t uid, bool isProxy) override;
+    virtual bool ResetAllProxy() override;
+    static bool IsProxyUid(int32_t uid);
 
 private:
     BLUETOOTH_DECLARE_IMPL();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleCentralManagerServer);
+    static std::mutex proxyMutex_;
+    static std::set<int32_t> proxyUids_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -40,6 +40,7 @@ struct BluetoothBleCentralManagerServer::impl {
 
     RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
     std::map<sptr<IRemoteObject>, uint32_t>     observersToken_;
+    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
     class BleCentralManagerCallback;
     std::unique_ptr<BleCentralManagerCallback> observerImp_ = std::make_unique<BleCentralManagerCallback>(this);
     IAdapterBle *bleService_ = nullptr;
@@ -72,6 +73,10 @@ public:
             GetEncryptAddr(result.GetPeripheralDevice().GetRawAddress().GetAddress()).c_str());
         observers_->ForEach([this, result](IBluetoothBleCentralManagerCallback *observer) {
             uint32_t  tokenId = this->pimpl_->observersToken_[observer->AsObject()];
+            int32_t uid = this->pimpl_->observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                return;
+            }
             if (PermissionUtils::VerifyUseBluetoothPermission(tokenId) == PERMISSION_DENIED) {
                 HILOGE("OnScanCallback(): failed, check permission failed, tokenId: %{public}u", tokenId);
             } else {
@@ -280,6 +285,35 @@ BluetoothBleCentralManagerServer::~BluetoothBleCentralManagerServer()
     pimpl->eventHandler_->PostSyncTask(
         [&]() { IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->systemStateObserver_)); },
         AppExecFwk::EventQueue::Priority::HIGH);
+}
+
+std::mutex BluetoothBleCentralManagerServer::proxyMutex_;
+std::set<int32_t> BluetoothBleCentralManagerServer::proxyUids_;
+
+bool BluetoothBleCentralManagerServer::ProxyUid(int32_t uid, bool isProxy)
+{
+    HILOGI("lkktest ProxyUid, uid: %{public}d", uid);
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    if (isProxy) {
+        proxyUids_.insert(uid);
+    } else {
+        proxyUids_.erase(uid);
+    }
+    return true;
+}
+
+bool BluetoothBleCentralManagerServer::ResetAllProxy()
+{
+    HILOGI("lkktest ResetAllProxy");
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    proxyUids_.clear();
+    return true;
+}
+
+bool BluetoothBleCentralManagerServer::IsProxyUid(int32_t uid)
+{
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    return proxyUids_.find(uid) != proxyUids_.end();
 }
 
 void BluetoothBleCentralManagerServer::StartScan()
