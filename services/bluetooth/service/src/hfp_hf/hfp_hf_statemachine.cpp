@@ -670,9 +670,9 @@ void HfpHfStateMachine::SyncScoEvents(int state)
 {
     if (state == HFP_HF_AUDIO_STATE_CONNECTED) {
         int spkVolume = OHOS::AudioStandard::AudioSystemManager::GetInstance()->GetVolume(
-            OHOS::AudioStandard::AudioSystemManager::STREAM_VOICE_CALL);
+            OHOS::AudioStandard::STREAM_VOICE_CALL);
         int micVolume = OHOS::AudioStandard::AudioSystemManager::GetInstance()->GetVolume(
-            OHOS::AudioStandard::AudioSystemManager::STREAM_VOICE_CALL);
+            OHOS::AudioStandard::STREAM_VOICE_CALL);
         profile_.SetHfVolume(spkVolume, HFP_HF_VOLUME_TYPE_SPK);
         profile_.SetHfVolume(micVolume, HFP_HF_VOLUME_TYPE_MIC);
 
@@ -834,7 +834,7 @@ void HfpHfStateMachine::ProcessSetVolumeEvent(const HfpHfMessage &event) const
 {
     if (event.arg1_ == HFP_HF_VOLUME_TYPE_SPK) {
         OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetVolume(
-            OHOS::AudioStandard::AudioSystemManager::STREAM_VOICE_CALL, event.arg3_);
+            OHOS::AudioStandard::STREAM_VOICE_CALL, event.arg3_);
     } else if (event.arg1_ == HFP_HF_VOLUME_TYPE_MIC) {
         OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetMicrophoneMute(event.arg3_ == 0);
     } else {
