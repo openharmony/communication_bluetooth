@@ -485,6 +485,89 @@ void BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter>  &filt
     }
 }
 
+BleProxyManager& BleProxyManager::GetInstance()
+{
+    static BleProxyManager instance;
+    return instance;
+}
+
+bool BleProxyManager::ProxyUid(int32_t uid, bool isProxy)
+{
+    if (!GetBleCentralManagerProxy()) {
+        return false;
+    }
+    return proxy_->ProxyUid(uid, isProxy);
+}
+
+bool BleProxyManager::ResetAllProxy()
+{
+    if (!GetBleCentralManagerProxy()) {
+        return false;
+    }
+    return proxy_->ResetAllProxy();
+}
+
+bool BleProxyManager::GetBleCentralManagerProxy()
+{
+    if (proxy_) {
+        return true;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!samgr) {
+        HILOGE("samgr is null");
+        return false;
+    }
+
+    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    if (!hostRemote) {
+        HILOGE("hostRemote is null");
+        return false;
+    }
+    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+    if (!hostProxy) {
+        HILOGE("hostProxy is null");
+        return false;
+    }
+    sptr<IRemoteObject> remote = hostProxy->GetBleRemote(BLE_CENTRAL_MANAGER_SERVER);
+    if (!remote) {
+        HILOGE("remote is null");
+        return false;
+    }
+    proxy_ = iface_cast<IBluetoothBleCentralManager>(remote);
+    if (!proxy_ || !proxy_->AsObject()) {
+        HILOGE("proxy_ is null");
+        return false;
+    }
+    recipient_ = new (std::nothrow) BleCentralManagerDeathRecipient(*this);
+    if (!recipient_) {
+        HILOGE("recipient_ is null");
+        proxy_ = nullptr;
+        return false;
+    }
+    proxy_->AsObject()->AddDeathRecipient(recipient_);
+    return true;
+}
+
+void BleProxyManager::ResetClient()
+{
+    if (proxy_ && proxy_->AsObject()) {
+        proxy_->AsObject()->RemoveDeathRecipient(recipient_);
+    }
+    proxy_ = nullptr;
+}
+
+BleProxyManager::BleCentralManagerDeathRecipient::BleCentralManagerDeathRecipient(
+    BleProxyManager &bleProxyManager) : bleProxyManager_(bleProxyManager) {}
+
+BleProxyManager::BleCentralManagerDeathRecipient::~BleCentralManagerDeathRecipient() {}
+
+void BleProxyManager::BleCentralManagerDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    bleProxyManager_.ResetClient();
+}
+
 BleScanResult::BleScanResult()
 {}
 

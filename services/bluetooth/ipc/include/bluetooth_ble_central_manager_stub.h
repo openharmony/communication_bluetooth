@@ -44,6 +44,8 @@ private:
     ErrCode StopScanInner(MessageParcel &data, MessageParcel &reply);
     ErrCode ConfigScanFilterInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RemoveScanFilterInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode ProxyUidInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode ResetAllProxyInner(MessageParcel &data, MessageParcel &reply);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -33,6 +33,11 @@
 #ifndef BLUETOOTH_BLE_CENTRAL_MANAGER_H
 #define BLUETOOTH_BLE_CENTRAL_MANAGER_H
 
+#include <mutex>
+
+#include "iremote_broker.h"
+#include "refbase.h"
+
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
@@ -424,6 +429,40 @@ public:
         uint16_t manufacturerId_ = 0;
         std::vector<uint8_t> manufactureData_;
         std::vector<uint8_t> manufactureDataMask_;
+};
+
+class IBluetoothBleCentralManager;
+class BleProxyManager {
+public:
+    bool ProxyUid(int32_t uid, bool isProxy);
+    bool ResetAllProxy();
+
+    static BleProxyManager& GetInstance();
+
+private:
+    BleProxyManager() = default;
+    ~BleProxyManager() = default;
+    BleProxyManager(const BleProxyManager& bleProxyManager);
+    const BleProxyManager &operator=(const BleProxyManager& bleProxyManager);
+
+private:
+    class BleCentralManagerDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit BleCentralManagerDeathRecipient(BleProxyManager &bleProxyManager);
+        ~BleCentralManagerDeathRecipient();
+
+        void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+
+    private:
+        BleProxyManager &bleProxyManager_;
+    };
+
+private:
+    bool GetBleCentralManagerProxy();
+    void ResetClient();
+    sptr<IBluetoothBleCentralManager> proxy_;
+    sptr<BleCentralManagerDeathRecipient> recipient_;
+    std::mutex mutex_;
 };
 
 /**
