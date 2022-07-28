@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +35,7 @@ struct SppServer {
   @State deviceId: string = AppStorage.Get('inputDeviceId');
   @State dataReadMessage: string = "";
   private stateBT: string = "";
-//  @State sppOption: any = {uuid: '00001810-0000-1000-8000-00805F9B34FB', secure: false, type: 0};
+  @State writeData: any = '';
   private uuid: string = AppStorage.Get('inputUuid');
   private serverNumber: number = 0;
   private clientNumber: number = 0;
@@ -66,7 +67,7 @@ struct SppServer {
             Stack().height("0.5vp").backgroundColor("#000000");
             Row() {
               Text("目标设备MAC：").fontSize("20vp")
-                TextInput( { text: this.deviceId, placeholder: "请输入mac地址" } )
+              TextInput( { text: this.deviceId, placeholder: "请输入mac地址" } )
                 .fontSize("20vp")
                 .onChange((str) => {
                   this.deviceId = str;
@@ -89,6 +90,16 @@ struct SppServer {
             .margin( { top: "20vp", left: "20vp", right: "20vp" } )
             .alignItems(VerticalAlign.Center)
             Row() {
+              Text("写入目标设备数据：").fontSize("20vp")
+              TextInput( { text: this.writeData, placeholder: "请输入写入的数据" } )
+                .fontSize("20vp")
+                .onChange((str) => {this.writeData = this.strToArrayBuffer(str);})
+                .width('70%')
+            }
+            .margin( { top: "20vp", left: "20vp", right: "20vp" } )
+            .alignItems(VerticalAlign.Center)
+
+            Row() {
               Text("读取的数据为：").fontSize("20vp")
               Text(this.dataReadMessage)
                 .fontSize("20vp")
@@ -97,7 +108,10 @@ struct SppServer {
             .margin( { top: "20vp", left: "20vp", right: "20vp" } )
             .alignItems(VerticalAlign.Center)
 
+          Scroll() {
+            Collumn() {
             List({ space: 1 }) {
+              //使能蓝牙
               ListItem() {
                 TitleComponent({
                   title: "enableBluetooth",
@@ -117,6 +131,7 @@ struct SppServer {
                 this.message = "蓝牙使能执行结果：" + ret;
               })
 
+              //去使能蓝牙
               ListItem() {
                 TitleComponent({
                   title: "disableBluetooth",
@@ -136,6 +151,7 @@ struct SppServer {
                 this.message = "蓝牙去使能执行结果：" + ret;
               })
 
+              //查询蓝牙状态
               ListItem() {
                 TitleComponent({
                   title: "getState",
@@ -175,6 +191,7 @@ struct SppServer {
                 this.message = "当前蓝牙的状态是：" + this.stateBT;
               })
 
+              //查询当前连接状态
               ListItem() {
                 TitleComponent({
                   title: "getBtConnectionState",
@@ -188,85 +205,149 @@ struct SppServer {
                 this.message = "当前连接状态是：" + ret;
               })
 
-            ListItem() {
-              TitleComponent({ title: "spp_server_create" });
-            }
-            .padding({
-              top: $r('app.float.distance_2'),
-              bottom: $r('app.float.distance_2')
-            })
-            .onClick(() => {
-              console.log('spp server socketId create! ');
-              if (this.uuid == '') {
-                this.message = 'uuid为空';
-                return;
+              //服务端(安全模式)连接
+              ListItem() {
+                TitleComponent({ title: "spp_server_create(安全模式)" });
               }
-              // 创建蓝牙服务器侦听套接字, 返回服务端ID
-              bluetooth.sppListen('BluetoothDevice', {uuid: this.uuid, secure: false, type: 0}, (code,serverSocketID) => {
-                console.log('bluetooth error code: ' + code.code);
-                if (code.code == 0) {
-                  console.log('spp server: serverSocketID - ' + serverSocketID);
-                  this.serverNumber = serverSocketID;
-                  this.message = "创建server成功";
+              .padding({
+                top: $r('app.float.distance_2'),
+                bottom: $r('app.float.distance_2')
+              })
+              .onClick(() => {
+                console.log('spp server socketId(safe mode) create! ');
+                if (this.uuid == '') {
+                  this.message = 'uuid为空';
+                  return;
                 }
-              });
-            })
-
-            ListItem() {
-              TitleComponent({ title: "spp_server_accept" });
-            }
-            .padding({
-              top: $r('app.float.distance_2'),
-              bottom: $r('app.float.distance_2')
-            })
-            .onClick(() => {
-              // 连接客户端，返回客户端ID
-                bluetooth.sppAccept(this.serverNumber, (code,clientSocketID) => {
+                // 创建蓝牙服务器侦听套接字, 返回服务端ID
+                bluetooth.sppListen('BluetoothDevice', {uuid: this.uuid, secure: true, type: 0}, (code,serverSocketID) => {
+                  console.log('bluetooth error code: ' + code.code);
                   if (code.code == 0) {
-                    console.log('spp server: clientSocketID - ' + clientSocketID);
-                    this.clientNumber = clientSocketID;
-                    this.message = "接受客户端成功";
-                    bluetooth.on('sppRead', this.clientNumber, this.dataRead.bind(this));
+                    console.log('spp server: serverSocketID(safe mode) - ' + serverSocketID);
+                    this.serverNumber = serverSocketID;
+                    this.message = "创建server成功";
                   }
                 });
-            })
+              })
 
-            ListItem() {
-              TitleComponent({ title: "spp_server_readOn" });
+              //服务端(非安全模式)连接
+              ListItem() {
+                TitleComponent({ title: "spp_server_create(非安全模式)" });
+              }
+              .padding({
+                top: $r('app.float.distance_2'),
+                bottom: $r('app.float.distance_2')
+              })
+              .onClick(() => {
+                console.log('spp server socketId(non-safe mode) create! ');
+                if (this.uuid == '') {
+                  this.message = 'uuid为空';
+                  return;
+                }
+                // 创建蓝牙服务器侦听套接字, 返回服务端ID
+                bluetooth.sppListen('BluetoothDevice', {uuid: this.uuid, secure: false, type: 0}, (code,serverSocketID) => {
+                  console.log('bluetooth error code: ' + code.code);
+                  if (code.code == 0) {
+                    console.log('spp server: serverSocketID(non-safe mode) - ' + serverSocketID);
+                    this.serverNumber = serverSocketID;
+                    this.message = "创建server成功";
+                  }
+                });
+              })
+
+              //服务端接受操作
+              ListItem() {
+                TitleComponent({ title: "spp_server_accept" });
+              }
+              .padding({
+                top: $r('app.float.distance_2'),
+                bottom: $r('app.float.distance_2')
+              })
+              .onClick(() => {
+                // 连接客户端，返回客户端ID
+                  bluetooth.sppAccept(this.serverNumber, (code,clientSocketID) => {
+                    if (code.code == 0) {
+                      console.log('spp server: clientSocketID - ' + clientSocketID);
+                      this.clientNumber = clientSocketID;
+                      this.message = "接受客户端成功";
+                      bluetooth.on('sppRead', this.clientNumber, this.dataRead.bind(this));
+                    }
+                  });
+              })
+
+              //服务端写数据传给客户端
+              ListItem() {
+                TitleComponent({ title: "spp_client_write" });
+              }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+              .onClick(() => {
+                LogUtil.info(MODEL + 'sppWrite clientNumber: ' + JSON.stringify(this.clientNumber));
+                const sppWriteSuccess = bluetooth.sppWrite(this.clientNumber, this.writeData);
+                if (sppWriteSuccess) {
+                  console.log('sppWrite successfully');
+                  this.message = "写入成功 ";
+                } else {
+                  console.log('sppWrite failed');
+                  this.message = "写入失败";
+                }
+              })
+
+              //服务端读操作打开
+              ListItem() {
+                TitleComponent({ title: "spp_server_readOn" });
+              }
+              .padding({
+                top: $r('app.float.distance_2'),
+                bottom: $r('app.float.distance_2')
+              })
+              .onClick(() => {
+                  bluetooth.on('sppRead', this.clientNumber, this.dataRead.bind(this));
+              })
+
+              //服务端读操作关闭
+              ListItem() {
+                TitleComponent({ title: "spp_server_readOff" });
+              }
+              .padding({
+                top: $r('app.float.distance_2'),
+                bottom: $r('app.float.distance_2')
+              })
+              .onClick(() => {
+                bluetooth.off('sppRead', this.clientNumber, this.dataRead.bind(this));
+              })
+
+              //关闭服务端serversocket
+              ListItem() {
+                TitleComponent({ title: "spp_server_close" });
+              }
+              .padding({
+                top: $r('app.float.distance_2'),
+                bottom: $r('app.float.distance_2')
+              })
+              .onClick(() => {
+                LogUtil.info(MODEL + 'sppCloseServerSocket serverNumber: ' + this.serverNumber)
+                bluetooth.sppCloseServerSocket(this.serverNumber);
+                this.message = "关闭服务端";
+              })
+
+              //关闭服务端accept回调的clientsocket
+              ListItem() {
+                TitleComponent({ title: "spp_client_close" });
+              }
+              .padding({
+                top: $r('app.float.distance_2'),
+                bottom: $r('app.float.distance_2')
+              })
+              .onClick(() => {
+                LogUtil.info(MODEL + 'sppCloseClientSocket serverNumber: ' + this.clientNumber)
+                bluetooth.sppCloseClientSocket(this.clientNumber);
+                this.message = "关闭client端";
+              })
+            }.margin(20);
             }
-            .padding({
-              top: $r('app.float.distance_2'),
-              bottom: $r('app.float.distance_2')
-            })
-            .onClick(() => {
-                bluetooth.on('sppRead', this.clientNumber, this.dataRead.bind(this));
-            })
+              .width('100%')
+              .visibility(Visibility.Visible)
+          }.height('50%')
 
-            ListItem() {
-              TitleComponent({ title: "spp_server_close" });
-            }
-            .padding({
-              top: $r('app.float.distance_2'),
-              bottom: $r('app.float.distance_2')
-            })
-            .onClick(() => {
-              LogUtil.info(MODEL + 'sppCloseServerSocket serverNumber: ' + this.serverNumber)
-              bluetooth.sppCloseServerSocket(this.serverNumber);
-              this.message = "关闭服务端";
-            })
-
-            ListItem() {
-              TitleComponent({ title: "spp_server_readOff" });
-            }
-            .padding({
-              top: $r('app.float.distance_2'),
-              bottom: $r('app.float.distance_2')
-            })
-            .onClick(() => {
-              bluetooth.off('sppRead', this.clientNumber, this.dataRead.bind(this));
-            })
-
-          }.margin(20);
           Text("接口调用结果：" + this.message)
             .textAlign(TextAlign.Start)
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
@@ -277,6 +358,20 @@ struct SppServer {
     .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
     .height('100%')
     .alignItems(VerticalAlign.Top)
+  }
+
+
+/**
+* 字符串转arrayBuffer
+* @param {*} str 需要转换的字符串
+* @returns 返回 arrayBuffer
+*/
+  strToArrayBuffer (str) {
+    let array = new Uint8Array(str.length);
+    for(var i = 0; i < str.length; i++) {
+      array[i] = str.charCodeAt(i);
+    }
+    return array.buffer
   }
 
   /**
