@@ -661,7 +661,7 @@ void BluetoothHostServer::RegisterObserver(const sptr<IBluetoothHostObserver> &o
     }
 
     pimpl->observersToken_[observer->AsObject()] = IPCSkeleton::GetCallingTokenID();
-    pimpl->observersUid_[observer->AsObject()] = IPCSkeleton::GetCallingUid();;
+    pimpl->observersUid_[observer->AsObject()] = IPCSkeleton::GetCallingUid();
     pimpl->observers_.Register(observer);
     pimpl->hostObservers_.push_back(observer);
 }
