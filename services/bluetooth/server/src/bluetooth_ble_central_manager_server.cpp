@@ -126,7 +126,11 @@ public:
     {
         HILOGI("enter");
 
-        observers_->ForEach([results](IBluetoothBleCentralManagerCallback *observer) {
+        observers_->ForEach([this, results](IBluetoothBleCentralManagerCallback *observer) {
+            int32_t uid = this->pimpl_->observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                return;
+            }
             std::vector<BluetoothBleScanResult> bleScanResults;
 
             for (auto iter = results.begin(); iter != results.end(); iter++) {
@@ -292,7 +296,7 @@ std::set<int32_t> BluetoothBleCentralManagerServer::proxyUids_;
 
 bool BluetoothBleCentralManagerServer::ProxyUid(int32_t uid, bool isProxy)
 {
-    HILOGI("Start ProxyUid, uid: %{public}d", uid);
+    HILOGI("Start bluetooth proxy, uid: %{public}d", uid);
     std::lock_guard<std::mutex> lock(proxyMutex_);
     if (isProxy) {
         proxyUids_.insert(uid);
@@ -304,7 +308,7 @@ bool BluetoothBleCentralManagerServer::ProxyUid(int32_t uid, bool isProxy)
 
 bool BluetoothBleCentralManagerServer::ResetAllProxy()
 {
-    HILOGI("Start ResetAllProxy");
+    HILOGI("Start bluetooth ResetAllProxy");
     std::lock_guard<std::mutex> lock(proxyMutex_);
     proxyUids_.clear();
     return true;
@@ -503,6 +507,7 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
     pimpl->eventHandler_->PostSyncTask([&]() {
         if (pimpl != nullptr) {
             pimpl->observersToken_[callback->AsObject()] = IPCSkeleton::GetCallingTokenID();
+            pimpl->observersUid_[callback->AsObject()] = uid;
             pimpl->observers_.Register(callback);
             impl::ScanCallbackInfo info;
             info.pid_ = pid;
@@ -533,6 +538,12 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
         for (auto iter =  pimpl->observersToken_.begin(); iter !=  pimpl->observersToken_.end(); ++iter) {
             if (iter->first == callback->AsObject()) {
                 pimpl->observersToken_.erase(iter);
+                break;
+            }
+        }
+        for (auto iter =  pimpl->observersUid_.begin(); iter !=  pimpl->observersUid_.end(); ++iter) {
+            if (iter->first == callback->AsObject()) {
+                pimpl->observersUid_.erase(iter);
                 break;
             }
         }
