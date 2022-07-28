@@ -166,7 +166,7 @@ ErrCode BluetoothBleCentralManagerStub::ProxyUidInner(MessageParcel &data, Messa
     bool isProxy = data.ReadBool();
 
     bool ret = ProxyUid(uid, isProxy);
-    if (reply.WriteBool(ret)) {
+    if (!reply.WriteBool(ret)) {
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
@@ -175,7 +175,7 @@ ErrCode BluetoothBleCentralManagerStub::ProxyUidInner(MessageParcel &data, Messa
 ErrCode BluetoothBleCentralManagerStub::ResetAllProxyInner(MessageParcel &data, MessageParcel &reply)
 {
     bool ret = ResetAllProxy();
-    if (reply.WriteBool(ret)) {
+    if (!reply.WriteBool(ret)) {
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
