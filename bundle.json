@@ -95,6 +95,7 @@
               "bluetooth_gatt_server.h",
               "bluetooth_gatt_service.h",
               "bluetooth_host.h",
+              "bluetooth_proxy_manager.h",
               "bluetooth_remote_device.h",
               "bluetooth_socket_inputstream.h",
               "bluetooth_socket_outputstream.h",
