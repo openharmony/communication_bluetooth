@@ -29,6 +29,7 @@
 #include "stub/media_service.h"
 #ifdef AVRCP_AVSESSION
 #include "avsession_manager.h"
+#include "avsession_errors.h"
 #endif
 namespace bluetooth {
 /**
@@ -1017,6 +1018,15 @@ private:
      * @retval false Execute failure.
      */
     void DisableNative(void);
+
+#ifdef AVRCP_AVSESSION
+    /**
+     * @brief Registers AVSessionControl.
+     *
+     * @return void.
+     */
+    void RegisterAvSessionControl(void);
+#endif
 
     /**
      * @brief Registers security requirements into the GAP.
