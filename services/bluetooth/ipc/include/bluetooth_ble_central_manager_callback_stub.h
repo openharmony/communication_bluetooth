@@ -34,7 +34,7 @@ public:
 private:
     ErrCode OnScanCallbackInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnBleBatchScanResultsEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnStartScanFailedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnStartOrStopScanEventInner(MessageParcel &data, MessageParcel &reply);
 
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothBleCentralManagerCallBackStub *, MessageParcel &, MessageParcel &)>>

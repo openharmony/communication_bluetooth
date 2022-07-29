@@ -30,7 +30,7 @@ const std::map<uint32_t,
             std::bind(&BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
         {IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED,
-            std::bind(&BluetoothBleCentralManagerCallBackStub::OnStartScanFailedInner, std::placeholders::_1,
+            std::bind(&BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
 };
 
@@ -98,10 +98,11 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner(
     return NO_ERROR;
 }
 
-ErrCode BluetoothBleCentralManagerCallBackStub::OnStartScanFailedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t resultCode = data.ReadInt32();
-    OnStartScanFailed(resultCode);
+    bool isStartScan = data.ReadBool();
+    OnStartOrStopScanEvent(resultCode, isStartScan);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
