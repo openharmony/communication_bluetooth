@@ -34,7 +34,7 @@ public:
 
     virtual void OnScanCallback(const BluetoothBleScanResult &result) = 0;
     virtual void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) = 0;
-    virtual void OnStartScanFailed(int resultCode) = 0;
+    virtual void OnStartOrStopScanEvent(int resultCode, bool isStartScan) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
