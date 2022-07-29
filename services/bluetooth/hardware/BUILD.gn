@@ -39,16 +39,17 @@ ohos_shared_library("bluetooth_hdi_adapter") {
     "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
     "$hdf_uhdf_path/utils:libhdf_utils",
     "//third_party/bounds_checking_function:libsec_shared",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
   } else {
     external_deps = [
+      "c_utils:utils",
       "hilog:libhilog",
       "ipc:ipc_core",
     ]
