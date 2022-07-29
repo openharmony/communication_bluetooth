@@ -29,6 +29,7 @@
 #include "stub/media_service.h"
 #ifdef AVRCP_AVSESSION
 #include "avsession_manager.h"
+#include "avsession_errors.h"
 #endif
 namespace bluetooth {
 /**
@@ -355,7 +356,7 @@ public:
 
         void OnSessionCreate(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
         void OnSessionRelease(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
-        void OnTopSessionChanged(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
+        void OnTopSessionChange(const OHOS::AVSession::AVSessionDescriptor& descriptor) override;
     private:
         IProfileAvrcpTg *GetService(void);
     };
@@ -947,7 +948,7 @@ public:
     /**
      * @brief Notifies the TopAVSession is changed.
      */
-    void OnTopSessionChanged(std::string sessionId) override;
+    void OnTopSessionChange(std::string sessionId) override;
 
     /**
      * @brief Notifies the playback state is changed.
@@ -1017,6 +1018,15 @@ private:
      * @retval false Execute failure.
      */
     void DisableNative(void);
+
+#ifdef AVRCP_AVSESSION
+    /**
+     * @brief Registers AVSessionControl.
+     *
+     * @return void.
+     */
+    void RegisterAvSessionControl(void);
+#endif
 
     /**
      * @brief Registers security requirements into the GAP.

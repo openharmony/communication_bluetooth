@@ -131,8 +131,10 @@ ohos_static_library("btipc_static") {
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//utils/native/base:utils",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }

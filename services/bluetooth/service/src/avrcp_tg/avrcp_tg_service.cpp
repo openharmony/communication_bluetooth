@@ -350,14 +350,14 @@ void AvrcpTgService::AVSessionObserverImpl::OnSessionRelease(const OHOS::AVSessi
     }
 }
 
-void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChanged(const OHOS::AVSession::AVSessionDescriptor& descriptor)
+void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChange(const OHOS::AVSession::AVSessionDescriptor& descriptor)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s, sessionId:%{public}s",
         __func__, descriptor.sessionId_.c_str());
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
-        service->OnTopSessionChanged(descriptor.sessionId_);
+        service->OnTopSessionChange(descriptor.sessionId_);
     }
 }
 
@@ -555,29 +555,7 @@ void AvrcpTgService::EnableNative(void)
 
     stub::MediaService::GetInstance()->RegisterObserver(mdObserver_.get());
 #ifdef AVRCP_AVSESSION
-    // register avSession observer
-    OHOS::AVSession::AVSessionManager::GetInstance().RegisterSessionListener(avSessionObserver_);
-
-    avSessionDescriptor_ = OHOS::AVSession::AVSessionManager::GetInstance().GetAllSessionDescriptors();
-    // parse top descriptor
-    std::string sessionId;
-    for (auto descriptor : avSessionDescriptor_) {
-        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, isTopSession:%{public}d", __func__, descriptor.isTopSession_);
-        if (descriptor.isTopSession_) {
-            sessionId = descriptor.sessionId_;
-        }
-    }
-
-    if (sessionId.empty()) {
-        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, no valid avsession", __func__);
-    } else {
-        avSessionController_ = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId);
-        if (avSessionController_ != NULL) {
-            avSessionController_->RegisterCallback(avControllerObserver_);
-        } else {
-            LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
-        }
-    }
+    RegisterAvSessionControl();
 #endif
     IAdapterConfig *config = AdapterConfig::GetInstance();
     config->GetValue(SECTION_AVRCP_TG_SERVICE, PROPERTY_MAX_CONNECTED_DEVICES, maxConnection_);
@@ -616,6 +594,44 @@ void AvrcpTgService::DisableNative(void)
         OnProfileDisabled(RET_BAD_STATUS);
     }
 }
+
+#ifdef AVRCP_AVSESSION
+void AvrcpTgService::RegisterAvSessionControl(void)
+{
+    // register avSession observer
+    auto res = OHOS::AVSession::AVSessionManager::GetInstance().RegisterSessionListener(avSessionObserver_);
+    if (res != OHOS::AVSession::AVSESSION_SUCCESS) {
+        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, RegisterSessionListener fail", __func__);
+        return;
+    }
+
+    res = OHOS::AVSession::AVSessionManager::GetInstance().GetAllSessionDescriptors(avSessionDescriptor_);
+    if (res != OHOS::AVSession::AVSESSION_SUCCESS) {
+        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, GetAllSessionDescriptors fail", __func__);
+        return;
+    }
+
+    // parse top descriptor
+    std::string sessionId;
+    for (auto descriptor : avSessionDescriptor_) {
+        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, isTopSession:%{public}d", __func__, descriptor.isTopSession_);
+        if (descriptor.isTopSession_) {
+            sessionId = descriptor.sessionId_;
+        }
+    }
+
+    if (sessionId.empty()) {
+        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, no valid avsession", __func__);
+    } else {
+        res = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId, avSessionController_);
+        if (res == OHOS::AVSession::AVSESSION_SUCCESS && avSessionController_ != NULL) {
+            avSessionController_->RegisterCallback(avControllerObserver_);
+        } else {
+            LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
+        }
+    }
+}
+#endif
 
 int AvrcpTgService::RegisterSecurity(void)
 {
@@ -2539,15 +2555,18 @@ void AvrcpTgService::OnSessionRelease(std::string sessionId)
 #endif
 }
 
-void AvrcpTgService::OnTopSessionChanged(std::string sessionId)
+void AvrcpTgService::OnTopSessionChange(std::string sessionId)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
 #ifdef AVRCP_AVSESSION
-    if (avSessionController_ != NULL && avSessionController_->GetSessionId().compare(sessionId) == 0) {
-        return;
-    }
-    avSessionController_ = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId);
     if (avSessionController_ != NULL) {
+        if (avSessionController_->GetSessionId().compare(sessionId) == 0) {
+            return;
+        }
+        avSessionController_->Destroy();
+    }
+    auto res = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId, avSessionController_);
+    if (res == OHOS::AVSession::AVSESSION_SUCCESS && avSessionController_ != NULL) {
         avSessionController_->RegisterCallback(avControllerObserver_);
         OHOS::AVSession::AVPlaybackState::PlaybackStateMaskType filter;
         filter.set(OHOS::AVSession::AVPlaybackState::PLAYBACK_KEY_STATE);
