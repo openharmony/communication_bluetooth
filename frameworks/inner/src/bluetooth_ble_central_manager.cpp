@@ -115,10 +115,11 @@ struct BleCentralManager::impl {
             });
         }
 
-        void OnStartScanFailed(int resultCode) override
+        void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override
         {
-            bleCentralManger_.callbacks_.ForEach([resultCode](std::shared_ptr<BleCentralManagerCallback> observer) {
-                observer->OnStartScanFailed(resultCode);
+            bleCentralManger_.callbacks_.ForEach(
+                [resultCode, isStartScan](std::shared_ptr<BleCentralManagerCallback> observer) {
+                    observer->OnStartOrStopScanEvent(resultCode, isStartScan);
             });
         }
 

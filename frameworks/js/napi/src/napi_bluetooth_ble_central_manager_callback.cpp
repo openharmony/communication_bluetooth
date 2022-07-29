@@ -324,9 +324,9 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
     }
 }
 
-void NapiBluetoothBleCentralManagerCallback::OnStartScanFailed(int resultCode)
+void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
-    HILOGI("enter, resultCode is %{public}d", resultCode);
+    HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
     auto observers = GetSysBLEObserver();
     if (observers.find(REGISTER_SYS_BLE_SCAN_TYPE) == observers.end()) {
         HILOGE("sys BEL callback is not registered by ability.");

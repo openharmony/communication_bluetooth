@@ -81,16 +81,20 @@ void BluetoothBleCentralManagerCallBackProxy::OnBleBatchScanResultsEvent(std::ve
         return;
     }
 }
-void BluetoothBleCentralManagerCallBackProxy::OnStartScanFailed(int resultCode)
+void BluetoothBleCentralManagerCallBackProxy::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerCallBackProxy::GetDescriptor())) {
-        HILOGE("[OnStartScanFailed] fail: write interface token failed.");
+        HILOGE("write interface token failed.");
         return;
     }
 
     if (!data.WriteInt32(resultCode)) {
-        HILOGE("[OnStartScanFailed] fail: write resultCode failed");
+        HILOGE("write resultCode failed");
+        return;
+    }
+    if (!data.WriteBool(isStartScan)) {
+        HILOGE("write isStartScan failed");
         return;
     }
     MessageParcel reply;
@@ -98,7 +102,7 @@ void BluetoothBleCentralManagerCallBackProxy::OnStartScanFailed(int resultCode)
     int error = InnerTransact(
         IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED, option, data, reply);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothBleCentralManagerCallBackProxy::OnStartScanFailed done fail, error: %{public}d", error);
+        HILOGE("InnerTransact error: %{public}d", error);
         return;
     }
 }

@@ -69,12 +69,12 @@ public:
     virtual void OnBleBatchScanResultsEvent(std::vector<BleScanResultImpl> &results) = 0;
 
     /**
-     * @brief Start scan failed callback.
+     * @brief Start or Stop scan event callback.
      *
      * @param resultCode Start scan result code.
      * @since 6
      */
-    virtual void OnStartScanFailed(int resultCode) = 0;
+    virtual void OnStartOrStopScanEvent(int resultCode, bool isStartScan) = 0;
 };
 
 /**

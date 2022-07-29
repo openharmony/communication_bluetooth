@@ -48,7 +48,7 @@ struct BluetoothBleCentralManagerServer::impl {
     std::vector<ScanCallbackInfo> scanCallbackInfo_;
 
     BleScanSettingsImpl scanSettingImpl_;
-    bool isScanning;
+    bool isScanning; // Indicates the bluetooth service is scanning or not.
 
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
@@ -57,7 +57,7 @@ struct BluetoothBleCentralManagerServer::impl {
 struct BluetoothBleCentralManagerServer::impl::ScanCallbackInfo {
     int pid_;
     int uid_;
-    bool isStart_;
+    bool isStart_; // Indicates the process for which scanning is started or not.
     sptr<IBluetoothBleCentralManagerCallback> callback_;
 };
 
@@ -170,17 +170,34 @@ public:
         });
     }
 
-    void OnStartScanFailed(int resultCode) override
+    void OnStartOrStopScanEvent(int resultCode, bool isStartScanEvt) override
     {
-        HILOGI("enter, code: %{public}d", resultCode);
-
+        HILOGI("code: %{public}d, isStartScanEvt: %{public}d", resultCode, isStartScanEvt);
+        if (pimpl_ == nullptr || pimpl_->eventHandler_ == nullptr) {
+            HILOGE("pimpl_ or eventHandler_ is nullptr");
+            return;
+        }
         pimpl_->eventHandler_->PostTask([=]() {
-            // update the scan state to ensure that the state is the same as that of the service.
+            /* start scan -> close bluetooth -> open bluetooth -> start scan
+               After the bluetooth is closed, the stack stops scanning.
+               When receiving this event, the related status needs to be cleared. Otherwise, the next scanning fails. */
+            HILOGI("isScanning: %{public}d", pimpl_->isScanning);
+            if (pimpl_->isScanning && !isStartScanEvt && resultCode == 0) {
+                pimpl_->isScanning = false;
+                ClearMultiProcessScanState();
+                OnStartOrStopScanEventCb(resultCode, isStartScanEvt);
+                return;
+            }
+
             if (resultCode != 0) {
                 pimpl_->isScanning = !pimpl_->isScanning;
             }
             pimpl_->bleService_ =
                 static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+            if (pimpl_->bleService_ == nullptr) {
+                HILOGE("bleService_ is nullptr.");
+                return;
+            }
 
             if (!pimpl_->isScanning && resultCode == 0) {
                 // When updating params the scanning is stopped successfully and the scanning will be restarted.
@@ -188,21 +205,14 @@ public:
                     if (iter->isStart_) {
                         pimpl_->bleService_->StartScan(pimpl_->scanSettingImpl_);
                         pimpl_->isScanning = true;
-                        return;
+                        break;
                     }
                 }
             } else if (!pimpl_->isScanning && resultCode != 0) {
                 // When updating params the scanning is stopped successfully and the scanning restart failed.
-                for (auto iter = pimpl_->scanCallbackInfo_.begin(); iter != pimpl_->scanCallbackInfo_.end(); ++iter) {
-                    if (iter->isStart_) {
-                        iter->isStart_ = false;
-                    }
-                }
+                ClearMultiProcessScanState();
             }
-
-            observers_->ForEach([resultCode](IBluetoothBleCentralManagerCallback *observer) {
-                observer->OnStartScanFailed(resultCode);
-            });
+            OnStartOrStopScanEventCb(resultCode, isStartScanEvt);
         });
     }
 
@@ -214,6 +224,22 @@ public:
 private:
     RemoteObserverList<IBluetoothBleCentralManagerCallback> *observers_ = nullptr;
     BluetoothBleCentralManagerServer::impl *pimpl_ = nullptr;
+
+    void ClearMultiProcessScanState()
+    {
+        for (auto iter = pimpl_->scanCallbackInfo_.begin(); iter != pimpl_->scanCallbackInfo_.end(); ++iter) {
+            if (iter->isStart_) {
+                iter->isStart_ = false;
+            }
+        }
+    }
+
+    void OnStartOrStopScanEventCb(int resultCode, bool isStartScanEvt)
+    {
+        observers_->ForEach([resultCode, isStartScanEvt](IBluetoothBleCentralManagerCallback *observer) {
+            observer->OnStartOrStopScanEvent(resultCode, isStartScanEvt);
+        });
+    }
 };
 
 class BluetoothBleCentralManagerServer::impl::SystemStateObserver : public ISystemStateObserver {
@@ -290,15 +316,17 @@ void BluetoothBleCentralManagerServer::StartScan()
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyLocationPermission() == PERMISSION_DENIED) {
-        HILOGE("check permission failed");
+        HILOGE("check permission failed.");
         return;
     }
-    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
-        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid,
-        "TYPE", 0);
+
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
             static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+        if (pimpl->bleService_ == nullptr) {
+            HILOGE("bleService_ is nullptr.");
+            return;
+        }
 
         for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
             if (iter->pid_ == pid && iter->uid_ == uid) {
@@ -306,12 +334,15 @@ void BluetoothBleCentralManagerServer::StartScan()
             }
         }
 
-        if (pimpl->bleService_ != nullptr) {
-            if (!pimpl->isScanning) {
-                pimpl->bleService_->StartScan();
-            }
+        if (!pimpl->isScanning) {
+            HILOGI("start ble scan without params.");
+            pimpl->bleService_->StartScan();
+            pimpl->isScanning = true;
+            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "TYPE", 0);
+        } else {
+            HILOGI("scan is already started.");
         }
-        pimpl->isScanning = true;
     });
 }
 
@@ -323,51 +354,40 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED ||
         PermissionUtils::VerifyLocationPermission() == PERMISSION_DENIED) {
-        HILOGE("check permission failed");
+        HILOGE("check permission failed.");
         return;
     }
 
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
             static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+        if (pimpl->bleService_ == nullptr) {
+            HILOGE("bleService_ is nullptr.");
+            return;
+        }
 
         for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
             if (iter->pid_ == pid && iter->uid_ == uid) {
-                // Indicates the process and thread for which scanning is started.
                 iter->isStart_ = true;
             }
         }
 
-        if (pimpl->bleService_ != nullptr) {
-            if (!pimpl->isScanning) {
-                HILOGI("start ble scan");
-                pimpl->scanSettingImpl_.SetReportDelay(settings.GetReportDelayMillisValue());
-                pimpl->scanSettingImpl_.SetScanMode(settings.GetScanMode());
-                pimpl->scanSettingImpl_.SetLegacy(settings.GetLegacy());
-                pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
-                pimpl->bleService_->StartScan(pimpl->scanSettingImpl_);
-                // Indicates the bluetooth service is scanning.
-                pimpl->isScanning = true;
-                int8_t type = 0;
-                if (settings.GetReportDelayMillisValue() > 0) {
-                    type = 1;
-                }
-                OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
-                    OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "TYPE", type);
-            } else if (pimpl->scanSettingImpl_.GetReportDelayMillisValue() != settings.GetReportDelayMillisValue() ||
-                       pimpl->scanSettingImpl_.GetScanMode() != settings.GetScanMode() ||
-                       pimpl->scanSettingImpl_.GetLegacy() != settings.GetLegacy() ||
-                       pimpl->scanSettingImpl_.GetPhy() != settings.GetPhy()) {
-                // Stop an ongoing ble scan, update parameters and restart the ble scan in OnStartScanFailed().
-                HILOGI("restart ble scan");
-                pimpl->scanSettingImpl_.SetReportDelay(settings.GetReportDelayMillisValue());
-                pimpl->scanSettingImpl_.SetScanMode(settings.GetScanMode());
-                pimpl->scanSettingImpl_.SetLegacy(settings.GetLegacy());
-                pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
-                pimpl->bleService_->StopScan();
-                // Indicates the bluetooth service is not scanning.
-                pimpl->isScanning = false;
-            }
+        if (!pimpl->isScanning) {
+            HILOGI("start ble scan.");
+            SetScanParams(settings);
+            pimpl->bleService_->StartScan(pimpl->scanSettingImpl_);
+            pimpl->isScanning = true;
+            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_START",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid,
+                "TYPE", (settings.GetReportDelayMillisValue() > 0) ? 1 : 0);
+        } else if (IsNewScanParams(settings)) {
+            // Stop an ongoing ble scan, update parameters and restart the ble scan in OnStartOrStopScanEvent().
+            HILOGI("restart ble scan.");
+            SetScanParams(settings);
+            pimpl->bleService_->StopScan();
+            pimpl->isScanning = false;
+        } else {
+            HILOGI("scan is already started and has the same params.");
         }
     });
 }
@@ -378,15 +398,21 @@ void BluetoothBleCentralManagerServer::StopScan()
     int32_t uid = IPCSkeleton::GetCallingUid();
     HILOGI("pid: %{public}d, uid: %{public}d", pid, uid);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("check permission failed");
+        HILOGE("check permission failed.");
         return;
     }
-    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_STOP",
-        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid);
+    if (!pimpl->isScanning) {
+        HILOGE("scan is not started.");
+        return;
+    }
+
     pimpl->eventHandler_->PostSyncTask([&]() {
         pimpl->bleService_ =
             static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
-
+        if (pimpl->bleService_ == nullptr) {
+            HILOGE("bleService_ is nullptr.");
+            return;
+        }
         bool doStop = true;
         for (auto iter = pimpl->scanCallbackInfo_.begin(); iter != pimpl->scanCallbackInfo_.end(); ++iter) {
             if (iter->pid_ == pid && iter->uid_ == uid) {
@@ -395,11 +421,11 @@ void BluetoothBleCentralManagerServer::StopScan()
             doStop = iter->isStart_ ? false : doStop;
         }
 
-        if (pimpl->bleService_ != nullptr) {
-            if (doStop) {
-                pimpl->bleService_->StopScan();
-                pimpl->isScanning = false;
-            }
+        if (doStop) {
+            pimpl->bleService_->StopScan();
+            pimpl->isScanning = false;
+            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_STOP",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid);
         }
     });
 }
@@ -503,6 +529,30 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
             }
         }
     });
+}
+
+void BluetoothBleCentralManagerServer::SetScanParams(const BluetoothBleScanSettings &settings)
+{
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is nullptr");
+    }
+    pimpl->scanSettingImpl_.SetReportDelay(settings.GetReportDelayMillisValue());
+    pimpl->scanSettingImpl_.SetScanMode(settings.GetScanMode());
+    pimpl->scanSettingImpl_.SetLegacy(settings.GetLegacy());
+    pimpl->scanSettingImpl_.SetPhy(settings.GetPhy());
+}
+
+bool BluetoothBleCentralManagerServer::IsNewScanParams(const BluetoothBleScanSettings &settings)
+{
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is nullptr");
+        return false;
+    }
+    bool ret = (pimpl->scanSettingImpl_.GetReportDelayMillisValue() != settings.GetReportDelayMillisValue() ||
+        pimpl->scanSettingImpl_.GetScanMode() != settings.GetScanMode() ||
+        pimpl->scanSettingImpl_.GetLegacy() != settings.GetLegacy() ||
+        pimpl->scanSettingImpl_.GetPhy() != settings.GetPhy());
+    return ret;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -41,6 +41,8 @@ public:
 private:
     BLUETOOTH_DECLARE_IMPL();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleCentralManagerServer);
+    void SetScanParams(const BluetoothBleScanSettings &settings);
+    bool IsNewScanParams(const BluetoothBleScanSettings &settings);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
