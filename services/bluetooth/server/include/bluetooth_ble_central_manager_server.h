@@ -50,6 +50,8 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleCentralManagerServer);
     static std::mutex proxyMutex_;
     static std::set<int32_t> proxyUids_;
+    void SetScanParams(const BluetoothBleScanSettings &settings);
+    bool IsNewScanParams(const BluetoothBleScanSettings &settings);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -96,12 +96,13 @@ public:
     void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) {}
 
     /**
-     * @brief Start scan failed callback.
+     * @brief Start or Stop scan event callback.
      *
      * @param resultCode Scan result code.
+     * @param isStartScan true->start scan, false->stop scan.
      * @since 6
      */
-    void OnStartScanFailed(int resultCode) {}
+    void OnStartOrStopScanEvent(int resultCode, bool isStartScan) {}
 };
 
 class BleAdvCallback : public BleAdvertiseCallback {
