@@ -75,6 +75,7 @@ public:
             uint32_t  tokenId = this->pimpl_->observersToken_[observer->AsObject()];
             int32_t uid = this->pimpl_->observersUid_[observer->AsObject()];
             if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
                 return;
             }
             if (PermissionUtils::VerifyUseBluetoothPermission(tokenId) == PERMISSION_DENIED) {
@@ -129,6 +130,7 @@ public:
         observers_->ForEach([this, results](IBluetoothBleCentralManagerCallback *observer) {
             int32_t uid = this->pimpl_->observersUid_[observer->AsObject()];
             if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
                 return;
             }
             std::vector<BluetoothBleScanResult> bleScanResults;
@@ -567,7 +569,7 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
                 break;
             }
         }
-        for (auto iter =  pimpl->observersUid_.begin(); iter !=  pimpl->observersUid_.end(); ++iter) {
+        for (auto iter = pimpl->observersUid_.begin(); iter != pimpl->observersUid_.end(); ++iter) {
             if (iter->first == callback->AsObject()) {
                 pimpl->observersUid_.erase(iter);
                 break;
