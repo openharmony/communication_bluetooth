@@ -95,7 +95,7 @@ int BluetoothRemoteDevice::GetPhonebookPermission() const
 
 bool BluetoothRemoteDevice::SetPhonebookPermission(int permission)
 {
-    HILOGI("enter");
+    HILOGI("enter, permission: %{public}d", permission);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device.");
         return false;
@@ -125,7 +125,7 @@ int BluetoothRemoteDevice::GetMessagePermission() const
 
 bool BluetoothRemoteDevice::SetMessagePermission(int permission)
 {
-    HILOGI("enter");
+    HILOGI("enter, permission: %{public}d", permission);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
         return false;
@@ -357,7 +357,7 @@ bool BluetoothRemoteDevice::SetDevicePin(const std::string &pin)
 
 bool BluetoothRemoteDevice::SetDevicePairingConfirmation(bool accept)
 {
-    HILOGI("enter");
+    HILOGI("enter, accept: %{public}d", accept);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
         return false;
@@ -372,7 +372,7 @@ bool BluetoothRemoteDevice::SetDevicePairingConfirmation(bool accept)
 
 bool BluetoothRemoteDevice::SetDevicePasskey(int passkey, bool accept)
 {
-    HILOGI("enter");
+    HILOGI("enter, accept: %{public}d", accept);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
         return false;
@@ -387,7 +387,7 @@ bool BluetoothRemoteDevice::SetDevicePasskey(int passkey, bool accept)
 
 bool BluetoothRemoteDevice::PairRequestReply(bool accept)
 {
-    HILOGI("enter");
+    HILOGI("enter, accept: %{public}d", accept);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
         return false;

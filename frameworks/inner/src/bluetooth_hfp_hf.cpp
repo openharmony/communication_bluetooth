@@ -16,6 +16,7 @@
 #include "bluetooth_hfp_hf.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
 #include "i_bluetooth_hfp_hf.h"
 #include "bluetooth_hfp_hf_observer_stub.h"
@@ -38,7 +39,7 @@ public:
 
     void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
@@ -47,7 +48,7 @@ public:
 
     void OnScoStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnScoStateChanged(remoteDevice, state);
@@ -57,7 +58,7 @@ public:
     void OnCallChanged(const BluetoothRawAddress &device,
         const BluetoothHfpHfCall &call) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         UUID uuid = UUID::ConvertFrom128Bits(call.GetUuid().ConvertTo128Bits());
         HandsFreeUnitCall tmpCall(call.GetRemoteDevice(),
@@ -76,7 +77,7 @@ public:
 
     void OnSignalStrengthChanged(const BluetoothRawAddress &device, int32_t signal) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, signal: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), signal);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, signal](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnSignalStrengthChanged(remoteDevice, signal);
@@ -85,7 +86,7 @@ public:
 
     void OnRegistrationStatusChanged(const BluetoothRawAddress &device, int32_t status) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, status: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), status);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, status](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnRegistrationStatusChanged(remoteDevice, status);
@@ -94,7 +95,7 @@ public:
 
     void OnRoamingStatusChanged(const BluetoothRawAddress &device, int32_t status) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, status: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), status);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, status](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnRoamingStatusChanged(remoteDevice, status);
@@ -104,7 +105,7 @@ public:
     void OnOperatorSelectionChanged(
         const BluetoothRawAddress &device, const std::string &name) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, name](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnOperatorSelectionChanged(remoteDevice, name);
@@ -114,7 +115,8 @@ public:
     void OnSubscriberNumberChanged(
         const BluetoothRawAddress &device, const std::string &number) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, number: %{public}s",
+            GetEncryptAddr((device).GetAddress()).c_str(), number.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, number](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnSubscriberNumberChanged(remoteDevice, number);
@@ -124,7 +126,7 @@ public:
     void OnVoiceRecognitionStatusChanged(
         const BluetoothRawAddress &device, int32_t status) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, status: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), status);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, status](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnVoiceRecognitionStatusChanged(remoteDevice, status);
@@ -133,7 +135,7 @@ public:
 
     void OnInBandRingToneChanged(const BluetoothRawAddress &device, int32_t status) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, status: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), status);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, status](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnInBandRingToneChanged(remoteDevice, status);
@@ -153,7 +155,7 @@ struct HandsFreeUnit::impl {
 
     bool ConnectSco(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->ConnectSco(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -162,7 +164,7 @@ struct HandsFreeUnit::impl {
 
     bool DisconnectSco(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->DisconnectSco(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -191,7 +193,7 @@ struct HandsFreeUnit::impl {
 
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -200,7 +202,7 @@ struct HandsFreeUnit::impl {
 
     int GetScoState(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->GetScoState(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -209,7 +211,7 @@ struct HandsFreeUnit::impl {
 
     bool SendDTMFTone(const BluetoothRemoteDevice &device, uint8_t code)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, code: %{public}d", GET_ENCRYPT_ADDR(device), code);
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->SendDTMFTone(BluetoothRawAddress(device.GetDeviceAddr()), code);
         }
@@ -218,7 +220,7 @@ struct HandsFreeUnit::impl {
 
     bool Connect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && !BluetoothHost::GetDefaultHost().IsBtDiscovering() &&
             device.IsValidBluetoothRemoteDevice()) {
                 return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
@@ -229,7 +231,7 @@ struct HandsFreeUnit::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -239,7 +241,7 @@ struct HandsFreeUnit::impl {
 
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->OpenVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -248,7 +250,7 @@ struct HandsFreeUnit::impl {
 
     bool CloseVoiceRecognition(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->CloseVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -257,7 +259,7 @@ struct HandsFreeUnit::impl {
 
     std::vector<HandsFreeUnitCall> GetExistingCalls(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         std::vector<HandsFreeUnitCall> calls;
         std::vector<BluetoothHfpHfCall> callsList;
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
@@ -281,7 +283,7 @@ struct HandsFreeUnit::impl {
 
     bool AcceptIncomingCall(const BluetoothRemoteDevice &device, int flag)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, flag: %{public}d", GET_ENCRYPT_ADDR(device), flag);
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->AcceptIncomingCall(BluetoothRawAddress(device.GetDeviceAddr()), (int32_t)flag);
         }
@@ -290,7 +292,7 @@ struct HandsFreeUnit::impl {
 
     bool HoldActiveCall(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->HoldActiveCall(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -299,7 +301,7 @@ struct HandsFreeUnit::impl {
 
     bool RejectIncomingCall(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->RejectIncomingCall(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -308,7 +310,7 @@ struct HandsFreeUnit::impl {
 
     bool FinishActiveCall(const BluetoothRemoteDevice &device, const HandsFreeUnitCall &call)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             bluetooth::Uuid uuid = bluetooth::Uuid::ConvertFrom128Bits(call.GetUuid().ConvertTo128Bits());
             bluetooth::HandsFreeUnitCalls calls(call.GetRemoteDevice(),
@@ -327,7 +329,7 @@ struct HandsFreeUnit::impl {
 
     std::optional<HandsFreeUnitCall> StartDial(const BluetoothRemoteDevice &device, const std::string &number)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, number: %{public}s", GET_ENCRYPT_ADDR(device), number.c_str());
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             BluetoothHfpHfCall calls;
             proxy_->StartDial(BluetoothRawAddress(device.GetDeviceAddr()), number, calls);

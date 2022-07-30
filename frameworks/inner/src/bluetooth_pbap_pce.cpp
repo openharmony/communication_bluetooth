@@ -24,6 +24,7 @@
 #include "bluetooth_pbap_pce_observer_stub.h"
 #include "bluetooth_observer_list.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "iservice_registry.h"
 #include "raw_address.h"
 #include "system_ability_definition.h"
@@ -413,7 +414,7 @@ public:
 
     void OnServiceConnectionStateChanged(const BluetoothRawAddress &device, int state) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         if (frameworkObserverListPtr_ != nullptr) {
             frameworkObserverListPtr_->ForEach([device, state](std::shared_ptr<PbapClientObserver> observer) {
                 BluetoothRemoteDevice dev(device.GetAddress(), 0);
@@ -425,7 +426,8 @@ public:
     void OnServicePasswordRequired(const BluetoothRawAddress &device, 
         const ::std::vector<uint8_t> &description, int8_t charset, bool fullAccess) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, charset: %{public}d, fullAccess: %{public}d",
+            GetEncryptAddr((device).GetAddress()).c_str(), charset, fullAccess);
         if (frameworkObserverListPtr_ != nullptr) {
             frameworkObserverListPtr_->ForEach(
                 [device, description, charset, fullAccess](std::shared_ptr<PbapClientObserver> observer) {
@@ -438,7 +440,8 @@ public:
     void  OnActionCompleted(const BluetoothRawAddress &device, 
         int respCode, int actionType, const BluetoothIPbapPhoneBookData &result) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, respCode: %{public}d, actionType: %{public}d",
+            GetEncryptAddr((device).GetAddress()).c_str(), respCode, actionType);
         if (frameworkObserverListPtr_ != nullptr) {
             frameworkObserverListPtr_->ForEach([device, 
                 respCode, actionType, result](std::shared_ptr<PbapClientObserver> observer) {
@@ -478,7 +481,7 @@ struct PbapClient::impl {
 
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr) {
             return proxy_->GetDeviceState(bluetooth::RawAddress(device.GetDeviceAddr()));
         }
@@ -522,7 +525,7 @@ struct PbapClient::impl {
 
     bool Connect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr) {
             int ret = proxy_->Connect(bluetooth::RawAddress(device.GetDeviceAddr()));
             return ret == RET_NO_ERROR;
@@ -533,7 +536,7 @@ struct PbapClient::impl {
 
     int PullPhoneBook(const BluetoothRemoteDevice &device, const BluetoothIPbapPullPhoneBookParam &param)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         int ret = -1;
         if (proxy_ != nullptr) {
             ret = proxy_->PullPhoneBook(bluetooth::RawAddress(device.GetDeviceAddr()), param);
@@ -543,7 +546,7 @@ struct PbapClient::impl {
 
     int SetPhoneBook(const BluetoothRemoteDevice &device, const std::u16string &name, int flag)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, flag: %{public}d", GET_ENCRYPT_ADDR(device), flag);
         int ret = -1;
         if (proxy_ != nullptr) {
             ret = proxy_->SetPhoneBook(
@@ -554,7 +557,7 @@ struct PbapClient::impl {
 
     int PullvCardListing(const BluetoothRemoteDevice &device, const BluetoothIPbapPullvCardListingParam &param)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         int ret = -1;
         if (proxy_ != nullptr) {
             proxy_->PullvCardListing(bluetooth::RawAddress(device.GetDeviceAddr()), param);
@@ -564,7 +567,7 @@ struct PbapClient::impl {
 
     int PullvCardEntry(const BluetoothRemoteDevice &device, const BluetoothIPbapPullvCardEntryParam &param)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         int ret = -1;
         if (proxy_ != nullptr) {
             ret = proxy_->PullvCardEntry(bluetooth::RawAddress(device.GetDeviceAddr()), param);
@@ -574,7 +577,7 @@ struct PbapClient::impl {
 
     bool IsDownloading(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         bool ret = false;
         if (proxy_ != nullptr) {
             ret = proxy_->IsDownloading(bluetooth::RawAddress(device.GetDeviceAddr()));
@@ -584,7 +587,7 @@ struct PbapClient::impl {
 
     int AbortDownloading(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         int ret = -1;
         if (proxy_ != nullptr) {
             ret = proxy_->AbortDownloading(bluetooth::RawAddress(device.GetDeviceAddr()));
@@ -594,7 +597,7 @@ struct PbapClient::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr) {
             int ret = proxy_->Disconnect(bluetooth::RawAddress(device.GetDeviceAddr()));
             return ret == RET_NO_ERROR;
@@ -605,7 +608,7 @@ struct PbapClient::impl {
 
     bool SetConnectionStrategy(const BluetoothRemoteDevice &device, int strategy)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
         if (proxy_ != nullptr) {
             int ret = proxy_->SetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()), strategy);
             return ret == RET_NO_ERROR;
@@ -616,7 +619,7 @@ struct PbapClient::impl {
 
     int GetConnectionStrategy(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         int ret = (int)BTStrategyType::CONNECTION_UNKNOWN;
         if (proxy_ != nullptr) {
             ret = proxy_->GetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()));
@@ -626,7 +629,7 @@ struct PbapClient::impl {
 
     int SetDevicePassword(const BluetoothRemoteDevice &device, const std::string &password, const std::string &userId)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         int ret = -1;
         if (proxy_ != nullptr) {
             ret = proxy_->SetDevicePassword(bluetooth::RawAddress(device.GetDeviceAddr()), 
@@ -716,7 +719,7 @@ void PbapClient::DeregisterObserver(PbapClientObserver *observer)
 
 int PbapClient::GetDeviceState(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return (int)BTConnectState::DISCONNECTED;
     }
@@ -746,7 +749,7 @@ std::vector<BluetoothRemoteDevice> PbapClient::GetConnectedDevices()
 
 bool PbapClient::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return false;
     }
@@ -758,7 +761,7 @@ bool PbapClient::Connect(const BluetoothRemoteDevice &device)
 
 bool PbapClient::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return false;
     }
@@ -770,7 +773,7 @@ bool PbapClient::Disconnect(const BluetoothRemoteDevice &device)
 
 bool PbapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, int strategy)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     if (!IS_BT_ENABLED()) {
         return false;
     }
@@ -782,7 +785,7 @@ bool PbapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, int 
 
 int PbapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return (int)BTStrategyType::CONNECTION_FORBIDDEN;
     }
@@ -795,7 +798,7 @@ int PbapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device)
 int PbapClient::SetDevicePassword(
     const BluetoothRemoteDevice &device, const std::string &password, const std::string &userId)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return RET_BAD_STATUS;
     }
@@ -807,7 +810,7 @@ int PbapClient::SetDevicePassword(
 
 int PbapClient::PullPhoneBook(const BluetoothRemoteDevice &device, const PbapPullPhoneBookParam &param)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return RET_BAD_STATUS;
     }
@@ -819,7 +822,7 @@ int PbapClient::PullPhoneBook(const BluetoothRemoteDevice &device, const PbapPul
 
 int PbapClient::SetPhoneBook(const BluetoothRemoteDevice &device, const std::u16string &name, int flag)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, flag: %{public}d", GET_ENCRYPT_ADDR(device), flag);
     if (!IS_BT_ENABLED()) {
         return RET_BAD_STATUS;
     }
@@ -831,7 +834,7 @@ int PbapClient::SetPhoneBook(const BluetoothRemoteDevice &device, const std::u16
 
 int PbapClient::PullvCardListing(const BluetoothRemoteDevice &device, const PbapPullvCardListingParam &param)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return RET_BAD_STATUS;
     }
@@ -843,7 +846,7 @@ int PbapClient::PullvCardListing(const BluetoothRemoteDevice &device, const Pbap
 
 int PbapClient::PullvCardEntry(const BluetoothRemoteDevice &device, const PbapPullvCardEntryParam &param)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return RET_BAD_STATUS;
     }
@@ -855,7 +858,7 @@ int PbapClient::PullvCardEntry(const BluetoothRemoteDevice &device, const PbapPu
 
 bool PbapClient::IsDownloading(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return false;
     }
@@ -867,7 +870,7 @@ bool PbapClient::IsDownloading(const BluetoothRemoteDevice &device)
 
 int PbapClient::AbortDownloading(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         return RET_BAD_STATUS;
     }

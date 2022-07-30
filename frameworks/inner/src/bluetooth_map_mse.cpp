@@ -20,6 +20,7 @@
 
 #include "bt_def.h"
 #include "bluetooth_host.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_observer_list.h"
 #include "iservice_registry.h"
@@ -161,7 +162,7 @@ int MapServer::GetState() const
 
 bool MapServer::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
         return false;
@@ -176,7 +177,7 @@ bool MapServer::Disconnect(const BluetoothRemoteDevice &device)
 
 bool MapServer::IsConnected(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
         return false;
@@ -219,7 +220,7 @@ std::vector<BluetoothRemoteDevice> MapServer::GetDevicesByStates(std::vector<int
 
 int MapServer::GetConnectionState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
         return (int)BTConnectState::DISCONNECTED;
@@ -234,7 +235,7 @@ int MapServer::GetConnectionState(const BluetoothRemoteDevice &device) const
 
 bool MapServer::SetConnectionStrategy(const BluetoothRemoteDevice &device, int strategy)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
         return false;
@@ -249,7 +250,7 @@ bool MapServer::SetConnectionStrategy(const BluetoothRemoteDevice &device, int s
 
 int MapServer::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
         return (int)BTStrategyType::CONNECTION_FORBIDDEN;
@@ -264,7 +265,7 @@ int MapServer::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 
 void MapServer::GrantPermission(const BluetoothRemoteDevice &device, bool allow, bool save)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, allow: %{public}d, save: %{public}d", GET_ENCRYPT_ADDR(device), allow, save);
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
         return;
