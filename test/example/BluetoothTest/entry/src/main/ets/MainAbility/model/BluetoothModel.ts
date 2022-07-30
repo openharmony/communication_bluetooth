@@ -614,6 +614,68 @@ export class BluetoothModel extends BaseModel{
             }
         }
     }
+
+    // BLE public
+    createGattServer():bluetooth.GattServer{
+        return bluetooth.BLE.createGattServer();
+    }
+    createGattClient(deviceId: string):bluetooth.GattClientDevice{
+        return bluetooth.BLE.createGattClientDevice(deviceId);
+    }
+    getConnectedBLEDevices(): Array<string>
+    {
+        return bluetooth.BLE.getConnectedBLEDevices();
+    }
+    // start BLE scanning
+    startBLEScan(filters: Array<bluetooth.ScanFilter>, options?: bluetooth.ScanOptions): void
+    {
+        switch (arguments.length)
+        {
+            case 1:
+                LogUtil.info(`${this.TAG} startBLEScan with filters(or null) only `);
+                bluetooth.BLE.startBLEScan(filters);
+            break;
+            case 2:
+                LogUtil.info(`${this.TAG} startBLEScan with filters and options`);
+                bluetooth.BLE.startBLEScan(filters, options);
+            break;
+            default:
+                LogUtil.error(`${this.TAG} startBLEScan with unexpected input parameter!`);
+        }
+    }
+
+    /**
+     * Stops BLE scanning.
+     */
+    stopBLEScan():void
+    {
+        bluetooth.BLE.stopBLEScan();
+    }
+    /**
+     * Subscribe BLEDeviceFind
+    */
+    subscribeBLEDeviceFind(callback: (bleDeviceFindData: Array<bluetooth.ScanResult>) => void): void {
+
+        bluetooth.BLE.on("BLEDeviceFind", (bleDeviceFindData) => {
+            LogUtil.info(`${this.TAG} subscribeBLEDeviceFind->deviceFind return:${JSON.stringify(bleDeviceFindData)}`);
+            if (callback) {
+                callback(bleDeviceFindData);
+            }
+        })
+    }
+
+    /**
+     * unsubscribe BLEDeviceFind
+     */
+    unsubscribeBLEDeviceFind(callback?: (bleDeviceFindData: Array<bluetooth.ScanResult>) => void): void {
+        bluetooth.BLE.off('BLEDeviceFind', (bleDeviceFindData) => {
+            LogUtil.info(`${this.TAG} unsubscribeBLEDeviceFind->deviceFind return:${JSON.stringify(bleDeviceFindData)}`);
+            if (callback) {
+                callback(bleDeviceFindData);
+            }
+        })
+    }
+
 }
 
 let bluetoothModel = new BluetoothModel();
