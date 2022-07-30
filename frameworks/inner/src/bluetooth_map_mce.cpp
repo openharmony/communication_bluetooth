@@ -24,6 +24,7 @@
 
 #include "bt_def.h"
 #include "bluetooth_host.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_observer_list.h"
 #include "iservice_registry.h"
@@ -406,7 +407,7 @@ void MapClient::DeregisterObserver(MapClientObserver &observer)
 
 bool MapClient::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int retInt = RET_BAD_PARAM;
     bool ret = false;
     if (!device.IsValidBluetoothRemoteDevice()) {
@@ -425,7 +426,7 @@ bool MapClient::Connect(const BluetoothRemoteDevice &device)
 
 bool MapClient::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int retInt = RET_BAD_PARAM;
     bool ret = false;
     if (!device.IsValidBluetoothRemoteDevice()) {
@@ -444,7 +445,7 @@ bool MapClient::Disconnect(const BluetoothRemoteDevice &device)
 
 bool MapClient::IsConnected(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int retInt = 0;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -487,7 +488,7 @@ std::vector<BluetoothRemoteDevice> MapClient::GetDevicesByStates(const std::vect
 
 int MapClient::GetConnectionState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int retState = (int)BTConnectState::DISCONNECTED;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -502,7 +503,7 @@ int MapClient::GetConnectionState(const BluetoothRemoteDevice &device) const
 
 bool MapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, const int strategy)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, device: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     int retInt = RET_BAD_PARAM;
     bool ret = false;
     if (!device.IsValidBluetoothRemoteDevice()) {
@@ -522,7 +523,7 @@ bool MapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, const
 
 int MapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = (int)BTStrategyType::CONNECTION_FORBIDDEN;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -538,7 +539,7 @@ int MapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 
 int MapClient::GetUnreadMessages(const BluetoothRemoteDevice &device, MapMessageType type, uint8_t max)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, max: %{public}d", GET_ENCRYPT_ADDR(device), max);
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -554,7 +555,7 @@ int MapClient::GetUnreadMessages(const BluetoothRemoteDevice &device, MapMessage
 
 int MapClient::GetSupportedFeatures(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = RET_BAD_STATUS;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -626,7 +627,7 @@ void MapClient::impl::ConvertEnvelopeToProfileFormat(
 
 int MapClient::SendMessage(const BluetoothRemoteDevice &device, const MapSendMessageParameters &msg)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = RET_BAD_STATUS;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -657,7 +658,7 @@ int MapClient::SendMessage(const BluetoothRemoteDevice &device, const MapSendMes
 
 int MapClient::SetNotificationFilter(const BluetoothRemoteDevice &device, const int mask)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, mask: %{public}d", GET_ENCRYPT_ADDR(device), mask);
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -673,7 +674,7 @@ int MapClient::SetNotificationFilter(const BluetoothRemoteDevice &device, const 
 
 int MapClient::GetMessagesListing(const BluetoothRemoteDevice &device, const GetMessagesListingParameters &para) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -705,7 +706,7 @@ int MapClient::GetMessagesListing(const BluetoothRemoteDevice &device, const Get
 int MapClient::GetMessage(const BluetoothRemoteDevice &device, MapMessageType type, const std::u16string &msgHandle,
     const GetMessageParameters &para) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     std::string u8Str;
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
@@ -728,7 +729,7 @@ int MapClient::GetMessage(const BluetoothRemoteDevice &device, MapMessageType ty
 
 int MapClient::UpdateInbox(const BluetoothRemoteDevice &device, MapMessageType type)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -745,7 +746,7 @@ int MapClient::UpdateInbox(const BluetoothRemoteDevice &device, MapMessageType t
 int MapClient::GetConversationListing(
     const BluetoothRemoteDevice &device, const GetConversationListingParameters &para) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -772,7 +773,7 @@ int MapClient::GetConversationListing(
 int MapClient::SetMessageStatus(
     const BluetoothRemoteDevice &device, MapMessageType type, const MapSetMessageStatus &msgStatus)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -794,7 +795,7 @@ int MapClient::SetMessageStatus(
 
 int MapClient::SetOwnerStatus(const BluetoothRemoteDevice &device, const SetOwnerStatusParameters &para)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -818,7 +819,7 @@ int MapClient::SetOwnerStatus(const BluetoothRemoteDevice &device, const SetOwne
 
 int MapClient::GetOwnerStatus(const BluetoothRemoteDevice &device, const std::string &conversationId) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s, conversationId: %{public}s", GET_ENCRYPT_ADDR(device), conversationId.c_str());
     int ret = RET_BAD_PARAM;
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("BluetoothRemoteDevice error");
@@ -834,7 +835,7 @@ int MapClient::GetOwnerStatus(const BluetoothRemoteDevice &device, const std::st
 
 MapMasInstanceInfoList MapClient::GetMasInstanceInfo(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     MapMasInstanceInfoList frameworkMasInfoList;
     frameworkMasInfoList.isValid = false;
     BluetoothIProfileMasInstanceInfoList infoList;

@@ -20,6 +20,7 @@
 #include "bluetooth_pan_observer_stub.h"
 #include "i_bluetooth_pan.h"
 #include "i_bluetooth_host.h"
+#include "bluetooth_utils.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
@@ -38,7 +39,7 @@ public:
 
     ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 1);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<PanObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
@@ -79,7 +80,7 @@ struct Pan::impl {
 
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             int state;
             proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
@@ -90,7 +91,7 @@ struct Pan::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             bool isOk;
             proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);

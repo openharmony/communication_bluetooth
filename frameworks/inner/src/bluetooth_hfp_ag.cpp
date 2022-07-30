@@ -16,6 +16,7 @@
 #include "bluetooth_hfp_ag.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
 #include "i_bluetooth_hfp_ag.h"
 #include "bluetooth_hfp_ag_observer_stub.h"
@@ -38,7 +39,7 @@ public:
 
     void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
@@ -47,7 +48,7 @@ public:
 
     void OnScoStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnScoStateChanged(remoteDevice, state);
@@ -56,7 +57,7 @@ public:
 
     void OnActiveDeviceChanged(const BluetoothRawAddress &device) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnActiveDeviceChanged(remoteDevice);
@@ -66,7 +67,8 @@ public:
     void OnHfEnhancedDriverSafetyChanged(
         const BluetoothRawAddress &device, int32_t indValue) override
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s, indValue: %{public}d",
+            GetEncryptAddr((device).GetAddress()).c_str(), indValue);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, indValue](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnHfEnhancedDriverSafetyChanged(remoteDevice, indValue);
@@ -119,7 +121,7 @@ struct HandsFreeAudioGateway::impl {
 
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
         if (proxy_ == nullptr) {
             HILOGE("proxy_ is nullptr");
@@ -139,7 +141,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool Connect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
         if (proxy_ == nullptr) {
             HILOGE("proxy_ is nullptr");
@@ -165,7 +167,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
         if (proxy_ == nullptr) {
             HILOGE("proxy_ == nullptr");
@@ -191,7 +193,7 @@ struct HandsFreeAudioGateway::impl {
 
     int GetScoState(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->GetScoState(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -219,7 +221,8 @@ struct HandsFreeAudioGateway::impl {
     void PhoneStateChanged(
         int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
     {
-        HILOGI("enter");
+        HILOGI("enter, numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, number: %{public}s,"
+            " type: %{public}d", numActive, numHeld, callState, number.c_str(), type);
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             proxy_->PhoneStateChanged(numActive, numHeld, callState, number, type, name);
         }
@@ -227,7 +230,8 @@ struct HandsFreeAudioGateway::impl {
 
     void ClccResponse(int index, int direction, int status, int mode, bool mpty, std::string number, int type)
     {
-        HILOGI("enter");
+        HILOGI("enter, index: %{public}d, direction: %{public}d, status: %{public}d, mode: %{public}d, mpty: "
+            "%{public}d, type: %{public}d", index, direction, status, mode, mpty, type);
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             proxy_->ClccResponse(index, direction, status, mode, mpty, number, type);
         }
@@ -235,7 +239,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->OpenVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -244,7 +248,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool CloseVoiceRecognition(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->CloseVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -253,7 +257,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool SetActiveDevice(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter");
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->SetActiveDevice(BluetoothRawAddress(device.GetDeviceAddr()));
         }
@@ -380,25 +384,25 @@ std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetDevicesByStates(std
 
 int HandsFreeAudioGateway::GetDeviceState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->GetDeviceState(device);
 }
 
 bool HandsFreeAudioGateway::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->Connect(device);
 }
 
 bool HandsFreeAudioGateway::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->Disconnect(device);
 }
 
 int HandsFreeAudioGateway::GetScoState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter");
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->GetScoState(device);
 }
 
@@ -428,16 +432,19 @@ void HandsFreeAudioGateway::ClccResponse(
 
 bool HandsFreeAudioGateway::OpenVoiceRecognition(const BluetoothRemoteDevice &device)
 {
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->OpenVoiceRecognition(device);
 }
 
 bool HandsFreeAudioGateway::CloseVoiceRecognition(const BluetoothRemoteDevice &device)
 {
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->CloseVoiceRecognition(device);
 }
 
 bool HandsFreeAudioGateway::SetActiveDevice(const BluetoothRemoteDevice &device)
 {
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->SetActiveDevice(device);
 }
 
