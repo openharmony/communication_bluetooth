@@ -188,7 +188,7 @@ bool BluetoothBleCentralManagerProxy::ProxyUid(int32_t uid, bool isProxy)
     }
 
     if (!data.WriteInt32(uid) || !data.WriteBool(isProxy)) {
-        HILOGE("[ProxyUid] fail: write clientId failed");
+        HILOGE("[ProxyUid] fail: write data failed");
         return false;
     }
 

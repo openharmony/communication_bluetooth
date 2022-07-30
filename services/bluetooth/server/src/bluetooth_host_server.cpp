@@ -187,6 +187,7 @@ public:
             impl_->observers_.ForEach([this, transport, state](sptr<IBluetoothHostObserver> observer) {
                 int32_t uid = this->impl_->observersUid_[observer->AsObject()];
                 if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                    HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
                     return;
                 }
                 uint32_t tokenId = this->impl_->observersToken_[observer->AsObject()];
@@ -206,6 +207,7 @@ public:
             impl_->bleObservers_.ForEach([this, transport, state](sptr<IBluetoothHostObserver> observer) {
                 int32_t uid = this->impl_->bleObserversUid_[observer->AsObject()];
                 if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                    HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
                     return;
                 }
                 uint32_t  tokenId = this->impl_->bleObserversToken_[observer->AsObject()];
@@ -251,6 +253,7 @@ public:
         impl_->observers_.ForEach([this, device](IBluetoothHostObserver *observer) {
             int32_t uid = this->impl_->observersUid_[observer->AsObject()];
             if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
                 return;
             }
             uint32_t tokenId = this->impl_->observersToken_[observer->AsObject()];
@@ -378,6 +381,7 @@ public:
         impl_->bleObservers_.ForEach([this, device](IBluetoothHostObserver *observer) {
             int32_t uid = this->impl_->bleObserversUid_[observer->AsObject()];
             if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
                 return;
             }
             uint32_t tokenId = this->impl_->bleObserversToken_[observer->AsObject()];
@@ -685,7 +689,7 @@ void BluetoothHostServer::DeregisterObserver(const sptr<IBluetoothHostObserver> 
             break;
         }
     }
-    for (auto iter =  pimpl->observersUid_.begin(); iter !=  pimpl->observersUid_.end(); ++iter) {
+    for (auto iter = pimpl->observersUid_.begin(); iter != pimpl->observersUid_.end(); ++iter) {
         if (iter->first == observer->AsObject()) {
             pimpl->observersUid_.erase(iter);
             break;
@@ -1467,7 +1471,7 @@ void BluetoothHostServer::DeregisterBleAdapterObserver(const sptr<IBluetoothHost
             break;
         }
     }
-    for (auto iter =  pimpl->bleObserversUid_.begin(); iter !=  pimpl->bleObserversUid_.end(); ++iter) {
+    for (auto iter = pimpl->bleObserversUid_.begin(); iter != pimpl->bleObserversUid_.end(); ++iter) {
         if (iter->first == observer->AsObject()) {
             pimpl->bleObserversUid_.erase(iter);
             break;
