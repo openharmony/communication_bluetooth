@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
+#ifndef BLUETOOTH_PROXY_MANAGER_H
+#define BLUETOOTH_PROXY_MANAGER_H
+
 #include <mutex>
 
 #include "iremote_broker.h"
 #include "refbase.h"
-
-#ifndef BLUETOOTH_PROXY_MANAGER_H
-#define BLUETOOTH_PROXY_MANAGER_H
 
 namespace OHOS {
 namespace Bluetooth {

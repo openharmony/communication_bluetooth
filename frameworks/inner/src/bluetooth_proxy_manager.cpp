@@ -107,6 +107,5 @@ void BluetoothProxyManager::BleCentralManagerDeathRecipient::OnRemoteDied(const 
 {
     bleProxyManager_.ResetClient();
 }
-
 } // namespace Bluetooth
 } // namespace OHOS
