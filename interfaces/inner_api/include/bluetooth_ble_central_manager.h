@@ -233,12 +233,13 @@ public:
     virtual void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) = 0;
 
     /**
-     * @brief Start scan failed callback.
+     * @brief Start or Stop scan event callback.
      *
      * @param resultCode Scan result code.
+     * @param isStartScan true->start scan, false->stop scan.
      * @since 6
      */
-    virtual void OnStartScanFailed(int resultCode) = 0;
+    virtual void OnStartOrStopScanEvent(int resultCode, bool isStartScan) = 0;
 };
 
 /**
