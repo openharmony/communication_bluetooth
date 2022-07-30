@@ -64,7 +64,7 @@ private:
     {}
     void OnBleBatchScanResultsEvent(const std::vector<Bluetooth::BleScanResult> &results)
     {}
-    void OnStartScanFailed(int resultCode)
+    void OnStartOrStopScanEvent(int resultCode, bool isStartScan)
     {}
 };
 
