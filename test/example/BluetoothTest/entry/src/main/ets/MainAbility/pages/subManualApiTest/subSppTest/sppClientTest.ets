@@ -16,7 +16,6 @@
 /**
  * SPP Test Page Of Bluetooth test
  */
-//import PromptDialog from './components/dialog/PromptDialog.ets'
 import { TitleComponent } from '../../../../Component/titleComponent';
 import HeadComponent from '../../../../component/headcomponent';
 import ConfigData from '../../../../Utils/ConfigData';
@@ -33,18 +32,16 @@ let MODEL = "bluetoothModel:"
 struct SppClient {
   @State message: string = "";
   @State isConnection: boolean = false;
+  @State dataReadMessage: string = "";
   @State btConnectionState: number = 0;
   @State profileType: number = 0;
   @State connectionStateInfo: string = "";
   private stateBT: string = "";
-//  private sppOption: any = {uuid: '00001810-0000-1000-8000-00805F9B34FB', secure: false, type: 0};
   private sppOption: any ={};
   private uuid: string = AppStorage.Get('inputUuid');
-//  private uuid: string = '00001101-0000-1000-8000-00805F9B34FB';
   private serverNumber: number = -1;
   private clientNumber: number = -1;
   private sppWriteText: string = '';
-//  private deviceId = router.getParams().deviceId;
   @State deviceId: string = AppStorage.Get('inputDeviceId');
   @State writeData: any = '';
   private TAG_PAGE = ConfigData.TAG + 'Paired_Device ';
@@ -79,11 +76,7 @@ struct SppClient {
           Stack().height("0.5vp").backgroundColor("#000000");
           Row() {
             Text("目标设备MAC：").fontSize("20vp")
-//            TextInput( { text: this.deviceId, placeholder: "8C:7A:3D:7D:DF:DD" } )
-//            TextInput( { text: this.deviceId, placeholder: "54:EF:92:C0:9A:7B" } )
-//            TextInput( { text: this.deviceId, placeholder: "70:F7:54:95:F3:A1" } )
-//            TextInput( { text: this.deviceId, placeholder: "08:FB:EA:7A:67:ED" } )
-              TextInput( { text: this.deviceId, placeholder: "请输入mac地址" } )
+            TextInput( { text: this.deviceId, placeholder: "请输入mac地址" } )
               .fontSize("20vp")
               .onChange((str) => {
                 this.deviceId = str;
@@ -114,8 +107,19 @@ struct SppClient {
           }
           .margin( { top: "20vp", left: "20vp", right: "20vp" } )
           .alignItems(VerticalAlign.Center)
+          Row() {
+            Text("读取的数据为：").fontSize("20vp")
+            Text(this.dataReadMessage)
+              .fontSize("20vp")
+              .width('70%')
+          }
+          .margin( { top: "20vp", left: "20vp", right: "20vp" } )
+          .alignItems(VerticalAlign.Center)
 
+        Scroll() {
+          Collumn() {
           List({ space: 1 }) {
+          //使能蓝牙
           ListItem() {
             TitleComponent({
               title: "enableBluetooth",
@@ -135,6 +139,7 @@ struct SppClient {
             this.message = "蓝牙使能执行结果：" + ret;
           })
 
+          //去使能蓝牙
           ListItem() {
             TitleComponent({
               title: "disableBluetooth",
@@ -154,6 +159,7 @@ struct SppClient {
             this.message = "蓝牙去使能执行结果：" + ret;
           })
 
+          //查询蓝牙状态
           ListItem() {
             TitleComponent({
               title: "getState",
@@ -192,23 +198,42 @@ struct SppClient {
             }
             this.message = "当前蓝牙的状态是：" + this.stateBT;
           })
-
-          ListItem() {
-            TitleComponent({
-              title: "getBtConnectionState",
-              bgColor: this.currentClick === 3 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-            });
-          }
-          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-          .onClick(() => {
-            this.currentClick = 3;
-            let ret = BluetoothModel.getBtConnectionState();
-            this.message = "当前连接状态是：" + ret;
-          })
-
-            // 客户端连接
+            //查询当前连接状态
             ListItem() {
-              TitleComponent({ title: "spp_client_connect" });
+              TitleComponent({
+                title: "getBtConnectionState",
+                bgColor: this.currentClick === 3 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+            .onClick(() => {
+              this.currentClick = 3;
+              let ret = BluetoothModel.getBtConnectionState();
+              this.message = "当前连接状态是：" + ret;
+            })
+
+            // 客户端(安全模式)连接
+            ListItem() {
+              TitleComponent({ title: "spp_client_connect(安全模式)" });
+            }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+            .onClick(() => {
+                bluetooth.sppConnect(this.deviceId, {
+                  uuid: this.uuid,
+                  secure: true,
+                  type: 0
+                }, (code, socketID) => {
+                  if (code.code != 0) {
+                    return;
+                  }
+                  this.acceptClientSocket(socketID);
+                  LogUtil.info(MODEL + 'sppConnect callback socketNumber(safe mode): ' + socketID);
+                  this.message = "客户端连接成功!";
+                });
+            })
+
+            // 客户端(非安全模式)连接
+            ListItem() {
+              TitleComponent({ title: "spp_client_connect(非安全模式)" });
             }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
             .onClick(() => {
                 bluetooth.sppConnect(this.deviceId, {
@@ -220,12 +245,12 @@ struct SppClient {
                     return;
                   }
                   this.acceptClientSocket(socketID);
-                  LogUtil.info(MODEL + 'sppConnect callback socketNumber: ' + socketID);
+                  LogUtil.info(MODEL + 'sppConnect callback socketNumber(non-safe mode): ' + socketID);
                   this.message = "客户端连接成功!";
                 });
             })
 
-            // 将设备ID传到服务端
+            //客户端写数据传给服务端
             ListItem() {
               TitleComponent({ title: "spp_client_write" });
             }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
@@ -241,6 +266,30 @@ struct SppClient {
               }
             })
 
+            //客户端读操作打开
+            ListItem() {
+              TitleComponent({ title: "spp_client_readOn" });
+            }
+            .padding({
+              top: $r('app.float.distance_2'),
+              bottom: $r('app.float.distance_2')
+            })
+            .onClick(() => {
+                bluetooth.on('sppRead', this.clientNumber, this.dataRead.bind(this));
+            })
+
+            //客户端读操作关闭
+            ListItem() {
+              TitleComponent({ title: "spp_client_readOff" });
+            }
+            .padding({
+              top: $r('app.float.distance_2'),
+              bottom: $r('app.float.distance_2')
+            })
+            .onClick(() => {
+              bluetooth.off('sppRead', this.clientNumber, this.dataRead.bind(this));
+            })
+
             //关闭客户端
             ListItem() {
               TitleComponent({ title: "spp_client_close" });
@@ -250,10 +299,13 @@ struct SppClient {
             })
 
           }.margin(20);
+          }
+          .width('100%')
+          .visibility(Visibility.Visible)
+        }.height('50%')
           Text("接口调用结果： " + this.message)
             .textAlign(TextAlign.Start)
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
-//          TitleComponent({ title: this.sppWriteText })
         }
         .visibility(Visibility.Visible);
       }
@@ -281,8 +333,13 @@ struct SppClient {
   }
 
   dataRead(dataBuffer) {
-    let data = new Uint8Array(dataBuffer);
-    console.log('spp bluetooth read data is: ' + data[0]);
+    const data = new Uint8Array(dataBuffer);
+    console.log('spp bluetooth read is: ' + data);
+    if(data != null) {
+      this.dataReadMessage = "读取成功" + JSON.stringify(data);
+    } else {
+      this.dataReadMessage = "读取失败";
+    }
   }
 
 /**
@@ -298,7 +355,7 @@ struct SppClient {
     return array.buffer
   }
 
-  /**
+/**
 * Pair device
 * @param device
 */
