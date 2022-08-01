@@ -36,6 +36,8 @@ public:
     virtual void StopScan() override;
     virtual int ConfigScanFilter(const int clientId, const std::vector<BluetoothBleScanFilter> &filters) override;
     virtual void RemoveScanFilter(const int clientId) override;
+    virtual bool ProxyUid(int32_t uid, bool isProxy) override;
+    virtual bool ResetAllProxy() override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

@@ -45,6 +45,12 @@ const std::map<uint32_t, std::function<ErrCode(BluetoothBleCentralManagerStub *,
         {IBluetoothBleCentralManager::Code::BLE_STOP_SCAN,
             std::bind(&BluetoothBleCentralManagerStub::StopScanInner, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
+        {IBluetoothBleCentralManager::Code::BLE_PROXY_UID,
+            std::bind(&BluetoothBleCentralManagerStub::ProxyUidInner, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {IBluetoothBleCentralManager::Code::BLE_RESET_ALL_PROXY,
+            std::bind(&BluetoothBleCentralManagerStub::ResetAllProxyInner, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
 };
 
 BluetoothBleCentralManagerStub::BluetoothBleCentralManagerStub()
@@ -151,6 +157,27 @@ ErrCode BluetoothBleCentralManagerStub::RemoveScanFilterInner(MessageParcel &dat
     int32_t clientId = data.ReadInt32();
 
     RemoveScanFilter(clientId);
+    return NO_ERROR;
+}
+
+ErrCode BluetoothBleCentralManagerStub::ProxyUidInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t uid = data.ReadInt32();
+    bool isProxy = data.ReadBool();
+
+    bool ret = ProxyUid(uid, isProxy);
+    if (!reply.WriteBool(ret)) {
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothBleCentralManagerStub::ResetAllProxyInner(MessageParcel &data, MessageParcel &reply)
+{
+    bool ret = ResetAllProxy();
+    if (!reply.WriteBool(ret)) {
+        return ERR_INVALID_VALUE;
+    }
     return NO_ERROR;
 }
 }  // namespace Bluetooth
