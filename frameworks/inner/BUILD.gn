@@ -71,6 +71,7 @@ ohos_shared_library("btframework") {
     "src/bluetooth_pan.cpp",
     "src/bluetooth_pbap_pce.cpp",
     "src/bluetooth_pbap_pse.cpp",
+    "src/bluetooth_proxy_manager.cpp",
     "src/bluetooth_remote_device.cpp",
     "src/bluetooth_socket.cpp",
     "src/bluetooth_socket_inputstream.cpp",
