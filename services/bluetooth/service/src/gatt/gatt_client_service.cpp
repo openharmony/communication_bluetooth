@@ -1261,6 +1261,7 @@ bool ClientApplication::Discover::DiscoverNext(int appId)
 {
     bool doOnce = true;
     do {
+        doOnce = true;
         if (tasks_.empty()) {
             return true;
         }
