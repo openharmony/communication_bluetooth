@@ -40,6 +40,7 @@ struct BluetoothBleCentralManagerServer::impl {
 
     RemoteObserverList<IBluetoothBleCentralManagerCallback> observers_;
     std::map<sptr<IRemoteObject>, uint32_t>     observersToken_;
+    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
     class BleCentralManagerCallback;
     std::unique_ptr<BleCentralManagerCallback> observerImp_ = std::make_unique<BleCentralManagerCallback>(this);
     IAdapterBle *bleService_ = nullptr;
@@ -72,6 +73,11 @@ public:
             GetEncryptAddr(result.GetPeripheralDevice().GetRawAddress().GetAddress()).c_str());
         observers_->ForEach([this, result](IBluetoothBleCentralManagerCallback *observer) {
             uint32_t  tokenId = this->pimpl_->observersToken_[observer->AsObject()];
+            int32_t uid = this->pimpl_->observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             if (PermissionUtils::VerifyUseBluetoothPermission(tokenId) == PERMISSION_DENIED) {
                 HILOGE("OnScanCallback(): failed, check permission failed, tokenId: %{public}u", tokenId);
             } else {
@@ -121,7 +127,12 @@ public:
     {
         HILOGI("enter");
 
-        observers_->ForEach([results](IBluetoothBleCentralManagerCallback *observer) {
+        observers_->ForEach([this, results](IBluetoothBleCentralManagerCallback *observer) {
+            int32_t uid = this->pimpl_->observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             std::vector<BluetoothBleScanResult> bleScanResults;
 
             for (auto iter = results.begin(); iter != results.end(); iter++) {
@@ -306,6 +317,35 @@ BluetoothBleCentralManagerServer::~BluetoothBleCentralManagerServer()
     pimpl->eventHandler_->PostSyncTask(
         [&]() { IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->systemStateObserver_)); },
         AppExecFwk::EventQueue::Priority::HIGH);
+}
+
+std::mutex BluetoothBleCentralManagerServer::proxyMutex_;
+std::set<int32_t> BluetoothBleCentralManagerServer::proxyUids_;
+
+bool BluetoothBleCentralManagerServer::ProxyUid(int32_t uid, bool isProxy)
+{
+    HILOGI("Start bluetooth proxy, uid: %{public}d, isProxy: %{public}d", uid, isProxy);
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    if (isProxy) {
+        proxyUids_.insert(uid);
+    } else {
+        proxyUids_.erase(uid);
+    }
+    return true;
+}
+
+bool BluetoothBleCentralManagerServer::ResetAllProxy()
+{
+    HILOGI("Start bluetooth ResetAllProxy");
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    proxyUids_.clear();
+    return true;
+}
+
+bool BluetoothBleCentralManagerServer::IsProxyUid(int32_t uid)
+{
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    return proxyUids_.find(uid) != proxyUids_.end();
 }
 
 void BluetoothBleCentralManagerServer::StartScan()
@@ -495,6 +535,7 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
     pimpl->eventHandler_->PostSyncTask([&]() {
         if (pimpl != nullptr) {
             pimpl->observersToken_[callback->AsObject()] = IPCSkeleton::GetCallingTokenID();
+            pimpl->observersUid_[callback->AsObject()] = uid;
             pimpl->observers_.Register(callback);
             impl::ScanCallbackInfo info;
             info.pid_ = pid;
@@ -525,6 +566,12 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
         for (auto iter =  pimpl->observersToken_.begin(); iter !=  pimpl->observersToken_.end(); ++iter) {
             if (iter->first == callback->AsObject()) {
                 pimpl->observersToken_.erase(iter);
+                break;
+            }
+        }
+        for (auto iter = pimpl->observersUid_.begin(); iter != pimpl->observersUid_.end(); ++iter) {
+            if (iter->first == callback->AsObject()) {
+                pimpl->observersUid_.erase(iter);
                 break;
             }
         }

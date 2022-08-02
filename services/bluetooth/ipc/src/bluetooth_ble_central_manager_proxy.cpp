@@ -179,6 +179,47 @@ void BluetoothBleCentralManagerProxy::RemoveScanFilter(const int clientId)
     }
 }
 
+bool BluetoothBleCentralManagerProxy::ProxyUid(int32_t uid, bool isProxy)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
+        HILOGW("[ProxyUid] fail: write interface token failed.");
+        return false;
+    }
+
+    if (!data.WriteInt32(uid) || !data.WriteBool(isProxy)) {
+        HILOGE("[ProxyUid] fail: write data failed");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_ASYNC};
+    ErrCode result = InnerTransact(BLE_PROXY_UID, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGW("[ProxyUid] fail: transact ErrCode=%{public}d", result);
+        return false;
+    }
+    return true;
+}
+
+bool BluetoothBleCentralManagerProxy::ResetAllProxy()
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
+        HILOGW("[ResetAllProxy] fail: write interface token failed.");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_ASYNC};
+    ErrCode result = InnerTransact(BLE_RESET_ALL_PROXY, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGW("[ResetAllProxy] fail: transact ErrCode=%{public}d", result);
+        return false;
+    }
+    return true;
+}
+
 ErrCode BluetoothBleCentralManagerProxy::InnerTransact(
     uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
 {
