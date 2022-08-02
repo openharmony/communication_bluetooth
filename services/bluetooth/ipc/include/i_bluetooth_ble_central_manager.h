@@ -35,6 +35,8 @@ public:
         BLE_STOP_SCAN,
         BLE_CONFIG_SCAN_FILTER,
         BLE_REMOVE_SCAN_FILTER,
+        BLE_PROXY_UID,
+        BLE_RESET_ALL_PROXY,
     };
 
     virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
@@ -44,6 +46,8 @@ public:
     virtual void StopScan() = 0;
     virtual int ConfigScanFilter(const int clientId, const std::vector<BluetoothBleScanFilter> &filters) = 0;
     virtual void RemoveScanFilter(const int clientId) = 0;
+    virtual bool ProxyUid(int32_t uid, bool isProxy) = 0;
+    virtual bool ResetAllProxy() = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

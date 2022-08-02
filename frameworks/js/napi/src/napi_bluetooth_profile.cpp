@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-std::map<ProfileId, napi_value> NapiProfile::profiles_;
+thread_local std::map<ProfileId, napi_value> NapiProfile::profiles_;
 
 void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
 {
