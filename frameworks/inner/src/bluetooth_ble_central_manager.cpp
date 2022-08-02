@@ -45,8 +45,7 @@ struct BleCentralManager::impl {
         ~BluetoothBleCentralManagerCallbackImp() override = default;
         void OnScanCallback(const BluetoothBleScanResult &result) override
         {
-            HILOGI("enter");
-
+            std::lock_guard<std::mutex> lock(bleCentralManger_.blesCanFiltersMutex_);
             if (!bleCentralManger_.bleScanFilters_.empty() && bleCentralManger_.IsNeedFilterMatches_
                 && !bleCentralManger_.MatchesScanFilters(result)) {
                 HILOGE("the result does not matche the filter, ignore");
@@ -117,6 +116,7 @@ struct BleCentralManager::impl {
 
         void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override
         {
+            HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
             bleCentralManger_.callbacks_.ForEach(
                 [resultCode, isStartScan](std::shared_ptr<BleCentralManagerCallback> observer) {
                     observer->OnStartOrStopScanEvent(resultCode, isStartScan);
@@ -134,6 +134,7 @@ struct BleCentralManager::impl {
 
     std::vector<BluetoothBleScanFilter> bleScanFilters_;
     bool IsNeedFilterMatches_ = true;
+    std::mutex blesCanFiltersMutex_;
 };
 
 BleCentralManager::impl::impl()
@@ -408,7 +409,7 @@ BleCentralManager::~BleCentralManager()
 
 void BleCentralManager::StartScan()
 {
-    HILOGI("enter");
+    HILOGI("StartScan without param.");
     if (pimpl->proxy_ != nullptr) {
         pimpl->proxy_->StartScan();
     }
@@ -416,7 +417,7 @@ void BleCentralManager::StartScan()
 
 void BleCentralManager::StartScan(const BleScanSettings &settings)
 {
-    HILOGI("enter");
+    HILOGI("StartScan with params.");
     if (pimpl->proxy_ != nullptr) {
         BluetoothBleScanSettings setting;
         // not use report delay scan. settings.GetReportDelayMillisValue()
@@ -430,7 +431,8 @@ void BleCentralManager::StartScan(const BleScanSettings &settings)
 
 void BleCentralManager::StopScan()
 {
-    HILOGI("enter, clientId: %{public}d", clientId_);
+    HILOGI("clientId: %{public}d", clientId_);
+    std::lock_guard<std::mutex> lock(pimpl->blesCanFiltersMutex_);
     if (pimpl->proxy_ != nullptr) {
         pimpl->proxy_->StopScan();
         if (clientId_ != 0) {
@@ -445,6 +447,7 @@ void BleCentralManager::StopScan()
 void BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter>  &filters)
 {
     HILOGI("enter");
+    std::lock_guard<std::mutex> lock(pimpl->blesCanFiltersMutex_);
     if (pimpl->proxy_ != nullptr) {
         std::vector<BluetoothBleScanFilter> bluetoothBleScanFilters;
         for (auto filter : filters) {
