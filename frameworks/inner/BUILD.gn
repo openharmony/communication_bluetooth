@@ -86,6 +86,7 @@ ohos_shared_library("btframework") {
 
   external_deps = [
     "c_utils:utils",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "samgr_standard:samgr_proxy",
   ]
