@@ -412,7 +412,13 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
     auto it = pimpl->callbacks_.emplace(
         pimpl->callbacks_.begin(), std::make_shared<impl::GattServerCallbackImpl>(callback, *this));
 
-    return pimpl->serverService_->RegisterApplication(*it);
+    int ret = pimpl->serverService_->RegisterApplication(*it);
+    if (ret >= 0) {
+        OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_GATT_APP_REGISTER",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register", "SIDE", "server", "ADDRESS", "empty",
+           "PID", OHOS::IPCSkeleton::GetCallingPid(), "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", ret);
+    }
+    return ret;
 }
 
 int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
@@ -427,7 +433,9 @@ int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
         HILOGE("serverService_ is null");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
-
+    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_GATT_APP_REGISTER",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "deregister", "SIDE", "server", "ADDRESS", "empty",
+        "PID", OHOS::IPCSkeleton::GetCallingPid(), "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
     return pimpl->serverService_->DeregisterApplication(appId);
 }
 BluetoothGattServerServer::BluetoothGattServerServer() : pimpl(new impl())
