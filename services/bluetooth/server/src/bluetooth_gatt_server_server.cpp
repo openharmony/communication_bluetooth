@@ -415,8 +415,9 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
     int ret = pimpl->serverService_->RegisterApplication(*it);
     if (ret >= 0) {
         OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_GATT_APP_REGISTER",
-            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register", "SIDE", "server", "ADDRESS", "empty",
-           "PID", OHOS::IPCSkeleton::GetCallingPid(), "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", ret);
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register",
+            "SIDE", "server", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
+            "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", ret);
     }
     return ret;
 }
@@ -434,8 +435,9 @@ int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
     OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_GATT_APP_REGISTER",
-        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "deregister", "SIDE", "server", "ADDRESS", "empty",
-        "PID", OHOS::IPCSkeleton::GetCallingPid(), "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "deregister",
+        "SIDE", "server", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
+        "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
     return pimpl->serverService_->DeregisterApplication(appId);
 }
 BluetoothGattServerServer::BluetoothGattServerServer() : pimpl(new impl())
