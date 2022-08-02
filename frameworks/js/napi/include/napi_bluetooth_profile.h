@@ -28,7 +28,7 @@ namespace Bluetooth {
 class NapiProfile {
 public:
     static void DefineProfileFunctions(napi_env env, napi_value exports);
-    static std::map<ProfileId, napi_value> profiles_;
+    static thread_local std::map<ProfileId, napi_value> profiles_;
     static void SetProfile(ProfileId code, napi_value profile);
     static napi_value GetProfile(napi_env env, napi_callback_info info);
     static void ProfileEnumInit(napi_env env, napi_value exports);
