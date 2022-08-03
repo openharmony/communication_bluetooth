@@ -16,12 +16,15 @@
 #ifndef GATT_DATA_H
 #define GATT_DATA_H
 
+#include <stdint.h>
 #include <cstring>
 #include <memory>
 #include <vector>
 #include "bt_def.h"
 #include "bt_uuid.h"
+#include "cstdint"
 #include "raw_address.h"
+#include "type_traits"
 
 namespace bluetooth {
 struct Descriptor {

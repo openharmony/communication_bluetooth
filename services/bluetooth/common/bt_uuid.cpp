@@ -15,11 +15,14 @@
 
 #include "bt_uuid.h"
 
+#include <sys/time.h>
 #include <algorithm>
-#include <climits>
-
+#include "array"
 #include "securec.h"
+#include "stdlib.h"
+#include "string"
 #include "sys/time.h"
+#include "time.h"
 
 namespace bluetooth {
 Uuid Uuid::Random()

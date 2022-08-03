@@ -38,7 +38,14 @@
 
 #include <list>
 
+#include <stddef.h>
+#include <stdint.h>
+#include "bluetooth_def.h"
 #include "bluetooth_gatt_descriptor.h"
+#include "cstdint"
+#include "memory"
+#include "uuid.h"
+#include "vector"
 
 namespace OHOS {
 namespace Bluetooth {

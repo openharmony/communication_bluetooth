@@ -17,6 +17,8 @@
 #include <cstring>
 #include <vector>
 #include "securec.h"
+#include "stdlib.h"
+#include "string"
 
 namespace bluetooth {
 void RawAddress::ConvertToUint8(uint8_t *dst, const size_t size) const

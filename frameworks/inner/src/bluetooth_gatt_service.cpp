@@ -14,7 +14,13 @@
  */
 
 #include "bluetooth_gatt_service.h"
-#include "bluetooth_log.h"
+
+#include <stdint.h>
+#include "__functional_base"
+#include "bluetooth_gatt_characteristic.h"
+#include "type_traits"
+#include "uuid.h"
+#include "vector"
 
 namespace OHOS {
 namespace Bluetooth {
