@@ -36,9 +36,14 @@
 
 #include <map>
 #include <vector>
+#include "__functional_base"
 #include "bt_def.h"
 #include "bt_uuid.h"
+#include "cstdint"
+#include "iosfwd"
 #include "raw_address.h"
+#include "string"
+#include "utility"
 
 namespace bluetooth {
 /**

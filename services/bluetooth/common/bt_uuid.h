@@ -16,11 +16,8 @@
 #ifndef BT_UUID_H
 #define BT_UUID_H
 
-#include <array>
-#include <stdint.h>
-#include <string>
-#include <string.h>
-#include <thread>
+#include "cstdint"
+#include "iosfwd"
 
 /**
  * @brief The bluetooth subsystem.

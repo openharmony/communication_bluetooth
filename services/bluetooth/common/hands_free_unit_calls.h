@@ -40,6 +40,8 @@
 
 #include "bt_uuid.h"
 
+#include "iosfwd"
+
 namespace bluetooth {
 /**
  * @brief Phone call state enum.
