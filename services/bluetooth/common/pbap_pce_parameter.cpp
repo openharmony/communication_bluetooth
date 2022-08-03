@@ -16,11 +16,19 @@
 #include "pbap_pce_parameter.h"
 #include <algorithm>
 #include <codecvt>
-#include <locale>
-#include <iomanip>
-#include <sstream>
 #include <fstream>
+#include <locale>
+#include <sstream>
 #include "bt_def.h"
+#include "ios"
+#include "istream"
+#include "iterator"
+#include "new"
+#include "ostream"
+#include "stdio.h"
+#include "streambuf"
+#include "string"
+#include "vector"
 
 namespace bluetooth {
 IPbapPullPhoneBookParam::IPbapPullPhoneBookParam()

@@ -14,18 +14,32 @@
  */
 
 #include "bluetooth_a2dp_snk.h"
-#include "bluetooth_a2dp_sink_proxy.h"
 #include "bluetooth_a2dp_sink_observer_stub.h"
-#include "bluetooth_host_proxy.h"
-#include "bluetooth_observer_list.h"
-#include "raw_address.h"
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"
-
 #include "bluetooth_log.h"
+#include "bluetooth_observer_list.h"
+#include "bluetooth_remote_device.h"
+#include "bluetooth_types.h"
 #include "bluetooth_utils.h"
+#include <cstdint>
+#include "functional"
+#include "i_bluetooth_a2dp_sink.h"
+#include "i_bluetooth_a2dp_sink_observer.h"
+#include "i_bluetooth_host.h"
+#include "if_system_ability_manager.h"
+#include "iosfwd"
+#include "iremote_broker.h"
+#include "iremote_object.h"
 #include "iservice_registry.h"
+#include "list"
+#include "memory"
+#include "new"
+#include "raw_address.h"
+#include "refbase.h"
+#include "string"
 #include "system_ability_definition.h"
+#include "vector"
 
 namespace OHOS {
 namespace Bluetooth {

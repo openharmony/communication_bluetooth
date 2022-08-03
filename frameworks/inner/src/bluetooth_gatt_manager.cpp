@@ -12,19 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <set>
 #include <vector>
 
+#include "__functional_base"
+#include "__tree"
+#include "array"
+
 #include "bluetooth_def.h"
-#include "bluetooth_gatt_client.h"
 #include "bluetooth_gatt_client_proxy.h"
+#include "bluetooth_gatt_device.h"
 #include "bluetooth_gatt_manager.h"
 #include "bluetooth_host_proxy.h"
-#include "bluetooth_log.h"
-#include "i_bluetooth_gatt_client.h"
+#include "bluetooth_remote_device.h"
 #include "i_bluetooth_host.h"
+#include "if_system_ability_manager.h"
+#include "iremote_object.h"
 #include "iservice_registry.h"
+#include "memory"
+#include "new"
+#include "raw_address.h"
+#include "refbase.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {

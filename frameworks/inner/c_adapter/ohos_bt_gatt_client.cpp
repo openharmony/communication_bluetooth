@@ -14,17 +14,28 @@
  */
 
 #include "ohos_bt_gatt_client.h"
-
-#include <iostream>
 #include <cstring>
-#include <vector>
 #include <map>
+#include "__config"
+#include "__functional_base"
 
-#include "ohos_bt_adapter_utils.h"
+#include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_client.h"
+#include "bluetooth_gatt_descriptor.h"
+#include "bluetooth_gatt_service.h"
 #include "bluetooth_log.h"
+#include "bluetooth_remote_device.h"
 
-#include "securec.h"
+#include "iosfwd"
+#include "memory"
+#include "new"
+#include "ohos_bt_adapter_utils.h"
+#include "ohos_bt_def.h"
+#include "optional"
+#include "string"
+#include "type_traits"
+#include "utility"
+#include "uuid.h"
 
 #ifdef __cplusplus
 extern "C" {

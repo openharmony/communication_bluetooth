@@ -15,15 +15,19 @@
 
 #include "ohos_bt_gap.h"
 
-#include <iostream>
 #include <string.h>
-#include <vector>
+#include "__config"
 
-#include "ohos_bt_adapter_utils.h"
 #include "bluetooth_host.h"
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
+#include "bluetooth_remote_device.h"
+
+#include "iosfwd"
+#include "ohos_bt_adapter_utils.h"
+#include "ohos_bt_def.h"
+#include "string"
 
 #ifdef __cplusplus
 extern "C" {

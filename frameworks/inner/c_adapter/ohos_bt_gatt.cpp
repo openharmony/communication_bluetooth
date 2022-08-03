@@ -15,20 +15,30 @@
 
 #include "ohos_bt_gatt.h"
 
-#include <cstring>
-#include <iostream>
-#include <string.h>
-#include <sstream>
 #include <unistd.h>
-#include <vector>
+#include <cstdint>
+#include <cstring>
+#include <sstream>
 
-#include "ohos_bt_adapter_utils.h"
-#include "bluetooth_ble_central_manager.h"
+#include <vector>
+#include "__config"
+
 #include "bluetooth_ble_advertiser.h"
+#include "bluetooth_ble_central_manager.h"
 #include "bluetooth_log.h"
+#include "bluetooth_remote_device.h"
 #include "bluetooth_utils.h"
 
+#include "cstdint"
+#include "iosfwd"
+#include "istream"
+#include "new"
+#include "ohos_bt_adapter_utils.h"
+#include "ohos_bt_def.h"
+#include "ostream"
 #include "securec.h"
+#include "streambuf"
+#include "string"
 
 #ifdef __cplusplus
 extern "C" {
