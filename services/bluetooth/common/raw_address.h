@@ -16,8 +16,10 @@
 #ifndef RAW_ADDRESS_H
 #define RAW_ADDRESS_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <string>
+#include "iosfwd"
 
 namespace bluetooth {
 class RawAddress {

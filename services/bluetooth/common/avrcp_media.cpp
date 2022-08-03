@@ -14,6 +14,8 @@
  */
 
 #include "avrcp_media.h"
+#include "string"
+#include "vector"
 
 namespace bluetooth {
 AvrcMpItem::AvrcMpItem(uint8_t itemType, uint16_t playerId, uint8_t majorType, uint32_t subType, uint8_t playStatus,

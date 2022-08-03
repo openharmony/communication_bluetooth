@@ -16,6 +16,7 @@
 #include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_log.h"
+#include "type_traits"
 
 namespace OHOS {
 namespace Bluetooth {
