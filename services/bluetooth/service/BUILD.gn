@@ -292,6 +292,18 @@ ServicePanSrc = [
   "src/pan/pan_network.cpp",
 ]
 
+ServiceOppSrc = [
+  "src/opp/opp_obex_client.cpp",
+  "src/opp/opp_obex_server.cpp",
+  "src/opp/opp_sdp_client.cpp",
+  "src/opp/opp_sdp_server.cpp",
+  "src/opp/opp_gap_client.cpp",
+  "src/opp/opp_gap_server.cpp",
+  "src/opp/opp_service.cpp",
+  "src/opp/opp_statemachine.cpp",
+  "src/opp/opp_transfer.cpp",
+]
+
 config("btservice_public_config") {
   include_dirs = [
     "include",
@@ -374,6 +386,7 @@ ohos_shared_library("btservice") {
   sources += ServiceHidHostSrc
   sources += ServicePermissionSrc
   sources += ServicePanSrc
+  sources += ServiceOppSrc
 
   deps = [
     "$PART_DIR/external:btdummy",
