@@ -104,6 +104,8 @@ typedef enum {
     SPP_ID_START,
     HID_HOST,
     PAN_BNEP,
+    OPP_CLIENT,
+    OPP_SERVER,
 } GAP_Service;
 
 /**
