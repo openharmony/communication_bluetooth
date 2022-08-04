@@ -16,7 +16,6 @@
 #include "ohos_bt_gap.h"
 
 #include <string.h>
-#include "__config"
 
 #include "bluetooth_host.h"
 #include "bluetooth_def.h"

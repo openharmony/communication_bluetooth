@@ -16,7 +16,9 @@
 #ifndef BT_UUID_H
 #define BT_UUID_H
 
-#include "cstdint"
+#include <array>
+#include <string>
+#include <cstdint>
 #include "iosfwd"
 
 /**
