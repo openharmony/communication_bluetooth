@@ -436,6 +436,16 @@ void PanBnep::BnepRecvConfigReqCallback(
         return;
     }
 
+    if (cfg->rfc.mode == L2CAP_ENHANCED_RETRANSMISSION_MODE) {
+        HILOGI("[PAN BNEP] for PTS BROADCAST-0/BV-01-C");
+        L2capConfigInfo l2capConfigInfo;
+        (void)memset_s(&l2capConfigInfo, sizeof(L2capConfigInfo), 0x00, sizeof(L2capConfigInfo));
+        l2capConfigInfo.mtu = BNEP_MTU_SIZE;
+        l2capConfigInfo.flushTimeout = 0xFFFF;
+        L2CIF_ConfigRsp(lcid, id, &l2capConfigInfo, L2CAP_UNACCEPTABLE_PARAMETERS, nullptr);
+        return;
+    }
+
     PanMessage event(BNEP_L2CAP_CONFIG_REQ_EVT);
     PanL2capConnectionInfo l2capInfo;
     L2capConfigInfo l2capConfigInfo;
