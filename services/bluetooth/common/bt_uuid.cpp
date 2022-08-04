@@ -15,10 +15,14 @@
 
 #include "bt_uuid.h"
 
+#include <sys/time.h>
 #include <algorithm>
-#include <climits>
 
+#include <cstdlib>
+#include <ctime>
+#include "array"
 #include "securec.h"
+#include "string"
 #include "sys/time.h"
 
 namespace bluetooth {
