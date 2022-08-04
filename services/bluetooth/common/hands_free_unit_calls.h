@@ -37,8 +37,8 @@
 #define HANDS_FREE_UNIT_CALLS_H
 
 #include <string>
-
 #include "bt_uuid.h"
+#include "iosfwd"
 
 namespace bluetooth {
 /**
