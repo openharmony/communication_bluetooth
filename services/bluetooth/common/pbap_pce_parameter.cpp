@@ -12,14 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "pbagit p_pce_parameter.h"
-#include <cstdio>
-#include <algorithm>
-#include <codecvt>
-#include <fstream>
-#include <locale>
-#include <sstream>
-#include "bt_def.h"
 #include "ios"
 #include "istream"
 #include "iterator"
