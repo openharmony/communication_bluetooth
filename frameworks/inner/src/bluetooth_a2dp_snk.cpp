@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <cstdint>
-
 #include "bluetooth_a2dp_snk.h"
+#include <cstdint>
 #include "bluetooth_a2dp_sink_observer_stub.h"
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"
@@ -23,7 +22,6 @@
 #include "bluetooth_remote_device.h"
 #include "bluetooth_types.h"
 #include "bluetooth_utils.h"
-
 #include "functional"
 #include "i_bluetooth_a2dp_sink.h"
 #include "i_bluetooth_a2dp_sink_observer.h"
