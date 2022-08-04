@@ -17,9 +17,10 @@
 
 #include <sys/time.h>
 #include <algorithm>
-#include "array"
+
 #include <cstdlib>
 #include <ctime>
+#include "array"
 #include "securec.h"
 #include "string"
 #include "sys/time.h"

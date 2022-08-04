@@ -45,6 +45,7 @@
 #include "uuid.h"
 #include "vector"
 
+
 namespace OHOS {
 namespace Bluetooth {
 /**

@@ -38,8 +38,6 @@
 
 #include <string>
 
-#include "bt_uuid.h"
-
 #include "iosfwd"
 
 namespace bluetooth {
