@@ -68,24 +68,24 @@ BLUETOOTH_BLE_SCAN_DUTY_CYCLE:
   INTERVAL: {type: INT32, desc: interval}
   TYPE: {type: INT32, desc: type}
 
-BLUETOOTH_SPP_CONNECT_STATE:
+SPP_CONNECT_STATE:
   __BASE: {type: STATISTIC, level: MINOR, desc: bluetooth spp connect message}
   ACTION: {type: STRING, desc: connect or close}
   ID: {type: INT32, desc: socket number}
   PID: {type: INT32, desc: PID value}
   UID: {type: INT32, desc: UID value}
 
-BLUETOOTH_GATT_CONNECT_STATE:
+GATT_CONNECT_STATE:
   __BASE: {type: STATISTIC, level: MINOR, desc: bluetooth gatt connect message}
   ADDRESS: {type: STRING, desc: ble device address}
   STATE: {type: INT32, desc: connect state}
   ROLE: {type: INT32, desc: device role}
 
-BLUETOOTH_GATT_APP_REGISTER:
+GATT_APP_REGISTER:
   __BASE: {type: STATISTIC, level: MINOR, desc: bluetooth gatt app register message}
   ACTION: {type: STRING, desc: register or deregister}
   SIDE: {type: STRING, desc: client or server}
   ADDRESS: {type: STRING, desc: remote ble device address}
   PID: {type: INT32, desc: PID value}
   UID: {type: INT32, desc: UID value}
-  APPID: {type: INT32, desc: gatt client app id}
+  APPID: {type: INT32, desc: gatt app id}
