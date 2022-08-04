@@ -20,8 +20,9 @@
 #include "new"
 #include "ostream"
 #include "streambuf"
-#include "string"
+#include <string>
 #include "vector"
+#include <sstream>
 
 namespace bluetooth {
 IPbapPullPhoneBookParam::IPbapPullPhoneBookParam()
