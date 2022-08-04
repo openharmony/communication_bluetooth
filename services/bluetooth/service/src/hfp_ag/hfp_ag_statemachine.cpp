@@ -263,6 +263,8 @@ bool HfpAgConnecting::Dispatch(const utility::Message &msg)
             break;
         case HFP_AG_AUDIO_CONNECTED_EVT:
         case HFP_AG_AUDIO_DISCONNECTED_EVT:
+        case HFP_AG_CONNECT_EVT:
+        case HFP_AG_DISCONNECT_EVT:
             stateMachine_.AddDeferredMessage(event);
             break;
         case HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS:
@@ -272,10 +274,6 @@ bool HfpAgConnecting::Dispatch(const utility::Message &msg)
             break;
         case HFP_AG_SDP_DISCOVERY_RESULT_FAIL:
             Transition(HfpAgStateMachine::DISCONNECTED);
-            break;
-        case HFP_AG_CONNECT_EVT:
-        case HFP_AG_DISCONNECT_EVT:
-            stateMachine_.AddDeferredMessage(event);
             break;
         case HFP_AG_DISCONNECTED_EVT:
             profile_.RemoveRemoteScnLoging();

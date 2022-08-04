@@ -102,13 +102,13 @@ void HfpAgSdpClient::SdpHspCallback(const BtAddr *addr, const SdpService *servic
     if (serviceNum > 0) {
         CopySdpServiceArray(address, serviceAry, serviceNum);
         msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
+        HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
     } else {
         HfpAgSdpClient *sdpClient = static_cast<HfpAgSdpClient *>(context);
         HfpAgService::GetService()->GetDispatcher()->PostTask(
             std::bind(&HfpAgSdpClient::DoHspHsDiscovery, sdpClient, address));
         return;
     }
-    HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
 }
 
 void HfpAgSdpClient::DoHspDiscovery(const std::string &remoteAddr)
