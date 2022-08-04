@@ -19,13 +19,13 @@
 #include <fstream>
 #include <locale>
 #include <sstream>
+#include <cstdio>
 #include "bt_def.h"
 #include "ios"
 #include "istream"
 #include "iterator"
 #include "new"
 #include "ostream"
-#include <cstdio>
 #include "streambuf"
 #include "string"
 #include "vector"
