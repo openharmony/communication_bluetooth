@@ -56,7 +56,7 @@ size_t OppReceiveFileBodyObject::Write(const uint8_t *buf, size_t bufLen)
 {
     size_t writeSize = 0;
     if (ofs_.is_open()) {
-        auto buffer = reinterpret_cast<const char*>(buf);
+        auto buffer = (const char*)(char*)(buf);
         ofs_.write(buffer, bufLen);
         fileReceiveSize_ += bufLen;
         writeSize = bufLen;
@@ -316,7 +316,7 @@ std::string OppObexServer::OppObexObserver::RenameFile(std::string fileName)
     }
 
     time_t timeStamp = 0;
-    time(&timeStamp);
+    (void)time(&timeStamp);
     char *name = strchr(&fileName[0], '.');
     if (name == nullptr) {
         HILOGI("[OPP OBEX SERVER] opendir error");
