@@ -14,7 +14,6 @@
  */
 
 #include "opp_gap_client.h"
-#include <cstring>
 #include "btstack.h"
 #include "log.h"
 #include "opp_defines.h"

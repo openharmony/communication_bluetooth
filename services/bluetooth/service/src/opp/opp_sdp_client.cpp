@@ -17,8 +17,6 @@
 
 #include "btstack.h"
 #include "log.h"
-#include "opp_defines.h"
-#include "opp_message.h"
 #include "opp_service.h"
 #include "raw_address.h"
 
