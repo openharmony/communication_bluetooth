@@ -54,6 +54,7 @@ struct ObexConnectParams {
     ObexTlvParamters *appParams_ = nullptr;          // Application Parameters
     ObexDigestChallenge *authChallenges_ = nullptr;  // Auth Challenges
     ObexDigestResponse *authResponses_ = nullptr;    // Auth Responses
+    uint32_t *count_ = nullptr;                      // Count
 };
 
 class ObexClient;
@@ -252,7 +253,7 @@ public:
     static int SetSessionTimeout(uint32_t timeoutSec = OBEX_SESSION_MAX_TIMEOUT_SEC);
 
     // Get ClientSession
-    const ObexClientSession &GetClientSession() const;
+    ObexClientSession &GetClientSession() const;
 
     // Get GetClientId
     const std::string &GetClientId();
