@@ -82,6 +82,8 @@ int HfpAgSdpServer::AddServiceClassId() const
     classId[0].uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
     classId[1].type = BT_UUID_16;
     classId[1].uuid16 = HFP_AG_UUID_SERVCLASS_GENERIC_AUDIO;
+    classId[HSP_AG_SERVER_CLASSID_NUM].type = BT_UUID_16;
+    classId[HSP_AG_SERVER_CLASSID_NUM].uuid16 = HSP_AG_UUID_SERVCLASS;
     return SDP_AddServiceClassIdList(sdpHandle_, classId, HFP_AG_SERVER_CLASSID_NUM);
 }
 
@@ -105,6 +107,9 @@ int HfpAgSdpServer::AddProfile() const
     profile[0].profileUuid.type = BT_UUID_16;
     profile[0].profileUuid.uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
     profile[0].versionNumber = HFP_AG_HFP_VERSION_1_7;
+    profile[1].profileUuid.type = BT_UUID_16;
+    profile[1].profileUuid.uuid16 = HSP_UUID_SERVCLASS;
+    profile[1].versionNumber = HSP_AG_HSP_VERSION_1_2;
     return SDP_AddBluetoothProfileDescriptorList(sdpHandle_, profile, HFP_AG_SERVER_PROFILE_NUM);
 }
 

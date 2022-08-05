@@ -229,6 +229,13 @@ void HfpAgProfileEventSender::SendRingAndClip(const std::string &device) const
     SendMessageToService(msg);
 }
 
+void HfpAgProfileEventSender::ProcessCKpdEvent(const std::string &device) const
+{
+    HfpAgMessage msg(HFP_AG_PROCESS_CKPD_EVT);
+    msg.dev_ = device;
+    SendMessageToService(msg);
+}
+
 utility::Dispatcher *HfpAgProfileEventSender::GetDispatchter() const
 {
     HfpAgService *service = HfpAgService::GetService();
