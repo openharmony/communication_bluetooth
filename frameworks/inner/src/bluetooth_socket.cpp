@@ -48,7 +48,7 @@ struct SppClientSocket::impl {
             shutdown(fd_, SHUT_WR);
             close(fd_);
             HiviewDFX::HiSysEvent::Write("BLUETOOTH", "SPP_CONNECT_STATE",
-                HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_,
+                HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_, "ADDRESS", "empty",
                 "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
             HILOGI("fd closed, fd_: %{pubilc}d", fd_);
             fd_ = -1;
@@ -68,7 +68,7 @@ struct SppClientSocket::impl {
                 shutdown(fd_, SHUT_WR);
                 close(fd_);
                 HiviewDFX::HiSysEvent::Write("BLUETOOTH", "SPP_CONNECT_STATE",
-                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_,
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_, "ADDRESS", "empty",
                     "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
                 HILOGI("fd closed, fd_: %{pubilc}d", fd_);
                 fd_ = -1;
@@ -324,7 +324,7 @@ int SppClientSocket::Connect()
     }
     pimpl->socketStatus_ = SOCKET_CONNECTED;
     HiviewDFX::HiSysEvent::Write("BLUETOOTH", "SPP_CONNECT_STATE",
-        HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", pimpl->fd_,
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", pimpl->fd_, "ADDRESS", tempAddress,
         "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
     return BtStatus::BT_SUCCESS;
 }
@@ -453,8 +453,8 @@ struct SppServerSocket::impl {
         std::unique_ptr<SppClientSocket> clientSocket = std::make_unique<SppClientSocket>(acceptFd_, acceptAddress_);
 
         HiviewDFX::HiSysEvent::Write("BLUETOOTH", "SPP_CONNECT_STATE",
-            HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", acceptFd_,
-            "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
+            HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", acceptFd_, "ADDRESS",
+            acceptAddress_, "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
 
         return clientSocket;
     }
