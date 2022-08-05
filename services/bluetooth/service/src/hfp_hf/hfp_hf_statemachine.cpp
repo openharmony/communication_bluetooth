@@ -264,6 +264,18 @@ bool HfpHfConnected::Dispatch(const utility::Message &msg)
         case HFP_HF_REJECT_CALL_EVT:
             stateMachine_.ProcessRejectCall();
             break;
+        case HFP_HF_HANDLE_INCOMING_CALL_EVT:
+            stateMachine_.ProcessHandleIncomingCall(event.arg1_);
+            break;
+        case HFP_HF_HANDLE_MULTI_CALL_EVT:
+            stateMachine_.ProcessHandleMultiCall(event.arg1_, event.arg3_);
+            break;
+        case HFP_HF_DIAL_LAST_NUMBER:
+            stateMachine_.ProcessDialLastNumber();
+            break;
+        case HFP_HF_DIAL_MEMORY:
+            stateMachine_.ProcessDialMemory(event.arg1_);
+            break;
         case HFP_HF_FINISH_CALL_EVT:
             stateMachine_.ProcessFinishCall(event);
             break;
@@ -493,6 +505,50 @@ void HfpHfStateMachine::ProcessRejectCall()
         LOG_DEBUG("[HFP HF]%{public}s():No call to reject", __FUNCTION__);
     }
     return;
+}
+
+void HfpHfStateMachine::ProcessHandleIncomingCall(int flag)
+{
+    HILOGI("[HFP HF]:handle incoming call flag = %{public}d", flag);
+    if (calls_->GetCallByState(HFP_HF_CALL_STATE_INCOMING) != nullptr) {
+        if (flag != static_cast<int>(HfpHfHandleIncomingCalAction::HFP_HF_HOLD_INCOMING_ACTION)) {
+            HILOGE("[HFP HF]:No incoming call hold");
+        }
+        if (profile_.SendBtrh(flag)) {
+            HILOGE("[HFP HF]:Send BTRH = %{public}d failed", flag);
+        }
+    } else if (calls_->GetCallByState(HFP_HF_CALL_STATE_RESPONSE_HELD) != nullptr) {
+        if (!profile_.SendBtrh(flag)) {
+            HILOGE("[HFP HF]:Send BTRH = %{public}d failed", flag);
+        }
+    } else {
+        HILOGI("[HFP HF]:No call handle");
+    }
+    return;
+}
+
+void HfpHfStateMachine::ProcessHandleMultiCall(int flag, int index)
+{
+    HILOGI("[HFP HF]:enter flag = %{public}d, index = %{public}d", flag, index);
+    if (!profile_.SendChld(flag, index)) {
+            HILOGE("[HFP HF]:Send CHLD failed");
+    }
+}
+
+void HfpHfStateMachine::ProcessDialLastNumber()
+{
+    HILOGI("[HFP HF]:enter");
+    if (!profile_.CallLastDialedNumber()) {
+            HILOGE("[HFP HF]:ProcessDialLastNumber failed");
+    }
+}
+
+void HfpHfStateMachine::ProcessDialMemory(int index)
+{
+    HILOGI("[HFP HF]:enter index = %{public}d", index);
+    if (!profile_.DialMemory(index)) {
+            HILOGE("[HFP HF]:ProcessDialMemory failed");
+    }
 }
 
 void HfpHfStateMachine::ProcessHoldCall()
@@ -956,6 +1012,14 @@ std::string HfpHfStateMachine::GetEventName(int what)
             return "HFP_HF_HOLD_CALL_EVT";
         case HFP_HF_REJECT_CALL_EVT:
             return "HFP_HF_REJECT_CALL_EVT";
+        case HFP_HF_HANDLE_INCOMING_CALL_EVT:
+            return "HFP_HF_HANDLE_INCOMING_CALL_EVT";
+        case HFP_HF_HANDLE_MULTI_CALL_EVT:
+            return "HFP_HF_HANDLE_MULTI_CALL_EVT";
+        case HFP_HF_DIAL_LAST_NUMBER:
+            return "HFP_HF_DIAL_LAST_NUMBER";
+        case HFP_HF_DIAL_MEMORY:
+            return "HFP_HF_DIAL_MEMORY";
         case HFP_HF_FINISH_CALL_EVT:
             return "HFP_HF_FINISH_CALL_EVT";
         case HFP_HF_DIAL_CALL_EVT:

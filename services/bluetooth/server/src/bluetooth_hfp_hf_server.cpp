@@ -339,6 +339,45 @@ bool BluetoothHfpHfServer::RejectIncomingCall(const BluetoothRawAddress &device)
     return false;
 }
 
+bool BluetoothHfpHfServer::HandleIncomingCall(const BluetoothRawAddress &device, int flag) {
+    HILOGI("Enter!");
+    RawAddress addr(device.GetAddress());
+    if (pimpl->HfpHfService_ != nullptr) {
+        return pimpl->HfpHfService_->HandleIncomingCall(addr, flag);
+    }
+    return false;
+}
+
+bool BluetoothHfpHfServer::DialLastNumber(const BluetoothRawAddress &device)
+{
+    HILOGI("Enter!");
+    RawAddress addr(device.GetAddress());
+    if (pimpl->HfpHfService_ != nullptr) {
+        return pimpl->HfpHfService_->DialLastNumber(addr);
+    }
+    return false;
+}
+
+bool BluetoothHfpHfServer::DialMemory(const BluetoothRawAddress &device, int index)
+{
+    HILOGI("Enter!");
+    RawAddress addr(device.GetAddress());
+    if (pimpl->HfpHfService_ != nullptr) {
+        return pimpl->HfpHfService_->DialMemory(addr, index);
+    }
+    return false;
+}
+
+bool BluetoothHfpHfServer::HandleMultiCall(const BluetoothRawAddress &device, int flag, int index)
+{
+    HILOGI("Enter!");
+    RawAddress addr(device.GetAddress());
+    if (pimpl->HfpHfService_ != nullptr) {
+        return pimpl->HfpHfService_->HandleMultiCall(addr, flag, index);
+    }
+    return false;
+}
+
 bool BluetoothHfpHfServer::FinishActiveCall(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call) {
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     RawAddress addr(device.GetAddress());

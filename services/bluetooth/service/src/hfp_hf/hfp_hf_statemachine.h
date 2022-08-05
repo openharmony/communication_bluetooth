@@ -103,6 +103,34 @@ public:
     void ProcessRejectCall();
 
     /**
+     * @brief Process handle incoming call event from service.
+     *
+     * @param flag Handle call flag.
+     */
+    void ProcessHandleIncomingCall(int flag);
+
+    /**
+     * @brief Process handle incoming call event from service.
+     *
+     * @param flag Handle call flag.
+     * @param index call index
+     */
+    void ProcessHandleMultiCall(int flag, int index);
+
+    /**
+     * @brief Process dial last number event from service.
+     *
+     */
+    void ProcessDialLastNumber();
+
+    /**
+     * @brief Process dial memory number event from service.
+     *
+     * @param index Memory number index
+     */
+    void ProcessDialMemory(int index);
+
+    /**
      * @brief Process finish call event from service.
      *
      * @param event The finish call event.
