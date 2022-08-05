@@ -318,6 +318,10 @@ std::string OppObexServer::OppObexObserver::RenameFile(std::string fileName)
     time_t timeStamp = 0;
     time(&timeStamp);
     char *name = strchr(&fileName[0], '.');
+    if (name == nullptr) {
+        HILOGI("[OPP OBEX SERVER] opendir error");
+        return fileName;
+    }
     size_t namelen = name - &fileName[0];
     std::string rename = fileName.substr(0, namelen);
     std::string type = fileName.erase(0, fileName.find_last_of('.') + 1);
@@ -327,8 +331,7 @@ std::string OppObexServer::OppObexObserver::RenameFile(std::string fileName)
 
 bool OppObexServer::OppObexObserver::HasSameName(std::string path, std::string name)
 {
-    const char *filePath = path.c_str();
-    DIR *dir = opendir(filePath);
+    DIR *dir = opendir(path.c_str());
     if (dir == nullptr) {
         HILOGI("[OPP OBEX SERVER] opendir error");
         return false;
