@@ -29,7 +29,7 @@ ohos_shared_library("bluetooth") {
 
   defines = [
     "BT_LOG_TAG = \"bluetooth_napi\"",
-    "BT_LOG_DOMAIN = 0xD005310",
+    "BT_LOG_DOMAIN = 0xD000100",
   ]
 
   sources = [
