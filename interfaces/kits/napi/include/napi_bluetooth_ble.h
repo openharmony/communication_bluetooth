@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Bluetooth {
 void DefineBLEJSObject(napi_env env, napi_value exports);
+void DefineSystemBLEInterface(napi_env env, napi_value exports);
 napi_value StartBLEScan(napi_env env, napi_callback_info info);
 napi_value StopBLEScan(napi_env env, napi_callback_info info);
 napi_value StartAdvertising(napi_env env, napi_callback_info info);
@@ -30,3 +31,4 @@ napi_value PropertyInit(napi_env env, napi_value exports);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_BLE_H_ */
+
