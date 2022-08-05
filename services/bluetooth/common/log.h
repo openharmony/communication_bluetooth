@@ -16,7 +16,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#define LOG_DOMAIN 0xD001550
+#define LOG_DOMAIN 0xD000102
 #define LOG_TAG "Bluetooth"
 
 #include "hilog/log.h"
