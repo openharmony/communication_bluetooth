@@ -237,7 +237,12 @@ public:
 
     void OnDiscoveryStateChanged(const int32_t status) override
     {
-        impl_->observers_.ForEach([status](sptr<IBluetoothHostObserver> observer) {
+        impl_->observers_.ForEach([this, status](sptr<IBluetoothHostObserver> observer) {
+            int32_t uid = this->impl_->observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnDiscoveryStateChanged(static_cast<int32_t>(status));
         });
         if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
@@ -371,7 +376,12 @@ public:
 
     void OnDiscoveryStateChanged(const int32_t status) override
     {
-        impl_->bleObservers_.ForEach([status](sptr<IBluetoothHostObserver> observer) {
+        impl_->bleObservers_.ForEach([this, status](sptr<IBluetoothHostObserver> observer) {
+            int32_t uid = this->impl_->bleObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnDiscoveryStateChanged(static_cast<int32_t>(status));
         });
     }
