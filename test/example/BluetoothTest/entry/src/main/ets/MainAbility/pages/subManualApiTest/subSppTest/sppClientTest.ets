@@ -116,98 +116,135 @@ struct SppClient {
           .margin( { top: "20vp", left: "20vp", right: "20vp" } )
           .alignItems(VerticalAlign.Center)
 
-        Scroll() {
-          Collumn() {
-          List({ space: 1 }) {
-          //使能蓝牙
-          ListItem() {
-            TitleComponent({
-              title: "enableBluetooth",
-              bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-            });
-          }
-          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-          .onClick(() => {
-            this.currentClick = 0;
-            if (this.btEnable) {
-              this.message = '蓝牙已经使能';
-              return;
-            }
-            let ret = BluetoothModel.enableBluetooth();
-            this.btEnable = ret;
-            AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
-            this.message = "蓝牙使能执行结果：" + ret;
-          })
-
-          //去使能蓝牙
-          ListItem() {
-            TitleComponent({
-              title: "disableBluetooth",
-              bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-            });
-          }
-          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-          .onClick(() => {
-            this.currentClick = 1;
-            if (!this.btEnable) {
-              this.message = '蓝牙还未使能';
-              return;
-            }
-            let ret = BluetoothModel.disableBluetooth();
-            this.btEnable = false;
-            AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
-            this.message = "蓝牙去使能执行结果：" + ret;
-          })
-
-          //查询蓝牙状态
-          ListItem() {
-            TitleComponent({
-              title: "getState",
-              bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-            });
-          }
-          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-          .onClick(() => {
-            this.currentClick = 2;
-            let ret = BluetoothModel.getState();
-            switch (ret) {
-              case 0:
-                this.stateBT = 'STATE_OFF';
-                break;
-              case 1:
-                this.stateBT = 'STATE_TURNING_ON';
-                break;
-              case 2:
-                this.stateBT = 'STATE_ON';
-                break;
-              case 3:
-                this.stateBT = 'STATE_TURNING_OFF';
-                break;
-              case 4:
-                this.stateBT = 'STATE_BLE_TURNING_ON';
-                break;
-              case 5:
-                this.stateBT = 'STATE_BLE_ON';
-                break;
-              case 6:
-                this.stateBT = 'STATE_BLE_TURNING_OFF';
-                break;
-              default:
-                this.stateBT = '未知状态';
-                break;
-            }
-            this.message = "当前蓝牙的状态是：" + this.stateBT;
-          })
-            //查询当前连接状态
+          Scroll() {
+            Column() {
+            List({ space: 1 }) {
+            //使能蓝牙
             ListItem() {
               TitleComponent({
-                title: "getBtConnectionState",
+                title: "enableBluetooth",
+                bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+            .onClick(() => {
+              this.currentClick = 0;
+              if (this.btEnable) {
+                this.message = '蓝牙已经使能';
+                return;
+              }
+              let ret = BluetoothModel.enableBluetooth();
+              this.btEnable = ret;
+              AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
+              this.message = "蓝牙使能执行结果：" + ret;
+            })
+
+            //去使能蓝牙
+            ListItem() {
+              TitleComponent({
+                title: "disableBluetooth",
+                bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+            .onClick(() => {
+              this.currentClick = 1;
+              if (!this.btEnable) {
+                this.message = '蓝牙还未使能';
+                return;
+              }
+              let ret = BluetoothModel.disableBluetooth();
+              this.btEnable = false;
+              AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
+              this.message = "蓝牙去使能执行结果：" + ret;
+            })
+
+            //设置扫描方式为可发现可连接
+            ListItem() {
+              TitleComponent({
+                title: "setBluetoothScanMode",
+                bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+            .onClick(() => {
+              this.currentClick = 2;
+              if (!this.btEnable) {
+                this.message = '蓝牙还未使能';
+                return;
+              }
+              let ret = BluetoothModel.setBluetoothScanMode(4, 0);
+              if (ret) {
+                this.message = "设置成功"
+              } else {
+                this.message = "设置失败"
+              }
+            })
+
+            //查询蓝牙状态
+            ListItem() {
+              TitleComponent({
+                title: "getState",
                 bgColor: this.currentClick === 3 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
               });
             }
             .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
             .onClick(() => {
               this.currentClick = 3;
+              let ret = BluetoothModel.getState();
+              switch (ret) {
+                case 0:
+                  this.stateBT = 'STATE_OFF';
+                  break;
+                case 1:
+                  this.stateBT = 'STATE_TURNING_ON';
+                  break;
+                case 2:
+                  this.stateBT = 'STATE_ON';
+                  break;
+                case 3:
+                  this.stateBT = 'STATE_TURNING_OFF';
+                  break;
+                case 4:
+                  this.stateBT = 'STATE_BLE_TURNING_ON';
+                  break;
+                case 5:
+                  this.stateBT = 'STATE_BLE_ON';
+                  break;
+                case 6:
+                  this.stateBT = 'STATE_BLE_TURNING_OFF';
+                  break;
+                default:
+                  this.stateBT = '未知状态';
+                  break;
+              }
+              this.message = "当前蓝牙的状态是：" + this.stateBT;
+            })
+
+            //查询当前扫描方式
+            ListItem() {
+              TitleComponent({
+                title: "getBluetoothScanMode",
+                bgColor: this.currentClick === 4 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+            .onClick(() => {
+              this.currentClick = 4;
+              let ret = BluetoothModel.getBluetoothScanMode();
+              this.message = "蓝牙当前扫描方式为：" + ret;
+            })
+
+            //查询当前连接状态
+            ListItem() {
+              TitleComponent({
+                title: "getBtConnectionState",
+                bgColor: this.currentClick === 5 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+            .onClick(() => {
+              this.currentClick = 5;
               let ret = BluetoothModel.getBtConnectionState();
               this.message = "当前连接状态是：" + ret;
             })
@@ -303,9 +340,9 @@ struct SppClient {
           .width('100%')
           .visibility(Visibility.Visible)
         }.height('50%')
-          Text("接口调用结果： " + this.message)
-            .textAlign(TextAlign.Start)
-            .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+        Text("接口调用结果： " + this.message)
+        .textAlign(TextAlign.Start)
+        .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
         }
         .visibility(Visibility.Visible);
       }
@@ -342,11 +379,11 @@ struct SppClient {
     }
   }
 
-/**
-* 字符串转arrayBuffer
-* @param {*} str 需要转换的字符串
-* @returns 返回 arrayBuffer
-*/
+  /**
+  * 字符串转arrayBuffer
+  * @param {*} str 需要转换的字符串
+  * @returns 返回 arrayBuffer
+  */
   strToArrayBuffer (str) {
     let array = new Uint8Array(str.length);
     for(var i = 0; i < str.length; i++) {
@@ -355,10 +392,10 @@ struct SppClient {
     return array.buffer
   }
 
-/**
-* Pair device
-* @param device
-*/
+  /**
+  * Pair device
+  * @param device
+  */
   pairDevice(deviceId: string) {
     this.controller.pair(this.deviceId, (pinCode: string) => {
       LogUtil.info(this.TAG_PAGE + 'pairDevice success callback : pinCode = ' + pinCode);
@@ -432,7 +469,6 @@ struct SppClient {
     $r("app.string.bluetooth_know_button")
     );
   }
-
 }
 
 /**
