@@ -43,6 +43,7 @@
 		<T1 property="SocketService">true</T1>
 		<T1 property="DIService">true</T1>
 		<T1 property="HidHostService">true</T1>
+		<T1 property="OppService">true</T1>
 	</T1>
 	<T1 section="A2dpSrcService">
 		<T1 property="MaxConnectedDevices">0x06</T1>
@@ -128,7 +129,11 @@
     <T1 section="HidHostService">
         <T1 property="MaxConnectedDevices">0x06</T1>
     </T1>
-	<T1 section="PanService">
+    <T1 section="PanService">
         <T1 property="MaxConnectedDevices">0x07</T1>
+    </T1>
+    <T1 section="OppService">
+        <T1 property="L2capMtu">0x1f97</T1>
+        <T1 property="RfcommMtu">0x1f97</T1>
     </T1>
 </config>

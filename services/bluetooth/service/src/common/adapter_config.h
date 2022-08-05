@@ -39,6 +39,7 @@ const std::string SECTION_PAN_SERVICE = "PanService";
 const std::string SECTION_PBAP_PCE_SERVICE = "PbapPceService";
 const std::string SECTION_PBAP_PSE_SERVICE = "PbapPseService";
 const std::string SECTION_HID_HOST_SERVICE = "HidHostService";
+const std::string SECTION_OPP_SERVICE = "OppService";
 const std::string SECTION_DI_SERVICE = "DIService";
 const std::string SECTION_OUTPUT_SETTING = "OutputSetting";
 
