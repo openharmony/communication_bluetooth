@@ -41,7 +41,7 @@
 #endif
 
 #ifndef BT_LOG_DOMAIN
-#define BT_LOG_DOMAIN 0xD006000
+#define BT_LOG_DOMAIN 0xD000101
 #endif
 
 #ifndef BT_LOG_TAG
