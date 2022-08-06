@@ -62,7 +62,7 @@
         "hiviewdfx_hilog_native",
         "ipc",
         "samgr_proxy",
-        "samgr_standard"
+        "samgr"
       ],
       "third_party": [
         "googletest",

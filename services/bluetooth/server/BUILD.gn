@@ -57,8 +57,8 @@ ohos_shared_library("bluetooth_server") {
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/service:btservice",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
   ]
 
   external_deps = [
