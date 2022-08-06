@@ -15,9 +15,11 @@
 
 #include "bluetooth_ble_advertiser_server.h"
 
+#include "bluetooth_ble_central_manager_server.h"
 #include "bluetooth_log.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
+#include "ipc_skeleton.h"
 #include "remote_observer_list.h"
 #include "permission_utils.h"
 
@@ -33,7 +35,12 @@ public:
     {
         HILOGI("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
 
-        observers_->ForEach([result, advHandle, opcode](IBluetoothBleAdvertiseCallback *observer) {
+        observers_->ForEach([this, result, advHandle, opcode](IBluetoothBleAdvertiseCallback *observer) {
+            int32_t uid = observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnStartResultEvent(result, advHandle, opcode);
         });
     }
@@ -51,7 +58,13 @@ public:
         observers_ = observers;
     }
 
+    void SetObserver(std::map<sptr<IRemoteObject>, int32_t> &observerUid)
+    {
+        observerUid_ = observerUid;
+    }
+
 private:
+    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
     RemoteObserverList<IBluetoothBleAdvertiseCallback> *observers_;
 };
 
@@ -64,6 +77,7 @@ struct BluetoothBleAdvertiserServer::impl {
     std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
     RemoteObserverList<IBluetoothBleAdvertiseCallback> observers_;
+    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
     std::unique_ptr<BleAdvertiserCallback> observerImp_ = std::make_unique<BleAdvertiserCallback>();
     IAdapterBle *bleService_ = nullptr;
     std::vector<sptr<IBluetoothBleAdvertiseCallback>> advCallBack_;
@@ -220,6 +234,7 @@ void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBlu
         return;
     }
     if (pimpl != nullptr) {
+        pimpl->observersUid_[callback->AsObject()] = IPCSkeleton::GetCallingUid();
         pimpl->observers_.Register(callback);
         pimpl->advCallBack_.push_back(callback);
     }
@@ -238,6 +253,12 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
             HILOGI("Deregister observer");
             pimpl->observers_.Deregister(*iter);
             pimpl->advCallBack_.erase(iter);
+            break;
+        }
+    }
+    for (auto iter = pimpl->observersUid_.begin(); iter != pimpl->observersUid_.end(); ++iter) {
+        if (iter->first == callback->AsObject()) {
+            pimpl->observersUid_.erase(iter);
             break;
         }
     }
