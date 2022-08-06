@@ -74,7 +74,7 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
         napi_set_element(env, scanResultArray, count, result);
         ++count;
     }
-	HILOGI("ConvertScanResult called end");
+	    HILOGI("ConvertScanResult called end");
 }
 
 void AfterWorkCallbackToSysBLEScan(uv_work_t *work, int status)
