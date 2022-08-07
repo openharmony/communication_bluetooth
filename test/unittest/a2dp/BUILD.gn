@@ -35,7 +35,7 @@ config("module_private_config") {
   ]
   defines = [
     "BTFW_LOG_TAG = \"bluetooth_test\"",
-    "BTFW_LOG_DOMAIN = 0xD005300",
+    "BTFW_LOG_DOMAIN = 0xD000103",
   ]
 }
 

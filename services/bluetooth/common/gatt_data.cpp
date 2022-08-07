@@ -15,6 +15,7 @@
 
 #include "gatt_data.h"
 #include "bt_def.h"
+#include "memory"
 #include "securec.h"
 
 namespace bluetooth {

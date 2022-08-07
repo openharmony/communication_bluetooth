@@ -306,6 +306,42 @@ struct HandsFreeUnit::impl {
         return false;
     }
 
+    bool HandleIncomingCall(const BluetoothRemoteDevice &device, int flag)
+    {
+        HILOGI("Enter!");
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy_->HandleIncomingCall(BluetoothRawAddress(device.GetDeviceAddr()), (int32_t)flag);
+        }
+        return false;
+    }
+
+    bool HandleMultiCall(const BluetoothRemoteDevice &device, int flag, int index)
+    {
+        HILOGI("Enter!");
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy_->HandleMultiCall(BluetoothRawAddress(device.GetDeviceAddr()), (int32_t)flag, (int32_t)index);
+        }
+        return false;
+    }
+
+    bool DialLastNumber(const BluetoothRemoteDevice &device)
+    {
+        HILOGI("Enter!");
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy_->DialLastNumber(BluetoothRawAddress(device.GetDeviceAddr()));
+        }
+        return false;
+    }
+
+    bool DialMemory(const BluetoothRemoteDevice &device, int index)
+    {
+        HILOGD("Enter! index = %{public}d", index);
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy_->DialMemory(BluetoothRawAddress(device.GetDeviceAddr()), index);
+        }
+        return false;
+    }
+
     bool FinishActiveCall(const BluetoothRemoteDevice &device, const HandsFreeUnitCall &call)
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
@@ -504,6 +540,26 @@ bool HandsFreeUnit::HoldActiveCall(const BluetoothRemoteDevice &device)
 bool HandsFreeUnit::RejectIncomingCall(const BluetoothRemoteDevice &device)
 {
     return pimpl->RejectIncomingCall(device);
+}
+
+bool HandsFreeUnit::HandleIncomingCall(const BluetoothRemoteDevice &device, int flag)
+{
+    return pimpl->HandleIncomingCall(device, flag);
+}
+
+bool HandsFreeUnit::HandleMultiCall(const BluetoothRemoteDevice &device, int flag, int index)
+{
+    return pimpl->HandleMultiCall(device, flag, index);
+}
+
+bool HandsFreeUnit::DialLastNumber(const BluetoothRemoteDevice &device)
+{
+    return pimpl->DialLastNumber(device);
+}
+
+bool HandsFreeUnit::DialMemory(const BluetoothRemoteDevice &device, int index)
+{
+    return pimpl->DialMemory(device, index);
 }
 
 bool HandsFreeUnit::FinishActiveCall(const BluetoothRemoteDevice &device, const HandsFreeUnitCall &call)

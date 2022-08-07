@@ -21,7 +21,9 @@
 #include <vector>
 #include "bt_def.h"
 #include "bt_uuid.h"
+#include "cstdint"
 #include "raw_address.h"
+#include "type_traits"
 
 namespace bluetooth {
 struct Descriptor {
