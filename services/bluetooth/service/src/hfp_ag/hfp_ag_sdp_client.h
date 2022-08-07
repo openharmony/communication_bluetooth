@@ -79,6 +79,40 @@ public:
     int DoDiscovery(const std::string &remoteAddr, int role);
 
     /**
+     * @brief Callback function of SDP discovery for HSP.
+     *
+     * @param addr Remote device address defined bt stack.
+     * @param serviceAry Array of services discovered.
+     * @param serviceNum Number of services discovered.
+     * @param context Upper layer context.
+     */
+    static void SdpHspCallback(const BtAddr *addr, const SdpService *serviceAry, uint16_t serviceNum, void *context);
+
+    /**
+     * @brief Start a service discovery job for HSP.
+     *
+     * @param remoteAddr Remote device address.
+     */
+    void DoHspDiscovery(const std::string &remoteAddr);
+
+    /**
+     * @brief Callback function of SDP discovery for HSP HS.
+     *
+     * @param addr Remote device address defined bt stack.
+     * @param serviceAry Array of services discovered.
+     * @param serviceNum Number of services discovered.
+     * @param context Upper layer context.
+     */
+    static void SdpHspHsCallback(const BtAddr *addr, const SdpService *serviceAry, uint16_t serviceNum, void *context);
+
+    /**
+     * @brief Start a service discovery job for HSP HS.
+     *
+     * @param remoteAddr Remote device address.
+     */
+    void DoHspHsDiscovery(const std::string &remoteAddr);
+
+    /**
      * @brief Start a find service attributes job.
      *
      * @param remoteAddr Remote device address.

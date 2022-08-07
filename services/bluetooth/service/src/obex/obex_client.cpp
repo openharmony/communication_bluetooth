@@ -273,7 +273,16 @@ int ObexClient::SendRequest(const ObexHeader &req)
         return -1;
     }
     auto obexPacket = req.Build();
-    isProcessing_ = true;
+    bool srmEnable = false;
+    if (req.HasHeader(ObexHeader::SRM)) {
+        srmEnable = req.GetItemSrm();
+    }
+    if ((req.GetFieldCode() == static_cast<uint8_t>(ObexOpeId::PUT)) &&
+        !srmEnable) {
+        isProcessing_ = false;
+    } else {
+        isProcessing_ = true;
+    }
     bool ret = clientTransport_->Write(obexPacket->GetPacket());
     if (!ret) {
         OBEX_LOG_ERROR("SendRequest Fail!");
@@ -316,6 +325,9 @@ int ObexClient::Connect(ObexConnectParams &connectParams)
     }
     if (connectParams.authResponses_ != nullptr) {
         header->AppendItemAuthResponse(*connectParams.authResponses_);
+    }
+    if (connectParams.count_ != nullptr) {
+        header->AppendItemCount(*connectParams.count_);
     }
     // create transport before obex connect
     if (!clientTransport_->IsConnected()) {
@@ -609,6 +621,7 @@ void ObexClient::AbortDataAvailable(const ObexHeader &resp)
 void ObexClient::HandleTransportDataBusy(uint8_t isBusy)
 {
     OBEX_LOG_INFO("Call %{public}s, isBusy %{public}d", __PRETTY_FUNCTION__, isBusy);
+    clientObserver_.OnBusy(*this, isBusy);
 }
 
 int ObexClient::SendConnectRequest(ObexHeader &header)
@@ -627,7 +640,7 @@ int ObexClient::SendConnectRequest(ObexHeader &header)
     return SendRequest(header);
 }
 
-const ObexClientSession &ObexClient::GetClientSession() const
+ObexClientSession &ObexClient::GetClientSession() const
 {
     return *clientSession_;
 }

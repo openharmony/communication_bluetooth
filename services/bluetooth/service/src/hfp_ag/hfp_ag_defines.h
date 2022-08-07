@@ -38,6 +38,7 @@ constexpr int HFP_AG_COMMAND_MTU = 512;
 // SDP attribute defines
 static constexpr uint16_t HFP_AG_SDP_ATTRIBUTE_DATA_STORES_OR_NETWORK = 0x0301;
 static constexpr uint16_t HFP_AG_SDP_ATTRIBUTE_SUPPORTED_FEATURES = 0x0311;
+static constexpr uint16_t HSP_AG_SDP_ATTRIBUTE_REMOTE_AUDIO_VOLUME_CONTROL = 0x0302;
 
 // AG service name string
 static const std::string HFP_AG_SERVER_SERVICE_NAME = "Handsfree Audio Gateway";
@@ -46,12 +47,16 @@ static const std::string HFP_AG_SERVER_SERVICE_NAME = "Handsfree Audio Gateway";
 static constexpr uint16_t HFP_AG_UUID_SERVCLASS_HFP_HF = 0X111E;
 static constexpr uint16_t HFP_AG_UUID_SERVCLASS_HFP_AG = 0X111F;
 static constexpr uint16_t HFP_AG_UUID_SERVCLASS_GENERIC_AUDIO = 0X1203;
+static constexpr uint16_t HSP_UUID_SERVCLASS = 0X1108;
+static constexpr uint16_t HSP_HS_UUID_SERVCLASS = 0X1131;
+static constexpr uint16_t HSP_AG_UUID_SERVCLASS = 0X1112;
 
 // HFP version
 static constexpr uint16_t HFP_AG_HFP_VERSION_1_1 = 0x0101;
 static constexpr uint16_t HFP_AG_HFP_VERSION_1_5 = 0x0105;
 static constexpr uint16_t HFP_AG_HFP_VERSION_1_6 = 0x0106;
 static constexpr uint16_t HFP_AG_HFP_VERSION_1_7 = 0x0107;
+static constexpr uint16_t HSP_AG_HSP_VERSION_1_2 = 0x0102;
 
 // Feature mask for HFP 1.6 (and below)
 static constexpr uint32_t HFP_AG_1_6_FEATURES_MASK = 0x000003FF;
@@ -391,7 +396,8 @@ enum {
     HFP_AG_AUDIO_CONNECT_FAILED_EVT,
     HFP_AG_AUDIO_DISCONNECT_FAILED_EVT,
 
-    HFP_AG_RING_TIMEOUT_EVT
+    HFP_AG_RING_TIMEOUT_EVT,
+    HFP_AG_PROCESS_CKPD_EVT
 };
 
 // This is the message type that Hfp controls other modules.

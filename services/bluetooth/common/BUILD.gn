@@ -30,6 +30,7 @@ ohos_static_library("btcommon") {
     "bt_uuid.cpp",
     "gatt_data.cpp",
     "hands_free_unit_calls.cpp",
+    "opp_transfer_information.cpp",
     "pbap_pce_parameter.cpp",
     "raw_address.cpp",
   ]

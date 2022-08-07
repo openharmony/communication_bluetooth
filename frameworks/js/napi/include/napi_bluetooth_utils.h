@@ -21,6 +21,7 @@
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_log.h"
+#include "bluetooth_opp.h"
 #include "bluetooth_remote_device.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -119,6 +120,9 @@ void ConvertDescriptorWriteReqToJS(
     napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
+
+void ConvertOppTransferInformationToJS(napi_env env,
+    napi_value result, BluetoothOppTransferInformation& transferInformation);
 
 void GetServiceVectorFromJS(napi_env env, napi_value object, std::vector<GattService> &services,
     std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
@@ -238,6 +242,10 @@ struct BufferCallbackInfo : public BluetoothCallbackInfo {
     char buffer_[1024];
 };
 
+struct TransforInformationCallbackInfo : public BluetoothCallbackInfo {
+    BluetoothOppTransferInformation information_;
+};
+
 namespace {
 using sysBLEMap = std::map<std::string, std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE>>;
 sysBLEMap g_sysBLEObserver;
@@ -297,7 +305,6 @@ struct ScanResult {
     int32_t rssi;               // RSSI of the remote device
     std::vector<uint8_t> data;  // The raw data of broadcast packet
 };
-
 enum ProfileConnectionState {
     STATE_DISCONNECTED = 0,  // the current profile is disconnected
     STATE_CONNECTING = 1,    // the current profile is being connected
@@ -485,7 +492,8 @@ enum ProfileId {
     PROFILE_HID_HOST = 6,
     PROFILE_PAN_NETWORK = 7,
     PROFILE_PBAP_CLIENT = 8,
-    PROFILE_PBAP_SERVER = 9
+    PROFILE_PBAP_SERVER = 9,
+    PROFILE_OPP = 10
 };
 
 template<typename T1, typename T2, typename T3>

@@ -305,7 +305,47 @@ public:
     bool RejectIncomingCall(const BluetoothRemoteDevice &device);
 
     /**
-     * @brief Finish a specified active call.
+     * @brief Handle an incoming call.
+     *
+     * @param device Remote device object.
+     * @param flag handle action
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool HandleIncomingCall(const BluetoothRemoteDevice &device, int flag);
+
+    /**
+     * @brief Hande multi calll.
+     *
+     * @param device Remote device object.
+     * @param flag handle action
+     * @param index call index
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool HandleMultiCall(const BluetoothRemoteDevice &device, int flag, int index);
+
+    /**
+     * @brief dial last number.
+     *
+     * @param device Remote device object.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool DialLastNumber(const BluetoothRemoteDevice &device);
+
+    /**
+     * @brief dial memory number.
+     *
+     * @param device Remote device object.
+     * @param index memory number index
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool DialMemory(const BluetoothRemoteDevice &device, int index);
+
+    /**
+     * @brief brief Finish a specified active call.
      *
      * @param device Remote device object.
      * @param call Call object.
