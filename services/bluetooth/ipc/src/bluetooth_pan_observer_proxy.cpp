@@ -30,7 +30,7 @@ ErrCode BluetoothPanObserverProxy::OnConnectionStateChanged(const BluetoothRawAd
     data.WriteInt16(state);
     int32_t st = Remote()->SendRequest(COMMAND_ON_CONNECTION_STATE_CHANGED, data, reply, option);
     if (st != ERR_NONE) {
-        HILOGW("OnConnectionStateChanged failed, error code is %{public}d", st);
+        HILOGE("OnConnectionStateChanged failed, error code is %{public}d", st);
         return st;
     }
 

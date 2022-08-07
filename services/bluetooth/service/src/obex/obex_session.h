@@ -386,6 +386,10 @@ public:
     {
         receivedObject_ = nullptr;
     }
+    bool IsSupportSrmMode() const
+    {
+        return isSupportSrm_;
+    }
 
 private:
     int ProcessSendSrmResponse();

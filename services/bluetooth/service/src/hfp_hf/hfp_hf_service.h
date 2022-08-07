@@ -240,6 +240,46 @@ public:
     bool RejectIncomingCall(const RawAddress &device) override;
 
     /**
+     * @brief handle an incoming call.
+     *
+     * @param device Remote device object.
+     * @param flag Types of incoming calls handle.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool HandleIncomingCall(const RawAddress &device, int flag) override;
+
+    /**
+     * @brief handle multi call.
+     *
+     * @param device Remote device object.
+     * @param flag Types of incoming calls handle.
+     * @param index call index
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool HandleMultiCall(const RawAddress &device, int flag, int index) override;
+
+    /**
+     * @brief Dial last number.
+     *
+     * @param device Remote device object.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool DialLastNumber(const RawAddress &device) override;
+
+    /**
+     * @brief Dial memory.
+     *
+     * @param device Remote device object.
+     * @param index Memory index.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    bool DialMemory(const RawAddress &device, int index) override;
+
+    /**
      * @brief Finish a specified active call.
      *
      * @param device Remote device object.

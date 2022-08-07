@@ -62,7 +62,7 @@
         "hiviewdfx_hilog_native",
         "ipc",
         "samgr_proxy",
-        "samgr_standard"
+        "samgr"
       ],
       "third_party": [
         "googletest",
@@ -112,6 +112,7 @@
         "//foundation/communication/bluetooth/test/unittest/ble:unittest",
         "//foundation/communication/bluetooth/test/unittest/hid:unittest",
         "//foundation/communication/bluetooth/test/unittest/pan:unittest",
+        "//foundation/communication/bluetooth/test/unittest/opp:unittest",
         "//foundation/communication/bluetooth/test/fuzztest/host:fuzztest"
       ]
     }

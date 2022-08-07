@@ -15,6 +15,7 @@
 
 #include "hands_free_unit_calls.h"
 #include <ctime>
+#include "string"
 
 namespace bluetooth {
 HandsFreeUnitCalls::HandsFreeUnitCalls(const std::string &device, int id, int state, const std::string &number,

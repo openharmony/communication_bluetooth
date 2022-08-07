@@ -117,12 +117,13 @@ private:
      */
     int AddAttribute(const SdpAttribute &attribute) const;
 
-    inline static constexpr uint16_t HFP_AG_SERVER_CLASSID_NUM = 2;
+    inline static constexpr uint16_t HFP_AG_SERVER_CLASSID_NUM = 3;
     inline static constexpr uint16_t HFP_AG_SERVER_PROTOCOL_NUM = 2;
-    inline static constexpr uint16_t HFP_AG_SERVER_PROFILE_NUM = 1;
+    inline static constexpr uint16_t HFP_AG_SERVER_PROFILE_NUM = 2;
     inline static constexpr uint16_t HFP_AG_SERVER_BROWSE_LIST_NUM = 1;
     inline static constexpr uint16_t HFP_AG_SERVER_NETWORK_LENGTH = 1;
     inline static constexpr uint16_t HFP_AG_SERVER_FEATURES_LENGTH = 2;
+    inline static constexpr uint16_t HSP_AG_SERVER_CLASSID_NUM = 2;
 
     // SDP service record handle
     uint32_t sdpHandle_ {0};

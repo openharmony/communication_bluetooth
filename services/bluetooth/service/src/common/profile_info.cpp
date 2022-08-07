@@ -38,6 +38,7 @@ const std::vector<ProfileInfo> SupportProfilesInfo::SUPPORT_FILES = {
     ProfileInfo(PROFILE_NAME_DI, PROFILE_ID_DI, BLUETOOTH_UUID_PNP),
     ProfileInfo(PROFILE_NAME_HID_HOST, PROFILE_ID_HID_HOST, BLUETOOTH_UUID_HID_HOST),
     ProfileInfo(PROFILE_NAME_PAN, PROFILE_ID_PAN, BLUETOOTH_UUID_PAN),
+    ProfileInfo(PROFILE_NAME_OPP, PROFILE_ID_OPP, BLUETOOTH_UUID_OPP),
 };
 
 const std::vector<ProfileInfo> &SupportProfilesInfo::GetSupportProfiles()

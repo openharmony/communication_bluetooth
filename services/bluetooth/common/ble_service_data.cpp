@@ -17,6 +17,10 @@
 
 #include <algorithm>
 
+#include "array"
+#include "map"
+#include "vector"
+
 namespace bluetooth {
 /**
  * @brief Represents scan settings.
