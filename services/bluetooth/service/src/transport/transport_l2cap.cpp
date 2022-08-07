@@ -227,12 +227,9 @@ L2capTransport *L2capTransport::GetTransport(uint16_t lcid, void *ctx)
 {
     LOG_INFO("[L2capTransport]%{public}s lcid:%hu", __func__, lcid);
 
-    L2capTransport *transport = nullptr;
-    if (ctx != nullptr) {
+    L2capTransport *transport = FindClientTransport(lcid);
+    if ((transport == nullptr) && (ctx != nullptr)) {
         transport = static_cast<L2capTransport *>(ctx);
-    } else {
-        L2capTransport *clientTransport = FindClientTransport(lcid);
-        transport = clientTransport;
     }
     return transport;
 }

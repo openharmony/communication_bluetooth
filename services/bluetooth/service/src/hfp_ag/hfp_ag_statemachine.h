@@ -129,6 +129,8 @@ public:
      */
     void SetRemoving(bool isRemoving);
 
+    void ProcessKeyPressed(const RawAddress &device, const int &phoneState) const;
+
     inline static const std::string DISCONNECTED = "Disconnected";
     inline static const std::string CONNECTING = "Connecting";
     inline static const std::string DISCONNECTING = "Disconnecting";
@@ -187,6 +189,7 @@ public:
 
 protected:
     HfpAgProfile& profile_;
+    int callState_;
     HfpAgSystemEventProcesser &eventProcessor_;
     int stateInt_ {HFP_AG_STATE_DISCONNECTED};
     HfpAgStateMachine &stateMachine_;

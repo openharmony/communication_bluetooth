@@ -20,6 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "cstdint"
+#include "iosfwd"
+
 namespace bluetooth {
 class IPbapPullPhoneBookParam {
 public:

@@ -39,6 +39,10 @@ public:
     bool AcceptIncomingCall(const BluetoothRawAddress &device, int flag) override;
     bool HoldActiveCall(const BluetoothRawAddress &device) override;
     bool RejectIncomingCall(const BluetoothRawAddress &device) override;
+    bool HandleIncomingCall(const BluetoothRawAddress &device, int flag) override;
+    bool HandleMultiCall(const BluetoothRawAddress &device, int flag, int index) override;
+    bool DialLastNumber(const BluetoothRawAddress &device) override;
+    bool DialMemory(const BluetoothRawAddress &device, int index) override;
     bool FinishActiveCall(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call) override;
     int StartDial(const BluetoothRawAddress &device, const std::string &number, BluetoothHfpHfCall &call) override;
     void RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) override;

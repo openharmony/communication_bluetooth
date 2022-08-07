@@ -256,6 +256,13 @@ public:
     bool SendChup();
 
     /**
+     * @brief Send BTRH command.
+     *
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     */
+    bool SendBtrh(int action);
+
+    /**
      * @brief Send BCC command.
      *
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.

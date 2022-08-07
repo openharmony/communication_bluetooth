@@ -63,6 +63,18 @@ BluetoothHfpHfStub::BluetoothHfpHfStub() {
         BluetoothHfpHfStub::Code::BT_HFP_HF_REJECT_INCOMING_CALL)] =
         &BluetoothHfpHfStub::RejectIncomingCallInner;
     memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpHfStub::Code::BT_HFP_HF_HANDLE_INCOMING_CALL)] =
+        &BluetoothHfpHfStub::HandleIncomingCallInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpHfStub::Code::BT_HFP_HF_HANDLE_MULLTI_CALL)] =
+        &BluetoothHfpHfStub::HandleMultiCallInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpHfStub::Code::BT_HFP_HF_DIAL_LAST_NUMBER)] =
+        &BluetoothHfpHfStub::DialLastNumberInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpHfStub::Code::BT_HFP_HF_DIAL_MEMORY)] =
+        &BluetoothHfpHfStub::DialMemoryInner;
+    memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfStub::Code::BT_HFP_HF_FINISH_ATIVE_CALL)] =
         &BluetoothHfpHfStub::FinishActiveCallInner;
     memberFuncMap_[static_cast<uint32_t>(
@@ -297,6 +309,71 @@ ErrCode BluetoothHfpHfStub::RejectIncomingCallInner(MessageParcel &data, Message
     int result = RejectIncomingCall(*device);
     if (!reply.WriteBool(result)) {
         HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHfpHfStub::HandleIncomingCallInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        HILOGE("BluetoothHfpHfStub: device is not exist.");
+        return TRANSACTION_ERR;
+    }
+    int flag = data.ReadInt32();
+    int result = HandleIncomingCall(*device, flag);
+    if (!reply.WriteBool(result)) {
+        HILOGE("BluetoothHfpHfStub: reply writing failed.");
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHfpHfStub::HandleMultiCallInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        HILOGE("BluetoothHfpHfStub: device is not exist.");
+        return TRANSACTION_ERR;
+    }
+    int flag = data.ReadInt32();
+    int index = data.ReadInt32();
+    int result = HandleMultiCall(*device, flag, index);
+    if (!reply.WriteBool(result)) {
+        HILOGE("BluetoothHfpHfStub: reply writing failed.");
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHfpHfStub::DialLastNumberInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        HILOGE("BluetoothHfpHfStub: device is not exist.");
+        return TRANSACTION_ERR;
+    }
+    int result = DialLastNumber(*device);
+    if (!reply.WriteBool(result)) {
+        HILOGE("BluetoothHfpHfStub: reply writing failed.");
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHfpHfStub::DialMemoryInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        HILOGE("BluetoothHfpHfStub: device is not exist.");
+        return TRANSACTION_ERR;
+    }
+    int index = data.ReadInt32();
+    HILOGE("BluetoothHfpHfStub: reply writing failed. index = %{publilc}d", index);
+    int result = DialMemory(*device, index);
+    if (!reply.WriteBool(result)) {
+        HILOGE("BluetoothHfpHfStub: reply writing failed.");
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
