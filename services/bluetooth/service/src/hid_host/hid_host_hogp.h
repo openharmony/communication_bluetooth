@@ -116,6 +116,7 @@ private:
     // For PTS
     void GetBatteryInformation(Service service);
     void GetExternalRptRefInfo(Characteristic character);
+    void GetExternalCfgInfo(Characteristic character);
 };
 }  // namespace bluetooth
 #endif  // HID_HOST_HOGP_H
