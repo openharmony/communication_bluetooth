@@ -251,7 +251,8 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
             break;
         }
     }
-    for (auto iter = pimpl->observerImp_->observersUid_.begin(); iter != pimpl->observerImp_->observersUid_.end(); ++iter) {
+    for (auto iter = pimpl->observerImp_->observersUid_.begin(); iter != pimpl->observerImp_->observersUid_.end();
+        ++iter) {
         if (iter->first == callback->AsObject()) {
             pimpl->observerImp_->observersUid_.erase(iter);
             break;
