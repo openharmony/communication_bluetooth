@@ -31,7 +31,6 @@ public:
     void OnStartScanFailed(int resultCode) override;
 
 private:
-    void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env &env, napi_value &scanResultArray);
     void UvQueueWorkOnScanCallback(uv_work_t *work, std::shared_ptr<BleScanResult> &result);
     void UvQueueWorkOnBleBatchScanResultsEvent(uv_work_t *work, const std::vector<BleScanResult> &results);
 };

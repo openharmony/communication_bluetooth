@@ -807,6 +807,11 @@ void GetDescriptorVectorFromJS(napi_env env, napi_value object, vector<GattDescr
     }
 }
 
+const sysBLEMap &GetSysBLEObserver()
+{
+    return g_sysBLEObserver;
+}
+
 GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared_ptr<GattServer> server,
     std::shared_ptr<GattClient> client)
 {
@@ -1020,6 +1025,23 @@ int GetScoConnectionState(int state)
             break;
     }
     return scoState;
+}
+void RegisterSysBLEObserver(
+    const std::shared_ptr<BluetoothCallbackInfo> &info, int32_t callbackIndex, const std::string &type)
+{
+    if (callbackIndex >= ARGS_SIZE_THREE) {
+        return;
+    }
+    HILOGI("type: %{public}s, index: %{public}d", type.c_str(), callbackIndex);
+    g_sysBLEObserver[type][callbackIndex] = info;
+}
+
+void UnregisterSysBLEObserver(const std::string &type)
+{
+    auto itor = g_sysBLEObserver.find(type);
+    if (itor != g_sysBLEObserver.end()) {
+        g_sysBLEObserver.erase(itor);
+    }
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
