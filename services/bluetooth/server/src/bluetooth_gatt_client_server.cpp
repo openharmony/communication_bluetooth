@@ -282,6 +282,12 @@ int BluetoothGattClientServer::RegisterApplication(
     int appId = pimpl->clientService_->RegisterSharedApplication(*it->get(), (RawAddress)addr, transport);
     (*it)->SetAppId(appId);
     HILOGI("appId: %{public}d", appId);
+    if (appId >= 0) {
+        OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register",
+            "SIDE", "client", "ADDRESS", addr.GetAddress(), "PID", OHOS::IPCSkeleton::GetCallingPid(),
+            "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
+    }
     return appId;
 }
 
@@ -297,6 +303,10 @@ int BluetoothGattClientServer::DeregisterApplication(int32_t appId)
         HILOGE("request not support.");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
+    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "deregister",
+        "SIDE", "client", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
+        "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
     return pimpl->clientService_->DeregisterApplication(appId);
 }
 
