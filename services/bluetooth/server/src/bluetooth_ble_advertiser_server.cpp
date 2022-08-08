@@ -58,13 +58,9 @@ public:
         observers_ = observers;
     }
 
-    void SetObserver(std::map<sptr<IRemoteObject>, int32_t> &observerUid)
-    {
-        observerUid_ = observerUid;
-    }
+    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
 
 private:
-    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
     RemoteObserverList<IBluetoothBleAdvertiseCallback> *observers_;
 };
 
@@ -77,7 +73,6 @@ struct BluetoothBleAdvertiserServer::impl {
     std::unique_ptr<SystemStateObserver> systemStateObserver_ = nullptr;
 
     RemoteObserverList<IBluetoothBleAdvertiseCallback> observers_;
-    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
     std::unique_ptr<BleAdvertiserCallback> observerImp_ = std::make_unique<BleAdvertiserCallback>();
     IAdapterBle *bleService_ = nullptr;
     std::vector<sptr<IBluetoothBleAdvertiseCallback>> advCallBack_;
@@ -234,7 +229,7 @@ void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBlu
         return;
     }
     if (pimpl != nullptr) {
-        pimpl->observersUid_[callback->AsObject()] = IPCSkeleton::GetCallingUid();
+        pimpl->observerImp_->observersUid_[callback->AsObject()] = IPCSkeleton::GetCallingUid();
         pimpl->observers_.Register(callback);
         pimpl->advCallBack_.push_back(callback);
     }
@@ -256,9 +251,9 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
             break;
         }
     }
-    for (auto iter = pimpl->observersUid_.begin(); iter != pimpl->observersUid_.end(); ++iter) {
+    for (auto iter = pimpl->observerImp_->observersUid_.begin(); iter != pimpl->observerImp_->observersUid_.end(); ++iter) {
         if (iter->first == callback->AsObject()) {
-            pimpl->observersUid_.erase(iter);
+            pimpl->observerImp_->observersUid_.erase(iter);
             break;
         }
     }
