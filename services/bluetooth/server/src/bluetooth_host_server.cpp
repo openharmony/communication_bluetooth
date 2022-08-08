@@ -100,6 +100,7 @@ struct BluetoothHostServer::impl {
     /// user regist remote observers
     RemoteObserverList<IBluetoothRemoteDeviceObserver> remoteObservers_;
     std::map<sptr<IRemoteObject>, uint32_t> remoteObserversToken_;
+    std::map<sptr<IRemoteObject>, int32_t> remoteObserversUid_;
 
     /// user regist remote observers
     RemoteObserverList<IBluetoothBlePeripheralObserver> bleRemoteObservers_;
@@ -238,7 +239,12 @@ public:
 
     void OnDiscoveryStateChanged(const int32_t status) override
     {
-        impl_->observers_.ForEach([status](sptr<IBluetoothHostObserver> observer) {
+        impl_->observers_.ForEach([this, status](sptr<IBluetoothHostObserver> observer) {
+            int32_t uid = this->impl_->observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnDiscoveryStateChanged(static_cast<int32_t>(status));
         });
         if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
@@ -314,6 +320,11 @@ public:
     void OnPairStatusChanged(const BTTransport transport, const RawAddress &device, const int32_t status) override
     {
         impl_->remoteObservers_.ForEach([this, transport, device, status](IBluetoothRemoteDeviceObserver *observer) {
+            int32_t uid = this->impl_->remoteObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             uint32_t tokenId = this->impl_->remoteObserversToken_[observer->AsObject()];
             if (PermissionUtils::VerifyUseBluetoothPermission(tokenId) == PERMISSION_DENIED) {
                 HILOGE("OnPairStatusChanged() false, check permission failed");
@@ -329,14 +340,24 @@ public:
         for (const auto &val : uuids) {
             btUuids.push_back(val);
         }
-        impl_->remoteObservers_.ForEach([device, btUuids](IBluetoothRemoteDeviceObserver *observer) {
+        impl_->remoteObservers_.ForEach([this, device, btUuids](IBluetoothRemoteDeviceObserver *observer) {
+            int32_t uid = this->impl_->remoteObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnRemoteUuidChanged(device, btUuids);
         });
     }
 
     void OnRemoteNameChanged(const RawAddress &device, const std::string &deviceName) override
     {
-        impl_->remoteObservers_.ForEach([device, deviceName](IBluetoothRemoteDeviceObserver *observer) {
+        impl_->remoteObservers_.ForEach([this, device, deviceName](IBluetoothRemoteDeviceObserver *observer) {
+            int32_t uid = this->impl_->remoteObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnRemoteNameChanged(device, deviceName);
         });
     }
@@ -350,13 +371,24 @@ public:
 
     void OnRemoteCodChanged(const RawAddress &device, int32_t cod) override
     {
-        impl_->remoteObservers_.ForEach(
-            [device, cod](IBluetoothRemoteDeviceObserver *observer) { observer->OnRemoteCodChanged(device, cod); });
+        impl_->remoteObservers_.ForEach([this, device, cod](IBluetoothRemoteDeviceObserver *observer) {
+            int32_t uid = this->impl_->remoteObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
+            observer->OnRemoteCodChanged(device, cod);
+        });
     }
 
     void OnRemoteBatteryLevelChanged(const RawAddress &device, const int32_t batteryLevel) override
     {
-        impl_->remoteObservers_.ForEach([device, batteryLevel](IBluetoothRemoteDeviceObserver *observer) {
+        impl_->remoteObservers_.ForEach([this, device, batteryLevel](IBluetoothRemoteDeviceObserver *observer) {
+            int32_t uid = this->impl_->remoteObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnRemoteBatteryLevelChanged(device, batteryLevel);
         });
     }
@@ -372,7 +404,12 @@ public:
 
     void OnDiscoveryStateChanged(const int32_t status) override
     {
-        impl_->bleObservers_.ForEach([status](sptr<IBluetoothHostObserver> observer) {
+        impl_->bleObservers_.ForEach([this, status](sptr<IBluetoothHostObserver> observer) {
+            int32_t uid = this->impl_->bleObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnDiscoveryStateChanged(static_cast<int32_t>(status));
         });
     }
@@ -404,6 +441,11 @@ public:
         const BTTransport transport, const RawAddress &device, const int32_t reqType, const int32_t number) override
     {
         impl_->bleObservers_.ForEach([this, transport, device, reqType, number](IBluetoothHostObserver *observer) {
+            int32_t uid = this->impl_->bleObserversUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             uint32_t tokenId = this->impl_->bleObserversToken_[observer->AsObject()];
             if (PermissionUtils::VerifyUseBluetoothPermission(tokenId) == PERMISSION_DENIED) {
                 HILOGE("OnPairConfirmed() false, check permission failed");
@@ -1407,6 +1449,7 @@ void BluetoothHostServer::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemo
         return;
     }
     pimpl->remoteObserversToken_[observer->AsObject()] = IPCSkeleton::GetCallingTokenID();
+    pimpl->remoteObserversUid_[observer->AsObject()] = IPCSkeleton::GetCallingUid();
     pimpl->remoteObservers_.Register(observer);
     pimpl->remoteDeviceObservers_.push_back(observer);
 }
@@ -1428,6 +1471,12 @@ void BluetoothHostServer::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRe
     for (auto iter =  pimpl->remoteObserversToken_.begin(); iter !=  pimpl->remoteObserversToken_.end(); ++iter) {
         if (iter->first == observer->AsObject()) {
             pimpl->remoteObserversToken_.erase(iter);
+            break;
+        }
+    }
+    for (auto iter = pimpl->remoteObserversUid_.begin(); iter != pimpl->remoteObserversUid_.end(); ++iter) {
+        if (iter->first == observer->AsObject()) {
+            pimpl->remoteObserversUid_.erase(iter);
             break;
         }
     }
