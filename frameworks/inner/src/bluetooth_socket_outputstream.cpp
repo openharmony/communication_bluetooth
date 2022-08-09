@@ -29,17 +29,17 @@ OutputStream::~OutputStream()
 
 size_t OutputStream::Write(const char *buf, const size_t length)
 {
-    HILOGI("OutputStream::Write(2 parameters) starts");
+    HILOGI("(2 parameters) starts");
     if (socketFd_ == -1) {
-        HILOGE("[sock]socket closed.");
+        HILOGE("socket closed.");
         return -1;
     }
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
 
-    HILOGI("[sock]write ret: %{public}zu", ret);
+    HILOGI("ret: %{public}zu", ret);
 
     if (ret == -1) {
-        HILOGE("[sock]write Error.");
+        HILOGE("Error.");
     }
     return ret;
 }

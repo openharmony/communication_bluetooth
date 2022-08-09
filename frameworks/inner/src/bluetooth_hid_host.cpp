@@ -30,11 +30,11 @@ class HidHostInnerObserver : public BluetoothHidHostObserverStub {
 public:
     explicit HidHostInnerObserver(BluetoothObserverList<HidHostObserver> &observers) : observers_(observers)
     {
-        HILOGD("Enter!");
+        HILOGI("Enter!");
     }
     ~HidHostInnerObserver() override
     {
-        HILOGD("Enter!");
+        HILOGI("Enter!");
     }
 
     ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
@@ -57,7 +57,7 @@ struct HidHost::impl {
     ~impl();
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states)
     {
-        HILOGD("Enter!");
+        HILOGI("Enter!");
         std::vector<BluetoothRemoteDevice> remoteDevices;
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             std::vector<BluetoothRawAddress> rawDevices;
@@ -128,7 +128,7 @@ struct HidHost::impl {
 
     void HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type)
     {
-        HILOGD("Enter!");
+        HILOGI("Enter!");
         int result;
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             proxy_->HidHostVCUnplug(device, id, size, type, result);
@@ -137,7 +137,7 @@ struct HidHost::impl {
 
     void HidHostSendData(std::string device, uint8_t id, uint16_t size, uint8_t type)
     {
-        HILOGD("Enter!");
+        HILOGI("Enter!");
         int result;
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             proxy_->HidHostSendData(device, id, size, type, result);
@@ -146,7 +146,7 @@ struct HidHost::impl {
 
     void HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t report)
     {
-        HILOGD("Enter!");
+        HILOGI("Enter!");
         int result;
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             proxy_->HidHostSetReport(device, type, size, report, result);
@@ -155,7 +155,7 @@ struct HidHost::impl {
 
     void HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type)
     {
-        HILOGD("Enter!");
+        HILOGI("Enter!");
         int result;
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             proxy_->HidHostGetReport(device, id, size, type, result);
@@ -190,7 +190,7 @@ private:
 
 HidHost::impl::impl()
 {
-    HILOGD("Enter!");
+    HILOGI("Enter!");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
@@ -217,7 +217,7 @@ HidHost::impl::impl()
 
 HidHost::impl::~impl()
 {
-    HILOGD("Enter!");
+    HILOGI("Enter!");
     if (proxy_ != nullptr) {
         proxy_->DeregisterObserver(innerObserver_);
     }
