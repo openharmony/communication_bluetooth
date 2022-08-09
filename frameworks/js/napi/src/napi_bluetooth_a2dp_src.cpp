@@ -199,7 +199,9 @@ napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info
     A2dpSource *profile = A2dpSource::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
     int res = profile->GetPlayingState(device);
-
+    
+    //except is_playing  all others return equals not_playing 
+    res = (res == true ? true : false);
     napi_value result = nullptr;
     napi_create_int32(env, res, &result);
     HILOGI("res: %{public}d", res);
