@@ -28,18 +28,18 @@ InputStream::~InputStream()
 
 ssize_t InputStream::Read(char *buf, const size_t length)
 {
-    HILOGI("InputStream::Read (2 parameters) starts");
+    HILOGI("(2 parameters) starts");
     if (socketFd_ == -1) {
-        HILOGE("[sock]socket closed");
+        HILOGE("socket closed");
         return -1;
     }
 
     auto ret = recv(socketFd_, buf, length, MSG_NOSIGNAL);
 
-    HILOGE("[sock] Read ret:%{public}zd", ret);
+    HILOGE("ret:%{public}zd", ret);
 
     if (ret < 0) {
-        HILOGE("[sock]socket exception! errno:%{public}d", errno);
+        HILOGE("socket exception! errno:%{public}d", errno);
     }
     return ret;
 }
