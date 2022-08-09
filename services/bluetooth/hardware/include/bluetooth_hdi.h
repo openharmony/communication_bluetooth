@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,7 @@ typedef enum {
     TRANSPORT_ERROR,
     INITIALIZATION_ERROR,
     UNKNOWN,
-} BtStatus;
+} BtInitStatus;
 
 typedef enum {
     PACKET_TYPE_UNKNOWN = 0,
@@ -48,7 +48,7 @@ typedef struct BtPacket {
 
 // BluetoothHciCallbacks register to hal by upperlayer protocol
 typedef struct BtHciCallbacks {
-    void (*OnInited)(BtStatus status);
+    void (*OnInited)(BtInitStatus status);
     void (*OnReceivedHciPacket)(BtPacketType type, const BtPacket *packet);
 } BtHciCallbacks;
 
