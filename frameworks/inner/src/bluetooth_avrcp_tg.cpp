@@ -278,7 +278,7 @@ void AvrcpTarget::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t playb
 
 void AvrcpTarget::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos)
 {
-    HILOGI("enter, uid: %{public}llu, playbackPos: %{public}d", uid, playbackPos);
+    HILOGI("enter, playbackPos: %{public}d", playbackPos);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyTrackChanged(static_cast<int64_t>(uid), static_cast<int32_t>(playbackPos));
