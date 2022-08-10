@@ -325,8 +325,7 @@ public:
 
         void OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result) override
         {
-            HILOGI("enter, address: %{public}s, uid: %{public}llu, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), uid, result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnTrackChanged(device, static_cast<uint64_t>(uid), static_cast<int>(result));
@@ -763,7 +762,7 @@ public:
 
     void OnTrackChanged(const BluetoothRemoteDevice &device, uint64_t uid, int result)
     {
-        HILOGI("enter, device: %{public}s, uid: %{public}llu, res: %{public}d", GET_ENCRYPT_ADDR(device), uid, result);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, uid, result](std::shared_ptr<IObserver> observer) {
@@ -1436,8 +1435,7 @@ int AvrcpController::GetPlayStatus(const BluetoothRemoteDevice &device)
 
 int AvrcpController::PlayItem(const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter)
 {
-    HILOGI("enter, device: %{public}s, uid: %{public}llu, uidCounter: %{public}d",
-        GET_ENCRYPT_ADDR(device), uid, uidCounter);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
     int result = RET_BAD_STATUS;
 
@@ -1617,8 +1615,8 @@ int AvrcpController::SetBrowsedPlayer(const BluetoothRemoteDevice &device, uint1
 int AvrcpController::ChangePath(
     const BluetoothRemoteDevice &device, uint16_t uidCounter, uint16_t direction, uint64_t folderUid)
 {
-    HILOGI("enter, device: %{public}s, uidCounter: %{public}d, direction: %{public}d, folderUid: %{public}llu",
-        GET_ENCRYPT_ADDR(device), uidCounter, direction, folderUid);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d, direction: %{public}d",
+        GET_ENCRYPT_ADDR(device), uidCounter, direction);
 
     int result = RET_BAD_STATUS;
 
@@ -1628,8 +1626,7 @@ int AvrcpController::ChangePath(
 int AvrcpController::GetItemAttributes(
     const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter, const std::vector<uint32_t> &attributes)
 {
-    HILOGI("enter, device: %{public}s, uid: %{public}llu, uidCounter: %{public}d",
-        GET_ENCRYPT_ADDR(device), uid, uidCounter);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
     int result = RET_BAD_STATUS;
     std::vector<int32_t> attrs;
@@ -1665,8 +1662,7 @@ int AvrcpController::AbortContinuingResponse(const BluetoothRemoteDevice &device
 
 int AvrcpController::AddToNowPlaying(const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter)
 {
-    HILOGI("enter, device: %{public}s, uid: %{public}llu, uidCounter: %{public}d",
-        GET_ENCRYPT_ADDR(device), uid, uidCounter);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
     int result = RET_BAD_STATUS;
 
