@@ -304,7 +304,7 @@ public:
         appCallback_->notificationCb(clientId_, &notificationData, OHOS_BT_STATUS_SUCCESS);
     }
 private:
-    void GattcBuildUuid(BtUuid *desUuid, std::string &srcUuid)
+    void GattcBuildUuid(BtUuid *desUuid, const std::string &srcUuid)
     {
         desUuid->uuid = (char *)srcUuid.c_str();
         desUuid->uuidLen = srcUuid.size();
@@ -535,7 +535,7 @@ int BleGattcReadCharacteristic(int clientId, BtGattCharacteristic characteristic
  * @return Returns the operation result status {@link BtStatus}.
  */
 int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristic,
-    BtGattWriteType writeType, int len, char *value)
+    BtGattWriteType writeType, int len, const char *value)
 {
     HILOGI("start, clientId: %{public}d", clientId);
     GattClient *client = nullptr;
@@ -591,7 +591,7 @@ int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
  * @param len The length of the value.
  * @return Returns the operation result status {@link BtStatus}.
  */
-int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, char *value)
+int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, const char *value)
 {
     HILOGI("start, clientId: %{public}d", clientId);
     GattClient *client = nullptr;
