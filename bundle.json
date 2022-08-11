@@ -38,7 +38,8 @@
     "name": "bluetooth",
     "subsystem": "communication",
     "syscap": [
-      "SystemCapability.Communication.Bluetooth.Core"
+      "SystemCapability.Communication.Bluetooth.Core",
+      "SystemCapability.Communication.Bluetooth.Lite"
     ],
     "features": [
       "bluetooth_avrcp_avsession"
