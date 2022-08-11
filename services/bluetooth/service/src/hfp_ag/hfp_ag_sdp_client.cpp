@@ -151,6 +151,7 @@ void HfpAgSdpClient::SdpHspHsCallback(const BtAddr *addr, const SdpService *serv
         CopySdpServiceArray(address, serviceAry, serviceNum);
         msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
     }
+    (void)context;
     HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
 }
 

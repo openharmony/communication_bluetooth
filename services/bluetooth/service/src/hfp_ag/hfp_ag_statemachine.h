@@ -189,7 +189,7 @@ public:
 
 protected:
     HfpAgProfile& profile_;
-    int callState_;
+    int callState_ = 0;
     HfpAgSystemEventProcesser &eventProcessor_;
     int stateInt_ {HFP_AG_STATE_DISCONNECTED};
     HfpAgStateMachine &stateMachine_;

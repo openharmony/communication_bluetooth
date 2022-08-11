@@ -364,7 +364,8 @@ bool BluetoothHfpHfProxy::RejectIncomingCall(const BluetoothRawAddress &device) 
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::HandleIncomingCall(const BluetoothRawAddress &device, int flag) {
+bool BluetoothHfpHfProxy::HandleIncomingCall(const BluetoothRawAddress &device, int flag)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::HandleIncomingCall WriteInterfaceToken error");
