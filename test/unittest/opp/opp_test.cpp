@@ -36,7 +36,7 @@ private:
 
 
 static Bluetooth::Opp  *profile_;
-static OppObserverTest oppObserverTest;
+static OppObserverTest g_oppObserverTest;
 
 class OppTest : public testing::Test {
 public:
@@ -45,8 +45,8 @@ public:
 
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
+    void SetUp() const;
+    void TearDown() const;
     bool CompareDevice(std::vector<BluetoothRemoteDevice> bluetoothRemoteDeviceByState,
         std::vector<std::string> bluetoothRemoteDeviceAddr);
     bool CompareTransferInformation(const BluetoothOppTransferInformation &information,
@@ -69,10 +69,10 @@ void OppTest::SetUpTestCase(void)
 void OppTest::TearDownTestCase(void)
 {
 }
-void OppTest::SetUp()
+void OppTest::SetUp() const
 {
 }
-void OppTest::TearDown()
+void OppTest::TearDown() const
 {
 }
 
@@ -273,7 +273,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_OnReceiveIncomingFileChanged_00100, TestSize.Le
     GTEST_LOG_(INFO) << "OnReceiveIncomingFileChanged function test";
 
     BluetoothOppTransferInformation trasnferInformation;
-    oppObserverTest.OnReceiveIncomingFileChanged(trasnferInformation);
+    g_oppObserverTest.OnReceiveIncomingFileChanged(trasnferInformation);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_OnReceiveIncomingFileChanged_00100 end";
 }
@@ -290,7 +290,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_OnTransferStateChanged_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "OnTransferStateChanged function test";
 
     BluetoothOppTransferInformation trasnferInformation;
-    oppObserverTest.OnTransferStateChanged(trasnferInformation);
+    g_oppObserverTest.OnTransferStateChanged(trasnferInformation);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_OnTransferStateChanged_00100 end";
 }

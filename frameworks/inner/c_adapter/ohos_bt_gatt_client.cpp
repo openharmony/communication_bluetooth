@@ -55,7 +55,7 @@ struct GattClientWrapper {
 
 using ClientIterator = std::map<int, struct GattClientWrapper>::iterator;
 
-static int g_ClientIncrease = 0;
+static int g_clientIncrease = 0;
 static std::map<int, struct GattClientWrapper> g_MapGattClient;
 
 #define GATTCLIENT g_MapGattClient
@@ -304,7 +304,7 @@ public:
         appCallback_->notificationCb(clientId_, &notificationData, OHOS_BT_STATUS_SUCCESS);
     }
 private:
-    void GattcBuildUuid(BtUuid *desUuid, std::string &srcUuid)
+    void GattcBuildUuid(BtUuid *desUuid, const std::string &srcUuid)
     {
         desUuid->uuid = (char *)srcUuid.c_str();
         desUuid->uuidLen = srcUuid.size();
@@ -323,12 +323,12 @@ private:
  */
 int BleGattcRegister(BtUuid appUuid)
 {
-    g_ClientIncrease++;
+    g_clientIncrease++;
     struct GattClientWrapper clientWrapper;
     clientWrapper.gattClient = nullptr;
     clientWrapper.gattClientCallback = nullptr;
     clientWrapper.remoteAddr = "";
-    int clientId = g_ClientIncrease;
+    int clientId = g_clientIncrease;
     GATTCLIENT.insert(std::pair<int, struct GattClientWrapper>(clientId, clientWrapper));
     HILOGI("clientId: %{public}d", clientId);
     return clientId;

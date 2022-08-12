@@ -96,7 +96,7 @@ void OppSdpServer::Deregister()
     sdpHandle_ = 0;
 }
 
-int OppSdpServer::AddServiceClassIdList()
+int OppSdpServer::AddServiceClassIdList() const
 {
     HILOGI("[OPP SDP SERVER] Call");
     BtUuid classId[1];
@@ -107,7 +107,7 @@ int OppSdpServer::AddServiceClassIdList()
     return SDP_AddServiceClassIdList(sdpHandle_, classId, 1);
 }
 
-int OppSdpServer::AddProtocolDescriptorList(uint8_t rfcommScn)
+int OppSdpServer::AddProtocolDescriptorList(uint8_t rfcommScn) const
 {
     HILOGI("[OPP SDP SERVER] Call");
     SdpProtocolDescriptor protocol[OPP_PROTOCOL_DESCRIPTOR_NUMBER];
@@ -128,14 +128,14 @@ int OppSdpServer::AddProtocolDescriptorList(uint8_t rfcommScn)
     return SDP_AddProtocolDescriptorList(sdpHandle_, protocol, OPP_PROTOCOL_DESCRIPTOR_NUMBER);
 }
 
-int OppSdpServer::AddBrowseGroupList()
+int OppSdpServer::AddBrowseGroupList() const
 {
     HILOGI("[OPP SDP SERVER] Call");
     BtUuid btUuid = {BT_UUID_16, {SDP_PUBLIC_BROWSE_GROUP_ROOT_UUID}};
     return SDP_AddBrowseGroupList(sdpHandle_, &btUuid, 1);
 }
 
-int OppSdpServer::AddBluetoothProfileDescriptorList()
+int OppSdpServer::AddBluetoothProfileDescriptorList() const
 {
     HILOGI("[OPP SDP SERVER] Call");
     // Bluetooth Profile Descriptor List
@@ -147,7 +147,7 @@ int OppSdpServer::AddBluetoothProfileDescriptorList()
     return SDP_AddBluetoothProfileDescriptorList(sdpHandle_, &profileDescriptor, 1);
 }
 
-int OppSdpServer::AddServiceName()
+int OppSdpServer::AddServiceName() const
 {
     HILOGI("[OPP SDP SERVER] Call");
     // Service Name
@@ -155,7 +155,7 @@ int OppSdpServer::AddServiceName()
         OPP_SERVICE_NAME.c_str(), OPP_SERVICE_NAME.length());
 }
 
-int OppSdpServer::AddL2capPsm(uint16_t l2capPsm)
+int OppSdpServer::AddL2capPsm(uint16_t l2capPsm) const
 {
     HILOGI("[OPP SDP SERVER] Call");
     // GoepL2CapPsm
@@ -163,10 +163,10 @@ int OppSdpServer::AddL2capPsm(uint16_t l2capPsm)
         OPP_GOEP_L2CAP_PSM_ATTRIBUTE_ID, SDP_TYPE_UINT_16, &l2capPsm, sizeof(l2capPsm));
 }
 
-int OppSdpServer::AddSupportedFormatsList()
+int OppSdpServer::AddSupportedFormatsList() const
 {
     HILOGI("[OPP SDP SERVER] Call");
     return SDP_AddSequenceAttribute(sdpHandle_, OPP_GOEP_SUPPORTED_FORMATS_LIST_ATTRIBUTE_ID,
-        (uint8_t*)oppSupportedFormatsListData, sizeof(oppSupportedFormatsListData));
+        (uint8_t*)g_oppSupportedFormatsListData, sizeof(g_oppSupportedFormatsListData));
 }
 }  // namespace bluetooth
