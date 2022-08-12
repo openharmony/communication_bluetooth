@@ -67,13 +67,13 @@ private:
         void OnAbort(ObexServerSession &session, const ObexHeader &req) override;
 
     private:
-        void SendOppDisconnected(const std::string &btAddr);
+        void SendOppDisconnected(const std::string &btAddr) const;
         int ReceiveFileHeader(ObexServerSession &session, const ObexHeader &req);
-        void ReceiveFileBody(ObexServerSession &session, const ObexHeader &req, bool isHead);
-        std::string U16stringToString(const std::u16string &u16str);
-        std::string RenameFile(std::string fileName);
-        bool HasSameName(std::string path, std::string name);
-        bool NeedRejectFileForPts(std::string fileName);
+        void ReceiveFileBody(ObexServerSession &session, const ObexHeader &req, bool isHead) const;
+        std::string U16stringToString(const std::u16string &u16str) const;
+        std::string RenameFile(std::string fileName) const;
+        bool HasSameName(std::string path, std::string name) const;
+        bool NeedRejectFileForPts(std::string fileName) const;
 
         uint32_t connectionId_ = 1;
     };

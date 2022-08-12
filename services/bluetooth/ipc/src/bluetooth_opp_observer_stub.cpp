@@ -34,6 +34,10 @@ int BluetoothOppObserverStub::OnRemoteRequest(
             }
             const BluetoothIOppTransferInformation *oppInformation =
                 data.ReadParcelable<BluetoothIOppTransferInformation>();
+            if(oppInformation == nullptr)
+            {
+                return ERR_NULL_OBJECT;
+            }
             OnReceiveIncomingFileChanged(*oppInformation);
             HILOGE("COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED end");
             return NO_ERROR;
@@ -47,6 +51,10 @@ int BluetoothOppObserverStub::OnRemoteRequest(
             }
             const BluetoothIOppTransferInformation *oppInformation =
                 data.ReadParcelable<BluetoothIOppTransferInformation>();
+            if(oppInformation == nullptr)
+            {
+                return ERR_NULL_OBJECT;
+            }
             OnTransferStateChanged(*oppInformation);
             HILOGE("COMMAND_ON_TRANSFER_STATE_CHANGED end");
             return NO_ERROR;

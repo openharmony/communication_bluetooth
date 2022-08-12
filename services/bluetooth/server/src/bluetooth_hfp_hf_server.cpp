@@ -339,8 +339,9 @@ bool BluetoothHfpHfServer::RejectIncomingCall(const BluetoothRawAddress &device)
     return false;
 }
 
-bool BluetoothHfpHfServer::HandleIncomingCall(const BluetoothRawAddress &device, int flag) {
-    HILOGI("Enter!");
+bool BluetoothHfpHfServer::HandleIncomingCall(const BluetoothRawAddress &device, int flag)
+{
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->HandleIncomingCall(addr, flag);

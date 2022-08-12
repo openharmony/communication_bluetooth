@@ -28,7 +28,12 @@ OppSendFileBodyObject::OppSendFileBodyObject(const std::string &file)
 
 OppSendFileBodyObject::~OppSendFileBodyObject()
 {
-    Close();
+    try {
+        Close();
+    } catch(std::exception &e) {
+        LOG_ERROR("[OPP OBEX SERVER]%{public}s():Catch exception %{public}s", __FUNCTION__, e.what());
+    }
+    
 }
 
 void OppSendFileBodyObject::OpenFile(const std::string &file)
@@ -41,7 +46,7 @@ void OppSendFileBodyObject::OpenFile(const std::string &file)
         HILOGI("[OPP OBEX CLIENT] file=%{public}s  opened.", file.c_str());
     }
     ifs_.seekg(0, std::ios::end);
-    fileSize_ = ifs_.tellg();
+    fileSize_ = static_cast<size_t>(ifs_.tellg());
     ifs_.seekg(0, std::ios::beg);
 }
 
@@ -52,7 +57,7 @@ size_t OppSendFileBodyObject::Read(uint8_t *buf, size_t bufLen)
     if (remainSize < readSize) {
         readSize = remainSize;
     }
-    ifs_.read((char*)buf, readSize);
+    ifs_.read(reinterpret_cast<char*>(buf), readSize);
     fileSendSize_ += readSize;
     return readSize;
 }
@@ -62,12 +67,12 @@ size_t OppSendFileBodyObject::Write(const uint8_t *buf, size_t bufLen)
     return bufLen;
 }
 
-size_t OppSendFileBodyObject::GetFileSize()
+size_t OppSendFileBodyObject::GetFileSize() const
 {
     return fileSize_;
 }
 
-size_t OppSendFileBodyObject::GetFileSendSize()
+size_t OppSendFileBodyObject::GetFileSendSize() const
 {
     return fileSendSize_;
 }
@@ -113,7 +118,7 @@ OppObexClient::~OppObexClient()
     }
 }
 
-int OppObexClient::Connect(uint32_t fileCount)
+int OppObexClient::Connect(uint32_t fileCount) const
 {
     HILOGI("[OPP OBEX CLIENT] start");
     int ret = RET_BAD_STATUS;
@@ -121,14 +126,14 @@ int OppObexClient::Connect(uint32_t fileCount)
         HILOGE("[OPP OBEX CLIENT] end, observer_ is null");
         return ret;
     }
-    ObexConnectParams param = {.count_ = &fileCount};
+    ObexConnectParams param = {.count = &fileCount};
     ret = client_->Connect(param);
 
     HILOGI("[OPP OBEX CLIENT] end");
     return ret;
 }
 
-int OppObexClient::Disconnect(bool withObexReq)
+int OppObexClient::Disconnect(bool withObexReq) const
 {
     HILOGI("[OPP OBEX CLIENT] start");
     int ret = RET_BAD_STATUS;
@@ -275,7 +280,7 @@ void OppObexClient::OppObexObserver::OnTransportFailed(ObexClient &client, int e
     oppObexClient_->OnTransportFailed(client, errCd);
 }
 
-void OppObexClient::OnTransportFailed(ObexClient &client, int errCd)
+void OppObexClient::OnTransportFailed(const ObexClient &client, int errCd)
 {
     HILOGI("[OPP OBEX CLIENT] start");
     std::string address = client.GetClientSession().GetRemoteAddr().GetAddress();
@@ -299,7 +304,7 @@ void OppObexClient::OppObexObserver::OnConnected(ObexClient &client, const ObexH
     oppObexClient_->OnConnected(client, resp);
 }
 
-void OppObexClient::OnConnected(ObexClient &client, const ObexHeader &resp)
+void OppObexClient::OnConnected(const ObexClient &client, const ObexHeader &resp)
 {
     HILOGI("[OPP OBEX CLIENT] start");
     std::string address = client.GetClientSession().GetRemoteAddr().GetAddress();
@@ -325,10 +330,10 @@ void OppObexClient::OppObexObserver::OnConnectFailed(ObexClient &client, const O
         HILOGE("[OPP OBEX CLIENT] oppObexClient_ is null");
         return;
     }
-    oppObexClient_->OnConnectFailed(client, resp);
+    oppObexClient_->OnConnectFailed(client);
 }
 
-void OppObexClient::OnConnectFailed(ObexClient &client, const ObexHeader &resp)
+void OppObexClient::OnConnectFailed(const ObexClient &client)
 {
     HILOGI("[OPP OBEX CLIENT] start");
     std::string address = client.GetClientSession().GetRemoteAddr().GetAddress();
@@ -351,7 +356,7 @@ void OppObexClient::OppObexObserver::OnDisconnected(ObexClient &client)
     oppObexClient_->OnDisconnected(client);
 }
 
-void OppObexClient::OnDisconnected(ObexClient &client)
+void OppObexClient::OnDisconnected(const ObexClient &client)
 {
     HILOGI("[OPP OBEX CLIENT] start");
     std::string address = client.GetClientSession().GetRemoteAddr().GetAddress();
@@ -374,7 +379,7 @@ void OppObexClient::OppObexObserver::OnActionCompleted(ObexClient &client, const
     oppObexClient_->OnActionCompleted(client, resp);
 }
 
-void OppObexClient::OnActionCompleted(ObexClient &client, const ObexHeader &resp)
+void OppObexClient::OnActionCompleted(const ObexClient &client, const ObexHeader &resp)
 {
     HILOGI("[OPP OBEX CLIENT] start");
     std::string address = client.GetClientSession().GetRemoteAddr().GetAddress();
@@ -432,7 +437,7 @@ void OppObexClient::OnBusy(ObexClient &client, bool isBusy)
     HILOGI("[OPP OBEX CLIENT] end, isBusy=%{public}d", isBusy ? 1 : 0);
 }
 
-std::u16string OppObexClient::StringToU16string(const std::string &str)
+std::u16string OppObexClient::StringToU16string(const std::string &str) const
 {
     return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.from_bytes(str);
 }

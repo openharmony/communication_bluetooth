@@ -100,8 +100,8 @@ private:
     std::unique_ptr<OppGapClient> gapClient_ {nullptr};
     std::unique_ptr<utility::Timer> connTimer_ {nullptr};
     std::unique_ptr<utility::Timer> disconnTimer_ {nullptr};
-    inline static const int CONNECTION_TIMEOUT_MS {60000};
-    inline static const int DISCONNECTION_TIMEOUT_MS {60000};
+    inline static const int connectionTimeoutMs {60000};
+    inline static const int disconnectionTimeoutMs {60000};
     BT_DISALLOW_COPY_AND_ASSIGN(OppStateMachine);
 };
 
