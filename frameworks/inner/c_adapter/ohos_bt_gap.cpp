@@ -73,7 +73,10 @@ public:
      * @param status Device discovery status.
      * @since 6
      */
-    void OnDiscoveryStateChanged(int status) {}
+    void OnDiscoveryStateChanged(int status)
+    {
+        (void)status;
+    }
 
     /**
      * @brief Discovery result observer.
@@ -162,7 +165,10 @@ public:
      * @param deviceName Device name.
      * @since 6
      */
-    void OnDeviceNameChanged(const std::string &deviceName) {};
+    void OnDeviceNameChanged(const std::string &deviceName)
+    {
+        (void)deviceName;
+    };
 
     /**
      * @brief Device address changed observer.
@@ -170,7 +176,10 @@ public:
      * @param address Device address.
      * @since 6
      */
-    void OnDeviceAddrChanged(const std::string &address) {};
+    void OnDeviceAddrChanged(const std::string &address)
+    {
+        (void)address;
+    };
 };
 
 static BluetoothHostObserverWapper g_HostObserver;
@@ -288,7 +297,7 @@ bool GetLocalAddr(unsigned char *mac, unsigned int len)
 bool SetLocalName(unsigned char *localName, unsigned char length)
 {
     HILOGI("enter");
-    if (localName == NULL) {
+    if (localName == nullptr) {
         HILOGE("invalid param: localName(%{public}p)", localName);
         return false;
     }
