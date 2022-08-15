@@ -34,7 +34,7 @@ int BluetoothOppObserverStub::OnRemoteRequest(
             }
             const BluetoothIOppTransferInformation *oppInformation =
                 data.ReadParcelable<BluetoothIOppTransferInformation>();
-            if(oppInformation == nullptr) {
+            if (oppInformation == nullptr) {
                 return ERR_NULL_OBJECT;
             }
             OnReceiveIncomingFileChanged(*oppInformation);
@@ -50,7 +50,7 @@ int BluetoothOppObserverStub::OnRemoteRequest(
             }
             const BluetoothIOppTransferInformation *oppInformation =
                 data.ReadParcelable<BluetoothIOppTransferInformation>();
-            if(oppInformation == nullptr) {
+            if (oppInformation == nullptr) {
                 return ERR_NULL_OBJECT;
             }
             OnTransferStateChanged(*oppInformation);
