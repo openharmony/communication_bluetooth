@@ -49,7 +49,7 @@ static constexpr uint16_t OPP_GOEP_L2CAP_PSM = 0x1023;
 static constexpr uint16_t OPP_GOEP_L2CAP_PSM_ATTRIBUTE_ID = 0x0200;
 static constexpr uint16_t OPP_GOEP_SUPPORTED_FORMATS_LIST_ATTRIBUTE_ID = 0x0303;
 
-static const uint8_t oppSupportedFormatsListData[] = {
+static const uint8_t g_oppSupportedFormatsListData[] = {
     0x08, 0x01 /* vCard 2.1 */,
     0x08, 0x02 /* vCard 3.0 */,
     0x08, 0x03 /* vCal 1.0 */,
@@ -104,13 +104,13 @@ static constexpr int OPP_TRANSFER_FAILED_SEND = 7;
 static constexpr int OPP_TRANSFER_FAILED_UNKNOWN = 8;
 
 struct OppConfig {
-    int rfcommMtu_ = OBEX_DEFAULT_MTU;
-    int l2capMtu_ = OBEX_DEFAULT_MTU;
+    int rfcommMtu = OBEX_DEFAULT_MTU;
+    int l2capMtu = OBEX_DEFAULT_MTU;
 };
 
 struct OppSdpInformation {
-    uint16_t psm_ = 0;
-    uint8_t rfcommNo_ = 0;
+    uint16_t psm = 0;
+    uint8_t rfcommNo = 0;
 };
 }  // namespace bluetooth
 #endif  // PAN_DEFINES_H

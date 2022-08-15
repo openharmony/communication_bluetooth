@@ -376,7 +376,7 @@ bool BluetoothHfpHfProxy::HandleIncomingCall(const BluetoothRawAddress &device, 
         return false;
     }
     if (!data.WriteInt32(flag)) {
-        HILOGE("BluetoothHfpHfProxy::AcceptIncomingCall WriteInt32 error");
+        HILOGE("BluetoothHfpHfProxy::HandleIncomingCall WriteInt32 error");
         return false;
     }
     MessageParcel reply;
@@ -428,11 +428,11 @@ bool BluetoothHfpHfProxy::DialLastNumber(const BluetoothRawAddress &device)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
-        HILOGE("BluetoothHfpHfProxy::HandleMultiCall WriteInterfaceToken error");
+        HILOGE("BluetoothHfpHfProxy::DialLastNumber WriteInterfaceToken error");
         return false;
     }
     if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothHfpHfProxy::HandleMultiCall WriteParcelable error");
+        HILOGE("BluetoothHfpHfProxy::DialLastNumber WriteParcelable error");
         return false;
     }
     MessageParcel reply;

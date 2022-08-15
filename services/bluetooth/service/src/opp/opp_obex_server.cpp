@@ -33,7 +33,11 @@ OppReceiveFileBodyObject::OppReceiveFileBodyObject(const std::string &file, cons
 
 OppReceiveFileBodyObject::~OppReceiveFileBodyObject()
 {
-    Close();
+    try {
+        Close();
+    } catch(std::exception &e) {
+        LOG_ERROR("[OPP OBEX SERVER]%{public}s():Catch exception %{public}s", __FUNCTION__, e.what());
+    }
 }
 
 void OppReceiveFileBodyObject::OpenFile(const std::string &file)
@@ -107,7 +111,7 @@ int OppObexServer::ShutDown() const
     return RET_NO_ERROR;
 }
 
-void OppObexServer::OppObexObserver::SendOppDisconnected(const std::string &btAddr)
+void OppObexServer::OppObexObserver::SendOppDisconnected(const std::string &btAddr) const
 {
     OppMessage event(OPP_DISCONNECTED_EVT);
     event.dev_ = btAddr;
@@ -238,7 +242,7 @@ int OppObexServer::OppObexObserver::ReceiveFileHeader(ObexServerSession &session
 }
 
 // For PTS OPP/SR/OPH/BV-xxx.
-bool OppObexServer::OppObexObserver::NeedRejectFileForPts(std::string fileName)
+bool OppObexServer::OppObexObserver::NeedRejectFileForPts(std::string fileName) const
 {
     // regect OPHBV10,OPHBV14,OPHBV18.
     std::string ptsRejectName = "OPHBV";
@@ -249,7 +253,8 @@ bool OppObexServer::OppObexObserver::NeedRejectFileForPts(std::string fileName)
     return true;
 }
 
-void OppObexServer::OppObexObserver::ReceiveFileBody(ObexServerSession &session, const ObexHeader &req, bool isHead)
+void OppObexServer::OppObexObserver::ReceiveFileBody(ObexServerSession &session,
+    const ObexHeader &req, bool isHead) const
 {
     std::unique_ptr<ObexServerReceivedObject> &receivedObject = session.GetReceivedObject();
     if (receivedObject == nullptr) {
@@ -304,12 +309,12 @@ void OppObexServer::OppObexObserver::ReceiveFileBody(ObexServerSession &session,
     }
 }
 
-std::string OppObexServer::OppObexObserver::U16stringToString(const std::u16string &u16str)
+std::string OppObexServer::OppObexObserver::U16stringToString(const std::u16string &u16str) const
 {
     return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(u16str);
 }
 
-std::string OppObexServer::OppObexObserver::RenameFile(std::string fileName)
+std::string OppObexServer::OppObexObserver::RenameFile(std::string fileName) const
 {
     if (!HasSameName(OPP_RECEIVE_FILE_PATH, fileName)) {
         return fileName;
@@ -329,7 +334,7 @@ std::string OppObexServer::OppObexObserver::RenameFile(std::string fileName)
     return fileNewName;
 }
 
-bool OppObexServer::OppObexObserver::HasSameName(std::string path, std::string name)
+bool OppObexServer::OppObexObserver::HasSameName(std::string path, std::string name) const
 {
     DIR *dir = opendir(path.c_str());
     if (dir == nullptr) {

@@ -30,20 +30,20 @@ public:
     void CreateOppTransfer(const std::string &address, const std::vector<std::string> filePaths,
         const std::vector<std::string> mimeTypes, int direction);
     int ConnectObex(const ObexClientConfig &config, utility::Dispatcher &dispatcher);
-    int DisconnectObex();
+    int DisconnectObex() const;
     int CancelTransfer();
     IOppTransferInformation GetCurrentTransferInformation();
     int AcceptConnect();
     int SetIncomingFileConfirmation(bool accept);
     int StartTransfer();
     std::string GetDeviceAddress();
-    int GetDirection();
-    int GetFileNumber();
+    int GetDirection() const;
+    int GetFileNumber() const;
     void OnObexDisconnected();
     void OnReceiveIncomingConnect(ObexServerSession &session, uint32_t connectId);
     void OnReceiveIncomingFile(IOppTransferInformation info);
     void OnTransferStateChange(int state, int reason);
-    void OnTransferPositionChange(size_t position);
+    void OnTransferPositionChange(size_t position) const;
 
 private:
     void IncomingConnectTimeout();
@@ -51,8 +51,8 @@ private:
     void OnTransferStateChangeRunning();
     void OnTransferStateChangeSuccess();
     void OnTransferStateChangeFaild(int reason);
-    size_t GetFileLength(std::string filePath);
-    std::string GetFileNameFromPath(std::string filePath);
+    size_t GetFileLength(std::string filePath) const;
+    std::string GetFileNameFromPath(std::string filePath) const;
 
     std::queue<IOppTransferInformation> fileList_ {};
     std::unique_ptr<IOppTransferInformation> curretTransferInfo_ {nullptr};
@@ -61,7 +61,7 @@ private:
     bool isConnected_ = false;
     time_t timeStamp_ = 0;
     int direction_ = OPP_TRANSFER_DIRECTION_OUTBOND;
-    int Confirm_ = OPP_TRANSFER_CONFIRM_PENDING;
+    int confirm_ = OPP_TRANSFER_CONFIRM_PENDING;
     ObexServerSession *obexSession_ = nullptr;
     uint32_t connectId_ = 0;
     std::string address_;

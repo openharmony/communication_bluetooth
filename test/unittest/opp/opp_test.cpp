@@ -36,7 +36,7 @@ private:
 
 
 static Bluetooth::Opp  *profile_;
-static OppObserverTest oppObserverTest;
+static OppObserverTest g_oppObserverTest;
 
 class OppTest : public testing::Test {
 public:
@@ -239,7 +239,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_RegisterObserver_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "RegisterObserver function test";
 
     profile_ = Opp::GetProfile();
-    profile_->RegisterObserver(&oppObserverTest);
+    profile_->RegisterObserver(&g_oppObserverTest);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_RegisterObserver_00100 end";
 }
@@ -256,7 +256,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_DeregisterObserver_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeregisterObserver function test";
 
     profile_ = Opp::GetProfile();
-    profile_->DeregisterObserver(&oppObserverTest);
+    profile_->DeregisterObserver(&g_oppObserverTest);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_DeregisterObserver_00100 end";
 }
@@ -273,7 +273,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_OnReceiveIncomingFileChanged_00100, TestSize.Le
     GTEST_LOG_(INFO) << "OnReceiveIncomingFileChanged function test";
 
     BluetoothOppTransferInformation trasnferInformation;
-    oppObserverTest.OnReceiveIncomingFileChanged(trasnferInformation);
+    g_oppObserverTest.OnReceiveIncomingFileChanged(trasnferInformation);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_OnReceiveIncomingFileChanged_00100 end";
 }
@@ -290,7 +290,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_OnTransferStateChanged_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "OnTransferStateChanged function test";
 
     BluetoothOppTransferInformation trasnferInformation;
-    oppObserverTest.OnTransferStateChanged(trasnferInformation);
+    g_oppObserverTest.OnTransferStateChanged(trasnferInformation);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_OnTransferStateChanged_00100 end";
 }

@@ -36,8 +36,8 @@ public:
     size_t Read(uint8_t *buf, size_t bufLen) override;
     size_t Write(const uint8_t *buf, size_t bufLen) override;
     int Close() override;
-    size_t GetFileSize();
-    size_t GetFileSendSize();
+    size_t GetFileSize() const;
+    size_t GetFileSendSize() const;
 
 private:
     void OpenFile(const std::string &file);
@@ -50,16 +50,16 @@ class OppObexClient {
 public:
     explicit OppObexClient(const ObexClientConfig &config, utility::Dispatcher &dispatcher);
     virtual ~OppObexClient();
-    int Connect(uint32_t fileCount);
-    int Disconnect(bool withObexReq = true);
+    int Connect(uint32_t fileCount) const;
+    int Disconnect(bool withObexReq = true) const;
     int CancelSendFile();
     int SendFile(IOppTransferInformation fileInfo);
 
-    void OnTransportFailed(ObexClient &client, int errCd);
-    void OnConnected(ObexClient &client, const ObexHeader &resp);
-    void OnConnectFailed(ObexClient &client, const ObexHeader &resp);
-    void OnDisconnected(ObexClient &client);
-    void OnActionCompleted(ObexClient &client, const ObexHeader &resp);
+    void OnTransportFailed(const ObexClient &client, int errCd);
+    void OnConnected(const ObexClient &client, const ObexHeader &resp);
+    void OnConnectFailed(const ObexClient &client);
+    void OnDisconnected(const ObexClient &client);
+    void OnActionCompleted(const ObexClient &client, const ObexHeader &resp);
     void OnBusy(ObexClient &client, bool isBusy);
 
     class OppObexObserver : public ObexClientObserver {
@@ -97,7 +97,7 @@ private:
     void SendOppDisconnected();
     void SendOppConnected();
     void OnTransferStateChangeFaild(int reason);
-    std::u16string StringToU16string(const std::string &str);
+    std::u16string StringToU16string(const std::string &str) const;
 };
 }  // namespace bluetooth
 #endif  // OPP_OBEX_CLIENT_H

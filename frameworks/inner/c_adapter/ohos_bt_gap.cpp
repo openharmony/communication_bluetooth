@@ -182,7 +182,7 @@ public:
     };
 };
 
-static BluetoothHostObserverWapper g_HostObserver;
+static BluetoothHostObserverWapper g_hostObserver;
 
 bool EnableBle(void)
 {
@@ -368,7 +368,7 @@ int GapRegisterCallbacks(BtGapCallBacks *func)
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
     g_GapCallback = func;
-    g_BluetoothHost->RegisterObserver(g_HostObserver);
+    g_BluetoothHost->RegisterObserver(g_hostObserver);
     return OHOS_BT_STATUS_SUCCESS;
 }
 }  // namespace Bluetooth

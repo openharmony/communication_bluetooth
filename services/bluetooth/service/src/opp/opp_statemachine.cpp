@@ -230,15 +230,15 @@ void OppStateMachine::ProcessSdpCompleteEvent(const OppMessage &msg)
         obexConfig_.addr_.type = BT_PUBLIC_DEVICE_ADDRESS;
         obexConfig_.lpsm_ = OPP_GOEP_L2CAP_PSM;
         obexConfig_.isSupportReliableSession_ = false;
-        if (msg.sdpInfo_.psm_ > 0) {
+        if (msg.sdpInfo_.psm > 0) {
             obexConfig_.isGoepL2capPSM_ = true;
-            obexConfig_.scn_ = msg.sdpInfo_.psm_;
+            obexConfig_.scn_ = msg.sdpInfo_.psm;
             obexConfig_.isSupportSrm_ = true;
-            obexConfig_.mtu_ = OppService::GetService()->GetOppConfig().l2capMtu_;
+            obexConfig_.mtu_ = OppService::GetService()->GetOppConfig().l2capMtu;
             gapSecChannel.l2capPsm = obexConfig_.scn_;
         } else {
-            obexConfig_.scn_ = msg.sdpInfo_.rfcommNo_;
-            obexConfig_.mtu_ = OppService::GetService()->GetOppConfig().rfcommMtu_;
+            obexConfig_.scn_ = msg.sdpInfo_.rfcommNo;
+            obexConfig_.mtu_ = OppService::GetService()->GetOppConfig().rfcommMtu;
             gapSecChannel.rfcommChannel = obexConfig_.scn_;
         }
         gapClient_ = std::make_unique<OppGapClient>(address_, gapSecChannel, obexConfig_.isGoepL2capPSM_);
@@ -282,7 +282,7 @@ int OppStateMachine::GetDeviceStateInt() const
 
 void OppStateMachine::StartConnectionTimer() const
 {
-    connTimer_->Start(CONNECTION_TIMEOUT_MS);
+    connTimer_->Start(connectionTimeoutMs);
     HILOGI("[OPP Machine]:Start connection timer!");
 }
 
@@ -301,7 +301,7 @@ void OppStateMachine::ConnectionTimeout() const
 
 void OppStateMachine::StartDisconnectionTimer() const
 {
-    disconnTimer_->Start(DISCONNECTION_TIMEOUT_MS);
+    disconnTimer_->Start(disconnectionTimeoutMs);
     HILOGI("[OPP Machine]:Start disconnection timer!");
 }
 
