@@ -54,7 +54,7 @@ struct ObexConnectParams {
     ObexTlvParamters *appParams_ = nullptr;          // Application Parameters
     ObexDigestChallenge *authChallenges_ = nullptr;  // Auth Challenges
     ObexDigestResponse *authResponses_ = nullptr;    // Auth Responses
-    uint32_t *count_ = nullptr;                      // Count
+    uint32_t *count = nullptr;                      // Count
 };
 
 class ObexClient;

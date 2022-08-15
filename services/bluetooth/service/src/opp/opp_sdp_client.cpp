@@ -78,11 +78,11 @@ void OppSdpClient::SdpSearchCallback_(const BtAddr *addr, const SdpService *serv
         if (classId->uuid16 != OPP_UUID16) {
             continue;
         }
-        sdpInfo.rfcommNo_ = FindRFCommChannel(*serviceAry);
-        sdpInfo.psm_ = FindL2capPSM(*serviceAry);
+        sdpInfo.rfcommNo = FindRFCommChannel(*serviceAry);
+        sdpInfo.psm = FindL2capPSM(*serviceAry);
     }
 
-    if ((sdpInfo.psm_ != 0) || (sdpInfo.rfcommNo_ != 0)) {
+    if ((sdpInfo.psm != 0) || (sdpInfo.rfcommNo != 0)) {
         OppMessage event(OPP_SDP_CMPL_EVT, OPP_SDP_SUCCESS);
         event.dev_ = address_;
         event.sdpInfo_ = sdpInfo;

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NAPI_BLUETOOTH_OPP_H_
-#define NAPI_BLUETOOTH_OPP_H_
+#ifndef NAPI_BLUETOOTH_OPP_H
+#define NAPI_BLUETOOTH_OPP_H
 
 #include "bluetooth_opp.h"
 #include "napi_bluetooth_opp_observer.h"
@@ -40,4 +40,4 @@ public:
 };
 } // namespace Bluetooth
 } // namespace OHOS
-#endif  // NAPI_BLUETOOTH_OPP_H_
+#endif  // NAPI_BLUETOOTH_OPP_H

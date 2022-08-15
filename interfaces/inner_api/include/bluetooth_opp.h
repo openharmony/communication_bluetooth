@@ -253,18 +253,18 @@ public:
     void SetTotalBytes(uint64_t totalBytes);
 
 private:
-    int id_;
+    int id_ = -1;
     std::string fileName_;
     std::string filePath_;
     std::string mimeType_;
     std::string deviceName_;
     std::string deviceAddress_;
-    int direction_;
-    int status_;
-    int failedReason_;
-    uint64_t timeStamp_;
-    uint64_t currentBytes_;
-    uint64_t totalBytes_;
+    int direction_ = 0;
+    int status_ = 0;
+    int failedReason_ = 0;
+    uint64_t timeStamp_ = 0;
+    uint64_t currentBytes_ = 0;
+    uint64_t totalBytes_ = 0;
 };
 
 /**

@@ -326,8 +326,8 @@ int ObexClient::Connect(ObexConnectParams &connectParams)
     if (connectParams.authResponses_ != nullptr) {
         header->AppendItemAuthResponse(*connectParams.authResponses_);
     }
-    if (connectParams.count_ != nullptr) {
-        header->AppendItemCount(*connectParams.count_);
+    if (connectParams.count != nullptr) {
+        header->AppendItemCount(*connectParams.count);
     }
     // create transport before obex connect
     if (!clientTransport_->IsConnected()) {
