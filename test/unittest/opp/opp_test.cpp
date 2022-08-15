@@ -45,8 +45,8 @@ public:
 
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
-    void SetUp() const;
-    void TearDown() const;
+    void SetUp();
+    void TearDown();
     bool CompareDevice(std::vector<BluetoothRemoteDevice> bluetoothRemoteDeviceByState,
         std::vector<std::string> bluetoothRemoteDeviceAddr);
     bool CompareTransferInformation(const BluetoothOppTransferInformation &information,
@@ -69,10 +69,10 @@ void OppTest::SetUpTestCase(void)
 void OppTest::TearDownTestCase(void)
 {
 }
-void OppTest::SetUp() const
+void OppTest::SetUp()
 {
 }
-void OppTest::TearDown() const
+void OppTest::TearDown()
 {
 }
 
@@ -239,7 +239,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_RegisterObserver_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "RegisterObserver function test";
 
     profile_ = Opp::GetProfile();
-    profile_->RegisterObserver(&oppObserverTest);
+    profile_->RegisterObserver(&g_oppObserverTest);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_RegisterObserver_00100 end";
 }
@@ -256,7 +256,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_DeregisterObserver_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeregisterObserver function test";
 
     profile_ = Opp::GetProfile();
-    profile_->DeregisterObserver(&oppObserverTest);
+    profile_->DeregisterObserver(&g_oppObserverTest);
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_DeregisterObserver_00100 end";
 }
