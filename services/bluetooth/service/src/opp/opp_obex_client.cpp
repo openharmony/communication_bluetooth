@@ -33,7 +33,6 @@ OppSendFileBodyObject::~OppSendFileBodyObject()
     } catch(std::exception &e) {
         LOG_ERROR("[OPP OBEX SERVER]%{public}s():Catch exception %{public}s", __FUNCTION__, e.what());
     }
-    
 }
 
 void OppSendFileBodyObject::OpenFile(const std::string &file)

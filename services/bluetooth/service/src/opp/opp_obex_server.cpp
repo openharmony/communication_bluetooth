@@ -253,7 +253,8 @@ bool OppObexServer::OppObexObserver::NeedRejectFileForPts(std::string fileName) 
     return true;
 }
 
-void OppObexServer::OppObexObserver::ReceiveFileBody(ObexServerSession &session, const ObexHeader &req, bool isHead) const
+void OppObexServer::OppObexObserver::ReceiveFileBody(ObexServerSession &session,
+    const ObexHeader &req, bool isHead) const
 {
     std::unique_ptr<ObexServerReceivedObject> &receivedObject = session.GetReceivedObject();
     if (receivedObject == nullptr) {
