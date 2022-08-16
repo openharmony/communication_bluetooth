@@ -46,11 +46,11 @@ struct SppClientSocket::impl {
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
-            close(fd_);
             HiviewDFX::HiSysEvent::Write("BLUETOOTH", "SPP_CONNECT_STATE",
                 HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_, "ADDRESS", "empty",
                 "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
             HILOGI("fd closed, fd_: %{pubilc}d", fd_);
+            close(fd_);
             fd_ = -1;
         }
     }
