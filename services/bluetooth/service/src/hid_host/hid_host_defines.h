@@ -227,6 +227,7 @@ static constexpr uint16_t HID_HOST_UUID_GATT_REPORT_REFERENCE = 0x2908;
 static constexpr uint16_t HID_HOST_UUID_BATTERY_SERVICE = 0x180F;
 static constexpr uint16_t HID_HOST_UUID_GATT_BATTERY_LEVEL = 0x2A19;
 static constexpr uint16_t HID_HOST_UUID_GATT_EXT_RPT_REF = 0x2907;
+static constexpr uint16_t HID_HOST_UUID_GATT_EXT_CFG_REF = 0x2902;
 
 static constexpr int HID_HOST_PNP_ID_SIZE = 7;
 static constexpr int HID_HOST_HID_INFORMATION_SIZE = 4;
