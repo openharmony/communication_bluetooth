@@ -416,6 +416,7 @@ int HidHostHogp::GetHidInformation(Service service)
             ret = GetHidReportMap(character);
         } else if (character.uuid_ == Uuid::ConvertFrom16Bits(HID_HOST_UUID_GATT_HID_REPORT)) {
             GetHidReport(character);
+            GetExternalCfgInfo(character);
         }
         if (ret != BT_NO_ERROR) {
             return ret;
@@ -452,12 +453,14 @@ int HidHostHogp::GetHidReportMap(Characteristic character)
         LOG_ERROR("[HOGP] %{public}s:gattClientService is null.", __func__);
         return RET_BAD_STATUS;
     }
-    std::unique_lock<std::mutex> lock(mutexWaitGattCallback_);
-    gattClientService->ReadCharacteristic(appId_, character);
-    if (cvfull_.wait_for(lock,
-        std::chrono::seconds(HOGP_GATT_THREAD_WAIT_TIMEOUT)) == std::cv_status::timeout) {
-        LOG_ERROR("[HOGP] %{public}s:GetHidReportMap timeout", __func__);
-        return RET_BAD_STATUS;
+    {
+        std::unique_lock<std::mutex> lock(mutexWaitGattCallback_);
+        gattClientService->ReadCharacteristic(appId_, character);
+        if (cvfull_.wait_for(lock,
+            std::chrono::seconds(HOGP_GATT_THREAD_WAIT_TIMEOUT)) == std::cv_status::timeout) {
+            LOG_ERROR("[HOGP] %{public}s:GetHidReportMap timeout", __func__);
+            return RET_BAD_STATUS;
+        }
     }
 
     GetExternalRptRefInfo(character);
@@ -490,6 +493,30 @@ void HidHostHogp::GetExternalRptRefInfo(Characteristic character)
                 LOG_ERROR("[HOGP] %{public}s:GetExternalRptRefInfo timeout", __func__);
                 return;
             }
+        }
+    }
+}
+
+void HidHostHogp::GetExternalCfgInfo(Characteristic character)
+{
+    IProfileGattClient *gattClientService = GetGattClientService();
+    if (gattClientService == nullptr) {
+        LOG_ERROR("[HOGP] %{public}s:gattClientService is null.", __func__);
+        return;
+    }
+
+    for (auto &descriptor : character.descriptors_) {
+        if (descriptor.uuid_ == Uuid::ConvertFrom16Bits(HID_HOST_UUID_GATT_EXT_CFG_REF)) {
+            LOG_INFO("[HOGP] %{public}s:for pts to get external report reference.", __func__);
+            std::unique_lock<std::mutex> lock(mutexWaitGattCallback_);
+            gattClientService->ReadDescriptor(appId_, descriptor);
+            if (cvfull_.wait_for(lock,
+                std::chrono::seconds(HOGP_GATT_THREAD_WAIT_TIMEOUT)) == std::cv_status::timeout) {
+                LOG_ERROR("[HOGP] %{public}s:GetExternalRptRefInfo timeout", __func__);
+                return;
+            }
+        } else {
+            LOG_ERROR("[HOGP] %{public}s:NOT FOUND", __func__);
         }
     }
 }
