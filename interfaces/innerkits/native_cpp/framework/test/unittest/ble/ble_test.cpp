@@ -25,6 +25,7 @@ BleTest *BleTest::bleInstance_ = nullptr;
 namespace {
 const static int defaultInt = 150;
 const static int INTERVAL = 350;
+const static int MIN_ADV_LENGTH = 31;
 const static int MAX_ADV_LENGTH = 1650;
 Bluetooth::UUID g_uuid = Bluetooth::UUID::FromString("00000000-0000-1000-8000-00805F9B34FB");
 Bluetooth::UUID g_serviceDataUuid = Bluetooth::UUID::FromString("00000000-0000-1000-8000-00805F9B34FA");
@@ -200,7 +201,9 @@ HWTEST_F(BleTest, BLE_ModuleTest_StartAdvertising_00100, TestSize.Level1)
     bleAdvertise.StartAdvertising(
         BleTest::bleInstance_->bleAdvertiserSettings_, advData1, scanData1, bleAdvertiseCallbackTest_);
     bleAdvertise.StopAdvertising(bleAdvertiseCallbackTest_);
-    EXPECT_EQ(MAX_ADV_LENGTH, host_->GetBleMaxAdvertisingDataLength());
+    int32_t length = host_->GetBleMaxAdvertisingDataLength();
+    EXPECT_LE(MIN_ADV_LENGTH, length);
+    EXPECT_GE(MAX_ADV_LENGTH, length);
 
     bleAdvertise.Close(bleAdvertiseCallbackTest_);
     EXPECT_TRUE(DisableBle());
