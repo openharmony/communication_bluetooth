@@ -19,6 +19,7 @@
 #include "class_creator.h"
 #include "hfp_ag_defines.h"
 #include "hfp_ag_system_interface.h"
+#include "log_util.h"
 #include "profile_service_manager.h"
 #include "stub/telephone_service.h"
 
@@ -663,7 +664,7 @@ void HfpAgService::DeregisterObserver(HfpAgServiceObserver &observer)
 
 void HfpAgService::NotifySlcStateChanged(const RawAddress &device, int toState)
 {
-    LOG_INFO("[HFP AG]%{public}s():", __FUNCTION__);
+    HILOGI("[HFP AG] device:%{public}s, toState:%{public}d", GET_ENCRYPT_ADDR(device), toState);
     std::list<HfpAgServiceObserver *>::iterator iter;
     for (iter = observers_.begin(); iter != observers_.end(); ++iter) {
         (*iter)->OnConnectionStateChanged(device, stateMap_.at(toState));
@@ -672,7 +673,7 @@ void HfpAgService::NotifySlcStateChanged(const RawAddress &device, int toState)
 
 void HfpAgService::NotifyAudioStateChanged(const RawAddress &device, int toState)
 {
-    LOG_INFO("[HFP AG]%{public}s():", __FUNCTION__);
+    HILOGI("[HFP AG] device:%{public}s, toState:%{public}d", GET_ENCRYPT_ADDR(device), toState);
     std::list<HfpAgServiceObserver *>::iterator iter;
     for (iter = observers_.begin(); iter != observers_.end(); ++iter) {
         (*iter)->OnScoStateChanged(device, toState);
