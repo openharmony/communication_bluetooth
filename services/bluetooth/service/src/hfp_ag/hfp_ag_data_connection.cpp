@@ -182,6 +182,7 @@ void HfpAgDataConnection::SetSdpInfo(HfpAgRemoteSdpInfo sdpInfo)
 
 void HfpAgDataConnection::SetSlcConnectState(bool state)
 {
+    HILOGI("[HFP AG]:state = %{public}d", state);
     slcConnected_ = state;
 }
 
