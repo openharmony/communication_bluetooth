@@ -393,6 +393,7 @@ HWTEST_F(HostTest, Host_ModuleTest_GetBtScanMode_00100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtScanMode_00100 start";
 
+    sleep(1);
     host_ = &BluetoothHost::GetDefaultHost();
     EXPECT_EQ(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, host_->GetBtScanMode());
 
