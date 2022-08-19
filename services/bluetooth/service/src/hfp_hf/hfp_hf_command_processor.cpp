@@ -193,9 +193,9 @@ void HfpHfCommandProcessor::ProcessBtrh(HfpHfDataConnection &dataConn, const std
     int response = 0;
     const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "%{public}d", &response);
+    int res = sscanf_s(buf, "%d", &response);
     if (res < 1) {
-        LOG_WARN("[HFP HF]%{public}s():Invalid command format arg[%{public}s]", __FUNCTION__, arg.c_str());
+        HILOGE("[HFP HF]ProcessBtrh failed, res:%{public}d, arg:%{public}s", res, arg.c_str());
         return;
     }
 
