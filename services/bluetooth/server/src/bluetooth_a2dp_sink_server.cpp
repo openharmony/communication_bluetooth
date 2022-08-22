@@ -15,6 +15,7 @@
 
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils_server.h"
 #include "interface_profile_manager.h"
 #include "interface_profile_a2dp_snk.h"
 #include "remote_observer_list.h"
@@ -67,7 +68,7 @@ public:
     {
         IProfileManager *serviceMgr = IProfileManager::GetInstance();
         if (!pimpl_) {
-            HILOGD("BluetoothA2dpSinkServer::impl::SystemStateObserver::OnSystemStateChange failed: pimpl_ is null");
+            HILOGI("failed: pimpl_ is null");
             return;
         }
 
@@ -95,12 +96,12 @@ private:
 
 BluetoothA2dpSinkServer::impl::impl()
 {
-    HILOGI("BluetoothA2dpSinkServer::impl::impl() starts");
+    HILOGI("starts");
 }
 
 BluetoothA2dpSinkServer::impl::~impl()
 {
-    HILOGI("BluetoothA2dpSinkServer::impl::~impl() starts");
+    HILOGI("starts");
 }
 
 BluetoothA2dpSinkServer::BluetoothA2dpSinkServer()
@@ -129,9 +130,9 @@ BluetoothA2dpSinkServer::~BluetoothA2dpSinkServer()
 
 void BluetoothA2dpSinkServer::RegisterObserver(const sptr<IBluetoothA2dpSinkObserver> &observer)
 {
-    HILOGI("BluetoothA2dpSinkServer::RegisterObserver starts");
+    HILOGI("starts");
     if (observer == nullptr) {
-        HILOGI("BluetoothA2dpSinkServer::RegisterObserver observer is null");
+        HILOGI("observer is null");
         return;
     }
     pimpl->observers_.Register(observer);
@@ -139,9 +140,9 @@ void BluetoothA2dpSinkServer::RegisterObserver(const sptr<IBluetoothA2dpSinkObse
 
 void BluetoothA2dpSinkServer::DeregisterObserver(const sptr<IBluetoothA2dpSinkObserver> &observer)
 {
-    HILOGI("BluetoothA2dpSinkServer::DeregisterObserver starts");
+    HILOGI("starts");
     if (observer == nullptr) {
-        HILOGE("BluetoothA2dpSinkServer::DeregisterObserver observer is null");
+        HILOGI("observer is null");
         return;
     }
 
@@ -152,21 +153,21 @@ void BluetoothA2dpSinkServer::DeregisterObserver(const sptr<IBluetoothA2dpSinkOb
 
 int BluetoothA2dpSinkServer::Connect(const RawAddress &device)
 {
-    HILOGI("BluetoothA2dpSinkServer::Connect starts");
+    HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->a2dpSnkService_->Connect(device);
 }
 
 int BluetoothA2dpSinkServer::Disconnect(const RawAddress &device)
 {
-    HILOGI("BluetoothA2dpSinkServer::Disconnect starts");
+    HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->a2dpSnkService_->Disconnect(device);
 }
 
 int BluetoothA2dpSinkServer::GetDeviceState(const RawAddress &device)
 {
-    HILOGI("BluetoothA2dpSinkServer::GetDeviceState starts");
+    HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDeviceState() false, check permission failed");
+        HILOGE("false, check permission failed");
         return BT_FAILURE;
     }
     return pimpl->a2dpSnkService_->GetDeviceState(device);
@@ -174,15 +175,15 @@ int BluetoothA2dpSinkServer::GetDeviceState(const RawAddress &device)
 
 std::vector<RawAddress> BluetoothA2dpSinkServer::GetDevicesByStates(const std::vector<int32_t> &states)
 {
-    HILOGI("BluetoothA2dpSinkServer::GetDevicesByStates starts");
+    HILOGI("starts");
     std::vector<RawAddress> rawDevices;
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDevicesByStates() false, check permission failed");
+        HILOGE("false, check permission failed");
         return rawDevices;
     }
     std::vector<int> tmpStates;
     for (int32_t state : states) {
-        HILOGD("state = %{public}d", state);
+        HILOGI("state = %{public}d", state);
         tmpStates.push_back((int)state);
     }
 
@@ -192,9 +193,9 @@ std::vector<RawAddress> BluetoothA2dpSinkServer::GetDevicesByStates(const std::v
 
 int BluetoothA2dpSinkServer::GetPlayingState(const RawAddress &device)
 {
-    HILOGI("BluetoothA2dpSinkServer::GetPlayingState starts");
+    HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetPlayingState() false, check permission failed");
+        HILOGE("false, check permission failed");
         return BT_FAILURE;
     }
     return pimpl->a2dpSnkService_->GetPlayingState(device);
@@ -202,20 +203,19 @@ int BluetoothA2dpSinkServer::GetPlayingState(const RawAddress &device)
 
 int BluetoothA2dpSinkServer::SetConnectStrategy(const RawAddress &device, int strategy)
 {
-    HILOGI("BluetoothA2dpSinkServer::SetConnectStrategy starts, strategy = %{public}d", 
-           strategy);
+    HILOGI("addr: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     return pimpl->a2dpSnkService_->SetConnectStrategy(device, strategy);
 }
 
 int BluetoothA2dpSinkServer::GetConnectStrategy(const RawAddress &device)
 {
-    HILOGI("BluetoothA2dpSinkServer::GetConnectStrategy starts");
+    HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->a2dpSnkService_->GetConnectStrategy(device);
 }
 
 int BluetoothA2dpSinkServer::SendDelay(const RawAddress &device, int32_t delayValue)
 {
-    HILOGI("BluetoothA2dpSinkServer::SendDelay starts, delayValue = %{public}d", delayValue);
+    HILOGI("addr: %{public}s, delayValue: %{public}d", GET_ENCRYPT_ADDR(device), delayValue);
     if (pimpl->a2dpSnkService_ == nullptr) {
         HILOGE("SendDelay but a2dpSnkService_ is nullptr return");
         return BT_FAILURE;
