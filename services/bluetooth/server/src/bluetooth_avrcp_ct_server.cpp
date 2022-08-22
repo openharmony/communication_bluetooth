@@ -478,7 +478,7 @@ public:
     void OnGetPlayStatus(
         const RawAddress &rawAddr, uint32_t songLength, uint32_t songPosition, uint8_t playStatus, int result)
     {
-        HILOGI("addr: %{public}s, songLength: %{public}d, songPosition: %{public}d, playStatus: %{public}d, "
+        HILOGI("addr: %{public}s, songLength: %{public}u, songPosition: %{public}u, playStatus: %{public}d, "
             "res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), songLength, songPosition, playStatus, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
@@ -531,7 +531,7 @@ public:
     void OnGetFolderItems(
         const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMeItem> &items, int result, int detail)
     {
-        HILOGI("addr: %{public}s, uidCounter: %{public}d, res: %{public}d, detail: %{public}d",
+        HILOGI("addr: %{public}s, uidCounter: %{public}hu, res: %{public}d, detail: %{public}d",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
@@ -569,7 +569,7 @@ public:
     void OnGetTotalNumberOfItems(
         const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems, int result, int detail)
     {
-        HILOGI("addr: %{public}s, uidCounter: %{public}d, numOfItems: %{public}d, res: %{public}d, detail: %{public}d",
+        HILOGI("addr: %{public}s, uidCounter: %{public}hu, numOfItems: %{public}u, res: %{public}d, detail: %{public}d",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
@@ -613,8 +613,8 @@ public:
 
     void OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result)
     {
-        HILOGI("addr: %{public}s, uid: %{public}ju, res: %{public}d",
-            GET_ENCRYPT_AVRCP_ADDR(rawAddr), uid, result);
+        HILOGI("addr: %{public}s, uid: %{public}llu, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), (unsigned long long)uid, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -651,7 +651,7 @@ public:
 
     void OnPlaybackPosChanged(const RawAddress &rawAddr, uint32_t playbackPos, int result)
     {
-        HILOGI("addr: %{public}s, playbackPos: %{public}d, res: %{public}d",
+        HILOGI("addr: %{public}s, playbackPos: %{public}u, res: %{public}d",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr), playbackPos, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
@@ -704,7 +704,7 @@ public:
 
     void OnAddressedPlayerChanged(const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, int result)
     {
-        HILOGI("addr: %{public}s, playerId: %{public}d, uidCounter: %{public}d, res: %{public}d",
+        HILOGI("addr: %{public}s, playerId: %{public}hu, uidCounter: %{public}hu, res: %{public}d",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
@@ -719,7 +719,7 @@ public:
 
     void OnUidChanged(const RawAddress &rawAddr, uint16_t uidCounter, int result)
     {
-        HILOGI("addr: %{public}s, uidCounter: %{public}d, res: %{public}d",
+        HILOGI("addr: %{public}s, uidCounter: %{public}hu, res: %{public}d",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
