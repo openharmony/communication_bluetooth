@@ -1413,7 +1413,7 @@ int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, c
     }
 
     return result;
-}  
+}
 
 /******************************************************************
  * PLAY                                                           *
