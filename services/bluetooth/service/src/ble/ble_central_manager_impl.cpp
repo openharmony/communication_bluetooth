@@ -776,7 +776,7 @@ void BleCentralManagerImpl::StartOrStopScan(const STOP_SCAN_TYPE &scanType, bool
 
 void BleCentralManagerImpl::SetActiveScan(bool active) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    HILOGI("active: %{public}d", active);
 
     if (active) {
         pimpl->scanParams_.scanType = BLE_SCAN_TYPE_ACTIVE;
@@ -787,21 +787,21 @@ void BleCentralManagerImpl::SetActiveScan(bool active) const
 
 void BleCentralManagerImpl::SetInterval(uint16_t intervalMSecs) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    HILOGI("intervalMSecs: %{public}hu", intervalMSecs);
 
     pimpl->scanParams_.scanInterval = intervalMSecs / BLE_SCAN_UNIT_TIME;
 }
 
 void BleCentralManagerImpl::SetWindow(uint16_t windowMSecs) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    HILOGI("windowMSecs: %{public}hu", windowMSecs);
 
     pimpl->scanParams_.scanWindow = windowMSecs / BLE_SCAN_UNIT_TIME;
 }
 
 void BleCentralManagerImpl::ClearResults() const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
     pimpl->bleScanResult_.clear();
@@ -809,7 +809,7 @@ void BleCentralManagerImpl::ClearResults() const
 
 void BleCentralManagerImpl::SetScanModeDuration(int scanMode, int type) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    HILOGI("scanMode: %{public}d, type: %{public}d", scanMode, type);
 
     switch (scanMode) {
         case SCAN_MODE_LOW_POWER:
