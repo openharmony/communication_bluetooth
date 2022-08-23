@@ -381,7 +381,7 @@ using BLE_IO_CAP = enum {
 };
 
 // Adv status
-using Ble_AdvState = enum {
+using BleAdvState = enum {
     BLE_ADV_STATE_IDLE,
     BLE_ADV_STATE_ADVERTISING,
 };
