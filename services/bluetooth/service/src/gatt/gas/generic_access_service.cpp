@@ -163,7 +163,7 @@ int GenericAccessService::RegisterService()
     if (adapterBle != nullptr) {
         adapterBle->RegisterBleAdapterObserver(*adapterBleObserver_.get());
         auto state = adapterBle->GetAdvertisingStatus();
-        if (state == Ble_AdvState::BLE_ADV_STATE_ADVERTISING) {
+        if (state == BleAdvState::BLE_ADV_STATE_ADVERTISING) {
             bleDiscoverable_ = true;
         } else {
             bleDiscoverable_ = false;
@@ -283,7 +283,7 @@ void GenericAccessService::OnDeviceNameChanged(std::string &deviceName) const
 void GenericAccessService::OnAdvertisingStateChanged(int state)
 {
     LOG_DEBUG("%{public}s:%{public}d:%{public}s :state: %{public}d", __FILE__, __LINE__, __FUNCTION__, state);
-    if (state == Ble_AdvState::BLE_ADV_STATE_ADVERTISING) {
+    if (state == BleAdvState::BLE_ADV_STATE_ADVERTISING) {
         bleDiscoverable_ = true;
     } else {
         bleDiscoverable_ = false;
