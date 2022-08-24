@@ -43,7 +43,7 @@ const std::string DeviceInformationService::DEFAULT_IEEE_REGULATORY_CERTIFICATIO
 const std::string DeviceInformationService::DEFAULT_PNP_ID = "-";
 
 DeviceInformationService::DeviceInformationService(GattServerService &service)
-    : serverService_(service), serviceCallback_(std::make_unique<GattServerCallbackImpl>(*this))
+    : serverService_(service), serviceCallback_(std::make_shared<GattServerCallbackImpl>(*this))
 {
     AdapterDeviceInfo::GetInstance()->Load();
 }
@@ -99,7 +99,7 @@ private:
 
 int DeviceInformationService::RegisterService()
 {
-    appId_ = serverService_.RegisterApplicationSync(*serviceCallback_);
+    appId_ = serverService_.RegisterApplicationSync(serviceCallback_);
     if (appId_ < 0) {
         return appId_;
     }
@@ -115,6 +115,7 @@ int DeviceInformationService::RegisterService()
 
 void DeviceInformationService::DeregisterService() const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     serverService_.DeregisterApplicationSync(appId_);
 }
 
@@ -137,6 +138,7 @@ int DeviceInformationService::RegisterSDP()
 
 void DeviceInformationService::DeregisterSDP() const
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (sdpRegister_ != nullptr) {
         static_cast<DiServiceOverBredrInterface *>(sdpRegister_.get())->DeregisterSDP();
     }

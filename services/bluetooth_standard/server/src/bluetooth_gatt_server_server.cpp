@@ -33,7 +33,7 @@ struct BluetoothGattServerServer::impl {
 
     bluetooth::IProfileGattServer *serverService_;
     std::unique_ptr<SystemStateObserver> systemStateObserver_;
-    std::list<std::unique_ptr<GattServerCallbackImpl>> callbacks_;
+    std::list<std::shared_ptr<GattServerCallbackImpl>> callbacks_;
     std::mutex registerMutex_;
 
     impl();
@@ -333,9 +333,9 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
     }
 
     auto it = pimpl->callbacks_.emplace(
-        pimpl->callbacks_.begin(), std::make_unique<impl::GattServerCallbackImpl>(callback, *this));
+        pimpl->callbacks_.begin(), std::make_shared<impl::GattServerCallbackImpl>(callback, *this));
 
-    return pimpl->serverService_->RegisterApplication(*it->get());
+    return pimpl->serverService_->RegisterApplication(*it);
 }
 
 int BluetoothGattServerServer::DeregisterApplication(int32_t appId)

@@ -307,7 +307,7 @@ int BluetoothGattClientServer::DiscoveryServices(int32_t appId)
 
 int BluetoothGattClientServer::ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic &characteristic)
 {
-    HILOGI("Bluetooth Gatt Client Server ReadCharacteristic Triggered!");
+    HILOGI("appId: %{public}d", appId);
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGI("BluetoothGattClientServer: ReadCharacteristic request not support.");
