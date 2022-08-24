@@ -31,9 +31,12 @@
 
 namespace bluetooth {
 struct ServerApplication {
-    explicit ServerApplication(IGattServerCallback &callback) : callback_(callback), services_() {};
+    explicit ServerApplication(std::shared_ptr<IGattServerCallback> callback) : services_()
+    {
+        callback_ = callback;
+    }
 
-    IGattServerCallback &callback_;
+    std::shared_ptr<IGattServerCallback> callback_;
     // service handle set of application
     std::set<uint16_t> services_;
 };
@@ -61,9 +64,9 @@ struct GattServerService::impl : public GattServiceBase {
     explicit impl(GattServerService &service);
     ~impl();
 
-    void RegisterApplication(IGattServerCallback &callback, std::promise<int> &promise);
+    void RegisterApplication(std::shared_ptr<IGattServerCallback> callback, std::promise<int> &promise);
     void DeregisterApplication(int appId, std::promise<int> &promise);
-    int RegisterApplicationImpl(IGattServerCallback &callback);
+    int RegisterApplicationImpl(std::shared_ptr<IGattServerCallback> callback);
     int DeregisterApplicationImpl(int appId);
 
     int AddService(int appId, Service &service, bool IsAsync);
@@ -375,7 +378,7 @@ int GattServerService::RespondDescriptorWrite(const GattDevice &device, const De
     return GattStatus::GATT_SUCCESS;
 }
 
-int GattServerService::RegisterApplication(IGattServerCallback &callback)
+int GattServerService::RegisterApplication(std::shared_ptr<IGattServerCallback> callback)
 {
     LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
@@ -404,7 +407,7 @@ int GattServerService::DeregisterApplication(int appId)
     return future.get();
 }
 
-int GattServerService::RegisterApplicationSync(IGattServerCallback &callback) const
+int GattServerService::RegisterApplicationSync(std::shared_ptr<IGattServerCallback> callback) const
 {
     LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (!pimpl->InRunningState()) {
@@ -627,7 +630,7 @@ GattServerService::impl::~impl()
     GattConnectionManager::GetInstance().DeregisterObserver(connectionObserverId_);
 }
 
-int GattServerService::impl::RegisterApplicationImpl(IGattServerCallback &callback)
+int GattServerService::impl::RegisterApplicationImpl(std::shared_ptr<IGattServerCallback> callback)
 {
     LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     if (servers_.size() >= MAXIMUM_NUMBER_APPLICATION) {
@@ -660,7 +663,7 @@ int GattServerService::impl::DeregisterApplicationImpl(int appId)
 }
 
 void GattServerService::impl::RegisterApplication(
-    IGattServerCallback &callback, std::promise<int> &promise)
+    std::shared_ptr<IGattServerCallback> callback, std::promise<int> &promise)
 {
     LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     promise.set_value(RegisterApplicationImpl(callback));
@@ -687,7 +690,7 @@ int GattServerService::impl::AddService(int appId, Service &service, bool IsAsyn
 
         if (IsAsync) {
             LOG_INFO("%{public}s:%{public}d:%{public}s: call OnAddService ", __FILE__, __LINE__, __FUNCTION__);
-            server.value()->second.callback_.OnAddService(result, service);
+            server.value()->second.callback_->OnAddService(result, service);
         }
     }
     return result;
@@ -832,7 +835,7 @@ void GattServerService::impl::CancelConnection(const GattDevice &device)
         }
 
         for (auto &server : servers_) {
-            server.second.callback_.OnConnectionStateChanged(
+            server.second.callback_->OnConnectionStateChanged(
                 device, result, ConvertConnectionState(manager.GetDeviceState(device)));
         }
     }
@@ -871,7 +874,7 @@ void GattServerService::impl::OnExchangeMtuEvent(uint16_t connectionHandle, uint
 
         remote->second.SetMtu(rxMtu);
         for (auto &server : servers_) {
-            server.second.callback_.OnMtuChanged(remote->second.GetDevice(), rxMtu);
+            server.second.callback_->OnMtuChanged(remote->second.GetDevice(), rxMtu);
         }
     }
 }
@@ -908,10 +911,10 @@ void GattServerService::impl::OnReadCharacteristicValueEvent(
         }
 
         if (!isUsingUuid) {
-            server->second.callback_.OnCharacteristicReadRequest(
+            server->second.callback_->OnCharacteristicReadRequest(
                 remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_));
         } else {
-            server->second.callback_.OnCharacteristicReadByUuidRequest(
+            server->second.callback_->OnCharacteristicReadByUuidRequest(
                 remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_));
         }
     }
@@ -952,7 +955,7 @@ void GattServerService::impl::OnWriteCharacteristicEvent(
         gattCCC.length_ = length;
         gattCCC.value_ = std::move(*value);
 
-        server->second.callback_.OnCharacteristicWriteRequest(remote->second.GetDevice(), gattCCC, needRespones);
+        server->second.callback_->OnCharacteristicWriteRequest(remote->second.GetDevice(), gattCCC, needRespones);
     }
 }
 
@@ -986,7 +989,7 @@ void GattServerService::impl::OnDescriptorReadEvent(uint16_t connectionHandle, u
             return;
         }
 
-        server->second.callback_.OnDescriptorReadRequest(
+        server->second.callback_->OnDescriptorReadRequest(
             remote->second.GetDevice(), Descriptor(descriptor->handle_, descriptor->uuid_, descriptor->permissions_));
     }
 }
@@ -1018,7 +1021,7 @@ void GattServerService::impl::OnDescriptorWriteEvent(
         gattDescriptor.length_ = length;
         gattDescriptor.value_ = std::move(*value);
 
-        server->second.callback_.OnDescriptorWriteRequest(remote->second.GetDevice(), gattDescriptor);
+        server->second.callback_->OnDescriptorWriteRequest(remote->second.GetDevice(), gattDescriptor);
     }
 }
 
@@ -1051,7 +1054,7 @@ void GattServerService::impl::OnIndicationEvent(uint16_t connectionHandle, uint1
                 __FUNCTION__);
             return;
         }
-        server->second.callback_.OnNotifyConfirm(
+        server->second.callback_->OnNotifyConfirm(
             remote->second.GetDevice(), Characteristic(ccc->uuid_, ccc->handle_, ccc->properties_), ret);
     }
 }
@@ -1073,7 +1076,7 @@ void GattServerService::impl::OnConnect(const GattDevice &device, uint16_t conne
 
     for (auto &server : servers_) {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
-        server.second.callback_.OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::CONNECTED));
+        server.second.callback_->OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::CONNECTED));
     }
 }
 
@@ -1107,7 +1110,7 @@ void GattServerService::impl::OnDisconnect(const GattDevice &device, uint16_t co
 
     for (auto &server : servers_) {
         LOG_DEBUG("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
-        server.second.callback_.OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::DISCONNECTED));
+        server.second.callback_->OnConnectionStateChanged(device, ret, static_cast<int>(BTConnectState::DISCONNECTED));
     }
 }
 
@@ -1118,7 +1121,7 @@ void GattServerService::impl::OnConnectionChanged(const GattDevice &device, int 
         return;
     }
     for (auto &server : servers_) {
-        server.second.callback_.OnConnectionStateChanged(device, GattStatus::GATT_SUCCESS, state);
+        server.second.callback_->OnConnectionStateChanged(device, GattStatus::GATT_SUCCESS, state);
     }
 }
 
@@ -1127,7 +1130,7 @@ void GattServerService::impl::OnConnectionParameterChanged(
 {
     LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     for (auto &server : servers_) {
-        server.second.callback_.OnConnectionParameterChanged(device, interval, latency, timeout, status);
+        server.second.callback_->OnConnectionParameterChanged(device, interval, latency, timeout, status);
     }
 }
 
@@ -1245,7 +1248,7 @@ void GattServerService::impl::NotifyServiceChanged(int appId, const Service &ser
             continue;
         }
         LOG_INFO("%{public}d:%{public}s: call OnServiceChanged", __LINE__, __FUNCTION__);
-        server.second.callback_.OnServiceChanged(service);
+        server.second.callback_->OnServiceChanged(service);
     }
 }
 
