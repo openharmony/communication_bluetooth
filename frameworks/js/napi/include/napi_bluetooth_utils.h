@@ -249,6 +249,7 @@ struct TransforInformationCallbackInfo : public BluetoothCallbackInfo {
 namespace {
 using sysBLEMap = std::map<std::string, std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE>>;
 sysBLEMap g_sysBLEObserver;
+std::mutex sysBLEObserverMutex_;
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> g_Observer;
 std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = nullptr;
 std::string deviceAddr;
