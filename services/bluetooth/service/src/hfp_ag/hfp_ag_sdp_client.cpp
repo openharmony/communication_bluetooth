@@ -43,11 +43,6 @@ void HfpAgSdpClient::SdpCallback(const BtAddr *addr, const SdpService *serviceAr
     if (serviceNum > 0) {
         CopySdpServiceArray(address, serviceAry, serviceNum);
         msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
-    } else {
-        HfpAgSdpClient *sdpClient = static_cast<HfpAgSdpClient *>(context);
-        HfpAgService::GetService()->GetDispatcher()->PostTask(
-            std::bind(&HfpAgSdpClient::DoHspDiscovery, sdpClient, address));
-        return;
     }
     HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
 }
