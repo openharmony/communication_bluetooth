@@ -26,6 +26,7 @@ const PAGE_URI_DEVICE_NAME = 'pages/subManualApiTest/subBrTest/deviceName';
 const PAGE_URI_SET_SCAN_MODE = 'pages/subManualApiTest/subBrTest/setScanMode';
 const PAGE_URI_DEVICE_FOUND_MODE = 'pages/subManualApiTest/subBrTest/deviceFound';
 const PAGE_URI_PROFILE_CONN_STATE = 'pages/subManualApiTest/subBrTest/profileConnState';
+const PAGE_URI_PROFILE_CONN_STATE_BY_ID = 'pages/subManualApiTest/subBrTest/searchProfileConnStateById';
 const PAGE_URI_PAIRED_DEVICES = "pages/subManualApiTest/subBrTest/pairedDevices";
 
 @Entry
@@ -378,7 +379,7 @@ struct Index {
 
               ListItem() {
                 TitleComponent({
-                  title: "getProfileConnState",
+                  title: "getProfileConnState1",
                   bgColor: this.currentClick === 15 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
                 });
               }
@@ -391,9 +392,22 @@ struct Index {
 
               ListItem() {
                 TitleComponent({
+                  title: "getProfileConnState2",
+                  bgColor: this.currentClick === 16 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+                });
+              }
+              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+              .onClick(() => {
+                this.currentClick = 16;
+                Router.push({ uri: PAGE_URI_PROFILE_CONN_STATE_BY_ID })
+                this.message = '';
+              })
+
+              ListItem() {
+                TitleComponent({
                   title: this.btOnState,
                   stateChangeFlag: true,
-                  bgColor: this.currentClick === 16 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+                  bgColor: this.currentClick === 17 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
                 });
               }
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
@@ -407,7 +421,7 @@ struct Index {
                   return;
                 }
                 this.isStateChangeClick = true;
-                this.currentClick = 16;
+                this.currentClick = 17;
                 this.btOnState = 'off:stateChange'
                 AppStorage.SetOrCreate('on_stateChange', this.btOnState);
                 this.btStateMessage = 'STATE: ';
@@ -447,7 +461,7 @@ struct Index {
                 TitleComponent({
                   title: this.btPinRequired,
                   pinRequiredFlag: true,
-                  bgColor: this.currentClick === 17 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+                  bgColor: this.currentClick === 18 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
                 });
               }
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
@@ -467,7 +481,7 @@ struct Index {
                   return;
                 }
                 this.isPinRequiredClick = true;
-                this.currentClick = 17;
+                this.currentClick = 18;
                 this.btPinRequired = 'off:pinRequired';
                 AppStorage.SetOrCreate('on_pinRequired', this.btPinRequired);
                 this.pinMessage = 'PIN: ';
@@ -482,7 +496,7 @@ struct Index {
                 TitleComponent({
                   title: this.btBondStateChange,
                   bondStateChangeFlag: true,
-                  bgColor: this.currentClick === 18 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+                  bgColor: this.currentClick === 19 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
                 });
               }
               .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
@@ -501,7 +515,7 @@ struct Index {
                   return;
                 }
                 this.isBondStateChangeClick = true;
-                this.currentClick = 18;
+                this.currentClick = 19;
                 this.btBondStateChange = 'off:bondStateChange'
                 AppStorage.SetOrCreate('on_bondStateChange', this.btBondStateChange);
                 this.bondStateMessage = 'bondState: ';
