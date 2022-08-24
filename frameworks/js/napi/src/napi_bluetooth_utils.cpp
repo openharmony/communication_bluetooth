@@ -802,6 +802,7 @@ std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver()
 
 const sysBLEMap &GetSysBLEObserver()
 {
+    std::lock_guard<std::mutex> lock(g_sysBLEObserver);
     return g_sysBLEObserver;
 }
 
