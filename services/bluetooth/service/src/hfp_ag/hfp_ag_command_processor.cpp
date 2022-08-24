@@ -345,8 +345,10 @@ void HfpAgCommandProcessor::CmerSetter(HfpAgDataConnection &dataConn, const std:
     int offset = 0;
     const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "%{public}d,%{public}d,%{public}d,%{public}d%n", &data[CMER_MODE_INDEX], &data[CMER_KEYP_INDEX],
+    int res = sscanf_s(buf, "%d,%d,%d,%d%n", &data[CMER_MODE_INDEX], &data[CMER_KEYP_INDEX],
         &data[CMER_DISP_INDEX], &data[CMER_IND_INDEX], &offset);
+    HILOGI("[HFP AG]CmerSetter:(%{public}d,%{public}d,%{public}d,%{public}d), res:%{public}d), offset:%{public}d",
+        data[CMER_MODE_INDEX], data[CMER_KEYP_INDEX], data[CMER_DISP_INDEX], data[CMER_IND_INDEX], res, offset);
     if (res != CMER_ELEMENTS_NUMBER || offset == 0) {
         goto error;
     } else {
