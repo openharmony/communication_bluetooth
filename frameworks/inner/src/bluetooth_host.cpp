@@ -15,6 +15,7 @@
 
 #include "bluetooth_host.h"
 #include <memory>
+#include <mutex>
 #include <unistd.h>
 #include "bluetooth_ble_peripheral_observer_stub.h"
 #include "bluetooth_host_observer_stub.h"
@@ -54,7 +55,10 @@ struct BluetoothHost::impl {
     sptr<IBluetoothHost> proxy_ = nullptr;
 
 private:
-    void GetProxy();
+    void GetHostProxy();
+    class BluetoothHostDeathRecipient;
+    sptr<BluetoothHostDeathRecipient> deathRecipient_ = nullptr;
+    std::mutex proxyMutex_;
 };
 
 class BluetoothHost::impl::BluetoothHostObserverImp : public BluetoothHostObserverStub {
@@ -250,30 +254,86 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBlePeripheralCallbackImp);
 };
 
+class BluetoothHost::impl::BluetoothHostDeathRecipient final : public IRemoteObject::DeathRecipient {
+public:
+    BluetoothHostDeathRecipient(BluetoothHost::impl &impl) : impl_(impl)
+    {};
+    ~BluetoothHostDeathRecipient() final = default;
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHostDeathRecipient);
+
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
+    {
+        HILOGI("bluetooth_servi died and then re-registered");
+        std::lock_guard<std::mutex> lock(impl_.proxyMutex_);
+        impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
+        impl_.proxy_ = nullptr;
+
+        // Notify the upper layer that bluetooth is disabled.
+        if (impl_.observerImp_ != nullptr && impl_.bleObserverImp_ != nullptr) {
+            HILOGI("bluetooth_servi died and send state off to app");
+            impl_.observerImp_->OnStateChanged(BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
+            impl_.bleObserverImp_->OnStateChanged(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
+        }
+
+        // Re-obtain the proxy and register the observer.
+        if (!ResetHostProxy()) {
+            HILOGE("proxy reset failed");
+            return;
+        }
+        HILOGE("proxy reset succeded");
+    }
+
+private:
+    bool ResetHostProxy()
+    {
+        if (impl_.proxy_ != nullptr) {
+            return true;
+        }
+        HILOGI("proxy is null, try to get proxy.");
+        impl_.GetHostProxy();
+
+        if (impl_.proxy_ == nullptr) {
+            HILOGI("try to get proxy failed.");
+            return false;
+        }
+        impl_.proxy_->RegisterObserver(impl_.observerImp_);
+        impl_.proxy_->RegisterBleAdapterObserver(impl_.bleObserverImp_);
+        impl_.proxy_->RegisterRemoteDeviceObserver(impl_.remoteObserverImp_);
+        impl_.proxy_->RegisterBlePeripheralCallback(impl_.bleRemoteObserverImp_);
+        impl_.proxy_->AsObject()->AddDeathRecipient(impl_.deathRecipient_);
+        return true;
+    }
+    BluetoothHost::impl &impl_;
+};
+
 BluetoothHost::impl::impl()
 {
     HILOGI("starts");
     observerImp_ = new (std::nothrow) BluetoothHostObserverImp(*this);
     if (observerImp_ == nullptr) {
+        HILOGE("observerImp_ is null");
         return;
     }
 
     remoteObserverImp_ = new (std::nothrow) BluetoothRemoteDeviceObserverImp(*this);
     if (remoteObserverImp_ == nullptr) {
+        HILOGE("remoteObserverImp_ is null");
         return;
     }
 
     bleRemoteObserverImp_ = new (std::nothrow) BluetoothBlePeripheralCallbackImp(*this);
     if (bleRemoteObserverImp_ == nullptr) {
+        HILOGE("bleRemoteObserverImp_ is null");
         return;
     }
 
     bleObserverImp_ = new (std::nothrow) BluetoothHostObserverImp(*this);
     if (bleObserverImp_ == nullptr) {
+        HILOGE("bleObserverImp_ is null");
         return;
     }
 
-    GetProxy();
+    GetHostProxy();
 
     if (proxy_ == nullptr) {
         HILOGE("proxy_ is null");
@@ -284,6 +344,13 @@ BluetoothHost::impl::impl()
     proxy_->RegisterBleAdapterObserver(bleObserverImp_);
     proxy_->RegisterRemoteDeviceObserver(remoteObserverImp_);
     proxy_->RegisterBlePeripheralCallback(bleRemoteObserverImp_);
+
+    deathRecipient_ = new BluetoothHostDeathRecipient(*this);
+    if (deathRecipient_ == nullptr) {
+        HILOGE("deathRecipient_ is null");
+        return;
+    }
+    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
 BluetoothHost::impl::~impl()
@@ -294,12 +361,13 @@ BluetoothHost::impl::~impl()
         return;
     }
     proxy_->DeregisterObserver(observerImp_);
-    proxy_->DeregisterBleAdapterObserver(observerImp_);
+    proxy_->DeregisterBleAdapterObserver(bleObserverImp_);
     proxy_->DeregisterRemoteDeviceObserver(remoteObserverImp_);
     proxy_->DeregisterBlePeripheralCallback(bleRemoteObserverImp_);
+    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }
 
-void BluetoothHost::impl::GetProxy()
+void BluetoothHost::impl::GetHostProxy()
 {
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
@@ -311,7 +379,7 @@ void BluetoothHost::impl::GetProxy()
     if (!remote) {
         int try_time = 5;
         while ((!remote) && (try_time--) > 0) {
-            sleep(1);
+            sleep(GET_PROXY_SLEEP_SEC);
             remote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
         }
     }

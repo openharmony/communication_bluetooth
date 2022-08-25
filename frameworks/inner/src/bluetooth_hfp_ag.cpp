@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_hfp_ag.h"
+#include <unistd.h>
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
@@ -298,6 +299,39 @@ private:
     sptr<IBluetoothHfpAg> proxy_;
     class HandsFreeAudioGatewayDeathRecipient;
     sptr<HandsFreeAudioGatewayDeathRecipient> deathRecipient_;
+
+    void GetHfpAgProxy()
+    {
+        sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgr == nullptr) {
+            HILOGE("error: no samgr");
+            return;
+        }
+
+        sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+        if (hostRemote == nullptr) {
+            HILOGE("failed: no hostRemote");
+            return;
+        }
+
+        sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+        if (hostProxy == nullptr) {
+            HILOGE("error: host no proxy");
+            return;
+        }
+
+        sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_HFP_AG);
+        if (remote == nullptr) {
+            HILOGE("failed: no remote");
+            return;
+        }
+
+        proxy_ = iface_cast<IBluetoothHfpAg>(remote);
+        if (proxy_ == nullptr) {
+            HILOGE("error: no proxy");
+            return;
+        }
+    }
 };
 
 class HandsFreeAudioGateway::impl::HandsFreeAudioGatewayDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -312,6 +346,20 @@ public:
         HILOGI("starts");
         impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
+
+        // Re-obtain the proxy and register the observer.
+        sleep(GET_PROXY_SLEEP_SEC);
+        impl_.GetHfpAgProxy();
+        if (impl_.proxy_ == nullptr) {
+            HILOGE("proxy reset failed");
+            return;
+        }
+        if (impl_.serviceObserver_ == nullptr || impl_.deathRecipient_ == nullptr) {
+            HILOGE("serviceObserver_ or deathRecipient_ is null");
+            return;
+        }
+        impl_.proxy_->RegisterObserver(impl_.serviceObserver_);
+        impl_.proxy_->AsObject()->AddDeathRecipient(impl_.deathRecipient_);
     }
 
 private:
@@ -320,27 +368,24 @@ private:
 
 HandsFreeAudioGateway::impl::impl()
 {
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGE("failed: no hostRemote");
+    HILOGI("start");
+    GetHfpAgProxy();
+    if (proxy_ == nullptr) {
+        HILOGE("get proxy_ failed");
         return;
     }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_HFP_AG);
-
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return;
-    }
-    HILOGI("remote obtained");
-
     serviceObserver_ = new AgServiceObserver(observers_);
-
-    proxy_ = iface_cast<IBluetoothHfpAg>(remote);
+    if (serviceObserver_ == nullptr) {
+        HILOGE("serviceObserver_ is null");
+        return;
+    }
     proxy_->RegisterObserver(serviceObserver_);
+
     deathRecipient_ = new HandsFreeAudioGatewayDeathRecipient(*this);
+    if (deathRecipient_ == nullptr) {
+        HILOGE("deathRecipient_ is null");
+        return;
+    }
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
