@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include "bluetooth_opp.h"
 #include "bluetooth_remote_device.h"
+#include "bluetooth_host.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -37,6 +38,7 @@ private:
 
 static Bluetooth::Opp  *profile_;
 static OppObserverTest g_oppObserverTest;
+static BluetoothHost *host_;
 
 class OppTest : public testing::Test {
 public:
@@ -71,9 +73,15 @@ void OppTest::TearDownTestCase(void)
 }
 void OppTest::SetUp()
 {
+    host_ = &BluetoothHost::GetDefaultHost();
+    host_->EnableBt();
+    host_->EnableBle();
 }
 void OppTest::TearDown()
 {
+    host_->DisableBt();
+    host_->DisableBle();
+    host_ = nullptr;
 }
 
 bool OppTest::CompareDevice(std::vector<BluetoothRemoteDevice> bluetoothRemoteDeviceByState,
