@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_hid_host.h"
+#include <unistd.h>
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"
@@ -168,6 +169,37 @@ private:
     sptr<IBluetoothHidHost> proxy_;
     class HidHostDeathRecipient;
     sptr<HidHostDeathRecipient> deathRecipient_;
+    void GetHidProxy()
+    {
+        sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgr == nullptr) {
+            HILOGE("error: no samgr");
+            return;
+        }
+        sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+        if (hostRemote == nullptr) {
+            HILOGE("failed: no hostRemote");
+            return;
+        }
+
+        sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+        if (hostProxy == nullptr) {
+            HILOGE("error: host no proxy");
+            return;
+        }
+
+        sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_HID_HOST_SERVER);
+        if (remote == nullptr) {
+            HILOGE("failed: no remote");
+            return;
+        }
+
+        proxy_ = iface_cast<IBluetoothHidHost>(remote);
+        if (proxy_ == nullptr) {
+            HILOGE("error: no proxy");
+            return;
+        }
+    }
 };
 
 class HidHost::impl::HidHostDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -182,6 +214,20 @@ public:
         HILOGI("starts");
         impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
+
+        // Re-obtain the proxy and register the observer.
+        sleep(GET_PROXY_SLEEP_SEC);
+        impl_.GetHidProxy();
+        if (impl_.proxy_ == nullptr) {
+            HILOGE("proxy reset failed");
+            return;
+        }
+        if (impl_.innerObserver_ == nullptr || impl_.deathRecipient_ == nullptr) {
+            HILOGE("innerObserver_ or deathRecipient_ is null");
+            return;
+        }
+        impl_.proxy_->RegisterObserver(impl_.innerObserver_);
+        impl_.proxy_->AsObject()->AddDeathRecipient(impl_.deathRecipient_);
     }
 
 private:
@@ -191,27 +237,24 @@ private:
 HidHost::impl::impl()
 {
     HILOGI("Enter!");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGE("failed: no hostRemote");
+    GetHidProxy();
+    if (proxy_ == nullptr) {
+        HILOGI("get proxy_ failed");
         return;
     }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_HID_HOST_SERVER);
-
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return;
-    }
-    HILOGI("remote obtained");
 
     innerObserver_ = new HidHostInnerObserver(observers_);
-
-    proxy_ = iface_cast<IBluetoothHidHost>(remote);
+    if (innerObserver_ == nullptr) {
+        HILOGE("innerObserver_ is null");
+        return;
+    }
     proxy_->RegisterObserver(innerObserver_);
+
     deathRecipient_ = new HidHostDeathRecipient(*this);
+    if (deathRecipient_ == nullptr) {
+        HILOGE("deathRecipient_ is null");
+        return;
+    }
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
