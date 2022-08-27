@@ -33,14 +33,14 @@ public:
 
     void OnReceiveIncomingFile(const IOppTransferInformation &transferInformation) override
     {
-        HILOGI("BluetoothOppCallback::OnReceiveIncomingFileChanged start.");
+        HILOGI("start.");
         observers_->ForEach([transferInformation](sptr<IBluetoothOppObserver> observer) {
             observer->OnReceiveIncomingFileChanged(BluetoothIOppTransferInformation(transferInformation));
         });
     }
     void OnTransferStateChange(const IOppTransferInformation &transferInformation) override
     {
-        HILOGI("BluetoothOppCallback::OnTransferStateChanged start.");
+        HILOGI("start.");
         observers_->ForEach([transferInformation](sptr<IBluetoothOppObserver> observer) {
             observer->OnTransferStateChanged(BluetoothIOppTransferInformation(transferInformation));
         });
@@ -83,7 +83,7 @@ public:
     explicit SystemStateObserver(BluetoothOppServer::impl *pimpl) : pimpl_(pimpl) {}
     void OnSystemStateChange(const BTSystemState state) override
     {
-        HILOGI("start, BTSystemState:%{public}d", state);
+        HILOGI("BTSystemState:%{public}d", state);
         switch (state) {
             case BTSystemState::ON:
                 pimpl_->oppService_ = pimpl_->GetServicePtr();
@@ -115,7 +115,7 @@ BluetoothOppServer::impl::~impl()
 
 BluetoothOppServer::BluetoothOppServer()
 {
-    HILOGI("BluetoothOppServer start");
+    HILOGI("start");
     pimpl = std::make_unique<impl>();
     pimpl->observerImp_->SetObserver(&(pimpl->observers_));
     pimpl->systemStateObserver_ = std::make_unique<impl::SystemStateObserver>(pimpl.get());
@@ -138,7 +138,7 @@ BluetoothOppServer::~BluetoothOppServer()
 
 ErrCode BluetoothOppServer::RegisterObserver(const sptr<IBluetoothOppObserver> observer)
 {
-    HILOGI("BluetoothOppServer::RegisterObserver start");
+    HILOGI("start");
 
     if (observer == nullptr) {
         HILOGE("observer is null");
@@ -156,7 +156,7 @@ ErrCode BluetoothOppServer::RegisterObserver(const sptr<IBluetoothOppObserver> o
 
 ErrCode BluetoothOppServer::DeregisterObserver(const sptr<IBluetoothOppObserver> observer)
 {
-    HILOGI("BluetoothOppServer::DeregisterObserver start");
+    HILOGI("start");
     if (observer == nullptr) {
         HILOGE("observer is null");
         return ERR_INVALID_VALUE;
@@ -181,7 +181,7 @@ ErrCode BluetoothOppServer::DeregisterObserver(const sptr<IBluetoothOppObserver>
 ErrCode BluetoothOppServer::GetDevicesByStates(
     const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result)
 {
-    HILOGI("BluetoothOppServer::GetDevicesByStates start");
+    HILOGI("start");
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
         return false;
@@ -202,7 +202,7 @@ ErrCode BluetoothOppServer::GetDevicesByStates(
 
 ErrCode BluetoothOppServer::GetDeviceState(const BluetoothRawAddress &device, int& result)
 {
-    HILOGI("BluetoothOppServer::GetDeviceState start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGI("addr:%{public}s, res:%{public}d", GET_ENCRYPT_ADDR(device), result);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
         return BT_FAILURE;
@@ -219,7 +219,7 @@ ErrCode BluetoothOppServer::GetDeviceState(const BluetoothRawAddress &device, in
 ErrCode BluetoothOppServer::SendFile(std::string &device, std::vector<std::string> &filePaths,
     std::vector<std::string> &mimeTypes, bool& result)
 {
-    HILOGI("BluetoothOppServer::SendFile start");
+    HILOGI("addr:%{public}s, res:%{public}d", GetEncryptAddr(device).c_str(), result);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
         return ERR_INVALID_VALUE;
@@ -235,7 +235,7 @@ ErrCode BluetoothOppServer::SendFile(std::string &device, std::vector<std::strin
 
 ErrCode BluetoothOppServer::SetIncomingFileConfirmation(bool &accept, bool &result)
 {
-    HILOGI("BluetoothOppServer::SetIncomingFileConfirmationstart");
+    HILOGI("accept:%{public}d, res:%{public}d", accept, result);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
         return ERR_INVALID_VALUE;
@@ -251,7 +251,7 @@ ErrCode BluetoothOppServer::SetIncomingFileConfirmation(bool &accept, bool &resu
 
 ErrCode BluetoothOppServer::GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation)
 {
-    HILOGI("BluetoothOppServer::GetCurrentTransferInformationstart");
+    HILOGI("start");
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
         return ERR_INVALID_VALUE;
@@ -267,7 +267,7 @@ ErrCode BluetoothOppServer::GetCurrentTransferInformation(BluetoothIOppTransferI
 
 ErrCode BluetoothOppServer::CancelTransfer(bool &result)
 {
-    HILOGI("BluetoothOppServer::CancelTransferstart");
+    HILOGI("res:%{public}d", result);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
         return ERR_INVALID_VALUE;
