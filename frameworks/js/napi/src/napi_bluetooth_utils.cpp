@@ -1088,12 +1088,14 @@ void RegisterSysBLEObserver(
     if (callbackIndex >= ARGS_SIZE_THREE) {
         return;
     }
+    std::lock_guard<std::mutex> lock(sysBLEObserverMutex_);
     HILOGI("type: %{public}s, index: %{public}d", type.c_str(), callbackIndex);
     g_sysBLEObserver[type][callbackIndex] = info;
 }
 
 void UnregisterSysBLEObserver(const std::string &type)
 {
+    std::lock_guard<std::mutex> lock(sysBLEObserverMutex_);
     auto itor = g_sysBLEObserver.find(type);
     if (itor != g_sysBLEObserver.end()) {
         g_sysBLEObserver.erase(itor);
