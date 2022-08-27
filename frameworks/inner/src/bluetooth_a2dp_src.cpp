@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_a2dp_src.h"
+#include <unistd.h>
 #include "bluetooth_a2dp_codec.h"
 #include "bluetooth_a2dp_src_proxy.h"
 #include "bluetooth_a2dp_src_observer_stub.h"
@@ -44,7 +45,7 @@ struct A2dpSource::impl {
     sptr<BluetoothA2dpSourceDeathRecipient> deathRecipient_ = nullptr;
 
 private:
-    void GetProxy();
+    void GetA2dpSrcProxy();
 };
 
 class A2dpSource::impl::BluetoothA2dpSourceObserverImp : public BluetoothA2dpSrcObserverStub {
@@ -113,6 +114,20 @@ public:
         HILOGI("enter");
         a2dpSrcDeath_.proxy_->AsObject()->RemoveDeathRecipient(a2dpSrcDeath_.deathRecipient_);
         a2dpSrcDeath_.proxy_ = nullptr;
+
+        // Re-obtain the proxy and register the observer.
+        sleep(GET_PROXY_SLEEP_SEC);
+        a2dpSrcDeath_.GetA2dpSrcProxy();
+        if (a2dpSrcDeath_.proxy_ == nullptr) {
+            HILOGE("proxy reset failed");
+            return;
+        }
+        if (a2dpSrcDeath_.deathRecipient_ == nullptr || a2dpSrcDeath_.observerImp_ == nullptr) {
+            HILOGE("deathRecipient_ or observerImp_ is null");
+            return;
+        }
+        a2dpSrcDeath_.proxy_->AsObject()->AddDeathRecipient(a2dpSrcDeath_.deathRecipient_);
+        a2dpSrcDeath_.proxy_->RegisterObserver(a2dpSrcDeath_.observerImp_);
     }
 
 private:
@@ -122,9 +137,9 @@ private:
 A2dpSource::impl::impl()
 {
     HILOGI("start");
-    GetProxy();
+    GetA2dpSrcProxy();
     if (proxy_ == nullptr) {
-        HILOGI("get proxy_ failed");
+        HILOGE("get proxy_ failed");
         return;
     }
     deathRecipient_ = new BluetoothA2dpSourceDeathRecipient(*this);
@@ -132,7 +147,7 @@ A2dpSource::impl::impl()
 
     observerImp_ = new (std::nothrow) BluetoothA2dpSourceObserverImp(*this);
     if (observerImp_ == nullptr) {
-        HILOGI("get proxy_observerImp_ failed");
+        HILOGE("get proxy_observerImp_ failed");
         return;
     }
     proxy_->RegisterObserver(observerImp_);
@@ -147,7 +162,7 @@ A2dpSource::impl::~impl()
     }
 }
 
-void A2dpSource::impl::GetProxy()
+void A2dpSource::impl::GetA2dpSrcProxy()
 {
     HILOGI("start");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
