@@ -290,9 +290,6 @@ bool HfpAgConnecting::Dispatch(const utility::Message &msg)
             profile_.ProcessSlcEstablished();
             Transition(HfpAgStateMachine::CONNECTED);
             break;
-        case HFP_AG_CONNECTED_EVT:
-            Transition(HfpAgStateMachine::CONNECTED);
-            break;
         case HFP_AG_CONTROL_OTHER_MODULES_EVT:
             eventProcessor_.ExecuteEventProcess(event);
             break;
