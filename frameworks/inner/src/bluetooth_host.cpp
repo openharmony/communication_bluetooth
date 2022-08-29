@@ -378,8 +378,9 @@ void BluetoothHost::impl::GetHostProxy()
     sptr<IRemoteObject> remote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (!remote) {
         int try_time = 5;
-        while ((!remote) && (try_time--) > 0) {
+        while ((!remote) && try_time > 0) {
             sleep(GET_PROXY_SLEEP_SEC);
+            try_time--;
             remote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
         }
     }
