@@ -15,6 +15,7 @@
 
 #include "bluetooth_pan_server.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils_server.h"
 #include "interface_profile.h"
 #include "interface_profile_pan.h"
 #include "i_bluetooth_host_observer.h"
@@ -30,7 +31,7 @@ public:
 
     void OnConnectionStateChanged(const RawAddress &device, int state) override
     {
-        HILOGI("BluetoothPanCallback::OnConnectionStateChanged start.");
+        HILOGI("addr:%{public}s, state:%{public}d", GET_ENCRYPT_ADDR(device), state);
         observers_->ForEach([device, state](sptr<IBluetoothPanObserver> observer) {
             observer->OnConnectionStateChanged(device, state);
         });
@@ -94,12 +95,12 @@ private:
 
 BluetoothPanServer::impl::impl()
 {
-    HILOGI("BluetoothPanServer::impl::impl() starts");
+    HILOGI("starts");
 }
 
 BluetoothPanServer::impl::~impl()
 {
-    HILOGI("BluetoothPanServer::impl::~impl() starts");
+    HILOGI("starts");
 }
 
 BluetoothPanServer::BluetoothPanServer()
@@ -125,14 +126,14 @@ BluetoothPanServer::~BluetoothPanServer()
 
 ErrCode BluetoothPanServer::RegisterObserver(const sptr<IBluetoothPanObserver> observer)
 {
-    HILOGI("BluetoothPanServer::RegisterObserver");
+    HILOGI("enter");
 
     if (observer == nullptr) {
-        HILOGE("BluetoothPanServer::RegisterObserver observer is null");
+        HILOGE("observer is null");
         return ERR_INVALID_VALUE;
     }
     if (pimpl == nullptr) {
-        HILOGE("BluetoothPanServer::RegisterObserver pimpl is null");
+        HILOGE("pimpl is null");
         return ERR_NO_INIT;
     }
 
@@ -143,13 +144,13 @@ ErrCode BluetoothPanServer::RegisterObserver(const sptr<IBluetoothPanObserver> o
 
 ErrCode BluetoothPanServer::DeregisterObserver(const sptr<IBluetoothPanObserver> observer)
 {
-    HILOGI("BluetoothPanServer::DeregisterObserver");
+    HILOGI("enter");
     if (observer == nullptr) {
-        HILOGE("BluetoothPanServer::DeregisterObserver observer is null");
+        HILOGE("observer is null");
         return ERR_INVALID_VALUE;
     }
     if (pimpl == nullptr) {
-        HILOGE("BluetoothPanServer::DeregisterObserver pimpl is null");
+        HILOGE("pimpl is null");
         return ERR_NO_INIT;
     }
     for (auto iter = pimpl->advCallBack_.begin(); iter != pimpl->advCallBack_.end(); ++iter) {
@@ -169,9 +170,9 @@ ErrCode BluetoothPanServer::GetDevicesByStates(
     const std::vector<int32_t> &states,
     std::vector<BluetoothRawAddress>& result)
 {
-    HILOGI("Bluetooth Pan Server GetDevicesByStates Triggered!");
+    HILOGI("Triggered!");
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
-        HILOGI("BluetoothPanServer: GetDevicesByStates not init.");
+        HILOGI("not init.");
         return ERR_NO_INIT;
     }
 
@@ -186,9 +187,9 @@ ErrCode BluetoothPanServer::GetDevicesByStates(
 ErrCode BluetoothPanServer::GetDeviceState(const BluetoothRawAddress &device,
     int& result)
 {
-    HILOGI("Bluetooth Pan Server GetDeviceState Triggered!");
+    HILOGI("addr:%{public}s, res:%{public}d", GET_ENCRYPT_ADDR(device), result);
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
-        HILOGI("BluetoothPanServer: GetDevicesByStates not init.");
+        HILOGI("not init.");
         return ERR_NO_INIT;
     }
     result = pimpl->panService_->GetDeviceState(device);
@@ -199,9 +200,9 @@ ErrCode BluetoothPanServer::Disconnect(
     const BluetoothRawAddress &device,
     bool& result)
 {
-    HILOGI("Bluetooth Pan Server Disconnect Triggered!");
+    HILOGI("addr:%{public}s, res:%{public}d", GET_ENCRYPT_ADDR(device), result);
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
-        HILOGI("BluetoothPanServer: Disconnect not init.");
+        HILOGI("not init.");
         return ERR_NO_INIT;
     }
     result = pimpl->panService_->Disconnect(device);
@@ -212,9 +213,9 @@ ErrCode BluetoothPanServer::SetTethering(
     const bool enable,
     bool& result)
 {
-    HILOGI("Bluetooth Pan Server SetTethering Triggered!");
+    HILOGI("enable:%{public}d, res:%{public}d", enable, result);
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
-        HILOGI("BluetoothPanServer: SetTethering not init.");
+        HILOGI("not init.");
         return ERR_NO_INIT;
     }
     result = pimpl->panService_->SetTethering(enable);
@@ -224,9 +225,9 @@ ErrCode BluetoothPanServer::SetTethering(
 ErrCode BluetoothPanServer::IsTetheringOn(
     bool& result)
 {
-        HILOGI("Bluetooth Pan Server IsTetheringOn Triggered!");
+    HILOGI("res:%{public}d", result);
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
-        HILOGI("BluetoothPanServer: IsTetheringOn not init.");
+        HILOGI("not init.");
         return ERR_NO_INIT;
     }
     result = pimpl->panService_->IsTetheringOn();
