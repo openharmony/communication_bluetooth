@@ -24,6 +24,7 @@
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_remote_device.h"
 
 #include "iosfwd"
@@ -379,7 +380,8 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
 
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
-
+    HILOGI("clientId: %{public}d, addr: %{public}s, isAutoConnect: %{public}d",
+        clientId, GetEncryptAddr(strAddress).c_str(), isAutoConnect);
     GattClient *client = nullptr;
     if (iter->second.gattClient != nullptr && iter->second.remoteAddr == strAddress) {
         HILOGI("connect to the same remote device again.");
