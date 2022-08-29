@@ -189,7 +189,7 @@ ErrCode BluetoothHidHostServer::GetDevicesByStates(
     for (auto &device : serviceDeviceList) {
         BluetoothRawAddress bluetoothDevice(device.GetAddress());
         result.push_back(bluetoothDevice);
-        HILOGD("%{public}s", GET_ENCRYPT_ADDR(bluetoothDevice));
+        HILOGI("%{public}s", GET_ENCRYPT_ADDR(bluetoothDevice));
     }
     return ERR_OK;
 }
