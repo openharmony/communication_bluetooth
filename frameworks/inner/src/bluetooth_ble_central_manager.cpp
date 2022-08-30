@@ -593,7 +593,7 @@ long BleScanSettings::GetReportDelayMillisValue() const
 
 int BleScanSettings::SetScanMode(int scanMode)
 {
-    if (scanMode < SCAN_MODE_LOW_POWER || scanMode > SCAN_MODE_LOW_LATENCY) {
+    if (scanMode < SCAN_MODE_LOW_POWER || scanMode >= SCAN_MODE_INVALID) {
         return RET_BAD_PARAM;
     }
 
