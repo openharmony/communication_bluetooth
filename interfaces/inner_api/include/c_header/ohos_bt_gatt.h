@@ -138,6 +138,28 @@ typedef enum {
 } BleScanType;
 
 /**
+ * @brief Enumerates BLE scan modes.
+ *
+ * @since 6
+ */
+typedef enum {
+    /** Low power */
+    OHOS_BLE_SCAN_MODE_LOW_POWER = 0x00,
+    /** Balance */
+    OHOS_BLE_SCAN_MODE_BALANCED = 0x01,
+    /** Low latency */
+    OHOS_BLE_SCAN_MODE_LOW_LATENCY = 0x02,
+    /** Duty cycle 2 */
+    OHOS_BLE_SCAN_MODE_OP_P2_60_3000 = 0x03,
+    /** Duty cycle 10 */
+    OHOS_BLE_SCAN_MODE_OP_P10_60_600 = 0x04,
+    /** Duty cycle 25 */
+    OHOS_BLE_SCAN_MODE_OP_P25_60_240 = 0x05,
+    /** Duty cycle 100 */
+    OHOS_BLE_SCAN_MODE_OP_P100_1000_1000 = 0x06
+} BleScanMode;
+
+/**
  * @brief Enumerates policies for filtering advertisements in a BLE scan.
  *
  * @since 6
@@ -322,6 +344,22 @@ typedef struct {
     /** Policy for filtering the scan result, as enumerated in {@link BleScanFilterPolicy} */
     unsigned char scanFilterPolicy;
 } BleScanParams;
+
+/**
+ * @brief Defines BLE scan configurations.
+ *
+ * @since 6
+ */
+typedef struct {
+    /** Repport delay time */
+    long reportDelayMillis;
+    /** Scan mode */
+    int scanMode;
+    /** Legacy */
+    bool legacy;
+    /** Phy */
+    int phy;
+} BleScanConfigs;
 
 /**
  * @brief Defines raw data for the BLE advertising and scan response.
@@ -645,6 +683,15 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func);
  * @since 6
  */
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam);
+
+/**
+ * @brief Starts a scan with BleScanConfigs.
+ *
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleStartScanEx(BleScanConfigs *configs);
 
 #ifdef __cplusplus
 }
