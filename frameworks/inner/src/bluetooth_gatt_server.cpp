@@ -762,6 +762,11 @@ int GattServer::SendResponse(
 GattServer::~GattServer()
 {
     HILOGI("enter");
+    if (pimpl->proxy_ == nullptr) {
+        HILOGE("proxy is null.");
+        return;
+    }
+
     if (pimpl->isRegisterSucceeded_) {
         pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
     }
