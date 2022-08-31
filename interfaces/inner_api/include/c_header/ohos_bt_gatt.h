@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -346,6 +346,36 @@ typedef struct {
 } BleScanParams;
 
 /**
+ * @brief Defines BLE scan native filter.
+ *
+ * @since 6
+ */
+typedef struct {
+    /** Handling advertisments sent by advertisers with specific address */
+    char *address;
+    /** Handling advertisments sent by advertisers with specific deviceName */
+    char *deviceName;
+    /** Handling advertisments sent by advertisers with specific service uuid */
+    unsigned char serviceUuid[36];
+    /** Handling advertisments sent by advertisers with specific service uuid mask */
+    unsigned char serviceUuidMask[36];
+    /** The length of the service data */
+    unsigned int serviceDataLength;
+    /** Handling advertisments sent by advertisers with specific serviceData */
+    unsigned char *serviceData;
+    /** Handling advertisments sent by advertisers with specific serviceDataMask */
+    unsigned char *serviceDataMask;
+    /** The length of the manufacture data */
+    unsigned int manufactureDataLength;
+    /** Handling advertisments sent by advertisers with specific manufactureData */
+    unsigned char *manufactureData;
+    /** Handling advertisments sent by advertisers with specific manufactureDataMask */
+    unsigned char *manufactureDataMask;
+    /** Handling advertisments sent by advertisers with specific manufactureId */
+    unsigned short manufactureId;
+} BleScanNativeFilter;
+
+/**
  * @brief Defines BLE scan configurations.
  *
  * @since 6
@@ -650,6 +680,30 @@ int BleSetScanParameters(int clientId, BleScanParams *param);
  * @since 6
  */
 int BleStartScan(void);
+
+/**
+ * @brief Starts a scan with specific parameters and filters.
+ *
+ * @param params Indicates the pointer to the scan parameters. For details, see {@link BleScanParams}.
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleStartFilterScan(BleScanParams *params, BleScanNativeFilter *filter, unsigned int filterSize);
+
+/**
+ * @brief Gets BLE scan mode.
+ *
+ * @param scanInterval Scan interval. It is calculated as follows: [N * 0.625 ms],
+ * where N indicates the value of this field.
+ * @param scanWindow Scan window. It is calculated as follows: [N * 0.625 ms],
+ * where N indicates the value of this field.
+ * @return Returns scan mode. For details, see {@link SCAN_MODE}.
+ * @since 6
+ */
+int GetBleScanMode(unsigned short scanInterval, unsigned short scanWindow);
 
 /**
  * @brief Stops a scan.

@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -181,6 +181,30 @@ ohos_unittest("btfw_gatt_characteristic_unit_test") {
   ]
 }
 
+ohos_unittest("btfw_gatt_unit_test") {
+  module_out_path = module_output_path
+
+  include_dirs =
+      [ "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header" ]
+
+  sources = [ "gatt_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
+    "//base/global/resource_management/frameworks/resmgr:global_resmgr",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
 ################################################################################
 group("unittest") {
   testonly = true
@@ -195,6 +219,7 @@ group("unittest") {
       ":btfw_gatt_manager_unit_test",
       ":btfw_gatt_server_unit_test",
       ":btfw_gatt_service_unit_test",
+      ":btfw_gatt_unit_test",
     ]
   }
 }
