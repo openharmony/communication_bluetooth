@@ -484,7 +484,11 @@ bool HfpAgSystemInterface::IsRinging() const
 void HfpAgSystemInterface::AgTelephonyObserver::OnNetworkStateUpdated(int32_t slotId,
     const sptr<NetworkState> &networkState)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    HILOGI("[HFP AG] slotId: %{public}d", slotId);
+    if (networkState == nullptr) {
+        HILOGE("[HFP AG] networkState is null");
+        return;
+    }
     interface_.slotId_ = slotId;
     interface_.operatorName_ = networkState->GetLongOperatorName();
     interface_.OnSubscriptionStateChanged(static_cast<std::underlying_type<RegServiceState>::type>(
