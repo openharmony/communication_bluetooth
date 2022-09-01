@@ -181,13 +181,13 @@ ohos_unittest("btfw_gatt_characteristic_unit_test") {
   ]
 }
 
-ohos_unittest("btfw_gatt_unit_test") {
+ohos_unittest("btfw_gatt_c_unit_test") {
   module_out_path = module_output_path
 
   include_dirs =
       [ "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header" ]
 
-  sources = [ "gatt_test.cpp" ]
+  sources = [ "gatt_c_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -213,13 +213,13 @@ group("unittest") {
 
   if (is_phone_product) {
     deps += [
+      ":btfw_gatt_c_unit_test",
       ":btfw_gatt_characteristic_unit_test",
       ":btfw_gatt_client_unit_test",
       ":btfw_gatt_descriptor_unit_test",
       ":btfw_gatt_manager_unit_test",
       ":btfw_gatt_server_unit_test",
       ":btfw_gatt_service_unit_test",
-      ":btfw_gatt_unit_test",
     ]
   }
 }
