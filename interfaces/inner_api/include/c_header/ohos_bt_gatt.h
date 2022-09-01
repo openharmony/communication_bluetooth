@@ -718,7 +718,6 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
 /**
  * @brief Starts a scan with BleScanConfigs.
- * 
  * If don't need ble scan filter, set BleScanNativeFilter nullptr or filterSize zero.
  *
  * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
