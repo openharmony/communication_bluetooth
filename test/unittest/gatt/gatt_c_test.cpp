@@ -24,7 +24,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Bluetooth {
-class GattTest : public testing::Test {
+class GattCTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -32,43 +32,70 @@ public:
     void TearDown();
 };
 
-void GattTest::SetUpTestCase(void) {}
+void GattCTest::SetUpTestCase(void) {}
 
-void GattTest::TearDownTestCase(void) {}
+void GattCTest::TearDownTestCase(void) {}
 
-void GattTest::SetUp() {}
+void GattCTest::SetUp() {}
 
-void GattTest::TearDown() {}
+void GattCTest::TearDown() {}
 
 /*
- * @tc.name: GattTest_001
- * @tc.desc: Test BleStartFilterScan when g_BleCentralManager is null
+ * @tc.name: GattCTest_001
+ * @tc.desc: Test BleStartScanEx when g_BleCentralManager or BleScanConfigs is nullptr
  * @tc.type: FUNC
  * @tc.require: issueI5OH5C
 */
-HWTEST_F(GattTest, GattTest_001, TestSize.Level1)
+HWTEST_F(GattCTest, GattCTest_001, TestSize.Level1)
 {
-    BleScanParams params;
+    BleScanConfigs configs;
     BleScanNativeFilter filter[1];
     int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
-    int res = BleStartFilterScan(&params, filter, filterSize);
-    EXPECT_EQ(res, 1);
+    int res = BleStartScanEx(&configs, filter, filterSize);
+    EXPECT_EQ(res, OHOS_BT_STATUS_FAIL);
+
+    BtGattCallbacks btGattCallbacks;
+    BleGattRegisterCallbacks(&btGattCallbacks);
+    res = BleStartScanEx(nullptr, filter, filterSize);
+    EXPECT_EQ(res, OHOS_BT_STATUS_FAIL);
 }
 
 /*
- * @tc.name: GattTest_002
- * @tc.desc: Test BleStartFilterScan success status
+ * @tc.name: GattCTest_002
+ * @tc.desc: Test BleStartScanEx when BleScanNativeFilter is null or filterSize is zero
  * @tc.type: FUNC
  * @tc.require: issueI5OH5C
 */
-HWTEST_F(GattTest, GattTest_002, TestSize.Level1)
+HWTEST_F(GattCTest, GattCTest_002, TestSize.Level1)
 {
-    BtGattCallbacks btGattCallbacks;
-    BleGattRegisterCallbacks(&btGattCallbacks);
-    BleScanParams params;
-    params.scanInterval = 3000;
-    params.scanWindow = 60;
-    params.scanPhy = PHY_LE_1M;
+    BleScanConfigs configs;
+    configs.reportDelayMillis = 0;
+    configs.scanMode = SCAN_MODE_LOW_POWER;
+    configs.legacy = true;
+    configs.phy = PHY_LE_ALL_SUPPORTED;
+
+    BleScanNativeFilter filter[1];
+    int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
+    int res = BleStartScanEx(&configs, nullptr, filterSize);
+    EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
+
+    res = BleStartScanEx(&configs, filter, 0);
+    EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
+}
+
+/*
+ * @tc.name: GattCTest_003
+ * @tc.desc: Test BleStartScanEx success status
+ * @tc.type: FUNC
+ * @tc.require: issueI5OH5C
+*/
+HWTEST_F(GattCTest, GattCTest_003, TestSize.Level1)
+{
+    BleScanConfigs configs;
+    configs.reportDelayMillis = 0;
+    configs.scanMode = SCAN_MODE_LOW_POWER;
+    configs.legacy = true;
+    configs.phy = PHY_LE_ALL_SUPPORTED;
 
     BleScanNativeFilter filter[1];
     char testDeviceName[5] = "test";
@@ -91,48 +118,12 @@ HWTEST_F(GattTest, GattTest_002, TestSize.Level1)
     filter[0].manufactureDataLength = 1;
     filter[0].manufactureId = 0;
     int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
-    int res = BleStartFilterScan(&params, filter, filterSize);
+    int res = BleStartScanEx(&configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 
-    params.scanPhy = PHY_LE_ALL_SUPPORTED;
-    res = BleStartFilterScan(&params, filter, filterSize);
-    EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
-
-    res = BleStartFilterScan(NULL, filter, filterSize);
-    EXPECT_EQ(res, 1);
-    
-    res = BleStartFilterScan(&params, NULL, 0);
-    EXPECT_EQ(res, 1);
-}
-
-/*
- * @tc.name: GattTest_003
- * @tc.desc: Test BleStartFilterScan when serviceData or manufactureData is null
- * @tc.type: FUNC
- * @tc.require: issueI5OH5C
-*/
-HWTEST_F(GattTest, GattTest_003, TestSize.Level1)
-{
-    BleScanParams params;
-    params.scanInterval = 3000;
-    params.scanWindow = 60;
-
-    BleScanNativeFilter filter[1];
-    char testDeviceName[5] = "test";
-    filter[0].deviceName = testDeviceName;
-    memcpy_s(filter[0].serviceUuid, sizeof(filter[0].serviceUuid), "AABBCC", sizeof("AABBCC"));
-    memcpy_s(filter[0].serviceUuidMask, sizeof(filter[0].serviceUuidMask), "AABBCC", sizeof("AABBCC"));
-    unsigned char test1[1];
-    unsigned char test2[1];
-    filter[0].serviceData = NULL;
-    filter[0].serviceDataMask = test1;
-    filter[0].manufactureData = NULL;
-    filter[0].manufactureDataMask = test2;
-    filter[0].serviceDataLength = 0;
-    filter[0].manufactureDataLength = 0;
-    filter[0].manufactureId = 0;
-    int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
-    int res = BleStartFilterScan(&params, filter, filterSize);
+    filter[0].serviceData = nullptr;
+    filter[0].manufactureData = nullptr;
+    res = BleStartScanEx(&configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 }
 }  // namespace Bluetooth
