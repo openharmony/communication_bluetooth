@@ -684,30 +684,6 @@ int BleSetScanParameters(int clientId, BleScanParams *param);
 int BleStartScan(void);
 
 /**
- * @brief Starts a scan with specific parameters and filters.
- *
- * @param params Indicates the pointer to the scan parameters. For details, see {@link BleScanParams}.
- * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
- * @param filterSize Indicates the number of the scan filter.
- * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
- * returns an error code defined in {@link BtStatus} otherwise.
- * @since 6
- */
-int BleStartFilterScan(BleScanParams *params, BleScanNativeFilter *filter, unsigned int filterSize);
-
-/**
- * @brief Gets BLE scan mode.
- *
- * @param scanInterval Scan interval. It is calculated as follows: [N * 0.625 ms],
- * where N indicates the value of this field.
- * @param scanWindow Scan window. It is calculated as follows: [N * 0.625 ms],
- * where N indicates the value of this field.
- * @return Returns scan mode. For details, see {@link SCAN_MODE}.
- * @since 6
- */
-int GetBleScanMode(unsigned short scanInterval, unsigned short scanWindow);
-
-/**
  * @brief Stops a scan.
  *
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is stopped;
