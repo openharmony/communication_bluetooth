@@ -43,6 +43,8 @@
 extern "C" {
 #endif
 
+#define OHOS_BD_UUID_LEN 36
+
 /**
  * @brief Enumerates advertising filtering parameters.
  *
@@ -356,9 +358,9 @@ typedef struct {
     /** Handling advertisments sent by advertisers with specific deviceName */
     char *deviceName;
     /** Handling advertisments sent by advertisers with specific service uuid */
-    unsigned char serviceUuid[36];
+    unsigned char serviceUuid[OHOS_BD_UUID_LEN];
     /** Handling advertisments sent by advertisers with specific service uuid mask */
-    unsigned char serviceUuidMask[36];
+    unsigned char serviceUuidMask[OHOS_BD_UUID_LEN];
     /** The length of the service data */
     unsigned int serviceDataLength;
     /** Handling advertisments sent by advertisers with specific serviceData */
