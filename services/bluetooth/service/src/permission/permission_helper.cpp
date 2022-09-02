@@ -29,6 +29,8 @@ int PermissionHelper::VerifyPermission(const std::string &permissionName, const 
 
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_NATIVE) {
         result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
+    } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_SHELL) {
+        result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
     } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_HAP) {
         result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     } else {
@@ -49,6 +51,8 @@ int PermissionHelper::VerifyPermission(const std::string &permissionName, const 
     int result;
 
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_NATIVE) {
+        result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
+    } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_SHELL) {
         result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
     } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_HAP) {
         result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
