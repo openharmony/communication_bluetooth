@@ -19,6 +19,7 @@
 #include <cstdint>
 #include "accesstoken_kit.h"
 
+namespace OHOS {
 namespace bluetooth {
 using namespace OHOS::Security::AccessToken;
 
@@ -32,5 +33,6 @@ public:
     static int VerifyUseBluetoothPermission(const std::uint32_t  &tokenID);
     static int VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID);
 };
-}
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif

@@ -18,6 +18,7 @@
 #include "transport_l2cap.h"
 #include "transport_rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::unique_ptr<DataTransport> TransportFactory::CreateRfcommTransport(
     const RawAddress *addr, uint8_t scn, uint16_t mtu, DataTransportObserver &observer, utility::Dispatcher &dispatcher)
@@ -32,3 +33,4 @@ std::unique_ptr<DataTransport> TransportFactory::CreateL2capTransport(L2capTrans
     return std::make_unique<L2capTransport>(createInfo);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

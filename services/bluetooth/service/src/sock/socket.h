@@ -31,6 +31,7 @@
 #include "socket_sdp_client.h"
 #include "socket_sdp_server.h"
 
+namespace OHOS {
 namespace bluetooth {
 // result of sending data to app
 typedef enum {
@@ -331,4 +332,5 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // SOCKET_H

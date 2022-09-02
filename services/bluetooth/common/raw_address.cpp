@@ -20,6 +20,7 @@
 #include "securec.h"
 #include "string"
 
+namespace OHOS {
 namespace bluetooth {
 void RawAddress::ConvertToUint8(uint8_t *dst, const size_t size) const
 {
@@ -75,3 +76,4 @@ bool RawAddress::operator==(const RawAddress &rhs) const
     return (address_.compare(rhs.address_) == 0);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

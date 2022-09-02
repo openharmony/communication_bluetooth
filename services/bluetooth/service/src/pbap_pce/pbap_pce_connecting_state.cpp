@@ -21,6 +21,7 @@
 #include "power_manager.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 PceConnectingState::PceConnectingState(
     const std::string &name, PbapPceStateMachine &stm, BaseObserverList<IPbapPceObserver> &observerMgrList)
@@ -356,3 +357,4 @@ void PceConnectingState::SendRequest() const
     PBAP_PCE_LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -22,6 +22,7 @@
 
 #include "bt_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief IProfile Map Event Report
@@ -489,5 +490,6 @@ struct IProfileSetMessageStatus {
     std::string extendedData {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MCE_PARAMETER_H

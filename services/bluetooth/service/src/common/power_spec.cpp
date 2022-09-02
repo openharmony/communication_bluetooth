@@ -15,6 +15,7 @@
 
 #include "power_spec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::map<RequestStatus, PowerInfo> PowerSpec::MODE_SPEC_AG = {
     {RequestStatus::CONNECT_ON, PowerInfo(PowerModeLevel::LEVEL_LOW, SNIFF_DELAYSET_TIMEOUT_7000_MS)},
@@ -260,3 +261,4 @@ PowerSsrParam PowerSpec::GetPowerSsrParam(PowerSsrLevel level)
     return PowerSsrParam(0, 0, 0);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -29,6 +29,7 @@
 
 #include "gavdp/a2dp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a2dp source functions called by Framework API.
@@ -65,4 +66,5 @@ private:
     static uint8_t g_role;         /// profile role.
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_SRC_SERVICE_H

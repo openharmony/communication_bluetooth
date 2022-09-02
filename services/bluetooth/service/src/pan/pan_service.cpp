@@ -16,6 +16,7 @@
 #include "pan_service.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 PanService::PanService() : utility::Context(PROFILE_NAME_PAN, "1.0")
 {
@@ -533,3 +534,4 @@ void PanService::ProcessDefaultEvent(const PanMessage &event) const
 }
 REGISTER_CLASS_CREATOR(PanService);
 }  // namespace bluetooth
+}  // namespace OHOS

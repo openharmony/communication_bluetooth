@@ -30,6 +30,7 @@
 #include "string"
 #include "vector"
 
+namespace OHOS {
 namespace bluetooth {
 IPbapPullPhoneBookParam::IPbapPullPhoneBookParam()
     : name_(u""),
@@ -553,3 +554,4 @@ void IPbapPhoneBookData::Load(std::vector<uint8_t> &retResult)
     return;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -27,6 +27,7 @@
 #include "raw_address.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for HFP AG data connection.
@@ -257,4 +258,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgDataConnection);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_DATA_CONNECTION_H

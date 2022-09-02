@@ -19,6 +19,7 @@
 #include "log.h"
 #include "memory.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::recursive_mutex g_deviceMutex {};
 
@@ -113,3 +114,4 @@ uint16_t A2dpDeviceInfo::GetHandle() const
     return handle_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

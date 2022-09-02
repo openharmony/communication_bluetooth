@@ -45,6 +45,7 @@
 #include "message.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief MceInstanceState Type
@@ -458,4 +459,5 @@ private:
     };
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_INSTANCE_STM_H

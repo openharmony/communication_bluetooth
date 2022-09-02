@@ -39,6 +39,7 @@
 #include "base_def.h"
 #include "hid_host_statemachine.h"
 
+namespace OHOS {
 namespace bluetooth {
 class HidHostService : public IProfileHidHost, public utility::Context {
 public:
@@ -134,4 +135,5 @@ private:
     };
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // HID_HOST_SERVICE_H

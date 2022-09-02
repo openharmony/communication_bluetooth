@@ -19,6 +19,7 @@
 #include <cstdint>
 #include "gatt_data.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattConnection {
     uint16_t connectionHandle_ = 0;
@@ -62,5 +63,6 @@ public:
     }
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif // GATT_CONNECTION_OBSERVER_H

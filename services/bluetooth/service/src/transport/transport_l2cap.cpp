@@ -17,6 +17,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::map<uint16_t, L2capTransport *> L2capTransport::g_clientTransportMap {};
 std::recursive_mutex L2capTransport::g_clientTransportMutex;
@@ -713,3 +714,4 @@ void L2capTransport::TransportRemoteBusyCallbackNative(L2capTransport *transport
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

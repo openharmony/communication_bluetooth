@@ -19,6 +19,7 @@
 #include "dispatcher.h"
 #include "transport.h"
 
+namespace OHOS {
 namespace bluetooth {
 // Transport event declarations
 // The event is triggered when connection failed.
@@ -55,4 +56,5 @@ typedef struct {
     utility::Dispatcher &dispatcher;
 } L2capTransportInfo;
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // TRANSPORT_DEF_H

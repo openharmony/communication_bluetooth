@@ -17,6 +17,7 @@
 
 #include "hfp_ag_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 int HfpAgGapClient::RegisterServiceSecurity(const BtAddr &address, uint8_t scn)
 {
@@ -40,3 +41,4 @@ int HfpAgGapClient::DeregisterServiceSecurity(const BtAddr &address) const
     return BT_NO_ERROR;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

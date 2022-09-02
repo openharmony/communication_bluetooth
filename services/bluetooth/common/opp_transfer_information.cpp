@@ -15,6 +15,7 @@
 
 #include "opp_transfer_information.h"
 
+namespace OHOS {
 namespace bluetooth {
 int IOppTransferInformation::GetId() const
 {
@@ -136,3 +137,4 @@ void IOppTransferInformation::SetTotalBytes(uint64_t totalBytes)
     totalBytes_ = totalBytes;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -18,6 +18,7 @@
 
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief obsever for pbap server
@@ -153,4 +154,5 @@ public:
         const RawAddress &device, const std::string &password, const std::string userId = "") = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_PBAP_PSE_H

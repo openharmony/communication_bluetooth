@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class IPbapPullPhoneBookParamAdapter {
 public:
@@ -77,7 +77,7 @@ public:
 
 private:
     bluetooth::IPbapPullvCardListingParam data_;
-};  
+};
 
 class IPbapPullvCardEntryParamAdapter {
 public:

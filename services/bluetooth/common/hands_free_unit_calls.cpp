@@ -17,6 +17,7 @@
 #include <ctime>
 #include "string"
 
+namespace OHOS {
 namespace bluetooth {
 HandsFreeUnitCalls::HandsFreeUnitCalls(const std::string &device, int id, int state, const std::string &number,
     bool multiParty, bool outgoing, bool inBandRing)
@@ -93,4 +94,5 @@ void HandsFreeUnitCalls::SetMultiParty(bool multiParty)
 {
     multiParty_ = multiParty;
 }
-} // namespace OHOS
+}  // namespace bluetooth
+}  // namespace OHOS

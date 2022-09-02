@@ -24,6 +24,7 @@
 #include "state_machine.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for opp state machine.
@@ -175,4 +176,5 @@ public:
     virtual bool Dispatch(const utility::Message &msg) override;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_STATEMACHINE_H

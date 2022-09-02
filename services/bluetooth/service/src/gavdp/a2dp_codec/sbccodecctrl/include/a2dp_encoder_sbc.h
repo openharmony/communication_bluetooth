@@ -25,6 +25,7 @@
 #include "../../include/a2dp_codec_wrapper.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /* A2DP sbc max mtu size.(byte) */
 constexpr int A2DP_SBC_MAX_PACKET_SIZE = 6144;
@@ -154,5 +155,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(A2dpSbcEncoder);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // A2DP_ENCODER_SBC_H

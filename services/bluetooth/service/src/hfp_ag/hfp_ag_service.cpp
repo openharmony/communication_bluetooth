@@ -23,6 +23,7 @@
 #include "profile_service_manager.h"
 #include "stub/telephone_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgService::HfpAgService() : utility::Context(PROFILE_NAME_HFP_AG, "1.7.1")
 {
@@ -1028,3 +1029,4 @@ void HfpAgService::ModifyActiveDevice(const std::string &newAddress)
 
 REGISTER_CLASS_CREATOR(HfpAgService);
 }  // namespace bluetooth
+}  // namespace OHOS

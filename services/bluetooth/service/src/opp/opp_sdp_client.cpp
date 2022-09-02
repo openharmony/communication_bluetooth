@@ -20,6 +20,7 @@
 #include "opp_service.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppSdpClient::OppSdpClient(std::string address)
 {
@@ -122,3 +123,4 @@ uint16_t OppSdpClient::FindL2capPSM(const SdpService &serviceAry)
     return psm;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

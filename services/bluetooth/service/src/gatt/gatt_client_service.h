@@ -27,6 +27,7 @@
 #include "interface_profile_gatt_client.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattClientService : public IProfileGattClient, public utility::Context {
 public:
@@ -67,5 +68,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !GATT_CLIENT_SERVICE_H

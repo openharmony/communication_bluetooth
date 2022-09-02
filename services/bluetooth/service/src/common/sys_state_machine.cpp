@@ -17,6 +17,7 @@
 #include "adapter_manager.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 void SysStateMachine::Init(AdapterManager &am)
 {
@@ -207,3 +208,4 @@ bool SysFactoryResettingState::Dispatch(const utility::Message &msg)
     return true;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

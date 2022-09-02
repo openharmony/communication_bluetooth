@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This SocketUtil class provides a set of methods that send
@@ -47,5 +48,6 @@ public:
     static int SocketSendFd(int sockFd, const uint8_t *buf, int len, int acceptFd);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // SOCKET_UTIL_H

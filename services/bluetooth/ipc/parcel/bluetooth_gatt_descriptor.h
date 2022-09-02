@@ -21,12 +21,12 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothGattDescriptor : public Parcelable, public ::bluetooth::Descriptor {
+class BluetoothGattDescriptor : public Parcelable, public bluetooth::Descriptor {
 public:
     BluetoothGattDescriptor() = default;
-    BluetoothGattDescriptor(const ::bluetooth::Descriptor &other) : ::bluetooth::Descriptor(other)
+    BluetoothGattDescriptor(const bluetooth::Descriptor &other) : bluetooth::Descriptor(other)
     {}
-    BluetoothGattDescriptor(const BluetoothGattDescriptor &other) : ::bluetooth::Descriptor(other)
+    BluetoothGattDescriptor(const BluetoothGattDescriptor &other) : bluetooth::Descriptor(other)
     {}
     ~BluetoothGattDescriptor() = default;
 

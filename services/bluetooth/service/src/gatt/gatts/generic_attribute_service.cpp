@@ -23,6 +23,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const size_t GenericAttributeService::CLIENT_CHARACTERISTIC_CONFIGURATION_VALUE_LENGTH = 0x02;
 const size_t GenericAttributeService::SERVICE_CHANGED_VALUE_LENGTH = 0x04;
@@ -279,3 +280,4 @@ std::unique_ptr<uint8_t[]> GenericAttributeService::BuildValue(uint16_t startHan
     return value;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

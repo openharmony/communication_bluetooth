@@ -18,6 +18,7 @@
 #include <cstring>
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 ClassicRemoteDevice::ClassicRemoteDevice()
 {
@@ -375,3 +376,4 @@ bool ClassicRemoteDevice::CheckCod(uint32_t cod) const
     return (tmpCod & CLASS_OF_DEVICE_MASK) == cod;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

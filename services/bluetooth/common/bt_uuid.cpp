@@ -25,6 +25,7 @@
 #include "string"
 #include "sys/time.h"
 
+namespace OHOS {
 namespace bluetooth {
 Uuid Uuid::Random()
 {
@@ -215,3 +216,4 @@ bool Uuid::operator!=(const Uuid &rhs) const
     return (uuid_ != rhs.uuid_);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

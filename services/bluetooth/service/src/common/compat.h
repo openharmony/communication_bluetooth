@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 enum class CompatType : int {
     COMPAT_DISABLE_BLE_SECURE_CONNECTIONS,
@@ -37,5 +38,6 @@ public:
 private:
     static const std::map<CompatType, std::vector<std::string>> COMPAT_DATA;
 };
-};      // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif  // COMPAT_H

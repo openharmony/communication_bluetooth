@@ -27,6 +27,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 class GenericAccessService {
 public:
@@ -79,5 +80,6 @@ private:
     void OnScanModeChanged(int mode);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GENERIC_ACCESS_SERVICE_H

@@ -42,6 +42,7 @@
 #include "map_mce_parameter.h"
 #include "map_mce_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 class MapMceInstanceClient;
 #define MCE_DEBUG_SEND_DATA
@@ -304,13 +305,13 @@ public:
     ~MapMceRequestSetNotificationFilter();
     /**
      * @brief Get the Request Type object
-     * @return MceRequestType 
+     * @return MceRequestType
      */
     MceRequestType GetRequestType() override;
     /**
      * @brief  Send Request process
      * @param  obexIns          obex client
-     * @return int 
+     * @return int
      */
     int SendRequest(ObexMpClient &obexIns) override;
     /**
@@ -318,7 +319,7 @@ public:
      * @param  clientInst       obex client object
      * @param  resp             ObexHeader
      * @param  retAction        action observer data
-     * @return int 
+     * @return int
      */
     int ProcessResponse(
         MapMceInstanceClient &clientInst, const ObexHeader &resp, MapRequestResponseAction &retAction) override;
@@ -343,13 +344,13 @@ public:
     ~MapMceRequestSetNotificationRegistration();
     /**
      * @brief Get the Request Type object
-     * @return MceRequestType 
+     * @return MceRequestType
      */
     MceRequestType GetRequestType() override;
     /**
      * @brief  Send Request process
      * @param  obexIns          obex client
-     * @return int 
+     * @return int
      */
     int SendRequest(ObexMpClient &obexIns) override;
     /**
@@ -357,7 +358,7 @@ public:
      * @param  clientInst       obex client object
      * @param  resp             ObexHeader
      * @param  retAction        action observer data
-     * @return int 
+     * @return int
      */
     int ProcessResponse(
         MapMceInstanceClient &clientInst, const ObexHeader &resp, MapRequestResponseAction &retAction) override;
@@ -382,13 +383,13 @@ public:
     ~MapMceRequestGetMasInstanceInformation();
     /**
      * @brief Get the Request Type object
-     * @return MceRequestType 
+     * @return MceRequestType
      */
     MceRequestType GetRequestType() override;
     /**
      * @brief  Send Request process
      * @param  obexIns          obex client
-     * @return int 
+     * @return int
      */
     int SendRequest(ObexMpClient &obexIns) override;
     /**
@@ -396,7 +397,7 @@ public:
      * @param  clientInst       obex client object
      * @param  resp             ObexHeader
      * @param  retAction        action observer data
-     * @return int 
+     * @return int
      */
     int ProcessResponse(
         MapMceInstanceClient &clientInst, const ObexHeader &resp, MapRequestResponseAction &retAction) override;
@@ -423,13 +424,13 @@ public:
     ~MapMceRequestGetFolderListing();
     /**
      * @brief Get the Request Type object
-     * @return MceRequestType 
+     * @return MceRequestType
      */
     MceRequestType GetRequestType() override;
     /**
      * @brief  Send Request process
      * @param  obexIns          obex client
-     * @return int 
+     * @return int
      */
     int SendRequest(ObexMpClient &obexIns) override;
     /**
@@ -437,7 +438,7 @@ public:
      * @param  clientInst       obex client object
      * @param  resp             ObexHeader
      * @param  retAction        action observer data
-     * @return int 
+     * @return int
      */
     int ProcessResponse(
         MapMceInstanceClient &clientInst, const ObexHeader &resp, MapRequestResponseAction &retAction) override;
@@ -471,13 +472,13 @@ public:
     ~MapMceRequestSetPath();
     /**
      * @brief Get the Request Type object
-     * @return MceRequestType 
+     * @return MceRequestType
      */
     MceRequestType GetRequestType() override;
     /**
      * @brief  Send Request process
      * @param  obexIns          obex client
-     * @return int 
+     * @return int
      */
     int SendRequest(ObexMpClient &obexIns) override;
     /**
@@ -485,7 +486,7 @@ public:
      * @param  clientInst       obex client object
      * @param  resp             ObexHeader
      * @param  retAction        action observer data
-     * @return int 
+     * @return int
      */
     int ProcessResponse(
         MapMceInstanceClient &clientInst, const ObexHeader &resp, MapRequestResponseAction &retAction) override;
@@ -655,4 +656,5 @@ private:
     IProfileGetMessagesListingParameters listParam_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_INSTANCE_REQUEST_H

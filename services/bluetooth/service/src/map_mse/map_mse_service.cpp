@@ -15,6 +15,7 @@
 
 #include "map_mse_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 const uint16_t MapMseService::GOEP_L2CAP_PSM_VALUE[LPSM_SIZE] = {
     0x1005, 0x1007, 0x1009, 0x100B, 0x100D, 0x100F, 0x1011, 0x1013, 0x1015, 0x1017, 0x1019, 0x101B
@@ -647,3 +648,4 @@ void MapMseService::DeregisterObserver(IMapMseObserver &mapMseObserver)
 }
 REGISTER_CLASS_CREATOR(MapMseService);
 }  // namespace bluetooth
+}  // namespace OHOS

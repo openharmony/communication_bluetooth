@@ -22,6 +22,7 @@
 #include "obex_utils.h"
 #include "transport/transport_l2cap.h"
 
+namespace OHOS {
 namespace bluetooth {
 ObexClient::ObexClientTransportObserver::ObexClientTransportObserver(ObexClient &obexClient) : obexClient_(obexClient)
 {}
@@ -681,3 +682,4 @@ void ObexClientObserver::OnBusy(ObexClient &client, bool isBusy)
     OBEX_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

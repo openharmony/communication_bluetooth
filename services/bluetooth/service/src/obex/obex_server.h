@@ -26,6 +26,7 @@
 #include "obex_socket_transport.h"
 #include "obex_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief ObexServerConfig
@@ -139,4 +140,5 @@ protected:
     std::unique_ptr<ObexPrivateServer> l2capServer_ = nullptr;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_SERVER_H

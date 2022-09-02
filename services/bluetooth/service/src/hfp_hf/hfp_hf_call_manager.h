@@ -22,6 +22,7 @@
 
 #include "hands_free_unit_calls.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods that is used to process the current calls.
@@ -99,4 +100,5 @@ private:
     std::map<int, HandsFreeUnitCalls> updateCalls_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_CALL_MANAGER_H

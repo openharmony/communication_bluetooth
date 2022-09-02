@@ -23,6 +23,7 @@
 #include "interface_profile.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define SNIFF_LEVEL_LOW_MAX_INTERVAL 800
 #define SNIFF_LEVEL_LOW_MIN_INTERVAL 400
@@ -264,6 +265,7 @@ private:
     static const std::map<std::string, std::map<RequestStatus, PowerSsrLevel>> SSR_SPEC;
     static const std::map<PowerSsrLevel, PowerSsrParam> POWER_SSR_PARAMS;
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // POWER_SPEC_H

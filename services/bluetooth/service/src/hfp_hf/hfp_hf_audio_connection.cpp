@@ -20,6 +20,7 @@
 #include "raw_address.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::vector<HfpHfAudioConnection::AudioDevice> HfpHfAudioConnection::g_audioDevices;
 
@@ -440,3 +441,4 @@ void HfpHfAudioConnection::OnWriteVoiceSettingCompleted(uint8_t status, void *co
     LOG_INFO("[HFP HF]%{public}s(): status[%hhu]", __FUNCTION__, status);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

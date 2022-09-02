@@ -26,6 +26,7 @@
 #include "ble_scan_filter/include/ble_scan_filter_lsf.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 constexpr char BLE_SCAN_FILTER_LIB_NAME[] = "libble_scan_filter.z.so";
 
@@ -1893,3 +1894,4 @@ void BleCentralManagerImpl::HandleGapExScanEvent(const BLE_GAP_CB_EVENT &event, 
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

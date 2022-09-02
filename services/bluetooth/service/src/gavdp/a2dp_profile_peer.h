@@ -35,6 +35,7 @@
 #include "timer.h"
 #include "../stack/platform/include/queue.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief The stream information associated with the a2dp profile.
@@ -588,7 +589,7 @@ public:
     void UpdatePeerEdr(uint8_t edr);
 
     bool SendPacket(const Packet *packet, size_t frames, uint32_t bytes, uint32_t pktTimeStamp) const;
-    
+
 private:
     BT_DISALLOW_COPY_AND_ASSIGN(A2dpProfilePeer);
     /**
@@ -715,4 +716,5 @@ private:
     bool reconfigTag_ = false;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_PROFILE_PEER_H

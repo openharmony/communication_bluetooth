@@ -22,6 +22,7 @@
 #include "opp_message.h"
 #include "opp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 int OppTransfer::currentTransferId_ = 0;
 
@@ -454,3 +455,4 @@ void OppTransfer::OnTransferPositionChange(size_t position) const
     OppService::GetService()->NotifyTransferStateChanged(*curretTransferInfo_);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

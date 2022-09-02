@@ -33,6 +33,7 @@
 
 #include <cstdint>
 
+namespace OHOS {
 namespace bluetooth {
 enum MceEnumType {
     MCE_MAX_OF_CONNECTED_DEVICES = 4,
@@ -87,4 +88,5 @@ struct MasInstanceConfig {
     int singleInstanceId_ = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_TYPES_H

@@ -77,7 +77,7 @@ bool BluetoothIProfileMapAction::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    action_ = ::bluetooth::MapActionType(action);
+    action_ = bluetooth::MapActionType(action);
 
     status = parcel.ReadInt32(supportedFeatures_);
     if (!status) {
@@ -117,7 +117,7 @@ bool BluetoothIProfileMasInstanceInfoList::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    ::bluetooth::IProfileMasInstanceInfo info;
+    bluetooth::IProfileMasInstanceInfo info;
     for (auto it = masInfoList.begin(); it != masInfoList.end(); it++) {
         info = *it;
         status = parcel.WriteString(info.OwnerUCI);
@@ -169,7 +169,7 @@ bool BluetoothIProfileMasInstanceInfoList::ReadFromParcel(Parcel &parcel)
         return status;
     }
 
-    ::bluetooth::IProfileMasInstanceInfo tempInfo;
+    bluetooth::IProfileMasInstanceInfo tempInfo;
     for (int i = 0; i < tempInt; i++) {
         status = parcel.ReadString(tempInfo.OwnerUCI);
         if (!status) {
@@ -197,7 +197,7 @@ bool BluetoothIProfileMasInstanceInfoList::ReadFromParcel(Parcel &parcel)
 }
 
 bool BluetoothIProfileBMessageStruct::WriteToParcelIProfileMapVcard(
-    Parcel &parcel, const ::bluetooth::IProfileMapVcard &vcard) const
+    Parcel &parcel, const bluetooth::IProfileMapVcard &vcard) const
 {
     bool status;
 
@@ -215,7 +215,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcelIProfileMapVcard(
     if (!status) {
         return status;
     }
-    
+
     status = parcel.WriteStringVector(vcard.EMAIL);
     if (!status) {
         return status;
@@ -240,7 +240,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcelIProfileMapVcard(
 }
 
 bool BluetoothIProfileBMessageStruct::ReadFromParcelIProfileMapVcard(
-    Parcel &parcel, ::bluetooth::IProfileMapVcard &vcard)
+    Parcel &parcel, bluetooth::IProfileMapVcard &vcard)
 {
     bool status;
 
@@ -283,10 +283,10 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcelIProfileMapVcard(
 }
 
 bool BluetoothIProfileBMessageStruct::WriteToParcel(
-    Parcel &parcel, const ::bluetooth::IProfileBMessageStruct &msgStruct) const
+    Parcel &parcel, const bluetooth::IProfileBMessageStruct &msgStruct) const
 {
     bool status;
-    ::bluetooth::IProfileMapVcard vcard;
+    bluetooth::IProfileMapVcard vcard;
 
     status = parcel.WriteString(msgStruct.version_property);
     if (!status) {
@@ -303,7 +303,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
         return status;
     }
 
-    status = parcel.WriteString16(msgStruct.folder_property);  
+    status = parcel.WriteString16(msgStruct.folder_property);
     if (!status) {
         return status;
     }
@@ -402,11 +402,11 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
 }
 
 bool BluetoothIProfileBMessageStruct::ReadFromParcel(
-    Parcel &parcel, ::bluetooth::IProfileBMessageStruct &msgStruct)
+    Parcel &parcel, bluetooth::IProfileBMessageStruct &msgStruct)
 {
     bool status;
     int tempInt;
-    ::bluetooth::IProfileMapVcard vcard;
+    bluetooth::IProfileMapVcard vcard;
     int i;
 
     status = parcel.ReadString(msgStruct.version_property);
@@ -418,15 +418,15 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     if (!status) {
         return status;
     }
-    msgStruct.readstatus_property = ::bluetooth::MapMessageStatus(tempInt);
+    msgStruct.readstatus_property = bluetooth::MapMessageStatus(tempInt);
 
     status = parcel.ReadInt32(tempInt);
     if (!status) {
         return status;
     }
-    msgStruct.type_property = ::bluetooth::MapMessageType(tempInt);
+    msgStruct.type_property = bluetooth::MapMessageType(tempInt);
 
-    status = parcel.ReadString16(msgStruct.folder_property);  
+    status = parcel.ReadString16(msgStruct.folder_property);
     if (!status) {
         return status;
     }
@@ -594,25 +594,25 @@ bool BluetoothIProfileSendMessageParameters::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    Attachment = ::bluetooth::MapAttachmentType(tempInt);
+    Attachment = bluetooth::MapAttachmentType(tempInt);
 
     status = parcel.ReadInt32(tempInt);
     if (!status) {
         return status;
     }
-    Charset = ::bluetooth::MapCharsetType(tempInt);
+    Charset = bluetooth::MapCharsetType(tempInt);
 
     status = parcel.ReadInt32(tempInt);
     if (!status) {
         return status;
     }
-    Transparent = ::bluetooth::MapOnOffType(tempInt);
+    Transparent = bluetooth::MapOnOffType(tempInt);
 
     status = parcel.ReadInt32(tempInt);
     if (!status) {
         return status;
     }
-    Retry = ::bluetooth::MapOnOffType(tempInt);
+    Retry = bluetooth::MapOnOffType(tempInt);
 
     status = parcel.ReadString(MessageHandle);
     if (!status) {
@@ -623,7 +623,7 @@ bool BluetoothIProfileSendMessageParameters::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    ModifyText = ::bluetooth::MapModifyTextType(tempInt);
+    ModifyText = bluetooth::MapModifyTextType(tempInt);
 
     BluetoothIProfileBMessageStruct bMessageStruct;
     status = bMessageStruct.ReadFromParcel(parcel, bmessage_);
@@ -866,16 +866,16 @@ bool BluetoothIProfileGetMessageParameters::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    Attachment = ::bluetooth::MapAttachmentType(tempInt);
+    Attachment = bluetooth::MapAttachmentType(tempInt);
 
     status = parcel.ReadInt32(tempInt);
     if (!status) {
         return status;
     }
-    Charset = ::bluetooth::MapCharsetType(tempInt);
+    Charset = bluetooth::MapCharsetType(tempInt);
 
     status = parcel.ReadInt32(tempInt);
-    FractionRequest = ::bluetooth::MapFractionRequestType(tempInt);
+    FractionRequest = bluetooth::MapFractionRequestType(tempInt);
     return status;
 }
 
@@ -883,7 +883,7 @@ bool BluetoothIProfileGetMessagesListingParameters::Marshalling(Parcel &parcel) 
 {
     bool status;
 
-    status = parcel.WriteString16(folder);  
+    status = parcel.WriteString16(folder);
     if (!status) {
         return status;
     }
@@ -976,7 +976,7 @@ bool BluetoothIProfileGetMessagesListingParameters::ReadFromParcel(Parcel &parce
 {
     bool status;
 
-    status = parcel.ReadString16(folder);  
+    status = parcel.ReadString16(folder);
     if (!status) {
         return status;
     }
@@ -1096,7 +1096,7 @@ bool BluetoothIProfileBMessage::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    FractionDeliver = ::bluetooth::MapFractionDeliverType(tmpInt);
+    FractionDeliver = bluetooth::MapFractionDeliverType(tmpInt);
 
     BluetoothIProfileBMessageStruct bMessageStruct;
     status = bMessageStruct.ReadFromParcel(parcel, bMessageParam_);
@@ -1113,7 +1113,7 @@ bool BluetoothIProfileBMessage::ReadFromParcel(Parcel &parcel)
 }
 
 bool BluetoothIProfileMessagesListing::WriteToParcelIProfileMessageOutline(
-    Parcel &parcel, const ::bluetooth::IProfileMessageOutline &outline) const
+    Parcel &parcel, const bluetooth::IProfileMessageOutline &outline) const
 {
     bool status;
 
@@ -1245,7 +1245,7 @@ BluetoothIProfileMessagesListing *BluetoothIProfileMessagesListing::Unmarshallin
 }
 
 bool BluetoothIProfileMessagesListing::ReadFromParcelIProfileMessageOutline(
-    Parcel &parcel, ::bluetooth::IProfileMessageOutline &outline)
+    Parcel &parcel, bluetooth::IProfileMessageOutline &outline)
 {
     bool status;
     int tmpInt;
@@ -1294,13 +1294,13 @@ bool BluetoothIProfileMessagesListing::ReadFromParcelIProfileMessageOutline(
     if (!status) {
         return status;
     }
-    outline.type = ::bluetooth::MapMessageType(tmpInt);
+    outline.type = bluetooth::MapMessageType(tmpInt);
 
     status = parcel.ReadInt32(tmpInt);
     if (!status) {
         return status;
     }
-    outline.receptionStatus = ::bluetooth::MapMsgReceptionStatus(tmpInt);
+    outline.receptionStatus = bluetooth::MapMsgReceptionStatus(tmpInt);
 
     status = parcel.ReadInt32(tmpInt);
     if (!status) {
@@ -1318,37 +1318,37 @@ bool BluetoothIProfileMessagesListing::ReadFromParcelIProfileMessageOutline(
     if (!status) {
         return status;
     }
-    outline.text = ::bluetooth::MapBoolType(tmpInt);
+    outline.text = bluetooth::MapBoolType(tmpInt);
 
     status = parcel.ReadInt32(tmpInt);
     if (!status) {
         return status;
     }
-    outline.read = ::bluetooth::MapMessageStatus(tmpInt);
+    outline.read = bluetooth::MapMessageStatus(tmpInt);
 
     status = parcel.ReadInt32(tmpInt);
     if (!status) {
         return status;
     }
-    outline.sent = ::bluetooth::MapBoolType(tmpInt);
+    outline.sent = bluetooth::MapBoolType(tmpInt);
 
     status = parcel.ReadInt32(tmpInt);
     if (!status) {
         return status;
     }
-    outline.protected_ = ::bluetooth::MapBoolType(tmpInt);
+    outline.protected_ = bluetooth::MapBoolType(tmpInt);
 
     status = parcel.ReadInt32(tmpInt);
     if (!status) {
         return status;
     }
-    outline.priority = ::bluetooth::MapBoolType(tmpInt);
+    outline.priority = bluetooth::MapBoolType(tmpInt);
 
     status = parcel.ReadInt32(tmpInt);
     if (!status) {
         return status;
     }
-    outline.delivery_status = ::bluetooth::MapMsgDeliveryStatus(tmpInt);
+    outline.delivery_status = bluetooth::MapMsgDeliveryStatus(tmpInt);
 
     status = parcel.ReadString(outline.conversation_id);
     if (!status) {
@@ -1364,7 +1364,7 @@ bool BluetoothIProfileMessagesListing::ReadFromParcelIProfileMessageOutline(
     if (!status) {
         return status;
     }
-    outline.direction = ::bluetooth::MapMsgDirection(tmpInt);
+    outline.direction = bluetooth::MapMsgDirection(tmpInt);
 
     status = parcel.ReadString(outline.attachment_mime_types);
     if (!status) {
@@ -1385,7 +1385,7 @@ bool BluetoothIProfileMessagesListing::Marshalling(Parcel &parcel) const
     }
 
     // save the IProfileMessageOutline
-    ::bluetooth::IProfileMessageOutline msgOutline;
+    bluetooth::IProfileMessageOutline msgOutline;
     for (auto it = messageOutlineList_.begin(); it != messageOutlineList_.end(); it++) {
         msgOutline = *it;
         status = WriteToParcelIProfileMessageOutline(parcel, msgOutline);
@@ -1439,7 +1439,7 @@ bool BluetoothIProfileMessagesListing::ReadFromParcel(Parcel &parcel)
     }
 
     // get the outline list
-    ::bluetooth::IProfileMessageOutline msgOutline;
+    bluetooth::IProfileMessageOutline msgOutline;
     for (int i = 0; i < outlineListSize; i++) {
         ReadFromParcelIProfileMessageOutline(parcel, msgOutline);
         messageOutlineList_.push_back(msgOutline);
@@ -1449,7 +1449,7 @@ bool BluetoothIProfileMessagesListing::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    messagesListingParam_.NewMessage = ::bluetooth::MapOnOffType(tmpInt);
+    messagesListingParam_.NewMessage = bluetooth::MapOnOffType(tmpInt);
 
     status = parcel.ReadString(messagesListingParam_.MseTime);
     if (!status) {
@@ -1484,7 +1484,7 @@ bool BluetoothIProfileMessagesListing::ReadFromParcel(Parcel &parcel)
 }
 
 bool BluetoothIProfileConversationListing::WriteToParcelIProfileConversation(
-    Parcel &parcel, const ::bluetooth::IProfileConversation &outline) const
+    Parcel &parcel, const bluetooth::IProfileConversation &outline) const
 {
     bool status;
 
@@ -1523,7 +1523,7 @@ bool BluetoothIProfileConversationListing::WriteToParcelIProfileConversation(
         return status;
     }
 
-    ::bluetooth::IProfileParticipant participant;
+    bluetooth::IProfileParticipant participant;
     for (auto it = outline.participantList_.begin(); it != outline.participantList_.end(); it++) {
         participant = *it;
         WriteToParcelIProfileParticipant(parcel, participant);
@@ -1533,7 +1533,7 @@ bool BluetoothIProfileConversationListing::WriteToParcelIProfileConversation(
 }
 
 bool BluetoothIProfileConversationListing::ReadFromParcelIProfileConversation(
-    Parcel &parcel, ::bluetooth::IProfileConversation &outline)
+    Parcel &parcel, bluetooth::IProfileConversation &outline)
 {
     bool status;
     int tmpInt;
@@ -1574,7 +1574,7 @@ bool BluetoothIProfileConversationListing::ReadFromParcelIProfileConversation(
     }
     participantListNum_ = tmpInt;
 
-    ::bluetooth::IProfileParticipant participant;
+    bluetooth::IProfileParticipant participant;
     for (int i = 0; i < participantListNum_; i++) {
         ReadFromParcelIProfileParticipant(parcel, participant);
         outline.participantList_.push_back(participant);
@@ -1584,7 +1584,7 @@ bool BluetoothIProfileConversationListing::ReadFromParcelIProfileConversation(
 }
 
 bool BluetoothIProfileConversationListing::WriteToParcelIProfileParticipant(
-    Parcel &parcel, const ::bluetooth::IProfileParticipant &outline) const
+    Parcel &parcel, const bluetooth::IProfileParticipant &outline) const
 {
     bool status;
 
@@ -1637,7 +1637,7 @@ bool BluetoothIProfileConversationListing::WriteToParcelIProfileParticipant(
 }
 
 bool BluetoothIProfileConversationListing::ReadFromParcelIProfileParticipant(
-    Parcel &parcel, ::bluetooth::IProfileParticipant &outline)
+    Parcel &parcel, bluetooth::IProfileParticipant &outline)
 {
     bool status;
 
@@ -1698,7 +1698,7 @@ bool BluetoothIProfileConversationListing::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    ::bluetooth::IProfileConversation conversation;
+    bluetooth::IProfileConversation conversation;
     for (auto it = conversationOutlineList_.begin(); it != conversationOutlineList_.end(); it++) {
         conversation = *it;
         WriteToParcelIProfileConversation(parcel, conversation);
@@ -1763,7 +1763,7 @@ bool BluetoothIProfileConversationListing::ReadFromParcel(Parcel &parcel)
     }
     conversationOutlineListNum_ = tmpInt;
 
-    ::bluetooth::IProfileConversation conversation;
+    bluetooth::IProfileConversation conversation;
     for (int i = 0; i < conversationOutlineListNum_; i++) {
         ReadFromParcelIProfileConversation(parcel, conversation);
         conversationOutlineList_.push_back(conversation);
@@ -1816,12 +1816,12 @@ bool BluetoothIProfileMapEventReport::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    status = parcel.WriteString16(folder);  
+    status = parcel.WriteString16(folder);
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteString16(old_folder);  
+    status = parcel.WriteString16(old_folder);
     if (!status) {
         return status;
     }
@@ -1962,7 +1962,7 @@ bool BluetoothIProfileMapEventReport::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    msg_type = ::bluetooth::MapMessageType(tempInt);
+    msg_type = bluetooth::MapMessageType(tempInt);
 
     status = parcel.ReadString(datetime);
     if (!status) {
@@ -1983,7 +1983,7 @@ bool BluetoothIProfileMapEventReport::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    priority = ::bluetooth::MapBoolType(tempInt);
+    priority = bluetooth::MapBoolType(tempInt);
 
     status = parcel.ReadString(conversation_name);
     if (!status) {
@@ -2019,7 +2019,7 @@ bool BluetoothIProfileMapEventReport::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-    read_status = ::bluetooth::MapMessageStatus(tempInt);
+    read_status = bluetooth::MapMessageStatus(tempInt);
 
     status = parcel.ReadString(extended_data);
     if (!status) {

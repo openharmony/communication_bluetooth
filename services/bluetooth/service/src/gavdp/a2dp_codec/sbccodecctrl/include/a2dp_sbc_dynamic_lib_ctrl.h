@@ -17,6 +17,7 @@
 #define A2DP_SBC_DYNAMIC_LIB_CTRL_H
 #include "../../sbclib/include/sbc_codec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct CODECSbcEncoder {
     sbc::createSbcEncoder createSbcEncode;
@@ -45,4 +46,5 @@ private:
     bool isEncoder_ = false;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_SBC_DYNAMIC_LIB_CTRL_H

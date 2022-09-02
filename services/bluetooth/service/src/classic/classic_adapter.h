@@ -48,6 +48,7 @@
  *
  */
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents classic adapter.
@@ -1078,4 +1079,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(ClassicAdapter);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // CLASSIC_ADAPTER_H

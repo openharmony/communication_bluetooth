@@ -31,6 +31,7 @@
 #include "profile_config.h"
 #include "rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct PbapPseService::impl {
     // state machine
@@ -645,3 +646,4 @@ void PbapPseService::LoadAdapterConfig() const
 
 REGISTER_CLASS_CREATOR(PbapPseService);
 }  // namespace bluetooth
+}  // namespace OHOS

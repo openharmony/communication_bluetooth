@@ -25,6 +25,7 @@
 #include "avrcp_tg_vendor_player_application_settings.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 bool AvrcTgProfile::g_isEnabled = false;
 
@@ -246,7 +247,7 @@ int AvrcTgProfile::Connect(const RawAddress &rawAddr) const
     return result;
 }
 
-int AvrcTgProfile::ConnectBr(const RawAddress &rawAddr) 
+int AvrcTgProfile::ConnectBr(const RawAddress &rawAddr)
 {
     LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
@@ -255,7 +256,7 @@ int AvrcTgProfile::ConnectBr(const RawAddress &rawAddr)
     return smManager->AddBrowseStateMachine(rawAddr);
 }
 
-int AvrcTgProfile::Disconnect(const RawAddress &rawAddr) const 
+int AvrcTgProfile::Disconnect(const RawAddress &rawAddr) const
 {
     LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
 
@@ -2170,3 +2171,4 @@ void AvrcTgProfile::SetNotificationLabel(uint8_t event, uint8_t label)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

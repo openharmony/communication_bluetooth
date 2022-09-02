@@ -27,6 +27,7 @@
 #include "hfp_hf_defines.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 typedef struct {
     uint16_t attributeId {0};
@@ -199,4 +200,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfSdpClient);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_SDP_CLIENT_H

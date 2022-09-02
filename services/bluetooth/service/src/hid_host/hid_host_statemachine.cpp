@@ -16,6 +16,7 @@
 #include "hid_host_statemachine.h"
 #include "hid_host_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HidHostStateMachine::HidHostStateMachine(const std::string &address)
     : address_(address), uhid_(address)
@@ -800,3 +801,4 @@ void HidHostStateMachine::ProcessDeferredMessage()
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

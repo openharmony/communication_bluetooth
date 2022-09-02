@@ -37,6 +37,7 @@
 #include "map_mce_parameter.h"
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief map mce observer for framework api
@@ -246,7 +247,7 @@ public:
      * @param  device
      * @param  type
      * @param  msgStatus
-     * @return int 
+     * @return int
      */
     virtual int SetMessageStatus(const RawAddress &device, MapMessageType type,
         const IProfileSetMessageStatus &msgStatus) = 0;
@@ -311,4 +312,5 @@ public:
         std::vector<std::u16string> &folderList) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_MAP_MCE_H

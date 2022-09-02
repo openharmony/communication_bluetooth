@@ -31,6 +31,7 @@
 #include "pbap_pce_sdp.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief pbap pce service main state
@@ -555,5 +556,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(PbapPceService);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PCE_SERVICE_H

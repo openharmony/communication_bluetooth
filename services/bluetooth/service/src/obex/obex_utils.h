@@ -22,6 +22,7 @@
 #include "obex_headers.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObexUtils {
 public:
@@ -54,4 +55,5 @@ private:
     static void ObexHeaderItemDebug(const ObexOptionalHeader &hi);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_UTILS_H

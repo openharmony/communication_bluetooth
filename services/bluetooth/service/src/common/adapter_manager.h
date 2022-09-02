@@ -24,6 +24,7 @@
 #include "interface_adapter_manager.h"
 #include "util/context.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents adapter manager.
@@ -307,6 +308,7 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AdapterManager);
     DECLARE_IMPL();
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // ADAPTER_MANAGER_H

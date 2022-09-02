@@ -29,6 +29,7 @@
 #include "pbap_pse_service.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief obex server
@@ -153,4 +154,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(PbapPseObexServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_OBEX_SERVER_H

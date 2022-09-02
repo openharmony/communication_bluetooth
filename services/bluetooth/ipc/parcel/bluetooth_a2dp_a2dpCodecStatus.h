@@ -23,13 +23,13 @@
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothA2dpCodecStatus : public Parcelable,
-                                 public ::bluetooth::CodecStatus {
+                                 public bluetooth::CodecStatus {
 public:
     BluetoothA2dpCodecStatus() = default;
-    BluetoothA2dpCodecStatus(const ::bluetooth::CodecStatus& other)
-        : ::bluetooth::CodecStatus(other) {} // NOLINT(implicit)
+    BluetoothA2dpCodecStatus(const bluetooth::CodecStatus& other)
+        : bluetooth::CodecStatus(other) {} // NOLINT(implicit)
     BluetoothA2dpCodecStatus(const BluetoothA2dpCodecStatus& other)
-        : ::bluetooth::CodecStatus(other) {} // NOLINT(implicit)
+        : bluetooth::CodecStatus(other) {} // NOLINT(implicit)
     ~BluetoothA2dpCodecStatus() = default;
 
     bool Marshalling(Parcel &parcel) const override;
@@ -40,7 +40,7 @@ public:
     bool ReadFromParcel(Parcel &parcel);
 };
 
-}  // namespace bluetooth
+}  // namespace Bluetooth
 }  // namespace OHOS
 
 #endif // BLUETOOTH_PARCEL_A2DP_A2DPCODECSTATUS_H

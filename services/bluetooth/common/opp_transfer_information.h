@@ -19,6 +19,7 @@
 #include <string>
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 class IOppTransferInformation {
 public:
@@ -65,5 +66,6 @@ private:
     uint64_t totalBytes_ = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // OPP_TRANSFER_INFORMATION_H
