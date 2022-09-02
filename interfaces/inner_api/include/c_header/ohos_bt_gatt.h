@@ -43,8 +43,6 @@
 extern "C" {
 #endif
 
-#define OHOS_BD_UUID_LEN 36
-
 /**
  * @brief Enumerates advertising filtering parameters.
  *
@@ -357,10 +355,12 @@ typedef struct {
     char *address;
     /** Handling advertisments sent by advertisers with specific deviceName */
     char *deviceName;
+    /** The length of the service uuid */
+    unsigned int serviceUuidLength;
     /** Handling advertisments sent by advertisers with specific service uuid */
-    unsigned char serviceUuid[OHOS_BD_UUID_LEN];
+    unsigned char *serviceUuid;
     /** Handling advertisments sent by advertisers with specific service uuid mask */
-    unsigned char serviceUuidMask[OHOS_BD_UUID_LEN];
+    unsigned char *serviceUuidMask;
     /** The length of the service data */
     unsigned int serviceDataLength;
     /** Handling advertisments sent by advertisers with specific serviceData */
@@ -718,7 +718,10 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
 /**
  * @brief Starts a scan with BleScanConfigs.
- * If don't need ble scan filter, set BleScanNativeFilter nullptr or filterSize zero.
+ * If don't need ble scan filter, set BleScanNativeFilter to NULL or filterSize to zero.
+ * If one of the ble scan filtering rules is not required, set it to NULL.
+ * For example, set the address to NULL when you don't need it.
+ * Exceptionally, the manufactureId need to be set zero when you don't need it.
  *
  * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
  * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
