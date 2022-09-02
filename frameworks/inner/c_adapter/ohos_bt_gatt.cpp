@@ -467,7 +467,10 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
 /**
  * @brief Starts a scan with BleScanConfigs.
- * If don't need ble scan filter, set BleScanNativeFilter nullptr or filterSize zero.
+ * If don't need ble scan filter, set BleScanNativeFilter to NULL or filterSize to zero.
+ * If one of the ble scan filtering rules is not required, set it to NULL.
+ * For example, set the address to NULL when you don't need it.
+ * Exceptionally, the manufactureId need to be set zero when you don't need it.
  *
  * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
  * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
@@ -511,11 +514,19 @@ int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize)
     for (unsigned int i = 0; i < filterSize; i++) {
         BleScanNativeFilter nativeScanFilter = filter[i];
         BleScanFilter scanFilter;
-        scanFilter.SetName(nativeScanFilter.deviceName);
-        UUID serviceUuid = UUID::FromString((char *)nativeScanFilter.serviceUuid);
-        scanFilter.SetServiceUuid(serviceUuid);
-        UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter.serviceUuidMask);
-        scanFilter.SetServiceUuidMask(serviceUuidMask);
+        if (nativeScanFilter.address != nullptr) {
+            scanFilter.SetDeviceId(nativeScanFilter.address);
+        }
+        if (nativeScanFilter.deviceName != nullptr) {
+            scanFilter.SetName(nativeScanFilter.deviceName);
+        }
+        if (nativeScanFilter.serviceUuidLength != 0 &&
+                nativeScanFilter.serviceUuid != nullptr && nativeScanFilter.serviceUuidMask != nullptr) {
+            UUID serviceUuid = UUID::FromString((char *)nativeScanFilter.serviceUuid);
+            scanFilter.SetServiceUuid(serviceUuid);
+            UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter.serviceUuidMask);
+            scanFilter.SetServiceUuidMask(serviceUuidMask);
+        }
 
         std::vector<uint8_t> serviceData;
         std::vector<uint8_t> serviceDataMask;
@@ -538,7 +549,9 @@ int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize)
         }
         scanFilter.SetManufactureData(manufactureData);
         scanFilter.SetManufactureDataMask(manufactureDataMask);
-        scanFilter.SetManufacturerId(nativeScanFilter.manufactureId);
+        if (nativeScanFilter.manufactureId != 0) {
+            scanFilter.SetManufacturerId(nativeScanFilter.manufactureId);
+        }
         scanFilters.push_back(scanFilter);
     }
     g_BleCentralManager->ConfigScanFilter(scanFilters);
