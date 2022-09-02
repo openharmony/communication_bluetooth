@@ -16,9 +16,6 @@ import("//build/test.gni")
 module_output_path = "bluetooth/framework_test/gatt/"
 SUBSYSTEM_DIR = "//foundation/communication"
 
-###############################################################################
-#1. intent(c++) get/set test without transport
-
 config("module_private_config") {
   visibility = [ ":*" ]
   cflags = []
@@ -26,16 +23,11 @@ config("module_private_config") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   include_dirs = [
-    "mock/include",
     "//third_party/json/include",
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "//foundation/communication/bluetooth/interfaces/inner_api/include",
     "//foundation/communication/bluetooth/frameworks/inner/common",
-  ]
-  defines = [
-    "BTFW_LOG_TAG = \"bluetooth_test\"",
-    "BTFW_LOG_DOMAIN = 0xD000103",
   ]
 }
 
@@ -52,18 +44,12 @@ ohos_unittest("btfw_gatt_c_unit_test") {
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
-    "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
-################################################################################
 group("unittest") {
   testonly = true
 
