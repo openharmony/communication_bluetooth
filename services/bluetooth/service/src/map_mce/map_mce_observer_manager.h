@@ -37,6 +37,7 @@
 #include "interface_profile_map_mce.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief map mce observer manager
@@ -113,4 +114,5 @@ private:
     BaseObserverList<IProfileMapMceObserver> observerMgrListMap_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_OBSERVER_MANAGER_H

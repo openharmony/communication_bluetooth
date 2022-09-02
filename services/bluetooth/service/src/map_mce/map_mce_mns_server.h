@@ -40,6 +40,7 @@
 #include "map_mce_service.h"
 #include "map_mce_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 static const std::string MCE_MNS_SERVICE_NAME = "MAP MNS";  // MAP MNS-name
 static const uint16_t MCE_MNS_GOEP_L2CAP_PSM_VALUE = 0x1021;
@@ -210,5 +211,6 @@ private:
     MasInstanceConfig mnsConfig_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MNS_SERVER_H

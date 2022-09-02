@@ -20,6 +20,7 @@
 #include "log.h"
 #include "pbap_pse_header_msg.h"
 
+namespace OHOS {
 namespace bluetooth {
 PbapPseObexServer::PbapPseObexServer(
     const std::string &serverName, const ObexServerConfig &config, PbapPseService &service)
@@ -107,3 +108,4 @@ void PbapPseObexServer::PseObexObserver::OnBusy(ObexServerSession &session, bool
     pseObexServer_.pbapPseService_.ProcessObexBusy(session.GetRemoteAddr(), isBusy);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

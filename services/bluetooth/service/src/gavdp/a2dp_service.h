@@ -44,6 +44,7 @@
 #include "message.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObserverProfile : public A2dpProfileObserver {
 public:
@@ -593,7 +594,7 @@ private:
      * @since 6.0
      */
     bool FindStateMatched(std::vector<int> states, int connectState) const;
-  
+
     /**
      * @brief Check if other codec configuration is similar with current configuration.
      *
@@ -645,4 +646,5 @@ A2dpProfile *GetProfileInstance(uint8_t role);
  */
 A2dpService *GetServiceInstance(uint8_t role);
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_SERVICE_H

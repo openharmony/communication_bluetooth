@@ -25,6 +25,7 @@
 #include "hfp_hf_data_connection.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for process AT command.
@@ -242,4 +243,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfCommandProcessor);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_COMMAND_PROCESSOR_H

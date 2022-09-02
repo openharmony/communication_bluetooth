@@ -24,6 +24,7 @@
 #include "base_def.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 // A2dp encoder interface
 class A2dpEncoder {
@@ -68,5 +69,6 @@ protected:
     A2dpDecoderObserver *observer_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !A2DP_CODEC_WRAPPER_H

@@ -17,6 +17,7 @@
 #include "gap_if.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppGapServer::OppGapServer(uint8_t rfcommScn, uint16_t l2capPsm) : rfcommScn_(rfcommScn), l2capPsm_(l2capPsm)
 {}
@@ -85,3 +86,4 @@ void OppGapServer::Deregister() const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

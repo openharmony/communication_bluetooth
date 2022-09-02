@@ -25,6 +25,7 @@
 #include "packet.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::unordered_map<std::string, HfpAgCommandProcessor::HfpAgAtHandler> HfpAgCommandProcessor::g_atCmdMap = {
     std::make_pair<std::string, HfpAgAtHandler>("AT+BRSF", {&HfpAgCommandProcessor::AtEmptyFn,
@@ -708,3 +709,4 @@ void HfpAgCommandProcessor::CkpdSetter(HfpAgDataConnection &dataConn, const std:
     HfpAgProfileEventSender::GetInstance().ProcessCKpdEvent(dataConn.remoteAddr_);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

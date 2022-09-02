@@ -29,6 +29,7 @@
 #include "timer.h"
 #include "pan_message.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for pan state machine.
@@ -193,4 +194,5 @@ public:
 private:
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // Pan_STATEMACHINE_H

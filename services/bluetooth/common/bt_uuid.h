@@ -24,6 +24,7 @@
 /**
  * @brief The bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides service uuid.
@@ -249,5 +250,6 @@ protected:
     std::array<uint8_t, UUID128_BYTES_TYPE> uuid_ = BASE_UUID;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BT_UUID_H

@@ -20,6 +20,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 int SocketUtil::SocketSendData(int sockFd, const uint8_t *buf, int len)
 {
@@ -90,3 +91,4 @@ int SocketUtil::SocketSendFd(int sockFd, const uint8_t *buf, int len, int accept
     return sendSize;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -25,6 +25,7 @@
 #include "packet.h"
 #include "time.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of attributes for saving the connection information.
@@ -504,5 +505,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcTgConnectManager);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_CONNECTION_H

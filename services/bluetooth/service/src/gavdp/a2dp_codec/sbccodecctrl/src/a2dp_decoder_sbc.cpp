@@ -18,6 +18,7 @@
 #include "memory.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int CODEC_BUFFER_SIZE4K = 4096;
 
@@ -85,3 +86,4 @@ bool A2dpSbcDecoder::DecodePacket(uint8_t *data, uint16_t size)
     return true;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

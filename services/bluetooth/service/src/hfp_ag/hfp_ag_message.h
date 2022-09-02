@@ -21,6 +21,7 @@
 #include "hfp_ag_defines.h"
 #include "message.h"
 
+namespace OHOS {
 namespace bluetooth {
 typedef struct {
     bool service {false};
@@ -43,4 +44,5 @@ public:
     HfpAgCallList call_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_MESSAGE_H

@@ -27,6 +27,7 @@
 #include "gatt_data.h"
 #include "gatt_service_over_bredr.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GenericAttributeService {
 public:
@@ -72,6 +73,7 @@ private:
     void Disconnected(const GattDevice& device);
     std::unique_ptr<uint8_t[]> BuildValue(uint16_t startHandle, uint16_t endHandle) const;
 };
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif // GENERIC_ATTRIBUTE_SERVICE_H

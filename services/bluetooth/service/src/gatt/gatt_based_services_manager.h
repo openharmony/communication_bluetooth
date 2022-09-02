@@ -23,6 +23,7 @@
 #include "gas/generic_access_service.h"
 #include "gatts/generic_attribute_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattBasedServicesManager {
 public:
@@ -41,5 +42,6 @@ private:
     std::unique_ptr<GenericAttributeService> gatts_ = {nullptr};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GATT_BASED_SERVICES_MANAGER_H

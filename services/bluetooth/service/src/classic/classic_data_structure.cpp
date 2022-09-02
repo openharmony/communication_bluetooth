@@ -18,6 +18,7 @@
 #include <string>
 #include "classic_data_type_defs.h"
 
+namespace OHOS {
 namespace bluetooth {
 ClassicDataStructure::ClassicDataStructure()
 {}
@@ -48,3 +49,4 @@ int ClassicDataStructure::GetType() const
     return type_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

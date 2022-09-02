@@ -16,6 +16,7 @@
 #ifndef CLASSIC_DATA_TYPE_DEFINE_H
 #define CLASSIC_DATA_TYPE_DEFINE_H
 
+namespace OHOS {
 namespace bluetooth {
 /// Flags
 static const int BLUETOOTH_DATA_TYPE_FLAGS = 0x01;
@@ -110,4 +111,5 @@ static const int BLUETOOTH_DATA_TYPE_3D_INFORMATION_DATA = 0x3D;
 /// Manufacturer Specific Data
 static const int BLUETOOTH_DATA_TYPE_MANUFACTURER_SPECIFIC_DATA = 0xFF;
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  /// CLASSIC_DATA_TYPE_DEFINE_H

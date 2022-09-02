@@ -26,6 +26,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 class DeviceInformationService {
 public:
@@ -88,5 +89,6 @@ private:
     static std::string GetSoftwareRevision();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // DEVICE_INFO_SERVICE_H

@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class PbapPseObserver : public bluetooth::IPbapPseObserver {
 public:
@@ -243,7 +243,7 @@ std::vector<BluetoothRawAddress> BluetoothPbapPseServer::GetConnectedDevices()
     ::std::vector<int32_t> states{static_cast<int32_t>(BTConnectState::CONNECTED)};
     std::vector<BluetoothRawAddress> rawDevices;
     GetDevicesByStates(states, rawDevices);
-    
+
     return rawDevices;
 }
 }  // namespace Bluetooth

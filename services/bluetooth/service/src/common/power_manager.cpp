@@ -25,6 +25,7 @@
 #include "power_device.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 // static function
 static std::unique_ptr<PowerManager> g_powerManager = nullptr;
@@ -296,3 +297,4 @@ void PowerManager::impl::DisconnectionCompleteCallBack(
             reason));
 }
 }  // namespace bluetooth
+}  // namespace OHOS

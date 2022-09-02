@@ -22,12 +22,12 @@
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothAvrcpMeItem : public Parcelable,
-                             public ::bluetooth::AvrcMeItem {
+                             public bluetooth::AvrcMeItem {
 public:
     BluetoothAvrcpMeItem() = default;
-    BluetoothAvrcpMeItem(const ::bluetooth::AvrcMeItem &other) : ::bluetooth::AvrcMeItem(other)
+    BluetoothAvrcpMeItem(const bluetooth::AvrcMeItem &other) : bluetooth::AvrcMeItem(other)
     {}  // NOLINT(implicit)
-    BluetoothAvrcpMeItem(const BluetoothAvrcpMeItem &other) : ::bluetooth::AvrcMeItem(other)
+    BluetoothAvrcpMeItem(const BluetoothAvrcpMeItem &other) : bluetooth::AvrcMeItem(other)
     {}  // NOLINT(implicit)
     ~BluetoothAvrcpMeItem() = default;
 

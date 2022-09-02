@@ -31,6 +31,7 @@
 #include "avsession_manager.h"
 #include "avsession_errors.h"
 #endif
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the states of the AVRCP TG service.
@@ -1900,5 +1901,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcpTgService);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_SERVICE_H

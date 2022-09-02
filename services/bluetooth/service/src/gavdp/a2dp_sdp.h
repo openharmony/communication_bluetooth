@@ -24,6 +24,7 @@
 /**
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 #define A2DP_SDP_ATTRIBUTE_NUM 3
 /**
@@ -75,5 +76,6 @@ private:
     uint32_t sdpHandle_ = 0;  // A handle to the SDP service record got from the SDP protocol.
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // A2DP_SDP_H

@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 
+namespace OHOS {
 namespace bluetooth {
 class IDataResult {
 public:
@@ -124,4 +125,5 @@ public:
     }
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif

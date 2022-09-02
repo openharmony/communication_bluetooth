@@ -21,6 +21,7 @@
 #include "base_def.h"
 #include "hfp_hf_rfcomm_connection_server.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for managining HFP HF data connection.
@@ -114,4 +115,5 @@ private:
     HfpHfRfcommConnectionServer rfcommServer_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_DATA_CONNECTION_SERVER_H

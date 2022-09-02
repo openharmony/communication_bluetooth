@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class HfpAgServerObserver : public HfpAgServiceObserver {
 public:
@@ -87,7 +87,7 @@ private:
 struct BluetoothHfpAgServer::impl {
     RemoteObserverList<IBluetoothHfpAgObserver> observers_;
     std::unique_ptr<HfpAgServerObserver> observerImp_{std::make_unique<HfpAgServerObserver>()};
-    IProfileHfpAg* HfpAgService_ = nullptr;  
+    IProfileHfpAg* HfpAgService_ = nullptr;
 
     class HfpAgSystemObserver : public ISystemStateObserver {
     public:

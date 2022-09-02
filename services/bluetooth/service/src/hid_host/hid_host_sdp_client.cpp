@@ -18,6 +18,7 @@
 #include "hid_host_service.h"
 #include "hid_host_sdp_client.h"
 
+namespace OHOS {
 namespace bluetooth {
 HidHostSdpClient::HidHostSdpClient(std::string address)
 {
@@ -305,3 +306,4 @@ HidInformation& HidHostSdpClient::GetRemoteSdpHidInfo()
     return hidInf_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -23,6 +23,7 @@
 #include "cstdint"
 #include "iosfwd"
 
+namespace OHOS {
 namespace bluetooth {
 class IPbapPullPhoneBookParam {
 public:
@@ -188,5 +189,6 @@ public:
     std::vector<uint8_t> result_ {};                  // VCard bytes with utf-8
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PBAP_PCE_PARAMETER_H

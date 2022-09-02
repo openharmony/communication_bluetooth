@@ -17,6 +17,7 @@
 #include <memory>
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 // create obex server
 ObexMpServer::ObexMpServer(const std::string &serviceName, const ObexServerConfig &config,
@@ -207,3 +208,4 @@ void ObexPrivateMpServer::HandleAbortRequest(ObexServerSession &session, ObexHea
     OBEX_LOG_DEBUG("send abort response %{public}d", ret);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

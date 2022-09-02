@@ -22,6 +22,7 @@
 #include "btstack.h"
 #include "gap_if.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for HFP HF GAP client.
@@ -60,4 +61,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfGapClient);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_GAP_CLIENT_H

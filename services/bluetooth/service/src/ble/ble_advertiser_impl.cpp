@@ -24,6 +24,7 @@
 #include "ble_utils.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct BleAdvertiserImpl::impl {
     std::map<uint8_t, BleAdvertiserImplWrapData> advHandleSettingDatas_ {};
@@ -1897,3 +1898,4 @@ int BleAdvertiserImpl::GetMaxAdvertisingDataLength(const BleAdvertiserSettingsIm
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

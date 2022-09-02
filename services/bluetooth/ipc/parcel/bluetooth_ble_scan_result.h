@@ -21,12 +21,12 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothBleScanResult : public Parcelable, public ::bluetooth::ScanResult {
+class BluetoothBleScanResult : public Parcelable, public bluetooth::ScanResult {
 public:
     explicit BluetoothBleScanResult() = default;
-    BluetoothBleScanResult(const ::bluetooth::ScanResult &other) : ::bluetooth::ScanResult(other)
+    BluetoothBleScanResult(const bluetooth::ScanResult &other) : bluetooth::ScanResult(other)
     {}
-    BluetoothBleScanResult(const BluetoothBleScanResult &other) : ::bluetooth::ScanResult(other)
+    BluetoothBleScanResult(const BluetoothBleScanResult &other) : bluetooth::ScanResult(other)
     {}
     ~BluetoothBleScanResult() = default;
 

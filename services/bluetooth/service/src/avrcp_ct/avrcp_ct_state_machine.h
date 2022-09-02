@@ -21,6 +21,7 @@
 #include "raw_address.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the events for sending to the state machine.
@@ -823,5 +824,6 @@ private:
     bool IsBrowseSpecifiedState(const std::string &addr, std::string stateName);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_STATE_MACHINE_H

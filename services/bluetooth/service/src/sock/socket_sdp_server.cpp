@@ -17,6 +17,7 @@
 #include "log.h"
 #include "socket_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 int SocketSdpServer::RegisterSdpService(const std::string &name, const Uuid &uuid, uint8_t scn)
 {
@@ -131,3 +132,4 @@ int SocketSdpServer::AddBrowseGroupList()
     return SDP_AddBrowseGroupList(sdpHandle_, browseGroupList, SPP_BROWSE_LIST_NUM);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

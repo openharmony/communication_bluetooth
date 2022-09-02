@@ -20,6 +20,7 @@
 
 #include "xml_parse.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct ProfileConfig::impl {
     utility::XmlParse parse_ = {};
@@ -124,3 +125,4 @@ bool ProfileConfig::HasSection(const std::string &addr, const std::string &secti
     return pimpl->parse_.HasSection(addr, section);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

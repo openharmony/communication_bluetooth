@@ -20,6 +20,7 @@
 #include "base_def.h"
 #include "gap_if.h"
 
+namespace OHOS {
 namespace bluetooth {
 class SocketGapClient {
 public:
@@ -58,4 +59,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(SocketGapClient);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // SOCKET_GAP_CLIENT_H

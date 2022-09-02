@@ -19,6 +19,7 @@
 #include "log.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 DIService::DIService() : utility::Context(PROFILE_NAME_DI, "1.2.1"), config_(DIConfig::GetInstance())
 {}
@@ -197,3 +198,4 @@ int DIService::GetMaxConnectNum()
 
 REGISTER_CLASS_CREATOR(DIService);
 }  // namespace bluetooth
+}  // namespace OHOS

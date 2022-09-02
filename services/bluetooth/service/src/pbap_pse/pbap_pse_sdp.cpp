@@ -18,6 +18,7 @@
 #include "log.h"
 #include "pbap_pse_def.h"
 #include "sdp.h"
+namespace OHOS {
 namespace bluetooth {
 PbapPseSdp::PbapPseSdp(uint8_t rfcommScn, uint16_t l2capPsm) : rfcommScn_(rfcommScn), l2capPsm_(l2capPsm)
 {}
@@ -223,3 +224,4 @@ int PbapPseSdp::RegisterServiceRecord() const
     return retVal;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

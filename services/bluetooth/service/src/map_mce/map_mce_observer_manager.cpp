@@ -32,6 +32,7 @@
 #include "log.h"
 #include "interface_profile_map_mce.h"
 
+namespace OHOS {
 namespace bluetooth {
 MapMceObserverManager::MapMceObserverManager()
 {
@@ -114,3 +115,4 @@ void MapMceObserverManager::ExcuteObserverOnConversationListingCompleted(
     });
 }
 }  // namespace bluetooth
+}  // namespace OHOS

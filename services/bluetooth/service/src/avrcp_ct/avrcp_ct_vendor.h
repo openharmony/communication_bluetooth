@@ -19,6 +19,7 @@
 #include "avrcp_ct_packet.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the <b>VENDOR DEPENDENT</b> command.
@@ -971,5 +972,6 @@ private:
     AvrcCtSavPacket() = delete;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_VENDOR_H

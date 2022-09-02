@@ -39,6 +39,7 @@
 #include "profile_service_manager.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 // c language function declare
 int MceAnalyseSupportedFeatrueAttribute(int &supportedFeatrue, const SdpService &servicePointer)
@@ -1318,3 +1319,4 @@ void MapMceService::GetConfigFromXml()
 
 REGISTER_CLASS_CREATOR(MapMceService);
 }  // namespace bluetooth
+}  // namespace OHOS

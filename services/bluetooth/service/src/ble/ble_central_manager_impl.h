@@ -31,6 +31,7 @@
 /*
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief BLE scan manager.
@@ -382,5 +383,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BLE_CENTRAL_MANAGER_IMPL_H

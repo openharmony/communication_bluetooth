@@ -40,6 +40,7 @@
 #include "interface_profile_map_mce.h"
 #include "map_mce_xml.h"
 
+namespace OHOS {
 namespace bluetooth {
 enum MceAnalyseEnumType {
     MCE_RECIPIENT_LEVEL1 = 1,
@@ -568,5 +569,6 @@ public:
     static MapBoolType ConvertStringToMapBoolType(const std::string &str);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MCE_DATA_ANALYSE_H

@@ -36,6 +36,7 @@
 #include "base_def.h"
 #include "classic_data_structure.h"
 
+namespace OHOS {
 namespace bluetooth {
 static constexpr int BLUETOOTH_DATA_MAX_LENGTH = 240;
 
@@ -96,4 +97,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(ClassicBluetoothData);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  /// CLASSIC_BLUETOOTH_DATA_H

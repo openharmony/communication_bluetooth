@@ -18,6 +18,7 @@
 #include "log.h"
 #include "socket_listener.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::string SPP_VERSION = "0.4.1";
 
@@ -254,3 +255,4 @@ void SocketService::CleanupClientSocket(Socket *socket)
 }
 REGISTER_CLASS_CREATOR(SocketService);
 }  // namespace bluetooth
+}  // namespace OHOS

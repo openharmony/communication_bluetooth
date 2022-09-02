@@ -25,6 +25,7 @@
 #include "avrcp_tg_internal.h"
 #include "avrcp_tg_packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the <b>UNIT INFO</b> command.
@@ -132,5 +133,6 @@ protected:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcTgUnitPacket);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_UNIT_INFO_H

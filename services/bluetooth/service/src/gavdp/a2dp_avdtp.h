@@ -24,6 +24,7 @@
 #include "message.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief The class supply the method between A2dp profile with the AVDT protocal
@@ -609,5 +610,6 @@ private:
     A2dpAvdtp() = delete;
     uint8_t peerRole_ = 0;
 };
-};      // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_AVDTP_H

@@ -20,6 +20,7 @@
 
 #include "avrcp_tg_packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the <b>BROWSING</b> commands.
@@ -828,6 +829,7 @@ private:
      */
     AvrcTgGtnoiPacket() = delete;
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_BROWSE_H

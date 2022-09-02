@@ -27,6 +27,7 @@
 #include "pan_defines.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 static constexpr int POLL_TIMEOUT = 50;
 
@@ -66,4 +67,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(PanNetwork);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PAN_NETWORK_H

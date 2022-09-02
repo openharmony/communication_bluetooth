@@ -19,6 +19,7 @@
 #include "avrcp_ct_internal.h"
 #include "avrcp_ct_packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the <b>PASS THROUGH</b> command.
@@ -191,5 +192,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcCtPassPacket);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_PASS_THROUGH_H

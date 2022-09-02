@@ -29,6 +29,7 @@
 #include "interface_profile_manager.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct ClassicAdapter::impl {
     std::recursive_mutex syncMutex_ {};
@@ -2417,3 +2418,4 @@ void ClassicAdapter::SendRemoteBatteryLevelChanged(const RawAddress &device, int
 
 REGISTER_CLASS_CREATOR(ClassicAdapter);
 }  // namespace bluetooth
+}  // namespace OHOS

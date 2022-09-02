@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief A2dp codec type enum.
@@ -152,5 +153,6 @@ struct CodecStatus {
     std::vector<CodecInfo> codecInfoConfirmCap;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // A2DP_PARCEL_CODEC_H

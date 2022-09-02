@@ -45,6 +45,7 @@ namespace utility {
 class Context;
 }
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief profile service name Define
@@ -140,5 +141,6 @@ public:
     virtual utility::Context *GetContext() = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_H

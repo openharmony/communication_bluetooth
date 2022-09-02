@@ -18,6 +18,7 @@
 #include "memory"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 GattDevice::GattDevice(const RawAddress& addr, uint8_t type, uint8_t transport)
     : isEncryption_((transport == GATT_TRANSPORT_TYPE_CLASSIC) ? true : false),
@@ -111,4 +112,5 @@ void Characteristic::SetValue(const uint8_t *value, size_t length)
     value_ = std::make_unique<uint8_t[]>(length_);
     (void)memcpy_s(value_.get(), length_, value, length_);
 }
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

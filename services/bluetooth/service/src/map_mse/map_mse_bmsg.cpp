@@ -17,6 +17,7 @@
 using std::string;
 using std::vector;
 
+namespace OHOS {
 namespace bluetooth {
 const std::string MapMseBmsg::MAP_MSE_BMESSAGE_VERSION = "VERSION:";
 
@@ -529,3 +530,4 @@ void MapMseBmsg::SetRecipients(const std::vector<MapMseVcard> &recipient)
     recipient_ = recipient;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -21,6 +21,7 @@
 #include "base_def.h"
 #include "rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for rfcomm connection server.
@@ -92,4 +93,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfRfcommConnectionServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_RFCOMM_CONNECTION_SERVER_H

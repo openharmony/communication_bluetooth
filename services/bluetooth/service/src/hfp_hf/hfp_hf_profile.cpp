@@ -23,6 +23,7 @@
 #include "interface_profile.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define HFP_HF_RETURN_IF_NOT_CONNECTED(state)                                       \
     do {                                                                            \
@@ -497,3 +498,4 @@ void HfpHfProfile::RemoveRemoteScnLoging() const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

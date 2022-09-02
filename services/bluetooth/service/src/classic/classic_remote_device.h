@@ -40,6 +40,7 @@
 #include "bt_uuid.h"
 #include "classic_defs.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents remote device.
@@ -406,4 +407,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(ClassicRemoteDevice);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // REMOTE_DEVICE_H

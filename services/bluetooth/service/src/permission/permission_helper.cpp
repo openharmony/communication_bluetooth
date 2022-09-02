@@ -18,6 +18,7 @@
 #include "ipc_skeleton.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 using namespace OHOS;
 using namespace Security::AccessToken;
@@ -117,4 +118,5 @@ int PermissionHelper::VerifyDiscoverBluetoothPermission(const std::uint32_t  &to
 
     return PERMISSION_GRANTED;
 }
-}
+}  // namespace bluetooth
+}  // namespace OHOS

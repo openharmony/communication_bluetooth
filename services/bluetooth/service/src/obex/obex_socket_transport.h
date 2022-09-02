@@ -25,6 +25,7 @@
 #include "obex_types.h"
 #include "transport/transport.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObexSocketTransport : public ObexTransport {
 public:
@@ -227,4 +228,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(ObexServerIncomingConnect);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_SOCKET_TRANSPORT_H
