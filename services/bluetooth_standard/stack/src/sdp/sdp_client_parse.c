@@ -614,7 +614,7 @@ static Packet *SdpParseResponseCommon(
 static void SdpParseErrorResponse(
     const BtAddr *addr, uint16_t transactionId, uint16_t parameterLength, const Packet *packet)
 {
-    if (PacketSize(packet) != parameterLength || parameterLength != SDP_UINT16_LENGTH) {
+    if (PacketSize(packet) != parameterLength) {
         LOG_ERROR("[%{public}s][%{public}d] Different length between [%u] and [%u].",
             __FUNCTION__,
             __LINE__,

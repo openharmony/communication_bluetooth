@@ -507,27 +507,27 @@ static void GetDeviceNameSyncWorkStart(const napi_env env, GattGetDeviceNameCall
 void AsyncCompleteCallbackGetDeviceName(napi_env env, napi_status status, void *data)
 {
     HILOGD("GetDeviceName napi_create_async_work complete start");
-    GattGetDeviceNameCallbackInfo *asynccallbackinfo = (GattGetDeviceNameCallbackInfo *)data;
-
-    if (asynccallbackinfo->promise.errorCode != CODE_SUCCESS) {
-        HILOGD("GetDeviceName failed.");
-        asynccallbackinfo->result = NapiGetNull(env);
-    } else {
-        HILOGD("GetDeviceName success.");
-        napi_value result = nullptr;
-        napi_create_string_utf8(env, asynccallbackinfo->deviceId.c_str(), asynccallbackinfo->deviceId.size(), &result);
-        asynccallbackinfo->result = result;
+    if (!data) {
+        HILOGE("Invalid async callback data");
+        return;
     }
-    ReturnCallbackPromise(env, asynccallbackinfo->promise, asynccallbackinfo->result);
+    GattGetDeviceNameCallbackInfo *asynccallbackinfo = (GattGetDeviceNameCallbackInfo *)data;
+    napi_value result = nullptr;
+    if (asynccallbackinfo->promise.errorCode != CODE_SUCCESS) {
+        HILOGI("failed.");
+        result = NapiGetNull(env);
+    } else {
+        HILOGI("success.");
+        napi_create_string_utf8(env, asynccallbackinfo->deviceId.c_str(), asynccallbackinfo->deviceId.size(), &result);
+    }
+    ReturnCallbackPromise(env, asynccallbackinfo->promise, result);
     if (asynccallbackinfo->promise.callback != nullptr) {
         napi_delete_reference(env, asynccallbackinfo->promise.callback);
     }
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
-    HILOGD("GetDeviceName napi_create_async_work complete end");
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
+    HILOGI("napi_create_async_work complete end");
 }
 
 napi_value GetDeviceName(napi_env env, napi_callback_info info)
@@ -586,29 +586,33 @@ static void GetRssiValueSyncWorkStart(const napi_env env, GattGetRssiValueCallba
 
 void AsyncCompleteCallbackGetRssiValue(napi_env env, napi_status status, void *data)
 {
-    HILOGD("GetRssiValue napi_create_async_work complete start");
+    HILOGI("napi_create_async_work complete start");
+    if (!data) {
+        HILOGE("Invalid async callback data");
+        return;
+    }
     GattGetRssiValueCallbackInfo *asynccallbackinfo = (GattGetRssiValueCallbackInfo *)data;
+    napi_value result = nullptr;
     if (asynccallbackinfo->promise.errorCode != CODE_SUCCESS) {
-        HILOGE("GetRssiValue failed.");
-        asynccallbackinfo->result = NapiGetNull(env);
+        HILOGE("failed.");
+        result = NapiGetNull(env);
     } else {
-        HILOGD("GetRssiValue success.");
-        napi_value result = nullptr;
-        napi_create_int32(callbackInfo->env, callbackInfo->rssi, &result);
-        callbackInfo->result = result;
+        HILOGI("success.");
+        napi_create_int32(env, asynccallbackinfo->rssi, &result);
     }
 
-    ReturnCallbackPromise(env, asynccallbackinfo->promise, asynccallbackinfo->result);
+    ReturnCallbackPromise(env, asynccallbackinfo->promise, result);
     if (asynccallbackinfo->promise.callback != nullptr) {
         napi_delete_reference(env, asynccallbackinfo->promise.callback);
     }
 
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
-    HILOGD("GetRssiValue napi_create_async_work complete end");
+
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
+    std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = nullptr;
+    SetRssiValueCallbackInfo(callbackInfo);
+    HILOGI("napi_create_async_work complete end");
 }
 
 napi_value GetRssiValue(napi_env env, napi_callback_info info)
