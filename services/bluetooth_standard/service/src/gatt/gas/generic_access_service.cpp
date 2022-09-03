@@ -145,7 +145,7 @@ private:
 };
 
 GenericAccessService::GenericAccessService(GattServerService &service, utility::Dispatcher &dispatcher)
-    : serviceCallback_(std::make_unique<GattServerCallbackImpl>(*this)),
+    : serviceCallback_(std::make_shared<GattServerCallbackImpl>(*this)),
       adapterBleObserver_(std::make_unique<AdapterBleObserverImpl>(*this)),
       adapterClassicObserver_(std::make_unique<AdapterClassicObserverImpl>(*this)),
       serverService_(service),
@@ -153,7 +153,9 @@ GenericAccessService::GenericAccessService(GattServerService &service, utility::
 {}
 
 GenericAccessService::~GenericAccessService()
-{}
+{
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
+}
 
 int GenericAccessService::RegisterService()
 {
@@ -181,7 +183,7 @@ int GenericAccessService::RegisterService()
         }
     }
 
-    appId_ = serverService_.RegisterApplicationSync(*serviceCallback_);
+    appId_ = serverService_.RegisterApplicationSync(serviceCallback_);
     if (appId_ < 0) {
         return appId_;
     }
@@ -197,6 +199,7 @@ int GenericAccessService::RegisterService()
 
 void GenericAccessService::DeregisterService()
 {
+    LOG_INFO("%{public}s:%{public}d:%{public}s", __FILE__, __LINE__, __FUNCTION__);
     IAdapterBle *adapterBle = (IAdapterBle *)(IAdapterManager::GetInstance()->GetAdapter(ADAPTER_BLE));
     if (adapterBle != nullptr) {
         adapterBle->DeregisterBleAdapterObserver(*adapterBleObserver_.get());

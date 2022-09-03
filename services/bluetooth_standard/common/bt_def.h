@@ -209,6 +209,9 @@ const int DEVICE_TYPE_DUAL_MONO = 2;
 constexpr uint8_t GATT_TRANSPORT_TYPE_AUTO = 0x0;
 constexpr uint8_t GATT_TRANSPORT_TYPE_LE = 0x1;
 constexpr uint8_t GATT_TRANSPORT_TYPE_CLASSIC = 0x2;
+constexpr uint8_t GATT_ROLE_MASTER = 0x00;
+constexpr uint8_t GATT_ROLE_SLAVE = 0x01;
+constexpr uint8_t GATT_ROLE_INVALID = 0xFF;
 
 /** A GATT Attribute Permission.
  *  Define GATT Attribute permissions.

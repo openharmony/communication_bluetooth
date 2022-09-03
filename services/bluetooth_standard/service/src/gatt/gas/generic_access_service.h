@@ -64,7 +64,7 @@ private:
     bool classicDiscoverable_ = {false};
     uint8_t central_addr_resolution_ = {0};
     std::unique_ptr<Service> instance_ = {nullptr};
-    std::unique_ptr<GattServerCallbackImpl> serviceCallback_;
+    std::shared_ptr<GattServerCallbackImpl> serviceCallback_;
     std::unique_ptr<AdapterBleObserverImpl> adapterBleObserver_;
     std::unique_ptr<AdapterClassicObserverImpl> adapterClassicObserver_;
     GattServerService &serverService_;

@@ -27,7 +27,7 @@
 namespace bluetooth {
 class GattServerService : public IProfileGattServer, public utility::Context {
 public:
-    int RegisterApplication(IGattServerCallback &callback) override;
+    int RegisterApplication(std::shared_ptr<IGattServerCallback> callback) override;
     int DeregisterApplication(int appId) override;
     int AddService(int appId, Service &service) override;
     int RemoveService(int appId, const Service &service) override;
@@ -42,7 +42,7 @@ public:
     int SetCharacteristicValue(const Characteristic &characteristic);
     int SetCharacteristicPermission(const Characteristic &characteristic, uint8_t properties, uint8_t permission);
 
-    int RegisterApplicationSync(IGattServerCallback &callback) const;
+    int RegisterApplicationSync(std::shared_ptr<IGattServerCallback> callback) const;
     int DeregisterApplicationSync(int appId) const;
     int AddServiceSync(int appId, Service &service) const;
     const std::string GetDatabaseHash() const;

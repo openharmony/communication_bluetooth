@@ -1125,7 +1125,9 @@ void GattClientService::impl::OnDisconnect(const GattDevice &device, uint16_t co
             client.connection_.SetHandle(0);
             client.connection_.SetMtu(0);
             client.connState_ = static_cast<int>(BTConnectState::DISCONNECTED);
-            client.callback_.OnConnectionStateChanged(ret, client.connState_);
+            if (device.role_ == GATT_ROLE_MASTER) {
+                client.callback_.OnConnectionStateChanged(ret, client.connState_);
+            }
         }
     }
 }

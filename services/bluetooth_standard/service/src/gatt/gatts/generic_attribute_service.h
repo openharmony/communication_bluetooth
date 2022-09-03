@@ -58,7 +58,7 @@ private:
     int appId_ = -1;
     std::unique_ptr<GattServiceOverBredrInterface> sdpRegister_ = {nullptr};
     std::unique_ptr<Service> instance_ = {nullptr};
-    std::unique_ptr<GattServerCallbackImpl> serviceCallback_;
+    std::shared_ptr<GattServerCallbackImpl> serviceCallback_;
     std::map<GattDevice, NotifyInformation> devices_ = {};
 
     void StoreNotifyInformation() const;
