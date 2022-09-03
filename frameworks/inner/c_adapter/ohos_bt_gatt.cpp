@@ -529,34 +529,26 @@ int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize)
             }
         }
 
-        if (nativeScanFilter.serviceData != nullptr) {
+        if (nativeScanFilter.serviceData != nullptr && nativeScanFilter.serviceDataMask != nullptr) {
             std::vector<uint8_t> serviceData;
+            std::vector<uint8_t> serviceDataMask;
             for (unsigned int i = 0; i < nativeScanFilter.serviceDataLength; i++) {
                 serviceData.push_back(nativeScanFilter.serviceData[i]);
+                serviceDataMask.push_back(nativeScanFilter.serviceDataMask[i]);
             }
             scanFilter.SetServiceData(serviceData);
-            if (nativeScanFilter.serviceDataMask != nullptr) {
-                std::vector<uint8_t> serviceDataMask;
-                for (unsigned int i = 0; i < nativeScanFilter.serviceDataLength; i++) {
-                    serviceDataMask.push_back(nativeScanFilter.serviceDataMask[i]);
-                }
-                scanFilter.SetServiceDataMask(serviceDataMask);
-            }
+            scanFilter.SetServiceDataMask(serviceDataMask);
         }
 
-        if (nativeScanFilter.manufactureData != nullptr) {
+        if (nativeScanFilter.manufactureData != nullptr && nativeScanFilter.manufactureDataMask != nullptr) {
             std::vector<uint8_t> manufactureData;
+            std::vector<uint8_t> manufactureDataMask;
             for (unsigned int i = 0; i < nativeScanFilter.manufactureDataLength; i++) {
                 manufactureData.push_back(nativeScanFilter.manufactureData[i]);
+                manufactureDataMask.push_back(nativeScanFilter.manufactureDataMask[i]);
             }
             scanFilter.SetManufactureData(manufactureData);
-            if (nativeScanFilter.manufactureDataMask != nullptr) {
-                std::vector<uint8_t> manufactureDataMask;
-                for (unsigned int i = 0; i < nativeScanFilter.manufactureDataLength; i++) {
-                    manufactureDataMask.push_back(nativeScanFilter.manufactureDataMask[i]);
-                }
-                scanFilter.SetManufactureDataMask(manufactureDataMask);
-            }
+            scanFilter.SetManufactureDataMask(manufactureDataMask);
         }
 
         if (nativeScanFilter.manufactureId != 0) {
