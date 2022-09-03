@@ -520,35 +520,45 @@ int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize)
         if (nativeScanFilter.deviceName != nullptr) {
             scanFilter.SetName(nativeScanFilter.deviceName);
         }
-        if (nativeScanFilter.serviceUuidLength != 0 &&
-                nativeScanFilter.serviceUuid != nullptr && nativeScanFilter.serviceUuidMask != nullptr) {
+        if (nativeScanFilter.serviceUuidLength != 0 && nativeScanFilter.serviceUuid != nullptr) {
             UUID serviceUuid = UUID::FromString((char *)nativeScanFilter.serviceUuid);
             scanFilter.SetServiceUuid(serviceUuid);
-            UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter.serviceUuidMask);
-            scanFilter.SetServiceUuidMask(serviceUuidMask);
+            if (nativeScanFilter.serviceUuidMask != nullptr) {
+                UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter.serviceUuidMask);
+                scanFilter.SetServiceUuidMask(serviceUuidMask);
+            }
         }
 
-        std::vector<uint8_t> serviceData;
-        std::vector<uint8_t> serviceDataMask;
-        if (nativeScanFilter.manufactureData != nullptr && nativeScanFilter.manufactureDataMask != nullptr) {
+        if (nativeScanFilter.serviceData != nullptr) {
+            std::vector<uint8_t> serviceData;
             for (unsigned int i = 0; i < nativeScanFilter.serviceDataLength; i++) {
                 serviceData.push_back(nativeScanFilter.serviceData[i]);
-                serviceDataMask.push_back(nativeScanFilter.serviceDataMask[i]);
+            }
+            scanFilter.SetServiceData(serviceData);
+            if (nativeScanFilter.serviceDataMask != nullptr) {
+                std::vector<uint8_t> serviceDataMask;
+                for (unsigned int i = 0; i < nativeScanFilter.serviceDataLength; i++) {
+                    serviceDataMask.push_back(nativeScanFilter.serviceDataMask[i]);
+                }
+                scanFilter.SetServiceDataMask(serviceDataMask);
             }
         }
-        scanFilter.SetServiceData(serviceData);
-        scanFilter.SetServiceDataMask(serviceDataMask);
 
-        std::vector<uint8_t> manufactureData;
-        std::vector<uint8_t> manufactureDataMask;
-        if (nativeScanFilter.manufactureData != nullptr && nativeScanFilter.manufactureDataMask != nullptr) {
+        if (nativeScanFilter.manufactureData != nullptr) {
+            std::vector<uint8_t> manufactureData;
             for (unsigned int i = 0; i < nativeScanFilter.manufactureDataLength; i++) {
                 manufactureData.push_back(nativeScanFilter.manufactureData[i]);
-                manufactureDataMask.push_back(nativeScanFilter.manufactureDataMask[i]);
+            }
+            scanFilter.SetManufactureData(manufactureData);
+            if (nativeScanFilter.manufactureDataMask != nullptr) {
+                std::vector<uint8_t> manufactureDataMask;
+                for (unsigned int i = 0; i < nativeScanFilter.manufactureDataLength; i++) {
+                    manufactureDataMask.push_back(nativeScanFilter.manufactureDataMask[i]);
+                }
+                scanFilter.SetManufactureDataMask(manufactureDataMask);
             }
         }
-        scanFilter.SetManufactureData(manufactureData);
-        scanFilter.SetManufactureDataMask(manufactureDataMask);
+
         if (nativeScanFilter.manufactureId != 0) {
             scanFilter.SetManufacturerId(nativeScanFilter.manufactureId);
         }
