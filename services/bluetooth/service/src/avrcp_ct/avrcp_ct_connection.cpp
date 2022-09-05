@@ -16,6 +16,7 @@
 #include "avrcp_ct_connection.h"
 #include "avrcp_ct_packet.h"
 #include "avrcp_ct_pass_through.h"
+#include "log_util.h"
 
 namespace bluetooth {
 AvrcCtConnectManager *AvrcCtConnectManager::g_instance = nullptr;
@@ -34,7 +35,7 @@ AvrcCtConnectInfo::AvrcCtConnectInfo(const std::string &btAddr, uint8_t connectI
       absVolume_(absVolume),
       btAddr_(btAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectInfo::%{public}s", __func__);
+    HILOGI("enter");
 
     notes_.insert(std::make_pair(AVRC_EVENT_ID_PLAYBACK_STATUS_CHANGED, true));
     notes_.insert(std::make_pair(AVRC_EVENT_ID_TRACK_CHANGED, true));
@@ -59,7 +60,7 @@ AvrcCtConnectInfo::AvrcCtConnectInfo(const std::string &btAddr, uint8_t connectI
 
 AvrcCtConnectInfo::~AvrcCtConnectInfo()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectInfo::%{public}s", __func__);
+    HILOGI("enter");
 
     if (ptInfo_.timer_ != nullptr) {
         ptInfo_.timer_->Stop();
@@ -96,7 +97,7 @@ AvrcCtConnectInfo::~AvrcCtConnectInfo()
 
 AvrcCtConnectManager *AvrcCtConnectManager::GetInstance(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("enter");
 
     if (g_instance == nullptr) {
         g_instance = new (std::nothrow) AvrcCtConnectManager();
@@ -109,7 +110,16 @@ int AvrcCtConnectManager::Add(const RawAddress &rawAddr, uint8_t connectId, uint
     uint16_t browseMtu, uint32_t companyId, uint16_t uidCounter, bool absVolume, AvctChannelEventCallback eventCallback,
     AvctMsgCallback msgCallback)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s, connectId: %{public}d, role: %{public}d, controlMtu: %{public}hu, browseMtu: "
+        "%{public}hu, companyId: %{public}u, uidCounter: %{public}hu, absVolume: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr),
+        connectId,
+        role,
+        controlMtu,
+        browseMtu,
+        companyId,
+        uidCounter,
+        absVolume);
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -129,7 +139,7 @@ int AvrcCtConnectManager::Add(const RawAddress &rawAddr, uint8_t connectId, uint
                 msgCallback)));
     } else {
         result = RET_BAD_PARAM;
-        LOG_DEBUG("[AVRCP CT] The connection information exists!");
+        HILOGI("The connection information exists!");
     }
 
     return result;
@@ -137,7 +147,7 @@ int AvrcCtConnectManager::Add(const RawAddress &rawAddr, uint8_t connectId, uint
 
 void AvrcCtConnectManager::Delete(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -146,7 +156,7 @@ void AvrcCtConnectManager::Delete(const RawAddress &rawAddr)
 
 const AvrcCtConnectInfo *AvrcCtConnectManager::GetConnectInfo(const RawAddress &rawAddr) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     const AvrcCtConnectInfo *info = nullptr;
 
@@ -160,7 +170,7 @@ const AvrcCtConnectInfo *AvrcCtConnectManager::GetConnectInfo(const RawAddress &
 
 RawAddress AvrcCtConnectManager::GetRawAddress(uint8_t connectId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("connectId: %{public}d", connectId);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::string addr(AVRC_CT_DEFAULT_BLUETOOTH_ADDRESS);
 
@@ -176,7 +186,7 @@ RawAddress AvrcCtConnectManager::GetRawAddress(uint8_t connectId)
 
 std::list<std::string> AvrcCtConnectManager::GetDeviceAddresses(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -190,7 +200,7 @@ std::list<std::string> AvrcCtConnectManager::GetDeviceAddresses(void)
 
 void AvrcCtConnectManager::AddDisconnectedDevice(const std::string &addr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(addr).c_str());
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -199,7 +209,7 @@ void AvrcCtConnectManager::AddDisconnectedDevice(const std::string &addr)
 
 void AvrcCtConnectManager::DeleteDisconnectedDevice(const std::string &addr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(addr).c_str());
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -212,7 +222,7 @@ void AvrcCtConnectManager::DeleteDisconnectedDevice(const std::string &addr)
 
 const std::list<std::string> &AvrcCtConnectManager::GetAllDisconnectedDevices(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -221,14 +231,14 @@ const std::list<std::string> &AvrcCtConnectManager::GetAllDisconnectedDevices(vo
 
 bool AvrcCtConnectManager::IsConnectInfoEmpty(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("enter");
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     return infos_.empty();
 }
 
 uint8_t AvrcCtConnectManager::GetConnectId(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     uint8_t connectId = 0x00;
 
@@ -236,7 +246,7 @@ uint8_t AvrcCtConnectManager::GetConnectId(const RawAddress &rawAddr)
     if (info != nullptr) {
         connectId = info->connectId_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return connectId;
@@ -244,21 +254,19 @@ uint8_t AvrcCtConnectManager::GetConnectId(const RawAddress &rawAddr)
 
 void AvrcCtConnectManager::SetConnectId(const RawAddress &rawAddr, uint8_t connectId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] connectId[%{public}d]", connectId);
+    HILOGI("address: %{public}s, connectId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), connectId);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->connectId_ = connectId;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::EnableNotifyState(const RawAddress &rawAddr, uint8_t notification)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] notification[%{public}d]", notification);
+    HILOGI("address: %{public}s, notification: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), notification);
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -269,14 +277,13 @@ void AvrcCtConnectManager::EnableNotifyState(const RawAddress &rawAddr, uint8_t 
             iter->second = true;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::DisableNotifyState(const RawAddress &rawAddr, uint8_t notification)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] notification[%{public}d]", notification);
+    HILOGI("address: %{public}s, notification: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), notification);
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -287,14 +294,13 @@ void AvrcCtConnectManager::DisableNotifyState(const RawAddress &rawAddr, uint8_t
             iter->second = false;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 bool AvrcCtConnectManager::IsNotifyStateEnabled(const RawAddress &rawAddr, uint8_t notification)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] notification[%{public}d]", notification);
+    HILOGI("address: %{public}s, notification: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), notification);
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -307,21 +313,21 @@ bool AvrcCtConnectManager::IsNotifyStateEnabled(const RawAddress &rawAddr, uint8
             result = iter->second;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
-    LOG_DEBUG("[AVRCP CT] result[%{public}d]", result);
+    HILOGI("result[%{public}d]", result);
 
     return result;
 }
 
 void AvrcCtConnectManager::DisableExcludeEvents(const RawAddress &rawAddr, std::vector<uint8_t> events)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info == nullptr) {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
         return;
     }
     for (auto pos = info->notes_.begin(); pos != info->notes_.end(); ) {
@@ -337,7 +343,7 @@ void AvrcCtConnectManager::DisableExcludeEvents(const RawAddress &rawAddr, std::
 
 uint32_t AvrcCtConnectManager::GetCompanyId(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     uint32_t companyId = AVRC_CT_DEFAULT_BLUETOOTH_SIG_COMPANY_ID;
 
@@ -345,7 +351,7 @@ uint32_t AvrcCtConnectManager::GetCompanyId(const RawAddress &rawAddr)
     if (info != nullptr) {
         companyId = info->companyId_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return companyId;
@@ -353,7 +359,7 @@ uint32_t AvrcCtConnectManager::GetCompanyId(const RawAddress &rawAddr)
 
 uint16_t AvrcCtConnectManager::GetUidCounter(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     uint16_t uidCounter = 0x00;
 
@@ -361,7 +367,7 @@ uint16_t AvrcCtConnectManager::GetUidCounter(const RawAddress &rawAddr)
     if (info != nullptr) {
         uidCounter = info->uidCounter_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return uidCounter;
@@ -369,15 +375,15 @@ uint16_t AvrcCtConnectManager::GetUidCounter(const RawAddress &rawAddr)
 
 void AvrcCtConnectManager::SetUidCounter(const RawAddress &rawAddr, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] uidCounter[%{public}d]", uidCounter);
+    HILOGI("address: %{public}s, uidCounter: %{public}hu", GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter);
+
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->uidCounter_ = uidCounter;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
@@ -387,7 +393,7 @@ void AvrcCtConnectManager::SetUidCounter(const RawAddress &rawAddr, uint16_t uid
 
 std::shared_ptr<AvrcCtPassPacket> AvrcCtConnectManager::GetPassPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtPassPacket> pkt = nullptr;
 
@@ -395,7 +401,7 @@ std::shared_ptr<AvrcCtPassPacket> AvrcCtConnectManager::GetPassPacket(const RawA
     if (info != nullptr) {
         pkt = info->ptInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -403,19 +409,19 @@ std::shared_ptr<AvrcCtPassPacket> AvrcCtConnectManager::GetPassPacket(const RawA
 
 void AvrcCtConnectManager::SetPassPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtPassPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->ptInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 bool AvrcCtConnectManager::IsPassPacketEmpty(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     bool result = true;
 
@@ -423,7 +429,7 @@ bool AvrcCtConnectManager::IsPassPacketEmpty(const RawAddress &rawAddr)
     if (info != nullptr && info->ptInfo_.pkt_ != nullptr) {
         result = false;
     } else {
-        LOG_DEBUG("[AVRCP CT] The PASS THROUGH packet is empty!");
+        HILOGI("The PASS THROUGH packet is empty!");
     }
 
     return result;
@@ -432,7 +438,7 @@ bool AvrcCtConnectManager::IsPassPacketEmpty(const RawAddress &rawAddr)
 void AvrcCtConnectManager::SetPassTimer(
     const RawAddress &rawAddr, const std::function<void()> callback, int ms, bool isPeriodic)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("addr:%{public}s, ms:%{public}d, isPeriodic:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), ms, isPeriodic);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -440,26 +446,26 @@ void AvrcCtConnectManager::SetPassTimer(
         info->ptInfo_.timer_ = std::make_shared<utility::Timer>(callback);
         info->ptInfo_.timer_->Start(ms, isPeriodic);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearPassPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->ptInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearPassTimer(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -469,13 +475,13 @@ void AvrcCtConnectManager::ClearPassTimer(const RawAddress &rawAddr)
             info->ptInfo_.timer_ = nullptr;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearPassInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     ClearPassTimer(rawAddr);
     ClearPassPacket(rawAddr);
@@ -483,7 +489,7 @@ void AvrcCtConnectManager::ClearPassInfo(const RawAddress &rawAddr)
 
 void AvrcCtConnectManager::PushPassQueue(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtPassPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -491,13 +497,13 @@ void AvrcCtConnectManager::PushPassQueue(const RawAddress &rawAddr, const std::s
     if (info != nullptr) {
         info->ptInfo_.cmdQue_.push(pkt);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 std::shared_ptr<AvrcCtPassPacket> AvrcCtConnectManager::PopPassQueue(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -508,7 +514,7 @@ std::shared_ptr<AvrcCtPassPacket> AvrcCtConnectManager::PopPassQueue(const RawAd
         pkt = info->ptInfo_.cmdQue_.front();
         info->ptInfo_.cmdQue_.pop();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -516,6 +522,7 @@ std::shared_ptr<AvrcCtPassPacket> AvrcCtConnectManager::PopPassQueue(const RawAd
 
 uint8_t AvrcCtConnectManager::GetSizeOfPassQueue(const RawAddress &rawAddr)
 {
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     uint8_t result = 0x00;
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
@@ -524,7 +531,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfPassQueue(const RawAddress &rawAddr)
     if (info != nullptr) {
         result = info->ptInfo_.cmdQue_.size();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return result;
@@ -536,7 +543,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfPassQueue(const RawAddress &rawAddr)
 
 std::shared_ptr<AvrcCtUnitPacket> AvrcCtConnectManager::GetUnitPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcTgConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtUnitPacket> pkt = nullptr;
 
@@ -544,7 +551,7 @@ std::shared_ptr<AvrcCtUnitPacket> AvrcCtConnectManager::GetUnitPacket(const RawA
     if (info != nullptr) {
         pkt = info->unInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -552,21 +559,21 @@ std::shared_ptr<AvrcCtUnitPacket> AvrcCtConnectManager::GetUnitPacket(const RawA
 
 void AvrcCtConnectManager::SetUnitPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtUnitPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcTgConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->unInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::SetUnitTimer(
     const RawAddress &rawAddr, std::function<void()> callback, int ms, bool isPeriodic)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("addr:%{public}s, ms:%{public}d, isPeriodic:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), ms, isPeriodic);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -574,26 +581,26 @@ void AvrcCtConnectManager::SetUnitTimer(
         info->unInfo_.timer_ = std::make_shared<utility::Timer>(callback);
         info->unInfo_.timer_->Start(ms, isPeriodic);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearUnitPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcTgConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->unInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearUnitTimer(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -603,13 +610,13 @@ void AvrcCtConnectManager::ClearUnitTimer(const RawAddress &rawAddr)
             info->unInfo_.timer_ = nullptr;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearUnitInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcTgConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     ClearUnitTimer(rawAddr);
     ClearUnitPacket(rawAddr);
@@ -617,20 +624,20 @@ void AvrcCtConnectManager::ClearUnitInfo(const RawAddress &rawAddr)
 
 void AvrcCtConnectManager::PushUnitQueue(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtUnitPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->unInfo_.cmdQue_.push(pkt);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 std::shared_ptr<AvrcCtUnitPacket> AvrcCtConnectManager::PopUnitQueue(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtUnitPacket> pkt = nullptr;
 
@@ -639,7 +646,7 @@ std::shared_ptr<AvrcCtUnitPacket> AvrcCtConnectManager::PopUnitQueue(const RawAd
         pkt = info->unInfo_.cmdQue_.front();
         info->unInfo_.cmdQue_.pop();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -647,7 +654,7 @@ std::shared_ptr<AvrcCtUnitPacket> AvrcCtConnectManager::PopUnitQueue(const RawAd
 
 uint8_t AvrcCtConnectManager::GetSizeOfUnitQueue(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     uint8_t result = 0x00;
 
@@ -655,7 +662,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfUnitQueue(const RawAddress &rawAddr)
     if (info != nullptr) {
         result = info->unInfo_.cmdQue_.size();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return result;
@@ -667,7 +674,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfUnitQueue(const RawAddress &rawAddr)
 
 std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::GetVendorPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtVendorPacket> pkt = nullptr;
 
@@ -675,7 +682,7 @@ std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::GetVendorPacket(const 
     if (info != nullptr) {
         pkt = info->vdInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -683,7 +690,7 @@ std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::GetVendorPacket(const 
 
 std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::GetVendorContinuePacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtVendorPacket> pkt = nullptr;
 
@@ -691,7 +698,7 @@ std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::GetVendorContinuePacke
     if (info != nullptr) {
         pkt = info->vdInfo_.continuePkt_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -699,34 +706,35 @@ std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::GetVendorContinuePacke
 
 void AvrcCtConnectManager::SetVendorPacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtVendorPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->vdInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
-void AvrcCtConnectManager::SetVendorContinuePacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtVendorPacket> &pkt)
+void AvrcCtConnectManager::SetVendorContinuePacket(const RawAddress &rawAddr,
+    const std::shared_ptr<AvrcCtVendorPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->vdInfo_.continuePkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::SetVendorTimer(
     const RawAddress &rawAddr, std::function<void()> callback, int ms, bool isPeriodic)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -734,39 +742,39 @@ void AvrcCtConnectManager::SetVendorTimer(
         info->vdInfo_.timer_ = std::make_shared<utility::Timer>(callback);
         info->vdInfo_.timer_->Start(ms, isPeriodic);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearVendorPacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->vdInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearVendorContinuePacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->vdInfo_.continuePkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearVendorTimer(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -776,13 +784,13 @@ void AvrcCtConnectManager::ClearVendorTimer(const RawAddress &rawAddr)
             info->vdInfo_.timer_ = nullptr;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearVendorInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     ClearVendorTimer(rawAddr);
     ClearVendorPacket(rawAddr);
@@ -791,20 +799,20 @@ void AvrcCtConnectManager::ClearVendorInfo(const RawAddress &rawAddr)
 
 void AvrcCtConnectManager::PushVendorQueue(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtVendorPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->vdInfo_.cmdQue_.push(pkt);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::PopVendorQueue(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtVendorPacket> pkt = nullptr;
 
@@ -813,7 +821,7 @@ std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::PopVendorQueue(const R
         pkt = info->vdInfo_.cmdQue_.front();
         info->vdInfo_.cmdQue_.pop();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -821,7 +829,7 @@ std::shared_ptr<AvrcCtVendorPacket> AvrcCtConnectManager::PopVendorQueue(const R
 
 uint8_t AvrcCtConnectManager::GetSizeOfVendorQueue(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     uint8_t result = 0x00;
 
@@ -829,7 +837,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfVendorQueue(const RawAddress &rawAddr)
     if (info != nullptr) {
         result = info->vdInfo_.cmdQue_.size();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return result;
@@ -841,7 +849,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfVendorQueue(const RawAddress &rawAddr)
 
 std::shared_ptr<AvrcCtBrowsePacket> AvrcCtConnectManager::GetBrowsePacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtBrowsePacket> pkt = nullptr;
 
@@ -849,7 +857,7 @@ std::shared_ptr<AvrcCtBrowsePacket> AvrcCtConnectManager::GetBrowsePacket(const 
     if (info != nullptr) {
         pkt = info->brInfo_.pkt_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -857,21 +865,21 @@ std::shared_ptr<AvrcCtBrowsePacket> AvrcCtConnectManager::GetBrowsePacket(const 
 
 void AvrcCtConnectManager::SetBrowsePacket(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtBrowsePacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->brInfo_.pkt_ = pkt;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::SetBrowseTimer(
     const RawAddress &rawAddr, std::function<void()> callback, int ms, bool isPeriodic)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("addr:%{public}s, ms:%{public}d, isPeriodic:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), ms, isPeriodic);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -879,26 +887,26 @@ void AvrcCtConnectManager::SetBrowseTimer(
         info->brInfo_.timer_ = std::make_shared<utility::Timer>(callback);
         info->brInfo_.timer_->Start(ms, isPeriodic);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearBrowsePacket(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->brInfo_.pkt_ = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearBrowseTimer(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
@@ -908,13 +916,13 @@ void AvrcCtConnectManager::ClearBrowseTimer(const RawAddress &rawAddr)
             info->brInfo_.timer_ = nullptr;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 void AvrcCtConnectManager::ClearBrowseInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     ClearBrowseTimer(rawAddr);
     ClearBrowsePacket(rawAddr);
@@ -922,20 +930,20 @@ void AvrcCtConnectManager::ClearBrowseInfo(const RawAddress &rawAddr)
 
 void AvrcCtConnectManager::PushBrowseQueue(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtBrowsePacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->brInfo_.cmdQue_.push(pkt);
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 std::shared_ptr<AvrcCtBrowsePacket> AvrcCtConnectManager::PopBrowseQueue(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     std::shared_ptr<AvrcCtBrowsePacket> pkt = nullptr;
 
@@ -944,7 +952,7 @@ std::shared_ptr<AvrcCtBrowsePacket> AvrcCtConnectManager::PopBrowseQueue(const R
         pkt = info->brInfo_.cmdQue_.front();
         info->brInfo_.cmdQue_.pop();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return pkt;
@@ -952,7 +960,7 @@ std::shared_ptr<AvrcCtBrowsePacket> AvrcCtConnectManager::PopBrowseQueue(const R
 
 uint8_t AvrcCtConnectManager::GetSizeOfBrowseQueue(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     uint8_t result = 0x00;
 
@@ -960,7 +968,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfBrowseQueue(const RawAddress &rawAddr)
     if (info != nullptr) {
         result = info->brInfo_.cmdQue_.size();
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return result;
@@ -968,7 +976,7 @@ uint8_t AvrcCtConnectManager::GetSizeOfBrowseQueue(const RawAddress &rawAddr)
 
 bool AvrcCtConnectManager::IsDisableAbsoluteVolume(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     bool result = false;
 
@@ -976,7 +984,7 @@ bool AvrcCtConnectManager::IsDisableAbsoluteVolume(const RawAddress &rawAddr)
     if (info != nullptr) {
         result = info->absVolume_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return result;
@@ -984,7 +992,7 @@ bool AvrcCtConnectManager::IsDisableAbsoluteVolume(const RawAddress &rawAddr)
 
 bool AvrcCtConnectManager::IsBrowsingConnected(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     bool result = false;
 
@@ -992,7 +1000,7 @@ bool AvrcCtConnectManager::IsBrowsingConnected(const RawAddress &rawAddr)
     if (info != nullptr) {
         result = info->brConnected_;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 
     return result;
@@ -1000,20 +1008,20 @@ bool AvrcCtConnectManager::IsBrowsingConnected(const RawAddress &rawAddr)
 
 void AvrcCtConnectManager::SetBrowsingState(const RawAddress &rawAddr, bool state)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectInfo *info = GetConnectInfo(rawAddr.GetAddress());
     if (info != nullptr) {
         info->brConnected_ = state;
     } else {
-        LOG_DEBUG("[AVRCP CT] The connection information does not exist!");
+        HILOGI("The connection information does not exist!");
     }
 }
 
 AvrcCtConnectManager::~AvrcCtConnectManager()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("enter");
 
     infos_.clear();
 
@@ -1022,7 +1030,7 @@ AvrcCtConnectManager::~AvrcCtConnectManager()
 
 AvrcCtConnectInfo *AvrcCtConnectManager::GetConnectInfo(const std::string &btAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtConnectManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(btAddr).c_str());
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     AvrcCtConnectInfo *info = nullptr;
 

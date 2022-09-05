@@ -67,7 +67,7 @@ public:
 
     void OnConnectionStateChanged(const RawAddress &device, int state) override
     {
-        HILOGI("enter");
+        HILOGI("device: %{public}s, state: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), state);
         a2dpSource_.observers_.ForEach([device, state](std::shared_ptr<A2dpSourceObserver> observer) {
             observer->OnConnectionStateChanged(BluetoothRemoteDevice(device.GetAddress(), 0), state);
         });
@@ -75,7 +75,8 @@ public:
 
     void OnPlayingStatusChanged(const RawAddress &device, int playingState, int error) override
     {
-        HILOGI("enter");
+        HILOGI("device: %{public}s, playingState: %{public}d, error: %{public}d",
+            GetEncryptAddr(device.GetAddress()).c_str(), playingState, error);
         a2dpSource_.observers_.ForEach([device, playingState, error](std::shared_ptr<A2dpSourceObserver> observer) {
             observer->OnPlayingStatusChanged(BluetoothRemoteDevice(device.GetAddress(), 0), playingState, error);
         });
@@ -83,7 +84,7 @@ public:
 
     void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) override
     {
-        HILOGI("enter");
+        HILOGI("device: %{public}s, error: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), error);
         a2dpSource_.observers_.ForEach([device, info, error](std::shared_ptr<A2dpSourceObserver> observer) {
             A2dpCodecInfo codecInfo;
 
@@ -200,7 +201,7 @@ A2dpSource::A2dpSource()
 {
     pimpl = std::make_unique<impl>();
     if (!pimpl) {
-        HILOGE("fails: no pimpl");
+        HILOGI("fails: no pimpl");
     }
 }
 
