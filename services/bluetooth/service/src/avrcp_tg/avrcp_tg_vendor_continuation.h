@@ -26,6 +26,7 @@
 #include "avrcp_tg_vendor.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /******************************************************************
  * RequestContinuingResponse                                      *
@@ -209,5 +210,6 @@ private:
     uint8_t continuePduId_ {AVRC_TG_PDU_ID_INVALID};  // The value of the "ContinuePDU_ID".
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_VENDOR_CONTINUATION_H

@@ -22,6 +22,7 @@
 #include "../obex/obex_transport.h"
 #include "btstack.h"
 
+namespace OHOS {
 namespace bluetooth {
 enum PbapPseMessage {
     PSE_DEVICE_CONNECT_INCOMING = 0x1001,  // when connect is incoming
@@ -101,5 +102,6 @@ private:
     ObexServerSession &obexSession_;
     const ObexHeader &header_;
 };
-}  // end of namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_HEADER_MSG_H

@@ -27,6 +27,7 @@
 #include "state_machine.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for HF state machine.
@@ -491,4 +492,5 @@ private:
     void ProcessDisconnect(const HfpHfMessage &event);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_STATEMACHINE_H

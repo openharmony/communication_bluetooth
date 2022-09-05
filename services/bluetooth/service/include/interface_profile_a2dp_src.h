@@ -26,6 +26,7 @@
 
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct A2dpSrcCodecInfo {
     // Codec priority
@@ -330,5 +331,6 @@ public:
  */
 class IProfileA2dpSrc : public IProfileA2dp {};
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_A2DP_SRC_H

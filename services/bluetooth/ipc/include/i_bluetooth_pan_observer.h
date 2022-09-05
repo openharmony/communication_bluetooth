@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class IBluetoothPanObserver : public OHOS::IRemoteBroker {
 public:

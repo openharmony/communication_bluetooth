@@ -28,6 +28,7 @@
 
 using namespace stub;
 
+namespace OHOS {
 namespace bluetooth {
 class PbapPseVcardDataAccess {
 public:
@@ -987,3 +988,4 @@ bool PbapPseVcardManager::IsSupportedXBtUID(const uint32_t &supportedFeatures)
     return (PBAP_FEATURES_X_BT_UID_VCARD_PROPERTY & supportedFeatures) != 0;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

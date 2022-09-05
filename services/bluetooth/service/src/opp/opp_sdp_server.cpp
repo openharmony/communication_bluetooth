@@ -19,6 +19,7 @@
 #include "opp_defines.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 int OppSdpServer::Register(uint8_t rfcommScn, uint16_t l2capPsm)
 {
@@ -170,3 +171,4 @@ int OppSdpServer::AddSupportedFormatsList() const
         (uint8_t*)g_oppSupportedFormatsListData, sizeof(g_oppSupportedFormatsListData));
 }
 }  // namespace bluetooth
+}  // namespace OHOS

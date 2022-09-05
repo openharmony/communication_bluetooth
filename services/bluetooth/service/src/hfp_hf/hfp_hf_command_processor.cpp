@@ -21,6 +21,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::unordered_map<std::string, HfpHfCommandProcessor::HfpHfAtHandler> HfpHfCommandProcessor::g_atCmdMap = {
     std::make_pair<std::string, HfpHfAtHandler>("OK", {&HfpHfCommandProcessor::ProcessOK}),
@@ -858,3 +859,4 @@ void HfpHfCommandProcessor::CleanUp()
     currentCommand_ = AT_COMMAND_NONE;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

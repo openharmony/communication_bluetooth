@@ -20,6 +20,7 @@
 #include "include/a2dp_codec_wrapper.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 static bool OrderCodecPriority(const A2dpCodecConfig *element1, const A2dpCodecConfig *element2)
 {
@@ -310,3 +311,4 @@ bool A2dpCodecFactory::SetPeerSourceCodecCapabilities(const uint8_t *capabilitie
     return a2dpCodecConfig->SetPeerCodecCapabilities(capabilities);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

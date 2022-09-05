@@ -25,6 +25,7 @@
 #include "pan_message.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for l2cap connection.
@@ -278,4 +279,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(PanBnep);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PAN_BNEP_H

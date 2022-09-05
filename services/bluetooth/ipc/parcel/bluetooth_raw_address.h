@@ -21,14 +21,14 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothRawAddress : public Parcelable, public ::bluetooth::RawAddress {
+class BluetoothRawAddress : public Parcelable, public bluetooth::RawAddress {
 public:
     BluetoothRawAddress() = default;
-    BluetoothRawAddress(const ::bluetooth::RawAddress &other) : ::bluetooth::RawAddress(other)
+    BluetoothRawAddress(const bluetooth::RawAddress &other) : bluetooth::RawAddress(other)
     {}
-    BluetoothRawAddress(const BluetoothRawAddress &other) : ::bluetooth::RawAddress(other)
+    BluetoothRawAddress(const BluetoothRawAddress &other) : bluetooth::RawAddress(other)
     {}
-    BluetoothRawAddress(const std::string &address) : ::bluetooth::RawAddress(address)
+    BluetoothRawAddress(const std::string &address) : bluetooth::RawAddress(address)
     {}
     ~BluetoothRawAddress() = default;
 

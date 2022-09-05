@@ -20,6 +20,7 @@
 #include "memory.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int BIT_MOVE_LEFT4 = 4;
 const int BIT_MOVE_RIGHT4 = 4;
@@ -937,3 +938,4 @@ bool IsSbcConfigChanged(const uint8_t *lastCodecInfo, const uint8_t *newCodecInf
            (lastInfo.maxBitpool == newInfo.maxBitpool);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

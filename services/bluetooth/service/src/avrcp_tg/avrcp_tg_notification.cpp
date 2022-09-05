@@ -16,6 +16,7 @@
 #include "avrcp_tg_notification.h"
 #include "avrcp_tg_vendor_player_application_settings.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcTgNotifyPacket::AvrcTgNotifyPacket(uint8_t eventId, uint8_t crCode, uint8_t label)
     : interval_(AVRC_PLAYBACK_INTERVAL_1_SEC), playStatus_(AVRC_PLAY_STATUS_ERROR),
@@ -474,4 +475,5 @@ bool AvrcTgNotifyPacket::IsSupportedEventId(void) const
 
     return !(eventId_ == AVRC_TG_EVENT_ID_BATT_STATUS_CHANGED || eventId_ == AVRC_TG_EVENT_ID_SYSTEM_STATUS_CHANGED);
 }
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

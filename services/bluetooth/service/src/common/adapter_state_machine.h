@@ -22,6 +22,7 @@
 
 #include "interface_adapter.h"
 
+namespace OHOS {
 namespace bluetooth {
 // adapter state machine each state name
 const std::string TURNING_ON_STATE = "TurningOn";
@@ -299,5 +300,6 @@ public:
     virtual bool Dispatch(const utility::Message &msg);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // ADAPTER_STATE_MACHINE_H

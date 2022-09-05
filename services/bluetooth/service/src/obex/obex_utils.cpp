@@ -26,6 +26,7 @@
 #include "securec.h"
 #include "stub/message_digest.h"
 
+namespace OHOS {
 namespace bluetooth {
 int ObexUtils::g_bigEndian = -1;
 
@@ -266,3 +267,4 @@ std::u16string ObexUtils::Utf8ToUnicode(const std::string &strUtf8)
     return convert.from_bytes(strUtf8);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

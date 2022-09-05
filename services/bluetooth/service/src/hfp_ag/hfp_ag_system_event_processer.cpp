@@ -19,6 +19,7 @@
 #include "hfp_ag_message.h"
 #include "hfp_ag_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgSystemEventProcesser::HfpAgSystemEventProcesser(HfpAgProfile &profile, const std::string &address)
     :profile_(profile), address_(address)
@@ -394,3 +395,4 @@ std::string HfpAgSystemEventProcesser::GetEventType(int type)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

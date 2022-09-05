@@ -19,6 +19,7 @@
 #include "map_mse_server.h"
 #include "map_mse_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct MapMseInstance::impl {
     class ConnectObserver : public MseObserver {
@@ -966,3 +967,4 @@ std::string MapAccountItem::GetUciFullName(void)
     return fullUci;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

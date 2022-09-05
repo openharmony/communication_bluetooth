@@ -23,6 +23,7 @@
 #include "hfp_hf_command_processor.h"
 #include "hfp_hf_data_connection.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for parse AT command from remote AG device.
@@ -68,4 +69,5 @@ private:
     };
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_COMMAND_PARSER_H

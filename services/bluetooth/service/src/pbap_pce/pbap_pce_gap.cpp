@@ -19,6 +19,7 @@
 #include "pbap_pce_service.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 PbapPceGap::PbapPceGap(
     const IProfilePbapPce &service, const RawAddress &device, GapSecChannel channel, bool rfcommOrPsm)
@@ -142,3 +143,4 @@ void PbapPceGap::RequestSecurityCallback(uint16_t result, GapServiceSecurityInfo
     PBAP_PCE_LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

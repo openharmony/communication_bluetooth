@@ -19,6 +19,7 @@
 #include "bt_def.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 GattBasedServicesManager::GattBasedServicesManager(GattServerService &server, utility::Dispatcher &dispatcher)
     : gas_(std::make_unique<GenericAccessService>(server, dispatcher)),
@@ -66,3 +67,4 @@ void GattBasedServicesManager::Disable() const
     gas_->DeregisterService();
 }
 }  // namespace bluetooth
+}  // namespace OHOS

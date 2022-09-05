@@ -29,6 +29,7 @@
 #include "avrcp_media.h"
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides data interaction for asynchronous actions.
@@ -1101,5 +1102,6 @@ public:
     virtual int DisableNotification(const RawAddress &rawAddr, const std::vector<uint8_t> &events) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_AVRCP_CT_H

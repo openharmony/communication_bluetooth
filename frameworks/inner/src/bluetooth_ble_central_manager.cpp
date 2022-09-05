@@ -455,19 +455,19 @@ void BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter>  &filt
             scanFilter.SetDeviceId(filter.GetDeviceId());
             scanFilter.SetName(filter.GetName());
             if (filter.HasServiceUuid()) {
-                scanFilter.SetServiceUuid(::bluetooth::Uuid::ConvertFromString(
+                scanFilter.SetServiceUuid(bluetooth::Uuid::ConvertFromString(
                     filter.GetServiceUuid().ToString()));
             }
             if (filter.HasServiceUuidMask()) {
-                scanFilter.SetServiceUuidMask(::bluetooth::Uuid::ConvertFromString(
+                scanFilter.SetServiceUuidMask(bluetooth::Uuid::ConvertFromString(
                     filter.GetServiceUuidMask().ToString()));
             }
             if (filter.HasSolicitationUuid()) {
-                scanFilter.SetServiceSolicitationUuid(::bluetooth::Uuid::ConvertFromString(
+                scanFilter.SetServiceSolicitationUuid(bluetooth::Uuid::ConvertFromString(
                     filter.GetServiceSolicitationUuid().ToString()));
             }
             if (filter.HasSolicitationUuidMask()) {
-                scanFilter.SetServiceSolicitationUuidMask(::bluetooth::Uuid::ConvertFromString(
+                scanFilter.SetServiceSolicitationUuidMask(bluetooth::Uuid::ConvertFromString(
                     filter.GetServiceSolicitationUuidMask().ToString()));
             }
             scanFilter.SetServiceData(filter.GetServiceData());

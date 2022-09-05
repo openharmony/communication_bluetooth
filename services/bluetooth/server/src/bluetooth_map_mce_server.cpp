@@ -20,7 +20,7 @@
 #include "bluetooth_utils.h"
 #include "remote_observer_list.h"
 
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {

@@ -24,7 +24,7 @@ using OHOS::Bluetooth::IBluetoothOppObserver;
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class IBluetoothOpp : public IRemoteBroker {
 public:

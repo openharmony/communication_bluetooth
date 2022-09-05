@@ -21,6 +21,7 @@
 #include "gatt/gatt_defines.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 const uint16_t DeviceInformationService::GATT_UUID_MANUFACTURER_NAME_STRING_CHAR = 0x2A29;
 const uint16_t DeviceInformationService::GATT_UUID_MODEL_NUMBER_STRING_CHAR = 0x2A24;
@@ -295,3 +296,4 @@ std::string DeviceInformationService::GetSoftwareRevision()
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

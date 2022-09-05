@@ -16,6 +16,7 @@
 #include "avrcp_tg_packet.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 uint16_t AvrcTgPacket::PushOctets1(uint8_t *pkt, uint8_t payload)
 {
@@ -207,3 +208,4 @@ uint16_t AvrcTgPacket::PopOctetsUpto8(uint8_t *pkt, size_t size, uint64_t &paylo
     return static_cast<uint16_t>(size);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

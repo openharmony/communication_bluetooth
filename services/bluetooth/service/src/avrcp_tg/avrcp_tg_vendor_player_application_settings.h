@@ -27,6 +27,7 @@
 #include "avrcp_tg_vendor.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /******************************************************************
  * ListPlayerApplicationSettingAttributes                         *
@@ -836,5 +837,6 @@ private:
     AvrcTgGpasvtPacket() = delete;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_VENDOR_PLAYER_APPLICATION_SETTINGS_H

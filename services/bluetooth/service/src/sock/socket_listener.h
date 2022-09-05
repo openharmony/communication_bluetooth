@@ -21,6 +21,7 @@
 #include <thread>
 #include "sock/socket.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class is used to create a listener thread.
@@ -105,4 +106,5 @@ private:
     SocketOptionCallback exceptCallback_ {Socket::OnSocketException};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // SOCKET_LISTENER_H

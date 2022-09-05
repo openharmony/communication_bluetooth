@@ -19,6 +19,7 @@
 #include <string>
 #include "../obex/obex_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 static const std::string OPP_SERVICE_NAME = "OBEX Object Push";
 static const std::string OPP_SEND_FILE_THREAD_NAME = "oppSendFile";
@@ -113,4 +114,5 @@ struct OppSdpInformation {
     uint8_t rfcommNo = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PAN_DEFINES_H

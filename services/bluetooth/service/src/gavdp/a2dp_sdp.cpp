@@ -17,6 +17,7 @@
 
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int ATTR_NUMBER2 = 2;
 const int ATTR_NUMBER1 = 1;
@@ -132,3 +133,4 @@ int A2dpSdpManager::FindSnkService(const BtAddr &addr, void *a2dpInstance,
     return SDP_ServiceSearchAttribute(&addr, &sdpUUid, attributeIdList, context, callback);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

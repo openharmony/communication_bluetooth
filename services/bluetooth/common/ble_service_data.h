@@ -46,6 +46,7 @@
 #include "string"
 #include "utility"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents scan settings.
@@ -1276,4 +1277,5 @@ private:
     uint8_t advertiseFlag_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  /// BLE_SERVICE_DATA_H

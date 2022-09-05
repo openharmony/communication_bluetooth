@@ -16,6 +16,7 @@
 #include "pan_statemachine.h"
 #include "pan_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 PanStateMachine::PanStateMachine(const std::string &address)
     : address_(address), panBnep_(address)
@@ -369,3 +370,4 @@ void PanStateMachine::ProcessDeferredMessage()
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -27,6 +27,7 @@
 #include "message.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::string A2DP_PROFILE_IDLE = "A2dpStateIdle";
 const std::string A2DP_PROFILE_CONFIG = "A2dpStateConfigure";
@@ -689,4 +690,5 @@ public:
     const std::string GetStateName(void) const;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_STATE_MACHINE_H

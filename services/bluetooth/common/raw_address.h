@@ -21,6 +21,7 @@
 #include <string>
 #include "iosfwd"
 
+namespace OHOS {
 namespace bluetooth {
 class RawAddress {
 public:
@@ -118,4 +119,5 @@ protected:
     std::string address_ = "";
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // RAW_ADDRESS_H

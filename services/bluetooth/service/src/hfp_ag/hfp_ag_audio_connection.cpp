@@ -21,6 +21,7 @@
 #include "securec.h"
 #include "hfp_ag_audio_connection.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::string HfpAgAudioConnection::g_activeAddr {NULL_ADDRESS};
 std::vector<HfpAgAudioConnection::AudioDevice> HfpAgAudioConnection::g_audioDevices {};
@@ -499,3 +500,4 @@ void HfpAgAudioConnection::OnWriteVoiceSettingCompleted(uint8_t status, void *co
     HILOGI("enter, status: %{public}hhu", status);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

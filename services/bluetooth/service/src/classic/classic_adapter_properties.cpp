@@ -25,6 +25,7 @@
 #include "raw_address.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 ClassicAdapterProperties &ClassicAdapterProperties::GetInstance()
 {
@@ -549,3 +550,4 @@ bool ClassicAdapterProperties::SaveSupportUuids(const std::vector<Uuid> &uuids)
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

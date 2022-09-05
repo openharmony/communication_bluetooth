@@ -24,6 +24,7 @@
 #include "bt_def.h"
 #include "btstack.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * SBC Codec Specific Information Element
@@ -243,4 +244,5 @@ enum A2dpMessage {
     A2DP_MSG_PROFILE_CODEC_CHANGE,
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_DEF_H

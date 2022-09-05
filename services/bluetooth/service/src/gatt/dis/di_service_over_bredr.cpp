@@ -20,6 +20,7 @@
 #include "log.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 int DiServiceOverBredr::RegisterSDP(uint16_t startHandle, uint16_t endHandle)
 {
@@ -108,4 +109,5 @@ int DiServiceOverBredr::SdpAddBrowseGroupList() const
 }
 
 REGISTER_CLASS_CREATOR(DiServiceOverBredr);
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

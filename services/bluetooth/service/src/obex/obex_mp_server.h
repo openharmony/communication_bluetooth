@@ -18,6 +18,7 @@
 
 #include "obex_server.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObexPrivateMpServer : public ObexPrivateServer {
 public:
@@ -42,4 +43,5 @@ public:
     virtual ~ObexMpServer() = default;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_MP_SERVER_H

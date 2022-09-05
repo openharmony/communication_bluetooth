@@ -22,6 +22,7 @@
 #include "a2dp_codec_constant.h"
 #include "a2dp_codec_wrapper.h"
 
+namespace OHOS {
 namespace bluetooth {
 class A2dpCodecConfigSbcBase : public A2dpCodecConfig {
 public:
@@ -105,4 +106,5 @@ int GetNumberOfSubbandsSbc(const uint8_t *codecInfo);
 int GetNumberOfBlocksSbc(const uint8_t *codecInfo);
 int GetAllocationMethodCodeSbc(const uint8_t *codecInfo);
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // !A2DP_SBC_PARAM_CTRL_H

@@ -21,6 +21,7 @@
 #include "a2dp_service_device.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class A2dpConnectManager {
 public:
@@ -121,4 +122,5 @@ private:
     uint8_t role_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_SERVICE_CONNECTION_H

@@ -34,6 +34,7 @@
 #include <string>
 #include "libxml/parser.h"
 
+namespace OHOS {
 namespace bluetooth {
 class MceXmlAttribute {
 public:
@@ -69,4 +70,5 @@ private:
     xmlDocPtr pDoc_ = nullptr;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_XML_H

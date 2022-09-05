@@ -25,6 +25,7 @@
 #include "data_access.h"
 #include "map_mse_instance.h"
 
+namespace OHOS {
 namespace bluetooth {
 const uint8_t MapMseServer::MAS_TARGET[TARGET_SIZE] = {
     0xbb, 0x58, 0x2b, 0x40, 0x42, 0x0c, 0x11, 0xdb, 0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66
@@ -1016,3 +1017,4 @@ void MapMseServer::LoadAdapterConfig()
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -35,6 +35,7 @@
 
 #include "interface_adapter.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents adapter classic observer.
@@ -361,5 +362,6 @@ public:
     virtual bool DeregisterClassicAdapterObserver(IAdapterClassicObserver &observer) const = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_ADAPTER_CLASSIC_H

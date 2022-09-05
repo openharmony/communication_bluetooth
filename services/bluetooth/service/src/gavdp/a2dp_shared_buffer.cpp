@@ -16,6 +16,7 @@
 #include "securec.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 A2dpSharedBuffer::A2dpSharedBuffer()
 {
@@ -96,4 +97,5 @@ void A2dpSharedBuffer::SetValid(bool isValid)
     LOG_ERROR("[A2dpSharedBuffer] %{public}s: isValid %{public}d\n", __func__, isValid);
     isValid_ = isValid;
 }
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

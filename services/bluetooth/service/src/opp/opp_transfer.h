@@ -20,6 +20,7 @@
 
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 class OppTransfer {
 public:
@@ -70,4 +71,5 @@ private:
     std::unique_ptr<utility::Timer> incomingFileTimer_ {nullptr};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_OBEX_SERVER_H

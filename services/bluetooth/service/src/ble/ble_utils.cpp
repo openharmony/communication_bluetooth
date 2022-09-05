@@ -21,6 +21,7 @@
 
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::string BleUtils::IntToHexString(uint8_t value)
 {
@@ -88,3 +89,4 @@ void BleUtils::GetRandomAddress(std::vector<uint8_t> &addr, bool isNonResPriAddr
     return;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

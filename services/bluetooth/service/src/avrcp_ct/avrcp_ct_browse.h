@@ -21,6 +21,7 @@
 #include "avrcp_media.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the <b>BROWSING</b> commands.
@@ -827,6 +828,7 @@ private:
     uint8_t status_ {AVRC_ES_CODE_INVALID};                // The value of the "Status".
     uint32_t numOfItems_ {AVRC_CT_GTNOI_NUMBER_OF_ITEMS};  // The value of the "Number of items".
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_BROWSE_H

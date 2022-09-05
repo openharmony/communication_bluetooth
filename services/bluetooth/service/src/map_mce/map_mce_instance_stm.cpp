@@ -32,6 +32,7 @@
 #include "log.h"
 #include "map_mce_mns_server.h"
 
+namespace OHOS {
 namespace bluetooth {
 void MapMceInstanceStm::CreateStm()
 {
@@ -636,3 +637,4 @@ bool MapMceInstanceStm::MapMceConnectedStateSubReqSending::Dispatch(const utilit
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

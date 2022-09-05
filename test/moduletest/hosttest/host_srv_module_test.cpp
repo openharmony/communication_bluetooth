@@ -17,7 +17,7 @@
 #include "adapter_manager.h"
 
 using namespace testing::ext;
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -61,9 +61,9 @@ HWTEST_F(HostServerTest, HostServer_ModuleTest_OnStateChanged, TestSize.Level1)
     AdapterManager::GetInstance()->Enable(BTTransport::ADAPTER_BREDR);
     AdapterManager::GetInstance()->OnAdapterStateChange(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
     GTEST_LOG_(INFO) << "BluetoothHostServer::OnStateChanged ends";
-    
+
     EXPECT_EQ(1000, 1000);
-    
+
     GTEST_LOG_(INFO) << "HostServer_ModuleTest_OnStateChanged end";
 }
 

@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothBleScanFilter : public Parcelable, public ::bluetooth::ScanFilter {
+class BluetoothBleScanFilter : public Parcelable, public bluetooth::ScanFilter {
 public:
     BluetoothBleScanFilter() = default;
     ~BluetoothBleScanFilter() = default;

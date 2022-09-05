@@ -39,6 +39,7 @@
 #include <optional>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for HfpHfServiceObserver functions.
@@ -366,4 +367,5 @@ public:
     virtual void DeregisterObserver(HfpHfServiceObserver &observer) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_HFP_HF_H

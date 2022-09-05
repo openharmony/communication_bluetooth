@@ -20,6 +20,7 @@
 #include "base_def.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the <b>UNIT INFO</b> command.
@@ -132,5 +133,6 @@ protected:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcCtUnitPacket);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_UNIT_INFO_H

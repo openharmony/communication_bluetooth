@@ -20,6 +20,7 @@
 #include "adapter_config.h"
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::vector<ProfileInfo> SupportProfilesInfo::SUPPORT_FILES = {
     ProfileInfo(PROFILE_NAME_GATT_CLIENT, PROFILE_ID_GATT_CLIENT, BLUETOOTH_UUID_GATT),
@@ -73,3 +74,4 @@ const std::vector<ProfileInfo> SupportProfilesInfo::GetConfigSupportProfiles(BTT
     return retProfiles;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

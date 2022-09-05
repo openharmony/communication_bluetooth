@@ -29,6 +29,7 @@
 #include "log.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct ServerApplication {
     explicit ServerApplication(std::shared_ptr<IGattServerCallback> callback) : services_()
@@ -1284,3 +1285,4 @@ void GattServerService::impl::NotifyServiceChanged(int appId, const Service &ser
 
 REGISTER_CLASS_CREATOR(GattServerService);
 }  // namespace bluetooth
+}  // namespace OHOS

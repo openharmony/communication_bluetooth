@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <memory>
 
+namespace OHOS {
 namespace bluetooth {
 using GattValue = std::shared_ptr<std::unique_ptr<uint8_t[]>>;
 
@@ -71,5 +72,6 @@ constexpr uint16_t UUID_DEVICE_INFORMATION_SERVICE = 0x180A;
 constexpr uint16_t ATT_CONN_HANDLE_RANGE_START = 0x0000;
 constexpr uint16_t ATT_CONN_HANDLE_RANGE_END = 0x0EFF;
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !GATT_DEFINES_H

@@ -17,6 +17,7 @@
 #include "pbap_pce_service.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 PceDisconnectingState::PceDisconnectingState(
     const std::string &name, PbapPceStateMachine &stm, BaseObserverList<IPbapPceObserver> &observerMgrList)
@@ -60,3 +61,4 @@ bool PceDisconnectingState::Dispatch(const utility::Message &msg)
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

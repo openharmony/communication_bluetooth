@@ -20,6 +20,7 @@
 #include "avrcp_tg_packet.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the <b>PASS THROUGH</b> command.
@@ -209,5 +210,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcTgPassPacket);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_PASS_THROUGH_H

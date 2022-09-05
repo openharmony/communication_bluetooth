@@ -34,6 +34,7 @@
 #include "interface_profile.h"
 #include "opp_transfer_information.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief opp observer for framework api
@@ -96,4 +97,5 @@ public:
     virtual int CancelTransfer() = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_OPP_H

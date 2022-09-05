@@ -36,6 +36,7 @@
 #include "adapter_device_info.h"
 #include "base_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents device info config.
@@ -129,5 +130,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(DIConfig);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // DEVICE_INFO_CONFIG_H

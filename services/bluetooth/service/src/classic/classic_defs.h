@@ -22,6 +22,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 constexpr int SUCCESS = 0;
 constexpr int FAILED = -1;
@@ -221,4 +222,5 @@ typedef union {
     } authorizeIndParam_;
 } GapCallbackParam;
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // CLASSIC_DEFS_H

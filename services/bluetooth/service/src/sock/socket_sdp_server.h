@@ -22,6 +22,7 @@
 #include "bt_uuid.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods used to interact with the SDP protocol.
@@ -103,4 +104,5 @@ private:
     inline static constexpr uint16_t SPP_BROWSE_LIST_NUM = 1;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // SOCKET_SDP_SERVER_H

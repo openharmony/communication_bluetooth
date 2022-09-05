@@ -34,6 +34,7 @@
 #include "map_mce_mns_server.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 // client uuid
 const uint8_t MapMceInstanceClient::mceClientUuidTbl_[MAX_OF_MASCLIENT_OBEX_UUID_TBL] = {
@@ -673,3 +674,4 @@ void MapMceInstanceClient::MasObexClientObserver::OnBusy(ObexClient &client, boo
     ((MapMceInstanceStm &)obexObserverInstStm_).PostMessage(msg);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

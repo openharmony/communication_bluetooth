@@ -27,6 +27,7 @@
 #include "opp_defines.h"
 #include "opp_transfer_information.h"
 
+namespace OHOS {
 namespace bluetooth {
 class OppSendFileBodyObject : public ObexBodyObject {
 public:
@@ -100,4 +101,5 @@ private:
     std::u16string StringToU16string(const std::string &str) const;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_OBEX_CLIENT_H

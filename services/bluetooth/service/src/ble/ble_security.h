@@ -27,6 +27,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 /*
  * @brief BLE filter.
@@ -129,5 +130,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BLE_SECURITY_H

@@ -36,6 +36,7 @@
 #include "interface_profile_hfp_ag.h"
 #include "interface_profile_hfp_hf.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ClassicBatteryObserverHf : public HfpHfServiceObserver {
 public:
@@ -62,4 +63,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(ClassicBatteryObserverAg);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // CLASSIC_BATTERY_OBSERVER

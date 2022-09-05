@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Bluetooth {
 // BluetoothIPbapPullPhoneBookParam
-BluetoothIPbapPullPhoneBookParam::BluetoothIPbapPullPhoneBookParam(const ::bluetooth::IPbapPullPhoneBookParam &other)
+BluetoothIPbapPullPhoneBookParam::BluetoothIPbapPullPhoneBookParam(const bluetooth::IPbapPullPhoneBookParam &other)
 {
     SetName(other.GetName());
     SetPropertySelector(other.GetPropertySelector());
@@ -156,7 +156,7 @@ BluetoothIPbapPullPhoneBookParam *BluetoothIPbapPullPhoneBookParam::Unmarshallin
 
 // BluetoothIPbapPullvCardListingParam
 BluetoothIPbapPullvCardListingParam::BluetoothIPbapPullvCardListingParam(
-    const ::bluetooth::IPbapPullvCardListingParam &other)
+    const bluetooth::IPbapPullvCardListingParam &other)
 {
     SetName(other.GetName());
     SetOrder(other.GetOrder());
@@ -296,7 +296,7 @@ BluetoothIPbapPullvCardListingParam *BluetoothIPbapPullvCardListingParam::Unmars
 
 // BluetoothIPbapPullvCardEntryParam
 BluetoothIPbapPullvCardEntryParam::BluetoothIPbapPullvCardEntryParam(
-    const ::bluetooth::IPbapPullvCardEntryParam &other)
+    const bluetooth::IPbapPullvCardEntryParam &other)
 {
     SetName(other.GetName());
     SetPropertySelector(other.GetPropertySelector());
@@ -377,7 +377,7 @@ BluetoothIPbapPullvCardEntryParam *BluetoothIPbapPullvCardEntryParam::Unmarshall
 }
 
 // BluetoothIPbapPhoneBookData functions
-BluetoothIPbapPhoneBookData::BluetoothIPbapPhoneBookData(const ::bluetooth::IPbapPhoneBookData &other)
+BluetoothIPbapPhoneBookData::BluetoothIPbapPhoneBookData(const bluetooth::IPbapPhoneBookData &other)
 {
     phoneBookSize_ = other.phoneBookSize_;
     primaryFolderVersion_ = other.primaryFolderVersion_;

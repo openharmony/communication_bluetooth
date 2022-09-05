@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class BluetoothPanObserverProxy : public IRemoteProxy<IBluetoothPanObserver> {
 public:

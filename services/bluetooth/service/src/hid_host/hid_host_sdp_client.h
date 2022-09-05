@@ -28,6 +28,7 @@
 #include "sdp.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for discovery remote H device's SDP server and finding out
@@ -101,4 +102,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HidHostSdpClient);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HID_HOST_SDP_CLIENT_H

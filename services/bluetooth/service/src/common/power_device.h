@@ -21,6 +21,7 @@
 #include "raw_address.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents power device.
@@ -296,5 +297,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // POWER_DEVICE_H

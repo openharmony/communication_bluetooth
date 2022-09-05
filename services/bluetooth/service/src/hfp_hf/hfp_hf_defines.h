@@ -21,6 +21,7 @@
 
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define HFP_HF_RETURN_IF_FAIL(ret)                                \
     do {                                                          \
@@ -302,4 +303,5 @@ enum HfpHfDirectionType { HFP_HF_DIRECTION_TYPE_OUTGOING = 0, HFP_HF_DIRECTION_T
 
 enum { HFP_HF_VR_STATE_CLOSED, HFP_HF_VR_STATE_OPENED };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_DEFINES_H

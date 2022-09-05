@@ -32,6 +32,7 @@
  * @brief bluetooth namespace
  *
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Callback function of MapMseServer
@@ -279,5 +280,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(MapMseServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_SERVER_H

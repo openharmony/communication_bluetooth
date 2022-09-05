@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
 {
     HILOGD("%{public}s start.", __func__);
