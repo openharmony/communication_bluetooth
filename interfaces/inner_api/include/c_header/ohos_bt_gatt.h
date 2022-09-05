@@ -721,7 +721,8 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
  * If don't need ble scan filter, set BleScanNativeFilter to NULL or filterSize to zero.
  * If one of the ble scan filtering rules is not required, set it to NULL.
  * For example, set the address to NULL when you don't need it.
- * Exceptionally, the manufactureId need to be set zero when you don't need it.
+ * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
+ * The manufactureId need to be set a related number when you need a filtering condition of manufactureData.
  *
  * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
  * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
@@ -731,17 +732,6 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
  * @since 6
  */
 int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigned int filterSize);
-
-/**
- * @brief Sets scan filter configs.
- *
- * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
- * @param filterSize Indicates the number of the scan filter.
- * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set scan filter configs success;
- * returns an error code defined in {@link BtStatus} otherwise.
- * @since 6
- */
-int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize);
 
 #ifdef __cplusplus
 }
