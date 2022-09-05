@@ -465,18 +465,118 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 }
 
 /**
- * @brief Starts a scan with BleScanConfigs.
+ * @brief Sets one scan filter config.
  *
+ * @param scanFilter Indicates the framework object of scan filter, see {@link BleScanFilter}.
+ * @param nativeScanFilter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set onr scan filter config success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nativeScanFilter)
+{
+    HILOGI("SetOneScanFilter enter");
+    if (nativeScanFilter->address != nullptr) {
+        scanFilter.SetDeviceId(nativeScanFilter->address);
+    }
+    if (nativeScanFilter->deviceName != nullptr) {
+        scanFilter.SetName(nativeScanFilter->deviceName);
+    }
+    if (nativeScanFilter->serviceUuidLength != 0 && nativeScanFilter->serviceUuid != nullptr) {
+        UUID serviceUuid = UUID::FromString((char *)nativeScanFilter->serviceUuid);
+        scanFilter.SetServiceUuid(serviceUuid);
+        if (nativeScanFilter->serviceUuidMask != nullptr) {
+            UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter->serviceUuidMask);
+            scanFilter.SetServiceUuidMask(serviceUuidMask);
+        }
+    }
+
+    if (nativeScanFilter->serviceData != nullptr) {
+        std::vector<uint8_t> serviceData;
+        for (unsigned int i = 0; i < nativeScanFilter->serviceDataLength; i++) {
+            serviceData.push_back(nativeScanFilter->serviceData[i]);
+        }
+        scanFilter.SetServiceData(serviceData);
+
+        if (nativeScanFilter->serviceDataMask != nullptr) {
+            std::vector<uint8_t> serviceDataMask;
+            for (unsigned int i = 0; i < nativeScanFilter->serviceDataLength; i++) {
+                serviceDataMask.push_back(nativeScanFilter->serviceDataMask[i]);
+            }
+            scanFilter.SetServiceDataMask(serviceDataMask);
+        }
+    }
+
+    if (nativeScanFilter->manufactureData != nullptr) {
+        std::vector<uint8_t> manufactureData;
+        for (unsigned int i = 0; i < nativeScanFilter->manufactureDataLength; i++) {
+            manufactureData.push_back(nativeScanFilter->manufactureData[i]);
+        }
+        scanFilter.SetManufactureData(manufactureData);
+
+        if (nativeScanFilter->manufactureDataMask != nullptr) {
+            std::vector<uint8_t> manufactureDataMask;
+            for (unsigned int i = 0; i < nativeScanFilter->manufactureDataLength; i++) {
+                manufactureDataMask.push_back(nativeScanFilter->manufactureDataMask[i]);
+            }
+            scanFilter.SetManufactureDataMask(manufactureDataMask);
+        }
+
+        if (nativeScanFilter->manufactureId != 0) {
+            scanFilter.SetManufacturerId(nativeScanFilter->manufactureId);
+        }
+    }
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Sets scan filter configs.
+ *
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set scan filter configs success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+static int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize)
+{
+    HILOGI("SetConfigScanFilter enter");
+    vector<BleScanFilter> scanFilters;
+    for (unsigned int i = 0; i < filterSize; i++) {
+        BleScanNativeFilter nativeScanFilter = filter[i];
+        BleScanFilter scanFilter;
+        SetOneScanFilter(scanFilter, &nativeScanFilter);
+        scanFilters.push_back(scanFilter);
+    }
+    g_BleCentralManager->ConfigScanFilter(scanFilters);
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Starts a scan with BleScanConfigs.
+ * If don't need ble scan filter, set BleScanNativeFilter to NULL or filterSize to zero.
+ * If one of the ble scan filtering rules is not required, set it to NULL.
+ * For example, set the address to NULL when you don't need it.
+ * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
+ * The manufactureId need to be set a related number when you need a filtering condition of manufactureData.
+ *
+ * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleStartScanEx(BleScanConfigs *configs)
+int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigned int filterSize)
 {
-    HILOGI("BleStartScanEx enter");
+    HILOGI("BleStartScanEx enter, filterSize %{public}u", filterSize);
     if (g_BleCentralManager == nullptr || configs == nullptr) {
         HILOGE("BleStartScanEx fail, ble centra manager is null or configs is null.");
         return OHOS_BT_STATUS_FAIL;
+    }
+
+    if (filter != nullptr && filterSize != 0) {
+        SetConfigScanFilter(filter, filterSize);
     }
 
     HILOGI("scanMode: %{public}d", configs->scanMode);
