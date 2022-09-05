@@ -86,8 +86,8 @@ struct BleCentralManager::impl {
                 std::vector<BleScanResult> scanResults;
                 for (auto &result : results) {
                     BleScanResult scanResult;
-                    for (auto &manufaturerData : result.GetManufacturerData()) {
-                        scanResult.AddManufacturerData(manufaturerData.first, manufaturerData.second);
+                    for (auto &manufacturerData : result.GetManufacturerData()) {
+                        scanResult.AddManufacturerData(manufacturerData.first, manufacturerData.second);
                     }
 
                     for (auto &serviceData : result.GetServiceData()) {
@@ -292,12 +292,12 @@ bool BleCentralManager::impl::MatchesManufacturerDatas(BluetoothBleScanFilter fi
 
     std::vector<uint8_t> dataMask = filter.GetManufactureDataMask();
 
-    for (auto &manufaturerData : result.GetManufacturerData()) {
-        if (manufacturerId != manufaturerData.first) {
+    for (auto &manufacturerData : result.GetManufacturerData()) {
+        if (manufacturerId != manufacturerData.first) {
             continue;
         }
 
-        if (MatchesData(data, manufaturerData.second, dataMask)) {
+        if (MatchesData(data, manufacturerData.second, dataMask)) {
             return true;
         }
     }
