@@ -21,6 +21,7 @@
 namespace bluetooth {
 std::string GetEncryptAddr(std::string addr);
 #define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetAddress()).c_str())
+#define GET_ENCRYPT_AVRCP_ADDR(rawAddr) (GetEncryptAddr((rawAddr).GetAddress()).c_str())
 }  // namespace bluetooth
 
 #endif // LOG_UTIL_H

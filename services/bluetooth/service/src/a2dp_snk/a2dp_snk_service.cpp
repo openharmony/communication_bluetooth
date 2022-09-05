@@ -29,12 +29,12 @@ IProfileA2dp *IProfileA2dp::GetSnkProfile()
 
 A2dpSnkService::A2dpSnkService() : A2dpService(g_name, g_version, g_role)
 {
-    LOG_INFO("[A2dpSnkService] %{public}s\n", __func__);
+    HILOGI("enter");
 }
 
 A2dpSnkService *A2dpSnkService::GetProfile(void)
 {
-    LOG_INFO("[A2dpSnkService] %{public}s\n", __func__);
+    HILOGI("enter");
 
     static A2dpSnkService service;
     return &service;
