@@ -183,7 +183,7 @@ bool PanService::SetTethering(bool enable)
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (!enable && (isTetheringOn_ != enable)) {
         for (auto it = stateMachines_.begin(); it != stateMachines_.end(); it++) {
-            if ((it->second == nullptr) && (it->second->GetDeviceStateInt() == PAN_STATE_CONNECTED)) {
+            if ((it->second != nullptr) && (it->second->GetDeviceStateInt() == PAN_STATE_CONNECTED)) {
                 PanMessage event(PAN_API_CLOSE_EVT);
                 event.dev_ = it->first;
                 PostEvent(event);
