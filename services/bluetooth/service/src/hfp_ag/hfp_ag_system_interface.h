@@ -21,6 +21,7 @@
 #include "hfp_ag_defines.h"
 #include "telephony_observer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief  Defines the interfaces that is called by HFP.
@@ -322,7 +323,7 @@ private:
      * @brief Unregister a TelephonyObserver to the telephony subsystem.
      */
     void UnregisterObserver();
-    
+
     /**
      * @brief Convert from string to u16string
      */
@@ -382,7 +383,7 @@ public:
     {}
     void OnSignalInfoUpdated(int32_t slotId,
         const std::vector<OHOS::sptr<OHOS::Telephony::SignalInformation>> &vec) override;
-        
+
     void OnNetworkStateUpdated(int32_t slotId, const OHOS::sptr<OHOS::Telephony::NetworkState> &networkState) override;
 
     void OnCellInfoUpdated(int32_t slotId,
@@ -399,4 +400,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AgTelephonyObserver);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_SYSTEM_INTERFACE_H

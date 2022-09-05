@@ -33,6 +33,7 @@
 #include "stub/map_service.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct MapAccountItem {
     MessageType msgType_ = MessageType::NONE;
@@ -215,5 +216,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(MapMseInstance);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_INSTANCE_H

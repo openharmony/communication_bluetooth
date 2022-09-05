@@ -18,6 +18,7 @@
 
 #include "interface_profile.h"
 #include "pbap_pce_parameter.h"
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief obsever for pbap client
@@ -221,5 +222,6 @@ public:
     virtual int AbortDownloading(const RawAddress &device) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_PBAP_PCE_H

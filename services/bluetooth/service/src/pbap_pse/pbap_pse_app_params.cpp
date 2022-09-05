@@ -17,6 +17,7 @@
 #include <cstring>
 #include "pbap_pse_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::map<uint8_t, int> PbapPseAppParams::LENS_MAP = {
     {ORDER, 1},
@@ -601,3 +602,4 @@ const uint8_t PbapPseAppParams::VCARD_SELECTOR_OPERATOR;
 const uint8_t PbapPseAppParams::RESET_NEW_MISSED_CALLS;
 const uint8_t PbapPseAppParams::PBAP_SUPPORTED_FEATURES;
 }  // namespace bluetooth
+}  // namespace OHOS

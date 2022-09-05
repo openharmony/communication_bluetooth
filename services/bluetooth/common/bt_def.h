@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 // Defined here are various status codes
 /*********************************************
@@ -1404,5 +1405,6 @@ enum PbapResponseCode : uint8_t {
 #else
 #define BLUETOOTH_API
 #endif
-};      // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif  // BT_DEF_H

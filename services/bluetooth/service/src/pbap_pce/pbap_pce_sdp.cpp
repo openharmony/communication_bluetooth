@@ -22,6 +22,7 @@
 #include "pbap_pce_header_msg.h"
 #include "pbap_pce_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 PbapPceSdp::PbapPceSdp(const IProfilePbapPce &service) : service_(service)
 {}
@@ -247,3 +248,4 @@ void PbapPceSdp::SdpSearchCallback(const BtAddr *addr, const SdpService *service
     pThis->SdpSearchCallback(addr, *serviceAry, serviceNum);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

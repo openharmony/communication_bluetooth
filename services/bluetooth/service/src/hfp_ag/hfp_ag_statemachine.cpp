@@ -22,6 +22,7 @@
 #include "hfp_ag_system_interface.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgStateMachine::HfpAgStateMachine(const std::string &address)
     : address_(address), profile_(address), eventProcessor_(profile_, address)
@@ -739,3 +740,4 @@ std::string HfpAgStateMachine::GetEventName(int what)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

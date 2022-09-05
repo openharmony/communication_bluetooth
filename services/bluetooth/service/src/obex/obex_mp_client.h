@@ -18,6 +18,7 @@
 
 #include "obex_client.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObexMpClient : public ObexClient {
 public:
@@ -88,4 +89,5 @@ private:
     void HandlePutData(const ObexHeader &resp);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_MP_CLIENT_H

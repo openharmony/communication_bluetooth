@@ -31,7 +31,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 struct A2dpSource::impl {
     impl();
@@ -590,7 +590,7 @@ int A2dpSource::WriteFrame(const uint8_t *data, uint32_t size)
     }
     return RET_BAD_STATUS;
 }
-    
+
 void A2dpSource::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
 {
     HILOGI("enter");

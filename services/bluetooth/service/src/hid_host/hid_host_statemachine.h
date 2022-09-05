@@ -30,6 +30,7 @@
 #include "hid_host_hogp.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for hid host state machine.
@@ -224,4 +225,5 @@ private:
     bool DispatchBle(const utility::Message &msg);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // HID_HOST_STATEMACHINE_H

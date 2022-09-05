@@ -29,6 +29,7 @@
 #include "stub/media_service.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 void AvrcpTgService::ObserverImpl::OnConnectionStateChanged(const std::string &addr, int state)
 {
@@ -2707,3 +2708,4 @@ uint8_t AvrcpTgService::ConvertPlayState(const int32_t state) const
 }
 REGISTER_CLASS_CREATOR(AvrcpTgService);
 }  // namespace bluetooth
+}  // namespace OHOS

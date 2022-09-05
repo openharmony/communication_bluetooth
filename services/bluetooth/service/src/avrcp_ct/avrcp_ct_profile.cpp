@@ -26,6 +26,7 @@
 #include "compat.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 bool AvrcCtProfile::g_isEnabled = false;
 
@@ -2339,3 +2340,4 @@ std::string AvrcCtProfile::GetEventName(uint8_t event)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

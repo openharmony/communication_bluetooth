@@ -55,7 +55,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 struct BluetoothHostServer::impl {
     impl();
     ~impl();

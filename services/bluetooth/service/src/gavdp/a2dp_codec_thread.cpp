@@ -22,6 +22,7 @@
 #include "log.h"
 #include "a2dp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int ENCODE_TIMER_SBC = 20;
 const int ENCODE_TIMER_AAC = 25;
@@ -233,3 +234,4 @@ void A2dpCodecThread::SinkDecode(const A2dpCodecConfig &config, A2dpDecoderObser
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

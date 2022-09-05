@@ -21,6 +21,7 @@
 #include "profile_service_manager.h"
 #include "stub/telephone_client_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 class TelephoneHfObserver : public stub::TelephoneClientServiceObserver {
 public:
@@ -860,3 +861,4 @@ bool HfpHfService::IsConnected(const std::string &address) const
 
 REGISTER_CLASS_CREATOR(HfpHfService);
 }  // namespace bluetooth
+}  // namespace OHOS

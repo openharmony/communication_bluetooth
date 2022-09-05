@@ -25,6 +25,7 @@
 #include "hfp_hf_data_connection_server.h"
 #include "hfp_hf_sdp_client.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for providing functions to relate to other underlying layers.
@@ -350,4 +351,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfProfile);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_PROFILE_H

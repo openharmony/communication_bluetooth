@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief opp sdp server
@@ -65,4 +66,5 @@ private:
     int AddSupportedFormatsList() const;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_SDP_SERVER_H

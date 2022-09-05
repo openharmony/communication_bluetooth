@@ -28,6 +28,7 @@
 #include "btstack.h"
 #include "hfp_hf_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for Audio connection required by HandfreeUnit.
@@ -397,4 +398,5 @@ private:
     int inUseCodec_ {HFP_HF_CODEC_CVSD};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_AUDIO_CONNECTION_H

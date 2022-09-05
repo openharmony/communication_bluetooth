@@ -23,6 +23,7 @@
 #include "bt_uuid.h"
 #include "btstack.h"
 
+namespace OHOS {
 namespace bluetooth {
 static const uint16_t FILTER_FLAG_ADDRESS = 0x0001;
 static const uint16_t FILTER_FLAG_SERVICE_UUID = 0x0002;
@@ -74,4 +75,5 @@ public:
 using createBleScanFilter = IBleScanFilter* (*)(void);
 using destroyBleScanFilter = void (*)(IBleScanFilter* p);
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // I_BLE_SCAN_FILTER_H

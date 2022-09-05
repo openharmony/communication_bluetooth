@@ -33,6 +33,7 @@
 
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief pan observer for framework api
@@ -88,4 +89,5 @@ public:
     virtual bool IsTetheringOn() = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_PAN_H

@@ -21,6 +21,7 @@
 #include "memory.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int PCM_CHANNEL_SAMPLES_PER_SAMPLE = 1024;
 const int BIT_MOVE_RIGHT16 = 16;
@@ -944,3 +945,4 @@ bool IsAacConfigChanged(const uint8_t *lastCodecInfo, const uint8_t *newCodecInf
            (lastInfo.bitRate == newInfo.bitRate);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

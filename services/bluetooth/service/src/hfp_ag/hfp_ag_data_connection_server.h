@@ -21,6 +21,7 @@
 #include "base_def.h"
 #include "hfp_ag_rfcomm_connection_server.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for managining HFP AG data connection.
@@ -114,4 +115,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgDataConnectionServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_DATA_CONNECTION_SERVER_H

@@ -38,6 +38,7 @@
 #include <vector>
 #include <string>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for HfpAgServiceObserver functions.
@@ -242,4 +243,5 @@ public:
     virtual void DeregisterObserver(HfpAgServiceObserver &observer) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_HFP_AG_H

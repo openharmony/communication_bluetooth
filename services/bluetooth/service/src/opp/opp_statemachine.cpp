@@ -18,6 +18,7 @@
 #include "log.h"
 #include "opp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppStateMachine::OppStateMachine(const std::string &address)
     : address_(address)
@@ -357,3 +358,4 @@ void OppStateMachine::NotifyStateTransitions()
     preState_ = toState;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

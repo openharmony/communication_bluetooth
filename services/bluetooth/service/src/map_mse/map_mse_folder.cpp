@@ -17,6 +17,7 @@
 #include <sstream>
 #include "libxml/parser.h"
 
+namespace OHOS {
 namespace bluetooth {
 MapMseFolder::MapMseFolder(const std::string &name) : name_(name)
 {}
@@ -167,3 +168,4 @@ void MapMseFolder::SetIgnore(const bool ignore)
     ignore_ = ignore;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

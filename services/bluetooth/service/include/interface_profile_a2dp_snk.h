@@ -20,13 +20,15 @@
  *
  * @since 6
  */
- 
+
 #ifndef INTERFACE_PROFILE_A2DP_SNK_H
 #define INTERFACE_PROFILE_A2DP_SNK_H
 
 #include "interface_profile_a2dp_src.h"
 
+namespace OHOS {
 namespace bluetooth {
 class IProfileA2dpSnk : public IProfileA2dp {};
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_A2DP_SNK_H

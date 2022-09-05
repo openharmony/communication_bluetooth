@@ -26,6 +26,7 @@
 #include "base_def.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 static constexpr int MAX_POLLING_ATTEMPTS = 10;
 static constexpr int POLLING_SLEEP_DURATION_US = 5000;
@@ -74,4 +75,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HidHostUhid);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HID_HOST_UHID_H

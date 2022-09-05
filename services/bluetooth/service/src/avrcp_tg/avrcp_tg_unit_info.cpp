@@ -21,6 +21,7 @@
 
 #include "avrcp_tg_unit_info.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcTgUnitPacket::AvrcTgUnitPacket() : label_(AVRC_DEFAULT_LABEL)
 {
@@ -82,3 +83,4 @@ bool AvrcTgUnitPacket::DisassemblePacket(Packet *pkt)
     return isValid_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

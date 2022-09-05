@@ -34,6 +34,7 @@
 #include "packet.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class DataTransport;
 
@@ -197,4 +198,5 @@ public:
     {}
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // TRANSPORT_H

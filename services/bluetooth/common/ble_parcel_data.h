@@ -40,6 +40,7 @@
 #include "bt_uuid.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class AdvertiserData {
 public:
@@ -146,7 +147,7 @@ public:
      * @param serviceData Service data.
      * @since 6
      */
-    void AddServiceData(::bluetooth::Uuid uuid, std::string serviceData)
+    void AddServiceData(bluetooth::Uuid uuid, std::string serviceData)
     {
         serviceData_.insert(std::make_pair(uuid, serviceData));
     }
@@ -157,7 +158,7 @@ public:
      * @param serviceUuid Service uuid.
      * @since 6
      */
-    void AddServiceUuid(const ::bluetooth::Uuid &serviceUuid)
+    void AddServiceUuid(const bluetooth::Uuid &serviceUuid)
     {
         serviceUuids_.push_back(serviceUuid);
     }
@@ -461,7 +462,7 @@ public:
     {
         serviceUuids_.push_back(serviceUuid);
     }
-    
+
     /**
      * @brief Set peripheral device.
      *
@@ -827,5 +828,6 @@ public:
     std::vector<uint8_t> manufactureDataMask_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  /// BLE_PARCEL_DATA_H

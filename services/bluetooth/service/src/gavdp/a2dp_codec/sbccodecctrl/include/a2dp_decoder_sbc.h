@@ -21,6 +21,7 @@
 #include "a2dp_sbc_dynamic_lib_ctrl.h"
 #include "../../include/a2dp_codec_wrapper.h"
 
+namespace OHOS {
 namespace bluetooth {
 class A2dpSbcDecoder : public A2dpDecoder {
 public:
@@ -34,5 +35,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(A2dpSbcDecoder);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !A2DP_DECODER_SBC_H

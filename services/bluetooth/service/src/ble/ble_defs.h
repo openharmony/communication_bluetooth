@@ -25,6 +25,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 /// const
 constexpr uint8_t BLE_IRK_HEX_ELN = 0x10;
@@ -505,4 +506,5 @@ typedef struct {
     BLE_ADV_FILTER advFilterPolicy;  /// Advertising filter policy
 } BleAdvParams;
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif

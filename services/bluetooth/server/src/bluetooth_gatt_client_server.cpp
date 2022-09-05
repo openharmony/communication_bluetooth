@@ -32,7 +32,7 @@
 #include "ipc_skeleton.h"
 #include "permission_utils.h"
 
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 namespace OHOS {
 namespace Bluetooth {
 struct BluetoothGattClientServer::impl {

@@ -18,6 +18,7 @@
 #include "permission_helper.h"
 
 
+namespace OHOS {
 namespace bluetooth {
 #ifdef PERMISSION_ALWAYS_GRANT
 bool g_permissionAlwaysGrant = true;
@@ -81,4 +82,5 @@ int AuthCenter::VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID)
     }
     return PermissionHelper::VerifyDiscoverBluetoothPermission(tokenID);
 }
-}
+}  // namespace bluetooth
+}  // namespace OHOS

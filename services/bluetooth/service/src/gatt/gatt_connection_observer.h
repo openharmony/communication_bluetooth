@@ -19,6 +19,7 @@
 #include <cstdint>
 #include "gatt_data.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattConnectionObserver {
 public:
@@ -44,5 +45,6 @@ public:
     {}
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GATT_CONNECTION_OBSERVER_H

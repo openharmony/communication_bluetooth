@@ -24,6 +24,7 @@
 #include "bt_uuid.h"
 #include "gatt_data.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattCache {
 public:
@@ -147,5 +148,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(GattCache);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !GATT_CACHE_H

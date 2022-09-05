@@ -20,14 +20,14 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothBleAdvertiserData : public Parcelable, public ::bluetooth::AdvertiserData {
+class BluetoothBleAdvertiserData : public Parcelable, public bluetooth::AdvertiserData {
 public:
     explicit BluetoothBleAdvertiserData() = default;
-    explicit BluetoothBleAdvertiserData(const ::bluetooth::AdvertiserData &other) : ::bluetooth::AdvertiserData(other)
+    explicit BluetoothBleAdvertiserData(const bluetooth::AdvertiserData &other) : bluetooth::AdvertiserData(other)
     {}
-    explicit BluetoothBleAdvertiserData(const BluetoothBleAdvertiserData &other) : ::bluetooth::AdvertiserData(other)
+    explicit BluetoothBleAdvertiserData(const BluetoothBleAdvertiserData &other) : bluetooth::AdvertiserData(other)
     {}
-    BluetoothBleAdvertiserData& operator=(const ::bluetooth::AdvertiserData &other) = delete;
+    BluetoothBleAdvertiserData& operator=(const bluetooth::AdvertiserData &other) = delete;
     BluetoothBleAdvertiserData& operator=(const BluetoothBleAdvertiserData &other) = delete;
     ~BluetoothBleAdvertiserData() = default;
 

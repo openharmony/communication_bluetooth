@@ -21,12 +21,12 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothGattDevice : public Parcelable, public ::bluetooth::GattDevice {
+class BluetoothGattDevice : public Parcelable, public bluetooth::GattDevice {
 public:
     BluetoothGattDevice() = default;
-    BluetoothGattDevice(const ::bluetooth::GattDevice &other) : ::bluetooth::GattDevice(other)
+    BluetoothGattDevice(const bluetooth::GattDevice &other) : bluetooth::GattDevice(other)
     {}
-    BluetoothGattDevice(const BluetoothGattDevice &other) : ::bluetooth::GattDevice(other)
+    BluetoothGattDevice(const BluetoothGattDevice &other) : bluetooth::GattDevice(other)
     {}
     ~BluetoothGattDevice() = default;
 

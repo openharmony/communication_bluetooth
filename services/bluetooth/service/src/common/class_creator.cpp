@@ -15,6 +15,7 @@
 
 #include "class_creator.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::map<std::string, ClassCreateFun> ClassFactory::g_register;
 
@@ -33,3 +34,4 @@ void *ClassFactory::NewInstance(const std::string &name)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

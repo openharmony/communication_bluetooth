@@ -21,7 +21,7 @@
 #include "interface_profile_socket.h"
 #include "permission_utils.h"
 
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {

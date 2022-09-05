@@ -14,6 +14,7 @@
  */
 #include "../include/ble_scan_filter_lsf.h"
 
+namespace OHOS {
 namespace bluetooth {
 BleScanFilterLsf::BleScanFilterLsf()
 {
@@ -718,3 +719,4 @@ void BleScanFilterLsf::BleScanFilterCommandCompleteFaild(VendorEventParamLSF eve
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

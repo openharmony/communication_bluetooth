@@ -18,9 +18,11 @@
 
 #include <string>
 
+namespace OHOS {
 namespace bluetooth {
 std::string GetEncryptAddr(std::string addr);
 #define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetAddress()).c_str())
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif // LOG_UTIL_H

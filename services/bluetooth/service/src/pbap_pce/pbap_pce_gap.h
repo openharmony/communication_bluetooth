@@ -21,6 +21,7 @@
 #include "interface_profile_pbap_pce.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class PbapPceService;
 /**
@@ -83,4 +84,5 @@ private:
     bool l2capOrRfcomm_ = false;       // true:l2cap false:rfcomm
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PCE_GAP_H

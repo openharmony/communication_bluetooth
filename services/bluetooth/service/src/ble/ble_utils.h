@@ -24,6 +24,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief BLE Utils.
@@ -74,4 +75,5 @@ private:
     const static uint8_t HEX = 16;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // BLE_UTILS_H

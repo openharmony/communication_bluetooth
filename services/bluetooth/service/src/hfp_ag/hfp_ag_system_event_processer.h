@@ -22,6 +22,7 @@
 #include "hfp_ag_profile.h"
 #include "hfp_ag_system_interface.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods that is used to process system event.
@@ -206,4 +207,5 @@ private:
     std::string address_ {""};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_SYSTEM_EVENT_PROCESS_H

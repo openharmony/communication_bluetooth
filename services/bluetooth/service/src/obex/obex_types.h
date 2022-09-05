@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+namespace OHOS {
 namespace bluetooth {
 #define OBEX_LOG_DEBUG(fmt, ...) LOG_DEBUG("[OBEX]:" fmt, ##__VA_ARGS__)
 #define OBEX_LOG_INFO(fmt, ...) LOG_INFO("[OBEX]:" fmt, ##__VA_ARGS__)
@@ -89,4 +90,5 @@ enum class ObexRspCode : uint8_t {
     DATABASE_LOCKED = 0xE1              // Database Locked
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_TYPES_H

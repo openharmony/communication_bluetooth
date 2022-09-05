@@ -19,6 +19,7 @@
 #include "avrcp_tg_internal.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /// The attribute id of the supported features.
 const uint16_t AVRC_TG_ATTRIBUTE_ID_SUPPORTED_FEATURES = 0x0311;
@@ -103,5 +104,6 @@ private:
     int AddProtocolDescriptorList();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_SDP_H

@@ -19,6 +19,7 @@
 #include <cstdint>
 #include "base_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 class DiServiceOverBredrInterface {
 public:
@@ -43,6 +44,7 @@ private:
     int SdpAddProtocol(uint16_t startHandle, uint16_t endHandle) const;
     int SdpAddBrowseGroupList() const;
 };
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif // DI_SERVICE_OVER_BREDR_H

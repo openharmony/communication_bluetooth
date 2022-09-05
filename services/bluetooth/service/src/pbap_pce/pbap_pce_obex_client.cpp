@@ -17,6 +17,7 @@
 #include "pbap_pce_def.h"
 #include "pbap_pce_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 ObexFileBodyObject::ObexFileBodyObject(const std::string &file)
 {
@@ -339,3 +340,4 @@ void PbapPceObexClient::SetAbort(bool isAbort) const
     PBAP_PCE_LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

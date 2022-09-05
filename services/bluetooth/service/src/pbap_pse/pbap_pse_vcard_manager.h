@@ -23,6 +23,7 @@
 #include "../obex/obex_types.h"
 #include "pbap_pse_app_params.h"
 
+namespace OHOS {
 namespace bluetooth {
 class PbapPseVcardManager {
 public:
@@ -64,4 +65,5 @@ private:
     static const std::map<char16_t, uint8_t> VCARD_HANDLE_CHAR_MAP;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_VCARD_MANAGER_H

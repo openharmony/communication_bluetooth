@@ -20,6 +20,7 @@
 #include "dispatcher.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief request status
@@ -201,6 +202,7 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(PowerManager);
     DECLARE_IMPL();
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // POWER_MANAGER_H

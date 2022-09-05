@@ -25,6 +25,7 @@
 #include "interface_profile_a2dp_src.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Single device information management,including device address,playing state,
@@ -148,4 +149,5 @@ private:
     A2dpStateManager state_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_SERVICE_DEVICE_H

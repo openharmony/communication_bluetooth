@@ -48,6 +48,7 @@
 #include "raw_address.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This HFP class provides a set of methods that is called by Framework API, and manage
@@ -642,7 +643,7 @@ private:
      * @brief Open the voice recognition internal
      *
      * @param device The Remote device address.
-     * @param isRequestByHf true if VR request by hf, else false. 
+     * @param isRequestByHf true if VR request by hf, else false.
      * @since 6
      */
     void SendOpenVoiceEvent(const std::string &address, bool isRequestByHf);
@@ -717,4 +718,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgService);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_SERVICE_H

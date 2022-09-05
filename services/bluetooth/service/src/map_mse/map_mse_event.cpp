@@ -16,6 +16,7 @@
 #include "map_mse_event.h"
 #include <sstream>
 
+namespace OHOS {
 namespace bluetooth {
 const std::string MapMseEvent::PATH = "telecom/msg/";
 
@@ -223,3 +224,4 @@ std::string MapMseEvent::GetMessageNameByType(const MessageType type) const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

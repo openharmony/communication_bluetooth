@@ -20,6 +20,7 @@
 #include "memory.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int PRIORITY_SBC_BASIC = 1000;
 const int PRIORITY_NUM_BASIC_VALUE = 1;
@@ -299,3 +300,4 @@ bool IsPeerSourceCodecValid(const uint8_t *codecInfo)
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

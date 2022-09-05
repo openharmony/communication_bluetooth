@@ -24,6 +24,7 @@
 
 using namespace OHOS;
 using namespace OHOS::Telephony;
+namespace OHOS {
 namespace bluetooth {
 HfpAgSystemInterface::HfpAgSystemInterface()
 {}
@@ -321,7 +322,7 @@ void HfpAgSystemInterface::QueryAgIndicator()
             LOG_INFO("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
         }
         LOG_INFO("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
-        
+
         subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
         LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
@@ -520,3 +521,4 @@ inline std::string HfpAgSystemInterface::Str16ToStr8(const std::u16string& str) 
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

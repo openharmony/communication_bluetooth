@@ -50,6 +50,7 @@
 #include "message.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 // external class and c function declare
 class MapMceMnsServer;
@@ -222,7 +223,7 @@ public:
      * @param  device
      * @param  type
      * @param  msgStatus
-     * @return int 
+     * @return int
      */
     int SetMessageStatus(const RawAddress &device, MapMessageType type,
         const IProfileSetMessageStatus &msgStatus) override;
@@ -466,4 +467,5 @@ private:
     std::recursive_mutex mceDeviceMapMutex_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_SERVICE_H

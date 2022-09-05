@@ -22,6 +22,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct GattClientProfile::impl {
     class GattConnectionObserverImplement;
@@ -2442,3 +2443,4 @@ void GattClientProfile::impl::DeregisterCallbackToConnectManager()
     GattConnectionManager::GetInstance().DeregisterObserver(connectionObserverId_);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

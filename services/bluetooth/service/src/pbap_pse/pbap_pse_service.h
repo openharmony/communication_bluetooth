@@ -30,6 +30,7 @@
 #include "pbap_pse_def.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief phone book server service
@@ -341,4 +342,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(PbapPseService);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_SERVICE_H

@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 SocketThread &SocketThread::GetInstance()
 {
@@ -189,3 +190,4 @@ bool SocketThread::DeleteSocket(Socket &sock)
     return false;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -23,6 +23,7 @@
 #include "interface_profile.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define HFP_AG_RETURN_IF_NOT_CONNECTED(state)                                       \
     do {                                                                            \
@@ -894,3 +895,4 @@ std::string HfpAgProfile::GetCallState(int state)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

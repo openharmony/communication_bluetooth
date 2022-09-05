@@ -22,6 +22,7 @@
 #include "profile_service_manager.h"
 #include "rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppService::OppService() : utility::Context(PROFILE_NAME_OPP, "1.2.1")
 {
@@ -557,3 +558,4 @@ int OppService::GetMaxConnectNum(void)
 
 REGISTER_CLASS_CREATOR(OppService);
 }  // namespace bluetooth
+}  // namespace OHOS

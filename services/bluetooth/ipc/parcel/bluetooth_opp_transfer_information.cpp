@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-BluetoothIOppTransferInformation::BluetoothIOppTransferInformation(const ::bluetooth::IOppTransferInformation &other)
+BluetoothIOppTransferInformation::BluetoothIOppTransferInformation(const bluetooth::IOppTransferInformation &other)
 {
     SetId(other.GetId());
     SetFileName(other.GetFileName());

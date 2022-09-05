@@ -18,6 +18,7 @@
 #include <sstream>
 #include <algorithm>
 
+namespace OHOS {
 namespace bluetooth {
 const std::string MapMseResource::XML_TAG_CONVO_LISTING = "MAP-convo-listing";
 const std::string MapMseResource::XML_ATT_ENCODING = "encoding";
@@ -1850,3 +1851,4 @@ std::string MapMseResource::GetMessageNameByType(MessageType type)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

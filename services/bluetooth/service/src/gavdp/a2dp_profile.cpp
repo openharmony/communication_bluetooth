@@ -27,6 +27,7 @@
 #include "raw_address.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int CODEC_SBC_TYPE_INDEX = 2;
 const int SAMPLE_SBC_INDEX = 3;
@@ -412,7 +413,7 @@ void A2dpProfile::EnqueuePacket(const Packet *packet, size_t frames, uint32_t by
     packetData->frames = frames;
     packetData->bytes = bytes;
     packetData->pktTimeStamp = pktTimeStamp;
-    
+
     QueueEnqueue(packetQueue_, (void *)packetData);
     count = QueueGetSize(packetQueue_);
     LOG_INFO("[A2dpProfile] %{public}s ends count %{public}d \n", __func__, count);
@@ -623,7 +624,7 @@ void A2dpProfile::ProcessSDPCallback(const BtAddr &addr, uint8_t result)
     A2dpAvdtMsg data = {};
     A2dpProfilePeer *peer = FindOrCreatePeer(addr, role);
     utility::Message msg(EVT_CONNECT_REQ, 0, &data);
-    
+
     data.a2dpMsg.connectInfo.addr = addr;
     data.role = role;
     msg.arg2_ = &data;
@@ -1145,3 +1146,4 @@ void CleanPacketData(void *data)
     free(packetData);
 }
 }  // namespace bluetooth
+}  // namespace OHOS
