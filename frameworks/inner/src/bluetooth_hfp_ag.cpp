@@ -413,7 +413,9 @@ HandsFreeAudioGateway::HandsFreeAudioGateway()
 }
 
 HandsFreeAudioGateway::~HandsFreeAudioGateway()
-{}
+{
+    HILOGI("enter");
+}
 
 std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetConnectedDevices() const
 {
@@ -510,6 +512,10 @@ void HandsFreeAudioGateway::DeregisterObserver(HandsFreeAudioGatewayObserver *ob
 {
     HILOGI("enter");
     std::shared_ptr<HandsFreeAudioGatewayObserver> observerPtr(observer, [](HandsFreeAudioGatewayObserver *) {});
+    if (pimpl == nullptr) {
+        HILOGI("pimpl is nullptr!");
+        return;
+    }
     pimpl->DeregisterObserver(observerPtr);
     HILOGI("end");
 }
