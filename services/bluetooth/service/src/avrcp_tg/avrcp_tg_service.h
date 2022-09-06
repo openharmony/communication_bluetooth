@@ -382,6 +382,7 @@ public:
         void OnMetaDataChange(const OHOS::AVSession::AVMetaData &data) override;
         void OnActiveStateChange(bool isActive) override;
         void OnValidCommandChange(const std::vector<int32_t> &cmds) override;
+        void OnOutputDeviceChange(const OHOS::AVSession::OutputDeviceInfo &outputDeviceInfo) override {};
     private:
         IProfileAvrcpTg *GetService(void);
     };
