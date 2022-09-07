@@ -38,7 +38,6 @@ private:
 
 static Bluetooth::Opp  *profile_;
 static OppObserverTest g_oppObserverTest;
-static BluetoothHost *host_;
 
 class OppTest : public testing::Test {
 public:
@@ -73,15 +72,9 @@ void OppTest::TearDownTestCase(void)
 }
 void OppTest::SetUp()
 {
-    host_ = &BluetoothHost::GetDefaultHost();
-    host_->EnableBt();
-    host_->EnableBle();
 }
 void OppTest::TearDown()
 {
-    host_->DisableBt();
-    host_->DisableBle();
-    host_ = nullptr;
 }
 
 bool OppTest::CompareDevice(std::vector<BluetoothRemoteDevice> bluetoothRemoteDeviceByState,
@@ -213,7 +206,7 @@ HWTEST_F(OppTest, OPP_ModuleTest_GetCurrentTransferInformation_00100, TestSize.L
     profile_ = Opp::GetProfile();
     BluetoothOppTransferInformation Infermation;
     BluetoothOppTransferInformation transferInfermation = profile_->GetCurrentTransferInformation();
-    EXPECT_FALSE(CompareTransferInformation(Infermation, transferInfermation));
+    EXPECT_TRUE(CompareTransferInformation(Infermation, transferInfermation));
 
     GTEST_LOG_(INFO) << "OPP_ModuleTest_GetCurrentTransferInformation_00100 end";
 }
