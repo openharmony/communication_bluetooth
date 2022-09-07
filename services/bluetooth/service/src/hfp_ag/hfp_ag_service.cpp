@@ -256,8 +256,7 @@ void HfpAgService::PostEvent(const HfpAgMessage &event)
 void HfpAgService::ProcessEvent(const HfpAgMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
-    LOG_INFO("[HFP AG]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__,
-        event.dev_.c_str(), event.what_);
+    HILOGI("addr: %{public}s, event_no: %{public}d", GetEncryptAddr(event.dev_).c_str(), event.what_);
     switch (event.what_) {
         case HFP_AG_SERVICE_STARTUP_EVT:
             StartUp();
@@ -917,7 +916,7 @@ void HfpAgService::ProcessDefaultEvent(const HfpAgMessage &event) const
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         it->second->ProcessMessage(event);
     } else {
-        LOG_INFO("[HFP AG]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
+        HILOGI("addr: %{public}s", GetEncryptAddr(event.dev_).c_str());
     }
 }
 
