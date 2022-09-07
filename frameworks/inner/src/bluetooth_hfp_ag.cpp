@@ -222,8 +222,8 @@ struct HandsFreeAudioGateway::impl {
     void PhoneStateChanged(
         int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
     {
-        HILOGI("enter, numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, number: %{public}s,"
-            " type: %{public}d", numActive, numHeld, callState, number.c_str(), type);
+        HILOGI("numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, type: %{public}d",
+            numActive, numHeld, callState, type);
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             proxy_->PhoneStateChanged(numActive, numHeld, callState, number, type, name);
         }
