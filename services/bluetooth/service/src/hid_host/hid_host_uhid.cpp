@@ -151,7 +151,7 @@ int HidHostUhid::SendHandshake(uint16_t err)
 int HidHostUhid::SendGetReportReplyUhid(int fd, int id, uint16_t err, uint8_t* rpt, uint16_t len)
 {
     struct uhid_event ev;
-    (void)memset_s(&ev, sizeof(ev), 0, sizeof(ev));
+    memset_s(&ev, sizeof(ev), 0, sizeof(ev));
     ev.type = UHID_FEATURE_ANSWER;
     ev.u.feature_answer.id = id;
     ev.u.feature_answer.err = err;
@@ -170,7 +170,7 @@ int HidHostUhid::SendGetReportReplyUhid(int fd, int id, uint16_t err, uint8_t* r
 int HidHostUhid::SendSetReportReplyUhid(int fd, int id, uint16_t err)
 {
     struct uhid_event ev;
-    (void)memset_s(&ev, sizeof(ev), 0, sizeof(ev));
+    memset_s(&ev, sizeof(ev), 0, sizeof(ev));
     ev.type = UHID_SET_REPORT_REPLY;
     ev.u.set_report_reply.id = id;
     ev.u.set_report_reply.err = err;
@@ -188,7 +188,7 @@ int HidHostUhid::SendHidInfo(const char* devName, PnpInformation& pnpInf, HidInf
         return HID_HOST_FAILURE;
     }
     // Create and send hid descriptor to kernel
-    (void)memset_s(&ev, sizeof(ev), 0, sizeof(ev));
+    memset_s(&ev, sizeof(ev), 0, sizeof(ev));
     ev.type = UHID_CREATE;
     if (strncpy_s((char*)ev.u.create.name, sizeof(ev.u.create.name), devName, sizeof(ev.u.create.name) - 1)
         != EOK) {
@@ -226,7 +226,7 @@ int HidHostUhid::Destroy()
 {
     if (fd_ >= 0) {
         struct uhid_event ev;
-        (void)memset_s(&ev, sizeof(ev), 0, sizeof(ev));
+        memset_s(&ev, sizeof(ev), 0, sizeof(ev));
         ev.type = UHID_DESTROY;
 
         WriteUhid(fd_, &ev);
@@ -257,7 +257,7 @@ int HidHostUhid::WriteUhid(int fd, const struct uhid_event* ev)
 int HidHostUhid::WritePackUhid(int fd, uint8_t* rpt, uint16_t len)
 {
     struct uhid_event ev;
-    (void)memset_s(&ev, sizeof(ev), 0, sizeof(ev));
+    memset_s(&ev, sizeof(ev), 0, sizeof(ev));
     ev.type = UHID_INPUT;
     ev.u.input.size = len;
     if (len > sizeof(ev.u.input.data)) {
@@ -361,7 +361,7 @@ int HidHostUhid::ReadUhidEvent()
     struct uhid_event ev;
     ssize_t ret;
 
-    (void)memset_s(&ev, sizeof(ev), 0, sizeof(ev));
+    memset_s(&ev, sizeof(ev), 0, sizeof(ev));
 
     do {
     } while ((ret = read(fd_, &ev, sizeof(ev))) == -1 && errno == EINTR);
