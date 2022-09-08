@@ -15,6 +15,7 @@
 #include "napi_bluetooth_host_observer.h"
 
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -145,7 +146,8 @@ void NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult(
     napi_value undefined = 0;
     napi_value callResult = 0;
     napi_get_undefined(callbackData->env, &undefined);
-    HILOGD("NapiBluetoothHostObserver::OnDiscoveryResult: Status is %{public}s", device->GetDeviceAddr().c_str());
+    HILOGD("NapiBluetoothHostObserver::OnDiscoveryResult: Status is %{public}s",
+        GetEncryptAddr(device->GetDeviceAddr()).c_str());
     napi_create_array(callbackData->env, &result);
     napi_create_string_utf8(callbackData->env, device->GetDeviceAddr().c_str(), device->GetDeviceAddr().size(), &value);
     napi_set_element(callbackData->env, result, 0, value);

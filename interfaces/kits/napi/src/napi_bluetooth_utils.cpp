@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_bluetooth_spp_client.h"
@@ -297,7 +298,7 @@ void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertCharacteristicReadReqToJS deviceId is %{public}s", device.c_str());
+    HILOGI("ConvertCharacteristicReadReqToJS deviceId is %{public}s", GetEncryptAddr(device).c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
@@ -332,7 +333,7 @@ void ConvertDescriptorReadReqToJS(napi_env env, napi_value result, const std::st
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertDescriptorReadReqToJS deviceId is %{public}s", device.c_str());
+    HILOGI("ConvertDescriptorReadReqToJS deviceId is %{public}s", GetEncryptAddr(device).c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
@@ -376,7 +377,7 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertCharacteristicWriteReqToJS deviceId is %{public}s", device.c_str());
+    HILOGI("ConvertCharacteristicWriteReqToJS deviceId is %{public}s", GetEncryptAddr(device).c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
@@ -428,7 +429,7 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertCharacteristicWriteReqToJS deviceId is %{public}s", device.c_str());
+    HILOGI("ConvertCharacteristicWriteReqToJS deviceId is %{public}s", GetEncryptAddr(device).c_str());
 
     napi_value transId;
     napi_create_int32(env, requestId, &transId);
@@ -486,7 +487,7 @@ void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::str
     napi_value deviceId = nullptr;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertStateChangeParamToJS deviceId is %{public}s", device.c_str());
+    HILOGI("ConvertStateChangeParamToJS deviceId is %{public}s", GetEncryptAddr(device).c_str());
 
     napi_value profileState = nullptr;
     napi_create_int32(env, GetProfileConnectionState(state), &profileState);
@@ -500,7 +501,7 @@ void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::
     napi_value deviceId = nullptr;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
-    HILOGI("ConvertScoStateChangeParamToJS deviceId is %{public}s", device.c_str());
+    HILOGI("ConvertScoStateChangeParamToJS deviceId is %{public}s", GetEncryptAddr(device).c_str());
 
     napi_value profileState = nullptr;
     napi_create_int32(env, GetScoConnectionState(state), &profileState);

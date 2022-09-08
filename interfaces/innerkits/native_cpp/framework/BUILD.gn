@@ -73,6 +73,7 @@ ohos_shared_library("btframework") {
     "src/bluetooth_socket.cpp",
     "src/bluetooth_socket_inputstream.cpp",
     "src/bluetooth_socket_outputstream.cpp",
+    "src/bluetooth_utils.cpp",
   ]
 
   deps = [
