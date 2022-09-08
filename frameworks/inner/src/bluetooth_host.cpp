@@ -78,7 +78,8 @@ public:
 
     void OnStateChanged(int32_t transport, int32_t status) override
     {
-        HILOGI("enter, transport: %{public}d, status: %{public}d", transport, status);
+        HILOGI("bluetooth state, transport: %{public}s, status: %{public}s",
+            GetBtTransportName(transport).c_str(), GetBtStateName(status).c_str());
         host_.observers_.ForEach([transport, status](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnStateChanged(transport, status);
         });

@@ -15,6 +15,7 @@
 #include "bluetooth_device_class.h"
 
 #include "bluetooth_device.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -34,7 +35,9 @@ int BluetoothDeviceClass::GetMajorClass() const
 
 int BluetoothDeviceClass::GetMajorMinorClass() const
 {
-    return (class_ & BluetoothDevice::DEVICE_BITMASK);
+    int res = (class_ & BluetoothDevice::DEVICE_BITMASK);
+    HILOGI("MajorMinorClass: 0x%{public}X", res);
+    return res;
 }
 
 int BluetoothDeviceClass::GetClassOfDevice() const
@@ -70,6 +73,7 @@ bool BluetoothDeviceClass::IsProfileSupported(int profileId) const
 bool BluetoothDeviceClass::IsA2dpSupported() const
 {
     if (IsServiceSupported(BluetoothDevice::SERVICE_RENDER)) {
+        HILOGI("service supported.");
         return true;
     }
     switch (GetMajorMinorClass()) {
@@ -86,6 +90,7 @@ bool BluetoothDeviceClass::IsA2dpSupported() const
 bool BluetoothDeviceClass::IsA2dpSinkSupported() const
 {
     if (IsServiceSupported(BluetoothDevice::SERVICE_CAPTURE)) {
+        HILOGI("service supported.");
         return true;
     }
     switch (GetMajorMinorClass()) {
@@ -101,6 +106,7 @@ bool BluetoothDeviceClass::IsA2dpSinkSupported() const
 bool BluetoothDeviceClass::IsHeadSetSupported() const
 {
     if (IsServiceSupported(BluetoothDevice::SERVICE_RENDER)) {
+        HILOGI("service supported.");
         return true;
     }
     switch (GetMajorMinorClass()) {
