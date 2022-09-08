@@ -22,6 +22,7 @@
 #include "adapter_manager.h"
 #include "btm.h"
 #include "log.h"
+#include "log_util.h"
 #include "power_device.h"
 #include "timer.h"
 
@@ -138,7 +139,7 @@ void PowerManager::StatusUpdate(
         __FUNCTION__,
         profileName.c_str(),
         status,
-        addr.GetAddress().c_str());
+        GetEncryptAddr(addr.GetAddress()).c_str());
 
     if (pimpl->isEnabled_) {
         pimpl->dispatcher_.PostTask(
@@ -244,7 +245,8 @@ void PowerManager::impl::SsrCompleteCallBack(uint8_t status, const BtAddr *btAdd
 
 void PowerManager::impl::ConnectionCompleteCallBackProcess(const RawAddress rawAddr, uint16_t connectionHandle)
 {
-    LOG_DEBUG("PM_: ConnectionCompleteCallBackProcess(), addr=%{public}s\n", rawAddr.GetAddress().c_str());
+    LOG_DEBUG("PM_: ConnectionCompleteCallBackProcess(), addr=%{public}s\n",
+        GetEncryptAddr(rawAddr.GetAddress()).c_str());
     // construct
     std::unique_lock<std::mutex> lock(mutex_);
     auto iter = powerDevices_.find(rawAddr);
@@ -279,7 +281,7 @@ void PowerManager::impl::DisconnectionCompleteCallBackProcess(uint8_t status, ui
                 powerDevices_.erase(its);
             }
             LOG_DEBUG("PM_: DisconnectionCompleteCallBackProcess(), delete powerDevices, addr=%{public}s\n",
-                iter->second.GetAddress().c_str());
+                GetEncryptAddr(iter->second.GetAddress()).c_str());
             connectionHandles_.erase(iter);
         }
     }

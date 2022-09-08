@@ -23,6 +23,7 @@
 #include "classic_utils.h"
 #include "gap_if.h"
 #include "raw_address.h"
+#include "log_util.h"
 #include "securec.h"
 
 namespace bluetooth {
@@ -521,11 +522,12 @@ void ClassicAdapterProperties::SavePairedDeviceInfo(std::shared_ptr<ClassicRemot
 
 void ClassicAdapterProperties::RemovePairedDeviceInfo(std::string addr) const
 {
-    LOG_DEBUG("ClassicAdapterProperties::%{public}s, addr: %{public}s", __func__, addr.c_str());
+    LOG_DEBUG("ClassicAdapterProperties::%{public}s, addr: %{public}s", __func__, GetEncryptAddr(addr).c_str());
 
     bool ret = config_.RemovePairedDevice(addr);
     if (ret == false) {
-        LOG_WARN("ClassicAdapterProperties::RemovePairedDeviceInfo failed, addr is %{public}s", addr.c_str());
+        LOG_WARN("ClassicAdapterProperties::RemovePairedDeviceInfo failed, addr is %{public}s",
+            GetEncryptAddr(addr).c_str());
     }
 }
 

@@ -1137,7 +1137,8 @@ void ClassicAdapter::SendDiscoveryStateChanged(int discoveryState) const
 
 void ClassicAdapter::SendDiscoveryResult(const RawAddress &device) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s", __func__, device.GetAddress().c_str());
+    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s",
+        __func__, GetEncryptAddr(device.GetAddress()).c_str());
 
     pimpl->adapterObservers_.ForEach(
         [device](IAdapterClassicObserver &observer) { observer.OnDiscoveryResult(device); });
@@ -1145,7 +1146,7 @@ void ClassicAdapter::SendDiscoveryResult(const RawAddress &device) const
 
 void ClassicAdapter::SendRemoteCodChanged(const RawAddress &device, int cod) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s, cod: %{public}d", __func__, device.GetAddress().c_str(), cod);
+    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s, cod: %{public}d", __func__, GetEncryptAddr(device.GetAddress()).c_str(), cod);
 
     pimpl->remoteObservers_.ForEach(
         [device, cod](IClassicRemoteDeviceObserver &observer) { observer.OnRemoteCodChanged(device, cod); });
@@ -1229,7 +1230,7 @@ void ClassicAdapter::SendPairConfirmed(const RawAddress &device, int reqType, in
 
 void ClassicAdapter::UserConfirmAutoReply(const RawAddress &device, int reqType, bool accept) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s, accept: %{public}d", __func__, device.GetAddress().c_str(), accept);
+    LOG_DEBUG("[ClassicAdapter]::%{public}s address: %{public}s, accept: %{public}d", __func__, GetEncryptAddr(device.GetAddress()).c_str(), accept);
 
     auto it = devices_.find(device.GetAddress());
     if (it != devices_.end()) {
@@ -1857,7 +1858,7 @@ bool ClassicAdapter::CancelPairing(const RawAddress &device)
 
 bool ClassicAdapter::RemovePair(const RawAddress &device)
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s address %{public}s", __func__, device.GetAddress().c_str());
+    LOG_DEBUG("[ClassicAdapter]::%{public}s address %{public}s", __func__, GetEncryptAddr(device.GetAddress()).c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
@@ -2392,7 +2393,7 @@ int ClassicAdapter::GetDeviceBatteryLevel(const RawAddress &device) const
 
 void ClassicAdapter::SetDeviceBatteryLevel(const RawAddress &device, int batteryLevel) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s, addr: %{public}s, batteryLevel: %{public}d", __func__, device.GetAddress().c_str(), batteryLevel);
+    LOG_DEBUG("[ClassicAdapter]::%{public}s, addr: %{public}s, batteryLevel: %{public}d", __func__, GetEncryptAddr(device.GetAddress()).c_str(), batteryLevel);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
@@ -2405,7 +2406,7 @@ void ClassicAdapter::SetDeviceBatteryLevel(const RawAddress &device, int battery
 
 void ClassicAdapter::SendRemoteBatteryLevelChanged(const RawAddress &device, int batteryLevel) const
 {
-    LOG_DEBUG("[ClassicAdapter]::%{public}s addr: %{public}s, batteryLevel: %{public}d", __func__, device.GetAddress().c_str(), batteryLevel);
+    LOG_DEBUG("[ClassicAdapter]::%{public}s addr: %{public}s, batteryLevel: %{public}d", __func__, GetEncryptAddr(device.GetAddress()).c_str(), batteryLevel);
 
     pimpl->remoteObservers_.ForEach([device, batteryLevel](IClassicRemoteDeviceObserver &observer) {
         observer.OnRemoteBatteryLevelChanged(device, batteryLevel);

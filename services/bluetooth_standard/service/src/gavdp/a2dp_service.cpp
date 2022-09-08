@@ -19,6 +19,7 @@
 #include "adapter_config.h"
 #include "class_creator.h"
 #include "log.h"
+#include "log_util.h"
 #include "profile_config.h"
 #include "profile_service_manager.h"
 #include "securec.h"
@@ -55,7 +56,7 @@ void ObserverProfile::OnConnectStateChanged(const BtAddr &addr, const int state,
     int connectState =
         ProcessConnectStateMessage(btAddr, deviceInfo, connectPolicy, state, (static_cast<CallbackParameter*>(context))->handle);
     LOG_INFO(
-        "[ObserverProfile] %{public}s Active device(%{public}s)\n", __func__, service->GetActiveSinkDevice().GetAddress().c_str());
+        "[ObserverProfile] %{public}s Active device(%{public}s)\n", __func__, GetEncryptAddr(service->GetActiveSinkDevice().GetAddress()).c_str());
 
     if (connectState == static_cast<int>(BTConnectState::DISCONNECTED)) {
         if (strcmp(btAddr.GetAddress().c_str(), service->GetActiveSinkDevice().GetAddress().c_str()) == 0) {
@@ -268,7 +269,8 @@ void A2dpService::Disable()
 
 int A2dpService::Connect(const RawAddress &device)
 {
-    LOG_INFO("[A2dpService] %{public}s [address:%{public}s] role[%u]\n", __func__, device.GetAddress().c_str(), role_);
+    LOG_INFO("[A2dpService] %{public}s [address:%{public}s] role[%u]\n",
+        __func__, GetEncryptAddr(device.GetAddress()).c_str(), role_);
 
     int ret = RET_NO_ERROR;
     std::lock_guard<std::recursive_mutex> lock(g_a2dpServiceMutex);
@@ -565,7 +567,8 @@ const RawAddress &A2dpService::GetActiveSinkDevice() const
 {
     std::lock_guard<std::recursive_mutex> lock(g_a2dpServiceMutex);
 
-    LOG_INFO("[A2dpService] %{public}s address(%{public}s)\n", __func__, activeDevice_.GetAddress().c_str());
+    LOG_INFO("[A2dpService] %{public}s address(%{public}s)\n",
+        __func__, GetEncryptAddr(activeDevice_.GetAddress()).c_str());
 
     return activeDevice_;
 }
@@ -624,7 +627,7 @@ int A2dpService::GetConnectStrategy(const RawAddress &device) const
         SECTION_CONNECTION_POLICIES,
         (role_ == A2DP_ROLE_SOURCE) ? PROPERTY_A2DP_CONNECTION_POLICY : PROPERTY_A2DP_SINK_CONNECTION_POLICY,
         value)) {
-        LOG_ERROR("%{public}s connection policy not found", device.GetAddress().c_str());
+        LOG_ERROR("%{public}s connection policy not found", GetEncryptAddr(device.GetAddress()).c_str());
         return (int)BTStrategyType::CONNECTION_UNKNOWN;
     }
 
@@ -735,7 +738,7 @@ int A2dpService::GetOptionalCodecsSupportState(const RawAddress &device) const
 
     if (!config->GetValue(
         device.GetAddress(), SECTION_CODE_CS_SUPPORT, PROPERTY_A2DP_SUPPORTS_OPTIONAL_CODECS, value)) {
-        LOG_ERROR("%{public}s %{public}s not found", device.GetAddress().c_str(), PROPERTY_A2DP_SUPPORTS_OPTIONAL_CODECS.c_str());
+        LOG_ERROR("%{public}s %{public}s not found", GetEncryptAddr(device.GetAddress()).c_str(), PROPERTY_A2DP_SUPPORTS_OPTIONAL_CODECS.c_str());
         return (int)A2DP_OPTIONAL_SUPPORT_UNKNOWN;
     }
 
@@ -970,7 +973,7 @@ void A2dpService::DeleteDeviceFromList(const RawAddress &device)
             a2dpDevices_.erase(it);
             break;
         }
-        LOG_INFO("[A2dpService]%{public}s device[%{public}s]\n", __func__, it->first.c_str());
+        LOG_INFO("[A2dpService]%{public}s device[%{public}s]\n", __func__, GetEncryptAddr(it->first).c_str());
     }
 }
 
@@ -981,7 +984,7 @@ void A2dpService::PostEvent(utility::Message event, RawAddress &device)
 
 void A2dpService::ProcessEvent(utility::Message event, RawAddress &device)
 {
-    LOG_INFO("[A2dpService] %{public}s peerAddr(%{public}s)\n", __func__, device.GetAddress().c_str());
+    LOG_INFO("[A2dpService] %{public}s peerAddr(%{public}s)\n", __func__, GetEncryptAddr(device.GetAddress()).c_str());
     BtAddr addr = {};
     device.ConvertToUint8(addr.addr);
     A2dpAvdtMsg data = {};
