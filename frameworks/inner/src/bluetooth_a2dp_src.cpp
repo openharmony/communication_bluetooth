@@ -18,6 +18,7 @@
 #include "bluetooth_a2dp_codec.h"
 #include "bluetooth_a2dp_src_proxy.h"
 #include "bluetooth_a2dp_src_observer_stub.h"
+#include "bluetooth_device.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_observer_list.h"
 #include "raw_address.h"
@@ -67,7 +68,8 @@ public:
 
     void OnConnectionStateChanged(const RawAddress &device, int state) override
     {
-        HILOGI("enter");
+        HILOGI("a2dpSrc conn state, device: %{public}s, state: %{public}s",
+            GetEncryptAddr((device).GetAddress()).c_str(), GetProfileConnStateName(state).c_str());
         a2dpSource_.observers_.ForEach([device, state](std::shared_ptr<A2dpSourceObserver> observer) {
             observer->OnConnectionStateChanged(BluetoothRemoteDevice(device.GetAddress(), 0), state);
         });
@@ -288,10 +290,15 @@ int A2dpSource::GetPlayingState(const BluetoothRemoteDevice &device) const
 
 bool A2dpSource::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGI("a2dp connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("input parameter error.");
+        return false;
+    }
+
+    if (!device.GetDeviceClass().IsProfileSupported(BluetoothDevice::PROFILE_A2DP)) {
+        HILOGE("a2dp connect failed. The remote device does not support A2DP service.");
         return false;
     }
 
@@ -299,7 +306,7 @@ bool A2dpSource::Connect(const BluetoothRemoteDevice &device)
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret= pimpl->proxy_->Connect(RawAddress(device.GetDeviceAddr()));
     } else {
-        HILOGI("proxy or bt disable.");
+        HILOGI("a2dp connect failed. proxy_ is null or bt is disabled.");
         return false;
     }
     return (RET_NO_ERROR == ret);
@@ -307,7 +314,7 @@ bool A2dpSource::Connect(const BluetoothRemoteDevice &device)
 
 bool A2dpSource::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGI("a2dp disconnect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("input parameter error.");
@@ -318,7 +325,7 @@ bool A2dpSource::Disconnect(const BluetoothRemoteDevice &device)
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
         ret = pimpl->proxy_->Disconnect(RawAddress(device.GetDeviceAddr()));
     } else {
-        HILOGI("proxy or bt disable.");
+        HILOGI("a2dp disconnect failed. proxy_ is null or bt is disabled.");
         return false;
     }
     return (RET_NO_ERROR == ret);
