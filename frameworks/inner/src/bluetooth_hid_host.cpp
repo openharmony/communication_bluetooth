@@ -15,6 +15,7 @@
 
 #include "bluetooth_hid_host.h"
 #include <unistd.h>
+#include "bluetooth_device.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"
@@ -40,8 +41,9 @@ public:
 
     ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
+        HILOGI("hid conn state, device: %{public}s, state: %{public}s",
+            GetEncryptAddr((device).GetAddress()).c_str(), GetProfileConnStateName(state).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        HILOGI("addr:%{public}s, state:%{public}d", GET_ENCRYPT_ADDR(remoteDevice), state);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HidHostObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
         });
@@ -91,12 +93,22 @@ struct HidHost::impl {
 
     bool Connect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
-                bool isOk;
-                proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);
-                HILOGI("end, result:%{public}d", isOk);
-                return isOk;
+        HILOGI("hid connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
+        if (!device.IsValidBluetoothRemoteDevice()) {
+            HILOGE("Addr is invalid");
+            return false;
+        }
+
+        if (!device.GetDeviceClass().IsProfileSupported(BluetoothDevice::PROFILE_HID)) {
+            HILOGE("hid connect failed. The remote device does not support HID service.");
+            return false;
+        }
+
+        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+            bool isOk;
+            proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);
+            HILOGI("end, result:%{public}d", isOk);
+            return isOk;
         }
         HILOGE("end, fw return false!");
         return false;
@@ -104,7 +116,7 @@ struct HidHost::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
+        HILOGI("hid disconnect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             bool isOk;
             proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);

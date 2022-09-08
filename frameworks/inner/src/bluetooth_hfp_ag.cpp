@@ -15,6 +15,7 @@
 
 #include "bluetooth_hfp_ag.h"
 #include <unistd.h>
+#include "bluetooth_device.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
@@ -40,7 +41,8 @@ public:
 
     void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
+        HILOGI("hfpAg conn state, device: %{public}s, state: %{public}s",
+            GetEncryptAddr((device).GetAddress()).c_str(), GetProfileConnStateName(state).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
@@ -142,7 +144,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool Connect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+        HILOGI("hfp connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
 
         if (proxy_ == nullptr) {
             HILOGE("proxy_ is nullptr");
@@ -159,6 +161,11 @@ struct HandsFreeAudioGateway::impl {
             return false;
         }
 
+        if (!device.GetDeviceClass().IsProfileSupported(BluetoothDevice::PROFILE_HEADSET)) {
+            HILOGE("hfp connect failed. The remote device does not support HFP service.");
+            return false;
+        }
+
         if (proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr())) == NO_ERROR) {
             return true;
         }
@@ -168,7 +175,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+        HILOGI("hfp disconnect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
 
         if (proxy_ == nullptr) {
             HILOGE("proxy_ == nullptr");
