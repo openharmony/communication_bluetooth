@@ -30,6 +30,7 @@
 #include "gap_if.h"
 #include "interface_adapter_classic.h"
 #include "log.h"
+#include "log_util.h"
 #include "raw_address.h"
 #include "sdp.h"
 

@@ -17,6 +17,7 @@
 
 #include "a2dp_service.h"
 #include "log.h"
+#include "log_util.h"
 
 namespace bluetooth {
 A2dpConnectManager::A2dpConnectManager(uint8_t role)
@@ -26,7 +27,7 @@ A2dpConnectManager::A2dpConnectManager(uint8_t role)
 
 bool A2dpConnectManager::A2dpConnect(const RawAddress &device)
 {
-    LOG_INFO("[A2dpConnectManager] %{public}s [address:%{public}s] role[%u]\n", __func__, device.GetAddress().c_str(), role_);
+    LOG_INFO("[A2dpConnectManager] %{public}s [address:%{public}s] role[%u]\n", __func__, GetEncryptAddr(device.GetAddress()).c_str(), role_);
 
     A2dpService *service = GetServiceInstance(role_);
     A2dpDeviceInfo *info = nullptr;

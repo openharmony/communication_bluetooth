@@ -15,6 +15,7 @@
 
 #include "hfp_hf_data_connection.h"
 
+#include "log_util.h"
 #include "btm.h"
 #include "hfp_hf_profile_event_sender.h"
 #include "raw_address.h"
@@ -27,7 +28,7 @@ void HfpHfDataConnection::ProcessDataConnectionCallback(uint16_t handle, uint32_
     auto addr = HfpHfRfcommConnection::GetRemoteAddressByHandle(handle);
     LOG_DEBUG("[HFP HF]%{public}s():Event from rfcomm device[%{public}s], handle[%hu], eventId[%u]",
         __FUNCTION__,
-        addr.c_str(),
+        GetEncryptAddr(addr).c_str(),
         handle,
         eventId);
     int event = HFP_HF_INVALID_EVT;

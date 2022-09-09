@@ -17,6 +17,7 @@
 
 #include <cstring>
 #include "log.h"
+#include "log_util.h"
 
 namespace bluetooth {
 ClassicRemoteDevice::ClassicRemoteDevice()
@@ -48,7 +49,7 @@ ClassicRemoteDevice::~ClassicRemoteDevice()
 
 std::string ClassicRemoteDevice::GetAddress() const
 {
-    LOG_DEBUG("[ClassicRemoteDevice]::%{public}s, addr = %{public}s", __func__, macAddr_.c_str());
+    LOG_DEBUG("[ClassicRemoteDevice]::%{public}s, addr = %{public}s", __func__, GetEncryptAddr(macAddr_).c_str());
 
     return macAddr_;
 }
