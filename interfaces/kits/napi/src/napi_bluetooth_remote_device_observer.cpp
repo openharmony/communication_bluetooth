@@ -17,6 +17,7 @@
 #include <string>
 
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_remote_device_observer.h"
 #include "napi_bluetooth_utils.h"
 
@@ -124,7 +125,7 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteNameChanged(
 {
     HILOGI("NapiBluetoothRemoteDeviceObserver::OnRemoteNameChanged called, address is %{public}s, deviceName is "
            "%{public}s",
-        device.GetDeviceAddr().c_str(),
+        GetEncryptAddr(device.GetDeviceAddr()).c_str(),
         deviceName.c_str());
 }
 
@@ -133,7 +134,7 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteAliasChanged(
 {
     HILOGI("NapiBluetoothRemoteDeviceObserver::OnRemoteAliasChanged called, address is %{public}s, alias is "
            "%{public}s",
-        device.GetDeviceAddr().c_str(),
+        GetEncryptAddr(device.GetDeviceAddr()).c_str(),
         alias.c_str());
 }
 
@@ -142,7 +143,7 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteCodChanged(
 {
     HILOGI("NapiBluetoothRemoteDeviceObserver::OnRemoteCodChanged called, address is %{public}s, cod is "
            "%{public}d",
-        device.GetDeviceAddr().c_str(),
+        GetEncryptAddr(device.GetDeviceAddr()).c_str(),
         cod.GetClassOfDevice());
 }
 
@@ -152,7 +153,7 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryLevelChanged(
     HILOGI(
         "NapiBluetoothRemoteDeviceObserver::OnRemoteBatteryLevelChanged called, address is %{public}s, batteryLevel is "
         "%{public}d",
-        device.GetDeviceAddr().c_str(),
+        GetEncryptAddr(device.GetDeviceAddr()).c_str(),
         batteryLevel);
 }
 
@@ -161,7 +162,7 @@ void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
 {
     HILOGI("NapiBluetoothRemoteDeviceObserver::OnReadRemoteRssiEvent called, address is %{public}s, rssi is "
            "%{public}d, status is %{public}d",
-        device.GetDeviceAddr().c_str(),
+        GetEncryptAddr(device.GetDeviceAddr()).c_str(),
         rssi,
         status);
     std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = GetRssiValueCallbackInfo();
