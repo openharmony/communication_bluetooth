@@ -31,7 +31,7 @@ struct AdapterConfig::impl {
 IAdapterConfig *AdapterConfig::GetInstance()
 {
     static AdapterConfig instance;
-    return (IAdapterConfig *)(&instance);
+    return reinterpret_cast<IAdapterConfig *>(&instance);
 }
 
 AdapterConfig::AdapterConfig() : pimpl(std::make_unique<impl>())

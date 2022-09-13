@@ -86,13 +86,13 @@ Reactor *ReactorCreate()
     }
 
     reactor->movedItems = ListCreate(NULL);
-    if (reactor->movedItems == NULL)
+    if (reactor->movedItems == NULL) {
         goto ERROR;
-
+    }
     reactor->apiMutex = MutexCreate();
-    if (reactor->apiMutex == NULL)
+    if (reactor->apiMutex == NULL) {
         goto ERROR;
-
+    }
     reactor->epollFd = epollFd;
     reactor->stopFd = stopFd;
 

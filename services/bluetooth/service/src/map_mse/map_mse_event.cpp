@@ -28,7 +28,7 @@ MapMseEvent::MapMseEvent(const std::string &eventType, const std::string &handle
     : version_("1.0"), eventType_(eventType), handle_(handle), folder_(folder), oldFolder_(oldFolder), msgType_(msgType)
 {
     SetFolderPath(folder, msgType);
-    if (MessageType::EMAIL != msgType && MessageType::IM != msgType && oldFolder != "") {
+    if ((msgType != MessageType::EMAIL) && (msgType != MessageType::IM) && (oldFolder != "")) {
         oldFolder_ = PATH + oldFolder;
     }
 }
@@ -202,22 +202,22 @@ MapMseEvent::~MapMseEvent()
 
 void MapMseEvent::SetFolderPath(const std::string &name, const MessageType &type)
 {
-    if ((MessageType::EMAIL != type) && (MessageType::IM != type) && (name != "")) {
+    if ((type != MessageType::EMAIL) && (type != MessageType::IM) && (name != "")) {
         folder_ = PATH + name;
     }
 }
 
 std::string MapMseEvent::GetMessageNameByType(const MessageType type) const
 {
-    if (MessageType::EMAIL == type) {
+    if (type == MessageType::EMAIL) {
         return "EMAIL";
-    } else if (MessageType::IM == type) {
+    } else if (type == MessageType::IM) {
         return "IM";
-    } else if (MessageType::MMS == type) {
+    } else if (type == MessageType::MMS) {
         return "MMS";
-    } else if (MessageType::SMS_GSM == type) {
+    } else if (type == MessageType::SMS_GSM) {
         return "SMS_GSM";
-    } else if (MessageType::SMS_CDMA == type) {
+    } else if (type == MessageType::SMS_CDMA) {
         return "SMS_CDMA";
     } else {
         return "NONE";

@@ -412,8 +412,8 @@ BleAdvertiserDataImpl::BleAdvertiserDataImpl() : payload_()
 int BleAdvertiserDataImpl::AddManufacturerData(uint16_t manufacturerId, const std::string &data)
 {
     char cdata[BLE_ADV_DATA_FIELD_TYPE_AND_LEN];
-    cdata[0] = (char)(manufacturerId & 0xFF);
-    cdata[1] = (char)((manufacturerId >> BLE_ONE_BYTE_LEN) & 0xFF);
+    cdata[0] = static_cast<char>(manufacturerId & 0xFF);
+    cdata[1] = static_cast<char>((manufacturerId >> BLE_ONE_BYTE_LEN) & 0xFF);
     SetManufacturerData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) + data);
 
     return RET_NO_ERROR;

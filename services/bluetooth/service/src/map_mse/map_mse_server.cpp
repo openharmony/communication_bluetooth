@@ -595,16 +595,19 @@ void MapMseServer::CreateOutputAppPrarams(
     if ((supportedFeatureMask_ & MAP_FEATURE_DATABASE_INDENTIFIER_BIT) == MAP_FEATURE_DATABASE_INDENTIFIER_BIT) {
         auto value = std::to_string(instance_.GetDatabaseIdentifier());
         obexAppPrarams.AppendTlvtriplet(
-            TlvTriplet(MapMseParams::PARAM_DATABASE_IDENTIFIER, (uint8_t)(value.size() + 1), (uint8_t *)value.data()));
+            TlvTriplet(MapMseParams::PARAM_DATABASE_IDENTIFIER, static_cast<uint8_t>(value.size() + 1),
+            reinterpret_cast<uint8_t *>(value.data())));
     }
     if ((supportedFeatureMask_ & MAP_FEATURE_FOLDER_VERSION_COUNTER_BIT) == MAP_FEATURE_FOLDER_VERSION_COUNTER_BIT) {
         auto value = std::to_string(instance_.GetFolderVersionCounter());
         obexAppPrarams.AppendTlvtriplet(TlvTriplet(
-            MapMseParams::PARAM_FOLDER_VERSION_COUNTER, (uint8_t)(value.size() + 1), (uint8_t *)value.data()));
+            MapMseParams::PARAM_FOLDER_VERSION_COUNTER, static_cast<uint8_t>(value.size() + 1),
+            reinterpret_cast<uint8_t *>(value.data())));
     }
     std::string mseTime = GetMseTime();
     obexAppPrarams.AppendTlvtriplet(
-        TlvTriplet(MapMseParams::PARAM_MSE_TIME, mseTime.size(), (uint8_t *)mseTime.c_str()));
+        TlvTriplet(MapMseParams::PARAM_MSE_TIME, mseTime.size(),
+            reinterpret_cast<uint8_t *>(const_cast<char *>(mseTime.c_str()))));
 }
 
 void MapMseServer::GetConversationListing(ObexServerSession &session, const ObexHeader &req)
@@ -626,8 +629,8 @@ void MapMseServer::GetConversationListing(ObexServerSession &session, const Obex
         if ((supportedFeatureMask_ & MAP_FEATURE_CONVERSATION_VERSION_COUNTER_BIT) > 0) {
             auto value = std::to_string(instance_.GetConversationVersionCounter());
             obexAppPrarams.AppendTlvtriplet(TlvTriplet(MapMseParams::PARAM_CONVERSATION_LISTING_VERSION_COUNTER,
-                (uint8_t)(value.size() + 1),
-                (uint8_t *)value.data()));
+                static_cast<uint8_t>(value.size() + 1),
+                reinterpret_cast<uint8_t *>(value.data())));
         }
     } else {
         auto bodyData = content_.GetCvslistBodyXml(*appParams, listingSize);
@@ -639,11 +642,13 @@ void MapMseServer::GetConversationListing(ObexServerSession &session, const Obex
     if ((supportedFeatureMask_ & MAP_FEATURE_DATABASE_INDENTIFIER_BIT) > 0) {
         auto value = std::to_string(instance_.GetDatabaseIdentifier());
         obexAppPrarams.AppendTlvtriplet(
-            TlvTriplet(MapMseParams::PARAM_DATABASE_IDENTIFIER, (uint8_t)(value.size() + 1), (uint8_t *)value.data()));
+            TlvTriplet(MapMseParams::PARAM_DATABASE_IDENTIFIER, static_cast<uint8_t>(value.size() + 1),
+            reinterpret_cast<uint8_t *>(value.data())));
     }
     std::string mseTime = GetMseTime();
     obexAppPrarams.AppendTlvtriplet(
-        TlvTriplet(MapMseParams::PARAM_MSE_TIME, (uint8_t)mseTime.size(), (uint8_t *)mseTime.c_str()));
+        TlvTriplet(MapMseParams::PARAM_MSE_TIME, static_cast<uint8_t>(mseTime.size()),
+        reinterpret_cast<uint8_t *>(const_cast<char *>(mseTime.c_str()))));
     resHeader->AppendItemAppParams(obexAppPrarams);
     session.SendGetResponse(req, *resHeader, bodyObj);
 }
@@ -700,12 +705,14 @@ void MapMseServer::GetOwnerStatus(const ObexServerSession &session, const ObexHe
         std::string presenceText = result.presenceText;
         obexAppPrarams.AppendTlvtriplet(TlvTriplet(MapMseParams::PARAM_PRESENCE_AVAILABILITY, presenceAvlt));
         obexAppPrarams.AppendTlvtriplet(
-            TlvTriplet(MapMseParams::PARAM_PRESENCE_TEXT, presenceText.size(), (uint8_t *)presenceText.c_str()));
+            TlvTriplet(MapMseParams::PARAM_PRESENCE_TEXT, presenceText.size(),
+            reinterpret_cast<uint8_t *>(const_cast<char *>(presenceText.c_str()))));
         if (appParams->conversationId_.size() > 0) {
             std::string lastActivity = result.lastActivity;
             uint8_t chatState = result.chatState;
             obexAppPrarams.AppendTlvtriplet(TlvTriplet(
-                MapMseParams::PARAM_LAST_ACTIVITY, (uint8_t)lastActivity.size(), (uint8_t *)lastActivity.c_str()));
+                MapMseParams::PARAM_LAST_ACTIVITY, static_cast<uint8_t>(lastActivity.size()),
+                reinterpret_cast<uint8_t *>(const_cast<char *>(lastActivity.c_str()))));
             obexAppPrarams.AppendTlvtriplet(TlvTriplet(MapMseParams::PARAM_CHAT_STATE, chatState));
         }
         auto resHeader = ObexHeader::CreateResponse(ObexRspCode::SUCCESS);
@@ -731,14 +738,15 @@ void MapMseServer::GetMASInstanceInformation(ObexServerSession &session, const O
         std::string ownerUci;
         GetImEmailMasInfo(masStr, ownerUci);
         auto resHeader = ObexHeader::CreateResponse(ObexRspCode::SUCCESS);
-        if (MAP_MAS_INSTANCE_INFORMATION_LENGTH < masStr.size()) {
+        if (masStr.size() > MAP_MAS_INSTANCE_INFORMATION_LENGTH) {
             masStr = masStr.substr(0, MAP_MAS_INSTANCE_INFORMATION_LENGTH);
         }
         auto bodyObj = std::make_shared<ObexArrayBodyObject>();
         bodyObj->Write((uint8_t *)masStr.data(), masStr.size());
         ObexTlvParamters obexAppPrarams;
         obexAppPrarams.AppendTlvtriplet(
-            TlvTriplet(MapMseParams::PARAM_OWNER_UCI, (uint8_t)ownerUci.size(), (uint8_t *)ownerUci.data()));
+            TlvTriplet(MapMseParams::PARAM_OWNER_UCI, static_cast<uint8_t>(ownerUci.size()),
+            reinterpret_cast<uint8_t *>(ownerUci.data())));
         resHeader->AppendItemAppParams(obexAppPrarams);
         session.SendGetResponse(req, *resHeader, bodyObj);
         return;

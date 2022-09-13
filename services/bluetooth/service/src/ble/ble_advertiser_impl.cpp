@@ -867,22 +867,26 @@ int BleAdvertiserImpl::ExAdvDataFragment(const BleAdvertiserDataImpl &data) cons
     if ((payloadLen / maxlen == 0) || ((payloadLen / maxlen == 1) && (payloadLen % maxlen == 0))) {
         uint8_t operation = GAP_ADVERTISING_DATA_OPERATION_COMPLETE;
         pimpl->operationLast_ = true;
-        return GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, payloadLen, (uint8_t *)payload.c_str());
+        return GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, payloadLen,
+            reinterpret_cast<uint8_t *>(const_cast<char *>(payload.c_str())));
     } else if (((payloadLen / maxlen == 1) && (payloadLen % maxlen > 0)) ||
                ((payloadLen / maxlen == BLE_DIV_RESULT_TWO) && (payloadLen % maxlen == 0))) {
         std::string advData = payload.substr(0, maxlen);
         uint8_t operation = GAP_ADVERTISING_DATA_OPERATION_FIRST;
-        ret = GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, maxlen, (uint8_t *)advData.c_str());
+        ret = GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, maxlen,
+            reinterpret_cast<uint8_t *>(const_cast<char *>(advData.c_str())));
         pimpl->operationLast_ = true;
         operation = GAP_ADVERTISING_DATA_OPERATION_LAST;
         uint8_t length = payloadLen - maxlen;
         advData = payload.substr(maxlen, payloadLen - maxlen);
-        ret &= GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, length, (uint8_t *)advData.c_str());
+        ret &= GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, length,
+            reinterpret_cast<uint8_t *>(const_cast<char *>(advData.c_str())));
     } else if (((payloadLen / maxlen == BLE_DIV_RESULT_TWO) && (payloadLen % maxlen > 0)) ||
                payloadLen / maxlen > BLE_DIV_RESULT_TWO) {
         uint8_t operation = GAP_ADVERTISING_DATA_OPERATION_FIRST;
         std::string advData = payload.substr(0, maxlen);
-        ret = GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, maxlen, (uint8_t *)advData.c_str());
+        ret = GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, maxlen,
+            reinterpret_cast<uint8_t *>(const_cast<char *>(advData.c_str())));
         operation = GAP_ADVERTISING_DATA_OPERATION_INTERMEDIATE;
         for (size_t i = 0; i < (payloadLen / maxlen - 1); i++) {
             if ((i == (payloadLen / maxlen - 1) - 1) && (payloadLen - maxlen * (payloadLen / maxlen) == 0)) {
@@ -890,13 +894,12 @@ int BleAdvertiserImpl::ExAdvDataFragment(const BleAdvertiserDataImpl &data) cons
             }
             uint8_t length = maxlen * (i + 1);
             advData = payload.substr(maxlen * (i + 1), maxlen);
-            ret &= GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, length, (uint8_t *)advData.c_str());
+            ret &= GAPIF_LeExAdvSetData(advStartHandle, operation, fragment, length,
+                reinterpret_cast<uint8_t *>(const_cast<char *>(advData.c_str())));
         }
         pimpl->operationLast_ = true;
         if (payloadLen - maxlen * (payloadLen / maxlen) > 0) {
-            ret &= GAPIF_LeExAdvSetData(advStartHandle,
-                GAP_ADVERTISING_DATA_OPERATION_LAST,
-                fragment,
+            ret &= GAPIF_LeExAdvSetData(advStartHandle, GAP_ADVERTISING_DATA_OPERATION_LAST, fragment,
                 payloadLen - maxlen * (payloadLen / maxlen),
                 (uint8_t *)payload.substr(maxlen * (payloadLen / maxlen), payloadLen - maxlen * (payloadLen / maxlen))
                     .c_str());
@@ -1391,7 +1394,7 @@ void BleAdvertiserImpl::GapAdvStopCompleteEvt(int status) const
 
 void BleAdvertiserImpl::HandleGapEvent(const BLE_GAP_CB_EVENT &event, int status, int8_t txPower)
 {
-    LOG_DEBUG("[BleAdvertiserImpl] %{public}s:[event no: %{public}d]", __func__, (int)event);
+    LOG_DEBUG("[BleAdvertiserImpl] %{public}s:[event no: %{public}d]", __func__, static_cast<int>(event));
 
     switch (event) {
         case BLE_GAP_ADV_PARAM_SET_COMPLETE_EVT:
@@ -1735,7 +1738,7 @@ void BleAdvertiserImpl::GapExAdvTerminatedAdvSetEvt(int status, uint8_t handle) 
 
 void BleAdvertiserImpl::HandleGapExAdvEvent(const BLE_GAP_CB_EVENT &event, int status, int8_t txPower, uint8_t handle)
 {
-    LOG_INFO("[BleAdvertiserImpl] %{public}s:HandleGapExAdvEvent [event no: %{public}d].", __func__, (int)event);
+    HILOGI("event no: %{public}d.", static_cast<int>(event));
 
     switch (event) {
         case BLE_GAP_EX_ADV_SET_RAND_ADDR_RESULT_EVT:

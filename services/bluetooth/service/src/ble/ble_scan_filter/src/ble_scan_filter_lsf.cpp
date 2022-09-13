@@ -369,7 +369,7 @@ int BleScanFilterLsf::BleScanFilterEnable(uint8_t enable)
     ongoingTag_ = param.enable;
     StartCommandTimer();
 
-    return HCIVIF_SendCmd(opCode, (void *)&param, sizeof(VendorCmdParamLSFEnable));
+    return HCIVIF_SendCmd(opCode, static_cast<void *>(&param), sizeof(VendorCmdParamLSFEnable));
 }
 
 int BleScanFilterLsf::BleScanFilterSetParameters(uint16_t featureSelection, uint8_t opcode)
@@ -390,7 +390,7 @@ int BleScanFilterLsf::BleScanFilterSetParameters(uint16_t featureSelection, uint
     ongoingTag_ = param.tag;
     StartCommandTimer();
 
-    return HCIVIF_SendCmd(opCode, (void *)&param, paramLength);
+    return HCIVIF_SendCmd(opCode, static_cast<void *>(&param), paramLength);
 }
 
 int BleScanFilterLsf::BleScanFilterAddressAdd(BtAddr address)
@@ -405,7 +405,7 @@ int BleScanFilterLsf::BleScanFilterAddressAdd(BtAddr address)
     ongoingTag_ = param.tag;
     StartCommandTimer();
 
-    return HCIVIF_SendCmd(opCode, (void *)&param, sizeof(VendorCmdParamLSFAddress));
+    return HCIVIF_SendCmd(opCode, static_cast<void *>(&param), sizeof(VendorCmdParamLSFAddress));
 }
 
 int BleScanFilterLsf::BleScanFilterUuidAdd(Uuid uuid, Uuid uuidMask, uint8_t tag)
@@ -454,7 +454,7 @@ int BleScanFilterLsf::BleScanFilterUuidAdd(Uuid uuid, Uuid uuidMask, uint8_t tag
     ongoingTag_ = param.tag;
     StartCommandTimer();
 
-    return HCIVIF_SendCmd(opCode, (void *)&param, paramLength);
+    return HCIVIF_SendCmd(opCode, static_cast<void *>(&param), paramLength);
 }
 
 int BleScanFilterLsf::BleScanFilterNameAdd(std::string name)
@@ -481,7 +481,7 @@ int BleScanFilterLsf::BleScanFilterNameAdd(std::string name)
     ongoingOpcode_ = param.opcode;
     ongoingTag_ = param.tag;
     StartCommandTimer();
-    return HCIVIF_SendCmd(opCode, (void *)&param, paramLength);
+    return HCIVIF_SendCmd(opCode, static_cast<void *>(&param), paramLength);
 }
 
 int BleScanFilterLsf::BleScanFilterManufacturerDataAdd(uint16_t manufacturerId, uint16_t manufacturerIdMask,
@@ -540,7 +540,7 @@ int BleScanFilterLsf::BleScanFilterManufacturerDataAdd(uint16_t manufacturerId, 
     ongoingTag_ = param.tag;
     StartCommandTimer();
 
-    return HCIVIF_SendCmd(opCode, (void *)&param, paramLength);
+    return HCIVIF_SendCmd(opCode, static_cast<void *>(&param), paramLength);
 }
 
 int BleScanFilterLsf::BleScanFilterServiceDataAdd(
@@ -580,7 +580,7 @@ int BleScanFilterLsf::BleScanFilterServiceDataAdd(
     ongoingTag_ = param.tag;
     StartCommandTimer();
 
-    return HCIVIF_SendCmd(opCode, (void *)&param, paramLength);
+    return HCIVIF_SendCmd(opCode, static_cast<void *>(&param), paramLength);
 }
 
 uint16_t BleScanFilterLsf::MakeVendorOpCode(uint16_t ocf)
