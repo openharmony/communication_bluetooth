@@ -26,7 +26,7 @@ static inline int32_t FABS(int32_t x)
 static inline int32_t ASR(int32_t val, int bits)
 {
     return ((-2 >> 1 == -1) ?
-        ((int32_t)(val)) >> (bits) : ((int32_t) (val)) / (1 << (bits)));
+        (static_cast<int32_t>(val)) >> (bits) : (static_cast<int32_t>(val)) / (1 << (bits)));
 }
 
 #define SCALE_SPROTO4_TBL    12
@@ -41,12 +41,14 @@ static inline int32_t ASR(int32_t val, int bits)
 static inline int32_t Scale4Staged1(int32_t src)
 {
     return ((-2 >> 1 == -1) ?
-        ((int32_t)(src)) >> (SCALE4_STAGED1_BITS) : ((int32_t) (src)) / (1 << (SCALE4_STAGED1_BITS)));
+        (static_cast<int32_t>(src)) >> (SCALE4_STAGED1_BITS) :
+            (static_cast<int32_t>(src)) / (1 << (SCALE4_STAGED1_BITS)));
 }
 static inline int32_t Scale8Staged1(int32_t src)
 {
     return ((-2 >> 1 == -1) ?
-        ((int32_t)(src)) >> (SCALE8_STAGED1_BITS) : ((int32_t) (src)) / (1 << (SCALE8_STAGED1_BITS)));
+        (static_cast<int32_t>(src)) >> (SCALE8_STAGED1_BITS) :
+            (static_cast<int32_t>(src)) / (1 << (SCALE8_STAGED1_BITS)));
 }
 
 static inline int32_t MUL(int32_t a, int32_t b)

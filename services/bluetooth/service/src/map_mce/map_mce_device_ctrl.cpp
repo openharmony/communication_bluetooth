@@ -299,7 +299,7 @@ bool MapMceDeviceCtrl::AllInstancesStartDisConnecting()
         }
     }
     // disconnect the mns server
-    if (MAP_MCE_DEV_STATE_DISCONNECTED != GetMnsState()) {
+    if (GetMnsState() != MAP_MCE_DEV_STATE_DISCONNECTED) {
         MnsProcRequestDisconnect();
         finish = false;
     }
@@ -802,10 +802,10 @@ void MapMceDeviceCtrl::ProcessDisconnected()
         }
     }
     // check mns server disconnect
-    if (MAP_MCE_DEV_STATE_DISCONNECTED != GetMnsState()) {
+    if (GetMnsState() != MAP_MCE_DEV_STATE_DISCONNECTED) {
         notfinish = true;
         // disconnect the mns server
-        if (MAP_MCE_DEV_STATE_CONNECTED == GetMnsState()) {
+        if (GetMnsState() == MAP_MCE_DEV_STATE_CONNECTED) {
             MnsProcRequestDisconnect();
         }
     }

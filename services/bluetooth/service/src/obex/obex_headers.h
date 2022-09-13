@@ -76,7 +76,7 @@ public:
     explicit TlvTriplet(const uint8_t tagId, const uint16_t val);
     explicit TlvTriplet(const uint8_t tagId, const uint32_t val);
     explicit TlvTriplet(const uint8_t tagId, const uint64_t val);
-    explicit TlvTriplet(const TlvTriplet &);
+    explicit TlvTriplet(const TlvTriplet &tlvTriplet);
     uint8_t GetTagId() const;
     uint8_t GetLen() const;
     uint8_t GetUnitLen() const;
@@ -248,7 +248,7 @@ protected:
 class ObexOptionalBytesHeader : public ObexOptionalHeader {
 public:
     ObexOptionalBytesHeader(const uint8_t headerId, const uint8_t *data,
-        const uint16_t dataSize, uint16_t unitLen = 1);
+        const uint16_t dataSize, const uint16_t unitLen = 1);
     virtual ~ObexOptionalBytesHeader() = default;
     std::unique_ptr<uint8_t[]> GetBytes() const override;
     bool HasLengthField() const override;
@@ -420,10 +420,10 @@ public:
 
     void SetRespCode(uint8_t code);
     void SetFinalBit(bool finalBit);
-    void SetFieldObexVersionNum(const uint8_t);
-    void SetFieldFlags(const uint8_t);
-    void SetFieldMaxPacketLength(const uint16_t);
-    void SetFieldConstants(const uint8_t);
+    void SetFieldObexVersionNum(const uint8_t obexVersionNum);
+    void SetFieldFlags(const uint8_t flags);
+    void SetFieldMaxPacketLength(const uint16_t maxPacketLength);
+    void SetFieldConstants(const uint8_t constants);
 
     // obex header add methods
     // bytes

@@ -39,23 +39,23 @@ static const int SBC_OFFSET_8[4][8] = {
 
 static inline int32_t SS4(int32_t val)
 {
-    return ((-2 >> 1 == -1) ? ((int32_t)(val)) >> (SCALE_SPROTO4_TBL) :
-            ((int32_t) (val)) / (1 << (SCALE_SPROTO4_TBL)));
+    return ((-2 >> 1 == -1) ? (static_cast<int32_t>(val)) >> (SCALE_SPROTO4_TBL) :
+            (static_cast<int32_t>(val)) / (1 << (SCALE_SPROTO4_TBL)));
 }
 static inline int32_t SS8(int32_t val)
 {
-    return ((-2 >> 1 == -1) ? ((int32_t)(val)) >> (SCALE_SPROTO8_TBL) :
-            ((int32_t) (val)) / (1 << (SCALE_SPROTO8_TBL)));
+    return ((-2 >> 1 == -1) ? (static_cast<int32_t>(val)) >> (SCALE_SPROTO8_TBL) :
+            (static_cast<int32_t>(val)) / (1 << (SCALE_SPROTO8_TBL)));
 }
 static inline int32_t SN4(int32_t val)
 {
-    return ((-2 >> 1 == -1) ? ((int32_t)(val)) >> (SCALE_NPROTO4_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS) :
-            ((int32_t) (val)) / (1 << (SCALE_NPROTO4_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)));
+    return ((-2 >> 1 == -1) ? (static_cast<int32_t>(val)) >> (SCALE_NPROTO4_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS) :
+            (static_cast<int32_t>(val)) / (1 << (SCALE_NPROTO4_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)));
 }
 static inline int32_t SN8(int32_t val)
 {
-    return ((-2 >> 1 == -1) ? ((int32_t)(val)) >> (SCALE_NPROTO8_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS) :
-            ((int32_t) (val)) / (1 << (SCALE_NPROTO8_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)));
+    return ((-2 >> 1 == -1) ? (static_cast<int32_t>(val)) >> (SCALE_NPROTO8_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS) :
+            (static_cast<int32_t>(val)) / (1 << (SCALE_NPROTO8_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)));
 }
 
 static const int32_t PROTO_4_40M0[] = {
@@ -151,12 +151,12 @@ static const int32_t SYNMATRIX8[16][8] = {
 #define PROTO_BAND4_SCALE \
     ((sizeof(int16_t) * CHAR_BIT - 1) - SBC_FIXED_EXTRA_BITS + 1)
 static int16_t FProto4(double x) {
-    return (int32_t) ((x * 2) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return static_cast<int32_t>((x * 2) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 static int16_t FProto4N(double x) {
-    return -(int32_t) ((x * 2) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return -static_cast<int32_t>((x * 2) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 
 static const int16_t PROTO_BAND4[40] = {
@@ -189,12 +189,12 @@ static const int16_t PROTO_BAND4[40] = {
 #define COS_TABLE_BAND4_SCALE \
     ((sizeof(int16_t) * CHAR_BIT - 1) + SBC_FIXED_EXTRA_BITS)
 static int16_t FCos4(double x) {
-    return (int32_t) ((x) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return static_cast<int32_t>((x) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 static int16_t FCos4N(double x) {
-    return -(int32_t) ((x) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return -static_cast<int32_t>((x) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 
 static const int16_t COS_TABLE_BAND_4[32] = {
@@ -214,12 +214,12 @@ static const int16_t COS_TABLE_BAND_4[32] = {
 #define PROTO_BAND8_SCALE \
     ((sizeof(int16_t) * CHAR_BIT - 1) - SBC_FIXED_EXTRA_BITS + 1)
 static int16_t FProto8(double x) {
-    return (int32_t) ((x * 2) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return static_cast<int32_t>((x * 2) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 static int16_t FProto8N(double x) {
-    return -(int32_t) ((x * 2) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return -static_cast<int32_t>((x * 2) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 
 static const int16_t PROTO_BAND8[80] = {
@@ -272,12 +272,12 @@ static const int16_t PROTO_BAND8[80] = {
 #define COS_TABLE_BAND8_SCALE \
     ((sizeof(int16_t) * CHAR_BIT - 1) + SBC_FIXED_EXTRA_BITS)
 static int16_t FCos8(double x) {
-    return (int32_t) ((x) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return static_cast<int32_t>((x) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 static int16_t FCos8N(double x) {
-    return -(int32_t) ((x) * \
-    ((int32_t) 1 << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
+    return -static_cast<int32_t>((x) * \
+    (static_cast<int32_t>(1) << (sizeof(int16_t) * CHAR_BIT - 1)) + 0.5);
 }
 
 static const int16_t COS_TABLE_BAND_8[128] = {

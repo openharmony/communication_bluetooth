@@ -359,7 +359,7 @@ int PanBnep::BnepBuildEthernetPacketHeader(uint8_t type, EthernetHeader ethernet
         offset += BT_ADDRESS_LENGTH;
     }
 
-    *((uint16_t *)(buf + offset)) = htobe16(ethernetHeader.protocol);
+    *(reinterpret_cast<uint16_t *>(buf + offset)) = htobe16(ethernetHeader.protocol);
     offset += BNEP_UINT16_SIZE;
     return offset;
 }
@@ -997,17 +997,17 @@ int PanBnep::ProcessBnepSetupConnectionRequest(uint8_t *data, int dataLength)
         return 0;
     }
     if (uuidType == Uuid::UUID16_BYTES_TYPE) {
-        uint16_t uuid = be16toh(*(uint16_t *)(data + offset));
+        uint16_t uuid = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
         offset += uuidType;
         localUuid = Uuid::ConvertFrom16Bits(uuid);
-        uuid = be16toh(*(uint16_t *)(data + offset));
+        uuid = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
         offset += uuidType;
         remoteUuid = Uuid::ConvertFrom16Bits(uuid);
     } else if (uuidType == Uuid::UUID32_BYTES_TYPE) {
-        uint32_t uuid = be32toh(*(uint32_t *)(data + offset));
+        uint32_t uuid = be32toh(*reinterpret_cast<uint32_t *>(data + offset));
         offset += uuidType;
         localUuid = Uuid::ConvertFrom32Bits(uuid);
-        uuid = be32toh(*(uint32_t *)(data + offset));
+        uuid = be32toh(*reinterpret_cast<uint32_t *>(data + offset));
         offset += uuidType;
         remoteUuid = Uuid::ConvertFrom32Bits(uuid);
     } else if (uuidType == Uuid::UUID128_BYTES_TYPE) {
@@ -1032,7 +1032,7 @@ int PanBnep::ProcessBnepSetupConnectionResponse(uint8_t *data, int dataLength)
         LOG_ERROR("[PAN BNEP]%{public}s data is null!", __func__);
         return 0;
     }
-    uint16_t responseMessage = be16toh(*(uint16_t *)(data + offset));
+    uint16_t responseMessage = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
     offset += BNEP_UINT16_SIZE;
     LOG_ERROR("[PAN BNEP]%{public}s we are not origination! responseMessage=%{public}d",
         __func__, responseMessage);
@@ -1049,7 +1049,7 @@ int PanBnep::ProcessBnepFilterNetTypeSet(uint8_t *data, int dataLength)
         LOG_ERROR("[PAN BNEP]%{public}s data is null!", __func__);
         return 0;
     }
-    uint16_t listLength = be16toh(*(uint16_t *)(data + offset));
+    uint16_t listLength = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
     offset += BNEP_UINT16_SIZE;
     ret = offset + listLength;
     if ((dataLength - offset) < listLength) {
@@ -1072,8 +1072,8 @@ int PanBnep::ProcessBnepFilterNetTypeSet(uint8_t *data, int dataLength)
     std::vector<BnepProtocolFilterRange> tempFilters_;
     for (uint16_t i = 0; i < filterNum; i++) {
         BnepProtocolFilterRange range;
-        range.start = be16toh(*(uint16_t *)(data + offset));
-        range.end = be16toh(*(uint16_t *)(data + offset + BNEP_UINT16_SIZE));
+        range.start = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
+        range.end = be16toh(*reinterpret_cast<uint16_t *>(data + offset + BNEP_UINT16_SIZE));
         if (range.start > range.end) {
             LOG_ERROR("[PAN BNEP]%{public}s range.start > range.end!", __func__);
             BnepSendFilterNetTypeResponse(BNEP_FILTER_FAILED_INVALID_NET_TYPE_RANGE);
@@ -1094,7 +1094,7 @@ int PanBnep::ProcessBnepFilterNetTypeResponse(uint8_t *data, int dataLength)
         LOG_ERROR("[PAN BNEP]%{public}s data is null!", __func__);
         return 0;
     }
-    uint16_t responseMessage = be16toh(*(uint16_t *)(data + offset));
+    uint16_t responseMessage = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
     offset += BNEP_UINT16_SIZE;
     LOG_ERROR("[PAN BNEP]%{public}s we are not set filter! responseMessage=%{public}d",
         __func__, responseMessage);
@@ -1111,7 +1111,7 @@ int PanBnep::ProcessBnepFilterMultiAddrSet(uint8_t *data, int dataLength)
         LOG_ERROR("[PAN BNEP]%{public}s data is null!", __func__);
         return 0;
     }
-    uint16_t listLength = be16toh(*(uint16_t *)(data + offset));
+    uint16_t listLength = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
     offset += BNEP_UINT16_SIZE;
     ret = offset + listLength;
     if ((dataLength - offset) < listLength) {
@@ -1160,7 +1160,7 @@ int PanBnep::ProcessBnepFilterMultiAddrResponse(uint8_t *data, int dataLength)
         LOG_ERROR("[PAN BNEP]%{public}s data is null!", __func__);
         return 0;
     }
-    uint16_t responseMessage = be16toh(*(uint16_t *)(data + offset));
+    uint16_t responseMessage = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
     offset += BNEP_UINT16_SIZE;
     LOG_ERROR("[PAN BNEP]%{public}s we are not set filter! responseMessage=%{public}d",
         __func__, responseMessage);
@@ -1223,7 +1223,7 @@ void PanBnep::BnepSendSetupConnectionResponse(uint16_t responseMessage)
     offset++;
     buf[offset] = BNEP_SETUP_CONNECTION_RESPONSE_MSG;
     offset++;
-    *((uint16_t *)(buf + offset)) = htobe16(responseMessage);
+    *(reinterpret_cast<uint16_t *>(buf + offset)) = htobe16(responseMessage);
 
     L2CIF_SendData(lcid_, packet, nullptr);
     LOG_DEBUG("[PAN BNEP] %{public}s send bnep setup connection response ", __FUNCTION__);
@@ -1244,7 +1244,7 @@ void PanBnep::BnepSendFilterNetTypeResponse(uint16_t responseMessage)
     offset++;
     buf[offset] = BNEP_FILTER_NET_TYPE_RESPONSE_MSG;
     offset++;
-    *((uint16_t *)(buf + offset)) = htobe16(responseMessage);
+    *(reinterpret_cast<uint16_t *>(buf + offset)) = htobe16(responseMessage);
 
     L2CIF_SendData(lcid_, packet, nullptr);
     LOG_DEBUG("[PAN BNEP] %{public}s send BNEP_FILTER_NET_TYPE_RESPONSE_MSG ", __FUNCTION__);
@@ -1265,7 +1265,7 @@ void PanBnep::BnepSendFilterMultiAddrResponse(uint16_t responseMessage)
     offset++;
     buf[offset] = BNEP_FILTER_MULTI_ADDR_RESPONSE_MSG;
     offset++;
-    *((uint16_t *)(buf + offset)) = htobe16(responseMessage);
+    *(reinterpret_cast<uint16_t *>(buf + offset)) = htobe16(responseMessage);
 
     L2CIF_SendData(lcid_, packet, nullptr);
     LOG_DEBUG("[PAN BNEP] %{public}s send BNEP_FILTER_MULTI_ADDR_RESPONSE_MSG ", __FUNCTION__);
@@ -1323,7 +1323,7 @@ int PanBnep::ProcessBnepEthernetPacketHeader(uint8_t type, EthernetHeader &ether
         LOG_ERROR("[PAN BNEP]%{public}s get protocol,data length is error!", __func__);
         return 0;
     }
-    ethernetHeader.protocol = be16toh(*(uint16_t *)(data + offset));
+    ethernetHeader.protocol = be16toh(*reinterpret_cast<uint16_t *>(data + offset));
     offset += BNEP_UINT16_SIZE;
     return offset;
 }

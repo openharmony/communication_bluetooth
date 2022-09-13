@@ -33,7 +33,7 @@ struct ProfileConfig::impl {
 IProfileConfig *ProfileConfig::GetInstance()
 {
     static ProfileConfig instance;
-    return (IProfileConfig *)(&instance);
+    return reinterpret_cast<IProfileConfig *>(&instance);
 }
 
 ProfileConfig::ProfileConfig() : pimpl(std::make_unique<impl>()){};

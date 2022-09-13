@@ -165,9 +165,9 @@ void GattDatabase::ReleaseHandle(GattDatabase::Service &service)
         } else {
             //   current            Next           service
             // [first,second][first,second][start handle, end handle]
-            if (service.handle_ > nextNode->second)
+            if (service.handle_ > nextNode->second) {
                 continue;
-
+            }
             //   current           service                Next
             // [first,second][start handle, end handle][first,second]
 

@@ -351,7 +351,7 @@ uint8_t A2dpAvdtp::ParseAvdtpConfigureInd(
     }
 
     msg.a2dpMsg.configRsp.addr = bdAddr;
-    msg.a2dpMsg.configRsp.handle = (uint8_t)handle;
+    msg.a2dpMsg.configRsp.handle = static_cast<uint8_t>(handle);
     msg.a2dpMsg.configRsp.label = data.configInd.hdr.label;
     (void)memcpy_s(msg.a2dpMsg.configRsp.codecInfo, A2DP_CODEC_SIZE, data.configInd.cfg.codecInfo, A2DP_CODEC_SIZE);
     msg.a2dpMsg.configRsp.role = role;
@@ -390,7 +390,7 @@ uint8_t A2dpAvdtp::ParseAvdtpReconfigureInd(
     peer->StopSignalingTimer();
     msg.a2dpMsg.msg = data;
     msg.a2dpMsg.configRsp.addr = bdAddr;
-    msg.a2dpMsg.configRsp.handle = (uint8_t)handle;
+    msg.a2dpMsg.configRsp.handle = static_cast<uint8_t>(handle);
     msg.a2dpMsg.configRsp.label = data.reconfigInd.hdr.label;
     uint8_t *pCodecInfo = const_cast<uint8_t *>(data.reconfigInd.cfg.codecInfo);
 

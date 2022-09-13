@@ -878,19 +878,19 @@ TlvTriplet::TlvTriplet(const TlvTriplet &tlvTriplet)
 {}
 
 TlvTriplet::TlvTriplet(const uint8_t tagId, const uint8_t val)
-    : TlvTriplet(tagId, uint8_t(1), (const uint8_t *)&val, uint8_t(1))
+    : TlvTriplet(tagId, static_cast<uint8_t>(1), reinterpret_cast<const uint8_t *>(&val), static_cast<uint8_t>(1))
 {}
 
 TlvTriplet::TlvTriplet(const uint8_t tagId, const uint16_t val)
-    : TlvTriplet(tagId, uint8_t(2), (const uint8_t *)&val, uint8_t(2))
+    : TlvTriplet(tagId, static_cast<uint8_t>(2), reinterpret_cast<const uint8_t *>(&val), static_cast<uint8_t>(2))
 {}
 
 TlvTriplet::TlvTriplet(const uint8_t tagId, const uint32_t val)
-    : TlvTriplet(tagId, uint8_t(4), (const uint8_t *)&val, uint8_t(4))
+    : TlvTriplet(tagId, static_cast<uint8_t>(4), reinterpret_cast<const uint8_t *>(&val), static_cast<uint8_t>(4))
 {}
 
 TlvTriplet::TlvTriplet(const uint8_t tagId, const uint64_t val)
-    : TlvTriplet(tagId, uint8_t(8), (const uint8_t *)&val, uint8_t(8))
+    : TlvTriplet(tagId, static_cast<uint8_t>(8), reinterpret_cast<const uint8_t *>(&val), static_cast<uint8_t>(8))
 {}
 
 uint8_t TlvTriplet::GetTagId() const
@@ -917,7 +917,7 @@ uint16_t TlvTriplet::GetUint16() const
 {
     if (len_ == ObexHeader::UINT16_LENGTH) {
         if (unitLen_ > 1) {
-            return *((const uint16_t *)GetVal());
+            return *(reinterpret_cast<const uint16_t *>(GetVal()));
         }
         return ObexUtils::GetBufData16(GetVal());
     }
@@ -928,7 +928,7 @@ uint32_t TlvTriplet::GetUint32() const
 {
     if (len_ == ObexHeader::UINT32_LENGTH) {
         if (unitLen_ > 1) {
-            return *((const uint32_t *)GetVal());
+            return *(reinterpret_cast<const uint32_t *>(GetVal()));
         }
         return ObexUtils::GetBufData32(GetVal());
     }
@@ -939,7 +939,7 @@ uint64_t TlvTriplet::GetUint64() const
 {
     if (len_ == ObexHeader::UINT64_LENGTH) {
         if (unitLen_ > 1) {
-            return *((const uint64_t *)GetVal());
+            return *(reinterpret_cast<const uint64_t *>(GetVal()));
         }
         return ObexUtils::GetBufData64(GetVal());
     }
@@ -1022,7 +1022,8 @@ std::unique_ptr<ObexOptionalHeader> ObexOptionalBytesHeader::Clone() const
 
 // ObexOptionalStringHeader
 ObexOptionalStringHeader::ObexOptionalStringHeader(const uint8_t headerId, const std::string &str)
-    : ObexOptionalBytesHeader(headerId, (uint8_t *)(str.c_str()), (str.size() == 0) ? 0 : (str.size() + 1), 1)
+    : ObexOptionalBytesHeader(headerId, reinterpret_cast<uint8_t *>(const_cast<char *>(str.c_str())),
+    (str.size() == 0) ? 0 : (str.size() + 1), 1)
 {}
 
 ObexOptionalStringHeader::ObexOptionalStringHeader(const uint8_t headerId,
@@ -1056,9 +1057,9 @@ std::unique_ptr<ObexOptionalHeader> ObexOptionalStringHeader::Clone() const
 
 // ObexOptionalUnicodeHeader
 ObexOptionalUnicodeHeader::ObexOptionalUnicodeHeader(const uint8_t headerId, const std::u16string &unicodeText)
-    : ObexOptionalBytesHeader(headerId, (uint8_t *)(unicodeText.c_str()),
-          (unicodeText.size() == 0) ? 0 : ((unicodeText.size() + 1) * ObexHeader::U16STRING_LENGTH),
-          ObexHeader::U16STRING_LENGTH)
+    : ObexOptionalBytesHeader(headerId, reinterpret_cast<uint8_t *>(const_cast<char16_t *>(unicodeText.c_str())),
+    (unicodeText.size() == 0) ? 0 : ((unicodeText.size() + 1) * ObexHeader::U16STRING_LENGTH),
+    ObexHeader::U16STRING_LENGTH)
 {}
 std::u16string ObexOptionalUnicodeHeader::GetUnicodeText() const
 {
@@ -1086,8 +1087,8 @@ std::unique_ptr<ObexOptionalHeader> ObexOptionalUnicodeHeader::Clone() const
 }
 
 // ObexOptionalByteHeader
-ObexOptionalByteHeader::ObexOptionalByteHeader(uint8_t headerId, uint8_t byte)
-    : ObexOptionalBytesHeader(headerId, (uint8_t *)(&byte), 1)
+ObexOptionalByteHeader::ObexOptionalByteHeader(const uint8_t headerId, const uint8_t byte)
+    : ObexOptionalBytesHeader(headerId, reinterpret_cast<uint8_t *>(const_cast<uint8_t *>(&byte)), 1)
 {}
 bool ObexOptionalByteHeader::HasLengthField() const
 {
@@ -1115,8 +1116,9 @@ std::unique_ptr<ObexOptionalHeader> ObexOptionalByteHeader::Clone() const
 }
 
 // ObexOptionalWordHeader
-ObexOptionalWordHeader::ObexOptionalWordHeader(uint8_t headerId, uint32_t word)
-    : ObexOptionalBytesHeader(headerId, (uint8_t *)(&word), ObexHeader::UINT32_LENGTH, ObexHeader::UINT32_LENGTH)
+ObexOptionalWordHeader::ObexOptionalWordHeader(const uint8_t headerId, const uint32_t word)
+    : ObexOptionalBytesHeader(headerId, reinterpret_cast<uint8_t *>(const_cast<uint32_t *>(&word)),
+    ObexHeader::UINT32_LENGTH, ObexHeader::UINT32_LENGTH)
 {}
 uint32_t ObexOptionalWordHeader::GetWord() const
 {

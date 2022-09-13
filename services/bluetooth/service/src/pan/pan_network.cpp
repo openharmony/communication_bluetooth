@@ -175,7 +175,7 @@ int PanNetwork::SetIpAddress(int inetSocket)
     mask = mask >> (MAX_MASK_LENGTH - PAN_NETWORK_IPV4_PREFIX_LENGTH);
     mask4Addr.s_addr = mask;
 
-    struct sockaddr_in *sin = (struct sockaddr_in *) &ifr.ifr_addr;
+    struct sockaddr_in *sin = reinterpret_cast<struct sockaddr_in *>(&ifr.ifr_addr);
     sin->sin_family = AF_INET;
     sin->sin_port = 0;
     sin->sin_addr = ipv4Addr;
@@ -193,7 +193,7 @@ int PanNetwork::SetIpAddress(int inetSocket)
         LOG_ERROR("[Pan Network]%{public}s(): ioctl get ip address failed", __FUNCTION__);
         return PAN_SUCCESS;
     }
-    ipv4Addr.s_addr = ((struct sockaddr_in *) &ifr.ifr_addr)->sin_addr.s_addr;
+    ipv4Addr.s_addr = (reinterpret_cast<struct sockaddr_in *>(&ifr.ifr_addr))->sin_addr.s_addr;
     std::string ipv4AddrStr = std::string(inet_ntoa(ipv4Addr));
     LOG_DEBUG("[Pan Network]%{public}s(): ip address is  ipv4AddrStr=%{public}s",
         __FUNCTION__, ipv4AddrStr.c_str());
@@ -356,7 +356,7 @@ void* PanNetwork::PollEventThread(void* arg)
 
 void PanNetwork::PollEventThread_()
 {
-    LOG_DEBUG("[Pan Network]%{public}s(): Thread%d  fd%{public}d execute", __FUNCTION__, (int)pollThreadId_, fd_);
+    HILOGI("[Pan Network] Thread: %{public}d, fd: %{public}d execute", static_cast<int>(pollThreadId_), fd_);
     struct pollfd pfds[1];
     keepPolling_ = true;
     pfds[0].fd = fd_;

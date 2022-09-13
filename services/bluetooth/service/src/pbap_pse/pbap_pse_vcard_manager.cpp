@@ -172,7 +172,7 @@ public:
         bool isOutVcard21 = true;  // The format vCard 2.1 shall be the default format if this header is not specified.
         if (pbapAppParams.GetFormat()) {
             // 0x00 = 2.1 0x01 = 3.0
-            isOutVcard21 = (0x00 == *pbapAppParams.GetFormat());
+            isOutVcard21 = (*pbapAppParams.GetFormat() == 0x00);
         }
         // 5.1.4.11 ResetNewMissedCalls :not support in this impl
 
@@ -226,7 +226,7 @@ public:
         bool isOutVcard21 = true;  // The format vCard 2.1 shall be the default format if this header is not specified.
         if (pbapAppParams.GetFormat()) {
             // 0x00 = 2.1 0x01 = 3.0
-            isOutVcard21 = (0x00 == *pbapAppParams.GetFormat());
+            isOutVcard21 = (*pbapAppParams.GetFormat() == 0x00);
         }
 
         // 5.1.4.1 PropertySelector :PropertyMask (64-bit value)

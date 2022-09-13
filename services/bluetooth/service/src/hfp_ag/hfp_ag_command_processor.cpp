@@ -464,7 +464,7 @@ void HfpAgCommandProcessor::CmeeSetter(HfpAgDataConnection &dataConn, const std:
 {
     if (dataConn.g_localFeatures & HFP_AG_FEATURES_EXTEND_ERROR_CODE) {
         int cmee = StoiTryCatch(dataConn, arg);
-        dataConn.cmeeEnabled_ = (bool)cmee;
+        dataConn.cmeeEnabled_ = static_cast<bool>(cmee);
         SendAtCommand(dataConn, OK);
     } else {
         SendErrorCode(dataConn, HFP_AG_ERROR_OPERATION_NOT_SUPPORTED);
@@ -629,14 +629,14 @@ void HfpAgCommandProcessor::BievSetter(HfpAgDataConnection &dataConn, const std:
         anum = anumOut;
     }
 
-    for (index = 0; index < (int)dataConn.localHfIndicators_.size(); index++) {
+    for (index = 0; index < static_cast<int>(dataConn.localHfIndicators_.size()); index++) {
         if (anum == dataConn.localHfIndicators_[index].anum) {
             break;
         }
     }
 
-    if (index == (int)dataConn.localHfIndicators_.size() || !dataConn.localHfIndicators_[index].isEnabled ||
-        !dataConn.localHfIndicators_[index].isSupported) {
+    if (index == static_cast<int>(dataConn.localHfIndicators_.size()) ||
+        !dataConn.localHfIndicators_[index].isEnabled || !dataConn.localHfIndicators_[index].isSupported) {
         goto INDEX_ERROR;
     }
 

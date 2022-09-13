@@ -24,7 +24,8 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothAvrcpCtObserverProxy : public IRemoteProxy<IBluetoothAvrcpCtObserver> {
 public:
-    explicit BluetoothAvrcpCtObserverProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothAvrcpCtObserver>(impl) {};
+    explicit BluetoothAvrcpCtObserverProxy(const sptr<IRemoteObject> &impl)
+        : IRemoteProxy<IBluetoothAvrcpCtObserver>(impl) {};
     ~BluetoothAvrcpCtObserverProxy() {};
 
     void OnConnectionStateChanged(const RawAddress &rawAddr, int state) override;
@@ -39,7 +40,8 @@ public:
     void OnGetPlayerAppSettingValues(const RawAddress &rawAddr,
         int attribute, const std::vector<uint8_t> &values, int result) override;
     void OnGetPlayerAppSettingCurrentValue(
-        const RawAddress &rawAddr, const std::vector<uint8_t> attributes, const std::vector<uint8_t> &values, int result) override;
+        const RawAddress &rawAddr, const std::vector<uint8_t> attributes,
+            const std::vector<uint8_t> &values, int result) override;
     void OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, int result) override;
     void OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr,
         const std::vector<uint8_t> attribtues, const std::vector<std::string> &attributeName, int result) override;
@@ -53,7 +55,8 @@ public:
     void OnGetTotalNumberOfItems(const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems,
         int result, int detail) override;
     void OnGetItemAttributes(const RawAddress &rawAddr,
-        const std::vector<uint32_t> &attribtues, const std::vector<std::string> &values, int result, int detail) override;
+        const std::vector<uint32_t> &attribtues, const std::vector<std::string> &values,
+            int result, int detail) override;
     void OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, int result) override;
     void OnPlaybackStatusChanged(const RawAddress &rawAddr, uint8_t playStatus, int result) override;
     void OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result) override;

@@ -348,7 +348,7 @@ void PceConnectingState::SendRequest() const
         ObexUtils::MakeRequestDigest(authNonce_.data(), authNonce_.size(), stm_.GetPassword());
     response.AppendRequestDigest(requestDigest.data(), requestDigest.size());
     if (authNeedUser_ && stm_.GetUserId().size() > 0) {
-        const uint8_t *userId = (const uint8_t *)stm_.GetUserId().c_str();
+        const uint8_t *userId = reinterpret_cast<const uint8_t *>(stm_.GetUserId().c_str());
         response.AppendUserId(userId, stm_.GetUserId().size());
     }
     response.AppendNonce(authNonce_.data(), authNonce_.size());
