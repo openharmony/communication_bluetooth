@@ -23,6 +23,7 @@
 /**
  * @brief The bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods related to the role of the controller described in the Audio/Video Remote
@@ -1528,5 +1529,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcCtProfile);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_PROFILE_H

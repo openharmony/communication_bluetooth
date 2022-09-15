@@ -48,7 +48,7 @@ static ReactorItem *g_hciTxReactorItem = NULL;
 static ReactorItem *g_hciRxReactorItem = NULL;
 
 static Semaphore *g_waitHdiInit;
-static BtStatus g_hdiInitStatus = UNKNOWN;
+static BtInitStatus g_hdiInitStatus = UNKNOWN;
 
 static HDILib *g_hdiLib = NULL;
 
@@ -287,7 +287,7 @@ void HCI_Close()
     LOG_DEBUG("%{public}s end", __FUNCTION__);
 }
 
-static void HciOnHDIInited(BtStatus status)
+static void HciOnHDIInited(BtInitStatus status)
 {
     g_hdiInitStatus = status;
     SemaphorePost(g_waitHdiInit);

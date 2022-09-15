@@ -26,7 +26,7 @@ namespace Bluetooth {
  *
  * @since 6
  */
-class BluetoothUuid : public Parcelable, public ::bluetooth::Uuid {
+class BluetoothUuid : public Parcelable, public bluetooth::Uuid {
 public:
     /**
      * @brief A constructor used to create an <b>BluetoothUuid</b> instance.
@@ -41,7 +41,7 @@ public:
      * @param other Other Uuid to create a new BluetoothUuid.
      * @since 6
      */
-    BluetoothUuid(const ::bluetooth::Uuid &other) : ::bluetooth::Uuid(other)
+    BluetoothUuid(const bluetooth::Uuid &other) : bluetooth::Uuid(other)
     {}  // NOLINT(implicit)
 
     /**
@@ -50,7 +50,7 @@ public:
      * @param other Other BluetoothUuid to create a new BluetoothUuid.
      * @since 6
      */
-    BluetoothUuid(const BluetoothUuid &other) : ::bluetooth::Uuid(other)
+    BluetoothUuid(const BluetoothUuid &other) : bluetooth::Uuid(other)
     {}  // NOLINT(implicit)
 
     /**

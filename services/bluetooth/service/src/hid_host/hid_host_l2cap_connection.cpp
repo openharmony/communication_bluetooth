@@ -16,6 +16,7 @@
 #include "hid_host_l2cap_connection.h"
 #include "hid_host_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 int HidHostL2capConnection::Startup()
 {
@@ -995,3 +996,4 @@ std::string HidHostL2capConnection::GetEventName(int what)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -17,6 +17,7 @@
 #include "class_creator.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::string A2dpSrcService::g_name = "A2dpSrcService";
 std::string A2dpSrcService::g_version = "1.3.2";
@@ -42,3 +43,4 @@ A2dpSrcService *A2dpSrcService::GetProfile(void)
 
 REGISTER_CLASS_CREATOR(A2dpSrcService);
 }  // namespace bluetooth
+}  // namespace OHOS

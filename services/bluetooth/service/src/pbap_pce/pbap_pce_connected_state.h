@@ -23,6 +23,7 @@
 #include "pbap_pce_base_state.h"
 #include "pbap_pce_state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief connected statemachine
@@ -69,5 +70,6 @@ private:
     void ReqPullvCardEntry(const utility::Message &msg) const;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PBAP_PCE_CONNECTED_STATE_H

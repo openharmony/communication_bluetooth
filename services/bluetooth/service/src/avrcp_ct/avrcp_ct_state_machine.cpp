@@ -17,6 +17,7 @@
 #include "avrcp_ct_pass_through.h"
 #include "avrcp_ct_vendor.h"
 
+namespace OHOS {
 namespace bluetooth {
 /// The name of state "CONNECTING".
 const std::string AVRC_CT_SM_STATE_CONNECTING = "CONNECTING";
@@ -902,3 +903,4 @@ bool AvrcCtStateMachineManager::StateMachine::BrPending::Dispatch(const utility:
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

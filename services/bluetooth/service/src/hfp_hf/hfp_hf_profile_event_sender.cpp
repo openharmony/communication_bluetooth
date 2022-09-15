@@ -17,6 +17,7 @@
 
 #include "hfp_hf_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpHfProfileEventSender &HfpHfProfileEventSender::GetInstance()
 {
@@ -273,3 +274,4 @@ utility::Dispatcher *HfpHfProfileEventSender::GetDispatchter() const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

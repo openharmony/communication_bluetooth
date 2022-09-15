@@ -20,6 +20,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 ClassicBluetoothData::ClassicBluetoothData()
 {}
@@ -95,3 +96,4 @@ std::vector<ClassicDataStructure> ClassicBluetoothData::ParserData(const std::ve
     return dataList;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

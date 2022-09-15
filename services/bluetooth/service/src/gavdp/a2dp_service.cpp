@@ -26,6 +26,7 @@
 
 constexpr const char *AUDIO_BLUETOOTH_SERVICE_NAME = "audio_bluetooth_hdi_service";
 
+namespace OHOS {
 namespace bluetooth {
 std::recursive_mutex g_a2dpServiceMutex {};
 ObserverProfile::ObserverProfile(uint8_t role)
@@ -71,7 +72,7 @@ void ObserverProfile::OnConnectStateChanged(const BtAddr &addr, const int state,
         LOG_INFO("[ObserverProfile] %{public}s Add the active device\n", __func__);
         service->UpdateActiveDevice(btAddr);
     }
-    
+
     if ((connectState == static_cast<int>(BTConnectState::CONNECTED)) ||
         (connectState == static_cast<int>(BTConnectState::DISCONNECTED))) {
         service->ProcessConnectFrameworkCallback(connectState, btAddr);
@@ -1261,3 +1262,4 @@ A2dpProfile *GetProfileInstance(uint8_t role)
     return profile;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

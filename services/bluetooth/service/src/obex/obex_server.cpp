@@ -20,6 +20,7 @@
 #include "log.h"
 #include "obex_utils.h"
 
+namespace OHOS {
 namespace bluetooth {
 ObexServer::ObexServer(const std::string &serviceName, const ObexServerConfig &config, ObexServerObserver &observer,
     utility::Dispatcher &dispatcher)
@@ -387,3 +388,4 @@ void ObexPrivateServer::RemoveSessionByTransport(ObexTransport &transport)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

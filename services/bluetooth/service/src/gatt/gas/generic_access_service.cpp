@@ -24,6 +24,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const uint16_t GenericAccessService::GATT_UUID_GAP_SERVICE = 0x1800;
 const uint16_t GenericAccessService::GATT_UUID_GAP_DEVICE_NAME = 0x2A00;
@@ -163,7 +164,7 @@ int GenericAccessService::RegisterService()
     if (adapterBle != nullptr) {
         adapterBle->RegisterBleAdapterObserver(*adapterBleObserver_.get());
         auto state = adapterBle->GetAdvertisingStatus();
-        if (state == Ble_AdvState::BLE_ADV_STATE_ADVERTISING) {
+        if (state == BleAdvState::BLE_ADV_STATE_ADVERTISING) {
             bleDiscoverable_ = true;
         } else {
             bleDiscoverable_ = false;
@@ -272,7 +273,7 @@ void GenericAccessService::OnDeviceNameChanged(std::string &deviceName) const
             [](Characteristic &ccc) {
             return ccc.uuid_ == Uuid::ConvertFrom16Bits(GATT_UUID_GAP_DEVICE_NAME);
         });
-        
+
     if (cIt != instance_->characteristics_.end()) {
         cIt->SetValue((uint8_t *)deviceName.c_str(), deviceName.length());
         serverService_.SetCharacteristicValue(*cIt);
@@ -283,7 +284,7 @@ void GenericAccessService::OnDeviceNameChanged(std::string &deviceName) const
 void GenericAccessService::OnAdvertisingStateChanged(int state)
 {
     LOG_DEBUG("%{public}s:%{public}d:%{public}s :state: %{public}d", __FILE__, __LINE__, __FUNCTION__, state);
-    if (state == Ble_AdvState::BLE_ADV_STATE_ADVERTISING) {
+    if (state == BleAdvState::BLE_ADV_STATE_ADVERTISING) {
         bleDiscoverable_ = true;
     } else {
         bleDiscoverable_ = false;
@@ -341,3 +342,4 @@ void GenericAccessService::OnScanModeChanged(int mode)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

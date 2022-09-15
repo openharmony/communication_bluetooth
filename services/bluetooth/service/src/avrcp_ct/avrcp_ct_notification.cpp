@@ -15,6 +15,7 @@
 
 #include "avrcp_ct_notification.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcCtNotifyPacket::AvrcCtNotifyPacket(uint8_t eventId, uint32_t interval)
     : AvrcCtVendorPacket(),
@@ -274,4 +275,5 @@ bool AvrcCtNotifyPacket::DisassembleVolumeChanged(uint8_t *buffer)
 
     return isValid_;
 }
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

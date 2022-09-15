@@ -24,6 +24,7 @@
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_remote_device.h"
 
 #include "iosfwd"
@@ -55,7 +56,7 @@ struct GattClientWrapper {
 
 using ClientIterator = std::map<int, struct GattClientWrapper>::iterator;
 
-static int g_ClientIncrease = 0;
+static int g_clientIncrease = 0;
 static std::map<int, struct GattClientWrapper> g_MapGattClient;
 
 #define GATTCLIENT g_MapGattClient
@@ -304,7 +305,7 @@ public:
         appCallback_->notificationCb(clientId_, &notificationData, OHOS_BT_STATUS_SUCCESS);
     }
 private:
-    void GattcBuildUuid(BtUuid *desUuid, std::string &srcUuid)
+    void GattcBuildUuid(BtUuid *desUuid, const std::string &srcUuid)
     {
         desUuid->uuid = (char *)srcUuid.c_str();
         desUuid->uuidLen = srcUuid.size();
@@ -323,12 +324,12 @@ private:
  */
 int BleGattcRegister(BtUuid appUuid)
 {
-    g_ClientIncrease++;
+    g_clientIncrease++;
     struct GattClientWrapper clientWrapper;
     clientWrapper.gattClient = nullptr;
     clientWrapper.gattClientCallback = nullptr;
     clientWrapper.remoteAddr = "";
-    int clientId = g_ClientIncrease;
+    int clientId = g_clientIncrease;
     GATTCLIENT.insert(std::pair<int, struct GattClientWrapper>(clientId, clientWrapper));
     HILOGI("clientId: %{public}d", clientId);
     return clientId;
@@ -379,7 +380,8 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
 
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
-
+    HILOGI("clientId: %{public}d, addr: %{public}s, isAutoConnect: %{public}d",
+        clientId, GetEncryptAddr(strAddress).c_str(), isAutoConnect);
     GattClient *client = nullptr;
     if (iter->second.gattClient != nullptr && iter->second.remoteAddr == strAddress) {
         HILOGI("connect to the same remote device again.");
@@ -535,7 +537,7 @@ int BleGattcReadCharacteristic(int clientId, BtGattCharacteristic characteristic
  * @return Returns the operation result status {@link BtStatus}.
  */
 int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristic,
-    BtGattWriteType writeType, int len, char *value)
+    BtGattWriteType writeType, int len, const char *value)
 {
     HILOGI("start, clientId: %{public}d", clientId);
     GattClient *client = nullptr;
@@ -591,7 +593,7 @@ int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
  * @param len The length of the value.
  * @return Returns the operation result status {@link BtStatus}.
  */
-int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, char *value)
+int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, const char *value)
 {
     HILOGI("start, clientId: %{public}d", clientId);
     GattClient *client = nullptr;

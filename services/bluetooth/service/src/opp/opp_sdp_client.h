@@ -20,6 +20,7 @@
 
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief opp sdp client
@@ -69,4 +70,5 @@ private:
     std::string address_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_SDP_CLIENT_H

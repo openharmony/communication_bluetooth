@@ -36,5 +36,50 @@ std::string GetEncryptAddr(std::string addr)
     }
     return out;
 }
+
+std::string GetBtStateName(int state)
+{
+    switch (state) {
+        case BTStateID::STATE_TURNING_ON:
+            return "STATE_TURNING_ON(0)";
+        case BTStateID::STATE_TURN_ON:
+            return "STATE_TURN_ON(1)";
+        case BTStateID::STATE_TURNING_OFF:
+            return "STATE_TURNING_OFF(2)";
+        case BTStateID::STATE_TURN_OFF:
+            return "STATE_TURN_OFF(3)";
+        default:
+            return "Unknown";
+    }
+}
+
+std::string GetBtTransportName(int transport)
+{
+    switch (transport) {
+        case BTTransport::ADAPTER_BREDR:
+            return "ADAPTER_BREDR(0)";
+        case BTTransport::ADAPTER_BLE:
+            return "ADAPTER_BLE(1)";
+        default:
+            return "Unknown";
+    }
+}
+
+std::string GetProfileConnStateName(int state)
+{
+    switch (state) {
+        case static_cast<int>(BTConnectState::CONNECTING):
+            return "CONNECTING(0)";
+        case static_cast<int>(BTConnectState::CONNECTED):
+            return "CONNECTED(1)";
+        case static_cast<int>(BTConnectState::DISCONNECTING):
+            return "DISCONNECTING(2)";
+        case static_cast<int>(BTConnectState::DISCONNECTED):
+            return "DISCONNECTED(3)";
+        default:
+            return "Unknown";
+    }
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

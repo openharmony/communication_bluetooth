@@ -31,6 +31,7 @@
 /*
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief BLE scan manager.
@@ -233,6 +234,55 @@ private:
     void SetScanModeDuration(int scanMode, int type) const;
 
     /**
+     * @brief set low power duration
+     *
+     * @param [in] type callback type
+     */
+    void SetLowPowerDuration(int type) const;
+
+    /**
+     * @brief set balanced duration
+     *
+     * @param [in] type callback type
+     */
+    void SetBalancedDuration(int type) const;
+
+    /**
+     * @brief set low latency duration
+     *
+     * @param [in] type callback type
+     */
+    void SetLowLatencyDuration(int type) const;
+
+    /**
+     * @brief set duty cycle duration
+     *
+     * @param [in] type callback type
+     */
+    void SetDutyCycle2Duration(int type) const;
+
+    /**
+     * @brief set duty cycle duration
+     *
+     * @param [in] type callback type
+     */
+    void SetDutyCycle10Duration(int type) const;
+
+    /**
+     * @brief set duty cycle duration
+     *
+     * @param [in] type callback type
+     */
+    void SetDutyCycle25Duration(int type) const;
+
+    /**
+     * @brief set duty cycle duration
+     *
+     * @param [in] type callback type
+     */
+    void SetDutyCycle100Duration(int type) const;
+
+    /**
      *  @brief Gap scan event
      *
      *  @param [in] event gap event.
@@ -333,5 +383,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BLE_CENTRAL_MANAGER_IMPL_H

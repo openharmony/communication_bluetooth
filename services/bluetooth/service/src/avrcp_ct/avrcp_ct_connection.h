@@ -29,6 +29,7 @@
 #include "avrcp_ct_unit_info.h"
 #include "avrcp_ct_vendor.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of attributes for saving the connection information.
@@ -676,5 +677,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcCtConnectManager);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_CONNECTION_H

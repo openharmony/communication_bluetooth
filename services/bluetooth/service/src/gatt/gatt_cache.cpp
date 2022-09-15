@@ -17,6 +17,7 @@
 #include "bt_def.h"
 #include "gatt_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 using Descriptors = std::pair<std::map<uint16_t, GattCache::Descriptor> *, uint16_t>;
 
@@ -299,3 +300,4 @@ std::vector<GattCache::StorageBlob> GattCache::ReadStorageBlobFromFile(const Gat
     return blob;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

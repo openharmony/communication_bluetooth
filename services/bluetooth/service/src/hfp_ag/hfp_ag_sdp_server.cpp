@@ -20,6 +20,7 @@
 #include "raw_address.h"
 #include "rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgSdpServer &HfpAgSdpServer::GetInstance()
 {
@@ -162,3 +163,4 @@ int HfpAgSdpServer::AddAttribute(const SdpAttribute &attribute) const
         sdpHandle_, attribute.attributeId, attribute.type, attribute.attributeValue, attribute.attributeValueLength);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief opp sdp server
@@ -56,13 +57,14 @@ public:
 private:
     uint32_t sdpHandle_ = 0;  // sdp handler
 
-    int AddServiceClassIdList();
-    int AddProtocolDescriptorList(uint8_t rfcommScn);
-    int AddBrowseGroupList();
-    int AddBluetoothProfileDescriptorList();
-    int AddServiceName();
-    int AddL2capPsm(uint16_t l2capPsm);
-    int AddSupportedFormatsList();
+    int AddServiceClassIdList() const;
+    int AddProtocolDescriptorList(uint8_t rfcommScn) const;
+    int AddBrowseGroupList() const;
+    int AddBluetoothProfileDescriptorList() const;
+    int AddServiceName() const;
+    int AddL2capPsm(uint16_t l2capPsm) const;
+    int AddSupportedFormatsList() const;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_SDP_SERVER_H

@@ -26,6 +26,7 @@
 #include "pbap_pce_def.h"
 #include "pbap_pce_gap.h"
 
+namespace OHOS {
 namespace bluetooth {
 /// pbap pce state mathine message
 enum PbapPceStmMessage {
@@ -600,4 +601,5 @@ private:
     std::u16string name_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PCE_HEADER_MSG_H

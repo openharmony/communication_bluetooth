@@ -22,6 +22,7 @@
 #include "hfp_hf_defines.h"
 #include "message.h"
 
+namespace OHOS {
 namespace bluetooth {
 class HfpHfMessage : public utility::Message {
 public:
@@ -36,4 +37,5 @@ public:
     HandsFreeUnitCalls calls_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_MESSAGE_H

@@ -16,7 +16,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_avrcp_ct_server.h"
 #include "bluetooth_log.h"
-
+#include "bluetooth_utils.h"
 #include "interface_adapter_manager.h"
 #include "interface_profile.h"
 #include "interface_profile_avrcp_ct.h"
@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 struct BluetoothAvrcpCtServer::impl {
 public:
@@ -239,7 +239,7 @@ public:
 
     impl()
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("start.");
 
         auto svManager = IProfileManager::GetInstance();
         service_ = static_cast<IProfileAvrcpCt *>(svManager->GetProfileService(PROFILE_NAME_AVRCP_CT));
@@ -254,7 +254,7 @@ public:
 
     ~impl()
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("start.");
 
         auto svManager = IProfileManager::GetInstance();
         service_ = static_cast<IProfileAvrcpCt *>(svManager->GetProfileService(PROFILE_NAME_AVRCP_CT));
@@ -270,7 +270,7 @@ public:
 
     bool IsEnabled()
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("start.");
 
         auto servManager = IProfileManager::GetInstance();
         service_ = static_cast<IProfileAvrcpCt *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_CT));
@@ -280,7 +280,7 @@ public:
 
     void OnSystemStateChange(const BTSystemState state)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("state: %{public}d", state);
 
         std::lock_guard<std::mutex> lock(serviceMutex_);
 
@@ -308,7 +308,7 @@ public:
 
     void OnConnectionStateChanged(const RawAddress &rawAddr, int state)
     {
-        HILOGD("%{public}s start state:%{public}d.", __func__, state);
+        HILOGI("address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([rawAddr, state](IBluetoothAvrcpCtObserver *observer) {
@@ -319,7 +319,8 @@ public:
 
     void OnPressButton(const RawAddress &rawAddr, uint8_t button, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("address: %{public}s, button: %{public}d, result: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -332,7 +333,8 @@ public:
 
     void OnReleaseButton(const RawAddress &rawAddr, uint8_t button, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("address: %{public}s, button: %{public}d, result: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -346,7 +348,8 @@ public:
     void OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems,
         const std::vector<std::string> &folderNames, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -364,7 +367,7 @@ public:
     void OnGetCapabilities(const RawAddress &rawAddr, const std::vector<uint32_t> &companies,
         const std::vector<uint8_t> &events, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -378,7 +381,7 @@ public:
 
     void OnGetPlayerAppSettingAttributes(const RawAddress &rawAddr, std::vector<uint8_t> attributes, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -391,7 +394,8 @@ public:
     void OnGetPlayerAppSettingValues(
         const RawAddress &rawAddr, uint8_t attribute, const std::vector<uint8_t> values, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, attribute: %{public}d, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -404,7 +408,7 @@ public:
     void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> &attributes,
         const std::vector<uint8_t> &values, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -418,7 +422,7 @@ public:
 
     void OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -431,7 +435,7 @@ public:
     void OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr, const std::vector<uint8_t> &attributes,
         const std::vector<std::string> &attributeName, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -446,7 +450,7 @@ public:
     void OnGetPlayerAppSettingValueText(const RawAddress &rawAddr, const std::vector<uint8_t> &values,
         const std::vector<std::string> &valueName, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -459,7 +463,7 @@ public:
     void OnGetElementAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attributes,
         const std::vector<std::string> &valueName, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -474,7 +478,8 @@ public:
     void OnGetPlayStatus(
         const RawAddress &rawAddr, uint32_t songLength, uint32_t songPosition, uint8_t playStatus, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, songLength: %{public}u, songPosition: %{public}u, playStatus: %{public}d, "
+            "res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), songLength, songPosition, playStatus, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -490,7 +495,8 @@ public:
 
     void OnPlayItem(const RawAddress &rawAddr, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -504,7 +510,8 @@ public:
     void OnGetMediaPlayers(
         const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMpItem> &items, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -524,7 +531,8 @@ public:
     void OnGetFolderItems(
         const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMeItem> &items, int result, int detail)
     {
-        HILOGD("%{public}s start items.size = %{public}zu.", __func__, items.size());
+        HILOGI("addr: %{public}s, uidCounter: %{public}hu, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -544,7 +552,8 @@ public:
     void OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attributes,
         const std::vector<std::string> &values, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -560,7 +569,8 @@ public:
     void OnGetTotalNumberOfItems(
         const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, uidCounter: %{public}hu, numOfItems: %{public}u, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -575,7 +585,8 @@ public:
 
     void OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, volume: %{public}d, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -588,7 +599,8 @@ public:
 
     void OnPlaybackStatusChanged(const RawAddress &rawAddr, uint8_t playStatus, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, playStatus: %{public}d, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), playStatus, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -601,7 +613,8 @@ public:
 
     void OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, uid: %{public}llu, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), (unsigned long long)uid, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -614,7 +627,7 @@ public:
 
     void OnTrackReachedEnd(const RawAddress &rawAddr, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -626,7 +639,7 @@ public:
 
     void OnTrackReachedStart(const RawAddress &rawAddr, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -638,7 +651,8 @@ public:
 
     void OnPlaybackPosChanged(const RawAddress &rawAddr, uint32_t playbackPos, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, playbackPos: %{public}u, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), playbackPos, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -652,7 +666,7 @@ public:
     void OnPlayerAppSettingChanged(const RawAddress &rawAddr, const std::vector<uint8_t> &attributes,
         const std::vector<uint8_t> &values, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -666,7 +680,7 @@ public:
 
     void OnNowPlayingContentChanged(const RawAddress &rawAddr, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -678,7 +692,7 @@ public:
 
     void OnAvailablePlayersChanged(const RawAddress &rawAddr, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -690,7 +704,8 @@ public:
 
     void OnAddressedPlayerChanged(const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, playerId: %{public}hu, uidCounter: %{public}hu, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -704,7 +719,8 @@ public:
 
     void OnUidChanged(const RawAddress &rawAddr, uint16_t uidCounter, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, uidCounter: %{public}hu, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -717,7 +733,8 @@ public:
 
     void OnVolumeChanged(const RawAddress &rawAddr, uint8_t volume, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("addr: %{public}s, volume: %{public}d, res: %{public}d",
+            GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -740,7 +757,7 @@ public:
 
 BluetoothAvrcpCtServer::BluetoothAvrcpCtServer()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 
     pimpl = std::make_unique<impl>();
 }
@@ -752,56 +769,56 @@ BluetoothAvrcpCtServer::~BluetoothAvrcpCtServer()
 
 void BluetoothAvrcpCtServer::RegisterObserver(const sptr<IBluetoothAvrcpCtObserver> &observer)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
     if (observer == nullptr) {
-        HILOGD("RegisterObserver called with NULL binder. Ignoring.");
+        HILOGI("called with NULL binder. Ignoring.");
         return ;
     }
     pimpl->observers_.Register(observer);
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return ;
 }
 
 void BluetoothAvrcpCtServer::UnregisterObserver(const sptr<IBluetoothAvrcpCtObserver> &observer)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
     if (observer == nullptr) {
-        HILOGD("UnregisterObserver called with NULL binder. Ignoring.");
+        HILOGI("called with NULL binder. Ignoring.");
         return;
     }
     pimpl->observers_.Deregister(observer);
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return;
 }
 
 std::vector<RawAddress> BluetoothAvrcpCtServer::GetConnectedDevices()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     std::vector<RawAddress> devices {};
     if (pimpl->IsEnabled()) {
         devices = pimpl->service_->GetConnectedDevices();
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return devices;
 }
 
 std::vector<RawAddress> BluetoothAvrcpCtServer::GetDevicesByStates(const std::vector<int32_t> &states)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     std::vector<RawAddress> devices {};
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDevicesByStates() false, check permission failed");
+        HILOGE("false, check permission failed");
         return devices;
     }
     if (pimpl->IsEnabled()) {
@@ -809,20 +826,20 @@ std::vector<RawAddress> BluetoothAvrcpCtServer::GetDevicesByStates(const std::ve
         for (auto state : states) {
             convertStates.push_back(static_cast<int>(state));
         }
-        
+
         devices = pimpl->service_->GetDevicesByStates(convertStates);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
     return devices;
 }
 
 int32_t BluetoothAvrcpCtServer::GetDeviceState(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDeviceState() false, check permission failed");
+        HILOGE("false, check permission failed");
         return BT_FAILURE;
     }
     int32_t result = 0;
@@ -830,162 +847,160 @@ int32_t BluetoothAvrcpCtServer::GetDeviceState(const RawAddress &device)
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetDeviceState(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::Connect(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->Connect(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::Disconnect(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->Disconnect(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
 
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::PressButton(const RawAddress &device, int32_t button)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: button = %{public}d", __func__, button);
+    HILOGI("addr: %{public}s, button: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), button);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->PressButton(BluetoothRawAddress(device), static_cast<uint8_t>(button));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::ReleaseButton(const RawAddress &device, int32_t button)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: button = %{public}d", __func__, button);
+    HILOGI("addr: %{public}s, button: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), button);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->ReleaseButton(BluetoothRawAddress(device), static_cast<uint8_t>(button));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetUnitInfo(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetUnitInfo(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetSubUnitInfo(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetSubUnitInfo(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetSupportedCompanies(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetSupportedCompanies(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetSupportedEvents(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetSupportedEvents(device);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingAttributes(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetPlayerAppSettingAttributes(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingValues(const RawAddress &device, int32_t attribute)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: attribute = %{public}d", __func__, attribute);
+    HILOGI("addr: %{public}s, attribute: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), attribute);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
-        result = pimpl->service_->GetPlayerAppSettingValues(BluetoothRawAddress(device), static_cast<uint8_t>(attribute));
+        result = pimpl->service_->GetPlayerAppSettingValues(BluetoothRawAddress(device),
+            static_cast<uint8_t>(attribute));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
@@ -993,21 +1008,21 @@ int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingValues(const RawAddress &devi
 int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingCurrentValue(const RawAddress &device,
         const std::vector<int32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
     std::vector<uint8_t> myAttributes;
 
     for (auto attribute : attributes) {
-        HILOGD("%{public}s: attribute = %{public}d", __func__, attribute);
+        HILOGI("attribute: %{public}d", attribute);
         myAttributes.push_back(static_cast<uint8_t>(attribute));
     }
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetPlayerAppSettingCurrentValue(BluetoothRawAddress(device), myAttributes);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
@@ -1015,25 +1030,25 @@ int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingCurrentValue(const RawAddress
 int32_t BluetoothAvrcpCtServer::SetPlayerAppSettingCurrentValue(const RawAddress &device,
         const std::vector<int32_t> &attributes, const std::vector<int32_t> &values)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
     std::vector<uint8_t> myAttributes;
     std::vector<uint8_t> myValues;
     for (auto attribute : attributes) {
-        HILOGD("%{public}s: attribute = %{public}d", __func__, attribute);
+        HILOGI("attribute: %{public}d", attribute);
         myAttributes.push_back(static_cast<uint8_t>(attribute));
     }
     for (auto value : values) {
-        HILOGD("%{public}s: value = %{public}d", __func__, value);
+        HILOGI("value: %{public}d", value);
         myValues.push_back(static_cast<uint8_t>(value));
     }
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->SetPlayerAppSettingCurrentValue(BluetoothRawAddress(device), myAttributes, myValues);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
@@ -1041,20 +1056,20 @@ int32_t BluetoothAvrcpCtServer::SetPlayerAppSettingCurrentValue(const RawAddress
 int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingAttributeText(const RawAddress &device,
         const std::vector<int32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
     if (pimpl->IsEnabled()) {
         std::vector<uint8_t> attrs;
         for (auto attribute : attributes) {
-            HILOGD("%{public}s: attribute = %{public}d", __func__, attribute);
+            HILOGI("attribute: %{public}d", attribute);
             attrs.push_back(static_cast<uint8_t>(attribute));
         }
 
         result = pimpl->service_->GetPlayerAppSettingAttributeText(BluetoothRawAddress(device), attrs);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
@@ -1062,69 +1077,69 @@ int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingAttributeText(const RawAddres
 int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingValueText(const RawAddress &device, int32_t attributes,
         const std::vector<int32_t> &values)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: button = %{public}d", __func__, attributes);
+    HILOGI("addr: %{public}s, attributes: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), attributes);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         std::vector<uint8_t> myValues;
         for (auto value : values) {
-            HILOGD("%{public}s: value = %{public}d", __func__, value);
+            HILOGI("value: %{public}d", value);
             myValues.push_back(static_cast<uint8_t>(value));
         }
 
         result =
-            pimpl->service_->GetPlayerAppSettingValueText(BluetoothRawAddress(device), static_cast<uint8_t>(attributes), myValues);
+            pimpl->service_->GetPlayerAppSettingValueText(BluetoothRawAddress(device),
+                static_cast<uint8_t>(attributes), myValues);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetElementAttributes(const RawAddress &device,
-        const std::vector<int32_t> &attributes) 
+        const std::vector<int32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         std::vector<uint32_t> attrs;
         for (auto attribute : attributes) {
-            HILOGD("%{public}s: attribute = %{public}d", __func__, attribute);
+            HILOGI("attribute: %{public}d", attribute);
             attrs.push_back(static_cast<uint32_t>(attribute));
         }
 
         result =
             pimpl->service_->GetElementAttributes(BluetoothRawAddress(device), AVRC_ELEMENT_ATTRIBUTES_IDENTIFIER_PLAYING, attrs);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetPlayStatus(const RawAddress &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetPlayStatus(BluetoothRawAddress(device));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
-int32_t BluetoothAvrcpCtServer::PlayItem(const RawAddress &device, int32_t scope, int64_t uid, int32_t uidCounter) 
+int32_t BluetoothAvrcpCtServer::PlayItem(const RawAddress &device, int32_t scope, int64_t uid, int32_t uidCounter)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: scope = %{public}d, uid = %{public}jd, uidCounter = %{public}d", __func__, scope, uid, uidCounter);
+    HILOGI("res: %{public}s, scope: %{public}d, uid: %{public}jd, uidCounter: %{public}d",
+        GetEncryptAddr(device.GetAddress()).c_str(), scope, uid, uidCounter);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
@@ -1132,9 +1147,9 @@ int32_t BluetoothAvrcpCtServer::PlayItem(const RawAddress &device, int32_t scope
             BluetoothRawAddress(device), static_cast<uint8_t>(scope),
             static_cast<uint64_t>(uid), static_cast<uint16_t>(uidCounter));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
@@ -1142,13 +1157,13 @@ int32_t BluetoothAvrcpCtServer::PlayItem(const RawAddress &device, int32_t scope
 int32_t BluetoothAvrcpCtServer::GetFolderItems(const RawAddress &device, int32_t startItem, int32_t endItem,
         const std::vector<int32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: startItem = %{public}d, endItem = %{public}d", __func__, startItem, endItem);
+    HILOGI("res: %{public}s, startItem: %{public}d, endItem: %{public}d",
+        GetEncryptAddr(device.GetAddress()).c_str(), startItem, endItem);
     int32_t result = 0;
     if (pimpl->IsEnabled()) {
         std::vector<uint32_t> attrs;
         for (auto attribute : attributes) {
-            HILOGD("%{public}s: attribute = %{public}d,", __func__, attribute);
+            HILOGI("attribute: %{public}d,", attribute);
             attrs.push_back(static_cast<uint32_t>(attribute));
         }
         result = pimpl->service_->GetFolderItems(BluetoothRawAddress(device),
@@ -1157,41 +1172,39 @@ int32_t BluetoothAvrcpCtServer::GetFolderItems(const RawAddress &device, int32_t
             static_cast<uint32_t>(endItem),
             attrs);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetTotalNumberOfItems(const RawAddress &device, int32_t scope)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: scope = %{public}d,", __func__, scope);
+    HILOGI("addr: %{public}s, scope: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), scope);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->GetTotalNumberOfItems(BluetoothRawAddress(device), static_cast<uint8_t>(scope));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::SetAbsoluteVolume(const RawAddress &device, int32_t volume)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: volume = %{public}d,", __func__, volume);
+    HILOGI("addr: %{public}s, volume: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), volume);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->SetAbsoluteVolume(BluetoothRawAddress(device), static_cast<uint8_t>(volume));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
@@ -1199,57 +1212,57 @@ int32_t BluetoothAvrcpCtServer::SetAbsoluteVolume(const RawAddress &device, int3
 int32_t BluetoothAvrcpCtServer::EnableNotification(const RawAddress &device,
         const std::vector<int32_t> &events, int32_t interval)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: interval = %{public}d,", __func__, interval);
+    HILOGI("addr: %{public}s, interval: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), interval);
     int32_t result = 0;
 
     std::vector<uint8_t> myEvents;
     for (auto event : events) {
-        HILOGD("%{public}s: event = %{public}d,", __func__, event);
+        HILOGI("event: %{public}d", event);
         myEvents.push_back(static_cast<uint8_t>(event));
     }
 
     if (pimpl->IsEnabled()) {
-        result = pimpl->service_->EnableNotification(BluetoothRawAddress(device), myEvents, static_cast<uint32_t>(interval));
+        result = pimpl->service_->EnableNotification(BluetoothRawAddress(device),
+            myEvents, static_cast<uint32_t>(interval));
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::DisableNotification(const RawAddress &device, const std::vector<int32_t> &events)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
 
     std::vector<uint8_t> myEvents;
     for (auto event : events) {
-        HILOGD("%{public}s: event = %{public}d,", __func__, event);
+        HILOGI("event: %{public}d,", event);
         myEvents.push_back(static_cast<uint8_t>(event));
     }
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->DisableNotification(BluetoothRawAddress(device), myEvents);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetItemAttributes(const RawAddress &device, int64_t uid, int32_t uidCounter,
-        const std::vector<int32_t> &attributes) 
+        const std::vector<int32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: uid = %{public}jd, uidCounter = %{public}d", __func__, uid, uidCounter);
+    HILOGI("res: %{public}s, uid: %{public}jd, uidCounter: %{public}d",
+        GetEncryptAddr(device.GetAddress()).c_str(), uid, uidCounter);
     int32_t result = 0;
 
     std::vector<uint32_t> myAttribtues;
     for (auto attribue : attributes) {
-        HILOGD("%{public}s: attribue = %{public}d", __func__, attribue);
+        HILOGI("attribue = %{public}d", attribue);
         myAttribtues.push_back(static_cast<uint32_t>(attribue));
     }
 
@@ -1257,33 +1270,32 @@ int32_t BluetoothAvrcpCtServer::GetItemAttributes(const RawAddress &device, int6
         result = pimpl->service_->GetItemAttributes(
             BluetoothRawAddress(device), AVRC_MEDIA_SCOPE_NOW_PLAYING, (uint64_t)uid, (uint16_t)uidCounter, myAttribtues);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::SetBrowsedPlayer(const RawAddress &device, int32_t playerId)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: playerId = %{public}d", __func__, playerId);
+    HILOGI("addr: %{public}s, playerId: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), playerId);
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
         result = pimpl->service_->SetBrowsedPlayer(BluetoothRawAddress(device), (uint16_t)playerId);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }
 
 int32_t BluetoothAvrcpCtServer::GetMeidaPlayerList(const RawAddress &device, int32_t startItem, int32_t endItem)
 {
-    HILOGD("%{public}s start.", __func__);
-    HILOGD("%{public}s: startItem = %{public}d, endItem = %{public}d", __func__, startItem, endItem);
+    HILOGI("res: %{public}s: startItem: %{public}d, endItem: %{public}d",
+        GetEncryptAddr(device.GetAddress()).c_str(), startItem, endItem);
     int32_t result = 0;
     std::vector<uint32_t> attrs;
 
@@ -1294,9 +1306,9 @@ int32_t BluetoothAvrcpCtServer::GetMeidaPlayerList(const RawAddress &device, int
             static_cast<uint32_t>(endItem),
             attrs);
     } else {
-        HILOGE("%{public}s: service is null or disable ", __func__);
+        HILOGE("service is null or disable");
     }
-    HILOGD("%{public}s end.", __func__);
+    HILOGI("end.");
 
     return result;
 }

@@ -37,6 +37,7 @@
 #include "ble_service_data.h"
 #include <memory>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents central manager callbacks.
@@ -428,5 +429,6 @@ public:
     virtual void RemoveScanFilter(const int clientId) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_ADAPTER_BLE_H

@@ -17,6 +17,7 @@
 
 #include <algorithm>
 
+namespace OHOS {
 namespace bluetooth {
 const std::map<CompatType, std::vector<std::string>> Compat::COMPAT_DATA = {
     {CompatType::COMPAT_DISABLE_BLE_SECURE_CONNECTIONS, {
@@ -48,7 +49,7 @@ const std::map<CompatType, std::vector<std::string>> Compat::COMPAT_DATA = {
         "00:1D:86",
         "KMM-BT51*HD"}},
     {CompatType::COMPAT_REJECT_ABSOLUTE_VOLUME, {
-        "44:5E:F3", 
+        "44:5E:F3",
         "D4:9C:28",
         "00:24:1C",
         "A4:15:66",
@@ -78,3 +79,4 @@ bool Compat::CompatCheck(CompatType type, const std::string &value)
     return false;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

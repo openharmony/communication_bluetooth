@@ -26,6 +26,7 @@
 #define PBAP_PCE_LOG_INFO(fmt, ...) LOG_INFO("[PBAP_PCE]:" fmt, ##__VA_ARGS__)
 #define PBAP_PCE_LOG_ERROR(fmt, ...) LOG_ERROR("[PBAP_PCE]:" fmt, ##__VA_ARGS__)
 
+namespace OHOS {
 namespace bluetooth {
 /// phone book supported features
 enum class PbapSupportedFeatures : uint8_t {
@@ -87,4 +88,5 @@ static const int PBAP_PCE_SUPPORTED_REPOS_LOCALPB = 1 << 0;
 static const int PBAP_PCE_SUPPORTED_REPOS_SIMCARD = 1 << 1;
 static const int PBAP_PCE_SUPPORTED_REPOS_FAV = 1 << 3;
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PCE_DEF_H

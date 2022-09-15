@@ -19,6 +19,7 @@
 #include "hfp_hf_sdp_client.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::map<std::string, HfpHfRemoteSdpServiceArray> HfpHfSdpClient::g_remoteSdpServiceArrays;
 std::recursive_mutex HfpHfSdpClient::g_hfpSdpMutex;
@@ -281,3 +282,4 @@ void HfpHfSdpClient::SelectProfileFeatures(uint16_t &features, int &codec)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

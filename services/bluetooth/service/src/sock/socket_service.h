@@ -41,6 +41,7 @@
 #include "profile_service_manager.h"
 #include "socket.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This Socket class provides a set of methods that is called by Framework API, and manage
@@ -185,4 +186,5 @@ private:
     void CleanupClientSocket(Socket *socket);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // SOCKET_SERVICE_H

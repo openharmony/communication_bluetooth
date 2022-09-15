@@ -33,6 +33,7 @@
 
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief hid host observer for framework api
@@ -109,4 +110,5 @@ public:
     virtual int HidHostGetReport(std::string device, uint8_t id, uint16_t size, const uint8_t type) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // INTERFACE_PROFILE_HID_HOST_H

@@ -39,6 +39,7 @@
 #include "gatt_data.h"
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for IGattClientCallback functions.
@@ -273,5 +274,6 @@ private:
     using IProfile::Disconnect;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_GATT_CLIENT_H

@@ -29,6 +29,7 @@
 /*
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief BLE advertiser wrap data.
@@ -379,5 +380,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BLE_ADVERTISER_IMPL_H

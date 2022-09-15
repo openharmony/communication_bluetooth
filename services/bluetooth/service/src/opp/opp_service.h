@@ -28,6 +28,7 @@
 #include "opp_transfer.h"
 #include "opp_transfer_information.h"
 
+namespace OHOS {
 namespace bluetooth {
 class OppService : public IProfileOpp, public utility::Context {
 public:
@@ -125,4 +126,5 @@ private:
     };
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_SERVICE_H

@@ -104,7 +104,7 @@ template<typename T>
 uint8_t BluetoothObserverMap<T>::GetAdvertiserHandle(T *observer)
 {
     std::lock_guard<std::mutex> lock(lock_);
-    uint8_t advHandle = bluetooth::BLE_INVALID_ADVERTISING_HANDLE;
+    uint8_t advHandle = OHOS::bluetooth::BLE_INVALID_ADVERTISING_HANDLE;
     if (observer == nullptr) {
         return advHandle;
     }

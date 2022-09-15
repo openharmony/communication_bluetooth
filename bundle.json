@@ -38,7 +38,8 @@
     "name": "bluetooth",
     "subsystem": "communication",
     "syscap": [
-      "SystemCapability.Communication.Bluetooth.Core"
+      "SystemCapability.Communication.Bluetooth.Core",
+      "SystemCapability.Communication.Bluetooth.Lite"
     ],
     "features": [
       "bluetooth_avrcp_avsession"
@@ -113,6 +114,7 @@
         "//foundation/communication/bluetooth/test/unittest/hid:unittest",
         "//foundation/communication/bluetooth/test/unittest/pan:unittest",
         "//foundation/communication/bluetooth/test/unittest/opp:unittest",
+        "//foundation/communication/bluetooth/test/unittest/gatt_c:unittest",
         "//foundation/communication/bluetooth/test/fuzztest/host:fuzztest"
       ]
     }

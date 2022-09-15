@@ -22,6 +22,7 @@
 
 #include "hfp_ag_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::map<std::string, HfpAgRemoteSdpServiceArray> HfpAgSdpClient::g_remoteSdpServiceArrays;
 std::recursive_mutex HfpAgSdpClient::g_hfpSdpMutex;
@@ -43,11 +44,6 @@ void HfpAgSdpClient::SdpCallback(const BtAddr *addr, const SdpService *serviceAr
     if (serviceNum > 0) {
         CopySdpServiceArray(address, serviceAry, serviceNum);
         msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
-    } else {
-        HfpAgSdpClient *sdpClient = static_cast<HfpAgSdpClient *>(context);
-        HfpAgService::GetService()->GetDispatcher()->PostTask(
-            std::bind(&HfpAgSdpClient::DoHspDiscovery, sdpClient, address));
-        return;
     }
     HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
 }
@@ -151,6 +147,7 @@ void HfpAgSdpClient::SdpHspHsCallback(const BtAddr *addr, const SdpService *serv
         CopySdpServiceArray(address, serviceAry, serviceNum);
         msgWhat = HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS;
     }
+    (void)context;
     HfpAgProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
 }
 
@@ -350,3 +347,4 @@ bool HfpAgSdpClient::FindProfileFeatures(const std::vector<HfpAgSdpAttribute> &a
     return false;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

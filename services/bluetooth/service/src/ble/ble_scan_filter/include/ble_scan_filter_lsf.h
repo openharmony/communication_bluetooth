@@ -27,6 +27,7 @@
 #include "securec.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 static const int HCI_OGF_OFFSET = 10;
 static const uint16_t HCI_VENDOR_OCF_LSF = 0x601;
@@ -194,4 +195,5 @@ private:
     std::unique_ptr<utility::Timer> cmdTimer_ {nullptr};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // BLE_SCAN_FILTER_LSF_H

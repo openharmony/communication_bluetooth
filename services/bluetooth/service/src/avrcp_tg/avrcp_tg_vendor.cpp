@@ -17,6 +17,7 @@
 #include "avrcp_tg_vendor_continuation.h"
 #include "avrcp_tg_vendor_player_application_settings.h"
 
+namespace OHOS {
 namespace bluetooth {
 /******************************************************************
  * AvrcTgVendorPacket                                             *
@@ -913,7 +914,7 @@ bool AvrcTgGcpasvPacket::IsValidAttribute(void) const
                 break;
             }
 
-            if ((attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN) 
+            if ((attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN)
                 && (attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX)) {
                 break;
             }
@@ -2357,3 +2358,4 @@ uint16_t AvrcTgSavPacket::GetNumberOfPackets(void)
     return AVRC_TG_SAV_NUM_OF_PACKETS;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -37,6 +37,7 @@
 #ifndef GATT_SERVER_PROFILE_CALLBACK_H
 #define GATT_SERVER_PROFILE_CALLBACK_H
 
+namespace OHOS {
 namespace bluetooth {
 class GattServerProfileCallback {
 public:
@@ -62,5 +63,6 @@ public:
     {}
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GATT_SERVER_PROFILE_CALLBACK_H

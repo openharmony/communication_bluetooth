@@ -40,6 +40,7 @@
 #include "interface_profile_manager.h"
 #include "util/dispatcher.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents profile service manager.
@@ -218,5 +219,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PROFILE_SERVICE_MANAGER_H

@@ -24,6 +24,7 @@
 
 using namespace OHOS;
 using namespace OHOS::Telephony;
+namespace OHOS {
 namespace bluetooth {
 HfpAgSystemInterface::HfpAgSystemInterface()
 {}
@@ -321,7 +322,7 @@ void HfpAgSystemInterface::QueryAgIndicator()
             LOG_INFO("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
         }
         LOG_INFO("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
-        
+
         subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
         LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
@@ -484,7 +485,11 @@ bool HfpAgSystemInterface::IsRinging() const
 void HfpAgSystemInterface::AgTelephonyObserver::OnNetworkStateUpdated(int32_t slotId,
     const sptr<NetworkState> &networkState)
 {
-    LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    HILOGI("[HFP AG] slotId: %{public}d", slotId);
+    if (networkState == nullptr) {
+        HILOGE("[HFP AG] networkState is null");
+        return;
+    }
     interface_.slotId_ = slotId;
     interface_.operatorName_ = networkState->GetLongOperatorName();
     interface_.OnSubscriptionStateChanged(static_cast<std::underlying_type<RegServiceState>::type>(
@@ -516,3 +521,4 @@ inline std::string HfpAgSystemInterface::Str16ToStr8(const std::u16string& str) 
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -14,14 +14,13 @@
  */
 
 #include "bluetooth_hdi.h"
-
-#include "bt_hci_proxy.h"
+#include <v1_0/ihci_interface.h>
 #include "bluetooth_hci_callbacks.h"
 
-using namespace OHOS;
+using OHOS::HDI::Bluetooth::Hci::V1_0::IHciInterface;
 
-static sptr<ohos::hardware::bt::v1_0::IBtHci> g_iBtHci = nullptr;
-static sptr<BluetoothHciCallbacks> g_bluetoothHciCallbacks = nullptr;
+static OHOS::sptr<IHciInterface> g_iBtHci = nullptr;
+static OHOS::sptr<BluetoothHciCallbacks> g_bluetoothHciCallbacks = nullptr;
 
 int HdiInit(BtHciCallbacks *callbacks)
 {
@@ -29,18 +28,18 @@ int HdiInit(BtHciCallbacks *callbacks)
         return INITIALIZATION_ERROR;
     }
 
-    sptr<ohos::hardware::bt::v1_0::IBtHci> iBtHci = ohos::hardware::bt::v1_0::IBtHci::Get();
+    OHOS::sptr<IHciInterface> iBtHci = IHciInterface::Get();
     if (iBtHci == nullptr) {
         return INITIALIZATION_ERROR;
     }
 
-    g_bluetoothHciCallbacks = new BluetoothHciCallbacks(callbacks);
+    g_bluetoothHciCallbacks = new (std::nothrow) BluetoothHciCallbacks(callbacks);
     if (g_bluetoothHciCallbacks == nullptr) {
         return INITIALIZATION_ERROR;
     }
 
     int32_t result = iBtHci->Init(g_bluetoothHciCallbacks);
-    if (result != ohos::hardware::bt::v1_0::BtStatus::SUCCESS) {
+    if (result != BtStatus::SUCCESS) {
         return INITIALIZATION_ERROR;
     }
 
@@ -57,16 +56,16 @@ int HdiSendHciPacket(BtPacketType type, const BtPacket *packet)
     if (g_iBtHci == nullptr) {
         return INITIALIZATION_ERROR;
     }
-    ohos::hardware::bt::v1_0::BtType btType = ohos::hardware::bt::v1_0::BtType::ACL_DATA;
+    BtType btType = BtType::ACL_DATA;
     switch (type) {
         case PACKET_TYPE_CMD:
-            btType = ohos::hardware::bt::v1_0::BtType::HCI_CMD;
+            btType = BtType::HCI_CMD;
             break;
         case PACKET_TYPE_ACL:
-            btType = ohos::hardware::bt::v1_0::BtType::ACL_DATA;
+            btType = BtType::ACL_DATA;
             break;
         case PACKET_TYPE_SCO:
-            btType = ohos::hardware::bt::v1_0::BtType::SCO_DATA;
+            btType = BtType::SCO_DATA;
             break;
         default:
             break;
@@ -74,7 +73,7 @@ int HdiSendHciPacket(BtPacketType type, const BtPacket *packet)
     std::vector<uint8_t> data;
     data.assign(packet->data, packet->data + packet->size);
     int32_t result = g_iBtHci->SendHciPacket(btType, data);
-    if (result != ohos::hardware::bt::v1_0::BtStatus::SUCCESS) {
+    if (result != BtStatus::SUCCESS) {
         return TRANSPORT_ERROR;
     }
     return SUCCESS;

@@ -29,6 +29,7 @@
 #include "interface_profile_manager.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct ClassicAdapter::impl {
     std::recursive_mutex syncMutex_ {};
@@ -1136,7 +1137,7 @@ void ClassicAdapter::SendDiscoveryStateChanged(int discoveryState) const
 
 void ClassicAdapter::SendDiscoveryResult(const RawAddress &device) const
 {
-    HILOGI("address: %{public}s", device.GetAddress().c_str());
+    HILOGI("address: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
 
     pimpl->adapterObservers_.ForEach(
         [device](IAdapterClassicObserver &observer) { observer.OnDiscoveryResult(device); });
@@ -1144,7 +1145,7 @@ void ClassicAdapter::SendDiscoveryResult(const RawAddress &device) const
 
 void ClassicAdapter::SendRemoteCodChanged(const RawAddress &device, int cod) const
 {
-    HILOGI("address: %{public}s, cod: %{public}d", device.GetAddress().c_str(), cod);
+    HILOGI("address: %{public}s, cod: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), cod);
 
     pimpl->remoteObservers_.ForEach(
         [device, cod](IClassicRemoteDeviceObserver &observer) { observer.OnRemoteCodChanged(device, cod); });
@@ -1228,7 +1229,7 @@ void ClassicAdapter::SendPairConfirmed(const RawAddress &device, int reqType, in
 
 void ClassicAdapter::UserConfirmAutoReply(const RawAddress &device, int reqType, bool accept) const
 {
-    HILOGI("address: %{public}s, accept: %{public}d", device.GetAddress().c_str(), accept);
+    HILOGI("address: %{public}s, accept: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), accept);
 
     auto it = devices_.find(device.GetAddress());
     if (it != devices_.end()) {
@@ -1859,7 +1860,7 @@ bool ClassicAdapter::CancelPairing(const RawAddress &device)
 
 bool ClassicAdapter::RemovePair(const RawAddress &device)
 {
-    HILOGI("address %{public}s", device.GetAddress().c_str());
+    HILOGI("address %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
@@ -2395,7 +2396,7 @@ int ClassicAdapter::GetDeviceBatteryLevel(const RawAddress &device) const
 
 void ClassicAdapter::SetDeviceBatteryLevel(const RawAddress &device, int batteryLevel) const
 {
-    HILOGI("addr: %{public}s, batteryLevel: %{public}d", device.GetAddress().c_str(), batteryLevel);
+    HILOGI("addr: %{public}s, batteryLevel: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), batteryLevel);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
@@ -2408,7 +2409,7 @@ void ClassicAdapter::SetDeviceBatteryLevel(const RawAddress &device, int battery
 
 void ClassicAdapter::SendRemoteBatteryLevelChanged(const RawAddress &device, int batteryLevel) const
 {
-    HILOGI("addr: %{public}s, batteryLevel: %{public}d", device.GetAddress().c_str(), batteryLevel);
+    HILOGI("addr: %{public}s, batteryLevel: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), batteryLevel);
 
     pimpl->remoteObservers_.ForEach([device, batteryLevel](IClassicRemoteDeviceObserver &observer) {
         observer.OnRemoteBatteryLevelChanged(device, batteryLevel);
@@ -2417,3 +2418,4 @@ void ClassicAdapter::SendRemoteBatteryLevelChanged(const RawAddress &device, int
 
 REGISTER_CLASS_CREATOR(ClassicAdapter);
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -20,6 +20,7 @@
 #include "bluetooth_pan_observer_stub.h"
 #include "i_bluetooth_pan.h"
 #include "i_bluetooth_host.h"
+#include "bluetooth_utils.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
@@ -29,16 +30,16 @@ class PanInnerObserver : public BluetoothPanObserverStub {
 public:
     explicit PanInnerObserver(BluetoothObserverList<PanObserver> &observers) : observers_(observers)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
     }
     ~PanInnerObserver() override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
     }
 
     ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 1);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<PanObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
@@ -57,7 +58,7 @@ struct Pan::impl {
 
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         std::vector<BluetoothRemoteDevice> remoteDevices;
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             std::vector<BluetoothRawAddress> rawDevices;
@@ -66,7 +67,7 @@ struct Pan::impl {
                 tmpStates.push_back((int32_t)state);
             }
             if (proxy_ != nullptr) {
-                HILOGD("[%{public}s]: %{public}s():proxy_ != nullptr !", __FILE__, __FUNCTION__);
+                HILOGI("proxy_ != nullptr !");
                 proxy_->GetDevicesByStates(tmpStates, rawDevices);
             }
             for (BluetoothRawAddress rawDevice : rawDevices) {
@@ -79,7 +80,7 @@ struct Pan::impl {
 
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             int state;
             proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
@@ -90,49 +91,49 @@ struct Pan::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             bool isOk;
             proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);
             return isOk;
         }
-        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
+        HILOGE("fw return false!");
         return false;
     }
 
     void RegisterObserver(std::shared_ptr<PanObserver> observer)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         observers_.Register(observer);
     }
 
     void DeregisterObserver(std::shared_ptr<PanObserver> observer)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         observers_.Deregister(observer);
     }
 
     bool SetTethering(bool value)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             bool isOk;
             proxy_->SetTethering(value, isOk);
             return isOk;
         }
-        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
+        HILOGE("fw return false!");
         return false;
     }
 
     bool IsTetheringOn()
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             bool isOk;
             proxy_->IsTetheringOn(isOk);
             return isOk;
         }
-        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
+        HILOGE("fw return false!");
         return false;
     }
 
@@ -153,7 +154,7 @@ public:
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
-        HILOGI("Pan::impl::PanDeathRecipient::OnRemoteDied starts");
+        HILOGI("starts");
         impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
     }
@@ -164,22 +165,22 @@ private:
 
 Pan::impl::impl()
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
     if (!hostRemote) {
-        HILOGE("Pan::impl:impl() failed: no hostRemote");
+        HILOGE("failed: no hostRemote");
         return;
     }
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_PAN_SERVER);
 
     if (!remote) {
-        HILOGE("Pan::impl:impl() failed: no remote");
+        HILOGE("failed: no remote");
         return;
     }
-    HILOGI("Pan::impl:impl() remote obtained");
+    HILOGI("remote obtained");
 
     innerObserver_ = new PanInnerObserver(observers_);
 
@@ -191,7 +192,7 @@ Pan::impl::impl()
 
 Pan::impl::~impl()
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
     if (proxy_ != nullptr) {
         proxy_->DeregisterObserver(innerObserver_);
     }

@@ -17,9 +17,10 @@
 #include "interface_profile_manager.h"
 #include "interface_profile_map_mce.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "remote_observer_list.h"
 
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -191,11 +192,11 @@ BluetoothMapMceServer::BluetoothMapMceServer()
             pimpl->mceService_->RegisterObserver(*(pimpl->observerImp_));
         } else {
             // erro
-            HILOGI("%{public}s pimpl->mceService_ null", __func__);
+            HILOGI("pimpl->mceService_ null");
         }
     } else {
         // erro
-        HILOGI("%{public}s serviceMgr null", __func__);
+        HILOGI("serviceMgr null");
     }
 
     pimpl->systemStateObserver_ = new BluetoothMapMceServer::impl::MapMceSystemStateObserver(pimpl.get());
@@ -227,21 +228,21 @@ BluetoothMapMceServer::~BluetoothMapMceServer()
 void BluetoothMapMceServer::RegisterObserver(
     const sptr<IBluetoothMapMceObserver> &observer)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("start");
     if (!observer) {
-        HILOGE("%{public}s RegisterObserver called with NULL . Ignoring.", __func__);
+        HILOGE("called with NULL . Ignoring.");
         return;
     }
     pimpl->observersList_.Register(observer);
-    HILOGI("%{public}s end", __func__);
+    HILOGI("end");
 }
 
 void BluetoothMapMceServer::DeregisterObserver(
     const sptr<IBluetoothMapMceObserver> &observer)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("start");
     if (!observer) {
-        HILOGE("%{public}s UnregisterObserver called with NULL . Ignoring.", __func__);
+        HILOGE("UnregisterObserver called with NULL . Ignoring.");
         return;
     }
     pimpl->observersList_.Deregister(observer);
@@ -250,49 +251,49 @@ void BluetoothMapMceServer::DeregisterObserver(
 int BluetoothMapMceServer::Connect(
     const BluetoothRawAddress &device)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret = pimpl->mceService_->Connect((RawAddress)device);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::Disconnect(
     const BluetoothRawAddress &device)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->Disconnect((RawAddress)device);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::IsConnected(
     const BluetoothRawAddress &device)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  (int)pimpl->mceService_->IsConnected((RawAddress)device);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 void BluetoothMapMceServer::GetConnectDevices(
     std::vector<BluetoothRawAddress> &devices)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("start");
     if (pimpl->mceService_ != nullptr) {
         std::list<RawAddress> btDevice = pimpl->mceService_->GetConnectDevices();
         for (auto it : btDevice) {
@@ -300,15 +301,15 @@ void BluetoothMapMceServer::GetConnectDevices(
         }
         pimpl->mceService_->GetConnectDevices();
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("end");
 }
 
 void BluetoothMapMceServer::GetDevicesByStates(
     const std::vector<int32_t> &statusList, std::vector<BluetoothRawAddress> &devices)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("start");
     std::vector<RawAddress> serviceDeviceList;
 
     if (pimpl->mceService_ != nullptr) {
@@ -322,95 +323,92 @@ void BluetoothMapMceServer::GetDevicesByStates(
             delete bluetoothDevice;
         }
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("end");
 }
 
 int BluetoothMapMceServer::GetConnectionState(
     const BluetoothRawAddress &device)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->GetDeviceConnectState((RawAddress)device);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::SetConnectionStrategy(
     const BluetoothRawAddress &device, int32_t strategy)
 {
-    HILOGI("%{public}s start", __func__);
-    HILOGI("%{public}s: strategy = %{public}d ", __func__, strategy);
+    HILOGI("device: %{public}s, strategy: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), strategy);
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->SetConnectionStrategy((RawAddress)device, strategy);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::GetConnectionStrategy(
     const BluetoothRawAddress &device)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->GetConnectionStrategy((RawAddress)device);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::GetSupportedFeatures(
     const BluetoothRawAddress &device)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->GetSupportedFeatures((RawAddress)device);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::SetNotificationFilter(
     const BluetoothRawAddress &device, int32_t mask)
 {
-    HILOGI("%{public}s start", __func__);
-    HILOGI("%{public}s: mask = %{public}d ", __func__, mask);
+    HILOGI("device: %{public}s, mask: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), mask);
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->SetNotificationFilter((RawAddress)device, mask);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::UpdateInbox(
     const BluetoothRawAddress &device, int32_t msgType)
 {
-    HILOGI("%{public}s start", __func__);
-    HILOGI("%{public}s: msgType = %{public}d ", __func__, msgType);
+    HILOGI("device: %{public}s, msgType: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), msgType);
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->UpdateInbox((RawAddress)device, MapMessageType(msgType));
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
@@ -418,9 +416,8 @@ int BluetoothMapMceServer::SetMessageStatus(const BluetoothRawAddress &device,
     int32_t msgType, const std::u16string &msgHandle, int32_t statusIndicator, int32_t statusValue,
     const std::string &extendedData)
 {
-    HILOGI("%{public}s start", __func__);
-    HILOGI("%{public}s: msgType = %{public}d, statusIndicator = %{public}d, statusValue = %{public}d ",
-             __func__, msgType, statusIndicator, statusValue);
+    HILOGI("device: %{public}s, msgType: %{public}d, statusIndicator: %{public}d, statusValue: %{public}d",
+        GetEncryptAddr(device.GetAddress()).c_str(), msgType, statusIndicator, statusValue);
     int ret = -1;
     IProfileSetMessageStatus serviceStatus;
     serviceStatus.msgHandle = msgHandle;
@@ -432,121 +429,120 @@ int BluetoothMapMceServer::SetMessageStatus(const BluetoothRawAddress &device,
         ret =
             pimpl->mceService_->SetMessageStatus((RawAddress)device, MapMessageType(msgType), serviceStatus);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::GetOwnerStatus(const BluetoothRawAddress &device,
     const std::string &conversationId)
 {
-    HILOGI("%{public}s start", __func__);
-    HILOGI("%{public}s: msgType = %{public}s ", __func__, conversationId.c_str());
+    HILOGI("device: %{public}s, conversationId: %{public}s",
+        GetEncryptAddr(device.GetAddress()).c_str(), conversationId.c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->GetOwnerStatus((RawAddress)device, conversationId);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
         ret =  -1;
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::GetUnreadMessages(
     const BluetoothRawAddress &device, int32_t msgType, int32_t max)
 {
-    HILOGI("%{public}s start", __func__);
-    HILOGI("%{public}s: msgType = %{public}d, max = %{public}d ", __func__, msgType, max);
+    HILOGI("device: %{public}s, msgType: %{public}d, max: %{public}d",
+        GetEncryptAddr(device.GetAddress()).c_str(), msgType, max);
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =
             pimpl->mceService_->GetUnreadMessages((RawAddress)device, MapMessageType(msgType), (uint8_t)max);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::SendMessage(const BluetoothRawAddress &device,
     const BluetoothIProfileSendMessageParameters &msg)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->SendMessage((RawAddress)device, (IProfileSendMessageParameters)msg);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::GetMessagesListing(const BluetoothRawAddress &device,
     const BluetoothIProfileGetMessagesListingParameters &para)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =
             pimpl->mceService_->GetMessagesListing((RawAddress)device, (IProfileGetMessagesListingParameters)para);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::GetMessage(const BluetoothRawAddress &device, int32_t msgType,
     const std::u16string &msgHandle, const BluetoothIProfileGetMessageParameters &para)
 {
-    HILOGI("%{public}s start", __func__);
-    HILOGI("%{public}s: msgType = %{public}d", __func__, msgType);
+    HILOGI("device: %{public}s, msgType: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), msgType);
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->GetMessage(
             (RawAddress)device, MapMessageType(msgType), msgHandle, (IProfileGetMessageParameters)para);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::GetConversationListing(const BluetoothRawAddress &device,
     const BluetoothIProfileGetConversationListingParameters &para)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->GetConversationListing(
             (RawAddress)device, (IProfileGetConversationListingParameters)para);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 int BluetoothMapMceServer::SetOwnerStatus(const BluetoothRawAddress &device,
     const BluetoothIProfileSetOwnerStatusParameters &para)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int ret = -1;
     if (pimpl->mceService_ != nullptr) {
         ret =  pimpl->mceService_->SetOwnerStatus((RawAddress)device, (IProfileSetOwnerStatusParameters)para);
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
-    HILOGI("%{public}s end", __func__);
+    HILOGI("ret: %{public}d", ret);
     return ret;
 }
 
 BluetoothIProfileMasInstanceInfoList BluetoothMapMceServer::GetMasInstanceInfo(const BluetoothRawAddress &device)
 {
-    HILOGI("%{public}s start", __func__);
+    HILOGI("device: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     BluetoothIProfileMasInstanceInfoList bluetoothlist;
     bluetoothlist.isValid = false;
     if (pimpl->mceService_ != nullptr) {
@@ -556,7 +552,7 @@ BluetoothIProfileMasInstanceInfoList BluetoothMapMceServer::GetMasInstanceInfo(c
             bluetoothlist.masInfoList.push_back(masInfo);
         }
     } else {
-        HILOGE("pimpl->mceService_ null %{public}s", __func__);
+        HILOGE("pimpl->mceService_ null");
     }
     return bluetoothlist;
 }

@@ -35,6 +35,7 @@
 #include "rfcomm.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief statemachine
@@ -377,5 +378,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(PbapPceStateMachine);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PCE_STATE_MACHINE_H

@@ -21,11 +21,13 @@
 #include "gap_le_if.h"
 #include "gatt_defines.h"
 #include "gatt_service_base.h"
+#include "hisysevent.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 constexpr uint8_t OBSERVER_EVENT_CONNECTED = 0x0;
 constexpr uint8_t OBSERVER_EVENT_DISCONNECTED = 0x1;
@@ -520,6 +522,9 @@ void GattConnectionManager::impl::NotifyObserver(
     const GattDevice &device, uint8_t event, uint16_t connectionHandle, int ret)
 {
     std::lock_guard<std::mutex> lck(registerMutex_);
+    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_CONNECT_STATE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "ADDRESS", device.addr_.GetAddress(), "STATE",
+        event, "ROLE", device.role_);
     for (auto &item : observers_) {
         if (item.first) {
             switch (event) {
@@ -1553,3 +1558,4 @@ bool GattConnectionManager::Device::StateMachine::Disconnected::Dispatch(const u
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -25,6 +25,7 @@
 #include "rfcomm.h"
 #include "transport.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This RfcommTransport class provides a set of methods that is interactive with RFCOMM.
@@ -239,4 +240,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(RfcommTransport);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // TRANSPORT_RFCOMM_H

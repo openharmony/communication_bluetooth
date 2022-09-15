@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 struct MseVcard2 {
     std::string name_ = "";
@@ -82,5 +83,6 @@ private:
     std::vector<std::string> btUcis_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_VCARD_H

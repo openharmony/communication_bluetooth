@@ -19,6 +19,7 @@
 #include "raw_address.h"
 #include "rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpHfSdpServer &HfpHfSdpServer::GetInstance()
 {
@@ -141,3 +142,4 @@ int HfpHfSdpServer::AddAttribute(SdpAttribute attribute) const
         sdpHandle_, attribute.attributeId, attribute.type, attribute.attributeValue, attribute.attributeValueLength);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

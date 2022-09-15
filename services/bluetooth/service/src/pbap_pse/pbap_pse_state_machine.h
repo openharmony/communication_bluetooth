@@ -35,6 +35,7 @@
 #include "state_machine.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct PbapPseStateMachineInfo {
     ObexServerSession *obexSession_ = nullptr;
@@ -342,4 +343,5 @@ private:
     BaseObserverList<IPbapPseObserver> &observerMgrList_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_STATE_MACHINE_H

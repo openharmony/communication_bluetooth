@@ -28,6 +28,7 @@
 #include "raw_address.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Callback function of MnsObserver
@@ -168,5 +169,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(MapMseMnscli);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_MNSCLI_H

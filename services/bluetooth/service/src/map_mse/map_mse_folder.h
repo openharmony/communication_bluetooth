@@ -25,6 +25,7 @@
 #include "log.h"
 #include "map_mse_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 class MapMseFolder {
 public:
@@ -58,5 +59,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(MapMseFolder);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_FOLDER_H

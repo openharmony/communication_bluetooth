@@ -23,6 +23,7 @@
 #include "hfp_hf_service.h"
 #include "message.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods that is used to sent the event to service.
@@ -288,4 +289,5 @@ private:
     static void SendMessageToService(const HfpHfMessage &event);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_PROFILE_EVENT_SENDER_H

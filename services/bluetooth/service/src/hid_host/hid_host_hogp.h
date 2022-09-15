@@ -27,6 +27,7 @@
 #include "interface_profile_gatt_client.h"
 #include "interface_profile_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 using utility::Dispatcher;
 
@@ -116,6 +117,8 @@ private:
     // For PTS
     void GetBatteryInformation(Service service);
     void GetExternalRptRefInfo(Characteristic character);
+    void GetExternalCfgInfo(Characteristic character);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // HID_HOST_HOGP_H

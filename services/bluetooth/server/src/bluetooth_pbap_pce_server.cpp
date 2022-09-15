@@ -19,13 +19,14 @@
 #include "interface_profile_manager.h"
 #include "interface_profile_pbap_pce.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils_server.h"
 #include "permission_utils.h"
 #include "remote_observer_list.h"
 #include "bluetooth_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class IPbapPullPhoneBookParamAdapter {
 public:
@@ -76,7 +77,7 @@ public:
 
 private:
     bluetooth::IPbapPullvCardListingParam data_;
-};  
+};
 
 class IPbapPullvCardEntryParamAdapter {
 public:
@@ -129,7 +130,7 @@ public:
     ~PbapPceObserver() = default;
     void OnServiceConnectionStateChanged(const bluetooth::RawAddress &remoteAddr, int state) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("state: %{public}d", state);
         observers_->ForEach([remoteAddr, state](IBluetoothPbapPceObserver *observer) {
             observer->OnServiceConnectionStateChanged(remoteAddr, state);
         });
@@ -137,7 +138,7 @@ public:
     void OnServicePasswordRequired(
         const bluetooth::RawAddress &remoteAddr, const std::vector<uint8_t> &description, uint8_t charset, bool fullAccess) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("charset: %{public}d, fullAccess: %{public}d", charset, fullAccess);
         observers_->ForEach([remoteAddr, description, charset, fullAccess](IBluetoothPbapPceObserver *observer) {
             observer->OnServicePasswordRequired(remoteAddr, description, charset, fullAccess);
         });
@@ -145,7 +146,7 @@ public:
     void OnActionCompleted(const bluetooth::RawAddress &remoteAddr, int respCode,
         int actionType, const bluetooth::IPbapPhoneBookData &result) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("respCode: %{public}d, actionType: %{public}d", respCode, actionType);
         observers_->ForEach([remoteAddr, respCode, actionType, result](IBluetoothPbapPceObserver *observer) {
             observer->OnActionCompleted(remoteAddr, respCode, actionType, BluetoothIPbapPhoneBookDataAdapter(result));
         });
@@ -233,37 +234,37 @@ BluetoothPbapPceServer::~BluetoothPbapPceServer()
 
 int BluetoothPbapPceServer::GetDeviceState(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDeviceState() false, check permission failed");
+        HILOGE("false, check permission failed");
         return BT_FAILURE;
     }
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->GetDeviceState(device);
     } else {
-        HILOGE("BluetoothPbapPceServer::GetDeviceState: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
 
 int BluetoothPbapPceServer::Connect(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->Connect(device);
     } else {
-        HILOGE("BluetoothPbapPceServer::Connect: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
 
 int BluetoothPbapPceServer::Disconnect(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->Disconnect(device);
     } else {
-        HILOGE("BluetoothPbapPceServer::Disconnect: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
@@ -271,22 +272,22 @@ int BluetoothPbapPceServer::Disconnect(const BluetoothRawAddress &device)
 int BluetoothPbapPceServer::PullPhoneBook(const BluetoothRawAddress &device,
     const BluetoothIPbapPullPhoneBookParam &param)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->PullPhoneBook(device, IPbapPullPhoneBookParamAdapter(param));
     } else {
-        HILOGE("BluetoothPbapPceServer::PullPhoneBook: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
 
 int BluetoothPbapPceServer::SetPhoneBook(const BluetoothRawAddress &device, const std::u16string &name, int32_t flag)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter! flag: %{public}d", __FILE__, __FUNCTION__, flag);
+    HILOGI("device: %{public}s, flag: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), flag);
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->SetPhoneBook(device, name.c_str(), flag);
     } else {
-        HILOGE("BluetoothPbapPceServer::SetPhoneBook: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
@@ -294,11 +295,11 @@ int BluetoothPbapPceServer::SetPhoneBook(const BluetoothRawAddress &device, cons
 int BluetoothPbapPceServer::PullvCardListing(const BluetoothRawAddress &device,
     const BluetoothIPbapPullvCardListingParam &param)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->PullvCardListing(device, IPbapPullvCardListingParamAdapter(param));
     } else {
-        HILOGE("BluetoothPbapPceServer::PullvCardListing: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
@@ -306,33 +307,33 @@ int BluetoothPbapPceServer::PullvCardListing(const BluetoothRawAddress &device,
 int BluetoothPbapPceServer::PullvCardEntry(const BluetoothRawAddress &device,
     const BluetoothIPbapPullvCardEntryParam &param)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->PullvCardEntry(device, IPbapPullvCardEntryParamAdapter(param));
     } else {
-        HILOGE("BluetoothPbapPceServer::PullvCardEntry: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
 
 bool BluetoothPbapPceServer::IsDownloading(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->IsDownloading(device);
     } else {
-        HILOGE("BluetoothPbapPceServer::IsDownloading: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return false;
     }
 }
 
 int BluetoothPbapPceServer::AbortDownloading(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->AbortDownloading(device);
     } else {
-        HILOGE("BluetoothPbapPceServer::AbortDownloading: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
@@ -340,35 +341,35 @@ int BluetoothPbapPceServer::AbortDownloading(const BluetoothRawAddress &device)
 int BluetoothPbapPceServer::SetDevicePassword(const BluetoothRawAddress &device,
     const std::string &password, const std::string &userId)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         std::string pwdTmp = password;
         std::string usrIdTmp = userId;
         return pimpl->pbapPceService_->SetDevicePassword(device, pwdTmp, usrIdTmp);
     } else {
-        HILOGE("BluetoothPbapPceServer::SetDevicePassword: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
 
 int BluetoothPbapPceServer::SetConnectionStrategy(const BluetoothRawAddress &device, int32_t strategy)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter! strategy: %{public}d" , __FILE__, __FUNCTION__, strategy);
+    HILOGI("device: %{public}s, strategy: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), strategy);
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->SetConnectionStrategy(device, strategy);
     } else {
-        HILOGE("BluetoothPbapPceServer::SetConnectionStrategy: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
 
 int BluetoothPbapPceServer::GetConnectionStrategy(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (pimpl->pbapPceService_) {
         return pimpl->pbapPceService_->GetConnectionStrategy(device);
     } else {
-        HILOGE("BluetoothPbapPceServer::GetConnectionStrategy: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return RET_BAD_STATUS;
     }
 }
@@ -376,9 +377,9 @@ int BluetoothPbapPceServer::GetConnectionStrategy(const BluetoothRawAddress &dev
 void BluetoothPbapPceServer::GetDevicesByStates(const ::std::vector<int32_t> states,
     std::vector<BluetoothRawAddress> &rawDevices)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDevicesByStates() false, check permission failed");
+        HILOGE("false, check permission failed");
         return;
     }
     if (pimpl->pbapPceService_ != nullptr) {
@@ -389,14 +390,14 @@ void BluetoothPbapPceServer::GetDevicesByStates(const ::std::vector<int32_t> sta
         }
         return;
     } else {
-        HILOGE("BluetoothPbapPceServer::GetDevicesByStates: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return;
     }
 }
 
 ::std::vector<BluetoothRawAddress> BluetoothPbapPceServer::GetConnectedDevices()
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     ::std::vector<BluetoothRawAddress> bluetoothDeviceList;
     if (pimpl->pbapPceService_ != nullptr) {
         const ::std::vector<int32_t> states{static_cast<int32_t>(BTConnectState::CONNECTED)};
@@ -407,16 +408,16 @@ void BluetoothPbapPceServer::GetDevicesByStates(const ::std::vector<int32_t> sta
         }
         return bluetoothDeviceList;
     } else {
-        HILOGE("BluetoothPbapPceServer::GetConnectedDevices: pimpl->pbapPceService_ null");
+        HILOGE("pimpl->pbapPceService_ null");
         return bluetoothDeviceList;
     }
 }
 
 void BluetoothPbapPceServer::RegisterObserver(const sptr<IBluetoothPbapPceObserver> &observer)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     if (!observer) {
-        HILOGE("RegisterObserver called with NULL observer. Ignoring.");
+        HILOGE("called with NULL observer. Ignoring.");
         return;
     }
     pimpl->observers_.Register(observer);
@@ -424,9 +425,9 @@ void BluetoothPbapPceServer::RegisterObserver(const sptr<IBluetoothPbapPceObserv
 
 void BluetoothPbapPceServer::DeregisterObserver(const sptr<IBluetoothPbapPceObserver> &observer)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     if (!observer) {
-        HILOGE("DeregisterObserver called with NULL observer. Ignoring.");
+        HILOGE("called with NULL observer. Ignoring.");
         return;
     }
     pimpl->observers_.Deregister(observer);

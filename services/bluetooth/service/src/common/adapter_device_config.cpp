@@ -20,6 +20,7 @@
 #include "log.h"
 #include "xml_parse.h"
 
+namespace OHOS {
 namespace bluetooth {
 AdapterDeviceConfig *AdapterDeviceConfig::g_instance = nullptr;
 
@@ -162,3 +163,4 @@ bool AdapterDeviceConfig::RemoveSection(const std::string &section, const std::s
     return pimpl->parse_.RemoveSection(section, subSection);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -59,7 +59,7 @@ static BleCentralManager *g_BleCentralManager;
 static BleCentralManagerCallbackWapper *g_ScanCallback;
 
 static BleAdvCallback *g_BleAdvCallbacks[MAX_BLE_ADV_NUM];
-static BleAdvertiser *g_BleAdvertiser = NULL;
+static BleAdvertiser *g_BleAdvertiser = nullptr;
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -130,7 +130,7 @@ public:
         }
 
         HILOGI("adv started. advId_: %{public}d", advId_);
-        if (g_AppCallback != NULL && g_AppCallback->advEnableCb != NULL) {
+        if (g_AppCallback != nullptr && g_AppCallback->advEnableCb != nullptr) {
             g_AppCallback->advEnableCb(advId_, 0);
         }
     }
@@ -221,7 +221,7 @@ int BleStartAdv(int advId, const BleAdvParams *param)
 static bool IsAllAdvStopped()
 {
     for (int i = 0; i < MAX_BLE_ADV_NUM; i++) {
-        if (g_BleAdvCallbacks[i] != NULL) {
+        if (g_BleAdvCallbacks[i] != nullptr) {
             return false;
         }
     }
@@ -243,7 +243,7 @@ int BleStopAdv(int advId)
         HILOGE("BleStopAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
-    if (g_BleAdvertiser == NULL || g_BleAdvCallbacks[advId] == NULL) {
+    if (g_BleAdvertiser == nullptr || g_BleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleStopAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
     }
@@ -251,17 +251,17 @@ int BleStopAdv(int advId)
     g_BleAdvertiser->StopAdvertising(*g_BleAdvCallbacks[advId]);
 
     usleep(100);
-    if (g_AppCallback != NULL && g_AppCallback->advDisableCb != NULL) {
+    if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
         HILOGI("adv stopped advId: %{public}d.", advId);
         g_AppCallback->advDisableCb(advId, 0);
     }
     delete g_BleAdvCallbacks[advId];
-    g_BleAdvCallbacks[advId] = NULL;
+    g_BleAdvCallbacks[advId] = nullptr;
 
     if (IsAllAdvStopped()) {
         HILOGI("All adv have been stopped.");
         delete g_BleAdvertiser;
-        g_BleAdvertiser = NULL;
+        g_BleAdvertiser = nullptr;
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -354,8 +354,9 @@ int BleSetScanParameters(int clientId, BleScanParams *param)
 int BleStartScan(void)
 {
     HILOGI("BleStartScan enter");
-    if (g_BleCentralManager == NULL) {
-        return 1;
+    if (g_BleCentralManager == nullptr) {
+        HILOGE("BleStartScan fail, ble centra manager is null.");
+        return OHOS_BT_STATUS_FAIL;
     }
 
     g_BleCentralManager->StartScan();
@@ -372,8 +373,9 @@ int BleStartScan(void)
 int BleStopScan(void)
 {
     HILOGI("BleStopScan enter");
-    if (g_BleCentralManager == NULL) {
-        return 1;
+    if (g_BleCentralManager == nullptr) {
+        HILOGE("BleStopScan fail, ble centra manager is null.");
+        return OHOS_BT_STATUS_FAIL;
     }
 
     g_BleCentralManager->StopScan();
@@ -393,11 +395,11 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
     HILOGI("BleGattRegisterCallbacks enter");
     g_AppCallback = func;
 
-    if (g_ScanCallback == NULL) {
+    if (g_ScanCallback == nullptr) {
         g_ScanCallback = new BleCentralManagerCallbackWapper();
     }
 
-    if (g_BleCentralManager == NULL) {
+    if (g_BleCentralManager == nullptr) {
         g_BleCentralManager = new BleCentralManager(*g_ScanCallback);
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -418,12 +420,12 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam)
 {
     HILOGI("BleStartAdvEx enter");
-    if (g_BleAdvertiser == NULL) {
+    if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = new BleAdvertiser();
     }
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
-        if (g_BleAdvCallbacks[i] == NULL) {
+        if (g_BleAdvCallbacks[i] == nullptr) {
             g_BleAdvCallbacks[i] = new BleAdvCallback(i);
             break;
         }
@@ -445,20 +447,142 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     }
 
     vector<uint8_t> advData;
-    if (rawData.advData != NULL) {
+    if (rawData.advData != nullptr) {
         for (unsigned int i = 0; i < rawData.advDataLen; i++) {
             advData.push_back(rawData.advData[i]);
         }
     }
 
     vector<uint8_t> scanResponse;
-    if (rawData.rspData != NULL) {
+    if (rawData.rspData != nullptr) {
         for (unsigned int i = 0; i < rawData.rspDataLen; i++) {
             scanResponse.push_back(rawData.rspData[i]);
         }
     }
 
     g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, *g_BleAdvCallbacks[i]);
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Sets one scan filter config.
+ *
+ * @param scanFilter Indicates the framework object of scan filter, see {@link BleScanFilter}.
+ * @param nativeScanFilter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set onr scan filter config success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nativeScanFilter)
+{
+    HILOGI("SetOneScanFilter enter");
+    if (nativeScanFilter->address != nullptr) {
+        scanFilter.SetDeviceId(nativeScanFilter->address);
+    }
+    if (nativeScanFilter->deviceName != nullptr) {
+        scanFilter.SetName(nativeScanFilter->deviceName);
+    }
+    if (nativeScanFilter->serviceUuidLength != 0 && nativeScanFilter->serviceUuid != nullptr) {
+        UUID serviceUuid = UUID::FromString((char *)nativeScanFilter->serviceUuid);
+        scanFilter.SetServiceUuid(serviceUuid);
+        if (nativeScanFilter->serviceUuidMask != nullptr) {
+            UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter->serviceUuidMask);
+            scanFilter.SetServiceUuidMask(serviceUuidMask);
+        }
+    }
+
+    if (nativeScanFilter->serviceData != nullptr) {
+        std::vector<uint8_t> serviceData;
+        for (unsigned int i = 0; i < nativeScanFilter->serviceDataLength; i++) {
+            serviceData.push_back(nativeScanFilter->serviceData[i]);
+        }
+        scanFilter.SetServiceData(serviceData);
+
+        if (nativeScanFilter->serviceDataMask != nullptr) {
+            std::vector<uint8_t> serviceDataMask;
+            for (unsigned int i = 0; i < nativeScanFilter->serviceDataLength; i++) {
+                serviceDataMask.push_back(nativeScanFilter->serviceDataMask[i]);
+            }
+            scanFilter.SetServiceDataMask(serviceDataMask);
+        }
+    }
+
+    if (nativeScanFilter->manufactureData != nullptr) {
+        std::vector<uint8_t> manufactureData;
+        for (unsigned int i = 0; i < nativeScanFilter->manufactureDataLength; i++) {
+            manufactureData.push_back(nativeScanFilter->manufactureData[i]);
+        }
+        scanFilter.SetManufactureData(manufactureData);
+
+        if (nativeScanFilter->manufactureDataMask != nullptr) {
+            std::vector<uint8_t> manufactureDataMask;
+            for (unsigned int i = 0; i < nativeScanFilter->manufactureDataLength; i++) {
+                manufactureDataMask.push_back(nativeScanFilter->manufactureDataMask[i]);
+            }
+            scanFilter.SetManufactureDataMask(manufactureDataMask);
+        }
+
+        if (nativeScanFilter->manufactureId != 0) {
+            scanFilter.SetManufacturerId(nativeScanFilter->manufactureId);
+        }
+    }
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Sets scan filter configs.
+ *
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set scan filter configs success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+static int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize)
+{
+    HILOGI("SetConfigScanFilter enter");
+    vector<BleScanFilter> scanFilters;
+    for (unsigned int i = 0; i < filterSize; i++) {
+        BleScanNativeFilter nativeScanFilter = filter[i];
+        BleScanFilter scanFilter;
+        SetOneScanFilter(scanFilter, &nativeScanFilter);
+        scanFilters.push_back(scanFilter);
+    }
+    g_BleCentralManager->ConfigScanFilter(scanFilters);
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Starts a scan with BleScanConfigs.
+ * If don't need ble scan filter, set BleScanNativeFilter to NULL or filterSize to zero.
+ * If one of the ble scan filtering rules is not required, set it to NULL.
+ * For example, set the address to NULL when you don't need it.
+ * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
+ * The manufactureId need to be set a related number when you need a filtering condition of manufactureData.
+ *
+ * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigned int filterSize)
+{
+    HILOGI("BleStartScanEx enter, filterSize %{public}u", filterSize);
+    if (g_BleCentralManager == nullptr || configs == nullptr) {
+        HILOGE("BleStartScanEx fail, ble centra manager is null or configs is null.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    if (filter != nullptr && filterSize != 0) {
+        SetConfigScanFilter(filter, filterSize);
+    }
+
+    HILOGI("scanMode: %{public}d", configs->scanMode);
+    BleScanSettings settings;
+    settings.SetScanMode(configs->scanMode);
+    g_BleCentralManager->StartScan(settings);
     return OHOS_BT_STATUS_SUCCESS;
 }
 }  // namespace Bluetooth

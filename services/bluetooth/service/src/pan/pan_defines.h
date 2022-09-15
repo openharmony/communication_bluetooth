@@ -24,6 +24,7 @@
 #include "l2cap_if.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 static constexpr int PAN_SUCCESS = 0;
 static constexpr int PAN_FAILURE = 1;
@@ -158,4 +159,5 @@ struct BnepMultycastFilterRange {
     uint8_t end[BT_ADDRESS_LENGTH];
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PAN_DEFINES_H

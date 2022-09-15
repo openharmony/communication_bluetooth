@@ -22,6 +22,7 @@
 #include "cstdint"
 #include "iosfwd"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of attributes for saving the packet of the <b>Media player item</b>.
@@ -77,5 +78,6 @@ public:
     std::vector<std::string> values_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // AVRCP_MEDIA_H

@@ -17,6 +17,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_hfp_hf_server.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils_server.h"
 #include "interface_profile_hfp_hf.h"
 #include "interface_profile_manager.h"
 #include "interface_profile.h"
@@ -24,7 +25,7 @@
 #include "permission_utils.h"
 #include "remote_observer_list.h"
 
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -35,15 +36,15 @@ public:
 
     void OnConnectionStateChanged(const RawAddress& device, int state) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
         observers_->ForEach([device, state](IBluetoothHfpHfObserver* observer) {
             observer->OnConnectionStateChanged(device, state);
         });
     }
 
-    void OnScoStateChanged(const RawAddress& device,  int state) override
+    void OnScoStateChanged(const RawAddress& device, int state) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
         observers_->ForEach([device, state](IBluetoothHfpHfObserver* observer) {
             observer->OnScoStateChanged(device, state);
         });
@@ -51,31 +52,31 @@ public:
 
     void OnCallChanged(const RawAddress& device, const HandsFreeUnitCalls& call) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
         observers_->ForEach([device, call](IBluetoothHfpHfObserver* observer) {
             observer->OnCallChanged(device, call);
         });
     }
 
-    void OnSignalStrengthChanged(const RawAddress& device,  int signal) override
+    void OnSignalStrengthChanged(const RawAddress& device, int signal) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, signal: %{public}d", GET_ENCRYPT_ADDR(device), signal);
         observers_->ForEach([device, signal](IBluetoothHfpHfObserver* observer) {
             observer->OnSignalStrengthChanged(device, signal);
         });
     }
 
-    void OnRegistrationStatusChanged(const RawAddress& device,  int status) override
+    void OnRegistrationStatusChanged(const RawAddress& device, int status) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, status: %{public}d", GET_ENCRYPT_ADDR(device), status);
         observers_->ForEach([device, status](IBluetoothHfpHfObserver* observer) {
             observer->OnRegistrationStatusChanged(device, status);
         });
     }
 
-    void OnRoamingStatusChanged(const RawAddress& device,  int status) override
+    void OnRoamingStatusChanged(const RawAddress& device, int status) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, status: %{public}d", GET_ENCRYPT_ADDR(device), status);
         observers_->ForEach([device, status](IBluetoothHfpHfObserver* observer) {
             observer->OnRoamingStatusChanged(device, status);
         });
@@ -83,7 +84,7 @@ public:
 
     void OnOperatorSelectionChanged(const RawAddress& device, const std::string& name) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, name: %{public}s", GET_ENCRYPT_ADDR(device), name.c_str());
         observers_->ForEach([device, name](IBluetoothHfpHfObserver* observer) {
             observer->OnOperatorSelectionChanged(device, name);
         });
@@ -91,7 +92,7 @@ public:
 
     void OnSubscriberNumberChanged(const RawAddress& device, const std::string& number) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, number: %{public}s", GET_ENCRYPT_ADDR(device), number.c_str());
         observers_->ForEach([device, number](IBluetoothHfpHfObserver* observer) {
             observer->OnSubscriberNumberChanged(device, number);
         });
@@ -99,7 +100,7 @@ public:
 
     void OnVoiceRecognitionStatusChanged(const RawAddress& device, int status) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, status: %{public}d", GET_ENCRYPT_ADDR(device), status);
         observers_->ForEach([device, status](IBluetoothHfpHfObserver* observer) {
             observer->OnVoiceRecognitionStatusChanged(device, status);
         });
@@ -107,7 +108,7 @@ public:
 
     void OnInBandRingToneChanged(const RawAddress& device, int status) override
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("addr: %{public}s, status: %{public}d", GET_ENCRYPT_ADDR(device), status);
     }
 
     void SetObserver(RemoteObserverList<IBluetoothHfpHfObserver>* observers)
@@ -123,14 +124,14 @@ private:
 struct BluetoothHfpHfServer::impl {
     RemoteObserverList<IBluetoothHfpHfObserver> observers_;
     std::unique_ptr<HfpHfServerObserver> observerImp_{std::make_unique<HfpHfServerObserver>()};
-    IProfileHfpHf* HfpHfService_ = nullptr;  
+    IProfileHfpHf* HfpHfService_ = nullptr;
 
     class HfpHfSystemObserver : public ISystemStateObserver {
     public:
         explicit HfpHfSystemObserver(BluetoothHfpHfServer::impl* pimpl) : pimpl_(pimpl) {};
         void OnSystemStateChange(const BTSystemState state) override
         {
-            HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+            HILOGI("state: %{public}d", state);
             IProfileManager* serviceMgr = IProfileManager::GetInstance();
             switch (state) {
             case BTSystemState::ON:
@@ -164,7 +165,7 @@ struct BluetoothHfpHfServer::impl {
 
 BluetoothHfpHfServer::BluetoothHfpHfServer()
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     pimpl = std::make_unique<impl>();
     pimpl->observerImp_->SetObserver(&(pimpl->observers_));
     pimpl->HfpHfSystemObserver_ = std::make_unique<impl::HfpHfSystemObserver>(pimpl.get());
@@ -181,7 +182,7 @@ BluetoothHfpHfServer::BluetoothHfpHfServer()
 
 BluetoothHfpHfServer::~BluetoothHfpHfServer()
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->HfpHfSystemObserver_));
     if (pimpl->HfpHfService_ != nullptr) {
         pimpl->HfpHfService_->DeregisterObserver(*pimpl->observerImp_);
@@ -189,7 +190,7 @@ BluetoothHfpHfServer::~BluetoothHfpHfServer()
 }
 
 bool BluetoothHfpHfServer::ConnectSco(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->ConnectSco(addr);
@@ -198,7 +199,7 @@ bool BluetoothHfpHfServer::ConnectSco(const BluetoothRawAddress &device) {
 }
 
 bool BluetoothHfpHfServer::DisconnectSco(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->DisconnectSco(addr);
@@ -206,20 +207,20 @@ bool BluetoothHfpHfServer::DisconnectSco(const BluetoothRawAddress &device) {
     return false;
 }
 
-int BluetoothHfpHfServer::GetDevicesByStates(const std::vector<int> &states, 
+int BluetoothHfpHfServer::GetDevicesByStates(const std::vector<int> &states,
     std::vector<BluetoothRawAddress> &devices) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDevicesByStates() false, check permission failed");
+        HILOGE("false, check permission failed");
         return BT_FAILURE;
     }
     std::vector<int> tmpStates;
     for (int32_t state : states) {
-        HILOGD("state = %{public}d", state);
+        HILOGI("state = %{public}d", state);
         tmpStates.push_back((int)state);
     }
     std::vector<RawAddress> rawDevices;
-     
+
     if (pimpl->HfpHfService_ != nullptr) {
         rawDevices = pimpl->HfpHfService_->GetDevicesByStates(tmpStates);
     } else {
@@ -232,9 +233,9 @@ int BluetoothHfpHfServer::GetDevicesByStates(const std::vector<int> &states,
 }
 
 int BluetoothHfpHfServer::GetDeviceState(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("GetDeviceState() false, check permission failed");
+        HILOGE("false, check permission failed");
         return BT_FAILURE;
     }
     RawAddress addr(device.GetAddress());
@@ -245,7 +246,7 @@ int BluetoothHfpHfServer::GetDeviceState(const BluetoothRawAddress &device) {
 }
 
 int BluetoothHfpHfServer::GetScoState(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->GetScoState(addr);
@@ -254,7 +255,7 @@ int BluetoothHfpHfServer::GetScoState(const BluetoothRawAddress &device) {
 }
 
 bool BluetoothHfpHfServer::SendDTMFTone(const BluetoothRawAddress &device, uint8_t code) {
-    HILOGD("[%{public}s]: %{public}s(): Enter, code = %{public}d", __FILE__, __FUNCTION__, code);
+    HILOGI("addr: %{public}s, code: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), code);
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->SendDTMFTone(addr, code);
@@ -263,7 +264,7 @@ bool BluetoothHfpHfServer::SendDTMFTone(const BluetoothRawAddress &device, uint8
 }
 
 int BluetoothHfpHfServer::Connect(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->Connect(addr);
@@ -272,7 +273,7 @@ int BluetoothHfpHfServer::Connect(const BluetoothRawAddress &device) {
 }
 
 int BluetoothHfpHfServer::Disconnect(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->Disconnect(addr);
@@ -281,7 +282,7 @@ int BluetoothHfpHfServer::Disconnect(const BluetoothRawAddress &device) {
 }
 
 bool BluetoothHfpHfServer::OpenVoiceRecognition(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->OpenVoiceRecognition(addr);
@@ -290,7 +291,7 @@ bool BluetoothHfpHfServer::OpenVoiceRecognition(const BluetoothRawAddress &devic
 }
 
 bool BluetoothHfpHfServer::CloseVoiceRecognition(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->CloseVoiceRecognition(addr);
@@ -298,9 +299,9 @@ bool BluetoothHfpHfServer::CloseVoiceRecognition(const BluetoothRawAddress &devi
     return false;
 }
 
-int BluetoothHfpHfServer::GetCurrentCallList(const BluetoothRawAddress &device, 
+int BluetoothHfpHfServer::GetCurrentCallList(const BluetoothRawAddress &device,
     std::vector<BluetoothHfpHfCall> &calls) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     std::vector<HandsFreeUnitCalls> callVector;
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
@@ -313,7 +314,7 @@ int BluetoothHfpHfServer::GetCurrentCallList(const BluetoothRawAddress &device,
 }
 
 bool BluetoothHfpHfServer::AcceptIncomingCall(const BluetoothRawAddress &device, int flag) {
-    HILOGD("[%{public}s]: %{public}s(): Enter, flag = %{public}d", __FILE__, __FUNCTION__, flag);
+    HILOGI("addr: %{public}s, flag: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), flag);
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->AcceptIncomingCall(addr, (int)flag);
@@ -322,7 +323,7 @@ bool BluetoothHfpHfServer::AcceptIncomingCall(const BluetoothRawAddress &device,
 }
 
 bool BluetoothHfpHfServer::HoldActiveCall(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->HoldActiveCall(addr);
@@ -331,7 +332,7 @@ bool BluetoothHfpHfServer::HoldActiveCall(const BluetoothRawAddress &device) {
 }
 
 bool BluetoothHfpHfServer::RejectIncomingCall(const BluetoothRawAddress &device) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->RejectIncomingCall(addr);
@@ -339,8 +340,9 @@ bool BluetoothHfpHfServer::RejectIncomingCall(const BluetoothRawAddress &device)
     return false;
 }
 
-bool BluetoothHfpHfServer::HandleIncomingCall(const BluetoothRawAddress &device, int flag) {
-    HILOGI("Enter!");
+bool BluetoothHfpHfServer::HandleIncomingCall(const BluetoothRawAddress &device, int flag)
+{
+    HILOGI("addr: %{public}s, flag: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), flag);
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->HandleIncomingCall(addr, flag);
@@ -350,7 +352,7 @@ bool BluetoothHfpHfServer::HandleIncomingCall(const BluetoothRawAddress &device,
 
 bool BluetoothHfpHfServer::DialLastNumber(const BluetoothRawAddress &device)
 {
-    HILOGI("Enter!");
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->DialLastNumber(addr);
@@ -360,7 +362,7 @@ bool BluetoothHfpHfServer::DialLastNumber(const BluetoothRawAddress &device)
 
 bool BluetoothHfpHfServer::DialMemory(const BluetoothRawAddress &device, int index)
 {
-    HILOGI("Enter!");
+    HILOGI("addr: %{public}s, index: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), index);
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->DialMemory(addr, index);
@@ -370,7 +372,8 @@ bool BluetoothHfpHfServer::DialMemory(const BluetoothRawAddress &device, int ind
 
 bool BluetoothHfpHfServer::HandleMultiCall(const BluetoothRawAddress &device, int flag, int index)
 {
-    HILOGI("Enter!");
+    HILOGI("addr: %{public}s, flag: %{public}d, index: %{public}d",
+        GetEncryptAddr((device).GetAddress()).c_str(), flag, index);
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->HandleMultiCall(addr, flag, index);
@@ -379,7 +382,7 @@ bool BluetoothHfpHfServer::HandleMultiCall(const BluetoothRawAddress &device, in
 }
 
 bool BluetoothHfpHfServer::FinishActiveCall(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->FinishActiveCall(addr, call);
@@ -387,9 +390,9 @@ bool BluetoothHfpHfServer::FinishActiveCall(const BluetoothRawAddress &device, c
     return false;
 }
 
-int BluetoothHfpHfServer::StartDial(const BluetoothRawAddress &device, const std::string &number, 
+int BluetoothHfpHfServer::StartDial(const BluetoothRawAddress &device, const std::string &number,
     BluetoothHfpHfCall &call) {
-    HILOGD("[%{public}s]: %{public}s(): Enter, number = %{public}s", __FILE__, __FUNCTION__, number.c_str());
+    HILOGI("addr: %{public}s, number: %{public}s", GetEncryptAddr((device).GetAddress()).c_str(), number.c_str());
     std::optional<HandsFreeUnitCalls> ret;
     HandsFreeUnitCalls calls;
     RawAddress addr(device.GetAddress());
@@ -406,12 +409,12 @@ int BluetoothHfpHfServer::StartDial(const BluetoothRawAddress &device, const std
 }
 
 void BluetoothHfpHfServer::RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     pimpl->observers_.Register(observer);
 }
 
 void BluetoothHfpHfServer::DeregisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     pimpl->observers_.Deregister(observer);
 }
 

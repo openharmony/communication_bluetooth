@@ -25,6 +25,7 @@
 #include "interface_adapter_classic.h"
 #include "pan_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 PanNetwork::PanNetwork()
 {
@@ -438,3 +439,4 @@ int PanNetwork::ReadPanNetworkEvent()
     return PAN_SUCCESS;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

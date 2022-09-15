@@ -19,6 +19,7 @@
 #include "interface_adapter_manager.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 ClassicBatteryObserverHf::ClassicBatteryObserverHf(utility::Dispatcher &dispatcher) : dispatcher_(&dispatcher)
 {
@@ -72,3 +73,4 @@ void ClassicBatteryObserverAg::SetBatteryLevel(const RawAddress &device, int bat
     classicAdapter->SetDeviceBatteryLevel(device, batteryLevel);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

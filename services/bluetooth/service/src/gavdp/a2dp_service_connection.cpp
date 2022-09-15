@@ -18,6 +18,7 @@
 #include "a2dp_service.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 A2dpConnectManager::A2dpConnectManager(uint8_t role)
 {
@@ -183,3 +184,4 @@ bool A2dpConnectManager::JudgeConnectExit(const RawAddress &device, uint8_t role
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

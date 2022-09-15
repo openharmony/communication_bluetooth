@@ -28,6 +28,7 @@
 
 using namespace stub;
 
+namespace OHOS {
 namespace bluetooth {
 const int CODEC_BIT_MOVE8 = 8;
 const int CODEC_BIT_MOVE16 = 16;
@@ -1269,3 +1270,4 @@ bool A2dpProfilePeer::SendPacket(const Packet *packet, size_t frames, uint32_t b
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

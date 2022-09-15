@@ -126,7 +126,7 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteNameChanged(
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteAliasChanged(
     const BluetoothRemoteDevice &device, const std::string &alias)
 {
-    HILOGI("addr:%{public}s, deviceName:%{public}s", GET_ENCRYPT_ADDR(device), alias.c_str());
+    HILOGI("addr:%{public}s, alias:%{public}s", GET_ENCRYPT_ADDR(device), alias.c_str());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteCodChanged(

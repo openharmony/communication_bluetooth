@@ -17,6 +17,7 @@
 #include "avrcp_tg_internal.h"
 #include "gap_if.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcTgGapManager::AvrcTgGapManager()
 {
@@ -72,3 +73,4 @@ int AvrcTgGapManager::UnregisterSecurity(void)
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

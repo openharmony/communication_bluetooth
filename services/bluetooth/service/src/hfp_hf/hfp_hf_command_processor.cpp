@@ -21,6 +21,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::unordered_map<std::string, HfpHfCommandProcessor::HfpHfAtHandler> HfpHfCommandProcessor::g_atCmdMap = {
     std::make_pair<std::string, HfpHfAtHandler>("OK", {&HfpHfCommandProcessor::ProcessOK}),
@@ -193,9 +194,9 @@ void HfpHfCommandProcessor::ProcessBtrh(HfpHfDataConnection &dataConn, const std
     int response = 0;
     const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "%{public}d", &response);
+    int res = sscanf_s(buf, "%d", &response);
     if (res < 1) {
-        LOG_WARN("[HFP HF]%{public}s():Invalid command format arg[%{public}s]", __FUNCTION__, arg.c_str());
+        HILOGE("[HFP HF]ProcessBtrh failed, res:%{public}d, arg:%{public}s", res, arg.c_str());
         return;
     }
 
@@ -858,3 +859,4 @@ void HfpHfCommandProcessor::CleanUp()
     currentCommand_ = AT_COMMAND_NONE;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

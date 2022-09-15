@@ -23,6 +23,7 @@
 #include "obex_headers.h"
 #include "obex_transport.h"
 
+namespace OHOS {
 namespace bluetooth {
 enum ObexReliableSessionState {
     OBEX_RELIABLE_SESSION_INIT = 0,
@@ -404,4 +405,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(ObexServerSession);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_SESSION_H

@@ -24,6 +24,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
 #include "i_bluetooth_avrcp_ct.h"
 #include "iservice_registry.h"
@@ -31,16 +32,16 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 AvrcpCtResponse::AvrcpCtResponse(uint8_t type, int resp) : type_(type), resp_(resp)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 }
 
 AvrcpCtResponse::~AvrcpCtResponse()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 }
 
 struct AvrcpController::impl {
@@ -53,7 +54,7 @@ public:
 
         void OnConnectionStateChanged(const RawAddress &rawAddr, int state) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnConnectionStateChanged(device, static_cast<int>(state));
@@ -63,7 +64,8 @@ public:
 
         void OnPressButton(const RawAddress &rawAddr, uint8_t button, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, button: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPressButton(device, static_cast<uint8_t>(button), static_cast<int>(result));
@@ -73,7 +75,8 @@ public:
 
         void OnReleaseButton(const RawAddress &rawAddr, uint8_t button,  int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, button: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnReleaseButton(device, static_cast<uint8_t>(button), static_cast<int>(result));
@@ -82,9 +85,10 @@ public:
         }
 
         void OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidCounter,
-        uint32_t numberOfItems, const std::vector<std::string> &folderNames, int result, int detail) override
+            uint32_t numberOfItems, const std::vector<std::string> &folderNames, int result, int detail) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d, detail: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -100,7 +104,7 @@ public:
         void OnGetCapabilities(const RawAddress &rawAddr, const std::vector<uint32_t> &companies,
             const std::vector<uint8_t> &events, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnGetCapabilities(device, companies, events, result);
@@ -111,7 +115,7 @@ public:
         void OnGetPlayerAppSettingAttributes(
             const RawAddress &rawAddr, std::vector<uint8_t> attributes, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -123,7 +127,8 @@ public:
         void OnGetPlayerAppSettingValues(const RawAddress &rawAddr,
             int attribute, const std::vector<uint8_t> &values, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, attribute: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -133,10 +138,10 @@ public:
             return;
         }
 
-        void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> attributes, 
+        void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> attributes,
             const std::vector<uint8_t> &values, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -147,7 +152,7 @@ public:
 
         void OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -159,7 +164,7 @@ public:
         void OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr,
             const std::vector<uint8_t> attribtues, const std::vector<std::string> &attributeName, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -171,7 +176,7 @@ public:
         void OnGetPlayerAppSettingValueText(const RawAddress &rawAddr,
             const std::vector<uint8_t> &values, const std::vector<std::string> &valueName, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -183,7 +188,7 @@ public:
         void OnGetElementAttributes(const RawAddress &rawAddr,
         const std::vector<uint32_t> &attribtues, const std::vector<std::string> &valueName, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -195,7 +200,8 @@ public:
         void OnGetPlayStatus(const RawAddress &rawAddr,
             uint32_t songLength, uint32_t songPosition, uint8_t playStatus, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, status: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playStatus, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnGetPlayStatus(device,
@@ -209,7 +215,8 @@ public:
 
         void OnPlayItem(const RawAddress &rawAddr, int status, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, status: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), status, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlayItem(device, static_cast<int>(status), static_cast<int>(result));
@@ -220,7 +227,8 @@ public:
         void OnGetMediaPlayers(const RawAddress &rawAddr, uint16_t uidCounter,
             std::vector<BluetoothAvrcpMpItem> &items, int result, int detail) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, uidCounter: %{public}d, res: %{public}d, detail: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             std::vector<AvrcMpItem> myItems;
@@ -264,10 +272,11 @@ public:
             return;
         }
 
-        void OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues, 
+        void OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues,
             const std::vector<std::string> &values, int result, int detail) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d, detail: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -279,7 +288,8 @@ public:
         void OnGetTotalNumberOfItems(const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems,
             int result, int detail) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("address: %{public}s, uidCounter: %{public}d, numOfItems: %{public}d, res: %{public}d, "
+                "detail: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnGetTotalNumberOfItems(device,
@@ -293,7 +303,8 @@ public:
 
         void OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, volume: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnSetAbsoluteVolume(device, static_cast<uint8_t>(volume), result);
@@ -303,7 +314,8 @@ public:
 
         void OnPlaybackStatusChanged(const RawAddress &rawAddr, uint8_t playStatus, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, status: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playStatus, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlaybackStatusChanged(device, static_cast<uint8_t>(playStatus), static_cast<int>(result));
@@ -313,7 +325,7 @@ public:
 
         void OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnTrackChanged(device, static_cast<uint64_t>(uid), static_cast<int>(result));
@@ -323,7 +335,7 @@ public:
 
         void OnTrackReachedEnd(const RawAddress &rawAddr, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnTrackReachedEnd(device, static_cast<int>(result));
@@ -333,7 +345,7 @@ public:
 
         void OnTrackReachedStart(const RawAddress &rawAddr, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnTrackReachedStart(device, static_cast<int>(result));
@@ -343,7 +355,8 @@ public:
 
         void OnPlaybackPosChanged(const RawAddress &rawAddr, uint32_t playbackPos, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, playbackPos: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playbackPos, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlaybackPosChanged(device, static_cast<uint32_t>(playbackPos), static_cast<int>(result));
@@ -354,7 +367,7 @@ public:
         void OnPlayerAppSettingChanged(const RawAddress &rawAddr, const std::vector<uint8_t> &attributes,
             const std::vector<uint8_t> &values, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlayerAppSettingChanged(device, attributes, values, static_cast<int>(result));
@@ -364,7 +377,7 @@ public:
 
         void OnNowPlayingContentChanged(const RawAddress &rawAddr, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnNowPlayingContentChanged(device, static_cast<int>(result));
@@ -374,7 +387,7 @@ public:
 
         void OnAvailablePlayersChanged(const RawAddress &rawAddr, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnAvailablePlayersChanged(device, static_cast<int>(result));
@@ -385,7 +398,8 @@ public:
         void OnAddressedPlayerChanged(
             const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, playerId: %{public}d, uidCounter: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnAddressedPlayerChanged(
@@ -396,7 +410,8 @@ public:
 
         void OnUidChanged(const RawAddress &rawAddr, uint16_t uidCounter, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, uidCounter: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnUidChanged(device, static_cast<uint16_t>(uidCounter), static_cast<int>(result));
@@ -406,7 +421,8 @@ public:
 
         void OnVolumeChanged(const RawAddress &rawAddr, uint8_t volume, int result) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, volume: %{public}d, res: %{public}d",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnVolumeChanged(device, static_cast<uint8_t>(volume), static_cast<int>(result));
@@ -421,20 +437,20 @@ public:
     impl();
     ~impl()
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter");
         proxy_->UnregisterObserver(observer_);
     }
 
     bool IsEnabled(void)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter");
 
         return (proxy_ != nullptr && !BluetoothHost::GetDefaultHost().IsBtDiscovering());
     }
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -445,7 +461,8 @@ public:
 
     void OnPressButton(const BluetoothRemoteDevice &device, uint8_t button, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, button: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), button, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -458,7 +475,8 @@ public:
 
     void OnReleaseButton(const BluetoothRemoteDevice &device, uint8_t button, int result)
     {
-        HILOGD("%{public}s start.", __func__);        
+        HILOGI("enter, device: %{public}s, button: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), button, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -472,7 +490,8 @@ public:
     void OnSetBrowsedPlayer(const BluetoothRemoteDevice &device, uint16_t uidCounter, uint32_t numOfItems,
         const std::vector<std::string> &folderNames, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_ADDR(device), result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -485,8 +504,8 @@ public:
     void OnGetCapabilities(const BluetoothRemoteDevice &device, const std::vector<uint32_t> &companies,
         const std::vector<uint8_t> &events, int result)
     {
-        HILOGD("%{public}s start.", __func__);
-        
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
+
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, companies, events, result](std::shared_ptr<IObserver> observer) {
@@ -504,7 +523,7 @@ public:
     void OnGetPlayerAppSettingAttributes(
         const BluetoothRemoteDevice &device, std::vector<uint8_t> attributes, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -518,7 +537,7 @@ public:
     void OnGetPlayerAppSettingValues(
         const BluetoothRemoteDevice &device, uint8_t attribute, std::vector<uint8_t> values, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -532,7 +551,7 @@ public:
     void OnGetPlayerAppSettingCurrentValue(
         const BluetoothRemoteDevice &device, std::vector<uint8_t> attributes, std::vector<uint8_t> values, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -545,7 +564,7 @@ public:
 
     void OnSetPlayerAppSettingCurrentValue(const BluetoothRemoteDevice &device, int result)
     {
-        HILOGD("%{public}s start.", __func__);        
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -558,7 +577,7 @@ public:
     void OnGetPlayerAppSettingAttributeText(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &attributes,
         const std::vector<std::string> &valueName, int result)
     {
-        HILOGD("%{public}s start.", __func__);        
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -572,7 +591,7 @@ public:
     void OnGetPlayerAppSettingValueText(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &values,
         const std::vector<std::string> &valueName, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -586,7 +605,7 @@ public:
     void OnGetElementAttributes(const BluetoothRemoteDevice &device, const std::vector<uint32_t> &attributes,
         const std::vector<std::string> &valueName, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -600,7 +619,8 @@ public:
     void OnGetPlayStatus(
         const BluetoothRemoteDevice &device, uint32_t songLength, uint32_t songPosition, uint8_t playStatus, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, songLength: %{public}d, songPosition: %{public}d, playStatus: %{public}d,"
+            " res: %{public}d", GET_ENCRYPT_ADDR(device), songLength, songPosition, playStatus, result);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -612,7 +632,8 @@ public:
 
     void OnPlayItem(const BluetoothRemoteDevice &device, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);        
+        HILOGI("enter, device: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_ADDR(device), result, detail);
 
         std::lock_guard<std::mutex> lock(observerMutex_);
 
@@ -625,7 +646,8 @@ public:
     void OnGetMediaPlayers(const BluetoothRemoteDevice &device, uint16_t uidCounter,
         const std::vector<AvrcMpItem> &items, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, uidCounter: %{public}d, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_ADDR(device), uidCounter, result, detail);
 
         std::vector<AvrcpCtResponse::MediaPlayers::MediaPlayer> MediaPlayers;
         for (int i = 0; i < static_cast<int>(items.size()); i++) {
@@ -652,7 +674,8 @@ public:
     void OnGetFolderItems(const BluetoothRemoteDevice &device, uint16_t uidCounter,
         const std::vector<AvrcMeItem> &items, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, uidCounter: %{public}d, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_ADDR(device), uidCounter, result, detail);
 
         std::vector<AvrcpCtResponse::MediaItems::MediaItem> mediaItems;
         for (int i = 0; i < static_cast<int>(items.size()); i++) {
@@ -679,7 +702,8 @@ public:
     void OnGetItemAttributes(const BluetoothRemoteDevice &device, const std::vector<uint32_t> &attributes,
         const std::vector<std::string> &values, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_ADDR(device), result, detail);
         std::vector<AvrcpCtResponse::ItemAttributes::ItemAttribute> itemAttrs;
         for (int i = 0; i < static_cast<int>(attributes.size()); i++) {
             AvrcpCtResponse::ItemAttributes::ItemAttribute itemAttr;
@@ -699,7 +723,8 @@ public:
     void OnGetTotalNumberOfItems(
         const BluetoothRemoteDevice &device, uint16_t uidCounter, uint32_t numOfItems, int result, int detail)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d, detail: %{public}d",
+            GET_ENCRYPT_ADDR(device), result, detail);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, uidCounter, numOfItems, result](std::shared_ptr<IObserver> observer) {
@@ -711,7 +736,8 @@ public:
 
     void OnSetAbsoluteVolume(const BluetoothRemoteDevice &device, uint16_t volume, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, volume: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), volume, result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, volume, result](std::shared_ptr<IObserver> observer) {
@@ -723,7 +749,8 @@ public:
 
     void OnPlaybackStatusChanged(const BluetoothRemoteDevice &device, uint8_t playStatus, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, playStatus: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), playStatus, result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, playStatus, result](std::shared_ptr<IObserver> observer) {
@@ -735,7 +762,7 @@ public:
 
     void OnTrackChanged(const BluetoothRemoteDevice &device, uint64_t uid, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, uid, result](std::shared_ptr<IObserver> observer) {
@@ -747,7 +774,7 @@ public:
 
     void OnTrackReachedEnd(const BluetoothRemoteDevice &device, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, result](std::shared_ptr<IObserver> observer) {
@@ -758,7 +785,7 @@ public:
 
     void OnTrackReachedStart(const BluetoothRemoteDevice &device, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, result](std::shared_ptr<IObserver> observer) {
@@ -769,7 +796,8 @@ public:
 
     void OnPlaybackPosChanged(const BluetoothRemoteDevice &device, uint32_t playbackPos, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, playbackPos: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), playbackPos, result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, playbackPos, result](std::shared_ptr<IObserver> observer) {
@@ -782,7 +810,7 @@ public:
     void OnPlayerAppSettingChanged(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &attributes,
         const std::vector<uint8_t> &values, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, attributes, values, result](std::shared_ptr<IObserver> observer) {
@@ -794,7 +822,7 @@ public:
 
     void OnNowPlayingContentChanged(const BluetoothRemoteDevice &device, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, result](std::shared_ptr<IObserver> observer) {
@@ -805,7 +833,7 @@ public:
 
     void OnAvailablePlayersChanged(const BluetoothRemoteDevice &device, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, result](std::shared_ptr<IObserver> observer) {
@@ -817,7 +845,8 @@ public:
     void OnAddressedPlayerChanged(
         const BluetoothRemoteDevice &device, uint16_t playerId, uint16_t uidCounter, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, playerId: %{public}d, uidCounter: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), playerId, uidCounter, result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, uidCounter, result](std::shared_ptr<IObserver> observer) {
@@ -829,7 +858,8 @@ public:
 
     void OnUidChanged(const BluetoothRemoteDevice &device, uint16_t uidCounter, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, uidCounter: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), uidCounter, result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, result, uidCounter](std::shared_ptr<IObserver> observer) {
@@ -841,7 +871,8 @@ public:
 
     void OnVolumeChanged(const BluetoothRemoteDevice &device, uint8_t volume, int result)
     {
-        HILOGD("%{public}s start.", __func__);
+        HILOGI("enter, device: %{public}s, volume: %{public}d, res: %{public}d",
+            GET_ENCRYPT_ADDR(device), volume, result);
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, volume, result](std::shared_ptr<IObserver> observer) {
@@ -868,7 +899,7 @@ public:
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
-        HILOGI("AvrcpController::impl::BluetoothAvrcpCtDeathRecipient::OnRemoteDied starts");
+        HILOGI("starts");
         avrcpCt_.proxy_->AsObject()->RemoveDeathRecipient(avrcpCt_.deathRecipient_);
         avrcpCt_.proxy_ = nullptr;
     }
@@ -879,25 +910,23 @@ private:
 
 AvrcpController::impl::impl()
 {
-    HILOGD("%{public}s start.", __func__);
-
     observer_ = new (std::nothrow) ObserverImpl(this);
-    HILOGI("AvrcpController::impl::impl starts");
+    HILOGI("starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
     if (!hostRemote) {
-        HILOGI("AvrcpController::impl:impl() failed: no hostRemote");
+        HILOGI("failed: no hostRemote");
         return;
     }
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_AVRCP_CT);
 
     if (!remote) {
-        HILOGE("AvrcpController::impl:impl() failed: no remote");
+        HILOGE("failed: no remote");
         return;
     }
-    HILOGI("AvrcpController::impl:impl() remote obtained");
+    HILOGI("remote obtained");
 
     proxy_ = iface_cast<IBluetoothAvrcpCt>(remote);
     proxy_->RegisterObserver(observer_);
@@ -908,7 +937,7 @@ AvrcpController::impl::impl()
 
 AvrcpController *AvrcpController::GetProfile(void)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 
     static AvrcpController instance;
 
@@ -921,7 +950,7 @@ AvrcpController *AvrcpController::GetProfile(void)
 
 void AvrcpController::RegisterObserver(IObserver *observer)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
@@ -933,7 +962,7 @@ void AvrcpController::RegisterObserver(IObserver *observer)
 
 void AvrcpController::UnregisterObserver(IObserver *observer)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
@@ -949,7 +978,7 @@ void AvrcpController::UnregisterObserver(IObserver *observer)
 
 std::vector<BluetoothRemoteDevice> AvrcpController::GetConnectedDevices(void)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 
     std::vector<BluetoothRemoteDevice> devices;
 
@@ -968,7 +997,7 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetConnectedDevices(void)
 
 std::vector<BluetoothRemoteDevice> AvrcpController::GetDevicesByStates(const std::vector<int> &states)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 
     std::vector<BluetoothRemoteDevice> devices;
 
@@ -991,7 +1020,7 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetDevicesByStates(const std
 
 int AvrcpController::GetDeviceState(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = static_cast<int>(BTConnectState::DISCONNECTED);
 
@@ -1005,7 +1034,7 @@ int AvrcpController::GetDeviceState(const BluetoothRemoteDevice &device)
 
 bool AvrcpController::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1019,7 +1048,7 @@ bool AvrcpController::Connect(const BluetoothRemoteDevice &device)
 
 bool AvrcpController::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1037,7 +1066,7 @@ bool AvrcpController::Disconnect(const BluetoothRemoteDevice &device)
 
 int AvrcpController::PressButton(const BluetoothRemoteDevice &device, uint8_t button)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, button: %{public}d", GET_ENCRYPT_ADDR(device), button);
 
     int result = RET_BAD_STATUS;
 
@@ -1071,7 +1100,7 @@ int AvrcpController::PressButton(const BluetoothRemoteDevice &device, uint8_t bu
 
 int AvrcpController::ReleaseButton(const BluetoothRemoteDevice &device, uint8_t button)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, button: %{public}d", GET_ENCRYPT_ADDR(device), button);
 
     int result = RET_BAD_STATUS;
 
@@ -1109,7 +1138,7 @@ int AvrcpController::ReleaseButton(const BluetoothRemoteDevice &device, uint8_t 
 
 int AvrcpController::GetUnitInfo(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1123,7 +1152,7 @@ int AvrcpController::GetUnitInfo(const BluetoothRemoteDevice &device)
 
 int AvrcpController::GetSubUnitInfo(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1141,7 +1170,7 @@ int AvrcpController::GetSubUnitInfo(const BluetoothRemoteDevice &device)
 
 int AvrcpController::GetSupportedCompanies(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1155,7 +1184,7 @@ int AvrcpController::GetSupportedCompanies(const BluetoothRemoteDevice &device)
 
 int AvrcpController::GetSupportedEvents(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1173,7 +1202,7 @@ int AvrcpController::GetSupportedEvents(const BluetoothRemoteDevice &device)
 
 int AvrcpController::GetPlayerAppSettingAttributes(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1187,7 +1216,7 @@ int AvrcpController::GetPlayerAppSettingAttributes(const BluetoothRemoteDevice &
 
 int AvrcpController::GetPlayerAppSettingValues(const BluetoothRemoteDevice &device, uint8_t attribute)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, attribute: %{public}d", GET_ENCRYPT_ADDR(device), attribute);
 
     int result = RET_BAD_STATUS;
 
@@ -1214,7 +1243,7 @@ int AvrcpController::GetPlayerAppSettingValues(const BluetoothRemoteDevice &devi
 int AvrcpController::GetPlayerAppSettingCurrentValue(
     const BluetoothRemoteDevice &device, const std::vector<uint8_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_NO_ERROR;
 
@@ -1252,7 +1281,7 @@ int AvrcpController::GetPlayerAppSettingCurrentValue(
 int AvrcpController::SetPlayerAppSettingCurrentValue(
     const BluetoothRemoteDevice &device, const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_NO_ERROR;
     std::vector<int32_t> myAttributes;
@@ -1299,7 +1328,7 @@ int AvrcpController::SetPlayerAppSettingCurrentValue(
 int AvrcpController::GetPlayerApplicationSettingAttributeText(
     const BluetoothRemoteDevice &device, const std::vector<uint8_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
     if (pimpl->IsEnabled()) {
@@ -1330,7 +1359,7 @@ int AvrcpController::GetPlayerApplicationSettingAttributeText(
 int AvrcpController::GetPlayerApplicationSettingValueText(
     const BluetoothRemoteDevice &device, uint8_t attributeId, const std::vector<uint8_t> &values)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1368,7 +1397,7 @@ int AvrcpController::GetPlayerApplicationSettingValueText(
 
 int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, const std::vector<uint32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1384,7 +1413,7 @@ int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, c
     }
 
     return result;
-}  
+}
 
 /******************************************************************
  * PLAY                                                           *
@@ -1392,7 +1421,7 @@ int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, c
 
 int AvrcpController::GetPlayStatus(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1406,7 +1435,7 @@ int AvrcpController::GetPlayStatus(const BluetoothRemoteDevice &device)
 
 int AvrcpController::PlayItem(const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
     int result = RET_BAD_STATUS;
 
@@ -1429,7 +1458,8 @@ int AvrcpController::PlayItem(const BluetoothRemoteDevice &device, uint64_t uid,
 int AvrcpController::GetFolderItems(
     const BluetoothRemoteDevice &device, uint32_t startItem, uint32_t endItem, const std::vector<uint32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, startItem: %{public}d, endItem: %{public}d",
+        GET_ENCRYPT_ADDR(device), startItem, endItem);
 
     int result = RET_NO_ERROR;
 
@@ -1468,7 +1498,8 @@ int AvrcpController::GetFolderItems(
 
 int AvrcpController::GetMeidaPlayerList(const BluetoothRemoteDevice &device, uint32_t startItem, uint32_t endItem)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, startItem: %{public}d, endItem: %{public}d",
+        GET_ENCRYPT_ADDR(device), startItem, endItem);
     int result = RET_BAD_STATUS;
     if (pimpl->IsEnabled()) {
         BluetoothRawAddress rawAddr(device.GetDeviceAddr());
@@ -1481,7 +1512,7 @@ int AvrcpController::GetMeidaPlayerList(const BluetoothRemoteDevice &device, uin
 
 int AvrcpController::GetTotalNumberOfItems(const BluetoothRemoteDevice &device)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
     uint8_t scope = AVRC_MEDIA_SCOPE_NOW_PLAYING;
@@ -1499,7 +1530,7 @@ int AvrcpController::GetTotalNumberOfItems(const BluetoothRemoteDevice &device)
 
 int AvrcpController::SetAbsoluteVolume(const BluetoothRemoteDevice &device, uint8_t volume)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, volume: %{public}d", GET_ENCRYPT_ADDR(device), volume);
 
     int result = RET_BAD_STATUS;
 
@@ -1518,7 +1549,7 @@ int AvrcpController::SetAbsoluteVolume(const BluetoothRemoteDevice &device, uint
 int AvrcpController::EnableNotification(
     const BluetoothRemoteDevice &device, const std::vector<uint8_t> &events, uint32_t interval)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, interval: %{public}d", GET_ENCRYPT_ADDR(device), interval);
 
     int result = RET_BAD_STATUS;
 
@@ -1537,7 +1568,7 @@ int AvrcpController::EnableNotification(
 
 int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &events)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -1560,7 +1591,7 @@ int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, co
 
 int AvrcpController::SetAddressedPlayer(const BluetoothRemoteDevice &device, uint16_t playerId)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, playerId: %{public}d", GET_ENCRYPT_ADDR(device), playerId);
 
     int result = RET_BAD_STATUS;
 
@@ -1569,7 +1600,7 @@ int AvrcpController::SetAddressedPlayer(const BluetoothRemoteDevice &device, uin
 
 int AvrcpController::SetBrowsedPlayer(const BluetoothRemoteDevice &device, uint16_t playerId)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, playerId: %{public}d", GET_ENCRYPT_ADDR(device), playerId);
 
     int result = RET_BAD_STATUS;
 
@@ -1584,7 +1615,8 @@ int AvrcpController::SetBrowsedPlayer(const BluetoothRemoteDevice &device, uint1
 int AvrcpController::ChangePath(
     const BluetoothRemoteDevice &device, uint16_t uidCounter, uint16_t direction, uint64_t folderUid)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d, direction: %{public}d",
+        GET_ENCRYPT_ADDR(device), uidCounter, direction);
 
     int result = RET_BAD_STATUS;
 
@@ -1594,7 +1626,7 @@ int AvrcpController::ChangePath(
 int AvrcpController::GetItemAttributes(
     const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter, const std::vector<uint32_t> &attributes)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
     int result = RET_BAD_STATUS;
     std::vector<int32_t> attrs;
@@ -1612,7 +1644,7 @@ int AvrcpController::GetItemAttributes(
 
 int AvrcpController::RequestContinuingResponse(const BluetoothRemoteDevice &device, uint8_t pduId)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, pduId: %{public}d", GET_ENCRYPT_ADDR(device), pduId);
 
     int result = RET_BAD_STATUS;
 
@@ -1621,7 +1653,7 @@ int AvrcpController::RequestContinuingResponse(const BluetoothRemoteDevice &devi
 
 int AvrcpController::AbortContinuingResponse(const BluetoothRemoteDevice &device, uint8_t pduId)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, pduId: %{public}d", GET_ENCRYPT_ADDR(device), pduId);
 
     int result = RET_BAD_STATUS;
 
@@ -1630,7 +1662,7 @@ int AvrcpController::AbortContinuingResponse(const BluetoothRemoteDevice &device
 
 int AvrcpController::AddToNowPlaying(const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
     int result = RET_BAD_STATUS;
 
@@ -1639,14 +1671,14 @@ int AvrcpController::AddToNowPlaying(const BluetoothRemoteDevice &device, uint64
 
 AvrcpController::AvrcpController(void)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
 
     pimpl = std::make_unique<AvrcpController::impl>();
 }
 
 AvrcpController::~AvrcpController(void)
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("enter");
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     pimpl = nullptr;
 }

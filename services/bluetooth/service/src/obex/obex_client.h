@@ -26,6 +26,7 @@
 #include "obex_transport.h"
 #include "obex_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 enum class ObexClientState : uint8_t {
     INIT = 0,
@@ -54,7 +55,7 @@ struct ObexConnectParams {
     ObexTlvParamters *appParams_ = nullptr;          // Application Parameters
     ObexDigestChallenge *authChallenges_ = nullptr;  // Auth Challenges
     ObexDigestResponse *authResponses_ = nullptr;    // Auth Responses
-    uint32_t *count_ = nullptr;                      // Count
+    uint32_t *count = nullptr;                      // Count
 };
 
 class ObexClient;
@@ -318,4 +319,5 @@ protected:
     BT_DISALLOW_COPY_AND_ASSIGN(ObexClient);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_CLIENT_H

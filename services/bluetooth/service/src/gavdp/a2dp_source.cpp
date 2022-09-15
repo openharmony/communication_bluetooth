@@ -17,6 +17,7 @@
 
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 A2dpSrcProfile::A2dpSrcProfile() : A2dpProfile(A2DP_ROLE_SOURCE)
 {
@@ -32,4 +33,5 @@ A2dpSrcProfile *A2dpSrcProfile::GetInstance()
     static A2dpSrcProfile instance;
     return &instance;
 }
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

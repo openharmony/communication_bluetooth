@@ -47,6 +47,7 @@
 #include "raw_address.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief AdapterProperties to save and get classic properties.
@@ -322,4 +323,5 @@ private:
     std::recursive_mutex propertiesMutex_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // CLASSIC_ADAPTER_PROPERTIES_H

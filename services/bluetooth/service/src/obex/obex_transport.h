@@ -24,6 +24,7 @@
 #include "raw_address.h"
 #include "transport/transport_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObexTransport;
 class ObexIncomingConnect;
@@ -100,4 +101,5 @@ protected:
     BT_DISALLOW_COPY_AND_ASSIGN(ObexServerTransport);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_TRANSPORT_H

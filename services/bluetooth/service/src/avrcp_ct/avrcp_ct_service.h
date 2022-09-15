@@ -27,6 +27,7 @@
 #include "avrcp_ct_profile.h"
 #include "avrcp_ct_sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the states of the AVRCP TG service.
@@ -1583,5 +1584,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcpCtService);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_SERVICE_H

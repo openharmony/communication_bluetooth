@@ -18,6 +18,7 @@
 #include "hfp_ag_defines.h"
 #include "hfp_ag_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgProfileEventSender &HfpAgProfileEventSender::GetInstance()
 {
@@ -247,3 +248,4 @@ utility::Dispatcher *HfpAgProfileEventSender::GetDispatchter() const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

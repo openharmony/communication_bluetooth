@@ -41,6 +41,7 @@
 #include "base_def.h"
 #include "pan_statemachine.h"
 
+namespace OHOS {
 namespace bluetooth {
 class PanService : public IProfilePan, public utility::Context {
 public:
@@ -147,4 +148,5 @@ private:
     };
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PAN_SERVICE_H

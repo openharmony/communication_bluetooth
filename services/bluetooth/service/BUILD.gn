@@ -395,7 +395,6 @@ ohos_shared_library("btservice") {
     "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//base/telephony/state_registry/frameworks/native/observer:tel_state_registry_api",
-    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiomanager:audio_client",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/libxml2:xml2",
   ]
@@ -408,6 +407,7 @@ ohos_shared_library("btservice") {
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_client",
   ]
 
   if (bluetooth_avrcp_avsession) {
