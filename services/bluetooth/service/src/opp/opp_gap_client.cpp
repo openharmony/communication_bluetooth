@@ -21,6 +21,7 @@
 #include "opp_service.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppGapClient::OppGapClient(
     const std::string &address, GapSecChannel channel, bool rfcommOrPsm)
@@ -150,3 +151,4 @@ void OppGapClient::RequestSecurityCallback(uint16_t result, GapServiceSecurityIn
     HILOGI("[OPP GAP CLIENT]end");
 }
 }  // namespace bluetooth
+}  // namespace OHOS

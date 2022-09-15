@@ -53,7 +53,7 @@ void HciVendorClosed(void)
     ListNode *node = ListGetFirstNode(g_hciVendorCallbackList);
     while (node != NULL) {
         block = ListGetNodeData(node);
-        if (block->callback != NULL && block->callback->hciCommandCompleteEvent != NULL) {
+        if (block->callback != NULL && block->callback->hciVendorClosed != NULL) {
             block->callback->hciVendorClosed(block->context);
         }
         node = ListGetNextNode(node);

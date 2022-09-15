@@ -37,6 +37,7 @@
 #include "interface_profile.h"
 #include "bt_uuid.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for IProfileSocket functions.
@@ -74,5 +75,6 @@ private:
     using IProfile::Connect;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_SOCKET_H

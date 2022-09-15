@@ -15,6 +15,7 @@
 
 #include "avrcp_tg_pass_through.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcTgPassPacket::AvrcTgPassPacket()
     : stateFlag_(AVRC_KEY_STATE_INVALID), operationId_(AVRC_KEY_OPERATION_INVALID), label_(AVRC_DEFAULT_LABEL)
@@ -159,3 +160,4 @@ bool AvrcTgPassPacket::IsValidKeyState(uint8_t state)
     return rtnSts;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

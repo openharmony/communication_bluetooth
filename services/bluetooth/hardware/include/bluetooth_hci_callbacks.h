@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,22 +16,25 @@
 #ifndef BLUETOOTH_HCI_CALLBACKS_H
 #define BLUETOOTH_HCI_CALLBACKS_H
 
+#include <v1_0/ihci_callback.h>
 #include "bluetooth_hdi.h"
-#include "bt_hci_callbacks_stub.h"
 
-class BluetoothHciCallbacks : public ohos::hardware::bt::v1_0::BtHciCallbacksStub {
+using OHOS::HDI::Bluetooth::Hci::V1_0::IHciCallback;
+using OHOS::HDI::Bluetooth::Hci::V1_0::BtStatus;
+using OHOS::HDI::Bluetooth::Hci::V1_0::BtType;
+
+class BluetoothHciCallbacks : public IHciCallback {
 public:
     BluetoothHciCallbacks(BtHciCallbacks *callbacks) : callbacks_(callbacks)
     {}
     virtual ~BluetoothHciCallbacks()
     {}
 
-    int32_t OnInited(ohos::hardware::bt::v1_0::BtStatus status) override;
+    int32_t OnInited(BtStatus status) override;
 
-    int32_t OnReceivedHciPacket(ohos::hardware::bt::v1_0::BtType type, const std::vector<uint8_t> &data) override;
+    int32_t OnReceivedHciPacket(BtType type, const std::vector<uint8_t> &data) override;
 
 private:
     BtHciCallbacks *callbacks_;
 };
-
 #endif

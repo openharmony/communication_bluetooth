@@ -24,6 +24,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 /*
  * @brief Ble feature.
@@ -191,5 +192,6 @@ private:
     BleFeature &operator=(const BleFeature &) = delete;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BLE_FEATURE_H

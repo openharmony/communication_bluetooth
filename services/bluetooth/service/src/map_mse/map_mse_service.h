@@ -34,6 +34,7 @@
 #include "profile_service_manager.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class MapMseService : public IProfileMapMse, public utility::Context {
 public:
@@ -161,5 +162,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(MapMseService);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_SERVICE_H

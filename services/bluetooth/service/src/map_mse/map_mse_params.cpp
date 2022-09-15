@@ -15,6 +15,7 @@
 
 #include "map_mse_params.h"
 
+namespace OHOS {
 namespace bluetooth {
 // Tag Id
 const uint8_t MapMseParams::PARAM_MAX_LIST_COUNT;
@@ -595,3 +596,4 @@ void MapMseParams::ParseParameter(const std::vector<std::unique_ptr<TlvTriplet>>
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

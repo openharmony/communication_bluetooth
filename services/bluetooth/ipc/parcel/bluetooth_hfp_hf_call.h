@@ -21,11 +21,11 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothHfpHfCall : public Parcelable, public ::bluetooth::HandsFreeUnitCalls {
+class BluetoothHfpHfCall : public Parcelable, public bluetooth::HandsFreeUnitCalls {
 public:
     BluetoothHfpHfCall() = default;
-    BluetoothHfpHfCall(const ::bluetooth::HandsFreeUnitCalls& other): ::bluetooth::HandsFreeUnitCalls(other) {}
-    BluetoothHfpHfCall(const BluetoothHfpHfCall& other): ::bluetooth::HandsFreeUnitCalls(other) {}
+    BluetoothHfpHfCall(const bluetooth::HandsFreeUnitCalls& other): bluetooth::HandsFreeUnitCalls(other) {}
+    BluetoothHfpHfCall(const BluetoothHfpHfCall& other): bluetooth::HandsFreeUnitCalls(other) {}
     ~BluetoothHfpHfCall() = default;
 
     bool Marshalling(Parcel &parcel) const override;

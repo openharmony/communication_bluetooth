@@ -28,8 +28,8 @@ extern "C" {
 #define GAP_BREDR_SUPPORT
 #define GAP_LE_SUPPORT
 
-#define BT_ADDR_FMT "%02X:%02X:%02X:%02X:%02X:%02X"
-#define BT_ADDR_FMT_OUTPUT(addr) (addr)[5], (addr)[4], (addr)[3], (addr)[2], (addr)[1], (addr)[0]
+#define BT_ADDR_FMT "%02X:%02X:**:**:**:%02X"
+#define BT_ADDR_FMT_OUTPUT(addr) (addr)[5], (addr)[4], (addr)[0]
 
 #define BT_ADDR_NULL \
     {                \

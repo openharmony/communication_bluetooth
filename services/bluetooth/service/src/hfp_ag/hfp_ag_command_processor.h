@@ -21,6 +21,7 @@
 
 #include "hfp_ag_data_connection.h"
 
+namespace OHOS {
 namespace bluetooth {
 typedef enum {
     HFP_AG_CMD_INVALID = 0,
@@ -384,10 +385,10 @@ private:
     inline static constexpr int CHLD_RELEASE_HOLD_ACCPET_OTHER = 2;
     inline static constexpr int BIEV_ARGS_VALID_LENGTH = 2;
     inline static constexpr int CMER_ELEMENTS_NUMBER = 4;
-    inline static constexpr int CMER_MODE_INDEX = 0;
-    inline static constexpr int CMER_KEYP_INDEX = 1;
-    inline static constexpr int CMER_DISP_INDEX = 2;
-    inline static constexpr int CMER_IND_INDEX = 3;
+    inline static constexpr unsigned int CMER_MODE_INDEX = 0;
+    inline static constexpr unsigned int CMER_KEYP_INDEX = 1;
+    inline static constexpr unsigned int CMER_DISP_INDEX = 2;
+    inline static constexpr unsigned int CMER_IND_INDEX = 3;
     inline static constexpr int CMER_MODE_FOR_HFP = 3;
 
     // Max Number of supported AG indicators
@@ -398,4 +399,5 @@ private:
     static inline constexpr int LOCAL_HF_IND_NUM = 2;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_COMMAND_PROCESSOR_H

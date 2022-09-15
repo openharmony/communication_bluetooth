@@ -23,6 +23,7 @@
 #include "power_state_machine.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct PowerDevice::impl {
 public:
@@ -332,3 +333,4 @@ uint64_t PowerDevice::PowerTimer::GetRemainMs()
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

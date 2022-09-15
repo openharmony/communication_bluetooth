@@ -24,7 +24,7 @@ using OHOS::Bluetooth::IBluetoothHidHostObserver;
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class IBluetoothHidHost : public IRemoteBroker {
 public:

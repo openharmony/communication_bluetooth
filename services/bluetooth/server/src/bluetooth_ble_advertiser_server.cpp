@@ -15,15 +15,17 @@
 
 #include "bluetooth_ble_advertiser_server.h"
 
+#include "bluetooth_ble_central_manager_server.h"
 #include "bluetooth_log.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
+#include "ipc_skeleton.h"
 #include "remote_observer_list.h"
 #include "permission_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 class BleAdvertiserCallback : public IBleAdvertiserCallback {
 public:
     BleAdvertiserCallback() = default;
@@ -33,7 +35,12 @@ public:
     {
         HILOGI("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
 
-        observers_->ForEach([result, advHandle, opcode](IBluetoothBleAdvertiseCallback *observer) {
+        observers_->ForEach([this, result, advHandle, opcode](IBluetoothBleAdvertiseCallback *observer) {
+            int32_t uid = observersUid_[observer->AsObject()];
+            if (BluetoothBleCentralManagerServer::IsProxyUid(uid)) {
+                HILOGD("uid:%{public}d is proxy uid, not callback.", uid);
+                return;
+            }
             observer->OnStartResultEvent(result, advHandle, opcode);
         });
     }
@@ -50,6 +57,8 @@ public:
     {
         observers_ = observers;
     }
+
+    std::map<sptr<IRemoteObject>, int32_t> observersUid_;
 
 private:
     RemoteObserverList<IBluetoothBleAdvertiseCallback> *observers_;
@@ -220,6 +229,7 @@ void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBlu
         return;
     }
     if (pimpl != nullptr) {
+        pimpl->observerImp_->observersUid_[callback->AsObject()] = IPCSkeleton::GetCallingUid();
         pimpl->observers_.Register(callback);
         pimpl->advCallBack_.push_back(callback);
     }
@@ -238,6 +248,13 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
             HILOGI("Deregister observer");
             pimpl->observers_.Deregister(*iter);
             pimpl->advCallBack_.erase(iter);
+            break;
+        }
+    }
+    for (auto iter = pimpl->observerImp_->observersUid_.begin(); iter != pimpl->observerImp_->observersUid_.end();
+        ++iter) {
+        if (iter->first == callback->AsObject()) {
+            pimpl->observerImp_->observersUid_.erase(iter);
             break;
         }
     }

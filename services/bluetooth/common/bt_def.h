@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 // Defined here are various status codes
 /*********************************************
@@ -334,17 +335,26 @@ const uint8_t BLE_EX_SCAN_DATE_STATUS_INCOMPLETE_MORE = 0x20;
 const uint8_t BLE_EX_SCAN_DATE_STATUS_INCOMPLETE_NO_MORE = 0x40;
 
 // Scan mode
-typedef enum { SCAN_MODE_LOW_POWER = 0x00, SCAN_MODE_BALANCED = 0x01, SCAN_MODE_LOW_LATENCY = 0x02 } SCAN_MODE;
+typedef enum {
+    SCAN_MODE_LOW_POWER = 0x00,
+    SCAN_MODE_BALANCED = 0x01,
+    SCAN_MODE_LOW_LATENCY = 0x02,
+    SCAN_MODE_OP_P2_60_3000 = 0x03,
+    SCAN_MODE_OP_P10_60_600 = 0x04,
+    SCAN_MODE_OP_P25_60_240 = 0x05,
+    SCAN_MODE_OP_P100_1000_1000 = 0x06
+} SCAN_MODE;
+
 // Phy type
-typedef enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 } PHY_TYPE;
+using PHY_TYPE = enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 };
 
 // BLE advertiser TX power level.
-typedef enum {
+using BLE_ADV_TX_POWER_LEVEL = enum {
     BLE_ADV_TX_POWER_ULTRA_LOW = 0x00,
     BLE_ADV_TX_POWER_LOW = 0x01,
     BLE_ADV_TX_POWER_MEDIUM = 0x02,
     BLE_ADV_TX_POWER_HIGH = 0x03
-} BLE_ADV_TX_POWER_LEVEL;
+};
 
 // BLE advertiser flag
 const uint8_t BLE_ADV_FLAG_NON_LIMIT_DISC = 0x00;
@@ -355,39 +365,39 @@ const uint8_t BLE_ADV_FLAG_DMT_CONTROLLER_SPT = 0x01 << 3;
 const uint8_t BLE_ADV_FLAG_DMT_HOST_SPT = 0x01 << 4;
 
 // Bluetooth device type
-typedef enum {
+using BLE_BT_DEV_TYPE = enum {
     BLE_BT_DEVICE_TYPE_UNKNOWN = -1,
     BLE_BT_DEVICE_TYPE_BREDR = 0,
     BLE_BT_DEVICE_TYPE_BLE = 1,
     BLE_BT_DEVICE_TYPE_DUMO = 2,
-} BLE_BT_DEV_TYPE;
+};
 
 // BLE device address type
-typedef enum {
+using BLE_ADDR_TYPE = enum {
     BLE_ADDR_TYPE_PUBLIC = 0x00,
     BLE_ADDR_TYPE_RANDOM = 0x01,
     BLE_ADDR_TYPE_NON_RPA = 0x02,
     BLE_ADDR_TYPE_RPA = 0x03,
     BLE_ADDR_TYPE_UNKNOWN = 0xFE,
     BLE_ADDR_TYPE_ANONYMOUS = 0xFF,
-} BLE_ADDR_TYPE;
+};
 
-typedef enum {
+using BLE_IO_CAP = enum {
     BLE_IO_CAP_OUT = 0x00,    // DisplayOnly
     BLE_IO_CAP_IO = 0x01,     // DisplayYesNo
     BLE_IO_CAP_IN = 0x02,     // KeyboardOnly
     BLE_IO_CAP_NONE = 0x03,   // NoInputNoOutput
     BLE_IO_CAP_KBDISP = 0x04  // Keyboard display
-} BLE_IO_CAP;
+};
 
 // Adv status
-typedef enum {
+using BleAdvState = enum {
     BLE_ADV_STATE_IDLE,
     BLE_ADV_STATE_ADVERTISING,
-} Ble_AdvState;
+};
 
 // The type of advertising data(not adv_type)
-typedef enum {
+using BLE_ADV_DATA_TYPE = enum {
     BLE_AD_TYPE_FLAG = 0x01,
     BLE_AD_TYPE_16SRV_PART = 0x02,
     BLE_AD_TYPE_16SRV_CMPL = 0x03,
@@ -424,7 +434,7 @@ typedef enum {
     BLE_AD_TYPE_LE_SUPPORT_FEATURE = 0x27,
     BLE_AD_TYPE_CHAN_MAP_UPDATE = 0x28,
     BLE_AD_MANUFACTURER_SPECIFIC_TYPE = 0xFF,
-} BLE_ADV_DATA_TYPE;
+};
 
 /*********************************************
  *
@@ -1395,5 +1405,6 @@ enum PbapResponseCode : uint8_t {
 #else
 #define BLUETOOTH_API
 #endif
-};      // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif  // BT_DEF_H

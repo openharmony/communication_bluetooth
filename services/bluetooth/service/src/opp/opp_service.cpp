@@ -22,6 +22,7 @@
 #include "profile_service_manager.h"
 #include "rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppService::OppService() : utility::Context(PROFILE_NAME_OPP, "1.2.1")
 {
@@ -114,10 +115,10 @@ void OppService::StartUp()
     ObexServerConfig config;
     config.useL2cap_ = true;
     config.l2capPsm_ = OPP_GOEP_L2CAP_PSM;
-    config.l2capMtu_ = oppConfig_.l2capMtu_;
+    config.l2capMtu_ = oppConfig_.l2capMtu;
     config.useRfcomm_ = true;
     config.rfcommScn_ = rfcommScn;
-    config.rfcommMtu_ = oppConfig_.rfcommMtu_;
+    config.rfcommMtu_ = oppConfig_.rfcommMtu;
     config.isSupportSrm_ = true;
     config.isSupportReliableSession_ = false;
     oppObexServer_ = std::make_unique<OppObexServer>(config, *GetDispatcher());
@@ -490,18 +491,18 @@ void OppService::ProcessDefaultEvent(const OppMessage &event) const
 void OppService::LoadOppConfig()
 {
     IAdapterConfig *adpterConfig = AdapterConfig::GetInstance();
-    if (!adpterConfig->GetValue(SECTION_OPP_SERVICE, PROPERTY_RFCOMM_MTU, oppConfig_.rfcommMtu_)) {
-        HILOGE("[OPP Service]:Load config %{public}s failure",
-            PROPERTY_RFCOMM_MTU.c_str());
-        oppConfig_.rfcommMtu_ = OBEX_DEFAULT_MTU;
+    if (!adpterConfig->GetValue(SECTION_OPP_SERVICE, PROPERTY_RFCOMM_MTU, oppConfig_.rfcommMtu)) {
+        LOG_ERROR("[OPP Service]%{public}s():Load config %{public}s failure",
+            __FUNCTION__, PROPERTY_RFCOMM_MTU.c_str());
+        oppConfig_.rfcommMtu = OBEX_DEFAULT_MTU;
     }
-    if (!adpterConfig->GetValue(SECTION_OPP_SERVICE, PROPERTY_L2CAP_MTU, oppConfig_.l2capMtu_)) {
-        HILOGE("[OPP Service]:Load config %{public}s failure",
-            PROPERTY_L2CAP_MTU.c_str());
-        oppConfig_.l2capMtu_ = OBEX_DEFAULT_MTU;
+    if (!adpterConfig->GetValue(SECTION_OPP_SERVICE, PROPERTY_L2CAP_MTU, oppConfig_.l2capMtu)) {
+        LOG_ERROR("[OPP Service]%{public}s():Load config %{public}s failure",
+            __FUNCTION__, PROPERTY_L2CAP_MTU.c_str());
+        oppConfig_.l2capMtu = OBEX_DEFAULT_MTU;
     }
-    HILOGE("[OPP Service]:rfcommMtu = 0x%X, l2capMtu_ = 0x%X",
-        oppConfig_.rfcommMtu_, oppConfig_.l2capMtu_);
+    LOG_INFO("[OPP Service]%{public}s():rfcommMtu = 0x%X, l2capMtu = 0x%X",
+        __FUNCTION__, oppConfig_.rfcommMtu, oppConfig_.l2capMtu);
 }
 
 OppConfig &OppService::GetOppConfig()
@@ -557,3 +558,4 @@ int OppService::GetMaxConnectNum(void)
 
 REGISTER_CLASS_CREATOR(OppService);
 }  // namespace bluetooth
+}  // namespace OHOS

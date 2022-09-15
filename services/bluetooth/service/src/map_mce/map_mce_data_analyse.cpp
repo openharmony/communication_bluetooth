@@ -37,6 +37,7 @@
 #include "log.h"
 #include "map_mce_xml.h"
 
+namespace OHOS {
 namespace bluetooth {
 MceSplitString::MceSplitString(const std::string &target, const std::string &filter)
 {
@@ -1151,3 +1152,4 @@ MapBoolType MceUtilityConvertFormat::ConvertStringToMapBoolType(const std::strin
     return type;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

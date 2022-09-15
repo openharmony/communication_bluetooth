@@ -24,6 +24,7 @@
 /**
  * @brief The bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the SUB UNIT INFO command.
@@ -106,5 +107,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcTgSubUnitPacket);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_SUB_UNIT_INFO_H

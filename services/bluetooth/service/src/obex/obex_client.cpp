@@ -22,6 +22,7 @@
 #include "obex_utils.h"
 #include "transport/transport_l2cap.h"
 
+namespace OHOS {
 namespace bluetooth {
 ObexClient::ObexClientTransportObserver::ObexClientTransportObserver(ObexClient &obexClient) : obexClient_(obexClient)
 {}
@@ -326,8 +327,8 @@ int ObexClient::Connect(ObexConnectParams &connectParams)
     if (connectParams.authResponses_ != nullptr) {
         header->AppendItemAuthResponse(*connectParams.authResponses_);
     }
-    if (connectParams.count_ != nullptr) {
-        header->AppendItemCount(*connectParams.count_);
+    if (connectParams.count != nullptr) {
+        header->AppendItemCount(*connectParams.count);
     }
     // create transport before obex connect
     if (!clientTransport_->IsConnected()) {
@@ -681,3 +682,4 @@ void ObexClientObserver::OnBusy(ObexClient &client, bool isBusy)
     OBEX_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

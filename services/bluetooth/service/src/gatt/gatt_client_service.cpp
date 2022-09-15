@@ -28,6 +28,7 @@
 #include "log.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct ClientApplication {
     struct Discover {
@@ -1261,6 +1262,7 @@ bool ClientApplication::Discover::DiscoverNext(int appId)
 {
     bool doOnce = true;
     do {
+        doOnce = true;
         if (tasks_.empty()) {
             return true;
         }
@@ -1326,3 +1328,4 @@ void GattClientService::Disable()
 
 REGISTER_CLASS_CREATOR(GattClientService);
 }  // namespace bluetooth
+}  // namespace OHOS

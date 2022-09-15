@@ -34,6 +34,7 @@
 #include <stdint.h>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents data structure.
@@ -89,4 +90,5 @@ private:
     std::vector<uint8_t> data_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  /// CLASSIC_DATA_STRUCTURE_H

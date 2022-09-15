@@ -18,6 +18,7 @@
 #include "securec.h"
 #include "transport_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int SOCK_RFCOMM_EVENTS = RFCOMM_CHANNEL_EV_CONNECT_INCOMING | RFCOMM_CHANNEL_EV_CONNECT_SUCCESS |
                                RFCOMM_CHANNEL_EV_CONNECT_FAIL | RFCOMM_CHANNEL_EV_DISCONNECTED |
@@ -360,3 +361,4 @@ void RfcommTransport::TransportRfcRecvData(uint16_t handle, RfcommTransport *tra
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

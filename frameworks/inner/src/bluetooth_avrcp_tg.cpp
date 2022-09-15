@@ -23,6 +23,7 @@
 #include "bluetooth_host.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
 #include "iservice_registry.h"
 #include "raw_address.h"
@@ -41,7 +42,7 @@ public:
 
         void OnConnectionStateChanged(const BluetoothRawAddress &addr, int32_t state) override
         {
-            HILOGD("%{public}s start.", __func__);
+            HILOGI("enter, address: %{public}s, state: %{public}d", GetEncryptAddr(addr.GetAddress()).c_str(), state);
             BluetoothRemoteDevice device(addr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnConnectionStateChanged(device, static_cast<int>(state));
 
@@ -60,7 +61,7 @@ public:
 
         void OnRemoteDied(const wptr<IRemoteObject> &remote) final
         {
-            HILOGI("AvrcpTarget::impl::AvrcpTgDeathRecipient::OnRemoteDied starts");
+            HILOGI("starts");
             avrcpTgServer_.proxy_->AsObject()->RemoveDeathRecipient(avrcpTgServer_.deathRecipient_);
             avrcpTgServer_.proxy_ = nullptr;
         }
@@ -71,27 +72,27 @@ public:
 
     impl()
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
 
         sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
         if (!hostRemote) {
-            HILOGI("AvrcpTarget::impl:impl() failed: no hostRemote");
+            HILOGI("failed: no hostRemote");
             return;
         }
 
         sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
         sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_AVRCP_TG);
         if (!remote) {
-            HILOGI("AvrcpTarget::impl:impl() failed: no remote");
+            HILOGI("failed: no remote");
             return;
         }
-        HILOGI("AvrcpTarget::impl:impl() remote obtained");
+        HILOGI("remote obtained");
         proxy_ = iface_cast<IBluetoothAvrcpTg>(remote);
 
         deathRecipient_ = new AvrcpTgDeathRecipient(*this);
         if (!proxy_) {
-            HILOGI("AvrcpTg::impl:impl() proxy_ is null when used!");
+            HILOGI("proxy_ is null when used!");
         } else {
             proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
         }
@@ -102,20 +103,20 @@ public:
 
     ~impl()
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
         proxy_->UnregisterObserver(observer_);
     }
 
     bool IsEnabled(void)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter");
 
         return (proxy_ != nullptr && !BluetoothHost::GetDefaultHost().IsBtDiscovering());
     }
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGI("enter, device: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
         std::lock_guard<std::mutex> lock(observerMutex_);
         observers_.ForEach([device, state](std::shared_ptr<IObserver> observer) {
             observer->OnConnectionStateChanged(device, state);
@@ -131,7 +132,7 @@ public:
 
 AvrcpTarget *AvrcpTarget::GetProfile(void)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     static AvrcpTarget instance;
 
@@ -144,7 +145,7 @@ AvrcpTarget *AvrcpTarget::GetProfile(void)
 
 void AvrcpTarget::RegisterObserver(AvrcpTarget::IObserver *observer)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
     if (pimpl->IsEnabled()) {
@@ -155,7 +156,7 @@ void AvrcpTarget::RegisterObserver(AvrcpTarget::IObserver *observer)
 
 void AvrcpTarget::UnregisterObserver(AvrcpTarget::IObserver *observer)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
@@ -171,7 +172,7 @@ void AvrcpTarget::UnregisterObserver(AvrcpTarget::IObserver *observer)
 
 void AvrcpTarget::SetActiveDevice(const BluetoothRemoteDevice &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     if (pimpl->IsEnabled()) {
         BluetoothRawAddress rawAddr(device.GetDeviceAddr());
@@ -181,7 +182,7 @@ void AvrcpTarget::SetActiveDevice(const BluetoothRemoteDevice &device)
 
 std::vector<BluetoothRemoteDevice> AvrcpTarget::GetConnectedDevices(void)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     std::vector<BluetoothRemoteDevice> devices;
 
@@ -199,7 +200,7 @@ std::vector<BluetoothRemoteDevice> AvrcpTarget::GetConnectedDevices(void)
 
 std::vector<BluetoothRemoteDevice> AvrcpTarget::GetDevicesByStates(std::vector<int> states)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     std::vector<BluetoothRemoteDevice> devices;
 
@@ -221,7 +222,7 @@ std::vector<BluetoothRemoteDevice> AvrcpTarget::GetDevicesByStates(std::vector<i
 
 int AvrcpTarget::GetDeviceState(const BluetoothRemoteDevice &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int32_t result = static_cast<int32_t>(BTConnectState::DISCONNECTED);
 
@@ -235,7 +236,7 @@ int AvrcpTarget::GetDeviceState(const BluetoothRemoteDevice &device)
 
 bool AvrcpTarget::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -249,7 +250,7 @@ bool AvrcpTarget::Connect(const BluetoothRemoteDevice &device)
 
 bool AvrcpTarget::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
     int result = RET_BAD_STATUS;
 
@@ -267,7 +268,7 @@ bool AvrcpTarget::Disconnect(const BluetoothRemoteDevice &device)
 
 void AvrcpTarget::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t playbackPos)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, playStatus: %{public}d, playbackPos: %{public}d", playStatus, playbackPos);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyPlaybackStatusChanged(
@@ -277,7 +278,7 @@ void AvrcpTarget::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t playb
 
 void AvrcpTarget::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, playbackPos: %{public}d", playbackPos);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyTrackChanged(static_cast<int64_t>(uid), static_cast<int32_t>(playbackPos));
@@ -286,7 +287,7 @@ void AvrcpTarget::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos)
 
 void AvrcpTarget::NotifyTrackReachedEnd(uint32_t playbackPos)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, playbackPos: %{public}d", playbackPos);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyTrackReachedEnd(static_cast<int32_t>(playbackPos));
@@ -295,7 +296,7 @@ void AvrcpTarget::NotifyTrackReachedEnd(uint32_t playbackPos)
 
 void AvrcpTarget::NotifyTrackReachedStart(uint32_t playbackPos)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, playbackPos: %{public}d", playbackPos);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyTrackReachedStart(static_cast<int32_t>(playbackPos));
@@ -304,7 +305,7 @@ void AvrcpTarget::NotifyTrackReachedStart(uint32_t playbackPos)
 
 void AvrcpTarget::NotifyPlaybackPosChanged(uint32_t playbackPos)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, playbackPos: %{public}d", playbackPos);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyPlaybackPosChanged(static_cast<int32_t>(playbackPos));
@@ -314,7 +315,7 @@ void AvrcpTarget::NotifyPlaybackPosChanged(uint32_t playbackPos)
 void AvrcpTarget::NotifyPlayerAppSettingChanged(
     const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     std::vector<int32_t> attrs;
     std::vector<int32_t> vals;
@@ -333,7 +334,7 @@ void AvrcpTarget::NotifyPlayerAppSettingChanged(
 
 void AvrcpTarget::NotifyNowPlayingContentChanged(void)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyNowPlayingContentChanged();
@@ -342,7 +343,7 @@ void AvrcpTarget::NotifyNowPlayingContentChanged(void)
 
 void AvrcpTarget::NotifyAvailablePlayersChanged(void)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyAvailablePlayersChanged();
@@ -351,7 +352,7 @@ void AvrcpTarget::NotifyAvailablePlayersChanged(void)
 
 void AvrcpTarget::NotifyAddressedPlayerChanged(uint16_t playerId, uint16_t uidCounter)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, playerId: %{public}d, uidCounter: %{public}d", playerId, uidCounter);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyAddressedPlayerChanged(
@@ -361,7 +362,7 @@ void AvrcpTarget::NotifyAddressedPlayerChanged(uint16_t playerId, uint16_t uidCo
 
 void AvrcpTarget::NotifyUidChanged(uint16_t uidCounter)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, uidCounter: %{public}d", uidCounter);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyUidChanged(static_cast<int32_t>(uidCounter));
@@ -370,7 +371,7 @@ void AvrcpTarget::NotifyUidChanged(uint16_t uidCounter)
 
 void AvrcpTarget::NotifyVolumeChanged(uint8_t volume)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter, volume: %{public}d", volume);
 
     if (pimpl->IsEnabled()) {
         pimpl->proxy_->NotifyVolumeChanged(static_cast<int32_t>(volume));
@@ -379,14 +380,14 @@ void AvrcpTarget::NotifyVolumeChanged(uint8_t volume)
 
 AvrcpTarget::AvrcpTarget(void)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     pimpl = std::make_unique<impl>();
 }
 
 AvrcpTarget::~AvrcpTarget(void)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("enter");
 
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     pimpl = nullptr;

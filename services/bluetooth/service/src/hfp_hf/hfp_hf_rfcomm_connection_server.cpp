@@ -18,6 +18,7 @@
 #include "hfp_hf_defines.h"
 #include "hfp_hf_gap_server.h"
 
+namespace OHOS {
 namespace bluetooth {
 int HfpHfRfcommConnectionServer::RegisterServer(RFCOMM_EventCallback fn) const
 {
@@ -69,3 +70,4 @@ uint8_t HfpHfRfcommConnectionServer::GetLocalScn() const
     return localScn_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

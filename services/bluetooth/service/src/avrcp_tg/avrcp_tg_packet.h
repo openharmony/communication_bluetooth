@@ -19,6 +19,7 @@
 #include "avrcp_tg_internal.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 const uint32_t AVRC_TG_INVALID_BLUETOOTH_SIG_COMPANY_ID = 0xFFFFFF;
 
@@ -301,4 +302,5 @@ private:
     static uint16_t PopOctetsUpto8(uint8_t *pkt, size_t size, uint64_t &payload);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // !AVRCP_TG_PACKET_H

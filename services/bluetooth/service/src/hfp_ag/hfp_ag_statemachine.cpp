@@ -22,6 +22,7 @@
 #include "hfp_ag_system_interface.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgStateMachine::HfpAgStateMachine(const std::string &address)
     : address_(address), profile_(address), eventProcessor_(profile_, address)
@@ -288,9 +289,6 @@ bool HfpAgConnecting::Dispatch(const utility::Message &msg)
             break;
         case HFP_AG_SLC_ESTABLISHED_EVT:
             profile_.ProcessSlcEstablished();
-            Transition(HfpAgStateMachine::CONNECTED);
-            break;
-        case HFP_AG_CONNECTED_EVT:
             Transition(HfpAgStateMachine::CONNECTED);
             break;
         case HFP_AG_CONTROL_OTHER_MODULES_EVT:
@@ -742,3 +740,4 @@ std::string HfpAgStateMachine::GetEventName(int what)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -35,6 +35,7 @@
 #include "profile_service_manager.h"
 #include "sys_state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 // data define
 const int TRANSPORT_MAX = 2;
@@ -755,3 +756,4 @@ int AdapterManager::GetPowerMode(const std::string &address) const
     return static_cast<int>(IPowerManager::GetInstance().GetPowerMode(addr));
 }
 }  // namespace bluetooth
+}  // namespace OHOS

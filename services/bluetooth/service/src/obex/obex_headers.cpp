@@ -23,6 +23,7 @@
 #include "obex_utils.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 /************************* OBEX ObexHdrType *******************************/
 const uint8_t ObexHdrType::UNICODE_TEXT;
@@ -1397,3 +1398,4 @@ void ObexSessionParameters::AppendSessionOpcode(const SessionOpcode opcode)
         std::make_unique<TlvTriplet>(ObexSessionParameters::SESSION_OPCODE, static_cast<uint8_t>(opcode)));
 }
 }  // namespace bluetooth
+}  // namespace OHOS

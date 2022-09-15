@@ -21,6 +21,7 @@
 #include "base_def.h"
 #include "gap_if.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for HFP AG GAP server.
@@ -57,4 +58,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgGapServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_GAP_SERVER_H

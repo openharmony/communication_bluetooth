@@ -23,25 +23,25 @@ static constexpr uint64_t BLUETOOTH_BYTRACE_LABEL = HITRACE_TAG_BLUETOOTH;
 void BluetoothHiTrace::BluetoothStartSyncTrace(const std::string& value)
 {
     StartTrace(BLUETOOTH_BYTRACE_LABEL, value);
-    HILOGI("BluetoothStartSyncTrace value:%{public}s", value.c_str());
+    HILOGI("value:%{public}s", value.c_str());
 }
 
 void BluetoothHiTrace::BluetoothFinishSyncTrace(const std::string& value)
 {
     FinishTrace(BLUETOOTH_BYTRACE_LABEL);
-    HILOGI("BluetoothFinishSyncTrace value:%{public}s", value.c_str());
+    HILOGI("value:%{public}s", value.c_str());
 }
 
 void BluetoothHiTrace::BluetoothStartAsyncTrace(const std::string& value, int32_t taskId)
 {
     StartAsyncTrace(BLUETOOTH_BYTRACE_LABEL, value, taskId);
-    HILOGI("BluetoothStartAsyncTrace value:%{public}s, taskId:%{public}d", value.c_str(), taskId);
+    HILOGI("value:%{public}s, taskId:%{public}d", value.c_str(), taskId);
 }
 
 void BluetoothHiTrace::BluetoothFinishAsyncTrace(const std::string& value, int32_t taskId)
 {
     FinishAsyncTrace(BLUETOOTH_BYTRACE_LABEL, value, taskId);
-    HILOGI("BluetoothFinishAsyncTrace value:%{public}s, taskId:%{public}d", value.c_str(), taskId);
+    HILOGI("value:%{public}s, taskId:%{public}d", value.c_str(), taskId);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -28,6 +28,7 @@
 #include "raw_address.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 PseWaitingForConnect::PseWaitingForConnect(const std::string &name, PbapPseStateMachine &stm)
     : State(name, stm), stm_(stm)
@@ -857,3 +858,4 @@ PbapPseStateMachineInfo &PbapPseStateMachine::GetStmInfo()
     return stmInfo_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

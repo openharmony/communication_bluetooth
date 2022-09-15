@@ -20,6 +20,7 @@
 #include "classic_defs.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::string ClassicUtils::IntToHexString(uint8_t value)
 {
@@ -86,3 +87,4 @@ std::vector<Uuid> ClassicUtils::ConvertStringToUuid(const std::string &value)
     return uuids;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -39,6 +39,7 @@
 
 #include "gatt_cache.h"
 #include "gatt_defines.h"
+namespace OHOS {
 namespace bluetooth {
 class GattClientProfileCallback {
 public:
@@ -71,5 +72,6 @@ public:
     {}
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GATT_CLIENT_PROFILE_CALLBACK_H

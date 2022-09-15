@@ -15,20 +15,22 @@
 
 #include "bluetooth_socket_server.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils_server.h"
 #include "bt_def.h"
 #include "interface_profile_manager.h"
 #include "interface_profile_socket.h"
 #include "permission_utils.h"
 
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
 int BluetoothSocketServer::Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
 {
-    HILOGI("BluetoothSocketServer: Connect starts");
+    HILOGI("addr: %{public}s, securityFlag: %{public}d, type: %{public}d",
+        GetEncryptAddr(addr).c_str(), securityFlag, type);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("Connect() false, check permission failed");
+        HILOGE("false, check permission failed");
         return RET_NO_SUPPORT;
     }
     int ret = RET_NO_SUPPORT;
@@ -42,9 +44,9 @@ int BluetoothSocketServer::Connect(std::string &addr, bluetooth::Uuid &uuid, int
 
 int BluetoothSocketServer::Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
 {
-    HILOGI("BluetoothSocketServer: Listen starts");
+    HILOGI("name: %{public}s, securityFlag: %{public}d, type: %{public}d", name.c_str(), securityFlag, type);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
-        HILOGE("Listen() false, check permission failed");
+        HILOGE("false, check permission failed");
         return RET_NO_SUPPORT;
     }
     int ret = RET_NO_SUPPORT;

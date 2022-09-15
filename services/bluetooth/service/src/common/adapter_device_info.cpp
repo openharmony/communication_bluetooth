@@ -20,6 +20,7 @@
 #include "log.h"
 #include "xml_parse.h"
 
+namespace OHOS {
 namespace bluetooth {
 AdapterDeviceInfo *AdapterDeviceInfo::g_instance = nullptr;
 
@@ -90,3 +91,4 @@ bool AdapterDeviceInfo::GetValue(const std::string &section, const std::string &
     return pimpl->parse_.GetValue(section, property, value);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

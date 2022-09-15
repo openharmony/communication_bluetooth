@@ -28,6 +28,7 @@
 #include "gatt_data.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattDatabase {
 public:
@@ -235,5 +236,6 @@ private:
     BT_DISALLOW_MOVE_AND_ASSIGN(GattDatabase);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !GATT_DATABASE_H

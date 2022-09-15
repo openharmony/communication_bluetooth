@@ -18,6 +18,7 @@
 #include "hfp_hf_defines.h"
 #include "hfp_hf_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpHfCallManager::HfpHfCallManager(const std::string &address) : address_(address)
 {}
@@ -121,3 +122,4 @@ void HfpHfCallManager::NotifyCallChanged(const HandsFreeUnitCalls &call)
     return;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

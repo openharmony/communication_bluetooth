@@ -25,6 +25,7 @@
 #include "map_mse_types.h"
 #include "map_mse_vcard.h"
 
+namespace OHOS {
 namespace bluetooth {
 class MapMseBmsg {
 public:
@@ -91,5 +92,6 @@ private:
     void AddRecipient(std::string &bmessage);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_BMSG_H

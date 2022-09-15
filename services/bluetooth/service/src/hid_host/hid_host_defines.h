@@ -24,6 +24,7 @@
 #include "l2cap_if.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 static constexpr int HID_HOST_STATE_DISCONNECTED = 0;
 static constexpr int HID_HOST_STATE_CONNECTING = 1;
@@ -227,6 +228,7 @@ static constexpr uint16_t HID_HOST_UUID_GATT_REPORT_REFERENCE = 0x2908;
 static constexpr uint16_t HID_HOST_UUID_BATTERY_SERVICE = 0x180F;
 static constexpr uint16_t HID_HOST_UUID_GATT_BATTERY_LEVEL = 0x2A19;
 static constexpr uint16_t HID_HOST_UUID_GATT_EXT_RPT_REF = 0x2907;
+static constexpr uint16_t HID_HOST_UUID_GATT_EXT_CFG_REF = 0x2902;
 
 static constexpr int HID_HOST_PNP_ID_SIZE = 7;
 static constexpr int HID_HOST_HID_INFORMATION_SIZE = 4;
@@ -262,4 +264,5 @@ static constexpr uint8_t HID_HOST_SHIFT_OPRATURN_8 = 8;
 
 static const char UHID_DEVICE_PATH[] = { "/dev/uhid" };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // HID_HOST_DEFINES_H

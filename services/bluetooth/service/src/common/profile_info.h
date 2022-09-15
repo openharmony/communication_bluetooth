@@ -20,6 +20,7 @@
 #include <vector>
 #include "bt_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents profile information.
@@ -98,6 +99,7 @@ private:
 
 #define GET_CONFIG_PROFILES SupportProfilesInfo::GetConfigSupportProfiles
 #define GET_SUPPORT_PROFILES SupportProfilesInfo::GetSupportProfiles
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PROFILE_CONFIG_H

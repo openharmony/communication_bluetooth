@@ -25,6 +25,7 @@
 /*
  * @brief The bluetooth system.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Classic Utils.
@@ -87,4 +88,5 @@ private:
     static std::string IntToHexString(uint8_t value);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // CLASSIC_UTILS_H

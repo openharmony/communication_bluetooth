@@ -20,6 +20,7 @@
 #include "hfp_ag_command_parser.h"
 
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgCommandParser &HfpAgCommandParser::GetInstance()
 {
@@ -167,3 +168,4 @@ void HfpAgCommandParser::ExtractArg(std::string &cmd, std::string &arg) const
     HILOGI("cmd: %{public}s arg: %{public}s", cmd.c_str(), arg.c_str());
 }
 }  // namespace bluetooth
+}  // namespace OHOS

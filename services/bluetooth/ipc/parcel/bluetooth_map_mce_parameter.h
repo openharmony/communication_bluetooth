@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothIProfileMapAction : public Parcelable, public ::bluetooth::IProfileMapAction {
+class BluetoothIProfileMapAction : public Parcelable, public bluetooth::IProfileMapAction {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -53,7 +53,7 @@ public:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIProfileMasInstanceInfoList : public Parcelable, public ::bluetooth::IProfileMasInstanceInfoList {
+class BluetoothIProfileMasInstanceInfoList : public Parcelable, public bluetooth::IProfileMasInstanceInfoList {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -85,7 +85,7 @@ public:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIProfileSendMessageParameters : public Parcelable, public ::bluetooth::IProfileSendMessageParameters {
+class BluetoothIProfileSendMessageParameters : public Parcelable, public bluetooth::IProfileSendMessageParameters {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -118,7 +118,7 @@ public:
  * @version 1.0
  */
 class BluetoothIProfileSetOwnerStatusParameters : public Parcelable,
-                                                  public ::bluetooth::IProfileSetOwnerStatusParameters {
+                                                  public bluetooth::IProfileSetOwnerStatusParameters {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -151,7 +151,7 @@ public:
  * @version 1.0
  */
 class BluetoothIProfileGetConversationListingParameters : public Parcelable,
-                                                          public ::bluetooth::IProfileGetConversationListingParameters {
+                                                          public bluetooth::IProfileGetConversationListingParameters {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -183,7 +183,7 @@ public:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIProfileGetMessageParameters : public Parcelable, public ::bluetooth::IProfileGetMessageParameters {
+class BluetoothIProfileGetMessageParameters : public Parcelable, public bluetooth::IProfileGetMessageParameters {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -216,7 +216,7 @@ public:
  * @version 1.0
  */
 class BluetoothIProfileGetMessagesListingParameters : public Parcelable,
-                                                      public ::bluetooth::IProfileGetMessagesListingParameters {
+                                                      public bluetooth::IProfileGetMessagesListingParameters {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -248,7 +248,7 @@ public:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIProfileBMessage : public Parcelable, public ::bluetooth::IProfileBMessage {
+class BluetoothIProfileBMessage : public Parcelable, public bluetooth::IProfileBMessage {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -280,7 +280,7 @@ public:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIProfileMessagesListing : public Parcelable, public ::bluetooth::IProfileMessagesListing {
+class BluetoothIProfileMessagesListing : public Parcelable, public bluetooth::IProfileMessagesListing {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -307,8 +307,8 @@ public:
 
 private:
     bool WriteToParcelIProfileMessageOutline(
-        Parcel &parcel, const ::bluetooth::IProfileMessageOutline &outline) const;
-    bool ReadFromParcelIProfileMessageOutline(Parcel &parcel, ::bluetooth::IProfileMessageOutline &outline);
+        Parcel &parcel, const bluetooth::IProfileMessageOutline &outline) const;
+    bool ReadFromParcelIProfileMessageOutline(Parcel &parcel, bluetooth::IProfileMessageOutline &outline);
     int outlineListSize;
 };
 
@@ -318,7 +318,7 @@ private:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIProfileConversationListing : public Parcelable, public ::bluetooth::IProfileConversationListing {
+class BluetoothIProfileConversationListing : public Parcelable, public bluetooth::IProfileConversationListing {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -344,10 +344,10 @@ public:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    bool WriteToParcelIProfileConversation(Parcel &parcel, const ::bluetooth::IProfileConversation &outline) const;
-    bool ReadFromParcelIProfileConversation(Parcel &parcel, ::bluetooth::IProfileConversation &outline);
-    bool WriteToParcelIProfileParticipant(Parcel &parcel, const ::bluetooth::IProfileParticipant &outline) const;
-    bool ReadFromParcelIProfileParticipant(Parcel &parcel, ::bluetooth::IProfileParticipant &outline);
+    bool WriteToParcelIProfileConversation(Parcel &parcel, const bluetooth::IProfileConversation &outline) const;
+    bool ReadFromParcelIProfileConversation(Parcel &parcel, bluetooth::IProfileConversation &outline);
+    bool WriteToParcelIProfileParticipant(Parcel &parcel, const bluetooth::IProfileParticipant &outline) const;
+    bool ReadFromParcelIProfileParticipant(Parcel &parcel, bluetooth::IProfileParticipant &outline);
     int participantListNum_ = 0;
     int conversationOutlineListNum_ = 0;
 };
@@ -358,7 +358,7 @@ private:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIProfileMapEventReport : public Parcelable, public ::bluetooth::IProfileMapEventReport {
+class BluetoothIProfileMapEventReport : public Parcelable, public bluetooth::IProfileMapEventReport {
 public:
     bool Marshalling(Parcel &parcel) const override;
 
@@ -400,7 +400,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool WriteToParcel(Parcel &parcel, const ::bluetooth::IProfileBMessageStruct &msgStruct) const;
+    bool WriteToParcel(Parcel &parcel, const bluetooth::IProfileBMessageStruct &msgStruct) const;
 
     /**
      * @brief Read IProfileBMessageStruct values from parcel.
@@ -410,14 +410,14 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    bool ReadFromParcel(Parcel &parcel, ::bluetooth::IProfileBMessageStruct &msgStruct);
+    bool ReadFromParcel(Parcel &parcel, bluetooth::IProfileBMessageStruct &msgStruct);
 
 private:
-    bool WriteToParcelIProfileMapVcard(Parcel &parcel, const ::bluetooth::IProfileMapVcard &vcard) const;
-    bool ReadFromParcelIProfileMapVcard(Parcel &parcel, ::bluetooth::IProfileMapVcard &vcard);
+    bool WriteToParcelIProfileMapVcard(Parcel &parcel, const bluetooth::IProfileMapVcard &vcard) const;
+    bool ReadFromParcelIProfileMapVcard(Parcel &parcel, bluetooth::IProfileMapVcard &vcard);
 };
 
-}  // namespace bluetooth
-}  // namespace polaris
+}  // namespace Bluetooth
+}  // namespace OHOS
 
 #endif  // BLUETOOTH_PARCEL_MAP_MCE_PARAMETER_H

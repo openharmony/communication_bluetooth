@@ -98,6 +98,9 @@ ErrCode BluetoothOppProxy::GetCurrentTransferInformation(BluetoothIOppTransferIn
     }
     std::unique_ptr<BluetoothIOppTransferInformation>
         oppInformation_(reply.ReadParcelable<BluetoothIOppTransferInformation>());
+    if (oppInformation_ == nullptr) {
+        return OBJECT_NULL;
+    }
     oppInformation = *oppInformation_;
     return ERR_OK;
 }

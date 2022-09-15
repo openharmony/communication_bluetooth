@@ -243,8 +243,8 @@ public:
 
     void OnConnectionStateChanged(const BluetoothGattDevice &device, int32_t ret, int32_t state) override
     {
-        HILOGI("remote device: %{public}s, ret: %{public}d, state: %{public}d",
-            GET_ENCRYPT_GATT_ADDR(device), ret, state);
+        HILOGI("gattServer conn state, remote device: %{public}s, ret: %{public}d, state: %{public}s",
+            GET_ENCRYPT_GATT_ADDR(device), ret, GetProfileConnStateName(state).c_str());
         if (state == static_cast<int>(BTConnectState::CONNECTED)) {
             std::lock_guard<std::mutex> lck(server_.pimpl->deviceListMutex_);
             server_.pimpl->devices_.push_back((bluetooth::GattDevice)device);
@@ -762,6 +762,11 @@ int GattServer::SendResponse(
 GattServer::~GattServer()
 {
     HILOGI("enter");
+    if (pimpl->proxy_ == nullptr) {
+        HILOGE("proxy is null.");
+        return;
+    }
+
     if (pimpl->isRegisterSucceeded_) {
         pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
     }

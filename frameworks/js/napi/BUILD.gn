@@ -76,7 +76,7 @@ ohos_shared_library("bluetooth") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
-    "//third_party/libuv:uv_static",
+    "//third_party/libuv:uv",
   ]
 
   external_deps = [

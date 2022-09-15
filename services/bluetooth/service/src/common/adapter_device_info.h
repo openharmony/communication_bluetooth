@@ -25,6 +25,7 @@
 /*
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 const std::string SECTION_BLE = "BLE";
 const std::string PROPERTY_SYSYTEM_ID = "SystemId";
@@ -165,5 +166,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif // ADAPTER_DEVICE_INFO_H

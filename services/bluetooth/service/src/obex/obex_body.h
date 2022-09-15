@@ -21,6 +21,7 @@
 #include <mutex>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 class ObexBodyObject {
 public:
@@ -46,4 +47,5 @@ private:
     std::mutex mutex_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_BODY_H

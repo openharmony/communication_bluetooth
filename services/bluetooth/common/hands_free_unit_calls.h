@@ -40,10 +40,11 @@
 #include "bt_uuid.h"
 #include "iosfwd"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Phone call state enum.
- * 
+ *
  * @since 6
  * @version 1.0
  */
@@ -60,7 +61,7 @@ enum HfpCallState {
 
 /**
  * @brief Class for HandsFree Unit calls.
- * 
+ *
  * @since 6
  * @version 1.0
  */
@@ -68,7 +69,7 @@ class HandsFreeUnitCalls {
 public:
     /**
      * @brief Construct a new HandsFreeUnitCalls object.
-     * 
+     *
      * @param device Remote device address.
      * @param id Call index.
      * @param state Call state @see HfpCallState.
@@ -84,7 +85,7 @@ public:
 
     /**
      * @brief Construct a new HandsFreeUnitCalls object.
-     * 
+     *
      * @param device Remote device address.
      * @param id Call index.
      * @param state Call state @see HfpCallState.
@@ -102,7 +103,7 @@ public:
 
     /**
      * @brief Construct a new HandsFreeUnitCall object as default.
-     * 
+     *
      * @since 6
      * @version 1.0
      */
@@ -110,7 +111,7 @@ public:
 
     /**
      * @brief Construct a new HandsFreeUnitCalls object as default.
-     * 
+     *
      * @param other Other HandsFreeUnitCalls object.
      * @since 6
      * @version 1.0
@@ -119,7 +120,7 @@ public:
 
     /**
      * @brief Destroy the HandsFreeUnitCall object.
-     * 
+     *
      * @since 6
      * @version 1.0
      */
@@ -127,7 +128,7 @@ public:
 
     /**
      * @brief Get the remote device address.
-     * 
+     *
      * @return Returns remote device address.
      * @since 6
      * @version 1.0
@@ -136,7 +137,7 @@ public:
 
     /**
      * @brief Get the call index.
-     * 
+     *
      * @return Returns the call index.
      * @since 6
      * @version 1.0
@@ -145,7 +146,7 @@ public:
 
     /**
      * @brief Get the uuid object.
-     * 
+     *
      * @return Returns the call uuid.
      * @since 6
      * @version 1.0
@@ -154,7 +155,7 @@ public:
 
     /**
      * @brief Get the call state.
-     * 
+     *
      * @return Returns the call state.
      * @since 6
      * @version 1.0
@@ -163,7 +164,7 @@ public:
 
     /**
      * @brief Get the call number.
-     * 
+     *
      * @return Returns the call number.
      * @since 6
      * @version 1.0
@@ -172,7 +173,7 @@ public:
 
     /**
      * @brief Get the call's creation time.
-     * 
+     *
      * @return Returns the call's creation time.
      * @since 6
      * @version 1.0
@@ -181,7 +182,7 @@ public:
 
     /**
      * @brief Get the IsMultiParty flag.
-     * 
+     *
      * @return Returns the IsMultiParty flag.
      * @since 6
      * @version 1.0
@@ -190,7 +191,7 @@ public:
 
     /**
      * @brief Get the IsOutgoing flag.
-     * 
+     *
      * @return Returns the IsOutgoing flag.
      * @since 6
      * @version 1.0
@@ -199,7 +200,7 @@ public:
 
     /**
      * @brief Get the IsInBandRing flag.
-     * 
+     *
      * @return Returns the IsInBandRing flag.
      * @since 6
      * @version 1.0
@@ -208,7 +209,7 @@ public:
 
     /**
      * @brief Set the call state.
-     * 
+     *
      * @param state Call state.
      * @since 6
      * @version 1.0
@@ -217,7 +218,7 @@ public:
 
     /**
      * @brief Set the call number.
-     * 
+     *
      * @param number Call number.
      * @since 6
      * @version 1.0
@@ -226,7 +227,7 @@ public:
 
     /**
      * @brief Set the multiParty flag.
-     * 
+     *
      * @param multiParty The multiParty flag
      * @since 6
      * @version 1.0
@@ -244,5 +245,6 @@ protected:
     bool inBandRing_ {false};
     long creationTime_ {0};
 };
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif // HANDS_FREE_UNIT_CALLS_H

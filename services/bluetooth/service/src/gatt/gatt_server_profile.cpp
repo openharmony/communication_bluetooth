@@ -20,6 +20,7 @@
 #include "gatt_service_base.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct GattServerProfile::impl {
     class GattConnectionObserverImplement;
@@ -2290,3 +2291,4 @@ int GattServerProfile::ConvertResponseErrorCode(int errorCode)
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

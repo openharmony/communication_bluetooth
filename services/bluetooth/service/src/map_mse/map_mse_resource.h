@@ -30,6 +30,7 @@
 #include "map_mse_params.h"
 #include "stub/map_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct MseMessageElement {
     // Messages-Listing Format Version 1.0
@@ -281,5 +282,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(MapMseResource);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_RESOURCE_H

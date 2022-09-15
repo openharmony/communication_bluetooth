@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+namespace OHOS {
 namespace bluetooth {
 class AuthCenter {
 public:
@@ -75,5 +76,6 @@ public:
      */
     static int VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID);
 };
-}
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif

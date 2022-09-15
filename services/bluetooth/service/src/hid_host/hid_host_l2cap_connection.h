@@ -23,6 +23,7 @@
 #include "hid_host_message.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for l2cap connection.
@@ -272,4 +273,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HidHostL2capConnection);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HID_HOST_L2CAP_CONNECTION_H

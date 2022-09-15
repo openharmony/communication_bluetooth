@@ -21,6 +21,7 @@
 #include "classic_defs.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 ClassicConfig &ClassicConfig::GetInstance()
 {
@@ -374,3 +375,4 @@ std::string ClassicConfig::GetRemoteUuids(const std::string &subSection) const
     return uuids;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -136,6 +136,28 @@ typedef enum {
     /** An active scan that may contain a scan request */
     OHOS_BLE_SCAN_TYPE_ACTIVE,
 } BleScanType;
+
+/**
+ * @brief Enumerates BLE scan modes.
+ *
+ * @since 6
+ */
+typedef enum {
+    /** Low power */
+    OHOS_BLE_SCAN_MODE_LOW_POWER = 0x00,
+    /** Balance */
+    OHOS_BLE_SCAN_MODE_BALANCED = 0x01,
+    /** Low latency */
+    OHOS_BLE_SCAN_MODE_LOW_LATENCY = 0x02,
+    /** Duty cycle 2 */
+    OHOS_BLE_SCAN_MODE_OP_P2_60_3000 = 0x03,
+    /** Duty cycle 10 */
+    OHOS_BLE_SCAN_MODE_OP_P10_60_600 = 0x04,
+    /** Duty cycle 25 */
+    OHOS_BLE_SCAN_MODE_OP_P25_60_240 = 0x05,
+    /** Duty cycle 100 */
+    OHOS_BLE_SCAN_MODE_OP_P100_1000_1000 = 0x06
+} BleScanMode;
 
 /**
  * @brief Enumerates policies for filtering advertisements in a BLE scan.
@@ -322,6 +344,54 @@ typedef struct {
     /** Policy for filtering the scan result, as enumerated in {@link BleScanFilterPolicy} */
     unsigned char scanFilterPolicy;
 } BleScanParams;
+
+/**
+ * @brief Defines BLE scan native filter.
+ *
+ * @since 6
+ */
+typedef struct {
+    /** Handling advertisments sent by advertisers with specific address */
+    char *address;
+    /** Handling advertisments sent by advertisers with specific deviceName */
+    char *deviceName;
+    /** The length of the service uuid */
+    unsigned int serviceUuidLength;
+    /** Handling advertisments sent by advertisers with specific service uuid */
+    unsigned char *serviceUuid;
+    /** Handling advertisments sent by advertisers with specific service uuid mask */
+    unsigned char *serviceUuidMask;
+    /** The length of the service data */
+    unsigned int serviceDataLength;
+    /** Handling advertisments sent by advertisers with specific serviceData */
+    unsigned char *serviceData;
+    /** Handling advertisments sent by advertisers with specific serviceDataMask */
+    unsigned char *serviceDataMask;
+    /** The length of the manufacture data */
+    unsigned int manufactureDataLength;
+    /** Handling advertisments sent by advertisers with specific manufactureData */
+    unsigned char *manufactureData;
+    /** Handling advertisments sent by advertisers with specific manufactureDataMask */
+    unsigned char *manufactureDataMask;
+    /** Handling advertisments sent by advertisers with specific manufactureId */
+    unsigned short manufactureId;
+} BleScanNativeFilter;
+
+/**
+ * @brief Defines BLE scan configurations.
+ *
+ * @since 6
+ */
+typedef struct {
+    /** Repport delay time */
+    long reportDelayMillis;
+    /** Scan mode */
+    int scanMode;
+    /** Legacy */
+    bool legacy;
+    /** Phy */
+    int phy;
+} BleScanConfigs;
 
 /**
  * @brief Defines raw data for the BLE advertising and scan response.
@@ -645,6 +715,23 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func);
  * @since 6
  */
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam);
+
+/**
+ * @brief Starts a scan with BleScanConfigs.
+ * If don't need ble scan filter, set BleScanNativeFilter to NULL or filterSize to zero.
+ * If one of the ble scan filtering rules is not required, set it to NULL.
+ * For example, set the address to NULL when you don't need it.
+ * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
+ * The manufactureId need to be set a related number when you need a filtering condition of manufactureData.
+ *
+ * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigned int filterSize);
 
 #ifdef __cplusplus
 }

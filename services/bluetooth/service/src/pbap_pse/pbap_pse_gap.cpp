@@ -18,6 +18,7 @@
 #include "log.h"
 #include "pbap_pse_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 PbapPseGap::PbapPseGap(uint8_t rfcommScn, uint16_t l2capPsm) : rfcommScn_(rfcommScn), l2capPsm_(l2capPsm)
 {}
@@ -90,3 +91,4 @@ void PbapPseGap::Deregister() const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

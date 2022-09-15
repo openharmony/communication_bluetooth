@@ -29,6 +29,7 @@
  * @brief bluetooth namespace
  *
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Application Parameters class
@@ -416,4 +417,5 @@ private:
     void SetOwnerUci(const std::unique_ptr<TlvTriplet> &tlvTriplet);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MSE_PARAMS_H

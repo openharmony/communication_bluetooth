@@ -19,6 +19,7 @@
 #include "a2dp_source.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 bool A2dpDisconnected::Dispatch(const utility::Message &msg)
 {
@@ -184,4 +185,5 @@ void A2dpStateManager::SetRole(uint8_t role)
 {
     role_ = role;
 }
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

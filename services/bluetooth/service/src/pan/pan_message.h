@@ -22,6 +22,7 @@
 #include "securec.h"
 #include "pan_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 class PanMessage : public utility::Message {
 public:
@@ -55,4 +56,5 @@ public:
     }
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PAN_MESSAGE_H

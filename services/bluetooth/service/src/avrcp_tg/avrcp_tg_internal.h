@@ -36,6 +36,7 @@
 #include "raw_address.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 /// The macro used to safely delete the pointer to an object created by[new].
 template<typename T>
@@ -170,5 +171,6 @@ using AvrcTgFeatures = enum {
     AVRC_TG_FEATURE_NOTIFY_ABSOLUTE_VOLUME_CHANGED = (AVRC_TG_FEATURE_CATEGORY_1 << AVRC_TG_OFFSET_TWENTYFIVE_BITS),
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_INTERNAL_H

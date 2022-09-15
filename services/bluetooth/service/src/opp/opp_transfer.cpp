@@ -22,6 +22,7 @@
 #include "opp_message.h"
 #include "opp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 int OppTransfer::currentTransferId_ = 0;
 
@@ -71,22 +72,22 @@ OppTransfer::~OppTransfer()
     OnTransferStateChangeFaild(OPP_TRANSFER_FAILED_PROTOCOL);
 }
 
-int OppTransfer::GetFileNumber()
+int OppTransfer::GetFileNumber() const
 {
     return fileList_.size();
 }
 
-std::string OppTransfer::GetFileNameFromPath(std::string filePath)
+std::string OppTransfer::GetFileNameFromPath(std::string filePath) const
 {
     std::string fileName;
     size_t pos = filePath.find_last_of(u'/');
-    if (std::string::npos != pos) {
+    if (pos != std::string::npos) {
         fileName = filePath.substr(pos + 1);
     }
     return fileName;
 }
 
-size_t OppTransfer::GetFileLength(std::string filePath)
+size_t OppTransfer::GetFileLength(std::string filePath) const
 {
     std::ifstream ifs;
     ifs.open(filePath, std::ios::in);
@@ -95,7 +96,7 @@ size_t OppTransfer::GetFileLength(std::string filePath)
         return 0;
     }
     ifs.seekg(0, std::ios::end);
-    size_t fileSize = ifs.tellg();
+    size_t fileSize = static_cast<size_t>(ifs.tellg());
     ifs.seekg(0, std::ios::beg);
     ifs.close();
     HILOGI("[OPP TRANSFER] File size is %{public}zu", fileSize);
@@ -119,7 +120,7 @@ int OppTransfer::ConnectObex(const ObexClientConfig &config, utility::Dispatcher
     return obexClient_->Connect(fileList_.size());
 }
 
-int OppTransfer::DisconnectObex()
+int OppTransfer::DisconnectObex() const
 {
     HILOGI("[OPP TRANSFER] Enter");
     if (direction_ == OPP_TRANSFER_DIRECTION_INBOND) {
@@ -191,12 +192,12 @@ void OppTransfer::OnReceiveIncomingFile(IOppTransferInformation info)
     info.SetStatus(OPP_TRANSFER_STATUS_PENDING);
     fileList_.push(info);
 
-    if (Confirm_ == OPP_TRANSFER_CONFIRM_PENDING) {
+    if (confirm_ == OPP_TRANSFER_CONFIRM_PENDING) {
         incomingFileTimer_->Start(INCOMING_FILE_TIMEOUT_MS);
         OppService::GetService()->NotifyReceiveIncomingFile(fileList_.front());
-    } else if (Confirm_ == OPP_TRANSFER_CONFIRM_ACCEPT) {
+    } else if (confirm_ == OPP_TRANSFER_CONFIRM_ACCEPT) {
         SetIncomingFileConfirmation(true);
-    } else if (Confirm_ == OPP_TRANSFER_CONFIRM_REJECT) {
+    } else if (confirm_ == OPP_TRANSFER_CONFIRM_REJECT) {
         SetIncomingFileConfirmation(false);
     } else {
         HILOGE("[OPP TRANSFER] unknow confirm");
@@ -262,9 +263,9 @@ int OppTransfer::SetIncomingFileConfirmation(bool accept)
         return RET_BAD_STATUS;
     }
     if (accept) {
-        Confirm_ = OPP_TRANSFER_CONFIRM_ACCEPT;
+        confirm_ = OPP_TRANSFER_CONFIRM_ACCEPT;
     } else {
-        Confirm_ = OPP_TRANSFER_CONFIRM_REJECT;
+        confirm_ = OPP_TRANSFER_CONFIRM_REJECT;
     }
     incomingFileTimer_->Stop();
     if (obexSession_ != nullptr) {
@@ -331,7 +332,7 @@ std::string OppTransfer::GetDeviceAddress()
     return address_;
 }
 
-int OppTransfer::GetDirection()
+int OppTransfer::GetDirection() const
 {
     return direction_;
 }
@@ -438,7 +439,7 @@ void OppTransfer::OnTransferStateChangeFaild(int reason)
     }
 }
 
-void OppTransfer::OnTransferPositionChange(size_t position)
+void OppTransfer::OnTransferPositionChange(size_t position) const
 {
     HILOGI("[OPP TRANSFER] Enter");
 
@@ -454,3 +455,4 @@ void OppTransfer::OnTransferPositionChange(size_t position)
     OppService::GetService()->NotifyTransferStateChanged(*curretTransferInfo_);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

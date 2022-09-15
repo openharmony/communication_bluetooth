@@ -23,6 +23,7 @@
 #include "pbap_pce_base_state.h"
 #include "pbap_pce_state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief disconnected statemachine
@@ -66,5 +67,6 @@ public:
     bool Dispatch(const utility::Message &msg) override;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PBAP_PCE_DISCONNECTED_STATE_H

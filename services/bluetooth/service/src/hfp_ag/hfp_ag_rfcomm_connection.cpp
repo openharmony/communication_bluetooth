@@ -18,6 +18,7 @@
 #include "btstack.h"
 #include "hfp_ag_gap_client.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::map<uint16_t, std::string> HfpAgRfcommConnection::g_devMap;
 
@@ -134,3 +135,4 @@ void HfpAgRfcommConnection::RemoveConnectionDevice(uint16_t handle)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

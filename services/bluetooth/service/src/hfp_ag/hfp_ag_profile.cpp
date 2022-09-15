@@ -23,6 +23,7 @@
 #include "interface_profile.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define HFP_AG_RETURN_IF_NOT_CONNECTED(state)                                       \
     do {                                                                            \
@@ -201,7 +202,9 @@ void HfpAgProfile::SendRingAndClip()
     NotifyCallingLineIdentification(dataConn_.clipType_, dataConn_.clipNumber_);
 
     // Start Ring timer again
-    dataConn_.ringTimer_->Start(HfpAgDataConnection::RING_TIMEOUT_MS, false);
+    if (dataConn_.ringTimer_ != nullptr) {
+        dataConn_.ringTimer_->Start(HfpAgDataConnection::RING_TIMEOUT_MS, false);
+    }
 }
 
 void HfpAgProfile::RingTimeout()
@@ -728,8 +731,11 @@ int HfpAgProfile::ProcessCurrentCallStateIncominging(
 
 int HfpAgProfile::ProcessCurrentCallStateIdle(int numActive, int numHeld)
 {
-    LOG_INFO("[HFP AG]%{public}s():Pre-CallState[%{public}s]", __FUNCTION__, GetCallState(preCallState_).c_str());
-    dataConn_.ringTimer_->Stop();
+    HILOGI("[HFP AG]:Pre-CallState[%{public}s], numActive:%{public}d, numHeld:%{public}d",
+        GetCallState(preCallState_).c_str(), numActive, numHeld);
+    if (dataConn_.ringTimer_ != nullptr) {
+        dataConn_.ringTimer_->Stop();
+    }
     dataConn_.clipNumber_ = "";
     dataConn_.clipType_ = 0;
 
@@ -751,7 +757,7 @@ int HfpAgProfile::ProcessCurrentCallStateIdle(int numActive, int numHeld)
 
     auto isAudioConnected = HfpAgAudioConnection::IsAudioConnected(address_);
     if (numActive == 0 && numHeld == 0 && isAudioConnected == true) {
-        LOG_INFO("[HFP AG]%{public}s(): No call exist , disconnect sco", __FUNCTION__);
+        HILOGI("[HFP AG]:No call exist , disconnect sco");
         HfpAgProfileEventSender::GetInstance().UpdateScoConnectState(address_, HFP_AG_DISCONNECT_AUDIO_EVT);
     }
 
@@ -889,3 +895,4 @@ std::string HfpAgProfile::GetCallState(int state)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

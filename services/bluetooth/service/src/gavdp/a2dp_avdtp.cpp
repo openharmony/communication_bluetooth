@@ -22,6 +22,7 @@
 #include "raw_address.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int MEDIA_CATEGORY = 7;
 const int CATEGORY_NOT_SUPPORTED = 0x29;
@@ -1009,3 +1010,4 @@ A2dpAvdtMsg *A2dpAvdtp::ParseAvdtpCallbackContent(const uint16_t handle, const B
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

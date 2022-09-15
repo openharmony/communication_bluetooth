@@ -15,6 +15,7 @@
 
 #include "obex_mp_client.h"
 #include "log.h"
+namespace OHOS {
 namespace bluetooth {
 ObexMpClient::ObexMpClient(
     const ObexClientConfig &config, ObexClientObserver &observer, utility::Dispatcher &dispatcher)
@@ -358,3 +359,4 @@ void ObexMpClient::HandleTransportDataBusy(uint8_t isBusy)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS
