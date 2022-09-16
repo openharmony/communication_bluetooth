@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 // Defined here are various status codes
 /*********************************************
@@ -334,7 +335,16 @@ const uint8_t BLE_EX_SCAN_DATE_STATUS_INCOMPLETE_MORE = 0x20;
 const uint8_t BLE_EX_SCAN_DATE_STATUS_INCOMPLETE_NO_MORE = 0x40;
 
 // Scan mode
-typedef enum { SCAN_MODE_LOW_POWER = 0x00, SCAN_MODE_BALANCED = 0x01, SCAN_MODE_LOW_LATENCY = 0x02 } SCAN_MODE;
+typedef enum {
+    SCAN_MODE_LOW_POWER = 0x00,
+    SCAN_MODE_BALANCED = 0x01,
+    SCAN_MODE_LOW_LATENCY = 0x02,
+    SCAN_MODE_OP_P2_60_3000 = 0x03,
+    SCAN_MODE_OP_P10_60_600 = 0x04,
+    SCAN_MODE_OP_P25_60_240 = 0x05,
+    SCAN_MODE_OP_P100_1000_1000 = 0x06
+} SCAN_MODE;
+
 // Phy type
 using PHY_TYPE = enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 };
 
@@ -1395,5 +1405,6 @@ enum PbapResponseCode : uint8_t {
 #else
 #define BLUETOOTH_API
 #endif
-};      // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif  // BT_DEF_H

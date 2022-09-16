@@ -18,6 +18,7 @@
 #include "ipc_skeleton.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 using namespace OHOS;
 using namespace Security::AccessToken;
@@ -28,6 +29,8 @@ int PermissionHelper::VerifyPermission(const std::string &permissionName, const 
     int result;
 
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_NATIVE) {
+        result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
+    } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_SHELL) {
         result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
     } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_HAP) {
         result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
@@ -49,6 +52,8 @@ int PermissionHelper::VerifyPermission(const std::string &permissionName, const 
     int result;
 
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_NATIVE) {
+        result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
+    } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_SHELL) {
         result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
     } else if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) == TOKEN_HAP) {
         result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
@@ -117,4 +122,5 @@ int PermissionHelper::VerifyDiscoverBluetoothPermission(const std::uint32_t  &to
 
     return PERMISSION_GRANTED;
 }
-}
+}  // namespace bluetooth
+}  // namespace OHOS

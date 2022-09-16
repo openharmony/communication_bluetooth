@@ -14,6 +14,7 @@
  */
 #include "pbap_pce_base_state.h"
 
+namespace OHOS {
 namespace bluetooth {
 PceBaseState::PceBaseState(
     const std::string &name,
@@ -22,3 +23,4 @@ PceBaseState::PceBaseState(
     : State(name, stm), stm_(stm), observerMgrList_(observerMgrList)
 {}
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -19,6 +19,7 @@
 #include "log.h"
 #include "xml_parse.h"
 
+namespace OHOS {
 namespace bluetooth {
 BleConfig &BleConfig::GetInstance()
 {
@@ -764,3 +765,4 @@ bool BleConfig::SetPeerDeviceIoCapability(const std::string &subSection, int io)
     return ret;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

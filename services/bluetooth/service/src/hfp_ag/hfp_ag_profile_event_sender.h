@@ -22,6 +22,7 @@
 #include "dispatcher.h"
 #include "hfp_ag_message.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods that is used to sent the event to service.
@@ -261,4 +262,5 @@ private:
     ~HfpAgProfileEventSender() = default;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_PROFILE_EVENT_SENDER_H

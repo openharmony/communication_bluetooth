@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 struct BluetoothAvrcpCtServer::impl {
 public:
@@ -826,7 +826,7 @@ std::vector<RawAddress> BluetoothAvrcpCtServer::GetDevicesByStates(const std::ve
         for (auto state : states) {
             convertStates.push_back(static_cast<int>(state));
         }
-        
+
         devices = pimpl->service_->GetDevicesByStates(convertStates);
     } else {
         HILOGE("service is null or disable");
@@ -1099,7 +1099,7 @@ int32_t BluetoothAvrcpCtServer::GetPlayerAppSettingValueText(const RawAddress &d
 }
 
 int32_t BluetoothAvrcpCtServer::GetElementAttributes(const RawAddress &device,
-        const std::vector<int32_t> &attributes) 
+        const std::vector<int32_t> &attributes)
 {
     HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int32_t result = 0;
@@ -1136,7 +1136,7 @@ int32_t BluetoothAvrcpCtServer::GetPlayStatus(const RawAddress &device)
     return result;
 }
 
-int32_t BluetoothAvrcpCtServer::PlayItem(const RawAddress &device, int32_t scope, int64_t uid, int32_t uidCounter) 
+int32_t BluetoothAvrcpCtServer::PlayItem(const RawAddress &device, int32_t scope, int64_t uid, int32_t uidCounter)
 {
     HILOGI("res: %{public}s, scope: %{public}d, uid: %{public}jd, uidCounter: %{public}d",
         GetEncryptAddr(device.GetAddress()).c_str(), scope, uid, uidCounter);
@@ -1254,7 +1254,7 @@ int32_t BluetoothAvrcpCtServer::DisableNotification(const RawAddress &device, co
 }
 
 int32_t BluetoothAvrcpCtServer::GetItemAttributes(const RawAddress &device, int64_t uid, int32_t uidCounter,
-        const std::vector<int32_t> &attributes) 
+        const std::vector<int32_t> &attributes)
 {
     HILOGI("res: %{public}s, uid: %{public}jd, uidCounter: %{public}d",
         GetEncryptAddr(device.GetAddress()).c_str(), uid, uidCounter);

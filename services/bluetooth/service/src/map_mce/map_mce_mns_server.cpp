@@ -35,6 +35,7 @@
 #include "rfcomm.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 MapMceMnsServer::MapMceMnsServer(MapMceService &service, MasInstanceConfig config)
     : mceService_(service), mnsConfig_(config)
@@ -389,3 +390,4 @@ void MapMceMnsServer::MceMnsObexServerObserver::OnBusy(ObexServerSession &sessio
     mceMnsServer_.mceService_.MnsPostMessage(outMsg, btDevice);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

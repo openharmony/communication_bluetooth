@@ -36,6 +36,7 @@
 #include "adapter_manager.h"
 #include "util/state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 // system state machine each state name
 const std::string SYS_STATE_STOPPED = "Stopped";
@@ -360,5 +361,6 @@ public:
     virtual bool Dispatch(const utility::Message &msg);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // SYS_STATE_MACHINE_H

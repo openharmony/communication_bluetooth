@@ -23,6 +23,7 @@
 #include "buffer.h"
 #include "gatt_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattServiceBase {
 public:
@@ -62,5 +63,6 @@ private:
     std::mutex mutexRunningState_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !GATT_SERVICE_BASE_H

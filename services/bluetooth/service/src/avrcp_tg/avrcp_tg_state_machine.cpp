@@ -22,6 +22,7 @@
 #include "avrcp_tg_vendor_player_application_settings.h"
 #include "log_util.h"
 
+namespace OHOS {
 namespace bluetooth {
 /// The name of state "CONNECTING".
 const std::string AVRC_TG_SM_STATE_CONNECTING = "CONNECTING";
@@ -835,3 +836,4 @@ bool AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Dispatch(const ut
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -19,6 +19,7 @@
 #include "hfp_hf_profile_event_sender.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 uint32_t HfpHfDataConnection::g_localFeatures {HFP_HF_FEATURES_DEFAULT};
 
@@ -190,3 +191,4 @@ uint8_t HfpHfDataConnection::GetRemoteScn() const
     return rfcommConnection_.GetRemoteScn();
 }
 }  // namespace bluetooth
+}  // namespace OHOS

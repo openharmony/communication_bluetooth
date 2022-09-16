@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <cstring>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief pbap pce sdp service
@@ -76,4 +77,5 @@ private:
     uint32_t sdpHandle_ = 0;  // sdp handler
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_SDP_H

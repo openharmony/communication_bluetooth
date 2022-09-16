@@ -19,6 +19,7 @@
 #include <cstdint>
 #include "../../include/a2dp_codec_wrapper.h"
 
+namespace OHOS {
 namespace bluetooth {
 class A2dpAacEncoder : public A2dpEncoder {
 public:
@@ -37,4 +38,5 @@ public:
     {}
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_ENCODER_AAC_H

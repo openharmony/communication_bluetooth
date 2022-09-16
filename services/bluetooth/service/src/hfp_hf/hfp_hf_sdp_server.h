@@ -22,6 +22,7 @@
 #include "hfp_hf_defines.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for managing SDP server register/unregister as HFP HF role.
@@ -124,4 +125,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfSdpServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_SDP_SERVER_H

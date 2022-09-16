@@ -26,6 +26,7 @@
 
 #include "a2dp_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 class A2dpSnkProfile : public A2dpProfile {
 public:
@@ -52,4 +53,5 @@ private:
     ~A2dpSnkProfile();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_SINK_H

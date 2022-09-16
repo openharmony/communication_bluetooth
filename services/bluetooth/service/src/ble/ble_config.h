@@ -25,6 +25,7 @@
 /*
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief BLE config.
@@ -133,5 +134,6 @@ private:
     IAdapterDeviceConfig *config_ = nullptr;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BLE_CONFIG_H

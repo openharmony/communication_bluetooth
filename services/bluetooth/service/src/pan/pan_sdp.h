@@ -16,6 +16,7 @@
 #define PAN_SDP_H
 #include <cstdint>
 #include "pan_defines.h"
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief pan sdp service
@@ -77,4 +78,5 @@ private:
     uint32_t sdpHandle_ = 0;  // sdp handler
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PAN_SDP_H

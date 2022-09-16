@@ -20,6 +20,7 @@
 #include "hfp_hf_defines.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpHfCommandParser &HfpHfCommandParser::GetInstance()
 {
@@ -96,3 +97,4 @@ void HfpHfCommandParser::Parse(HfpHfDataConnection &dataConn,
     return;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

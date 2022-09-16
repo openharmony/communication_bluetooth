@@ -17,6 +17,7 @@
 #include "log.h"
 #include "socket_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 SocketSdpClient::~SocketSdpClient()
 {}
@@ -103,3 +104,4 @@ void SocketSdpClient::SdpSearchCallback(
     socketService->GetDispatcher()->PostTask(std::bind(&SocketService::ProcessMessage, socketService, msg));
 }
 }  // namespace bluetooth
+}  // namespace OHOS

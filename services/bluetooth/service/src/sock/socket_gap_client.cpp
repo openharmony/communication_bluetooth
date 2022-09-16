@@ -16,6 +16,7 @@
 #include "socket_gap_client.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 int SocketGapClient::RegisterServiceSecurity(
     const BtAddr addr, uint8_t scn, int securityFlag, GAP_Service serviceId)
@@ -57,3 +58,4 @@ int SocketGapClient::UnregisterSecurity(const BtAddr addr, uint8_t scn, GAP_Serv
     return GAPIF_DeregisterServiceSecurity(&addr, &serviceInfo);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

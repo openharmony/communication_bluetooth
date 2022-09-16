@@ -22,6 +22,7 @@
 #ifndef AVRCP_CT_GAP_H
 #define AVRCP_CT_GAP_H
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods for registering/unregistering the security requirements into the GAP.
@@ -59,5 +60,6 @@ public:
     static int UnregisterSecurity(void);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_CT_GAP_H

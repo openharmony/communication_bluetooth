@@ -73,13 +73,18 @@
       ]
     },
     "build": {
-      "sub_component": [
-        "//foundation/communication/bluetooth/frameworks/inner:btframework",
-        "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth",
-        "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_sa_profile",
-        "//foundation/communication/bluetooth/services/bluetooth/server:bluetooth_server",
-        "//foundation/communication/bluetooth/services/bluetooth/service:btsbc"
-      ],
+      "group_type": {
+        "base_group": [],
+        "fwk_group": [
+          "//foundation/communication/bluetooth/frameworks/inner:btframework",
+          "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth"
+        ],
+        "service_group": [
+          "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_sa_profile",
+          "//foundation/communication/bluetooth/services/bluetooth/server:bluetooth_server",
+          "//foundation/communication/bluetooth/services/bluetooth/service:btsbc"
+        ]
+      },
       "inner_kits": [
         {
           "header": {
@@ -114,6 +119,7 @@
         "//foundation/communication/bluetooth/test/unittest/hid:unittest",
         "//foundation/communication/bluetooth/test/unittest/pan:unittest",
         "//foundation/communication/bluetooth/test/unittest/opp:unittest",
+        "//foundation/communication/bluetooth/test/unittest/gatt_c:unittest",
         "//foundation/communication/bluetooth/test/fuzztest/host:fuzztest"
       ]
     }

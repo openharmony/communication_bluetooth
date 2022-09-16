@@ -23,6 +23,7 @@
 #include "opp_defines.h"
 #include "opp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppReceiveFileBodyObject::OppReceiveFileBodyObject(const std::string &file, const std::string address)
 {
@@ -352,3 +353,4 @@ bool OppObexServer::OppObexObserver::HasSameName(std::string path, std::string n
     return false;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

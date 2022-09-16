@@ -21,6 +21,7 @@
 
 #include "a2dp_codec_constant.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct A2dpCodecCapability {
     A2dpCodecIndex codecIndex_;
@@ -205,4 +206,5 @@ A2dpCodecIndex GetSinkCodecIndex(const uint8_t *codecInfo);
  */
 bool IsConfigChanged(const uint8_t (&lastCodecInfo)[A2DP_CODEC_SIZE], const uint8_t *newCodecInfo);
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // !A2DP_CODEC_CONFIG_H

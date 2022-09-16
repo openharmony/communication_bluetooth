@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 class HfpAgServerObserver : public HfpAgServiceObserver {
 public:
@@ -87,7 +87,7 @@ private:
 struct BluetoothHfpAgServer::impl {
     RemoteObserverList<IBluetoothHfpAgObserver> observers_;
     std::unique_ptr<HfpAgServerObserver> observerImp_{std::make_unique<HfpAgServerObserver>()};
-    IProfileHfpAg* HfpAgService_ = nullptr;  
+    IProfileHfpAg* HfpAgService_ = nullptr;
 
     class HfpAgSystemObserver : public ISystemStateObserver {
     public:
@@ -270,8 +270,8 @@ bool BluetoothHfpAgServer::DisconnectSco()
 void BluetoothHfpAgServer::PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number,
     int type, const std::string &name)
 {
-    HILOGI("numActive:%{public}d, numHeld:%{public}d, callState:%{public}d, number:%{public}s,"
-        "type:%{public}d, name:%{public}s", numActive, numHeld, callState, number.c_str(), type, name.c_str());
+    HILOGI("numActive:%{public}d, numHeld:%{public}d, callState:%{public}d, type:%{public}d",
+        numActive, numHeld, callState, type);
     if (pimpl->HfpAgService_ != nullptr) {
         pimpl->HfpAgService_->PhoneStateChanged(numActive, numHeld, callState, number, type, name);
     }

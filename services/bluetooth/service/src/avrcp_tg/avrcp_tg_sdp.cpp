@@ -16,6 +16,7 @@
 #include "avrcp_tg_sdp.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /// Number of items when add service class id list.
 const uint16_t AVRC_SERVICE_CLASS_ID_LIST_NUMBER = 0x0001;
@@ -171,3 +172,4 @@ int AvrcTgSdpManager::AddProtocolDescriptorList()
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

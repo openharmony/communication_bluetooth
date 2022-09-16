@@ -34,6 +34,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct BleAdapter::impl {
     class GattClientCallback : public IGattClientCallback {
@@ -1626,3 +1627,4 @@ int BleAdapter::SetBleRoles() const
 
 REGISTER_CLASS_CREATOR(BleAdapter);
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -25,7 +25,7 @@
 #include "permission_utils.h"
 #include "remote_observer_list.h"
 
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -124,7 +124,7 @@ private:
 struct BluetoothHfpHfServer::impl {
     RemoteObserverList<IBluetoothHfpHfObserver> observers_;
     std::unique_ptr<HfpHfServerObserver> observerImp_{std::make_unique<HfpHfServerObserver>()};
-    IProfileHfpHf* HfpHfService_ = nullptr;  
+    IProfileHfpHf* HfpHfService_ = nullptr;
 
     class HfpHfSystemObserver : public ISystemStateObserver {
     public:
@@ -207,7 +207,7 @@ bool BluetoothHfpHfServer::DisconnectSco(const BluetoothRawAddress &device) {
     return false;
 }
 
-int BluetoothHfpHfServer::GetDevicesByStates(const std::vector<int> &states, 
+int BluetoothHfpHfServer::GetDevicesByStates(const std::vector<int> &states,
     std::vector<BluetoothRawAddress> &devices) {
     HILOGI("Enter!");
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
@@ -220,7 +220,7 @@ int BluetoothHfpHfServer::GetDevicesByStates(const std::vector<int> &states,
         tmpStates.push_back((int)state);
     }
     std::vector<RawAddress> rawDevices;
-     
+
     if (pimpl->HfpHfService_ != nullptr) {
         rawDevices = pimpl->HfpHfService_->GetDevicesByStates(tmpStates);
     } else {
@@ -299,7 +299,7 @@ bool BluetoothHfpHfServer::CloseVoiceRecognition(const BluetoothRawAddress &devi
     return false;
 }
 
-int BluetoothHfpHfServer::GetCurrentCallList(const BluetoothRawAddress &device, 
+int BluetoothHfpHfServer::GetCurrentCallList(const BluetoothRawAddress &device,
     std::vector<BluetoothHfpHfCall> &calls) {
     HILOGI("addr: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
     std::vector<HandsFreeUnitCalls> callVector;
@@ -390,7 +390,7 @@ bool BluetoothHfpHfServer::FinishActiveCall(const BluetoothRawAddress &device, c
     return false;
 }
 
-int BluetoothHfpHfServer::StartDial(const BluetoothRawAddress &device, const std::string &number, 
+int BluetoothHfpHfServer::StartDial(const BluetoothRawAddress &device, const std::string &number,
     BluetoothHfpHfCall &call) {
     HILOGI("addr: %{public}s, number: %{public}s", GetEncryptAddr((device).GetAddress()).c_str(), number.c_str());
     std::optional<HandsFreeUnitCalls> ret;

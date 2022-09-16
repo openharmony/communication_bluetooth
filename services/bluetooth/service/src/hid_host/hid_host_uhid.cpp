@@ -16,6 +16,7 @@
 #include "hid_host_uhid.h"
 #include "hid_host_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HidHostUhid::HidHostUhid(std::string address)
 {
@@ -457,3 +458,4 @@ void HidHostUhid::ReadUhidSetReport(uhid_event ev)
     task_type_ = HID_HOST_DATA_TYPE_SET_REPORT;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

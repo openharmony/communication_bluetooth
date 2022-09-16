@@ -19,6 +19,7 @@
 
 
 using namespace std;
+namespace OHOS {
 namespace bluetooth {
 constexpr int startPos = 6;
 constexpr int endPos = 13;
@@ -37,3 +38,4 @@ std::string GetEncryptAddr(std::string addr)
     return out;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

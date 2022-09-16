@@ -21,6 +21,7 @@
 
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define HFP_AG_RETURN_IF_FAIL(ret)                                \
     do {                                                          \
@@ -436,4 +437,5 @@ enum { HFP_AG_HF_VR_ClOSED, HFP_AG_HF_VR_OPENED };
 
 enum { HFP_AG_NUMBER_DIAL, HFP_AG_MEMORY_DIAL, HFP_AG_LAST_NUMBER_REDIAL };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_DEFINES_H

@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 struct BluetoothGattServerServer::impl {
     class GattServerCallbackImpl;
     class SystemStateObserver;

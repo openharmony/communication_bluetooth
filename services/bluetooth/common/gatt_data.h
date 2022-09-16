@@ -25,6 +25,7 @@
 #include "raw_address.h"
 #include "type_traits"
 
+namespace OHOS {
 namespace bluetooth {
 struct Descriptor {
     Descriptor() : handle_(0), permissions_(0), value_(nullptr), length_(0), uuid_() {}
@@ -68,12 +69,12 @@ struct Descriptor {
 };
 
 struct Characteristic {
-    Characteristic() 
+    Characteristic()
         : handle_(0), endHandle_(0), valueHandle_(0), properties_(0),
           permissions_(0), value_(nullptr), length_(0), uuid_(), descriptors_() {}
 
     Characteristic(const Uuid& uuid, uint16_t handle, int properties)
-        : handle_(handle), endHandle_(0), valueHandle_(handle + 1), properties_(properties), permissions_(0), 
+        : handle_(handle), endHandle_(0), valueHandle_(handle + 1), properties_(properties), permissions_(0),
         value_(nullptr),  length_(0), uuid_(uuid), descriptors_()
     {
     }
@@ -85,7 +86,7 @@ struct Characteristic {
 
     void SetValue(const uint8_t *value, size_t length);
 
-    explicit Characteristic(uint16_t handle) 
+    explicit Characteristic(uint16_t handle)
         : handle_(handle), endHandle_(0), valueHandle_(handle + 1), properties_(0), permissions_(0),
         value_(nullptr), length_(0), uuid_(), descriptors_() {}
 
@@ -134,13 +135,13 @@ struct Service {
     {
     }
 
-    explicit Service(uint16_t handle) 
+    explicit Service(uint16_t handle)
         : isPrimary_(false), handle_(handle), startHandle_(handle), endHandle_(0), uuid_(), includeServices_(),
         characteristics_()
     {
     }
 
-    Service(uint16_t handle, uint16_t endHandle) 
+    Service(uint16_t handle, uint16_t endHandle)
         : isPrimary_(false), handle_(handle), startHandle_(handle), endHandle_(endHandle), uuid_(), includeServices_(),
         characteristics_()
     {
@@ -186,5 +187,6 @@ struct GattDevice {
         return ((addr_ < rhs.addr_) && (transport_ == rhs.transport_));
     }
 };
-} // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif // GATT_DATA_H

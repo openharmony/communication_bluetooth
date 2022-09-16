@@ -18,6 +18,7 @@
 #include "avrcp_ct_pass_through.h"
 #include "log_util.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcCtConnectManager *AvrcCtConnectManager::g_instance = nullptr;
 
@@ -1042,3 +1043,4 @@ AvrcCtConnectInfo *AvrcCtConnectManager::GetConnectInfo(const std::string &btAdd
     return info;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

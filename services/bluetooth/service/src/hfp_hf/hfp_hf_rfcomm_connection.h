@@ -29,6 +29,7 @@
 #include "raw_address.h"
 #include "rfcomm.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for rfcomm connection.
@@ -167,4 +168,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfRfcommConnection);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_RFCOMM_CONNECTION_H

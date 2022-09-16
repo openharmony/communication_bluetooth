@@ -22,6 +22,7 @@
 #include "power_manager.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::recursive_mutex g_stateMutex {};
 void A2dpStateIdle::Entry()
@@ -1138,3 +1139,4 @@ const std::string A2dpStateMachine::GetStateName(void) const
     return GetState()->Name();
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -31,6 +31,7 @@
 #include "pbap_pce_service.h"
 #include "power_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 PbapPceStateMachine::PbapPceStateMachine(const RawAddress &dev, PbapPceService &pceService, PbapPceSdp &pbapPceSdp,
     BaseObserverList<IPbapPceObserver> &observerMgrList)
@@ -835,3 +836,4 @@ void PbapPceStateMachine::CreatePceObexClient(const ObexClientConfig &obexConfig
     PBAP_PCE_LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

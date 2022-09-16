@@ -44,6 +44,7 @@
 #include "raw_address.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 // SDP Record for the Message Access Service on the MAP Device
 static const uint16_t MAP_MCE_SERVICE_CLASS_UUID = 0x1132;
@@ -339,4 +340,5 @@ private:
     GapServiceSecurityInfo securityInfo_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_INSTANCE_CLIENT_H

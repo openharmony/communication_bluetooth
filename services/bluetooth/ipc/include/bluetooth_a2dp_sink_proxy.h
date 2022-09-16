@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 class BluetoothA2dpSinkProxy : public IRemoteProxy<IBluetoothA2dpSink> {
 public:
     explicit BluetoothA2dpSinkProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothA2dpSink>(impl)

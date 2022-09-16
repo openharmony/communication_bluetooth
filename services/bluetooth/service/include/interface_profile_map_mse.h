@@ -19,6 +19,7 @@
 #include "interface_profile.h"
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Callback function api of Map service, including connection, disconnection and authorization.
@@ -168,5 +169,6 @@ public:
     virtual void GrantPermission(const RawAddress &device, bool allow, bool save = false) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_MAP_MSE_H

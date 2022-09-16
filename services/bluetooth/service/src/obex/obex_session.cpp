@@ -19,6 +19,7 @@
 #include "obex_utils.h"
 #include "obex_socket_transport.h"
 
+namespace OHOS {
 namespace bluetooth {
 ObexServerSession::ObexServerSession(ObexTransport &transport, bool isSupportSrm, utility::Dispatcher &dispatcher,
     std::function<int(ObexServerSession &)> removeFun, std::function<void(ObexServerSession &, bool)> setBusyFun)
@@ -664,3 +665,4 @@ ObexSession::ObexSession(const RawAddress &remoteAddr) : remoteAddr_(remoteAddr)
 ObexClientSession::ObexClientSession(const RawAddress &remoteAddr) : ObexSession(remoteAddr)
 {}
 }  // namespace bluetooth
+}  // namespace OHOS

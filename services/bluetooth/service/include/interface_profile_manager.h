@@ -36,6 +36,7 @@
 #include "interface_profile.h"
 #include <vector>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents interface profile manager.
@@ -94,5 +95,6 @@ public:
     virtual void GetProfileServicesSupportedUuids(std::vector<std::string> &uuids) const = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_MANAGER_H

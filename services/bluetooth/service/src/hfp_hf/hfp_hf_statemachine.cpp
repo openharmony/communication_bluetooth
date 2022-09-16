@@ -20,6 +20,7 @@
 #include "power_manager.h"
 #include "audio_system_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpHfStateMachine::HfpHfStateMachine(const std::string &address)
     : address_(address), profile_(address)
@@ -1129,3 +1130,4 @@ std::string HfpHfStateMachine::GetInteractiveEventType(int type) const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

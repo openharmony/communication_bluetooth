@@ -26,6 +26,7 @@
 #include "hfp_ag_defines.h"
 #include "hfp_ag_sdp_client.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for providing functions to relate to other underlying layers.
@@ -552,4 +553,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgProfile);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_PROFILE_H

@@ -20,6 +20,7 @@
 #include "gatt_defines.h"
 #include "packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 enum ResponesType {
     NONE,
@@ -159,4 +160,5 @@ struct PrepareWriteParam {
     uint16_t offset_ = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // GATT_PROFLIE_DEFINES_H

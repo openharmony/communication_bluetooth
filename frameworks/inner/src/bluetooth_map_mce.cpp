@@ -30,7 +30,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "i_bluetooth_host.h"
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {

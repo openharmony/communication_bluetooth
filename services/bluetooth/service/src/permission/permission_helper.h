@@ -17,6 +17,7 @@
 #define PERMISSION_HELPER_H
 #include <string>
 
+namespace OHOS {
 namespace bluetooth {
 class PermissionHelper {
 public:
@@ -91,5 +92,6 @@ public:
      */
     static int VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID);
 };
-}
+}  // namespace bluetooth
+}  // namespace OHOS
 #endif

@@ -29,6 +29,7 @@
 #include "dispatcher.h"
 #include "message.h"
 
+namespace OHOS {
 namespace bluetooth {
 using utility::Dispatcher;
 using utility::Message;
@@ -171,5 +172,6 @@ private:
     bool isSbc_ = false;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // A2DP_CODEC_THREAD_H

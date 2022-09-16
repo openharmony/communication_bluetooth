@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 
+namespace OHOS {
 namespace bluetooth {
 using ClassCreateFun = void *(*)(void);
 
@@ -58,5 +59,6 @@ public:
     }                                      \
     const ClassRegister class_name##Register(#class_name, class_name##Creator)
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // CLASS_CREATOR_H

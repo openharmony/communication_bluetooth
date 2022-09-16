@@ -19,6 +19,7 @@
 
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define CODEC_LIB_SBC "libbtsbc.z.so"
 
@@ -109,3 +110,4 @@ void A2dpSBCDynamicLibCtrl::UnloadCodecSbcLib(CODECSbcLib *lib) const
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

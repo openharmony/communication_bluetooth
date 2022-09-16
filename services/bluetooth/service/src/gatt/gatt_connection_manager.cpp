@@ -27,6 +27,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 constexpr uint8_t OBSERVER_EVENT_CONNECTED = 0x0;
 constexpr uint8_t OBSERVER_EVENT_DISCONNECTED = 0x1;
@@ -1557,3 +1558,4 @@ bool GattConnectionManager::Device::StateMachine::Disconnected::Dispatch(const u
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

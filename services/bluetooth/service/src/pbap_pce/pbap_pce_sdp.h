@@ -23,6 +23,7 @@
 #include "raw_address.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief pbap pce sdp service
@@ -100,4 +101,5 @@ private:
     const IProfilePbapPce &service_;                                          // PbapPceService
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PCE_SDP_H

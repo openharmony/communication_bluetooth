@@ -23,6 +23,7 @@
 #include "profile_service_manager.h"
 #include "stub/telephone_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgService::HfpAgService() : utility::Context(PROFILE_NAME_HFP_AG, "1.7.1")
 {
@@ -255,8 +256,7 @@ void HfpAgService::PostEvent(const HfpAgMessage &event)
 void HfpAgService::ProcessEvent(const HfpAgMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
-    LOG_INFO("[HFP AG]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__,
-        event.dev_.c_str(), event.what_);
+    HILOGI("addr: %{public}s, event_no: %{public}d", GetEncryptAddr(event.dev_).c_str(), event.what_);
     switch (event.what_) {
         case HFP_AG_SERVICE_STARTUP_EVT:
             StartUp();
@@ -916,7 +916,7 @@ void HfpAgService::ProcessDefaultEvent(const HfpAgMessage &event) const
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         it->second->ProcessMessage(event);
     } else {
-        LOG_INFO("[HFP AG]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
+        HILOGI("addr: %{public}s", GetEncryptAddr(event.dev_).c_str());
     }
 }
 
@@ -1028,3 +1028,4 @@ void HfpAgService::ModifyActiveDevice(const std::string &newAddress)
 
 REGISTER_CLASS_CREATOR(HfpAgService);
 }  // namespace bluetooth
+}  // namespace OHOS

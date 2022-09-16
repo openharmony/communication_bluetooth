@@ -37,6 +37,7 @@
 #include "power_manager.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 const uint8_t MapMceDeviceCtrl::mnsTargetUuidTbl_[MAX_OF_MASCLIENT_OBEX_UUID_TBL] = {
     0xbb, 0x58, 0x2b, 0x41, 0x42, 0x0c, 0x11, 0xdb, 0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66
@@ -1340,3 +1341,4 @@ void MapMceDeviceCtrl::SetDeviceCtlConfig(const MasInstanceConfig &config)
     insDefaultConfig_ = config;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

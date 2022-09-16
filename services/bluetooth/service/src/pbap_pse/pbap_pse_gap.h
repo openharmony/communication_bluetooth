@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+namespace OHOS {
 namespace bluetooth {
 class PbapPseGap {
 public:
@@ -56,4 +57,5 @@ private:
     uint16_t l2capPsm_ = 0;  // l2cap psm
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_GAP_H

@@ -35,6 +35,7 @@
 #include "map_mce_instance_stm.h"
 #include "map_mce_mns_server.h"
 
+namespace OHOS {
 namespace bluetooth {
 MapMceInstanceRequest::MapMceInstanceRequest()
 {
@@ -1535,3 +1536,4 @@ int MapMceRequestGetMessagesListing::ProcessResponse(
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

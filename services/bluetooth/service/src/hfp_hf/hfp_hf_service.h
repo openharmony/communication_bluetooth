@@ -43,6 +43,7 @@
 #include "message.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This HFP class provides a set of methods that is called by Framework API, and manage
@@ -595,4 +596,5 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_HF_SERVICE_H

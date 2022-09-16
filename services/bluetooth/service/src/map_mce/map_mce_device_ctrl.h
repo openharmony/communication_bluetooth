@@ -46,6 +46,7 @@
 #include "message.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief map mce device state type
@@ -396,4 +397,5 @@ private:
     std::atomic_bool mnsContinueBusyFlag_ {false};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // MAP_MCE_DEVICE_CTRL_H

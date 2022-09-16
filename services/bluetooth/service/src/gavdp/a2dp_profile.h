@@ -40,6 +40,7 @@
 #include "a2dp_shared_buffer.h"
 #include "../stack/platform/include/queue.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides a set of methods to notify the service about status changed
@@ -507,7 +508,7 @@ public:
      * @since 6.0
      */
     void DequeuePacket();
-    
+
     /**
      * @brief Set the pcm data to the shared buffer.
      * @param buf The pointer of the data.
@@ -653,4 +654,5 @@ struct PacketData {
     uint32_t pktTimeStamp;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_PROFILE_H

@@ -26,6 +26,7 @@
 #include "obex_transport.h"
 #include "obex_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 enum class ObexClientState : uint8_t {
     INIT = 0,
@@ -318,4 +319,5 @@ protected:
     BT_DISALLOW_COPY_AND_ASSIGN(ObexClient);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_CLIENT_H

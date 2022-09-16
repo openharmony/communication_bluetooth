@@ -17,6 +17,7 @@
 #include "ipc_skeleton.h"
 #include "auth_center.h"
 
+namespace OHOS {
 namespace bluetooth {
 using namespace OHOS;
 
@@ -53,4 +54,5 @@ int PermissionUtils::VerifyDiscoverBluetoothPermission(const std::uint32_t  &tok
 {
     return AuthCenter::GetInstance().VerifyDiscoverBluetoothPermission(tokenID);
 }
-}
+}  // namespace bluetooth
+}  // namespace OHOS

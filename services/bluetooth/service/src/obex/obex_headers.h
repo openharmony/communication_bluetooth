@@ -25,6 +25,7 @@
 #include "obex_packet.h"
 #include "obex_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObexHdrType {
 public:
@@ -546,4 +547,5 @@ private:
     std::shared_ptr<ObexBodyObject> extendBodyObject_ = nullptr;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OBEX_HEADERS_H

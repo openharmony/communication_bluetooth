@@ -18,6 +18,7 @@
 #include "log.h"
 #include "power_spec.h"
 
+namespace OHOS {
 namespace bluetooth {
 void PowerStateMachine::Init(PowerDevice &pd)
 {
@@ -341,3 +342,4 @@ bool PowerSniffSniffingState::Dispatch(const utility::Message &msg)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -31,6 +31,7 @@
 #include "state_machine.h"
 #include "timer.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattConnectionManager {
 public:
@@ -177,5 +178,6 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(GattConnectionManager);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GATT_CONNECTION_MANAGER_H

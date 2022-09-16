@@ -20,6 +20,7 @@
 #include <string>
 #include "base/base_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 // define section name
 const std::string SECTION_CLASSIC_ADAPTER = "ClassicAdapter";
@@ -248,5 +249,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // ADAPTER_CONFIG_H

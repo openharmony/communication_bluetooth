@@ -22,6 +22,7 @@
 
 #include "hfp_ag_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 std::map<std::string, HfpAgRemoteSdpServiceArray> HfpAgSdpClient::g_remoteSdpServiceArrays;
 std::recursive_mutex HfpAgSdpClient::g_hfpSdpMutex;
@@ -346,3 +347,4 @@ bool HfpAgSdpClient::FindProfileFeatures(const std::vector<HfpAgSdpAttribute> &a
     return false;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

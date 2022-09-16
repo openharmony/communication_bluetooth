@@ -22,6 +22,7 @@
 #include "message.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 class HidHostMessage : public utility::Message {
 public:
@@ -76,4 +77,5 @@ public:
     }
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HID_HOST_MESSAGE_H
