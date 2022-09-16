@@ -105,7 +105,6 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
     status = napi_get_arraybuffer_info(env, args, (void**)data, &size);
     if (status != napi_ok) {
         HILOGE("can not get arraybuffer, error is %{public}d", status);
-        (*data)[0] = -1;
         return false;
     }
     HILOGI("arraybuffer size is %{public}zu", size);
