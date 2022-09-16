@@ -24,6 +24,7 @@
 #include "raw_address.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct BleProperties::impl {
     std::string deviceName_{BLE_DEFAULT_DEVICE_NAME};
@@ -299,3 +300,4 @@ void BleProperties::DeregisterBleAdapterObserver(IAdapterBleObserver &observer) 
     pimpl->observer_->Deregister(observer);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

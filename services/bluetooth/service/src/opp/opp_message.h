@@ -21,6 +21,7 @@
 #include "message.h"
 #include "opp_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 class OppMessage : public utility::Message {
 public:
@@ -31,4 +32,5 @@ public:
     OppSdpInformation sdpInfo_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // OPP_MESSAGE_H

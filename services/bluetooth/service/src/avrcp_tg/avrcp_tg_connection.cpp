@@ -17,6 +17,7 @@
 #include "avrcp_tg_packet.h"
 #include "avrcp_tg_pass_through.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcTgConnectManager *AvrcTgConnectManager::g_instance = nullptr;
 
@@ -689,3 +690,4 @@ AvrcTgConnectInfo *AvrcTgConnectManager::GetConnectInfo(const std::string &btAdd
     return info;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

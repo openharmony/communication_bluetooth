@@ -20,6 +20,7 @@
 #include "base/base_def.h"
 #include "sdp.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for managing SDP server register/unregister as HFP AG role.
@@ -131,4 +132,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgSdpServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_SDP_SERVER_H

@@ -17,6 +17,7 @@
 #include "btstack.h"
 #include "log.h"
 #include "sdp.h"
+namespace OHOS {
 namespace bluetooth {
 PanSdp::PanSdp()
 {}
@@ -228,3 +229,4 @@ int PanSdp::RegisterServiceInfo()
     return result;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

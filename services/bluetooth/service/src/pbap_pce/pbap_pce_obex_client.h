@@ -28,6 +28,7 @@
 #include "pbap_pce_header_msg.h"
 #include "pbap_pce_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 class ObexFileBodyObject : public ObexBodyObject {
 public:
@@ -251,4 +252,5 @@ private:
         PBAP_PCE_FEATURES_DEFAULT_CONTACT_IMAGE_FORMAT;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PCE_OBEX_CLIENT_H

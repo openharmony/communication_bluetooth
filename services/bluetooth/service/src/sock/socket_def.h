@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 
+namespace OHOS {
 namespace bluetooth {
 // Socket default MTU.
 static const int SOCK_DEF_RFC_MTU = 1500;
@@ -86,5 +87,6 @@ typedef struct {
     uint8_t addr[6];  // remote device address
 } SocketConnectInfo;
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif // SOCKET_DEF_H

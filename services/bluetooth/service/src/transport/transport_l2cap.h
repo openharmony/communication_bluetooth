@@ -24,6 +24,7 @@
 #include "raw_address.h"
 #include "transport_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This L2capTransport class provides a set of methods that is interactive with L2CAP.
@@ -223,7 +224,7 @@ private:
      * @param lcid local channel id.
      * @param result if the operation is successful, otherwise the operation fails.
      */
-    void TransportL2cConnectReqCallbackNative(L2capTransport *transport, 
+    void TransportL2cConnectReqCallbackNative(L2capTransport *transport,
                                               const BtAddr &addr, uint16_t lcid, int result);
 
     /**
@@ -402,4 +403,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(L2capTransport);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // TRANSPORT_L2CAP_H

@@ -23,6 +23,7 @@
 #include "a2dp_codec_constant.h"
 #include "a2dp_codec_wrapper.h"
 
+namespace OHOS {
 namespace bluetooth {
 class A2dpCodecConfigAacBase : public A2dpCodecConfig {
 public:
@@ -105,4 +106,5 @@ int GetTrackChannelModeAac(const uint8_t *codecInfo);
 int GetTrackChannelCountAac(const uint8_t *codecInfo);
 int GetObjectTypeCodeAac(const uint8_t *codecInfo);
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // !A2DP_AAC_PARAM_CTRL_H

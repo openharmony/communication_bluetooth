@@ -24,6 +24,7 @@
 #include "raw_address.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::string A2DP_STATE_CONNECTING = "A2dpServiceConnecting";
 const std::string A2DP_STATE_CONNECTED = "A2dpServiceConnected";
@@ -227,5 +228,6 @@ private:
     uint8_t role_ = A2DP_ROLE_SOURCE;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // A2DP_SERVICE_STATE_MACHINE_H

@@ -31,6 +31,7 @@
 #include "map_mce_xml.h"
 #include <cstring>
 
+namespace OHOS {
 namespace bluetooth {
 MceXmlAttribute::MceXmlAttribute() : value_("")
 {
@@ -141,3 +142,4 @@ MceXmlNode MceXmlDoc::Child(std::string name) const
     return node;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -18,6 +18,7 @@
 #include "avrcp_ct_vendor_player_application_settings.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 /******************************************************************
  * AvrcCtVendorPacket                                             *
@@ -1702,3 +1703,4 @@ bool AvrcCtSavPacket::DisassembleParameters(uint8_t *buffer)
     return isValid_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

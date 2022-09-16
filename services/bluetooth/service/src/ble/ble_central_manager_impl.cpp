@@ -26,6 +26,7 @@
 #include "ble_scan_filter/include/ble_scan_filter_lsf.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 constexpr char BLE_SCAN_FILTER_LIB_NAME[] = "libble_scan_filter.z.so";
 
@@ -813,43 +814,25 @@ void BleCentralManagerImpl::SetScanModeDuration(int scanMode, int type) const
 
     switch (scanMode) {
         case SCAN_MODE_LOW_POWER:
-            if (type == CALLBACK_TYPE_ALL_MATCHES) {
-                uint16_t interval = BLE_SCAN_MODE_BATCH_LOW_POWER_INTERVAL_MS;
-                SetInterval(interval);
-                uint16_t window = BLE_SCAN_MODE_BATCH_LOW_POWER_WINDOW_MS;
-                SetWindow(window);
-            } else {
-                uint16_t interval = BLE_SCAN_MODE_LOW_POWER_INTERVAL_MS;
-                SetInterval(interval);
-                uint16_t window = BLE_SCAN_MODE_LOW_POWER_WINDOW_MS;
-                SetWindow(window);
-            }
+            SetLowPowerDuration(type);
             break;
         case SCAN_MODE_BALANCED:
-            if (type == CALLBACK_TYPE_ALL_MATCHES) {
-                uint16_t interval = BLE_SCAN_MODE_BATCH_BALANCED_INTERVAL_MS;
-                SetInterval(interval);
-                uint16_t window = BLE_SCAN_MODE_BATCH_BALANCED_WINDOW_MS;
-                SetWindow(window);
-            } else {
-                uint16_t interval = BLE_SCAN_MODE_BALANCED_INTERVAL_MS;
-                SetInterval(interval);
-                uint16_t window = BLE_SCAN_MODE_BALANCED_WINDOW_MS;
-                SetWindow(window);
-            }
+            SetBalancedDuration(type);
             break;
         case SCAN_MODE_LOW_LATENCY:
-            if (type == CALLBACK_TYPE_ALL_MATCHES) {
-                uint16_t interval = BLE_SCAN_MODE_BATCH_LOW_LATENCY_INTERVAL_MS;
-                SetInterval(interval);
-                uint16_t window = BLE_SCAN_MODE_BATCH_LOW_LATENCY_WINDOW_MS;
-                SetWindow(window);
-            } else {
-                uint16_t interval = BLE_SCAN_MODE_LOW_LATENCY_INTERVAL_MS;
-                SetInterval(interval);
-                uint16_t window = BLE_SCAN_MODE_LOW_LATENCY_WINDOW_MS;
-                SetWindow(window);
-            }
+            SetLowLatencyDuration(type);
+            break;
+        case SCAN_MODE_OP_P2_60_3000:
+            SetDutyCycle2Duration(type);
+            break;
+        case SCAN_MODE_OP_P10_60_600:
+            SetDutyCycle10Duration(type);
+            break;
+        case SCAN_MODE_OP_P25_60_240:
+            SetDutyCycle25Duration(type);
+            break;
+        case SCAN_MODE_OP_P100_1000_1000:
+            SetDutyCycle100Duration(type);
             break;
         default:
             break;
@@ -857,6 +840,111 @@ void BleCentralManagerImpl::SetScanModeDuration(int scanMode, int type) const
     OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_DUTY_CYCLE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "WINDOW", pimpl->scanParams_.scanWindow,
         "INTERVAL", pimpl->scanParams_.scanInterval, "TYPE", pimpl->callBackType_);
+}
+
+void BleCentralManagerImpl::SetLowPowerDuration(int type) const
+{
+    if (type == CALLBACK_TYPE_ALL_MATCHES) {
+        uint16_t interval = BLE_SCAN_MODE_BATCH_LOW_POWER_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BATCH_LOW_POWER_WINDOW_MS;
+        SetWindow(window);
+    } else {
+        uint16_t interval = BLE_SCAN_MODE_LOW_POWER_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_LOW_POWER_WINDOW_MS;
+        SetWindow(window);
+    }
+}
+
+void BleCentralManagerImpl::SetBalancedDuration(int type) const
+{
+    if (type == CALLBACK_TYPE_ALL_MATCHES) {
+        uint16_t interval = BLE_SCAN_MODE_BATCH_BALANCED_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BATCH_BALANCED_WINDOW_MS;
+        SetWindow(window);
+    } else {
+        uint16_t interval = BLE_SCAN_MODE_BALANCED_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BALANCED_WINDOW_MS;
+        SetWindow(window);
+    }
+}
+
+void BleCentralManagerImpl::SetLowLatencyDuration(int type) const
+{
+    if (type == CALLBACK_TYPE_ALL_MATCHES) {
+        uint16_t interval = BLE_SCAN_MODE_BATCH_LOW_LATENCY_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BATCH_LOW_LATENCY_WINDOW_MS;
+        SetWindow(window);
+    } else {
+        uint16_t interval = BLE_SCAN_MODE_LOW_LATENCY_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_LOW_LATENCY_WINDOW_MS;
+        SetWindow(window);
+    }
+}
+
+void BleCentralManagerImpl::SetDutyCycle2Duration(int type) const
+{
+    if (type == CALLBACK_TYPE_ALL_MATCHES) {
+        uint16_t interval = BLE_SCAN_MODE_BATCH_OP_P2_60_3000_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BATCH_OP_P2_60_3000_WINDOW_MS;
+        SetWindow(window);
+    } else {
+        uint16_t interval = BLE_SCAN_MODE_OP_P2_60_3000_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_OP_P2_60_3000_WINDOW_MS;
+        SetWindow(window);
+    }
+}
+
+void BleCentralManagerImpl::SetDutyCycle10Duration(int type) const
+{
+    if (type == CALLBACK_TYPE_ALL_MATCHES) {
+        uint16_t interval = BLE_SCAN_MODE_BATCH_OP_P10_60_600_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BATCH_OP_P10_60_600_WINDOW_MS;
+        SetWindow(window);
+    } else {
+        uint16_t interval = BLE_SCAN_MODE_OP_P10_60_600_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_OP_P10_60_600_WINDOW_MS;
+        SetWindow(window);
+    }
+}
+
+void BleCentralManagerImpl::SetDutyCycle25Duration(int type) const
+{
+    if (type == CALLBACK_TYPE_ALL_MATCHES) {
+        uint16_t interval = BLE_SCAN_MODE_BATCH_OP_P25_60_240_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BATCH_OP_P25_60_240_WINDOW_MS;
+        SetWindow(window);
+    } else {
+        uint16_t interval = BLE_SCAN_MODE_OP_P25_60_240_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_OP_P25_60_240_WINDOW_MS;
+        SetWindow(window);
+    }
+}
+
+void BleCentralManagerImpl::SetDutyCycle100Duration(int type) const
+{
+    if (type == CALLBACK_TYPE_ALL_MATCHES) {
+        uint16_t interval = BLE_SCAN_MODE_BATCH_OP_P100_1000_1000_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_BATCH_OP_P100_1000_1000_WINDOW_MS;
+        SetWindow(window);
+    } else {
+        uint16_t interval = BLE_SCAN_MODE_OP_P100_1000_1000_INTERVAL_MS;
+        SetInterval(interval);
+        uint16_t window = BLE_SCAN_MODE_OP_P100_1000_1000_WINDOW_MS;
+        SetWindow(window);
+    }
 }
 
 void BleCentralManagerImpl::TimerCallback(void *context)
@@ -1806,3 +1894,4 @@ void BleCentralManagerImpl::HandleGapExScanEvent(const BLE_GAP_CB_EVENT &event, 
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

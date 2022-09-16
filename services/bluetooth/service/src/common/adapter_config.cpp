@@ -19,6 +19,7 @@
 
 #include "xml_parse.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct AdapterConfig::impl {
     utility::XmlParse parse_ = {};
@@ -82,3 +83,4 @@ bool AdapterConfig::HasSection(const std::string &section)
     return pimpl->parse_.HasSection(section);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

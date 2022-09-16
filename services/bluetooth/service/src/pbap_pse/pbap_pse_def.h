@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <string>
 #include "log.h"
+namespace OHOS {
 namespace bluetooth {
 #define PBAP_PSE_L2CAP_ENABLE
 #define PBAP_PSE_LOG_DEBUG(fmt, ...) LOG_DEBUG("[PBAP_PSE]:" fmt, ##__VA_ARGS__)
@@ -73,4 +74,5 @@ static const std::u16string PBAP_PSE_VCARD_SUFFIX = u".vcf";
 static const uint8_t PBAP_PSE_HANDLE_MAX_LENGTH = 4;
 static const std::string PBAP_PSE_DEFAULT_DB_FILE = "pbap_pse.s3db";
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PSE_DEF_H

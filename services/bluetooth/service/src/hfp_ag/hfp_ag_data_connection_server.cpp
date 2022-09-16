@@ -21,6 +21,7 @@
 #include "hfp_ag_rfcomm_connection.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 HfpAgDataConnectionServer &HfpAgDataConnectionServer::GetInstance()
 {
@@ -117,3 +118,4 @@ uint8_t HfpAgDataConnectionServer::GetLocalScn() const
     return rfcommServer_.GetLocalScn();
 }
 }  // namespace bluetooth
+}  // namespace OHOS

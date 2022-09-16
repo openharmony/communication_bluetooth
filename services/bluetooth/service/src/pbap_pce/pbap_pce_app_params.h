@@ -22,6 +22,7 @@
 #include <vector>
 #include "../obex/obex_headers.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Pbap Pce App Params
@@ -140,4 +141,5 @@ private:
     std::unique_ptr<uint32_t> pbapSupportedFeatures_ = nullptr;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // PBAP_PCE_APP_PARAMS_H

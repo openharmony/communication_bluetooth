@@ -21,6 +21,7 @@
 #include "avrcp_tg_vendor.h"
 #include"packet.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This enumeration declares the values of the "EVENT ID".
@@ -357,6 +358,7 @@ private:
      */
     AvrcTgNotifyPacket() = delete;
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // !AVRCP_TG_NOTIFICATION_H

@@ -27,6 +27,7 @@
 #include "base_def.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 class OppReceiveFileBodyObject : public ObexBodyObject {
 public:
@@ -83,4 +84,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(OppObexServer);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_OBEX_SERVER_H

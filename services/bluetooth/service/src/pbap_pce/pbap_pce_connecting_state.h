@@ -26,6 +26,7 @@
 #include "pbap_pce_header_msg.h"
 #include "pbap_pce_state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief connecting statemachine
@@ -180,5 +181,6 @@ private:
     std::unique_ptr<ObexHeader> header_ {nullptr};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PBAP_PCE_CONNECTING_STATE_H

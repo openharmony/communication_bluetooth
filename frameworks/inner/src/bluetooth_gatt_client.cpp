@@ -24,6 +24,7 @@
 #include "bluetooth_host.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "gatt_data.h"
 #include "hilog/log.h"
 #include "i_bluetooth_gatt_client.h"
@@ -139,7 +140,8 @@ public:
 
     void OnConnectionStateChanged(int32_t state, int32_t newState) override
     {
-        HILOGI("enter, curState(%{public}d) -> newState(%{public}d)", state, newState);
+        HILOGI("gattClient conn state, status: %{public}d, newState: %{public}s",
+            state, GetProfileConnStateName(newState).c_str());
         if (newState == static_cast<int>(BTConnectState::DISCONNECTED)) {
             client_.pimpl->CleanConnectionInfo();
         }

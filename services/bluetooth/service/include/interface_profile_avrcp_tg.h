@@ -30,6 +30,7 @@
 #include "avrcp_media.h"
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This class provides data interaction for asynchronous actions.
@@ -620,5 +621,6 @@ public:
     virtual void OnPlaybackStateChange(int32_t state) = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_PROFILE_AVRCP_TG_H

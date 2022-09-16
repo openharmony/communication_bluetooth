@@ -17,6 +17,7 @@
 
 #include "avrcp_ct_browse.h"
 
+namespace OHOS {
 namespace bluetooth {
 /******************************************************************
  * AvrcCtBrowsePacket                                             *
@@ -861,4 +862,5 @@ bool AvrcCtGtnoiPacket::DisassemblePacket(Packet *pkt)
 
     return isValid_;
 }
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS

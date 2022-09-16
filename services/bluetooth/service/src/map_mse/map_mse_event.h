@@ -21,6 +21,7 @@
 #include "libxml/parser.h"
 #include "map_mse_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct MseEventType11 {
     std::string eventType_ = "";
@@ -149,5 +150,6 @@ private:
     std::string contactUid_ = "";
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_EVENT_H

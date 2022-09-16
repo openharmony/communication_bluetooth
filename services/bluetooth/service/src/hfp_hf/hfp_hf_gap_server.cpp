@@ -17,6 +17,7 @@
 
 #include "hfp_hf_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 GapServiceSecurityInfo HfpHfGapServer::g_securityInfo;
 
@@ -42,3 +43,4 @@ int HfpHfGapServer::DeregisterServiceSecurity()
     return BT_NO_ERROR;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

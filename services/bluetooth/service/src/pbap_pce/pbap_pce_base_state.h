@@ -22,6 +22,7 @@
 #include "message.h"
 #include "pbap_pce_state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /// pbap pce state mathine identification
 static const std::string PCE_DISCONNECTED_STATE = "PceDisconnectedState";
@@ -50,5 +51,6 @@ protected:
     BaseObserverList<IPbapPceObserver> &observerMgrList_;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PBAP_PCE_BASE_STATE_H

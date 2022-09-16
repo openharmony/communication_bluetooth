@@ -55,7 +55,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 struct BluetoothHostServer::impl {
     impl();
     ~impl();
@@ -835,6 +835,10 @@ int32_t BluetoothHostServer::GetDeviceType(int32_t transport, const std::string 
 std::string BluetoothHostServer::GetLocalAddress()
 {
     HILOGI("Enter!");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("false, check permission failed");
+        return INVALID_MAC_ADDRESS;
+    }
     if (IsBtEnabled()) {
         return pimpl->classicService_->GetLocalAddress();
     } else if (IsBleEnabled()) {
@@ -1122,6 +1126,10 @@ bool BluetoothHostServer::RemovePair(int32_t transport, const sptr<BluetoothRawA
 bool BluetoothHostServer::RemoveAllPairs()
 {
     HILOGI("Enter!");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("check permission failed");
+        return false;
+    }
     if (BTStateID::STATE_TURN_ON != IAdapterManager::GetInstance()->GetState(BTTransport::ADAPTER_BREDR) &&
         BTStateID::STATE_TURN_ON != IAdapterManager::GetInstance()->GetState(BTTransport::ADAPTER_BLE)) {
         HILOGW("BT current state is not enabled!");
@@ -1207,6 +1215,10 @@ std::string BluetoothHostServer::GetDeviceName(int32_t transport, const std::str
 std::string BluetoothHostServer::GetDeviceAlias(const std::string &address)
 {
     HILOGI("address: %{public}s", GetEncryptAddr(address).c_str());
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("false, check permission failed");
+        return INVALID_NAME;
+    }
     if (IsBtEnabled()) {
         RawAddress addr(address);
         return pimpl->classicService_->GetAliasName(addr);
@@ -1219,6 +1231,10 @@ std::string BluetoothHostServer::GetDeviceAlias(const std::string &address)
 bool BluetoothHostServer::SetDeviceAlias(const std::string &address, const std::string &aliasName)
 {
     HILOGI("address: %{public}s, aliasName: %{public}s", GetEncryptAddr(address).c_str(), aliasName.c_str());
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("false, check permission failed");
+        return false;
+    }
     if (IsBtEnabled()) {
         RawAddress addr(address);
         return pimpl->classicService_->SetAliasName(addr, aliasName);
@@ -1366,6 +1382,10 @@ std::vector<bluetooth::Uuid> BluetoothHostServer::GetDeviceUuids(int32_t transpo
 bool BluetoothHostServer::SetDevicePin(const std::string &address, const std::string &pin)
 {
     HILOGI("address: %{public}s, pin: %{public}s", GetEncryptAddr(address).c_str(), pin.c_str());
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("false, check permission failed");
+        return false;
+    }
     if (IsBtEnabled()) {
         RawAddress addr(address);
         return pimpl->classicService_->SetDevicePin(addr, pin);
@@ -1398,6 +1418,10 @@ bool BluetoothHostServer::SetDevicePasskey(int32_t transport, const std::string 
 {
     HILOGI("transport: %{public}d, address: %{public}s, passkey: %{public}d, accept: %{public}d",
         transport, GetEncryptAddr(address).c_str(), passkey, accept);
+    if (PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("false, check permission failed");
+        return false;
+    }
     RawAddress addr(address);
     if ((transport == BT_TRANSPORT_BREDR) && IsBtEnabled()) {
         return pimpl->classicService_->SetDevicePasskey(addr, passkey, accept);

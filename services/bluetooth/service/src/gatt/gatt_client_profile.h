@@ -40,6 +40,7 @@
 #include "dispatcher.h"
 #include "gatt_client_profile_callback.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattClientProfile {
 public:
@@ -96,5 +97,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GATT_CLIENT_PROFILE_H

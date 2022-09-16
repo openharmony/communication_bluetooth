@@ -21,6 +21,7 @@
 #include "log.h"
 #include "raw_address.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief opp gap client
@@ -80,4 +81,5 @@ private:
     bool l2capOrRfcomm_ = false;       // true:l2cap false:rfcomm
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // OPP_GAP_CLIENT_H

@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 class BleAdvertiserCallback : public IBleAdvertiserCallback {
 public:
     BleAdvertiserCallback() = default;

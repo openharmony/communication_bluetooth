@@ -21,6 +21,7 @@
 #include "raw_address.h"
 #include "transport_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief This TransportFactory class provides a set of methods that create rfcomm transport and l2cap transport.
@@ -48,4 +49,5 @@ public:
     static std::unique_ptr<DataTransport> CreateL2capTransport(L2capTransportInfo &createInfo);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // TRANSPORT_FACTORY_H

@@ -19,6 +19,7 @@
 #include "class_creator.h"
 #include "profile_service_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcpCtService::AvrcpCtService() : utility::Context(PROFILE_NAME_AVRCP_CT, "1.6.2")
 {
@@ -2247,3 +2248,4 @@ bool AvrcpCtService::CheckConnectionNum()
 
 REGISTER_CLASS_CREATOR(AvrcpCtService);
 }  // namespace bluetooth
+}  // namespace OHOS

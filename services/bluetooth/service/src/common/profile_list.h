@@ -21,6 +21,7 @@
 
 #include "base/base_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents profile list template.
@@ -236,6 +237,7 @@ private:
 };
 
 #define FOR_EACH_LIST(it, profileList, transport) for (auto it : *(profileList.GetProfiles(transport)))
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PROFILE_CONFIG_H

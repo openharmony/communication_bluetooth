@@ -25,6 +25,7 @@
 #include "ble_defs.h"
 #include "interface_adapter_ble.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @BleProperties to save and get classic properties.
@@ -86,5 +87,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // BLE_PROPERTIES_H

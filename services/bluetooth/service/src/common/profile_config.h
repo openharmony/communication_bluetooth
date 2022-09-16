@@ -21,6 +21,7 @@
 
 #include "base/base_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::string SECTION_CONNECTION_POLICIES = "ConnectionPolicies";
 const std::string SECTION_PERMISSION = "Permission";
@@ -290,6 +291,7 @@ private:
 
     DECLARE_IMPL();
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // PROFILE_CONFIG_H

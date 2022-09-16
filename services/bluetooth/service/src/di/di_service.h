@@ -20,6 +20,7 @@
 #include "di_config.h"
 #include "interface_profile.h"
 
+namespace OHOS {
 namespace bluetooth {
 constexpr uint16_t UUID_SERVICE_CLASS_PNP_INFORMATION = 0x1200;
 constexpr uint16_t ATTR_ID_SPECIFICATION_ID = 0x0200;
@@ -83,5 +84,6 @@ private:
     uint32_t handle_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // DEVICE_INFO_H

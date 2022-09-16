@@ -19,6 +19,7 @@
 #include <mutex>
 #include "a2dp_encoder_sbc.h"
 
+namespace OHOS {
 namespace bluetooth {
 class A2dpSharedBuffer {
 public:
@@ -36,6 +37,7 @@ private:
     std::mutex mutex_;
     bool isValid_ = false;
 };
-}
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // A2DP_SHARED_BUFFER_H

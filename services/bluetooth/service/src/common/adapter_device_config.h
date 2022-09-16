@@ -25,6 +25,7 @@
 /*
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 const std::string SECTION_HOST = "Host";
 const std::string PROPERTY_DEVICE_ADDR = "Address";
@@ -456,5 +457,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif // ADAPTER_DEVICE_CONFIG_H

@@ -20,6 +20,7 @@
 #include "log.h"
 #include "opp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 OppSendFileBodyObject::OppSendFileBodyObject(const std::string &file)
 {
@@ -441,3 +442,4 @@ std::u16string OppObexClient::StringToU16string(const std::string &str) const
     return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.from_bytes(str);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

@@ -36,6 +36,7 @@
 #include "interface_adapter.h"
 #include <memory>
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents adapter state change observer during enable/disable.
@@ -298,5 +299,6 @@ public:
     virtual int GetPowerMode(const std::string &address) const = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_ADAPTER_MANAGER

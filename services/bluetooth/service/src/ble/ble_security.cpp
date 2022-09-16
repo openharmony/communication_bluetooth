@@ -27,6 +27,7 @@
 #include "log.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 struct BleSecurity::impl {
 public:
@@ -948,3 +949,4 @@ int BleSecurity::CancelPairing(const RawAddress &device) const
     return GAPIF_LeCancelPair(&addr);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

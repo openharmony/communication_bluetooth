@@ -27,6 +27,7 @@
 #include "btstack.h"
 #include "hfp_ag_defines.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for Audio connection required by AudioGateway.
@@ -420,4 +421,5 @@ private:
     int inUseCodec_ {HFP_AG_CODEC_CVSD};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_AUDIO_CONNECTION_H

@@ -16,6 +16,7 @@
 #include "map_mse_vcard.h"
 #include <algorithm>
 
+namespace OHOS {
 namespace bluetooth {
 MapMseVcard::MapMseVcard(const MseVcard2 &vcard)
     : name_(vcard.name_),
@@ -148,3 +149,4 @@ std::string MapMseVcard::ToVcardString(const std::string &bmsgVersion)
     return vcd;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

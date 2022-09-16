@@ -17,6 +17,7 @@
 #include "string"
 #include "vector"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcMpItem::AvrcMpItem(uint8_t itemType, uint16_t playerId, uint8_t majorType, uint32_t subType, uint8_t playStatus,
     const std::vector<uint8_t> &features, const std::string &name)
@@ -39,3 +40,4 @@ AvrcMeItem::AvrcMeItem(uint8_t itemType, uint64_t uid, uint8_t type, uint8_t pla
       values_(values)
 {}
 }  // namespace bluetooth
+}  // namespace OHOS

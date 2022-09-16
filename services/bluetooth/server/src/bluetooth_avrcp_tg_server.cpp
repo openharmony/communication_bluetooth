@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 struct BluetoothAvrcpTgServer::impl {
 public:
@@ -244,7 +244,7 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgServer::GetConnectedDevices()
     HILOGI("start.");
 
     std::vector<BluetoothRawAddress> results;
-    
+
     if (!pimpl->IsEnabled()) {
         HILOGE("service is null or disable ");
         return results;
@@ -255,7 +255,7 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgServer::GetConnectedDevices()
     for (auto device : devices) {
         BluetoothRawAddress rawAddr = BluetoothRawAddress(device);
         results.emplace_back(rawAddr);
-        
+
     }
     HILOGI("end.");
 
@@ -283,7 +283,7 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgServer::GetDevicesByStates(cons
         HILOGI("state = %{public}d", state);
         convertStates.push_back(static_cast<int>(state));
     }
-        
+
     devices = pimpl->service_->GetDevicesByStates(convertStates);
     for (auto device : devices) {
         BluetoothRawAddress rawAddr = BluetoothRawAddress(device);
@@ -330,7 +330,7 @@ void BluetoothAvrcpTgServer::NotifyPlaybackStatusChanged(int32_t playStatus, int
 void BluetoothAvrcpTgServer::NotifyTrackChanged(int64_t uid, int32_t playbackPos)
 {
     HILOGI("uid: %{public}jd, playbackPos: %{public}d", uid, playbackPos);
-    
+
     if (!pimpl->IsEnabled()) {
         HILOGE("service is null or disable ");
         return;

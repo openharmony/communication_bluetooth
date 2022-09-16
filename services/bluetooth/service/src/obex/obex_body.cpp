@@ -19,6 +19,7 @@
 #include "log.h"
 #include "obex_types.h"
 
+namespace OHOS {
 namespace bluetooth {
 ObexArrayBodyObject::ObexArrayBodyObject(const uint8_t *buf, size_t bufLen)
 {
@@ -61,3 +62,4 @@ int ObexArrayBodyObject::Close()
     return 0;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

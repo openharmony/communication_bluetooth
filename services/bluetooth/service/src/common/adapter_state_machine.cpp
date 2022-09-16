@@ -21,6 +21,7 @@
 #include "power_manager.h"
 #include "profile_service_manager.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int ENABLE_DISABLE_TIMEOUT_TIME = 70000;
 
@@ -212,3 +213,4 @@ bool AdapterTurningOffState::Dispatch(const utility::Message &msg)
     return true;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

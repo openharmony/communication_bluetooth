@@ -25,6 +25,7 @@
 #include "hfp_ag_system_event_processer.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Class for AG state machine.
@@ -293,4 +294,5 @@ private:
     void ProcessSetVolume(const HfpAgMessage &event);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_STATEMACHINE_H

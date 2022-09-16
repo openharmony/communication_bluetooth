@@ -42,6 +42,7 @@
 #include "gatt_profile_defines.h"
 #include "gatt_server_profile_callback.h"
 
+namespace OHOS {
 namespace bluetooth {
 class GattServerProfile {
 public:
@@ -84,5 +85,6 @@ private:
     DECLARE_IMPL();
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // GATT_SERVER_PROFILE_H

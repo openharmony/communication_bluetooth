@@ -23,6 +23,7 @@
 #include "packet.h"
 #include "transport/transport_factory.h"
 
+namespace OHOS {
 namespace bluetooth {
 ObexSocketTransport::ObexSocketTransport(
     DataTransport *dataTransport, uint16_t sendMtu, uint16_t recvMtu, const std::string &parentTranKey)
@@ -684,3 +685,4 @@ void ObexServerSocketTransport::TransportObserver::ProcessOnTransportError(DataT
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

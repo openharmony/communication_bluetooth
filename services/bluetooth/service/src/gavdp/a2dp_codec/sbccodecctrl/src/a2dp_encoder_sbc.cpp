@@ -23,6 +23,7 @@
 #include "securec.h"
 #include "../../../a2dp_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 const int BIT_SBC_NUMBER_PER_SAMPLE = 8;
 const int MS_TO_US = 1000;
@@ -325,9 +326,9 @@ void A2dpSbcEncoder::UpdateEncoderParam(void)
 bool A2dpSbcEncoder::A2dpSbcReadFeeding(uint32_t *bytesRead)
 {
     LOG_INFO("[SbcEncoder] %{public}s\n", __func__);
-    
+
     uint32_t expectedReadPcmData = a2dpSbcEncoderCb_.feedingState.bytesPerTick;
-    
+
     if (expectedReadPcmData + a2dpSbcEncoderCb_.offsetPCM > FRAME_THREE * A2DP_SBC_MAX_PACKET_SIZE) {
         LOG_ERROR("[Feeding] buffer no space");
         return false;
@@ -687,3 +688,4 @@ void A2dpSbcEncoder::UpdateMtuSize(void)
     LOG_INFO("[SBCEncoder] %{public}s [mtuSize:%u]", __func__, a2dpSbcEncoderCb_.mtuSize);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

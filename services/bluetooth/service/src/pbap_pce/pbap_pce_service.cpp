@@ -24,6 +24,7 @@
 #include "pbap_pce_state_machine.h"
 #include "profile_config.h"
 
+namespace OHOS {
 namespace bluetooth {
 PbapPceService::PbapPceService() : utility::Context("PbapPceService", "1.2.3")
 {
@@ -901,3 +902,4 @@ bool PbapPceService::LoadConnectPolicy(const std::string &addr, int &strategy)
 
 REGISTER_CLASS_CREATOR(PbapPceService);
 }  // namespace bluetooth
+}  // namespace OHOS

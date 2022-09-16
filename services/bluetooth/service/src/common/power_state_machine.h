@@ -19,6 +19,7 @@
 #include "power_device.h"
 #include "state_machine.h"
 
+namespace OHOS {
 namespace bluetooth {
 const std::string ACTIVE_STATE = "Active";
 const std::string SNIFF_STATE = "Sniff";
@@ -253,5 +254,6 @@ public:
     virtual bool Dispatch(const utility::Message &msg);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // ADAPTER_STATE_MACHINE_H

@@ -15,6 +15,7 @@
 
 #include "avrcp_tg_sub_unit_info.h"
 
+namespace OHOS {
 namespace bluetooth {
 AvrcTgSubUnitPacket::AvrcTgSubUnitPacket(void) : AvrcTgUnitPacket()
 {
@@ -86,3 +87,4 @@ bool AvrcTgSubUnitPacket::DisassemblePacket(Packet *pkt)
     return isValid;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

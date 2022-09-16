@@ -36,6 +36,7 @@
 
 #include "adapter_device_config.h"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents classic config.
@@ -358,4 +359,5 @@ private:
     IAdapterDeviceConfig *config_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // CLASSIS_CONFIG_H

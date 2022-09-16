@@ -19,6 +19,7 @@
 #include "interface_profile.h"
 #include "securec.h"
 
+namespace OHOS {
 namespace bluetooth {
 const uint8_t GattServiceBase::MAXIMUM_NUMBER_APPLICATION = 0xFF;
 
@@ -81,3 +82,4 @@ int GattServiceBase::GetApplicationId()
     return distribution(generator);
 }
 }  // namespace bluetooth
+}  // namespace OHOS

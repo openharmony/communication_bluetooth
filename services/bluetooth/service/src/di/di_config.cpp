@@ -18,6 +18,7 @@
 #include "bt_def.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 DIConfig &DIConfig::GetInstance()
 {
@@ -102,3 +103,4 @@ int DIConfig::GetVendorIdSource() const
     return vendorIdSrc;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

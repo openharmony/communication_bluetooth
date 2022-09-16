@@ -21,6 +21,7 @@
 #include "bt_def.h"
 #include "log.h"
 
+namespace OHOS {
 namespace bluetooth {
 #define MAP_MSE_L2CAP_ENABLE
 #define MSE_LOG_DEBUG(fmt, ...) LOG_DEBUG("[MAP MSE]:" fmt, ##__VA_ARGS__)
@@ -172,5 +173,6 @@ static const std::string MAP_MSE_TABLE_FOLDER = "folder";
 static const std::string MAP_MSE_TABLE_CONVERSATION = "conversation";
 static const std::string MAP_MSE_TABLE_PARTICIPANT = "participant";
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // MAP_MSE_TYPES_H

@@ -30,6 +30,7 @@
 #include "gap_if.h"
 #include "interface_adapter_classic.h"
 #include "log.h"
+#include "log_util.h"
 #include "raw_address.h"
 #include "sdp.h"
 
@@ -48,6 +49,7 @@
  *
  */
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents classic adapter.
@@ -1078,4 +1080,5 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(ClassicAdapter);
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // CLASSIC_ADAPTER_H

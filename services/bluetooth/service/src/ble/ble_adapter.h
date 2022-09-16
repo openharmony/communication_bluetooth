@@ -34,6 +34,7 @@
 /*
  * @brief The Bluetooth subsystem.
  */
+namespace OHOS {
 namespace bluetooth {
 /**
  *  @brief BLE Adpter implementation class
@@ -208,6 +209,7 @@ private:
     BT_DISALLOW_COPY_AND_ASSIGN(BleAdapter);
     DECLARE_IMPL();
 };
-};  // namespace bluetooth
+}  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  /// BLE_ADAPTER_H

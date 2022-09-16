@@ -21,6 +21,7 @@
 
 #include "hfp_ag_data_connection.h"
 
+namespace OHOS {
 namespace bluetooth {
 typedef enum {
     HFP_AG_CMD_INVALID = 0,
@@ -398,4 +399,5 @@ private:
     static inline constexpr int LOCAL_HF_IND_NUM = 2;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif // HFP_AG_COMMAND_PROCESSOR_H

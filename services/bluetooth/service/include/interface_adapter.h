@@ -53,6 +53,7 @@ namespace utility {
 class Context;
 }
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents basic adapter for classic and ble, including the common functions.
@@ -270,5 +271,6 @@ public:
     virtual utility::Context *GetContext() = 0;
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 
 #endif  // INTERFACE_ADAPTER_H

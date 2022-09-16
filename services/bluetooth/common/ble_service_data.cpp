@@ -21,6 +21,7 @@
 #include "map"
 #include "vector"
 
+namespace OHOS {
 namespace bluetooth {
 /**
  * @brief Represents scan settings.
@@ -1431,3 +1432,4 @@ size_t BlePeripheralDevice::GetPayloadLen() const
     return payloadLen_;
 }
 }  // namespace bluetooth
+}  // namespace OHOS

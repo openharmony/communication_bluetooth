@@ -15,6 +15,7 @@
 
 #include "hid_host_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 HidHostService::HidHostService() : utility::Context(PROFILE_NAME_HID_HOST, "1.1.1")
 {
@@ -88,7 +89,7 @@ void HidHostService::StartUp()
     }
 
     maxConnectionsNum_ = GetMaxConnectionsDeviceNum();
-    
+
     int ret = HidHostL2capConnection::Startup();
 
     GetContext()->OnEnable(PROFILE_NAME_HID_HOST, ret ? false : true);
@@ -468,3 +469,4 @@ void HidHostService::ProcessDefaultEvent(const HidHostMessage &event) const
 }
 REGISTER_CLASS_CREATOR(HidHostService);
 }  // namespace bluetooth
+}  // namespace OHOS

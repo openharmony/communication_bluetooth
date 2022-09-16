@@ -30,6 +30,7 @@
 #include "socket_service.h"
 #include "socket_util.h"
 
+namespace OHOS {
 namespace bluetooth {
 static int g_arrayServiceId[SOCK_MAX_SERVICE_ID] = {0};
 std::vector<Socket *> Socket::g_allServerSockets;
@@ -1014,3 +1015,4 @@ void Socket::ClearUpAllSocket()
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

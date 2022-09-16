@@ -25,6 +25,7 @@
 #include "a2dp_codec_wrapper.h"
 #include "base_def.h"
 
+namespace OHOS {
 namespace bluetooth {
 // A2dpCodecFactory manage all codec
 class A2dpCodecFactory {
@@ -65,4 +66,5 @@ private:
     std::list<A2dpCodecConfig *> indexedSinkCodecs_ {};
 };
 }  // namespace bluetooth
+}  // namespace OHOS
 #endif  // A2DP_CODEC_FACTORY_H

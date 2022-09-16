@@ -17,6 +17,7 @@
 #include <endian.h>
 #include "pan_service.h"
 
+namespace OHOS {
 namespace bluetooth {
 int PanBnep::Startup()
 {
@@ -1406,3 +1407,4 @@ std::string PanBnep::GetEventName(int what)
     }
 }
 }  // namespace bluetooth
+}  // namespace OHOS

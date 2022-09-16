@@ -32,7 +32,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 AvrcpCtResponse::AvrcpCtResponse(uint8_t type, int resp) : type_(type), resp_(resp)
 {
@@ -138,7 +138,7 @@ public:
             return;
         }
 
-        void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> attributes, 
+        void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> attributes,
             const std::vector<uint8_t> &values, int result) override
         {
             HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
@@ -272,7 +272,7 @@ public:
             return;
         }
 
-        void OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues, 
+        void OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues,
             const std::vector<std::string> &values, int result, int detail) override
         {
             HILOGI("enter, address: %{public}s, res: %{public}d, detail: %{public}d",
@@ -505,7 +505,7 @@ public:
         const std::vector<uint8_t> &events, int result)
     {
         HILOGI("enter, device: %{public}s, res: %{public}d", GET_ENCRYPT_ADDR(device), result);
-        
+
         std::lock_guard<std::mutex> lock(observerMutex_);
 
         observers_.ForEach([device, companies, events, result](std::shared_ptr<IObserver> observer) {
