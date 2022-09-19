@@ -23,7 +23,9 @@ ohos_shared_library("bluetooth_server") {
     "//foundation/communication/bluetooth/frameworks/inner/common",
     "//foundation/communication/bluetooth/interfaces/inner_api/include",
     "//foundation/communication/bluetooth/services/bluetooth/service/include",
+    "//foundation/communication/bluetooth/services/bluetooth/service/src/ble",
     "//foundation/communication/bluetooth/services/bluetooth/service/src/permission",
+    "//foundation/communication/bluetooth/services/bluetooth/stack/include",
   ]
 
   sources = [
