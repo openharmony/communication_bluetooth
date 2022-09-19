@@ -349,8 +349,8 @@ void OppStateMachine::NotifyStateTransitions()
     int toState = GetDeviceStateInt();
     if (service != nullptr) {
         RawAddress device(address_);
-        if ((preState_ != toState) && (preState_ <= OPP_STATE_CONNECTED)
-            && (toState <= OPP_STATE_CONNECTED)) {
+        if ((preState_ != toState) && (preState_ <= OPP_STATE_CONNECTED) &&
+            (toState <= OPP_STATE_CONNECTED)) {
             service->NotifyStateChanged(device, toState);
         }
     }

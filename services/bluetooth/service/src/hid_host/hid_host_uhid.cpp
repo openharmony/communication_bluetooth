@@ -194,7 +194,7 @@ int HidHostUhid::SendHidInfo(const char* devName, PnpInformation& pnpInf, HidInf
         != EOK) {
         LOG_ERROR("[UHID]%{public}s(): memcpy error", __FUNCTION__);
     }
-    int uniqLength = snprintf_s((char*)ev.u.create.uniq, sizeof(ev.u.create.uniq), address_.length(),
+    int uniqLength = snprintf_s(reinterpret_cast<char*>(ev.u.create.uniq), sizeof(ev.u.create.uniq), address_.length(),
         "%s", address_.c_str());
     if (uniqLength < 0) {
         LOG_ERROR("[UHID]%{public}s(): snprintf length error, uniqLength = %{public}d", __FUNCTION__, uniqLength);
@@ -312,7 +312,7 @@ void* HidHostUhid::PollEventThread(void* arg)
 
 void HidHostUhid::PollEventThread_()
 {
-    LOG_INFO("[UHID]%{public}s(): Thread:%{public}d, fd:%{public}d execute", __FUNCTION__, (int)pollThreadId_, fd_);
+    HILOGI("Thread:%{public}d, fd:%{public}d execute", static_cast<int>(pollThreadId_), fd_);
     struct pollfd pfds[1];
     keepPolling_ = true;
     pfds[0].fd = fd_;

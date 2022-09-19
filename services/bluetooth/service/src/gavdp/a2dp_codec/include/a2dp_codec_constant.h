@@ -35,7 +35,7 @@
 #define A2DP_AAC_MIN_BITRATE 64000       // 64 kbps
 
 #define A2DP_SUCCESS 0
-#define A2DP_BADPARAM -1
+#define A2DP_BADPARAM (-1)
 
 enum A2dpCodecType : uint8_t {
     A2DP_CODEC_TYPE_SBC = 0,

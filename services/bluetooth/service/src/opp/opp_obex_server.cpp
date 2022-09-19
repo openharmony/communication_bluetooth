@@ -61,7 +61,7 @@ size_t OppReceiveFileBodyObject::Write(const uint8_t *buf, size_t bufLen)
 {
     size_t writeSize = 0;
     if (ofs_.is_open()) {
-        auto buffer = (const char*)(char*)(buf);
+        auto buffer = reinterpret_cast<const char *>(buf);
         ofs_.write(buffer, bufLen);
         fileReceiveSize_ += bufLen;
         writeSize = bufLen;

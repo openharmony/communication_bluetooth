@@ -27,7 +27,7 @@ namespace Bluetooth {
  * @since 1.0
  * @version 1.0
  */
-class  BluetoothIPbapPullPhoneBookParam: public Parcelable, public bluetooth::IPbapPullPhoneBookParam {
+class BluetoothIPbapPullPhoneBookParam : public Parcelable, public bluetooth::IPbapPullPhoneBookParam {
 public:
     BluetoothIPbapPullPhoneBookParam() = default;
     virtual ~BluetoothIPbapPullPhoneBookParam() = default;
@@ -63,7 +63,7 @@ public:
  * @since 1.0
  * @version 1.0
  */
-class BluetoothIPbapPullvCardListingParam: public Parcelable, public bluetooth::IPbapPullvCardListingParam {
+class BluetoothIPbapPullvCardListingParam : public Parcelable, public bluetooth::IPbapPullvCardListingParam {
 public:
     BluetoothIPbapPullvCardListingParam() = default;
     virtual ~BluetoothIPbapPullvCardListingParam() = default;

@@ -204,8 +204,8 @@ void ObexPrivateServer::ObexServerTransportObserver::HandleDataAvailableConnect(
 {
     int minPacketSize = std::min(
         serverSession.GetTransport().GetMaxReceivePacketSize(), serverSession.GetTransport().GetMaxSendPacketSize());
-    minPacketSize = std::min(minPacketSize, (int)serverSession.GetMaxPacketLength());
-    minPacketSize = std::min(minPacketSize, (int)*req.GetFieldMaxPacketLength());
+    minPacketSize = std::min(minPacketSize, static_cast<int>(serverSession.GetMaxPacketLength()));
+    minPacketSize = std::min(minPacketSize, static_cast<int>(*req.GetFieldMaxPacketLength()));
     if (minPacketSize < OBEX_MINIMUM_MTU) {
         minPacketSize = OBEX_MINIMUM_MTU;
     }

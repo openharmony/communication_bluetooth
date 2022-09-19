@@ -168,7 +168,8 @@ int OppSdpServer::AddSupportedFormatsList() const
 {
     HILOGI("[OPP SDP SERVER] Call");
     return SDP_AddSequenceAttribute(sdpHandle_, OPP_GOEP_SUPPORTED_FORMATS_LIST_ATTRIBUTE_ID,
-        (uint8_t*)g_oppSupportedFormatsListData, sizeof(g_oppSupportedFormatsListData));
+        reinterpret_cast<uint8_t*>(const_cast<uint8_t*>(g_oppSupportedFormatsListData)),
+        sizeof(g_oppSupportedFormatsListData));
 }
 }  // namespace bluetooth
 }  // namespace OHOS

@@ -71,8 +71,8 @@ bool PbapPceStateMachine::IsRepositorySupported(const std::u16string &name) cons
         }
     }
 
-    bool isSim = std::u16string::npos != name.find(u"SIM");
-    bool isFav = std::u16string::npos != name.find(u"fav");
+    bool isSim = name.find(u"SIM") != std::u16string::npos;
+    bool isFav = name.find(u"fav") != std::u16string::npos;
     if (isLocalPhoneBook && (GetSupportedRes() & PBAP_PCE_SUPPORTED_REPOS_LOCALPB)) {
         ret = true;
     } else if (isSim && (GetSupportedRes() & PBAP_PCE_SUPPORTED_REPOS_SIMCARD)) {
@@ -373,7 +373,7 @@ bool PbapPceStateMachine::SplitFilePath(
 {
     bool ret = false;
     size_t pos = filePath.find_last_of(u'/');
-    if (std::u16string::npos != pos) {
+    if (pos != std::u16string::npos) {
         retPath = filePath.substr(0, pos);
         retFileName = filePath.substr(pos + 1);
         ret = true;
@@ -521,17 +521,17 @@ void PbapPceStateMachine::HandleSetPhoneBookActionCompleted(const utility::Messa
     std::string respTxt;
     uint8_t respCode = resp->GetFieldCode();
     std::u16string name = pceObexMsg->GetName();
-    if (static_cast<uint8_t>(ObexRspCode::SUCCESS) == respCode) {
+    if (respCode == static_cast<uint8_t>(ObexRspCode::SUCCESS)) {
         // PBAP v1.2.3
         // go up - bit0=1; go down - bit0=0; go to root - bit0=0 && Name is empty.
         const uint8_t flagMask = 0x01;
-        if (std::u16string::npos != name.find(u'/')) {
+        if (name.find(u'/') != std::u16string::npos) {
             SetCurrentPath(name);
         } else if (pceObexMsg->GetFlags() & flagMask) {
             // go up
             std::u16string currentPath = GetCurrentPath();
             size_t pos = currentPath.find_last_of(u'/');
-            if (std::u16string::npos != pos) {
+            if (pos != std::u16string::npos) {
                 currentPath = currentPath.substr(0, pos);
                 SetCurrentPath(currentPath);
             } else {
@@ -573,7 +573,7 @@ void PbapPceStateMachine::HandlePullvCardListingActionCompleted(const utility::M
     std::string respBodyObject;
     IPbapPhoneBookData result;
     uint8_t respCode = resp->GetFieldCode();
-    if (static_cast<uint8_t>(ObexRspCode::SUCCESS) == respCode) {
+    if (respCode == static_cast<uint8_t>(ObexRspCode::SUCCESS)) {
         if (ObexHeaderToDataResult(*resp, PBAP_ACTION_PULLVCARDLISTING, result)) {
             respBodyObject.assign(result.result_.begin(), result.result_.end());
             respTxt = "PullvCardListing Completed:\n" + respBodyObject;
@@ -606,7 +606,7 @@ void PbapPceStateMachine::HandlePullvCardEntryActionCompleted(const utility::Mes
     uint8_t respCode = resp->GetFieldCode();
     std::string respTxt;
     std::string respBodyObject;
-    if (static_cast<uint8_t>(ObexRspCode::SUCCESS) == respCode) {
+    if (respCode == static_cast<uint8_t>(ObexRspCode::SUCCESS)) {
         if (ObexHeaderToDataResult(*resp, PBAP_ACTION_PULLVCARDENTRY, result)) {
             respBodyObject.assign(result.result_.begin(), result.result_.end());
         }

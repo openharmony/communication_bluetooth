@@ -795,7 +795,7 @@ static void SMP_LinkLayerEncCompMaster()
         return;
     }
     LOG_INFO("g_smpPairMng.peer.keyDistCmdFlag is 0.");
-    if ((SMP_PAIR_TYPE_LEGACY == SMP_GetPairMng()->pairType) &&
+    if ((SMP_GetPairMng()->pairType) == SMP_PAIR_TYPE_LEGACY &&
         (SMP_GetPairMng()->local.keyDist & SMP_KEY_DIST_BIT_ENC_KEY)) {
         LOG_INFO("Local  need  to  send  ENC_KEY.");
         LOG_DEBUG("SMP_LEGACY_PAIR_MASTER_STEP_13 Started.");

@@ -170,7 +170,7 @@ public:
           profile_(profile),
           eventProcessor_(eventDispatch),
           stateInt_(stateInt),
-          stateMachine_((HfpAgStateMachine &)stu.sm_)
+          stateMachine_(static_cast<HfpAgStateMachine &>(stu.sm_))
     {}
 
     HfpAgState(const std::string &name, utility::StateMachine &statemachine, HfpAgProfile &profile,

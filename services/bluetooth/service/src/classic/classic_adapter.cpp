@@ -652,10 +652,11 @@ void ClassicAdapter::ExtendedInquiryResultCallback(const BtAddr *addr, uint32_t 
     HILOGI("enter");
 
     GapCallbackParam param = {};
-    (void)memcpy_s((void *)&param.iniquiryResultParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
+    (void)memcpy_s(static_cast<void *>(const_cast<BtAddr *>(&param.iniquiryResultParam_.addr)),
+        sizeof(BtAddr), addr, sizeof(BtAddr));
     param.extendedInquiryResultParam_.classOfDevice = classOfDevice;
     param.extendedInquiryResultParam_.rssi = rssi;
-    (void)memcpy_s((void *)&param.extendedInquiryResultParam_.eir,
+    (void)memcpy_s(static_cast<void *>(&param.extendedInquiryResultParam_.eir),
         MAX_EXTEND_INQUIRY_RESPONSE_LEN,
         eir,
         MAX_EXTEND_INQUIRY_RESPONSE_LEN);
@@ -688,8 +689,10 @@ void ClassicAdapter::RemoteNameCallback(
 
     GapCallbackParam param = {};
     param.remoteNameCallbackParam_.status = status;
-    (void)memcpy_s((void *)&param.remoteNameCallbackParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
-    (void)memcpy_s((void *)param.remoteNameCallbackParam_.name, MAX_LOC_BT_NAME_LEN, name, MAX_LOC_BT_NAME_LEN);
+    (void)memcpy_s(static_cast<void *>(const_cast<BtAddr *>(&param.remoteNameCallbackParam_.addr)),
+        sizeof(BtAddr), addr, sizeof(BtAddr));
+    (void)memcpy_s(static_cast<void *>(const_cast<uint8_t *>(param.remoteNameCallbackParam_.name)),
+        MAX_LOC_BT_NAME_LEN, name, MAX_LOC_BT_NAME_LEN);
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     if (adapter != nullptr) {

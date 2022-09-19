@@ -1747,7 +1747,7 @@ void BleCentralManagerImpl::GapScanResolvingCompletEvt(int status, bool isStart)
 
 void BleCentralManagerImpl::HandleGapEvent(const BLE_GAP_CB_EVENT &event, int status) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:[event no: %{public}d]", __func__, (int)event);
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:[event no: %{public}d]", __func__, static_cast<int>(event));
 
     switch (event) {
         case BLE_GAP_SCAN_PARAM_SET_COMPLETE_EVT:
@@ -1863,7 +1863,7 @@ void BleCentralManagerImpl::GapExScanResolvingCompletEvt(int status, bool isStar
 
 void BleCentralManagerImpl::HandleGapExScanEvent(const BLE_GAP_CB_EVENT &event, int status) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:[event no: %{public}d]", __func__, (int)event);
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:[event no: %{public}d]", __func__, static_cast<int>(event));
 
     switch (event) {
         case BLE_GAP_EX_SCAN_PARAM_SET_COMPLETE_EVT:

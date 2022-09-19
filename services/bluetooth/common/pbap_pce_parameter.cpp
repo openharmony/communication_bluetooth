@@ -70,7 +70,7 @@ std::string IPbapPullPhoneBookParam::ToDebugString() const
         ss << "propertySelector:" << GetPropertySelector() << std::endl;
     }
     if (IsSpecified(IPbapPullPhoneBookParam::FORMAT)) {
-        ss << "format:" << (int)GetFormat() << std::endl;
+        ss << "format:" << static_cast<int>(GetFormat()) << std::endl;
     }
     if (IsSpecified(IPbapPullPhoneBookParam::MAX_LIST_COUNT)) {
         ss << "maxListCount:" << GetMaxListCount() << std::endl;
@@ -79,13 +79,13 @@ std::string IPbapPullPhoneBookParam::ToDebugString() const
         ss << "listStartOffset:" << GetListStartOffset() << std::endl;
     }
     if (IsSpecified(IPbapPullPhoneBookParam::RESET_NEW_MISSED_CALLS)) {
-        ss << "resetNewMissedCalls:" << (int)GetResetNewMissedCalls() << std::endl;
+        ss << "resetNewMissedCalls:" << static_cast<int>(GetResetNewMissedCalls()) << std::endl;
     }
     if (IsSpecified(IPbapPullPhoneBookParam::VCARD_SELECTOR)) {
         ss << "vCardSelector:" << GetvCardSelector() << std::endl;
     }
     if (IsSpecified(IPbapPullPhoneBookParam::VCARD_SELECTOROP)) {
-        ss << "vCardSelectorOp:" << (int)GetvCardSelectorOp() << std::endl;
+        ss << "vCardSelectorOp:" << static_cast<int>(GetvCardSelectorOp()) << std::endl;
     }
     return ss.str();
 }
@@ -248,13 +248,13 @@ std::string IPbapPullvCardListingParam::ToDebugString() const
     ss << "name:" << converter.to_bytes(GetName())
        << std::endl;
     if (IsSpecified(IPbapPullvCardListingParam::ORDER)) {
-        ss << "order:" << (int)GetOrder() << std::endl;
+        ss << "order:" << static_cast<int>(GetOrder()) << std::endl;
     }
     if (IsSpecified(IPbapPullvCardListingParam::SEARCH_VALUE)) {
         ss << "searchValue:" << GetSearchValue() << std::endl;
     }
     if (IsSpecified(IPbapPullvCardListingParam::SEARCH_PROPERTY)) {
-        ss << "searchProperty:" << (int)GetSearchProperty() << std::endl;
+        ss << "searchProperty:" << static_cast<int>(GetSearchProperty()) << std::endl;
     }
     if (IsSpecified(IPbapPullvCardListingParam::MAX_LIST_COUNT)) {
         ss << "maxListCount:" << GetMaxListCount() << std::endl;
@@ -263,13 +263,13 @@ std::string IPbapPullvCardListingParam::ToDebugString() const
         ss << "listStartOffset:" << GetListStartOffset() << std::endl;
     }
     if (IsSpecified(IPbapPullvCardListingParam::RESET_NEW_MISSED_CALLS)) {
-        ss << "resetNewMissedCalls:" << (int)GetResetNewMissedCalls() << std::endl;
+        ss << "resetNewMissedCalls:" << static_cast<int>(GetResetNewMissedCalls()) << std::endl;
     }
     if (IsSpecified(IPbapPullvCardListingParam::VCARD_SELECTOR)) {
         ss << "vCardSelector:" << GetvCardSelector() << std::endl;
     }
     if (IsSpecified(IPbapPullvCardListingParam::VCARD_SELECTOROP)) {
-        ss << "vCardSelectorOp:" << (int)GetvCardSelectorOp() << std::endl;
+        ss << "vCardSelectorOp:" << static_cast<int>(GetvCardSelectorOp()) << std::endl;
     }
     return ss.str();
 }
@@ -444,7 +444,7 @@ std::string IPbapPullvCardEntryParam::ToDebugString() const
         ss << "propertySelector:" << GetPropertySelector() << std::endl;
     }
     if (IsSpecified(IPbapPullvCardEntryParam::FORMAT)) {
-        ss << "format:" << (int)GetFormat() << std::endl;
+        ss << "format:" << static_cast<int>(GetFormat()) << std::endl;
     }
     return ss.str();
 }

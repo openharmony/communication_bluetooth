@@ -679,15 +679,15 @@ void MapMseResource::AddVer10Node(xmlNodePtr &node, MseMessageElement &msg, uint
 
 std::string MapMseResource::ChangeType(MessageType type)
 {
-    if (MessageType::EMAIL == type) {
+    if (type == MessageType::EMAIL) {
         return "EMAIL";
-    } else if (MessageType::IM == type) {
+    } else if (type == MessageType::IM) {
         return "IM";
-    } else if (MessageType::MMS == type) {
+    } else if (type == MessageType::MMS) {
         return "MMS";
-    } else if (MessageType::SMS_GSM == type) {
+    } else if (type == MessageType::SMS_GSM) {
         return "SMS_GSM";
-    } else if (MessageType::SMS_CDMA == type) {
+    } else if (type == MessageType::SMS_CDMA) {
         return "SMS_CDMA";
     } else {
         return "NONE";
@@ -831,7 +831,7 @@ void MapMseResource::SetNotificationRegistration(const RawAddress &remoteAddr, c
 {
     MSE_LOG_INFO("%{public}s Enter", __PRETTY_FUNCTION__);
 
-    if (NotificationStatus::ON == NotificationStatus(status)) {
+    if (NotificationStatus(status) == NotificationStatus::ON) {
         mnsClient_->Connect(remoteAddr, masId_);
     } else {
         mnsClient_->DisConnect(remoteAddr, masId_);
@@ -1354,7 +1354,7 @@ bool MapMseResource::SetMessageStatusDeleted(
     stmt->SetParamString(0x1, MAP_MSE_FOLDER_NAME_DELETED);
     stmt->SetParamString(0x2, handle);
     std::string folderName = MAP_MSE_FOLDER_NAME_INBOX;
-    if (MessageType::EMAIL == type) {
+    if (type == MessageType::EMAIL) {
         folderName = path;
     }
     stmt->SetParamString(0x3, folderName);
@@ -1382,7 +1382,7 @@ bool MapMseResource::SetMessageStatusRead(
     stmt->SetParamInt(0x1, status);
     stmt->SetParamString(0x2, handle);
     std::string folderName = MAP_MSE_FOLDER_NAME_INBOX;
-    if (MessageType::EMAIL == type) {
+    if (type == MessageType::EMAIL) {
         folderName = path;
     }
     stmt->SetParamString(0x3, folderName);
@@ -1723,7 +1723,7 @@ void MapMseResource::GetNameAddress(
     sender = "";
     if (vcard.size() > 0) {
         name = vcard.front().GetName();
-        if (MessageType::EMAIL == type) {
+        if (type == MessageType::EMAIL) {
             sender = vcard.front().GetFirstEmail();
         } else {
             sender = vcard.front().GetFirstPhoneNumber();
@@ -1817,16 +1817,16 @@ std::string MapMseResource::GetDateTime()
 
 uint64_t MapMseResource::GetMessageHandle(MessageType type)
 {
-    uint64_t handle = std::strtoul(GetDateTime().c_str(), NULL, 0x10);
-    if (MessageType::EMAIL == type) {
+    uint64_t handle = std::strtoul(GetDateTime().c_str(), nullptr, 0x10);
+    if (type == MessageType::EMAIL) {
         return handle | MESSAGE_HANDLE_EMAIL_MASK;
-    } else if (MessageType::IM == type) {
+    } else if (type == MessageType::IM) {
         return handle | MESSAGE_HANDLE_IM_MASK;
-    } else if (MessageType::MMS == type) {
+    } else if (type == MessageType::MMS) {
         return handle | MESSAGE_HANDLE_MMS_MASK;
-    } else if (MessageType::SMS_GSM == type) {
+    } else if (type == MessageType::SMS_GSM) {
         return handle | MESSAGE_HANDLE_SMS_GSM_MASK;
-    } else if (MessageType::SMS_CDMA == type) {
+    } else if (type == MessageType::SMS_CDMA) {
         return handle | MESSAGE_HANDLE_SMS_CDMA_MASK;
     } else {
         MSE_LOG_INFO("Message type is not supported.");
@@ -1836,15 +1836,15 @@ uint64_t MapMseResource::GetMessageHandle(MessageType type)
 
 std::string MapMseResource::GetMessageNameByType(MessageType type)
 {
-    if (MessageType::EMAIL == type) {
+    if (type == MessageType::EMAIL) {
         return "EMAIL";
-    } else if (MessageType::IM == type) {
+    } else if (type == MessageType::IM) {
         return "IM";
-    } else if (MessageType::MMS == type) {
+    } else if (type == MessageType::MMS) {
         return "MMS";
-    } else if (MessageType::SMS_GSM == type) {
+    } else if (type == MessageType::SMS_GSM) {
         return "SMS_GSM";
-    } else if (MessageType::SMS_CDMA == type) {
+    } else if (type == MessageType::SMS_CDMA) {
         return "SMS_CDMA";
     } else {
         return "NONE";
