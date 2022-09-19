@@ -224,7 +224,7 @@ void BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallback
     const wptr<IRemoteObject> &remote)
 {
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
-        if ((*it)->GetCallback()->AsObject() == remote) {
+        if ((*it) != nullptr && (*it)->GetCallback() != nullptr && (*it)->GetCallback()->AsObject() == remote) {
             HILOGI("callback is erased from callbacks");
             sptr<GattServerCallbackDeathRecipient> dr = (*it)->deathRecipient_;
             if (!dr->GetCallback()->AsObject()->RemoveDeathRecipient(dr)) {
