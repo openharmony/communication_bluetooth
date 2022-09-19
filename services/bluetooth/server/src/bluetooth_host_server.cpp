@@ -705,7 +705,6 @@ void BluetoothHostServer::OnStart()
 
 bool BluetoothHostServer::Init()
 {
-    pimpl->Init();
     if (!registeredToService_) {
         bool ret = Publish(BluetoothHostServer::GetInstance());
         if (!ret) {
@@ -715,6 +714,7 @@ bool BluetoothHostServer::Init()
         registeredToService_ = true;
     }
     HILOGI("init success");
+    pimpl->Init();
     return true;
 }
 
