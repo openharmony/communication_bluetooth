@@ -30,12 +30,12 @@ IProfileA2dp *IProfileA2dp::GetSrcProfile()
 
 A2dpSrcService::A2dpSrcService() : A2dpService(g_name, g_version, g_role)
 {
-    LOG_INFO("[A2dpSrcService] %{public}s\n", __func__);
+    HILOGI("enter");
 }
 
 A2dpSrcService *A2dpSrcService::GetProfile(void)
 {
-    LOG_INFO("[A2dpSrcService] %{public}s\n", __func__);
+    HILOGI("enter");
 
     static A2dpSrcService service;
     return &service;
