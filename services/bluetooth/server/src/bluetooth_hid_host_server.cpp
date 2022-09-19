@@ -22,7 +22,6 @@
 #include "permission_utils.h"
 #include "remote_observer_list.h"
 #include "hilog/log.h"
-#include "permission_utils.h"
 #include "bluetooth_hid_host_server.h"
 
 namespace OHOS {
