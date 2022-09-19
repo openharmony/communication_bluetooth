@@ -392,24 +392,26 @@ int Encoder::Analyze8Subbands(int position, int16_t x[CHANNEL_NUM][BUFFER_SIZE],
 
 static int16_t UnalignedBigEndian(const uint8_t *ptr)
 {
-    return (int16_t) ((ptr[VALUE_0] << VALUE_8) | ptr[VALUE_1]);
+    return static_cast<int16_t>((ptr[VALUE_0] << VALUE_8) | ptr[VALUE_1]);
 }
 
 static int16_t UnalignedLittleEndian(const uint8_t *ptr)
 {
-    return (int16_t) (ptr[VALUE_0] | (ptr[VALUE_1] << VALUE_8));
+    return static_cast<int16_t>(ptr[VALUE_0] | (ptr[VALUE_1] << VALUE_8));
 }
 
 int Encoder::Get4SubbandSamplingPoint(const uint8_t *pcm, int16_t x[CHANNEL_NUM][BUFFER_SIZE],
                                       int samples, int channels, int bigEndian)
 {
     if (position_ < samples) {
-        if (channels > VALUE_0)
+        if (channels > VALUE_0) {
             (void)memcpy_s(&x[VALUE_0][BUFFER_SIZE - VALUE_40], VALUE_36 * sizeof(int16_t), &x[VALUE_0][position_],
                            VALUE_36 * sizeof(int16_t));
-        if (channels > VALUE_1)
+        }
+        if (channels > VALUE_1) {
             (void)memcpy_s(&x[VALUE_1][BUFFER_SIZE - VALUE_40], VALUE_36 * sizeof(int16_t), &x[VALUE_1][position_],
                            VALUE_36 * sizeof(int16_t));
+        }
         position_ = BUFFER_SIZE - VALUE_40;
     }
 #define PCM(i) (bigEndian ? UnalignedBigEndian(pcm + (i) * VALUE_2) : UnalignedLittleEndian(pcm + (i) * VALUE_2))
@@ -566,12 +568,14 @@ int Encoder::Get8SubbandSamplingPoint(const uint8_t *pcm, int16_t (*x)[BUFFER_SI
                                       int *samples, int channels, int bigEndian)
 {
     if (position_ < *samples) {
-        if (channels > VALUE_0)
+        if (channels > VALUE_0) {
             (void)memcpy_s(&x[VALUE_0][BUFFER_SIZE - VALUE_72], VALUE_72 * sizeof(int16_t), &x[VALUE_0][position_],
                            VALUE_72 * sizeof(int16_t));
-        if (channels > VALUE_1)
+        }
+        if (channels > VALUE_1) {
             (void)memcpy_s(&x[VALUE_1][BUFFER_SIZE - VALUE_72], VALUE_72 * sizeof(int16_t), &x[VALUE_1][position_],
                            VALUE_72 * sizeof(int16_t));
+        }
         position_ = BUFFER_SIZE - VALUE_72;
     }
 

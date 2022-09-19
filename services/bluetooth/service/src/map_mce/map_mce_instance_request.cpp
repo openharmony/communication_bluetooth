@@ -177,7 +177,7 @@ int MapMceInstanceRequest::MapMessageTypeToFrameworkMask(MapMessageType type) co
     return int(mask);
 }
 
-MapMceRequestSetNotificationFilter::MapMceRequestSetNotificationFilter(int mask)
+MapMceRequestSetNotificationFilter::MapMceRequestSetNotificationFilter(const int mask)
 {
     LOG_INFO("%{public}s execute", __PRETTY_FUNCTION__);
     notificationFilterMask_ = mask;
@@ -209,7 +209,7 @@ int MapMceRequestSetNotificationFilter::SendRequest(ObexMpClient &obexIns)
     header->AppendItemType(MCE_HEADER_TYPE_SET_NOTIFICATION_FILTER);
 
     // Application Parameters
-    uint32_t value = (uint32_t)notificationFilterMask_;
+    uint32_t value = static_cast<uint32_t>(notificationFilterMask_);
     TlvTriplet paramNotif(MCE_NOTIFICATION_FILTER_MASK, value);
     ObexTlvParamters appParams;
     appParams.AppendTlvtriplet(paramNotif);
@@ -362,7 +362,7 @@ int MapMceRequestGetMasInstanceInformation::ProcessResponse(
             int ownerUciLength = tlvParam->GetLen();
             const uint8_t *val = tlvParam->GetVal();
             if ((ownerUciLength != 0) && (val != nullptr)) {
-                std::string tempUci((char *)val, ownerUciLength);
+                std::string tempUci(reinterpret_cast<char *>(const_cast<uint8_t *>(val)), ownerUciLength);
                 instancInfo.ownerUciUtf8 = tempUci;
             }
         }
@@ -459,7 +459,7 @@ int MapMceRequestGetFolderListing::ProcessResponse(
             length = tlvParam->GetLen();
             const uint8_t *val = tlvParam->GetVal();
             if ((length != 0) && (val != nullptr)) {
-                uint16_t tempVal = *((uint16_t *)val);
+                uint16_t tempVal = *(reinterpret_cast<uint16_t *>(const_cast<uint8_t *>(val)));
                 listSize_ = ((tempVal >> MCE_8BIT) & MCE_16BIT_MASK_LEFT_LOW) |
                             ((tempVal << MCE_8BIT) & MCE_16BIT_MASK_LEFT_HIGH);
             }
@@ -1024,7 +1024,7 @@ int MapMceRequestGetOwnerStatus::ProcessResponse(
             int length2 = tlvParam2->GetLen();
             const uint8_t *val2 = tlvParam2->GetVal();
             if ((length2 != 0) && (val2 != nullptr)) {
-                std::string tempPresence((char *)val2, length2);
+                std::string tempPresence(reinterpret_cast<char *>(const_cast<uint8_t *>(val2)), length2);
                 retAction.ownerStatus_.PresenceText = tempPresence;
             }
         }
@@ -1033,7 +1033,7 @@ int MapMceRequestGetOwnerStatus::ProcessResponse(
             int length3 = tlvParam3->GetLen();
             const uint8_t *val3 = tlvParam3->GetVal();
             if ((length3 != 0) && (val3 != nullptr)) {
-                std::string tempLastAct((char *)val3, length3);
+                std::string tempLastAct(reinterpret_cast<char *>(const_cast<uint8_t *>(val3)), length3);
                 retAction.ownerStatus_.LastActivity = tempLastAct;
             }
         }
@@ -1224,7 +1224,7 @@ void MapMceRequestGetConversationListing::MapMceGetItemAppParams(
             int convLenth = convListVerCnt->GetLen();
             const uint8_t *val1 = convListVerCnt->GetVal();
             if ((convLenth != 0) && (val1 != nullptr)) {
-                std::string tempCounter((char *)val1, convLenth);
+                std::string tempCounter(reinterpret_cast<char *>(const_cast<uint8_t *>(val1)), convLenth);
                 data.ConversationListingVersionCounter = tempCounter;
             }
         }
@@ -1233,7 +1233,7 @@ void MapMceRequestGetConversationListing::MapMceGetItemAppParams(
             int convMseLen = convMseTim->GetLen();
             const uint8_t *val2 = convMseTim->GetVal();
             if ((convMseLen != 0) && (val2 != nullptr)) {
-                std::string tempTime((char *)val2, convMseLen);
+                std::string tempTime(reinterpret_cast<char *>(const_cast<uint8_t *>(val2)), convMseLen);
                 data.MseTime = tempTime;
             }
         }
@@ -1242,7 +1242,7 @@ void MapMceRequestGetConversationListing::MapMceGetItemAppParams(
             int convListLength = convListSize->GetLen();
             const uint8_t *val3 = convListSize->GetVal();
             if ((convListLength != 0) && (val3 != nullptr)) {
-                uint16_t tempVal = *((uint16_t *)val3);
+                uint16_t tempVal = *(reinterpret_cast<uint16_t *>(const_cast<uint8_t *>(val3)));
                 data.ListingSize = ((tempVal >> MCE_8BIT) & MCE_16BIT_MASK_LEFT_LOW) |
                                    ((tempVal << MCE_8BIT) & MCE_16BIT_MASK_LEFT_HIGH);
             }
@@ -1252,7 +1252,7 @@ void MapMceRequestGetConversationListing::MapMceGetItemAppParams(
             int convDbIdLenth = convDbId->GetLen();
             const uint8_t *val4 = convDbId->GetVal();
             if ((convDbIdLenth != 0) && (val4 != nullptr)) {
-                std::string tempDatabase((char *)val4, convDbIdLenth);
+                std::string tempDatabase(reinterpret_cast<char *>(const_cast<uint8_t *>(val4)), convDbIdLenth);
                 data.DatabaseIdentifier = tempDatabase;
             }
         }
@@ -1460,7 +1460,7 @@ void MapMceRequestGetMessagesListing::MapMceGetItemAppParams(
             int timeLength = msgListTime->GetLen();
             const uint8_t *val2 = msgListTime->GetVal();
             if ((timeLength != 0) && (val2 != nullptr)) {
-                std::string tempTime((char *)val2, timeLength);
+                std::string tempTime(reinterpret_cast<char *>(const_cast<uint8_t *>(val2)), timeLength);
                 data.MseTime = tempTime;
             }
         }
@@ -1469,7 +1469,7 @@ void MapMceRequestGetMessagesListing::MapMceGetItemAppParams(
             int length3 = msgListSize->GetLen();
             const uint8_t *val3 = msgListSize->GetVal();
             if ((length3 != 0) && (val3 != nullptr)) {
-                uint16_t tempVal = *((uint16_t *)val3);
+                uint16_t tempVal = *(reinterpret_cast<uint16_t *>(const_cast<uint8_t *>(val3)));
                 data.ListingSize = ((tempVal >> MCE_8BIT) & MCE_16BIT_MASK_LEFT_LOW) |
                                    ((tempVal << MCE_8BIT) & MCE_16BIT_MASK_LEFT_HIGH);
             }
@@ -1479,7 +1479,7 @@ void MapMceRequestGetMessagesListing::MapMceGetItemAppParams(
             int databaseLength = msgListDb->GetLen();
             const uint8_t *val4 = msgListDb->GetVal();
             if ((databaseLength != 0) && (val4 != nullptr)) {
-                std::string tempDatabase((char *)val4, databaseLength);
+                std::string tempDatabase(reinterpret_cast<char *>(const_cast<uint8_t *>(val4)), databaseLength);
                 data.DatabaseIdentifier = tempDatabase;
             }
         }
@@ -1488,7 +1488,7 @@ void MapMceRequestGetMessagesListing::MapMceGetItemAppParams(
             int folderLength = msgListVerCnt->GetLen();
             const uint8_t *val5 = msgListVerCnt->GetVal();
             if ((folderLength != 0) && (val5 != nullptr)) {
-                std::string tempFolderCn((char *)val5, folderLength);
+                std::string tempFolderCn(reinterpret_cast<char *>(const_cast<uint8_t *>(val5)), folderLength);
                 data.FolderVersionCounter = tempFolderCn;
             }
         }

@@ -220,7 +220,7 @@ HWTEST_F(BleTest, BLE_ModuleTest_StartAdvertising_00200, TestSize.Level1)
     BleTest::bleInstance_->InitAdvertiseSettings();
     EXPECT_TRUE(BleTest::bleInstance_->bleAdvertiserSettings_.IsConnectable());
     EXPECT_TRUE(BleTest::bleInstance_->bleAdvertiserSettings_.IsLegacyMode());
-    EXPECT_EQ((uint16_t)INTERVAL, BleTest::bleInstance_->bleAdvertiserSettings_.GetInterval());
+    EXPECT_EQ(static_cast<uint16_t>(INTERVAL), BleTest::bleInstance_->bleAdvertiserSettings_.GetInterval());
     EXPECT_EQ(
         BLE_ADV_TX_POWER_LEVEL::BLE_ADV_TX_POWER_MEDIUM, BleTest::bleInstance_->bleAdvertiserSettings_.GetTxPower());
     EXPECT_EQ(PHY_TYPE::PHY_LE_ALL_SUPPORTED, BleTest::bleInstance_->bleAdvertiserSettings_.GetPrimaryPhy());

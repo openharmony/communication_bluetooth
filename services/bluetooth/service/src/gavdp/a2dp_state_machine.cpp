@@ -189,7 +189,7 @@ void A2dpStateIdle::ProcessSetConfigInd(A2dpAvdtMsgData msgData, uint8_t role)
     uint8_t *pCodecInfo = msgData.configRsp.codecInfo;
     SetStateName(A2DP_PROFILE_CONFIG);
     avdtp.SetConfigureRsp(msgData.configRsp.handle, msgData.configRsp.label, msgData.configRsp.category);
-    profile->ConnectStateChangedNotify(msgData.configRsp.addr, STREAM_CONNECTING, (void *)&param);
+    profile->ConnectStateChangedNotify(msgData.configRsp.addr, STREAM_CONNECTING, static_cast<void *>(&param));
     if (role == A2DP_ROLE_SOURCE) {
         ret = codecFactory->SetCodecConfig(pCodecInfo, pResultConfig);
         LOG_INFO("[A2dpStateIdle]%{public}s SetConfig result(%{public}d)\n", __func__, ret);
@@ -366,7 +366,7 @@ void A2dpStateConfigure::ProcessOpenInd(A2dpAvdtMsgData msgData, uint8_t role)
     param.handle = msgData.stream.handle;
     profile->CodecChangedNotify(msgData.stream.addr, nullptr);
     LOG_INFO("[A2dpStateOpen]%{public}s open handle[%u]\n", __func__, param.handle);
-    profile->ConnectStateChangedNotify(msgData.stream.addr, STREAM_CONNECT, (void *)&param);
+    profile->ConnectStateChangedNotify(msgData.stream.addr, STREAM_CONNECT, static_cast<void *>(&param));
 
     if (role == A2DP_ROLE_SOURCE) {
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::CONNECT_ON,
@@ -503,7 +503,7 @@ void A2dpStateOpening::ProcessOpenCfm(A2dpAvdtMsgData msgData, uint8_t role)
 
     if (msgData.stream.errCode != AVDT_SUCCESS) {
         LOG_ERROR("[A2dpStateOpening]%{public}s [errcode: %u]", __func__, msgData.stream.errCode);
-        profile->ConnectStateChangedNotify(msgData.stream.addr, STREAM_CONNECT_FAILED, (void *)&param);
+        profile->ConnectStateChangedNotify(msgData.stream.addr, STREAM_CONNECT_FAILED, static_cast<void *>(&param));
     } else {
         SetStateName(A2DP_PROFILE_OPEN);
         profile->CodecChangedNotify(msgData.stream.addr, nullptr);
@@ -513,7 +513,7 @@ void A2dpStateOpening::ProcessOpenCfm(A2dpAvdtMsgData msgData, uint8_t role)
                 PROFILE_NAME_A2DP_SRC,
                 bluetooth::RawAddress::ConvertToString(msgData.stream.addr.addr));
         }
-        profile->ConnectStateChangedNotify(msgData.stream.addr, STREAM_CONNECT, (void *)&param);
+        profile->ConnectStateChangedNotify(msgData.stream.addr, STREAM_CONNECT, static_cast<void *>(&param));
     }
 }
 

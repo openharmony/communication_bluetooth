@@ -153,8 +153,9 @@ void MapMseMnscli::UnRegistGap(const RawAddress &remoteAddr, bool isL2cap, uint1
                               : GAP_SecMultiplexingProtocol::SEC_PROTOCOL_RFCOMM,
         .channelId = isL2cap ? GapSecChannel{.l2capPsm = scn} : GapSecChannel{.rfcommChannel = rfcommno}
     };
-    if (GAPIF_DeregisterServiceSecurity(&address, &serviceInfo))
+    if (GAPIF_DeregisterServiceSecurity(&address, &serviceInfo)) {
         MSE_LOG_INFO("Call GAP_UnregisterServiceSecurity Error");
+    }
 }
 
 void MapMseMnscli::DisConnect(const RawAddress &remoteAddr, int masId)
@@ -286,12 +287,14 @@ void MapMseMnscli::SdpSearchCallback(
         MNS_TARGET,
         sizeof(MNS_TARGET));
     obexConfig.addr_ = *addr;
-    if (serviceAry == nullptr)
+    if (serviceAry == nullptr) {
         return;
+    }
     uint32_t remoteFeature = MAP_SUPPORTED_FEATURES_DEFAULT;
     for (uint16_t serviceCount = 0; serviceCount < serviceNum; ++serviceCount, ++serviceAry) {
-        if (serviceAry->classId->uuid16 != SERVICE_CLASS_UUID)
+        if (serviceAry->classId->uuid16 != SERVICE_CLASS_UUID) {
             continue;
+        }
         GetRfcommNo(*serviceAry, rfcommNo);
         GetVersionNumber(*serviceAry, versionNumber);
         GetPsmRemoteFeature(*serviceAry, psm, remoteFeature);

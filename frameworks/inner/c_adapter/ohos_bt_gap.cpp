@@ -306,7 +306,7 @@ bool SetLocalName(unsigned char *localName, unsigned char length)
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
-    string newName((const char *)localName);
+    string newName(reinterpret_cast<const char *>(localName));
     bool ret = g_BluetoothHost->SetLocalName(newName);
     HILOGI("result %{public}d: LocalName : %{public}s", ret, g_BluetoothHost->GetLocalName().c_str());
     return ret;

@@ -860,7 +860,7 @@ int PbapPceService::AbortDownloadingInternal(const RawAddress &device)
 void PbapPceService::LoadPceConfig()
 {
     IAdapterConfig *adpterConfig = AdapterConfig::GetInstance();
-    auto &config = (PbapPceConfig &)GetPceConfig();
+    auto &config = reinterpret_cast<PbapPceConfig &>(const_cast<PbapPceConfig &>(GetPceConfig()));
     if (!adpterConfig->GetValue(SECTION_PBAP_PCE_SERVICE, PROPERTY_SRM_ENABLE, config.srmEnable_)) {
         PBAP_PCE_LOG_ERROR("Load config %{public}s failure", PROPERTY_SRM_ENABLE.c_str());
     }

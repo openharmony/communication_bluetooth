@@ -25,10 +25,10 @@ namespace OHOS {
 namespace bluetooth {
 #define HFP_HF_RETURN_IF_FAIL(ret)                                \
     do {                                                          \
-        if (ret == BT_ALREADY) {                                  \
+        if ((ret) == BT_ALREADY) {                                  \
             LOG_WARN("[HFP HF]%{public}s():ret[%{public}d]", __FUNCTION__, ret);  \
         }                                                         \
-        if ((ret != BT_NO_ERROR) && (ret != BT_ALREADY)) {        \
+        if (((ret) != BT_NO_ERROR) && ((ret) != BT_ALREADY)) {        \
             LOG_ERROR("[HFP HF]%{public}s():ret[%{public}d]", __FUNCTION__, ret); \
             return ret;                                           \
         }                                                         \

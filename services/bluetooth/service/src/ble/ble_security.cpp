@@ -846,9 +846,9 @@ int BleSecurity::GapLeRequestSecurity(uint16_t connectionHandle, const BtAddr &a
 
 void BleSecurity::HandleGapEvent(const BLE_GAP_CB_EVENT &event, const BleGapCallbackParam &param)
 {
-    LOG_DEBUG("[BleSecurity] %{public}s:[event no: %{public}d].", __func__, (int)event);
+    LOG_DEBUG("[BleSecurity] %{public}s:[event no: %{public}d].", __func__, static_cast<int>(event));
     if (pimpl->funcMap_.find(event) == pimpl->funcMap_.end()) {
-        LOG_ERROR("[BleSecurity] %{public}s:[Not exist event no: %{public}d].", __func__, (int)event);
+        LOG_ERROR("[BleSecurity] %{public}s:[Not exist event no: %{public}d].", __func__, static_cast<int>(event));
     } else {
         (this->*pimpl->funcMap_[event])(param);
     }

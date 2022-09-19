@@ -319,8 +319,8 @@ private:
 
 static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle)
 {
-    if (srvcHandle == NULL) {
-        return NULL;
+    if (srvcHandle == nullptr) {
+        return nullptr;
     }
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
         GattService *gattService = GATTSERVICE(serverId, i);
@@ -337,7 +337,7 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 /**

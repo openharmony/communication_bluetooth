@@ -70,32 +70,32 @@ void ObexUtils::DataReverse(uint8_t *data, const uint16_t &len, const uint8_t &u
 
 void ObexUtils::SetBufData16(uint8_t *bigEndData, uint16_t pos, const uint16_t &value)
 {
-    *((uint16_t *)&bigEndData[pos]) = htobe16(value);
+    *(reinterpret_cast<uint16_t *>(&bigEndData[pos])) = htobe16(value);
 }
 
 void ObexUtils::SetBufData32(uint8_t *bigEndData, uint16_t pos, const uint32_t &value)
 {
-    *((uint32_t *)&bigEndData[pos]) = htobe32(value);
+    *(reinterpret_cast<uint32_t *>(&bigEndData[pos])) = htobe32(value);
 }
 
 void ObexUtils::SetBufData64(uint8_t *bigEndData, uint16_t pos, const uint64_t &value)
 {
-    *((uint64_t *)&bigEndData[pos]) = htobe64(value);
+    *(reinterpret_cast<uint64_t *>(&bigEndData[pos])) = htobe64(value);
 }
 
 uint16_t ObexUtils::GetBufData16(const uint8_t *bigEndData, uint16_t pos)
 {
-    return be16toh(*((uint16_t *)&bigEndData[pos]));
+    return be16toh(*(reinterpret_cast<uint16_t *>(const_cast<uint8_t *>(&bigEndData[pos]))));
 }
 
 uint32_t ObexUtils::GetBufData32(const uint8_t *bigEndData, uint16_t pos)
 {
-    return be32toh(*((uint32_t *)&bigEndData[pos]));
+    return be32toh(*(reinterpret_cast<uint32_t *>(const_cast<uint8_t *>(&bigEndData[pos]))));
 }
 
 uint64_t ObexUtils::GetBufData64(const uint8_t *bigEndData, uint16_t pos)
 {
-    return be64toh(*((uint64_t *)&bigEndData[pos]));
+    return be64toh(*(reinterpret_cast<uint64_t *>(const_cast<uint8_t *>(&bigEndData[pos]))));
 }
 
 std::string ObexUtils::ToDebugString(Packet &obexPacket)
@@ -247,7 +247,8 @@ std::vector<uint8_t> ObexUtils::MakeRequestDigest(const uint8_t *nonce, int sz, 
     uint8_t nonceBuf[bufSize];
     (void)memcpy_s(nonceBuf, sizeof(nonceBuf), nonce, sz);
     nonceBuf[sz] = ':';
-    (void)memcpy_s(&nonceBuf[sz + 1], sizeof(nonceBuf) - sz - 1, (uint8_t *)password.c_str(), password.size());
+    (void)memcpy_s(&nonceBuf[sz + 1], sizeof(nonceBuf) - sz - 1,
+        reinterpret_cast<uint8_t *>(const_cast<char *>(password.c_str())), password.size());
 
     stub::MessageDigest *digest = stub::MessageDigestFactory::GetInstance(stub::DIGEST_TYPE_MD5);
     std::vector<uint8_t> vc = digest->Digest((uint8_t *)nonceBuf, sz + password.size() + 1);

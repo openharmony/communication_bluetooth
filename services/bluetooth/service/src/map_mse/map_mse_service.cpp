@@ -418,8 +418,9 @@ void MapMseService::DisConnectInternal(const utility::Message &msg) const
     MSE_LOG_INFO("%{public}s Enter", __PRETTY_FUNCTION__);
 
     RawAddress *rawAddress = (RawAddress *)msg.arg2_;
-    if (!rawAddress)
+    if (!rawAddress) {
         return;
+    }
     for (auto &instance : masInstanceMap_) {
         instance.second->DisConnect(rawAddress->GetAddress());
     }

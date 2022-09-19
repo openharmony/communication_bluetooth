@@ -316,8 +316,9 @@ void MapMceMnsServer::DeregisterServiceSecurity(void) const
     serviceInfo.channelId = secChannel;
     serviceInfo.protocolId = GAP_SecMultiplexingProtocol::SEC_PROTOCOL_RFCOMM;
     ret = GAPIF_DeregisterServiceSecurity(nullptr, &serviceInfo);
-    if (ret != BT_NO_ERROR)
+    if (ret != BT_NO_ERROR) {
         LOG_ERROR("MAP mce mns Call GAPIF_UnregisterServiceSecurity rfcomm Error");
+    }
 }
 
 MapMceMnsServer::MceMnsObexServerObserver::~MceMnsObexServerObserver()

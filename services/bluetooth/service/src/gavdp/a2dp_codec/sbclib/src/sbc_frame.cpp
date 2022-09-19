@@ -535,10 +535,10 @@ bool Frame::IsValid() const
                 count += (n);                                        \
                 if (count >= VALUE_OF_SIXTEEN) {                                        \
                         count -= VALUE8;                                \
-                        *data++ = (uint8_t)                                \
+                        *data++ = static_cast<uint8_t>                                \
                                 (cache >> count);                \
                         count -= VALUE8;                                \
-                        *data++ = (uint8_t)                                \
+                        *data++ = static_cast<uint8_t>                                \
                                 (cache >> count);                \
                 }                                                        \
         } while (0)
@@ -547,11 +547,11 @@ bool Frame::IsValid() const
         do {                                                                \
                 while (count >= VALUE8) {                                \
                         count -= VALUE8;                                \
-                        *data++ = (uint8_t)                                \
+                        *data++ = static_cast<uint8_t>                                \
                                 (cache >> count);                \
                 }                                                        \
                 if (count > 0)        {                                \
-                        *data++ = (uint8_t)                                \
+                        *data++ = static_cast<uint8_t>                                \
                                 (cache << (VALUE8 - count));        \
                 }                           \
         } while (0)
@@ -609,7 +609,7 @@ ssize_t Frame::PackFrameInternal(const Frame& frame, uint8_t* bufStream,
                 if (bits[channel][subband] == 0) {
                     continue;
                 }
-                audioSample = ((uint64_t) levels[channel][subband] *
+                audioSample = (static_cast<uint64_t>(levels[channel][subband]) *
                     (sampleDelta[channel][subband] + frame.audioSamples_[blk][channel][subband])) >> MOVE_BIT32;
                 PUT_BITS(data, bitsCache, bitsCount, audioSample, bits[channel][subband]);
             }
