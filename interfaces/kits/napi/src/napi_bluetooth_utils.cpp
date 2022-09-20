@@ -830,12 +830,12 @@ GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared
     napi_create_string_utf8(env, "serviceUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseString(env, serviceUuid, value);
-    HILOGI("descriptorUuid is %{public}s", serviceUuid.c_str());
+    HILOGI("serviceUuid is %{public}s", serviceUuid.c_str());
 
     napi_create_string_utf8(env, "characteristicUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseString(env, characteristicUuid, value);
-    HILOGI("descriptorUuid is %{public}s", characteristicUuid.c_str());
+    HILOGI("characteristicUuid is %{public}s", characteristicUuid.c_str());
 
     napi_create_string_utf8(env, "descriptorUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
