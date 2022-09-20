@@ -133,10 +133,10 @@ struct GattServer {
 
 
   private curAdvSettings: bluetooth.AdvertiseSetting = {
-                                                          interval:800,  //500ms
-                                                          txPower:-7 ,
-                                                          connectable:true
-                                                       };
+    interval:1600,  //500ms
+    txPower:-7 ,
+    connectable:true
+  };
   private curAdvData: bluetooth.AdvertiseData = {
     serviceUuids:["00003344-0000-1000-8000-00805f9b34fb","00008899-0000-1000-8000-00805f9b34fb"],
     manufactureData:[{
@@ -187,15 +187,15 @@ struct GattServer {
         HeadComponent({ headName: 'GattServer Test', isActive: true });
         Stack().height("0.5vp").backgroundColor("#000000");
 
-        Column() {
-          Text("Input Gatt Service value:")
-            .margin({top: "1vp"})
-            .padding("1vp")
-            .fontSize("15vp")
-            .fontColor("#4444444")
-            .height("30vp");
-          Scroll(){
-            Column() {
+      Column() {
+        Text("Input Gatt Service Data:")
+          .margin({top: "1vp"})
+          .padding("1vp")
+          .fontSize("15vp")
+          .fontColor("#4444444")
+          .height("30vp");
+        Scroll(){
+          Column() {
             Flex({ direction: FlexDirection.Row }) {
               Text("ServiceUUID:").fontSize("15vp").width("150vp")
               TextInput({ text: this.curServiceUUID, placeholder: "input service UUID" })
@@ -221,7 +221,7 @@ struct GattServer {
                   .margin( { top: "1vp", left: "5vp", right: "50vp" } )
               }
               .margin( { top: "1vp", left: "5vp", right: "50vp" } )
-              //.alignItems(VerticalAlign.Center)
+
               Row() {
                 Text("CCC Value:").fontSize("15vp")
                 TextInput({ text: this.curCharacteristicValue, placeholder: "input characteristic Value" })
@@ -232,7 +232,6 @@ struct GattServer {
                   .margin( { top: "1vp", left: "5vp", right: "50vp" } )
               }
               .margin( { top: "1vp", left: "5vp", right: "50vp" } )
-              //.alignItems(VerticalAlign.Center)
             }
             .height(60)
             .width('100%')
@@ -260,7 +259,6 @@ struct GattServer {
                   .margin( { top: "1vp", left: "5vp", right: "50vp" } )
               }
               .margin( { top: "1vp", left: "5vp", right: "50vp" } )
-              //.alignItems(VerticalAlign.Center)
             }
             .height(60)
             .width('100%')
@@ -268,30 +266,30 @@ struct GattServer {
             .backgroundColor(0xAFEEEE);
 
           }
-          }.height("80vp")
-          Stack().height("0.25vp").backgroundColor("#000000");
-          Text("Input advertiser value:")
-            .margin({top: "1vp"})
-            .padding("5vp")
-            .fontSize("15vp")
-            .fontColor("#4444444")
-            .height("30vp");
-          Stack().height("0.25vp").backgroundColor("#000000");
-          Scroll(){
-            Column() {
-              Flex({ direction: FlexDirection.Row }){
-                Checkbox({ name: 'AdvSettings', group: 'checkboxGroup1' })
-                  .select(this.cbxAdvSettings)
-                  .selectedColor(0x39a2db)
-                  .onChange((value) => {
-                    if(value)
-                    {
-                      this.cbxAdvSettings =true;
-                    }
-                    else
-                    {
-                      this.cbxAdvSettings =false;
-                    }
+        }.height("80vp")
+        Stack().height("0.25vp").backgroundColor("#000000");
+        Text("Input advertiser data:")
+          .margin({top: "1vp"})
+          .padding("5vp")
+          .fontSize("15vp")
+          .fontColor("#4444444")
+          .height("30vp");
+        Stack().height("0.25vp").backgroundColor("#000000");
+        Scroll(){
+          Column() {
+            Flex({ direction: FlexDirection.Row }){
+              Checkbox({ name: 'AdvSettings', group: 'checkboxGroup1' })
+                .select(this.cbxAdvSettings)
+                .selectedColor(0x39a2db)
+                .onChange((value) => {
+                  if(value)
+                  {
+                    this.cbxAdvSettings =true;
+                  }
+                  else
+                  {
+                    this.cbxAdvSettings =false;
+                  }
 
                   }).width("15vp").margin( { left: "1vp" } )
                 Text("settings:")
@@ -618,22 +616,20 @@ struct GattServer {
                   this.buildAdvData();
                   this.buildAdvResponse();
 
-                  let setting =this.curAdvSettings;
-                  let advData = this.curAdvData;
-                  let advResponse = this.curAdvResponse;
-                  this.message = "startAdvertising:build input parameter Out!";
-                  if(!this.cbxAdvSettings)
-                  {
-                    setting = null;
-                  }
-                  if(!this.cbxAdvResponse)
-                  {
-                    this.gattServerInstance.startAdvertising(setting,advData);
-                  }
-                  else
-                  {
-                    this.gattServerInstance.startAdvertising(setting,advData,advResponse);
-                  }
+                let setting = this.curAdvSettings;
+
+                let advData = this.curAdvData;
+                let advResponse = this.curAdvResponse;
+                this.message = "startAdvertising:build input parameter Out!";
+
+                if(!this.cbxAdvResponse)
+                {
+                  this.gattServerInstance.startAdvertising(setting,advData);
+                }
+                else
+                {
+                  this.gattServerInstance.startAdvertising(setting,advData,advResponse);
+                }
 
                   this.message = "startAdvertising succeeds!";
                 }
@@ -1064,24 +1060,34 @@ struct GattServer {
       .width('100%')
 
   }
-
   private buildAdvSettings()
   {
-      if(this.cbxAdvSettings)
+    if(this.cbxAdvSettings)
+    {
+      if(this.cbxInterval)
       {
-         if(this.cbxInterval)
-         {
-           this.curAdvSettings.interval = parseInt(this.advSettings_interval);
-         }
-         if(this.cbxTxPower)
-         {
-           this.curAdvSettings.txPower = parseInt(this.advSettings_txPower);
-         }
-         if(this.cbxConnectable)
-         {
-           this.curAdvSettings.connectable = this.advSettings_connectable;
-         }
+        this.curAdvSettings.interval = parseInt(this.advSettings_interval);
       }
+      else
+      {
+        this.curAdvSettings.interval = 1600;
+      }
+      if(this.cbxTxPower)
+      {
+        this.curAdvSettings.txPower = parseInt(this.advSettings_txPower);
+      }
+      else
+      {
+        this.curAdvSettings.txPower = -7;
+      }
+
+      this.curAdvSettings.connectable = this.advSettings_connectable;
+
+    }
+    else
+    {
+      this.curAdvSettings.connectable = true;
+    }
   }
 
   private buildAdvData()
