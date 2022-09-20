@@ -113,7 +113,6 @@ bool RemoteObserverList<T>::Deregister(const sptr<T> &observer)
     }
     HILOGW("Given observer not registered with this list");
     return false;
-    
 }
 
 template <typename T>
