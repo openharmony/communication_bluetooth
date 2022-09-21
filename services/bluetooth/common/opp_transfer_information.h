@@ -16,8 +16,9 @@
 #ifndef OPP_TRANSFER_INFORMATION_H
 #define OPP_TRANSFER_INFORMATION_H
 
+#include <cstdint>
 #include <string>
-#include "timer.h"
+#include "iosfwd"
 
 namespace OHOS {
 namespace bluetooth {

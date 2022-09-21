@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 #include "bluetooth_utils.h"
+#include "__config"
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
+#include "iosfwd"
+#include "string"
 
 using namespace std;
 

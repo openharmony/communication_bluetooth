@@ -14,10 +14,12 @@
  */
 
 #include "ohos_bt_adapter_utils.h"
-
+#include "__config"
 #include "bluetooth_log.h"
-
+#include "ohos_bt_def.h"
 #include "securec.h"
+#include <cstdlib>
+#include "string"
 
 #ifdef __cplusplus
 extern "C" {

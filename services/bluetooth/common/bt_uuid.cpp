@@ -17,13 +17,13 @@
 
 #include <sys/time.h>
 #include <algorithm>
-
 #include <cstdlib>
-#include <ctime>
 #include "array"
 #include "securec.h"
+#include <cstdlib>
 #include "string"
 #include "sys/time.h"
+#include <ctime>
 
 namespace OHOS {
 namespace bluetooth {
