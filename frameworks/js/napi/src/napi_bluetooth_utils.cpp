@@ -752,6 +752,57 @@ static void RemoveObserver(std::string type)
     }
 }
 
+static std::map<std::string, int32_t> registerTypeMap = {
+    {REGISTER_DEVICE_FIND_TYPE, BLUETOOTH_DEVICE_FIND_TYPE},
+    {REGISTER_STATE_CHANGE_TYPE, STATE_CHANGE_TYPE},
+    {REGISTER_PIN_REQUEST_TYPE, PIN_REQUEST_TYPE},
+    {REGISTER_BONE_STATE_TYPE, BOND_STATE_CHANGE_TYPE},
+    {REGISTER_BLE_FIND_DEVICE_TYPE, BLE_DEVICE_FIND_TYPE}
+};
+
+napi_value CallbackObserver(int32_t typeNum, std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo)
+{
+    napi_value result = 0;
+    napi_value deviceId = nullptr;
+    napi_value state = nullptr;
+    napi_value pinCode = nullptr;
+    napi_value value = 0;
+
+    switch (typeNum) {
+        case BLUETOOTH_DEVICE_FIND_TYPE:
+            napi_create_array(pCallbackInfo->env_, &result);
+            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &value);
+            napi_set_element(pCallbackInfo->env_, result, 0, value);
+            break;
+        case STATE_CHANGE_TYPE:
+            napi_create_int32(pCallbackInfo->env_, static_cast<int32_t>(BluetoothState::STATE_OFF), &result);
+            break;
+        case PIN_REQUEST_TYPE:
+            napi_create_object(pCallbackInfo->env_, &result);
+            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &deviceId);
+            napi_set_named_property(pCallbackInfo->env_, result, "deviceId", deviceId);
+            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &pinCode);
+            napi_set_named_property(pCallbackInfo->env_, result, "pinCode", pinCode);
+            break;
+        case BOND_STATE_CHANGE_TYPE:
+            napi_create_object(pCallbackInfo->env_, &result);
+            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &deviceId);
+            napi_set_named_property(pCallbackInfo->env_, result, "deviceId", deviceId);
+            napi_create_int32(pCallbackInfo->env_, static_cast<int32_t>(BondState::BOND_STATE_INVALID), &state);
+            napi_set_named_property(pCallbackInfo->env_, result, "state", state);
+            break;
+        case BLE_DEVICE_FIND_TYPE:
+            napi_create_array(pCallbackInfo->env_, &result);
+            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &value);
+            napi_set_element(pCallbackInfo->env_, result, 0, value);
+            break;
+        default:
+            result = NapiGetNull(pCallbackInfo->env_);
+            break;
+    }
+    return result;
+}
+
 napi_value DeregisterObserver(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -782,7 +833,11 @@ napi_value DeregisterObserver(napi_env env, napi_callback_info info)
             napi_value undefined = 0;
             napi_value callResult = 0;
             napi_get_undefined(pCallbackInfo->env_, &undefined);
-            napi_value result = NapiGetNull(pCallbackInfo->env_);
+            int32_t typeNum = 0;
+            if (registerTypeMap.find(type) != registerTypeMap.end()) {
+                typeNum = registerTypeMap[type];
+            }
+            napi_value result = CallbackObserver(typeNum, pCallbackInfo);
             napi_get_reference_value(pCallbackInfo->env_, pCallbackInfo->callback_, &callback);
             napi_call_function(pCallbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
         }
