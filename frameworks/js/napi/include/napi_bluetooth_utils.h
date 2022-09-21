@@ -55,6 +55,11 @@ constexpr int ASYNC_IDLE = 0;
 constexpr int ASYNC_START = 1;
 constexpr int ASYNC_DONE = 2;
 constexpr int32_t THREAD_WAIT_TIMEOUT = 5;
+constexpr int32_t BLUETOOTH_DEVICE_FIND_TYPE = 1;
+constexpr int32_t STATE_CHANGE_TYPE = 2;
+constexpr int32_t PIN_REQUEST_TYPE = 3;
+constexpr int32_t BOND_STATE_CHANGE_TYPE = 4;
+constexpr int32_t BLE_DEVICE_FIND_TYPE = 5;
 
 struct ServerResponse {
     std::string deviceId = "";
@@ -88,6 +93,9 @@ const std::string REGISTER_BONE_STATE_TYPE = "bondStateChange";
 const std::string REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
 const std::string REGISTER_SYS_BLE_SCAN_TYPE = "sysBLEScan";
 const std::string REGISTER_SYS_BLE_FIND_DEVICE_TYPE = "sysBLEDeviceFonud";
+
+const std::string INVALID_DEVICE_ID = "00:00:00:00:00:00";
+const std::string INVALID_PIN_CODE = "000000";
 
 bool ParseString(napi_env env, std::string &param, napi_value args);
 bool ParseInt32(napi_env env, int32_t &param, napi_value args);
