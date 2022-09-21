@@ -181,6 +181,14 @@ napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
     int tmpCod = deviceClass.GetClassOfDevice();
     int tmpMajorClass = deviceClass.GetMajorClass();
     int tmpMajorMinorClass = deviceClass.GetMajorMinorClass();
+    if (tmpCod == 0) {
+        HILOGI("cod = %{public}d", tmpCod);
+        tmpCod = MajorClass::MAJOR_UNCATEGORIZED;
+        tmpMajorClass = MajorClass::MAJOR_UNCATEGORIZED;
+        tmpMajorMinorClass = MajorClass::MAJOR_UNCATEGORIZED;
+    }
+    HILOGI("cod = %{public}d, majorClass = %{public}d, majorMinorClass = %{public}d",
+        tmpCod, tmpMajorClass, tmpMajorMinorClass);
     napi_value result = nullptr;
     napi_create_object(env, &result);
     napi_value majorClass = 0;
