@@ -16,13 +16,12 @@
 #include "ohos_bt_gap.h"
 
 #include <string.h>
-
-#include "bluetooth_host.h"
+#include "__config"
 #include "bluetooth_def.h"
+#include "bluetooth_host.h"
 #include "bluetooth_log.h"
-#include "bluetooth_utils.h"
 #include "bluetooth_remote_device.h"
-
+#include "bluetooth_utils.h"
 #include "iosfwd"
 #include "ohos_bt_adapter_utils.h"
 #include "ohos_bt_def.h"

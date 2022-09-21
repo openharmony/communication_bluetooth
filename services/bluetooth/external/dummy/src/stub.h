@@ -16,11 +16,4 @@
 #ifndef STUB_H
 #define STUB_H
 
-#include "stub/a2dp_data_service.h"
-#include "stub/map_service.h"
-#include "stub/media_service.h"
-#include "stub/message_digest.h"
-#include "stub/telephone_client_service.h"
-#include "stub/telephone_service.h"
-
 #endif // STUB_H

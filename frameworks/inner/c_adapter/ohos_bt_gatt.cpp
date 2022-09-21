@@ -17,18 +17,14 @@
 
 #include <unistd.h>
 #include <cstdint>
-#include <cstring>
 #include <sstream>
-
 #include <vector>
 #include "__config"
-
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_log.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_utils.h"
-
 #include "cstdint"
 #include "iosfwd"
 #include "istream"
@@ -39,6 +35,7 @@
 #include "securec.h"
 #include "streambuf"
 #include "string"
+#include "uuid.h"
 
 
 #ifdef __cplusplus

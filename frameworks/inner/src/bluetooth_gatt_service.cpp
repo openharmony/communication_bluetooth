@@ -15,6 +15,7 @@
 
 #include "bluetooth_gatt_service.h"
 
+#include <cstdint>
 #include "__functional_base"
 #include "bluetooth_gatt_characteristic.h"
 #include "type_traits"

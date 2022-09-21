@@ -14,6 +14,7 @@
  */
 
 #include "opp_transfer_information.h"
+#include "string"
 
 namespace OHOS {
 namespace bluetooth {

@@ -16,8 +16,11 @@
 #ifndef BLUETOOTH_HCI_CALLBACKS_H
 #define BLUETOOTH_HCI_CALLBACKS_H
 
+#include <stdint.h>
 #include <v1_0/ihci_callback.h>
 #include "bluetooth_hdi.h"
+#include "v1_0/hci_types.h"
+#include "vector"
 
 using OHOS::HDI::Bluetooth::Hci::V1_0::IHciCallback;
 using OHOS::HDI::Bluetooth::Hci::V1_0::BtStatus;

@@ -16,9 +16,7 @@
 #ifndef OHOS_BT_ADAPTER_UTILS_H
 #define OHOS_BT_ADAPTER_UTILS_H
 
-#include <string>
-
-#include "ohos_bt_def.h"
+#include "iosfwd"
 
 #ifdef __cplusplus
 extern "C" {

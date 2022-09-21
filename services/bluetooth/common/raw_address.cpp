@@ -14,10 +14,9 @@
  */
 
 #include "raw_address.h"
-#include <cstring>
-#include <cstdlib>
 #include <vector>
 #include "securec.h"
+#include <cstdlib>
 #include "string"
 
 namespace OHOS {

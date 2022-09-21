@@ -15,6 +15,18 @@
 
 #include "stub.h"
 
+#include <cstddef>
+#include <cstdint>
+#include "iosfwd"
+#include "string"
+#include "stub/a2dp_data_service.h"
+#include "stub/map_service.h"
+#include "stub/media_service.h"
+#include "stub/message_digest.h"
+#include "stub/telephone_client_service.h"
+#include "stub/telephone_service.h"
+#include "vector"
+
 namespace stub {
 class MD5 : public MessageDigest {
 public:
