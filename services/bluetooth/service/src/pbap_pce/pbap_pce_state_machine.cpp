@@ -294,10 +294,10 @@ void PbapPceStateMachine::SetPowerStatusBusy(bool isBusy)
     }
     powerStatusBusy_ = isBusy;
     if (isBusy) {
-        PBAP_PCE_LOG_INFO("[%{public}s] PowerStatusUpdate -> BUSY", device_.GetAddress().c_str());
+        HILOGI("[%{public}s] PowerStatusUpdate -> BUSY", GetEncryptAddr(device_.GetAddress()).c_str());
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_PBAP_PCE, device_);
     } else {
-        PBAP_PCE_LOG_INFO("[%{public}s] PowerStatusUpdate -> IDLE", device_.GetAddress().c_str());
+        HILOGI("[%{public}s] PowerStatusUpdate -> IDLE", GetEncryptAddr(device_.GetAddress()).c_str());
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::IDLE, PROFILE_NAME_PBAP_PCE, device_);
     }
     PBAP_PCE_LOG_DEBUG("%{public}s end", __PRETTY_FUNCTION__);

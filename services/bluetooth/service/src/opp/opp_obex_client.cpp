@@ -18,6 +18,7 @@
 #include <codecvt>
 #include "bt_def.h"
 #include "log.h"
+#include "log_util.h"
 #include "opp_service.h"
 
 namespace OHOS {
@@ -428,7 +429,7 @@ void OppObexClient::OppObexObserver::OnBusy(ObexClient &client, bool isBusy)
 void OppObexClient::OnBusy(ObexClient &client, bool isBusy)
 {
     auto &device = client.GetClientSession().GetRemoteAddr();
-    HILOGI("[OPP OBEX CLIENT] start, device=%{public}s", device.GetAddress().c_str());
+    HILOGI("[OPP OBEX CLIENT] start, device=%{public}s", GET_ENCRYPT_ADDR(device));
     isBusy_ = isBusy;
     if (!isBusy_) {
         std::lock_guard<std::mutex> lock(mutexBusyChanged_);

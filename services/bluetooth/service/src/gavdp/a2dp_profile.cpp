@@ -23,6 +23,7 @@
 #include "a2dp_source.h"
 #include "adapter_config.h"
 #include "log.h"
+#include "log_util.h"
 #include "profile_service_manager.h"
 #include "raw_address.h"
 #include "securec.h"
@@ -279,9 +280,9 @@ bool A2dpProfile::IsActiveDevice(const BtAddr &addr) const
     RawAddress activeAddr = RawAddress::ConvertToString(GetActivePeer().addr);
     std::lock_guard<std::mutex> lock(g_profileMutex);
 
-    LOG_INFO("[A2dpProfile] %{public}s current active address(%{public}s)\n", __func__, activeAddr.GetAddress().c_str());
+    HILOGI("[A2dpProfile] current active address(%{public}s)", GetEncryptAddr(activeAddr.GetAddress()).c_str());
     if (strcmp(activeAddr.GetAddress().c_str(), rawAddress.GetAddress().c_str()) == 0) {
-        LOG_INFO("[A2dpProfile] %{public}s connect address(%{public}s)\n", __func__, rawAddress.GetAddress().c_str());
+        HILOGI("[A2dpProfile] connect address(%{public}s)", GetEncryptAddr(rawAddress.GetAddress()).c_str());
         ret = true;
     }
     return ret;
@@ -957,8 +958,8 @@ void A2dpProfile::DeregisterObserver(A2dpProfileObserver *observer)
 
 A2dpProfilePeer *A2dpProfile::FindPeerByAddress(const BtAddr &peerAddress) const
 {
-    LOG_INFO(
-        "[A2dpProfile]%{public}s addr(%{public}s)\n", __func__, RawAddress::ConvertToString(peerAddress.addr).GetAddress().c_str());
+    HILOGI("[A2dpProfile] addr(%{public}s)",
+        GetEncryptAddr(RawAddress::ConvertToString(peerAddress.addr).GetAddress()).c_str());
     A2dpProfilePeer *peer = nullptr;
 
     for (const auto &it : peers_) {
@@ -1026,9 +1027,8 @@ bool A2dpProfile::DeletePeer(const BtAddr &peerAddress)
             peers_.erase(it);
             UpdateNumberPeerDevice(false);
             ret = true;
-            LOG_INFO("[A2dpProfile]%{public}s matched peers_addr(%{public}s)\n",
-                __func__,
-                RawAddress::ConvertToString(peerAddress.addr).GetAddress().c_str());
+            HILOGI("[A2dpProfile] matched peers_addr(%{public}s)",
+                GetEncryptAddr(RawAddress::ConvertToString(peerAddress.addr).GetAddress()).c_str());
             break;
         }
         LOG_INFO("[A2dpProfile]%{public}s peers_addr(%{public}s)\n", __func__, it->first.c_str());
