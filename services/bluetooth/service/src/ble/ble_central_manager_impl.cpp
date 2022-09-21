@@ -176,10 +176,6 @@ BleCentralManagerImpl::BleCentralManagerImpl(
     pimpl->scanParams_.ownAddrType = BLE_ADDR_TYPE_PUBLIC;
     pimpl->scanParams_.scanFilterPolicy = BLE_SCAN_FILTER_ALLOW_ALL;
     SetActiveScan(true);
-    uint16_t interval = BLE_SCAN_MODE_LOW_POWER_INTERVAL_MS;
-    SetInterval(interval);
-    uint16_t window = BLE_SCAN_MODE_LOW_POWER_WINDOW_MS;
-    SetWindow(window);
 
 #ifdef LSF_ENABLE
     bleScanFilter_ = new BleScanFilterLsf();
@@ -694,6 +690,11 @@ void BleCentralManagerImpl::StartScan() const
         centralManagerCallbacks_->OnStartOrStopScanEvent(SCAN_NOT_STARTED, true);
         return;
     }
+
+    uint16_t interval = BLE_SCAN_MODE_LOW_POWER_INTERVAL_MS;
+    SetInterval(interval);
+    uint16_t window = BLE_SCAN_MODE_LOW_POWER_WINDOW_MS;
+    SetWindow(window);
     pimpl->callBackType_ = CALLBACK_TYPE_FIRST_MATCH;
     Start(false);
 
