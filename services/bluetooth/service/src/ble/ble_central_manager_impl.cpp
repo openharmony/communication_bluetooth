@@ -327,7 +327,7 @@ void BleCentralManagerImpl::ExAdvertisingReport(
 void BleCentralManagerImpl::AdvertisingReportTask(
     uint8_t advType, const BtAddr &peerAddr, const std::vector<uint8_t> &data, int8_t rssi) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:Data = %{public}s", __func__, BleUtils::ConvertIntToHexString(data).c_str());
+    HILOGI("Data = %{public}s", BleUtils::ConvertIntToHexString(data).c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
     RawAddress advertisedAddress(RawAddress::ConvertToString(peerAddr.addr));
@@ -382,27 +382,23 @@ bool BleCentralManagerImpl::ExtractIncompleteData(uint8_t advType, const std::st
 void BleCentralManagerImpl::ExAdvertisingReportTask(uint8_t advType, const BtAddr &peerAddr,
     const std::vector<uint8_t> &data, int8_t rssi, const BtAddr &peerCurrentAddr) const
 {
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:Data = %{public}s", __func__, BleUtils::ConvertIntToHexString(data).c_str());
+    HILOGI("Data = %{public}s", BleUtils::ConvertIntToHexString(data).c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
     RawAddress advAddress(RawAddress::ConvertToString(peerAddr.addr));
     /// Set whether only legacy advertisments should be returned in scan results.
     if (pimpl->settings_.GetLegacy()) {
         if ((advType & BLE_LEGACY_ADV_NONCONN_IND_WITH_EX_ADV) == 0) {
-            LOG_DEBUG("[BleCentralManagerImpl] %{public}s: Excepted addr = %{public}s; advType = %{public}d",
-                __func__,
-                advAddress.GetAddress().c_str(),
-                advType);
+            HILOGI("Excepted addr: %{public}s, advType = %{public}d",
+                GetEncryptAddr(advAddress.GetAddress()).c_str(), advType);
             return;
         }
     }
 
     /// incomplete data
     RawAddress advCurrentAddress(RawAddress::ConvertToString(peerCurrentAddr.addr));
-    LOG_DEBUG("[BleCentralManagerImpl] %{public}s:peerAddr = %{public}s, peerCurrentAddr = %{public}s",
-        __func__,
-        advAddress.GetAddress().c_str(),
-        advCurrentAddress.GetAddress().c_str());
+    HILOGI("peerAddr: %{public}s, peerCurrentAddr: %{public}s", GetEncryptAddr(advAddress.GetAddress()).c_str(),
+        GetEncryptAddr(advCurrentAddress.GetAddress()).c_str());
     std::vector<uint8_t> incompleteData(data.begin(), data.end());
     if (ExtractIncompleteData(advType, advCurrentAddress.GetAddress(), data, incompleteData)) {
         return;

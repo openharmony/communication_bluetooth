@@ -24,6 +24,7 @@
 #include "avrcp_tg_vendor_continuation.h"
 #include "avrcp_tg_vendor_player_application_settings.h"
 #include "power_manager.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -135,8 +136,7 @@ void AvrcTgProfile::SetEnableFlag(bool isEnabled)
 
 void AvrcTgProfile::SetActiveDevice(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_INFO("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
+    HILOGI("[AVRCP TG] rawAddr[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -1521,8 +1521,8 @@ void AvrcTgProfile::ReceiveVendorCmd(const RawAddress &rawAddr, uint8_t label, P
             std::shared_ptr<AvrcTgVendorPacket> packet =
                 std::make_shared<AvrcTgVendorPacket>(pduId, AVRC_ES_CODE_INVALID_COMMAND, label);
             SendVendorRsp(rawAddr, packet, AVRC_TG_SM_EVENT_GENERAL_REJECT);
-            LOG_INFO("[AVRCP TG] The PDU ID is wrong! Address[%{public}s], pduId[%x]",
-                rawAddr.GetAddress().c_str(), pduId);
+            HILOGI("[AVRCP TG] The PDU ID is wrong! Address[%{public}s], pduId[%{public}x]",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
             break;
     }
 }
@@ -1740,8 +1740,8 @@ void AvrcTgProfile::ReceiveBrowseCmd(const RawAddress &rawAddr, uint8_t label, P
             std::shared_ptr<AvrcTgBrowsePacket> packet = std::make_shared<AvrcTgBrowsePacket>(
                 AVRC_TG_PDU_ID_GENERAL_REJECT, AVRC_ES_CODE_INVALID_COMMAND, label);
             SendBrowseRsp(rawAddr, packet, AVRC_TG_SM_EVENT_GENERAL_REJECT);
-            LOG_INFO("[AVRCP TG] The PDU ID is wrong! Address[%{public}s], pduId[%x]",
-                rawAddr.GetAddress().c_str(), pduId);
+            HILOGI("[AVRCP TG] The PDU ID is wrong! Address[%{public}s], pduId[%{public}x]",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
             break;
     }
 }
@@ -1752,56 +1752,49 @@ void AvrcTgProfile::ProcessChannelEvent(
     LOG_INFO("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
     switch (event) {
         case AVCT_CONNECT_IND_EVT:
-            LOG_INFO("[AVRCP TG] Receive [AVCT_CONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
-                result,
-                rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_CONNECT_IND_EVT] - Result[%{public}x] - Address[%{public}s]",
+                result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
             ProcessChannelEventConnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_DISCONNECT_IND_EVT:
-            LOG_INFO("[AVRCP TG] Receive [AVCT_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
-                result,
-                rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_DISCONNECT_IND_EVT] - Result[%{public}x] - Address[%{public}s]",
+                result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
             ProcessChannelEventDisconnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_DISCONNECT_CFM_EVT:
-            LOG_INFO("[AVRCP TG] Receive [AVCT_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
-                result,
-                rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_DISCONNECT_CFM_EVT] - Result[%{public}x] - Address[%{public}s]",
+                result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
             ProcessChannelEventDisconnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_CONNECT_IND_EVT:
-            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_CONNECT_IND_EVT] Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_BR_CONNECT_IND_EVT] Address:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
             ProcessChannelEventBrConnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_CONNECT_CFM_EVT:
-            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
-                result,
-                rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_BR_CONNECT_CFM_EVT] - Result[%{public}x] - Address[%{public}s]",
+                result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
             ProcessChannelEventBrConnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_DISCONNECT_IND_EVT:
-            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
-                result,
-                rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_IND_EVT] - Result[%{public}x] - Address[%{public}s]",
+                result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
             DeleteBrowseStateMachine(rawAddr);
             break;
         case AVCT_BR_DISCONNECT_CFM_EVT:
-            LOG_INFO("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
-                result,
-                rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_CFM_EVT] - Result[%{public}x] - Address[%{public}s]",
+                result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
             DeleteBrowseStateMachine(rawAddr);
             break;
         case AVCT_CONNECT_CFM_EVT:
             /// The AVCTP does not return this message when an passive connection is created.
-            LOG_INFO("[AVRCP TG] Receive [AVCT_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
-                result,
-                rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Receive [AVCT_CONNECT_CFM_EVT] - Result[%{public}x] - Address[%{public}s]",
+                result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
             ProcessChannelEventConnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         default:
-            LOG_INFO("[AVRCP TG] Unknown [%x]! - Address[%{public}s]", event, rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Unknown [%{public}x]! - Address[%{public}s]", event, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
             break;
     };
 }
@@ -2005,18 +1998,17 @@ void AvrcTgProfile::ProcessChannelMessage(
                     ReceiveVendorCmd(rawAddr, label, pkt);
                     break;
                 default:
-                    LOG_INFO("[AVRCP TG] opCode[%x] is wrong! - ConnectId[%x]", opCode, connectId);
+                    HILOGI("[AVRCP TG] opCode[%{public}x] is wrong! - ConnectId[%{public}x]", opCode, connectId);
                     break;
             }
         } else if (chType == AVCT_DATA_BR) {
             ReceiveBrowseCmd(rawAddr, label, pkt);
         } else {
-            LOG_INFO("[AVRCP TG] chType[%x] is wrong! - ConnectId[%x]", chType, connectId);
+            HILOGI("[AVRCP TG] chType[%{public}x] is wrong! - ConnectId[%{public}x]", chType, connectId);
         }
     } else {
-        LOG_INFO("[AVRCP TG] Active device[%{public}s] - Request device[%{public}s]!",
-            cnManager->GetActiveDevice().c_str(),
-            rawAddr.GetAddress().c_str());
+        HILOGI("[AVRCP TG] Active device[%{public}s] - Request device[%{public}s]!",
+            cnManager->GetActiveDevice().c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 
     PacketFree(pkt);

@@ -272,7 +272,7 @@ bool ClassicAdapterProperties::ReadAddrFromController()
         return ret;
     }
     macAddr_ = RawAddress::ConvertToString(btAddr.addr).GetAddress();
-    LOG_DEBUG("ClassicAdapterProperties::GAPIF_GetLocalAddr %{public}s", macAddr_.c_str());
+    HILOGI("GAPIF_GetLocalAddr: %{public}s", GetEncryptAddr(macAddr_).c_str());
 
     return ret;
 }
@@ -422,7 +422,7 @@ void ClassicAdapterProperties::SaveConfigFile() const
 
 std::shared_ptr<ClassicRemoteDevice> ClassicAdapterProperties::GetPairedDevice(std::string addr)
 {
-    LOG_DEBUG("[ClassicAdapterProperties]::%{public}s addr: %{public}s", __func__, addr.c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(addr).c_str());
 
     std::shared_ptr<ClassicRemoteDevice> remote = std::make_shared<ClassicRemoteDevice>(addr);
 

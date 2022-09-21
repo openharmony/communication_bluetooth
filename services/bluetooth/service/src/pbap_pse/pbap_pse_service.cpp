@@ -22,6 +22,7 @@
 #include "btm.h"
 #include "class_creator.h"
 #include "log.h"
+#include "log_util.h"
 #include "pbap_pse_def.h"
 #include "pbap_pse_gap.h"
 #include "pbap_pse_header_msg.h"
@@ -181,12 +182,12 @@ int PbapPseService::Disconnect(const RawAddress &device)
     PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
     auto target = pimpl->machineMap_.find(device.GetAddress());
     if (target == pimpl->machineMap_.end()) {
-        PBAP_PSE_LOG_ERROR("Disconnect: %{public}s doesn't exist.", device.GetAddress().c_str());
+        HILOGI("Disconnect: %{public}s doesn't exist.", GET_ENCRYPT_ADDR(device));
         return RET_BAD_STATUS;
     }
     BTConnectState state = target->second->GetConnectState();
     if (state != BTConnectState::CONNECTED) {
-        PBAP_PSE_LOG_ERROR("Disconnect: %{public}s isn't connected.", device.GetAddress().c_str());
+        HILOGI("Disconnect: %{public}s isn't connected.", GET_ENCRYPT_ADDR(device));
         return RET_BAD_STATUS;
     }
     GetDispatcher()->PostTask(std::bind(&PbapPseService::DisConnectInternal, this, device));
@@ -304,13 +305,12 @@ int PbapPseService::SetDevicePassword(const RawAddress &device, const std::strin
     }
     auto target = pimpl->machineMap_.find(device.GetAddress());
     if (target == pimpl->machineMap_.end()) {
-        PBAP_PSE_LOG_ERROR("SetDevicePassword: %{public}s doesn't exist!", device.GetAddress().c_str());
+        HILOGI("SetDevicePassword: %{public}s doesn't exist!", GET_ENCRYPT_ADDR(device));
         return RET_BAD_STATUS;
     }
     if (target->second->GetConnectState() != BTConnectState::CONNECTING) {
-        PBAP_PSE_LOG_ERROR("SetDevicePassword: %{public}s isn't connecting, now state is %{public}d.",
-            device.GetAddress().c_str(),
-            static_cast<int>(target->second->GetConnectState()));
+        HILOGI("SetDevicePassword: %{public}s isn't connecting, now state is %{public}d.",
+            GET_ENCRYPT_ADDR(device), static_cast<int>(target->second->GetConnectState()));
         return RET_BAD_STATUS;
     }
     GetDispatcher()->PostTask(std::bind(&PbapPseService::ProcessSetDevicePassword, this, device, password, userId));
@@ -406,7 +406,7 @@ void PbapPseService::ProcessObexRequest(
     PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
     auto target = pimpl->machineMap_.find(device.GetAddress());
     if (target == pimpl->machineMap_.end()) {
-        PBAP_PSE_LOG_ERROR("ProcessObexRequest: %{public}s doesn't exist! ", device.GetAddress().c_str());
+        HILOGI("ProcessObexRequest: %{public}s doesn't exist! ", GET_ENCRYPT_ADDR(device));
         return;
     }
     auto obexMsg = std::make_unique<PbapPseObexMessage>(session, req);
@@ -446,9 +446,8 @@ void PbapPseService::ProcessConnectIncoming(const RawAddress &device, const util
     PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
     auto target = pimpl->machineMap_.find(device.GetAddress());
     if (target != pimpl->machineMap_.end() && target->second->GetConnectState() != BTConnectState::DISCONNECTED) {
-        PBAP_PSE_LOG_ERROR("ProcessConnectIncoming: %{public}s already exists! , state is %{public}d .",
-            device.GetAddress().c_str(),
-            static_cast<int>(target->second->GetConnectState()));
+        HILOGI("ProcessConnectIncoming: %{public}s already exists! , state is %{public}d .",
+            GET_ENCRYPT_ADDR(device), static_cast<int>(target->second->GetConnectState()));
         auto incomeConnect = static_cast<ObexIncomingConnect *>(msg.arg2_);
         incomeConnect->RejectConnection();
         return;
@@ -459,24 +458,24 @@ void PbapPseService::ProcessConnectIncoming(const RawAddress &device, const util
     pimpl->machineMap_[device.GetAddress()] = std::move(stm);
     pimpl->machineMap_[device.GetAddress()]->ProcessMessage(msg);
     if (pimpl->disableFlag_) {
-        PBAP_PSE_LOG_INFO("PBAP DISABLING AUTO FORBIDDEN FOR DEVICE:%{public}s", device.GetAddress().c_str());
+        HILOGI("PBAP DISABLING AUTO FORBIDDEN FOR DEVICE:%{public}s", GET_ENCRYPT_ADDR(device));
         ProcessGrantPermission(device, false, false);
         return;
     }
     BTPermissionType permission = AdapterManager::GetInstance()->GetPhonebookPermission(device.GetAddress());
     if (BTPermissionType::ACCESS_ALLOWED == permission) {
-        PBAP_PSE_LOG_INFO("PBAP ACCESS AUTO ALLOWED FOR DEVICE:%{public}s", device.GetAddress().c_str());
+        HILOGI("PBAP ACCESS AUTO ALLOWED FOR DEVICE:%{public}s", GET_ENCRYPT_ADDR(device));
         SetConnectionStrategy(device, static_cast<int>(BTStrategyType::CONNECTION_ALLOWED));
         ProcessGrantPermission(device, true, false);
     } else if (BTPermissionType::ACCESS_FORBIDDEN == permission) {
-        PBAP_PSE_LOG_INFO("PBAP ACCESS AUTO FORBIDDEN FOR DEVICE:%{public}s", device.GetAddress().c_str());
+        HILOGI("PBAP ACCESS AUTO FORBIDDEN FOR DEVICE:%{public}s", GET_ENCRYPT_ADDR(device));
         ProcessGrantPermission(device, false, false);
     } else {
         pimpl->machineMap_[device.GetAddress()]->StartTimer(
             std::bind(&PbapPseService::IncomingTimeout, this, device), PBAP_PSE_INCOMING_TIME_OUT);
-        PBAP_PSE_LOG_INFO("PBAP ACCESS UNKNOWN FOR DEVICE:%{public}s", device.GetAddress().c_str());
+        HILOGI("PBAP ACCESS UNKNOWN FOR DEVICE:%{public}s", GET_ENCRYPT_ADDR(device));
         pimpl->observerMgrList_.ForEach([device](IPbapPseObserver &observer) {
-            PBAP_PSE_LOG_INFO("OnServicePermission(%{public}s) is called.", device.GetAddress().c_str());
+            HILOGI("OnServicePermission(%{public}s) is called.", GET_ENCRYPT_ADDR(device));
             observer.OnServicePermission(device);
         });
     }
@@ -488,13 +487,12 @@ void PbapPseService::ProcessGrantPermission(const RawAddress &device, bool allow
     PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
     auto target = pimpl->machineMap_.find(device.GetAddress());
     if (target == pimpl->machineMap_.end()) {
-        PBAP_PSE_LOG_ERROR("ProcessGrantPermission: %{public}s doesn't exist.", device.GetAddress().c_str());
+        HILOGI("ProcessGrantPermission: %{public}s doesn't exist.", GET_ENCRYPT_ADDR(device));
         return;
     }
     if (target->second->GetConnectState() != BTConnectState::CONNECTING) {
-        PBAP_PSE_LOG_ERROR("ProcessGrantPermission: %{public}s isn't connecting, now state is %{public}d.",
-            device.GetAddress().c_str(),
-            static_cast<int>(target->second->GetConnectState()));
+        HILOGI("ProcessGrantPermission: %{public}s isn't connecting, now state is %{public}d.",
+            GET_ENCRYPT_ADDR(device), static_cast<int>(target->second->GetConnectState()));
         return;
     }
     target->second->StopTimer();
@@ -503,10 +501,10 @@ void PbapPseService::ProcessGrantPermission(const RawAddress &device, bool allow
         // Save Permission
         BTPermissionType permission = adapterManager->GetPhonebookPermission(device.GetAddress());
         if (allow && BTPermissionType::ACCESS_ALLOWED != permission) {
-            PBAP_PSE_LOG_INFO("Pbap permission changed to ALLOWED for device: %{public}s", device.GetAddress().c_str());
+            HILOGI("Pbap permission changed to ALLOWED for device: %{public}s", GET_ENCRYPT_ADDR(device));
             adapterManager->SetPhonebookPermission(device.GetAddress(), BTPermissionType::ACCESS_ALLOWED);
         } else if (!allow && BTPermissionType::ACCESS_FORBIDDEN != permission) {
-            PBAP_PSE_LOG_INFO("Pbap permission changed to FORBIDDEN for device: %{public}s", device.GetAddress().c_str());
+            HILOGI("Pbap permission changed to FORBIDDEN for device: %{public}s", GET_ENCRYPT_ADDR(device));
             adapterManager->SetPhonebookPermission(device.GetAddress(), BTPermissionType::ACCESS_FORBIDDEN);
         }
     }
@@ -520,13 +518,12 @@ void PbapPseService::ProcessSetDevicePassword(const RawAddress &device, std::str
     PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
     auto target = pimpl->machineMap_.find(device.GetAddress());
     if (target == pimpl->machineMap_.end()) {
-        PBAP_PSE_LOG_ERROR("ProcessSetDevicePassword: %{public}s doesn't exist! ", device.GetAddress().c_str());
+        HILOGI("ProcessSetDevicePassword: %{public}s doesn't exist! ", GET_ENCRYPT_ADDR(device));
         return;
     }
     if (target->second->GetConnectState() != BTConnectState::CONNECTING) {
-        PBAP_PSE_LOG_ERROR("ProcessSetDevicePassword: %{public}s isn't connecting, now state is %{public}d.",
-            device.GetAddress().c_str(),
-            static_cast<int>(target->second->GetConnectState()));
+        HILOGI("ProcessSetDevicePassword: %{public}s isn't connecting, now state is %{public}d.",
+            GET_ENCRYPT_ADDR(device), static_cast<int>(target->second->GetConnectState()));
         return;
     }
     auto msgData = std::make_unique<PbapPsePasswordInputMsg>(password, userId);
@@ -603,8 +600,7 @@ bool PbapPseService::LoadConnectPolicy(const std::string &addr, int &strategy) c
 void PbapPseService::ProcessWaitToDisconnect(const RawAddress &device) const
 {
     std::lock_guard<std::recursive_mutex> lock(pimpl->machineMapMutex_);
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
-    PBAP_PSE_LOG_INFO("device is accepted, wait it connected: %{public}s ", device.GetAddress().c_str());
+    HILOGI("device is accepted, wait it connected: %{public}s ", GET_ENCRYPT_ADDR(device));
     auto target = pimpl->machineMap_.find(device.GetAddress());
     if (target != pimpl->machineMap_.end()) {
         utility::Message msg(PSE_WAITING_CONNECTED_TO_DISCONNECT);
