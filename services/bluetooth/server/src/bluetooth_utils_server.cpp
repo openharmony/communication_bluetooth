@@ -36,5 +36,27 @@ std::string GetEncryptAddr(std::string addr)
     }
     return out;
 }
+
+std::string GetScanModeName(int mode)
+{
+    switch (mode) {
+        case SCAN_MODE_LOW_POWER:
+            return "SCAN_MODE_LOW_POWER(0)";
+        case SCAN_MODE_BALANCED:
+            return "SCAN_MODE_BALANCED(1)";
+        case SCAN_MODE_LOW_LATENCY:
+            return "SCAN_MODE_LOW_LATENCY(2)";
+        case SCAN_MODE_OP_P2_60_3000:
+            return "SCAN_MODE_OP_P2_60_3000(3)";
+        case SCAN_MODE_OP_P10_60_600:
+            return "SCAN_MODE_OP_P10_60_600(4)";
+        case SCAN_MODE_OP_P25_60_240:
+            return "SCAN_MODE_OP_P25_60_240(5)";
+        case SCAN_MODE_OP_P100_1000_1000:
+            return "SCAN_MODE_OP_P100_1000_1000(6)";
+        default:
+            return "Unknown";
+    }
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

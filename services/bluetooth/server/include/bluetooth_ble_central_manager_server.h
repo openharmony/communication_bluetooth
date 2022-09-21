@@ -51,7 +51,9 @@ private:
     static std::mutex proxyMutex_;
     static std::set<int32_t> proxyUids_;
     void SetScanParams(const BluetoothBleScanSettings &settings);
-    bool IsNewScanParams(const BluetoothBleScanSettings &settings);
+    void SetWindowAndInterval(const int mode, uint16_t &window, uint16_t &interval);
+    bool IsNewScanParams();
+    bool IsAllStop();
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
