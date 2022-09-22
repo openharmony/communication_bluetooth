@@ -23,7 +23,7 @@ namespace OHOS {
 namespace bluetooth {
 static const std::string OPP_SERVICE_NAME = "OBEX Object Push";
 static const std::string OPP_SEND_FILE_THREAD_NAME = "oppSendFile";
-static const std::string OPP_RECEIVE_FILE_PATH = "/data/bluetooth/";
+static const std::string OPP_RECEIVE_FILE_PATH = "/data/service/el1/public/bluetooth/";
 
 static constexpr int OPP_STATE_DISCONNECTED = 0;
 static constexpr int OPP_STATE_CONNECTING = 1;
