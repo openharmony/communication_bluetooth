@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 #include <unistd.h>
+#include <cstddef>
+#include "bluetooth_log.h"
+#include "bluetooth_socket_inputstream.h"
 #include <cerrno>
 #include "sys/socket.h"
-#include "bluetooth_socket_inputstream.h"
-#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {

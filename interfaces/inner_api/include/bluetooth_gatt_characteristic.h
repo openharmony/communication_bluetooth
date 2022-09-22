@@ -36,15 +36,15 @@
 #ifndef BLUETOOTH_GATT_CHARACTERISTIC_H
 #define BLUETOOTH_GATT_CHARACTERISTIC_H
 
-#include <list>
-
+#include <cstddef>
+#include <stdint.h>
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "cstdint"
+#include <list>
 #include "memory"
 #include "uuid.h"
 #include "vector"
-
 
 namespace OHOS {
 namespace Bluetooth {
