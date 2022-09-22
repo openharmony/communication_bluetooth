@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 #include "../include/sbc_frame.h"
-#include <algorithm>
 #include <memory>
 #include "../include/sbc_constant.h"
 #include "../include/sbc_tables.h"
+#include "sys/types.h"
 
 namespace  sbc {
 const int SBC_ENCODE_FIXED_EXTRA_BITS = 2;

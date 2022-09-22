@@ -13,8 +13,13 @@
  * limitations under the License.
  */
 #include "securec.h"
-#include "bluetooth_log.h"
+#include <cstddef>
+#include <cstdint>
 #include "bluetooth_gatt_descriptor.h"
+#include "bluetooth_log.h"
+#include "cstdint"
+#include "memory"
+#include "uuid.h"
 
 namespace OHOS {
 namespace Bluetooth {

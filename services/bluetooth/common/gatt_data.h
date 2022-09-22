@@ -16,6 +16,7 @@
 #ifndef GATT_DATA_H
 #define GATT_DATA_H
 
+#include <stdint.h>
 #include <cstring>
 #include <memory>
 #include <vector>
@@ -24,6 +25,7 @@
 #include "cstdint"
 #include "raw_address.h"
 #include "type_traits"
+
 
 namespace OHOS {
 namespace bluetooth {

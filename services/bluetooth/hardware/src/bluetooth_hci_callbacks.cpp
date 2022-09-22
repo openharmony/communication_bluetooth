@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_hci_callbacks.h"
+#include "cstdint"
 
 int32_t BluetoothHciCallbacks::OnInited(BtStatus status)
 {

@@ -13,11 +13,12 @@
  * limitations under the License.
  */
 #include "../include/sbc_decoder.h"
-#include <cstdio>
 #include <memory>
 #include "../include/sbc_constant.h"
 #include "../include/sbc_tables.h"
-#include "memory.h"
+#include "foundation/communication/bluetooth/services/bluetooth/service/src/gavdp/a2dp_codec/sbclib/include/sbc_frame.h"
+#include "foundation/communication/bluetooth/services/bluetooth/service/src/gavdp/a2dp_codec/sbclib/include/sbc_math.h"
+#include "new"
 #include "securec.h"
 
 

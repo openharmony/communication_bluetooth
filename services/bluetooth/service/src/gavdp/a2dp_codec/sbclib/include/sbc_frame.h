@@ -16,11 +16,9 @@
 #ifndef SBC_FRAME_H
 #define SBC_FRAME_H
 
+#include <sys/types.h>
 #include <cstddef>
 #include <cstdint>
-#include <sys/types.h>
-
-#include "sbc_constant.h"
 
 namespace sbc {
 
