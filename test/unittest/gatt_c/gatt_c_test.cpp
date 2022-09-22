@@ -165,9 +165,9 @@ HWTEST_F(GattCTest, GattCTest_004, TestSize.Level1)
     int res = BleStartScanEx(&configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 
-    filter[0].serviceUuid = (unsigned char*)"FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFFFFF";
-    filter[0].serviceUuidMask = (unsigned char*)"FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFFFFF";
-    filter[0].serviceUuidLength = sizeof("FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFFFFF");
+    filter[0].serviceUuid = (unsigned char*)"FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
+    filter[0].serviceUuidMask = (unsigned char*)"FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
+    filter[0].serviceUuidLength = sizeof("FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFF");
     res = BleStartScanEx(&configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 }
