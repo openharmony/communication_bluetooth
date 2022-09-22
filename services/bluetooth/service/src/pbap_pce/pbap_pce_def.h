@@ -20,6 +20,7 @@
 #include <cstring>
 #include "base_def.h"
 #include "log.h"
+#include "log_util.h"
 
 #define PBAP_PCE_ENABLE_L2CAP_PSM
 #define PBAP_PCE_LOG_DEBUG(fmt, ...) LOG_DEBUG("[PBAP_PCE]:" fmt, ##__VA_ARGS__)

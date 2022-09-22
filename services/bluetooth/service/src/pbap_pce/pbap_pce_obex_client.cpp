@@ -16,6 +16,7 @@
 #include "pbap_pce_obex_client.h"
 #include "pbap_pce_def.h"
 #include "pbap_pce_service.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -288,8 +289,7 @@ void PbapPceObexClient::PceObexObserver::OnActionCompleted(ObexClient &client, c
 void PbapPceObexClient::PceObexObserver::OnBusy(ObexClient &client, bool isBusy)
 {
     auto &device = client.GetClientSession().GetRemoteAddr();
-    PBAP_PCE_LOG_INFO("%{public}s start, device=%{public}s", __PRETTY_FUNCTION__, device.GetAddress().c_str());
-    PBAP_PCE_LOG_INFO("%{public}s end, isBusy=%{public}d", __PRETTY_FUNCTION__, isBusy ? 1 : 0);
+    HILOGI("device=%{public}s, isBusy=%{public}d", GET_ENCRYPT_ADDR(device), isBusy ? 1 : 0);
 }
 
 bool PbapPceObexClient::PceObexObserver::GetPhoneBookActionInfo(

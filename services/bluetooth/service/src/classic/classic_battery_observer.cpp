@@ -18,6 +18,7 @@
 #include "interface_adapter_classic.h"
 #include "interface_adapter_manager.h"
 #include "log.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -33,10 +34,7 @@ ClassicBatteryObserverHf::~ClassicBatteryObserverHf()
 
 void ClassicBatteryObserverHf::OnBatteryLevelChanged(const RawAddress &device, int batteryLevel)
 {
-    LOG_DEBUG("[ClassicBatteryObserverHf]::%{public}s, address: %{public}s, batteryLevel: %{public}d",
-        __func__,
-        device.GetAddress().c_str(),
-        batteryLevel);
+    HILOGI("address: %{public}s, batteryLevel: %{public}d", GET_ENCRYPT_ADDR(device), batteryLevel);
     dispatcher_->PostTask(std::bind(&ClassicBatteryObserverHf::SetBatteryLevel, this, device, batteryLevel));
 }
 
@@ -59,10 +57,7 @@ ClassicBatteryObserverAg::~ClassicBatteryObserverAg()
 
 void ClassicBatteryObserverAg::OnHfBatteryLevelChanged(const RawAddress &device, int indValue)
 {
-    LOG_DEBUG("[ClassicBatteryObserverAg]::%{public}s, address: %{public}s, batteryLevel: %{public}d",
-        __func__,
-        device.GetAddress().c_str(),
-        indValue);
+    HILOGI("address: %{public}s, batteryLevel: %{public}d", GET_ENCRYPT_ADDR(device), indValue);
     dispatcher_->PostTask(std::bind(&ClassicBatteryObserverAg::SetBatteryLevel, this, device, indValue));
 }
 

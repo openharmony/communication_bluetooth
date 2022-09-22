@@ -17,6 +17,7 @@
 
 #include <cstring>
 #include "log.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -49,14 +50,14 @@ ClassicRemoteDevice::~ClassicRemoteDevice()
 
 std::string ClassicRemoteDevice::GetAddress() const
 {
-    LOG_DEBUG("[ClassicRemoteDevice]::%{public}s, addr = %{public}s", __func__, macAddr_.c_str());
+    HILOGI("addr = %{public}s", GetEncryptAddr(macAddr_).c_str());
 
     return macAddr_;
 }
 
 void ClassicRemoteDevice::SetAddress(const std::string &addr)
 {
-    LOG_DEBUG("[ClassicRemoteDevice]::%{public}s, addr = %{public}s", __func__, addr.c_str());
+    HILOGI("addr = %{public}s", GetEncryptAddr(addr).c_str());
 
     macAddr_ = addr;
 }

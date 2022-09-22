@@ -25,6 +25,7 @@
 #include "avrcp_ct_vendor_player_application_settings.h"
 #include "compat.h"
 #include "power_manager.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -373,12 +374,11 @@ void AvrcCtProfile::SendPassCmd(const RawAddress &rawAddr, const std::shared_ptr
         /// There is a command in processing,
         if (cnManager->GetSizeOfPassQueue(rawAddr) >= AVRC_CT_DEFAULT_SIZE_OF_QUEUE) {
             InformPassRsp(rawAddr, pkt->GetKeyOperation(), pkt->GetKeyState(), RET_BAD_STATUS);
-            LOG_DEBUG("[AVRCP CT] The pass through command is full! - Address[%{public}s] - sizeOf[%{public}d]",
-                rawAddr.GetAddress().c_str(),
-                AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
+            HILOGI("[AVRCP CT] The pass through command is full! - Address[%{public}s] - sizeOf[%{public}d]",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
         } else {
             cnManager->PushPassQueue(rawAddr, pkt);
-            LOG_DEBUG("[AVRCP CT] Waiting for the response! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP CT] Waiting for the response! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     }
 }
@@ -403,10 +403,8 @@ void AvrcCtProfile::ReceivePassRsp(const RawAddress &rawAddr, Packet *pkt)
     SendNextPassCmd(rawAddr);
 
     AvrcCtPassPacket packet(pkt);
-    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - key[%x] - state[%x]",
-        rawAddr.GetAddress().c_str(),
-        packet.GetKeyOperation(),
-        packet.GetKeyState());
+    HILOGI("[AVRCP CT] Address[%{public}s] - key[%{public}x] - state[%{public}x]", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
+        packet.GetKeyOperation(), packet.GetKeyState());
 
     InformPassRsp(
         rawAddr, packet.GetKeyOperation(), packet.GetKeyState(), ExpainPassCrCodeToResult(packet.GetCrCode()));
@@ -1175,7 +1173,7 @@ void AvrcCtProfile::ReceiveAbortContinuingResponseRsp(const RawAddress &rawAddr,
 
     if (packet != nullptr) {
         if (acrPkt.GetPduId() != packet->GetPduId()) {
-            LOG_DEBUG("[AVRCP CT] PDU ID is wrong! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP CT] PDU ID is wrong! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } else {
         LOG_DEBUG("[AVRCP CT] The saved continue packet is nullptr!");
@@ -1511,9 +1509,8 @@ void AvrcCtProfile::ReceiveVendorRsp(const RawAddress &rawAddr, Packet *pkt)
             ReceiveRegisterNotificationRsp(rawAddr, pkt);
             break;
         default:
-            LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                rawAddr.GetAddress().c_str(),
-                AvrcCtPacket::GetVendorPdu(pkt));
+            HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), AvrcCtPacket::GetVendorPdu(pkt));
             break;
     }
 }
@@ -1669,13 +1666,12 @@ void AvrcCtProfile::ProcessVendorTimeout(RawAddress rawAddr)
                     break;
                 }
                 default:
-                    LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                        rawAddr.GetAddress().c_str(),
-                        packet->GetPduId());
+                    HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+                        GET_ENCRYPT_AVRCP_ADDR(rawAddr), packet->GetPduId());
                     break;
             }
         } else {
-            LOG_DEBUG("[AVRCP CT] The saved packet is nullptr! - Address[%{public}s] - ", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP CT] The saved packet is nullptr! Address[%{public}s] - ", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
 
         SendNextVendorCmd(rawAddr);
@@ -1718,7 +1714,7 @@ void AvrcCtProfile::SendBrowseCmd(
             LOG_DEBUG("[AVRCP CT] The queue is oversize[%{public}d]", cnManager->GetSizeOfBrowseQueue(rawAddr));
         } else {
             cnManager->PushBrowseQueue(rawAddr, pkt);
-            LOG_DEBUG("[AVRCP CT] Waiting for the response! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP CT] Waiting for the response! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     }
 }
@@ -1935,9 +1931,8 @@ void AvrcCtProfile::ReceiveBrowseRsp(const RawAddress &rawAddr, Packet *pkt)
             ReceiveGetTotalNumberOfItemsRsp(rawAddr, pkt);
             break;
         default:
-            LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                rawAddr.GetAddress().c_str(),
-                AvrcCtPacket::GetBrowsePdu(pkt));
+            HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+                GET_ENCRYPT_AVRCP_ADDR(rawAddr), AvrcCtPacket::GetBrowsePdu(pkt));
             break;
     }
 }
@@ -1985,9 +1980,8 @@ void AvrcCtProfile::ProcessBrowseTimeout(RawAddress rawAddr)
                         rawAddr, 0x00, 0x00, RET_BAD_STATUS, AVRC_ES_CODE_INTERNAL_ERROR);
                     break;
                 default:
-                    LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                        rawAddr.GetAddress().c_str(),
-                        packet->GetPduId());
+                    HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+                        GET_ENCRYPT_AVRCP_ADDR(rawAddr), packet->GetPduId());
                     break;
             }
         }
@@ -2007,11 +2001,8 @@ void AvrcCtProfile::BrowseTimeoutCallback(const RawAddress &rawAddr)
 void AvrcCtProfile::ProcessChannelEvent(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] Receive [%{public}s] - Result[%x] - Address[%{public}s]",
-        GetEventName(event).c_str(),
-        result,
-        rawAddr.GetAddress().c_str());
+    HILOGI("[AVRCP CT] Receive [%{public}s] - Result[%{public}x] - Address[%{public}s]", GetEventName(event).c_str(),
+        result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     switch (event) {
         case AVCT_CONNECT_IND_EVT:
             ProcessChannelEventConnectIndEvt(rawAddr, connectId, event, result, context);
@@ -2196,8 +2187,8 @@ void AvrcCtProfile::ProcessChannelEventBrConnectCfmEvt(
 void AvrcCtProfile::ProcessChannelMessage(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] connectId[%{public}d] - label[%{public}d] - crType[%{public}d] - chType[%{public}d]", connectId, label, crType, chType);
+    HILOGI("[AVRCP CT] connectId[%{public}d] - label[%{public}d] - crType[%{public}d] - chType[%{public}d]",
+        connectId, label, crType, chType);
 
     RawAddress rawAddr = AvrcCtConnectManager::GetInstance()->GetRawAddress(connectId);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);

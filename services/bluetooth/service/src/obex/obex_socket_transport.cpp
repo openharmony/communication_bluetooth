@@ -19,6 +19,7 @@
 #include <memory>
 #include <sstream>
 #include "log.h"
+#include "log_util.h"
 #include "obex_utils.h"
 #include "packet.h"
 #include "transport/transport_factory.h"
@@ -311,7 +312,7 @@ ObexServerIncomingConnect::ObexServerIncomingConnect(
     ObexServerSocketTransport &obexTransport, const RawAddress &btAddr, int port)
     : obexTransport_(obexTransport), btAddr_(btAddr), port_(port), operDone_(false)
 {
-    OBEX_LOG_INFO("Create ObexServerIncomingConnect: %{public}s", btAddr_.GetAddress().c_str());
+    HILOGI("Create ObexServerIncomingConnect: %{public}s", GetEncryptAddr(btAddr_.GetAddress()).c_str());
 }
 
 ObexServerIncomingConnect::~ObexServerIncomingConnect()
@@ -322,7 +323,7 @@ ObexServerIncomingConnect::~ObexServerIncomingConnect()
 //  accept the connection request
 int ObexServerIncomingConnect::AcceptConnection()
 {
-    OBEX_LOG_INFO("Call %{public}s, %{public}s", __PRETTY_FUNCTION__, btAddr_.GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(btAddr_.GetAddress()).c_str());
     if (operDone_) {
         OBEX_LOG_ERROR("Operation is done!");
         return -1;
@@ -334,7 +335,7 @@ int ObexServerIncomingConnect::AcceptConnection()
 //  reject the connection request
 int ObexServerIncomingConnect::RejectConnection()
 {
-    OBEX_LOG_INFO("Call %{public}s, %{public}s", __PRETTY_FUNCTION__, btAddr_.GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(btAddr_.GetAddress()).c_str());
     if (operDone_) {
         OBEX_LOG_ERROR("Operation is done!");
         return -1;
@@ -400,12 +401,11 @@ int ObexServerSocketTransport::Disconnect()
     OBEX_LOG_INFO("[%{public}s] Call %{public}s", tranKey_.c_str(), __PRETTY_FUNCTION__);
     isOnListening_ = false;
     for (auto &it : incomingConnectMap_) {
-        OBEX_LOG_ERROR("[%{public}s] incomingConnect %{public}s hasn't been disconnected.", tranKey_.c_str(), it.first.c_str());
+        HILOGI("%{public}s: incomingConnect %{public}s hasn't been disconnected.", tranKey_.c_str(), it.first.c_str());
     }
     for (auto &it : subTranMap_) {
-        OBEX_LOG_ERROR("[%{public}s] subStransport %{public}s hasn't been disconnected.",
-            tranKey_.c_str(),
-            it.second->GetRemoteAddress().GetAddress().c_str());
+        HILOGI("[%{public}s] subStransport %{public}s hasn't been disconnected.",
+            tranKey_.c_str(), GetEncryptAddr(it.second->GetRemoteAddress().GetAddress()).c_str());
     }
     return dataTransport_->RemoveServer(true);
 }
@@ -431,7 +431,7 @@ int ObexServerSocketTransport::Disconnect(ObexTransport &subTransport)
 int ObexServerSocketTransport::AcceptConnection(ObexIncomingConnect &incomingConnect)
 {
     const RawAddress &addr = incomingConnect.GetRemoteAddress();
-    OBEX_LOG_INFO("[%{public}s] Call %{public}s , %{public}s", tranKey_.c_str(), __PRETTY_FUNCTION__, addr.GetAddress().c_str());
+    HILOGI("Call%{public}s , addr: %{public}s", tranKey_.c_str(), GetEncryptAddr(addr.GetAddress()).c_str());
     return dataTransport_->AcceptConnection(addr, incomingConnect.GetPort());
 }
 
@@ -439,10 +439,11 @@ int ObexServerSocketTransport::AcceptConnection(ObexIncomingConnect &incomingCon
 int ObexServerSocketTransport::RejectConnection(ObexIncomingConnect &incomingConnect)
 {
     const RawAddress &addr = incomingConnect.GetRemoteAddress();
-    OBEX_LOG_INFO("[%{public}s] Call %{public}s , %{public}s", tranKey_.c_str(), __PRETTY_FUNCTION__, addr.GetAddress().c_str());
+    HILOGI("Call %{public}s , addr: %{public}s", tranKey_.c_str(), GetEncryptAddr(addr.GetAddress()).c_str());
     int ret = dataTransport_->RejectConnection(addr, incomingConnect.GetPort());
     if (incomingConnectMap_.find(addr.GetAddress()) != incomingConnectMap_.end()) {
-        OBEX_LOG_DEBUG("[%{public}s] Remove incomingConnect %{public}s.", tranKey_.c_str(), addr.GetAddress().c_str());
+        HILOGI("[%{public}s] Remove incomingConnect %{public}s.", tranKey_.c_str(),
+            GetEncryptAddr(addr.GetAddress()).c_str());
         incomingConnectMap_.erase(addr.GetAddress());
     }
     return ret;
@@ -542,8 +543,8 @@ void ObexServerSocketTransport::TransportObserver::ProcessOnConnectIncoming(RawA
         return;
     }
     if (mainTran_.incomingConnectMap_.find(strAddr) != mainTran_.incomingConnectMap_.end()) {
-        OBEX_LOG_ERROR(
-            "[%{public}s] Incoming connect is already exists, So Reject: %{public}s", tranKey.c_str(), btAddr.GetAddress().c_str());
+        HILOGI("[%{public}s] Incoming connect is already exists, So Reject: %{public}s", tranKey.c_str(),
+            GetEncryptAddr(btAddr.GetAddress()).c_str());
         mainTran_.dataTransport_->RejectConnection(btAddr, port);
         return;
     }

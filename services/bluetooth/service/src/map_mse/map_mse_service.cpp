@@ -14,6 +14,7 @@
  */
 
 #include "map_mse_service.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -545,7 +546,8 @@ int MapMseService::GetConnectionStrategy(const RawAddress &device)
     IProfileConfig *config = ProfileConfig::GetInstance();
     int value = 0;
     if (!config->GetValue(device.GetAddress(), SECTION_CONNECTION_POLICIES, PROPERTY_MAP_CONNECTION_POLICY, value)) {
-        LOG_DEBUG("%{public}s %{public}s not found", device.GetAddress().c_str(), PROPERTY_MAP_CONNECTION_POLICY.c_str());
+        HILOGI("addr: %{public}s, %{public}s not found",
+            GET_ENCRYPT_ADDR(device), PROPERTY_MAP_CONNECTION_POLICY.c_str());
         return (int)BTStrategyType::CONNECTION_UNKNOWN;
     }
     if (value) {

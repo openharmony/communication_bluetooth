@@ -32,6 +32,7 @@
 #include "interface_profile_gatt_client.h"
 #include "interface_profile_manager.h"
 #include "log.h"
+#include "log_util.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -376,7 +377,7 @@ int BleAdapter::DeregisterAllCallback() const
 
 void BleAdapter::GenResPriAddrResult(uint8_t result, const uint8_t addr[BT_ADDRESS_SIZE], void *context)
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:ResPriAddr = %{public}s", __func__, RawAddress::ConvertToString(addr).GetAddress().c_str());
+    HILOGI("ResPriAddr: %{public}s", GetEncryptAddr(RawAddress::ConvertToString(addr).GetAddress()).c_str());
 
     auto *adapter = static_cast<BleAdapter *>(context);
     std::unique_lock<std::mutex> lock(adapter->pimpl->mutexRpa_);
@@ -447,7 +448,7 @@ int BleAdapter::SetLocalIrkAndIdentityAddrToBtm() const
         addr = RawAddress::ConvertToString(&vec[0]).GetAddress();
         BleConfig::GetInstance().SetBleLocalAddrType(BLE_ADDR_TYPE::BLE_ADDR_TYPE_RANDOM);
         BTM_SetOwnAddressType(BLE_ADDR_TYPE::BLE_ADDR_TYPE_RANDOM);
-        LOG_DEBUG("[BleAdapter] %{public}s:GAP_LeSetStaticIdentityAddr random addr = %{public}s!", __func__, addr.c_str());
+        HILOGI("GAP_LeSetStaticIdentityAddr random addr = %{public}s!", GetEncryptAddr(addr).c_str());
         ret = GAPIF_LeSetStaticIdentityAddr(&vec[0]);
         if (ret != BT_NO_ERROR) {
             LOG_DEBUG("[BleAdapter] %{public}s:GAP_LeSetStaticIdentityAddr failed!", __func__);
@@ -613,7 +614,7 @@ std::vector<RawAddress> BleAdapter::GetConnectedDevices() const
 
 bool BleAdapter::StartPair(const RawAddress &device)
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:%{public}s", __func__, device.GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (pimpl->bleSecurity_ == nullptr) {
@@ -642,16 +643,14 @@ bool BleAdapter::StartPair(const RawAddress &device)
 
 bool BleAdapter::CancelPairing(const RawAddress &device)
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:%{public}s", __func__, device.GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = pimpl->peerConnDeviceList_.find(device.GetAddress());
     if (it != pimpl->peerConnDeviceList_.end()) {
         int pairState = it->second.GetPairedStatus();
         if ((BLE_PAIR_PAIRED == pairState) || (BLE_PAIR_CANCELING == pairState) || (BLE_PAIR_NONE == pairState)) {
-            LOG_ERROR(
-                "[BleAdapter] %{public}s:CancelPairing failed, because of BLE_PAIR_NONE, PAIR_PAIRED or PAIR_CANCELING! %{public}d",
-                __func__,
+            HILOGE("CancelPairing failed, because of BLE_PAIR_NONE, PAIR_PAIRED or PAIR_CANCELING! %{public}d",
                 pairState);
             return false;
         }
@@ -720,7 +719,7 @@ bool BleAdapter::RemovePairWithDisConnect(const RawAddress &device, bool isDisco
 
 bool BleAdapter::RemovePair(const RawAddress &device)
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:%{public}s", __func__, device.GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
 
     return RemovePairWithDisConnect(device);
 }
@@ -867,7 +866,7 @@ utility::Context *BleAdapter::GetContext()
 
 int BleAdapter::GetPairState(const RawAddress &device) const
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:%{public}s", __func__, device.GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     int pairState = BLE_PAIR_NONE;
@@ -898,7 +897,7 @@ bool BleAdapter::SetBondableMode(int mode) const
 
 bool BleAdapter::SetDevicePairingConfirmation(const RawAddress &device, bool accept) const
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:%{public}s %{public}d", __func__, device.GetAddress().c_str(), accept);
+    HILOGI("addr: %{public}s, accept: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), accept);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (pimpl->bleSecurity_ == nullptr) {
@@ -1243,10 +1242,10 @@ int BleAdapter::DeregisterCallbackToBtm() const
 void BleAdapter::LeConnectionComplete(
     uint8_t status, uint16_t connectionHandle, const BtAddr *addr, uint8_t role, void *context)
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:%u", __func__, status);
+    HILOGI("status: %{public}u", status);
 
     if (status != BT_NO_ERROR) {
-        LOG_ERROR("[BleAdapter] %{public}s:%u", __func__, status);
+        HILOGI("status: %{public}u", status);
         return;
     }
 
@@ -1332,7 +1331,7 @@ void BleAdapter::LePairComplete(const RawAddress &device, const int status) cons
     if (status == BT_NO_ERROR) {
         auto it = pimpl->peerConnDeviceList_.find(device.GetAddress());
         if (it == pimpl->peerConnDeviceList_.end()) {
-            LOG_ERROR("[BleAdapter] %{public}s:addr %{public}s.", __func__, device.GetAddress().c_str());
+            HILOGI("addr %{public}s.", GetEncryptAddr(device.GetAddress()).c_str());
             return;
         }
         it->second.SetPairedStatus(BLE_PAIR_PAIRED);

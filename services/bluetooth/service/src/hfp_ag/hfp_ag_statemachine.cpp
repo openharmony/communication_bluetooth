@@ -21,6 +21,7 @@
 #include "hfp_ag_service.h"
 #include "hfp_ag_system_interface.h"
 #include "power_manager.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -181,8 +182,7 @@ void HfpAgStateMachine::ProcessKeyPressed(const RawAddress &device, const int &c
     } else if (mSystemInterface.IsInCall()) {
         if (GetStateInt() == HfpAgAudioState::HFP_AG_AUDIO_STATE_DISCONNECTED) {
             if (!HfpAgService::GetService()->SetActiveDevice(device)) {
-                LOG_INFO("[HFP AG]%{public}s():[failed to set active device to][%{public}s]", __FUNCTION__,
-                    device.GetAddress().c_str());
+                HILOGI("[HFP AG][failed to set active device to][%{public}s]", GET_ENCRYPT_ADDR(device));
             }
         } else {
             mSystemInterface.HangupCall(device.GetAddress());

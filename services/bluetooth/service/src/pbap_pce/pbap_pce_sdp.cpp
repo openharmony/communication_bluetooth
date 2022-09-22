@@ -21,6 +21,7 @@
 #include "message.h"
 #include "pbap_pce_header_msg.h"
 #include "pbap_pce_service.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -86,7 +87,7 @@ int PbapPceSdp::SdpSearch(const RawAddress &device)
 
     BtAddr address;
     address.type = BT_PUBLIC_DEVICE_ADDRESS;
-    PBAP_PCE_LOG_INFO("pbap client connect to [%{public}s]", device.GetAddress().c_str());
+    HILOGI("pbap client connect to [%{public}s]", GET_ENCRYPT_ADDR(device));
     device.ConvertToUint8(address.addr, sizeof(address.addr));
 
     BtUuid classId;
