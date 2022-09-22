@@ -18,6 +18,7 @@
 #include "avrcp_ct_internal.h"
 #include "class_creator.h"
 #include "profile_service_manager.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -434,8 +435,7 @@ void AvrcpCtService::DisconnectNative(RawAddress rawAddr)
         }
 
         if (profile_->Disconnect(rawAddr) != RET_NO_ERROR) {
-            LOG_DEBUG(
-                "[AVRCP CT] Call - AvrcCtProfile::Disconnect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP CT] AvrcCtProfile::Disconnect Failed! Addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }
@@ -455,8 +455,7 @@ int AvrcpCtService::GetConnectState(void)
 
 void AvrcpCtService::OnConnectionStateChanged(const RawAddress &rawAddr, int state) const
 {
-    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - state[%{public}d]", rawAddr.GetAddress().c_str(), state);
+    HILOGI("[AVRCP CT] Address[%{public}s] - state[%{public}d]", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnConnectionStateChanged(rawAddr, state);
@@ -479,7 +478,7 @@ void AvrcpCtService::AcceptActiveConnect(const RawAddress &rawAddr)
         }
 
         if (profile_->Connect(rawAddr) != RET_NO_ERROR) {
-            LOG_DEBUG("[AVRCP CT] Call - AvrcCtProfile::Connect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP CT] Call AvrcCtProfile::Connect Failed! Addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }
@@ -563,8 +562,8 @@ void AvrcpCtService::PressButtonNative(RawAddress rawAddr, uint8_t button)
 
 void AvrcpCtService::OnButtonPressed(const RawAddress &rawAddr, uint8_t button, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - button[%x] - result[%{public}d]", rawAddr.GetAddress().c_str(), button, result);
+    HILOGI("[AVRCP CT] Address: %{public}s, button: %{public}x, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
+        button, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnPressButton(rawAddr, button, result);
@@ -619,8 +618,8 @@ void AvrcpCtService::ReleaseButtonNative(RawAddress rawAddr, uint8_t button)
 
 void AvrcpCtService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - button[%x] - result[%{public}d]", rawAddr.GetAddress().c_str(), button, result);
+    HILOGI("[AVRCP CT] Address: %{public}s, button: %{public}x, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
+        button, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnReleaseButton(rawAddr, button, result);

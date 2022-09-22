@@ -25,6 +25,7 @@
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
 #include "log.h"
+#include "log_util.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -1197,13 +1198,8 @@ GattConnectionManager::Device::StateMachine::~StateMachine()
 
 bool GattConnectionManager::Device::ProcessMessage(int messageId, int arg1, void *arg2)
 {
-    LOG_DEBUG("%{public}s:%{public}d:%{public}s : Call Massage ID: %{public}d, Device Address:[%{public}s] Transport:[%{public}d]",
-        __FILE__,
-        __LINE__,
-        __FUNCTION__,
-        messageId,
-        this->Info().addr_.GetAddress().c_str(),
-        this->Info().transport_);
+    HILOGI("Call Massage ID: %{public}d, Device Address:[%{public}s] Transport:[%{public}d]", messageId,
+        GetEncryptAddr(this->Info().addr_.GetAddress()).c_str(), this->Info().transport_);
 
     return SM().ProcessMessage(utility::Message(messageId, arg1, arg2));
 }
@@ -1270,13 +1266,8 @@ GattConnectionManager::Device::StateMachine::Idle::Idle(
 
 void GattConnectionManager::Device::StateMachine::Idle::Entry()
 {
-    LOG_DEBUG("%{public}s:%{public}d:%{public}s Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
-        __FILE__,
-        __LINE__,
-        __FUNCTION__,
-        device_.Info().addr_.GetAddress().c_str(),
-        device_.Info().transport_,
-        "Idle");
+    HILOGI("Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
+        GetEncryptAddr(device_.Info().addr_.GetAddress()).c_str(), device_.Info().transport_, "Idle");
 }
 
 bool GattConnectionManager::Device::StateMachine::Idle::Dispatch(const utility::Message &msg)
@@ -1321,13 +1312,8 @@ GattConnectionManager::Device::StateMachine::Connecting::Connecting(
 
 void GattConnectionManager::Device::StateMachine::Connecting::Entry()
 {
-    LOG_DEBUG("%{public}s:%{public}d:%{public}s Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
-        __FILE__,
-        __LINE__,
-        __FUNCTION__,
-        device_.Info().addr_.GetAddress().c_str(),
-        device_.Info().transport_,
-        "Connecting");
+    HILOGI("Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
+        GetEncryptAddr(device_.Info().addr_.GetAddress()).c_str(), device_.Info().transport_, "Connecting");
     GattConnectionManager::GetInstance().pimpl->NotifyObserver(
         device_.Info(), OBSERVER_EVENT_CONNECTING, device_.handle_, GattStatus::GATT_SUCCESS);
 }
@@ -1376,13 +1362,8 @@ GattConnectionManager::Device::StateMachine::Connected::Connected(
 
 void GattConnectionManager::Device::StateMachine::Connected::Entry()
 {
-    LOG_DEBUG("%{public}s:%{public}d:%{public}s Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
-        __FILE__,
-        __LINE__,
-        __FUNCTION__,
-        device_.Info().addr_.GetAddress().c_str(),
-        device_.Info().transport_,
-        "Connected");
+    HILOGI("Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
+        GetEncryptAddr(device_.Info().addr_.GetAddress()).c_str(), device_.Info().transport_, "Connected");
 
     device_.CheckEncryption();
 
@@ -1461,13 +1442,8 @@ GattConnectionManager::Device::StateMachine::Disconnecting::Disconnecting(
 
 void GattConnectionManager::Device::StateMachine::Disconnecting::Entry()
 {
-    LOG_DEBUG("%{public}s:%{public}d:%{public}s Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
-        __FILE__,
-        __LINE__,
-        __FUNCTION__,
-        device_.Info().addr_.GetAddress().c_str(),
-        device_.Info().transport_,
-        "Disconnecting");
+    HILOGI("Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
+        GetEncryptAddr(device_.Info().addr_.GetAddress()).c_str(), device_.Info().transport_, "Disconnecting");
 
     GattConnectionManager::GetInstance().pimpl->NotifyObserver(
         device_.Info(), OBSERVER_EVENT_DISCONNECTING, device_.handle_, GattStatus::GATT_SUCCESS);
@@ -1506,13 +1482,8 @@ GattConnectionManager::Device::StateMachine::Disconnected::Disconnected(
 
 void GattConnectionManager::Device::StateMachine::Disconnected::Entry()
 {
-    LOG_DEBUG("%{public}s:%{public}d:%{public}s Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
-        __FILE__,
-        __LINE__,
-        __FUNCTION__,
-        device_.Info().addr_.GetAddress().c_str(),
-        device_.Info().transport_,
-        "Disconnected");
+    HILOGI("Device Address:[%{public}s] Transport:[%{public}d], Entry %{public}s State",
+        GetEncryptAddr(device_.Info().addr_.GetAddress()).c_str(), device_.Info().transport_, "Disconnected");
 
     device_.CheckEncryption();
 

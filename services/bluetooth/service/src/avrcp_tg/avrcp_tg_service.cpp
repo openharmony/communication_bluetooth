@@ -28,6 +28,7 @@
 #include "profile_service_manager.h"
 #include "stub/media_service.h"
 #include "timer.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -784,8 +785,7 @@ std::vector<bluetooth::RawAddress> AvrcpTgService::GetDevicesByStates(const std:
 
 int AvrcpTgService::GetDeviceState(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-    LOG_INFO("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
+    HILOGI("[AVRCP TG] rawAddr[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = static_cast<int>(BTConnectState::DISCONNECTED);
 
@@ -882,8 +882,8 @@ void AvrcpTgService::DisconnectNative(RawAddress rawAddr)
         }
 
         if (profile_->Disconnect(rawAddr) != RET_NO_ERROR) {
-            LOG_INFO(
-                "[AVRCP TG] Call - AvrcTgProfile::Disconnect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI(
+                "[AVRCP TG] Call AvrcTgProfile::Disconnect Failed Address%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }
@@ -903,8 +903,7 @@ int AvrcpTgService::GetConnectState(void)
 
 void AvrcpTgService::OnConnectionStateChanged(const RawAddress &rawAddr, int state)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-    LOG_INFO("[AVRCP TG] Address[%{public}s] - state[%{public}d]", rawAddr.GetAddress().c_str(), state);
+    HILOGI("[AVRCP TG] Address[%{public}s] - state[%{public}d]", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (myObserver_ != nullptr) {
         myObserver_->OnConnectionStateChanged(rawAddr.GetAddress(), state);
@@ -925,7 +924,7 @@ void AvrcpTgService::AcceptActiveConnect(const RawAddress &rawAddr)
         }
 
         if (profile_->Connect(rawAddr) != RET_NO_ERROR) {
-            LOG_INFO("[AVRCP TG] Call Connect Failed! Address[%{public}s]", rawAddr.GetAddress().c_str());
+            HILOGI("[AVRCP TG] Call Connect Failed! Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }

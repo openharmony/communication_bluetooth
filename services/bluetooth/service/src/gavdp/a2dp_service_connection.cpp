@@ -17,6 +17,7 @@
 
 #include "a2dp_service.h"
 #include "log.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -27,7 +28,7 @@ A2dpConnectManager::A2dpConnectManager(uint8_t role)
 
 bool A2dpConnectManager::A2dpConnect(const RawAddress &device)
 {
-    LOG_INFO("[A2dpConnectManager] %{public}s [address:%{public}s] role[%u]\n", __func__, device.GetAddress().c_str(), role_);
+    HILOGI("[address:%{public}s] role[%{public}u]", GET_ENCRYPT_ADDR(device), role_);
 
     A2dpService *service = GetServiceInstance(role_);
     A2dpDeviceInfo *info = nullptr;

@@ -19,6 +19,7 @@
 #include "../obex/obex_utils.h"
 #include "interface_profile_pbap_pse.h"
 #include "log.h"
+#include "log_util.h"
 #include "pbap_pse_app_params.h"
 #include "pbap_pse_def.h"
 #include "pbap_pse_obex_server.h"
@@ -131,23 +132,23 @@ void PseConnecting::AcceptConnection()
         stm_.GetStmInfo().accepted_ = true;
         incomeConnect_ = nullptr;
     } else {
-        PBAP_PSE_LOG_ERROR(
-            "%{public}s incomeConnect is null, maybe accepted or rejected.", stm_.GetDevice().GetAddress().c_str());
+        HILOGI("%{public}s incomeConnect is null, maybe accepted or rejected.",
+            GetEncryptAddr(stm_.GetDevice().GetAddress()).c_str());
     }
 }
 
 void PseConnecting::RejectConnection()
 {
     if (incomeConnect_ != nullptr) {
-        PBAP_PSE_LOG_INFO("%{public}s RejectConnection", stm_.GetDevice().GetAddress().c_str());
+        HILOGI("%{public}s RejectConnection", GetEncryptAddr(stm_.GetDevice().GetAddress()).c_str());
         stm_.StopTimer();
         Transition(PbapPseStateMachine::PSE_DISCONNECTING_STATE);
         incomeConnect_->RejectConnection();
         incomeConnect_ = nullptr;
         Transition(PbapPseStateMachine::PSE_DISCONNECTED_STATE);
     } else {
-        PBAP_PSE_LOG_ERROR(
-            "%{public}s incomeConnect is null, maybe accepted or rejected.", stm_.GetDevice().GetAddress().c_str());
+        HILOGI("%{public}s incomeConnect is null, maybe accepted or rejected.",
+            GetEncryptAddr(stm_.GetDevice().GetAddress()).c_str());
     }
 }
 
@@ -840,10 +841,10 @@ void PbapPseStateMachine::SetBusy(bool isBusy)
     }
     stmInfo_.isBusy_ = isBusy;
     if (isBusy) {
-        PBAP_PSE_LOG_INFO("[%{public}s] PowerStatusUpdate -> BUSY", device_.GetAddress().c_str());
+        HILOGI("[%{public}s] PowerStatusUpdate -> BUSY", GetEncryptAddr(device_.GetAddress()).c_str());
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_PBAP_PSE, device_);
     } else {
-        PBAP_PSE_LOG_INFO("[%{public}s] PowerStatusUpdate -> IDLE", device_.GetAddress().c_str());
+        HILOGI("[%{public}s] PowerStatusUpdate -> IDLE", GetEncryptAddr(device_.GetAddress()).c_str());
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::IDLE, PROFILE_NAME_PBAP_PSE, device_);
     }
 }

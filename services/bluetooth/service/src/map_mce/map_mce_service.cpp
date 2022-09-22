@@ -32,6 +32,7 @@
 #include "adapter_config.h"
 #include "class_creator.h"
 #include "log.h"
+#include "log_util.h"
 #include "map_mce_types.h"
 #include "map_mce_instance_stm.h"
 #include "map_mce_mns_server.h"
@@ -717,7 +718,7 @@ int MapMceService::SendRequestToConnectedDevice(
 
 int MapMceService::ConnectInternal(const RawAddress &device, bool sInsMode, int sInsId)
 {
-    LOG_INFO("%{public}s enter,address=%{public}s", __PRETTY_FUNCTION__, device.GetAddress().c_str());
+    HILOGI("address=%{public}s", GET_ENCRYPT_ADDR(device));
     std::lock_guard<std::recursive_mutex> lock(mceDeviceMapMutex_);
 
     insDefaultConfig_.singleInstMode_ = sInsMode;

@@ -22,6 +22,7 @@
 #include "adapter_manager.h"
 #include "btm.h"
 #include "log.h"
+#include "log_util.h"
 #include "power_device.h"
 #include "timer.h"
 
@@ -135,11 +136,8 @@ void PowerManager::Disable()
 void PowerManager::StatusUpdate(
     const RequestStatus status, const std::string &profileName, const RawAddress &addr) const
 {
-    LOG_DEBUG("PM_: %{public}s, profileName: %{public}s, status: %u,  addr: %{public}s\n",
-        __FUNCTION__,
-        profileName.c_str(),
-        status,
-        addr.GetAddress().c_str());
+    HILOGI("profileName: %{public}s, status: %{public}u,  addr: %{public}s", profileName.c_str(), status,
+        GetEncryptAddr(addr.GetAddress()).c_str());
 
     if (pimpl->isEnabled_) {
         pimpl->dispatcher_.PostTask(
@@ -160,8 +158,7 @@ BTPowerMode PowerManager::GetPowerMode(const RawAddress &addr) const
 void PowerManager::impl::PowerProcess(
     const RequestStatus status, const std::string &profileName, const RawAddress rawAddr)
 {
-    LOG_DEBUG(
-        "PM_: %{public}s start, status: %u, profileName: %{public}s, line: %{public}d\n", __FUNCTION__, status, profileName.c_str(), __LINE__);
+    HILOGI("status: %{public}u, profileName: %{public}s", status, profileName.c_str());
     std::unique_lock<std::mutex> lock(mutex_);
     UpdatePowerDevicesInfo(rawAddr, profileName, status);
     auto iter = powerDevices_.find(rawAddr);
@@ -245,7 +242,7 @@ void PowerManager::impl::SsrCompleteCallBack(uint8_t status, const BtAddr *btAdd
 
 void PowerManager::impl::ConnectionCompleteCallBackProcess(const RawAddress rawAddr, uint16_t connectionHandle)
 {
-    LOG_DEBUG("PM_: ConnectionCompleteCallBackProcess(), addr=%{public}s\n", rawAddr.GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     // construct
     std::unique_lock<std::mutex> lock(mutex_);
     auto iter = powerDevices_.find(rawAddr);
@@ -279,8 +276,7 @@ void PowerManager::impl::DisconnectionCompleteCallBackProcess(uint8_t status, ui
             if (its != powerDevices_.end()) {
                 powerDevices_.erase(its);
             }
-            LOG_DEBUG("PM_: DisconnectionCompleteCallBackProcess(), delete powerDevices, addr=%{public}s\n",
-                iter->second.GetAddress().c_str());
+            HILOGI("delete powerDevices, addr: %{public}s", GetEncryptAddr(iter->second.GetAddress()).c_str());
             connectionHandles_.erase(iter);
         }
     }

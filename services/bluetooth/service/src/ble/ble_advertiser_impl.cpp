@@ -1847,9 +1847,7 @@ void BleAdvertiserImpl::TimerCallbackEx(void *context, uint8_t advHandle)
 
 void BleAdvertiserImpl::GenResPriAddrResultTask(uint8_t result, BtAddr btAddr) const
 {
-    LOG_DEBUG("[BleAdvertiserImpl] %{public}s:ResPriAddr = %{public}s",
-        __func__,
-        RawAddress::ConvertToString(btAddr.addr).GetAddress().c_str());
+    HILOGI("ResPriAddr = %{public}s", GetEncryptAddr(RawAddress::ConvertToString(btAddr.addr).GetAddress()).c_str());
 
     auto iter = pimpl->advHandleSettingDatas_.find(pimpl->advStartHandle_);
     if (iter == pimpl->advHandleSettingDatas_.end()) {
@@ -1876,9 +1874,7 @@ void BleAdvertiserImpl::GenResPriAddrResultTask(uint8_t result, BtAddr btAddr) c
 
 void BleAdvertiserImpl::GenResPriAddrResult(uint8_t result, const uint8_t addr[BT_ADDRESS_SIZE], void *context)
 {
-    LOG_DEBUG("[BleAdvertiserImpl] %{public}s:ResPriAddr = %{public}s",
-        __func__,
-        RawAddress::ConvertToString(addr).GetAddress().c_str());
+    HILOGI("ResPriAddr = %{public}s", GetEncryptAddr(RawAddress::ConvertToString(addr).GetAddress()).c_str());
 
     auto *bleAdvertiser = static_cast<BleAdvertiserImpl *>(context);
 

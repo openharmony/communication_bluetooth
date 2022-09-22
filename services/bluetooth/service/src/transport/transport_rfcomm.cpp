@@ -15,6 +15,7 @@
 
 #include "transport_rfcomm.h"
 #include "log.h"
+#include "log_util.h"
 #include "securec.h"
 #include "transport_def.h"
 
@@ -84,9 +85,7 @@ int RfcommTransport::RemoveServer(bool isDisable)
 
 int RfcommTransport::AcceptConnection(const RawAddress &addr, uint16_t scn)
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
-
-    LOG_INFO("[RfcommTransport]%{public}s RawAddress:%{public}s", __func__, addr.GetAddress().c_str());
+    HILOGI("[RfcommTransport] RawAddress:%{public}s", GetEncryptAddr(addr.GetAddress()).c_str());
     if (this->handleMap_.find(addr) != this->handleMap_.end()) {
         this->rfcHandle_ = this->handleMap_.at(addr);
     } else {

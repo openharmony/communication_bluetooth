@@ -15,6 +15,7 @@
 
 #include "transport_l2cap.h"
 #include "log.h"
+#include "log_util.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -30,8 +31,8 @@ L2capTransport::L2capTransport(L2capTransportInfo &createInfo)
       dispatcher_(createInfo.dispatcher)
 {
     if (createInfo.addr != nullptr) {
-        LOG_DEBUG("remoteAddr: %{public}s, lpsm: %hu, rpsm: %hu", remoteAddr_.GetAddress().c_str(), lpsm_, rpsm_);
-        LOG_DEBUG("localMtu: %hu", localMtu_);
+        HILOGI("remoteAddr: %{public}s, lpsm: %{public}hu, rpsm: %{public}hu, localMtu_: %{public}hu",
+            GetEncryptAddr(remoteAddr_.GetAddress()).c_str(), lpsm_, rpsm_, localMtu_);
         remoteAddr_ = *createInfo.addr;
     }
 }
