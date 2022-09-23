@@ -116,15 +116,15 @@ void MapMceInstanceClient::SetObexConfig()
     // set obex config value
     masClientConfig_.addr_ = btAddr;
     masClientConfig_.isGoepL2capPSM_ = masSdpParamSave_.isGoepL2capPSM;  // rfcomm is false or l2cap is true
-    masClientConfig_.mtu_ = insDefaultConfig_.rfcommMtu_;
+    masClientConfig_.mtu_ = insDefaultConfig_.rfcommMtu;
 #ifdef MCE_DISABLE_L2CAP
     // GOEP 2.0 srm set true
-    masClientConfig_.isSupportSrm_ = insDefaultConfig_.isSupportSrm_;
+    masClientConfig_.isSupportSrm_ = insDefaultConfig_.isSupportSrm;
 #else
     // GOEP 2.0 srm set true
     if (masClientConfig_.isGoepL2capPSM_) {
         masClientConfig_.isSupportSrm_ = true;
-        masClientConfig_.mtu_ = insDefaultConfig_.l2capMtu_;
+        masClientConfig_.mtu_ = insDefaultConfig_.l2capMtu;
     }
 #endif
     masClientConfig_.isSupportReliableSession_ = false;
@@ -605,7 +605,7 @@ void MapMceInstanceClient::ExcuteCallbackToFramework(MapRequestResponseAction &r
         IProfileMapAction prifileAction;
         prifileAction.action_ = retAction.action_;
         prifileAction.ownerStatus_ = retAction.ownerStatus_;
-        prifileAction.supportedFeatures_ = retAction.supportedFeatures_;
+        prifileAction.supportedFeatures_ = retAction.supportedFeatures;
         observerMgrPtr_.ExcuteObserverOnMapActionCompleted(
             ((MapMceInstanceStm &)instanceStm_).GetBtDevice(), prifileAction, resCode);
     }
@@ -639,7 +639,7 @@ void MapMceInstanceClient::MasObexClientObserver::OnConnected(ObexClient &client
 void MapMceInstanceClient::MasObexClientObserver::OnConnectFailed(ObexClient &client, const ObexHeader &resp)
 {
     LOG_INFO("%{public}s enter", __PRETTY_FUNCTION__);
-    ObexHeader *tempPtr = (ObexHeader *)&resp;
+    ObexHeader *tempPtr = const_cast<ObexHeader *>(&resp);
     utility::Message msg(MSG_MASSTM_OBEX_CONNECTED_FAILED);
     // save error code
     msg.arg1_ = int(tempPtr->GetFieldCode());

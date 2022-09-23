@@ -202,10 +202,10 @@ public:
         HfpAgSystemEventProcesser &eventDispatch)
         : HfpAgState(name, statemachine, profile, eventDispatch, HFP_AG_STATE_DISCONNECTED)
     {}
-    ~HfpAgDisconnected() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpAgDisconnected() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool isReentry_ {false};
@@ -217,10 +217,10 @@ public:
         HfpAgSystemEventProcesser &eventDispatch)
         : HfpAgState(name, statemachine, profile, eventDispatch, HFP_AG_STATE_CONNECTING)
     {}
-    ~HfpAgConnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpAgConnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpAgDisconnecting : public HfpAgState {
@@ -229,10 +229,10 @@ public:
         HfpAgSystemEventProcesser &eventDispatch)
         : HfpAgState(name, statemachine, profile, eventDispatch, HFP_AG_STATE_DISCONNECTING)
     {}
-    ~HfpAgDisconnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpAgDisconnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpAgConnected : public HfpAgState {
@@ -241,11 +241,11 @@ public:
         HfpAgSystemEventProcesser &eventDispatch)
         : HfpAgState(name, statemachine, profile, eventDispatch, HFP_AG_STATE_CONNECTED)
     {}
-    ~HfpAgConnected() = default;
-    virtual void Entry() override;
-    virtual void Exit() override
+    ~HfpAgConnected() override = default;
+    void Entry() override;
+    void Exit() override
     {}
-    virtual bool Dispatch(const utility::Message &msg) override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     void ProcessVoiceRecognitionResult(int result);
@@ -259,10 +259,10 @@ public:
         HfpAgSystemEventProcesser &eventDispatch, utility::StateMachine::State &parent)
         : HfpAgState(HfpAgSmInfo(name, statemachine), profile, eventDispatch, HFP_AG_AUDIO_STATE_CONNECTING, parent)
     {}
-    ~HfpAgAudioConnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpAgAudioConnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpAgAudioDisconnecting : public HfpAgState {
@@ -271,10 +271,10 @@ public:
         HfpAgSystemEventProcesser &eventDispatch, utility::StateMachine::State &parent)
         : HfpAgState(HfpAgSmInfo(name, statemachine), profile, eventDispatch, HFP_AG_AUDIO_STATE_DISCONNECTING, parent)
     {}
-    ~HfpAgAudioDisconnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpAgAudioDisconnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpAgAudioConnected : public HfpAgState {
@@ -283,11 +283,11 @@ public:
         HfpAgSystemEventProcesser &eventDispatch, utility::StateMachine::State &parent)
         : HfpAgState(HfpAgSmInfo(name, statemachine), profile, eventDispatch, HFP_AG_AUDIO_STATE_CONNECTED, parent)
     {}
-    ~HfpAgAudioConnected() = default;
-    virtual void Entry() override;
-    virtual void Exit() override
+    ~HfpAgAudioConnected() override = default;
+    void Entry() override;
+    void Exit() override
     {}
-    virtual bool Dispatch(const utility::Message &msg) override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     void ProcessDisconnect(const HfpAgMessage &event);

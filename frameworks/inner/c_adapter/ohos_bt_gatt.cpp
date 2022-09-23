@@ -56,9 +56,9 @@ class BleAdvCallback;
 
 static BtGattCallbacks *g_AppCallback;
 static BleCentralManager *g_BleCentralManager;
-static BleCentralManagerCallbackWapper *g_ScanCallback;
+static BleCentralManagerCallbackWapper *g_scanCallback;
 
-static BleAdvCallback *g_BleAdvCallbacks[MAX_BLE_ADV_NUM];
+static BleAdvCallback *g_bleAdvCallbacks[MAX_BLE_ADV_NUM];
 static BleAdvertiser *g_BleAdvertiser = nullptr;
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
@@ -118,7 +118,7 @@ public:
 
 class BleAdvCallback : public BleAdvertiseCallback {
 public:
-    BleAdvCallback(int advId)
+    explicit BleAdvCallback(int advId)
     {
         advId_ = advId;
     }
@@ -221,7 +221,7 @@ int BleStartAdv(int advId, const BleAdvParams *param)
 static bool IsAllAdvStopped()
 {
     for (int i = 0; i < MAX_BLE_ADV_NUM; i++) {
-        if (g_BleAdvCallbacks[i] != nullptr) {
+        if (g_bleAdvCallbacks[i] != nullptr) {
             return false;
         }
     }
@@ -243,20 +243,20 @@ int BleStopAdv(int advId)
         HILOGE("BleStopAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
-    if (g_BleAdvertiser == nullptr || g_BleAdvCallbacks[advId] == nullptr) {
+    if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleStopAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleAdvertiser->StopAdvertising(*g_BleAdvCallbacks[advId]);
+    g_BleAdvertiser->StopAdvertising(*g_bleAdvCallbacks[advId]);
 
     usleep(100);
     if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
         HILOGI("adv stopped advId: %{public}d.", advId);
         g_AppCallback->advDisableCb(advId, 0);
     }
-    delete g_BleAdvCallbacks[advId];
-    g_BleAdvCallbacks[advId] = nullptr;
+    delete g_bleAdvCallbacks[advId];
+    g_bleAdvCallbacks[advId] = nullptr;
 
     if (IsAllAdvStopped()) {
         HILOGI("All adv have been stopped.");
@@ -395,12 +395,12 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
     HILOGI("BleGattRegisterCallbacks enter");
     g_AppCallback = func;
 
-    if (g_ScanCallback == nullptr) {
-        g_ScanCallback = new BleCentralManagerCallbackWapper();
+    if (g_scanCallback == nullptr) {
+        g_scanCallback = new BleCentralManagerCallbackWapper();
     }
 
     if (g_BleCentralManager == nullptr) {
-        g_BleCentralManager = new BleCentralManager(*g_ScanCallback);
+        g_BleCentralManager = new BleCentralManager(*g_scanCallback);
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -425,11 +425,11 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     }
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
-        if (g_BleAdvCallbacks[i] == nullptr) {
-            g_BleAdvCallbacks[i] = new BleAdvCallback(i);
+        if (g_bleAdvCallbacks[i] == nullptr) {
+            g_bleAdvCallbacks[i] = new BleAdvCallback(i);
             break;
         }
-        HILOGI("g_BleAdvCallbacks[%{public}d] = %{public}p.", i, g_BleAdvCallbacks[i]);
+        HILOGI("g_bleAdvCallbacks[%{public}d] = %{public}p.", i, g_bleAdvCallbacks[i]);
     }
 
     if (i == MAX_BLE_ADV_NUM) {
@@ -460,7 +460,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
         }
     }
 
-    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, *g_BleAdvCallbacks[i]);
+    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, *g_bleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;
 }
 

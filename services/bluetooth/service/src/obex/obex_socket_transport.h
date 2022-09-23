@@ -139,7 +139,7 @@ public:
         uint16_t mtu_ = 0;
     };
     ObexServerSocketTransport(const Option &option, ObexTransportObserver &observer, utility::Dispatcher &dispatcher);
-    virtual ~ObexServerSocketTransport() = default;
+    ~ObexServerSocketTransport() override = default;
     int Listen() override;
     int Disconnect() override;
     int Disconnect(ObexTransport &subTransport) override;

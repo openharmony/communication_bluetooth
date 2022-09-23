@@ -168,11 +168,11 @@ void HfpAgCommandProcessor::SendAtCommand(const HfpAgDataConnection &dataConn, c
 {
     LOG_INFO("[HFP AG]%{public}s():Send Command[%{public}s]", __FUNCTION__, command.c_str());
     std::string fullCommand(HEAD + command + TAIL);
-    std::size_t CmdLength = fullCommand.length();
-    Packet *packet = PacketMalloc(0, 0, CmdLength);
+    std::size_t cmdLength = fullCommand.length();
+    Packet *packet = PacketMalloc(0, 0, cmdLength);
     Buffer *buf = PacketContinuousPayload(packet);
     void *data = BufferPtr(buf);
-    (void)memcpy_s(data, CmdLength, fullCommand.c_str(), CmdLength);
+    (void)memcpy_s(data, cmdLength, fullCommand.c_str(), cmdLength);
     dataConn.WriteData(*packet);
     PacketFree(packet);
 }
@@ -236,8 +236,8 @@ void HfpAgCommandProcessor::AtdExecuter(HfpAgDataConnection &dataConn, const std
     }
 
     if (number.at(0) == '>') {  // ATD> memory dial
-        const std::regex base_regex("[^\\d>;]");
-        if (std::regex_search(number, base_regex) || number.at(number.length() - 1) != ';') {
+        const std::regex baseRegex("[^\\d>;]");
+        if (std::regex_search(number, baseRegex) || number.at(number.length() - 1) != ';') {
             SendErrorCode(dataConn, HFP_AG_ERROR_INVALID_CHARS_IN_DIAL_STRING);
             return;
         }
@@ -245,8 +245,8 @@ void HfpAgCommandProcessor::AtdExecuter(HfpAgDataConnection &dataConn, const std
         type = HFP_AG_MEMORY_DIAL;
         number = number.substr(1, number.length() - ATD_VALID_LENGTH);
     } else {  // specific number dial
-        const std::regex base_regex("[^\\d*#+;]");
-        if (std::regex_search(number, base_regex) || number.at(number.length() - 1) != ';') {
+        const std::regex baseRegex("[^\\d*#+;]");
+        if (std::regex_search(number, baseRegex) || number.at(number.length() - 1) != ';') {
             SendErrorCode(dataConn, HFP_AG_ERROR_INVALID_CHARS_IN_DIAL_STRING);
             return;
         }
@@ -474,20 +474,20 @@ void HfpAgCommandProcessor::CmeeSetter(HfpAgDataConnection &dataConn, const std:
 void HfpAgCommandProcessor::BiaSetter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
     size_t i;
-    int ind_id;
+    int indId;
     size_t len = arg.length();
     const char *buf = arg.c_str();
     int biaMaskOut = dataConn.biaMaskOut_;
-    for (i = 0, ind_id = 1; i < len && ind_id <= MAX_AG_INDICATORS; i++) {
+    for (i = 0, indId = 1; i < len && indId <= MAX_AG_INDICATORS; i++) {
         if (buf[i] == ',') {
-            ind_id++;
+            indId++;
             continue;
         }
 
         if (buf[i] == '0') {
-            biaMaskOut |= 1 << ind_id;
+            biaMaskOut |= 1 << indId;
         } else if (buf[i] == '1') {
-            biaMaskOut &= ~(1 << ind_id);
+            biaMaskOut &= ~(1 << indId);
         } else {
             break;
         }
@@ -501,7 +501,7 @@ void HfpAgCommandProcessor::BiaSetter(HfpAgDataConnection &dataConn, const std::
         }
     }
 
-    LOG_INFO("[HFP AG]%{public}s(): i[%zu], ind_id[%{public}d], len[%zu]", __FUNCTION__, i, ind_id, len);
+    LOG_INFO("[HFP AG]%{public}s(): i[%zu], indId[%{public}d], len[%zu]", __FUNCTION__, i, indId, len);
 
     if (i == len) {
         SendAtCommand(dataConn, OK);

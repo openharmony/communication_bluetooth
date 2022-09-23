@@ -237,7 +237,7 @@ public:
         : PbapPceObexMessage(client, resp), name_(name), flags_(flags)
     {}
 
-    ~PbapPceActionObexMessage() = default;
+    ~PbapPceActionObexMessage() override = default;
 
     std::u16string GetName() const
     {

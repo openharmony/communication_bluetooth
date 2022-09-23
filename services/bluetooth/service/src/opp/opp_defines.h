@@ -50,7 +50,7 @@ static constexpr uint16_t OPP_GOEP_L2CAP_PSM = 0x1023;
 static constexpr uint16_t OPP_GOEP_L2CAP_PSM_ATTRIBUTE_ID = 0x0200;
 static constexpr uint16_t OPP_GOEP_SUPPORTED_FORMATS_LIST_ATTRIBUTE_ID = 0x0303;
 
-static const uint8_t g_oppSupportedFormatsListData[] = {
+static const uint8_t OPP_SUPPORTED_FORMATS_LIST_DATA[] = {
     0x08, 0x01 /* vCard 2.1 */,
     0x08, 0x02 /* vCard 3.0 */,
     0x08, 0x03 /* vCal 1.0 */,

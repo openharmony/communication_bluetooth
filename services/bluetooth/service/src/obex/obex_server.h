@@ -86,7 +86,7 @@ protected:
     class ObexServerTransportObserver : public ObexTransportObserver {
     public:
         explicit ObexServerTransportObserver(ObexPrivateServer &obexServer);
-        virtual ~ObexServerTransportObserver() = default;
+        ~ObexServerTransportObserver() override = default;
         // Transport callback
         void OnTransportConnectIncoming(ObexIncomingConnect &incomingConnect) override;
         void OnTransportIncomingDisconnected(const std::string &btAddr) override;

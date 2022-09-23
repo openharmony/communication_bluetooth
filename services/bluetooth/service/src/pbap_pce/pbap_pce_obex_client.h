@@ -34,7 +34,7 @@ class ObexFileBodyObject : public ObexBodyObject {
 public:
     explicit ObexFileBodyObject(const std::string &file);
     ObexFileBodyObject() = default;
-    virtual ~ObexFileBodyObject() = default;
+    ~ObexFileBodyObject() override = default;
     size_t Read(uint8_t *buf, size_t bufLen) override;
     size_t Write(const uint8_t *buf, size_t bufLen) override;
     int Close() override;

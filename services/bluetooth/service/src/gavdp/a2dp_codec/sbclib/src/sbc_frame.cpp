@@ -531,28 +531,28 @@ bool Frame::IsValid() const
 
 #define PUT_BITS(data, cache, count, v, n)                \
         do {                                                                \
-                cache = (v) | (cache << (n));                        \
-                count += (n);                                        \
-                if (count >= VALUE_OF_SIXTEEN) {                                        \
-                        count -= VALUE8;                                \
-                        *data++ = static_cast<uint8_t>                                \
-                                (cache >> count);                \
-                        count -= VALUE8;                                \
-                        *data++ = static_cast<uint8_t>                                \
-                                (cache >> count);                \
+                (cache) = (v) | ((cache) << (n));                        \
+                (count) += (n);                                        \
+                if ((count) >= VALUE_OF_SIXTEEN) {                                        \
+                        (count) -= VALUE8;                                \
+                        *(data)++ = static_cast<uint8_t>                                \
+                                ((cache) >> (count));                \
+                        (count) -= VALUE8;                                \
+                        *(data)++ = static_cast<uint8_t>                                \
+                                ((cache) >> (count));                \
                 }                                                        \
         } while (0)
 
 #define FLUSH_BITS(data, cache, count)                        \
         do {                                                                \
-                while (count >= VALUE8) {                                \
-                        count -= VALUE8;                                \
-                        *data++ = static_cast<uint8_t>                                \
-                                (cache >> count);                \
+                while ((count) >= VALUE8) {                                \
+                        (count) -= VALUE8;                                \
+                        *(data)++ = static_cast<uint8_t>                                \
+                                ((cache) >> (count));                \
                 }                                                        \
-                if (count > 0)        {                                \
-                        *data++ = static_cast<uint8_t>                                \
-                                (cache << (VALUE8 - count));        \
+                if ((count) > 0)        {                                \
+                        *(data)++ = static_cast<uint8_t>                                \
+                                ((cache) << (VALUE8 - (count)));        \
                 }                           \
         } while (0)
 

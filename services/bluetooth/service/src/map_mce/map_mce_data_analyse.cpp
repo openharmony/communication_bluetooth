@@ -146,7 +146,8 @@ MceBMessageNode MceBMessageNode::GetNextChild()
         begin = wordList_.front();
         wordList_.pop_front();
 
-        if ((begin.size() >= (std::size_t)beginLength) && (begin.substr(0, (std::size_t)beginLength) == "BEGIN:")) {
+        if ((begin.size() >= static_cast<std::size_t>(beginLength)) &&
+            (begin.substr(0, static_cast<std::size_t>(beginLength)) == "BEGIN:")) {
             nextName = begin.substr(beginLength);
             break;
         }
@@ -161,10 +162,12 @@ MceBMessageNode MceBMessageNode::GetNextChild()
     while (wordList_.size() != 0) {
         end = wordList_.front();
         wordList_.pop_front();
-        if ((end.size() >= (std::size_t)beginLength) && (end.substr(0, (std::size_t)beginLength) == "BEGIN:")) {
+        if ((end.size() >= static_cast<std::size_t>(beginLength)) &&
+            (end.substr(0, static_cast<std::size_t>(beginLength)) == "BEGIN:")) {
             beginNum++;
         }
-        if ((end.size() >= (std::size_t)endLength) && (end.substr(0, (std::size_t)endLength) == "END:")) {
+        if ((end.size() >= static_cast<std::size_t>(endLength)) &&
+            (end.substr(0, static_cast<std::size_t>(endLength)) == "END:")) {
             if (beginNum == 0) {
                 node.MceConstructNode(nextNode, nextName);
                 break;
