@@ -16,7 +16,7 @@ import("//build/ohos_var.gni")
 
 group("etc") {
   deps = [
-    ":bluetooth_service.rc",
+    ":bluetooth_service_cfg",
     ":bt_config.xml",
     ":bt_device_config.xml",
     ":bt_device_info.xml",
@@ -52,7 +52,7 @@ ohos_prebuilt_etc("bt_profile_config.xml") {
   subsystem_name = "communication"
 }
 
-ohos_prebuilt_etc("bluetooth_service.rc") {
+ohos_prebuilt_etc("bluetooth_service_cfg") {
   source = "bluetooth_service.cfg"
   relative_install_dir = "init"
   part_name = "bluetooth"
