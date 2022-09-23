@@ -72,20 +72,20 @@ enum MceRequestType {
  */
 struct MasInstanceConfig {
     // max of connected mce device list
-    uint32_t maxOfDevice_ = MCE_MAX_OF_CONNECTED_DEVICES;
+    uint32_t maxOfDevice = MCE_MAX_OF_CONNECTED_DEVICES;
     // max of unread message list number
-    uint32_t maxOfGetUnread_ = MAP_MAX_LIST_COUNT_FOR_GET_UNREAD_MESSAGE;
+    uint32_t maxOfGetUnread = MAP_MAX_LIST_COUNT_FOR_GET_UNREAD_MESSAGE;
     // max of mtu
-    uint32_t l2capMtu_ = MCE_INSTANCE_CLIENT_OBEX_MTU;
-    uint32_t rfcommMtu_ = MCE_INSTANCE_CLIENT_OBEX_MTU;
+    uint32_t l2capMtu = MCE_INSTANCE_CLIENT_OBEX_MTU;
+    uint32_t rfcommMtu = MCE_INSTANCE_CLIENT_OBEX_MTU;
     // mns connected id
-    uint32_t deviceId_ = 0;
+    uint32_t deviceId = 0;
     // if support srm
-    bool isSupportSrm_ = true;
+    bool isSupportSrm = true;
     // instance mode
-    bool singleInstMode_ = false;
+    bool singleInstMode = false;
     // instance save
-    int singleInstanceId_ = 0;
+    int singleInstanceId = 0;
 };
 }  // namespace bluetooth
 }  // namespace OHOS

@@ -229,7 +229,7 @@ public:
         /**
          * @brief Destroy the Mas Obex Client Observer object
          */
-        ~MasObexClientObserver();
+        ~MasObexClientObserver() override;
         /**
          * @brief  OnTransportFailed observer
          * @param  client

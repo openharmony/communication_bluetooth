@@ -146,10 +146,10 @@ public:
     PanDisconnectedState(const std::string &name, utility::StateMachine &statemachine)
         : PanState(name, statemachine, PAN_STATE_DISCONNECTED)
     {}
-    ~PanDisconnectedState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~PanDisconnectedState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool isReentry_ {false};
@@ -160,10 +160,10 @@ public:
     PanConnectingState(const std::string &name, utility::StateMachine &statemachine)
         : PanState(name, statemachine, PAN_STATE_CONNECTING)
     {}
-    ~PanConnectingState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~PanConnectingState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
 };
@@ -173,10 +173,10 @@ public:
     PanDisconnectingState(const std::string &name, utility::StateMachine &statemachine)
         : PanState(name, statemachine, PAN_STATE_DISCONNECTING)
     {}
-    ~PanDisconnectingState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~PanDisconnectingState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
 };
@@ -186,10 +186,10 @@ public:
     PanConnectedState(const std::string &name, utility::StateMachine &statemachine)
         : PanState(name, statemachine, PAN_STATE_CONNECTED)
     {}
-    ~PanConnectedState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~PanConnectedState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
 };

@@ -34,7 +34,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-std::string GattClientServiceName = "bluetooth-gatt-client-server";
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_READ = 0x00;
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_WRITE = 0x01;
 constexpr uint8_t REQUEST_TYPE_DESCRIPTOR_READ = 0x02;

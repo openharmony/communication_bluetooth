@@ -149,7 +149,7 @@ private:
          * @brief Destroy the Mse Obex Server object
          *
          */
-        virtual ~MseObexServer();
+        ~MseObexServer() override;
 
     private:
         /**
