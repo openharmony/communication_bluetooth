@@ -132,8 +132,12 @@ public:
         if (gattcharacter.has_value()) {
             {
                 std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                server_.pimpl->requests_.emplace(
+                auto ret = server_.pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_CHARACTERISTICS_READ, device, &gattcharacter.value().get()));
+                if (!ret.second) {
+                    HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
+                        REQUEST_TYPE_CHARACTERISTICS_READ, GET_ENCRYPT_GATT_ADDR(device));
+                }
             }
             server_.pimpl->callback_.OnCharacteristicReadRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
@@ -159,10 +163,14 @@ public:
             gattcharacter.value().get().SetWriteType(
                 needRespones ? GattCharacteristic::WriteType::DEFAULT : GattCharacteristic::WriteType::NO_RESPONSE);
 
-            {
+            if (needRespones) {
                 std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                server_.pimpl->requests_.emplace(
+                auto ret = server_.pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_CHARACTERISTICS_WRITE, device, &gattcharacter.value().get()));
+                if (!ret.second) {
+                    HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
+                        REQUEST_TYPE_CHARACTERISTICS_WRITE, GET_ENCRYPT_GATT_ADDR(device));
+                }
             }
 
             server_.pimpl->callback_.OnCharacteristicWriteRequest(
@@ -187,8 +195,12 @@ public:
         if (gattdesc.has_value()) {
             {
                 std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                server_.pimpl->requests_.emplace(
+                auto ret = server_.pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_DESCRIPTOR_READ, device, &gattdesc.value().get()));
+                if (!ret.second) {
+                    HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
+                        REQUEST_TYPE_DESCRIPTOR_READ, GET_ENCRYPT_GATT_ADDR(device));
+                }
             }
             server_.pimpl->callback_.OnDescriptorReadRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
@@ -214,8 +226,12 @@ public:
 
             {
                 std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                server_.pimpl->requests_.emplace(
+                auto ret = server_.pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_DESCRIPTOR_WRITE, device, &gattdesc.value().get()));
+                if (!ret.second) {
+                    HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
+                        REQUEST_TYPE_DESCRIPTOR_WRITE, GET_ENCRYPT_GATT_ADDR(device));
+                }
             }
             server_.pimpl->callback_.OnDescriptorWriteRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
