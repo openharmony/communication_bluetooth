@@ -34,20 +34,17 @@ namespace OHOS {
 namespace bluetooth {
 void AvrcpTgService::ObserverImpl::OnConnectionStateChanged(const std::string &addr, int state)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_INFO("[AVRCP TG] addr[%{public}s], state[%{public}d]", addr.c_str(), state);
+    HILOGI("addr: %{public}s, state: %{public}d", GetEncryptAddr(addr).c_str(), state);
 }
 
 void AvrcpTgService::ObserverImpl::OnPressButton(const std::string &addr, uint8_t button)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_INFO("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
+    HILOGI("addr: %{public}s, button: %{public}x", GetEncryptAddr(addr).c_str(), button);
 }
 
 void AvrcpTgService::ObserverImpl::OnReleaseButton(const std::string &addr, uint8_t button)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_INFO("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
+    HILOGI("addr: %{public}s, button: %{public}x", GetEncryptAddr(addr).c_str(), button);
 }
 
 void AvrcpTgService::ObserverImpl::OnSetAddressedPlayer(const std::string &addr, uint8_t label, int status)
