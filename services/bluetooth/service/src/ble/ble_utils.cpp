@@ -44,7 +44,7 @@ std::string BleUtils::ConvertIntToHexString(const std::vector<uint8_t> &key)
 
 void BleUtils::ConvertHexStringToInt(const std::string &str, std::vector<uint8_t> &key)
 {
-    for (size_t i = 0; i < str.size(); i = i + 2) {
+    for (size_t i = 0; i < str.size(); i = i + 2) {  // 2 is the length of str to be truncated
         long k = std::stol(str.substr(i, 2), nullptr, HEX);
         key.push_back(k);
     }
