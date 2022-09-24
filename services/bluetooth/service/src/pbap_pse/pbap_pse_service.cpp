@@ -579,8 +579,8 @@ bool PbapPseService::SaveConnectPolicy(const std::string &addr, int strategy) co
 {
     IProfileConfig *config = ProfileConfig::GetInstance();
     if (!config->SetValue(addr, SECTION_CONNECTION_POLICIES, PROPERTY_PBAP_CONNECTION_POLICY, strategy)) {
-        PBAP_PSE_LOG_ERROR(
-            "SaveConnectPolicy: %{public}s %{public}s save fail.", addr.c_str(), PROPERTY_PBAP_CONNECTION_POLICY.c_str());
+        HILOGE("SaveConnectPolicy: %{public}s %{public}s save fail.",
+            GetEncryptAddr(addr).c_str(), PROPERTY_PBAP_CONNECTION_POLICY.c_str());
         return false;
     }
     return true;
@@ -590,8 +590,8 @@ bool PbapPseService::LoadConnectPolicy(const std::string &addr, int &strategy) c
 {
     IProfileConfig *config = ProfileConfig::GetInstance();
     if (!config->GetValue(addr, SECTION_CONNECTION_POLICIES, PROPERTY_PBAP_CONNECTION_POLICY, strategy)) {
-        PBAP_PSE_LOG_ERROR(
-            "LoadConnectPolicy: %{public}s %{public}s load fail.", addr.c_str(), PROPERTY_PBAP_CONNECTION_POLICY.c_str());
+        HILOGE("LoadConnectPolicy: %{public}s %{public}s load fail.",
+            GetEncryptAddr(addr).c_str(), PROPERTY_PBAP_CONNECTION_POLICY.c_str());
         return false;
     }
     return true;

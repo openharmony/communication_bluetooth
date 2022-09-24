@@ -17,6 +17,7 @@
 
 #include "btm.h"
 #include "hfp_ag_profile_event_sender.h"
+#include "log_util.h"
 #include "raw_address.h"
 
 namespace OHOS {
@@ -35,11 +36,8 @@ void HfpAgDataConnection::DataConnectionCallback(uint16_t handle, uint32_t event
 void HfpAgDataConnection::ProcessDataConnectionCallback(uint16_t handle, uint32_t eventId)
 {
     auto addr = HfpAgRfcommConnection::GetRemoteAddressByHandle(handle);
-    LOG_INFO("[HFP AG]%{public}s():Event from rfcomm device[%{public}s], handle[%hu], eventId[%u]",
-        __FUNCTION__,
-        addr.c_str(),
-        handle,
-        eventId);
+    HILOGI("Event from rfcomm device: %{public}s, handle: %{public}hu, eventId: %{public}u",
+        GetEncryptAddr(addr).c_str(), handle, eventId);
     int event = HFP_AG_INVALID_EVT;
     switch (eventId) {
         case RFCOMM_CHANNEL_EV_CONNECT_SUCCESS:
