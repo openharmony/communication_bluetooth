@@ -171,6 +171,18 @@ public:
     {
         return callback_;
     }
+
+    void SetAppId(int32_t appId)
+    {
+        HILOGI("SetAppId = %{public}d", appId);
+        appId_ = appId;
+    }
+
+    int32_t GetAppId()
+    {
+        return appId_;
+    }
+
     GattServerCallbackImpl(const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner);
     ~GattServerCallbackImpl()
     {
@@ -202,6 +214,7 @@ private:
     sptr<IBluetoothGattServerCallback> callback_;
     sptr<GattServerCallbackDeathRecipient> deathRecipient_;
     uint32_t tokenId_;
+    int32_t appId_;
 };
 
 BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackImpl(
@@ -212,6 +225,7 @@ BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackImpl(
         HILOGE("Failed to link death recipient to callback");
     }
     tokenId_ = IPCSkeleton::GetCallingTokenID();
+    appId_ = -1;
 }
 
 BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::
@@ -223,12 +237,20 @@ BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeath
 void BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::OnRemoteDied(
     const wptr<IRemoteObject> &remote)
 {
+    HILOGI("GattServerCallbackDeathRecipient OnRemoteDied start, list size = %{public}d",
+        owner_.pimpl->callbacks_.size());
+    std::lock_guard<std::mutex> lck(owner_.pimpl->registerMutex_);
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
         if ((*it) != nullptr && (*it)->GetCallback() != nullptr && (*it)->GetCallback()->AsObject() == remote) {
-            HILOGI("callback is erased from callbacks");
+            int appId = (*it)->GetAppId();
+            HILOGI("callback is erased from callbacks, appId: %{public}d", appId);
             sptr<GattServerCallbackDeathRecipient> dr = (*it)->deathRecipient_;
             if (!dr->GetCallback()->AsObject()->RemoveDeathRecipient(dr)) {
                 HILOGE("Failed to unlink death recipient from callback");
+            }
+            if (owner_.pimpl->serverService_ != nullptr) {
+                int ret = owner_.pimpl->serverService_->DeregisterApplication(appId);
+                HILOGI("DeregisterApplication result:%{public}d, appId:%{public}d", ret, appId);
             }
             owner_.pimpl->callbacks_.erase(it);
             return;
@@ -401,7 +423,6 @@ int BluetoothGattServerServer::RespondDescriptorWrite(
 
 int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback)
 {
-    HILOGI("enter");
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     pimpl->serverService_ = pimpl->GetServicePtr();
     if (!pimpl->serverService_) {
@@ -414,10 +435,15 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
 
     int ret = pimpl->serverService_->RegisterApplication(*it);
     if (ret >= 0) {
+        HILOGI("appId, %{public}d", ret);
+        (*it)->SetAppId(ret);
         OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
             OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register",
             "SIDE", "server", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
             "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", ret);
+    } else {
+        HILOGE("RegisterApplication failed, ret: %{public}d", ret);
+        pimpl->callbacks_.erase(it);
     }
     return ret;
 }
@@ -434,11 +460,20 @@ int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
         HILOGE("serverService_ is null");
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
+    int ret = pimpl->serverService_->DeregisterApplication(appId);
+    HILOGI("list size: %{public}d", pimpl->callbacks_.size());
+    for (auto it = pimpl->callbacks_.begin(); it != pimpl->callbacks_.end(); ++it) {
+        if ((*it) != nullptr && (*it)->GetAppId() == appId) {
+            HILOGI("erase appId: %{public}d", appId);
+            pimpl->callbacks_.erase(it);
+            break;
+        }
+    }
     OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "deregister",
         "SIDE", "server", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
         "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
-    return pimpl->serverService_->DeregisterApplication(appId);
+    return ret;
 }
 BluetoothGattServerServer::BluetoothGattServerServer() : pimpl(new impl())
 {
