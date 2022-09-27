@@ -237,8 +237,8 @@ BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeath
 void BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackDeathRecipient::OnRemoteDied(
     const wptr<IRemoteObject> &remote)
 {
-    HILOGI("GattServerCallbackDeathRecipient OnRemoteDied start, list size = %{public}d",
-        owner_.pimpl->callbacks_.size());
+    HILOGI("GattServerCallbackDeathRecipient OnRemoteDied start, list size = %{public}lu",
+        (unsigned long)owner_.pimpl->callbacks_.size());
     std::lock_guard<std::mutex> lck(owner_.pimpl->registerMutex_);
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
         if ((*it) != nullptr && (*it)->GetCallback() != nullptr && (*it)->GetCallback()->AsObject() == remote) {
@@ -461,7 +461,7 @@ int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
         return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
     }
     int ret = pimpl->serverService_->DeregisterApplication(appId);
-    HILOGI("list size: %{public}d", pimpl->callbacks_.size());
+    HILOGI("list size: %{public}lu", (unsigned long)pimpl->callbacks_.size());
     for (auto it = pimpl->callbacks_.begin(); it != pimpl->callbacks_.end(); ++it) {
         if ((*it) != nullptr && (*it)->GetAppId() == appId) {
             HILOGI("erase appId: %{public}d", appId);
