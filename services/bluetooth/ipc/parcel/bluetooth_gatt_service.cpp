@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const uint32_t GATT_SERVICE_PARCEL_SIZE_MAX = 0x100;
 bool BluetoothGattService::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteBool(isPrimary_)) {
@@ -97,7 +98,8 @@ bool BluetoothGattService::ReadFromParcel(Parcel &parcel)
     }
     uuid_ = BluetoothUuid(*uuid);
     uint32_t size = 0;
-    if (!parcel.ReadUint32(size)) {
+    if (!parcel.ReadUint32(size) || size > GATT_SERVICE_PARCEL_SIZE_MAX) {
+        HILOGE("readfailed size value:%{public}u", size);
         return false;
     }
     for (size_t i = 0; i < size; i++) {
@@ -107,7 +109,8 @@ bool BluetoothGattService::ReadFromParcel(Parcel &parcel)
         }
         includeServices_.push_back(*service);
     }
-    if (!parcel.ReadUint32(size)) {
+    if (!parcel.ReadUint32(size) || size > GATT_SERVICE_PARCEL_SIZE_MAX) {
+        HILOGE("readfailed size value:%{public}u", size);
         return false;
     }
     for (size_t i = 0; i < size; i++) {
