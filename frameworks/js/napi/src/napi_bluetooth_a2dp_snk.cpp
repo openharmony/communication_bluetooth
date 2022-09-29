@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,6 +54,7 @@ napi_value NapiA2dpSink::A2dpSinkConstructor(napi_env env, napi_callback_info in
 napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::unique_lock<std::shared_mutex> guard(g_a2dpSinkCallbackInfosMutex);
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -96,6 +97,7 @@ napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::unique_lock<std::shared_mutex> guard(g_a2dpSinkCallbackInfosMutex);
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -113,6 +115,12 @@ napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
         return ret;
+    }
+    uint32_t refCount = INVALID_REF_COUNT;
+    napi_reference_unref(env, observer_.callbackInfos_[type]->callback_, &refCount);
+    HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
+    if (refCount == 0) {
+        napi_delete_reference(env, observer_.callbackInfos_[type]->callback_);
     }
     observer_.callbackInfos_[type] = nullptr;
     HILOGI("%{public}s is unregistered", type.c_str());
