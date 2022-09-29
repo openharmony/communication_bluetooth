@@ -19,19 +19,19 @@ namespace OHOS {
 namespace bluetooth {
 AvrcCtUnitPacket::AvrcCtUnitPacket(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 AvrcCtUnitPacket::AvrcCtUnitPacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     DisassemblePacket(pkt);
 }
 
 AvrcCtUnitPacket::~AvrcCtUnitPacket(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (pkt_ != nullptr) {
         PacketFree(pkt_);
@@ -41,7 +41,7 @@ AvrcCtUnitPacket::~AvrcCtUnitPacket(void)
 
 const Packet *AvrcCtUnitPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_CT_UNIT_COMMAND_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
@@ -61,7 +61,7 @@ const Packet *AvrcCtUnitPacket::AssemblePacket(void)
 
 bool AvrcCtUnitPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
     size_t size = PacketPayloadSize(pkt);
@@ -79,7 +79,7 @@ bool AvrcCtUnitPacket::DisassemblePacket(Packet *pkt)
         isValid_ = true;
     } else {
         crCode_ = AVRC_CT_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP CT] The size of the packet is invalid!");
+        HILOGI("The size of the packet is invalid!");
     }
 
     return isValid_;

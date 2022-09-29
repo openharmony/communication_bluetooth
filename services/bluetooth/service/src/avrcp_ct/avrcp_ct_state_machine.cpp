@@ -16,7 +16,6 @@
 #include "avrcp_ct_state_machine.h"
 #include "avrcp_ct_pass_through.h"
 #include "avrcp_ct_vendor.h"
-#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -37,7 +36,7 @@ const std::string AVRC_CT_SM_STATE_DISABLE = "DISABLE";
 
 AvrcCtStateMachineManager *AvrcCtStateMachineManager::GetInstance(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("enter");
 
     static AvrcCtStateMachineManager instance;
 
@@ -46,20 +45,20 @@ AvrcCtStateMachineManager *AvrcCtStateMachineManager::GetInstance(void)
 
 AvrcCtStateMachineManager::~AvrcCtStateMachineManager()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("enter");
     stateMachines_.clear();
 }
 
 void AvrcCtStateMachineManager::ShutDown(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("enter");
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     stateMachines_.clear();
 }
 
 int AvrcCtStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -73,7 +72,7 @@ int AvrcCtStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
         stateMachines_.insert(std::make_pair(rawAddr.GetAddress(), std::make_pair(std::move(stateMachine), nullptr)));
     } else {
         result = RET_BAD_PARAM;
-        HILOGI("[AVRCP CT] The control state machine exists! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+        HILOGI("The control state machine exists! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 
     return result;
@@ -81,7 +80,7 @@ int AvrcCtStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
 
 int AvrcCtStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -90,7 +89,7 @@ int AvrcCtStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
     StateMachinePair *pair = GetPairOfStateMachine(rawAddr.GetAddress());
     if (pair == nullptr) {
         result = RET_BAD_PARAM;
-        HILOGI("[AVRCP CT] The pair of state machines doest not exists! Address:%{public}s",
+        HILOGI("The pair of state machines doest not exists! Address:%{public}s",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     } else if (pair->second == nullptr) {
         pair->second = std::make_unique<StateMachine>(StateMachine::Type::AVRC_CT_SM_TYPE_BROWSE, rawAddr);
@@ -98,7 +97,7 @@ int AvrcCtStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
         pair->second->InitState(AVRC_CT_SM_STATE_CONNECTING);
     } else {
         result = RET_BAD_PARAM;
-        HILOGI("[AVRCP CT] The browse state machine exists! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+        HILOGI("The browse state machine exists! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 
     return result;
@@ -106,7 +105,7 @@ int AvrcCtStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
 
 void AvrcCtStateMachineManager::DeletePairOfStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -114,14 +113,14 @@ void AvrcCtStateMachineManager::DeletePairOfStateMachine(const RawAddress &rawAd
     if (pair != nullptr) {
         stateMachines_.erase(rawAddr.GetAddress());
     } else {
-        HILOGI("[AVRCP CT] The pair of state machines does not exist! - Address[%{public}s]",
+        HILOGI("The pair of state machines does not exist! Address: %{public}s",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 }
 
 void AvrcCtStateMachineManager::DeleteBrowseStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -129,15 +128,14 @@ void AvrcCtStateMachineManager::DeleteBrowseStateMachine(const RawAddress &rawAd
     if (pair != nullptr && pair->second != nullptr) {
         pair->second = nullptr;
     } else {
-        HILOGI("[AVRCP CT] The browse state machine does not exist! - Address[%{public}s]",
+        HILOGI("The browse state machine does not exist! Address: %{public}s",
             GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 }
 
 bool AvrcCtStateMachineManager::SendMessageToControlStateMachine(const RawAddress &rawAddr, const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] msg[%x]", msg.what_);
+    HILOGI("addr: %{public}s, msg: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), msg.what_);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     bool result = false;
 
@@ -145,12 +143,10 @@ bool AvrcCtStateMachineManager::SendMessageToControlStateMachine(const RawAddres
     if (pair != nullptr && pair->first != nullptr) {
         result = pair->first->ProcessMessage(msg);
         if (!result) {
-            HILOGI("[AVRCP CT] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_,
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Unknown message: %{public}d]! Address: %{public}s", msg.what_, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } else {
-        HILOGI("[AVRCP CT] The control state machine does not exist! - Address[%{public}s]",
-            GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+        HILOGI("The control state machine does not exist! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 
     return result;
@@ -158,8 +154,7 @@ bool AvrcCtStateMachineManager::SendMessageToControlStateMachine(const RawAddres
 
 void AvrcCtStateMachineManager::SendMessageToAllControlStateMachine(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] msg[%x]", msg.what_);
+    HILOGI("msg: %{public}x", msg.what_);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     for (auto &pairSm : stateMachines_) {
@@ -171,8 +166,7 @@ void AvrcCtStateMachineManager::SendMessageToAllControlStateMachine(const utilit
 
 bool AvrcCtStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress &rawAddr, const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] msg[%x]", msg.what_);
+    HILOGI("addr: %{public}s, msg: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), msg.what_);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     bool result = false;
 
@@ -180,12 +174,10 @@ bool AvrcCtStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress
     if (pair != nullptr && pair->second != nullptr) {
         result = pair->second->ProcessMessage(msg);
         if (!result) {
-            HILOGI("[AVRCP CT] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_,
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Unknown message: %{public}d]! Address: %{public}s", msg.what_, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } else {
-        HILOGI("[AVRCP CT] The browse state machine does not exist! - Address[%{public}s]",
-            GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+        HILOGI("The browse state machine does not exist! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 
     return result;
@@ -193,8 +185,7 @@ bool AvrcCtStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress
 
 void AvrcCtStateMachineManager::SendMessageToAllBrowseStateMachine(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] msg[%x]", msg.what_);
+    HILOGI("msg: %{public}x", msg.what_);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     for (auto &pairSm : stateMachines_) {
@@ -206,61 +197,61 @@ void AvrcCtStateMachineManager::SendMessageToAllBrowseStateMachine(const utility
 
 bool AvrcCtStateMachineManager::IsControlConnectingState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_CT_SM_STATE_CONNECTING);
 }
 
 bool AvrcCtStateMachineManager::IsControlConnectedState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_CT_SM_STATE_CONNECTED);
 }
 
 bool AvrcCtStateMachineManager::IsControlDisconnectingState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_CT_SM_STATE_DISCONNECTING);
 }
 
 bool AvrcCtStateMachineManager::IsControlPendingState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_CT_SM_STATE_PENDING);
 }
 
 bool AvrcCtStateMachineManager::IsBrowsePendingState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsBrowseSpecifiedState(rawAddr.GetAddress(), AVRC_CT_SM_STATE_PENDING);
 }
 
 bool AvrcCtStateMachineManager::IsControlContinuationState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_CT_SM_STATE_CONTINUATION);
 }
 
 bool AvrcCtStateMachineManager::IsControlDisableState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_CT_SM_STATE_DISABLE);
 }
 
 AvrcCtStateMachineManager::AvrcCtStateMachineManager()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 AvrcCtStateMachineManager::StateMachinePair *AvrcCtStateMachineManager::GetPairOfStateMachine(const std::string &addr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GetEncryptAddr(addr).c_str());
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     StateMachinePair *pair = nullptr;
 
@@ -274,7 +265,7 @@ AvrcCtStateMachineManager::StateMachinePair *AvrcCtStateMachineManager::GetPairO
 
 bool AvrcCtStateMachineManager::IsControlSpecifiedState(const std::string &addr, std::string stateName)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s, stateName: %{public}s", GetEncryptAddr(addr).c_str(), stateName.c_str());
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -286,7 +277,7 @@ bool AvrcCtStateMachineManager::IsControlSpecifiedState(const std::string &addr,
             result = true;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The pair of state machines does not exist!");
+        HILOGI("The pair of state machines does not exist!");
     }
 
     return result;
@@ -294,7 +285,7 @@ bool AvrcCtStateMachineManager::IsControlSpecifiedState(const std::string &addr,
 
 bool AvrcCtStateMachineManager::IsBrowseSpecifiedState(const std::string &addr, std::string stateName)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtStateMachineManager::%{public}s", __func__);
+    HILOGI("addr: %{public}s, stateName: %{public}s", GetEncryptAddr(addr).c_str(), stateName.c_str());
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -306,7 +297,7 @@ bool AvrcCtStateMachineManager::IsBrowseSpecifiedState(const std::string &addr, 
             result = true;
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The pair of state machines does not exist!");
+        HILOGI("The pair of state machines does not exist!");
     }
 
     return result;
@@ -315,12 +306,12 @@ bool AvrcCtStateMachineManager::IsBrowseSpecifiedState(const std::string &addr, 
 AvrcCtStateMachineManager::StateMachine::StateMachine(Type type, const RawAddress &rawAddr)
     : type_(type), rawAddr_(rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] StateMachine::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcCtStateMachineManager::StateMachine::AddStates(void)
 {
-    LOG_DEBUG("[AVRCP CT] StateMachine::%{public}s", __func__);
+    HILOGI("enter");
 
     if (type_ == Type::AVRC_CT_SM_TYPE_CONTROL) {
         /// CONNECTING state.
@@ -385,7 +376,7 @@ void AvrcCtStateMachineManager::StateMachine::AddStates(void)
         Move(brConnectedPtr);
         Move(brConnectingPtr);
     } else {
-        LOG_DEBUG("[AVRCP CT] The type of the state machine is wrong!");
+        HILOGI("The type of the state machine is wrong!");
     }
 }
 
@@ -393,22 +384,23 @@ void AvrcCtStateMachineManager::StateMachine::AddStates(void)
  * AvrcCtStateMachineManager::StateMachine::State                 *
  ******************************************************************/
 
-AvrcCtStateMachineManager::StateMachine::State::State(const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
+AvrcCtStateMachineManager::StateMachine::State::State(const std::string &name, utility::StateMachine &stateMachine,
+    const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : utility::StateMachine::State(name, stateMachine, parent), rawAddr_(rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] State::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 AvrcCtStateMachineManager::StateMachine::State::State(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : utility::StateMachine::State(name, stateMachine), rawAddr_(rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] State::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 AvrcCtStateMachineManager::StateMachine::State::~State()
 {
-    LOG_DEBUG("[AVRCP CT] State::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 /******************************************************************
@@ -419,12 +411,12 @@ AvrcCtStateMachineManager::StateMachine::CtConnecting::CtConnecting(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : State(name, stateMachine, rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnecting::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtConnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     const AvrcCtConnectInfo *info = AvrcCtConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -438,19 +430,18 @@ void AvrcCtStateMachineManager::StateMachine::CtConnecting::Entry(void)
 
     if (AVCT_ConnectReq(&connectId, &param, &btAddr) != AVCT_SUCCESS) {
         info->eventCallback_(connectId, AVCT_CONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        HILOGI("[AVRCP CT] Call - AVCT_ConnectReq Failed! - Address[%{public}s]",
-            GetEncryptAddr(rawAddr_.GetAddress()).c_str());
+        HILOGI("Call AVCT_ConnectReq Failed! Address: %{public}s", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtConnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnecting::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::CtConnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
@@ -477,22 +468,22 @@ AvrcCtStateMachineManager::StateMachine::CtConnected::CtConnected(const std::str
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnected::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtConnected::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnected::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtConnected::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnected::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::CtConnected::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] CtConnected::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
@@ -559,12 +550,12 @@ AvrcCtStateMachineManager::StateMachine::CtDisconnecting::CtDisconnecting(const 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisconnecting::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtDisconnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisconnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     const AvrcCtConnectInfo *info = AvrcCtConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -572,19 +563,18 @@ void AvrcCtStateMachineManager::StateMachine::CtDisconnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        HILOGI("[AVRCP CT] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]",
-            GetEncryptAddr(rawAddr_.GetAddress()).c_str());
+        HILOGI("Call AVCT_DisconnectReq Failed! Address: %{public}s", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtDisconnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisconnecting::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::CtDisconnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisconnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
@@ -605,22 +595,22 @@ AvrcCtStateMachineManager::StateMachine::CtPending::CtPending(const std::string 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] CtPending::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtPending::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtPending::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtPending::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtPending::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::CtPending::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] CtPending::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
@@ -644,22 +634,22 @@ AvrcCtStateMachineManager::StateMachine::CtContinuation::CtContinuation(const st
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] CtContinuation::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtContinuation::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtContinuation::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtContinuation::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtContinuation::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::CtContinuation::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] CtContinuation::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
@@ -684,12 +674,12 @@ AvrcCtStateMachineManager::StateMachine::CtDisable::CtDisable(const std::string 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisable::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtDisable::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisable::%{public}s", __func__);
+    HILOGI("enter");
 
     AVCT_Deregister();
 
@@ -699,20 +689,19 @@ void AvrcCtStateMachineManager::StateMachine::CtDisable::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
 
-        HILOGI("[AVRCP CT] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]",
-            GetEncryptAddr(rawAddr_.GetAddress()).c_str());
+        HILOGI("Call AVCT_DisconnectReq Failed! Address: %{public}s", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
         info->eventCallback_(info->connectId_, AVCT_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
     }
 }
 
 void AvrcCtStateMachineManager::StateMachine::CtDisable::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisable::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::CtDisable::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] CtDisable::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
@@ -733,12 +722,12 @@ AvrcCtStateMachineManager::StateMachine::BrConnecting::BrConnecting(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : State(name, stateMachine, rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnecting::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrConnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     const AvrcCtConnectInfo *info = AvrcCtConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -746,19 +735,18 @@ void AvrcCtStateMachineManager::StateMachine::BrConnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_BR_CONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        HILOGI("[AVRCP CT] Call - AVCT_BrConnectReq Failed! - Address[%{public}s]",
-            GetEncryptAddr(rawAddr_.GetAddress()).c_str());
+        HILOGI("Call AVCT_BrConnectReq Failed! Address: %{public}s", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrConnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnecting::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::BrConnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
@@ -785,22 +773,22 @@ AvrcCtStateMachineManager::StateMachine::BrConnected::BrConnected(const std::str
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnected::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrConnected::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnected::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrConnected::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnected::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::BrConnected::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] BrConnected::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
@@ -838,12 +826,12 @@ AvrcCtStateMachineManager::StateMachine::BrDisconnecting::BrDisconnecting(const 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] BrDisconnecting::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrDisconnecting::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrDisconnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     const AvrcCtConnectInfo *info = AvrcCtConnectManager::GetInstance()->GetConnectInfo(rawAddr_);
 
@@ -851,19 +839,18 @@ void AvrcCtStateMachineManager::StateMachine::BrDisconnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_BR_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        HILOGI("[AVRCP CT] Call - AVCT_BrDisconnectReq Failed! - Address[%{public}s]",
-            GetEncryptAddr(rawAddr_.GetAddress()).c_str());
+        HILOGI("Call AVCT_BrDisconnectReq Failed! Address: %{public}s", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrDisconnecting::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrDisconnecting::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::BrDisconnecting::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] BrDisconnecting::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
@@ -884,22 +871,22 @@ AvrcCtStateMachineManager::StateMachine::BrPending::BrPending(const std::string 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    LOG_DEBUG("[AVRCP CT] BrPending::%{public}s", __func__);
+    HILOGI("name: %{public}s, addr: %{public}s", name.c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrPending::Entry(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrPending::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcCtStateMachineManager::StateMachine::BrPending::Exit(void)
 {
-    LOG_DEBUG("[AVRCP CT] BrPending::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 bool AvrcCtStateMachineManager::StateMachine::BrPending::Dispatch(const utility::Message &msg)
 {
-    LOG_DEBUG("[AVRCP CT] BrPending::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = true;
 
