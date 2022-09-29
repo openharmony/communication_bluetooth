@@ -43,10 +43,10 @@ MapMceInstanceRequest::MapMceInstanceRequest()
     saveFlag_ = false;
     messageType_ = MAP_MCE_SUPPORTED_MESSAGE_TYPE_ALL;
     ownerUci_ = "";
-    config_.isUseSrmp_ = false;
-    config_.srmpCount_ = 0;
+    config_.isUseSrmp = false;
+    config_.srmpCount = 0;
     const int defaultMaxValue = 100;
-    config_.maxOfGetUnread_ = defaultMaxValue;
+    config_.maxOfGetUnread = defaultMaxValue;
 }
 
 MapMceInstanceRequest::~MapMceInstanceRequest()
@@ -140,7 +140,8 @@ MapMessageType MapMceInstanceRequest::IprofileMaskToMapMessageType(int mask) con
 
 void MapMceInstanceRequest::SetRequestConfig(MapMceRequestConfig cfg)
 {
-    LOG_INFO("%{public}s execute,isUseSrmp_=%{public}d,srmpCount_=%{public}d", __PRETTY_FUNCTION__, cfg.isUseSrmp_, cfg.srmpCount_);
+    LOG_INFO("%{public}s execute,isUseSrmp=%{public}d,srmpCount=%{public}d",
+        __PRETTY_FUNCTION__, cfg.isUseSrmp, cfg.srmpCount);
     config_ = cfg;
 }
 
@@ -651,7 +652,7 @@ int MapMceRequestGetMessage::SendRequest(ObexMpClient &obexIns)
     header->AppendItemType(MCE_HEADER_TYPE_MESSAGE);
     header->AppendItemName(msgHandle_);
 
-    if (GetRequestConfig().isUseSrmp_) {
+    if (GetRequestConfig().isUseSrmp) {
         LOG_ERROR("%{public}s warning: srmp only valid in pts test!", __PRETTY_FUNCTION__);
         header->AppendItemSrmp();
     }
@@ -676,9 +677,9 @@ int MapMceRequestGetMessage::SendRequest(ObexMpClient &obexIns)
     // make writer object
     std::shared_ptr<ObexBodyObject> writer = std::make_shared<ObexArrayBodyObject>();
     // send request
-    if (GetRequestConfig().isUseSrmp_) {
+    if (GetRequestConfig().isUseSrmp) {
         LOG_ERROR("%{public}s warning: srmp only valid in pts test!", __PRETTY_FUNCTION__);
-        ret = obexIns.Get(*header, writer, GetRequestConfig().srmpCount_);
+        ret = obexIns.Get(*header, writer, GetRequestConfig().srmpCount);
     } else {
         ret = obexIns.Get(*header, writer);
     }
@@ -770,8 +771,8 @@ int MapMceRequestGetUreadMessages::SendRequest(ObexMpClient &obexIns)
     MapMceRequestConfig cfg = GetRequestConfig();
 
     obexInsBackup_ = &obexIns;
-    if (listParam_.MaxListCount > cfg.maxOfGetUnread_) {
-        listParam_.MaxListCount = cfg.maxOfGetUnread_;
+    if (listParam_.MaxListCount > cfg.maxOfGetUnread) {
+        listParam_.MaxListCount = cfg.maxOfGetUnread;
     }
     requestPtr_ = std::make_unique<MapMceRequestGetMessagesListing>(listParam_);
     ret = requestPtr_->SendRequest(obexIns);

@@ -69,7 +69,7 @@ public:
      *
      * @since 6.0
      */
-    ~ObserverProfile() = default;
+    ~ObserverProfile() override = default;
 
     /**
      * @brief The connection status changes from connected to disconnected.

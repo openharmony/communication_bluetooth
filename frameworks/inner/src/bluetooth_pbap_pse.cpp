@@ -34,7 +34,7 @@ namespace Bluetooth {
 class BluetoothPbapPseObserverImp : public BluetoothPbapPseObserverStub {
 public:
     BluetoothPbapPseObserverImp() = default;
-    virtual ~BluetoothPbapPseObserverImp() override = default;
+    ~BluetoothPbapPseObserverImp() override = default;
     void SetObserver(BluetoothObserverList<PbapObserver> *observers)
     {
         observers_ = observers;
@@ -71,8 +71,6 @@ public:
 private:
     BluetoothObserverList<PbapObserver> *observers_;
 };
-
-std::string PbapPseServiceName = "bluetooth-pbap-pse-server";
 
 struct PbapServer::impl {
     sptr<IBluetoothPbapPse> proxy_;

@@ -248,7 +248,7 @@ MapMceDeviceCtrl::MapMceDeviceCtrl(const std::string &device, MapMceService &ser
     mnsSessionObexheader_ = nullptr;
     supportedFeatures_ = 0;
     insDefaultConfig_ = config;
-    connectId_ = config.deviceId_ << MCE_16BIT;
+    connectId_ = config.deviceId << MCE_16BIT;
     ctrlSendFlag_ = false;
     ctrlBusyStatus_ = MAP_MCE_PWBUSY_STATUS_DISCONNECT;
     mnsContinueBusyFlag_ = false;
@@ -746,8 +746,8 @@ void MapMceDeviceCtrl::ClientDisConnectingProcMsg(utility::Message msg)
 
 int MapMceDeviceCtrl::ProcessGetInstance(const utility::Message &msg)
 {
-    LOG_INFO("%{public}s enter,insmod=%{public}d", __PRETTY_FUNCTION__, insDefaultConfig_.singleInstMode_);
-    LOG_INFO("%{public}s ,instance id=%{public}d", __PRETTY_FUNCTION__, insDefaultConfig_.singleInstanceId_);
+    LOG_INFO("%{public}s enter,insmod=%{public}d", __PRETTY_FUNCTION__, insDefaultConfig_.singleInstMode);
+    LOG_INFO("%{public}s ,instance id=%{public}d", __PRETTY_FUNCTION__, insDefaultConfig_.singleInstanceId);
     int ret = RET_BAD_STATUS;
     MasSdpParam sdpParam;
     auto argPrt = static_cast<MapSdpMsgArgPrt *>(msg.arg2_);
@@ -762,8 +762,8 @@ int MapMceDeviceCtrl::ProcessGetInstance(const utility::Message &msg)
     // insert new instance
     for (auto it = argPrt->masSdpParamListPrt.begin(); it != argPrt->masSdpParamListPrt.end(); it++) {
         sdpParam = *it;
-        if (insDefaultConfig_.singleInstMode_) {
-            if (insDefaultConfig_.singleInstanceId_ == sdpParam.instanceId) {
+        if (insDefaultConfig_.singleInstMode) {
+            if (insDefaultConfig_.singleInstanceId == sdpParam.instanceId) {
                 ret = RET_NO_ERROR;
                 auto stateMachine1 = std::make_unique<MapMceInstanceStm>(
                     *this, *(devService_.GetDispatcher()), sdpParam.instanceId, insDefaultConfig_);

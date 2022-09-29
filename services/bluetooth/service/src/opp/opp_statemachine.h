@@ -134,10 +134,10 @@ public:
     OppDisconnectedState(const std::string &name, utility::StateMachine &statemachine)
         : OppState(name, statemachine, OPP_STATE_DISCONNECTED)
     {}
-    ~OppDisconnectedState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~OppDisconnectedState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool isReentry_ {false};
@@ -148,10 +148,10 @@ public:
     OppConnectingState(const std::string &name, utility::StateMachine &statemachine)
         : OppState(name, statemachine, OPP_STATE_CONNECTING)
     {}
-    ~OppConnectingState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~OppConnectingState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class OppDisconnectingState : public OppState {
@@ -159,10 +159,10 @@ public:
     OppDisconnectingState(const std::string &name, utility::StateMachine &statemachine)
         : OppState(name, statemachine, OPP_STATE_DISCONNECTING)
     {}
-    ~OppDisconnectingState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~OppDisconnectingState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class OppConnectedState : public OppState {
@@ -170,10 +170,10 @@ public:
     OppConnectedState(const std::string &name, utility::StateMachine &statemachine)
         : OppState(name, statemachine, OPP_STATE_CONNECTED)
     {}
-    ~OppConnectedState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~OppConnectedState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 }  // namespace bluetooth
 }  // namespace OHOS

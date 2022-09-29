@@ -267,7 +267,7 @@ protected:
     class ObexClientTransportObserver : public ObexTransportObserver {
     public:
         explicit ObexClientTransportObserver(ObexClient &obexClient);
-        virtual ~ObexClientTransportObserver() = default;
+        ~ObexClientTransportObserver() override = default;
         // call back from transport
         void OnTransportConnected(ObexTransport &transport) override;
         void OnTransportDisconnected(ObexTransport &transport) override;

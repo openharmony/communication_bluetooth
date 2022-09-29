@@ -354,10 +354,10 @@ bool PbapPceStateMachine::ObexHeaderToDataResult(const ObexHeader &resp, int act
     auto &extendBody = resp.GetExtendBodyObject();
     if (extendBody) {
         if (actionType != PBAP_ACTION_PULLPHONEBOOK) {
-            const int BufSize = 100;
-            uint8_t buf[BufSize] = {0};
+            const int bufSize = 100;
+            uint8_t buf[bufSize] = {0};
             size_t cnt = 0;
-            while ((cnt = extendBody->Read(buf, BufSize)) > 0) {
+            while ((cnt = extendBody->Read(buf, bufSize)) > 0) {
                 retResult.result_.insert(retResult.result_.end(), buf, buf + cnt);
             }
         }

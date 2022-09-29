@@ -72,7 +72,7 @@ struct MasInstanceInformation {
 
 struct MapRequestResponseAction {
     MapActionType action_ {};
-    int supportedFeatures_ = 0;
+    int supportedFeatures = 0;
     IProfileOwnerStatus ownerStatus_ {};
     MceTypesBMessage bmessage_ {};
     MceTypesMessagesListing messageList_ {};
@@ -185,9 +185,9 @@ const std::string MCE_HEADER_TYPE_SET_OWNER_STATUS = "x-bt/ownerStatus";
  * @brief config data
  */
 struct MapMceRequestConfig {
-    bool isUseSrmp_ = false;
-    int srmpCount_ = 0;
-    int maxOfGetUnread_ = 100;
+    bool isUseSrmp = false;
+    int srmpCount = 0;
+    int maxOfGetUnread = 100;
 };
 
 /**
@@ -302,7 +302,7 @@ public:
     /**
      * @brief Destroy the Map Mce Request Set Notification Filter object
      */
-    ~MapMceRequestSetNotificationFilter();
+    ~MapMceRequestSetNotificationFilter() override;
     /**
      * @brief Get the Request Type object
      * @return MceRequestType
@@ -341,7 +341,7 @@ public:
     /**
      * @brief Destroy the Map Mce Request Set Notification Registration object
      */
-    ~MapMceRequestSetNotificationRegistration();
+    ~MapMceRequestSetNotificationRegistration() override;
     /**
      * @brief Get the Request Type object
      * @return MceRequestType
@@ -380,7 +380,7 @@ public:
     /**
      * @brief Destroy the Map Mce Request Get Mas Instance Information object
      */
-    ~MapMceRequestGetMasInstanceInformation();
+    ~MapMceRequestGetMasInstanceInformation() override;
     /**
      * @brief Get the Request Type object
      * @return MceRequestType
@@ -421,7 +421,7 @@ public:
     /**
      * @brief Destroy the Map Mce Request Get Folder Listing object
      */
-    ~MapMceRequestGetFolderListing();
+    ~MapMceRequestGetFolderListing() override;
     /**
      * @brief Get the Request Type object
      * @return MceRequestType
@@ -469,7 +469,7 @@ public:
     /**
      * @brief Destroy the Map Mce Request Set Path object
      */
-    ~MapMceRequestSetPath();
+    ~MapMceRequestSetPath() override;
     /**
      * @brief Get the Request Type object
      * @return MceRequestType
@@ -503,7 +503,7 @@ private:
 class MapMceRequestPushMessage : public MapMceInstanceRequest {
 public:
     explicit MapMceRequestPushMessage(const IProfileSendMessageParameters &msg);
-    ~MapMceRequestPushMessage();
+    ~MapMceRequestPushMessage() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -519,7 +519,7 @@ private:
 class MapMceRequestGetMessage : public MapMceInstanceRequest {
 public:
     MapMceRequestGetMessage(const std::u16string &msgHandle, const IProfileGetMessageParameters &para);
-    ~MapMceRequestGetMessage();
+    ~MapMceRequestGetMessage() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -537,7 +537,7 @@ private:
 class MapMceRequestUpdateInbox : public MapMceInstanceRequest {
 public:
     MapMceRequestUpdateInbox();
-    ~MapMceRequestUpdateInbox();
+    ~MapMceRequestUpdateInbox() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -552,7 +552,7 @@ private:
 class MapMceRequestSetOwnerStatus : public MapMceInstanceRequest {
 public:
     explicit MapMceRequestSetOwnerStatus(const IProfileSetOwnerStatusParameters &para);
-    ~MapMceRequestSetOwnerStatus();
+    ~MapMceRequestSetOwnerStatus() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -568,7 +568,7 @@ private:
 class MapMceRequestGetOwnerStatus : public MapMceInstanceRequest {
 public:
     explicit MapMceRequestGetOwnerStatus(const std::string &conversationId);
-    ~MapMceRequestGetOwnerStatus();
+    ~MapMceRequestGetOwnerStatus() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -585,7 +585,7 @@ class MapMceRequestSetMessageStatus : public MapMceInstanceRequest {
 public:
     MapMceRequestSetMessageStatus(const std::u16string &msgHandle, MapStatusIndicatorType statusIndicator,
         MapStatusValueType statusValue, const std::string &exData);
-    ~MapMceRequestSetMessageStatus();
+    ~MapMceRequestSetMessageStatus() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -604,7 +604,7 @@ private:
 class MapMceRequestGetConversationListing : public MapMceInstanceRequest {
 public:
     explicit MapMceRequestGetConversationListing(const IProfileGetConversationListingParameters &para);
-    ~MapMceRequestGetConversationListing();
+    ~MapMceRequestGetConversationListing() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -622,7 +622,7 @@ private:
 class MapMceRequestGetMessagesListing : public MapMceInstanceRequest {
 public:
     explicit MapMceRequestGetMessagesListing(const IProfileGetMessagesListingParameters &para);
-    ~MapMceRequestGetMessagesListing();
+    ~MapMceRequestGetMessagesListing() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(
@@ -643,7 +643,7 @@ class MapMceRequestGetUreadMessages : public MapMceInstanceRequest {
 public:
     BT_DISALLOW_COPY_AND_ASSIGN(MapMceRequestGetUreadMessages);
     MapMceRequestGetUreadMessages(MapMessageType type, const IProfileGetMessagesListingParameters &para);
-    ~MapMceRequestGetUreadMessages();
+    ~MapMceRequestGetUreadMessages() override;
     MceRequestType GetRequestType() override;
     int SendRequest(ObexMpClient &obexIns) override;
     int ProcessResponse(

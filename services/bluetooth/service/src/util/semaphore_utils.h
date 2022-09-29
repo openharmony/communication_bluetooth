@@ -29,7 +29,7 @@ public:
      * @param val Initial value of the Semaphore.
      * @since 6
      */
-    Semaphore(int val = 1) : count_(val){};
+    explicit Semaphore(int val = 1) : count_(val){};
 
     /**
      * @brief Destroy the Semaphore object.
