@@ -18,6 +18,7 @@
 #include "class_creator.h"
 #include "interface_adapter.h"
 #include "log.h"
+#include "log_util.h"
 #include "pbap_pce_base_state.h"
 #include "pbap_pce_gap.h"
 #include "pbap_pce_sdp.h"
@@ -359,7 +360,7 @@ int PbapPceService::ConnectInternal(const RawAddress &device)
     }
 
     std::string addr = device.GetAddress();
-    PBAP_PCE_LOG_INFO("Connect to rawaddr:[%{public}s]", addr.c_str());
+    HILOGI("Connect to rawaddr: %{public}s", GetEncryptAddr(addr).c_str());
     std::lock_guard<std::recursive_mutex> lock(machineMapMutex_);
     if (machineMap_.find(addr) == machineMap_.end()) {
         machineMap_[addr] = std::make_unique<PbapPceStateMachine>(device, *this, *pbapPceSdp_, observerMgrList_);
@@ -884,7 +885,8 @@ bool PbapPceService::SaveConnectPolicy(const std::string &addr, int strategy)
 {
     IProfileConfig *config = ProfileConfig::GetInstance();
     if (!config->SetValue(addr, SECTION_CONNECTION_POLICIES, PROPERTY_PBAP_CLIENT_CONNECTION_POLICY, strategy)) {
-        PBAP_PCE_LOG_ERROR("%{public}s %{public}s save fail.", addr.c_str(), PROPERTY_PBAP_CLIENT_CONNECTION_POLICY.c_str());
+        HILOGE("addr: %{public}s %{public}s save fail.",
+            GetEncryptAddr(addr).c_str(), PROPERTY_PBAP_CLIENT_CONNECTION_POLICY.c_str());
         return false;
     }
     return true;
@@ -894,7 +896,8 @@ bool PbapPceService::LoadConnectPolicy(const std::string &addr, int &strategy)
 {
     IProfileConfig *config = ProfileConfig::GetInstance();
     if (!config->GetValue(addr, SECTION_CONNECTION_POLICIES, PROPERTY_PBAP_CLIENT_CONNECTION_POLICY, strategy)) {
-        PBAP_PCE_LOG_ERROR("%{public}s %{public}s load fail.", addr.c_str(), PROPERTY_PBAP_CLIENT_CONNECTION_POLICY.c_str());
+        HILOGE("addr: %{public}s %{public}s load fail.",
+            GetEncryptAddr(addr).c_str(), PROPERTY_PBAP_CLIENT_CONNECTION_POLICY.c_str());
         return false;
     }
     return true;

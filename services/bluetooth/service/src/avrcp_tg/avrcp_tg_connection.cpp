@@ -16,6 +16,7 @@
 #include "avrcp_tg_connection.h"
 #include "avrcp_tg_packet.h"
 #include "avrcp_tg_pass_through.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -169,8 +170,7 @@ std::list<std::string> AvrcTgConnectManager::GetDeviceAddresses(void)
 
 void AvrcTgConnectManager::SetActiveDevice(const std::string addr)
 {
-    LOG_INFO("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_INFO("[AVRCP TG] rawAddr[%{public}s]", addr.c_str());
+    HILOGI("rawAddr: %{public}s", GetEncryptAddr(addr).c_str());
 
     std::lock_guard<std::mutex> lock(mutex_);
 

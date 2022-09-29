@@ -1001,9 +1001,9 @@ A2dpProfilePeer *A2dpProfile::FindOrCreatePeer(const BtAddr &peerAddress, uint8_
         auto peerInstance = std::make_unique<A2dpProfilePeer>(peerAddress, localRole);
         peer = peerInstance.release();
         peers_.insert(std::make_pair(addr, peer));
-        LOG_INFO("[A2dpProfile]%{public}s addr(%{public}s)End\n", __func__, addr.c_str());
+        HILOGI("addr: %{public}s", GetEncryptAddr(addr).c_str());
     } else {
-        LOG_ERROR("[A2dpProfile]%{public}s Connected device is max(%u)", __func__, GetConnectedPeerDevice());
+        HILOGE("Connected device is max: %{public}u", GetConnectedPeerDevice());
     }
     return peer;
 }

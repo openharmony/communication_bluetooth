@@ -17,6 +17,7 @@
 
 #include "btstack.h"
 #include "hfp_hf_profile_event_sender.h"
+#include "log_util.h"
 #include "raw_address.h"
 #include "securec.h"
 
@@ -414,13 +415,11 @@ void HfpHfAudioConnection::ProcessOnDisconnectCompleted(HfpScoDisconnectionCompl
     auto it = GetDeviceByHandle(parameters.connectionHandle);
     if (it != g_audioDevices.end()) {
         if (!parameters.status) {
-            LOG_INFO("[HFP HF]%{public}s(): Disconnect SCO from address[%{public}s] successfully.", __FUNCTION__,
-                it->addr.c_str());
+            HILOGI("Disconnect SCO from address: %{public}s successfully.", GetEncryptAddr(it->addr).c_str());
             HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(it->addr, HFP_HF_AUDIO_DISCONNECTED_EVT);
             g_audioDevices.erase(it);
         } else {
-            LOG_INFO("[HFP HF]%{public}s(): Disconnect SCO from address[%{public}s] failed.", __FUNCTION__,
-                it->addr.c_str());
+            HILOGI("Disconnect SCO from address: %{public}s failed.", GetEncryptAddr(it->addr).c_str());
             HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(
                 it->addr, HFP_HF_AUDIO_DISCONNECT_FAILED_EVT);
         }
