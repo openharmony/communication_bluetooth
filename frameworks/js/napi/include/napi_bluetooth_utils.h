@@ -56,6 +56,8 @@ constexpr int ASYNC_START = 1;
 constexpr int ASYNC_DONE = 2;
 constexpr int32_t THREAD_WAIT_TIMEOUT = 5;
 
+constexpr uint32_t INVALID_REF_COUNT = 0xFF;
+
 struct ServerResponse {
     std::string deviceId = "";
     int transId = 0;

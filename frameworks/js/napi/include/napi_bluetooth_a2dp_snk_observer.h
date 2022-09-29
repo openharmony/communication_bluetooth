@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,13 @@
 #ifndef NAPI_BLUETOOTH_A2DP_SNK_OBSERVER_H_
 #define NAPI_BLUETOOTH_A2DP_SNK_OBSERVER_H_
 
+#include <shared_mutex>
 #include "bluetooth_a2dp_snk.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
+static std::shared_mutex g_a2dpSinkCallbackInfosMutex;
 const std::string STR_BT_A2DP_SINK_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
 class NapiA2dpSinkObserver : public A2dpSinkObserver{
