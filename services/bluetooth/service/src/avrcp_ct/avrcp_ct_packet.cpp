@@ -26,42 +26,42 @@ namespace OHOS {
 namespace bluetooth {
 uint16_t AvrcCtPacket::PushOctets1(uint8_t *pkt, uint8_t payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("payload: %{public}d", payload);
 
     return PushOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_1, payload);
 }
 
 uint16_t AvrcCtPacket::PushOctets2(uint8_t *pkt, uint16_t payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("payload: %{public}d", payload);
 
     return PushOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_2, payload);
 }
 
 uint16_t AvrcCtPacket::PushOctets3(uint8_t *pkt, uint32_t payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("payload: %{public}u", payload);
 
     return PushOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_3, payload);
 }
 
 uint16_t AvrcCtPacket::PushOctets4(uint8_t *pkt, uint32_t payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("payload: %{public}u", payload);
 
     return PushOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_4, payload);
 }
 
 uint16_t AvrcCtPacket::PushOctets8(uint8_t *pkt, uint64_t payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("payload: %{public}llu", static_cast<unsigned long long>(payload));
 
     return PushOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_8, payload);
 }
 
 uint16_t AvrcCtPacket::PushOctets(uint8_t *pkt, uint8_t *playload, uint16_t length)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("length: %{public}d", length);
 
     (void)memcpy_s(pkt, length, playload, length);
 
@@ -70,7 +70,7 @@ uint16_t AvrcCtPacket::PushOctets(uint8_t *pkt, uint8_t *playload, uint16_t leng
 
 uint16_t AvrcCtPacket::PopOctets1(uint8_t *pkt, uint64_t &payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint64_t tmpPayload = 0x00;
     uint16_t octets = PopOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_1, tmpPayload);
@@ -81,7 +81,7 @@ uint16_t AvrcCtPacket::PopOctets1(uint8_t *pkt, uint64_t &payload) const
 
 uint16_t AvrcCtPacket::PopOctets2(uint8_t *pkt, uint64_t &payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint64_t tmpPayload = 0x00;
     uint16_t octets = PopOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_2, tmpPayload);
@@ -92,7 +92,7 @@ uint16_t AvrcCtPacket::PopOctets2(uint8_t *pkt, uint64_t &payload) const
 
 uint16_t AvrcCtPacket::PopOctets3(uint8_t *pkt, uint64_t &payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint64_t tmpPayload = 0x00;
     uint16_t octets = PopOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_3, tmpPayload);
@@ -103,7 +103,7 @@ uint16_t AvrcCtPacket::PopOctets3(uint8_t *pkt, uint64_t &payload) const
 
 uint16_t AvrcCtPacket::PopOctets4(uint8_t *pkt, uint64_t &payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint64_t tmpPayload = 0x00;
     uint16_t octets = PopOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_4, tmpPayload);
@@ -114,7 +114,7 @@ uint16_t AvrcCtPacket::PopOctets4(uint8_t *pkt, uint64_t &payload) const
 
 uint16_t AvrcCtPacket::PopOctets8(uint8_t *pkt, uint64_t &payload) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint64_t tmpPayload = 0x00;
     uint16_t octets = PopOctetsUpto8(pkt, sizeof(uint8_t) * AVRC_CT_UNIT8_NUM_8, tmpPayload);
@@ -125,7 +125,7 @@ uint16_t AvrcCtPacket::PopOctets8(uint8_t *pkt, uint64_t &payload) const
 
 uint16_t AvrcCtPacket::PopOctets(uint8_t *pkt, uint8_t *playload, uint16_t length)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("length: %{public}d", length);
 
     (void)memcpy_s(playload, length, pkt, length);
 
@@ -134,7 +134,7 @@ uint16_t AvrcCtPacket::PopOctets(uint8_t *pkt, uint8_t *playload, uint16_t lengt
 
 uint8_t AvrcCtPacket::GetOpCode(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint8_t opCode = AVRC_CT_OP_CODE_INVALID;
     if (PacketPayloadRead(pkt, &opCode, AVRC_CT_AVC_COMMON_OPCODE_OFFSET, 1) != 1) {
@@ -146,7 +146,7 @@ uint8_t AvrcCtPacket::GetOpCode(Packet *pkt)
 
 uint8_t AvrcCtPacket::GetVendorPdu(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint8_t pduId = AVRC_CT_PDU_ID_INVALID;
     if (PacketPayloadRead(pkt, &pduId, AVRC_CT_AVC_COMMON_VENDOR_PDU_ID_OFFSET, 1) != 1) {
@@ -158,7 +158,7 @@ uint8_t AvrcCtPacket::GetVendorPdu(Packet *pkt)
 
 uint8_t AvrcCtPacket::GetBrowsePdu(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint8_t pduId = AVRC_CT_PDU_ID_INVALID;
     if (PacketPayloadRead(pkt, &pduId, AVRC_CT_AVC_COMMON_BROWSE_PDU_ID_OFFSET, 1) != 1) {
@@ -170,7 +170,7 @@ uint8_t AvrcCtPacket::GetBrowsePdu(Packet *pkt)
 
 bool AvrcCtPacket::IsValidOpCode(uint8_t code)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("code: %{public}d", code);
 
     bool rtnSts = true;
 
@@ -189,7 +189,7 @@ bool AvrcCtPacket::IsValidOpCode(uint8_t code)
 
 uint16_t AvrcCtPacket::PushOctetsUpto8(uint8_t *pkt, size_t size, uint64_t payload)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("payload: %{public}llu", static_cast<unsigned long long>(payload));
 
     if (size <= sizeof(uint64_t)) {
         for (size_t i = 0; i < size; i++) {
@@ -202,7 +202,7 @@ uint16_t AvrcCtPacket::PushOctetsUpto8(uint8_t *pkt, size_t size, uint64_t paylo
 
 uint16_t AvrcCtPacket::PopOctetsUpto8(uint8_t *pkt, size_t size, uint64_t &payload)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (size <= sizeof(uint64_t)) {
         for (size_t i = 0; i < size; i++) {

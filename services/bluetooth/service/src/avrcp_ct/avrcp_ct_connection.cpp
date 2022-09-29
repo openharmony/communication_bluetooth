@@ -16,7 +16,6 @@
 #include "avrcp_ct_connection.h"
 #include "avrcp_ct_packet.h"
 #include "avrcp_ct_pass_through.h"
-#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {

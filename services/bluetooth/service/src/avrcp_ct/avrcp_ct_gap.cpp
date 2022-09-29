@@ -21,17 +21,17 @@ namespace OHOS {
 namespace bluetooth {
 AvrcCtGapManager::AvrcCtGapManager()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtGapManager::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 AvrcCtGapManager::~AvrcCtGapManager()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtGapManager::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 int AvrcCtGapManager::RegisterSecurity(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtGapManager::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = RET_NO_ERROR;
 
@@ -54,7 +54,7 @@ int AvrcCtGapManager::RegisterSecurity(void)
 
 int AvrcCtGapManager::UnregisterSecurity(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtGapManager::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = RET_NO_ERROR;
 

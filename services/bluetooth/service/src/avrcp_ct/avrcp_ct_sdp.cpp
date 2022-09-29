@@ -35,17 +35,17 @@ const uint16_t AVRC_SERVICE_NAME_LENGTH = 0x001C;
 
 AvrcCtSdpManager::AvrcCtSdpManager(uint32_t features) : sdpHandle_(0xFFFFFFFF), features_(features)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSdpManager::%{public}s", __func__);
+    HILOGI("features: %{public}u", features);
 }
 
 AvrcCtSdpManager::~AvrcCtSdpManager()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSdpManager::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 int AvrcCtSdpManager::RegisterService(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSdpManager::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = RET_NO_ERROR;
     sdpHandle_ = SDP_CreateServiceRecord();
@@ -101,7 +101,7 @@ int AvrcCtSdpManager::RegisterService(void)
 
 int AvrcCtSdpManager::UnregisterService(void) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSdpManager::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = RET_NO_ERROR;
 
@@ -116,7 +116,7 @@ int AvrcCtSdpManager::UnregisterService(void) const
 int AvrcCtSdpManager::FindTgService(const RawAddress &rawAddr,
     void (*callback)(const BtAddr *btAddr, const uint32_t *handleArray, uint16_t handleNum, void *context))
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSdpManager::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     BtAddr btAddr;
     rawAddr.ConvertToUint8(btAddr.addr);
@@ -134,7 +134,7 @@ int AvrcCtSdpManager::FindTgService(const RawAddress &rawAddr,
 
 int AvrcCtSdpManager::AddProtocolDescriptorList()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSdpManager::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = RET_NO_ERROR;
 
