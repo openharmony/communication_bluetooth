@@ -409,10 +409,10 @@ public:
     HfpHfDisconnected(const std::string &name, utility::StateMachine &statemachine, HfpHfProfile &profile)
         : HfpHfState(name, statemachine, profile, HFP_HF_STATE_DISCONNECTED)
     {}
-    ~HfpHfDisconnected() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpHfDisconnected() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool isReentry_ {false};
@@ -423,10 +423,10 @@ public:
     HfpHfConnecting(const std::string &name, utility::StateMachine &statemachine, HfpHfProfile &profile)
         : HfpHfState(name, statemachine, profile, HFP_HF_STATE_CONNECTING)
     {}
-    ~HfpHfConnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpHfConnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpHfDisconnecting : public HfpHfState {
@@ -434,10 +434,10 @@ public:
     HfpHfDisconnecting(const std::string &name, utility::StateMachine &statemachine, HfpHfProfile &profile)
         : HfpHfState(name, statemachine, profile, HFP_HF_STATE_DISCONNECTING)
     {}
-    ~HfpHfDisconnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpHfDisconnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpHfConnected : public HfpHfState {
@@ -445,11 +445,11 @@ public:
     HfpHfConnected(const std::string &name, utility::StateMachine &statemachine, HfpHfProfile &profile)
         : HfpHfState(name, statemachine, profile, HFP_HF_STATE_CONNECTED)
     {}
-    ~HfpHfConnected() = default;
-    virtual void Entry() override;
-    virtual void Exit() override
+    ~HfpHfConnected() override = default;
+    void Entry() override;
+    void Exit() override
     {}
-    virtual bool Dispatch(const utility::Message &msg) override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpHfAudioConnecting : public HfpHfState {
@@ -458,10 +458,10 @@ public:
         utility::StateMachine::State &parent)
         : HfpHfState(name, statemachine, profile, HFP_HF_AUDIO_STATE_CONNECTING, parent)
     {}
-    ~HfpHfAudioConnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpHfAudioConnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpHfAudioDisconnecting : public HfpHfState {
@@ -470,10 +470,10 @@ public:
         utility::StateMachine::State &parent)
         : HfpHfState(name, statemachine, profile, HFP_HF_AUDIO_STATE_DISCONNECTING, parent)
     {}
-    ~HfpHfAudioDisconnecting() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HfpHfAudioDisconnecting() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 };
 
 class HfpHfAudioConnected : public HfpHfState {
@@ -482,11 +482,11 @@ public:
         utility::StateMachine::State &parent)
         : HfpHfState(name, statemachine, profile, HFP_HF_AUDIO_STATE_CONNECTED, parent)
     {}
-    ~HfpHfAudioConnected() = default;
-    virtual void Entry() override;
-    virtual void Exit() override
+    ~HfpHfAudioConnected() override = default;
+    void Entry() override;
+    void Exit() override
     {}
-    virtual bool Dispatch(const utility::Message &msg) override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     void ProcessDisconnect(const HfpHfMessage &event);

@@ -42,7 +42,7 @@ struct MseMessageElement {
     std::string replytoAddressing_ = "";
     std::string recipientName_ = "";
     std::string recipientAddressing_ = "";
-    MessageType type_ = MessageType::NONE;
+    MessageType type = MessageType::NONE;
     int size_ = -1;
     std::string text_ = "";
     std::string receptionStatus_ = "";

@@ -76,35 +76,35 @@ public:
             };
             struct Idle : public StateBase {
                 Idle(utility::StateMachine &stateMachine, GattConnectionManager::Device &device);
-                ~Idle(){};
+                ~Idle() override{};
                 void Entry() override;
                 void Exit() override{};
                 bool Dispatch(const utility::Message &msg) override;
             };
             struct Connecting : public StateBase {
                 Connecting(utility::StateMachine &stateMachine, GattConnectionManager::Device &device);
-                ~Connecting(){};
+                ~Connecting() override{};
                 void Entry() override;
                 void Exit() override{};
                 bool Dispatch(const utility::Message &msg) override;
             };
             struct Connected : public StateBase {
                 Connected(utility::StateMachine &stateMachine, GattConnectionManager::Device &device);
-                ~Connected(){};
+                ~Connected() override{};
                 void Entry() override;
                 void Exit() override{};
                 bool Dispatch(const utility::Message &msg) override;
             };
             struct Disconnecting : public StateBase {
                 Disconnecting(utility::StateMachine &stateMachine, GattConnectionManager::Device &device);
-                ~Disconnecting(){};
+                ~Disconnecting() override{};
                 void Entry() override;
                 void Exit() override{};
                 bool Dispatch(const utility::Message &msg) override;
             };
             struct Disconnected : public StateBase {
                 Disconnected(utility::StateMachine &stateMachine, GattConnectionManager::Device &device);
-                ~Disconnected(){};
+                ~Disconnected() override{};
                 void Entry() override;
                 void Exit() override{};
                 bool Dispatch(const utility::Message &msg) override;

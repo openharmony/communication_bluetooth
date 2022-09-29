@@ -57,16 +57,16 @@ private:
     public:
         explicit HogpGattClientCallback(HidHostHogp *hogp);
         ~HogpGattClientCallback() = default;
-        virtual void OnConnectionStateChanged(int state, int newState) override;
-        virtual void OnServicesChanged(const std::vector<Service> &services) override;
-        virtual void OnCharacteristicRead(int ret, const Characteristic &characteristic) override;
-        virtual void OnCharacteristicWrite(int ret, const Characteristic &characteristic) override;
-        virtual void OnCharacteristicChanged(const Characteristic &characteristic) override;
-        virtual void OnDescriptorRead(int ret, const Descriptor &descriptor) override;
-        virtual void OnDescriptorWrite(int ret, const Descriptor &descriptor) override;
-        virtual void OnMtuChanged(int state, int mtu) override;
-        virtual void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override;
-        virtual void OnServicesDiscovered(int status) override;
+        void OnConnectionStateChanged(int state, int newState) override;
+        void OnServicesChanged(const std::vector<Service> &services) override;
+        void OnCharacteristicRead(int ret, const Characteristic &characteristic) override;
+        void OnCharacteristicWrite(int ret, const Characteristic &characteristic) override;
+        void OnCharacteristicChanged(const Characteristic &characteristic) override;
+        void OnDescriptorRead(int ret, const Descriptor &descriptor) override;
+        void OnDescriptorWrite(int ret, const Descriptor &descriptor) override;
+        void OnMtuChanged(int state, int mtu) override;
+        void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override;
+        void OnServicesDiscovered(int status) override;
 
     private:
         HidHostHogp *hogp_;

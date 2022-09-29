@@ -172,10 +172,10 @@ public:
     HidHostDisconnectedState(const std::string &name, utility::StateMachine &statemachine)
         : HidHostState(name, statemachine, HID_HOST_STATE_DISCONNECTED)
     {}
-    ~HidHostDisconnectedState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HidHostDisconnectedState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool isReentry_ {false};
@@ -188,10 +188,10 @@ public:
     HidHostConnectingState(const std::string &name, utility::StateMachine &statemachine)
         : HidHostState(name, statemachine, HID_HOST_STATE_CONNECTING)
     {}
-    ~HidHostConnectingState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HidHostConnectingState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool DispatchBle(const utility::Message &msg);
@@ -202,10 +202,10 @@ public:
     HidHostDisconnectingState(const std::string &name, utility::StateMachine &statemachine)
         : HidHostState(name, statemachine, HID_HOST_STATE_DISCONNECTING)
     {}
-    ~HidHostDisconnectingState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HidHostDisconnectingState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool DispatchBle(const utility::Message &msg);
@@ -216,10 +216,10 @@ public:
     HidHostConnectedState(const std::string &name, utility::StateMachine &statemachine)
         : HidHostState(name, statemachine, HID_HOST_STATE_CONNECTED)
     {}
-    ~HidHostConnectedState() = default;
-    virtual void Entry() override;
-    virtual void Exit() override;
-    virtual bool Dispatch(const utility::Message &msg) override;
+    ~HidHostConnectedState() override = default;
+    void Entry() override;
+    void Exit() override;
+    bool Dispatch(const utility::Message &msg) override;
 
 private:
     bool DispatchBle(const utility::Message &msg);

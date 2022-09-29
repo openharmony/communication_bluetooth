@@ -214,7 +214,7 @@ private:
 class ObexClientSession : public ObexSession {
 public:
     explicit ObexClientSession(const RawAddress &remoteAddr);
-    virtual ~ObexClientSession() = default;
+    ~ObexClientSession() override = default;
     const uint8_t &GetLastOpeId() const
     {
         return lastOpeId_;
@@ -354,7 +354,7 @@ class ObexServerSession : public ObexSession {
 public:
     ObexServerSession(ObexTransport &transport, bool isSupportSrm, utility::Dispatcher &dispatcher,
         std::function<int(ObexServerSession &)> removeFun, std::function<void(ObexServerSession &, bool)> setBusyFun);
-    virtual ~ObexServerSession() = default;
+    ~ObexServerSession() override = default;
     int Disconnect();
     int SendResponse(ObexHeader &resp) const;
     int SendGetResponse(const ObexHeader &req, ObexHeader &resp, std::shared_ptr<ObexBodyObject> reader = nullptr);

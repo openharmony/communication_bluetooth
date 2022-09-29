@@ -26,7 +26,7 @@ public:
     explicit ObexMpClient(
         const ObexClientConfig &config, ObexClientObserver &observer, utility::Dispatcher &dispatcher);
     // destroy obex client
-    virtual ~ObexMpClient() = default;
+    ~ObexMpClient() override = default;
 
     int Put(const ObexHeader &req);
     /**
