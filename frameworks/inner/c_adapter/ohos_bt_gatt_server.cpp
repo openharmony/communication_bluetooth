@@ -201,7 +201,7 @@ public:
         writeInfo.offset = 0;
         writeInfo.value = characteristic.GetValue(&length).get();
         writeInfo.length = length;
-        writeInfo.needRsp = true;
+        writeInfo.needRsp = (characteristic.GetWriteType() == GattCharacteristic::WriteType::DEFAULT);
         writeInfo.isPrep = false;
         HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d, valueLen: %{public}d",
             iter->first, requestId, writeInfo.attrHandle, writeInfo.length);
