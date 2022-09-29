@@ -434,7 +434,7 @@ const T ObexHeader::GetItem(uint8_t headerId) const
     if (headerItem == nullptr) {
         return nullptr;
     }
-    return (T)(headerItem);
+    return static_cast<T>(const_cast<ObexOptionalHeader *>(headerItem));
 }
 
 void ObexHeader::AppendUnicode(const uint8_t headerId, const std::u16string &text)

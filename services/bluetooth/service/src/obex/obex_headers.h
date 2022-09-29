@@ -249,7 +249,7 @@ class ObexOptionalBytesHeader : public ObexOptionalHeader {
 public:
     ObexOptionalBytesHeader(const uint8_t headerId, const uint8_t *data,
         const uint16_t dataSize, const uint16_t unitLen = 1);
-    virtual ~ObexOptionalBytesHeader() = default;
+    ~ObexOptionalBytesHeader() override = default;
     std::unique_ptr<uint8_t[]> GetBytes() const override;
     bool HasLengthField() const override;
     ObexHeaderDataType GetHeaderClassType() const override;
@@ -263,7 +263,7 @@ protected:
 class ObexOptionalByteHeader : public ObexOptionalBytesHeader {
 public:
     ObexOptionalByteHeader(const uint8_t headerId, const uint8_t byte);
-    virtual ~ObexOptionalByteHeader() = default;
+    ~ObexOptionalByteHeader() override = default;
     bool HasLengthField() const override;
     uint8_t GetByte() const;
     ObexHeaderDataType GetHeaderClassType() const override;
@@ -273,7 +273,7 @@ public:
 class ObexOptionalWordHeader : public ObexOptionalBytesHeader {
 public:
     ObexOptionalWordHeader(const uint8_t headerId, const uint32_t word);
-    virtual ~ObexOptionalWordHeader() = default;
+    ~ObexOptionalWordHeader() override = default;
     bool HasLengthField() const override;
     uint32_t GetWord() const;
     ObexHeaderDataType GetHeaderClassType() const override;
@@ -285,7 +285,7 @@ public:
     ObexOptionalStringHeader(const uint8_t headerId, const std::string &str);
     ObexOptionalStringHeader(const uint8_t headerId, const uint8_t *data, const uint16_t dataSize);
 
-    virtual ~ObexOptionalStringHeader() = default;
+    ~ObexOptionalStringHeader() override = default;
     std::string GetString() const;
     ObexHeaderDataType GetHeaderClassType() const override;
     std::string GetHeaderClassTypeName() const override;
@@ -294,7 +294,7 @@ public:
 class ObexOptionalUnicodeHeader : public ObexOptionalBytesHeader {
 public:
     ObexOptionalUnicodeHeader(const uint8_t headerId, const std::u16string &unicodeText);
-    virtual ~ObexOptionalUnicodeHeader() = default;
+    ~ObexOptionalUnicodeHeader() override = default;
     std::u16string GetUnicodeText() const;
     ObexHeaderDataType GetHeaderClassType() const override;
     std::string GetHeaderClassTypeName() const override;
@@ -305,7 +305,7 @@ public:
     explicit ObexOptionalTlvHeader(const uint8_t headerId, const uint8_t *data, const uint16_t dataSize);
     ObexOptionalTlvHeader(const uint8_t headerId);
     ObexOptionalTlvHeader(const uint8_t headerId, const ObexTlvParamters &tlvParamters);
-    virtual ~ObexOptionalTlvHeader() = default;
+    ~ObexOptionalTlvHeader() override = default;
     std::unique_ptr<uint8_t[]> GetBytes() const override;
     bool HasLengthField() const override;
     ObexHeaderDataType GetHeaderClassType() const override;
@@ -423,7 +423,7 @@ public:
     void SetFieldObexVersionNum(const uint8_t obexVersionNum);
     void SetFieldFlags(const uint8_t flags);
     void SetFieldMaxPacketLength(const uint16_t maxPacketLength);
-    void SetFieldConstants(const uint8_t constants);
+    void SetFieldConstants(uint8_t constants);
 
     // obex header add methods
     // bytes

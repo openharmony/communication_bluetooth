@@ -60,10 +60,10 @@ struct GattServerWapper {
     struct GattServiceWapper gattServices[MAXIMUM_NUMBER_GATTSERVICE];
 };
 
-GattServerWapper g_GattServers[MAXIMUM_NUMBER_APPLICATION];
+GattServerWapper g_gattServers[MAXIMUM_NUMBER_APPLICATION];
 
-#define GATTSERVER(x) g_GattServers[x].gattServer
-#define GATTSERVICES(x, y) g_GattServers[x].gattServices[y]
+#define GATTSERVER(x) g_gattServers[x].gattServer
+#define GATTSERVICES(x, y) g_gattServers[x].gattServices[y]
 #define GATTSERVICE(x, y) GATTSERVICES(x, y).gattService
 
 static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle);

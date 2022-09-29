@@ -60,7 +60,7 @@ class ObexClientTransport : public ObexTransport {
 public:
     ObexClientTransport(ObexTransportObserver &observer) : observer_(observer)
     {}
-    virtual ~ObexClientTransport(){};
+    ~ObexClientTransport() override{};
     virtual int Connect() = 0;
     virtual int Disconnect() = 0;
 

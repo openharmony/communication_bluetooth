@@ -125,14 +125,14 @@ MapMceService::MapMceService() : utility::Context(PROFILE_NAME_MAP_MCE, "1.4.2")
     mnsServer_ = nullptr;
     serviceBtDeviceInstMgrMap_.clear();
     notificationRegistration_ = false;
-    insDefaultConfig_.l2capMtu_ = MCE_INSTANCE_CLIENT_OBEX_MTU;
-    insDefaultConfig_.rfcommMtu_ = MCE_INSTANCE_CLIENT_OBEX_MTU;
-    insDefaultConfig_.isSupportSrm_ = true;
-    insDefaultConfig_.deviceId_ = 0;
-    insDefaultConfig_.singleInstMode_ = false;
-    insDefaultConfig_.singleInstanceId_ = 0;
-    insDefaultConfig_.maxOfDevice_ = MCE_MAX_OF_CONNECTED_DEVICES;
-    insDefaultConfig_.maxOfGetUnread_ = MAP_MAX_LIST_COUNT_FOR_GET_UNREAD_MESSAGE;
+    insDefaultConfig_.l2capMtu = MCE_INSTANCE_CLIENT_OBEX_MTU;
+    insDefaultConfig_.rfcommMtu = MCE_INSTANCE_CLIENT_OBEX_MTU;
+    insDefaultConfig_.isSupportSrm = true;
+    insDefaultConfig_.deviceId = 0;
+    insDefaultConfig_.singleInstMode = false;
+    insDefaultConfig_.singleInstanceId = 0;
+    insDefaultConfig_.maxOfDevice = MCE_MAX_OF_CONNECTED_DEVICES;
+    insDefaultConfig_.maxOfGetUnread = MAP_MAX_LIST_COUNT_FOR_GET_UNREAD_MESSAGE;
 
     LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }
@@ -306,7 +306,7 @@ int MapMceService::GetUnreadMessages(const RawAddress &device, MapMessageType ty
     para.FilterMessageHandle = "";
 
     MapMceRequestConfig cfg;
-    cfg.maxOfGetUnread_ = insDefaultConfig_.maxOfGetUnread_;
+    cfg.maxOfGetUnread = insDefaultConfig_.maxOfGetUnread;
 
     utility::Message outMsg(MSG_MCEDEVICE_REQ_SEND_REQUEST);
     std::unique_ptr<MapMceInstanceRequest> reqPtr = std::make_unique<MapMceRequestGetUreadMessages>(type, para);
@@ -643,7 +643,7 @@ int MapMceService::CheckDeviceConnectStatus(const RawAddress &device)
         LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
         return ret;
     }
-    if (serviceBtDeviceInstMgrMap_.size() >= insDefaultConfig_.maxOfDevice_) {
+    if (serviceBtDeviceInstMgrMap_.size() >= insDefaultConfig_.maxOfDevice) {
         ret = RET_NO_SUPPORT;
         for (auto it2 = serviceBtDeviceInstMgrMap_.begin(); it2 != serviceBtDeviceInstMgrMap_.end(); ++it2) {
             // if it have disconnect devcie in the list
@@ -721,8 +721,8 @@ int MapMceService::ConnectInternal(const RawAddress &device, bool sInsMode, int 
     HILOGI("address=%{public}s", GET_ENCRYPT_ADDR(device));
     std::lock_guard<std::recursive_mutex> lock(mceDeviceMapMutex_);
 
-    insDefaultConfig_.singleInstMode_ = sInsMode;
-    insDefaultConfig_.singleInstanceId_ = sInsId;
+    insDefaultConfig_.singleInstMode = sInsMode;
+    insDefaultConfig_.singleInstanceId = sInsId;
     LOG_INFO("%{public}s singleInstMode=%{public}d,singleInstanceId=%{public}d ", __PRETTY_FUNCTION__, sInsMode, sInsId);
 
     int ret = RET_NO_ERROR;
@@ -738,8 +738,8 @@ int MapMceService::ConnectInternal(const RawAddress &device, bool sInsMode, int 
         // remove the no useful device and instance if the map is max
         RemoveNoUseDeviceAndInstance();
         // insert the instance and create the client stm
-        if (serviceBtDeviceInstMgrMap_.size() < insDefaultConfig_.maxOfDevice_) {
-            insDefaultConfig_.deviceId_++;
+        if (serviceBtDeviceInstMgrMap_.size() < insDefaultConfig_.maxOfDevice) {
+            insDefaultConfig_.deviceId++;
             auto deviceCtl1 = std::make_unique<MapMceDeviceCtrl>(
                 tempDev, *this, notificationRegistration_, insDefaultConfig_, serviceRpcCallbackMgr_);
             utility::Message outMsg1(MSG_MCEDEVICE_REQ_DEVICE_CONNECT);
@@ -791,7 +791,7 @@ void MapMceService::RemoveNoUseDeviceAndInstance()
 {
     LOG_INFO("%{public}s enter", __PRETTY_FUNCTION__);
     // check map length
-    if (serviceBtDeviceInstMgrMap_.size() < insDefaultConfig_.maxOfDevice_) {
+    if (serviceBtDeviceInstMgrMap_.size() < insDefaultConfig_.maxOfDevice) {
         return;
     }
     // check iterator in map
@@ -1271,9 +1271,9 @@ void MapMceService::SetDefaultConfig(const MasInstanceConfig &configSave)
     LOG_INFO("%{public}s enter", __PRETTY_FUNCTION__);
     std::lock_guard<std::recursive_mutex> lock(mceDeviceMapMutex_);
 
-    int saveId = insDefaultConfig_.deviceId_;
+    int saveId = insDefaultConfig_.deviceId;
     insDefaultConfig_ = configSave;
-    insDefaultConfig_.deviceId_ = saveId;
+    insDefaultConfig_.deviceId = saveId;
     LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }
 
@@ -1287,35 +1287,31 @@ void MapMceService::GetConfigFromXml()
     if (!config->GetValue(SECTION_MAP_MCE_SERVICE, "MaxConnectedDevices", value)) {
         LOG_ERROR("%{public}s error:MaxConnectedDevices not found", __PRETTY_FUNCTION__);
     } else {
-        insDefaultConfig_.maxOfDevice_ = value;
+        insDefaultConfig_.maxOfDevice = value;
     }
     if (!config->GetValue(SECTION_MAP_MCE_SERVICE, PROPERTY_L2CAP_MTU, value)) {
         LOG_ERROR("%{public}s error:l2capMtu not found", __PRETTY_FUNCTION__);
     } else {
-        insDefaultConfig_.l2capMtu_ = value;
+        insDefaultConfig_.l2capMtu = value;
     }
     if (!config->GetValue(SECTION_MAP_MCE_SERVICE, PROPERTY_RFCOMM_MTU, value)) {
         LOG_ERROR("%{public}s error:rfcomm Mtu not found", __PRETTY_FUNCTION__);
     } else {
-        insDefaultConfig_.rfcommMtu_ = value;
+        insDefaultConfig_.rfcommMtu = value;
     }
     if (!config->GetValue(SECTION_MAP_MCE_SERVICE, PROPERTY_MAP_MAX_OF_GET_UREAD, value)) {
         LOG_ERROR("%{public}s error:MaxOfGetUreadMessage not found", __PRETTY_FUNCTION__);
     } else {
-        insDefaultConfig_.maxOfGetUnread_ = value;
+        insDefaultConfig_.maxOfGetUnread = value;
     }
     if (!config->GetValue(SECTION_MAP_MCE_SERVICE, PROPERTY_SRM_ENABLE, boolValue)) {
         LOG_ERROR("%{public}s error:SrmEnable not found", __PRETTY_FUNCTION__);
     } else {
-        insDefaultConfig_.isSupportSrm_ = boolValue;
+        insDefaultConfig_.isSupportSrm = boolValue;
     }
-    LOG_INFO("%{public}s end, maxOfDevice_ = %{public}d, l2capMtu_ = %{public}d, rfcommMtu_ = %{public}d, UreadNumber = %{public}d, EnableSrm_ = %{public}d",
-        __PRETTY_FUNCTION__,
-        insDefaultConfig_.maxOfDevice_,
-        insDefaultConfig_.l2capMtu_,
-        insDefaultConfig_.rfcommMtu_,
-        insDefaultConfig_.maxOfGetUnread_,
-        insDefaultConfig_.isSupportSrm_);
+    HILOGI("maxOfDevice = %{public}d, l2capMtu = %{public}d, rfcommMtu = %{public}d, UreadNumber = %{public}d, "
+        "EnableSrm_ = %{public}d", insDefaultConfig_.maxOfDevice, insDefaultConfig_.l2capMtu,
+        insDefaultConfig_.rfcommMtu, insDefaultConfig_.maxOfGetUnread, insDefaultConfig_.isSupportSrm);
 }
 
 REGISTER_CLASS_CREATOR(MapMceService);

@@ -356,7 +356,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>CtConnecting</b> instance.
              */
-            ~CtConnecting(void) = default;
+            ~CtConnecting(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -400,7 +400,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>CtConnected</b> instance.
              */
-            ~CtConnected(void) = default;
+            ~CtConnected(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -444,7 +444,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>CtDisconnecting</b> instance.
              */
-            ~CtDisconnecting(void) = default;
+            ~CtDisconnecting(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -488,7 +488,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>CtContinuation</b> instance.
              */
-            ~CtContinuation(void) = default;
+            ~CtContinuation(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -532,7 +532,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>CtDisable</b> instance.
              */
-            ~CtDisable(void) = default;
+            ~CtDisable(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -576,7 +576,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>CtPending</b> instance.
              */
-            ~CtPending(void) = default;
+            ~CtPending(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -619,7 +619,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>BrConnecting</b> instance.
              */
-            ~BrConnecting(void) = default;
+            ~BrConnecting(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -663,7 +663,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>BrConnected</b> instance.
              */
-            ~BrConnected(void) = default;
+            ~BrConnected(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -707,7 +707,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>BrDisconnecting</b> instance.
              */
-            ~BrDisconnecting(void) = default;
+            ~BrDisconnecting(void) override = default;
 
             /**
              * @brief Enters the state.
@@ -751,7 +751,7 @@ private:
             /**
              * @brief A destructor used to delete the <b>BrPending</b> instance.
              */
-            ~BrPending(void) = default;
+            ~BrPending(void) override = default;
 
             /**
              * @brief Enters the state.

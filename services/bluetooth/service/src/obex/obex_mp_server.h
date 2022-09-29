@@ -24,7 +24,7 @@ class ObexPrivateMpServer : public ObexPrivateServer {
 public:
     explicit ObexPrivateMpServer(
         const ObexPrivateServerConfig &config, ObexServerObserver &observer, utility::Dispatcher &dispatcher);
-    virtual ~ObexPrivateMpServer() = default;
+    ~ObexPrivateMpServer() override = default;
 
     void HandleTransportDataBusy(ObexServerSession &session, uint8_t isBusy) override;
     void HandlePutRequest(ObexServerSession &session, ObexHeader &req) const override;
@@ -40,7 +40,7 @@ public:
     ObexMpServer(const std::string &serviceName, const ObexServerConfig &config, ObexServerObserver &observer,
         utility::Dispatcher &dispatcher);
     // destroy obex server
-    virtual ~ObexMpServer() = default;
+    ~ObexMpServer() override = default;
 };
 }  // namespace bluetooth
 }  // namespace OHOS

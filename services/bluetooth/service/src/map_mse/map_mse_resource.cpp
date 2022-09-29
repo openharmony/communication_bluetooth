@@ -606,7 +606,7 @@ std::vector<std::unique_ptr<MseMessageElement>> MapMseResource::GetMessageListCo
         messageEle->replytoAddressing_ = dataResult->GetString(index++);
         messageEle->recipientName_ = dataResult->GetString(index++);
         messageEle->recipientAddressing_ = dataResult->GetString(index++);
-        messageEle->type_ = MessageType(dataResult->GetInt(index++));
+        messageEle->type = MessageType(dataResult->GetInt(index++));
         messageEle->size_ = dataResult->GetInt(index++);
         messageEle->text_ = (dataResult->GetInt(index++) == 1) ? "yes" : "no";
         messageEle->receptionStatus_ = dataResult->GetString(index++);
@@ -653,9 +653,9 @@ void MapMseResource::AddVer10Node(xmlNodePtr &node, MseMessageElement &msg, uint
         xmlNewProp(node, BAD_CAST "recipient_name", BAD_CAST msg.recipientName_.c_str());
     if (CheckParameterMask(RECIPIENT_ADDRESSING_MASK, msg.recipientAddressing_, paraMask, true))
         xmlNewProp(node, BAD_CAST "recipient_addressing", BAD_CAST msg.recipientAddressing_.c_str());
-    if (static_cast<int>(msg.type_) > 0) {
-        if (CheckParameterMask(TYPE_MASK, std::to_string(static_cast<int>(msg.type_)), paraMask, true))
-            xmlNewProp(node, BAD_CAST "type", BAD_CAST ChangeType(msg.type_).c_str());
+    if (static_cast<int>(msg.type) > 0) {
+        if (CheckParameterMask(TYPE_MASK, std::to_string(static_cast<int>(msg.type)), paraMask, true))
+            xmlNewProp(node, BAD_CAST "type", BAD_CAST ChangeType(msg.type).c_str());
     }
     if (CheckParameterMask(SIZE_MASK, std::to_string(msg.size_), paraMask, true))
         xmlNewProp(node, BAD_CAST "size", BAD_CAST std::to_string(msg.size_).c_str());

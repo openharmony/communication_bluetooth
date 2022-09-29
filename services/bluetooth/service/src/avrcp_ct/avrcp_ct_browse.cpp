@@ -190,7 +190,7 @@ AvrcCtCpPacket::AvrcCtCpPacket(uint16_t uidCounter, uint8_t direction, uint64_t 
     : AvrcCtBrowsePacket(), direction_(direction), status_(AVRC_ES_CODE_INVALID)
 {
     HILOGI("uidCounter: %{public}d, direction: %{public}d, folderUid: %{public}llu",
-        uidCounter, direction, (unsigned long long)folderUid);
+        uidCounter, direction, static_cast<unsigned long long>(folderUid));
 
     pduId_ = AVRC_CT_PDU_ID_CHANGE_PATH;
     parameterLength_ = AVRC_CT_CP_FIXED_CMD_PARAMETER_LENGTH;
@@ -634,7 +634,8 @@ AvrcCtGiaPacket::AvrcCtGiaPacket(
     uint8_t scope, uint64_t uid, uint16_t uidCounter, const std::vector<uint32_t> &attributes)
     : AvrcCtBrowsePacket(), scope_(scope), status_(AVRC_ES_CODE_INVALID)
 {
-    HILOGI("scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d", scope, (unsigned long long)uid, uidCounter);
+    HILOGI("scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d",
+        scope, static_cast<unsigned long long>(uid), uidCounter);
 
     pduId_ = AVRC_CT_PDU_ID_GET_ITEM_ATTRIBUTES;
     scope_ = scope;

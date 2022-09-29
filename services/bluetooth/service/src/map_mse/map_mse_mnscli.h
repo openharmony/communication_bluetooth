@@ -125,7 +125,7 @@ private:
          * @brief A destructor used to delete the Mns Client Observer object.
          *
          */
-        virtual ~MseClientObserver() = default;
+        ~MseClientObserver() override = default;
 
     private:
         /**
