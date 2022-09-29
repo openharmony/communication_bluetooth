@@ -415,7 +415,7 @@ ohos_shared_library("btservice") {
       "ability_runtime:wantagent_innerkits",
       "input:libmmi-client",
       "multimedia_av_session:avsession_client",
-      "multimedia_image_standard:image_native",
+      "multimedia_image_framework:image_native",
     ]
   }
 
