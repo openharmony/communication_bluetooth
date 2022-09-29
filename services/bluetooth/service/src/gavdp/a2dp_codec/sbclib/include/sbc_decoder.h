@@ -27,7 +27,7 @@ namespace sbc {
 class Decoder: public IDecoderBase {
 public:
     explicit Decoder();
-    virtual ~Decoder() = default;
+    ~Decoder() override = default;
     ssize_t SBCDecode(const CodecParam& codecParam, const uint8_t* in, size_t iLength,
         uint8_t* out, size_t oLength, size_t* written) override;
 private:

@@ -33,7 +33,7 @@ protected:
     A2dpCodecConfigSbcBase(A2dpCodecIndex codecIndex, A2dpCodecPriority codecPriority, bool isSource)
         : A2dpCodecConfig(codecIndex, codecPriority), isSource_(isSource)
     {}
-    ~A2dpCodecConfigSbcBase() = default;
+    ~A2dpCodecConfigSbcBase() override = default;
     void SetSampleRateUser(uint32_t sampFreq, A2dpSBCCapability &resultCap);
     void SetSampleRateSelectableCapa(uint32_t sampFreq);
     void SetSampleRateCommonCapa(uint32_t sampFreq);
@@ -78,7 +78,7 @@ protected:
 class A2dpCodecConfigSbcSource : public A2dpCodecConfigSbcBase {
 public:
     explicit A2dpCodecConfigSbcSource(A2dpCodecPriority codecPriority);
-    virtual ~A2dpCodecConfigSbcSource() = default;
+    ~A2dpCodecConfigSbcSource() override = default;
     bool Initialize();
     uint64_t EncoderIntervalMs() const;
     int GetEffectiveMtu() const;
@@ -87,7 +87,7 @@ public:
 class A2dpCodecConfigSbcSink : public A2dpCodecConfigSbcBase {
 public:
     explicit A2dpCodecConfigSbcSink(A2dpCodecPriority codecPriority);
-    virtual ~A2dpCodecConfigSbcSink() = default;
+    ~A2dpCodecConfigSbcSink() override = default;
 
     bool Init();
     uint64_t EncoderIntervalMs() const;

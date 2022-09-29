@@ -38,7 +38,7 @@ public:
      * @brief destructor
      * @details destructor
      */
-    virtual ~PceDisconnectingState() = default;
+    ~PceDisconnectingState() override = default;
 
     /**
      * @brief entry

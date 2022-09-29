@@ -44,8 +44,8 @@ struct ClientSocketWrapper {
 using SppServerIterator = std::map<int, std::shared_ptr<ServerSocketWrapper>>::iterator;
 using SppClientIterator = std::map<int, std::shared_ptr<ClientSocketWrapper>>::iterator;
 
-static int g_ServerIncrease = 1;
-static int g_ClientIncrease = 1;
+static int g_serverIncrease = 1;
+static int g_clientIncrease = 1;
 static std::map<int, std::shared_ptr<ServerSocketWrapper>> g_SppServerMap;
 static std::map<int, std::shared_ptr<ClientSocketWrapper>> g_SppClientMap;
 
@@ -87,7 +87,7 @@ int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned i
     HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
     std::shared_ptr<ServerSocketWrapper> ServerWrap = std::make_shared<ServerSocketWrapper>();
         ServerWrap->serverSocket = server;
-    int serverId = g_ServerIncrease++;
+    int serverId = g_serverIncrease++;
     SPP_SERVER_MAP.insert(std::make_pair(serverId, ServerWrap));
     HILOGI("success, serverId: %{public}d", serverId);
     return serverId;
@@ -126,7 +126,7 @@ int SppServerAccept(int serverId)
 
     std::shared_ptr<ClientSocketWrapper> clientWrap = std::make_shared<ClientSocketWrapper>();
     clientWrap->clientSocket = client;
-    int clientId = g_ClientIncrease++;
+    int clientId = g_clientIncrease++;
     SPP_CLIENT_MAP.insert(std::make_pair(clientId, clientWrap));
     HILOGI("success, clientId: %{public}d", clientId);
     return clientId;
@@ -184,7 +184,7 @@ int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
     if (result == OHOS_BT_STATUS_SUCCESS) {
         std::shared_ptr<ClientSocketWrapper> clientWrap =  std::make_shared<ClientSocketWrapper>();
         clientWrap->clientSocket = client;
-        int clientId = g_ClientIncrease++;
+        int clientId = g_clientIncrease++;
         SPP_CLIENT_MAP.insert(std::make_pair(clientId, clientWrap));
         HILOGI("success, clientId: %{public}d", clientId);
         return clientId;

@@ -101,7 +101,7 @@ private:
         /**
          * @brief Destroy the Mce Mns Obex Server Observer object
          */
-        virtual ~MceMnsObexServerObserver();
+        ~MceMnsObexServerObserver() override;
 
     private:
         void OnTransportConnect(ObexIncomingConnect &incomingConnect) override;

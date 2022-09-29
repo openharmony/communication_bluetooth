@@ -126,8 +126,8 @@ void HfpHfCommandProcessor::ProcessOK(HfpHfDataConnection &dataConn, const std::
 
 void HfpHfCommandProcessor::ProcessCmeError(HfpHfDataConnection &dataConn, const std::string &arg)
 {
-    const std::regex base_regex("[^\\d]");
-    if (!std::regex_search(arg, base_regex)) {
+    const std::regex baseRegex("[^\\d]");
+    if (!std::regex_search(arg, baseRegex)) {
         int errorCode = StoiTryCatch(arg);
         if (errorCode != INVALID_CME_ERROR_CODE) {
             ProcessErrorCode(dataConn, errorCode);
@@ -816,11 +816,11 @@ void HfpHfCommandProcessor::SendAtCommand(
     if (currentCommand_ == AT_COMMAND_NONE || !dataConn.slcConnected_) {
         LOG_DEBUG("[HFP HF]%{public}s(): commandId[%{public}d], command[%{public}s]", __FUNCTION__, commandId, command.c_str());
         currentCommand_ = commandId;
-        std::size_t CmdLength = fullCommand.length();
-        Packet *packet = PacketMalloc(0, 0, CmdLength);
+        std::size_t cmdLength = fullCommand.length();
+        Packet *packet = PacketMalloc(0, 0, cmdLength);
         Buffer *buf = PacketContinuousPayload(packet);
         void *data = BufferPtr(buf);
-        if (memcpy_s(data, CmdLength, fullCommand.c_str(), CmdLength) != EOK) {
+        if (memcpy_s(data, cmdLength, fullCommand.c_str(), cmdLength) != EOK) {
             LOG_DEBUG("[HFP HF]%{public}s(): memcpy_s fail", __FUNCTION__);
             return;
         }

@@ -146,7 +146,7 @@ private:
 
 class A2dpCodecDecoderObserver : public A2dpDecoderObserver {
 public:
-    ~A2dpCodecDecoderObserver() = default;
+    ~A2dpCodecDecoderObserver() override = default;
     void DataAvailable(uint8_t *buf, uint32_t size) override;
 };
 

@@ -75,14 +75,14 @@ int MapMceMnsServer::StartUp(void)
     ObexServerConfig obexSrvConfig;
     obexSrvConfig.useRfcomm_ = true;
     obexSrvConfig.rfcommScn_ = rfcommNo_;
-    obexSrvConfig.rfcommMtu_ = mnsConfig_.rfcommMtu_;
+    obexSrvConfig.rfcommMtu_ = mnsConfig_.rfcommMtu;
 #ifdef MCE_DISABLE_L2CAP
     obexSrvConfig.useL2cap_ = false;
 #else
     obexSrvConfig.useL2cap_ = true;
 #endif
     obexSrvConfig.l2capPsm_ = goepL2capPsm_;
-    obexSrvConfig.l2capMtu_ = mnsConfig_.l2capMtu_;
+    obexSrvConfig.l2capMtu_ = mnsConfig_.l2capMtu;
     obexSrvConfig.isSupportSrm_ = true;
     obexSrvConfig.isSupportReliableSession_ = false;
     mceMnsObexObserver_ = std::make_unique<MceMnsObexServerObserver>(*this);

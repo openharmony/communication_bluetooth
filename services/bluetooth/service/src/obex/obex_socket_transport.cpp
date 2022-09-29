@@ -574,7 +574,8 @@ void ObexServerSocketTransport::TransportObserver::ProcessOnConnected(
     int i = 0;
     for (auto &it : mainTran_.subTranMap_) {
         std::string addr = it.second->GetRemoteAddress().GetAddress();
-        OBEX_LOG_DEBUG("[%{public}s] subStransport[%{public}d],addr=[%{public}s]", mainTran_.tranKey_.c_str(), i, addr.c_str());
+        HILOGI("%{public}s subStransport: %{public}d, addr: %{public}s",
+            mainTran_.tranKey_.c_str(), i, GetEncryptAddr(addr).c_str());
         i++;
     }
     std::string strAddr = transport->GetRemoteAddress().GetAddress();
@@ -597,7 +598,7 @@ void ObexServerSocketTransport::TransportObserver::ProcessOnDisconnected(DataTra
     uint32_t i = 0;
     for (auto &it : mainTran_.subTranMap_) {
         std::string addr = it.second->GetRemoteAddress().GetAddress();
-        OBEX_LOG_DEBUG("[%{public}s] subStransport[%{public}d] address[%{public}s]", tranKey.c_str(), i, addr.c_str());
+        HILOGI("%{public}s subStransport: %{public}d address: %{public}s", tranKey.c_str(), i, GetEncryptAddr(addr).c_str());
         i++;
     }
     if (mainTran_.subTranMap_.find(transport) != mainTran_.subTranMap_.end()) {
@@ -624,7 +625,8 @@ void ObexServerSocketTransport::TransportObserver::ProcessOnDataAvailable(DataTr
     uint32_t i = 0;
     for (auto &it : mainTran_.subTranMap_) {
         std::string addr = it.second->GetRemoteAddress().GetAddress();
-        OBEX_LOG_DEBUG("[%{public}s] subStransport[%{public}d], addr=[%{public}s]", mainTran_.tranKey_.c_str(), i, addr.c_str());
+        HILOGI("%{public}s subStransport: %{public}d, addr: %{public}s",
+            mainTran_.tranKey_.c_str(), i, GetEncryptAddr(addr).c_str());
         i++;
     }
     if (mainTran_.subTranMap_.find(transport) != mainTran_.subTranMap_.end()) {

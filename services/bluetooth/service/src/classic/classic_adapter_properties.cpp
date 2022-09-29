@@ -22,6 +22,7 @@
 #include "classic_defs.h"
 #include "classic_utils.h"
 #include "gap_if.h"
+#include "log_util.h"
 #include "raw_address.h"
 #include "securec.h"
 
@@ -471,7 +472,7 @@ std::shared_ptr<ClassicRemoteDevice> ClassicAdapterProperties::GetPairedDevice(s
 
 void ClassicAdapterProperties::SavePairedDeviceInfo(std::shared_ptr<ClassicRemoteDevice> remote)
 {
-    LOG_DEBUG("ClassicAdapterProperties::%{public}s, addr: %{public}s", __func__, remote->GetAddress().c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(remote->GetAddress()).c_str());
     std::string addr = remote->GetAddress();
 
     std::string name = remote->GetRemoteName();
@@ -522,11 +523,11 @@ void ClassicAdapterProperties::SavePairedDeviceInfo(std::shared_ptr<ClassicRemot
 
 void ClassicAdapterProperties::RemovePairedDeviceInfo(std::string addr) const
 {
-    LOG_DEBUG("ClassicAdapterProperties::%{public}s, addr: %{public}s", __func__, addr.c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(addr).c_str());
 
     bool ret = config_.RemovePairedDevice(addr);
     if (ret == false) {
-        LOG_WARN("ClassicAdapterProperties::RemovePairedDeviceInfo failed, addr is %{public}s", addr.c_str());
+        HILOGI("failed, addr is %{public}s", GetEncryptAddr(addr).c_str());
     }
 }
 
