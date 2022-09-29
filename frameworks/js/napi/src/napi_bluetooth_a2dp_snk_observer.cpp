@@ -21,18 +21,24 @@ namespace Bluetooth {
 void NapiA2dpSinkObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    if (!callbackInfos_[STR_BT_A2DP_SINK_CONNECTION_STATE_CHANGE]) {
+    std::unique_lock<std::shared_mutex> guard(g_a2dpSinkCallbackInfosMutex);
+
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
+        callbackInfos_.find(STR_BT_A2DP_SINK_CONNECTION_STATE_CHANGE);
+    if (it == callbackInfos_.end() || it->second == nullptr) {
         HILOGW("This callback is not registered by ability.");
         return;
     }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
-        callbackInfos_[STR_BT_A2DP_SINK_CONNECTION_STATE_CHANGE];
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
 
     callbackInfo->state_ = state;
     callbackInfo->deviceId_ = device.GetDeviceAddr();
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     uv_work_t *work = new uv_work_t;
+    uint32_t refCount = INVALID_REF_COUNT;
+    napi_reference_ref(callbackInfo->env_, callbackInfo->callback_, &refCount);
+    HILOGI("increments the reference count, refCount: %{public}d", refCount);
     work->data = (void*)callbackInfo.get();
 
     uv_queue_work(
@@ -49,7 +55,16 @@ void NapiA2dpSinkObserver::OnConnectionStateChanged(const BluetoothRemoteDevice 
             napi_value callResult = nullptr;
             napi_get_undefined(callbackInfo->env_, &undefined);
             napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            if (callback != nullptr) {
+                HILOGI("a2dp snk napi_call_function called");
+                napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            }
+            uint32_t refCount = INVALID_REF_COUNT;
+            napi_reference_unref(callbackInfo->env_, callbackInfo->callback_, &refCount);
+            HILOGI("uv_queue_work unref, refCount: %{public}d", refCount);
+            if (refCount == 0) {
+                napi_delete_reference(callbackInfo->env_, callbackInfo->callback_);
+            }
             delete work;
             work = nullptr;
         }

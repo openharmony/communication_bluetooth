@@ -61,6 +61,8 @@ constexpr int32_t PIN_REQUEST_TYPE = 3;
 constexpr int32_t BOND_STATE_CHANGE_TYPE = 4;
 constexpr int32_t BLE_DEVICE_FIND_TYPE = 5;
 
+constexpr uint32_t INVALID_REF_COUNT = 0xFF;
+
 struct ServerResponse {
     std::string deviceId = "";
     int transId = 0;
