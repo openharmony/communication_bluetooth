@@ -28,6 +28,7 @@
 #include "log.h"
 #include "log_util.h"
 #include "power_manager.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -1032,7 +1033,10 @@ void GattClientService::impl::OnCharacteristicNotifyEvent(
             client.value()->second.callback_.OnServicesChanged(std::vector<Service>());
         } else {
             Characteristic gattCCC(ccc->uuid_, ccc->handle_, ccc->properties_);
-            gattCCC.value_ = std::move(*value);
+            gattCCC.value_ = std::make_unique<uint8_t[]>(length);
+            if (memcpy_s(gattCCC.value_.get(), length, (*value).get(), length) != EOK) {
+                return;
+            }
             gattCCC.length_ = length;
             client.value()->second.callback_.OnCharacteristicChanged(gattCCC);
         }
