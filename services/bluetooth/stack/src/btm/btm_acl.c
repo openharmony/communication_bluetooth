@@ -664,6 +664,7 @@ static int BtmLeExtendedCreateConnection()
 
     HciLeConnectionParamSet *sets = MEM_MALLOC.alloc(sizeof(HciLeConnectionParamSet) * countOfSets);
     if (sets == NULL) {
+        LOG_ERROR("sets is NULL");
         return BT_NO_MEMORY;
     }
     for (uint8_t i = 0; i < countOfSets; i++) {
