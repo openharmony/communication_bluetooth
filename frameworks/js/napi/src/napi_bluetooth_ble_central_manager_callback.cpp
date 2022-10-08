@@ -333,6 +333,7 @@ void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCo
     
     std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE> callbackInfos;
     {
+        std::lock_guard<std::mutex> lock(sysBLEObserverMutex_);
         auto observers = GetSysBLEObserver();
         if (observers.find(REGISTER_SYS_BLE_SCAN_TYPE) == observers.end()) {
             HILOGE("sys BEL callback is not registered by ability.");
