@@ -155,7 +155,6 @@ int BluetoothRemoteDevice::GetPowerMode(void) const
 
 std::string BluetoothRemoteDevice::GetDeviceName() const
 {
-    HILOGI("enter");
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
         return INVALID_NAME;
