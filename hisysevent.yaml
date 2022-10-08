@@ -55,7 +55,7 @@ BLUETOOTH_BLE_SCAN_START:
   __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth scan start message}
   PID: {type: INT32, desc: application pid}
   UID: {type: INT32, desc: application uid}
-  TYPE: {type: INT32, desc: 1 is batch, 0 is not}
+  TYPE: {type: INT32, desc: 1 is batch 0 is not}
 
 BLUETOOTH_BLE_SCAN_STOP:
   __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: bluetooth scan stop message}
