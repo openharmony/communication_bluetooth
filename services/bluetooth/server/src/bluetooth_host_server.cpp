@@ -863,7 +863,6 @@ bool BluetoothHostServer::DisableBle()
 
 bool BluetoothHostServer::IsBleEnabled()
 {
-    HILOGI("Enter!");
     return IAdapterManager::GetInstance()->GetState(BTTransport::ADAPTER_BLE) == BTStateID::STATE_TURN_ON;
 }
 
@@ -1196,7 +1195,6 @@ int32_t BluetoothHostServer::GetPowerMode(const std::string &address)
 
 std::string BluetoothHostServer::GetDeviceName(int32_t transport, const std::string &address)
 {
-    HILOGI("transport: %{public}d, address: %{public}s", transport, GetEncryptAddr(address).c_str());
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("false, check permission failed");
         return INVALID_NAME;
