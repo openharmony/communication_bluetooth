@@ -49,7 +49,7 @@ void AvrcpTgService::ObserverImpl::OnReleaseButton(const std::string &addr, uint
 
 void AvrcpTgService::ObserverImpl::OnSetAddressedPlayer(const std::string &addr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d, status: %{public}d", GetEncryptAddr(addr).c_str(), label, status);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -61,7 +61,8 @@ void AvrcpTgService::ObserverImpl::OnSetAddressedPlayer(const std::string &addr,
 void AvrcpTgService::ObserverImpl::OnSetBrowsedPlayer(const std::string &addr, uint16_t uidCounter, uint32_t numOfItems,
     const std::vector<std::string> &folderNames, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, uidCounter: %{public}d, numOfItems: %{public}u, label: %{public}d, status: %{public}d",
+        GetEncryptAddr(addr).c_str(), uidCounter, numOfItems, label, status);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -73,7 +74,7 @@ void AvrcpTgService::ObserverImpl::OnSetBrowsedPlayer(const std::string &addr, u
 void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingAttributes(
     const std::string &addr, const std::deque<uint8_t> &attributes, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d", GetEncryptAddr(addr).c_str(), label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -85,7 +86,7 @@ void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingAttributes(
 void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingValues(
     const std::string &addr, const std::deque<uint8_t> &values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d", GetEncryptAddr(addr).c_str(), label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -97,7 +98,7 @@ void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingValues(
 void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingCurrentValue(const std::string &addr,
     const std::deque<uint8_t> &attributes, const std::deque<uint8_t> &values, uint8_t label, uint8_t context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d, context: %{public}d", GetEncryptAddr(addr).c_str(), label, context);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -108,7 +109,7 @@ void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingCurrentValue(const std::
 
 void AvrcpTgService::ObserverImpl::OnSetPlayerAppSettingCurrentValue(const std::string &addr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d", GetEncryptAddr(addr).c_str(), label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -120,7 +121,7 @@ void AvrcpTgService::ObserverImpl::OnSetPlayerAppSettingCurrentValue(const std::
 void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingAttributeText(const std::string &addr,
     const std::vector<uint8_t> &attributes, const std::vector<std::string> &attrStr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d", GetEncryptAddr(addr).c_str(), label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -132,7 +133,7 @@ void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingAttributeText(const std:
 void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingValueText(const std::string &addr,
     const std::vector<uint8_t> &values, const std::vector<std::string> &valueStr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d", GetEncryptAddr(addr).c_str(), label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -144,7 +145,7 @@ void AvrcpTgService::ObserverImpl::OnGetPlayerAppSettingValueText(const std::str
 void AvrcpTgService::ObserverImpl::OnGetElementAttributes(const std::string &addr,
     const std::vector<uint32_t> &attribtues, const std::vector<std::string> &values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d", GetEncryptAddr(addr).c_str(), label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -156,8 +157,8 @@ void AvrcpTgService::ObserverImpl::OnGetElementAttributes(const std::string &add
 void AvrcpTgService::ObserverImpl::OnGetPlayStatus(const std::string &addr, uint32_t songLength, uint32_t songPosition,
     uint8_t playStatus, uint8_t label, uint8_t context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, songLength:%{public}u, songPosition:%{public}u, playStatus:%{public}d, label:%{public}d,"
+        " context:%{public}d", GetEncryptAddr(addr).c_str(), songLength, songPosition, playStatus, label, context);
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
         RawAddress rawAddr(addr);
@@ -167,7 +168,7 @@ void AvrcpTgService::ObserverImpl::OnGetPlayStatus(const std::string &addr, uint
 
 void AvrcpTgService::ObserverImpl::OnPlayItem(const std::string &addr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d, status: %{public}d", GetEncryptAddr(addr).c_str(), label, status);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -177,7 +178,7 @@ void AvrcpTgService::ObserverImpl::OnPlayItem(const std::string &addr, uint8_t l
 }
 void AvrcpTgService::ObserverImpl::OnAddToNowPlaying(const std::string &addr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, label: %{public}d, status: %{public}d", GetEncryptAddr(addr).c_str(), label, status);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -188,7 +189,8 @@ void AvrcpTgService::ObserverImpl::OnAddToNowPlaying(const std::string &addr, ui
 
 void AvrcpTgService::ObserverImpl::OnChangePath(const std::string &addr, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, numOfItems: %{public}u, label: %{public}d, status: %{public}d",
+        GetEncryptAddr(addr).c_str(), numOfItems, label, status);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -200,8 +202,8 @@ void AvrcpTgService::ObserverImpl::OnChangePath(const std::string &addr, uint32_
 void AvrcpTgService::ObserverImpl::OnGetMediaPlayers(const std::string &addr, uint16_t uidCounter,
     const std::vector<stub::MediaService::MediaPlayer> &items, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-
+    HILOGI("addr: %{public}s, uidCounter: %{public}d, label: %{public}d, status: %{public}d",
+        GetEncryptAddr(addr).c_str(), uidCounter, label, status);
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
         RawAddress rawAddr(addr);
@@ -224,8 +226,8 @@ void AvrcpTgService::ObserverImpl::OnGetMediaPlayers(const std::string &addr, ui
 void AvrcpTgService::ObserverImpl::OnGetFolderItems(const std::string &addr, uint16_t uidCounter,
     const std::vector<stub::MediaService::MediaItem> &items, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-
+    HILOGI("addr: %{public}s, uidCounter: %{public}d, label: %{public}d, status: %{public}d",
+        GetEncryptAddr(addr).c_str(), uidCounter, label, status);
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
         RawAddress rawAddr(addr);
@@ -243,8 +245,7 @@ void AvrcpTgService::ObserverImpl::OnGetFolderItems(const std::string &addr, uin
 void AvrcpTgService::ObserverImpl::OnGetItemAttributes(const std::string &addr, const std::vector<uint32_t> &attributes,
     const std::vector<std::string> &values, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-
+    HILOGI("addr: %{public}s, label: %{public}d, status: %{public}d", GetEncryptAddr(addr).c_str(), label, status);
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
         RawAddress rawAddr(addr);
@@ -255,7 +256,8 @@ void AvrcpTgService::ObserverImpl::OnGetItemAttributes(const std::string &addr, 
 void AvrcpTgService::ObserverImpl::OnGetTotalNumberOfItems(
     const std::string &addr, uint16_t uidCounter, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, uidCounter: %{public}d, numOfItems: %{public}u, label: %{public}d, status: %{public}d",
+        GetEncryptAddr(addr).c_str(), uidCounter, numOfItems, label, status);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -266,7 +268,7 @@ void AvrcpTgService::ObserverImpl::OnGetTotalNumberOfItems(
 
 void AvrcpTgService::ObserverImpl::OnSetAbsoluteVolume(const std::string &addr, uint8_t volume, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, volume: %{public}d, label: %{public}d", GetEncryptAddr(addr).c_str(), volume, label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -277,7 +279,8 @@ void AvrcpTgService::ObserverImpl::OnSetAbsoluteVolume(const std::string &addr, 
 
 void AvrcpTgService::ObserverImpl::OnGetSelectedTrack(const std::string &addr, uint64_t uid, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, uid: %{public}llu, label: %{public}d",
+        GetEncryptAddr(addr).c_str(), static_cast<unsigned long long>(uid), label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -289,7 +292,8 @@ void AvrcpTgService::ObserverImpl::OnGetSelectedTrack(const std::string &addr, u
 void AvrcpTgService::ObserverImpl::OnGetAddressedPlayer(
     const std::string &addr, uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("addr: %{public}s, playerId: %{public}d, uidCounter: %{public}d, label: %{public}d",
+        GetEncryptAddr(addr).c_str(), playerId, uidCounter, label);
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -300,8 +304,8 @@ void AvrcpTgService::ObserverImpl::OnGetAddressedPlayer(
 
 void AvrcpTgService::ObserverImpl::OnGetUidCounter(const std::string &addr, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-
+    HILOGI("addr: %{public}s, uidCounter: %{public}d, label: %{public}d",
+        GetEncryptAddr(addr).c_str(), uidCounter, label);
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
         RawAddress rawAddr(addr);
@@ -311,8 +315,7 @@ void AvrcpTgService::ObserverImpl::OnGetUidCounter(const std::string &addr, uint
 
 void AvrcpTgService::ObserverImpl::OnGetCurrentAbsoluteVolume(const std::string &addr, uint8_t volume, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-
+    HILOGI("addr: %{public}s, volume: %{public}d, label: %{public}d", GetEncryptAddr(addr).c_str(), volume, label);
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
         RawAddress rawAddr(addr);
@@ -322,7 +325,7 @@ void AvrcpTgService::ObserverImpl::OnGetCurrentAbsoluteVolume(const std::string 
 
 IProfileAvrcpTg *AvrcpTgService::ObserverImpl::GetService(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 
     auto svManager = IProfileManager::GetInstance();
 
@@ -331,7 +334,7 @@ IProfileAvrcpTg *AvrcpTgService::ObserverImpl::GetService(void)
 #ifdef AVRCP_AVSESSION
 void AvrcpTgService::AVSessionObserverImpl::OnSessionCreate(const OHOS::AVSession::AVSessionDescriptor& descriptor)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -341,7 +344,7 @@ void AvrcpTgService::AVSessionObserverImpl::OnSessionCreate(const OHOS::AVSessio
 
 void AvrcpTgService::AVSessionObserverImpl::OnSessionRelease(const OHOS::AVSession::AVSessionDescriptor& descriptor)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -351,8 +354,7 @@ void AvrcpTgService::AVSessionObserverImpl::OnSessionRelease(const OHOS::AVSessi
 
 void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChange(const OHOS::AVSession::AVSessionDescriptor& descriptor)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s, sessionId:%{public}s",
-        __func__, descriptor.sessionId_.c_str());
+    HILOGI("sessionId:%{public}s", descriptor.sessionId_.c_str());
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -362,7 +364,7 @@ void AvrcpTgService::AVSessionObserverImpl::OnTopSessionChange(const OHOS::AVSes
 
 IProfileAvrcpTg *AvrcpTgService::AVSessionObserverImpl::GetService(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVSessionObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 
     auto svManager = IProfileManager::GetInstance();
 
@@ -371,13 +373,12 @@ IProfileAvrcpTg *AvrcpTgService::AVSessionObserverImpl::GetService(void)
 
 void AvrcpTgService::AVControllerObserverImpl::OnSessionDestroy()
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcpTgService::AVControllerObserverImpl::OnPlaybackStateChange(const OHOS::AVSession::AVPlaybackState &state)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s, state:%{public}d",
-        __func__, state.GetState());
+    HILOGI("state:%{public}d", state.GetState());
 
     IProfileAvrcpTg *service = GetService();
     if (service != nullptr) {
@@ -387,22 +388,22 @@ void AvrcpTgService::AVControllerObserverImpl::OnPlaybackStateChange(const OHOS:
 
 void AvrcpTgService::AVControllerObserverImpl::OnMetaDataChange(const OHOS::AVSession::AVMetaData &data)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 void AvrcpTgService::AVControllerObserverImpl::OnActiveStateChange(bool isActive)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+    HILOGI("isActive:%{public}d", isActive);
 }
 
 void AvrcpTgService::AVControllerObserverImpl::OnValidCommandChange(const std::vector<int32_t> &cmds)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 IProfileAvrcpTg *AvrcpTgService::AVControllerObserverImpl::GetService(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::AVControllerObserverImpl::%{public}s", __func__);
+    HILOGI("enter");
 
     auto svManager = IProfileManager::GetInstance();
 
@@ -411,7 +412,7 @@ IProfileAvrcpTg *AvrcpTgService::AVControllerObserverImpl::GetService(void)
 #endif
 AvrcpTgService::AvrcpTgService() : utility::Context(PROFILE_NAME_AVRCP_TG, "1.6.2")
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     mdObserver_ = std::make_unique<ObserverImpl>();
 #ifdef AVRCP_AVSESSION
@@ -459,21 +460,21 @@ AvrcpTgService::AvrcpTgService() : utility::Context(PROFILE_NAME_AVRCP_TG, "1.6.
 
 AvrcpTgService::~AvrcpTgService()
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     myObserver_ = nullptr;
 }
 
 utility::Context *AvrcpTgService::GetContext()
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     return this;
 }
 
 void AvrcpTgService::InitFeatures()
 {
-    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     features_ |= AVRC_TG_FEATURE_CATEGORY_1;
     features_ |= AVRC_TG_FEATURE_CATEGORY_2;
@@ -498,7 +499,7 @@ void AvrcpTgService::InitFeatures()
 
 void AvrcpTgService::RegisterObserver(IObserver *observer)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -507,7 +508,7 @@ void AvrcpTgService::RegisterObserver(IObserver *observer)
 
 void AvrcpTgService::UnregisterObserver(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
@@ -520,20 +521,20 @@ void AvrcpTgService::UnregisterObserver(void)
 
 void AvrcpTgService::Enable(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     if (IsDisabled()) {
         SetServiceState(AVRC_TG_SERVICE_STATE_ENABLING);
 
         GetDispatcher()->PostTask(std::bind(&AvrcpTgService::EnableNative, this));
     } else {
-        LOG_ERROR("[AVRCP TG] Is not disabled!");
+        HILOGE("Is not disabled!");
     }
 }
 
 void AvrcpTgService::Disable(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     if (IsEnabled()) {
         SetServiceState(AVRC_TG_SERVICE_STATE_DISABLING);
@@ -542,13 +543,13 @@ void AvrcpTgService::Disable(void)
         }
         GetDispatcher()->PostTask(std::bind(&AvrcpTgService::DisableNative, this));
     } else {
-        LOG_ERROR("[AVRCP TG] Is not enable!");
+        HILOGE("Is not enable!");
     }
 }
 
 void AvrcpTgService::EnableNative(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = RET_NO_ERROR;
 
@@ -587,7 +588,7 @@ void AvrcpTgService::EnableNative(void)
 
 void AvrcpTgService::DisableNative(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     if (DisableProfile() != RET_NO_ERROR) {
         OnProfileDisabled(RET_BAD_STATUS);
@@ -600,33 +601,33 @@ void AvrcpTgService::RegisterAvSessionControl(void)
     // register avSession observer
     auto res = OHOS::AVSession::AVSessionManager::GetInstance().RegisterSessionListener(avSessionObserver_);
     if (res != OHOS::AVSession::AVSESSION_SUCCESS) {
-        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, RegisterSessionListener fail", __func__);
+        HILOGE("RegisterSessionListener fail");
         return;
     }
 
     res = OHOS::AVSession::AVSessionManager::GetInstance().GetAllSessionDescriptors(avSessionDescriptor_);
     if (res != OHOS::AVSession::AVSESSION_SUCCESS) {
-        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, GetAllSessionDescriptors fail", __func__);
+        HILOGE("GetAllSessionDescriptors fail");
         return;
     }
 
     // parse top descriptor
     std::string sessionId;
     for (auto descriptor : avSessionDescriptor_) {
-        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, isTopSession:%{public}d", __func__, descriptor.isTopSession_);
+        HILOGI("isTopSession:%{public}d", descriptor.isTopSession_);
         if (descriptor.isTopSession_) {
             sessionId = descriptor.sessionId_;
         }
     }
 
     if (sessionId.empty()) {
-        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, no valid avsession", __func__);
+        HILOGI("no valid avsession");
     } else {
         res = OHOS::AVSession::AVSessionManager::GetInstance().CreateController(sessionId, avSessionController_);
         if (res == OHOS::AVSession::AVSESSION_SUCCESS && avSessionController_ != NULL) {
             avSessionController_->RegisterCallback(avControllerObserver_);
         } else {
-            LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
+            HILOGE("avSessionController_ is NULL");
         }
     }
 }
@@ -634,7 +635,7 @@ void AvrcpTgService::RegisterAvSessionControl(void)
 
 int AvrcpTgService::RegisterSecurity(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     gapManager_ = std::make_unique<AvrcTgGapManager>();
 
@@ -643,7 +644,7 @@ int AvrcpTgService::RegisterSecurity(void)
 
 int AvrcpTgService::UnregisterSecurity(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = gapManager_->UnregisterSecurity();
     gapManager_ = nullptr;
@@ -653,7 +654,7 @@ int AvrcpTgService::UnregisterSecurity(void)
 
 int AvrcpTgService::RegisterService(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     sdpManager_ = std::make_unique<AvrcTgSdpManager>(features_ & AVRC_TG_SDP_ALL_SUPPORTED_FEATURES);
 
@@ -662,7 +663,7 @@ int AvrcpTgService::RegisterService(void)
 
 int AvrcpTgService::UnregisterService(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = sdpManager_->UnregisterService();
     sdpManager_ = nullptr;
@@ -672,7 +673,7 @@ int AvrcpTgService::UnregisterService(void)
 
 int AvrcpTgService::EnableProfile(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     /// Gets the size of the MTU.
     int controlMtu = AVRC_TG_DEFAULT_CONTROL_MTU_SIZE;
@@ -696,14 +697,14 @@ int AvrcpTgService::EnableProfile(void)
 
 int AvrcpTgService::DisableProfile(void) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     return profile_->Disable();
 }
 
 void AvrcpTgService::OnProfileDisabled(int result)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("result:%{public}d", result);
 
     SetServiceState(AVRC_TG_SERVICE_STATE_DISABLED);
 
@@ -720,7 +721,7 @@ void AvrcpTgService::OnProfileDisabled(int result)
 bool AvrcpTgService::IsEnabled(void)
 {
     bool enable = (state_ == AVRC_TG_SERVICE_STATE_ENABLED);
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, enable:%{public}d", __func__, enable);
+    HILOGI("enable:%{public}d", enable);
 
     return enable;
 }
@@ -728,14 +729,14 @@ bool AvrcpTgService::IsEnabled(void)
 bool AvrcpTgService::IsDisabled(void)
 {
     bool disable = (state_ == AVRC_TG_SERVICE_STATE_DISABLED);
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, disable:%{public}d", __func__, disable);
+    HILOGI("disable:%{public}d", disable);
 
     return disable;
 }
 
 void AvrcpTgService::SetServiceState(uint8_t state)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("state:%{public}d", state);
 
     state_ = state;
 }
@@ -746,7 +747,7 @@ void AvrcpTgService::SetServiceState(uint8_t state)
 
 void AvrcpTgService::SetActiveDevice(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     if (IsEnabled()) {
         profile_->SetActiveDevice(rawAddr);
@@ -756,7 +757,7 @@ void AvrcpTgService::SetActiveDevice(const RawAddress &rawAddr)
 
 std::vector<RawAddress> AvrcpTgService::GetConnectedDevices(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<RawAddress> result;
 
@@ -769,7 +770,7 @@ std::vector<RawAddress> AvrcpTgService::GetConnectedDevices(void)
 
 std::vector<bluetooth::RawAddress> AvrcpTgService::GetDevicesByStates(const std::vector<int> &states)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<bluetooth::RawAddress> result;
 
@@ -782,7 +783,7 @@ std::vector<bluetooth::RawAddress> AvrcpTgService::GetDevicesByStates(const std:
 
 int AvrcpTgService::GetDeviceState(const RawAddress &rawAddr)
 {
-    HILOGI("[AVRCP TG] rawAddr[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = static_cast<int>(BTConnectState::DISCONNECTED);
 
@@ -790,14 +791,14 @@ int AvrcpTgService::GetDeviceState(const RawAddress &rawAddr)
         result = profile_->GetDeviceState(rawAddr);
     }
 
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s: result[%{public}d]", __func__, result);
+    HILOGI("result: %{public}d", result);
 
     return result;
 }
 
 int AvrcpTgService::GetMaxConnectNum(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = 0;
 
@@ -810,7 +811,7 @@ int AvrcpTgService::GetMaxConnectNum(void)
 
 int AvrcpTgService::Connect(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -837,14 +838,14 @@ int AvrcpTgService::Connect(const RawAddress &rawAddr)
 
 void AvrcpTgService::ConnectNative(RawAddress rawAddr)
 {
-    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AcceptActiveConnect(rawAddr);
 }
 
 int AvrcpTgService::Disconnect(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -867,7 +868,7 @@ int AvrcpTgService::Disconnect(const RawAddress &rawAddr)
 
 void AvrcpTgService::DisconnectNative(RawAddress rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -879,15 +880,14 @@ void AvrcpTgService::DisconnectNative(RawAddress rawAddr)
         }
 
         if (profile_->Disconnect(rawAddr) != RET_NO_ERROR) {
-            HILOGI(
-                "[AVRCP TG] Call AvrcTgProfile::Disconnect Failed Address%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Call AvrcTgProfile::Disconnect Failed Address%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }
 
 int AvrcpTgService::GetConnectState(void)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = PROFILE_STATE_DISCONNECTED;
 
@@ -900,7 +900,7 @@ int AvrcpTgService::GetConnectState(void)
 
 void AvrcpTgService::OnConnectionStateChanged(const RawAddress &rawAddr, int state)
 {
-    HILOGI("[AVRCP TG] Address[%{public}s] - state[%{public}d]", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
+    HILOGI("Address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (myObserver_ != nullptr) {
         myObserver_->OnConnectionStateChanged(rawAddr.GetAddress(), state);
@@ -909,7 +909,7 @@ void AvrcpTgService::OnConnectionStateChanged(const RawAddress &rawAddr, int sta
 
 void AvrcpTgService::AcceptActiveConnect(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpCtService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -921,14 +921,14 @@ void AvrcpTgService::AcceptActiveConnect(const RawAddress &rawAddr)
         }
 
         if (profile_->Connect(rawAddr) != RET_NO_ERROR) {
-            HILOGI("[AVRCP TG] Call Connect Failed! Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Call Connect Failed! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }
 
 void AvrcpTgService::AcceptPassiveConnect(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -941,7 +941,7 @@ void AvrcpTgService::AcceptPassiveConnect(const RawAddress &rawAddr)
 
 void AvrcpTgService::RejectPassiveConnect(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -954,7 +954,7 @@ void AvrcpTgService::RejectPassiveConnect(const RawAddress &rawAddr)
 
 void AvrcpTgService::FindCtService(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     if (sdpManager_->FindCtService(rawAddr, FindCtServiceCallback) != RET_NO_ERROR) {
         RejectPassiveConnect(rawAddr);
@@ -964,7 +964,7 @@ void AvrcpTgService::FindCtService(const RawAddress &rawAddr)
 void AvrcpTgService::FindCtServiceCallback(
     const BtAddr *btAddr, const uint32_t *handleArray, uint16_t handleCount, void *context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("handleCount: %{public}d", handleCount);
 
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpTgService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
@@ -1027,7 +1027,7 @@ static void SetAvControlCommand(uint8_t button, OHOS::AVSession::AVControlComman
 #endif
 void AvrcpTgService::OnButtonPressed(const RawAddress &rawAddr, uint8_t button, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, button:%{public}d", __func__, button);
+    HILOGI("rawAddr:%{public}s, button:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, label);
 #ifndef AVRCP_AVSESSION
     int result = stub::MediaService::GetInstance()->PressButton(rawAddr.GetAddress(), button, label);
     profile_->SendPressButtonRsp(rawAddr, button, label, result);
@@ -1040,7 +1040,7 @@ void AvrcpTgService::OnButtonPressed(const RawAddress &rawAddr, uint8_t button, 
 
 void AvrcpTgService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, button:%{public}d", __func__, button);
+    HILOGI("rawAddr:%{public}s, button:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, label);
 #ifndef AVRCP_AVSESSION
     int result = stub::MediaService::GetInstance()->ReleaseButton(rawAddr.GetAddress(), button, label);
 #else
@@ -1053,7 +1053,7 @@ void AvrcpTgService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button,
 
 void AvrcpTgService::HoldButton(const RawAddress &rawAddr, uint8_t button, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, button:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, label);
 
     int result = stub::MediaService::GetInstance()->PressButton(rawAddr.GetAddress(), button, label);
     profile_->SendPressButtonRsp(rawAddr, button, label, result);
@@ -1066,7 +1066,8 @@ void AvrcpTgService::HoldButton(const RawAddress &rawAddr, uint8_t button, uint8
 void AvrcpTgService::SetAddressedPlayer(
     const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, playerId:%{public}d, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, label);
 
     int result =
         stub::MediaService::GetInstance()->SetAddressedPlayer(rawAddr.GetAddress(), playerId, uidCounter, label);
@@ -1077,8 +1078,7 @@ void AvrcpTgService::SetAddressedPlayer(
 
 void AvrcpTgService::OnSetAddressedPlayer(const RawAddress &rawAddr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("rawAddr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1096,7 +1096,7 @@ void AvrcpTgService::OnSetAddressedPlayer(const RawAddress &rawAddr, uint8_t lab
 
 void AvrcpTgService::OnSetAddressedPlayerNative(RawAddress rawAddr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1114,7 +1114,8 @@ void AvrcpTgService::OnSetAddressedPlayerNative(RawAddress rawAddr, uint8_t labe
 void AvrcpTgService::SetBrowsedPlayer(const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter,
     uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, playerId:%{public}d, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, label);
 
     int result = stub::MediaService::GetInstance()->SetBrowsedPlayer(rawAddr.GetAddress(), playerId, uidCounter, label);
     if (result != RET_NO_ERROR) {
@@ -1126,8 +1127,8 @@ void AvrcpTgService::SetBrowsedPlayer(const RawAddress &rawAddr, uint16_t player
 void AvrcpTgService::OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems,
     const std::vector<std::string> &folderNames, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("rawAddr:%{public}s, uidCounter:%{public}d, numOfItems:%{public}u, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1152,8 +1153,8 @@ void AvrcpTgService::OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidC
 void AvrcpTgService::OnSetBrowsedPlayerNative(RawAddress rawAddr, uint16_t uidCounter, uint32_t numOfItems,
     std::vector<std::string> folderNames, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("rawAddr:%{public}s, uidCounter:%{public}d, numOfItems:%{public}u, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1172,7 +1173,7 @@ void AvrcpTgService::OnSetBrowsedPlayerNative(RawAddress rawAddr, uint16_t uidCo
  ******************************************************************/
 void AvrcpTgService::GetCapabilities(const RawAddress &rawAddr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 #ifndef AVRCP_AVSESSION
     std::vector<uint8_t> events = stub::MediaService::GetInstance()->GetCapabilities(rawAddr.GetAddress(), label);
 #else
@@ -1199,7 +1200,7 @@ void AvrcpTgService::GetCapabilities(const RawAddress &rawAddr, uint8_t label)
 
 void AvrcpTgService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingAttributes(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -1211,7 +1212,7 @@ void AvrcpTgService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr, ui
 void AvrcpTgService::OnGetPlayerAppSettingAttributes(
     const RawAddress &rawAddr, const std::deque<uint8_t> &attributes, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1231,7 +1232,7 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributes(
 void AvrcpTgService::OnGetPlayerAppSettingAttributesNative(
     RawAddress rawAddr, std::deque<uint8_t> attributes, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1248,7 +1249,8 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributesNative(
 
 void AvrcpTgService::GetPlayerAppSettingValues(const RawAddress &rawAddr, uint8_t attribute, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, attribute:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute, label);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingValues(rawAddr.GetAddress(), attribute, label);
     if (result != RET_NO_ERROR) {
@@ -1260,7 +1262,7 @@ void AvrcpTgService::GetPlayerAppSettingValues(const RawAddress &rawAddr, uint8_
 void AvrcpTgService::OnGetPlayerAppSettingValues(
     const RawAddress &rawAddr, const std::deque<uint8_t> &values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1279,7 +1281,7 @@ void AvrcpTgService::OnGetPlayerAppSettingValues(
 
 void AvrcpTgService::OnGetPlayerAppSettingValuesNative(RawAddress rawAddr, std::deque<uint8_t> values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("rawAddr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1297,7 +1299,7 @@ void AvrcpTgService::OnGetPlayerAppSettingValuesNative(RawAddress rawAddr, std::
 void AvrcpTgService::GetPlayerAppSettingCurrentValue(
     const RawAddress &rawAddr, const std::deque<uint8_t> &attributes, uint8_t label, uint8_t context) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, context:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, context);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingCurrentValue(
         rawAddr.GetAddress(), attributes, label, context);
@@ -1315,7 +1317,7 @@ void AvrcpTgService::GetPlayerAppSettingCurrentValue(
 void AvrcpTgService::OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::deque<uint8_t> &attributes,
     const std::deque<uint8_t> &values, uint8_t label, uint8_t context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, context:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, context);
 
     do {
         if (!IsEnabled()) {
@@ -1340,7 +1342,7 @@ void AvrcpTgService::OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr
 void AvrcpTgService::OnGetCurrentPlayerAppSettingValueNative(
     RawAddress rawAddr, std::deque<uint8_t> attributes, std::deque<uint8_t> values, uint8_t label, uint8_t context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, context:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, context);
 
     do {
         if (!IsEnabled()) {
@@ -1363,7 +1365,7 @@ void AvrcpTgService::SetPlayerAppSettingCurrentValue(
     const RawAddress &rawAddr, const std::deque<uint8_t> &attributes,
     const std::deque<uint8_t> &values, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     int result = stub::MediaService::GetInstance()->SetPlayerAppSettingCurrentValue(
         rawAddr.GetAddress(), attributes, values, label);
@@ -1374,7 +1376,7 @@ void AvrcpTgService::SetPlayerAppSettingCurrentValue(
 
 void AvrcpTgService::OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1393,7 +1395,7 @@ void AvrcpTgService::OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr
 
 void AvrcpTgService::OnSetPlayerAppSettingCurrentValueNative(RawAddress rawAddr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1411,7 +1413,7 @@ void AvrcpTgService::OnSetPlayerAppSettingCurrentValueNative(RawAddress rawAddr,
 void AvrcpTgService::GetPlayerAppSettingAttributeText(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     int result =
         stub::MediaService::GetInstance()->GetPlayerAppSettingAttributeText(rawAddr.GetAddress(), attributes, label);
@@ -1423,7 +1425,7 @@ void AvrcpTgService::GetPlayerAppSettingAttributeText(
 void AvrcpTgService::OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr,
     const std::vector<uint8_t> &attributes, const std::vector<std::string> &attrStr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1443,7 +1445,7 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributeText(const RawAddress &rawAdd
 void AvrcpTgService::OnGetPlayerAppSettingAttributeTextNative(
     RawAddress rawAddr, std::vector<uint8_t> attributes, std::vector<std::string> attrStr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1461,7 +1463,8 @@ void AvrcpTgService::OnGetPlayerAppSettingAttributeTextNative(
 void AvrcpTgService::GetPlayerAppSettingValueText(
     const RawAddress &rawAddr, uint8_t attributeId, const std::vector<uint8_t> &values, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, attributeId:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributeId, label);
 
     int result = stub::MediaService::GetInstance()->GetPlayerAppSettingValueText(
         rawAddr.GetAddress(), attributeId, values, label);
@@ -1473,7 +1476,7 @@ void AvrcpTgService::GetPlayerAppSettingValueText(
 void AvrcpTgService::OnGetPlayerAppSettingValueText(const RawAddress &rawAddr, const std::vector<uint8_t> &values,
     const std::vector<std::string> &valueStr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1493,7 +1496,7 @@ void AvrcpTgService::OnGetPlayerAppSettingValueText(const RawAddress &rawAddr, c
 void AvrcpTgService::OnGetPlayerAppSettingValueTextNative(
     RawAddress rawAddr, std::vector<uint8_t> values, std::vector<std::string> valueStr, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1515,7 +1518,8 @@ void AvrcpTgService::OnGetPlayerAppSettingValueTextNative(
 void AvrcpTgService::GetElementAttributes(
     const RawAddress &rawAddr, uint64_t identifier, const std::vector<uint32_t> &attributes, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, identifier:%{public}llu, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), static_cast<unsigned long long>(identifier), label);
     int result =
         stub::MediaService::GetInstance()->GetElementAttributes(rawAddr.GetAddress(), identifier, attributes, label);
     if (result != RET_NO_ERROR) {
@@ -1527,7 +1531,7 @@ void AvrcpTgService::GetElementAttributes(
 void AvrcpTgService::OnGetElementAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attribtues,
     const std::vector<std::string> &values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1545,7 +1549,7 @@ void AvrcpTgService::OnGetElementAttributes(const RawAddress &rawAddr, const std
 void AvrcpTgService::OnGetElementAttributesNative(
     RawAddress rawAddr, std::vector<uint32_t> attributes, std::vector<std::string> values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     do {
         if (!IsEnabled()) {
@@ -1566,7 +1570,7 @@ void AvrcpTgService::OnGetElementAttributesNative(
 
 void AvrcpTgService::GetPlayStatus(const RawAddress &rawAddr, uint8_t label, uint8_t context) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, context:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, context);
 #ifndef AVRCP_AVSESSION
     int result = stub::MediaService::GetInstance()->GetPlayStatus(rawAddr.GetAddress(), label, context);
     if (result != RET_NO_ERROR) {
@@ -1585,7 +1589,7 @@ void AvrcpTgService::GetPlayStatus(const RawAddress &rawAddr, uint8_t label, uin
 #else
     OHOS::AVSession::AVPlaybackState state;
     if (avSessionController_ == NULL) {
-        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
+        HILOGE("avSessionController_ is NULL");
         return;
     }
     int32_t result = avSessionController_->GetAVPlaybackState(state);
@@ -1609,7 +1613,8 @@ void AvrcpTgService::GetPlayStatus(const RawAddress &rawAddr, uint8_t label, uin
 void AvrcpTgService::OnGetPlayStatus(const RawAddress &rawAddr, uint32_t songLength, uint32_t songPosition,
     uint8_t playStatus, uint8_t label, uint8_t context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, songLength:%{public}u, songPosition:%{public}u, playStatus:%{public}d, label:%{public}d,"
+        " context:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), songLength, songPosition, playStatus, label, context);
 
     do {
         if (!IsEnabled()) {
@@ -1635,8 +1640,8 @@ void AvrcpTgService::OnGetPlayStatus(const RawAddress &rawAddr, uint32_t songLen
 void AvrcpTgService::OnGetPlayStatusNative(
     RawAddress rawAddr, uint32_t songLength, uint32_t songPosition, uint8_t playStatus, uint8_t label, uint8_t context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, songLength:%{public}u, songPosition:%{public}u, playStatus:%{public}d, label:%{public}d,"
+        " context:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), songLength, songPosition, playStatus, label, context);
     do {
         if (!IsEnabled()) {
             break;
@@ -1659,8 +1664,8 @@ void AvrcpTgService::OnGetPlayStatusNative(
 void AvrcpTgService::PlayItem(
     const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, scope:%{public}d, uid:%{public}llu, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter, label);
     int result = stub::MediaService::GetInstance()->PlayItem(rawAddr.GetAddress(), scope, uid, uidCounter, label);
     if (result != RET_NO_ERROR) {
         profile_->SendPlayItemRsp(rawAddr, AVRC_ES_CODE_INTERNAL_ERROR, label, result);
@@ -1669,7 +1674,7 @@ void AvrcpTgService::PlayItem(
 
 void AvrcpTgService::OnPlayItem(const RawAddress &rawAddr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1685,7 +1690,7 @@ void AvrcpTgService::OnPlayItem(const RawAddress &rawAddr, uint8_t label, int st
 
 void AvrcpTgService::OnPlayItemNative(RawAddress rawAddr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1703,8 +1708,8 @@ void AvrcpTgService::OnPlayItemNative(RawAddress rawAddr, uint8_t label, int sta
 void AvrcpTgService::AddToNowPlaying(
     const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, scope:%{public}d, uid:%{public}llu, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter, label);
     int result =
         stub::MediaService::GetInstance()->AddToNowPlaying(rawAddr.GetAddress(), scope, uid, uidCounter, label);
     if (result != RET_NO_ERROR) {
@@ -1714,7 +1719,7 @@ void AvrcpTgService::AddToNowPlaying(
 
 void AvrcpTgService::OnAddToNowPlaying(const RawAddress &rawAddr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1732,7 +1737,7 @@ void AvrcpTgService::OnAddToNowPlaying(const RawAddress &rawAddr, uint8_t label,
 
 void AvrcpTgService::OnAddToNowPlayingNative(RawAddress rawAddr, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1754,8 +1759,8 @@ void AvrcpTgService::OnAddToNowPlayingNative(RawAddress rawAddr, uint8_t label, 
 void AvrcpTgService::ChangePath(
     const RawAddress &rawAddr, uint16_t uidCounter, uint8_t direction, uint64_t folderUid, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, direction:%{public}d, folderUid:%{public}llu, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, direction, static_cast<unsigned long long>(folderUid), label);
     int result =
         stub::MediaService::GetInstance()->ChangePath(rawAddr.GetAddress(), uidCounter, direction, folderUid, label);
     if (result != RET_NO_ERROR) {
@@ -1765,7 +1770,8 @@ void AvrcpTgService::ChangePath(
 
 void AvrcpTgService::OnChangePath(const RawAddress &rawAddr, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, numOfItems:%{public}u, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), numOfItems, label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1784,8 +1790,8 @@ void AvrcpTgService::OnChangePath(const RawAddress &rawAddr, uint32_t numOfItems
 
 void AvrcpTgService::OnChangePathNative(RawAddress rawAddr, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, numOfItems:%{public}u, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), numOfItems, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1802,8 +1808,8 @@ void AvrcpTgService::OnChangePathNative(RawAddress rawAddr, uint32_t numOfItems,
 void AvrcpTgService::GetFolderItems(const RawAddress &rawAddr, uint8_t scope, uint32_t startItem, uint32_t endItem,
     const std::vector<uint32_t> &attributes, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, scope:%{public}d, startItem:%{public}u, endItem:%{public}u, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, startItem, endItem, label);
     int result = stub::MediaService::GetInstance()->GetFolderItems(
         rawAddr.GetAddress(), scope, startItem, endItem, attributes, label);
     if (result != RET_NO_ERROR) {
@@ -1820,8 +1826,8 @@ void AvrcpTgService::GetFolderItems(const RawAddress &rawAddr, uint8_t scope, ui
 void AvrcpTgService::OnGetMediaPlayers(
     const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMpItem> &items, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1840,8 +1846,8 @@ void AvrcpTgService::OnGetMediaPlayers(
 void AvrcpTgService::OnGetMediaPlayersNative(
     RawAddress rawAddr, uint16_t uidCounter, std::vector<AvrcMpItem> items, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1858,8 +1864,8 @@ void AvrcpTgService::OnGetMediaPlayersNative(
 void AvrcpTgService::OnGetFolderItems(
     const RawAddress &rawAddr, uint16_t uidCounter, const std::vector<AvrcMeItem> &items, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1878,8 +1884,8 @@ void AvrcpTgService::OnGetFolderItems(
 void AvrcpTgService::OnGetFolderItemsNative(
     RawAddress rawAddr, uint16_t uidCounter, std::vector<AvrcMeItem> items, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1896,8 +1902,8 @@ void AvrcpTgService::OnGetFolderItemsNative(
 void AvrcpTgService::GetItemAttributes(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter,
     std::vector<uint32_t> attributes, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, scope:%{public}d, uid:%{public}llu, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter, label);
     int result = stub::MediaService::GetInstance()->GetItemAttributes(
         rawAddr.GetAddress(), scope, uid, uidCounter, attributes, label);
     if (result != RET_NO_ERROR) {
@@ -1910,8 +1916,7 @@ void AvrcpTgService::GetItemAttributes(const RawAddress &rawAddr, uint8_t scope,
 void AvrcpTgService::OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attributes,
     const std::vector<std::string> &values, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1930,7 +1935,7 @@ void AvrcpTgService::OnGetItemAttributes(const RawAddress &rawAddr, const std::v
 void AvrcpTgService::OnGetItemAttributesNative(
     RawAddress rawAddr, std::vector<uint32_t> attributes, std::vector<std::string> values, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d, status:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1956,7 +1961,8 @@ void AvrcpTgService::GetTotalNumberOfItems(const RawAddress &rawAddr, uint8_t sc
 void AvrcpTgService::OnGetTotalNumberOfItems(
     const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, numOfItems:%{public}u, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, label, status);
 
     do {
         if (!IsEnabled()) {
@@ -1976,8 +1982,8 @@ void AvrcpTgService::OnGetTotalNumberOfItems(
 void AvrcpTgService::OnGetTotalNumberOfItemsNative(
     RawAddress rawAddr, uint16_t uidCounter, uint32_t numOfItems, uint8_t label, int status)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, numOfItems:%{public}u, label:%{public}d, status:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, label, status);
     do {
         if (!IsEnabled()) {
             break;
@@ -1997,8 +2003,7 @@ void AvrcpTgService::OnGetTotalNumberOfItemsNative(
 
 void AvrcpTgService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, volume:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, label);
     int result = stub::MediaService::GetInstance()->SetAbsoluteVolume(rawAddr.GetAddress(), volume, label);
     if (result != RET_NO_ERROR) {
         profile_->SendSetAbsoluteVolumeRsp(rawAddr, AVRC_ABSOLUTE_VOLUME_PERCENTAGE_0, label, result);
@@ -2007,7 +2012,7 @@ void AvrcpTgService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume
 
 void AvrcpTgService::OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, volume:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, label);
 
     do {
         if (!IsEnabled()) {
@@ -2025,7 +2030,7 @@ void AvrcpTgService::OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volu
 
 void AvrcpTgService::OnSetAbsoluteVolumeNative(RawAddress rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, volume:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, label);
 
     do {
         if (!IsEnabled()) {
@@ -2046,7 +2051,7 @@ void AvrcpTgService::OnSetAbsoluteVolumeNative(RawAddress rawAddr, uint8_t volum
 
 void AvrcpTgService::GetSelectedTrack(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     int result = stub::MediaService::GetInstance()->GetSelectedTrack(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -2056,7 +2061,8 @@ void AvrcpTgService::GetSelectedTrack(const RawAddress &rawAddr, uint8_t label) 
 
 void AvrcpTgService::OnGetSelectedTrack(const RawAddress &rawAddr, uint64_t uid, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, uid:%{public}llu, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), static_cast<unsigned long long>(uid), label);
 
     do {
         if (!IsEnabled()) {
@@ -2074,8 +2080,8 @@ void AvrcpTgService::OnGetSelectedTrack(const RawAddress &rawAddr, uint64_t uid,
 
 void AvrcpTgService::OnGetSelectedTrackNative(RawAddress rawAddr, uint64_t uid, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uid:%{public}llu, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), static_cast<unsigned long long>(uid), label);
     do {
         if (!IsEnabled()) {
             break;
@@ -2091,7 +2097,7 @@ void AvrcpTgService::OnGetSelectedTrackNative(RawAddress rawAddr, uint64_t uid, 
 
 void AvrcpTgService::GetAddressedPlayer(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     int result = stub::MediaService::GetInstance()->GetAddressedPlayer(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -2102,7 +2108,8 @@ void AvrcpTgService::GetAddressedPlayer(const RawAddress &rawAddr, uint8_t label
 void AvrcpTgService::OnGetAddressedPlayer(
     const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, playerId:%{public}d, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, label);
 
     do {
         if (!IsEnabled()) {
@@ -2122,8 +2129,8 @@ void AvrcpTgService::OnGetAddressedPlayer(
 void AvrcpTgService::OnGetAddressedPlayerNative(
     RawAddress rawAddr, uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, playerId:%{public}d, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, label);
     do {
         if (!IsEnabled()) {
             break;
@@ -2139,7 +2146,7 @@ void AvrcpTgService::OnGetAddressedPlayerNative(
 
 void AvrcpTgService::GetUidCounter(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     int result = stub::MediaService::GetInstance()->GetUidCounter(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -2149,7 +2156,8 @@ void AvrcpTgService::GetUidCounter(const RawAddress &rawAddr, uint8_t label) con
 
 void AvrcpTgService::OnGetUidCounter(const RawAddress &rawAddr, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, label);
 
     do {
         if (!IsEnabled()) {
@@ -2167,8 +2175,8 @@ void AvrcpTgService::OnGetUidCounter(const RawAddress &rawAddr, uint16_t uidCoun
 
 void AvrcpTgService::OnGetUidCounterNative(const RawAddress &rawAddr, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, label:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, label);
     do {
         if (!IsEnabled()) {
             break;
@@ -2184,7 +2192,7 @@ void AvrcpTgService::OnGetUidCounterNative(const RawAddress &rawAddr, uint16_t u
 
 void AvrcpTgService::GetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8_t label) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), label);
 
     int result = stub::MediaService::GetInstance()->GetCurrentAbsoluteVolume(rawAddr.GetAddress(), label);
     if (result != RET_NO_ERROR) {
@@ -2194,8 +2202,7 @@ void AvrcpTgService::GetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8_t
 
 void AvrcpTgService::OnGetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("addr:%{public}s, volume:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, label);
     do {
         if (!IsEnabled()) {
             break;
@@ -2213,7 +2220,7 @@ void AvrcpTgService::OnGetCurrentAbsoluteVolume(const RawAddress &rawAddr, uint8
 
 void AvrcpTgService::OnGetCurrentAbsoluteVolumeNative(const RawAddress &rawAddr, uint8_t volume, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, volume:%{public}d, label:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, label);
 
     do {
         if (!IsEnabled()) {
@@ -2230,14 +2237,14 @@ void AvrcpTgService::OnGetCurrentAbsoluteVolumeNative(const RawAddress &rawAddr,
 
 void AvrcpTgService::SetPlaybackInterval(const RawAddress &rawAddr, uint32_t interval) const
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, interval:%{public}u", GET_ENCRYPT_AVRCP_ADDR(rawAddr), interval);
 
     stub::MediaService::GetInstance()->SetPlaybackInterval(rawAddr.GetAddress(), interval);
 }
 
 void AvrcpTgService::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playStatus:%{public}d, playbackPos:%{public}u, label:%{public}d", playStatus, playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2250,7 +2257,7 @@ void AvrcpTgService::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t pl
 }
 void AvrcpTgService::NotifyPlaybackStatusChangedNative(uint8_t playStatus, uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playStatus:%{public}d, playbackPos:%{public}u, label:%{public}d", playStatus, playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2264,7 +2271,8 @@ void AvrcpTgService::NotifyPlaybackStatusChangedNative(uint8_t playStatus, uint3
 
 void AvrcpTgService::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("uid:%{public}llu, playbackPos:%{public}u, label:%{public}d",
+        static_cast<unsigned long long>(uid), playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2277,8 +2285,8 @@ void AvrcpTgService::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos, uint
 
 void AvrcpTgService::NotifyTrackChangedNative(uint64_t uid, uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("uid:%{public}llu, playbackPos:%{public}u, label:%{public}d",
+        static_cast<unsigned long long>(uid), playbackPos, label);
     do {
         if (!IsEnabled()) {
             break;
@@ -2291,7 +2299,7 @@ void AvrcpTgService::NotifyTrackChangedNative(uint64_t uid, uint32_t playbackPos
 
 void AvrcpTgService::NotifyTrackReachedEnd(uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playbackPos:%{public}u, label:%{public}d", playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2304,7 +2312,7 @@ void AvrcpTgService::NotifyTrackReachedEnd(uint32_t playbackPos, uint8_t label)
 
 void AvrcpTgService::NotifyTrackReachedEndNative(uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playbackPos:%{public}u, label:%{public}d", playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2318,7 +2326,7 @@ void AvrcpTgService::NotifyTrackReachedEndNative(uint32_t playbackPos, uint8_t l
 
 void AvrcpTgService::NotifyTrackReachedStart(uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playbackPos:%{public}u, label:%{public}d", playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2331,7 +2339,7 @@ void AvrcpTgService::NotifyTrackReachedStart(uint32_t playbackPos, uint8_t label
 
 void AvrcpTgService::NotifyTrackReachedStartNative(uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playbackPos:%{public}u, label:%{public}d", playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2345,7 +2353,7 @@ void AvrcpTgService::NotifyTrackReachedStartNative(uint32_t playbackPos, uint8_t
 
 void AvrcpTgService::NotifyPlaybackPosChanged(uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playbackPos:%{public}u, label:%{public}d", playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2358,7 +2366,7 @@ void AvrcpTgService::NotifyPlaybackPosChanged(uint32_t playbackPos, uint8_t labe
 
 void AvrcpTgService::NotifyPlaybackPosChangedNative(uint32_t playbackPos, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playbackPos:%{public}u, label:%{public}d", playbackPos, label);
 
     do {
         if (!IsEnabled()) {
@@ -2372,7 +2380,7 @@ void AvrcpTgService::NotifyPlaybackPosChangedNative(uint32_t playbackPos, uint8_
 void AvrcpTgService::NotifyPlayerAppSettingChanged(
     const std::deque<uint8_t> &attributes, const std::deque<uint8_t> &values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     do {
         if (!IsEnabled()) {
@@ -2387,7 +2395,7 @@ void AvrcpTgService::NotifyPlayerAppSettingChanged(
 void AvrcpTgService::NotifyPlayerAppSettingChangedNative(
     std::deque<uint8_t> attributes, std::deque<uint8_t> values, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     do {
         if (!IsEnabled()) {
@@ -2400,7 +2408,7 @@ void AvrcpTgService::NotifyPlayerAppSettingChangedNative(
 
 void AvrcpTgService::NotifyNowPlayingContentChanged(uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     do {
         if (!IsEnabled()) {
@@ -2413,7 +2421,7 @@ void AvrcpTgService::NotifyNowPlayingContentChanged(uint8_t label)
 
 void AvrcpTgService::NotifyNowPlayingContentChangedNative(uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     do {
         if (!IsEnabled()) {
@@ -2425,7 +2433,7 @@ void AvrcpTgService::NotifyNowPlayingContentChangedNative(uint8_t label)
 
 void AvrcpTgService::NotifyAvailablePlayersChanged(uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     do {
         if (!IsEnabled()) {
@@ -2438,7 +2446,7 @@ void AvrcpTgService::NotifyAvailablePlayersChanged(uint8_t label)
 
 void AvrcpTgService::NotifyAvailablePlayersChangedNative(uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     do {
         if (!IsEnabled()) {
@@ -2450,7 +2458,7 @@ void AvrcpTgService::NotifyAvailablePlayersChangedNative(uint8_t label)
 
 void AvrcpTgService::NotifyAddressedPlayerChanged(uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playerId:%{public}d, uidCounter:%{public}d, label:%{public}d", playerId, uidCounter, label);
 
     do {
         if (!IsEnabled()) {
@@ -2464,7 +2472,7 @@ void AvrcpTgService::NotifyAddressedPlayerChanged(uint16_t playerId, uint16_t ui
 
 void AvrcpTgService::NotifyAddressedPlayerChangedNative(uint16_t playerId, uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("playerId:%{public}d, uidCounter:%{public}d, label:%{public}d", playerId, uidCounter, label);
 
     do {
         if (!IsEnabled()) {
@@ -2485,7 +2493,7 @@ void AvrcpTgService::NotifyAddressedPlayerChangedNative(uint16_t playerId, uint1
 
 void AvrcpTgService::NotifyUidChanged(uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("uidCounter:%{public}d, label:%{public}d", uidCounter, label);
 
     do {
         if (!IsEnabled()) {
@@ -2498,7 +2506,7 @@ void AvrcpTgService::NotifyUidChanged(uint16_t uidCounter, uint8_t label)
 
 void AvrcpTgService::NotifyUidChangedNative(uint16_t uidCounter, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("uidCounter:%{public}d, label:%{public}d", uidCounter, label);
 
     do {
         if (!IsEnabled()) {
@@ -2512,7 +2520,7 @@ void AvrcpTgService::NotifyUidChangedNative(uint16_t uidCounter, uint8_t label)
 void AvrcpTgService::NotifyVolumeChanged(uint8_t volume, uint8_t label)
 {
     {
-        LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+        HILOGI("volume:%{public}d, label:%{public}d", volume, label);
 
         do {
             if (!IsEnabled()) {
@@ -2526,7 +2534,7 @@ void AvrcpTgService::NotifyVolumeChanged(uint8_t volume, uint8_t label)
 
 void AvrcpTgService::NotifyVolumeChangedNative(uint8_t volume, uint8_t label)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("volume:%{public}d, label:%{public}d", volume, label);
 
     do {
         if (!IsEnabled()) {
@@ -2538,12 +2546,12 @@ void AvrcpTgService::NotifyVolumeChangedNative(uint8_t volume, uint8_t label)
 
 void AvrcpTgService::OnSessionCreate(std::string sessionId)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
+    HILOGI("sessionId:%{public}s", sessionId.c_str());
 }
 
 void AvrcpTgService::OnSessionRelease(std::string sessionId)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
+    HILOGI("sessionId:%{public}s", sessionId.c_str());
 #ifdef AVRCP_AVSESSION
     if (avSessionController_ != NULL && avSessionController_->GetSessionId().compare(sessionId) == 0) {
         avSessionController_->Destroy();
@@ -2554,7 +2562,7 @@ void AvrcpTgService::OnSessionRelease(std::string sessionId)
 
 void AvrcpTgService::OnTopSessionChange(std::string sessionId)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, sessionId:%{public}s", __func__, sessionId.c_str());
+    HILOGI("sessionId:%{public}s", sessionId.c_str());
 #ifdef AVRCP_AVSESSION
     if (avSessionController_ != NULL) {
         if (avSessionController_->GetSessionId().compare(sessionId) == 0) {
@@ -2569,14 +2577,14 @@ void AvrcpTgService::OnTopSessionChange(std::string sessionId)
         filter.set(OHOS::AVSession::AVPlaybackState::PLAYBACK_KEY_STATE);
         avSessionController_->SetPlaybackFilter(filter);
     } else {
-        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, avSessionController_ is NULL", __func__);
+        HILOGE("avSessionController_ is NULL");
     }
 #endif
 }
 
 void AvrcpTgService::OnPlaybackStateChange(const int32_t state)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, state:%{public}d", __func__, state);
+    HILOGI("state:%{public}d", state);
 
     do {
         if (!IsEnabled()) {
@@ -2589,10 +2597,10 @@ void AvrcpTgService::OnPlaybackStateChange(const int32_t state)
 
 void AvrcpTgService::OnPlaybackStateChangeNative(int32_t state)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s, state:%{public}d", __func__, state);
+    HILOGI("state:%{public}d", state);
     std::pair<bool, uint8_t> playback = profile_->GetNotificationLabel(AVRC_EVENT_ID_PLAYBACK_STATUS_CHANGED);
     if (!playback.first) {
-        LOG_ERROR("[AVRCP TG] AvrcpTgService::%{public}s, device is not register for playStatus updates", __func__);
+        HILOGE("device is not register for playStatus updates");
         return;
     }
 
@@ -2602,7 +2610,8 @@ void AvrcpTgService::OnPlaybackStateChangeNative(int32_t state)
 void AvrcpTgService::ProcessChannelEvent(
     RawAddress rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, connectId:%{public}d, event:%{public}d, result:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), connectId, event, result);
 
     if (!IsDisabled()) {
         profile_->ProcessChannelEvent(rawAddr, connectId, event, result, context);
@@ -2612,8 +2621,8 @@ void AvrcpTgService::ProcessChannelEvent(
 void AvrcpTgService::ProcessChannelMessage(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("connectId:%{public}d, label:%{public}d, crType:%{public}d, chType:%{public}d",
+        connectId, label, crType, chType);
     if (!IsDisabled()) {
         profile_->ProcessChannelMessage(connectId, label, crType, chType, pkt, context);
     }
@@ -2622,8 +2631,7 @@ void AvrcpTgService::ProcessChannelMessage(
 void AvrcpTgService::ChannelEventCallback(
     uint8_t connectId, uint8_t event, uint16_t result, const BtAddr *btAddr, void *context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("connectId:%{public}d, event:%{public}d, result:%{public}d", connectId, event, result);
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpTgService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
     RawAddress rawAddr(RawAddress::ConvertToString(btAddr->addr));
@@ -2651,8 +2659,8 @@ void AvrcpTgService::ChannelEventCallback(
 void AvrcpTgService::ChannelMessageCallback(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_INFO("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-
+    HILOGI("connectId:%{public}d, label:%{public}d, crType:%{public}d, chType:%{public}d",
+        connectId, label, crType, chType);
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpTgService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_TG));
     auto myPkt = PacketRefMalloc(pkt);
@@ -2674,6 +2682,7 @@ bool AvrcpTgService::CheckConnectionNum()
 
 uint8_t AvrcpTgService::ConvertPlayState(const int32_t state) const
 {
+    HILOGI("state:%{public}d", state);
     uint8_t ret = AVRC_PLAY_STATUS_ERROR;
 #ifdef AVRCP_AVSESSION
     switch (state) {

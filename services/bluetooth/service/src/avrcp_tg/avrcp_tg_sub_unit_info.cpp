@@ -19,7 +19,7 @@ namespace OHOS {
 namespace bluetooth {
 AvrcTgSubUnitPacket::AvrcTgSubUnitPacket(void) : AvrcTgUnitPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     subunitType_ = AVRC_TG_SUB_UNIT_SUBUNIT_TYPE_UNIT;
     subunitId_ = AVRC_TG_SUB_UNIT_SUBUNIT_ID_IGNORE;
@@ -28,7 +28,7 @@ AvrcTgSubUnitPacket::AvrcTgSubUnitPacket(void) : AvrcTgUnitPacket()
 
 AvrcTgSubUnitPacket::AvrcTgSubUnitPacket(Packet *pkt, uint8_t label) : AvrcTgUnitPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSubUnitPacket::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     subunitType_ = AVRC_TG_SUB_UNIT_SUBUNIT_TYPE_UNIT;
     subunitId_ = AVRC_TG_SUB_UNIT_SUBUNIT_ID_IGNORE;
@@ -40,7 +40,7 @@ AvrcTgSubUnitPacket::AvrcTgSubUnitPacket(Packet *pkt, uint8_t label) : AvrcTgUni
 
 AvrcTgSubUnitPacket::~AvrcTgSubUnitPacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (pkt_ != nullptr) {
         PacketFree(pkt_);
@@ -50,7 +50,7 @@ AvrcTgSubUnitPacket::~AvrcTgSubUnitPacket(void)
 
 const Packet *AvrcTgSubUnitPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_TG_SUB_UNIT_RESPONSE_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
@@ -71,7 +71,7 @@ const Packet *AvrcTgSubUnitPacket::AssemblePacket(void)
 
 bool AvrcTgSubUnitPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     bool isValid = false;
     size_t size = PacketPayloadSize(pkt);
@@ -79,9 +79,8 @@ bool AvrcTgSubUnitPacket::DisassemblePacket(Packet *pkt)
         isValid = true;
     } else {
         crCode_ = AVRC_TG_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP TG] The size of the packet is invalid! - actual size[%zu] - valid min size[%u]",
-            size,
-            AVRC_TG_SUB_UNIT_COMMAND_SIZE);
+        HILOGI("The size of the packet is invalid! actual size: %{public}zu valid min size: %{public}u",
+            size, AVRC_TG_SUB_UNIT_COMMAND_SIZE);
     }
 
     return isValid;

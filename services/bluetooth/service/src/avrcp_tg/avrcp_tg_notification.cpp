@@ -22,7 +22,7 @@ AvrcTgNotifyPacket::AvrcTgNotifyPacket(uint8_t eventId, uint8_t crCode, uint8_t 
     : interval_(AVRC_PLAYBACK_INTERVAL_1_SEC), playStatus_(AVRC_PLAY_STATUS_ERROR),
       volume_(AVRC_ABSOLUTE_VOLUME_INVALID)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("eventId: %{public}d, crCode: %{public}d, label: %{public}d", eventId, crCode, label);
 
     crCode_ = crCode;
     pduId_ = AVRC_TG_PDU_ID_REGISTER_NOTIFICATION;
@@ -37,7 +37,7 @@ AvrcTgNotifyPacket::AvrcTgNotifyPacket(Packet *pkt, uint8_t label)
       playStatus_(AVRC_PLAY_STATUS_ERROR),
       volume_(AVRC_ABSOLUTE_VOLUME_INVALID)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("label: %{public}d", label);
 
     crCode_ = AVRC_TG_RSP_CODE_CHANGED;
     pduId_ = AVRC_TG_PDU_ID_REGISTER_NOTIFICATION;
@@ -48,7 +48,7 @@ AvrcTgNotifyPacket::AvrcTgNotifyPacket(Packet *pkt, uint8_t label)
 
 AvrcTgNotifyPacket::~AvrcTgNotifyPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     attributes_.clear();
     values_.clear();
@@ -56,7 +56,7 @@ AvrcTgNotifyPacket::~AvrcTgNotifyPacket()
 
 Packet *AvrcTgNotifyPacket::AssembleParameters(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     switch (eventId_) {
         case AVRC_TG_EVENT_ID_PLAYBACK_STATUS_CHANGED:
@@ -100,32 +100,32 @@ Packet *AvrcTgNotifyPacket::AssembleParameters(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssemblePlaybackStatusChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_ID_PLAYBACK_STATUS_SIZE);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP TG] AvrcTgNotifyPacket::AssemblePlaybackStatusChanged BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
+    HILOGI("BufferMalloc: %{public}ju",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_ID_PLAYBACK_STATUS_SIZE));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ = AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_ID_PLAYBACK_STATUS_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%hu]", parameterLength_);
+    HILOGI("parameterLength_: %{public}hu", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%hhx]", eventId_);
+    HILOGI("eventId_: %{public}hhx", eventId_);
 
     PushOctets1((bufferPtr + offset), playStatus_);
-    LOG_DEBUG("[AVRCP TG] playStatus_[%hhx]", playStatus_);
+    HILOGI("playStatus_: %{public}hhx", playStatus_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -134,32 +134,32 @@ void AvrcTgNotifyPacket::AssemblePlaybackStatusChanged(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssembleTrackChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_UID_SIZE);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP TG] AvrcTgNotifyPacket::AssembleTrackChanged BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
+    HILOGI("BufferMalloc: %{public}ju",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_UID_SIZE));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ = AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_UID_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     PushOctets8((bufferPtr + offset), uid_);
-    LOG_DEBUG("[AVRCP TG] uid_[%jx]", uid_);
+    HILOGI("uid_: %{public}jx", uid_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -168,32 +168,32 @@ void AvrcTgNotifyPacket::AssembleTrackChanged(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssemblePlaybackPosChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_PLAYBACK_POSITION_SIZE);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP TG] AvrcTgNotifyPacket::AssemblePlaybackPosChanged BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
+    HILOGI("BufferMalloc: %{public}ju",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_PLAYBACK_POSITION_SIZE));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ = AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_PLAYBACK_POSITION_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     PushOctets4((bufferPtr + offset), playbackPos_);
-    LOG_DEBUG("[AVRCP TG] playbackPos_[%x]", playbackPos_);
+    HILOGI("playbackPos_: %{public}x", playbackPos_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -202,7 +202,7 @@ void AvrcTgNotifyPacket::AssemblePlaybackPosChanged(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssemblePlayerApplicationSettingChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t numOfAttributes = GetAvailableParameterSize() / AVRC_TG_OFFSET_TWO_BITS;
     if (numOfAttributes > values_.size()) {
@@ -212,41 +212,41 @@ void AvrcTgNotifyPacket::AssemblePlayerApplicationSettingChanged(Packet *pkt)
     size_t bufferSize = AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                         AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_GCPASV_NUM_OF_VALUES_SIZE + numOfAttributes +
                         numOfAttributes;
-    LOG_DEBUG("[AVRCP CT] BufferMalloc[%zu]", bufferSize);
+    HILOGI("BufferMalloc: %{public}zu", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP TG] AvrcTgNotifyPacket::AssemblePlayerApplicationSettingChanged BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ =
         numOfAttributes + numOfAttributes + AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_GCPASV_NUM_OF_VALUES_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
+    HILOGI("parameterLength_: %{public}u", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%u]", eventId_);
+    HILOGI("eventId_: %{public}u", eventId_);
 
     offset += PushOctets1((bufferPtr + offset), numOfAttributes);
-    LOG_DEBUG("[AVRCP TG] numOfAttributes[%u]", numOfAttributes);
+    HILOGI("numOfAttributes: %{public}u", numOfAttributes);
 
     for (int i = 0; i < numOfAttributes; i++) {
         offset += PushOctets1((bufferPtr + offset), attributes_.at(i));
-        LOG_DEBUG("[AVRCP TG] attribute[%u]", attributes_.at(i));
+        HILOGI("attribute: %{public}u", attributes_.at(i));
         offset += PushOctets1((bufferPtr + offset), values_.at(i));
-        LOG_DEBUG("[AVRCP TG] value[%x]", values_.at(i));
+        HILOGI("value: %{public}x", values_.at(i));
     }
     attributes_.erase(attributes_.begin(), attributes_.begin() + numOfAttributes);
     values_.erase(values_.begin(), values_.begin() + numOfAttributes);
 
-    LOG_DEBUG("[AVRCP TG] attributes_.size[%{public}zu]", attributes_.size());
-    LOG_DEBUG("[AVRCP TG] values_.size[%{public}zu]", values_.size());
+    HILOGI("attributes_.size: %{public}zu", attributes_.size());
+    HILOGI("values_.size: %{public}zu", values_.size());
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -255,37 +255,37 @@ void AvrcTgNotifyPacket::AssemblePlayerApplicationSettingChanged(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssembleAddressedPlayerChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     size_t bufferSize = AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                         AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_PLAYER_ID_SIZE +
                         AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE;
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%{public}zu]", bufferSize);
+    HILOGI("BufferMalloc: %{public}zu", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP TG] AvrcTgNotifyPacket::AssembleAddressedPlayerChanged BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ =
         AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_PLAYER_ID_SIZE + AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     offset += PushOctets2((bufferPtr + offset), playerId_);
-    LOG_DEBUG("[AVRCP TG] playerId_[%x]", playerId_);
+    HILOGI("playerId_: %{public}x", playerId_);
 
     PushOctets2((bufferPtr + offset), uidCounter_);
-    LOG_DEBUG("[AVRCP TG] uidCounter_[%x]", uidCounter_);
+    HILOGI("uidCounter_: %{public}x", uidCounter_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -294,32 +294,32 @@ void AvrcTgNotifyPacket::AssembleAddressedPlayerChanged(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssembleUidsChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP TG] AvrcTgNotifyPacket::AssembleUidsChanged BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
+    HILOGI("BufferMalloc: %{public}ju",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ = AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_UID_COUNTER_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     PushOctets2((bufferPtr + offset), uidCounter_);
-    LOG_DEBUG("[AVRCP TG] uidCounter_[%{public}d]", uidCounter_);
+    HILOGI("uidCounter_: %{public}d", uidCounter_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -328,32 +328,32 @@ void AvrcTgNotifyPacket::AssembleUidsChanged(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssembleVolumeChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_ID_VOLUME_SIZE);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP TG] AvrcTgNotifyPacket::AssembleVolumeChanged BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
+    HILOGI("BufferMalloc: %{public}ju",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_EVENT_ID_SIZE +
             AVRC_TG_NOTIFY_EVENT_ID_VOLUME_SIZE));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ = AVRC_TG_NOTIFY_EVENT_ID_SIZE + AVRC_TG_NOTIFY_EVENT_ID_VOLUME_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     PushOctets1((bufferPtr + offset), volume_);
-    LOG_DEBUG("[AVRCP TG] volume_[%x]", volume_);
+    HILOGI("volume_: %{public}x", volume_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -362,25 +362,25 @@ void AvrcTgNotifyPacket::AssembleVolumeChanged(Packet *pkt)
 
 void AvrcTgNotifyPacket::AssembleCommonChanged(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     auto buffer = BufferMalloc(AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE +
                                AVRC_TG_NOTIFY_PARAMETER_LENGTH + AVRC_TG_NOTIFY_EVENT_ID_SIZE);
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
-    LOG_DEBUG("[AVRCP TG] BufferMalloc[%ju]",
+    HILOGI("BufferMalloc: %{public}ju",
         (AVRC_TG_VENDOR_PACKET_TYPE_SIZE + AVRC_TG_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_TG_NOTIFY_PARAMETER_LENGTH +
             AVRC_TG_NOTIFY_EVENT_ID_SIZE));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((bufferPtr + offset), packetType_);
-    LOG_DEBUG("[AVRCP TG] packetType_[%x]", packetType_);
+    HILOGI("packetType_: %{public}x", packetType_);
 
     parameterLength_ = AVRC_TG_NOTIFY_EVENT_ID_SIZE;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -389,7 +389,7 @@ void AvrcTgNotifyPacket::AssembleCommonChanged(Packet *pkt)
 
 bool AvrcTgNotifyPacket::DisassembleParameters(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -398,12 +398,12 @@ bool AvrcTgNotifyPacket::DisassembleParameters(uint8_t *buffer)
         uint64_t payload = 0x00;
         offset += PopOctets2((buffer + offset), payload);
         parameterLength_ = static_cast<uint16_t>(payload);
-        LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+        HILOGI("parameterLength_: %{public}d", parameterLength_);
 
         payload = 0x00;
         offset += PopOctets1((buffer + offset), payload);
         eventId_ = static_cast<uint8_t>(payload);
-        LOG_DEBUG("[AVRCP TG] eventId_[%x]", eventId_);
+        HILOGI("eventId_: %{public}x", eventId_);
         if (!IsValidEventId()) {
             crCode_ = AVRC_TG_RSP_CODE_REJECTED;
             status_ = AVRC_ES_CODE_INVALID_PARAMETER;
@@ -420,13 +420,13 @@ bool AvrcTgNotifyPacket::DisassembleParameters(uint8_t *buffer)
         payload = 0x00;
         PopOctets4((buffer + offset), payload);
         interval_ = static_cast<uint32_t>(payload);
-        LOG_DEBUG("[AVRCP TG] interval_[%u]", interval_);
+        HILOGI("interval_: %{public}u", interval_);
 
         crCode_ = AVRC_TG_RSP_CODE_INTERIM;
 
         isValid_ = true;
 
-        LOG_DEBUG("[AVRCP TG] isValid_[%{public}d]", isValid_);
+        HILOGI("isValid_: %{public}d", isValid_);
     } while (false);
 
     return isValid_;
@@ -434,7 +434,7 @@ bool AvrcTgNotifyPacket::DisassembleParameters(uint8_t *buffer)
 
 uint16_t AvrcTgNotifyPacket::GetNumberOfPackets(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t numOfPkts = AVRC_TG_NOTIFY_NUM_OF_PACKETS;
 
@@ -444,14 +444,14 @@ uint16_t AvrcTgNotifyPacket::GetNumberOfPackets(void)
             numOfPkts = ceil(paramSize / GetAvailableParameterSize());
         }
     }
-    LOG_DEBUG("[AVRCP TG] numOfPkts[%u]", numOfPkts);
+    HILOGI("numOfPkts: %{public}u", numOfPkts);
 
     return numOfPkts;
 }
 
 uint16_t AvrcTgNotifyPacket::GetAvailableParameterSize(void) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t remain = mtu_ - (AVRC_TG_VENDOR_FIXED_OPERAND_SIZE + AVRC_TG_GCPASV_NUM_OF_VALUES_SIZE);
     if (remain > (AVRC_TG_GCPASV_MAX_NUM_OF_ATTRIBUTES + AVRC_TG_GCPASV_MAX_NUM_OF_VALUES)) {
@@ -464,14 +464,14 @@ uint16_t AvrcTgNotifyPacket::GetAvailableParameterSize(void) const
 
 bool AvrcTgNotifyPacket::IsValidEventId(void) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     return ((eventId_ >= AVRC_TG_EVENT_ID_PLAYBACK_STATUS_CHANGED) && (eventId_ <= AVRC_TG_EVENT_ID_VOLUME_CHANGED));
 }
 
 bool AvrcTgNotifyPacket::IsSupportedEventId(void) const
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     return !(eventId_ == AVRC_TG_EVENT_ID_BATT_STATUS_CHANGED || eventId_ == AVRC_TG_EVENT_ID_SYSTEM_STATUS_CHANGED);
 }
