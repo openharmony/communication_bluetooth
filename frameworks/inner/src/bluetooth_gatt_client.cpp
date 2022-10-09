@@ -289,6 +289,7 @@ GattClient::impl::impl(GattClient &client, const BluetoothRemoteDevice &device)
 
 GattClient::impl::~impl()
 {
+    HILOGI("GattClient ~impl");
     if (!proxy_) {
         HILOGE("proxy_ is null");
     } else {
@@ -453,6 +454,7 @@ GattClient::GattClient(const BluetoothRemoteDevice &device) : pimpl(new GattClie
 
 GattClient::~GattClient()
 {
+    HILOGI("~GattClient");
     if (pimpl->isRegisterSucceeded_) {
         if (!pimpl->proxy_) {
             HILOGE("proxy_ is null");
