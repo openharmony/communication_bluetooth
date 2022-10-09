@@ -16,11 +16,13 @@
 #ifndef NAPI_BLUETOOTH_AVRCP_CT_OBSERVER_H_
 #define NAPI_BLUETOOTH_AVRCP_CT_OBSERVER_H_
 
+#include <shared_mutex>
 #include "bluetooth_avrcp_ct.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
+static std::shared_mutex g_avrcpCtCallbackInfosMutex;
 const std::string STR_BT_AVRCP_CT_CONNECTION_STATE_CHANGE = "connectionStateChange";
 class NapiAvrcpControllerObserver : public AvrcpController::IObserver{
 public:

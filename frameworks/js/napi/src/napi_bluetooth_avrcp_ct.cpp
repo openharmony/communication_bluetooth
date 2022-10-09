@@ -53,6 +53,7 @@ napi_value NapiAvrcpController::AvrcpControllerConstructor(napi_env env, napi_ca
 napi_value NapiAvrcpController::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::unique_lock<std::shared_mutex> guard(g_avrcpCtCallbackInfosMutex);
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = {0};
@@ -96,6 +97,7 @@ napi_value NapiAvrcpController::On(napi_env env, napi_callback_info info)
 napi_value NapiAvrcpController::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::unique_lock<std::shared_mutex> guard(g_avrcpCtCallbackInfosMutex);
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -113,6 +115,12 @@ napi_value NapiAvrcpController::Off(napi_env env, napi_callback_info info)
     if (!ParseString(env, type, argv[PARAM0])) {
         HILOGE("string expected.");
         return ret;
+    }
+    uint32_t refCount = INVALID_REF_COUNT;
+    napi_reference_unref(env, observer_.callbackInfos_[type]->callback_, &refCount);
+    HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
+    if (refCount == 0) {
+        napi_delete_reference(env, observer_.callbackInfos_[type]->callback_);
     }
     observer_.callbackInfos_[type] = nullptr;
     HILOGI("%{public}s is unregistered", type.c_str());
