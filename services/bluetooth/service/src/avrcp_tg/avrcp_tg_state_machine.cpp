@@ -64,7 +64,7 @@ void AvrcTgStateMachineManager::ShutDown(void)
 
 int AvrcTgStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -86,7 +86,7 @@ int AvrcTgStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
 
 int AvrcTgStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -110,7 +110,7 @@ int AvrcTgStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
 
 void AvrcTgStateMachineManager::DeletePairOfStateMachine(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -124,7 +124,7 @@ void AvrcTgStateMachineManager::DeletePairOfStateMachine(const RawAddress &rawAd
 
 void AvrcTgStateMachineManager::DeleteBrowseStateMachine(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -138,7 +138,7 @@ void AvrcTgStateMachineManager::DeleteBrowseStateMachine(const RawAddress &rawAd
 
 bool AvrcTgStateMachineManager::SendMessageToControlStateMachine(const RawAddress &rawAddr, const utility::Message &msg)
 {
-    HILOGI("enter, msg: %{public}x", msg.what_);
+    HILOGI("addr:%{public}s, msg: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), msg.what_);
     std::lock_guard<std::mutex> lock(mutex_);
     bool result = false;
 
@@ -170,7 +170,7 @@ void AvrcTgStateMachineManager::SendMessageToAllControlStateMachine(const utilit
 
 bool AvrcTgStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress &rawAddr, const utility::Message &msg)
 {
-    HILOGI("enter, msg: %{public}x", msg.what_);
+    HILOGI("addr:%{public}s, msg: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), msg.what_);
     std::lock_guard<std::mutex> lock(mutex_);
     bool result = false;
 
@@ -201,35 +201,35 @@ void AvrcTgStateMachineManager::SendMessageToAllBrowseStateMachine(const utility
 
 bool AvrcTgStateMachineManager::IsControlConnectingState(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_CONNECTING);
 }
 
 bool AvrcTgStateMachineManager::IsControlConnectedState(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_CONNECTED);
 }
 
 bool AvrcTgStateMachineManager::IsControlDisconnectingState(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_DISCONNECTING);
 }
 
 bool AvrcTgStateMachineManager::IsControlContinuationState(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_CONTINUATION);
 }
 
 bool AvrcTgStateMachineManager::IsControlDisableState(const RawAddress &rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return IsControlSpecifiedState(rawAddr.GetAddress(), AVRC_TG_SM_STATE_DISABLE);
 }
@@ -241,7 +241,7 @@ AvrcTgStateMachineManager::AvrcTgStateMachineManager()
 
 AvrcTgStateMachineManager::StateMachinePair *AvrcTgStateMachineManager::GetPairOfStateMachine(const std::string &addr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GetEncryptAddr(addr).c_str());
 
     StateMachinePair *pair = nullptr;
 
@@ -255,7 +255,7 @@ AvrcTgStateMachineManager::StateMachinePair *AvrcTgStateMachineManager::GetPairO
 
 bool AvrcTgStateMachineManager::IsControlSpecifiedState(const std::string &addr, std::string stateName)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s, stateName:%{public}s", GetEncryptAddr(addr).c_str(), stateName.c_str());
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -276,7 +276,7 @@ bool AvrcTgStateMachineManager::IsControlSpecifiedState(const std::string &addr,
 AvrcTgStateMachineManager::StateMachine::StateMachine(Type type, const RawAddress &rawAddr)
     : type_(type), rawAddr_(rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::AddStates(void)
@@ -326,18 +326,18 @@ void AvrcTgStateMachineManager::StateMachine::AddStates(void)
  * AvrcTgStateMachineManager::StateMachine::State                 *
  ******************************************************************/
 
-AvrcTgStateMachineManager::StateMachine::State::State(
-    const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
+AvrcTgStateMachineManager::StateMachine::State::State(const std::string &name, utility::StateMachine &stateMachine,
+    const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : utility::StateMachine::State(name, stateMachine, parent), rawAddr_(rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 AvrcTgStateMachineManager::StateMachine::State::State(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : utility::StateMachine::State(name, stateMachine), rawAddr_(rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 AvrcTgStateMachineManager::StateMachine::State::~State()
@@ -353,7 +353,7 @@ AvrcTgStateMachineManager::StateMachine::CtConnecting::CtConnecting(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : State(name, stateMachine, rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtConnecting::Entry(void)
@@ -384,7 +384,7 @@ void AvrcTgStateMachineManager::StateMachine::CtConnecting::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::CtConnecting::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("enter, msg: %{public}x", msg.what_);
 
     bool result = true;
 
@@ -410,7 +410,7 @@ AvrcTgStateMachineManager::StateMachine::CtConnected::CtConnected(const std::str
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtConnected::Entry(void)
@@ -425,7 +425,7 @@ void AvrcTgStateMachineManager::StateMachine::CtConnected::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::CtConnected::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("msg: %{public}x", msg.what_);
 
     bool result = true;
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -536,7 +536,7 @@ AvrcTgStateMachineManager::StateMachine::CtDisconnecting::CtDisconnecting(const 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtDisconnecting::Entry(void)
@@ -561,7 +561,7 @@ void AvrcTgStateMachineManager::StateMachine::CtDisconnecting::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::CtDisconnecting::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("msg: %{public}x", msg.what_);
 
     bool result = true;
 
@@ -582,7 +582,7 @@ AvrcTgStateMachineManager::StateMachine::CtContinuation::CtContinuation(const st
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtContinuation::Entry(void)
@@ -597,7 +597,7 @@ void AvrcTgStateMachineManager::StateMachine::CtContinuation::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::CtContinuation::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("msg: %{public}x", msg.what_);
 
     bool result = true;
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -640,7 +640,7 @@ AvrcTgStateMachineManager::StateMachine::CtDisable::CtDisable(const std::string 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::CtDisable::Entry(void)
@@ -668,7 +668,7 @@ void AvrcTgStateMachineManager::StateMachine::CtDisable::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::CtDisable::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("msg: %{public}x", msg.what_);
 
     bool result = true;
 
@@ -689,7 +689,7 @@ AvrcTgStateMachineManager::StateMachine::BrConnecting::BrConnecting(
     const std::string &name, utility::StateMachine &stateMachine, const RawAddress &rawAddr)
     : State(name, stateMachine, rawAddr)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrConnecting::Entry(void)
@@ -714,7 +714,7 @@ void AvrcTgStateMachineManager::StateMachine::BrConnecting::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::BrConnecting::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("msg: %{public}x", msg.what_);
 
     bool result = true;
 
@@ -741,7 +741,7 @@ AvrcTgStateMachineManager::StateMachine::BrConnected::BrConnected(const std::str
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrConnected::Entry(void)
@@ -756,7 +756,7 @@ void AvrcTgStateMachineManager::StateMachine::BrConnected::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::BrConnected::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("msg: %{public}x", msg.what_);
 
     bool result = true;
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -799,7 +799,7 @@ AvrcTgStateMachineManager::StateMachine::BrDisconnecting::BrDisconnecting(const 
     utility::StateMachine &stateMachine, const RawAddress &rawAddr, utility::StateMachine::State &parent)
     : State(name, stateMachine, rawAddr, parent)
 {
-    HILOGI("enter");
+    HILOGI("addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 void AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Entry(void)
@@ -824,7 +824,7 @@ void AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Exit(void)
 
 bool AvrcTgStateMachineManager::StateMachine::BrDisconnecting::Dispatch(const utility::Message &msg)
 {
-    HILOGI("enter");
+    HILOGI("msg: %{public}x", msg.what_);
 
     bool result = true;
     switch (msg.what_) {
