@@ -41,15 +41,17 @@ struct BleCentralManager::impl {
     class BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
     public:
         BluetoothBleCentralManagerCallbackImp(BleCentralManager::impl &bleCentralManger)
-            : bleCentralManger_(bleCentralManger){};
+            : bleCentralManger_(bleCentralManger) {};
         ~BluetoothBleCentralManagerCallbackImp() override = default;
         void OnScanCallback(const BluetoothBleScanResult &result) override
         {
-            std::lock_guard<std::mutex> lock(bleCentralManger_.blesCanFiltersMutex_);
-            if (!bleCentralManger_.bleScanFilters_.empty() && bleCentralManger_.IsNeedFilterMatches_
-                && !bleCentralManger_.MatchesScanFilters(result)) {
-                HILOGE("the result does not matche the filter, ignore");
-                return;
+            {
+                std::lock_guard<std::mutex> lock(bleCentralManger_.blesCanFiltersMutex_);
+                if (!bleCentralManger_.bleScanFilters_.empty() && bleCentralManger_.IsNeedFilterMatches_
+                    && !bleCentralManger_.MatchesScanFilters(result)) {
+                    HILOGE("the result does not matche the filter, ignore");
+                    return;
+                }
             }
 
             bleCentralManger_.callbacks_.ForEach([&result](std::shared_ptr<BleCentralManagerCallback> observer) {
@@ -216,10 +218,13 @@ bool BleCentralManager::impl::MatchesAddrAndName(BluetoothBleScanFilter filter, 
         return false;
     }
 
-    std::string rName = device.GetDeviceName();
     std::string name = filter.GetName();
-    if (!name.empty() && (rName.empty() || rName != name)) {
-        return false;
+    // To avoid to call IPC if no needed.
+    if (!name.empty()) {
+        std::string rName = device.GetDeviceName();
+        if (rName.empty() || rName != name) {
+            return false;
+        }
     }
 
     return true;
@@ -326,7 +331,6 @@ std::string BleCentralManager::impl::ParseServiceData(bluetooth::Uuid uuid, std:
 {
     std::string tmpServcieData;
     int uuidType = uuid.GetUuidType();
-    HILOGI("enter, uuidType: %{public}d ", uuidType);
     switch (uuidType) {
         case bluetooth::Uuid::UUID16_BYTES_TYPE: {
             uint16_t uuid16 = uuid.ConvertTo16Bits();
