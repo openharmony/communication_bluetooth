@@ -25,12 +25,12 @@ namespace OHOS {
 namespace bluetooth {
 AvrcTgUnitPacket::AvrcTgUnitPacket() : label_(AVRC_DEFAULT_LABEL)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 AvrcTgUnitPacket::AvrcTgUnitPacket(Packet *pkt, uint8_t label) : label_(label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgUnitPacket::%{public}s", __func__);
+    HILOGI("label:%{public}d", label);
 
     label_ = label;
 
@@ -39,7 +39,7 @@ AvrcTgUnitPacket::AvrcTgUnitPacket(Packet *pkt, uint8_t label) : label_(label)
 
 AvrcTgUnitPacket::~AvrcTgUnitPacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (pkt_ != nullptr) {
         PacketFree(pkt_);
@@ -49,7 +49,7 @@ AvrcTgUnitPacket::~AvrcTgUnitPacket(void)
 
 const Packet *AvrcTgUnitPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_TG_UNIT_RESPONSE_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
@@ -67,7 +67,7 @@ const Packet *AvrcTgUnitPacket::AssemblePacket(void)
 
 bool AvrcTgUnitPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
     size_t size = PacketPayloadSize(pkt);
@@ -75,9 +75,8 @@ bool AvrcTgUnitPacket::DisassemblePacket(Packet *pkt)
         isValid_ = true;
     } else {
         crCode_ = AVRC_TG_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP TG] The size of the packet is invalid! - actual size[%zu] - valid min size[%u]",
-            size,
-            AVRC_TG_UNIT_COMMAND_SIZE);
+        HILOGI("The size of the packet is invalid! actual size: %{public}zu valid min size: %{public}u",
+            size, AVRC_TG_UNIT_COMMAND_SIZE);
     }
 
     return isValid_;

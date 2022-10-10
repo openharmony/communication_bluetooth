@@ -20,13 +20,13 @@ namespace bluetooth {
 AvrcTgPassPacket::AvrcTgPassPacket()
     : stateFlag_(AVRC_KEY_STATE_INVALID), operationId_(AVRC_KEY_OPERATION_INVALID), label_(AVRC_DEFAULT_LABEL)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 AvrcTgPassPacket::AvrcTgPassPacket(uint8_t oper, uint8_t state, uint8_t label)
     : stateFlag_(AVRC_KEY_STATE_INVALID), operationId_(AVRC_KEY_OPERATION_INVALID), label_(AVRC_DEFAULT_LABEL)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("oper: %{public}d, state: %{public}d, label: %{public}d", oper, state, label);
 
     operationId_ = oper;
     stateFlag_ = state;
@@ -36,7 +36,7 @@ AvrcTgPassPacket::AvrcTgPassPacket(uint8_t oper, uint8_t state, uint8_t label)
 AvrcTgPassPacket::AvrcTgPassPacket(Packet *pkt, uint8_t label)
     : stateFlag_(AVRC_KEY_STATE_INVALID), operationId_(AVRC_KEY_OPERATION_INVALID), label_(AVRC_DEFAULT_LABEL)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("label: %{public}d", label);
 
     label_ = label;
 
@@ -45,7 +45,7 @@ AvrcTgPassPacket::AvrcTgPassPacket(Packet *pkt, uint8_t label)
 
 AvrcTgPassPacket::~AvrcTgPassPacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (pkt_ != nullptr) {
         PacketFree(pkt_);
@@ -55,7 +55,7 @@ AvrcTgPassPacket::~AvrcTgPassPacket(void)
 
 const Packet *AvrcTgPassPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_TG_PASS_RESPONSE_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
@@ -72,7 +72,7 @@ const Packet *AvrcTgPassPacket::AssemblePacket(void)
 
 bool AvrcTgPassPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
     size_t size = PacketPayloadSize(pkt);
@@ -96,9 +96,8 @@ bool AvrcTgPassPacket::DisassemblePacket(Packet *pkt)
         }
     } else {
         crCode_ = AVRC_TG_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP TG] The size of the packet is invalid! - actual size[%zu] - valid min size[%u]",
-            size,
-            AVRC_TG_PASS_COMMAND_SIZE);
+        HILOGI("The size of the packet is invalid! - actual size: %{public}zu valid min size: %{public}u",
+            size, AVRC_TG_PASS_COMMAND_SIZE);
     }
 
     return isValid_;
@@ -106,21 +105,21 @@ bool AvrcTgPassPacket::DisassemblePacket(Packet *pkt)
 
 bool AvrcTgPassPacket::IsSupportedKeyOperation(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     return IsSupportedKeyOperation(operationId_);
 }
 
 bool AvrcTgPassPacket::IsValidKeyState(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     return IsValidKeyState(stateFlag_);
 }
 
 bool AvrcTgPassPacket::IsSupportedKeyOperation(uint8_t key)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("key: %{public}d", key);
 
     bool rtnSts = true;
 
@@ -145,7 +144,7 @@ bool AvrcTgPassPacket::IsSupportedKeyOperation(uint8_t key)
 
 bool AvrcTgPassPacket::IsValidKeyState(uint8_t state)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgPassPacket::%{public}s", __func__);
+    HILOGI("state: %{public}d", state);
 
     bool rtnSts = true;
 
