@@ -22,12 +22,12 @@ namespace bluetooth {
 
 AvrcTgBrowsePacket::AvrcTgBrowsePacket() : status_(AVRC_ES_CODE_NO_ERROR), label_(AVRC_INVALID_LABEL)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcCtBrowsePacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 AvrcTgBrowsePacket::AvrcTgBrowsePacket(uint8_t pduId, uint8_t status, uint8_t label) : status_(status), label_(label)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcCtBrowsePacket::%{public}s", __func__);
+    HILOGI("pduId: %{public}d, status: %{public}d, label: %{public}d", pduId, status, label);
 
     pduId_ = pduId;
     status_ = status;
@@ -36,7 +36,7 @@ AvrcTgBrowsePacket::AvrcTgBrowsePacket(uint8_t pduId, uint8_t status, uint8_t la
 
 AvrcTgBrowsePacket::~AvrcTgBrowsePacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcCtBrowsePacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (pkt_ != nullptr) {
         PacketFree(pkt_);
@@ -46,28 +46,28 @@ AvrcTgBrowsePacket::~AvrcTgBrowsePacket()
 
 const Packet *AvrcTgBrowsePacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgBrowsePacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_TG_BROWSE_MIN_SIZE + AVRC_TG_BROWSE_STATUS_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((buffer + offset), pduId_);
-    LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+    HILOGI("pduId_: %{public}x", pduId_);
 
     parameterLength_ = AVRC_TG_BROWSE_STATUS_SIZE;
     offset += PushOctets2((buffer + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     PushOctets1((buffer + offset), status_);
-    LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
+    HILOGI("status_: %{public}x", status_);
 
     return pkt_;
 }
 
 bool AvrcTgBrowsePacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgBrowsePacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = pkt;
 
@@ -76,7 +76,7 @@ bool AvrcTgBrowsePacket::DisassemblePacket(Packet *pkt)
 
 bool AvrcTgBrowsePacket::IsValidParameterLength(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcCtBrowsePacket::%{public}s", __func__);
+    HILOGI("enter");
 
     bool result = false;
 
@@ -88,15 +88,14 @@ bool AvrcTgBrowsePacket::IsValidParameterLength(Packet *pkt)
         uint64_t payload = 0x00;
         PopOctets2((buffer + offset), payload);
         parameterLength_ = static_cast<uint32_t>(payload);
-        LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
+        HILOGI("parameterLength_: %{public}u", parameterLength_);
 
         if (size - AVRC_TG_BROWSE_MIN_SIZE == parameterLength_) {
             result = true;
         }
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%zu] - valid size[%u]",
-            size,
-            AVRC_TG_BROWSE_MIN_SIZE);
+        HILOGI("The size of the packet is invalid! actual size: %{public}zu, valid size: %{public}u",
+            size, AVRC_TG_BROWSE_MIN_SIZE);
     }
 
     return result;
@@ -110,12 +109,12 @@ AvrcTgSbpPacket::AvrcTgSbpPacket(uint16_t mtu, uint8_t status, uint16_t uidCount
     const std::vector<std::string> &folderNames, uint8_t label)
     : AvrcTgBrowsePacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSbpPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pduId_ = AVRC_TG_PDU_ID_SET_BROWSED_PLAYER;
     parameterLength_ = AVRC_TG_SBP_MIN_RSP_FRAME_SIZE;
     mtu_ = mtu;
-    LOG_DEBUG("[AVRCP TG] mtu_[%u]", mtu_);
+    HILOGI("mtu_: %{public}u", mtu_);
     status_ = status;
     uidCounter_ = uidCounter;
     numOfItems_ = numOfItems;
@@ -125,7 +124,7 @@ AvrcTgSbpPacket::AvrcTgSbpPacket(uint16_t mtu, uint8_t status, uint16_t uidCount
 
 AvrcTgSbpPacket::AvrcTgSbpPacket(Packet *pkt, uint8_t label) : AvrcTgBrowsePacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSbpPacket::%{public}s", __func__);
+    HILOGI("label: %{public}d", label);
 
     pduId_ = AVRC_TG_PDU_ID_SET_BROWSED_PLAYER;
     label_ = label;
@@ -135,12 +134,12 @@ AvrcTgSbpPacket::AvrcTgSbpPacket(Packet *pkt, uint8_t label) : AvrcTgBrowsePacke
 
 AvrcTgSbpPacket::~AvrcTgSbpPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSbpPacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 const Packet *AvrcTgSbpPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSbpPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t folderNamesSize = 0x0000;
     for (std::string folderName : folderNames_) {
@@ -155,36 +154,36 @@ const Packet *AvrcTgSbpPacket::AssemblePacket(void)
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((buffer + offset), pduId_);
-    LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+    HILOGI("pduId_: %{public}x", pduId_);
 
     parameterLength_ = frameSize - (AVRC_TG_BROWSE_PDU_ID_SIZE + AVRC_TG_BROWSE_PARAMETER_LENGTH_SIZE);
     offset += PushOctets2((buffer + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
+    HILOGI("parameterLength_: %{public}u", parameterLength_);
 
     offset += PushOctets1((buffer + offset), status_);
-    LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
+    HILOGI("status_: %{public}x", status_);
 
     offset += PushOctets2((buffer + offset), uidCounter_);
-    LOG_DEBUG("[AVRCP TG] uidCounter_[%x]", uidCounter_);
+    HILOGI("uidCounter_: %{public}x", uidCounter_);
 
     offset += PushOctets4((buffer + offset), numOfItems_);
-    LOG_DEBUG("[AVRCP TG] numOfItems_[%{public}d]", numOfItems_);
+    HILOGI("numOfItems_: %{public}d", numOfItems_);
 
     offset += PushOctets2((buffer + offset), AVRC_MEDIA_CHARACTER_SET_UTF8);
-    LOG_DEBUG("[AVRCP TG] characterSetId_[%x]", AVRC_MEDIA_CHARACTER_SET_UTF8);
+    HILOGI("characterSetId_: %{public}x", AVRC_MEDIA_CHARACTER_SET_UTF8);
 
     folderDepth_ = folderNames_.size();
     offset += PushOctets1((buffer + offset), folderDepth_);
-    LOG_DEBUG("[AVRCP TG] folderDepth_[%{public}d]", folderDepth_);
+    HILOGI("folderDepth_: %{public}d", folderDepth_);
 
     for (std::string folderName : folderNames_) {
         offset += PushOctets2((buffer + offset), folderName.size());
-        LOG_DEBUG("[AVRCP TG] folderNameLength_[%{public}zu]", folderName.size());
+        HILOGI("folderNameLength_: %{public}zu", folderName.size());
 
         for (auto it = folderName.begin(); it != folderName.end(); it++) {
             offset += PushOctets1((buffer + offset), *it);
         }
-        LOG_DEBUG("[AVRCP TG] folderName_[%{public}s]", folderName.c_str());
+        HILOGI("folderName_: %{public}s", folderName.c_str());
     }
 
     return pkt_;
@@ -192,7 +191,7 @@ const Packet *AvrcTgSbpPacket::AssemblePacket(void)
 
 bool AvrcTgSbpPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgSbpPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = IsValidParameterLength(pkt);
     if (isValid_) {
@@ -205,15 +204,15 @@ bool AvrcTgSbpPacket::DisassemblePacket(Packet *pkt)
                 uint64_t payload = 0x00;
                 offset += PopOctets1((buffer + offset), payload);
                 pduId_ = static_cast<uint8_t>(payload);
-                LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+                HILOGI("pduId_: %{public}x", pduId_);
 
                 offset += PopOctets2((buffer + offset), payload);
                 parameterLength_ = static_cast<uint16_t>(payload);
-                LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
+                HILOGI("parameterLength_: %{public}u", parameterLength_);
 
                 PopOctets2((buffer + offset), payload);
                 playerId_ = static_cast<uint16_t>(payload);
-                LOG_DEBUG("[AVRCP TG] playerId_[%x]", playerId_);
+                HILOGI("playerId_: %{public}x", playerId_);
 
                 isValid_ = true;
             } while (false);
@@ -230,7 +229,7 @@ bool AvrcTgSbpPacket::DisassemblePacket(Packet *pkt)
 AvrcTgCpPacket::AvrcTgCpPacket(uint8_t status, uint32_t numOfItems, uint8_t label)
     : AvrcTgBrowsePacket(), direction_(AVRC_FOLDER_DIRECTION_INVALID)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgCpPacket::%{public}s", __func__);
+    HILOGI("status: %{public}d, numOfItems: %{public}u, label: %{public}d", status, numOfItems, label);
 
     pduId_ = AVRC_TG_PDU_ID_CHANGE_PATH;
     parameterLength_ = AVRC_TG_CP_FIXED_RSP_PARAMETER_LENGTH;
@@ -242,7 +241,7 @@ AvrcTgCpPacket::AvrcTgCpPacket(uint8_t status, uint32_t numOfItems, uint8_t labe
 AvrcTgCpPacket::AvrcTgCpPacket(Packet *pkt, uint32_t uidCounter, uint8_t label)
     : AvrcTgBrowsePacket(), direction_(AVRC_FOLDER_DIRECTION_INVALID)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgCpPacket::%{public}s", __func__);
+    HILOGI("uidCounter: %{public}u, label: %{public}d", uidCounter, label);
 
     pduId_ = AVRC_TG_PDU_ID_CHANGE_PATH;
     label_ = label;
@@ -253,35 +252,35 @@ AvrcTgCpPacket::AvrcTgCpPacket(Packet *pkt, uint32_t uidCounter, uint8_t label)
 
 AvrcTgCpPacket::~AvrcTgCpPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgCpPacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 const Packet *AvrcTgCpPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgCpPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_TG_CP_FIXED_RSP_FRAME_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((buffer + offset), pduId_);
-    LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+    HILOGI("pduId_: %{public}x", pduId_);
 
     offset += PushOctets2((buffer + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
+    HILOGI("parameterLength_: %{public}u", parameterLength_);
 
     offset += PushOctets1((buffer + offset), status_);
-    LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
+    HILOGI("status_: %{public}x", status_);
 
     PushOctets4((buffer + offset), numOfItems_);
-    LOG_DEBUG("[AVRCP TG] numOfItems_[%u]", numOfItems_);
+    HILOGI("numOfItems_: %{public}u", numOfItems_);
 
     return pkt_;
 }
 
 bool AvrcTgCpPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgCpPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
     size_t size = PacketPayloadSize(pkt);
@@ -293,16 +292,16 @@ bool AvrcTgCpPacket::DisassemblePacket(Packet *pkt)
             uint64_t payload = 0x00;
             offset += PopOctets1((buffer + offset), payload);
             pduId_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+            HILOGI("pduId_: %{public}x", pduId_);
 
             offset += PopOctets2((buffer + offset), payload);
             parameterLength_ = static_cast<uint16_t>(payload);
-            LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
+            HILOGI("parameterLength_: %{public}u", parameterLength_);
 
             offset += PopOctets2((buffer + offset), payload);
             uint32_t uidCounter = static_cast<uint16_t>(payload);
-            LOG_DEBUG("[AVRCP TG] uidCounter[%u]", uidCounter);
-            LOG_DEBUG("[AVRCP TG] uidCounter_[%u]", uidCounter_);
+            HILOGI("uidCounter: %{public}u", uidCounter);
+            HILOGI("uidCounter_: %{public}u", uidCounter_);
             if (uidCounter != uidCounter_) {
                 status_ = AVRC_ES_CODE_UID_CHANGED;
                 break;
@@ -310,21 +309,20 @@ bool AvrcTgCpPacket::DisassemblePacket(Packet *pkt)
 
             offset += PopOctets1((buffer + offset), payload);
             direction_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] direction_[%x]", direction_);
+            HILOGI("direction_: %{public}x", direction_);
             if (direction_ < AVRC_FOLDER_DIRECTION_UP || direction_ > AVRC_FOLDER_DIRECTION_DOWN) {
                 status_ = AVRC_ES_CODE_INVALID_DIRECTION;
                 break;
             }
 
             PopOctets8((buffer + offset), folderUid_);
-            LOG_DEBUG("[AVRCP TG] folderUid_[%jx]", folderUid_);
+            HILOGI("folderUid_: %{public}jx", folderUid_);
 
             isValid_ = true;
         } while (false);
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}zu] - valid size[%{public}d]",
-            size,
-            AVRC_TG_CP_FIXED_CMD_FRAME_SIZE);
+        HILOGI("The size of the packet is invalid! actual size: %{public}zu valid size: %{public}d",
+            size, AVRC_TG_CP_FIXED_CMD_FRAME_SIZE);
     }
 
     return isValid_;
@@ -338,11 +336,12 @@ AvrcTgGfiPacket::AvrcTgGfiPacket(
     uint16_t mtu, uint8_t status, uint32_t uidCounter, const std::vector<AvrcMpItem> &items, uint8_t label)
     : AvrcTgBrowsePacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("mtu: %{public}d, status: %{public}d, uidCounter: %{public}u, label: %{public}d",
+        mtu, status, uidCounter, label);
 
     pduId_ = AVRC_TG_PDU_ID_GET_FOLDER_ITEMS;
     mtu_ = mtu;
-    LOG_DEBUG("[AVRCP TG] mtu_[%{public}d]", mtu_);
+    HILOGI("mtu_: %{public}d", mtu_);
     status_ = status;
     label_ = label;
     scope_ = AVRC_MEDIA_SCOPE_PLAYER_LIST;
@@ -354,11 +353,12 @@ AvrcTgGfiPacket::AvrcTgGfiPacket(
     uint16_t mtu, uint8_t status, uint32_t uidCounter, const std::vector<AvrcMeItem> &items, uint8_t label)
     : AvrcTgBrowsePacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("mtu: %{public}d, status: %{public}d, uidCounter: %{public}u, label: %{public}d",
+        mtu, status, uidCounter, label);
 
     pduId_ = AVRC_TG_PDU_ID_GET_FOLDER_ITEMS;
     mtu_ = mtu;
-    LOG_DEBUG("[AVRCP TG] mtu_[%{public}d]", mtu_);
+    HILOGI("mtu_: %{public}d", mtu_);
     status_ = status;
     label_ = label;
     scope_ = AVRC_MEDIA_SCOPE_NOW_PLAYING;
@@ -368,7 +368,7 @@ AvrcTgGfiPacket::AvrcTgGfiPacket(
 
 AvrcTgGfiPacket::AvrcTgGfiPacket(Packet *pkt, uint8_t label) : AvrcTgBrowsePacket(), scope_(AVRC_MEDIA_SCOPE_INVALID)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("label: %{public}d", label);
 
     pduId_ = AVRC_TG_PDU_ID_GET_FOLDER_ITEMS;
     label_ = label;
@@ -378,7 +378,7 @@ AvrcTgGfiPacket::AvrcTgGfiPacket(Packet *pkt, uint8_t label) : AvrcTgBrowsePacke
 
 AvrcTgGfiPacket::~AvrcTgGfiPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     attributes_.clear();
     mpItems_.clear();
@@ -387,7 +387,7 @@ AvrcTgGfiPacket::~AvrcTgGfiPacket()
 
 const Packet *AvrcTgGfiPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (scope_ == AVRC_MEDIA_SCOPE_PLAYER_LIST) {
         pkt_ = AssembleMpPacket();
@@ -400,7 +400,7 @@ const Packet *AvrcTgGfiPacket::AssemblePacket(void)
 
 uint16_t AvrcTgGfiPacket::CountMpFrameSize(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t frameSize = AVRC_TG_GFI_MIN_RSP_FRAME_SIZE + AVRC_TG_GFI_FIXED_RSP_PARAMETER_LENGTH;
     uint16_t tempSize = frameSize;
@@ -419,7 +419,7 @@ uint16_t AvrcTgGfiPacket::CountMpFrameSize(void)
         tempSize += AVRC_TG_GFI_ITEM_LENGTH_SIZE;
         tempSize += itemLength;
         tempSize += item.name_.length();
-        LOG_DEBUG("[AVRCP TG] tempSize[%u]", tempSize);
+        HILOGI("tempSize: %{public}u", tempSize);
 
         if (tempSize <= mtu_) {
             frameSize = tempSize;
@@ -434,7 +434,7 @@ uint16_t AvrcTgGfiPacket::CountMpFrameSize(void)
 
 Packet *AvrcTgGfiPacket::AssembleMpPacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t frameSize = CountMpFrameSize();
 
@@ -443,23 +443,23 @@ Packet *AvrcTgGfiPacket::AssembleMpPacket(void)
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((buffer + offset), pduId_);
-    LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+    HILOGI("pduId_: %{public}x", pduId_);
 
     parameterLength_ = frameSize - AVRC_TG_GIA_MIN_RSP_FRAME_SIZE;
     offset += PushOctets2((buffer + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     if (numOfItems_ == AVRC_TG_GFI_NUMBER_OF_ITEMS) {
         status_ = AVRC_ES_CODE_RANGE_OUT_OF_BOUNDS;
     }
     offset += PushOctets1((buffer + offset), status_);
-    LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
+    HILOGI("status_: %{public}x", status_);
 
     offset += PushOctets2((buffer + offset), uidCounter_);
-    LOG_DEBUG("[AVRCP TG] uidCounter_[%{public}d]", uidCounter_);
+    HILOGI("uidCounter_: %{public}d", uidCounter_);
 
     offset += PushOctets2((buffer + offset), numOfItems_);
-    LOG_DEBUG("[AVRCP TG] numOfItems_[%{public}d]", numOfItems_);
+    HILOGI("numOfItems_: %{public}d", numOfItems_);
 
     AssembleMpItem(buffer, offset);
 
@@ -468,7 +468,7 @@ Packet *AvrcTgGfiPacket::AssembleMpPacket(void)
 
 void AvrcTgGfiPacket::AssembleMpItem(uint8_t *buffer, uint16_t offset)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("offset: %{public}d", offset);
 
     uint16_t itemLength = AVRC_TG_GFI_PLAYER_ID_SIZE + AVRC_TG_GFI_MAJOR_PLAYER_TYPE_SIZE +
                           AVRC_TG_GFI_PLAYER_SUB_TYPE_SIZE + AVRC_TG_GFI_PLAY_STATUS_SIZE +
@@ -482,27 +482,27 @@ void AvrcTgGfiPacket::AssembleMpItem(uint8_t *buffer, uint16_t offset)
             break;
         }
         newOffset += PushOctets1((buffer + newOffset), item.itemType_);
-        LOG_DEBUG("[AVRCP TG] itemType_[%x]", item.itemType_);
+        HILOGI("itemType_: %{public}x", item.itemType_);
 
         newOffset += PushOctets2((buffer + newOffset), itemLength + item.name_.size());
-        LOG_DEBUG("[AVRCP TG] itemLength[%{public}zu]", itemLength + item.name_.size());
+        HILOGI("itemLength: %{public}zu", itemLength + item.name_.size());
 
         newOffset += PushOctets2((buffer + newOffset), item.playerId_);
-        LOG_DEBUG("[AVRCP TG] playerId_[%x]", item.playerId_);
+        HILOGI("playerId_: %{public}x", item.playerId_);
 
         newOffset += PushOctets1((buffer + newOffset), item.majorType_);
-        LOG_DEBUG("[AVRCP TG] majorType_[%x]", item.majorType_);
+        HILOGI("majorType_: %{public}x", item.majorType_);
 
         newOffset += PushOctets4((buffer + newOffset), item.subType_);
-        LOG_DEBUG("[AVRCP TG] subType_[%x]", item.subType_);
+        HILOGI("subType_: %{public}x", item.subType_);
 
         newOffset += PushOctets1((buffer + newOffset), item.playStatus_);
-        LOG_DEBUG("[AVRCP TG] playStatus_[%x]", item.playStatus_);
+        HILOGI("playStatus_: %{public}x", item.playStatus_);
 
         for (int i = 0; i < AVRC_TG_GFI_VALID_FEATURE_OCTETS; i++) {
             if (i < static_cast<int>(item.features_.size())) {
                 newOffset += PushOctets1((buffer + newOffset), item.features_.at(i));
-                LOG_DEBUG("[AVRCP TG] feature[%x]", item.features_.at(i));
+                HILOGI("feature: %{public}x", item.features_.at(i));
             } else {
                 newOffset += PushOctets1((buffer + newOffset), 0x00);
             }
@@ -511,18 +511,18 @@ void AvrcTgGfiPacket::AssembleMpItem(uint8_t *buffer, uint16_t offset)
         newOffset += PushOctets2((buffer + newOffset), AVRC_MEDIA_CHARACTER_SET_UTF8);
 
         newOffset += PushOctets2((buffer + newOffset), item.name_.size());
-        LOG_DEBUG("[AVRCP TG] nameLength[%{public}zu]", item.name_.size());
+        HILOGI("nameLength: %{public}zu", item.name_.size());
 
         for (auto it = item.name_.begin(); it != item.name_.end(); it++) {
             newOffset += PushOctets1((buffer + newOffset), *it);
         }
-        LOG_DEBUG("[AVRCP TG] value[%{public}s]", item.name_.c_str());
+        HILOGI("value: %{public}s", item.name_.c_str());
     }
 }
 
 uint16_t AvrcTgGfiPacket::CountMeFrameSize(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t frameSize = AVRC_TG_GFI_MIN_RSP_FRAME_SIZE + AVRC_TG_GFI_FIXED_RSP_PARAMETER_LENGTH;
     uint16_t tempSize = frameSize;
@@ -548,7 +548,7 @@ uint16_t AvrcTgGfiPacket::CountMeFrameSize(void)
                 tempSize += item.values_.at(i).length();
             }
         }
-        LOG_DEBUG("[AVRCP TG] tempSize[%{public}d]", tempSize);
+        HILOGI("tempSize: %{public}d", tempSize);
 
         if (tempSize <= mtu_) {
             frameSize = tempSize;
@@ -563,7 +563,7 @@ uint16_t AvrcTgGfiPacket::CountMeFrameSize(void)
 
 Packet *AvrcTgGfiPacket::AssembleMePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t frameSize = CountMeFrameSize();
 
@@ -572,23 +572,23 @@ Packet *AvrcTgGfiPacket::AssembleMePacket(void)
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((buffer + offset), pduId_);
-    LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+    HILOGI("pduId_: %{public}x", pduId_);
 
     parameterLength_ = frameSize - AVRC_TG_GIA_MIN_RSP_FRAME_SIZE;
     offset += PushOctets2((buffer + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     if (numOfItems_ == AVRC_TG_GFI_NUMBER_OF_ITEMS) {
         status_ = AVRC_ES_CODE_RANGE_OUT_OF_BOUNDS;
     }
     offset += PushOctets1((buffer + offset), status_);
-    LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
+    HILOGI("status_: %{public}x", status_);
 
     offset += PushOctets2((buffer + offset), uidCounter_);
-    LOG_DEBUG("[AVRCP TG] uidCounter_[%{public}d]", uidCounter_);
+    HILOGI("uidCounter_: %{public}d", uidCounter_);
 
     offset += PushOctets2((buffer + offset), numOfItems_);
-    LOG_DEBUG("[AVRCP TG] numOfItems_[%{public}d]", numOfItems_);
+    HILOGI("numOfItems_: %{public}d", numOfItems_);
 
     AssembleMeItem(buffer, offset);
 
@@ -597,7 +597,7 @@ Packet *AvrcTgGfiPacket::AssembleMePacket(void)
 
 void AvrcTgGfiPacket::AssembleMeItem(uint8_t *buffer, uint16_t offset)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("offset: %{public}d", offset);
 
     uint16_t itemLength =
         AVRC_TG_GFI_UID_SIZE + AVRC_TG_GFI_TYPE_SIZE + AVRC_TG_GFI_CHARACTER_SET_ID_SIZE + AVRC_TG_GFI_NAME_LENGTH_SIZE;
@@ -659,7 +659,7 @@ void AvrcTgGfiPacket::AssembleMeItem(uint8_t *buffer, uint16_t offset)
 
 bool AvrcTgGfiPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
     size_t size = PacketPayloadSize(pkt);
@@ -671,15 +671,15 @@ bool AvrcTgGfiPacket::DisassemblePacket(Packet *pkt)
             uint64_t payload = 0x00;
             offset += PopOctets1((buffer + offset), payload);
             pduId_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+            HILOGI("pduId_: %{public}x", pduId_);
 
             offset += PopOctets2((buffer + offset), payload);
             parameterLength_ = static_cast<uint16_t>(payload);
-            LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+            HILOGI("parameterLength_: %{public}d", parameterLength_);
 
             offset += PopOctets1((buffer + offset), payload);
             scope_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] scope_[%x]", scope_);
+            HILOGI("scope_: %{public}x", scope_);
             if (scope_ < AVRC_MEDIA_SCOPE_PLAYER_LIST || scope_ > AVRC_MEDIA_SCOPE_NOW_PLAYING) {
                 status_ = AVRC_ES_CODE_INVALID_SCOPE;
                 break;
@@ -687,11 +687,11 @@ bool AvrcTgGfiPacket::DisassemblePacket(Packet *pkt)
 
             offset += PopOctets4((buffer + offset), payload);
             startItem_ = static_cast<uint32_t>(payload);
-            LOG_DEBUG("[AVRCP TG] startItem_[%x]", startItem_);
+            HILOGI("startItem_: %{public}x", startItem_);
 
             offset += PopOctets4((buffer + offset), payload);
             endItem_ = static_cast<uint32_t>(payload);
-            LOG_DEBUG("[AVRCP TG] endItem_[%x]", endItem_);
+            HILOGI("endItem_: %{public}x", endItem_);
             if (startItem_ > endItem_) {
                 status_ = AVRC_ES_CODE_RANGE_OUT_OF_BOUNDS;
                 break;
@@ -699,7 +699,7 @@ bool AvrcTgGfiPacket::DisassemblePacket(Packet *pkt)
 
             offset += PopOctets1((buffer + offset), payload);
             attributeCount_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] attributeCount_[%x]", attributeCount_);
+            HILOGI("attributeCount_: %{public}x", attributeCount_);
 
             if (scope_ == AVRC_MEDIA_SCOPE_PLAYER_LIST) {
                 isValid_ = true;
@@ -711,9 +711,8 @@ bool AvrcTgGfiPacket::DisassemblePacket(Packet *pkt)
             isValid_ = true;
         } while (false);
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}zu] - valid size[%{public}d]",
-            size,
-            AVRC_TG_GIA_MIN_CMD_FRAME_SIZE);
+        HILOGI("The size of the packet is invalid! actual size: %{public}zu valid size: %{public}d",
+            size, AVRC_TG_GIA_MIN_CMD_FRAME_SIZE);
     }
 
     return isValid_;
@@ -721,7 +720,7 @@ bool AvrcTgGfiPacket::DisassemblePacket(Packet *pkt)
 
 void AvrcTgGfiPacket::DisassemblePacketAttributes(Packet *pkt, uint8_t offset)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGfiPacket::%{public}s", __func__);
+    HILOGI("offset: %{public}x", offset);
 
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt)));
     uint64_t payload = 0x00;
@@ -740,7 +739,7 @@ void AvrcTgGfiPacket::DisassemblePacketAttributes(Packet *pkt, uint8_t offset)
         for (int i = 0; i < attributeCount_; i++) {
             offset += PopOctets4((buffer + offset), payload);
             attributes_.push_back(static_cast<uint32_t>(payload));
-            LOG_DEBUG("[AVRCP TG] attribute[%x]", attributes_.back());
+            HILOGI("attribute: %{public}x", attributes_.back());
         }
     }
 }
@@ -753,11 +752,11 @@ AvrcTgGiaPacket::AvrcTgGiaPacket(uint16_t mtu, uint8_t status, const std::vector
     const std::vector<std::string> &values, uint8_t label)
     : AvrcTgBrowsePacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGiaPacket::%{public}s", __func__);
+    HILOGI("mtu: %{public}d, status: %{public}d, label: %{public}d", mtu, status, label);
 
     pduId_ = AVRC_TG_PDU_ID_GET_ITEM_ATTRIBUTES;
     mtu_ = mtu;
-    LOG_DEBUG("[AVRCP TG] mtu_[%u]", mtu_);
+    HILOGI("mtu_: %{public}u", mtu_);
     status_ = status;
     label_ = label;
     attributes_ = attributes;
@@ -767,7 +766,7 @@ AvrcTgGiaPacket::AvrcTgGiaPacket(uint16_t mtu, uint8_t status, const std::vector
 AvrcTgGiaPacket::AvrcTgGiaPacket(Packet *pkt, uint32_t uidCounter, uint8_t label)
     : AvrcTgBrowsePacket(), scope_(AVRC_MEDIA_SCOPE_INVALID)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGiaPacket::%{public}s", __func__);
+    HILOGI("uidCounter: %{public}u, label: %{public}d", uidCounter, label);
 
     pduId_ = AVRC_TG_PDU_ID_GET_ITEM_ATTRIBUTES;
     label_ = label;
@@ -778,7 +777,7 @@ AvrcTgGiaPacket::AvrcTgGiaPacket(Packet *pkt, uint32_t uidCounter, uint8_t label
 
 AvrcTgGiaPacket::~AvrcTgGiaPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGiaPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     attributes_.clear();
     values_.clear();
@@ -786,7 +785,7 @@ AvrcTgGiaPacket::~AvrcTgGiaPacket()
 
 const Packet *AvrcTgGiaPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGiaPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     uint16_t frameSize = AVRC_TG_GIA_MIN_RSP_FRAME_SIZE + AVRC_TG_GIA_FIXED_RSP_PARAMETER_LENGTH;
     uint16_t tempSize = frameSize;
@@ -797,7 +796,7 @@ const Packet *AvrcTgGiaPacket::AssemblePacket(void)
         tempSize += AVRC_TG_GIA_CHARACTER_SET_ID_SIZE;
         tempSize += AVRC_TG_GIA_ATTRIBUTE_VALUE_LENGTH_SIZE;
         tempSize += values_.at(i).length();
-        LOG_DEBUG("[AVRCP TG] tempSize[%{public}d]", tempSize);
+        HILOGI("tempSize: %{public}d", tempSize);
 
         if (tempSize <= mtu_) {
             frameSize = tempSize;
@@ -812,42 +811,42 @@ const Packet *AvrcTgGiaPacket::AssemblePacket(void)
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((buffer + offset), pduId_);
-    LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+    HILOGI("pduId_: %{public}x", pduId_);
 
     parameterLength_ = frameSize - AVRC_TG_GIA_MIN_RSP_FRAME_SIZE;
     offset += PushOctets2((buffer + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     offset += PushOctets1((buffer + offset), status_);
-    LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
+    HILOGI("status_: %{public}x", status_);
 
     offset += PushOctets1((buffer + offset), numOfAttributes_);
-    LOG_DEBUG("[AVRCP TG] numOfAttributes_[%{public}d]", numOfAttributes_);
+    HILOGI("numOfAttributes_: %{public}d", numOfAttributes_);
 
     for (int i = 0; i < numOfAttributes_; i++) {
         offset += PushOctets4((buffer + offset), attributes_.at(i));
-        LOG_DEBUG("[AVRCP TG] attribute[%x]", attributes_.at(i));
+        HILOGI("attribute: %{public}x", attributes_.at(i));
 
         offset += PushOctets2((buffer + offset), AVRC_MEDIA_CHARACTER_SET_UTF8);
-        LOG_DEBUG("[AVRCP TG] characterSetId[%x]", AVRC_MEDIA_CHARACTER_SET_UTF8);
+        HILOGI("characterSetId: %{public}x", AVRC_MEDIA_CHARACTER_SET_UTF8);
 
         offset += PushOctets2((buffer + offset), values_.at(i).size());
-        LOG_DEBUG("[AVRCP TG] valueLength[%{public}zu]", values_.at(i).size());
+        HILOGI("valueLength: %{public}zu", values_.at(i).size());
 
         for (auto it = values_.at(i).begin(); it != values_.at(i).end(); it++) {
             offset += PushOctets1((buffer + offset), *it);
         }
-        LOG_DEBUG("[AVRCP TG] value[%{public}s]", values_.at(i).c_str());
+        HILOGI("value: %{public}s", values_.at(i).c_str());
     }
 
-    LOG_DEBUG("[AVRCP TG] offset[%{public}hu]", offset);
+    HILOGI("offset: %{public}hu", offset);
 
     return pkt_;
 }
 
 bool AvrcTgGiaPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGiaPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
     size_t size = PacketPayloadSize(pkt);
@@ -859,15 +858,15 @@ bool AvrcTgGiaPacket::DisassemblePacket(Packet *pkt)
             uint64_t payload = 0x00;
             offset += PopOctets1((buffer + offset), payload);
             pduId_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+            HILOGI("pduId_: %{public}x", pduId_);
 
             offset += PopOctets2((buffer + offset), payload);
             parameterLength_ = static_cast<uint16_t>(payload);
-            LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+            HILOGI("parameterLength_: %{public}d", parameterLength_);
 
             offset += PopOctets1((buffer + offset), payload);
             scope_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] scope_[%x]", scope_);
+            HILOGI("scope_: %{public}x", scope_);
             if ((scope_ < AVRC_MEDIA_SCOPE_PLAYER_LIST) || (scope_ > AVRC_MEDIA_SCOPE_NOW_PLAYING)) {
                 status_ = AVRC_ES_CODE_INVALID_SCOPE;
                 break;
@@ -875,12 +874,12 @@ bool AvrcTgGiaPacket::DisassemblePacket(Packet *pkt)
 
             offset += PopOctets8((buffer + offset), payload);
             uid_ = static_cast<uint64_t>(payload);
-            LOG_DEBUG("[AVRCP TG] uid_[%jx]", uid_);
+            HILOGI("uid_: %{public}jx", uid_);
 
             offset += PopOctets2((buffer + offset), payload);
             uint32_t uidCounter = static_cast<uint16_t>(payload);
-            LOG_DEBUG("[AVRCP TG] uidCounter[%u]", uidCounter);
-            LOG_DEBUG("[AVRCP TG] uidCounter_[%u]", uidCounter_);
+            HILOGI("uidCounter: %{public}u", uidCounter);
+            HILOGI("uidCounter_: %{public}u", uidCounter_);
             if (uidCounter != uidCounter_) {
                 status_ = AVRC_ES_CODE_UID_CHANGED;
                 break;
@@ -888,16 +887,15 @@ bool AvrcTgGiaPacket::DisassemblePacket(Packet *pkt)
 
             offset += PopOctets1((buffer + offset), payload);
             numOfAttributes_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] numOfAttributes_[%x]", numOfAttributes_);
+            HILOGI("numOfAttributes_: %{public}x", numOfAttributes_);
 
             DisassemblePacketAttributes(pkt, offset);
 
             isValid_ = true;
         } while (false);
     } else {
-        LOG_DEBUG("[AVRCP TG]: The size of the packet is invalid! - actual size[%{public}zu] - valid size[%{public}d]",
-            size,
-            AVRC_TG_GFI_MIN_CMD_FRAME_SIZE);
+        HILOGI("The size of the packet is invalid! actual size: %{public}zu, valid size: %{public}d",
+            size, AVRC_TG_GFI_MIN_CMD_FRAME_SIZE);
     }
 
     return isValid_;
@@ -905,7 +903,7 @@ bool AvrcTgGiaPacket::DisassemblePacket(Packet *pkt)
 
 void AvrcTgGiaPacket::DisassemblePacketAttributes(Packet *pkt, uint8_t offset)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGtnoiPacket::%{public}s", __func__);
+    HILOGI("offset: %{public}d", offset);
 
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt)));
 
@@ -914,7 +912,7 @@ void AvrcTgGiaPacket::DisassemblePacketAttributes(Packet *pkt, uint8_t offset)
     for (int i = 0; i < numOfAttributes_; i++) {
         offset += PopOctets4((buffer + offset), payload);
         attributes_.push_back(static_cast<uint32_t>(payload));
-        LOG_DEBUG("[AVRCP TG] attribute[%x]", attributes_.back());
+        HILOGI("attribute: %{public}x", attributes_.back());
     }
 
     if (numOfAttributes_ == AVRC_TG_GIA_NUMBER_OF_ATTRIBUTES) {
@@ -935,7 +933,8 @@ void AvrcTgGiaPacket::DisassemblePacketAttributes(Packet *pkt, uint8_t offset)
 AvrcTgGtnoiPacket::AvrcTgGtnoiPacket(uint8_t status, uint16_t uidCounter, uint32_t numOfItems, uint8_t label)
     : AvrcTgBrowsePacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGtnoiPacket::%{public}s", __func__);
+    HILOGI("status: %{public}d, uidCounter: %{public}d, numOfItems: %{public}u, label: %{public}d",
+        status, uidCounter, numOfItems, label);
 
     pduId_ = AVRC_TG_PDU_ID_GET_TOTAL_NUMBER_OF_ITEMS;
     parameterLength_ = AVRC_TG_GTNOI_FIXED_RSP_PARAMETER_LENGTH;
@@ -945,9 +944,10 @@ AvrcTgGtnoiPacket::AvrcTgGtnoiPacket(uint8_t status, uint16_t uidCounter, uint32
     numOfItems_ = numOfItems;
 }
 
-AvrcTgGtnoiPacket::AvrcTgGtnoiPacket(Packet *pkt, uint8_t label) : AvrcTgBrowsePacket(), scope_(AVRC_MEDIA_SCOPE_INVALID)
+AvrcTgGtnoiPacket::AvrcTgGtnoiPacket(Packet *pkt, uint8_t label)
+    : AvrcTgBrowsePacket(), scope_(AVRC_MEDIA_SCOPE_INVALID)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGtnoiPacket::%{public}s", __func__);
+    HILOGI("label: %{public}d", label);
 
     pduId_ = AVRC_TG_PDU_ID_GET_TOTAL_NUMBER_OF_ITEMS;
     label_ = label;
@@ -957,40 +957,40 @@ AvrcTgGtnoiPacket::AvrcTgGtnoiPacket(Packet *pkt, uint8_t label) : AvrcTgBrowseP
 
 AvrcTgGtnoiPacket::~AvrcTgGtnoiPacket()
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGtnoiPacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 const Packet *AvrcTgGtnoiPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGtnoiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_TG_GTNOI_FIXED_RSP_FRAME_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
 
     uint16_t offset = 0x0000;
     offset += PushOctets1((buffer + offset), pduId_);
-    LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+    HILOGI("pduId_: %{public}x", pduId_);
 
     offset += PushOctets2((buffer + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP TG] parameterLength_[%u]", parameterLength_);
+    HILOGI("parameterLength_: %{public}u", parameterLength_);
 
     offset += PushOctets1((buffer + offset), status_);
-    LOG_DEBUG("[AVRCP TG] status_[%x]", status_);
+    HILOGI("status_: %{public}x", status_);
 
     offset += PushOctets2((buffer + offset), uidCounter_);
-    LOG_DEBUG("[AVRCP TG] uidCounter_[%x]", uidCounter_);
+    HILOGI("uidCounter_: %{public}x", uidCounter_);
 
     offset += PushOctets4((buffer + offset), numOfItems_);
-    LOG_DEBUG("[AVRCP TG] numOfItems_[%u]", numOfItems_);
+    HILOGI("numOfItems_: %{public}u", numOfItems_);
 
-    LOG_DEBUG("[AVRCP TG] offset[%u]", offset);
+    HILOGI("offset: %{public}u", offset);
 
     return pkt_;
 }
 
 bool AvrcTgGtnoiPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP TG] AvrcTgGtnoiPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = IsValidParameterLength(pkt);
     if (isValid_) {
@@ -1001,17 +1001,17 @@ bool AvrcTgGtnoiPacket::DisassemblePacket(Packet *pkt)
             uint64_t payload = 0x00;
             offset += PopOctets1((buffer + offset), payload);
             pduId_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] pduId_[%x]", pduId_);
+            HILOGI("pduId_: %{public}x", pduId_);
 
             payload = 0x00;
             offset += PopOctets2((buffer + offset), payload);
             parameterLength_ = static_cast<uint16_t>(payload);
-            LOG_DEBUG("[AVRCP TG] parameterLength_[%{public}d]", parameterLength_);
+            HILOGI("parameterLength_: %{public}d", parameterLength_);
 
             payload = 0x00;
             PopOctets1((buffer + offset), payload);
             scope_ = static_cast<uint8_t>(payload);
-            LOG_DEBUG("[AVRCP TG] scope_[%x]", scope_);
+            HILOGI("scope_: %{public}x", scope_);
             if (scope_ < AVRC_MEDIA_SCOPE_PLAYER_LIST || scope_ > AVRC_MEDIA_SCOPE_NOW_PLAYING) {
                 status_ = AVRC_ES_CODE_INVALID_SCOPE;
                 break;
