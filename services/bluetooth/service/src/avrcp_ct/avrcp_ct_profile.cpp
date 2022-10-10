@@ -25,7 +25,6 @@
 #include "avrcp_ct_vendor_player_application_settings.h"
 #include "compat.h"
 #include "power_manager.h"
-#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -44,21 +43,22 @@ AvrcCtProfile::AvrcCtProfile(uint16_t features, uint32_t companyId, uint16_t con
       eventCallback_(eventCallback),
       msgCallback_(msgCallback)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("features: %{public}d, companyId: %{public}u, controlMtu: %{public}d, browseMtu: %{public}d, "
+        "maxFragments: %{public}d", features, companyId, controlMtu, browseMtu, maxFragments);
 
     SetEnableFlag(false);
 }
 
 bool AvrcCtProfile::IsEnabled(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
 
     return g_isEnabled;
 }
 
 AvrcCtProfile::~AvrcCtProfile()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
 
     SetEnableFlag(false);
 }
@@ -69,14 +69,14 @@ AvrcCtProfile::~AvrcCtProfile()
 
 void AvrcCtProfile::RegisterObserver(AvrcCtProfile::Observer *observer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
 
     myObserver_ = observer;
 }
 
 void AvrcCtProfile::UnregisterObserver(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
 
     myObserver_ = nullptr;
 }
@@ -87,7 +87,7 @@ void AvrcCtProfile::UnregisterObserver(void)
 
 int AvrcCtProfile::Enable(bool isTgEnabled)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("isTgEnabled: %{public}d", isTgEnabled);
 
     int result = RET_NO_ERROR;
     SetEnableFlag(true);
@@ -113,7 +113,7 @@ int AvrcCtProfile::Enable(bool isTgEnabled)
 
 int AvrcCtProfile::Disable(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
 
     do {
         std::lock_guard<std::recursive_mutex> lock(mutex_);
@@ -138,7 +138,7 @@ int AvrcCtProfile::Disable(void)
 
 void AvrcCtProfile::SetEnableFlag(bool isEnabled)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("isEnabled: %{public}d", isEnabled);
 
     g_isEnabled = isEnabled;
 }
@@ -149,7 +149,7 @@ void AvrcCtProfile::SetEnableFlag(bool isEnabled)
 
 std::vector<bluetooth::RawAddress> AvrcCtProfile::GetConnectedDevices(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     std::vector<bluetooth::RawAddress> result;
@@ -167,7 +167,7 @@ std::vector<bluetooth::RawAddress> AvrcCtProfile::GetConnectedDevices(void)
 
 std::vector<RawAddress> AvrcCtProfile::GetDevicesByStates(const std::vector<int> &states)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
@@ -194,7 +194,7 @@ std::vector<RawAddress> AvrcCtProfile::GetDevicesByStates(const std::vector<int>
 
 int AvrcCtProfile::GetDeviceState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -218,7 +218,7 @@ int AvrcCtProfile::GetDeviceState(const RawAddress &rawAddr)
 
 int AvrcCtProfile::GetMaxConnectNum(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     int result = 0x00;
@@ -237,7 +237,7 @@ int AvrcCtProfile::GetMaxConnectNum(void)
 
 int AvrcCtProfile::Connect(const RawAddress &rawAddr) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_NO_ERROR;
 
@@ -254,7 +254,7 @@ int AvrcCtProfile::Connect(const RawAddress &rawAddr) const
 
 int AvrcCtProfile::Disconnect(const RawAddress &rawAddr) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
     utility::Message msg(AVRC_CT_SM_EVENT_TO_DISCONNECTING_STATE);
@@ -271,7 +271,7 @@ int AvrcCtProfile::Disconnect(const RawAddress &rawAddr) const
 
 int AvrcCtProfile::ConnectBr(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
 
@@ -280,7 +280,7 @@ int AvrcCtProfile::ConnectBr(const RawAddress &rawAddr)
 
 int AvrcCtProfile::DisconnectBr(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     utility::Message msg(AVRC_CT_SM_EVENT_TO_DISCONNECTING_STATE);
     AvrcCtStateMachineManager::GetInstance()->SendMessageToBrowseStateMachine(rawAddr, msg);
@@ -290,7 +290,7 @@ int AvrcCtProfile::DisconnectBr(const RawAddress &rawAddr)
 
 int AvrcCtProfile::GetConnectState(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("enter");
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     int result = PROFILE_STATE_DISCONNECTED;
@@ -325,7 +325,7 @@ int AvrcCtProfile::GetConnectState(void)
 
 void AvrcCtProfile::SendPressButtonCmd(const RawAddress &rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, button: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button);
 
     std::shared_ptr<AvrcCtPassPacket> packet = std::make_shared<AvrcCtPassPacket>(button, AVRC_KEY_STATE_PRESS);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -335,7 +335,7 @@ void AvrcCtProfile::SendPressButtonCmd(const RawAddress &rawAddr, uint8_t button
 
 void AvrcCtProfile::SendReleaseButtonCmd(const RawAddress &rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, button: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button);
 
     std::shared_ptr<AvrcCtPassPacket> packet = std::make_shared<AvrcCtPassPacket>(button, AVRC_KEY_STATE_RELEASE);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -345,7 +345,7 @@ void AvrcCtProfile::SendReleaseButtonCmd(const RawAddress &rawAddr, uint8_t butt
 
 bool AvrcCtProfile::IsPassQueueFull(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     return (AvrcCtConnectManager::GetInstance()->GetSizeOfPassQueue(rawAddr) == AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
@@ -353,7 +353,7 @@ bool AvrcCtProfile::IsPassQueueFull(const RawAddress &rawAddr)
 
 void AvrcCtProfile::SendPassCmd(const RawAddress &rawAddr, const std::shared_ptr<AvrcCtPassPacket> &pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -374,18 +374,18 @@ void AvrcCtProfile::SendPassCmd(const RawAddress &rawAddr, const std::shared_ptr
         /// There is a command in processing,
         if (cnManager->GetSizeOfPassQueue(rawAddr) >= AVRC_CT_DEFAULT_SIZE_OF_QUEUE) {
             InformPassRsp(rawAddr, pkt->GetKeyOperation(), pkt->GetKeyState(), RET_BAD_STATUS);
-            HILOGI("[AVRCP CT] The pass through command is full! - Address[%{public}s] - sizeOf[%{public}d]",
+            HILOGI("The pass through command is full! - Address: %{public}s - sizeOf: %{public}d",
                 GET_ENCRYPT_AVRCP_ADDR(rawAddr), AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
         } else {
             cnManager->PushPassQueue(rawAddr, pkt);
-            HILOGI("[AVRCP CT] Waiting for the response! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Waiting for the response! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     }
 }
 
 void AvrcCtProfile::SendNextPassCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     cnManager->ClearPassInfo(rawAddr);
@@ -398,12 +398,12 @@ void AvrcCtProfile::SendNextPassCmd(const RawAddress &rawAddr)
 
 void AvrcCtProfile::ReceivePassRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextPassCmd(rawAddr);
 
     AvrcCtPassPacket packet(pkt);
-    HILOGI("[AVRCP CT] Address[%{public}s] - key[%{public}x] - state[%{public}x]", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
+    HILOGI("Address: %{public}s - key: %{public}x - state: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
         packet.GetKeyOperation(), packet.GetKeyState());
 
     InformPassRsp(
@@ -412,7 +412,8 @@ void AvrcCtProfile::ReceivePassRsp(const RawAddress &rawAddr, Packet *pkt)
 
 void AvrcCtProfile::InformPassRsp(const RawAddress &rawAddr, uint8_t button, uint8_t state, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, button: %{public}d, state: %{public}d, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, state, result);
 
     switch (state) {
         case AVRC_KEY_STATE_PRESS:
@@ -422,14 +423,14 @@ void AvrcCtProfile::InformPassRsp(const RawAddress &rawAddr, uint8_t button, uin
             myObserver_->onButtonReleased(rawAddr, button, result);
             break;
         default:
-            LOG_DEBUG("[AVRCP CT] The button state is incorrect!");
+            HILOGI("The button state is incorrect!");
             break;
     }
 }
 
 void AvrcCtProfile::ProcessPassTimeout(RawAddress rawAddr, uint8_t key, uint8_t state)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, key: %{public}x, state: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), key, state);
 
     if (IsEnabled()) {
         SendNextPassCmd(rawAddr);
@@ -439,8 +440,7 @@ void AvrcCtProfile::ProcessPassTimeout(RawAddress rawAddr, uint8_t key, uint8_t 
 
 void AvrcCtProfile::PassTimeoutCallback(const RawAddress &rawAddr, uint8_t key, uint8_t state)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] key[%x] - state[%x]", key, state);
+    HILOGI("address: %{public}s, key: %{public}x - state: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), key, state);
 
     if (IsEnabled()) {
         dispatcher_->PostTask(std::bind(&AvrcCtProfile::ProcessPassTimeout, this, rawAddr, key, state));
@@ -453,7 +453,7 @@ void AvrcCtProfile::PassTimeoutCallback(const RawAddress &rawAddr, uint8_t key, 
 
 void AvrcCtProfile::SendUnitCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -476,10 +476,10 @@ void AvrcCtProfile::SendUnitCmd(const RawAddress &rawAddr)
         /// There is a command in processing,
 
         if (cnManager->GetSizeOfUnitQueue(rawAddr) > AVRC_CT_DEFAULT_SIZE_OF_QUEUE) {
-            LOG_DEBUG("[AVRCP CT] The vendor queue is oversize[%{public}d]", cnManager->GetSizeOfVendorQueue(rawAddr));
+            HILOGI("The vendor queue is oversize: %{public}d", cnManager->GetSizeOfVendorQueue(rawAddr));
         } else {
             cnManager->PushUnitQueue(rawAddr, pkt);
-            LOG_DEBUG("[AVRCP CT] Waiting for the response!");
+            HILOGI("Waiting for the response!");
         }
     }
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::IDLE, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -487,7 +487,7 @@ void AvrcCtProfile::SendUnitCmd(const RawAddress &rawAddr)
 
 void AvrcCtProfile::SendSubUnitCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -510,10 +510,10 @@ void AvrcCtProfile::SendSubUnitCmd(const RawAddress &rawAddr)
         /// There is a command in processing,
 
         if (cnManager->GetSizeOfUnitQueue(rawAddr) > AVRC_CT_DEFAULT_SIZE_OF_QUEUE) {
-            LOG_DEBUG("[AVRCP CT] The vendor queue is oversize[%{public}d]", cnManager->GetSizeOfVendorQueue(rawAddr));
+            HILOGI("The vendor queue is oversize: %{public}d", cnManager->GetSizeOfVendorQueue(rawAddr));
         } else {
             cnManager->PushUnitQueue(rawAddr, pkt);
-            LOG_DEBUG("[AVRCP CT] Waiting for the response!");
+            HILOGI("Waiting for the response!");
         }
     }
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::IDLE, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -521,14 +521,14 @@ void AvrcCtProfile::SendSubUnitCmd(const RawAddress &rawAddr)
 
 bool AvrcCtProfile::IsUnitQueueFull(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return (AvrcCtConnectManager::GetInstance()->GetSizeOfUnitQueue(rawAddr) == AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
 }
 
 void AvrcCtProfile::SendNextUnitCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -549,7 +549,7 @@ void AvrcCtProfile::SendNextUnitCmd(const RawAddress &rawAddr)
                 msg.what_ = AVRC_CT_SM_EVENT_SUB_UNIT_INFO;
                 break;
             default:
-                LOG_DEBUG("[AVRCP CT] Opcode is wrong! - opCode[%x]", packet->GetOpCode());
+                HILOGI("Opcode is wrong! - opCode: %{public}x", packet->GetOpCode());
                 break;
         }
 
@@ -562,44 +562,44 @@ void AvrcCtProfile::SendNextUnitCmd(const RawAddress &rawAddr)
 
 void AvrcCtProfile::ReceiveUnitRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextUnitCmd(rawAddr);
 
     AvrcCtUnitPacket packet(pkt);
-    LOG_DEBUG("[AVRCP CT] response[%x]", packet.GetCrCode());
+    HILOGI("response: %{public}x", packet.GetCrCode());
 }
 
 void AvrcCtProfile::ReceiveSubUnitRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextUnitCmd(rawAddr);
 
     AvrcCtSubUnitPacket packet(pkt);
-    LOG_DEBUG("[AVRCP CT] response[%x]", packet.GetCrCode());
+    HILOGI("response: %{public}x", packet.GetCrCode());
 }
 
 void AvrcCtProfile::ProcessUnitTimeout(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     if (IsEnabled()) {
         std::shared_ptr<AvrcCtUnitPacket> packet = AvrcCtConnectManager::GetInstance()->GetUnitPacket(rawAddr);
         if (packet != nullptr) {
             switch (packet->GetOpCode()) {
                 case AVRC_CT_OP_CODE_UNIT_INFO:
-                    LOG_DEBUG("[AVRCP CT] opCode[UNIT_INFO]");
+                    HILOGI("opCode[UNIT_INFO]");
                     break;
                 case AVRC_CT_OP_CODE_SUB_UNIT_INFO:
-                    LOG_DEBUG("[AVRCP CT] opCode[SUB_UNIT_INFO]");
+                    HILOGI("opCode[SUB_UNIT_INFO]");
                     break;
                 default:
-                    LOG_DEBUG("[AVRCP CT] Opcode is wrong! - opCode[%x]", packet->GetOpCode());
+                    HILOGI("Opcode is wrong! - opCode: %{public}x", packet->GetOpCode());
                     break;
             }
         } else {
-            LOG_DEBUG("[AVRCP CT] The saved packet is nullptr!");
+            HILOGI("The saved packet is nullptr!");
         }
         IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
         SendNextUnitCmd(rawAddr);
@@ -609,7 +609,7 @@ void AvrcCtProfile::ProcessUnitTimeout(RawAddress rawAddr)
 
 void AvrcCtProfile::UnitTimeoutCallback(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     if (IsEnabled()) {
         dispatcher_->PostTask(std::bind(&AvrcCtProfile::ProcessUnitTimeout, this, rawAddr));
@@ -623,8 +623,7 @@ void AvrcCtProfile::UnitTimeoutCallback(const RawAddress &rawAddr)
 void AvrcCtProfile::SendVendorCmd(
     const RawAddress &rawAddr, const std::shared_ptr<AvrcCtVendorPacket> &pkt, AvrcCtSmEvent event)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] event[%x]", event);
+    HILOGI("address: %{public}s, event: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), event);
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -645,17 +644,17 @@ void AvrcCtProfile::SendVendorCmd(
         /// There is a command in processing,
 
         if (cnManager->GetSizeOfVendorQueue(rawAddr) > AVRC_CT_DEFAULT_SIZE_OF_QUEUE) {
-            LOG_DEBUG("[AVRCP CT] The vendor queue is oversize[%{public}d]", cnManager->GetSizeOfVendorQueue(rawAddr));
+            HILOGI("The vendor queue is oversize: %{public}d", cnManager->GetSizeOfVendorQueue(rawAddr));
         } else {
             cnManager->PushVendorQueue(rawAddr, pkt);
-            LOG_DEBUG("[AVRCP CT] Waiting for the response!");
+            HILOGI("Waiting for the response!");
         }
     }
 }
 
 void AvrcCtProfile::SendNextVendorCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     cnManager->ClearVendorInfo(rawAddr);
@@ -673,7 +672,7 @@ void AvrcCtProfile::SendNextVendorCmd(const RawAddress &rawAddr)
 
 void AvrcCtProfile::SendVendorContinueCmd(const RawAddress &rawAddr, uint8_t pduId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, pduId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     cnManager->ClearVendorPacket(rawAddr);
@@ -692,7 +691,7 @@ void AvrcCtProfile::SendVendorContinueCmd(const RawAddress &rawAddr, uint8_t pdu
 
 void AvrcCtProfile::SendVendorAbortCmd(const RawAddress &rawAddr, uint8_t pduId) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, pduId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     cnManager->ClearVendorPacket(rawAddr);
@@ -707,7 +706,7 @@ void AvrcCtProfile::SendVendorAbortCmd(const RawAddress &rawAddr, uint8_t pduId)
 
 bool AvrcCtProfile::IsVendorQueueFull(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     return (AvrcCtConnectManager::GetInstance()->GetSizeOfVendorQueue(rawAddr) == AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
@@ -715,7 +714,7 @@ bool AvrcCtProfile::IsVendorQueueFull(const RawAddress &rawAddr)
 
 void AvrcCtProfile::SendGetCapabilitiesCmd(const RawAddress &rawAddr, uint8_t capabilityId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, capabilityId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), capabilityId);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGcPacket>(capabilityId);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -725,7 +724,7 @@ void AvrcCtProfile::SendGetCapabilitiesCmd(const RawAddress &rawAddr, uint8_t ca
 
 void AvrcCtProfile::ReceiveGetCapabilitiesRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -739,7 +738,7 @@ void AvrcCtProfile::ReceiveGetCapabilitiesRsp(const RawAddress &rawAddr, Packet 
 
 void AvrcCtProfile::SendListPlayerApplicationSettingAttributesCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtLpasaPacket>();
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -749,7 +748,7 @@ void AvrcCtProfile::SendListPlayerApplicationSettingAttributesCmd(const RawAddre
 
 void AvrcCtProfile::ReceiveListPlayerApplicationSettingAttributesRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -760,8 +759,7 @@ void AvrcCtProfile::ReceiveListPlayerApplicationSettingAttributesRsp(const RawAd
 
 void AvrcCtProfile::SendListPlayerApplicationSettingValuesCmd(const RawAddress &rawAddr, uint8_t attribute)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attribute[%x]", attribute);
+    HILOGI("address: %{public}s, attribute: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtLpasvPacket>(attribute);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -771,7 +769,7 @@ void AvrcCtProfile::SendListPlayerApplicationSettingValuesCmd(const RawAddress &
 
 void AvrcCtProfile::ReceiveListPlayerApplicationSettingValuesRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -787,10 +785,8 @@ void AvrcCtProfile::ReceiveListPlayerApplicationSettingValuesRsp(const RawAddres
         lpasvPkt->DisassemblePacket(pkt);
     }
 
-    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}zu] - result[%{public}d]",
-        lpasvPkt->GetAttribute(),
-        lpasvPkt->GetValues().size(),
-        ExplainCrCodeToResult(lpasvPkt->GetCrCode()));
+    HILOGI("attribute: %{public}x - values.size: %{public}zu - result: %{public}d", lpasvPkt->GetAttribute(),
+        lpasvPkt->GetValues().size(), ExplainCrCodeToResult(lpasvPkt->GetCrCode()));
 
     switch (lpasvPkt->GetPacketType()) {
         case AVRC_CT_VENDOR_PACKET_TYPE:
@@ -818,7 +814,7 @@ void AvrcCtProfile::ReceiveListPlayerApplicationSettingValuesRsp(const RawAddres
             break;
         }
         default:
-            LOG_DEBUG("[AVRCP CT] Packet Type is wrong! - packetType[%{public}d]", lpasvPkt->GetPacketType());
+            HILOGI("Packet Type is wrong! - packetType: %{public}d", lpasvPkt->GetPacketType());
             break;
     }
 }
@@ -826,8 +822,7 @@ void AvrcCtProfile::ReceiveListPlayerApplicationSettingValuesRsp(const RawAddres
 void AvrcCtProfile::SendGetCurrentPlayerApplicationSettingValueCmd(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu]", attributes.size());
+    HILOGI("address: %{public}s, attributes.size: %{public}zu", GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributes.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGcpasvPacket>(attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -837,7 +832,7 @@ void AvrcCtProfile::SendGetCurrentPlayerApplicationSettingValueCmd(
 
 void AvrcCtProfile::ReceiveGetCurrentPlayerApplicationSettingValueRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -854,9 +849,8 @@ void AvrcCtProfile::ReceiveGetCurrentPlayerApplicationSettingValueRsp(const RawA
         gcpasvPkt->DisassemblePacket(pkt);
     }
 
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]",
-        gcpasvPkt->GetAttributes().size(),
-        gcpasvPkt->GetValues().size(),
+    HILOGI("attributes.size: %{public}zu - values.size: %{public}zu - result: %{public}d",
+        gcpasvPkt->GetAttributes().size(), gcpasvPkt->GetValues().size(),
         ExplainCrCodeToResult(gcpasvPkt->GetCrCode()));
 
     switch (gcpasvPkt->GetPacketType()) {
@@ -887,7 +881,7 @@ void AvrcCtProfile::ReceiveGetCurrentPlayerApplicationSettingValueRsp(const RawA
             break;
         }
         default:
-            LOG_DEBUG("[AVRCP CT] Packet Type is wrong! - packetType[%{public}d]", gcpasvPkt->GetPacketType());
+            HILOGI("Packet Type is wrong! - packetType: %{public}d", gcpasvPkt->GetPacketType());
             break;
     }
 }
@@ -895,8 +889,8 @@ void AvrcCtProfile::ReceiveGetCurrentPlayerApplicationSettingValueRsp(const RawA
 void AvrcCtProfile::SendSetPlayerApplicationSettingValueCmd(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu]", attributes.size(), values.size());
+    HILOGI("address: %{public}s, attributes.size: %{public}zu, values.size: %{public}zu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributes.size(), values.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtSpasvPacket>(attributes, values);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -906,7 +900,7 @@ void AvrcCtProfile::SendSetPlayerApplicationSettingValueCmd(
 
 void AvrcCtProfile::ReceiveSetPlayerApplicationSettingValueRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -917,8 +911,7 @@ void AvrcCtProfile::ReceiveSetPlayerApplicationSettingValueRsp(const RawAddress 
 void AvrcCtProfile::SendGetPlayerApplicationSettingAttributeTextCmd(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu]", attributes.size());
+    HILOGI("address: %{public}s, attributes.size: %{public}zu", GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributes.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGpasatPacket>(attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -928,7 +921,7 @@ void AvrcCtProfile::SendGetPlayerApplicationSettingAttributeTextCmd(
 
 void AvrcCtProfile::ReceiveGetPlayerApplicationSettingAttributeTextRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -945,9 +938,8 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingAttributeTextRsp(const Raw
         gpasatPkt = static_cast<AvrcCtGpasatPacket *>(packet.get());
         gpasatPkt->DisassemblePacket(pkt);
     }
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - attributeStringLength.size[%{public}zu] - result[%{public}d]",
-        gpasatPkt->GetAttributes().size(),
-        gpasatPkt->GetAttributeName().size(),
+    HILOGI("attributes.size: %{public}zu, attributeStringLength.size: %{public}zu, result: %{public}d",
+        gpasatPkt->GetAttributes().size(), gpasatPkt->GetAttributeName().size(),
         ExplainCrCodeToResult(gpasatPkt->GetCrCode()));
 
     switch (gpasatPkt->GetPacketType()) {
@@ -978,7 +970,7 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingAttributeTextRsp(const Raw
             break;
         }
         default:
-            LOG_DEBUG("[AVRCP CT] Packet Type is wrong! - packetType[%{public}d]", gpasatPkt->GetPacketType());
+            HILOGI("Packet Type is wrong! - packetType: %{public}d", gpasatPkt->GetPacketType());
             break;
     }
 }
@@ -986,8 +978,8 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingAttributeTextRsp(const Raw
 void AvrcCtProfile::SendGetPlayerApplicationSettingValueTextCmd(
     const RawAddress &rawAddr, uint8_t attributeId, const std::vector<uint8_t> &values)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] values.size[%{public}zu]", values.size());
+    HILOGI("address: %{public}s, attributeId: %{public}d, values.size[%{public}zu]",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributeId, values.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGpasvtPacket>(attributeId, values);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -997,7 +989,7 @@ void AvrcCtProfile::SendGetPlayerApplicationSettingValueTextCmd(
 
 void AvrcCtProfile::ReceiveGetPlayerApplicationSettingValueTextRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -1014,10 +1006,8 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingValueTextRsp(const RawAddr
         gpasvtPkt = static_cast<AvrcCtGpasvtPacket *>(packet.get());
         gpasvtPkt->DisassemblePacket(pkt);
     }
-    LOG_DEBUG("[AVRCP CT] values.size[%{public}zu] - valuestr.size[%{public}zu] - result[%{public}d]",
-        gpasvtPkt->GetValues().size(),
-        gpasvtPkt->GetValueName().size(),
-        ExplainCrCodeToResult(gpasvtPkt->GetCrCode()));
+    HILOGI("values.size: %{public}zu, valuestr.size: %{public}zu, result: %{public}d",
+        gpasvtPkt->GetValues().size(), gpasvtPkt->GetValueName().size(), ExplainCrCodeToResult(gpasvtPkt->GetCrCode()));
 
     switch (gpasvtPkt->GetPacketType()) {
         case AVRC_CT_VENDOR_PACKET_TYPE:
@@ -1047,7 +1037,7 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingValueTextRsp(const RawAddr
             break;
         }
         default:
-            LOG_DEBUG("[AVRCP CT] Packet Type is wrong! - packetType[%{public}d]", gpasvtPkt->GetPacketType());
+            HILOGI("Packet Type is wrong! packetType: %{public}d", gpasvtPkt->GetPacketType());
             break;
     }
 }
@@ -1055,8 +1045,8 @@ void AvrcCtProfile::ReceiveGetPlayerApplicationSettingValueTextRsp(const RawAddr
 void AvrcCtProfile::SendGetElementAttributesCmd(
     const RawAddress &rawAddr, uint64_t identifier, const std::vector<uint32_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] identifier[%ju] - attributes.size[%zu]", identifier, attributes.size());
+    HILOGI("address: %{public}s, identifier: %{public}ju, attributes.size: %{public}zu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), identifier, attributes.size());
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGeaPacket>(identifier, attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1066,7 +1056,7 @@ void AvrcCtProfile::SendGetElementAttributesCmd(
 
 void AvrcCtProfile::ReceiveGetElementAttributesRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -1083,10 +1073,8 @@ void AvrcCtProfile::ReceiveGetElementAttributesRsp(const RawAddress &rawAddr, Pa
         geaPkt->DisassemblePacket(pkt);
     }
 
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]",
-        geaPkt->GetAttributes().size(),
-        geaPkt->GetValues().size(),
-        ExplainCrCodeToResult(geaPkt->GetCrCode()));
+    HILOGI("attributes.size: %{public}zu, values.size: %{public}zu, result: %{public}d",
+        geaPkt->GetAttributes().size(), geaPkt->GetValues().size(), ExplainCrCodeToResult(geaPkt->GetCrCode()));
 
     switch (geaPkt->GetPacketType()) {
         case AVRC_CT_VENDOR_PACKET_TYPE:
@@ -1112,14 +1100,14 @@ void AvrcCtProfile::ReceiveGetElementAttributesRsp(const RawAddress &rawAddr, Pa
             break;
         }
         default:
-            LOG_DEBUG("[AVRCP CT] Packet Type is wrong! - packetType[%{public}d]", geaPkt->GetPacketType());
+            HILOGI("Packet Type is wrong! packetType: %{public}d", geaPkt->GetPacketType());
             break;
     }
 }
 
 void AvrcCtProfile::SendGetPlayStatusCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtGpsPacket>();
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1129,7 +1117,7 @@ void AvrcCtProfile::SendGetPlayStatusCmd(const RawAddress &rawAddr)
 
 void AvrcCtProfile::ReceiveGetPlayStatusRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -1143,8 +1131,7 @@ void AvrcCtProfile::ReceiveGetPlayStatusRsp(const RawAddress &rawAddr, Packet *p
 
 void AvrcCtProfile::SendRequestContinuingResponseCmd(const RawAddress &rawAddr, uint8_t pduId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] pduId[%x]", pduId);
+    HILOGI("address: %{public}s, pduId: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtRcrPacket>(pduId);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1154,8 +1141,7 @@ void AvrcCtProfile::SendRequestContinuingResponseCmd(const RawAddress &rawAddr, 
 
 void AvrcCtProfile::SendAbortContinuingResponseCmd(const RawAddress &rawAddr, uint8_t pduId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] pduId[%x]", pduId);
+    HILOGI("address: %{public}s, pduId: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtAcrPacket>(pduId);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1165,7 +1151,7 @@ void AvrcCtProfile::SendAbortContinuingResponseCmd(const RawAddress &rawAddr, ui
 
 void AvrcCtProfile::ReceiveAbortContinuingResponseRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtAcrPacket acrPkt(pkt);
 
@@ -1173,10 +1159,10 @@ void AvrcCtProfile::ReceiveAbortContinuingResponseRsp(const RawAddress &rawAddr,
 
     if (packet != nullptr) {
         if (acrPkt.GetPduId() != packet->GetPduId()) {
-            HILOGI("[AVRCP CT] PDU ID is wrong! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("PDU ID is wrong! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The saved continue packet is nullptr!");
+        HILOGI("The saved continue packet is nullptr!");
     }
 
     SendNextVendorCmd(rawAddr);
@@ -1184,8 +1170,7 @@ void AvrcCtProfile::ReceiveAbortContinuingResponseRsp(const RawAddress &rawAddr,
 
 void AvrcCtProfile::SendSetAddressedPlayerCmd(const RawAddress &rawAddr, uint16_t playerId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] playerId[%x]", playerId);
+    HILOGI("address: %{public}s, playerId: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtSapPacket>(playerId);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1195,7 +1180,7 @@ void AvrcCtProfile::SendSetAddressedPlayerCmd(const RawAddress &rawAddr, uint16_
 
 void AvrcCtProfile::ReceiveSetAddressedPlayerRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -1211,8 +1196,8 @@ void AvrcCtProfile::ReceiveSetAddressedPlayerRsp(const RawAddress &rawAddr, Pack
 
 void AvrcCtProfile::SendPlayItemCmd(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%x] - uid[%jx] - uidCounter[%{public}hd]", scope, uid, uidCounter);
+    HILOGI("address: %{public}s, scope: %{public}x, uid: %{public}jx, uidCounter: %{public}hd",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, uid, uidCounter);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtPiPacket>(scope, uid, uidCounter);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1222,7 +1207,7 @@ void AvrcCtProfile::SendPlayItemCmd(const RawAddress &rawAddr, uint8_t scope, ui
 
 void AvrcCtProfile::ReceivePlayItemRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -1238,8 +1223,8 @@ void AvrcCtProfile::ReceivePlayItemRsp(const RawAddress &rawAddr, Packet *pkt)
 
 void AvrcCtProfile::SendAddToNowPlayingCmd(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%hhx] - uid[%ju] - uidCounter[%hu]", scope, uid, uidCounter);
+    HILOGI("address: %{public}s, scope: %{public}d, uid: %{public}ju, uidCounter: %{public}hu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, uid, uidCounter);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtAtnpPacket>(scope, uid, uidCounter);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1249,7 +1234,7 @@ void AvrcCtProfile::SendAddToNowPlayingCmd(const RawAddress &rawAddr, uint8_t sc
 
 void AvrcCtProfile::ReceiveAddToNowPlayingRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -1265,8 +1250,7 @@ void AvrcCtProfile::ReceiveAddToNowPlayingRsp(const RawAddress &rawAddr, Packet 
 
 void AvrcCtProfile::SendSetAbsoluteVolumeCmd(const RawAddress &rawAddr, uint8_t volume)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] volume[%x]", volume);
+    HILOGI("address: %{public}s, volume: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume);
 
     std::shared_ptr<AvrcCtVendorPacket> packet = std::make_shared<AvrcCtSavPacket>(volume);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1276,7 +1260,7 @@ void AvrcCtProfile::SendSetAbsoluteVolumeCmd(const RawAddress &rawAddr, uint8_t 
 
 void AvrcCtProfile::ReceiveSetAbsoluteVolumeRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextVendorCmd(rawAddr);
 
@@ -1286,8 +1270,7 @@ void AvrcCtProfile::ReceiveSetAbsoluteVolumeRsp(const RawAddress &rawAddr, Packe
 
 void AvrcCtProfile::EnableNotification(const RawAddress &rawAddr, const std::vector<uint8_t> &events, uint32_t interval)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] events.size[%{public}zu]", events.size());
+    HILOGI("address: %{public}s, events.size: %{public}zu", GET_ENCRYPT_AVRCP_ADDR(rawAddr), events.size());
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     for (auto event : events) {
@@ -1300,7 +1283,7 @@ void AvrcCtProfile::EnableNotification(const RawAddress &rawAddr, const std::vec
 
 void AvrcCtProfile::DisableNotification(const RawAddress &rawAddr, const std::vector<uint8_t> &events)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     for (auto event : events) {
@@ -1310,7 +1293,7 @@ void AvrcCtProfile::DisableNotification(const RawAddress &rawAddr, const std::ve
 
 void AvrcCtProfile::ReceiveRegisterNotificationRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     std::shared_ptr<AvrcCtNotifyPacket> notifyPkt = std::make_shared<AvrcCtNotifyPacket>(pkt);
@@ -1346,7 +1329,7 @@ void AvrcCtProfile::ReceiveRegisterNotificationRsp(const RawAddress &rawAddr, Pa
 void AvrcCtProfile::InformNotificationChanged(
     const RawAddress &rawAddr, const std::shared_ptr<AvrcCtNotifyPacket> &notifyPkt, int result)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -1388,7 +1371,7 @@ void AvrcCtProfile::InformNotificationChanged(
             InformPlayerApplicationSettingChanged(rawAddr, notifyPkt, result);
             break;
         default:
-            LOG_DEBUG("[AVRCP CT] The event id is wrong! - event[%{public}d]", notifyPkt->GetEventId());
+            HILOGI("The event id is wrong! event: %{public}d", notifyPkt->GetEventId());
             break;
     }
 }
@@ -1396,7 +1379,7 @@ void AvrcCtProfile::InformNotificationChanged(
 void AvrcCtProfile::InformPlayerApplicationSettingChanged(
     const RawAddress &rawAddr, const std::shared_ptr<AvrcCtNotifyPacket> &notifyPkt, int result)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -1422,7 +1405,7 @@ void AvrcCtProfile::InformPlayerApplicationSettingChanged(
 
 void AvrcCtProfile::ReceiveVendorRspAvcStatus(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     switch (AvrcCtPacket::GetVendorPdu(pkt)) {
         case AVRC_CT_PDU_ID_GET_CAPABILITIES:
@@ -1456,7 +1439,7 @@ void AvrcCtProfile::ReceiveVendorRspAvcStatus(const RawAddress &rawAddr, Packet 
 
 void AvrcCtProfile::ReceiveVendorRspAvcControl(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     switch (AvrcCtPacket::GetVendorPdu(pkt)) {
         case AVRC_CT_PDU_ID_SET_PLAYER_APPLICATION_SETTING_VALUE:
@@ -1484,7 +1467,7 @@ void AvrcCtProfile::ReceiveVendorRspAvcControl(const RawAddress &rawAddr, Packet
 
 void AvrcCtProfile::ReceiveVendorRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     switch (AvrcCtPacket::GetVendorPdu(pkt)) {
         case AVRC_CT_PDU_ID_GET_CAPABILITIES:
@@ -1509,7 +1492,7 @@ void AvrcCtProfile::ReceiveVendorRsp(const RawAddress &rawAddr, Packet *pkt)
             ReceiveRegisterNotificationRsp(rawAddr, pkt);
             break;
         default:
-            HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+            HILOGI("The PDU ID is wrong! Address: %{public}s, pduId: %{public}x",
                 GET_ENCRYPT_AVRCP_ADDR(rawAddr), AvrcCtPacket::GetVendorPdu(pkt));
             break;
     }
@@ -1517,7 +1500,7 @@ void AvrcCtProfile::ReceiveVendorRsp(const RawAddress &rawAddr, Packet *pkt)
 
 void AvrcCtProfile::ProcessVendorNotificationTimeout(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtNotifyPacket *pkt = static_cast<AvrcCtNotifyPacket *>(cnManager->GetVendorPacket(rawAddr).get());
@@ -1631,7 +1614,7 @@ void AvrcCtProfile::ProcessVendorAvcStatus2Timeout(RawAddress rawAddr, const std
 
 void AvrcCtProfile::ProcessVendorTimeout(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -1666,12 +1649,12 @@ void AvrcCtProfile::ProcessVendorTimeout(RawAddress rawAddr)
                     break;
                 }
                 default:
-                    HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+                    HILOGI("The PDU ID is wrong! Address: %{public}s, pduId: %{public}x",
                         GET_ENCRYPT_AVRCP_ADDR(rawAddr), packet->GetPduId());
                     break;
             }
         } else {
-            HILOGI("[AVRCP CT] The saved packet is nullptr! Address[%{public}s] - ", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("The saved packet is nullptr! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
 
         SendNextVendorCmd(rawAddr);
@@ -1680,7 +1663,7 @@ void AvrcCtProfile::ProcessVendorTimeout(RawAddress rawAddr)
 
 void AvrcCtProfile::VendorTimeoutCallback(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     if (IsEnabled()) {
         dispatcher_->PostTask(std::bind(&AvrcCtProfile::ProcessVendorTimeout, this, rawAddr));
@@ -1694,8 +1677,7 @@ void AvrcCtProfile::VendorTimeoutCallback(const RawAddress &rawAddr)
 void AvrcCtProfile::SendBrowseCmd(
     const RawAddress &rawAddr, const std::shared_ptr<AvrcCtBrowsePacket> &pkt, AvrcCtSmEvent event)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] event[%x]", event);
+    HILOGI("address: %{public}s, event%{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), event);
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -1711,17 +1693,17 @@ void AvrcCtProfile::SendBrowseCmd(
         cnManager->SetBrowseTimer(rawAddr, func, AVRC_CT_TIMER_T_MTP);
     } else {
         if (cnManager->GetSizeOfBrowseQueue(rawAddr) > AVRC_CT_DEFAULT_SIZE_OF_QUEUE) {
-            LOG_DEBUG("[AVRCP CT] The queue is oversize[%{public}d]", cnManager->GetSizeOfBrowseQueue(rawAddr));
+            HILOGI("The queue is oversize: %{public}d", cnManager->GetSizeOfBrowseQueue(rawAddr));
         } else {
             cnManager->PushBrowseQueue(rawAddr, pkt);
-            HILOGI("[AVRCP CT] Waiting for the response! - Address[%{public}s]", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Waiting for the response! Address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     }
 }
 
 void AvrcCtProfile::SendNextBrowseCmd(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     cnManager->ClearBrowseInfo(rawAddr);
@@ -1739,7 +1721,7 @@ void AvrcCtProfile::SendNextBrowseCmd(const RawAddress &rawAddr)
 
 bool AvrcCtProfile::IsBrowseQueueFull(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     return (AvrcCtConnectManager::GetInstance()->GetSizeOfBrowseQueue(rawAddr) == AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
@@ -1747,7 +1729,7 @@ bool AvrcCtProfile::IsBrowseQueueFull(const RawAddress &rawAddr)
 
 bool AvrcCtProfile::IsDisableAbsoluteVolume(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     return AvrcCtConnectManager::GetInstance()->IsDisableAbsoluteVolume(rawAddr);
@@ -1755,7 +1737,7 @@ bool AvrcCtProfile::IsDisableAbsoluteVolume(const RawAddress &rawAddr)
 
 bool AvrcCtProfile::IsBrowsingConnected(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     return AvrcCtConnectManager::GetInstance()->IsBrowsingConnected(rawAddr);
@@ -1763,8 +1745,7 @@ bool AvrcCtProfile::IsBrowsingConnected(const RawAddress &rawAddr)
 
 void AvrcCtProfile::SendSetBrowsedPlayerCmd(const RawAddress &rawAddr, uint16_t playerId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] playerId[%x]", playerId);
+    HILOGI("address: %{public}s, playerId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId);
 
     std::shared_ptr<AvrcCtBrowsePacket> packet = std::make_shared<AvrcCtSbpPacket>(playerId);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1774,7 +1755,7 @@ void AvrcCtProfile::SendSetBrowsedPlayerCmd(const RawAddress &rawAddr, uint16_t 
 
 void AvrcCtProfile::ReceiveSetBrowsedPlayerRsp(const RawAddress &rawAddr, Packet *pkt) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtSbpPacket packet(pkt);
 
@@ -1793,8 +1774,8 @@ void AvrcCtProfile::ReceiveSetBrowsedPlayerRsp(const RawAddress &rawAddr, Packet
 void AvrcCtProfile::SendChangePathCmd(
     const RawAddress &rawAddr, uint16_t uidCounter, uint8_t direction, uint64_t folderUid)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] direction[%x] - folderUid[%jx]", direction, folderUid);
+    HILOGI("address: %{public}s, uidCounter: %{public}d, direction: %{public}x, folderUid: %{public}jx",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, direction, folderUid);
 
     std::shared_ptr<AvrcCtBrowsePacket> packet = std::make_shared<AvrcCtCpPacket>(uidCounter, direction, folderUid);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1804,7 +1785,7 @@ void AvrcCtProfile::SendChangePathCmd(
 
 void AvrcCtProfile::ReceiveChangePathRsp(const RawAddress &rawAddr, Packet *pkt) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtCpPacket packet(pkt);
 
@@ -1819,12 +1800,8 @@ void AvrcCtProfile::ReceiveChangePathRsp(const RawAddress &rawAddr, Packet *pkt)
 void AvrcCtProfile::SendGetFolderItemsCmd(const RawAddress &rawAddr, uint8_t scope, uint32_t startItem,
     uint32_t endItem, const std::vector<uint32_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%hhx] - startItem[%{public}d] - endItem[%{public}d] - attributes.size[%zu]",
-        scope,
-        startItem,
-        endItem,
-        attributes.size());
+    HILOGI("addr:%{public}s, scope:%{public}d, startItem:%{public}d, endItem:%{public}d, attributes.size:%{public}zu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, startItem, endItem, attributes.size());
 
     std::shared_ptr<AvrcCtBrowsePacket> packet =
         std::make_shared<AvrcCtGfiPacket>(scope, startItem, endItem, attributes);
@@ -1835,7 +1812,7 @@ void AvrcCtProfile::SendGetFolderItemsCmd(const RawAddress &rawAddr, uint8_t sco
 
 void AvrcCtProfile::ReceiveGetFolderItemsRsp(const RawAddress &rawAddr, Packet *pkt) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtGfiPacket packet(pkt);
 
@@ -1856,8 +1833,8 @@ void AvrcCtProfile::ReceiveGetFolderItemsRsp(const RawAddress &rawAddr, Packet *
 void AvrcCtProfile::SendGetItemAttributesCmd(const RawAddress &rawAddr, uint8_t scope, uint64_t uid,
     uint16_t uidCounter, const std::vector<uint32_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%x] - uid[%jx] - uidCounter[%{public}hu]", scope, uid, uidCounter);
+    HILOGI("addr: %{public}s, scope: %{public}x, uid: %{public}jx, uidCounter: %{public}hu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, uid, uidCounter);
 
     std::shared_ptr<AvrcCtBrowsePacket> packet = std::make_shared<AvrcCtGiaPacket>(scope, uid, uidCounter, attributes);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1867,7 +1844,7 @@ void AvrcCtProfile::SendGetItemAttributesCmd(const RawAddress &rawAddr, uint8_t 
 
 void AvrcCtProfile::ReceiveGetItemAttributesRsp(const RawAddress &rawAddr, Packet *pkt) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtGiaPacket packet(pkt);
 
@@ -1881,8 +1858,7 @@ void AvrcCtProfile::ReceiveGetItemAttributesRsp(const RawAddress &rawAddr, Packe
 
 void AvrcCtProfile::SendGetTotalNumberOfItemsCmd(const RawAddress &rawAddr, uint8_t scope)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] scope[%x]", scope);
+    HILOGI("address: %{public}s, scope: %{public}x", GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope);
 
     std::shared_ptr<AvrcCtBrowsePacket> packet = std::make_shared<AvrcCtGtnoiPacket>(scope);
     IPowerManager::GetInstance().StatusUpdate(RequestStatus::BUSY, PROFILE_NAME_AVRCP_CT, rawAddr);
@@ -1892,7 +1868,7 @@ void AvrcCtProfile::SendGetTotalNumberOfItemsCmd(const RawAddress &rawAddr, uint
 
 void AvrcCtProfile::ReceiveGetTotalNumberOfItemsRsp(const RawAddress &rawAddr, Packet *pkt) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtGtnoiPacket packet(pkt);
 
@@ -1910,7 +1886,7 @@ void AvrcCtProfile::ReceiveGetTotalNumberOfItemsRsp(const RawAddress &rawAddr, P
 
 void AvrcCtProfile::ReceiveBrowseRsp(const RawAddress &rawAddr, Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     SendNextBrowseCmd(rawAddr);
 
@@ -1931,7 +1907,7 @@ void AvrcCtProfile::ReceiveBrowseRsp(const RawAddress &rawAddr, Packet *pkt)
             ReceiveGetTotalNumberOfItemsRsp(rawAddr, pkt);
             break;
         default:
-            HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+            HILOGI("The PDU ID is wrong! Address: %{public}s, pduId: %{public}x",
                 GET_ENCRYPT_AVRCP_ADDR(rawAddr), AvrcCtPacket::GetBrowsePdu(pkt));
             break;
     }
@@ -1939,7 +1915,7 @@ void AvrcCtProfile::ReceiveBrowseRsp(const RawAddress &rawAddr, Packet *pkt)
 
 void AvrcCtProfile::ProcessBrowseTimeout(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     if (IsEnabled()) {
         std::shared_ptr<AvrcCtBrowsePacket> packet = AvrcCtConnectManager::GetInstance()->GetBrowsePacket(rawAddr);
@@ -1980,7 +1956,7 @@ void AvrcCtProfile::ProcessBrowseTimeout(RawAddress rawAddr)
                         rawAddr, 0x00, 0x00, RET_BAD_STATUS, AVRC_ES_CODE_INTERNAL_ERROR);
                     break;
                 default:
-                    HILOGI("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%{public}x]",
+                    HILOGI("The PDU ID is wrong! Address: %{public}s, pduId: %{public}x",
                         GET_ENCRYPT_AVRCP_ADDR(rawAddr), packet->GetPduId());
                     break;
             }
@@ -1991,7 +1967,7 @@ void AvrcCtProfile::ProcessBrowseTimeout(RawAddress rawAddr)
 
 void AvrcCtProfile::BrowseTimeoutCallback(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     if (IsEnabled()) {
         dispatcher_->PostTask(std::bind(&AvrcCtProfile::ProcessBrowseTimeout, this, rawAddr));
@@ -2001,8 +1977,8 @@ void AvrcCtProfile::BrowseTimeoutCallback(const RawAddress &rawAddr)
 void AvrcCtProfile::ProcessChannelEvent(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    HILOGI("[AVRCP CT] Receive [%{public}s] - Result[%{public}x] - Address[%{public}s]", GetEventName(event).c_str(),
-        result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+    HILOGI("Receive: %{public}s, connectId: %{public}d, Result: %{public}x, Address: %{public}s",
+        GetEventName(event).c_str(), connectId, result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     switch (event) {
         case AVCT_CONNECT_IND_EVT:
             ProcessChannelEventConnectIndEvt(rawAddr, connectId, event, result, context);
@@ -2036,7 +2012,8 @@ void AvrcCtProfile::ProcessChannelEvent(
 void AvrcCtProfile::ProcessChannelEventConnectIndEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("Receive: %{public}s, connectId: %{public}d, Result: %{public}x, Address: %{public}s",
+        GetEventName(event).c_str(), connectId, result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     result = ExpainAvctResult(result);
 
@@ -2071,7 +2048,8 @@ void AvrcCtProfile::ProcessChannelEventConnectIndEvt(
 void AvrcCtProfile::ProcessChannelEventConnectCfmEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("Receive: %{public}s, connectId: %{public}d, Result: %{public}x, Address: %{public}s",
+        GetEventName(event).c_str(), connectId, result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -2101,7 +2079,8 @@ void AvrcCtProfile::ProcessChannelEventConnectCfmEvt(
 void AvrcCtProfile::ProcessChannelEventDisconnectIndEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("Receive: %{public}s, connectId: %{public}d, Result: %{public}x, Address: %{public}s",
+        GetEventName(event).c_str(), connectId, result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
 
@@ -2115,7 +2094,8 @@ void AvrcCtProfile::ProcessChannelEventDisconnectIndEvt(
 void AvrcCtProfile::ProcessChannelEventDisconnectCfmEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("Receive: %{public}s, connectId: %{public}d, Result: %{public}x, Address: %{public}s",
+        GetEventName(event).c_str(), connectId, result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -2141,8 +2121,8 @@ void AvrcCtProfile::ProcessChannelEventDisconnectCfmEvt(
 void AvrcCtProfile::ProcessChannelEventBrConnectIndEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-
+    HILOGI("Receive: %{public}s, connectId: %{public}d, Result: %{public}x, Address: %{public}s",
+        GetEventName(event).c_str(), connectId, result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     result = ExpainAvctResult(result);
 
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
@@ -2165,8 +2145,8 @@ void AvrcCtProfile::ProcessChannelEventBrConnectIndEvt(
 void AvrcCtProfile::ProcessChannelEventBrConnectCfmEvt(
     const RawAddress &rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
-
+    HILOGI("Receive: %{public}s, connectId: %{public}d, Result: %{public}x, Address: %{public}s",
+        GetEventName(event).c_str(), connectId, result, GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     AvrcCtStateMachineManager *smManager = AvrcCtStateMachineManager::GetInstance();
     AvrcCtConnectManager *cnManager = AvrcCtConnectManager::GetInstance();
     utility::Message msg(AVRC_CT_SM_EVENT_INVALID);
@@ -2187,7 +2167,7 @@ void AvrcCtProfile::ProcessChannelEventBrConnectCfmEvt(
 void AvrcCtProfile::ProcessChannelMessage(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    HILOGI("[AVRCP CT] connectId[%{public}d] - label[%{public}d] - crType[%{public}d] - chType[%{public}d]",
+    HILOGI("connectId: %{public}d, label: %{public}d, crType: %{public}d, chType: %{public}d",
         connectId, label, crType, chType);
 
     RawAddress rawAddr = AvrcCtConnectManager::GetInstance()->GetRawAddress(connectId);
@@ -2195,7 +2175,7 @@ void AvrcCtProfile::ProcessChannelMessage(
 
     if (chType == AVCT_DATA_CTRL) {
         uint8_t opCode = AvrcCtPacket::GetOpCode(pkt);
-        LOG_DEBUG("[AVRCP CT] opCode[%x]", opCode);
+        HILOGI("opCode: %{public}x", opCode);
         switch (opCode) {
             case AVRC_CT_OP_CODE_PASS_THROUGH:
                 ReceivePassRsp(rawAddr, pkt);
@@ -2210,13 +2190,13 @@ void AvrcCtProfile::ProcessChannelMessage(
                 ReceiveVendorRsp(rawAddr, pkt);
                 break;
             default:
-                LOG_DEBUG("[AVRCP CT] opCode[%x] is wrong! - ConnectId[%x]", opCode, connectId);
+                HILOGI("opCode: %{public}x is wrong! ConnectId: %{public}x", opCode, connectId);
                 break;
         }
     } else if (chType == AVCT_DATA_BR) {
         ReceiveBrowseRsp(rawAddr, pkt);
     } else {
-        LOG_DEBUG("[AVRCP CT] chType[%x] is wrong! - ConnectId[%x]", chType, connectId);
+        HILOGI("chType: %{public}x is wrong! ConnectId: %{public}x", chType, connectId);
     }
 
     PacketFree(pkt);
@@ -2225,7 +2205,7 @@ void AvrcCtProfile::ProcessChannelMessage(
 
 void AvrcCtProfile::DeleteResource(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtConnectManager::GetInstance()->Delete(rawAddr);
     AvrcCtStateMachineManager::GetInstance()->DeletePairOfStateMachine(rawAddr);
@@ -2233,14 +2213,14 @@ void AvrcCtProfile::DeleteResource(const RawAddress &rawAddr)
 
 void AvrcCtProfile::DeleteBrowseStateMachine(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AvrcCtStateMachineManager::GetInstance()->DeleteBrowseStateMachine(rawAddr);
 }
 
 int AvrcCtProfile::ExpainAvctResult(uint16_t avctRet)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("avctRet: %{public}d", avctRet);
     int result = RET_BAD_STATUS;
 
     switch (avctRet) {
@@ -2259,7 +2239,7 @@ int AvrcCtProfile::ExpainAvctResult(uint16_t avctRet)
 
 int AvrcCtProfile::ExpainPassCrCodeToResult(uint8_t code)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("code: %{public}d", code);
     int result = RET_BAD_STATUS;
 
     switch (code) {
@@ -2283,7 +2263,7 @@ int AvrcCtProfile::ExpainPassCrCodeToResult(uint8_t code)
 
 int AvrcCtProfile::ExplainCrCodeToResult(uint8_t crCode)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtProfile::%{public}s", __func__);
+    HILOGI("crCode: %{public}d", crCode);
     int result = RET_BAD_STATUS;
 
     switch (crCode) {
