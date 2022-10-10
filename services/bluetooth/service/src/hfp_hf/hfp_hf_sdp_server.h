@@ -114,13 +114,17 @@ private:
     int AddAttribute(SdpAttribute attribute) const;
 
     inline static constexpr uint16_t HFP_HF_SERVER_CLASSID_NUM = 2;
+    inline static constexpr uint16_t HFP_HF_HSP_SERVER_CLASSID_NUM = 3;
     inline static constexpr uint16_t HFP_HF_SERVER_PROTOCOL_NUM = 2;
     inline static constexpr uint16_t HFP_HF_SERVER_PROFILE_NUM = 1;
+    inline static constexpr uint16_t HFP_HF_HSP_SERVER_PROFILE_NUM = 2;
     inline static constexpr uint16_t HFP_HF_SERVER_BROWSE_LIST_NUM = 1;
     inline static constexpr uint16_t HFP_HF_SERVER_FEATURES_LENGTH = 2;
 
     // SDP service record handle
     uint32_t sdpHandle_ {0};
+
+    int hspState_ = 1;
 
     BT_DISALLOW_COPY_AND_ASSIGN(HfpHfSdpServer);
 };

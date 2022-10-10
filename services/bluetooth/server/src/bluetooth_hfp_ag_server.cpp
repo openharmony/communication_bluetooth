@@ -318,6 +318,23 @@ bool BluetoothHfpAgServer::SetActiveDevice(const BluetoothRawAddress &device)
     return false;
 }
 
+bool BluetoothHfpAgServer::IntoMock(const BluetoothRawAddress &device, int state) {
+    HILOGI("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    if (pimpl->HfpAgService_ ) {
+        return pimpl->HfpAgService_ ->IntoMock(state);
+    }
+    return false;
+}
+
+bool BluetoothHfpAgServer::SendNoCarrier(const BluetoothRawAddress &device) {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    RawAddress addr(device.GetAddress());
+    if (pimpl->HfpAgService_ ) {
+        return pimpl->HfpAgService_ ->SendNoCarrier(addr);
+    }
+    return false;
+}
+
 std::string BluetoothHfpAgServer::GetActiveDevice()
 {
     std::string dev = "";

@@ -265,6 +265,9 @@ bool HfpHfConnected::Dispatch(const utility::Message &msg)
         case HFP_HF_REJECT_CALL_EVT:
             stateMachine_.ProcessRejectCall();
             break;
+        case HFP_HF_SEND_KEY_PRESSED:
+            stateMachine_.PrecessSendKeyPressed();
+            break;
         case HFP_HF_HANDLE_INCOMING_CALL_EVT:
             stateMachine_.ProcessHandleIncomingCall(event.arg1_);
             break;
@@ -276,6 +279,9 @@ bool HfpHfConnected::Dispatch(const utility::Message &msg)
             break;
         case HFP_HF_DIAL_MEMORY:
             stateMachine_.ProcessDialMemory(event.arg1_);
+            break;
+        case HFP_HF_SEND_VOICE_TAG:
+            stateMachine_.ProcessSendVoiceTag(event.arg1_);
             break;
         case HFP_HF_FINISH_CALL_EVT:
             stateMachine_.ProcessFinishCall(event);
@@ -508,6 +514,14 @@ void HfpHfStateMachine::ProcessRejectCall()
     return;
 }
 
+void HfpHfStateMachine::PrecessSendKeyPressed()
+{
+    LOG_INFO("[HFP HF]%{public}s():enter", __FUNCTION__);
+    if (!profile_.SendKeyPressed()) {
+        LOG_ERROR("[HFP HF]%{public}s():PrecessSendKeyPressed failed", __FUNCTION__);
+    }
+}
+
 void HfpHfStateMachine::ProcessHandleIncomingCall(int flag)
 {
     HILOGI("[HFP HF]:handle incoming call flag = %{public}d", flag);
@@ -549,6 +563,14 @@ void HfpHfStateMachine::ProcessDialMemory(int index)
     HILOGI("[HFP HF]:enter index = %{public}d", index);
     if (!profile_.DialMemory(index)) {
             HILOGE("[HFP HF]:ProcessDialMemory failed");
+    }
+}
+
+void HfpHfStateMachine::ProcessSendVoiceTag(int index)
+{
+    LOG_INFO("[HFP HF]%{public}s():enter index = %{public}d", __FUNCTION__, index);
+    if (!profile_.SendVoiceTag(index)) {
+            LOG_ERROR("[HFP HF]%{public}s():ProcessSendVoiceTag failed", __FUNCTION__);
     }
 }
 

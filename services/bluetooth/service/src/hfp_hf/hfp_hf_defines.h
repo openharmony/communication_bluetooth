@@ -44,16 +44,26 @@ static constexpr uint16_t HFP_HF_SDP_ATTRIBUTE_SUPPORTED_FEATURES = 0x0311;
 // HF service name string
 static const std::string HFP_HF_SERVER_SERVICE_NAME = "Handsfree Unit";
 
+static const std::string HSP_HS_SERVER_SERVICE_NAME = "Headset";
+
+static const std::string HSP_HS_STATE_SECTION_NAME = "HfpHfService";
+static const std::string HSP_HS_STATE_PROPERY_NAME = "HspHsState";
+
 // Service class UUID
-static constexpr uint16_t HFP_HF_UUID_SERVCLASS_HFP_HF = 0X111E;
-static constexpr uint16_t HFP_HF_UUID_SERVCLASS_HFP_AG = 0X111F;
+static constexpr uint16_t HFP_HF_UUID_SERVCLASS_HFP_HF = 0X111E;static constexpr uint16_t HFP_HF_UUID_SERVCLASS_HFP_AG = 0X111F;
 static constexpr uint16_t HFP_HF_UUID_SERVCLASS_GENERIC_AUDIO = 0X1203;
+static constexpr uint16_t HSP_UUID_SERVCLASS = 0x1108;
+static constexpr uint16_t HFP_HF_UUID_SERVCLASS_HSP_HS = 0x1131;
+static constexpr uint16_t HFP_HF_UUID_SERVCLASS_HSP_AG = 0x1112;
 
 // HFP version
 static constexpr uint16_t HFP_HF_HFP_VERSION_1_1 = 0x0101;
 static constexpr uint16_t HFP_HF_HFP_VERSION_1_5 = 0x0105;
 static constexpr uint16_t HFP_HF_HFP_VERSION_1_6 = 0x0106;
 static constexpr uint16_t HFP_HF_HFP_VERSION_1_7 = 0x0107;
+
+// HSP version
+static constexpr uint16_t HFP_HF_HSP_VERSION_1_2 = 0x0102;
 
 // HF features masks: using 16 ~ 0 bits
 static constexpr uint16_t HFP_HF_AG_FEATURES_NONE = 0x0000;
@@ -182,10 +192,12 @@ enum {
     HFP_HF_ACCEPT_CALL_EVT,
     HFP_HF_HOLD_CALL_EVT,
     HFP_HF_REJECT_CALL_EVT,
+    HFP_HF_SEND_KEY_PRESSED,
     HFP_HF_HANDLE_INCOMING_CALL_EVT,
     HFP_HF_HANDLE_MULTI_CALL_EVT,
     HFP_HF_DIAL_LAST_NUMBER,
     HFP_HF_DIAL_MEMORY,
+    HFP_HF_SEND_VOICE_TAG,
     HFP_HF_FINISH_CALL_EVT,
     HFP_HF_DIAL_CALL_EVT,
     HFP_HF_OPEN_VOICE_RECOGNITION_EVT,
@@ -302,6 +314,14 @@ enum HfpHfMptyType { HFP_HF_MPTY_TYPE_SINGLE = 0, HFP_HF_MPTY_TYPE_MULTI };
 enum HfpHfDirectionType { HFP_HF_DIRECTION_TYPE_OUTGOING = 0, HFP_HF_DIRECTION_TYPE_INCOMING };
 
 enum { HFP_HF_VR_STATE_CLOSED, HFP_HF_VR_STATE_OPENED };
+
+constexpr int HFP_HF_HFAG_FOUND = 1;
+constexpr int HFP_HF_HSAG_FOUND = 2;
+constexpr int HFP_HF_HFAG_HSAG_FOUND = 3;
+
+constexpr int HSP_HS_STATE_BOTH = 0X01;
+constexpr int HSP_HS_STATE_HSP = 0X02;
+constexpr int HSP_HS_STATE_NONE = 0X03;
 }  // namespace bluetooth
 }  // namespace OHOS
 #endif // HFP_HF_DEFINES_H

@@ -358,6 +358,14 @@ public:
     void CkpdSetter(HfpAgDataConnection &dataConn, const std::string &arg);
 
     /**
+     * @brief BINP Getter.
+     *
+     * @param dataConn Data connection.
+     * @param arg AT command argument
+     */
+    void BinpSetter(HfpAgDataConnection &dataConn, const std::string &arg);
+
+    /**
      * @brief Handle specific AT command.
      *
      * @param dataConn Data connection.
@@ -383,6 +391,12 @@ private:
     inline static constexpr int CHLD_RELEASE_ALL_HELD_CALLS = 0;
     inline static constexpr int CHLD_RELEASE_ACTIVE_ACCPET_OTHER = 1;
     inline static constexpr int CHLD_RELEASE_HOLD_ACCPET_OTHER = 2;
+    inline static constexpr int CHLD_ADD_CALL_TO_CONVERSATION = 3;
+    inline static constexpr int CHLD_CONNECT_TWO_CALL = 4;
+    inline static constexpr int CHLD_RELEASE_INDEX_ONE = 11;
+    inline static constexpr int CHLD_RELEASE_INDEX_TWO = 12;
+    inline static constexpr int CHLD_CONSULTATION_INDEX_ONE = 21;
+    inline static constexpr int CHLD_CONSULTATION_INDEX_TWO = 22;
     inline static constexpr int BIEV_ARGS_VALID_LENGTH = 2;
     inline static constexpr int CMER_ELEMENTS_NUMBER = 4;
     inline static constexpr unsigned int CMER_MODE_INDEX = 0;

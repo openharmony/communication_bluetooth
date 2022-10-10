@@ -196,6 +196,8 @@ public:
      */
     int GetScoState(const RawAddress &device) override;
 
+    void UpdateMockCallList(int callState, const std::string &number, int type);
+
     /**
      * @brief This function used to Update changed phone call information.
      *
@@ -251,6 +253,11 @@ public:
      * @since 6
      */
     bool SetActiveDevice(const RawAddress &device) override;
+
+    bool IntoMock(int state) override;
+    bool SendNoCarrier(const RawAddress &device) override;
+    int GetMockState();
+    std::vector<MockCall> GetCallList();
 
     /**
      * @brief Get the active device.
@@ -345,6 +352,35 @@ public:
      * @since 6
      */
     void NotifyAgIndicatorStateChanged(int what, int state);
+
+    /**
+     * @brief Notify the ag incoming state changed.
+     *
+     * @param what The name of the event.
+     * @param number incoming number.
+     * @param type call type
+     * @since 9
+     */
+    void NotifyAgIncomingStateChanged(int what, std::string number, int type);
+
+    void SendMockCmd(const HfpAgMessage &event);
+
+    /**
+     * @brief Notify the ag call response hold state changed.
+     *
+     * @param what The name of the event.
+     * @param state responsw hold state
+     * @since 9
+     */
+    void NotifyAgResponseHoldStateChanged(int what, int state);
+
+    /**
+     * @brief Send binp bumber.
+     *
+     * @param number voice number.
+     * @since 9
+     */
+    void SendBinpNumber(std::string number);
 
     /**
      * @brief Dial out call by HF.
@@ -477,6 +513,12 @@ public:
      */
     void SetInbandRing(bool action);
 
+    /**
+     * @brief respones ok to hf.
+     * @since 9
+     */
+    void ResponesOK(const std::string &address);
+
 private:
     /**
      * @brief Service startup.
@@ -582,6 +624,14 @@ private:
      * @since 6
      */
     void SendEventToEachStateMachine(const HfpAgMessage &event) const;
+
+    /**
+     * @brief Update ag indicators.
+     *
+     * @param event The event of the HFP AG role.
+     * @since 6
+     */
+    void UpdateAgIndicators() const;
 
     /**
      * @brief Process connect or connect request event of the HFP AG role.
@@ -714,6 +764,9 @@ private:
         {HFP_AG_STATE_DISCONNECTING, static_cast<int>(BTConnectState::DISCONNECTING)},
         {HFP_AG_STATE_CONNECTED, static_cast<int>(BTConnectState::CONNECTED)}
     };
+
+    int mockState_ {0};
+    std::vector<MockCall> callList_;
 
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgService);
 };

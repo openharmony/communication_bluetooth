@@ -365,6 +365,60 @@ bool BluetoothHfpAgProxy::SetActiveDevice(const BluetoothRawAddress &device) {
     return reply.ReadBool();
 }
 
+bool BluetoothHfpAgProxy::IntoMock(const BluetoothRawAddress &device, int state)
+{
+        MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
+        HILOGE("BluetoothHfpAgProxy::IntoMock WriteInterfaceToken error");
+        return false;
+    }
+
+    if (!data.WriteParcelable(&device)) {
+        HILOGE("BluetoothHfpAgProxy::IntoMock WriteParcelable error");
+        return false;
+    }
+
+    if (!data.WriteInt32(state)) {
+        HILOGE("BluetoothHfpAgProxy::IntoMock WriteParcelable error");
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(
+        IBluetoothHfpAg::Code::BT_HFP_AG_INTO_MOCK, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHfpAgProxy::IntoMock done fail, error: %{public}d", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool BluetoothHfpAgProxy::SendNoCarrier(const BluetoothRawAddress &device)
+{
+        MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
+        HILOGE("BluetoothHfpAgProxy::SendNoCarrier WriteInterfaceToken error");
+        return false;
+    }
+    if (!data.WriteParcelable(&device)) {
+        HILOGE("BluetoothHfpAgProxy::SendNoCarrier WriteParcelable error");
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(
+        IBluetoothHfpAg::Code::BT_HFP_AG_SEND_NO_CARRIER, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHfpAgProxy::SendNoCarrier done fail, error: %{public}d", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
 std::string BluetoothHfpAgProxy::GetActiveDevice() {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {

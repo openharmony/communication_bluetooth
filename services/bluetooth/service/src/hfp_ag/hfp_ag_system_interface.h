@@ -20,6 +20,7 @@
 #include "base_def.h"
 #include "hfp_ag_defines.h"
 #include "telephony_observer.h"
+#include "hfp_ag_message.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -110,7 +111,7 @@ public:
      *
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      */
-    bool QueryCurrentCallsList();
+    bool QueryCurrentCallsList(const std::string &address);
 
     /**
      * @brief Receives the command of HF and asks the telecom to respone the current call state.
@@ -189,6 +190,45 @@ public:
      * @brief Notify ag indicator from the phone.
      */
     void QueryAgIndicator();
+
+    /**
+     * @brief Update ag indicator from the phone.
+     */
+    void UpdateAgIndicator() const;
+
+    /**
+     * @brief update vluetooth call list
+     *
+     */
+    void UpdateCallList();
+
+    /**
+     * @brief Get the Call With State object
+     *
+     * @param state call state
+     * @return int call id
+     */
+    int GetCallWithState(int state) const;
+
+    /**
+     * @brief Get voice numner.
+     */
+    void GetVoiceNumber();
+
+    /**
+     * @brief Get response hold state.
+     */
+    void GetResponseHoldState(std::string address);
+
+    /**
+     * @brief Get response hold state.
+     */
+    void SetResponseHoldState(std::string address, int btrh);
+
+    /**
+     * @brief Get response hold state.
+     */
+    void HandlePhoneStateMock(std::string number, int state, int type);
 
     /**
      * @brief Notify the subscription state changed.
@@ -283,6 +323,15 @@ public:
      */
     bool IsRinging() const;
 
+    /**
+     * @brief handle chld command
+     *
+     * @param chld chld operation
+     * @return true operation success
+     * @return false operation failed
+     */
+    bool HandleChld(int chld) const;
+
 private:
     /**
      * @brief Construct a new HfpAgSystemInterface object.
@@ -298,6 +347,45 @@ private:
      * @brief Send the service state to the service.
      */
     void SendServiceStateToService() const;
+
+    /**
+     * @brief Send the service state to the service.
+     */
+    void SendIncomingCallToService(std::string number, int type) const;
+
+    /**
+     * @brief send cmd in mock state
+     *
+     * @param evt ag event
+     */
+    void SendMockEvent(HfpAgMessage evt) const;
+
+    /**
+     * @brief send mock clip command
+     *
+     * @param call number
+     */
+    void SendClip(std::string number) const;
+
+    /**
+     * @brief Send the service state to the service.
+     */
+    void SendCallSetupToService(int state) const;
+
+    /**
+     * @brief Send the call held state to the service.
+     */
+    void SendCallHeldToService(int state) const;
+
+    /**
+     * @brief Send the calle state to the service.
+     */
+    void SendCallStateToService(int state) const;
+
+    /**
+     * @brief Send response hold state to the service.
+     */
+    void SendResponseHoldStateToService(int state) const;
 
     /**
      * @brief Send the roam state to the service.
@@ -323,6 +411,24 @@ private:
      * @brief Unregister a TelephonyObserver to the telephony subsystem.
      */
     void UnregisterObserver();
+
+    /**
+     * @brief add for pts chld command
+     *
+     * @param chld  chle operation
+     * @return true success
+     * @return false  failed
+     */
+    bool HandleChldMock(int chld) const;
+
+    /**
+     * @brief add for pts get call list
+     *
+     * @param address device address
+     * @return true success
+     * @return false failed
+     */
+    bool HandleClccMock(std::string address) const;
 
     /**
      * @brief Convert from string to u16string
@@ -366,6 +472,12 @@ private:
     std::string operatorName_ {""};
 
     class AgTelephonyObserver;
+
+    // For pts mock call list
+    std::vector<MockCall> callList_;
+
+    // bluetooth call list
+    std::vector<BluetoothCall> bluetoothCallList_;
 
      // The observer that implements TelephonyObserver
     OHOS::sptr<AgTelephonyObserver> observer_ {nullptr};
