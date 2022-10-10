@@ -308,6 +308,15 @@ struct HandsFreeUnit::impl {
         return false;
     }
 
+    bool SendKeyPressed(const BluetoothRemoteDevice &device)
+    {
+        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy_->SendKeyPressed(BluetoothRawAddress(device.GetDeviceAddr()));
+        }
+        return false;
+    }
+
     bool HandleIncomingCall(const BluetoothRemoteDevice &device, int flag)
     {
         HILOGI("Enter!");
@@ -340,6 +349,15 @@ struct HandsFreeUnit::impl {
         HILOGD("Enter! index = %{public}d", index);
         if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->DialMemory(BluetoothRawAddress(device.GetDeviceAddr()), index);
+        }
+        return false;
+    }
+
+    bool SendVoiceTag(const BluetoothRemoteDevice &device, int index)
+    {
+        HILOGD("[%{public}s]: %{public}s(): Enter! index = %{public}d", __FILE__, __FUNCTION__, index);
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy_->SendVoiceTag(BluetoothRawAddress(device.GetDeviceAddr()), index);
         }
         return false;
     }
@@ -544,6 +562,11 @@ bool HandsFreeUnit::RejectIncomingCall(const BluetoothRemoteDevice &device)
     return pimpl->RejectIncomingCall(device);
 }
 
+bool HandsFreeUnit::SendKeyPressed(const BluetoothRemoteDevice &device)
+{
+    return pimpl->SendKeyPressed(device);
+}
+
 bool HandsFreeUnit::HandleIncomingCall(const BluetoothRemoteDevice &device, int flag)
 {
     return pimpl->HandleIncomingCall(device, flag);
@@ -562,6 +585,11 @@ bool HandsFreeUnit::DialLastNumber(const BluetoothRemoteDevice &device)
 bool HandsFreeUnit::DialMemory(const BluetoothRemoteDevice &device, int index)
 {
     return pimpl->DialMemory(device, index);
+}
+
+bool HandsFreeUnit::SendVoiceTag(const BluetoothRemoteDevice &device, int index)
+{
+    return pimpl->SendVoiceTag(device, index);
 }
 
 bool HandsFreeUnit::FinishActiveCall(const BluetoothRemoteDevice &device, const HandsFreeUnitCall &call)

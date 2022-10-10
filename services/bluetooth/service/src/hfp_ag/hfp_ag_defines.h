@@ -44,6 +44,13 @@ static constexpr uint16_t HSP_AG_SDP_ATTRIBUTE_REMOTE_AUDIO_VOLUME_CONTROL = 0x0
 // AG service name string
 static const std::string HFP_AG_SERVER_SERVICE_NAME = "Handsfree Audio Gateway";
 
+// AG service name string
+static const std::string HSP_AG_SERVER_SERVICE_NAME = "Headset Audio Gateway";
+// HSP support name string
+static const std::string HSP_AG_STATE_SECTION_NAME = "HfpAgService";
+static const std::string HSP_AG_STATE_PROPERY_NAME = "HspAgState";
+
+
 // Service class UUID
 static constexpr uint16_t HFP_AG_UUID_SERVCLASS_HFP_HF = 0X111E;
 static constexpr uint16_t HFP_AG_UUID_SERVCLASS_HFP_AG = 0X111F;
@@ -244,6 +251,18 @@ enum HfpAgCallStatus {
     HFP_AG_CALL_ACTIVE         // call active
 };
 
+// response hold state
+enum HfpAgResponseHoldStatus {
+    HFP_AG_RESPONSE_HOLD = 0,
+    HFP_AG_RESPONSE_HOLD_ACCEPT,
+    HFP_AG_RESPONSE_HOLD_REJECT,
+};
+
+// hfp ag mock state
+enum HfpAgMockState {
+    HFP_AG_MOCK_DEFAULT = 0,
+    HFP_AG_MOCK,
+};
 // callsetup indicator
 enum HfpCallSetupStatus {
     HFP_AG_CALLSETUP_NONE = 0,  // Not currently in call set up
@@ -361,6 +380,7 @@ enum {
     HFP_AG_CONTROL_OTHER_MODULES_EVT,
     HFP_AG_DIALING_OUT_RESULT,
     HFP_AG_CALL_STATE_CHANGE,
+    HFP_AG_CALL_STATE_CHANGE_MOCK,
     HFP_AG_SEND_CCLC_RESPONSE,
     HFP_AG_NOTIFY_SERVICE_STATE,
     HFP_AG_NOTIFY_ROAM_STATE,
@@ -369,6 +389,12 @@ enum {
     HFP_AG_RESPONSE_CLCC_TIME_OUT_EVT,
     HFP_AG_VOICE_RECOGNITION_TIME_OUT_EVT,
     HFP_AG_DIAL_TIME_OUT_EVT,
+    HFP_AG_NOTIFY_INDICATOR_EVT,
+    HFP_AG_SEND_INCOMING_EVT,
+    HFP_AG_SEND_CALL_SETUP_EVT,
+    HFP_AG_SEND_CALL_HELD_EVT,
+    HFP_AG_SEND_CALL_STATE_EVT,
+    HFP_AG_SEND_RESPONSE_HOLD_STATE,
 
     // stack sdp events
     HFP_AG_SDP_DISCOVERY_RESULT_SUCCESS = 98,
@@ -398,8 +424,27 @@ enum {
     HFP_AG_AUDIO_DISCONNECT_FAILED_EVT,
 
     HFP_AG_RING_TIMEOUT_EVT,
-    HFP_AG_PROCESS_CKPD_EVT
+    HFP_AG_PROCESS_CKPD_EVT,
+    HFP_AG_RESPONE_OK_EVT,
+    HFP_AG_GET_VOICE_NUMBER,
+    HFP_AG_SEND_BINP_EVT,
+    HFP_AG_GET_BTRH_EVT,
+    HFP_AG_SET_BTRH_EVT,
+    HFP_AG_SEND_BTRH_EVT,
+    HFP_AG_SEND_NO_CARRIER,
+    HFP_AG_START_MOCK,
+
+    HFP_AG_MOCK_RING,
+    HFP_AG_MOCK_CLIP,
 };
+
+constexpr int HFP_AG_HF_FOUND = 1;
+constexpr int HFP_AG_HS_FOUND = 2;
+constexpr int HFP_AG_HF_HS_FOUND = 3;
+
+constexpr int HSP_AG_STATE_BOTH = 0X01;
+constexpr int HSP_AG_STATE_HSP = 0X02;
+constexpr int HSP_AG_STATE_NONE = 0X03;
 
 // This is the message type that Hfp controls other modules.
 enum {
@@ -436,6 +481,41 @@ enum { HFP_AG_HF_INDICATOR_ENHANCED_DRIVER_SAFETY_ID = 1, HFP_AG_HF_INDICATOR_BA
 enum { HFP_AG_HF_VR_ClOSED, HFP_AG_HF_VR_OPENED };
 
 enum { HFP_AG_NUMBER_DIAL, HFP_AG_MEMORY_DIAL, HFP_AG_LAST_NUMBER_REDIAL };
+
+enum BTCallDirection {
+    BT_CALL_DIRECTION_OUT = 0,
+    BT_CALL_DIRECTION_IN,
+    BT_CALL_DIRECTION_UNKNOW
+};
+
+struct MockCall {
+    std::string number = "";
+    int callstate = 0;
+    int type = 0;
+};
+
+struct BluetoothCall {
+    std::string number = "";
+    int callstate = 0;
+    int precallstate = 0;
+    int type = 0;
+    int callid = 0;
+};
+
+constexpr int CALL_TYPE_DEFAULT = 129;
+constexpr int CALL_TYPE_VOIP = 225;
+
+constexpr int ATCHLD_RELEASE_ALL_HELD_CALLS = 0;
+constexpr int ATCHLD_RELEASE_ACTIVE_ACCPET_OTHER = 1;
+constexpr int ATCHLD_RELEASE_HOLD_ACCPET_OTHER = 2;
+constexpr int ATCHLD_ADD_CALL_TO_CONVERSATION = 3;
+constexpr int ATCHLD_CONNECT_TWO_CALL = 4;
+constexpr int ATCHLD_RELEASE_INDEX_ONE = 11;
+constexpr int ATCHLD_RELEASE_INDEX_TWO = 12;
+constexpr int ATCHLD_CONSULTATION_INDEX_ONE = 21;
+constexpr int ATCHLD_CONSULTATION_INDEX_TWO = 22;
+
+constexpr int HFP_AG_CALL_NUM_TWO = 2;
 }  // namespace bluetooth
 }  // namespace OHOS
 #endif // HFP_AG_DEFINES_H

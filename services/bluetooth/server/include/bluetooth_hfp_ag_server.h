@@ -45,6 +45,8 @@ public:
     bool CloseVoiceRecognition(const BluetoothRawAddress &device) override;
     bool SetActiveDevice(const BluetoothRawAddress &device) override;
     std::string GetActiveDevice() override;
+    bool IntoMock(const BluetoothRawAddress &device, int state) override;
+    bool SendNoCarrier(const BluetoothRawAddress &device) override;
     void RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) override;
 

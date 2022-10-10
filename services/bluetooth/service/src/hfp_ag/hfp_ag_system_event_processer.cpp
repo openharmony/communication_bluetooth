@@ -99,7 +99,23 @@ void HfpAgSystemEventProcesser::ExecuteEventProcess(const HfpAgMessage &event)
         case HFP_AG_MSG_TYPE_VR_CHANGED:
             VoiceRecognitionStateChanged(event.arg1_);
             break;
+        case HFP_AG_NOTIFY_INDICATOR_EVT:
+            UpdataAgIndicator();
+            break;
+        case HFP_AG_GET_VOICE_NUMBER:
+            GetVoiceNumber();
+            break;
+        case HFP_AG_GET_BTRH_EVT:
+            GetResponseHoldState(event.dev_);
+            break;
+        case HFP_AG_SET_BTRH_EVT:
+            SetResponseHold(event.dev_, event.arg1_);
+            break;
+        case HFP_AG_CALL_STATE_CHANGE_MOCK:
+            HandlePhoneStateMock(event.state_.number, event.state_.callState, event.state_.type);
+            break;
         default:
+            GetCurrentCalls();
             break;
     }
 }
@@ -211,10 +227,15 @@ void HfpAgSystemEventProcesser::ProcessWideBandSpeechEvent(int codec) const
 
 void HfpAgSystemEventProcesser::ProcessHoldCallEvent(int chld) const
 {
-    if (systemInterface_.HoldCall(chld)) {
-        profile_.SendResultCode(HFP_AG_RESULT_OK);
-    } else {
-        profile_.SendResultCode(HFP_AG_RESULT_ERROR);
+    bool result = systemInterface_.HoldCall(chld);
+    HfpAgService *service = HfpAgService::GetService();
+    int mock = service->GetMockState();
+    if (mock != HfpAgMockState::HFP_AG_MOCK) {
+        if (result) {
+            profile_.SendResultCode(HFP_AG_RESULT_OK);
+        } else {
+            profile_.SendResultCode(HFP_AG_RESULT_ERROR);
+        }
     }
 }
 
@@ -291,7 +312,7 @@ void HfpAgSystemEventProcesser::GetCurrentCalls() const
     if (service != nullptr) {
         service->SetResponseClccTimer(address_);
     }
-    systemInterface_.QueryCurrentCallsList();
+    systemInterface_.QueryCurrentCallsList(address_);
 }
 
 void HfpAgSystemEventProcesser::ProcessAtUnknownEvent(const std::string &atString) const
@@ -325,6 +346,33 @@ void HfpAgSystemEventProcesser::QueryAgIndicator()
     systemInterface_.QueryAgIndicator();
 }
 
+void HfpAgSystemEventProcesser::UpdataAgIndicator()
+{
+    systemInterface_.UpdateCallList();
+    systemInterface_.UpdateAgIndicator();
+}
+
+void HfpAgSystemEventProcesser::GetVoiceNumber()
+{
+    systemInterface_.GetVoiceNumber();
+}
+
+void HfpAgSystemEventProcesser::GetResponseHoldState(std::string address)
+{
+    systemInterface_.GetResponseHoldState(address);
+}
+
+void HfpAgSystemEventProcesser::SetResponseHold(std::string address, int btrh)
+{
+    systemInterface_.SetResponseHoldState(address, btrh);
+}
+
+void HfpAgSystemEventProcesser::HandlePhoneStateMock(std::string number, int state, int type)
+{
+    systemInterface_.HandlePhoneStateMock(number, state, type);
+}
+
+
 void HfpAgSystemEventProcesser::VoiceRecognitionStateChanged(int status)
 {
     HfpAgService *service = HfpAgService::GetService();
@@ -332,6 +380,7 @@ void HfpAgSystemEventProcesser::VoiceRecognitionStateChanged(int status)
         if (status == HFP_AG_HF_VR_OPENED) {
             if (service->OpenVoiceRecognitionByHf(address_)) {
                 systemInterface_.StartVoiceRecognition(address_);
+                profile_.SendResultCode(HFP_AG_RESULT_OK);
             } else {
                 profile_.SendResultCode(HFP_AG_RESULT_ERROR);
             }

@@ -340,6 +340,26 @@ bool HfpHfProfile::DialMemory(int memory)
     return true;
 }
 
+bool HfpHfProfile::SendVoiceTag(int index)
+{
+    HFP_HF_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
+
+    std::string cmd("AT+BINP");
+    cmd.append("=" + std::to_string(index));
+    commandProcessor_.SendAtCommand(dataConn_, cmd, HfpHfCommandProcessor::AT_BINP_SETTER);
+    return true;
+}
+
+bool HfpHfProfile::SendKeyPressed()
+{
+    HFP_HF_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
+
+    std::string cmd("AT+CKPD=200");
+    commandProcessor_.SendAtCommand(dataConn_, cmd, HfpHfCommandProcessor::AT_CKPD_SETTER);
+    return true;
+}
+
+
 bool HfpHfProfile::SendAta()
 {
     HFP_HF_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);

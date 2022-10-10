@@ -221,6 +221,8 @@ public:
     void Entry() override;
     void Exit() override;
     bool Dispatch(const utility::Message &msg) override;
+private:
+    int hspState_ = 1;
 };
 
 class HfpAgDisconnecting : public HfpAgState {
@@ -251,6 +253,7 @@ private:
     void ProcessVoiceRecognitionResult(int result);
     void ProcessPhoneStateChange(const HfpAgMessage &event) const;
     void ProcessResponseClcc(const HfpAgMessage &event) const;
+    void ProcessResponesOK() const;
 };
 
 class HfpAgAudioConnecting : public HfpAgState {

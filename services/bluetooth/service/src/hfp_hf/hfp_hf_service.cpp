@@ -503,6 +503,36 @@ bool HfpHfService::DialMemory(const RawAddress &device, int index)
     return true;
 }
 
+bool HfpHfService::SendVoiceTag(const RawAddress &device, int index)
+{
+    LOG_DEBUG("[HFP HF]%{public}s():==========<start>========== index = %{public}d", __FUNCTION__, index);
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    std::string address = device.GetAddress();
+    if (IsConnected(address) == false) {
+        return false;
+    }
+
+    HfpHfMessage event(HFP_HF_SEND_VOICE_TAG, index);
+    event.dev_ = address;
+    PostEvent(event);
+    return true;
+}
+
+bool HfpHfService::SendKeyPressed(const RawAddress &device)
+{
+    LOG_DEBUG("[HFP HF]%{public}s():==========<start>==========", __FUNCTION__);
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    std::string address = device.GetAddress();
+    if (IsConnected(address) == false) {
+        return false;
+    }
+
+    HfpHfMessage event(HFP_HF_SEND_KEY_PRESSED);
+    event.dev_ = address;
+    PostEvent(event);
+    return true;
+}
+
 bool HfpHfService::FinishActiveCall(const RawAddress &device, const HandsFreeUnitCalls &call)
 {
     LOG_DEBUG("[HFP HF]%{public}s():==========<start>==========", __FUNCTION__);

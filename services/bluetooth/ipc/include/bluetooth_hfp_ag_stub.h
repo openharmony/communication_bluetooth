@@ -44,6 +44,8 @@ private:
     ErrCode CloseVoiceRecognitionInner(MessageParcel &data, MessageParcel &reply);
     ErrCode SetActiveDeviceInner(MessageParcel &data, MessageParcel &reply);
     ErrCode GetActiveDeviceInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode IntoMockInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SendNoCarrierInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RegisterObserverInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DeregisterObserverInner(MessageParcel &data, MessageParcel &reply);
 

@@ -69,7 +69,8 @@ public:
         AT_CCWA_SETTER,
         AT_CCME_SETTER,
         AT_BCS_SETTER,
-        AT_BIEV_SETTER
+        AT_BIEV_SETTER,
+        AT_CKPD_SETTER
     };
 
     /**
@@ -145,6 +146,8 @@ private:
 
     // Respond timer object
     std::unique_ptr<utility::Timer> respTimer_ {nullptr};
+
+    int hspState_ = 1;
 
     static inline constexpr int HF_INDICATOR_MAX = 20;
     static inline constexpr int INDICATOR_NAME_MAX_LEN = 16;

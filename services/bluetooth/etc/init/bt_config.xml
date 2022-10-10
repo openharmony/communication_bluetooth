@@ -96,9 +96,11 @@
     </T1>
     <T1 section="HfpAgService">
         <T1 property="MaxConnectedDevices">0x06</T1>
+		<T1 property="HspAgState">0x01</T1>
     </T1>
     <T1 section="HfpHfService">
         <T1 property="MaxConnectedDevices">0x06</T1>
+		<T1 property="HspHsState">0x01</T1>
     </T1>
     <T1 section="SocketService">
         <T1 property="MaxConnectedDevices">0x06</T1>
