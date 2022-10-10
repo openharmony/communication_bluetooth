@@ -37,6 +37,7 @@
 #include "btstack.h"
 #include "interface_profile.h"
 #include "log.h"
+#include "log_util.h"
 #include "message.h"
 #include "packet.h"
 #include "raw_address.h"

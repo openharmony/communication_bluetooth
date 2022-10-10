@@ -20,7 +20,7 @@ namespace OHOS {
 namespace bluetooth {
 AvrcCtSubUnitPacket::AvrcCtSubUnitPacket()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     subunitType_ = AVRC_CT_SUB_UNIT_SUBUNIT_TYPE_UNIT;
     subunitId_ = AVRC_CT_SUB_UNIT_SUBUNIT_ID_IGNORE;
@@ -29,7 +29,7 @@ AvrcCtSubUnitPacket::AvrcCtSubUnitPacket()
 
 AvrcCtSubUnitPacket::AvrcCtSubUnitPacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     subunitType_ = AVRC_CT_SUB_UNIT_SUBUNIT_TYPE_UNIT;
     subunitId_ = AVRC_CT_SUB_UNIT_SUBUNIT_ID_IGNORE;
@@ -40,7 +40,7 @@ AvrcCtSubUnitPacket::AvrcCtSubUnitPacket(Packet *pkt)
 
 AvrcCtSubUnitPacket::~AvrcCtSubUnitPacket(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (pkt_ != nullptr) {
         PacketFree(pkt_);
@@ -50,7 +50,7 @@ AvrcCtSubUnitPacket::~AvrcCtSubUnitPacket(void)
 
 const Packet *AvrcCtSubUnitPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_CT_SUB_UNIT_COMMAND_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
@@ -71,7 +71,7 @@ const Packet *AvrcCtSubUnitPacket::AssemblePacket(void)
 
 bool AvrcCtSubUnitPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtSubUnitPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     bool isValid = false;
     size_t size = PacketPayloadSize(pkt);
@@ -85,9 +85,8 @@ bool AvrcCtSubUnitPacket::DisassemblePacket(Packet *pkt)
         isValid = true;
     } else {
         crCode_ = AVRC_CT_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP CT]The size of the packet is invalid! actual size[%{public}zu], valid min size[%{public}d]",
-            size,
-            AVRC_CT_SUB_UNIT_RESPONSE_SIZE);
+        HILOGI("The size of the packet is invalid! actual size: %{public}zu, valid min size: %{public}d",
+            size, AVRC_CT_SUB_UNIT_RESPONSE_SIZE);
     }
 
     return isValid;

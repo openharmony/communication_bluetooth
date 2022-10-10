@@ -23,7 +23,7 @@ AvrcCtNotifyPacket::AvrcCtNotifyPacket(uint8_t eventId, uint32_t interval)
       playStatus_(AVRC_PLAY_STATUS_ERROR),
       volume_(AVRC_ABSOLUTE_VOLUME_INVALID)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     crCode_ = AVRC_CT_CMD_CODE_NOTIFY;
     pduId_ = AVRC_CT_PDU_ID_REGISTER_NOTIFICATION;
@@ -38,7 +38,7 @@ AvrcCtNotifyPacket::AvrcCtNotifyPacket(Packet *pkt)
       playStatus_(AVRC_PLAY_STATUS_ERROR),
       volume_(AVRC_ABSOLUTE_VOLUME_INVALID)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     crCode_ = AVRC_CT_CMD_CODE_NOTIFY;
     pduId_ = AVRC_CT_PDU_ID_REGISTER_NOTIFICATION;
@@ -48,7 +48,7 @@ AvrcCtNotifyPacket::AvrcCtNotifyPacket(Packet *pkt)
 
 AvrcCtNotifyPacket::~AvrcCtNotifyPacket()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     attributes_.clear();
     values_.clear();
@@ -56,27 +56,27 @@ AvrcCtNotifyPacket::~AvrcCtNotifyPacket()
 
 Packet *AvrcCtNotifyPacket::AssembleParameters(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     size_t bufferSize = AVRC_CT_VENDOR_PARAMETER_LENGTH_SIZE + AVRC_CT_NOTIFY_PARAMETER_LENGTH;
-    LOG_DEBUG("[AVRCP CT] BufferMalloc[%{public}zu]", bufferSize);
+    HILOGI("BufferMalloc: %{public}zu", bufferSize);
 
     auto buffer = BufferMalloc(bufferSize);
     if (buffer == nullptr) {
-        LOG_ERROR("[AVRCP CT] AvrcCtNotifyPacket::AssembleParameters BufferMalloc fail");
+        HILOGE("BufferMalloc fail");
         return pkt;
     }
     auto bufferPtr = static_cast<uint8_t *>(BufferPtr(buffer));
 
     uint16_t offset = 0x0000;
     offset += PushOctets2((bufferPtr + offset), parameterLength_);
-    LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     offset += PushOctets1((bufferPtr + offset), eventId_);
-    LOG_DEBUG("[AVRCP CT] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     PushOctets4((bufferPtr + offset), interval_);
-    LOG_DEBUG("[AVRCP CT] interval_[%{public}d]", interval_);
+    HILOGI("interval_: %{public}d", interval_);
 
     PacketPayloadAddLast(pkt, buffer);
 
@@ -87,7 +87,7 @@ Packet *AvrcCtNotifyPacket::AssembleParameters(Packet *pkt)
 
 bool AvrcCtNotifyPacket::DisassembleParameters(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -95,12 +95,12 @@ bool AvrcCtNotifyPacket::DisassembleParameters(uint8_t *buffer)
     uint64_t payload = 0x00;
     offset += PopOctets2((buffer + offset), payload);
     parameterLength_ = static_cast<uint16_t>(payload);
-    LOG_DEBUG("[AVRCP CT] parameterLength_[%{public}d]", parameterLength_);
+    HILOGI("parameterLength_: %{public}d", parameterLength_);
 
     payload = 0x00;
     PopOctets1((buffer + offset), payload);
     eventId_ = static_cast<uint8_t>(payload);
-    LOG_DEBUG("[AVRCP CT] eventId_[%x]", eventId_);
+    HILOGI("eventId_: %{public}x", eventId_);
 
     switch (eventId_) {
         case AVRC_CT_EVENT_ID_PLAYBACK_STATUS_CHANGED:
@@ -135,14 +135,14 @@ bool AvrcCtNotifyPacket::DisassembleParameters(uint8_t *buffer)
             break;
     }
 
-    LOG_DEBUG("[AVRCP CT] isValid_[%{public}d]", isValid_);
+    HILOGI("isValid_: %{public}d", isValid_);
 
     return isValid_;
 }
 
 bool AvrcCtNotifyPacket::DisassemblePlaybackStatus(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -150,7 +150,7 @@ bool AvrcCtNotifyPacket::DisassemblePlaybackStatus(uint8_t *buffer)
     uint64_t payload = 0x00;
     PopOctets1((buffer + offset), payload);
     playStatus_ = static_cast<uint8_t>(payload);
-    LOG_DEBUG("[AVRCP CT] playStatus_[%x]", playStatus_);
+    HILOGI("playStatus_: %{public}x", playStatus_);
 
     isValid_ = true;
 
@@ -159,7 +159,7 @@ bool AvrcCtNotifyPacket::DisassemblePlaybackStatus(uint8_t *buffer)
 
 bool AvrcCtNotifyPacket::DisassembleTrackChanged(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -167,7 +167,7 @@ bool AvrcCtNotifyPacket::DisassembleTrackChanged(uint8_t *buffer)
     uint64_t payload = 0x00;
     PopOctets8((buffer + offset), payload);
     uid_ = payload;
-    LOG_DEBUG("[AVRCP CT] uid_[%jx]", uid_);
+    HILOGI("uid_: %{public}jx", uid_);
 
     isValid_ = true;
 
@@ -176,7 +176,7 @@ bool AvrcCtNotifyPacket::DisassembleTrackChanged(uint8_t *buffer)
 
 bool AvrcCtNotifyPacket::DisassemblePlaybackPosChanged(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -184,7 +184,7 @@ bool AvrcCtNotifyPacket::DisassemblePlaybackPosChanged(uint8_t *buffer)
     uint64_t payload = 0x00;
     PopOctets4((buffer + offset), payload);
     playbackPos_ = static_cast<uint32_t>(payload);
-    LOG_DEBUG("[AVRCP CT] playbackPos_[%{public}d]", playbackPos_);
+    HILOGI("playbackPos_: %{public}d", playbackPos_);
 
     isValid_ = true;
 
@@ -193,28 +193,28 @@ bool AvrcCtNotifyPacket::DisassemblePlaybackPosChanged(uint8_t *buffer)
 
 bool AvrcCtNotifyPacket::DisassemblePlayerApplicationSettingChanged(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
     receivedFragments_++;
-    LOG_DEBUG("[AVRCP CT] receivedFragments_[%{public}d]", receivedFragments_);
+    HILOGI("receivedFragments_: %{public}d", receivedFragments_);
 
     uint16_t offset = AVRC_CT_NOTIFY_EVENT_ID_OFFSET + AVRC_CT_NOTIFY_EVENT_ID_SIZE;
     uint64_t payload = 0x00;
     offset += PopOctets1((buffer + offset), payload);
     auto numOfAttributes = static_cast<uint8_t>(payload);
-    LOG_DEBUG("[AVRCP CT] numOfAttributes[%{public}d]", numOfAttributes);
+    HILOGI("numOfAttributes: %{public}d", numOfAttributes);
 
     for (int i = 0; i < numOfAttributes; i++) {
         payload = 0x00;
         offset += PopOctets1((buffer + offset), payload);
         attributes_.push_back(static_cast<uint8_t>(payload));
-        LOG_DEBUG("[AVRCP CT] attribute[%x]", attributes_.back());
+        HILOGI("attribute: %{public}x", attributes_.back());
 
         offset += PopOctets1((buffer + offset), payload);
         values_.push_back(static_cast<uint8_t>(payload));
-        LOG_DEBUG("[AVRCP CT] value[%x]", values_.back());
+        HILOGI("value: %{public}x", values_.back());
     }
 
     return isValid_;
@@ -222,7 +222,7 @@ bool AvrcCtNotifyPacket::DisassemblePlayerApplicationSettingChanged(uint8_t *buf
 
 bool AvrcCtNotifyPacket::DisassembleAddressedPlayerChanged(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -230,12 +230,12 @@ bool AvrcCtNotifyPacket::DisassembleAddressedPlayerChanged(uint8_t *buffer)
     uint64_t payload = 0x00;
     offset += PopOctets2((buffer + offset), payload);
     playerId_ = static_cast<uint16_t>(payload);
-    LOG_DEBUG("[AVRCP CT] playerId_[%x]", playerId_);
+    HILOGI("playerId_: %{public}x", playerId_);
 
     payload = 0x00;
     PopOctets2((buffer + offset), payload);
     uidCounter_ = static_cast<uint16_t>(payload);
-    LOG_DEBUG("[AVRCP CT] uidCounter_[%x]", uidCounter_);
+    HILOGI("uidCounter_: %{public}x", uidCounter_);
 
     isValid_ = true;
 
@@ -244,7 +244,7 @@ bool AvrcCtNotifyPacket::DisassembleAddressedPlayerChanged(uint8_t *buffer)
 
 bool AvrcCtNotifyPacket::DisassembleUidsChanged(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -252,7 +252,7 @@ bool AvrcCtNotifyPacket::DisassembleUidsChanged(uint8_t *buffer)
     uint64_t payload = 0x00;
     PopOctets2((buffer + offset), payload);
     uidCounter_ = static_cast<uint16_t>(payload);
-    LOG_DEBUG("[AVRCP CT] uidCounter_[%x]", uidCounter_);
+    HILOGI("uidCounter_: %{public}x", uidCounter_);
 
     isValid_ = true;
 
@@ -261,7 +261,7 @@ bool AvrcCtNotifyPacket::DisassembleUidsChanged(uint8_t *buffer)
 
 bool AvrcCtNotifyPacket::DisassembleVolumeChanged(uint8_t *buffer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtNotifyPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     isValid_ = false;
 
@@ -269,7 +269,7 @@ bool AvrcCtNotifyPacket::DisassembleVolumeChanged(uint8_t *buffer)
     uint64_t payload = 0x00;
     PopOctets1((buffer + offset), payload);
     volume_ = static_cast<uint8_t>(payload) & 0b01111111;
-    LOG_DEBUG("[AVRCP CT] volume_[%{public}d]", volume_);
+    HILOGI("volume_: %{public}d", volume_);
 
     isValid_ = true;
 

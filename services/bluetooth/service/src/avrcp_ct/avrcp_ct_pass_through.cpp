@@ -18,12 +18,12 @@ namespace OHOS {
 namespace bluetooth {
 AvrcCtPassPacket::AvrcCtPassPacket(void) : stateFlag_(AVRC_KEY_STATE_INVALID), operationId_(AVRC_KEY_OPERATION_INVALID)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 }
 
 AvrcCtPassPacket::AvrcCtPassPacket(uint8_t oper, uint8_t state) : stateFlag_(state), operationId_(oper)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("state: %{public}d", state);
 
     operationId_ = oper;
     stateFlag_ = state;
@@ -32,14 +32,14 @@ AvrcCtPassPacket::AvrcCtPassPacket(uint8_t oper, uint8_t state) : stateFlag_(sta
 AvrcCtPassPacket::AvrcCtPassPacket(Packet *pkt)
     : stateFlag_(AVRC_KEY_STATE_INVALID), operationId_(AVRC_KEY_OPERATION_INVALID)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     DisassemblePacket(pkt);
 }
 
 AvrcCtPassPacket::~AvrcCtPassPacket(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     if (pkt_ != nullptr) {
         PacketFree(pkt_);
@@ -49,7 +49,7 @@ AvrcCtPassPacket::~AvrcCtPassPacket(void)
 
 const Packet *AvrcCtPassPacket::AssemblePacket(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     pkt_ = PacketMalloc(0x00, 0x00, AVRC_CT_PASS_COMMAND_SIZE);
     auto buffer = static_cast<uint8_t *>(BufferPtr(PacketContinuousPayload(pkt_)));
@@ -66,7 +66,7 @@ const Packet *AvrcCtPassPacket::AssemblePacket(void)
 
 bool AvrcCtPassPacket::DisassemblePacket(Packet *pkt)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     bool isValid = false;
     size_t size = PacketPayloadSize(pkt);
@@ -89,7 +89,7 @@ bool AvrcCtPassPacket::DisassemblePacket(Packet *pkt)
         }
     } else {
         crCode_ = AVRC_CT_RSP_CODE_REJECTED;
-        LOG_DEBUG("[AVRCP CT] PacketPayloadRead Failed! size[%{public}zu] < AVRC_CT_PASS_RESPONSE_SIZE[%{public}d]",
+        HILOGI("PacketPayloadRead Failed! size: %{public}zu < AVRC_CT_PASS_RESPONSE_SIZE: %{public}d",
             size,
             AVRC_CT_PASS_COMMAND_SIZE);
     }
@@ -99,21 +99,21 @@ bool AvrcCtPassPacket::DisassemblePacket(Packet *pkt)
 
 bool AvrcCtPassPacket::IsSupportedKeyOperation(void) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     return IsSupportedKeyOperation(operationId_);
 }
 
 bool AvrcCtPassPacket::IsValidKeyState(void) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("enter");
 
     return IsValidKeyState(stateFlag_);
 }
 
 bool AvrcCtPassPacket::IsSupportedKeyOperation(uint8_t key)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("key: %{public}d", key);
 
     bool rtnSts = true;
 
@@ -138,7 +138,7 @@ bool AvrcCtPassPacket::IsSupportedKeyOperation(uint8_t key)
 
 bool AvrcCtPassPacket::IsValidKeyState(uint8_t state)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcCtPassPacket::%{public}s", __func__);
+    HILOGI("state: %{public}d", state);
 
     bool rtnSts = true;
 

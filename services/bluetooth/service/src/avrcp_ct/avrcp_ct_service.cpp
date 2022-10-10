@@ -18,14 +18,13 @@
 #include "avrcp_ct_internal.h"
 #include "class_creator.h"
 #include "profile_service_manager.h"
-#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
 AvrcpCtService::AvrcpCtService() : utility::Context(PROFILE_NAME_AVRCP_CT, "1.6.2")
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    /// [AVRCP CT] Need to set the features of the AVRCP CT service.
+    HILOGI("enter");
+    /// Need to set the features of the AVRCP CT service.
     InitFeatures();
     using namespace std::placeholders;
     AvrcCtProfile::Observer observer = {
@@ -68,7 +67,7 @@ AvrcpCtService::AvrcpCtService() : utility::Context(PROFILE_NAME_AVRCP_CT, "1.6.
 
 AvrcpCtService::~AvrcpCtService()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     SetServiceState(AVRC_CT_SERVICE_STATE_DISABLED);
 
@@ -77,14 +76,14 @@ AvrcpCtService::~AvrcpCtService()
 
 utility::Context *AvrcpCtService::GetContext()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     return this;
 }
 
 void AvrcpCtService::InitFeatures()
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     features_ |= AVRC_CT_FEATURE_CATEGORY_1;
     features_ |= AVRC_CT_FEATURE_CATEGORY_2;
@@ -107,7 +106,7 @@ void AvrcpCtService::InitFeatures()
 
 void AvrcpCtService::RegisterObserver(IObserver *observer)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -116,7 +115,7 @@ void AvrcpCtService::RegisterObserver(IObserver *observer)
 
 void AvrcpCtService::UnregisterObserver(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -129,20 +128,20 @@ void AvrcpCtService::UnregisterObserver(void)
 
 void AvrcpCtService::Enable(void)
 {
-    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     if (IsDisabled()) {
         SetServiceState(AVRC_CT_SERVICE_STATE_ENABLING);
 
         GetDispatcher()->PostTask(std::bind(&AvrcpCtService::EnableNative, this));
     } else {
-        LOG_ERROR("[AVRCP CT] Is not disabled!");
+        LOG_ERROR("Is not disabled!");
     }
 }
 
 void AvrcpCtService::Disable(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     if (IsEnabled()) {
         SetServiceState(AVRC_CT_SERVICE_STATE_DISABLING);
@@ -152,13 +151,13 @@ void AvrcpCtService::Disable(void)
 
         GetDispatcher()->PostTask(std::bind(&AvrcpCtService::DisableNative, this));
     } else {
-        LOG_ERROR("[AVRCP CT] Is not enable!");
+        LOG_ERROR("Is not enable!");
     }
 }
 
 void AvrcpCtService::EnableNative(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = RET_BAD_STATUS;
 
@@ -186,12 +185,12 @@ void AvrcpCtService::EnableNative(void)
         SetServiceState(AVRC_CT_SERVICE_STATE_DISABLED);
     }
     GetContext()->OnEnable(PROFILE_NAME_AVRCP_CT, IsEnabled());
-    LOG_INFO("[AVRCP CT] AvrcpCtService:: AVRCP is ENABLED");
+    HILOGI("AvrcpCtService:: AVRCP is ENABLED");
 }
 
 void AvrcpCtService::DisableNative(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     if (DisableProfile() != RET_NO_ERROR) {
         OnProfileDisabled(RET_BAD_STATUS);
@@ -200,7 +199,7 @@ void AvrcpCtService::DisableNative(void)
 
 int AvrcpCtService::EnableProfile(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     /// Gets the size of the MTU.
     int controlMtu = AVRC_CT_DEFAULT_CONTROL_MTU_SIZE;
@@ -227,14 +226,14 @@ int AvrcpCtService::EnableProfile(void)
 
 int AvrcpCtService::DisableProfile(void) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     return profile_->Disable();
 }
 
 void AvrcpCtService::OnProfileDisabled(int result)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("result: %{public}d", result);
 
     SetServiceState(AVRC_CT_SERVICE_STATE_DISABLED);
 
@@ -249,7 +248,7 @@ void AvrcpCtService::OnProfileDisabled(int result)
 
 int AvrcpCtService::RegisterSecurity(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     gapManager_ = std::make_unique<AvrcCtGapManager>();
 
@@ -258,7 +257,7 @@ int AvrcpCtService::RegisterSecurity(void)
 
 int AvrcpCtService::UnregisterSecurity(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = gapManager_->UnregisterSecurity();
     gapManager_ = nullptr;
@@ -268,7 +267,7 @@ int AvrcpCtService::UnregisterSecurity(void)
 
 int AvrcpCtService::RegisterService(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     sdpManager_ = std::make_unique<AvrcCtSdpManager>(features_ & AVRC_CT_SDP_ALL_SUPPORTED_FEATURES);
 
@@ -277,7 +276,7 @@ int AvrcpCtService::RegisterService(void)
 
 int AvrcpCtService::UnregisterService(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = sdpManager_->UnregisterService();
     sdpManager_ = nullptr;
@@ -287,21 +286,21 @@ int AvrcpCtService::UnregisterService(void)
 
 bool AvrcpCtService::IsEnabled(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     return (state_ == AVRC_CT_SERVICE_STATE_ENABLED);
 }
 
 bool AvrcpCtService::IsDisabled(void)
 {
-    LOG_INFO("[AVRCP CT] AvrcpTgService::%{public}s", __func__);
+    HILOGI("enter");
 
     return (state_ == AVRC_CT_SERVICE_STATE_DISABLED);
 }
 
 void AvrcpCtService::SetServiceState(uint8_t state)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("state: %{public}d", state);
 
     state_ = state;
 }
@@ -312,7 +311,7 @@ void AvrcpCtService::SetServiceState(uint8_t state)
 
 std::vector<RawAddress> AvrcpCtService::GetConnectedDevices(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<RawAddress> result;
 
@@ -325,7 +324,7 @@ std::vector<RawAddress> AvrcpCtService::GetConnectedDevices(void)
 
 std::vector<bluetooth::RawAddress> AvrcpCtService::GetDevicesByStates(const std::vector<int> &states)
 {
-    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     std::vector<bluetooth::RawAddress> result;
 
@@ -338,7 +337,7 @@ std::vector<bluetooth::RawAddress> AvrcpCtService::GetDevicesByStates(const std:
 
 int AvrcpCtService::GetMaxConnectNum(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = 0;
 
@@ -346,12 +345,13 @@ int AvrcpCtService::GetMaxConnectNum(void)
         result = profile_->GetMaxConnectNum();
     }
 
+    HILOGI("result: %{public}d", result);
     return result;
 }
 
 int AvrcpCtService::GetDeviceState(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = static_cast<int>(BTConnectState::DISCONNECTED);
 
@@ -359,14 +359,13 @@ int AvrcpCtService::GetDeviceState(const RawAddress &rawAddr)
         result = profile_->GetDeviceState(rawAddr);
     }
 
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s: result[%{public}d]", __func__, result);
-
+    HILOGI("result: %{public}d", result);
     return result;
 }
 
 int AvrcpCtService::Connect(const RawAddress &rawAddr)
 {
-    LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -393,14 +392,14 @@ int AvrcpCtService::Connect(const RawAddress &rawAddr)
 
 void AvrcpCtService::ConnectNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     AcceptActiveConnect(rawAddr);
 }
 
 int AvrcpCtService::Disconnect(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -423,7 +422,7 @@ int AvrcpCtService::Disconnect(const RawAddress &rawAddr)
 
 void AvrcpCtService::DisconnectNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -435,14 +434,14 @@ void AvrcpCtService::DisconnectNative(RawAddress rawAddr)
         }
 
         if (profile_->Disconnect(rawAddr) != RET_NO_ERROR) {
-            HILOGI("[AVRCP CT] AvrcCtProfile::Disconnect Failed! Addr:%{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Disconnect Failed! Addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }
 
 int AvrcpCtService::GetConnectState(void)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("enter");
 
     int result = PROFILE_STATE_DISCONNECTED;
 
@@ -455,18 +454,18 @@ int AvrcpCtService::GetConnectState(void)
 
 void AvrcpCtService::OnConnectionStateChanged(const RawAddress &rawAddr, int state) const
 {
-    HILOGI("[AVRCP CT] Address[%{public}s] - state[%{public}d]", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
+    HILOGI("Address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnConnectionStateChanged(rawAddr, state);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer[onConnectionStateChanged] is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::AcceptActiveConnect(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -478,19 +477,19 @@ void AvrcpCtService::AcceptActiveConnect(const RawAddress &rawAddr)
         }
 
         if (profile_->Connect(rawAddr) != RET_NO_ERROR) {
-            HILOGI("[AVRCP CT] Call AvrcCtProfile::Connect Failed! Addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            HILOGI("Connect Failed! Addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
         }
     } while (false);
 }
 
 void AvrcpCtService::RejectActiveConnect(const RawAddress &rawAddr) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 }
 
 int AvrcpCtService::FindTgService(const RawAddress &rawAddr) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     return sdpManager_->FindTgService(rawAddr, FindTgServiceCallback);
 }
@@ -498,7 +497,7 @@ int AvrcpCtService::FindTgService(const RawAddress &rawAddr) const
 void AvrcpCtService::FindTgServiceCallback(
     const BtAddr *btAddr, const uint32_t *handleArray, uint16_t handleCount, void *context)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("handleCount: %{public}d", handleCount);
 
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpCtService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_CT));
@@ -518,7 +517,7 @@ void AvrcpCtService::FindTgServiceCallback(
 
 int AvrcpCtService::PressButton(const RawAddress &rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, button: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button);
 
     int result = RET_BAD_STATUS;
 
@@ -545,7 +544,7 @@ int AvrcpCtService::PressButton(const RawAddress &rawAddr, uint8_t button)
 
 void AvrcpCtService::PressButtonNative(RawAddress rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, button: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button);
 
     do {
         if (!IsEnabled()) {
@@ -562,19 +561,19 @@ void AvrcpCtService::PressButtonNative(RawAddress rawAddr, uint8_t button)
 
 void AvrcpCtService::OnButtonPressed(const RawAddress &rawAddr, uint8_t button, int result) const
 {
-    HILOGI("[AVRCP CT] Address: %{public}s, button: %{public}x, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
+    HILOGI("Address: %{public}s, button: %{public}d, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
         button, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnPressButton(rawAddr, button, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer[onPressButton] is not registered!");
+        HILOGI("The observer[onPressButton] is not registered!");
     }
 }
 
 int AvrcpCtService::ReleaseButton(const RawAddress &rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, button: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button);
 
     int result = RET_BAD_STATUS;
 
@@ -601,7 +600,7 @@ int AvrcpCtService::ReleaseButton(const RawAddress &rawAddr, uint8_t button)
 
 void AvrcpCtService::ReleaseButtonNative(RawAddress rawAddr, uint8_t button)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, button: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), button);
 
     do {
         if (!IsEnabled()) {
@@ -618,13 +617,13 @@ void AvrcpCtService::ReleaseButtonNative(RawAddress rawAddr, uint8_t button)
 
 void AvrcpCtService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button, int result) const
 {
-    HILOGI("[AVRCP CT] Address: %{public}s, button: %{public}x, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
+    HILOGI("Address: %{public}s, button: %{public}d, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr),
         button, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnReleaseButton(rawAddr, button, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer[onReleaseButton] is not registered!");
+        HILOGI("The observer[onReleaseButton] is not registered!");
     }
 }
 
@@ -634,7 +633,7 @@ void AvrcpCtService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button,
 
 int AvrcpCtService::GetUnitInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -661,7 +660,7 @@ int AvrcpCtService::GetUnitInfo(const RawAddress &rawAddr)
 
 void AvrcpCtService::UnitInfoNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -678,7 +677,7 @@ void AvrcpCtService::UnitInfoNative(RawAddress rawAddr)
 
 int AvrcpCtService::GetSubUnitInfo(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -705,7 +704,7 @@ int AvrcpCtService::GetSubUnitInfo(const RawAddress &rawAddr)
 
 void AvrcpCtService::SubUnitInfoNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -726,7 +725,7 @@ void AvrcpCtService::SubUnitInfoNative(RawAddress rawAddr)
 
 int AvrcpCtService::SetAddressedPlayer(const RawAddress &rawAddr, uint16_t playerId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, playerId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId);
 
     int result = RET_BAD_STATUS;
 
@@ -753,7 +752,7 @@ int AvrcpCtService::SetAddressedPlayer(const RawAddress &rawAddr, uint16_t playe
 
 void AvrcpCtService::SetAddressedPlayerNative(RawAddress rawAddr, uint16_t playerId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, playerId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId);
 
     do {
         if (!IsEnabled()) {
@@ -770,20 +769,20 @@ void AvrcpCtService::SetAddressedPlayerNative(RawAddress rawAddr, uint16_t playe
 
 void AvrcpCtService::OnSetAddressedPlayer(const RawAddress &rawAddr, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] result[%{public}d] - detail[%x]", result, detail);
+    HILOGI("address: %{public}s, result: %{public}d, detail: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnSetAddressedPlayer(rawAddr, result, detail);
-        LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+        HILOGI("enter");
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::SetBrowsedPlayer(const RawAddress &rawAddr, uint16_t playerId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, playerId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId);
 
     int result = RET_BAD_STATUS;
 
@@ -814,7 +813,7 @@ int AvrcpCtService::SetBrowsedPlayer(const RawAddress &rawAddr, uint16_t playerI
 
 void AvrcpCtService::SetBrowsedPlayerNative(RawAddress rawAddr, uint16_t playerId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, playerId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId);
 
     do {
         if (!IsEnabled()) {
@@ -832,19 +831,15 @@ void AvrcpCtService::SetBrowsedPlayerNative(RawAddress rawAddr, uint16_t playerI
 void AvrcpCtService::OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems,
     const std::vector<std::string> &folderNames, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] uidCounter[%hu] - numOfItems[%{public}d] - folderNames.size[%zu] - result[%{public}d] - detail[%x]",
-        uidCounter,
-        numOfItems,
-        folderNames.size(),
-        result,
-        detail);
+    HILOGI("addr: %{public}s, uidCounter: %{public}hu, numOfItems: %{public}d, folderNames.size: %{public}zu, "
+        "result: %{public}d, detail: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems,
+        folderNames.size(), result, detail);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnSetBrowsedPlayer(rawAddr, uidCounter, numOfItems, folderNames, result, detail);
-        LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+        HILOGI("enter");
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
@@ -854,7 +849,7 @@ void AvrcpCtService::OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidC
 
 int AvrcpCtService::GetSupportedCompanies(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -882,7 +877,7 @@ int AvrcpCtService::GetSupportedCompanies(const RawAddress &rawAddr)
 
 int AvrcpCtService::GetSupportedEvents(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -926,15 +921,14 @@ void AvrcpCtService::GetCapabilitiesNative(RawAddress rawAddr, uint8_t capabilit
 void AvrcpCtService::OnGetCapabilities(const RawAddress &rawAddr, const std::vector<uint32_t> &companies,
     const std::vector<uint8_t> &events, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] companies.size[%{public}zu] - events.size[%{public}zu] - result[%{public}d]",
-        companies.size(), events.size(), result);
+    HILOGI("address: %{public}s, companies.size: %{public}zu, events.size: %{public}zu, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), companies.size(), events.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetCapabilities(rawAddr, companies, events, result);
-        LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+        HILOGI("enter");
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 /******************************************************************
@@ -943,7 +937,7 @@ void AvrcpCtService::OnGetCapabilities(const RawAddress &rawAddr, const std::vec
 
 int AvrcpCtService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -970,7 +964,7 @@ int AvrcpCtService::GetPlayerAppSettingAttributes(const RawAddress &rawAddr)
 
 void AvrcpCtService::GetPlayerAppSettingAttributesNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -988,20 +982,20 @@ void AvrcpCtService::GetPlayerAppSettingAttributesNative(RawAddress rawAddr)
 void AvrcpCtService::OnGetPlayerAppSettingAttribtues(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attribute.size[%{public}zu] - result[%{public}d]", attributes.size(), result);
+    HILOGI("addr: %{public}s, attribute.size: %{public}zu, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributes.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingAttributes(rawAddr, attributes, result);
-        LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+        HILOGI("enter");
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::GetPlayerAppSettingValues(const RawAddress &rawAddr, uint8_t attribute)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, attribute: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute);
 
     int result = RET_BAD_STATUS;
 
@@ -1029,7 +1023,7 @@ int AvrcpCtService::GetPlayerAppSettingValues(const RawAddress &rawAddr, uint8_t
 
 void AvrcpCtService::GetPlayerAppSettingValuesNative(RawAddress rawAddr, uint8_t attribute)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, attribute: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute);
 
     do {
         if (!IsEnabled()) {
@@ -1047,21 +1041,20 @@ void AvrcpCtService::GetPlayerAppSettingValuesNative(RawAddress rawAddr, uint8_t
 void AvrcpCtService::OnGetPlayerAppSettingValues(
     const RawAddress &rawAddr, uint8_t attribute, const std::vector<uint8_t> &values, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attribute[%x] - values.size[%{public}zu] - result[%{public}d]",
-        attribute, values.size(), result);
+    HILOGI("addr: %{public}s, attribute: %{public}d, values.size: %{public}zu, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute, values.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingValues(rawAddr, attribute, values, result);
-        LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+        HILOGI("enter");
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::GetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -1089,7 +1082,7 @@ int AvrcpCtService::GetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, c
 
 void AvrcpCtService::GetPlayerAppSettingCurrentValueNative(RawAddress rawAddr, std::vector<uint8_t> attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -1107,22 +1100,21 @@ void AvrcpCtService::GetPlayerAppSettingCurrentValueNative(RawAddress rawAddr, s
 void AvrcpCtService::OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr,
     const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%{public}zu] - values.size[%{public}zu] - result[%{public}d]",
-        attributes.size(), values.size(), result);
+    HILOGI("addr: %{public}s, attributes.size: %{public}zu, values.size: %{public}zu, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributes.size(), values.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingCurrentValue(rawAddr, attributes, values, result);
-        LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+        HILOGI("enter");
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::SetPlayerAppSettingCurrentValue(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -1151,7 +1143,7 @@ int AvrcpCtService::SetPlayerAppSettingCurrentValue(
 void AvrcpCtService::SetPlayerAppSettingCurrentValueNative(
     RawAddress rawAddr, std::vector<uint8_t> attributes, std::vector<uint8_t> values)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -1168,20 +1160,19 @@ void AvrcpCtService::SetPlayerAppSettingCurrentValueNative(
 
 void AvrcpCtService::OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] result[%{public}d]", result);
+    HILOGI("address: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnSetPlayerAppSettingCurrentValue(rawAddr, result);
-        LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+        HILOGI("enter");
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::GetPlayerAppSettingAttributeText(const RawAddress &rawAddr, const std::vector<uint8_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -1209,7 +1200,7 @@ int AvrcpCtService::GetPlayerAppSettingAttributeText(const RawAddress &rawAddr, 
 
 void AvrcpCtService::GetPlayerAppSettingAttributeTextNative(RawAddress rawAddr, std::vector<uint8_t> attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -1227,19 +1218,19 @@ void AvrcpCtService::GetPlayerAppSettingAttributeTextNative(RawAddress rawAddr, 
 void AvrcpCtService::OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr,
     const std::vector<uint8_t> &attributes, const std::vector<std::string> &attrStr, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingAttributeText(rawAddr, attributes, attrStr, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::GetPlayerAppSettingValueText(
     const RawAddress &rawAddr, uint8_t attributeId, const std::vector<uint8_t> &values)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, attributeId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributeId);
 
     int result = RET_BAD_STATUS;
 
@@ -1268,7 +1259,7 @@ int AvrcpCtService::GetPlayerAppSettingValueText(
 void AvrcpCtService::GetPlayerAppSettingValueTextNative(
     RawAddress rawAddr, uint8_t attributeId, std::vector<uint8_t> values)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, attributeId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributeId);
 
     do {
         if (!IsEnabled()) {
@@ -1286,12 +1277,12 @@ void AvrcpCtService::GetPlayerAppSettingValueTextNative(
 void AvrcpCtService::OnGetPlayerAppSettingValueText(const RawAddress &rawAddr, const std::vector<uint8_t> &values,
     const std::vector<std::string> &valueStr, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayerAppSettingValueText(rawAddr, values, valueStr, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
@@ -1302,7 +1293,8 @@ void AvrcpCtService::OnGetPlayerAppSettingValueText(const RawAddress &rawAddr, c
 int AvrcpCtService::GetElementAttributes(
     const RawAddress &rawAddr, uint64_t identifier, const std::vector<uint32_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, identifier: %{public}llu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), static_cast<unsigned long long>(identifier));
 
     int result = RET_BAD_STATUS;
     do {
@@ -1330,7 +1322,8 @@ int AvrcpCtService::GetElementAttributes(
 void AvrcpCtService::GetElementAttributesNative(
     RawAddress rawAddr, uint64_t identifier, std::vector<uint32_t> attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, identifier: %{public}llu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), static_cast<unsigned long long>(identifier));
 
     do {
         if (!IsEnabled()) {
@@ -1348,12 +1341,12 @@ void AvrcpCtService::GetElementAttributesNative(
 void AvrcpCtService::OnGetElementAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attributes,
     const std::vector<std::string> &values, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetElementAttributes(rawAddr, attributes, values, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
@@ -1363,7 +1356,7 @@ void AvrcpCtService::OnGetElementAttributes(const RawAddress &rawAddr, const std
 
 int AvrcpCtService::GetPlayStatus(const RawAddress &rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
     do {
@@ -1389,7 +1382,7 @@ int AvrcpCtService::GetPlayStatus(const RawAddress &rawAddr)
 
 void AvrcpCtService::GetPlayStatusNative(RawAddress rawAddr)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -1407,23 +1400,20 @@ void AvrcpCtService::GetPlayStatusNative(RawAddress rawAddr)
 void AvrcpCtService::OnGetPlayStatus(
     const RawAddress &rawAddr, uint32_t songLength, uint32_t songPosition, uint8_t playStatus, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] songLength[%{public}d] - songPosition[%{public}d] - playStatus[%x] - result[%{public}d]",
-        songLength,
-        songPosition,
-        playStatus,
-        result);
+    HILOGI("address: %{public}s, songLength: %{public}d, songPosition: %{public}d, playStatus: %{public}d, "
+        "result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), songLength, songPosition, playStatus, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetPlayStatus(rawAddr, songLength, songPosition, playStatus, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::PlayItem(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter);
 
     int result = RET_BAD_STATUS;
 
@@ -1450,7 +1440,8 @@ int AvrcpCtService::PlayItem(const RawAddress &rawAddr, uint8_t scope, uint64_t 
 
 void AvrcpCtService::PlayItemNative(RawAddress rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter);
 
     do {
         if (!IsEnabled()) {
@@ -1467,19 +1458,19 @@ void AvrcpCtService::PlayItemNative(RawAddress rawAddr, uint8_t scope, uint64_t 
 
 void AvrcpCtService::OnPlayItem(const RawAddress &rawAddr, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, result: %{public}d, detail: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
     if (myObserver_ != nullptr) {
         myObserver_->OnPlayItem(rawAddr, result, detail);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 };
 
 int AvrcpCtService::AddToNowPlaying(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter);
     int result = RET_BAD_STATUS;
 
     do {
@@ -1506,8 +1497,8 @@ int AvrcpCtService::AddToNowPlaying(const RawAddress &rawAddr, uint8_t scope, ui
 
 void AvrcpCtService::AddToNowPlayingNative(RawAddress rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter);
     do {
         if (!IsEnabled()) {
             break;
@@ -1523,13 +1514,13 @@ void AvrcpCtService::AddToNowPlayingNative(RawAddress rawAddr, uint8_t scope, ui
 
 void AvrcpCtService::OnAddToNowPlaying(const RawAddress &rawAddr, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] result[%{public}d] - detail[%x]", result, detail);
+    HILOGI("address: %{public}s, result: %{public}d, detail: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnAddToNowPlaying(rawAddr, result, detail);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
@@ -1539,8 +1530,7 @@ void AvrcpCtService::OnAddToNowPlaying(const RawAddress &rawAddr, int result, in
 
 int AvrcpCtService::RequestContinuingResponse(const RawAddress &rawAddr, uint8_t pduId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, pduId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
     int result = RET_BAD_STATUS;
 
     do {
@@ -1566,7 +1556,7 @@ int AvrcpCtService::RequestContinuingResponse(const RawAddress &rawAddr, uint8_t
 
 void AvrcpCtService::RequestContinuingResponseNative(RawAddress rawAddr, uint8_t pduId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, pduId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
 
     do {
         if (!IsEnabled()) {
@@ -1583,7 +1573,7 @@ void AvrcpCtService::RequestContinuingResponseNative(RawAddress rawAddr, uint8_t
 
 int AvrcpCtService::AbortContinuingResponse(const RawAddress &rawAddr, uint8_t pduId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, pduId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
 
     int result = RET_BAD_STATUS;
 
@@ -1610,7 +1600,7 @@ int AvrcpCtService::AbortContinuingResponse(const RawAddress &rawAddr, uint8_t p
 
 void AvrcpCtService::AbortContinuingResponseNative(RawAddress rawAddr, uint8_t pduId)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("address: %{public}s, pduId: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), pduId);
 
     do {
         if (!IsEnabled()) {
@@ -1631,8 +1621,8 @@ void AvrcpCtService::AbortContinuingResponseNative(RawAddress rawAddr, uint8_t p
 
 int AvrcpCtService::ChangePath(const RawAddress &rawAddr, uint16_t uidCounter, uint8_t direction, uint64_t folderUid)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, uidCounter: %{public}d, direction: %{public}d, folderUid: %{public}llu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, direction, static_cast<unsigned long long>(folderUid));
     int result = RET_BAD_STATUS;
 
     do {
@@ -1662,8 +1652,8 @@ int AvrcpCtService::ChangePath(const RawAddress &rawAddr, uint16_t uidCounter, u
 
 void AvrcpCtService::ChangePathNative(RawAddress rawAddr, uint16_t uidCounter, uint8_t direction, uint64_t folderUid)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, uidCounter: %{public}d, direction: %{public}d, folderUid: %{public}llu",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, direction, static_cast<unsigned long long>(folderUid));
     do {
         if (!IsEnabled()) {
             break;
@@ -1679,21 +1669,21 @@ void AvrcpCtService::ChangePathNative(RawAddress rawAddr, uint16_t uidCounter, u
 
 void AvrcpCtService::OnChangePath(const RawAddress &rawAddr, uint32_t numOfItems, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] numOfItems[%u] result[%{public}d]", numOfItems, result);
+    HILOGI("address: %{public}s, numOfItems: %{public}u, result: %{public}d, detail: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), numOfItems, result, detail);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnChangePath(rawAddr, numOfItems, result, detail);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::GetFolderItems(const RawAddress &rawAddr, uint8_t scope, uint32_t startItem, uint32_t endItem,
     const std::vector<uint32_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, scope: %{public}d, startItem: %{public}u, endItem: %{public}u",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, startItem, endItem);
     int result = RET_BAD_STATUS;
 
     do {
@@ -1725,8 +1715,8 @@ int AvrcpCtService::GetFolderItems(const RawAddress &rawAddr, uint8_t scope, uin
 void AvrcpCtService::GetFolderItemsNative(
     RawAddress rawAddr, uint8_t scope, uint32_t startItem, uint32_t endItem, std::vector<uint32_t> attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, scope: %{public}d, startItem: %{public}u, endItem: %{public}u",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, startItem, endItem);
     do {
         if (!IsEnabled()) {
             break;
@@ -1743,8 +1733,8 @@ void AvrcpCtService::GetFolderItemsNative(
 void AvrcpCtService::OnGetFolderItems(const RawAddress &rawAddr, uint8_t scope, uint16_t uidCounter,
     const std::vector<AvrcMpItem> &mpItems, const std::vector<AvrcMeItem> &meItems, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] mpItems.size[%zu] - meItems.size[%zu] result[%{public}d]", mpItems.size(), meItems.size(), result);
+    HILOGI("address: %{public}s, scope: %{public}d, uidCounter: %{public}d, result: %{public}d, detail: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, uidCounter, result, detail);
 
     if (myObserver_ != nullptr) {
         if (scope == AVRC_MEDIA_SCOPE_PLAYER_LIST) {
@@ -1753,15 +1743,15 @@ void AvrcpCtService::OnGetFolderItems(const RawAddress &rawAddr, uint8_t scope, 
             myObserver_->OnGetFolderItems(rawAddr, uidCounter, meItems, result, detail);
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::GetItemAttributes(const RawAddress &rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter,
     const std::vector<uint32_t> &attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter);
     int result = RET_BAD_STATUS;
 
     do {
@@ -1793,8 +1783,8 @@ int AvrcpCtService::GetItemAttributes(const RawAddress &rawAddr, uint8_t scope, 
 void AvrcpCtService::GetItemAttributesNative(
     RawAddress rawAddr, uint8_t scope, uint64_t uid, uint16_t uidCounter, std::vector<uint32_t> attributes)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("address: %{public}s, scope: %{public}d, uid: %{public}llu, uidCounter: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope, static_cast<unsigned long long>(uid), uidCounter);
     do {
         if (!IsEnabled()) {
             break;
@@ -1811,20 +1801,18 @@ void AvrcpCtService::GetItemAttributesNative(
 void AvrcpCtService::OnGetItemAttributes(const RawAddress &rawAddr, const std::vector<uint32_t> &attributes,
     const std::vector<std::string> &values, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG(
-        "[AVRCP CT] attributes.size[%zu] - values.size[%zu] - result[%{public}d]", attributes.size(), values.size(), result);
+    HILOGI("addr:%{public}s, result:%{public}d, detail:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetItemAttributes(rawAddr, attributes, values, result, detail);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 int AvrcpCtService::GetTotalNumberOfItems(const RawAddress &rawAddr, uint8_t scope)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, scope:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope);
 
     int result = RET_BAD_STATUS;
 
@@ -1855,7 +1843,7 @@ int AvrcpCtService::GetTotalNumberOfItems(const RawAddress &rawAddr, uint8_t sco
 
 void AvrcpCtService::GetTotalNumberOfItemsNative(RawAddress rawAddr, uint8_t scope)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr:%{public}s, scope:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), scope);
 
     do {
         if (!IsEnabled()) {
@@ -1873,13 +1861,13 @@ void AvrcpCtService::GetTotalNumberOfItemsNative(RawAddress rawAddr, uint8_t sco
 void AvrcpCtService::OnGetTotalNumberOfItems(
     const RawAddress &rawAddr, uint16_t uidCounter, uint32_t numOfItems, int result, int detail) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] uidCounter[%hu] - numOfItems[%u] - result[%{public}d]", uidCounter, numOfItems, result);
+    HILOGI("addr:%{public}s, uidCounter:%{public}d, numOfItems:%{public}u, result:%{public}d, detail:%{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, result, detail);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnGetTotalNumberOfItems(rawAddr, uidCounter, numOfItems, result, detail);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
@@ -1889,7 +1877,7 @@ void AvrcpCtService::OnGetTotalNumberOfItems(
 
 int AvrcpCtService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, volume: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume);
 
     int result = RET_BAD_STATUS;
 
@@ -1921,7 +1909,7 @@ int AvrcpCtService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume)
 
 void AvrcpCtService::SetAbsoluteVolumeNative(RawAddress rawAddr, uint8_t volume)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, volume: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume);
 
     do {
         if (!IsEnabled()) {
@@ -1938,13 +1926,12 @@ void AvrcpCtService::SetAbsoluteVolumeNative(RawAddress rawAddr, uint8_t volume)
 
 void AvrcpCtService::OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] volume[%x] - result[%{public}d]", volume, result);
+    HILOGI("addr:%{public}s, volume:%{public}d, result:%{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnSetAbsoluteVolume(rawAddr, volume, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
@@ -1954,7 +1941,7 @@ void AvrcpCtService::OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volu
 
 int AvrcpCtService::EnableNotification(const RawAddress &rawAddr, const std::vector<uint8_t> &events, uint8_t interval)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, interval: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), interval);
 
     int result = RET_BAD_STATUS;
 
@@ -1982,7 +1969,7 @@ int AvrcpCtService::EnableNotification(const RawAddress &rawAddr, const std::vec
 
 int AvrcpCtService::DisableNotification(const RawAddress &rawAddr, const std::vector<uint8_t> &events)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     int result = RET_BAD_STATUS;
 
@@ -2009,7 +1996,7 @@ int AvrcpCtService::DisableNotification(const RawAddress &rawAddr, const std::ve
 
 void AvrcpCtService::EnableNotificationNative(RawAddress rawAddr, std::vector<uint8_t> events, uint8_t interval)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, interval: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), interval);
 
     do {
         if (!IsEnabled()) {
@@ -2026,7 +2013,7 @@ void AvrcpCtService::EnableNotificationNative(RawAddress rawAddr, std::vector<ui
 
 void AvrcpCtService::DisableNotificationNative(RawAddress rawAddr, std::vector<uint8_t> events)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s", GET_ENCRYPT_AVRCP_ADDR(rawAddr));
 
     do {
         if (!IsEnabled()) {
@@ -2043,139 +2030,138 @@ void AvrcpCtService::DisableNotificationNative(RawAddress rawAddr, std::vector<u
 
 void AvrcpCtService::OnPlaybackStatusChanged(const RawAddress &rawAddr, uint8_t playStatus, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] playStatus[%x]", playStatus);
+    HILOGI("addr: %{public}s, playStatus: %{public}d, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), playStatus, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnPlaybackStatusChanged(rawAddr, playStatus, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] uid[%jx]", uid);
+    HILOGI("addr: %{public}s, uid: %{public}jx, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), uid, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnTrackChanged(rawAddr, uid, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnTrackReachedEnd(const RawAddress &rawAddr, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnTrackReachedEnd(rawAddr, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnTrackReachedStart(const RawAddress &rawAddr, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnTrackReachedStart(rawAddr, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnPlaybackPosChanged(const RawAddress &rawAddr, uint32_t playbackPos, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] playbackPos[%x]", playbackPos);
+    HILOGI("addr: %{public}s, playbackPos: %{public}d, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), playbackPos, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnPlaybackPosChanged(rawAddr, playbackPos, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnPlayerApplicationSettingChanged(const RawAddress &rawAddr,
     const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] attributes.size[%zu] - values.size[%zu]", attributes.size(), values.size());
+    HILOGI("addr: %{public}s, attributes.size: %{public}zu, values.size: %{public}zu, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), attributes.size(), values.size(), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnPlayerAppSettingChanged(rawAddr, attributes, values, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnNowPlayingContentChanged(const RawAddress &rawAddr, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnNowPlayingContentChanged(rawAddr, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnAvailablePlayersChanged(const RawAddress &rawAddr, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("addr: %{public}s, result: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnAvailablePlayersChanged(rawAddr, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnAddressedPlayerChanged(
     const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] playerId[%x] - uidCounter[%x]", playerId, uidCounter);
+    HILOGI("addr: %{public}s, playerId: %{public}d, uidCounter: %{public}d, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnAddressedPlayerChanged(rawAddr, playerId, uidCounter, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnUidChanged(const RawAddress &rawAddr, uint16_t uidCounter, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] uidCounter[%x]", uidCounter);
+    HILOGI("addr: %{public}s, uidCounter: %{public}d, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnUidChanged(rawAddr, uidCounter, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::OnVolumeChanged(const RawAddress &rawAddr, uint8_t volume, int result) const
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] volume[%x]", volume);
+    HILOGI("addr: %{public}s, volume: %{public}d, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnVolumeChanged(rawAddr, volume, result);
     } else {
-        LOG_DEBUG("[AVRCP CT] The observer is not registered!");
+        HILOGI("The observer is not registered!");
     }
 }
 
 void AvrcpCtService::ProcessChannelEvent(
     RawAddress rawAddr, uint8_t connectId, uint8_t event, uint16_t result, void *context)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("addr: %{public}s, connectId: %{public}d, event: %{public}d, result: %{public}d",
+        GET_ENCRYPT_AVRCP_ADDR(rawAddr), connectId, event, result);
     if (!IsDisabled()) {
         profile_->ProcessChannelEvent(rawAddr, connectId, event, result, context);
     }
@@ -2184,7 +2170,8 @@ void AvrcpCtService::ProcessChannelEvent(
 void AvrcpCtService::ProcessChannelMessage(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("connectId: %{public}d, label: %{public}d, crType: %{public}d, chType: %{public}d",
+        connectId, label, crType, chType);
 
     if (!IsDisabled()) {
         profile_->ProcessChannelMessage(connectId, label, crType, chType, pkt, context);
@@ -2194,8 +2181,7 @@ void AvrcpCtService::ProcessChannelMessage(
 void AvrcpCtService::ChannelEventCallback(
     uint8_t connectId, uint8_t event, uint16_t result, const BtAddr *btAddr, void *context)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-
+    HILOGI("connectId: %{public}d, event: %{public}d, result: %{public}d", connectId, event, result);
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpCtService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_CT));
     RawAddress rawAddr(RawAddress::ConvertToString(btAddr->addr));
@@ -2223,7 +2209,8 @@ void AvrcpCtService::ChannelEventCallback(
 void AvrcpCtService::ChannelMessageCallback(
     uint8_t connectId, uint8_t label, uint8_t crType, uint8_t chType, Packet *pkt, void *context)
 {
-    LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
+    HILOGI("connectId: %{public}d, label: %{public}d, crType: %{public}d, chType: %{public}d",
+        connectId, label, crType, chType);
 
     auto servManager = IProfileManager::GetInstance();
     auto service = static_cast<AvrcpCtService *>(servManager->GetProfileService(PROFILE_NAME_AVRCP_CT));
