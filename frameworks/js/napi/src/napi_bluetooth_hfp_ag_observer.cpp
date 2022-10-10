@@ -58,7 +58,7 @@ void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const Bluetooth
 
 void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
+    HILOGI("address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     if (!callbackInfos_[STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE]) {
         HILOGW("This callback is not registered by ability.");
         return;
@@ -69,8 +69,7 @@ void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteD
 
     callbackInfo->state_ = state;
     callbackInfo->deviceId_ = device.GetDeviceAddr();
-    HILOGI("deviceId = %{public}s", (callbackInfo->deviceId_).c_str());
-    HILOGI("state = %{public}d", state);
+    HILOGI("deviceId: %{public}s, state: %{public}d", GetEncryptAddr(callbackInfo->deviceId_).c_str(), state);
 
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
