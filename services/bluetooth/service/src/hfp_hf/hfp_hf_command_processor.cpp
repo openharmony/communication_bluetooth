@@ -177,9 +177,8 @@ void HfpHfCommandProcessor::ProcessCops(HfpHfDataConnection &dataConn, const std
 {
     uint8_t mode = 0;
     char operatorName[OPERATOR_NAME_MAX_LEN] = {0};    // Operator name max length is 16
-    const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "%hhi,0,\"%16[^\"]\"", &mode, operatorName, sizeof(operatorName));
+    int res = sscanf_s(arg.c_str(), "%hhi,0,\"%16[^\"]\"", &mode, operatorName, sizeof(operatorName));
     if (res < COPS_ARGS_NUMBER) {
         LOG_WARN("[HFP HF]%{public}s():Invalid command format arg[%{public}s]", __FUNCTION__, arg.c_str());
         return;
@@ -192,9 +191,8 @@ void HfpHfCommandProcessor::ProcessCops(HfpHfDataConnection &dataConn, const std
 void HfpHfCommandProcessor::ProcessBtrh(HfpHfDataConnection &dataConn, const std::string &arg)
 {
     int response = 0;
-    const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "%d", &response);
+    int res = sscanf_s(arg.c_str(), "%d", &response);
     if (res < 1) {
         HILOGE("[HFP HF]ProcessBtrh failed, res:%{public}d, arg:%{public}s", res, arg.c_str());
         return;
@@ -358,8 +356,7 @@ void HfpHfCommandProcessor::ProcessCnum(HfpHfDataConnection &dataConn, const std
     // Indicates which service this phone number relates to. Shall be either 4 (voice) or 5 (fax).
     uint16_t service = 0;
 
-    const char *buf = arg.c_str();
-    int res = sscanf_s(buf, ",\"%32[^\"]\",%hu,,%hu", number, sizeof(number), &type, &service);
+    int res = sscanf_s(arg.c_str(), ",\"%32[^\"]\",%hu,,%hu", number, sizeof(number), &type, &service);
     if (res < CNUM_ARGS_NUMBER) {
         LOG_WARN("[HFP HF]%{public}s():Invalid command format arg[%{public}s]", __FUNCTION__, arg.c_str());
         return;
@@ -452,11 +449,10 @@ void HfpHfCommandProcessor::ProcessListHfIndicators(
     HfpHfDataConnection &dataConn, const std::string &arg)
 {
     char anums[HF_INDICATOR_MAX] = {0};  // assume peer device support 20 hf indicators at most.
-    const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "(%20[^)]", anums, sizeof(anums));
+    int res = sscanf_s(arg.c_str(), "(%20[^)]", anums, sizeof(anums));
     if (res < 1) {
-        LOG_WARN("[HFP HF]%{public}s():invalid command buf[%{public}s]", __FUNCTION__, buf);
+        LOG_WARN("[HFP HF]%{public}s():invalid command arg[%{public}s]", __FUNCTION__, arg.c_str());
     }
 
     std::string tmpStr = anums;
@@ -489,11 +485,10 @@ void HfpHfCommandProcessor::ProcessChangeIndicatorState(
 {
     uint16_t anum = 0;
     uint16_t value = 0;
-    const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "%hu,%hu", &anum, &value);
+    int res = sscanf_s(arg.c_str(), "%hu,%hu", &anum, &value);
     if (res != BIND_SET_ARGS_NUMBER) {
-        LOG_WARN("[HFP HF]%{public}s():invalid command buf[%{public}s]", __FUNCTION__, buf);
+        LOG_WARN("[HFP HF]%{public}s():invalid command arg[%{public}s]", __FUNCTION__, arg.c_str());
     }
 
     for (auto &indicator : dataConn.remoteHfIndicators_) {
@@ -558,10 +553,9 @@ void HfpHfCommandProcessor::ProcessCiev(HfpHfDataConnection &dataConn, const std
     uint32_t index = 0;
     uint32_t value = 0;
 
-    const char *buf = arg.c_str();
-    int res = sscanf_s(buf, "%u,%u", &index, &value);
+    int res = sscanf_s(arg.c_str(), "%u,%u", &index, &value);
     if (res < CIEV_ARGS_NUMBER) {
-        LOG_WARN("[HFP HF]%{public}s():invalid command buf[%{public}s]", __FUNCTION__, buf);
+        LOG_WARN("[HFP HF]%{public}s():invalid command arg[%{public}s]", __FUNCTION__, arg.c_str());
     }
 
     auto it = std::find_if(dataConn.remoteAgIndicators_.begin(),
@@ -580,10 +574,9 @@ void HfpHfCommandProcessor::ProcessCcwa(HfpHfDataConnection &dataConn, const std
     char number[PHONE_NUMBER_MAX_LEN] = {0};
     uint32_t type = 0;
 
-    const char *buf = arg.c_str();
-    int res = sscanf_s(buf, "\"%32[^\"]\",%u", number, sizeof(number), &type);
+    int res = sscanf_s(arg.c_str(), "\"%32[^\"]\",%u", number, sizeof(number), &type);
     if (res < CCWA_ARGS_NUMBER) {
-        LOG_WARN("[HFP HF]%{public}s():invalid command format arg[%{public}s]", __FUNCTION__, buf);
+        LOG_WARN("[HFP HF]%{public}s():invalid command format arg[%{public}s]", __FUNCTION__, arg.c_str());
         return;
     }
 
