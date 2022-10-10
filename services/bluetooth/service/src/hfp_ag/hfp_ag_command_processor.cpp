@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -344,9 +344,8 @@ void HfpAgCommandProcessor::CmerSetter(HfpAgDataConnection &dataConn, const std:
 {
     int data[CMER_ELEMENTS_NUMBER] = {-1, -1, -1, -1};
     int offset = 0;
-    const char *buf = arg.c_str();
 
-    int res = sscanf_s(buf, "%d,%d,%d,%d%n", &data[CMER_MODE_INDEX], &data[CMER_KEYP_INDEX],
+    int res = sscanf_s(arg.c_str(), "%d,%d,%d,%d%n", &data[CMER_MODE_INDEX], &data[CMER_KEYP_INDEX],
         &data[CMER_DISP_INDEX], &data[CMER_IND_INDEX], &offset);
     HILOGI("[HFP AG]CmerSetter:(%{public}d,%{public}d,%{public}d,%{public}d), res:%{public}d), offset:%{public}d",
         data[CMER_MODE_INDEX], data[CMER_KEYP_INDEX], data[CMER_DISP_INDEX], data[CMER_IND_INDEX], res, offset);
@@ -476,24 +475,23 @@ void HfpAgCommandProcessor::BiaSetter(HfpAgDataConnection &dataConn, const std::
     size_t i;
     int indId;
     size_t len = arg.length();
-    const char *buf = arg.c_str();
     int biaMaskOut = dataConn.biaMaskOut_;
     for (i = 0, indId = 1; i < len && indId <= MAX_AG_INDICATORS; i++) {
-        if (buf[i] == ',') {
+        if (arg.c_str()[i] == ',') {
             indId++;
             continue;
         }
 
-        if (buf[i] == '0') {
+        if (arg.c_str()[i] == '0') {
             biaMaskOut |= 1 << indId;
-        } else if (buf[i] == '1') {
+        } else if (arg.c_str()[i] == '1') {
             biaMaskOut &= ~(1 << indId);
         } else {
             break;
         }
 
         if (i + 1 < len) {
-            if (buf[i + 1] != ',') {
+            if (arg.c_str()[i + 1] != ',') {
                 break;
             }
         } else {

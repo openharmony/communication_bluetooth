@@ -43,7 +43,7 @@ std::string ClassicUtils::ConvertIntToHexString(const std::vector<uint8_t> &valu
 
 void ClassicUtils::ConvertHexStringToInt(const std::string &str, std::vector<uint8_t> &value)
 {
-    for (size_t i = 0; i < str.size(); i = i + 2) {
+    for (size_t i = 0; i < str.size(); i = i + 2) {  // 2 is the length of str to be truncated
         long k = std::stol(str.substr(i, 2), nullptr, 16);
         value.push_back(k);
     }
