@@ -93,24 +93,26 @@ struct HidHost::impl {
 
     bool Connect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("hid connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (!device.IsValidBluetoothRemoteDevice()) {
             HILOGE("Addr is invalid");
             return false;
         }
 
-        if (!device.GetDeviceClass().IsProfileSupported(BluetoothDevice::PROFILE_HID)) {
+        BluetoothDeviceClass devClass = device.GetDeviceClass();
+        int cod = devClass.GetClassOfDevice();
+        if (cod != INVALID_VALUE && !devClass.IsProfileSupported(BluetoothDevice::PROFILE_HID)) {
             HILOGE("hid connect failed. The remote device does not support HID service.");
             return false;
         }
 
+        HILOGI("hid connect remote device: %{public}s, cod: %{public}d", GET_ENCRYPT_ADDR(device), cod);
         if (proxy_ != nullptr && IS_BT_ENABLED()) {
             bool isOk;
             proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);
-            HILOGI("end, result:%{public}d", isOk);
+            HILOGI("hid connect. result:%{public}d", isOk);
             return isOk;
         }
-        HILOGE("end, fw return false!");
+        HILOGE("hid connect failed. fw return false!");
         return false;
     }
 
