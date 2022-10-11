@@ -58,15 +58,24 @@ void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
     napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
+static std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type)
+{
+    std::lock_guard<std::mutex> lock(g_observerMutex);
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
+    if (!observers[type]) {
+        HILOGE("GetCallbackInfoByType type %{public}s is nullptr", type.c_str());
+        return nullptr;
+    }
+    return observers[type];
+}
+
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
 {
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
-    if (!observers[REGISTER_BONE_STATE_TYPE]) {
-        HILOGI("This callback is not registered by ability.");
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BONE_STATE_TYPE);
+    HILOGI("addr:%{public}s, status:%{public}d", GET_ENCRYPT_ADDR(device), status);
+    if (callbackInfo == nullptr) {
         return;
     }
-    HILOGI("addr:%{public}s, status:%{public}d", GET_ENCRYPT_ADDR(device), status);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_BONE_STATE_TYPE];
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     if (loop == nullptr) {
