@@ -106,6 +106,12 @@
               "bluetooth_socket_inputstream.h",
               "bluetooth_socket_outputstream.h",
               "bluetooth_socket.h",
+              "c_header/ohos_bt_def.h",
+              "c_header/ohos_bt_gap.h",
+              "c_header/ohos_bt_gatt.h",
+              "c_header/ohos_bt_gatt_client.h",
+              "c_header/ohos_bt_gatt_server.h",
+              "c_header/ohos_bt_spp.h",
               "uuid.h"
             ]
           },
