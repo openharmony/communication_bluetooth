@@ -124,7 +124,7 @@ public:
         advId_ = advId;
     }
 
-    void OnStartResultEvent(int result) {
+    NO_SANITIZE("cfi") void OnStartResultEvent(int result) {
         if (result != 0) {
             HILOGE("result : %{public}d", result);
             return;
@@ -239,7 +239,7 @@ static bool IsAllAdvStopped()
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleStopAdv(int advId)
+NO_SANITIZE("cfi") int BleStopAdv(int advId)
 {
     HILOGI("BleStopAdv, advId: %{public}d.", advId);
     if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {

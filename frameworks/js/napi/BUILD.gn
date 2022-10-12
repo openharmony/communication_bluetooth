@@ -14,6 +14,11 @@
 import("//build/ohos.gni")
 
 ohos_shared_library("bluetooth") {
+  sanitize = {
+    cfi = true
+  }
+  stack_protector_ret = true
+
   #install_enable = true
   include_dirs = [
     "include",

@@ -16,7 +16,7 @@
 #include "bluetooth_hci_callbacks.h"
 #include "cstdint"
 
-int32_t BluetoothHciCallbacks::OnInited(BtStatus status)
+NO_SANITIZE("cfi") int32_t BluetoothHciCallbacks::OnInited(BtStatus status)
 {
     if ((callbacks_ != nullptr) && (callbacks_->OnInited)) {
         BtInitStatus initStatus = BtInitStatus::SUCCESS;
@@ -28,7 +28,7 @@ int32_t BluetoothHciCallbacks::OnInited(BtStatus status)
     return 0;
 }
 
-int32_t BluetoothHciCallbacks::OnReceivedHciPacket(BtType type, const std::vector<uint8_t> &data)
+NO_SANITIZE("cfi") int32_t BluetoothHciCallbacks::OnReceivedHciPacket(BtType type, const std::vector<uint8_t> &data)
 {
     if ((callbacks_ != nullptr) && (callbacks_->OnReceivedHciPacket)) {
         BtPacketType packetType = BtPacketType::PACKET_TYPE_UNKNOWN;

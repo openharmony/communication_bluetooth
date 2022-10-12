@@ -53,7 +53,7 @@ public:
      *        BTStateID::STATE_TURN_OFF.
      * @since 6
      */
-    void OnStateChanged(const int transport, const int status) {
+    NO_SANITIZE("cfi") void OnStateChanged(const int transport, const int status) {
         int cvtTransport = OHOS_BT_TRANSPORT_LE;
         if (transport == BTTransport::ADAPTER_BREDR) {
             cvtTransport = OHOS_BT_TRANSPORT_BR_EDR;
@@ -91,7 +91,7 @@ public:
      * @param device Remote device.
      * @since 6
      */
-    void OnPairRequested(const BluetoothRemoteDevice &device)
+    NO_SANITIZE("cfi") void OnPairRequested(const BluetoothRemoteDevice &device)
     {
         BdAddr remoteAddr;
         GetAddrFromString(device.GetDeviceAddr(), remoteAddr.addr);
@@ -117,7 +117,7 @@ public:
      * @param number Paired passkey.
      * @since 6
      */
-    void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
+    NO_SANITIZE("cfi") void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
     {
         int transport = device.GetTransportType();
         HILOGI("reqType: %{public}d, number: %{public}d, transport: %{public}d",

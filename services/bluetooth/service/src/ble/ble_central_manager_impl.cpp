@@ -1106,7 +1106,7 @@ bool BleCentralManagerImpl::SetScanParamOrExScanParamToGap() const
     return ret;
 }
 
-void BleCentralManagerImpl::LoadBleScanFilterLib()
+NO_SANITIZE("cfi") void BleCentralManagerImpl::LoadBleScanFilterLib()
 {
     LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
 

@@ -1528,7 +1528,7 @@ uint16_t AvdtCreateSequenceNo(AvdtStreamCtrl *avdtStreamCtrl)
  * @return       void.
  *
  */
-void AvdtCtrlEvtCallback(
+NO_SANITIZE("cfi") void AvdtCtrlEvtCallback(
     AvdtSigCtrl *sigCtrl, uint16_t handle, const BtAddr *bdAddr, uint8_t event, const AvdtCtrlData *data, uint8_t role)
 {
     if (sigCtrl->procCback != NULL) {

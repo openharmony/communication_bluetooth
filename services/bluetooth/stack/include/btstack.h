@@ -22,6 +22,18 @@
 extern "C" {
 #endif
 
+#ifndef NO_SANITIZE
+#ifdef __has_attribute
+#if __has_attribute(no_sanitize)
+#define NO_SANITIZE(type) __attribute__((no_sanitize(type)))
+#endif
+#endif
+#endif
+
+#ifndef NO_SANITIZE
+#define NO_SANITIZE(type)
+#endif
+
 #define BT_CONNECT_NUM_MAX 6
 
 #define BT_NO_ERROR 0
