@@ -41,10 +41,12 @@ public:
         BT_HFP_HF_ACCEPT_INCOMING_CALL,
         BT_HFP_HF_HOLD_ACTIVE_CALL,
         BT_HFP_HF_REJECT_INCOMING_CALL,
+        BT_HFP_HF_SEND_KEY_PRESSED,
         BT_HFP_HF_HANDLE_INCOMING_CALL,
         BT_HFP_HF_HANDLE_MULLTI_CALL,
         BT_HFP_HF_DIAL_LAST_NUMBER,
         BT_HFP_HF_DIAL_MEMORY,
+        BT_HFP_HF_SEND_VOICE_TAG,
         BT_HFP_HF_FINISH_ATIVE_CALL,
         BT_HFP_HF_START_DIAL,
         BT_HFP_HF_REGISTER_OBSERVER,
@@ -65,10 +67,12 @@ public:
     virtual bool AcceptIncomingCall(const BluetoothRawAddress &device, int flag) = 0;
     virtual bool HoldActiveCall(const BluetoothRawAddress &device) = 0;
     virtual bool RejectIncomingCall(const BluetoothRawAddress &device) = 0;
+    virtual bool SendKeyPressed(const BluetoothRawAddress &device) = 0;
     virtual bool HandleIncomingCall(const BluetoothRawAddress &device, int flag) = 0;
     virtual bool HandleMultiCall(const BluetoothRawAddress &device, int flag, int index) = 0;
     virtual bool DialLastNumber(const BluetoothRawAddress &device) = 0;
     virtual bool DialMemory(const BluetoothRawAddress &device, int index) = 0;
+    virtual bool SendVoiceTag(const BluetoothRawAddress &device, int index) = 0;
     virtual bool FinishActiveCall(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call) = 0;
     virtual int StartDial(const BluetoothRawAddress &device, const std::string &number, BluetoothHfpHfCall &call) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) = 0;

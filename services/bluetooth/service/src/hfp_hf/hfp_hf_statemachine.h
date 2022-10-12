@@ -104,6 +104,12 @@ public:
     void ProcessRejectCall();
 
     /**
+     * @brief Process send key pressed event.
+     *
+     */
+    void PrecessSendKeyPressed();
+
+    /**
      * @brief Process handle incoming call event from service.
      *
      * @param flag Handle call flag.
@@ -130,6 +136,13 @@ public:
      * @param index Memory number index
      */
     void ProcessDialMemory(int index);
+
+    /**
+     * @brief Process send voice tag number event from service.
+     *
+     * @param index voice tag index
+     */
+    void ProcessSendVoiceTag(int index);
 
     /**
      * @brief Process finish call event from service.

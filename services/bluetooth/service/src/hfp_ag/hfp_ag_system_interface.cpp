@@ -14,6 +14,7 @@
  */
 
 #include "hfp_ag_system_interface.h"
+#include <string.h>
 #include "hfp_ag_service.h"
 #include "log.h"
 #include "stub/telephone_service.h"
@@ -110,7 +111,37 @@ void HfpAgSystemInterface::DialOutCall(const std::string &address, const std::st
 void HfpAgSystemInterface::HangupCall(const std::string &address) const
 {
     LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
-    DelayedSingleton<BluetoothCallClient>::GetInstance()->HangUpCall();
+    HfpAgService *service = HfpAgService::GetService();
+    if (service->GetMockState() == HFP_AG_MOCK) {
+        HfpAgMessage evt(HFP_AG_SEND_CALL_STATE_EVT, HFP_AG_CALL_INACTIVE);
+        SendMockEvent(evt);
+        return;
+    }
+
+    std::vector<CallAttributeInfo> callList;
+    int slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    bool isActiveCallHangUp = false;
+    if (slotId < 0) {
+        LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
+        return;
+    }
+    callList = DelayedSingleton<BluetoothCallClient>::GetInstance()->GetCurrentCallList(slotId);
+    for (auto call : callList) {
+        std::string number = call.accountNumber;
+        LOG_INFO("[HFP AG]%{public}s():HangupCallnumbre = %{public}s, state = %{public}d id = %{public}d",
+            __FUNCTION__, number.c_str(), (int)call.callState, (int)call.callId);
+        if ((int)TelCallState::CALL_STATUS_ACTIVE == (int)call.callState) {
+            // Should use hangup(index)
+            DelayedSingleton<BluetoothCallClient>::GetInstance()->HangUpCall();
+            isActiveCallHangUp = true;
+        }
+    }
+
+    if (!isActiveCallHangUp) {
+        DelayedSingleton<BluetoothCallClient>::GetInstance()->HangUpCall();
+        LOG_INFO(", HangUpCall ");
+    }
+    isActiveCallHangUp = false;
 }
 
 void HfpAgSystemInterface::AnswerCall(const std::string &address) const
@@ -133,10 +164,7 @@ bool HfpAgSystemInterface::SendDtmf(int dtmf, const std::string &address) const
 bool HfpAgSystemInterface::HoldCall(int chld) const
 {
     LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
-    if (!DelayedSingleton<BluetoothCallClient>::GetInstance()->HoldCall()) {
-        return false;
-    }
-    return true;
+    return HandleChld(chld);
 }
 
 std::string HfpAgSystemInterface::GetNetworkOperator()
@@ -168,30 +196,58 @@ std::string HfpAgSystemInterface::GetSubscriberNumber()
     return subscriberNumber_;
 }
 
-bool HfpAgSystemInterface::QueryCurrentCallsList()
+bool HfpAgSystemInterface::QueryCurrentCallsList(const std::string &address)
 {
-    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s(): enter",  __FUNCTION__);
     std::vector<CallAttributeInfo> callList;
     HfpAgService *service = HfpAgService::GetService();
     if (service == nullptr) {
-        LOG_ERROR("[HFP AG]%{public}s():no service",  __FUNCTION__);
+        LOG_INFO("[HFP AG]%{public}s():no service",  __FUNCTION__);
         return false;
+    }
+    if (service->GetMockState() == HFP_AG_MOCK) {
+        return HandleClccMock(address);
     }
     slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
     if (slotId_ < 0) {
         LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
+        service->ResponesOK(address);
         return false;
     }
     callList = DelayedSingleton<BluetoothCallClient>::GetInstance()->GetCurrentCallList(slotId_);
+    int callIndex = 0;
     for (auto call : callList) {
+        callIndex++;
         std::string number = call.accountNumber;
         bool conferenceState = false;
         if (call.conferenceState != TelConferenceState::TEL_CONFERENCE_IDLE) {
             conferenceState = true;
         }
-        service->ClccResponse(call.callId, (int)call.callDirection, (int)call.callState, 0, conferenceState, number,
-            (int)call.callType);
+        int dire = -1;
+        switch ((int)call.callDirection) {
+            case (int)CallDirection::CALL_DIRECTION_IN:
+                dire = BT_CALL_DIRECTION_IN;
+                break;
+            case (int)CallDirection::CALL_DIRECTION_OUT:
+                dire = BT_CALL_DIRECTION_OUT;
+                break;
+            default:
+                dire = BT_CALL_DIRECTION_UNKNOW;
+                break;
+        }
+        int calltype = -1;
+        if ((int)call.callType == (int)CallType::TYPE_CS) {
+            calltype = CALL_TYPE_DEFAULT;
+        } else {
+            calltype = (int)call.callType;
+        }
+
+        service->ClccResponse(callIndex, dire, (int)call.callState, 0, conferenceState, number, calltype);
+            LOG_INFO("[HFP AG]%{public}s(): for number = %{public}s id = %{public}d state = %{public}d",
+                __FUNCTION__, number.c_str(), callIndex, (int)call.callState);
     }
+    callIndex = 0;
+    service->ResponesOK(address);
     return true;
 }
 
@@ -334,6 +390,272 @@ void HfpAgSystemInterface::QueryAgIndicator()
     return;
 }
 
+void HfpAgSystemInterface::UpdateAgIndicator() const
+{
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    for (auto call : bluetoothCallList_) {
+        std::string number = call.number;
+        LOG_INFO("[HFP AG]%{public}s():for number = %{public}s state = %{public}d",
+            __FUNCTION__, number.c_str(), call.callstate);
+        if ((int)TelCallState::CALL_STATUS_WAITING == call.callstate && bluetoothCallList_.size() > 1) {
+            SendIncomingCallToService(number, CALL_TYPE_DEFAULT);
+            SendCallSetupToService((int)HfpCallSetupStatus::HFP_AG_CALLSETUP_INCOMING);
+        } else if ((int)TelCallState::CALL_STATUS_HOLDING == call.callstate) {
+            SendCallHeldToService(HFP_AG_CALLHELD_ACTIVE);
+        } else if ((int)TelCallState::CALL_STATUS_ACTIVE == call.callstate) {
+            if (call.precallstate == (int)TelCallState::CALL_STATUS_WAITING ||
+                call.precallstate == (int)TelCallState::CALL_STATUS_INCOMING) {
+                SendCallStateToService(HFP_AG_CALL_ACTIVE);
+            }
+        }
+    }
+}
+
+int HfpAgSystemInterface::GetCallWithState(int state) const
+{
+    int callid = -1;
+    for (auto call : bluetoothCallList_) {
+        if (call.callstate == state) {
+            callid = call.callid;
+        }
+    }
+    return callid;
+}
+
+void HfpAgSystemInterface::UpdateCallList()
+{
+    std::vector<CallAttributeInfo> callList;
+    int slotId;
+    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    if (slotId < 0) {
+        LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
+    }
+    callList = DelayedSingleton<BluetoothCallClient>::GetInstance()->GetCurrentCallList(slotId);
+    if (callList.size() == 0) {
+        bluetoothCallList_.clear();
+        return;
+    }
+    for (auto call : callList) {
+        int sameindex = -1;
+        int prestate = -1;
+        std::string number = call.accountNumber;
+        for (int i = 0; i < bluetoothCallList_.size(); i++) {
+            if (strcmp(bluetoothCallList_[i].number.c_str(), number.c_str()) == 0) {
+                sameindex = i;
+            }
+        }
+        if (bluetoothCallList_.size() > callList.size()) {
+            prestate = bluetoothCallList_[sameindex].callstate;
+            bluetoothCallList_.clear();
+            sameindex = -1;
+        }
+        if (sameindex != -1) {
+            bluetoothCallList_[sameindex].precallstate = bluetoothCallList_[sameindex].callstate;
+            bluetoothCallList_[sameindex].callstate = (int)call.callState;
+        } else {
+            BluetoothCall btcall;
+            btcall.callstate = (int)call.callState;
+            btcall.number = call.accountNumber;
+            btcall.callid = call.callId;
+            btcall.precallstate = prestate;
+            bluetoothCallList_.push_back(btcall);
+        }
+    }
+}
+
+void HfpAgSystemInterface::GetVoiceNumber()
+{
+    HfpAgService *service = HfpAgService::GetService();
+    if (service == nullptr) {
+        LOG_ERROR("[HFP AG]%{public}s():service is nullptr", __FUNCTION__);
+    }
+    std::string number = "1234567";
+    // NEED TO GET VOICE TAG NUMBER, 1234567 JUST FOR TEST, INTERFACE NOT AVAIABLE NOW!
+    service->SendBinpNumber(number);
+}
+
+void HfpAgSystemInterface::GetResponseHoldState(std::string address)
+{
+    LOG_INFO("[HFP AG]%{public}s(): enter",  __FUNCTION__);
+    std::vector<CallAttributeInfo> callList;
+    HfpAgService *service = HfpAgService::GetService();
+    if (service == nullptr) {
+        LOG_ERROR("[HFP AG]%{public}s():no service",  __FUNCTION__);
+    }
+    int slotId;
+    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    if (slotId < 0) {
+        LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
+    }
+    callList = DelayedSingleton<BluetoothCallClient>::GetInstance()->GetCurrentCallList(slotId);
+    bool hasHoldCall = false;
+    for (auto call : callList) {
+        std::string number = call.accountNumber;
+        if ((int)TelCallState::CALL_STATUS_HOLDING == (int)call.callState) {
+            hasHoldCall = true;
+        }
+    }
+
+    if (hasHoldCall) {
+        SendResponseHoldStateToService(HFP_AG_RESPONSE_HOLD);
+    }
+    hasHoldCall = false;
+    service->ResponesOK(address);
+}
+
+void HfpAgSystemInterface::SetResponseHoldState(std::string address, int btrh)
+{
+    LOG_INFO("enter %{publis}s", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    std::vector<CallAttributeInfo> callList;
+    HfpAgService *service = HfpAgService::GetService();
+    if (service == nullptr) {
+        LOG_ERROR("[HFP AG]%{public}s():no service",  __FUNCTION__);
+    }
+    int slotId;
+    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    if (slotId < 0) {
+        LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
+    }
+    callList = DelayedSingleton<BluetoothCallClient>::GetInstance()->GetCurrentCallList(slotId);
+    for (auto call : callList) {
+        std::string number = call.accountNumber;
+        if (btrh == 1) {
+            if ((int)TelCallState::CALL_STATUS_INCOMING == (int)call.callState) {
+                DelayedSingleton<BluetoothCallClient>::GetInstance()->HoldCall();
+                SendResponseHoldStateToService(HFP_AG_RESPONSE_HOLD_ACCEPT);
+            }
+        }
+    }
+    service->ResponesOK(address);
+}
+
+void HfpAgSystemInterface::HandlePhoneStateMock(std::string number, int state, int type)
+{
+    HfpAgService *service = HfpAgService::GetService();
+    callList_ = service->GetCallList();
+    int activenum = 0;
+    int holdnum = 0;
+    int endnum = 0;
+    int endcallindex = -1;
+    for (int j = 0; j < callList_.size(); j++) {
+        if (callList_[j].callstate == (int)TelCallState::CALL_STATUS_INCOMING) {
+            HfpAgMessage evt1(HFP_AG_SEND_CALL_SETUP_EVT, (int)HfpCallSetupStatus::HFP_AG_CALLSETUP_INCOMING);
+            SendMockEvent(evt1);
+            HfpAgMessage evt(HFP_AG_MOCK_RING);
+            SendMockEvent(evt);
+            SendClip(callList_[j].number);
+        } else if (callList_[j].callstate == (int)TelCallState::CALL_STATUS_WAITING) {
+            bool hasendcall = false;
+            for (auto call:callList_) {
+                if (call.callstate == (int)TelCallState::CALL_STATUS_DISCONNECTING ||
+                    call.callstate == (int)TelCallState::CALL_STATUS_DISCONNECTED) {
+                    hasendcall = true;
+                }
+            }
+            if (!hasendcall) {
+                HfpAgMessage evt(HFP_AG_SEND_INCOMING_EVT, CALL_TYPE_DEFAULT);
+                evt.str_ = callList_[j].number;
+                SendMockEvent(evt);
+                HfpAgMessage evt1(HFP_AG_SEND_CALL_SETUP_EVT, (int)HfpCallSetupStatus::HFP_AG_CALLSETUP_INCOMING);
+                SendMockEvent(evt1);
+            }
+        } else if (callList_[j].callstate == (int)TelCallState::CALL_STATUS_ACTIVE) {
+            bool hasoutgoingcall = false;
+            for (auto call : callList_) {
+                if (call.callstate == (int)TelCallState::CALL_STATUS_ALERTING ||
+                    call.callstate == (int)TelCallState::CALL_STATUS_DIALING) {
+                    hasoutgoingcall = true;
+                }
+            }
+            if (!hasoutgoingcall) {
+                HfpAgMessage evt(HFP_AG_SEND_CALL_STATE_EVT, HFP_AG_CALL_ACTIVE);
+                SendMockEvent(evt);
+                HfpAgMessage evt1(HFP_AG_SEND_CALL_SETUP_EVT, (int)HfpCallSetupStatus::HFP_AG_CALLSETUP_NONE);
+                SendMockEvent(evt1);
+            }
+            activenum++;
+        } else if (callList_[j].callstate == (int)TelCallState::CALL_STATUS_DISCONNECTED ||
+                callList_[j].callstate == (int)TelCallState::CALL_STATUS_DISCONNECTING) {
+            endcallindex = j;
+            endnum ++;
+            if (endnum < HFP_AG_CALL_NUM_TWO) {
+                HfpAgMessage evt(HFP_AG_SEND_CALL_STATE_EVT, HFP_AG_CALL_INACTIVE);
+                SendMockEvent(evt);
+            }
+        } else if (callList_[j].callstate == (int)TelCallState::CALL_STATUS_HOLDING) {
+            HfpAgMessage evt(HFP_AG_SEND_CALL_HELD_EVT, 1);
+            SendMockEvent(evt);
+            holdnum++;
+        } else if (callList_[j].callstate == (int)TelCallState::CALL_STATUS_DIALING) {
+            HfpAgMessage evt(HFP_AG_SEND_CALL_SETUP_EVT, HFP_AG_CALLSETUP_OUTGOING);
+            SendMockEvent(evt);
+        } else if (callList_[j].callstate == (int)TelCallState::CALL_STATUS_ALERTING) {
+            HfpAgMessage evt(HFP_AG_SEND_CALL_SETUP_EVT, HFP_AG_CALLSETUP_ALERTING);
+            SendMockEvent(evt);
+        }
+    }
+    if (endcallindex != -1) {
+        callList_.erase(callList_.begin() + endcallindex);
+        endcallindex = -1;
+    }
+    if (activenum > 1) {
+        HfpAgMessage evt(HFP_AG_SEND_CALL_HELD_EVT, 0);
+        SendMockEvent(evt);
+        LOG_INFO("HandlePhoneStateMock activenum = %{public}d", activenum);
+    } else if (activenum == 0 && holdnum == 0 && callList_.size() == 0) {
+        HfpAgMessage evt(HFP_AG_SEND_CALL_STATE_EVT, HFP_AG_CALL_INACTIVE);
+        SendMockEvent(evt);
+    }
+    activenum = 0;
+    holdnum = 0;
+    endnum = 0;
+}
+
+bool HfpAgSystemInterface::HandleChldMock(int chld) const
+{
+    HfpAgMessage evtok(HFP_AG_RESPONE_OK_EVT);
+    SendMockEvent(evtok);
+    if (chld == ATCHLD_RELEASE_HOLD_ACCPET_OTHER) {
+        HfpAgMessage evt(HFP_AG_SEND_CALL_HELD_EVT, HFP_AG_CALL_NUM_TWO);
+        SendMockEvent(evt);
+        HfpAgMessage evt1(HFP_AG_SEND_CALL_STATE_EVT, HFP_AG_CALL_ACTIVE);
+        SendMockEvent(evt1);
+        HfpAgMessage evt2(HFP_AG_SEND_CALL_SETUP_EVT, 0);
+        SendMockEvent(evt2);
+        evt.arg1_ = 1;
+        SendMockEvent(evt);
+    } else if (chld == ATCHLD_ADD_CALL_TO_CONVERSATION) {
+        HfpAgMessage evt(HFP_AG_SEND_CALL_HELD_EVT, 0);
+        SendMockEvent(evt);
+        HfpAgMessage evt1(HFP_AG_SEND_CALL_STATE_EVT, HFP_AG_CALL_ACTIVE);
+        SendMockEvent(evt1);
+        HfpAgMessage evt2(HFP_AG_SEND_CALL_SETUP_EVT, 0);
+        SendMockEvent(evt2);
+    }
+    return true;
+}
+
+
+bool HfpAgSystemInterface::HandleClccMock(std::string address) const
+{
+    HfpAgService *service = HfpAgService::GetService();
+    int callindex = 0;
+    for (auto mockcall : callList_) {
+        callindex++;
+        std::string number = mockcall.number;
+        bool conferenceState = false;
+        if (callList_.size() >1) {
+            conferenceState = true;
+        }
+        service->ClccResponse(callindex, BT_CALL_DIRECTION_IN, mockcall.callstate,
+            0, conferenceState, number, CALL_TYPE_DEFAULT);
+    }
+    callindex = 0;
+    service->ResponesOK(address);
+    return true;
+}
+
 void HfpAgSystemInterface::SendHfIndicator(const std::string &address, int indId, int indValue) const
 {
     LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
@@ -395,9 +717,88 @@ void HfpAgSystemInterface::SendServiceStateToService() const
     }
 }
 
-void HfpAgSystemInterface::SendRoamStateToService() const
+
+void HfpAgSystemInterface::SendIncomingCallToService(std::string number, int type) const
 {
     LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    HfpAgService *service = HfpAgService::GetService();
+    if (service != nullptr) {
+        service->NotifyAgIncomingStateChanged(HFP_AG_SEND_INCOMING_EVT, number, type);
+    } else {
+        LOG_ERROR("[HFP AG]%{public}s():service is null!", __FUNCTION__);
+    }
+}
+
+void HfpAgSystemInterface::SendMockEvent(HfpAgMessage evt) const
+{
+    LOG_INFO("[HFP AG]%{public}s():",  __FUNCTION__);
+    HfpAgService *service = HfpAgService::GetService();
+    if (service != nullptr) {
+        service->SendMockCmd(evt);
+    } else {
+        LOG_ERROR("[HFP AG]%{public}s():service is null!", __FUNCTION__);
+    }
+}
+
+void HfpAgSystemInterface::SendClip(std::string number) const
+{
+    LOG_INFO("[HFP AG]%{public}s():",  __FUNCTION__);
+    HfpAgService *service = HfpAgService::GetService();
+    HfpAgMessage evt(HFP_AG_MOCK_CLIP);
+    evt.str_ = number;
+    if (service != nullptr) {
+        service->SendMockCmd(evt);
+    } else {
+        LOG_ERROR("[HFP AG]%{public}s():service is null!", __FUNCTION__);
+    }
+}
+
+void HfpAgSystemInterface::SendCallSetupToService(int state) const
+{
+    LOG_INFO("[HFP AG]%{public}s():",  __FUNCTION__);
+    HfpAgService *service = HfpAgService::GetService();
+    if (service != nullptr) {
+        service->NotifyAgIndicatorStateChanged(HFP_AG_SEND_CALL_SETUP_EVT, state);
+    } else {
+        LOG_ERROR("[HFP AG]%{public}s():service is null!", __FUNCTION__);
+    }
+}
+
+void HfpAgSystemInterface::SendCallHeldToService(int state) const
+{
+    LOG_INFO("[HFP AG]%{public}s():",  __FUNCTION__);
+    HfpAgService *service = HfpAgService::GetService();
+    if (service != nullptr) {
+        service->NotifyAgIndicatorStateChanged(HFP_AG_SEND_CALL_HELD_EVT, state);
+    } else {
+        LOG_ERROR("[HFP AG]%{public}s():service is null!", __FUNCTION__);
+    }
+}
+
+void HfpAgSystemInterface::SendCallStateToService(int state) const
+{
+    HfpAgService *service = HfpAgService::GetService();
+    if (service != nullptr) {
+        service->NotifyAgIndicatorStateChanged(HFP_AG_SEND_CALL_STATE_EVT, state);
+    } else {
+        LOG_ERROR("[HFP AG]%{public}s():service is null!", __FUNCTION__);
+    }
+}
+
+void HfpAgSystemInterface::SendResponseHoldStateToService(int state) const
+{
+    LOG_INFO("[HFP AG]%{public}s():",  __FUNCTION__);
+    HfpAgService *service = HfpAgService::GetService();
+    if (service != nullptr) {
+        service->NotifyAgResponseHoldStateChanged(HFP_AG_SEND_RESPONSE_HOLD_STATE, state);
+    } else {
+        LOG_ERROR("[HFP AG]%{public}s():service is null!", __FUNCTION__);
+    }
+}
+
+void HfpAgSystemInterface::SendRoamStateToService() const
+{
+    LOG_INFO("[HFP AG]%{public}s():",  __FUNCTION__);
     HfpAgService *service = HfpAgService::GetService();
     if (service != nullptr) {
         service->NotifyAgIndicatorStateChanged(HFP_AG_NOTIFY_ROAM_STATE, roamState_);
@@ -480,6 +881,56 @@ bool HfpAgSystemInterface::IsRinging() const
 {
     LOG_DEBUG("[HFP AG]%{public}s():enter",  __FUNCTION__);
     return (callState_ == HFP_AG_CALL_STATE_INCOMING);
+}
+
+bool HfpAgSystemInterface::HandleChld(int chld) const
+{
+    HfpAgService *service = HfpAgService::GetService();
+    if (service->GetMockState() == HFP_AG_MOCK) {
+        return HandleChldMock(chld);
+    }
+    std::vector<CallAttributeInfo> callList;
+    int slotId;
+    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    if (slotId < 0) {
+        LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
+    }
+    callList = DelayedSingleton<BluetoothCallClient>::GetInstance()->GetCurrentCallList(slotId);
+    for (auto call : callList) {
+        std::string number = call.accountNumber;
+        LOG_INFO("[HFP AG]%{public}s():HandleChld for number = %{public}s state = %{public}d",
+            __FUNCTION__, number.c_str(), (int)call.callState);
+            if (chld == ATCHLD_RELEASE_ALL_HELD_CALLS) {
+                if ((int)TelCallState::CALL_STATUS_HOLDING == (int)call.callState ||
+                    (int)TelCallState::CALL_STATUS_WAITING == (int)call.callState) {
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->HangUpCall();
+                }
+            } else if (chld == ATCHLD_RELEASE_ACTIVE_ACCPET_OTHER) {
+                if ((int)TelCallState::CALL_STATUS_WAITING == (int)call.callState &&
+                    (int)call.callDirection == (int)CallDirection::CALL_DIRECTION_IN) {
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->AnswerCall();
+                } else if ((int)TelCallState::CALL_STATUS_ACTIVE == (int)call.callState) {
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->HangUpCall();
+                } else if ((int)TelCallState::CALL_STATUS_HOLDING == (int)call.callState) {
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->HoldCall();
+                }
+            } else if (chld == ATCHLD_RELEASE_HOLD_ACCPET_OTHER) {
+                if ((int)TelCallState::CALL_STATUS_WAITING == (int)call.callState) {
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->AnswerCall();
+                } else if ((int)TelCallState::CALL_STATUS_ACTIVE == (int)call.callState) {
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->HoldCall();
+                }
+            } else if (chld == ATCHLD_ADD_CALL_TO_CONVERSATION) {
+                if ((int)TelCallState::CALL_STATUS_WAITING == (int)call.callState) {
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->AnswerCall();
+                    DelayedSingleton<BluetoothCallClient>::GetInstance()->CombineConference();
+                }
+            } else if (chld == ATCHLD_CONNECT_TWO_CALL) {
+                DelayedSingleton<BluetoothCallClient>::GetInstance()->CombineConference();
+                DelayedSingleton<BluetoothCallClient>::GetInstance()->HangUpCall();
+            }
+    }
+    return true;
 }
 
 void HfpAgSystemInterface::AgTelephonyObserver::OnNetworkStateUpdated(int32_t slotId,

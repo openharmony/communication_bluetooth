@@ -31,8 +31,6 @@ void HfpAgProfileEventSender::SendMessageToService(const HfpAgMessage &msg)
     HfpAgService *service = HfpAgService::GetService();
     if (service != nullptr) {
         service->PostEvent(msg);
-    } else {
-        LOG_ERROR("[HFP AG]%{public}s():hfpAgService_ is nullptr!", __FUNCTION__);
     }
 }
 
@@ -195,6 +193,23 @@ void HfpAgProfileEventSender::UpdateScoConnectState(const std::string &device, i
     SendMessageToService(msg);
 }
 
+void HfpAgProfileEventSender::GetResponseHoldState(const std::string &device, int what) const
+{
+    HfpAgMessage msg(what);
+    msg.dev_ = device;
+    msg.type_ = what;
+    SendMessageToService(msg);
+}
+
+void HfpAgProfileEventSender::SetResponseHoldState(const std::string &device, int what, int btrh) const
+{
+    HfpAgMessage msg(what);
+    msg.dev_ = device;
+    msg.type_ = what;
+    msg.arg1_ = btrh;
+    SendMessageToService(msg);
+}
+
 void HfpAgProfileEventSender::ProcessSdpDiscoveryResult(const std::string &device, int what) const
 {
     HfpAgMessage msg(what);
@@ -233,6 +248,13 @@ void HfpAgProfileEventSender::SendRingAndClip(const std::string &device) const
 void HfpAgProfileEventSender::ProcessCKpdEvent(const std::string &device) const
 {
     HfpAgMessage msg(HFP_AG_PROCESS_CKPD_EVT);
+    msg.dev_ = device;
+    SendMessageToService(msg);
+}
+
+void HfpAgProfileEventSender::GetVoiceTagNumber(const std::string &device) const
+{
+    HfpAgMessage msg(HFP_AG_GET_VOICE_NUMBER);
     msg.dev_ = device;
     SendMessageToService(msg);
 }

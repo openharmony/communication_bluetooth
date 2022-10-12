@@ -226,12 +226,27 @@ public:
     bool DialOutCall(const std::string &number);
 
     /**
+     * @brief Send key pressed event.
+     *
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     */
+    bool SendKeyPressed();
+
+    /**
      * @brief Dial out the call by the memory.
      *
      * @param number The index of the memory.
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      */
     bool DialMemory(int memory);
+
+    /**
+     * @brief Send voice tag.
+     *
+     * @param index The index of voice tag.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     */
+    bool SendVoiceTag(int index);
 
     /**
      * @brief Send ATA command.

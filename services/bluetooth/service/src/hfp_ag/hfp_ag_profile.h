@@ -257,6 +257,8 @@ public:
      */
     int SendResultCode(int result) const;
 
+    void startMock(int state);
+
     /**
      * @brief Reports the change of the call status to remote HF device.
      *
@@ -280,6 +282,14 @@ public:
      * @return Returns the result of report callheld status.
      */
     int ReportCallheldStatus(uint32_t callheld);
+
+    /**
+     * @brief Reports the change of the response hold status to remote HF device.
+     *
+     * @param state Response status.
+     * @return Returns the result of report callheld status.
+     */
+    int ReportResponseHoldStatus(uint32_t state, int test);
 
     /**
      * @brief Reports the change of the registration status to remote HF device.
@@ -338,6 +348,12 @@ public:
     int ReportCurrentCallList(const HfpAgCallList &clcc) const;
 
     /**
+     * @brief respones ok to hf.
+     *
+     */
+    void ResponesOK() const;
+
+    /**
      * @brief Remote the state machine.
      */
     void RemoveStateMachine();
@@ -380,6 +396,31 @@ public:
      */
     void RemoveRemoteScnLoging() const;
 
+    /**
+     * @brief Reports the presence of new call waiting to remote HF device when there are ongoing calls.
+     *
+     * @param type Format type of the incoming call number.
+     * @param number Incoming call number.
+     * @return Returns the result of notify incoming call waiting.
+     */
+    int NotifyIncomingCallWaiting(uint16_t type, const std::string &number) const;
+
+    /**
+     * @brief send binp to hf
+     *
+     * @param number voice number
+     */
+    void SendBinp(std::string number) const;
+
+    /**
+     * @brief Reports the incoming call number to remote HF device after the new call coming.
+     *
+     * @param type Format type of the incoming call number.
+     * @param number Incoming call number.
+     * @return Returns the result of notify calling line identification.
+     */
+    int NotifyCallingLineIdentification(uint16_t type, const std::string &number) const;
+
 private:
     /**
      * @brief Reports the change of the call status to remote HF device by active call number
@@ -409,24 +450,6 @@ private:
      * @return Returns the result of report AG indicator.
      */
     int ReportAgIndicator(int indicator, int value) const;
-
-    /**
-     * @brief Reports the incoming call number to remote HF device after the new call coming.
-     *
-     * @param type Format type of the incoming call number.
-     * @param number Incoming call number.
-     * @return Returns the result of notify calling line identification.
-     */
-    int NotifyCallingLineIdentification(uint16_t type, const std::string &number) const;
-
-    /**
-     * @brief Reports the presence of new call waiting to remote HF device when there are ongoing calls.
-     *
-     * @param type Format type of the incoming call number.
-     * @param number Incoming call number.
-     * @return Returns the result of notify incoming call waiting.
-     */
-    int NotifyIncomingCallWaiting(uint16_t type, const std::string &number) const;
 
     /**
      * @brief Send RING command to remote HF device.
@@ -550,6 +573,7 @@ private:
     // HfpAgCommandProcessor instance
     HfpAgCommandProcessor &commandProcessor_ {HfpAgCommandProcessor::GetInstance()};
 
+    int mockState_ {0};
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgProfile);
 };
 }  // namespace bluetooth

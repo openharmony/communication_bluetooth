@@ -15,6 +15,7 @@
 
 #include <cstring>
 
+#include "adapter_config.h"
 #include "hfp_hf_profile_event_sender.h"
 #include "hfp_hf_sdp_client.h"
 #include "raw_address.h"
@@ -23,6 +24,7 @@ namespace OHOS {
 namespace bluetooth {
 std::map<std::string, HfpHfRemoteSdpServiceArray> HfpHfSdpClient::g_remoteSdpServiceArrays;
 std::recursive_mutex HfpHfSdpClient::g_hfpSdpMutex;
+int agProfileState_ = -1;
 
 HfpHfSdpClient::~HfpHfSdpClient()
 {
@@ -41,12 +43,28 @@ void HfpHfSdpClient::SdpCallback(const BtAddr *addr, const SdpService *serviceAr
     if (serviceNum > 0) {
         CopySdpServiceArray(address, serviceAry, serviceNum);
         msgWhat = HFP_HF_SDP_DISCOVERY_RESULT_SUCCESS;
+        agProfileState_ = HFP_HF_HFAG_FOUND;
+    }
+    int hspState = 1;
+    AdapterConfig::GetInstance()->GetValue(HSP_HS_STATE_SECTION_NAME, HSP_HS_STATE_PROPERY_NAME, hspState);
+    if (hspState == HSP_HS_STATE_BOTH) {
+        HfpHfSdpClient *sdpClient = static_cast<HfpHfSdpClient *>(context);
+        HfpHfService::GetService()->GetDispatcher()->PostTask(
+            std::bind(&HfpHfSdpClient::DoHspAgDiscovery, sdpClient, address));
+        return;
     }
     HfpHfProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
 }
 
 int HfpHfSdpClient::DoDiscovery(const std::string &remoteAddr, int role)
 {
+    agProfileState_ = -1;
+    AdapterConfig::GetInstance()->GetValue(HSP_HS_STATE_SECTION_NAME, HSP_HS_STATE_PROPERY_NAME, hspState_);
+    if (hspState_ == HSP_HS_STATE_HSP) {
+        LOG_INFO("[HFP HF] start hsp ag dicovery");
+        return DoHspAgDiscovery(remoteAddr);
+    }
+
     BtAddr address;
     address.type = BT_PUBLIC_DEVICE_ADDRESS;
     RawAddress rawAddr(remoteAddr);
@@ -85,7 +103,59 @@ int HfpHfSdpClient::DoDiscovery(const std::string &remoteAddr, int role)
             HFP_HF_SDP_ATTRIBUTE_DATA_STORES_OR_NETWORK;
     }
 
-    int ret = SDP_ServiceSearchAttribute(&address, &sdpUUid, attributeIdList, nullptr, &HfpHfSdpClient::SdpCallback);
+    int ret = SDP_ServiceSearchAttribute(&address, &sdpUUid, attributeIdList, this, &HfpHfSdpClient::SdpCallback);
+    HFP_HF_RETURN_IF_FAIL(ret);
+    currentAddr_ = remoteAddr;
+    return ret;
+}
+
+void HfpHfSdpClient::SdpHspCallback(const BtAddr *addr, const SdpService *serviceAry,
+                                    uint16_t serviceNum, void *context)
+{
+    int msgWhat = HFP_HF_SDP_DISCOVERY_RESULT_FAIL;
+    std::string address = RawAddress::ConvertToString(addr->addr).GetAddress();
+    if (serviceNum > 0) {
+        CopySdpServiceArray(address, serviceAry, serviceNum);
+        msgWhat = HFP_HF_SDP_DISCOVERY_RESULT_SUCCESS;
+        if (agProfileState_ == HFP_HF_HFAG_FOUND) {
+            agProfileState_ = HFP_HF_HFAG_HSAG_FOUND;
+        } else {
+            agProfileState_ = HFP_HF_HSAG_FOUND;
+        }
+    }
+    if (agProfileState_ != -1) {
+        msgWhat = HFP_HF_SDP_DISCOVERY_RESULT_SUCCESS;
+        HfpHfProfileEventSender::GetInstance().ProcessSdpDiscoveryResult(address, msgWhat);
+    }
+}
+
+int HfpHfSdpClient::DoHspAgDiscovery(const std::string &remoteAddr)
+{
+    BtAddr address;
+    address.type = BT_PUBLIC_DEVICE_ADDRESS;
+    RawAddress rawAddr(remoteAddr);
+    rawAddr.ConvertToUint8(address.addr);
+
+    BtUuid classid[HFP_HF_CLIENT_CLASSID_NUM];
+    classid[0].type = BT_UUID_16;
+    classid[0].uuid16 = HFP_HF_UUID_SERVCLASS_HSP_AG;
+    SdpUuid sdpUUid;
+    sdpUUid.uuidNum = HFP_HF_CLIENT_CLASSID_NUM;
+    sdpUUid.uuid = &classid[0];
+
+    SdpAttributeIdList attributeIdList;
+    attributeIdList.type = SDP_TYPE_LIST;
+    attributeIdList.attributeIdList.attributeIdNumber = HFP_HF_CLIENT_INITIATOR_ATTR_NUM;
+    attributeIdList.attributeIdList.attributeId[SERVICE_CLASS_ID_LIST_INDEX] =
+        SDP_ATTRIBUTE_SERVICE_CLASS_ID_LIST;
+    attributeIdList.attributeIdList.attributeId[PROTOCOL_DESCRIPTOR_LIST_INDEX] =
+        SDP_ATTRIBUTE_PROTOCOL_DESCRIPTOR_LIST;
+    attributeIdList.attributeIdList.attributeId[INITIATOR_PROFILE_DESCRIPTOR_LIST_INDEX] =
+        SDP_ATTRIBUTE_BLUETOOTH_PROFILE_DESCRIPTOR_LIST;
+    attributeIdList.attributeIdList.attributeId[INITIATOR_SUPPORTED_FEATURES_INDEX] =
+        HFP_HF_SDP_ATTRIBUTE_SUPPORTED_FEATURES;
+
+    int ret = SDP_ServiceSearchAttribute(&address, &sdpUUid, attributeIdList, this, &HfpHfSdpClient::SdpHspCallback);
     HFP_HF_RETURN_IF_FAIL(ret);
     currentAddr_ = remoteAddr;
     return ret;
@@ -235,6 +305,10 @@ bool HfpHfSdpClient::FindProfileVersion(const std::vector<SdpProfileDescriptor> 
         if (profiles[num].profileUuid.uuid16 == HFP_HF_UUID_SERVCLASS_HFP_AG) {
             version = profiles[num].versionNumber;
             LOG_DEBUG("[HFP HF]%{public}s():Found profile version is [%hu]", __FUNCTION__, version);
+            return true;
+        } else if (profiles[num].profileUuid.uuid16 == HFP_HF_UUID_SERVCLASS_HSP_AG) {
+            version = profiles[num].versionNumber;
+            LOG_DEBUG("[HSP HF]%{public}s():Found profile version is [%hu]", __FUNCTION__, version);
             return true;
         }
         num++;

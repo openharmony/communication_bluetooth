@@ -425,8 +425,10 @@ int HfpAgProfile::SendResultCode(int result) const
 
 int HfpAgProfile::ReportCallStatus(uint32_t call)
 {
-    HFP_AG_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
-    HFP_AG_RETURN_IF_INDICATOR_EQUAL(call, dataConn_.callInd_);
+    if (mockState_ != HFP_AG_MOCK) {
+        HFP_AG_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
+        HFP_AG_RETURN_IF_INDICATOR_EQUAL(call, dataConn_.callInd_);
+    }
 
     dataConn_.callInd_ = call;
     return ReportAgIndicator(HFP_AG_INDICATOR_CALL, call);
@@ -463,11 +465,21 @@ int HfpAgProfile::ReportCallsetupStatus(uint32_t callsetup)
 
 int HfpAgProfile::ReportCallheldStatus(uint32_t callheld)
 {
-    HFP_AG_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
-    HFP_AG_RETURN_IF_INDICATOR_EQUAL(callheld, dataConn_.callheldInd_);
+    if (mockState_ != HFP_AG_MOCK) {
+        HFP_AG_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
+    }
 
     dataConn_.callheldInd_ = callheld;
     return ReportAgIndicator(HFP_AG_INDICATOR_CALLHELD, callheld);
+}
+
+int HfpAgProfile::ReportResponseHoldStatus(uint32_t state, int test)
+{
+    HFP_AG_RETURN_IF_NOT_CONNECTED(dataConn_.slcConnected_);
+    std::string cmd("+BTRH: ");
+    cmd.append(std::to_string(state));
+    commandProcessor_.SendAtCommand(dataConn_, cmd);
+    return HFP_AG_SUCCESS;
 }
 
 int HfpAgProfile::ReportRegistrationStatus(uint32_t status)
@@ -557,6 +569,10 @@ int HfpAgProfile::PhoneStateChange(const HfpAgPhoneState &phoneState)
             return HFP_AG_SUCCESS;
     }
 
+    if (preNumActiveCalls_ == 1 && preNumHeldCalls_ == 1 &&  phoneState.activeNum == 1 && phoneState.heldNum == 0) {
+        ReportCallheldStatus(HFP_AG_CALLHELD_INACTIVE);
+    }
+
     SetCallStates(phoneState.heldNum, phoneState.activeNum, phoneState.callState);
     return HFP_AG_SUCCESS;
 }
@@ -579,9 +595,15 @@ int HfpAgProfile::ReportCurrentCallList(const HfpAgCallList &clcc) const
                 cmd.append(",\"" + clcc.number + "\"," + std::to_string(clcc.type));
             }
         }
+
         commandProcessor_.SendAtCommand(dataConn_, cmd);
     }
     return HFP_AG_SUCCESS;
+}
+
+void HfpAgProfile::ResponesOK() const
+{
+    SendResultCode(HFP_AG_RESULT_OK);
 }
 
 int HfpAgProfile::ReportCallStatusByCallNums(int numActive, int numHeld)
@@ -590,6 +612,10 @@ int HfpAgProfile::ReportCallStatusByCallNums(int numActive, int numHeld)
     if ((numActive + numHeld) > 0) {
         state = HFP_AG_CALL_ACTIVE;
     }
+    if (preNumActiveCalls_ == 1 && preNumHeldCalls_ == 0 && numActive == 1 && numHeld == 0) {
+        return HFP_AG_SUCCESS;
+    }
+
     ReportCallStatus(state);
     return HFP_AG_SUCCESS;
 }
@@ -604,7 +630,6 @@ int HfpAgProfile::ReportCallheldStatusByCallNums(int numActive, int numHeld)
             state = HFP_AG_CALLHELD_NOACTIVE;
         }
     }
-    ReportCallheldStatus(state);
     return HFP_AG_SUCCESS;
 }
 
@@ -646,6 +671,18 @@ int HfpAgProfile::NotifyIncomingCallWaiting(uint16_t type, const std::string &nu
     }
     commandProcessor_.SendAtCommand(dataConn_, cmd);
     return HFP_AG_SUCCESS;
+}
+
+void HfpAgProfile::SendBinp(std::string number) const
+{
+    std::string cmd("+BINP: ");
+    cmd.append(number);
+    if (!number.empty()) {
+        commandProcessor_.SendAtCommand(dataConn_, cmd);
+        SendResultCode(HFP_AG_RESULT_OK);
+    } else {
+        SendResultCode(HFP_AG_RESULT_ERROR);
+    }
 }
 
 int HfpAgProfile::SendRing() const
@@ -715,15 +752,14 @@ int HfpAgProfile::ProcessCurrentCallStateIncominging(
 
     dataConn_.clipNumber_ = number;
     dataConn_.clipType_ = type;
-
+    SendRingAndClip();
+    LOG_INFO("inBandRingTone_ %{public}d", dataConn_.inBandRingTone_);
     auto isAudioConnected = HfpAgAudioConnection::IsAudioConnected(address_);
     if ((preNumActiveCalls_ == 0) && (preNumHeldCalls_ == 0) &&
         (dataConn_.inBandRingTone_ == HFP_AG_INBAND_RING_ENABLE) &&
         (isAudioConnected == false)) {
         HfpAgProfileEventSender::GetInstance().UpdateScoConnectState(address_, HFP_AG_CONNECT_AUDIO_EVT);
         scoPostProcess_ = true;
-    } else {
-        SendRingAndClip();
     }
 
     return HFP_AG_SUCCESS;
@@ -831,6 +867,11 @@ int HfpAgProfile::ProcessPreviousCallStateIdle(int numActive, int numHeld)
         SendResultCode(HFP_AG_RESULT_NO_CARRIER);
     }
     return HFP_AG_SUCCESS;
+}
+
+void HfpAgProfile::startMock(int state)
+{
+    mockState_ = state;
 }
 
 void HfpAgProfile::SetCallStates(int numHeld, int numActive, int callState)

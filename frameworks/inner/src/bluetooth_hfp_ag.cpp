@@ -34,7 +34,7 @@ public:
     {
         HILOGI("enter");
     }
-    ~AgServiceObserver() override 
+    ~AgServiceObserver() override
     {
         HILOGI("enter");
     };
@@ -272,6 +272,24 @@ struct HandsFreeAudioGateway::impl {
         return false;
     }
 
+    bool IntoMock(const BluetoothRemoteDevice &device, int state)
+    {
+        HILOGI("enter");
+        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+            return proxy_->IntoMock(device.GetDeviceAddr(), state);
+        }
+        return false;
+    }
+
+    bool SendNoCarrier(const BluetoothRemoteDevice &device)
+    {
+        HILOGI("enter");
+        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy_->SendNoCarrier(BluetoothRawAddress(device.GetDeviceAddr()));
+        }
+        return false;
+    }
+
     BluetoothRemoteDevice GetActiveDevice()
     {
         HILOGI("enter");
@@ -500,6 +518,16 @@ bool HandsFreeAudioGateway::SetActiveDevice(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->SetActiveDevice(device);
+}
+
+bool HandsFreeAudioGateway::IntoMock(const BluetoothRemoteDevice &device, int state)
+{
+    return pimpl->IntoMock(device, state);
+}
+
+bool HandsFreeAudioGateway::SendNoCarrier(const BluetoothRemoteDevice &device)
+{
+    return pimpl->SendNoCarrier(device);
 }
 
 BluetoothRemoteDevice HandsFreeAudioGateway::GetActiveDevice() const

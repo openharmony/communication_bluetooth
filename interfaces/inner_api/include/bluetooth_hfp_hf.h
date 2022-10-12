@@ -305,6 +305,16 @@ public:
     bool RejectIncomingCall(const BluetoothRemoteDevice &device);
 
     /**
+     * @brief send key pressed event.
+     *
+     * @param device Remote device object.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+
+    bool SendKeyPressed(const BluetoothRemoteDevice &device);
+
+    /**
      * @brief Handle an incoming call.
      *
      * @param device Remote device object.
@@ -343,6 +353,18 @@ public:
      * @since 9
      */
     bool DialMemory(const BluetoothRemoteDevice &device, int index);
+
+
+    /**
+     * @brief send voice tag.
+     *
+     * @param device Remote device object.
+     * @param index voice tag index.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+
+    bool SendVoiceTag(const BluetoothRemoteDevice &device, int index);
 
     /**
      * @brief brief Finish a specified active call.

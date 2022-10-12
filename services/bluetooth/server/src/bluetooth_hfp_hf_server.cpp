@@ -340,6 +340,15 @@ bool BluetoothHfpHfServer::RejectIncomingCall(const BluetoothRawAddress &device)
     return false;
 }
 
+bool BluetoothHfpHfServer::SendKeyPressed(const BluetoothRawAddress &device) {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    RawAddress addr(device.GetAddress());
+    if (pimpl->HfpHfService_ != nullptr) {
+        return pimpl->HfpHfService_->SendKeyPressed(addr);
+    }
+    return false;
+}
+
 bool BluetoothHfpHfServer::HandleIncomingCall(const BluetoothRawAddress &device, int flag)
 {
     HILOGI("addr: %{public}s, flag: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), flag);
@@ -377,6 +386,15 @@ bool BluetoothHfpHfServer::HandleMultiCall(const BluetoothRawAddress &device, in
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpHfService_ != nullptr) {
         return pimpl->HfpHfService_->HandleMultiCall(addr, flag, index);
+    }
+    return false;
+}
+
+bool BluetoothHfpHfServer::SendVoiceTag(const BluetoothRawAddress &device, int index) {
+    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    RawAddress addr(device.GetAddress());
+    if (pimpl->HfpHfService_ != nullptr) {
+        return pimpl->HfpHfService_->SendVoiceTag(addr, index);
     }
     return false;
 }

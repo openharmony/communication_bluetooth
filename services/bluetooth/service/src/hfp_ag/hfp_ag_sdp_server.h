@@ -118,9 +118,11 @@ private:
      */
     int AddAttribute(const SdpAttribute &attribute) const;
 
-    inline static constexpr uint16_t HFP_AG_SERVER_CLASSID_NUM = 3;
+    inline static constexpr uint16_t HFP_AG_SERVER_CLASSID_NUM = 2;
+    inline static constexpr uint16_t HFP_AG_HSP_SERVER_CLASSID_NUM = 3;
     inline static constexpr uint16_t HFP_AG_SERVER_PROTOCOL_NUM = 2;
-    inline static constexpr uint16_t HFP_AG_SERVER_PROFILE_NUM = 2;
+    inline static constexpr uint16_t HFP_AG_SERVER_PROFILE_NUM = 1;
+    inline static constexpr uint16_t HFP_AG_HSP_SERVER_PROFILE_NUM = 2;
     inline static constexpr uint16_t HFP_AG_SERVER_BROWSE_LIST_NUM = 1;
     inline static constexpr uint16_t HFP_AG_SERVER_NETWORK_LENGTH = 1;
     inline static constexpr uint16_t HFP_AG_SERVER_FEATURES_LENGTH = 2;
@@ -128,6 +130,8 @@ private:
 
     // SDP service record handle
     uint32_t sdpHandle_ {0};
+
+    int hspState_ = 1;
 
     BT_DISALLOW_COPY_AND_ASSIGN(HfpAgSdpServer);
 };

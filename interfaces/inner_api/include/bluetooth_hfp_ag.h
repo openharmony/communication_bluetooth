@@ -239,6 +239,11 @@ public:
      */
     bool SetActiveDevice(const BluetoothRemoteDevice &device);
 
+    bool IntoMock(const BluetoothRemoteDevice &device, int state);
+
+    bool SendNoCarrier(const BluetoothRemoteDevice &device);
+
+
     /**
      * @brief Get the active device object.
      *
