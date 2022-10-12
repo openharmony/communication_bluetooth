@@ -356,6 +356,11 @@ config("btservice_config") {
 }
 
 ohos_shared_library("btservice") {
+  sanitize = {
+    cfi = true
+    blocklist = "./bluetooth_service_blocklist.txt"
+  }
+  stack_protector_ret = true
   configs = [ ":btservice_config" ]
   public_configs = [ ":btservice_public_config" ]
 
@@ -425,6 +430,10 @@ ohos_shared_library("btservice") {
 
 SBC_CODEC_DIR = "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbclib"
 ohos_shared_library("btsbc") {
+  sanitize = {
+    cfi = true
+  }
+  stack_protector_ret = true
   sources = [
     "$SBC_CODEC_DIR/src/sbc_decoder.cpp",
     "$SBC_CODEC_DIR/src/sbc_encoder.cpp",

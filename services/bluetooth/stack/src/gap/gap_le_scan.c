@@ -493,6 +493,7 @@ int GAP_DeregisterExScanCallback(void)
     return GAP_SUCCESS;
 }
 
+NO_SANITIZE("cfi")
 static void GapOnLeExtendedAdvertisingReportEventProcessOnce(const HciLeExtendedAdvertisingReport *report)
 {
     BtAddr addr;
@@ -633,7 +634,7 @@ static int GapLeSetExtendedScanParameters(
     return ret;
 }
 
-void GapLeSetExtendedScanParametersComplete(const HciLeSetExtendedScanParametersReturnParam *param)
+NO_SANITIZE("cfi") void GapLeSetExtendedScanParametersComplete(const HciLeSetExtendedScanParametersReturnParam *param)
 {
     if (g_leExScanCallback.callback.scanExSetParamResult) {
         g_leExScanCallback.callback.scanExSetParamResult(param->status, g_leExScanCallback.context);
@@ -670,7 +671,7 @@ static int GapLeSetExtendedScanEnable(uint8_t scanEnable, uint8_t filterDuplicat
     return HCI_LeSetExtendedScanEnable(&hciCmdParam);
 }
 
-void GapLeSetExtendedScanEnableComplete(const HciLeSetExtendedScanEnableReturnParam *param)
+NO_SANITIZE("cfi") void GapLeSetExtendedScanEnableComplete(const HciLeSetExtendedScanEnableReturnParam *param)
 {
     if (g_leExScanCallback.callback.scanExSetEnableResult) {
         g_leExScanCallback.callback.scanExSetEnableResult(param->status, g_leExScanCallback.context);

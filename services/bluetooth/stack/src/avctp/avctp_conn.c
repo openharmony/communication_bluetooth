@@ -75,6 +75,7 @@ void AvctCbConnDealloc(AvctCbConn *cbConn)
  * Param[in]    peerAddr  peer device address
  * Return       void
  */
+NO_SANITIZE("cfi")
 void AvctCbConnEvtCallback(const AvctCbConn *cbConn, uint8_t event, uint16_t result, const BtAddr *peerAddr)
 {
     LOG_DEBUG("[AVCT]---%{public}s: connId(%hhu) EventId(%hhu), result(%hu)", __func__, cbConn->connId, event, result);

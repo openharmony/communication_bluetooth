@@ -50,7 +50,7 @@ List *ListCreate(FreeDataCb cb)
     return newList;
 }
 
-static ListNode *ListFreeNode(List *list, ListNode *node)
+NO_SANITIZE("cfi") static ListNode *ListFreeNode(List *list, ListNode *node)
 {
     ASSERT(list);
     ASSERT(node);

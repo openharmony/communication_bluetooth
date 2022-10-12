@@ -95,7 +95,7 @@ int GAP_Inquiry(uint8_t mode, uint8_t inquiryLength)
     return ret;
 }
 
-void GapOnInquiryComplete(const HciInquiryCompleteEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnInquiryComplete(const HciInquiryCompleteEventParam *eventParam)
 {
     InquiryBlock *inquiryBlock = NULL;
 
@@ -129,7 +129,7 @@ void GapOnInquiryResult(const HciInquiryResultEventParam *eventParam)
     }
 }
 
-void GapOnInquiryResultRssi(const HciInquiryResultWithRssiEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnInquiryResultRssi(const HciInquiryResultWithRssiEventParam *eventParam)
 {
     BtmInquiryInfo inquiryInfo;
 
@@ -151,7 +151,7 @@ void GapOnInquiryResultRssi(const HciInquiryResultWithRssiEventParam *eventParam
     }
 }
 
-void GapOnEntendedInquiryResult(const HciExtendedInquiryResultEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnEntendedInquiryResult(const HciExtendedInquiryResultEventParam *eventParam)
 {
     BtmInquiryInfo inquiryInfo;
 
@@ -194,7 +194,7 @@ int GAP_InquiryCancel(void)
     return ret;
 }
 
-void GapInquiryCancelComplete(const HciInquiryCancelReturnParam *param)
+NO_SANITIZE("cfi") void GapInquiryCancelComplete(const HciInquiryCancelReturnParam *param)
 {
     LOG_DEBUG("%{public}s:", __FUNCTION__);
     InquiryBlock *inquiryBlock = NULL;
@@ -250,7 +250,7 @@ int GAP_GetRemoteName(const BtAddr *addr)
     return ret;
 }
 
-void GapOnGetRemoteNameComplete(const HciRemoteNameRequestCompleteEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnGetRemoteNameComplete(const HciRemoteNameRequestCompleteEventParam *eventParam)
 {
     LOG_DEBUG("%{public}s:", __FUNCTION__);
     RemoteNameBlock *remoteNameBlock = NULL;

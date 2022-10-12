@@ -993,7 +993,7 @@ static void BtmScoOnConnectionRequest(const HciConnectionRequestEventParam *even
     }
 }
 
-static void BtmScoOnDisconnectComplete(const HciDisconnectCompleteEventParam *param)
+NO_SANITIZE("cfi") static void BtmScoOnDisconnectComplete(const HciDisconnectCompleteEventParam *param)
 {
     MutexLock(g_scoListLock);
     BtmScoConnection *scoConnection =

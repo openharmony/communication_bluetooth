@@ -116,7 +116,7 @@ public:
         }
     }
 
-    void OnServiceAdded(GattService *Service, int ret)
+    NO_SANITIZE("cfi") void OnServiceAdded(GattService *Service, int ret)
     {
         int i;
         int err = OHOS_BT_STATUS_SUCCESS;
@@ -373,7 +373,7 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsRegister(BtUuid appUuid)
+NO_SANITIZE("cfi") int BleGattsRegister(BtUuid appUuid)
 {
     HILOGI("enter");
     if (g_GattsCallback == nullptr) {
@@ -465,7 +465,7 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number)
+NO_SANITIZE("cfi") int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number)
 {
     HILOGI("enter");
     string strUuid(srvcUuid.uuid);
@@ -538,7 +538,7 @@ static int ConvertPermissions(int permission)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
+NO_SANITIZE("cfi") int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
                               int properties, int permissions)
 {
     HILOGI("properties: %{public}d, permissions:%{public}d", properties, permissions);
@@ -576,7 +576,7 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int permissions)
+NO_SANITIZE("cfi") int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int permissions)
 {
     string strUuid(descUuid.uuid);
     HILOGI("descUuid: %{public}s", strUuid.c_str());
@@ -648,7 +648,7 @@ int BleGattsStopService(int serverId, int srvcHandle)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsDeleteService(int serverId, int srvcHandle)
+NO_SANITIZE("cfi") int BleGattsDeleteService(int serverId, int srvcHandle)
 {
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));

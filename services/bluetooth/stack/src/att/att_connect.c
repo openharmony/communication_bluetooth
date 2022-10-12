@@ -1651,7 +1651,7 @@ void ATT_DisconnectReq(uint16_t connectHandle)
  *
  * @param ctx Indicates the pointer to context.
  */
-static void AttLeConnectedAsync(const void *context)
+NO_SANITIZE("cfi") static void AttLeConnectedAsync(const void *context)
 {
     LOG_INFO("%{public}s enter", __FUNCTION__);
 

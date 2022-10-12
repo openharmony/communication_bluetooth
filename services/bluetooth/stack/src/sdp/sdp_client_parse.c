@@ -217,7 +217,7 @@ void SdpRemoveAllRequestByAddress(const BtAddr *addr)
     }
 }
 
-static void SdpCallbackError(const BtAddr *address, uint16_t transactionId)
+NO_SANITIZE("cfi") static void SdpCallbackError(const BtAddr *address, uint16_t transactionId)
 {
     SdpClientRequest *request = NULL;
 
@@ -779,6 +779,7 @@ static void SdpParseAttributeResponse(const BtAddr *addr, uint16_t lcid, uint16_
     SdpRemoveRequestByTransactionId(transactionId);
 }
 
+NO_SANITIZE("cfi")
 static void SdpParseSearchAttributeResponse(const BtAddr *addr, uint16_t lcid, uint16_t transactionId, Packet *packet)
 {
     SdpService serviceArray[SDP_SERVICE_ARRAY_NUMBER] = {0};

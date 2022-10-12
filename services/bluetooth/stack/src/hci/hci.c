@@ -98,7 +98,7 @@ static int HciInitQueue()
     return result;
 }
 
-static int HciInitHal()
+NO_SANITIZE("cfi") static int HciInitHal()
 {
     int result = BT_NO_ERROR;
 
@@ -234,7 +234,7 @@ static void WaitRxTaskComplete()
     }
 }
 
-void HCI_Close()
+NO_SANITIZE("cfi") void HCI_Close()
 {
     LOG_DEBUG("%{public}s start", __FUNCTION__);
 
@@ -320,7 +320,7 @@ static void HciOnReceivedHciPacket(BtPacketType type, const BtPacket *btPacket)
     }
 }
 
-static void HciSendPacketCallback(void *param)
+NO_SANITIZE("cfi") static void HciSendPacketCallback(void *param)
 {
     HciPacket *packet = QueueTryDequeue(g_hciTxQueue);
     if (packet != NULL) {
