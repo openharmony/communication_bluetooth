@@ -413,6 +413,37 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
 }
 
 /**
+ * @brief Set priority of the Gatt connection.
+ *
+ * @param clientId Indicates the ID of the GATT client.
+ * @param bdAddr Indicates the remote device's address.
+ * @param priority Indicates the priority of Gatt client {@link BtGattPriority}.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int BleGattcSetPriority(int clientId, const BdAddr *bdAddr, BtGattPriority priority)
+{
+    ClientIterator iter = GATTCLIENT.find(clientId);
+    if (iter == GATTCLIENT.end()) {
+        HILOGE("clientId: %{public}d, has not been registered.", clientId);
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    string strAddress;
+    ConvertAddr(bdAddr->addr, strAddress);
+    HILOGI("clientId: %{public}d, addr: %{public}s, priority: %{public}d",
+        clientId, GetEncryptAddr(strAddress).c_str(), priority);
+    if (iter->second.gattClient == nullptr || iter->second.remoteAddr != strAddress) {
+        HILOGE("fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    GattClient *client = iter->second.gattClient;
+    int result = client->RequestConnectionPriority(priority);
+    HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
+    return GetGattcResult(result);
+}
+
+/**
  * @brief Disconnect a Gatt connection with a remote device.
  *
  * @param clientId Indicates the ID of the GATT client.
