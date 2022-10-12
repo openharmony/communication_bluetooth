@@ -15,6 +15,7 @@
 
 #include "hfp_ag_statemachine.h"
 
+#include "adapter_config.h"
 #include "hfp_ag_data_connection_server.h"
 #include "hfp_ag_defines.h"
 #include "hfp_ag_message.h"
@@ -246,6 +247,7 @@ void HfpAgConnecting::Entry()
 {
     stateMachine_.NotifyStateTransitions();
     stateMachine_.StartConnectionTimer();
+    AdapterConfig::GetInstance()->GetValue(HSP_AG_STATE_SECTION_NAME, HSP_AG_STATE_PROPERY_NAME, hspState_);
 }
 
 void HfpAgConnecting::Exit()
@@ -290,6 +292,11 @@ bool HfpAgConnecting::Dispatch(const utility::Message &msg)
         case HFP_AG_SLC_ESTABLISHED_EVT:
             profile_.ProcessSlcEstablished();
             Transition(HfpAgStateMachine::CONNECTED);
+            break;
+        case HFP_AG_CONNECTED_EVT:
+            if (hspState_ == HSP_AG_STATE_HSP) {
+                Transition(HfpAgStateMachine::CONNECTED);
+            }
             break;
         case HFP_AG_CONTROL_OTHER_MODULES_EVT:
             eventProcessor_.ExecuteEventProcess(event);
@@ -390,6 +397,9 @@ bool HfpAgConnected::Dispatch(const utility::Message &msg)
             profile_.ReadData();
             break;
         case HFP_AG_CONTROL_OTHER_MODULES_EVT:
+            if (event.type_ == HFP_AG_MSG_TYPE_DIAL_CALL) {
+                profile_.SendResultCode(HFP_AG_RESULT_OK);
+            }
             eventProcessor_.ExecuteEventProcess(event);
             break;
         case HFP_AG_OPEN_VOICE_RECOGNITION_EVT:
@@ -410,6 +420,10 @@ bool HfpAgConnected::Dispatch(const utility::Message &msg)
         case HFP_AG_CALL_STATE_CHANGE:
             callState_ = event.state_.callState;
             ProcessPhoneStateChange(event);
+            break;
+        case HFP_AG_CALL_STATE_CHANGE_MOCK:
+            event.type_ = HFP_AG_CALL_STATE_CHANGE_MOCK;
+            eventProcessor_.ExecuteEventProcess(event);
             break;
         case HFP_AG_SEND_CCLC_RESPONSE:
         case HFP_AG_RESPONSE_CLCC_TIME_OUT_EVT:
@@ -435,6 +449,55 @@ bool HfpAgConnected::Dispatch(const utility::Message &msg)
             break;
         case HFP_AG_RING_TIMEOUT_EVT:
             profile_.SendRingAndClip();
+            break;
+        case HFP_AG_NOTIFY_INDICATOR_EVT:
+            eventProcessor_.ExecuteEventProcess(event);
+            break;
+        case HFP_AG_RESPONE_OK_EVT:
+            ProcessResponesOK();
+            break;
+        case HFP_AG_SEND_INCOMING_EVT:
+            profile_.NotifyIncomingCallWaiting(event.arg1_, event.str_);
+            LOG_INFO(" incoming call");
+            break;
+        case HFP_AG_SEND_CALL_SETUP_EVT:
+            LOG_INFO(" incoming call set up");
+            profile_.ReportCallsetupStatus(event.arg1_);
+            break;
+        case HFP_AG_SEND_CALL_HELD_EVT:
+            profile_.ReportCallheldStatus(event.arg1_);
+            break;
+        case HFP_AG_SEND_CALL_STATE_EVT:
+            profile_.ReportCallStatus(event.arg1_);
+            break;
+        case HFP_AG_GET_VOICE_NUMBER:
+            event.type_ = HFP_AG_GET_VOICE_NUMBER;
+            eventProcessor_.ExecuteEventProcess(event);
+            break;
+        case HFP_AG_SEND_BINP_EVT:
+            profile_.SendBinp(event.str_);
+            break;
+        case HFP_AG_GET_BTRH_EVT:
+        case HFP_AG_SET_BTRH_EVT:
+            eventProcessor_.ExecuteEventProcess(event);
+            break;
+        case HFP_AG_SEND_RESPONSE_HOLD_STATE:
+            profile_.ReportResponseHoldStatus(event.arg1_, -1);
+            break;
+        case HFP_AG_SEND_BTRH_EVT:
+            profile_.ReportResponseHoldStatus(event.arg1_, event.arg3_);
+            break;
+        case HFP_AG_SEND_NO_CARRIER:
+            profile_.SendResultCode(HFP_AG_RESULT_NO_CARRIER);
+            break;
+        case HFP_AG_START_MOCK:
+            profile_.startMock(event.arg1_);
+            break;
+        case HFP_AG_MOCK_RING:
+            profile_.SendResultCode(HFP_AG_RESULT_RING);
+            break;
+        case HFP_AG_MOCK_CLIP:
+            profile_.NotifyCallingLineIdentification(CALL_TYPE_DEFAULT, event.str_);
             break;
         default:
             break;
@@ -466,6 +529,11 @@ void HfpAgConnected::ProcessPhoneStateChange(const HfpAgMessage &event) const
 void HfpAgConnected::ProcessResponseClcc(const HfpAgMessage &event) const
 {
     profile_.ReportCurrentCallList(event.call_);
+}
+
+void HfpAgConnected::ProcessResponesOK() const
+{
+    profile_.ResponesOK();
 }
 
 void HfpAgAudioConnecting::Entry()

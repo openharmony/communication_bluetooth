@@ -15,6 +15,7 @@
 
 #include "hfp_ag_sdp_server.h"
 
+#include "adapter_config.h"
 #include "hfp_ag_data_connection.h"
 #include "hfp_ag_defines.h"
 #include "raw_address.h"
@@ -34,6 +35,9 @@ int HfpAgSdpServer::RegisterSdpService(uint8_t scn)
         LOG_ERROR("[HFP AG]%{public}s():Unavailable server channel number", __FUNCTION__);
         return HFP_AG_FAILURE;
     }
+
+    AdapterConfig::GetInstance()->GetValue(HSP_AG_STATE_SECTION_NAME, HSP_AG_STATE_PROPERY_NAME, hspState_);
+    LOG_INFO("[HFP AG]HSP STATE = %{public}d", hspState_);
 
     // Create and register service record
     sdpHandle_ = SDP_CreateServiceRecord();
@@ -78,14 +82,34 @@ int HfpAgSdpServer::DeregisterSdpService()
 
 int HfpAgSdpServer::AddServiceClassId() const
 {
-    BtUuid classId[HFP_AG_SERVER_CLASSID_NUM];
-    classId[0].type = BT_UUID_16;
-    classId[0].uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
-    classId[1].type = BT_UUID_16;
-    classId[1].uuid16 = HFP_AG_UUID_SERVCLASS_GENERIC_AUDIO;
-    classId[HSP_AG_SERVER_CLASSID_NUM].type = BT_UUID_16;
-    classId[HSP_AG_SERVER_CLASSID_NUM].uuid16 = HSP_AG_UUID_SERVCLASS;
-    return SDP_AddServiceClassIdList(sdpHandle_, classId, HFP_AG_SERVER_CLASSID_NUM);
+    switch(hspState_) {
+        case HSP_AG_STATE_BOTH:
+            BtUuid classIdBoth[HFP_AG_HSP_SERVER_CLASSID_NUM];
+            classIdBoth[0].type = BT_UUID_16;
+            classIdBoth[0].uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
+            classIdBoth[1].type = BT_UUID_16;
+            classIdBoth[1].uuid16 = HFP_AG_UUID_SERVCLASS_GENERIC_AUDIO;
+            classIdBoth[2].type = BT_UUID_16;
+            classIdBoth[2].uuid16 = HSP_AG_UUID_SERVCLASS;
+            return SDP_AddServiceClassIdList(sdpHandle_, classIdBoth, HFP_AG_HSP_SERVER_CLASSID_NUM);
+        case HSP_AG_STATE_HSP:
+            BtUuid classIdHsp[HFP_AG_SERVER_CLASSID_NUM];
+            classIdHsp[0].type = BT_UUID_16;
+            classIdHsp[0].uuid16 = HSP_AG_UUID_SERVCLASS;
+            classIdHsp[1].type = BT_UUID_16;
+            classIdHsp[1].uuid16 = HFP_AG_UUID_SERVCLASS_GENERIC_AUDIO;
+            return SDP_AddServiceClassIdList(sdpHandle_, classIdHsp, HFP_AG_SERVER_CLASSID_NUM);
+        case HSP_AG_STATE_NONE:
+            BtUuid classIdHfp[HFP_AG_SERVER_CLASSID_NUM];
+            classIdHfp[0].type = BT_UUID_16;
+            classIdHfp[0].uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
+            classIdHfp[1].type = BT_UUID_16;
+            classIdHfp[1].uuid16 = HFP_AG_UUID_SERVCLASS_GENERIC_AUDIO;
+            return SDP_AddServiceClassIdList(sdpHandle_, classIdHfp, HFP_AG_SERVER_CLASSID_NUM);
+        default:
+            break;
+    }
+    return BT_CONFIG_ERROR;
 }
 
 int HfpAgSdpServer::AddProtocol(uint8_t scn) const
@@ -104,14 +128,32 @@ int HfpAgSdpServer::AddProtocol(uint8_t scn) const
 
 int HfpAgSdpServer::AddProfile() const
 {
-    SdpProfileDescriptor profile[HFP_AG_SERVER_PROFILE_NUM];
-    profile[0].profileUuid.type = BT_UUID_16;
-    profile[0].profileUuid.uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
-    profile[0].versionNumber = HFP_AG_HFP_VERSION_1_7;
-    profile[1].profileUuid.type = BT_UUID_16;
-    profile[1].profileUuid.uuid16 = HSP_UUID_SERVCLASS;
-    profile[1].versionNumber = HSP_AG_HSP_VERSION_1_2;
-    return SDP_AddBluetoothProfileDescriptorList(sdpHandle_, profile, HFP_AG_SERVER_PROFILE_NUM);
+    switch(hspState_) {
+        case HSP_AG_STATE_BOTH:
+            SdpProfileDescriptor profileBoth[HFP_AG_HSP_SERVER_PROFILE_NUM];
+            profileBoth[0].profileUuid.type = BT_UUID_16;
+            profileBoth[0].profileUuid.uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
+            profileBoth[0].versionNumber = HFP_AG_HFP_VERSION_1_7;
+            profileBoth[1].profileUuid.type = BT_UUID_16;
+            profileBoth[1].profileUuid.uuid16 = HSP_AG_UUID_SERVCLASS;
+            profileBoth[1].versionNumber = HSP_AG_HSP_VERSION_1_2;
+            return SDP_AddBluetoothProfileDescriptorList(sdpHandle_, profileBoth, HFP_AG_HSP_SERVER_PROFILE_NUM);
+        case HSP_AG_STATE_HSP:
+            SdpProfileDescriptor profileHsp[HFP_AG_SERVER_PROFILE_NUM];
+            profileHsp[0].profileUuid.type = BT_UUID_16;
+            profileHsp[0].profileUuid.uuid16 = HSP_AG_UUID_SERVCLASS;
+            profileHsp[0].versionNumber = HSP_AG_HSP_VERSION_1_2;
+            return SDP_AddBluetoothProfileDescriptorList(sdpHandle_, profileHsp, HFP_AG_SERVER_PROFILE_NUM);
+        case HSP_AG_STATE_NONE:
+            SdpProfileDescriptor profileHfp[HFP_AG_SERVER_PROFILE_NUM];
+            profileHfp[0].profileUuid.type = BT_UUID_16;
+            profileHfp[0].profileUuid.uuid16 = HFP_AG_UUID_SERVCLASS_HFP_AG;
+            profileHfp[0].versionNumber = HFP_AG_HFP_VERSION_1_7;
+            return SDP_AddBluetoothProfileDescriptorList(sdpHandle_, profileHfp, HFP_AG_SERVER_PROFILE_NUM);
+        default:
+            break;
+    }
+    return BT_CONFIG_ERROR;
 }
 
 int HfpAgSdpServer::AddServiceName() const

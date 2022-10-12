@@ -477,6 +477,58 @@ bool BluetoothHfpHfProxy::DialMemory(const BluetoothRawAddress &device, int inde
     return reply.ReadBool();
 }
 
+bool BluetoothHfpHfProxy::SendVoiceTag(const BluetoothRawAddress &device, int index) {
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
+        HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteInterfaceToken error");
+        return false;
+    }
+    if (!data.WriteParcelable(&device)) {
+        HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteParcelable error");
+        return false;
+    }
+
+    if (!data.WriteInt32(index)) {
+        HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteInt32 error");
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(
+        IBluetoothHfpHf::Code::BT_HFP_HF_SEND_VOICE_TAG, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHfpHfProxy::SendVoiceTag done fail, error: %{public}d", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool BluetoothHfpHfProxy::SendKeyPressed(const BluetoothRawAddress &device) {
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
+        HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteInterfaceToken error");
+        return false;
+    }
+    if (!data.WriteParcelable(&device)) {
+        HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteParcelable error");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(
+        IBluetoothHfpHf::Code::BT_HFP_HF_SEND_KEY_PRESSED, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHfpHfProxy::SendKeyPressed done fail, error: %{public}d", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
 bool BluetoothHfpHfProxy::FinishActiveCall(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call) {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {

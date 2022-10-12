@@ -286,9 +286,20 @@ void HfpAgService::ProcessEvent(const HfpAgMessage &event)
         case HFP_AG_NOTIFY_SIGNAL_STRENGTH:
         case HFP_AG_NOTIFY_BATTERY_LEVEL:
         case HFP_AG_CALL_STATE_CHANGE:
+        case HFP_AG_CALL_STATE_CHANGE_MOCK:
         case HFP_AG_SEND_CCLC_RESPONSE:
         case HFP_AG_DIALING_OUT_RESULT:
         case HFP_AG_SET_INBAND_RING_TONE_EVT:
+        case HFP_AG_SEND_INCOMING_EVT:
+        case HFP_AG_SEND_CALL_SETUP_EVT:
+        case HFP_AG_SEND_BINP_EVT:
+        case HFP_AG_GET_BTRH_EVT:
+        case HFP_AG_SET_BTRH_EVT:
+        case HFP_AG_SEND_RESPONSE_HOLD_STATE:
+        case HFP_AG_SEND_BTRH_EVT:
+        case HFP_AG_SEND_NO_CARRIER:
+        case HFP_AG_START_MOCK:
+        case HFP_AG_SEND_CALL_HELD_EVT:
             SendEventToEachStateMachine(event);
             break;
         default:
@@ -441,10 +452,50 @@ void HfpAgService::SendEventToEachStateMachine(const HfpAgMessage &event) const
     }
 }
 
+void HfpAgService::UpdateAgIndicators() const
+{
+    HfpAgMessage evt(HFP_AG_NOTIFY_INDICATOR_EVT);
+    evt.type_ = HFP_AG_NOTIFY_INDICATOR_EVT;
+    for (auto it = stateMachines_.begin(); it != stateMachines_.end(); ++it) {
+        if (it->second != nullptr) {
+            evt.dev_ = it->first;
+            it->second->ProcessMessage(evt);
+        }
+    }
+}
+
+void HfpAgService::UpdateMockCallList(int callState, const std::string &number, int type)
+{
+    HfpAgMessage curEvent(HFP_AG_CALL_STATE_CHANGE_MOCK);
+    curEvent.state_.callState = callState;
+    curEvent.state_.number = number;
+    curEvent.state_.type = type;
+    PostEvent(curEvent);
+    MockCall call;
+    call.callstate = callState;
+    call.number = number;
+    call.type = CALL_TYPE_DEFAULT;
+    int sameindex = -1;
+    LOG_INFO("HFP AG MOCK moko changed number = %{public}s, state = %{public}d", number.c_str(), callState);
+    for (int i = 0; i < callList_.size(); i++) {
+        if (strcmp(callList_[i].number.c_str(), number.c_str()) == 0) {
+            sameindex = i;
+        }
+    }
+    if (sameindex != -1) {
+        callList_.erase(callList_.begin() + sameindex);
+    }
+    callList_.push_back(call);
+}
+
 void HfpAgService::PhoneStateChanged(
     int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
 {
-    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    LOG_INFO("[HFP AG]%{public}s(): ==========<start>==========", __FUNCTION__);
+    if (mockState_ == HFP_AG_MOCK) {
+        UpdateMockCallList(callState, number, type);
+        return;
+    }
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (dialingOutTimeout_ != nullptr) {
         if ((callState == HFP_AG_CALL_STATE_ACTIVE) || (callState == HFP_AG_CALL_STATE_IDLE)) {
@@ -477,6 +528,7 @@ void HfpAgService::PhoneStateChanged(
     curEvent.state_.type = type;
     curEvent.state_.name = name;
     PostEvent(curEvent);
+    UpdateAgIndicators();
 }
 
 void HfpAgService::ClccResponse(
@@ -574,6 +626,11 @@ void HfpAgService::SendCloseVoiceEvent(const std::string &address)
     isVrOpened_ = false;
 }
 
+void HfpAgService::SendMockCmd(const HfpAgMessage &event)
+{
+    SendEventToEachStateMachine(event);
+}
+
 bool HfpAgService::SetActiveDevice(const RawAddress &device)
 {
     LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
@@ -593,6 +650,40 @@ bool HfpAgService::SetActiveDevice(const RawAddress &device)
     }
 
     return true;
+}
+
+bool HfpAgService::IntoMock(int state)
+{
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    mockState_ = state;
+    HfpAgMessage evt(HFP_AG_START_MOCK);
+    evt.arg1_ = state;
+    PostEvent(evt);
+    if (state == HFP_AG_MOCK_DEFAULT) {
+        callList_.clear();
+    }
+    return true;
+}
+
+bool HfpAgService::SendNoCarrier(const RawAddress &device)
+{
+    LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    std::string address = device.GetAddress();
+    HfpAgMessage evt(HFP_AG_SEND_NO_CARRIER);
+    evt.dev_ = address;
+    PostEvent(evt);
+    return true;
+}
+
+int HfpAgService::GetMockState()
+{
+    return mockState_;
+}
+
+std::vector<MockCall> HfpAgService::GetCallList()
+{
+    return callList_;
 }
 
 void HfpAgService::ClearActiveDevice()
@@ -630,6 +721,28 @@ std::string HfpAgService::GetActiveDevice()
 void HfpAgService::NotifyAgIndicatorStateChanged(int what, int state)
 {
     HfpAgMessage curEvent(what, state);
+    PostEvent(curEvent);
+}
+
+void HfpAgService::NotifyAgIncomingStateChanged(int what, std::string number, int type)
+{
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    HfpAgMessage curEvent(what, type);
+    curEvent.str_ = number;
+    PostEvent(curEvent);
+}
+
+void HfpAgService::NotifyAgResponseHoldStateChanged(int what, int state)
+{
+    LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
+    HfpAgMessage curEvent(what, state);
+    PostEvent(curEvent);
+}
+
+void HfpAgService::SendBinpNumber(std::string number)
+{
+    HfpAgMessage curEvent(HFP_AG_SEND_BINP_EVT);
+    curEvent.str_ = number;
     PostEvent(curEvent);
 }
 
@@ -709,6 +822,9 @@ void HfpAgService::NotifyHfBatteryLevel(const RawAddress &device, int indValue)
 
 bool HfpAgService::DialOutCallByHf(const std::string &address)
 {
+    if (mockState_ == HFP_AG_MOCK) {
+        return true;
+    }
     if (dialingOutTimeout_ != nullptr) {
         LOG_ERROR("[HFP AG]%{public}s():already dialing out!", __FUNCTION__);
         return false;
@@ -976,6 +1092,13 @@ void HfpAgService::SetInbandRing(bool action)
     isInbandRinging_ = action;
     HfpAgMessage curEvent(HFP_AG_SET_INBAND_RING_TONE_EVT, action);
     PostEvent(curEvent);
+}
+
+void HfpAgService::ResponesOK(const std::string &address)
+{
+    HfpAgMessage event(HFP_AG_RESPONE_OK_EVT);
+    event.dev_ = address;
+    PostEvent(event);
 }
 
 bool HfpAgService::IsConnected(const std::string &address) const

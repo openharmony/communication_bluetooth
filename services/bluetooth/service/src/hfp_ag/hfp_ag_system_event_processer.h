@@ -192,6 +192,28 @@ private:
     void VoiceRecognitionStateChanged(int status);
 
     /**
+     * @brief process the event of update AG indicator.
+     */
+    void UpdataAgIndicator();
+
+    /**
+     * @brief get voice number.
+     */
+    void GetVoiceNumber();
+
+    /**
+     * @brief get response hold state.
+     */
+    void GetResponseHoldState(std::string address);
+
+    void SetResponseHold(std::string address, int btrh);
+
+    /**
+     * @brief get response hold state.
+     */
+    void HandlePhoneStateMock(std::string number, int state, int type);
+
+    /**
      * @brief Get the control other modules event type.
      *
      * @param type Event type number.

@@ -136,6 +136,10 @@ std::unordered_map<std::string, HfpAgCommandProcessor::HfpAgAtHandler> HfpAgComm
                                                             &HfpAgCommandProcessor::CkpdSetter,
                                                             &HfpAgCommandProcessor::AtEmptyFn,
                                                             &HfpAgCommandProcessor::AtEmptyFn}),
+    std::make_pair<std::string, HfpAgAtHandler>("AT+BINP", {&HfpAgCommandProcessor::AtEmptyFn,
+                                                            &HfpAgCommandProcessor::BinpSetter,
+                                                            &HfpAgCommandProcessor::AtEmptyFn,
+                                                            &HfpAgCommandProcessor::AtEmptyFn}),
 };
 
 int HfpAgCommandProcessor::StoiTryCatch(HfpAgDataConnection &dataConn, const std::string &arg)
@@ -277,10 +281,13 @@ void HfpAgCommandProcessor::CcwaSetter(HfpAgDataConnection &dataConn, const std:
 void HfpAgCommandProcessor::ChldSetter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
     int chld = StoiTryCatch(dataConn, arg);
+    LOG_INFO("[HFP AG] ChldSetter chld = %{public}d, arg = %{public}s", chld, arg.c_str());
     if (!(dataConn.g_localFeatures & HFP_AG_FEATURES_ENHANCED_CALL_CONTROL) &&
         (dataConn.remoteFeatures_ & HFP_AG_HF_FEATURES_ENHANCED_CALL_CONTROL)) {
         if (chld != CHLD_RELEASE_ALL_HELD_CALLS && chld != CHLD_RELEASE_ACTIVE_ACCPET_OTHER &&
-            chld != CHLD_RELEASE_HOLD_ACCPET_OTHER) {
+            chld != CHLD_RELEASE_HOLD_ACCPET_OTHER && chld != CHLD_ADD_CALL_TO_CONVERSATION &&
+            chld != CHLD_CONNECT_TWO_CALL && chld != CHLD_RELEASE_INDEX_ONE && chld != CHLD_RELEASE_INDEX_TWO &&
+            chld != CHLD_CONSULTATION_INDEX_ONE && chld != CHLD_CONSULTATION_INDEX_TWO) {
             // we does not support enhanced call control(AT+CHLD=1<idx> / AT+CHLD=2<idx>)
             SendErrorCode(dataConn, HFP_AG_ERROR_AG_FAILURE);
             return;
@@ -693,12 +700,21 @@ void HfpAgCommandProcessor::BacSetter(HfpAgDataConnection &dataConn, const std::
 
 void HfpAgCommandProcessor::BtrhGetter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
-    SendErrorCode(dataConn, HFP_AG_ERROR_OPERATION_NOT_SUPPORTED);
+    LOG_INFO("[HFP AG]%{public}s():BtrhGetter arg = %{public}s", __FUNCTION__, arg.c_str());
+    HfpAgProfileEventSender::GetInstance().GetResponseHoldState(dataConn.remoteAddr_, HFP_AG_GET_BTRH_EVT);
 }
 
 void HfpAgCommandProcessor::BtrhSetter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
-    SendErrorCode(dataConn, HFP_AG_ERROR_OPERATION_NOT_SUPPORTED);
+    LOG_INFO("[HFP AG]%{public}s():BtrhSetter arg = %{public}s", __FUNCTION__, arg.c_str());
+    int btrh = StoiTryCatch(dataConn, arg);
+    HfpAgProfileEventSender::GetInstance().SetResponseHoldState(dataConn.remoteAddr_, HFP_AG_GET_BTRH_EVT, btrh);
+}
+
+void HfpAgCommandProcessor::BinpSetter(HfpAgDataConnection &dataConn, const std::string &arg)
+{
+    LOG_INFO("[HFP AG]%{public}s():BinpGetter arg = %{public}s", __FUNCTION__, arg.c_str());
+    HfpAgProfileEventSender::GetInstance().GetVoiceTagNumber(dataConn.remoteAddr_);
 }
 
 void HfpAgCommandProcessor::CkpdSetter(HfpAgDataConnection &dataConn, const std::string &arg)

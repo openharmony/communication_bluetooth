@@ -63,6 +63,12 @@ BluetoothHfpAgStub::BluetoothHfpAgStub() {
         BluetoothHfpAgStub::Code::BT_HFP_AG_GET_ACTIVE_DEVICE)] =
         &BluetoothHfpAgStub::GetActiveDeviceInner;
     memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpAgStub::Code::BT_HFP_AG_INTO_MOCK)] =
+        &BluetoothHfpAgStub::IntoMockInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpAgStub::Code::BT_HFP_AG_SEND_NO_CARRIER)] =
+        &BluetoothHfpAgStub::SendNoCarrierInner;
+    memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpAgStub::Code::BT_HFP_AG_REGISTER_OBSERVER)] =
         &BluetoothHfpAgStub::RegisterObserverInner;
     memberFuncMap_[static_cast<uint32_t>(
@@ -265,6 +271,37 @@ ErrCode BluetoothHfpAgStub::SetActiveDeviceInner(MessageParcel &data, MessagePar
     }
     return NO_ERROR;
 }
+
+ErrCode BluetoothHfpAgStub::IntoMockInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    int state = data.ReadInt32();
+    int result = IntoMock(*device, state);
+    if (!reply.WriteInt32(result)) {
+        HILOGE("BluetoothHfpAgStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHfpAgStub::SendNoCarrierInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    int result = SendNoCarrier(*device);
+    if (!reply.WriteInt32(result)) {
+        HILOGE("BluetoothHfpAgStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
+
 
 ErrCode BluetoothHfpAgStub::GetActiveDeviceInner(MessageParcel &data, MessageParcel &reply) {
     std::string result = GetActiveDevice();

@@ -17,6 +17,7 @@
 
 #include <regex>
 
+#include "adapter_config.h"
 #include "hfp_hf_profile_event_sender.h"
 #include "log.h"
 #include "securec.h"
@@ -69,6 +70,7 @@ int HfpHfCommandProcessor::StoiTryCatch(const std::string &arg)
 void HfpHfCommandProcessor::Init(const std::string& address)
 {
     this->address_ = address;
+    AdapterConfig::GetInstance()->GetValue(HSP_HS_STATE_SECTION_NAME, HSP_HS_STATE_PROPERY_NAME, hspState_);
     respTimer_ = std::make_unique<utility::Timer>(std::bind(&HfpHfCommandProcessor::RespondTimeout, this));
 }
 
@@ -804,6 +806,10 @@ void HfpHfCommandProcessor::SendAtBindTester(HfpHfDataConnection &dataConn)
 void HfpHfCommandProcessor::RespondTimeout()
 {
     LOG_DEBUG("[HFP HF]%{public}s()", __FUNCTION__);
+    if (hspState_ == HSP_HS_STATE_HSP) {
+        LOG_INFO("[HFP HF] hsp only remove time out");
+        return;
+    }
     HfpHfProfileEventSender& instance = HfpHfProfileEventSender::GetInstance();
     instance.GetDispatchter()->PostTask(
         std::bind(&HfpHfProfileEventSender::UpdateConnectState, &instance, address_, HFP_HF_DISCONNECT_EVT));
@@ -813,7 +819,7 @@ void HfpHfCommandProcessor::SendAtCommand(
     HfpHfDataConnection &dataConn, const std::string &command, int commandId)
 {
     std::string fullCommand(command + "\r");
-    if (currentCommand_ == AT_COMMAND_NONE || !dataConn.slcConnected_) {
+    if (currentCommand_ == AT_COMMAND_NONE || !dataConn.slcConnected_ || (hspState_ == HSP_HS_STATE_HSP)) {
         LOG_DEBUG("[HFP HF]%{public}s(): commandId[%{public}d], command[%{public}s]", __FUNCTION__, commandId, command.c_str());
         currentCommand_ = commandId;
         std::size_t cmdLength = fullCommand.length();

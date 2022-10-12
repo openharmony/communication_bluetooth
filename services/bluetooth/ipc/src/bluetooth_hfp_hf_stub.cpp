@@ -63,6 +63,9 @@ BluetoothHfpHfStub::BluetoothHfpHfStub() {
         BluetoothHfpHfStub::Code::BT_HFP_HF_REJECT_INCOMING_CALL)] =
         &BluetoothHfpHfStub::RejectIncomingCallInner;
     memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpHfStub::Code::BT_HFP_HF_SEND_KEY_PRESSED)] =
+        &BluetoothHfpHfStub::SendKeyPressedInner;
+    memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfStub::Code::BT_HFP_HF_HANDLE_INCOMING_CALL)] =
         &BluetoothHfpHfStub::HandleIncomingCallInner;
     memberFuncMap_[static_cast<uint32_t>(
@@ -74,6 +77,9 @@ BluetoothHfpHfStub::BluetoothHfpHfStub() {
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfStub::Code::BT_HFP_HF_DIAL_MEMORY)] =
         &BluetoothHfpHfStub::DialMemoryInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpHfStub::Code::BT_HFP_HF_SEND_VOICE_TAG)] =
+        &BluetoothHfpHfStub::SendVoiceTagInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfStub::Code::BT_HFP_HF_FINISH_ATIVE_CALL)] =
         &BluetoothHfpHfStub::FinishActiveCallInner;
@@ -301,6 +307,19 @@ ErrCode BluetoothHfpHfStub::HoldActiveCallInner(MessageParcel &data, MessageParc
     return NO_ERROR;
 }
 
+ErrCode BluetoothHfpHfStub::SendKeyPressedInner(MessageParcel &data, MessageParcel &reply) {
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    int result = SendKeyPressed(*device);
+    if (!reply.WriteBool(result)) {
+        HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
 ErrCode BluetoothHfpHfStub::RejectIncomingCallInner(MessageParcel &data, MessageParcel &reply) {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
@@ -378,6 +397,23 @@ ErrCode BluetoothHfpHfStub::DialMemoryInner(MessageParcel &data, MessageParcel &
     }
     return NO_ERROR;
 }
+
+ErrCode BluetoothHfpHfStub::SendVoiceTagInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    int index = data.ReadInt32();
+    HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s. index = %{publilc}d", __func__, index);
+    int result = SendVoiceTag(*device, index);
+    if (!reply.WriteBool(result)) {
+        HILOGE("BluetoothHfpHfStub: reply writing failed in: %{public}s.", __func__);
+        return ERR_INVALID_VALUE;
+    }
+    return NO_ERROR;
+}
+
 
 ErrCode BluetoothHfpHfStub::FinishActiveCallInner(MessageParcel &data, MessageParcel &reply) {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());

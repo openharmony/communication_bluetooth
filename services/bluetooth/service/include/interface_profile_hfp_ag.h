@@ -218,6 +218,24 @@ public:
     virtual bool SetActiveDevice(const RawAddress &device) = 0;
 
     /**
+     * @brief Set mock state.
+     *
+     * @param state mock state.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    virtual bool IntoMock(int state) = 0;
+
+    /**
+     * @brief Set no carrier.
+     *
+     * @param device Remote device object..
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    virtual bool SendNoCarrier(const RawAddress &device) = 0;
+
+    /**
      * @brief Get the active device object.
      *
      * @param device Remote active device object.

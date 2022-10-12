@@ -193,6 +193,22 @@ public:
     void UpdateScoConnectState(const std::string &device, int what) const;
 
     /**
+     * @brief Get response and hold state.
+     *
+     * @param device Remote bluetooth address.
+     * @param what The event tag.
+     */
+    void GetResponseHoldState(const std::string &device, int what) const;
+
+    /**
+     * @brief Get response and hold state.
+     *
+     * @param device Remote bluetooth address.
+     * @param what The event tag.
+     */
+    void SetResponseHoldState(const std::string &device, int what, int btrh) const;
+
+    /**
      * @brief Process the result of the sdp discovery.
      *
      * @param device Remote bluetooth address.
@@ -228,6 +244,13 @@ public:
      * @param device Remote bluetooth address.
      */
     void SendRingAndClip(const std::string &device) const;
+
+    /**
+     * @brief Get voice number.
+     *
+     * @param device Remote bluetooth address.
+     */
+    void GetVoiceTagNumber(const std::string &device) const;
 
     /**
      * @brief Process CKpd Event.

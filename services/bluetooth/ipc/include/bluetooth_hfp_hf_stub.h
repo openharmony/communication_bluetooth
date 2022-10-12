@@ -47,10 +47,12 @@ private:
     ErrCode AcceptIncomingCallInner(MessageParcel &data, MessageParcel &reply);
     ErrCode HoldActiveCallInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RejectIncomingCallInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SendKeyPressedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIncomingCallInner(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleMultiCallInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DialLastNumberInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DialMemoryInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SendVoiceTagInner(MessageParcel &data, MessageParcel &reply);
     ErrCode FinishActiveCallInner(MessageParcel &data, MessageParcel &reply);
     ErrCode StartDialInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RegisterObserverInner(MessageParcel &data, MessageParcel &reply);

@@ -291,6 +291,15 @@ public:
     virtual bool RejectIncomingCall(const RawAddress &device) = 0;
 
     /**
+     * @brief Send key pressed event.
+     *
+     * @param device Remote device object.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    virtual bool SendKeyPressed(const RawAddress &device) = 0;
+
+    /**
      * @brief Handle an incoming call.
      *
      * @param device Remote device object.
@@ -329,6 +338,16 @@ public:
      * @since 9
      */
     virtual bool DialMemory(const RawAddress &device, int index) = 0;
+
+    /**
+     * @brief Send voice tag.
+     *
+     * @param device Remote device object.
+     * @param index voice tag index.
+     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
+     * @since 9
+     */
+    virtual bool SendVoiceTag(const RawAddress &device, int index) = 0;
 
     /**
      * @brief Finish a specified active call.
