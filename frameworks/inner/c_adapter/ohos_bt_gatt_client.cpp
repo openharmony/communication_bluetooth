@@ -119,8 +119,8 @@ public:
 
     void OnConnectionStateChanged(int connectionState, int ret)
     {
-        if (appCallback_ == nullptr || appCallback_->ConnectionStateCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->ConnectionStateCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
 
@@ -131,8 +131,8 @@ public:
 
     void OnConnectionParameterChanged(int interval, int latency, int timeout, int status)
     {
-        if (appCallback_ == nullptr || appCallback_->connectParaUpdateCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->connectParaUpdateCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
 
@@ -143,8 +143,8 @@ public:
 
     void OnServicesDiscovered(int status)
     {
-        if (appCallback_ == nullptr || appCallback_->searchServiceCompleteCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->searchServiceCompleteCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
 
@@ -154,8 +154,8 @@ public:
 
     void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
     {
-        if (appCallback_ == nullptr || appCallback_->readCharacteristicCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->readCharacteristicCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
         if (characteristic.GetService() == nullptr) {
@@ -181,8 +181,8 @@ public:
 
     void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret)
     {
-        if (appCallback_ == nullptr || appCallback_->writeCharacteristicCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->writeCharacteristicCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
         if (characteristic.GetService() == nullptr) {
@@ -203,8 +203,8 @@ public:
 
     void OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
     {
-        if (appCallback_ == nullptr || appCallback_->readDescriptorCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->readDescriptorCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
 
@@ -234,7 +234,7 @@ public:
     void OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret)
     {
         if (appCallback_ == nullptr || appCallback_->writeDescriptorCb == NULL) {
-            HILOGI("callback null.");
+            HILOGI("callback is null.");
             return;
         }
 
@@ -260,8 +260,8 @@ public:
 
     void OnMtuUpdate(int mtu, int ret)
     {
-        if (appCallback_ == nullptr || appCallback_->configureMtuSizeCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->configureMtuSizeCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
 
@@ -271,8 +271,8 @@ public:
 
     void OnSetNotifyCharacteristic(int status)
     {
-        if (appCallback_ == nullptr || appCallback_->registerNotificationCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->registerNotificationCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
 
@@ -282,8 +282,8 @@ public:
 
     void OnCharacteristicChanged(const GattCharacteristic &characteristic)
     {
-        if (appCallback_ == nullptr || appCallback_->notificationCb == NULL) {
-            HILOGI("callback null.");
+        if (appCallback_ == nullptr || appCallback_->notificationCb == nullptr) {
+            HILOGI("callback is null.");
             return;
         }
         if (characteristic.GetService() == nullptr) {
@@ -372,6 +372,10 @@ int BleGattcUnRegister(int clientId)
 int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdAddr,
     bool isAutoConnect, BtTransportType transport)
 {
+    if (func == nullptr || bdAddr == nullptr) {
+        HILOGE("func or bdAddr is null.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("clientId: %{public}d, has not been registered.", clientId);
@@ -445,7 +449,7 @@ int BleGattcDisconnect(int clientId)
  */
 int BleGattcSearchServices(int clientId)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId: %{public}d", clientId);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("clientId: %{public}d, has not been registered.", clientId);
@@ -473,7 +477,7 @@ int BleGattcSearchServices(int clientId)
  */
 bool BleGattcGetService(int clientId, BtUuid serviceUuid)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId: %{public}d", clientId);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("clientId has not been registered.");
@@ -513,10 +517,10 @@ bool BleGattcGetService(int clientId, BtUuid serviceUuid)
  */
 int BleGattcReadCharacteristic(int clientId, BtGattCharacteristic characteristic)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId: %{public}d", clientId);
     GattClient *client = nullptr;
     GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, characteristic);
-    if (tmpCharac == nullptr) {
+    if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
     }
@@ -539,10 +543,10 @@ int BleGattcReadCharacteristic(int clientId, BtGattCharacteristic characteristic
 int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristic,
     BtGattWriteType writeType, int len, const char *value)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId:%{public}d, writeType:%{public}d, len:%{public}d", clientId, writeType, len);
     GattClient *client = nullptr;
     GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, characteristic);
-    if (tmpCharac == nullptr) {
+    if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
     }
@@ -564,10 +568,10 @@ int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristi
  */
 int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId: %{public}d", clientId);
     GattClient *client = nullptr;
     GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, descriptor.characteristic);
-    if (tmpCharac == nullptr) {
+    if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
     }
@@ -595,10 +599,10 @@ int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
  */
 int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, const char *value)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId:%{public}d, len:%{public}d", clientId, len);
     GattClient *client = nullptr;
     GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, descriptor.characteristic);
-    if (tmpCharac == nullptr) {
+    if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
     }
@@ -625,7 +629,7 @@ int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, 
  */
 int BleGattcConfigureMtuSize(int clientId, int mtuSize)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId:%{public}d, mtuSize:%{public}d", clientId, mtuSize);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("GattcFindCharacteristic, clientId: %{public}d, has not been registered.", clientId);
@@ -653,10 +657,10 @@ int BleGattcConfigureMtuSize(int clientId, int mtuSize)
  */
 int BleGattcRegisterNotification(int clientId, BtGattCharacteristic characteristic, bool enable)
 {
-    HILOGI("start, clientId: %{public}d", clientId);
+    HILOGI("clientId:%{public}d, enable:%{public}d", clientId, enable);
     GattClient *client = nullptr;
     GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, characteristic);
-    if (tmpCharac == nullptr) {
+    if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
     }
