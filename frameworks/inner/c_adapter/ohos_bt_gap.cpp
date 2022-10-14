@@ -59,7 +59,7 @@ public:
             cvtTransport = OHOS_BT_TRANSPORT_BR_EDR;
         }
         HILOGI("transport: %{public}d, status: %{public}d", cvtTransport, status);
-        if (g_GapCallback != NULL && g_GapCallback->stateChangeCallback != NULL) {
+        if (g_GapCallback != nullptr && g_GapCallback->stateChangeCallback != nullptr) {
             g_GapCallback->stateChangeCallback(cvtTransport, status);
         } else {
             HILOGI("callback func is null!");
@@ -102,7 +102,7 @@ public:
             transport = OHOS_BT_TRANSPORT_LE;
         }
         HILOGI("device: %{public}s, transport:%{public}d", GET_ENCRYPT_ADDR(device), transport);
-        if (g_GapCallback != NULL && g_GapCallback->pairRequestedCallback != NULL) {
+        if (g_GapCallback != nullptr && g_GapCallback->pairRequestedCallback != nullptr) {
             g_GapCallback->pairRequestedCallback(&remoteAddr, transport);
         } else {
             HILOGW("callback func is null!");
@@ -125,7 +125,7 @@ public:
         BdAddr remoteAddr;
         GetAddrFromString(device.GetDeviceAddr(), remoteAddr.addr);
         HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (g_GapCallback == NULL || g_GapCallback->pairConfiremedCallback == NULL) {
+        if (g_GapCallback == nullptr || g_GapCallback->pairConfiremedCallback == nullptr) {
             HILOGW("callback func is null!");
             return;
         }
@@ -151,7 +151,7 @@ public:
     void OnScanModeChanged(int mode)
     {
         HILOGI("mode: %{public}d", mode);
-        if (g_GapCallback != NULL && g_GapCallback->scanModeChangedCallback != NULL) {
+        if (g_GapCallback != nullptr && g_GapCallback->scanModeChangedCallback != nullptr) {
             g_GapCallback->scanModeChangedCallback(mode);
         } else {
             HILOGW("mode: %{public}d, but callback is null!", mode);
@@ -186,7 +186,7 @@ static BluetoothHostObserverWapper g_hostObserver;
 bool EnableBle(void)
 {
     HILOGI("enter");
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -203,7 +203,7 @@ bool EnableBle(void)
 bool DisableBle(void)
 {
     HILOGI("enter");
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -220,7 +220,7 @@ bool DisableBle(void)
 bool EnableBt(void)
 {
     HILOGI("enter");
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -238,7 +238,7 @@ bool EnableBt(void)
 bool DisableBt(void)
 {
     HILOGI("enter");
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -256,7 +256,7 @@ bool DisableBt(void)
 int GetBtState()
 {
     HILOGI("enter");
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -267,7 +267,7 @@ int GetBtState()
 
 bool IsBleEnabled()
 {
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -279,11 +279,11 @@ bool IsBleEnabled()
 bool GetLocalAddr(unsigned char *mac, unsigned int len)
 {
     HILOGI("enter");
-    if (mac == NULL || len < OHOS_BD_ADDR_LEN) {
-        HILOGE("invalid param : mac:%{public}p, len:%{public}d", mac, len);
+    if (mac == nullptr || len < OHOS_BD_ADDR_LEN) {
+        HILOGE("invalid param, len:%{public}d", len);
         return false;
     }
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -297,11 +297,11 @@ bool SetLocalName(unsigned char *localName, unsigned char length)
 {
     HILOGI("enter");
     if (localName == nullptr) {
-        HILOGE("invalid param: localName(%{public}p)", localName);
+        HILOGE("localName is null");
         return false;
     }
 
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
@@ -314,7 +314,7 @@ bool SetLocalName(unsigned char *localName, unsigned char length)
 bool SetBtScanMode(int mode, int duration)
 {
     HILOGI("mode: %{public}d, duration: %{public}d", mode, duration);
-    if (g_BluetoothHost == NULL) {
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
     bool ret = g_BluetoothHost->SetBtScanMode(mode, duration);
@@ -362,8 +362,12 @@ bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool acce
 
 int GapRegisterCallbacks(BtGapCallBacks *func)
 {
-    HILOGI();
-    if (g_BluetoothHost == NULL) {
+    HILOGI("enter");
+    if (func == nullptr) {
+        HILOGE("func is null.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
     g_GapCallback = func;

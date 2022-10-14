@@ -84,6 +84,10 @@ public:
         HILOGI("device: %{public}s, connect state: %{public}d", GET_ENCRYPT_ADDR(device), state);
 
         if (state == static_cast<int>(BTConnectState::CONNECTED)) {
+            if (g_GattsCallback == nullptr || g_GattsCallback->connectServerCb == nullptr) {
+                HILOGW("call back is null.");
+                return;
+            }
             std::map<int, struct ConnectedDevice>::iterator iter;
             iter = FindDeviceRecord(dev);
             if (iter != g_MapConnectedDevice.end()) {
@@ -98,6 +102,10 @@ public:
         }
 
         if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+            if (g_GattsCallback == nullptr || g_GattsCallback->disconnectServerCb == nullptr) {
+                HILOGW("call back is null.");
+                return;
+            }
             std::map<int, struct ConnectedDevice>::iterator iter;
             iter = FindDeviceRecord(dev);
             if (iter != g_MapConnectedDevice.end()) {
@@ -113,7 +121,7 @@ public:
         int i;
         int err = OHOS_BT_STATUS_SUCCESS;
         for (i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-            if (GATTSERVICE(serverId_, i) != NULL) {
+            if (GATTSERVICE(serverId_, i) != nullptr) {
                 HILOGI("isAdding: %{public}d, srvcUuid: %{public}s, ind: %{public}s",
                     GATTSERVICES(serverId_, i).isAdding,
                     GATTSERVICE(serverId_, i)->GetUuid().ToString().c_str(),
@@ -121,7 +129,7 @@ public:
             } else {
                 HILOGE("services is empty!");
             }
-            if (GATTSERVICE(serverId_, i) != NULL &&
+            if (GATTSERVICE(serverId_, i) != nullptr &&
                 GATTSERVICES(serverId_, i).isAdding &&
                 GATTSERVICE(serverId_, i)->GetUuid().CompareTo(Service->GetUuid()) == 0) {
                 GATTSERVICES(serverId_, i).isAdding = false;
@@ -147,8 +155,10 @@ public:
             }
         }
 
-        if (g_GattsCallback != NULL && g_GattsCallback->serviceAddCb != NULL) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->serviceStartCb != nullptr) {
             g_GattsCallback->serviceStartCb(err, serverId_, i);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -174,8 +184,10 @@ public:
         readInfo.isLong = false;
         HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d",
             iter->first, requestId, readInfo.attrHandle);
-        if (g_GattsCallback != NULL && g_GattsCallback->requestReadCb != NULL) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->requestReadCb != nullptr) {
             g_GattsCallback->requestReadCb(readInfo);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -205,8 +217,10 @@ public:
         writeInfo.isPrep = false;
         HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d, valueLen: %{public}d",
             iter->first, requestId, writeInfo.attrHandle, writeInfo.length);
-        if (g_GattsCallback != NULL && g_GattsCallback->requestWriteCb != NULL) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->requestWriteCb != nullptr) {
             g_GattsCallback->requestWriteCb(writeInfo);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -230,8 +244,10 @@ public:
         readInfo.attrHandle = descriptor.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
         readInfo.offset = 0;
         readInfo.isLong = false;
-        if (g_GattsCallback != NULL && g_GattsCallback->requestReadCb != NULL) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->requestReadCb != nullptr) {
             g_GattsCallback->requestReadCb(readInfo);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -260,8 +276,10 @@ public:
         writeInfo.length = length;
         writeInfo.needRsp = true;
         writeInfo.isPrep = false;
-        if (g_GattsCallback != NULL && g_GattsCallback->requestWriteCb != NULL) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->requestWriteCb != nullptr) {
             g_GattsCallback->requestWriteCb(writeInfo);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -274,8 +292,10 @@ public:
 
         std::map<int, struct ConnectedDevice>::iterator iter;
         iter = FindDeviceRecord(dev);
-        if (g_GattsCallback != NULL && g_GattsCallback->mtuChangeCb != NULL) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->mtuChangeCb != nullptr) {
             g_GattsCallback->mtuChangeCb(iter->first, mtu);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -288,8 +308,10 @@ public:
 
         std::map<int, struct ConnectedDevice>::iterator iter;
         iter = FindDeviceRecord(dev);
-        if (g_GattsCallback != NULL && g_GattsCallback->indicationSentCb != NULL) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->indicationSentCb != nullptr) {
             g_GattsCallback->indicationSentCb(iter->first, result);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -324,7 +346,7 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
     }
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
         GattService *gattService = GATTSERVICE(serverId, i);
-        if (gattService == NULL) {
+        if (gattService == nullptr) {
             continue;
         }
 
@@ -354,23 +376,23 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
 int BleGattsRegister(BtUuid appUuid)
 {
     HILOGI("enter");
-    if (g_GattsCallback == NULL) {
+    if (g_GattsCallback == nullptr) {
         HILOGE("callback is null, call BleGattsRegisterCallbacks first");
         return OHOS_BT_STATUS_FAIL;
     }
     for (int i = 0; i < MAXIMUM_NUMBER_APPLICATION; i++) {
-        if (GATTSERVER(i) == NULL) {
+        if (GATTSERVER(i) == nullptr) {
             GattServerCallbackWapper *callbackWapper = new GattServerCallbackWapper(g_GattsCallback, i);
             GATTSERVER(i) = new GattServer(*callbackWapper);
             HILOGI("register gattServer: %{public}d", i);
-            if (g_GattsCallback->registerServerCb != NULL) {
+            if (g_GattsCallback->registerServerCb != nullptr) {
                 g_GattsCallback->registerServerCb(0, i, &appUuid);
             }
             return OHOS_BT_STATUS_SUCCESS;
         }
     }
 
-    if (g_GattsCallback->registerServerCb != NULL) {
+    if (g_GattsCallback->registerServerCb != nullptr) {
         g_GattsCallback->registerServerCb(1, 0, &appUuid);
     }
     return OHOS_BT_STATUS_FAIL;
@@ -386,11 +408,11 @@ int BleGattsRegister(BtUuid appUuid)
  */
 int BleGattsUnRegister(int serverId)
 {
-    HILOGI("enter");
+    HILOGI("serverId: %{public}d", serverId);
     if (serverId >= 0 && serverId < MAXIMUM_NUMBER_APPLICATION) {
-        if (GATTSERVER(serverId) != NULL) {
+        if (GATTSERVER(serverId) != nullptr) {
             delete GATTSERVER(serverId);
-            GATTSERVER(serverId) = NULL;
+            GATTSERVER(serverId) = nullptr;
             return OHOS_BT_STATUS_SUCCESS;
         }
     }
@@ -410,12 +432,12 @@ int BleGattsUnRegister(int serverId)
  */
 int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
 {
-    HILOGI("enter");
+    HILOGI("serverId: %{public}d, connId: %{public}d", serverId, connId);
     if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
-    if (GATTSERVER(serverId) == NULL) {
+    if (GATTSERVER(serverId) == nullptr) {
         return OHOS_BT_STATUS_UNHANDLED;
     }
 
@@ -424,7 +446,6 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
     BluetoothRemoteDevice device(strAddress, BT_TRANSPORT_BLE);
 
     GATTSERVER(serverId)->CancelConnection(device);
-    HILOGI("serverId: %{public}d, connId: %{public}d", serverId, connId);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -451,15 +472,17 @@ int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number
     UUID uuid(UUID::FromString(strUuid));
 
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-        if (GATTSERVICE(serverId, i) == NULL) {
+        if (GATTSERVICE(serverId, i) == nullptr) {
             HILOGI("add srvcHandle: %{public}d", i);
             GATTSERVICE(serverId, i) = new GattService(
                 uuid, i, number, isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
             GATTSERVICES(serverId, i).maxNum = number;
             GATTSERVICES(serverId, i).index = i + 1;
             GATTSERVICES(serverId, i).isAdding = false;
-            if (g_GattsCallback != NULL && g_GattsCallback->serviceAddCb != NULL) {
+            if (g_GattsCallback != nullptr && g_GattsCallback->serviceAddCb != nullptr) {
                 g_GattsCallback->serviceAddCb(0, serverId, &srvcUuid, i);
+            } else {
+                HILOGW("call back is null");
             }
             return OHOS_BT_STATUS_SUCCESS;
         }
@@ -531,8 +554,10 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
     GATTSERVICE(serverId, srvcHandle)->AddCharacteristic(characteristic);
 
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d, charHandle: %{public}d", serverId, srvcHandle, chHandle);
-    if (g_GattsCallback != NULL && g_GattsCallback->characteristicAddCb != NULL) {
+    if (g_GattsCallback != nullptr && g_GattsCallback->characteristicAddCb != nullptr) {
         g_GattsCallback->characteristicAddCb(0, serverId, &characUuid, srvcHandle, chHandle);
+    } else {
+        HILOGW("callback is null.");
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -565,8 +590,10 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
 
     characteristic.AddDescriptor(descriptor);
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d, desHandle: %{public}d", serverId, srvcHandle, desHandle);
-    if (g_GattsCallback != NULL && g_GattsCallback->descriptorAddCb != NULL) {
+    if (g_GattsCallback != nullptr && g_GattsCallback->descriptorAddCb != nullptr) {
         g_GattsCallback->descriptorAddCb(0, serverId, &descUuid, srvcHandle, desHandle);
+    } else {
+        HILOGW("callback is null.");
     }
 
     return OHOS_BT_STATUS_SUCCESS;
@@ -604,8 +631,10 @@ int BleGattsStopService(int serverId, int srvcHandle)
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVICES(serverId, srvcHandle).isAdding = false;
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
-    if (g_GattsCallback != NULL && g_GattsCallback->serviceStopCb != NULL) {
+    if (g_GattsCallback != nullptr && g_GattsCallback->serviceStopCb != nullptr) {
         g_GattsCallback->serviceStopCb(OHOS_BT_STATUS_SUCCESS, serverId, srvcHandle);
+    } else {
+        HILOGW("callback is null.");
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -624,9 +653,11 @@ int BleGattsDeleteService(int serverId, int srvcHandle)
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     delete GATTSERVICE(serverId, srvcHandle);
-    GATTSERVICE(serverId, srvcHandle) = NULL;
-    if (g_GattsCallback != NULL && g_GattsCallback->serviceDeleteCb != NULL) {
+    GATTSERVICE(serverId, srvcHandle) = nullptr;
+    if (g_GattsCallback != nullptr && g_GattsCallback->serviceDeleteCb != nullptr) {
         g_GattsCallback->serviceDeleteCb(OHOS_BT_STATUS_SUCCESS, serverId, srvcHandle);
+    } else {
+        HILOGW("callback is null.");
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -655,7 +686,12 @@ int BleGattsClearServices(int serverId) {
  */
 int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
 {
-    HILOGI("serverId: %{public}d", serverId);
+    if (param == nullptr) {
+        HILOGE("param is null, serverId: %{public}d", serverId);
+        return OHOS_BT_STATUS_FAIL;
+    }
+    HILOGI("serverId:%{public}d, attrHandle:%{public}d, valueLen:%{public}d",
+        serverId, param->attrHandle, param->valueLen);
     std::map<int, struct ConnectedDevice>::iterator iter;
     iter = g_MapConnectedDevice.find(param->connectId);
 
@@ -665,14 +701,14 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
 
     BluetoothRemoteDevice device(strAddress, 1);
-    // request id
-    HILOGI("attrHandle: %{public}d", param->attrHandle);
 
     int ret = GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
         param->status, 0, (unsigned char *)param->value, param->valueLen);
 
-    if (g_GattsCallback != NULL && g_GattsCallback->responseConfirmationCb != NULL) {
+    if (g_GattsCallback != nullptr && g_GattsCallback->responseConfirmationCb != nullptr) {
         g_GattsCallback->responseConfirmationCb(ret, param->attrHandle);
+    } else {
+        HILOGW("callback is null.");
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -690,7 +726,12 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
  */
 int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 {
-    HILOGI("serverId: %{public}d", serverId);
+    if (param == nullptr) {
+        HILOGE("param is null, serverId: %{public}d", serverId);
+        return OHOS_BT_STATUS_FAIL;
+    }
+    HILOGI("serverId: %{public}d, attrHandle:%{public}d, confirm:%{public}d, valueLen:%{public}d",
+        serverId, param->attrHandle, param->confirm, param->valueLen);
     std::map<int, struct ConnectedDevice>::iterator iter;
     iter = g_MapConnectedDevice.find(param->connectId);
 
@@ -703,14 +744,12 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 
     int srvcHandle = 0;
     GattCharacteristic *appCharacteristic = FindCharacteristic(serverId, param->attrHandle, false, &srvcHandle);
-    if (appCharacteristic == NULL) {
-        HILOGE("not find characteristic, serverId:%{public}d, attrHandle:%{public}d",
-            serverId, param->attrHandle);
+    if (appCharacteristic == nullptr) {
+        HILOGE("not find characteristic");
         return OHOS_BT_STATUS_FAIL;
     }
 
-    HILOGE("serverId:%{public}d, srvcHandle: %{public}d, attrHandle:%{public}d",
-        serverId, param->attrHandle, srvcHandle);
+    HILOGI("srvcHandle:%{public}d", srvcHandle);
     GattCharacteristic characteristic(appCharacteristic->GetUuid(),
         appCharacteristic->GetHandle() + GATTSERVICES(serverId, srvcHandle).handleOffset,
         appCharacteristic->GetPermissions(),
@@ -747,7 +786,8 @@ int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct) {
 int BleGattsRegisterCallbacks(BtGattServerCallbacks *func)
 {
     HILOGI("enter");
-    if (func == NULL) {
+    if (func == nullptr) {
+        HILOGE("func is null.");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 

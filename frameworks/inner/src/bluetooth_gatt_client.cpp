@@ -752,7 +752,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
         pimpl->requestInformation_.context_.characteristic_ = &characteristic;
         pimpl->requestInformation_.doing_ = true;
     } else {
-        HILOGI("failed, result: %{public}d", result);
+        HILOGI("result: %{public}d", result);
     }
     return result;
 }
