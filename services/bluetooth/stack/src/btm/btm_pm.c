@@ -278,7 +278,7 @@ static void BtmUpdateConnectionMode(uint16_t connectionHandle, uint8_t currentMo
     MutexUnlock(g_connectionModeListLock);
 }
 
-static void BtmPmOnModeChange(const HciModeChangeEventParam *param)
+NO_SANITIZE("cfi") static void BtmPmOnModeChange(const HciModeChangeEventParam *param)
 {
     BtAddr addr;
     int result = BtmGetAclAddressByHandle(param->connectionHandle, &addr);
@@ -298,7 +298,7 @@ static void BtmPmOnModeChange(const HciModeChangeEventParam *param)
     FOREACH_CALLBACKS_END;
 }
 
-static void BtmPmOnSniffSubratingComplete(const HciSniffSubratingReturnParam *param)
+NO_SANITIZE("cfi") static void BtmPmOnSniffSubratingComplete(const HciSniffSubratingReturnParam *param)
 {
     BtAddr addr;
     int result = BtmGetAclAddressByHandle(param->connectionHandle, &addr);

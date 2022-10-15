@@ -15,6 +15,10 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("bluetooth_hdi_adapter") {
+  sanitize = {
+    cfi = true
+  }
+  stack_protector_ret = true
   include_dirs = [
     "include",
     "//third_party/bounds_checking_function/include",

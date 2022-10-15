@@ -440,6 +440,7 @@ void RfcommResetChannelInfo(RfcommChannelInfo *channel)
  * @param eventId   The eventId to be notified to the upper layer.
  * @param eventData The data to be notified to the upper layer.
  */
+NO_SANITIZE("cfi")
 void RfcommNotifyEvtToUpper(const RfcommChannelInfo *channel, uint32_t eventId, const void *eventData)
 {
     LOG_INFO("%{public}s event is %u", __func__, eventId);

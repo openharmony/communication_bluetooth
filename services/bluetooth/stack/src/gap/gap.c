@@ -482,7 +482,7 @@ static int GapWriteScanEnable(void)
     return ret;
 }
 
-void GapWriteScanEnableComplete(const HciWriteScanEnableReturnParam *param)
+NO_SANITIZE("cfi") void GapWriteScanEnableComplete(const HciWriteScanEnableReturnParam *param)
 {
     LOG_DEBUG("%{public}s:", __FUNCTION__);
     int ret = GAP_SUCCESS;
@@ -1326,7 +1326,7 @@ int GAP_LeSetStaticIdentityAddr(uint8_t addr[BT_ADDRESS_SIZE])
     return ret;
 }
 
-void GapGenerateRPAResult(uint8_t status, const uint8_t *addr)
+NO_SANITIZE("cfi") void GapGenerateRPAResult(uint8_t status, const uint8_t *addr)
 {
     GenResPriAddrResult callback = NULL;
     void *context = NULL;

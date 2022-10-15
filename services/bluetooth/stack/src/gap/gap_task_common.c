@@ -31,7 +31,7 @@ void GapBlockInTaskProcess(void *ctx)
     }
 }
 
-void GapUnBlockInTaskProcess(void *ctx)
+NO_SANITIZE("cfi") void GapUnBlockInTaskProcess(void *ctx)
 {
     GapRunTaskUnBlockInfo *info = ctx;
     if (info != NULL) {

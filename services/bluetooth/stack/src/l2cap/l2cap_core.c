@@ -1389,7 +1389,7 @@ static int L2capProcessConfigurationReqContinueOption(
     return BT_NO_ERROR;
 }
 
-static void L2capProcessConfigurationReqParse(
+NO_SANITIZE("cfi") static void L2capProcessConfigurationReqParse(
     L2capConnection *conn, L2capChannel *chan, L2capSignalHeader *signal, const uint8_t *data, uint16_t optLength)
 {
     L2capConfigInfo cfg = {0};
@@ -1504,6 +1504,7 @@ static void L2capConfigurationReqContinuation(L2capConnection *conn, const L2cap
     return;
 }
 
+NO_SANITIZE("cfi")
 static void L2capProcessConfigurationRsp(uint16_t aclHandle, L2capSignalHeader *signal, uint8_t *data)
 {
     L2capConnection *conn = NULL;
@@ -1567,6 +1568,7 @@ static void L2capProcessConfigurationRsp(uint16_t aclHandle, L2capSignalHeader *
     return;
 }
 
+NO_SANITIZE("cfi")
 static void L2capProcessConnectionReq(uint16_t aclHandle, const L2capSignalHeader *signal, uint8_t *data)
 {
     L2capConnection *conn = NULL;
@@ -1737,6 +1739,7 @@ static void L2capProcessDisconnectionReq(uint16_t aclHandle, L2capSignalHeader *
     return;
 }
 
+NO_SANITIZE("cfi")
 static void L2capProcessDisconnectionRsp(uint16_t aclHandle, const L2capSignalHeader *signal, uint8_t *data)
 {
     L2capConnection *conn = NULL;
@@ -2095,7 +2098,7 @@ static int L2capProcessBasicData(const L2capChannel *chan, Packet *pkt)
     return BT_NO_ERROR;
 }
 
-static void L2capProcessData(uint16_t aclHandle, uint16_t cid, Packet *pkt)
+NO_SANITIZE("cfi") static void L2capProcessData(uint16_t aclHandle, uint16_t cid, Packet *pkt)
 {
     L2capConnection *conn = NULL;
     L2capChannel *chan = NULL;

@@ -41,7 +41,7 @@ Module *ModuleGet(const char *name)
     return module;
 }
 
-void ModuleInit(const char *name, int traceLevel)
+NO_SANITIZE("cfi") void ModuleInit(const char *name, int traceLevel)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
@@ -49,7 +49,7 @@ void ModuleInit(const char *name, int traceLevel)
     }
 }
 
-void ModuleStartup(const char *name)
+NO_SANITIZE("cfi") void ModuleStartup(const char *name)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
@@ -57,7 +57,7 @@ void ModuleStartup(const char *name)
     }
 }
 
-void ModuleShutdown(const char *name)
+NO_SANITIZE("cfi") void ModuleShutdown(const char *name)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
