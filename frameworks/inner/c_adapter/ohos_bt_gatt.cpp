@@ -92,7 +92,11 @@ public:
         strStream >> strs;
         string address = result.GetPeripheralDevice().GetDeviceAddr();
         HILOGI("device: %{public}s, scan data: %{public}s", GetEncryptAddr(address).c_str(), strs.c_str());
-        g_AppCallback->scanResultCb(&scanResult);
+        if (g_AppCallback != nullptr && g_AppCallback->scanResultCb != nullptr) {
+            g_AppCallback->scanResultCb(&scanResult);
+        } else {
+            HILOGW("call back is null.");
+        }
     }
 
     /**
@@ -129,6 +133,8 @@ public:
         HILOGI("adv started. advId_: %{public}d", advId_);
         if (g_AppCallback != nullptr && g_AppCallback->advEnableCb != nullptr) {
             g_AppCallback->advEnableCb(advId_, 0);
+        } else {
+            HILOGW("call back is null.");
         }
     }
 
@@ -390,6 +396,10 @@ int BleStopScan(void)
 int BleGattRegisterCallbacks(BtGattCallbacks *func)
 {
     HILOGI("BleGattRegisterCallbacks enter");
+    if (func == nullptr) {
+        HILOGE("func is null.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     g_AppCallback = func;
 
     if (g_scanCallback == nullptr) {
@@ -426,7 +436,6 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
             g_bleAdvCallbacks[i] = new BleAdvCallback(i);
             break;
         }
-        HILOGI("g_bleAdvCallbacks[%{public}d] = %{public}p.", i, g_bleAdvCallbacks[i]);
     }
 
     if (i == MAX_BLE_ADV_NUM) {
