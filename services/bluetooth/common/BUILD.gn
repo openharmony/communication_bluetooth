@@ -22,6 +22,7 @@ config("btcommon_public_config") {
 }
 
 ohos_static_library("btcommon") {
+  stack_protector_ret = true
   public_configs = [ ":btcommon_public_config" ]
 
   sources = [

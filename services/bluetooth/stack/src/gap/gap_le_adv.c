@@ -125,6 +125,7 @@ static int GapLeSetAdvertisingSetRandomAddress(uint8_t advHandle, const uint8_t 
     return HCI_LeSetAdvertisingSetRandomAddress(&hciCmdParam);
 }
 
+NO_SANITIZE("cfi")
 void GapLeSetAdvertisingSetRandomAddressComplete(const HciLeSetAdvertisingSetRandomAddressReturnParam *param)
 {
     if (g_leExAdvCallback.callback.exAdvSetRandAddrResult) {
@@ -176,6 +177,7 @@ static int GapLeSetExtendedAdvertisingParameters(
     return HCI_LeSetExtendedAdvertisingParameters(&hciCmdParam);
 }
 
+NO_SANITIZE("cfi")
 void GapLeSetExtendedAdvertisingParametersComplete(const HciLeSetExtendedAdvertisingParametersReturnParam *param)
 {
     if (g_leExAdvCallback.callback.exAdvSetParamResult) {
@@ -213,7 +215,7 @@ static int GapLeSetExtendedAdvertisingData(
     return HCI_LeSetExtendedAdvertisingData(&hciCmdParam);
 }
 
-void GapLeSetExtendedAdvertisingDataComplete(const HciLeSetExtendedAdvertisingDataReturnParam *param)
+NO_SANITIZE("cfi") void GapLeSetExtendedAdvertisingDataComplete(const HciLeSetExtendedAdvertisingDataReturnParam *param)
 {
     if (g_leExAdvCallback.callback.exAdvSetDataResult) {
         g_leExAdvCallback.callback.exAdvSetDataResult(param->status, g_leExAdvCallback.context);
@@ -250,6 +252,7 @@ static int GapLeSetExtendedScanResponseData(uint8_t advHandle, uint8_t operation
     return HCI_LeSetExtendedScanResponseData(&hciCmdParam);
 }
 
+NO_SANITIZE("cfi")
 void GapLeSetExtendedScanResponseDataComplete(const HciLeSetExtendedScanResponseDataReturnParam *param)
 {
     if (g_leExAdvCallback.callback.exAdvSetScanRspDataResult) {
@@ -299,6 +302,7 @@ static int GapLeSetExtendedAdvertisingEnable(uint8_t enable, uint8_t numberOfSet
     return ret;
 }
 
+NO_SANITIZE("cfi")
 void GapLeSetExtendedAdvertisingEnableComplete(const HciLeSetExtendedAdvertisingEnableReturnParam *param)
 {
     if (g_leExAdvCallback.callback.exAdvSetEnableResult) {
@@ -346,7 +350,7 @@ static int GapLeClearAdvertisingSets(void)
     return HCI_LeClearAdvertisingSets();
 }
 
-void GapLeClearAdvertisingSetsComplete(const HciLeClearAdvertisingSetsReturnParam *param)
+NO_SANITIZE("cfi") void GapLeClearAdvertisingSetsComplete(const HciLeClearAdvertisingSetsReturnParam *param)
 {
     if (g_leExAdvCallback.callback.exAdvClearHandleResult) {
         g_leExAdvCallback.callback.exAdvClearHandleResult(param->status, g_leExAdvCallback.context);

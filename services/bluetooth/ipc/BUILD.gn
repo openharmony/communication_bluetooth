@@ -24,6 +24,7 @@ config("btipc_public_config") {
 }
 
 ohos_static_library("btipc_static") {
+  stack_protector_ret = true
   public_configs = [ ":btipc_public_config" ]
   include_dirs = [
     "parcel",

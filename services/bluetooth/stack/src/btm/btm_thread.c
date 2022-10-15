@@ -55,7 +55,7 @@ static void FreeTask(void *task)
     MEM_MALLOC.free(task);
 }
 
-static void RunTask(void *context)
+NO_SANITIZE("cfi") static void RunTask(void *context)
 {
     BtmTask *task = QueueTryDequeue((Queue *)context);
     if (task != NULL) {

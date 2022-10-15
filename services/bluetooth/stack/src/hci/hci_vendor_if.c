@@ -42,7 +42,7 @@ static void HCIVendorFreeCallbacksBlock(void *block)
     MEM_MALLOC.free(block);
 }
 
-void HciVendorClosed(void)
+NO_SANITIZE("cfi") void HciVendorClosed(void)
 {
     if (g_hciVendorCallbackListLock == NULL) {
         LOG_ERROR("g_hciVendorCallbackListLock is null");
@@ -150,7 +150,7 @@ int HCIVIF_SendCmd(uint16_t opCode, const void *param, size_t paramLength)
     return HciSendCmd(cmd);
 }
 
-void HciEventOnVendorCommandComplete(uint16_t opCode, const void *param, uint8_t paramLength)
+NO_SANITIZE("cfi") void HciEventOnVendorCommandComplete(uint16_t opCode, const void *param, uint8_t paramLength)
 {
     if (g_hciVendorCallbackListLock == NULL) {
         LOG_ERROR("g_hciVendorCallbackListLock is null");

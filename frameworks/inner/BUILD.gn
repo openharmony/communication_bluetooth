@@ -40,6 +40,7 @@ config("btframework_public_config") {
 }
 
 ohos_shared_library("btframework") {
+  stack_protector_ret = true
   configs = [ ":btframework_config" ]
   public_configs = [ ":btframework_public_config" ]
   sources = [

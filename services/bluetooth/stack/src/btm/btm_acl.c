@@ -499,7 +499,7 @@ static void BtmAclTimeout(void *context)
     }
 }
 
-static void BtmOnConnectionComplete(const HciConnectionCompleteEventParam *eventParam)
+NO_SANITIZE("cfi") static void BtmOnConnectionComplete(const HciConnectionCompleteEventParam *eventParam)
 {
     if (eventParam->linkType != HCI_LINK_TYPE_ACL ||
         (eventParam->status == HCI_CONNECTION_ALREADY_EXISTS)) {
@@ -926,7 +926,7 @@ static void BtmUpdateLeConnectionOnConnectComplete(
     MutexUnlock(g_aclListLock);
 }
 
-static void BtmLeCancelConnectCallback(uint8_t status)
+NO_SANITIZE("cfi") static void BtmLeCancelConnectCallback(uint8_t status)
 {
     MutexLock(g_leConnectionCancelLock);
 
@@ -1355,7 +1355,7 @@ int BTM_AclDisconnect(uint16_t connectionHandle, uint8_t reason)
     return result;
 }
 
-static void BtmOnDisconnectComplete(const HciDisconnectCompleteEventParam *eventParam)
+NO_SANITIZE("cfi") static void BtmOnDisconnectComplete(const HciDisconnectCompleteEventParam *eventParam)
 {
     uint8_t transport = 0;
 

@@ -24,6 +24,18 @@
 
 #include "packet.h"
 
+#ifndef NO_SANITIZE
+#ifdef __has_attribute
+#if __has_attribute(no_sanitize)
+#define NO_SANITIZE(type) __attribute__((no_sanitize(type)))
+#endif
+#endif
+#endif
+
+#ifndef NO_SANITIZE
+#define NO_SANITIZE(type)
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -336,7 +336,7 @@ uint16_t AvctCbCtrlSendMsg(AvctCbDev *cbDev, const AvctEvtData *data)
  * Param[in]    *data  Event data
  * Return       AVCT_SUCCESS. Others: Fail
  */
-uint16_t AvctCbCtrlRevMsg(AvctCbDev *cbDev, const AvctEvtData *data)
+NO_SANITIZE("cfi") uint16_t AvctCbCtrlRevMsg(AvctCbDev *cbDev, const AvctEvtData *data)
 {
     LOG_DEBUG("[AVCT] %{public}s:", __func__);
     uint16_t ret = AVCT_SUCCESS;

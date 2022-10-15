@@ -22,6 +22,18 @@
 #include "v1_0/hci_types.h"
 #include "vector"
 
+#ifndef NO_SANITIZE
+#ifdef __has_attribute
+#if __has_attribute(no_sanitize)
+#define NO_SANITIZE(type) __attribute__((no_sanitize(type)))
+#endif
+#endif
+#endif
+
+#ifndef NO_SANITIZE
+#define NO_SANITIZE(type)
+#endif
+
 using OHOS::HDI::Bluetooth::Hci::V1_0::IHciCallback;
 using OHOS::HDI::Bluetooth::Hci::V1_0::BtStatus;
 using OHOS::HDI::Bluetooth::Hci::V1_0::BtType;

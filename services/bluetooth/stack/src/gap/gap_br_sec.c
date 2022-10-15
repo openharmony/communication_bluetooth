@@ -85,7 +85,7 @@ static RequestSecInfo *GapAllocReqSecInfo(
     return reqInfo;
 }
 
-void GapDoAuthenticationCallback(const void *req)
+NO_SANITIZE("cfi") void GapDoAuthenticationCallback(const void *req)
 {
     const RequestSecInfo *reqInfo = req;
     BtAddr addr = BT_ADDR_NULL;
@@ -110,7 +110,7 @@ static void GapTrySecurityCallback(RequestSecInfo *reqInfo)
     }
 }
 
-void GapDoSecurityCallback(void *req)
+NO_SANITIZE("cfi") void GapDoSecurityCallback(void *req)
 {
     RequestSecInfo *reqInfo = (RequestSecInfo *)req;
     uint16_t result = GAP_STATUS_FAILED;
@@ -850,7 +850,7 @@ void GapAuthenticationRetry(DeviceInfo *deviceInfo, RequestSecInfo *reqInfo, uin
     }
 }
 
-void GapOnAuthenticationComplete(const HciAuthenticationCompleteEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnAuthenticationComplete(const HciAuthenticationCompleteEventParam *eventParam)
 {
     LOG_DEBUG("%{public}s:", __FUNCTION__);
     bool inDedicatedBonding = false;
@@ -949,7 +949,7 @@ static int GapIOCapabilityRequestNegativeReply(const BtAddr *addr, uint8_t reaso
     return HCI_IOCapabilityRequestNegativeReply(&hciCmdParam);
 }
 
-void GapOnIOCapabilityRequestEvent(const HciIoCapabilityRequestEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnIOCapabilityRequestEvent(const HciIoCapabilityRequestEventParam *eventParam)
 {
     LOG_DEBUG("%{public}s:" BT_ADDR_FMT "", __FUNCTION__, BT_ADDR_FMT_OUTPUT(eventParam->bdAddr.raw));
     BtAddr addr = BT_ADDR_NULL;
@@ -999,7 +999,7 @@ void GapIOCapabilityRequestNegativeReplyComplete(const HciIoCapabilityRequestNeg
     }
 }
 
-void GapOnIOCapabilityResponseEvent(const HciIoCapabilityResponseEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnIOCapabilityResponseEvent(const HciIoCapabilityResponseEventParam *eventParam)
 {
     LOG_DEBUG("%{public}s:" BT_ADDR_FMT "", __FUNCTION__, BT_ADDR_FMT_OUTPUT(eventParam->bdAddr.raw));
     BtAddr addr = BT_ADDR_NULL;
@@ -1151,7 +1151,7 @@ static int GapUserConfirmationRequestNegativeReply(const BtAddr *addr)
     return HCI_UserConfirmationRequestNegativeReply(&hciCmdParam);
 }
 
-void GapOnUserConfirmationRequestEvent(const HciUserConfirmationRequestEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnUserConfirmationRequestEvent(const HciUserConfirmationRequestEventParam *eventParam)
 {
     LOG_INFO("%{public}s:" BT_ADDR_FMT "", __FUNCTION__, BT_ADDR_FMT_OUTPUT(eventParam->bdAddr.raw));
     BtAddr addr = BT_ADDR_NULL;
@@ -1507,7 +1507,7 @@ int GAP_PairIsFromLocal(const BtAddr *addr, bool *isLocal)
     return ret;
 }
 
-void GapOnLinkKeyNotificationEvent(const HciLinkKeyNotificationEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnLinkKeyNotificationEvent(const HciLinkKeyNotificationEventParam *eventParam)
 {
     LOG_DEBUG("%{public}s:" BT_ADDR_FMT, __FUNCTION__, BT_ADDR_FMT_OUTPUT(eventParam->bdAddr.raw));
     BtAddr addr;
@@ -1527,7 +1527,7 @@ void GapOnLinkKeyNotificationEvent(const HciLinkKeyNotificationEventParam *event
     }
 }
 
-void GapOnLinkKeyRequestEvent(const HciLinkKeyRequestEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnLinkKeyRequestEvent(const HciLinkKeyRequestEventParam *eventParam)
 {
     LOG_DEBUG("%{public}s:" BT_ADDR_FMT, __FUNCTION__, BT_ADDR_FMT_OUTPUT(eventParam->bdAddr.raw));
     BtAddr addr;
@@ -1606,7 +1606,7 @@ int GAP_LinkKeyRsp(const BtAddr *addr, uint8_t accept, const uint8_t linkKey[GAP
     return ret;
 }
 
-void GapOnSimplePairingComplete(const HciSimplePairingCompleteEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnSimplePairingComplete(const HciSimplePairingCompleteEventParam *eventParam)
 {
     LOG_INFO("%{public}s:" BT_ADDR_FMT, __FUNCTION__, BT_ADDR_FMT_OUTPUT(eventParam->bdAddr.raw));
     BtAddr addr;
@@ -1619,7 +1619,7 @@ void GapOnSimplePairingComplete(const HciSimplePairingCompleteEventParam *eventP
     }
 }
 
-void GapOnEncryptionChangeEvent(const HciEncryptionChangeEventParam *eventParam)
+NO_SANITIZE("cfi") void GapOnEncryptionChangeEvent(const HciEncryptionChangeEventParam *eventParam)
 {
     BtAddr addr = {0};
     GapEncryptionChangeCallback callback = NULL;

@@ -18,6 +18,7 @@ SUBSYSTEM_DIR = "//foundation/communication"
 BT_ROOT = "//foundation/communication/bluetooth/services/bluetooth"
 
 ohos_shared_library("bluetooth_server") {
+  stack_protector_ret = true
   include_dirs = [
     "include",
     "//foundation/communication/bluetooth/frameworks/inner/common",
