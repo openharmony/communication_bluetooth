@@ -32,6 +32,7 @@
 #include "interface_profile_gatt_client.h"
 #include "interface_profile_manager.h"
 #include "log.h"
+#include "log_util.h"
 #include "securec.h"
 
 namespace bluetooth {
@@ -371,7 +372,7 @@ int BleAdapter::DeregisterAllCallback() const
 
 void BleAdapter::GenResPriAddrResult(uint8_t result, const uint8_t addr[BT_ADDRESS_SIZE], void *context)
 {
-    LOG_DEBUG("[BleAdapter] %{public}s:ResPriAddr = %{public}s", __func__, RawAddress::ConvertToString(addr).GetAddress().c_str());
+    LOG_DEBUG("[BleAdapter] %{public}s:ResPriAddr = %{public}s", __func__, GetEncryptAddr(RawAddress::ConvertToString(addr).GetAddress()).c_str());
 
     auto *adapter = static_cast<BleAdapter *>(context);
     std::unique_lock<std::mutex> lock(adapter->pimpl->mutexRpa_);

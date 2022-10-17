@@ -272,7 +272,7 @@ bool ClassicAdapterProperties::ReadAddrFromController()
         return ret;
     }
     macAddr_ = RawAddress::ConvertToString(btAddr.addr).GetAddress();
-    LOG_DEBUG("ClassicAdapterProperties::GAPIF_GetLocalAddr %{public}s", macAddr_.c_str());
+    LOG_DEBUG("ClassicAdapterProperties::GAPIF_GetLocalAddr %{public}s", GetEncryptAddr(macAddr_).c_str());
 
     return ret;
 }

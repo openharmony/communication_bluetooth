@@ -242,7 +242,7 @@ void NapiBluetoothHostObserver::OnDeviceNameChanged(const std::string &deviceNam
 
 void NapiBluetoothHostObserver::OnDeviceAddrChanged(const std::string &address)
 {
-    HILOGI("NapiBluetoothHostObserver::OnDeviceAddrChanged called, address is %{public}s", address.c_str());
+    HILOGI("address is %{public}s", GetEncryptAddr(address).c_str());
 }
 
 void NapiBluetoothHostObserver::DealStateChange(const int transport, const int status, BluetoothState &state)
