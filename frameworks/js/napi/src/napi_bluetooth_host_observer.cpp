@@ -53,17 +53,6 @@ void NapiBluetoothHostObserver::UvQueueWorkOnStateChanged(uv_work_t *work, Bluet
     napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
-static std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type)
-{
-    std::lock_guard<std::mutex> lock(g_observerMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
-    if (!observers[type]) {
-        HILOGE("GetCallbackInfoByType type %{public}s is nullptr", type.c_str());
-        return nullptr;
-    }
-    return observers[type];
-}
-
 void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int status)
 {
     HILOGD("start");

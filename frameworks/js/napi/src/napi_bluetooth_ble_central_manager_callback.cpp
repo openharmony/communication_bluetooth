@@ -201,17 +201,6 @@ static void OnSysScanCallback(const BleScanResult &result, const std::string typ
         }
 }
 
-static std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type)
-{
-    std::lock_guard<std::mutex> lock(g_observerMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
-    if (!observers[type]) {
-        HILOGE("GetCallbackInfoByType type %{public}s is nullptr", type.c_str());
-        return nullptr;
-    }
-    return observers[type];
-}
-
 void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
 {
     HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
