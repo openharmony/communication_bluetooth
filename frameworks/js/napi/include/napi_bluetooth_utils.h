@@ -178,7 +178,6 @@ struct ReadCharacteristicValueCallbackInfo : public AsyncCallbackInfo {
 };
 
 struct ReadDescriptorValueCallbackInfo : public AsyncCallbackInfo {
-    // std::shared_ptr<GattDescriptor> inputDescriptor_ = nullptr;
     GattDescriptor *inputDescriptor_ = nullptr;
     const GattDescriptor *outputDescriptor_ = nullptr;
     int ret = -1;
@@ -259,8 +258,9 @@ struct TransforInformationCallbackInfo : public BluetoothCallbackInfo {
 namespace {
 using sysBLEMap = std::map<std::string, std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE>>;
 sysBLEMap g_sysBLEObserver;
-std::mutex sysBLEObserverMutex_;
+std::mutex g_sysBLEObserverMutex;
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> g_Observer;
+std::mutex g_observerMutex;
 std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = nullptr;
 std::string deviceAddr;
 std::atomic<bool> isCurrentAppOperate(false);
@@ -269,6 +269,7 @@ std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
 const sysBLEMap &GetSysBLEObserver();
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
+std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type);
 
 void SetRssiValueCallbackInfo(std::shared_ptr<GattGetRssiValueCallbackInfo> &callback);
 std::shared_ptr<GattGetRssiValueCallbackInfo> GetRssiValueCallbackInfo();
