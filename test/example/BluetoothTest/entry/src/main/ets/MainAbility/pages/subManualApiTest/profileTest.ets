@@ -12,50 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SubEntryComponent } from '../../../Component/subEntryComponent';
-import HeadComponent from '../../../component/headcomponent';
+// @ts-nocheck
+
 import router from '@system.router';
+import { TestData } from '../../model/testData'
+import { initProfileApiData } from '../../model/testDataModels'
+import { PageTitle } from '../../../Component/pageTitle';
+import { TestImageDisplay } from '../../../Component/testImageDisplay';
+import { ContentTable } from '../../../Component/contentTable';
+import btProfileModel from '../../model/btProfileModel';
 
 @Entry
 @Component
 struct Index {
   private deviceId = router.getParams().deviceId;
-
+  private testItem: TestData = router.getParams().testId;
+  aboutToAppear() {
+    btProfileModel.initProfile()
+  }
   build() {
-    Row() {
-      Column() {
-        HeadComponent({headName: $r('app.string.profile_test_title'), isActive: true})
-        Stack().height("0.5vp").backgroundColor("#000000");
-        List() {
-          ListItem() {
-            SubEntryComponent({
-              targetPage: "pages/subManualApiTest/subProfileTest/a2dpProfileTest",
-              title: $r("app.string.a2dp_profile_test_title"),
-              date: 0,
-              deviceId: this.deviceId
-            })
-          }
-          .padding({top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2')})
-          ListItem() {
-            SubEntryComponent({
-              targetPage: "pages/subManualApiTest/subProfileTest/a2dpProfileTest",
-              title: $r("app.string.hands_profile_test_title"),
-              date: 1,
-              deviceId: this.deviceId
-            })
-          }
-          .padding({top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2')})
-          ListItem() {
-            SubEntryComponent({
-              targetPage: "pages/subManualApiTest/subProfileTest/a2dpProfileTest",
-              title: $r("app.string.hid_host_profile_test_title"),
-              date: 2,
-              deviceId: this.deviceId
-            })
-          }
-          .padding({top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2')})
-        }
+    Column() {
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({testItem: this.testItem})
       }
+      ContentTable({ testItem: this.testItem, apiItems: initProfileApiData() })
     }
     .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
     .height('100%')

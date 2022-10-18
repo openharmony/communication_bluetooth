@@ -12,9 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// @ts-nocheck
 import ConfigData from '../../../Utils/ConfigData';
-import HeadComponent from '../../../component/headComponent';
-import {SubEntryComponent} from '../../../component/subEntryComponent';
+
+import Router from '@system.router';
+import { TestData } from '../../model/testData'
+import { initGattApiData } from '../../model/testDataModels'
+import { PageTitle } from '../../../Component/pageTitle';
+import { TestImageDisplay } from '../../../Component/testImageDisplay';
+import { ContentTable } from '../../../Component/contentTable';
+
+
+
 /**
  * GATT Test Page Of Bluetooth test
  */
@@ -22,58 +31,14 @@ import {SubEntryComponent} from '../../../component/subEntryComponent';
 @Component
 struct GattTest {
   @State message: string = 'GattTest'
-
+  private testItem: TestData = Router.getParams().testId;
   build() {
     Column(){
-      GridContainer({columns:12, sizeType: SizeType.Auto, gutter: vp2px(1) === 2 ? '12vp' : '0vp', margin: vp2px(1) === 2 ? '24vp' : '0vp'}) {
-        Row({}) {
-          Column() {
-          }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 0 }, sm: { span: 0, offset: 0 },
-            md: { span: 0, offset: 0 }, lg: { span: 2, offset: 0 }
-          });
-
-          Column() {
-            HeadComponent({headName: $r('app.string.gatt_test_title'), isActive: true})
-            Column({space: '12vp'}){
-              List() {
-                ListItem() {
-                  SubEntryComponent({targetPage: "pages/subManualApiTest/subGattTest/gattClient", title:$r("app.string.gatt_client_test_title")})
-                }
-                .padding({top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2')})
-                ListItem() {
-                  SubEntryComponent({targetPage: 'pages/subManualApiTest/subGattTest/gattServer', title:$r("app.string.gatt_server_test_title")})
-                }
-                .padding({top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2')})
-              }
-            }
-            .width(ConfigData.WH_100_100)
-          }
-          .padding({left: $r('app.float.distance_24'), right: $r('app.float.distance_24')})
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 12, offset: 0 }, sm: { span: 12, offset: 0 },
-            md: { span: 12, offset: 0 }, lg: { span: 8, offset: 2 }
-          });
-
-          Column() {
-          }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 12 }, sm: { span: 0, offset: 12 },
-            md: { span: 0, offset: 12 }, lg: { span: 2, offset: 10 }
-          })
-        }
-        .width(ConfigData.WH_100_100)
-        .height(ConfigData.WH_100_100);
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({testItem: this.testItem})
       }
-      .width(ConfigData.WH_100_100)
-      .height(ConfigData.WH_100_100);
+      ContentTable({ testItem: this.testItem, apiItems: initGattApiData() })
     }
     .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
     .width(ConfigData.WH_100_100)

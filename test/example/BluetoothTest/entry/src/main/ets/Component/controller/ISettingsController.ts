@@ -14,30 +14,28 @@
  */
 
 export default interface ISettingsController {
+  /**
+    * Bind component.
+    */
+  bindComponent(component: any): ISettingsController;
 
-    /**
-     * Bind component.
-     */
-    bindComponent(component: any): ISettingsController;
+  /**
+    *  Bind component's properties.
+    */
+  bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController
 
-    /**
-     *  Bind component's properties.
-     */
-    bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController
+  /**
+    * Initialize data.
+    */
+  initData(): ISettingsController;
 
-    /**
-     * Initialize data.
-     */
-    initData(): ISettingsController;
+  /**
+    * Subscribe listeners.
+    */
+  subscribe(): ISettingsController;
 
-    /**
-     * Subscribe listeners.
-     */
-    subscribe(): ISettingsController;
-
-    /**
-     * Unsubscribe listeners.
-     */
-    unsubscribe(): ISettingsController;
-
+  /**
+    * Unsubscribe listeners.
+    */
+  unsubscribe(): ISettingsController;
 }

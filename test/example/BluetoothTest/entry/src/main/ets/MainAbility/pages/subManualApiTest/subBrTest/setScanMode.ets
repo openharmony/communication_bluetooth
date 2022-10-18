@@ -13,19 +13,20 @@
  * limitations under the License.
  */
 import ConfigData from '../../../../Utils/ConfigData';
-import HeadComponent from '../../../../Component/headComponent';
-import BluetoothModel from '../../../model/BluetoothModel';
+import BluetoothModel from '../../../model/bluetoothModel';
 import Router from '@system.router'
 import { TitleComponent } from '../../../../Component/titleComponent';
 import InputMethod from '@ohos.inputmethod';
 import bluetooth from '@ohos.bluetooth';
+
+import {PageTitle} from '../../../../Component/pageTitle';
 /**
  * about phone
  */
 @Entry
 @Component
 struct setScanMode {
-  @State message: string = "";
+  @State message: string = "请点击选择SCAN MODE";
   private duration: string = '0';
   private deviceInfo: any = '';
   private aboutDeviceList: any[] = [];
@@ -37,175 +38,182 @@ struct setScanMode {
   }
 
   build() {
-    Column(){
-      GridContainer({columns:12, sizeType: SizeType.Auto, gutter: vp2px(1) === 2 ? '12vp' : '0vp', margin: vp2px(1) === 2 ? '24vp' : '0vp'}) {
-        Row({}) {
-          Column() {
-          }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 0 }, sm: { span: 0, offset: 0 },
-            md: { span: 0, offset: 0 }, lg: { span: 2, offset: 0 }
-          });
-
-          Column() {
-            HeadComponent({ headName: $r('app.string.bluetooth_scan_mode_type'), isActive: true })
-
-            Divider()
-              .padding({left: $r('sys.float.ohos_id_card_margin_start'), right: $r('sys.float.ohos_id_card_margin_end')})
-
-            Column(){
-
-              List() {
-                ListItem() {
-                  TitleComponent({
-                    title: "SCAN_MODE_SELECT",
-                    bgColor: $r('app.color.66ccff')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                })
-                ListItem() {
-                  TitleComponent({
-                    title: "SCAN_MODE_NONE",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 0;
-                })
-                ListItem() {
-                  TitleComponent({
-                    title: "CONNECTABLE",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 1;
-                })
-                ListItem() {
-                  TitleComponent({
-                    title: "GENERAL_DISCOVERABLE",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 2;
-                })
-                ListItem() {
-                  TitleComponent({
-                    title: "LIMITED_DISCOVERABLE",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 3 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 3;
-                })
-                ListItem() {
-                  TitleComponent({
-                    title: "CONNECTABLE_GENERAL_DISCOVERABLE",
-                    fontSize: '14vp',
-                    bgColor: this.currentClick === 4 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 4;
-                })
-                ListItem() {
-                  TitleComponent({
-                    title: "CONNECTABLE_LIMITED_DISCOVERABLE",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 5 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 5;
-                })
-              }
-              Blank()
+    Column() {
+      PageTitle({detail: '设置扫描类型'})
+      Scroll() {
+        Column() {
+          List() {
+            ListItem() {
+              TitleComponent({
+                title: "SCAN_MODE_SELECT",
+                bgColor: $r('app.color.moon'),
+                fontSize: '17vp',
+              });
             }
+            .height(80)
+            .borderRadius(10)
 
-            Row() {
-              Text('duration')
-                .textAlign(TextAlign.Center)
-                .fontSize('20fp')
-                .fontColor($r('app.color.font_color_182431'))
-                .fontWeight(FontWeight.Medium)
-              TextInput({ text: this.duration})
-                .placeholderFont({size: $r("app.float.font_18"), weight:FontWeight.Normal, style: FontStyle.Normal})
-                .type(InputType.Normal)
-                .enterKeyType(EnterKeyType.Done)
-                .caretColor(Color.Blue)
-                .height($r("app.float.wh_value_40"))
-                .borderRadius(0)
-                .backgroundColor($r('app.color.color_00000000_transparent'))
-                .onChange((value: string) => {
-                  console.info(ConfigData.TAG + 'device name changed to: ' + JSON.stringify(value));
-                  this.duration = value;
-                })
-                .onSubmit((enterKey) => {
-                  InputMethod.getInputMethodController().stopInput().then((ret) => {
-                    console.info( `${ConfigData.TAG}, enterType: ${enterKey}, stopInput: ${ret}`);
-                  });
-                })
+            ListItem() {
+              TitleComponent({
+                title: "SCAN_MODE_NONE",
+                fontSize: '15vp',
+                bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
             }
-            .padding($r('app.float.distance_15'))
-            .width('100%')
+            .padding({ top: 10 })
+            .height(80)
+            .borderRadius(10)
+            .onClick(() => {
+              this.currentClick = 0;
+            })
 
-            Text(this.message)
-              .textAlign(TextAlign.Start)
-              .fontSize('20fp')
-              .backgroundColor($r("app.color.66ccff"))
-
-            Flex({direction: FlexDirection.Row, justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }){
-              Row(){
-                ButtonComponent({text: $r("app.string.cancel"), onClick: () => {
-                  Router.back();
-                }})
-              }
-              .width($r("app.float.deviceName_button_width"))
-              .margin({right: $r("app.float.distance_12")})
-              Row(){
-                ButtonComponent({text: $r("app.string.confirm"), onClick: () => {
-                  if(this.currentClick === -1) {
-                    this.message = '请点击选择SCAN MODE';
-                    return;
-                  }
-                  this.message = '';
-                  let dur = parseInt(this.duration);
-                  let parseRet = isNaN(dur);
-                  let ret = BluetoothModel.setBluetoothScanMode(this.currentClick, !parseRet ? dur : 0);
-                  AppStorage.SetOrCreate('setScanModeRet', ret);
-                  Router.back();
-                }})
-              }.width($r("app.float.deviceName_button_width"))
+            ListItem() {
+              TitleComponent({
+                title: "CONNECTABLE",
+                fontSize: '15vp',
+                bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
             }
-          }
-          .padding({left: $r('app.float.distance_24'), right: $r('app.float.distance_24')})
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 12, offset: 0 }, sm: { span: 12, offset: 0 },
-            md: { span: 12, offset: 0 }, lg: { span: 8, offset: 2 }
-          });
+            .padding({top:10})
+            .height(80)
+            .borderRadius(10)
+            .onClick(() => {
+              this.currentClick = 1;
+            })
 
-          Column() {
+            ListItem() {
+              TitleComponent({
+                title: "GENERAL_DISCOVERABLE",
+                fontSize: '15vp',
+                bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({top:10})
+            .height(80)
+            .borderRadius(10)
+            .onClick(() => {
+              this.currentClick = 2;
+            })
 
+            ListItem() {
+              TitleComponent({
+                title: "LIMITED_DISCOVERABLE",
+                fontSize: '15vp',
+                bgColor: this.currentClick === 3 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({top:10})
+            .height(80)
+            .borderRadius(10)
+            .onClick(() => {
+              this.currentClick = 3;
+            })
+
+            ListItem() {
+              TitleComponent({
+                title: "CONNECTABLE_GENERAL_DISCOVERABLE",
+                fontSize: '15vp',
+                bgColor: this.currentClick === 4 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({top:10})
+            .height(80)
+            .borderRadius(10)
+            .onClick(() => {
+              this.currentClick = 4;
+            })
+
+            ListItem() {
+              TitleComponent({
+                title: "CONNECTABLE_LIMITED_DISCOVERABLE",
+                fontSize: '15vp',
+                bgColor: this.currentClick === 5 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+              });
+            }
+            .padding({top:10})
+            .height(80)
+            .borderRadius(10)
+            .onClick(() => {
+              this.currentClick = 5;
+            })
           }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 12 }, sm: { span: 0, offset: 12 },
-            md: { span: 0, offset: 12 }, lg: { span: 2, offset: 10 }
-          })
+          Blank()
         }
-        .width(ConfigData.WH_100_100)
-        .height(ConfigData.WH_100_100);
       }
-      .width(ConfigData.WH_100_100)
-      .height(ConfigData.WH_100_100);
+      .height('50%')
+      .scrollable(ScrollDirection.Vertical).scrollBar(BarState.On)
+      .scrollBarColor(Color.Gray).scrollBarWidth(30)
+
+      Row() {
+        Text('duration')
+          .textAlign(TextAlign.Center)
+          .fontSize('20fp')
+          .fontColor($r('app.color.font_color_182431'))
+          .fontWeight(FontWeight.Medium)
+        TextInput({ text: this.duration })
+          .placeholderFont({
+            size: $r("app.float.font_18"),
+            weight: FontWeight.Normal,
+            style: FontStyle.Normal
+          })
+          .type(InputType.Normal)
+          .enterKeyType(EnterKeyType.Done)
+          .caretColor(Color.Blue)
+          .height($r("app.float.wh_value_40"))
+          .borderRadius(0)
+          .backgroundColor($r('app.color.color_00000000_transparent'))
+          .onChange((value: string) => {
+            console.info(ConfigData.TAG + 'device name changed to: ' + JSON.stringify(value));
+            this.duration = value;
+          })
+          .onSubmit((enterKey) => {
+            InputMethod.getInputMethodController().stopInput().then((ret) => {
+              console.info(`${ConfigData.TAG}, enterType: ${enterKey}, stopInput: ${ret}`);
+            });
+          })
+      }
+      .padding($r('app.float.distance_15'))
+      .width('100%')
+
+      Text(this.message)
+        .textAlign(TextAlign.Center)
+        .fontSize('17fp')
+        .height(50)
+        .width("100%")
+        .fontWeight(FontWeight.Medium)
+        .backgroundColor($r("app.color.moon"))
+
+      Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+        Row() {
+          ButtonComponent({ text: $r("app.string.cancel"), onClick: () => {
+            Router.back();
+          } })
+        }
+        .width($r("app.float.deviceName_button_width"))
+        .margin({ right: $r("app.float.distance_12") })
+
+        Row() {
+          ButtonComponent({ text: $r("app.string.confirm"), onClick: () => {
+            if (this.currentClick === -1) {
+              this.message = '请点击选择SCAN MODE';
+              return;
+            }
+            this.message = '';
+            let dur = parseInt(this.duration);
+            let parseRet = isNaN(dur);
+            let ret = BluetoothModel.setBluetoothScanMode(this.currentClick,!parseRet ? dur : 0);
+            AppStorage.SetOrCreate('setScanModeRet', ret);
+            Router.back();
+          } })
+        }.width($r("app.float.deviceName_button_width"))
+
+
+      }
     }
-    .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
-    .width(ConfigData.WH_100_100)
-    .height(ConfigData.WH_100_100);
+    .padding({ left: $r('app.float.distance_24'), right: $r('app.float.distance_24') })
+    .width("100%")
+    .height(ConfigData.WH_100_100)
+    .backgroundColor($r("app.color.lead"))
   }
 }
 
