@@ -34,24 +34,28 @@ const LOG_LEVEL = LogLevel.INFO
  */
 export class LogUtil extends BaseModel{
     debug(msg): void {
+        console.info(msg)
         if (LogLevel.DEBUG >= LOG_LEVEL) {
             console.info(msg);
         }
     }
 
     log(msg): void {
+        console.info(msg)
         if (LogLevel.INFO >= LOG_LEVEL) {
-            console.log(msg);
+            console.info(msg);
         }
     }
 
     info(msg): void {
+        console.info(msg)
         if (LogLevel.INFO >= LOG_LEVEL) {
             console.info(msg);
         }
     }
 
     warn(msg): void {
+        console.info(msg)
         if (LogLevel.WARN >= LOG_LEVEL) {
             console.warn(msg);
         }
