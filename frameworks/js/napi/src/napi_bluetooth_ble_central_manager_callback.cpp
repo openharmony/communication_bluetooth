@@ -207,6 +207,7 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
     OnSysScanCallback(result, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BLE_FIND_DEVICE_TYPE);
     if (callbackInfo == nullptr) {
+        HILOGI("This callback is not registered by ability.");
         return;
     }
     uv_loop_s *loop = nullptr;
@@ -282,6 +283,7 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
     HILOGI("enter, scan result size: %{public}zu", results.size());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BLE_FIND_DEVICE_TYPE);
     if (callbackInfo == nullptr) {
+        HILOGI("This callback is not registered by ability.");
         return;
     }
     uv_loop_s *loop = nullptr;

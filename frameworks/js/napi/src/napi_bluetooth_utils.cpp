@@ -43,7 +43,6 @@ std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string t
     std::lock_guard<std::mutex> lock(g_observerMutex);
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
     if (!observers[type]) {
-        HILOGE("GetCallbackInfoByType type %{public}s is nullptr", type.c_str());
         return nullptr;
     }
     return observers[type];

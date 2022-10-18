@@ -63,6 +63,7 @@ void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int st
 
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_STATE_CHANGE_TYPE);
     if (callbackInfo == nullptr) {
+        HILOGI("This callback is not registered by ability.");
         return;
     }
     
@@ -160,6 +161,7 @@ void NapiBluetoothHostObserver::OnDiscoveryResult(const BluetoothRemoteDevice &d
     HILOGI("start");
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_DEVICE_FIND_TYPE);
     if (callbackInfo == nullptr) {
+        HILOGI("This callback is not registered by ability.");
         return;
     }
     uv_loop_s *loop = nullptr;
@@ -411,6 +413,7 @@ void NapiBluetoothHostObserver::OnPairConfirmedCallBack(const std::string &devic
     HILOGI("start");
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_PIN_REQUEST_TYPE);
     if (callbackInfo == nullptr) {
+        HILOGI("This callback is not registered by ability.");
         return;
     }
     uv_loop_s *loop = nullptr;
