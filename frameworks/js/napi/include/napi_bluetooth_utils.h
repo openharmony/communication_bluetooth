@@ -269,6 +269,7 @@ std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
 const sysBLEMap &GetSysBLEObserver();
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
+std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type);
 
 void SetRssiValueCallbackInfo(std::shared_ptr<GattGetRssiValueCallbackInfo> &callback);
 std::shared_ptr<GattGetRssiValueCallbackInfo> GetRssiValueCallbackInfo();
