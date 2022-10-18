@@ -60,13 +60,12 @@ void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
 
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
 {
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
-    if (!observers[REGISTER_BONE_STATE_TYPE]) {
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BONE_STATE_TYPE);
+    if (callbackInfo == nullptr) {
         HILOGI("This callback is not registered by ability.");
         return;
     }
     HILOGI("addr:%{public}s, status:%{public}d", GET_ENCRYPT_ADDR(device), status);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observers[REGISTER_BONE_STATE_TYPE];
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     if (loop == nullptr) {

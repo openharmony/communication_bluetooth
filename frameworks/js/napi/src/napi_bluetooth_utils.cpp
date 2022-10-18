@@ -38,6 +38,16 @@ napi_value GetCallbackErrorValue(napi_env env, int errCode)
     return result;
 }
 
+std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type)
+{
+    std::lock_guard<std::mutex> lock(g_observerMutex);
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
+    if (!observers[type]) {
+        return nullptr;
+    }
+    return observers[type];
+}
+
 bool ParseString(napi_env env, string &param, napi_value args)
 {
     napi_valuetype valuetype;
@@ -734,6 +744,7 @@ napi_value RegisterObserver(napi_env env, napi_callback_info info)
         napi_typeof(env, argv[PARAM1], &valueType);
         NAPI_ASSERT(env, valueType == napi_function, "Wrong argument type. Function expected.");
         napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_);
+        std::lock_guard<std::mutex> lock(g_observerMutex);
         g_Observer[type] = pCallbackInfo;
         HILOGI("%{public}s is registered", type.c_str());
     }
@@ -744,6 +755,7 @@ napi_value RegisterObserver(napi_env env, napi_callback_info info)
 
 static void RemoveObserver(std::string type)
 {
+    std::lock_guard<std::mutex> lock(g_observerMutex);
     if (g_Observer.find(type) != g_Observer.end()) {
         g_Observer[type] = nullptr;
         HILOGI("%{public}s is deregistered", type.c_str());
@@ -1142,14 +1154,14 @@ void RegisterSysBLEObserver(
     if (callbackIndex >= ARGS_SIZE_THREE) {
         return;
     }
-    std::lock_guard<std::mutex> lock(sysBLEObserverMutex_);
+    std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
     HILOGI("type: %{public}s, index: %{public}d", type.c_str(), callbackIndex);
     g_sysBLEObserver[type][callbackIndex] = info;
 }
 
 void UnregisterSysBLEObserver(const std::string &type)
 {
-    std::lock_guard<std::mutex> lock(sysBLEObserverMutex_);
+    std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
     auto itor = g_sysBLEObserver.find(type);
     if (itor != g_sysBLEObserver.end()) {
         g_sysBLEObserver.erase(itor);
