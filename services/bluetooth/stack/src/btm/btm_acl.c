@@ -967,7 +967,7 @@ static void BtmLeReadRemoteFeatures(uint16_t connectionHandle)
     HCI_LeReadRemoteFeatures(&cmdParam);
 }
 
-static void BtmOnLeConnectCallback(
+NO_SANITIZE("cfi") static void BtmOnLeConnectCallback(
     const BtAddr *addrList, uint8_t addrCount, uint8_t status, uint16_t connectionHandle, uint16_t role)
 {
     MutexLock(g_aclCallbackListLock);
