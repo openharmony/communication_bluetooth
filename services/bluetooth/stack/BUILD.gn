@@ -212,6 +212,7 @@ config("btstack_config") {
 ohos_shared_library("btstack") {
   sanitize = {
     cfi = true
+    blocklist = "./btstack_blocklist.txt"
   }
   stack_protector_ret = true
   configs = [ ":btstack_config" ]
