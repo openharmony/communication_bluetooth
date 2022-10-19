@@ -15,6 +15,7 @@
 #include "bluetooth_a2dp_snk.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_a2dp_snk.h"
+#include "napi_bluetooth_event.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -55,42 +56,15 @@ napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     std::unique_lock<std::shared_mutex> guard(g_a2dpSinkCallbackInfosMutex);
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
 
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 2 argument.");
-        return ret;
-    }
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
-    callbackInfo->env_ = env;
-
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[PARAM1], &valueType);
-    if (valueType != napi_function) {
-        HILOGE("Wrong argument type. Function expected.");
-        return ret;
-    }
-    napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    observer_.callbackInfos_[type] = callbackInfo;
-
+    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
     if (!isRegistered_) {
         A2dpSink *profile = A2dpSink::GetProfile();
         profile->RegisterObserver(&observer_);
         isRegistered_ = true;
     }
-    HILOGI("%{public}s is registered", type.c_str());
+    HILOGI("Napi A2dpSink is registered");
     return ret;
 }
 
@@ -98,32 +72,10 @@ napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     std::unique_lock<std::shared_mutex> guard(g_a2dpSinkCallbackInfosMutex);
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
 
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    uint32_t refCount = INVALID_REF_COUNT;
-    napi_reference_unref(env, observer_.callbackInfos_[type]->callback_, &refCount);
-    HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
-    if (refCount == 0) {
-        napi_delete_reference(env, observer_.callbackInfos_[type]->callback_);
-    }
-    observer_.callbackInfos_[type] = nullptr;
-    HILOGI("%{public}s is unregistered", type.c_str());
+    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    HILOGI("napi A2dpSink is unregistered");
     return ret;
 }
 
