@@ -24,6 +24,10 @@ config("btipc_public_config") {
 }
 
 ohos_static_library("btipc_static") {
+  sanitize = {
+    cfi = true
+    blocklist = "./ipc_blocklist.txt"
+  }
   stack_protector_ret = true
   public_configs = [ ":btipc_public_config" ]
   include_dirs = [
@@ -134,13 +138,11 @@ ohos_static_library("btipc_static") {
 
   cflags_cc = [ "-fvisibility=hidden" ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon" ]
 
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
 }
