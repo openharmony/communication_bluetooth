@@ -40,6 +40,11 @@ config("btframework_public_config") {
 }
 
 ohos_shared_library("btframework") {
+  # uncomment to enable cfi for libbtframework.z.so
+  # sanitize = {
+  #   cfi = true
+  #   blocklist = "./frameworks_inner_blocklist.txt"
+  # }
   stack_protector_ret = true
   configs = [ ":btframework_config" ]
   public_configs = [ ":btframework_public_config" ]
@@ -81,15 +86,13 @@ ohos_shared_library("btframework") {
     "src/bluetooth_utils.cpp",
   ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static" ]
 
   external_deps = [
     "c_utils:utils",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
 
