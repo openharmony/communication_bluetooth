@@ -73,8 +73,61 @@
       "value": "#ab274f"
     },
     {
-    "name":"66ccff",
-    "value":"#66ccff"
+      "name":"66ccff",
+      "value":"#66ccff"
+    },
+    {
+      "name": "white",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "black",
+      "value": "#000000"
+    },
+    {
+      "name": "blue",
+      "value": "#87CEFA"
+    },
+    {
+      "name": "cyan",
+      "value": "#E1FFFF"
+    },
+    {
+      "name": "spring",
+      "value": "#F5FFFA"
+    },
+    {
+      "name": "red",
+      "value": "#DC143C"
+    },
+    {
+      "name": "yellow",
+      "value": "#D9B612"
+    },
+    {
+      "name": "lightyellow",
+      "value": "#F3F143"
+    },
+    {
+      "name": "green",
+      "value": "#549688"
+    },
+    {
+      "name": "moon",
+      "value": "#D7ECF1"
+    },
+    {
+      "name": "frost",
+      "value": "#E9F0F6"
+    },
+    {
+      "name": "water",
+      "value": "#D4F2E8"
+    },
+    {
+      "name": "lead",
+      "value": "#F0EFF4"
     }
+
   ]
 }

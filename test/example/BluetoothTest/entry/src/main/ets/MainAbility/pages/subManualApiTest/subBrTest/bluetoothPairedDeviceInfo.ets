@@ -14,10 +14,10 @@
  */
 
 import ConfigData from '../../../../Utils/ConfigData';
-import HeadComponent from '../../../../Component/headComponent';
+import HeadTableComponent from '../../../../Component/headerComponent';
 import Router from '@system.router';
 import LogUtil from '../../../../Utils/LogUtil';
-import BluetoothDevice from '../../../model/BluetoothDevice';
+import BluetoothDevice from '../../../model/bluetoothDevice';
 import BluetoothDeviceController from '../../../../MainAbility/controller/BluetoothDeviceController'
 
 let param;
@@ -41,8 +41,7 @@ struct BluetoothPairedDeviceInfo {
     Column() {
       GridContainer({ columns: 12, sizeType: SizeType.Auto, gutter: vp2px(1) === 2 ? '12vp' : '0vp', margin: vp2px(1) === 2 ? '24vp' : '0vp' }) {
         Row({}) {
-          Column() {
-          }
+          Column() {}
           .width(ConfigData.WH_100_100)
           .height(ConfigData.WH_100_100)
           .useSizeType({
@@ -50,7 +49,7 @@ struct BluetoothPairedDeviceInfo {
             md: { span: 0, offset: 0 }, lg: { span: 2, offset: 0 }
           });
           Column() {
-            HeadComponent({ headName: this.bluetoothDevice.deviceName, isActive: true });
+            HeadTableComponent({ headName: this.bluetoothDevice.deviceName, isActive: true });
             Blank()
             Row() {
               Button() {
@@ -86,8 +85,7 @@ struct BluetoothPairedDeviceInfo {
             md: { span: 12, offset: 0 }, lg: { span: 8, offset: 2 }
           });
 
-          Column() {
-          }
+          Column() {}
           .width(ConfigData.WH_100_100)
           .height(ConfigData.WH_100_100)
           .useSizeType({

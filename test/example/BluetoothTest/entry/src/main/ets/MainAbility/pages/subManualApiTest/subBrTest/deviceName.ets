@@ -13,17 +13,16 @@
  * limitations under the License.
  */
 import ConfigData from '../../../../Utils/ConfigData';
-import HeadComponent from '../../../../Component/headComponent';
-import BluetoothModel from '../../../model/BluetoothModel';
+import BluetoothModel from '../../../model/bluetoothModel';
 import Router from '@system.router';
 import InputMethod from '@ohos.inputmethod';
-
+import {PageTitle} from '../../../../Component/pageTitle';
 /**
  * about phone
  */
 @Entry
 @Component
-struct DeviceName {
+struct DeviceNameCard {
   private deviceName: string = BluetoothModel.getLocalName();
   //private deviceName: string = 'testName';
   private deviceInfo: any = ''
@@ -43,7 +42,7 @@ struct DeviceName {
           });
 
           Column() {
-            HeadComponent({ headName: $r('app.string.bt_device_name_title'), isActive: true })
+            PageTitle({detail: '设备名称'})
 
             TextInput({ text: this.deviceName})
               .placeholderFont({size: $r("app.float.font_18"), weight:FontWeight.Normal, style: FontStyle.Normal})

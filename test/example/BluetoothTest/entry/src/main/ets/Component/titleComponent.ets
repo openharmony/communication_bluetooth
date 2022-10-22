@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import ConfigData from '../Utils/ConfigData';
 
 /**
@@ -20,11 +21,11 @@ import ConfigData from '../Utils/ConfigData';
 @Component
 export struct TitleComponent {
   private title:string | Resource;
-  private fontSize:string = '20vp';
+  private fontSize:string = '30vp';
   private stateChangeFlag: boolean = false;
   private pinRequiredFlag: boolean = false;
   private bondStateChangeFlag: boolean = false;
-  @State bgColor: string | Resource = '';
+  @State bgColor: Resource = $r('app.color.font_color_007DFF');
   @State isTouched:boolean = false;
   @StorageLink('on_stateChange') state: string = 'on:stateChange';
   @StorageLink('on_pinRequired') pin: string = 'on:pinRequired';
@@ -36,11 +37,12 @@ export struct TitleComponent {
         Text(this.stateChangeFlag ? this.state : (this.pinRequiredFlag ? this.pin : (this.bondStateChangeFlag ? this.bondState : this.title)))
           .textAlign(TextAlign.Center)
           .width("100%")
+          .height(70)
           .fontSize(this.fontSize)
           .fontColor($r('app.color.font_color_182431'))
           .fontWeight(FontWeight.Medium)
       }
-      .height(ConfigData.WH_100_100)
+      .height(80)
       .width(ConfigData.WH_100_100)
       .backgroundColor(this.bgColor)
       .linearGradient(this.isTouched ? {
@@ -50,7 +52,8 @@ export struct TitleComponent {
       } : {
          angle: 90,
          direction: GradientDirection.Right,
-         colors: [[$r("sys.color.ohos_id_color_foreground_contrary"), 1], [$r("sys.color.ohos_id_color_foreground_contrary"), 1]]})
+         colors: [[$r("sys.color.ohos_id_color_foreground_contrary"), 1], [$r("sys.color.ohos_id_color_foreground_contrary"), 1]]
+      })
       .onTouch((event: TouchEvent) => {
         if (event.type === TouchType.Down) {
           this.isTouched = true;
@@ -61,7 +64,8 @@ export struct TitleComponent {
       })
     }
     .padding($r('app.float.distance_4'))
-    .height("40vp")
+    .height("100vp")
+    .borderRadius($r('app.float.radius_12'))
     .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"));
   }
 }

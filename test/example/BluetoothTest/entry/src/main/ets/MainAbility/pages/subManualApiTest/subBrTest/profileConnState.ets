@@ -12,10 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// @ts-nocheck
 import ConfigData from '../../../../Utils/ConfigData';
-import HeadComponent from '../../../../Component/headComponent';
-import BluetoothModel from '../../../model/BluetoothModel';
-import Router from '@system.router'
+import {PageTitle} from '../../../../Component/pageTitle';
 import { TitleComponent } from '../../../../Component/titleComponent';
 
 /**
@@ -24,134 +23,110 @@ import { TitleComponent } from '../../../../Component/titleComponent';
 @Entry
 @Component
 struct profileConnState {
-  @State message: string = "";
+  @State message: string = "请点击选择PROFILE TYPE";
   @State currentClick: number = -1;
   @State profileId: number = -1;
   @State profileType: string = '';
-
   build() {
-    Column(){
-      GridContainer({columns:12, sizeType: SizeType.Auto, gutter: vp2px(1) === 2 ? '12vp' : '0vp', margin: vp2px(1) === 2 ? '24vp' : '0vp'}) {
-        Row({}) {
-          Column() {
+    Column() {
+      PageTitle({detail: '选择PROFILE ID'})
+      Column(){
+        List() {
+          ListItem() {
+            TitleComponent({
+              title: "SELECT_PROFILE_ID",
+              bgColor: $r("app.color.moon"),
+              fontSize: '17vp',
+            })
           }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 0 }, sm: { span: 0, offset: 0 },
-            md: { span: 0, offset: 0 }, lg: { span: 2, offset: 0 }
-          });
+          .height(80)
+          .borderRadius(10)
 
-          Column() {
-            HeadComponent({ headName: '选择PROFILE ID', isActive: true })
-
-            Divider()
-              .padding({left: $r('sys.float.ohos_id_card_margin_start'), right: $r('sys.float.ohos_id_card_margin_end')})
-
-            Column(){
-
-              List() {
-                ListItem() {
-                  TitleComponent({
-                    title: "SELECT_PROFILE_ID",
-                    bgColor: $r('app.color.ab274f')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                })
-
-                ListItem() {
-                  TitleComponent({
-                    title: "A2DP_SOURCE",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 0;
-                  this.profileId = 1;
-                })
-
-                ListItem() {
-                  TitleComponent({
-                    title: "HANDS_FREE_AUDIO_GATEWAY",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 1;
-                  this.profileId = 4;
-                })
-
-                ListItem() {
-                  TitleComponent({
-                    title: "HID_HOST",
-                    fontSize: '15vp',
-                    bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
-                }.padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-                .onClick(() => {
-                  this.currentClick = 2;
-                  this.profileId = 6;
-                })
-              }
-              Blank()
-            }
-
-            Text(this.message)
-              .textAlign(TextAlign.Start)
-              .fontSize('20fp')
-              .backgroundColor($r("app.color.66ccff"))
-
-            Flex({direction: FlexDirection.Row, justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }){
-              Row(){
-                ButtonComponent({text: $r("app.string.cancel"), onClick: () => {
-                  Router.back();
-                }})
-              }
-              .width($r("app.float.deviceName_button_width"))
-              .margin({right: $r("app.float.distance_12")})
-              Row(){
-                ButtonComponent({text: $r("app.string.confirm"), onClick: () => {
-                  if(this.currentClick === -1) {
-                    this.message = '请点击选择PROFILE TYPE';
-                    return;
-                  } else {
-                    this.profileType = this.currentClick == 0 ? 'A2DP_SOURCE' : (this.currentClick == 1 ? 'HANDS_FREE_AUDIO_GATEWAY' : 'HID_HOST');
-                  }
-                  this.message = '';
-                  let ret = BluetoothModel.getProfileConnState(this.profileId);
-                  AppStorage.SetOrCreate('getProfileConnState', ret);
-                  this.message = this.profileType + ' 的连接状态是 ' + ret;
-                  //Router.back();
-                }})
-              }.width($r("app.float.deviceName_button_width"))
-            }
+          ListItem() {
+            TitleComponent({
+              title: "A2DP_SOURCE",
+              fontSize: '15vp',
+              bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
           }
-          .padding({left: $r('app.float.distance_24'), right: $r('app.float.distance_24')})
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 12, offset: 0 }, sm: { span: 12, offset: 0 },
-            md: { span: 12, offset: 0 }, lg: { span: 8, offset: 2 }
-          });
+          .padding({top:10})
+          .height(80)
+          .borderRadius(10)
+          .onClick(() => {
+            this.currentClick = 0;
+            this.profileId = 1;
+          })
 
-          Column() {
-
+          ListItem() {
+            TitleComponent({
+              title: "HANDS_FREE_AUDIO_GATEWAY",
+              fontSize: '15vp',
+              bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
+            })
           }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 12 }, sm: { span: 0, offset: 12 },
-            md: { span: 0, offset: 12 }, lg: { span: 2, offset: 10 }
+          .padding({top:20})
+          .height(80)
+          .borderRadius(10)
+          .onClick(() => {
+            this.currentClick = 1;
+            this.profileId = 4;
+          })
+
+          ListItem() {
+            TitleComponent({
+              title: "HID_HOST",
+              fontSize: '15vp',
+              bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')});
+          }
+          .padding({top:20})
+          .height(80)
+          .borderRadius(10)
+          .onClick(() => {
+            this.currentClick = 2;
+            this.profileId = 6;
           })
         }
-        .width(ConfigData.WH_100_100)
-        .height(ConfigData.WH_100_100);
+        .height(400)
       }
-      .width(ConfigData.WH_100_100)
-      .height(ConfigData.WH_100_100);
+
+      Text(this.message)
+        .textAlign(TextAlign.Center)
+        .fontSize('17fp')
+        .height(60)
+        .width("100%")
+        .backgroundColor($r("app.color.moon"))
+
+
+      Row(){
+        Column(){
+          Text("取消")
+            .textAlign(TextAlign.Center)
+            .fontSize('17fp')
+            .height(60)
+            .width(100)
+            .borderRadius(10)
+            .borderColor($r("app.color.moon"))
+            .backgroundColor($r("app.color.white"))
+        }
+        .padding({right: 10})
+        Column() {
+          Text("确认")
+            .textAlign(TextAlign.Center)
+            .fontSize('17fp')
+            .height(60)
+            .width(100)
+            .borderRadius(10)
+            .borderColor($r("app.color.moon"))
+            .backgroundColor($r("app.color.white"))
+        }
+        .padding({left: 50})
+
+      }
+      .width("80%")
     }
-    .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
-    .width(ConfigData.WH_100_100)
-    .height(ConfigData.WH_100_100);
+    .padding({left: $r('app.float.distance_24'), right: $r('app.float.distance_24')})
+    .width("100%")
+    .height(ConfigData.WH_100_100)
+    .backgroundColor($r("app.color.lead"))
   }
 }
 
@@ -170,7 +145,7 @@ struct ButtonComponent {
         .lineHeight($r('app.float.wh_value_22'))
         .fontColor($r('app.color.font_color_007DFF'))
         .textAlign(TextAlign.Center)
-        .width($r('app.float.deviceName_button_width'))
+        .width(100)
         .height($r("app.float.wh_value_40"))
         .borderRadius($r('app.float.radius_20'))
         .backgroundColor(!this.isTouched ? $r("app.color.color_button_grey") : $r("sys.color.ohos_id_color_foreground_contrary"))
@@ -187,6 +162,5 @@ struct ButtonComponent {
         })
     }
     .width(ConfigData.WH_100_100)
-    .align(Alignment.Center);
   }
 }

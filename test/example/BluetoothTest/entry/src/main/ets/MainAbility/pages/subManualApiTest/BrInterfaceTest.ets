@@ -12,27 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TitleComponent } from '../../../Component/titleComponent';
-import HeadComponent from '../../../component/headcomponent';
-import BluetoothModel from '../../model/BluetoothModel';
+// @ts-nocheck
+
+import { PageTitle } from '../../../Component/pageTitle';
+import { TestImageDisplay } from '../../../Component/testImageDisplay';
+import { ContentTable } from '../../../Component/contentTable';
+import BluetoothModel from '../../model/bluetoothModel';
 import Router from '@system.router';
-import BluetoothDevice from '../../model/BluetoothDevice'
+import BluetoothDevice from '../../model/bluetoothDevice'
 import BluetoothDeviceController from '../../controller/BluetoothDeviceController';
 import ConfigData from '../../../Utils/ConfigData';
 import LogUtil from '../../../Utils/LogUtil';
-import bluetooth from '@ohos.bluetooth';
+import { initBRApiData } from '../../../MainAbility/model/testDataModels'
 
-const PAGE_URI_DEVICE_NAME = 'pages/subManualApiTest/subBrTest/deviceName';
-const PAGE_URI_SET_SCAN_MODE = 'pages/subManualApiTest/subBrTest/setScanMode';
-const PAGE_URI_DEVICE_FOUND_MODE = 'pages/subManualApiTest/subBrTest/deviceFound';
-const PAGE_URI_PROFILE_CONN_STATE = 'pages/subManualApiTest/subBrTest/profileConnState';
-const PAGE_URI_PROFILE_CONN_STATE_BY_ID = 'pages/subManualApiTest/subBrTest/searchProfileConnStateById';
-const PAGE_URI_PAIRED_DEVICES = "pages/subManualApiTest/subBrTest/pairedDevices";
+import { TestData } from '../../model/testData'
 
 @Entry
 @Component
 struct Index {
   private TAG_PAGE = ConfigData.TAG + 'Paired_Device ';
+  private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
   @State btStateMessage: string = "";
   @State pinMessage: string = "";
@@ -41,12 +40,14 @@ struct Index {
   @State isConnection: boolean = false;
   @StorageLink('setLocalNameRet') setLocalNameRet: boolean = false;
   @StorageLink('setScanModeRet') setScanModeRet: boolean = false;
+  private stateProfile: string = ""
   private stateBT: string = "";
   @State deviceId: string = '';
   @State currentClick: number = -1;
   @StorageLink('pairedDeviceInfo') pairingDevice: BluetoothDevice = new BluetoothDevice;
   @StorageLink('pairedDeviceId') pairedDeviceId: string = '';
   @StorageLink('btDeviceController') controller: BluetoothDeviceController = new BluetoothDeviceController;
+  @StorageLink('pairedMac') pairedMac: string = "AC:1E:9E:0B:2E:63";
   @State pairPinCode: string = '';
   @State btOnState: string = 'on:stateChange';
   @State btPinRequired: string = 'on:pinRequired';
@@ -69,494 +70,48 @@ struct Index {
 
   aboutToAppear() {
     this.btEnable = BluetoothModel.isStateOn();
+    this.controller.subscribePinRequired((deviceId, pinCode) => {
+      this.pairPinCode = pinCode
+      this.pairingDevice.deviceId = deviceId;
+      this.pairingDevice.deviceName = deviceId;
+      this.pairDialog.open();
+    })
     AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
+    AppStorage.SetOrCreate('pairedMac', this.pairedMac);
+  }
+
+  init() {
+    console.log("init-----------")
   }
 
   build() {
-    Row() {
+    Column() {
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({testItem: this.testItem})
+      }
       Column() {
-        HeadComponent({ headName: 'BR接口测试', isActive: true });
-        Stack().height("0.5vp").backgroundColor("#000000");
-        Row() {
-          Text("目标设备MAC：").fontSize("20vp")
-          TextInput( { text: this.deviceId, placeholder: "请输入即将连接的设备MAC" } )
+        Text("目标设备MAC：")
           .fontSize("20vp")
+          .height(50)
+          .width('100%')
+          .padding({top: 10, left: 10})
+        TextInput({ text: this.pairedMac, placeholder: "请输入即将连接的设备MAC" })
+          .height(50)
+          .borderStyle(BorderStyle.Dashed)
+          .backgroundColor($r("app.color.white"))
           .onChange((str) => {
             this.deviceId = str;
           })
-          .width('70%')
-        }
-        .margin( { top: "20vp", left: "20vp", right: "20vp" } )
-        .alignItems(VerticalAlign.Center)
-
-        Scroll() {
-          Column() {
-            List({ space: 1 }) {
-              ListItem() {
-                TitleComponent({
-                  title: "enableBluetooth",
-                  bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 0;
-                if (this.btEnable) {
-                  this.message = '蓝牙已经使能';
-                  return;
-                }
-                let ret = BluetoothModel.enableBluetooth();
-                this.btEnable = ret;
-                AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
-                this.message = "蓝牙使能执行结果：" + ret;
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "disableBluetooth",
-                  bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 1;
-                if (!this.btEnable) {
-                  this.message = '蓝牙还未使能';
-                  return;
-                }
-                let ret = BluetoothModel.disableBluetooth();
-                this.btEnable = false;
-                AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
-                this.message = "蓝牙去使能执行结果：" + ret;
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getState",
-                  bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 2;
-                let ret = BluetoothModel.getState();
-                switch (ret) {
-                  case 0:
-                    this.stateBT = 'STATE_OFF';
-                    break;
-                  case 1:
-                    this.stateBT = 'STATE_TURNING_ON';
-                    break;
-                  case 2:
-                    this.stateBT = 'STATE_ON';
-                    break;
-                  case 3:
-                    this.stateBT = 'STATE_TURNING_OFF';
-                    break;
-                  case 4:
-                    this.stateBT = 'STATE_BLE_TURNING_ON';
-                    break;
-                  case 5:
-                    this.stateBT = 'STATE_BLE_ON';
-                    break;
-                  case 6:
-                    this.stateBT = 'STATE_BLE_TURNING_OFF';
-                    break;
-                  default:
-                    this.stateBT = '未知状态';
-                    break;
-                }
-                this.message = "当前蓝牙的状态是：" + this.stateBT;
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getBtConnectionState",
-                  bgColor: this.currentClick === 3 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 3;
-                let ret = BluetoothModel.getBtConnectionState();
-                this.message = "当前连接状态是：" + ret;
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "setLocalName",
-                  bgColor: this.currentClick === 4 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 4;
-                if (this.btEnable) {
-                  Router.push({ uri: PAGE_URI_DEVICE_NAME });
-                  this.message = "设置SCAN MODE " + this.setScanModeRet ? '成功' : '失败';
-                } else {
-                  this.message = "蓝牙未使能";
-                }
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getLocalName",
-                  bgColor: this.currentClick === 5 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 5;
-                let ret = BluetoothModel.getLocalName();
-                this.message = "本设备名称是：" + ret;
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "setBluetoothScanMode",
-                  bgColor: this.currentClick === 6 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 6;
-                if (this.btEnable) {
-                  Router.push({ uri: PAGE_URI_SET_SCAN_MODE });
-                  this.message = "setBluetoothScanMode执行" + this.setLocalNameRet ? '成功' : '失败';
-                } else {
-                  this.message = "蓝牙未使能";
-                }
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getBluetoothScanMode",
-                  bgColor: this.currentClick === 7 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 7;
-                let ret = BluetoothModel.getBluetoothScanMode();
-                this.message = "蓝牙当前的扫描模式是: " + ret;
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "startBluetoothDiscovery",
-                  bgColor: this.currentClick === 8 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                LogUtil.info(this.TAG_PAGE + 'startBluetoothDiscovery 111');
-                if (!this.btEnable) {
-                  this.message = '蓝牙未使能';
-                  return;
-                }
-                this.currentClick = 8;
-                Router.push({ uri: PAGE_URI_DEVICE_FOUND_MODE });
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "stopBluetoothDiscovery",
-                  bgColor: this.currentClick === 9 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 9;
-                let ret = BluetoothModel.stopBluetoothDiscovery();
-                this.message = "stopBluetoothDiscovery 执行: " + ret;
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "pairDevice",
-                  bgColor: this.currentClick === 10 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 10;
-                if (!this.btEnable) {
-                  this.message = '蓝牙未使能';
-                  return;
-                }
-                if (this.deviceId == '') {
-                  this.message = "请输入目标设备的MAC";
-                  return;
-                } else {
-                  this.pairDevice(this.deviceId);
-                }
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getRemoteDeviceName",
-                  bgColor: this.currentClick === 11 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 11;
-                if (!this.btEnable) {
-                  this.message = '蓝牙未使能';
-                  return;
-                }
-                if (this.deviceId == '') {
-                  this.message = "请输入目标设备的MAC";
-                  return;
-                } else {
-                  let ret = BluetoothModel.getDeviceName(this.deviceId);
-                  this.message = '配对设备为' + ret;
-                }
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getRemoteDeviceClass",
-                  bgColor: this.currentClick === 12 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 12;
-                if (!this.btEnable) {
-                  this.message = '蓝牙未使能';
-                  return;
-                }
-                if (this.deviceId == '') {
-                  this.message = "请输入目标设备的MAC";
-                  return;
-                } else {
-                  let ret = BluetoothModel.getDeviceType(this.deviceId);
-                  this.message = '依据majorClass解析的设备类型是' + ret;
-                }
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getPairedDevices",
-                  bgColor: this.currentClick === 13 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 13;
-                let ret = BluetoothModel.getPairedDeviceIds();
-                if (ret.length == 0) {
-                  this.message = '当前没有任何配对设备';
-                  return;
-                }
-                AppStorage.SetOrCreate('pairedDevices', ret);
-                Router.push({ uri: PAGE_URI_PAIRED_DEVICES })
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "cancelPairedDevice",
-                  bgColor: this.currentClick === 14 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 14;
-                if (!this.btEnable) {
-                  this.message = '蓝牙未使能';
-                  return;
-                }
-                if (this.deviceId == '') {
-                  this.message = "请输入目标设备的MAC";
-                  return;
-                } else {
-                  let ret = BluetoothModel.unpairDevice(this.deviceId);
-                  this.message = '设备 "' + this.deviceId + '" 断开：' + ret;
-                }
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getProfileConnState1",
-                  bgColor: this.currentClick === 15 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 15;
-                Router.push({ uri: PAGE_URI_PROFILE_CONN_STATE })
-                this.message = '';
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: "getProfileConnState2",
-                  bgColor: this.currentClick === 16 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                this.currentClick = 16;
-                Router.push({ uri: PAGE_URI_PROFILE_CONN_STATE_BY_ID })
-                this.message = '';
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: this.btOnState,
-                  stateChangeFlag: true,
-                  bgColor: this.currentClick === 17 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                if (this.isStateChangeClick) {
-                  bluetooth.off('stateChange', () => {})
-                  this.message = 'on:stateChange监听已关闭，再次点击将开启监听';
-                  this.btOnState = 'on:stateChange'
-                  AppStorage.SetOrCreate('on_stateChange', this.btOnState);
-                  this.isStateChangeClick = false;
-                  return;
-                }
-                this.isStateChangeClick = true;
-                this.currentClick = 17;
-                this.btOnState = 'off:stateChange'
-                AppStorage.SetOrCreate('on_stateChange', this.btOnState);
-                this.btStateMessage = 'STATE: ';
-                bluetooth.on('stateChange', (data) => {
-                  this.btStateMessage = 'STATE: ';
-                  switch (data) {
-                    case 0:
-                      this.btStateMessage += 'STATE_OFF';
-                      break;
-                    case 1:
-                      this.btStateMessage += 'STATE_TURNING_ON';
-                      break;
-                    case 2:
-                      this.btStateMessage += 'STATE_ON';
-                      break;
-                    case 3:
-                      this.btStateMessage += 'STATE_TURNING_OFF';
-                      break;
-                    case 4:
-                      this.btStateMessage += 'STATE_BLE_TURNING_ON';
-                      break;
-                    case 5:
-                      this.btStateMessage += 'STATE_BLE_ON';
-                      break;
-                    case 6:
-                      this.btStateMessage += 'STATE_BLE_TURNING_OFF';
-                      break;
-                    default:
-                      this.btStateMessage += '未知状态';
-                      break;
-                  }
-                })
-                this.message = 'on:stateChange监听已启动，再次点击将关闭监听。';
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: this.btPinRequired,
-                  pinRequiredFlag: true,
-                  bgColor: this.currentClick === 18 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                if (!this.btEnable) {
-                  this.message = "蓝牙未使能";
-                  return;
-                }
-                if (this.isPinRequiredClick) {
-                  bluetooth.off('pinRequired', () => {
-
-                  })
-                  this.message = 'on:pinRequired监听已关闭，再次点击将开启监听';
-                  this.isPinRequiredClick = false;
-                  this.btPinRequired = 'on:pinRequired';
-                  AppStorage.SetOrCreate('on_pinRequired', this.btPinRequired);
-                  return;
-                }
-                this.isPinRequiredClick = true;
-                this.currentClick = 18;
-                this.btPinRequired = 'off:pinRequired';
-                AppStorage.SetOrCreate('on_pinRequired', this.btPinRequired);
-                this.pinMessage = 'PIN: ';
-                bluetooth.on('pinRequired', (data) => {
-                  this.pinMessage = 'PIN: ';
-                  this.pinMessage += data.pinCode;
-                })
-                this.message = 'on:pinRequired监听已启动，再次点击将关闭监听。';
-              })
-
-              ListItem() {
-                TitleComponent({
-                  title: this.btBondStateChange,
-                  bondStateChangeFlag: true,
-                  bgColor: this.currentClick === 19 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
-                });
-              }
-              .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
-              .onClick(() => {
-                if (!this.btEnable) {
-                  this.message = "蓝牙未使能";
-                  return;
-                }
-                if (this.isBondStateChangeClick) {
-                  bluetooth.off('bondStateChange', () => {
-                  })
-                  this.message = 'on:bondStateChange监听已关闭，再次点击将开启监听';
-                  this.isBondStateChangeClick = false;
-                  this.btBondStateChange = 'on:bondStateChange'
-                  AppStorage.SetOrCreate('on_bondStateChange', this.btBondStateChange);
-                  return;
-                }
-                this.isBondStateChangeClick = true;
-                this.currentClick = 19;
-                this.btBondStateChange = 'off:bondStateChange'
-                AppStorage.SetOrCreate('on_bondStateChange', this.btBondStateChange);
-                this.bondStateMessage = 'bondState: ';
-                bluetooth.on('bondStateChange', (data) => {
-                  this.bondStateMessage = 'bondState: ';
-                  this.bondStateMessage += data.state;
-                })
-                this.message = 'on:bondStateChange监听已启动，再次点击将关闭监听';
-              })
-
-            }
-            .margin(20)
-          }
-          .width('100%')
-          .visibility(Visibility.Visible)
-        }
-        .height('70%')
-
-        Text(this.message)
-          .fontSize('15vp')
-          .textAlign(TextAlign.Start)
-          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
-          .padding({ top: $r('app.float.distance_12'), bottom: $r('app.float.distance_12') })
-        Text(this.btStateMessage)
-          .fontSize('15vp')
-          .textAlign(TextAlign.Start)
-          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
-        Text(this.pinMessage)
-          .fontSize('15vp')
-          .textAlign(TextAlign.Start)
-          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
-        Text(this.bondStateMessage)
-          .fontSize('15vp')
-          .textAlign(TextAlign.Start)
-          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+          .width('96%')
+          .padding({top: 10, left: 10})
       }
-      .height('100%')
+      .align(Alignment.TopStart)
+      ContentTable({ testItem: this.testItem, apiItems: initBRApiData() })
     }
-    .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
-    .height('100%')
-    .alignItems(VerticalAlign.Top)
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor($r("app.color.lead"))
+
   }
 
   /**
