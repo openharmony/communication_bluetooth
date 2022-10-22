@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 import ConfigData from '../../../../Utils/ConfigData';
-import HeadComponent from '../../../../Component/headComponent';
+
 import Router from '@system.router'
 import { TitleComponent } from '../../../../Component/titleComponent';
-
+import {PageTitle} from '../../../../Component/pageTitle';
 /**
  * about phone
  */
@@ -29,6 +29,7 @@ struct pairedDevices {
   private aboutDeviceList: any[] = [];
   private scanMode: number = 0;
   @StorageLink('pairedDevices') pairedDevices: string[] = [];
+
 
   build() {
     Column(){
@@ -44,7 +45,8 @@ struct pairedDevices {
           });
 
           Column() {
-            HeadComponent({ headName: '已配对设备', isActive: true })
+            PageTitle({detail: '已配对设备'})
+
 
             Divider()
               .padding({left: $r('sys.float.ohos_id_card_margin_start'), right: $r('sys.float.ohos_id_card_margin_end')})
@@ -82,16 +84,6 @@ struct pairedDevices {
             xs: { span: 12, offset: 0 }, sm: { span: 12, offset: 0 },
             md: { span: 12, offset: 0 }, lg: { span: 8, offset: 2 }
           });
-
-          Column() {
-
-          }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 12 }, sm: { span: 0, offset: 12 },
-            md: { span: 0, offset: 12 }, lg: { span: 2, offset: 10 }
-          })
         }
         .width(ConfigData.WH_100_100)
         .height(ConfigData.WH_100_100);

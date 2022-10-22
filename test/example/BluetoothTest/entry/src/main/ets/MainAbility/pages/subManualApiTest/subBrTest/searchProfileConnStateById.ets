@@ -40,6 +40,7 @@ struct profileConnState2 {
             })
             .width('70%')
         }
+        .backgroundColor($r("app.color.moon"))
         .margin( { top: "20vp", left: "20vp", right: "20vp" } )
         .alignItems(VerticalAlign.Center)
 
@@ -51,7 +52,9 @@ struct profileConnState2 {
               bgColor: this.currentClick === 0 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
             });
           }
-          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+          .padding({top:20})
+          .height(80)
+          .borderRadius(10)
           .onClick(() => {
             this.currentClick = 0;
             this.profileId = 1;
@@ -84,7 +87,9 @@ struct profileConnState2 {
               bgColor: this.currentClick === 1 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
             });
           }
-          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+          .padding({top:20})
+          .height(80)
+          .borderRadius(10)
           .onClick(() => {
             this.currentClick = 1;
             this.profileId = 4;
@@ -117,7 +122,9 @@ struct profileConnState2 {
               bgColor: this.currentClick === 2 ? $r('app.color.font_color_007DFF') : $r('app.color.white_bg_color')
             });
           }
-          .padding({ top: $r('app.float.distance_2'), bottom: $r('app.float.distance_2') })
+          .padding({top:20})
+          .height(80)
+          .borderRadius(10)
           .onClick(() => {
             this.currentClick = 2;
             this.profileId = 6;
@@ -142,14 +149,18 @@ struct profileConnState2 {
             }
             this.message = "当前HID的状态是：" + this.stateProfile;
           })
-        }.margin(20);
+        }
+        .height(300)
+        .margin(20);
+
         Text("接口调用结果：" + this.message)
           .textAlign(TextAlign.Start)
-          .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+          .fontSize('17fp')
+          .backgroundColor($r("app.color.white"))
       }.width('100%')
     }
-    .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
     .height('100%')
     .alignItems(VerticalAlign.Top)
+    .backgroundColor($r("app.color.lead"))
   }
   }

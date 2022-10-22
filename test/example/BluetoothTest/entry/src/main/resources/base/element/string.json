@@ -13,6 +13,34 @@
       "value": "蓝牙专项测试"
     },
     {
+      "name": "api",
+      "value": "接口测试"
+    },
+    {
+      "name": "scenario",
+      "value": "场景测试"
+    },
+    {
+      "name": "autotest",
+      "value": "自动测试"
+    },
+    {
+      "name": "profile",
+      "value": "Profile测试"
+    },
+    {
+      "name": "testcase",
+      "value": "接口"
+    },
+    {
+      "name": "result",
+      "value": "结果"
+    },
+    {
+      "name": "benchmark",
+      "value": "性能测试"
+    },
+    {
       "name": "test_title",
       "value": "蓝牙测试"
     },
@@ -48,16 +76,44 @@
       "value": "Profile业务"
     },
     {
-      "name": "a2dp_profile_test_title",
-      "value": "A2DP Profile"
+      "name": "a2dp_sink_profile_test_title",
+      "value": "A2DP SINK Profile"
     },
     {
-      "name": "hands_profile_test_title",
-      "value": "HANDS Profile"
+      "name": "a2dp_sour_profile_test_title",
+      "value": "A2DP SOUR Profile"
+    },
+    {
+      "name": "avrcp_ct_profile_test_title",
+      "value": "AVRCP CT Profile"
+    },
+    {
+      "name": "avrcp_tg_profile_test_title",
+      "value": "AVRCP TG Profile"
+    },
+    {
+      "name": "hands_free_audio_gateway_profile_test_title",
+      "value": "HANDS FREE AUDIO GATEWAY Profile"
+    },
+    {
+      "name": "hands_free_unit_profile_test_title",
+      "value": "HANDS FREE UNIT Profile"
     },
     {
       "name": "hid_host_profile_test_title",
       "value": "HID HOST Profile"
+    },
+    {
+      "name": "pan_network_profile_test_title",
+      "value": "PAN NetWork Profile"
+    },
+    {
+      "name": "p_bap_clinet_profile_test_title",
+      "value": "Pbap CLIENT Profile"
+    },
+    {
+      "name": "p_bap_server_profile_test_title",
+      "value": "Pbap SERVER Profile"
     },
     {
       "name": "br_test_title",

@@ -12,7 +12,6 @@
     "mainAbility": ".MainAbility",
     "deviceType": [
       "default",
-      "phone",
       "tablet"
     ],
     "reqPermissions": [
@@ -26,9 +25,6 @@
       },
       {
         "name": "ohos.permission.LOCATION"
-      },
-      {
-        "name": "ohos.permission.MANAGE_BLUETOOTH"
       }
     ],
     "abilities": [
@@ -73,10 +69,10 @@
         },
         "pages": [
           "pages/homePage",
-          "pages/manualApiTest",
+          "pages/manualApiTestPage",
           "pages/manualSceneTest",
           "pages/autoTest",
-          "pages/confInfo",
+          "pages/profile",
           "pages/subManualApiTest/bleTest",
           "pages/subManualApiTest/subBrTest/deviceName",
           "pages/subManualApiTest/subBrTest/setScanMode",
@@ -87,13 +83,29 @@
           "pages/subManualApiTest/gattTest",
           "pages/subManualApiTest/sppTest",
           "pages/subManualApiTest/profileTest",
-          "pages/subManualApiTest/subProfileTest/a2dpProfileTest",
+          "pages/subManualApiTest/subProfileTest/a2dpSourceProfileTest",
+          "pages/subManualApiTest/subProfileTest/handsFreeAudioGatewayProfileTest",
+          "pages/subManualApiTest/subProfileTest/hidHostProfileTest",
+          "pages/subManualApiTest/subProfileTest/panNetworkProfileTest",
           "pages/subManualApiTest/subGattTest/gattClient",
           "pages/subManualApiTest/subGattTest/gattServer",
           "pages/subManualApiTest/subSppTest/sppClientTest",
           "pages/subManualApiTest/subSppTest/sppServerTest",
-          "pages/subManualApiTest/BrInterfaceTest"
-	],
+          "pages/subManualApiTest/BrInterfaceTest",
+          "pages/subAutoTest/brAutoTest",
+          "pages/subAutoTest/bleAutoTest",
+          "pages/subAutoTest/gattAutoTest",
+          "pages/subAutoTest/sppAutoTest",
+          "pages/subAutoTest/profileAutoTest",
+          "pages/subAutoTest/subGattAutoTest/gattClientAutoTest",
+          "pages/subAutoTest/subGattAutoTest/gattServerAutoTest",
+          "pages/subAutoTest/subSppAutoTest/sppClientAutoTest",
+          "pages/subAutoTest/subSppAutoTest/sppServerAutoTest",
+          "pages/subAutoTest/subProfileAutoTest/a2dpSourceAutoTest",
+          "pages/subAutoTest/subProfileAutoTest/handsFreeAudioGatewayAutoTest",
+          "pages/subAutoTest/subProfileAutoTest/hitHostAutoTest",
+          "pages/subAutoTest/subProfileAutoTest/panNetworkAutoTest"
+        ],
         "name": ".MainAbility",
         "window": {
           "designWidth": 720,
