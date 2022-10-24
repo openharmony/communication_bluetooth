@@ -15,6 +15,7 @@
 #include <uv.h>
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_a2dp_src_observer.h"
+#include "napi_bluetooth_event.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -29,47 +30,11 @@ void NapiA2dpSourceObserver::OnConnectionStateChanged(const BluetoothRemoteDevic
         HILOGW("This callback is not registered by ability.");
         return;
     }
-
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
 
     callbackInfo->state_ = state;
     callbackInfo->deviceId_ = device.GetDeviceAddr();
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    uint32_t refCount = INVALID_REF_COUNT;
-    napi_reference_ref(callbackInfo->env_, callbackInfo->callback_, &refCount);
-    HILOGI("increments the reference count, refCount: %{public}d", refCount);
-    work->data = (void*)callbackInfo.get();
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            if (callback != nullptr) {
-                HILOGI("a2dp src napi_call_function called");
-                napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            }
-            uint32_t refCount = INVALID_REF_COUNT;
-            napi_reference_unref(callbackInfo->env_, callbackInfo->callback_, &refCount);
-            HILOGI("uv_queue_work unref, refCount: %{public}d", refCount);
-            if (refCount == 0) {
-                napi_delete_reference(callbackInfo->env_, callbackInfo->callback_);
-            }
-            delete work;
-            work = nullptr;
-        }
-    );
+    NapiEvent::CheckAndNotify(callbackInfo, state);
 }
 
 } // namespace Bluetooth
