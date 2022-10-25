@@ -231,6 +231,11 @@ void BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecip
     const wptr<IRemoteObject> &remote)
 {
     HILOGI("enter");
+    if (owner_.pimpl == nullptr || owner_.pimpl->clientService_ == nullptr) {
+        HILOGE("gattClientServer clientService_ is not support.");
+        return;
+    }
+    std::lock_guard<std::mutex> lck(owner_.pimpl->registerMutex_);
     for (auto it = owner_.pimpl->callbacks_.begin(); it != owner_.pimpl->callbacks_.end(); ++it) {
         if ((*it)->GetCallback()->AsObject() == remote) {
             HILOGI("callback is found from callbacks");
@@ -239,8 +244,8 @@ void BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecip
                 HILOGE("Failed to unlink death recipient from callback");
             }
             HILOGI("App id is %{public}d", (*it)->GetAppId());
-            owner_.Disconnect((*it)->GetAppId());
-            owner_.DeregisterApplication((*it)->GetAppId());
+            owner_.pimpl->clientService_->Disconnect((*it)->GetAppId());
+            owner_.pimpl->clientService_->DeregisterApplication((*it)->GetAppId());
             owner_.pimpl->callbacks_.erase(it);
             *it = nullptr;
             return;
