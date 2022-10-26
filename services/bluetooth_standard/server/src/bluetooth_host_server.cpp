@@ -930,6 +930,10 @@ std::vector<sptr<BluetoothRawAddress>> BluetoothHostServer::GetPairedDevices(int
 
 bool BluetoothHostServer::RemovePair(int32_t transport, const sptr<BluetoothRawAddress> &device)
 {
+    if (device == nullptr) {
+        HILOGE("device is nullptr.");
+        return false;
+    }
     HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
     if ((transport == BTTransport::ADAPTER_BREDR) && IsBtEnabled()) {
         return pimpl->classicService_->RemovePair(*device);
