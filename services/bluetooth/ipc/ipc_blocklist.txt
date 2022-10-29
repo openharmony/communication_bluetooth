@@ -24,3 +24,5 @@ type:*OHOS::Bluetooth::IBluetoothHfpAgObserver*
 type:*OHOS::Bluetooth::IBluetoothBleAdvertiseCallback*
 type:*OHOS::Bluetooth::IBluetoothBleCentralManagerCallback*
 type:*OHOS::Bluetooth::IBluetoothGattClientCallback*
+src:*bluetooth_opp_observer_stub.cpp
+src:*bluetooth_pan_observer_stub.cpp
