@@ -13,6 +13,8 @@
  [cfi]
  src:*/bluetooth/services/bluetooth/stack/src/btm/btm_acl.c
  src:*/bluetooth/services/bluetooth/stack/src/btm/btm_sco.c
+ src:*/bluetooth/services/bluetooth/stack/src/btm/btm.c
+ src:*/bluetooth/services/bluetooth/stack/src/l2cap/l2cap_cmn.c
  src:*/bluetooth/services/bluetooth/stack/src/gap/gap_le_sec.c
  src:*/bluetooth/services/bluetooth/stack/src/gap/gap_le_adv.c
  src:*/bluetooth/services/bluetooth/stack/src/att/att_receive.c
