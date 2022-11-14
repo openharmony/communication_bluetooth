@@ -20,7 +20,7 @@ BT_ROOT = "//foundation/communication/bluetooth/services/bluetooth"
 ohos_shared_library("bluetooth_server") {
   sanitize = {
     cfi = true
-    # blocklist = "./bluetooth_server_blocklist.txt"
+    blocklist = "./bluetooth_server_blocklist.txt"
   }
   stack_protector_ret = true
   include_dirs = [
