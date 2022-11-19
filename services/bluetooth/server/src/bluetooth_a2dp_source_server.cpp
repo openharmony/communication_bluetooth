@@ -37,7 +37,7 @@ public:
         HILOGI("addr: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
         if (state == static_cast<int>(BTConnectState::CONNECTED) ||
             state == static_cast<int>(BTConnectState::DISCONNECTED)) {
-            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_A2DP_CONNECTED_STATE",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_A2DP_CONNECTED_STATE",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", state);
         }
         observers_->ForEach([device, state](sptr<IBluetoothA2dpSourceObserver> observer) {

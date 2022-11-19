@@ -202,7 +202,7 @@ public:
             if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
-                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BR_SWITCH_STATE",
+                HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_BR_SWITCH_STATE",
                     HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
             }
         } else if (transport == BTTransport::ADAPTER_BLE) {
@@ -222,7 +222,7 @@ public:
             if (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF) {
                 int32_t pid = IPCSkeleton::GetCallingPid();
                 int32_t uid = IPCSkeleton::GetCallingUid();
-                HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_STATE",
+                HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_BLE_STATE",
                     HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
             }
         }
@@ -251,7 +251,7 @@ public:
         if (status == DISCOVERY_STARTED || status == DISCOVERY_STOPED) {
             int32_t pid = IPCSkeleton::GetCallingPid();
             int32_t uid = IPCSkeleton::GetCallingUid();
-            HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_DISCOVERY_STATE",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_DISCOVERY_STATE",
                 HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", status);
         }
     }
