@@ -834,7 +834,7 @@ void BleCentralManagerImpl::SetScanModeDuration(int scanMode, int type) const
         default:
             break;
     }
-    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_BLE_SCAN_DUTY_CYCLE",
+    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_BLE_SCAN_DUTY_CYCLE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "WINDOW", pimpl->scanParams_.scanWindow,
         "INTERVAL", pimpl->scanParams_.scanInterval, "TYPE", pimpl->callBackType_);
 }
