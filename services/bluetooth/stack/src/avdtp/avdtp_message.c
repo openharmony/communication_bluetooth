@@ -958,8 +958,8 @@ void AvdtParseMsgAssembled(AvdtSigCtrl *sigCtrl, Packet *pkt)
         sigCtrl->rcvSignal,
         sigCtrl->rcvLabel,
         sigCtrl->msgType);
-    uint8_t header = 0;
-    PacketExtractHead(pkt, &header, AVDT_2BYTE);
+    uint8_t header[2] = {0};
+    PacketExtractHead(pkt, &header[0], AVDT_2BYTE);
     switch (sigCtrl->msgType) {
         case AVDT_MSG_TYPE_CMD:
             if (AvdtCheckSignal(sigCtrl->rcvSignal) != AVDT_SUCCESS) {
@@ -1602,7 +1602,11 @@ void AvdtParseDiscoverRsp(AvdtSigCtrl *sigCtrl, AvdtCtrlData *data, const Packet
     uint16_t Offset = 0;
     uint8_t context = 0;
     uint8_t index = 0;
+
     LOG_DEBUG("[AVDT]%{public}s: totalSize(%hu)", __func__, TotalSize);
+    if (maxNumSeps == 0) {
+        return;
+    }
     do {
         (void)memset_s(&data->discoverCfm.seps[index], sizeof(AvdtSepInfo), 0, sizeof(AvdtSepInfo));
         PacketPayloadRead(pkt, &context, Offset, AVDT_1BYTE);
