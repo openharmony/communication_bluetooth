@@ -2026,7 +2026,7 @@ static void L2capProcessSignal(uint16_t aclHandle, const Packet *pkt)
         signal.length = L2capLe16ToCpu(buff + offset + L2CAP_OFFSET_2);
 
         uint16_t signalLength = signal.length + L2CAP_SIGNAL_HEADER_LENGTH;
-        if (length < signalLength) {
+        if (length < signalLength || signal.length > L2CAP_SIGNAL_MTU) {
             L2capSendCommandReject(
                 aclHandle, L2CAP_SIGNALING_CHANNEL, signal.identifier, L2CAP_COMMAND_NOT_UNDERSTOOD, NULL);
             break;
