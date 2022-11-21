@@ -744,6 +744,10 @@ void AvdtL2capReadDataIndCallbackTsk(void *context)
 
 void AvdtL2capReadDataIndCallback(uint16_t lcid, Packet *packet, void *ctx)
 {
+    if (packet == NULL) {
+        LOG_ERROR("[AVDT]%{public}s:packet is null!!", __func__);
+        return;
+    }
     LOG_INFO("[AVDT]%{public}s:lcid(0x%x) ,PacketSize(%u)", __func__, lcid, PacketSize(packet));
     AvdtTransChannel *transTable = AvdtGetTransChTabByLcid(lcid);
     if (transTable == NULL) {
