@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@
 #include "bluetooth_call_client.h"
 #include "call_manager_client.h"
 #include "core_service_client.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#include "system_ability_status_change_stub.h"
 
 using namespace OHOS;
 using namespace OHOS::Telephony;
@@ -41,7 +44,17 @@ void HfpAgSystemInterface::Start()
     LOG_INFO("[HFP AG]%{public}s():enter",  __FUNCTION__);
     QueryAgIndicator();
     RegisterObserver();
-    DelayedSingleton<BluetoothCallClient>::GetInstance()->Init();
+    sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        LOG_ERROR("[HFP AG] failed to get samgrProxy");
+        return;
+    }
+    statusChangeListener_ = new SystemAbilityStatusChange();
+    int32_t ret = samgrProxy->SubscribeSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID, statusChangeListener_);
+    if (ret != ERR_OK) {
+        LOG_ERROR("[HFP AG] subscribe systemAbilityId: telephone failed!");
+        return;
+    }
     return;
 }
 
@@ -970,6 +983,27 @@ inline std::string HfpAgSystemInterface::Str16ToStr8(const std::u16string& str) 
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     std::string result = convert.to_bytes(str);
     return result;
+}
+
+void SystemAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    HILOGI("OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
+    switch (systemAbilityId) {
+        case TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID:
+            HILOGI("OnAddSystemAbility input service start");
+            DelayedSingleton<BluetoothCallClient>::GetInstance()->Init();
+            break;
+        default:
+            HILOGI("OnAddSystemAbility unhandled sysabilityId:%{public}d", systemAbilityId);
+            break;
+    }
+    return;
+}
+
+void SystemAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    HILOGI("OnRemoveSystemAbility: start!");
+    return;
 }
 }  // namespace bluetooth
 }  // namespace OHOS

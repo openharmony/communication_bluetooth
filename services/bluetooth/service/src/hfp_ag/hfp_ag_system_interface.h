@@ -21,12 +21,19 @@
 #include "hfp_ag_defines.h"
 #include "telephony_observer.h"
 #include "hfp_ag_message.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace bluetooth {
 /**
  * @brief  Defines the interfaces that is called by HFP.
  */
+class SystemAbilityStatusChange : public SystemAbilityStatusChangeStub {
+public:
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+};
+
 class HfpAgSystemInterface {
 public:
     /**
@@ -478,6 +485,8 @@ private:
 
     // bluetooth call list
     std::vector<BluetoothCall> bluetoothCallList_;
+
+    sptr<SystemAbilityStatusChange> statusChangeListener_;
 
      // The observer that implements TelephonyObserver
     OHOS::sptr<AgTelephonyObserver> observer_ {nullptr};
