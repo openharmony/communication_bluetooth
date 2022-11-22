@@ -197,12 +197,12 @@ int SetDeviceName(const char *name, unsigned int len) {
  * @brief Sets advertising data.
  *
  * @param advId Indicates the advertisement ID, which is allocated by the upper layer of the advertiser.
- * @param data Indicates the pointer to the advertising data. For details, see {@link BleConfigAdvData}.
+ * @param data Indicates the pointer to the advertising data. For details, see {@link StartAdvRawData}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if advertising data is set;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleSetAdvData(int advId, const BleConfigAdvData *data)
+int BleSetAdvData(int advId, const StartAdvRawData data)
 {
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
