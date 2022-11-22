@@ -1912,6 +1912,10 @@ static void AttSignWriteCommConfDataAssign(
         LOG_ERROR("%{public}s data or dataBuffer is NULL", __FUNCTION__);
         return;
     }
+    if (buffSize < STEP_TWO + GAPSIGNATURESIZE) {
+        LOG_ERROR("%{public}s buffSize is small", __FUNCTION__);
+        return;
+    }
 
     data[0] = SIGNED_WRITE_COMMAND;
     (void)memcpy_s(data + 1, buffSize, dataBuffer, buffSize);
