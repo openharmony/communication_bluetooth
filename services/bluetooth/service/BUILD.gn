@@ -413,6 +413,7 @@ ohos_shared_library("btservice") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_audio_framework:audio_client",
+    "samgr:samgr_proxy",
   ]
 
   if (bluetooth_avrcp_avsession) {
