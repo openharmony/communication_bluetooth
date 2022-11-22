@@ -140,7 +140,7 @@ public:
         int32_t uid = IPCSkeleton::GetCallingUid();
         if (state == static_cast<int>(BTConnectState::CONNECTED) ||
             state == static_cast<int>(BTConnectState::DISCONNECTED)) {
-            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_GATT_SERVER_CONN_STATE",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_GATT_SERVER_CONN_STATE",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "STATE", state);
         }
         callback_->OnConnectionStateChanged((BluetoothGattDevice)device, ret, state);
@@ -437,7 +437,7 @@ int BluetoothGattServerServer::RegisterApplication(const sptr<IBluetoothGattServ
     if (ret >= 0) {
         HILOGI("appId, %{public}d", ret);
         (*it)->SetAppId(ret);
-        OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
+        HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "GATT_APP_REGISTER",
             OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register",
             "SIDE", "server", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
             "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", ret);
@@ -469,7 +469,7 @@ int BluetoothGattServerServer::DeregisterApplication(int32_t appId)
             break;
         }
     }
-    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
+    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "GATT_APP_REGISTER",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "deregister",
         "SIDE", "server", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
         "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
