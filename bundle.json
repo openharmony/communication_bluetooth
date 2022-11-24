@@ -126,7 +126,8 @@
         "//foundation/communication/bluetooth/test/unittest/pan:unittest",
         "//foundation/communication/bluetooth/test/unittest/opp:unittest",
         "//foundation/communication/bluetooth/test/unittest/gatt_c:unittest",
-        "//foundation/communication/bluetooth/test/fuzztest/host:fuzztest"
+        "//foundation/communication/bluetooth/test/fuzztest/host:fuzztest",
+        "//foundation/communication/bluetooth/test/example/bluetoothtest:bluetoothtest"
       ]
     }
   }
