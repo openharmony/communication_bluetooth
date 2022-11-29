@@ -14,6 +14,7 @@
  */
 #include <uv.h>
 #include "bluetooth_log.h"
+#include "napi_bluetooth_event.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_client_callback.h"
 
@@ -22,38 +23,17 @@ namespace Bluetooth {
 void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
 {
     HILOGI("enter");
-    if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]) {
+    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
+        callbackInfos_.find(STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE);
+    if (it == callbackInfos_.end() || it->second == nullptr) {
         HILOGI("This callback is not registered by ability.");
         return;
-    }  
-    std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
-        std::static_pointer_cast<GattCharacteristicCallbackInfo>(
-            callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]);
+    }
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
+
     HILOGI("uuid is %{public}s", characteristic.GetUuid().ToString().c_str());
-    callbackInfo->characteristic_ = characteristic;
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = (void*)callbackInfo.get();
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            GattCharacteristicCallbackInfo *callbackInfo = (GattCharacteristicCallbackInfo *)work->data;
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertBLECharacteristicToJS(callbackInfo->env_, result, callbackInfo->characteristic_);
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    NapiEvent::CheckAndNotify(callbackInfo, characteristic);
 }
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
@@ -91,39 +71,18 @@ void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descri
 void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
 {
     HILOGI("enter");
-    if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE]) {
+    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
+    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
+    callbackInfos_.find(STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE);
+    if (it == callbackInfos_.end() || it->second == nullptr) {
         HILOGI("This callback is not registered by ability.");
         return;
     }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
-        callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE];
-
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
+    HILOGI("connectionState:%{public}d, ret:%{public}d", connectionState, ret);
     callbackInfo->state_ = connectionState;
     callbackInfo->deviceId_ = client_->GetDevice()->GetDeviceAddr();
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = (void*)callbackInfo.get();
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);      
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    NapiEvent::CheckAndNotify(callbackInfo, callbackInfo->state_);
 }
 
 void NapiGattClientCallback::OnServicesDiscovered(int status)
