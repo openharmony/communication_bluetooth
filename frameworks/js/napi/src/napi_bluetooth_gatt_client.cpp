@@ -91,7 +91,10 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
         env, thisVar, gattClient,
         [](napi_env env, void* data, void* hint) {
             NapiGattClient* client = (NapiGattClient*)data;
-            delete client;
+            if (client) {
+                delete client;
+                client = nullptr;
+            }
         },
         nullptr,
         nullptr);
@@ -102,7 +105,7 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
 napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
+    std::unique_lock<std::mutex> guard(g_gattClientCallbackInfosMutex);
     NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -128,6 +131,10 @@ napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
     callbackInfo->env_ = env;
 
     napi_unwrap(env, thisVar, (void **)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return ret;
+    }
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, argv[PARAM1], &valueType);
     if (valueType != napi_function) {
@@ -145,7 +152,7 @@ napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
 napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
+    std::unique_lock<std::mutex> guard(g_gattClientCallbackInfosMutex);
     NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -164,6 +171,14 @@ napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
     string type;
     ParseString(env, type, argv[PARAM0]);
     napi_unwrap(env, thisVar, (void **)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return ret;
+    }
+    if (gattClient->GetCallback().GetCallbackInfo(type) == nullptr) {
+        HILOGE("type %{public}s callbackInfos isn't exist.", type.c_str());
+        return ret;
+    }
     uint32_t refCount = INVALID_REF_COUNT;
     napi_reference_unref(env, gattClient->GetCallback().GetCallbackInfo(type)->callback_, &refCount);
     HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
@@ -185,6 +200,10 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void **)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
     int status = gattClient->GetClient()->Connect(gattClient->GetCallback(), true, GATT_TRANSPORT_TYPE_LE);
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
@@ -207,6 +226,10 @@ napi_value NapiGattClient::Disconnect(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
     int status = gattClient->GetClient()->Disconnect();
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
@@ -239,6 +262,10 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return ret;
+    }
     gattClient->readCharacteristicValueCallbackInfo_ = new ReadCharacteristicValueCallbackInfo();
     ReadCharacteristicValueCallbackInfo *callbackInfo = gattClient->readCharacteristicValueCallbackInfo_;
     callbackInfo->env_ = env;
@@ -362,6 +389,10 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return ret;
+    }
     gattClient->readDescriptorValueCallbackInfo_ = new ReadDescriptorValueCallbackInfo();
     ReadDescriptorValueCallbackInfo *callbackInfo = gattClient->readDescriptorValueCallbackInfo_;
     callbackInfo->env_ = env;
@@ -484,6 +515,10 @@ napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return ret;
+    }
 
     GetServiceCallbackInfo *callbackInfo = new GetServiceCallbackInfo();
     callbackInfo->env_ = env;
@@ -579,12 +614,15 @@ napi_value NapiGattClient::Close(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
 
     int status = gattClient->GetClient()->Close();
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
         isOK = true;
-        delete gattClient;
     } else {
         HILOGE("failed, status: %{public}d", status);
     }
@@ -614,6 +652,10 @@ napi_value NapiGattClient::WriteCharacteristicValue(napi_env env, napi_callback_
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
 
     GattCharacteristic* characteristic = GetCharacteristicFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
     if (characteristic != nullptr) {
@@ -651,6 +693,10 @@ napi_value NapiGattClient::WriteDescriptorValue(napi_env env, napi_callback_info
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
 
     GattDescriptor* descriptor = GetDescriptorFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
     if (descriptor != nullptr) {
@@ -688,6 +734,10 @@ napi_value NapiGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
 
     int32_t mtuSize;
     ParseInt32(env, mtuSize, argv[PARAM0]);
@@ -724,6 +774,10 @@ napi_value NapiGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_cal
     }
 
     napi_unwrap(env, thisVar, (void**)&gattClient);
+    if (gattClient == nullptr) {
+        HILOGE("gattClient is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
 
     GattCharacteristic* characteristic = GetCharacteristicFromJS(env, argv[PARAM0], nullptr, gattClient->GetClient());
     if (characteristic == nullptr) {
