@@ -15,11 +15,13 @@
 #ifndef NAPI_BLUETOOTH_GATT_CLIENT_CALLBACK_H_
 #define NAPI_BLUETOOTH_GATT_CLIENT_CALLBACK_H_
 
+#include <shared_mutex>
 #include "bluetooth_gatt_client.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
+static std::shared_mutex g_gattClientCallbackInfosMutex;
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLECharacteristicChange";
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
 class NapiGattClient;
@@ -44,6 +46,10 @@ public:
     void SetClient(NapiGattClient *client)
     {
         client_ = client;
+    }
+    std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfo(const std::string &type)
+    {
+        return callbackInfos_[type];
     }
     NapiGattClientCallback() = default;
     virtual ~NapiGattClientCallback() = default;

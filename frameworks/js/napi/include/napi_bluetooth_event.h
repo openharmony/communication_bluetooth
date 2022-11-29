@@ -47,7 +47,7 @@ public:
     static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb, int value);
     static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb,
         BluetoothOppTransferInformation &information);
-	static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb,
+    static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb,
         GattCharacteristic &characteristic);
     static napi_value OnEvent(napi_env env, napi_callback_info cbinfo,
         std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> &callbackInfos);
@@ -63,8 +63,7 @@ public:
             return;
         }
         auto func = std::bind(
-		    [](const std::shared_ptr<BluetoothCallbackInfo> &cb, T& obj) -> napi_value 
-            {
+		    [](const std::shared_ptr<BluetoothCallbackInfo> &cb, T& obj) -> napi_value {
 			    return NapiEvent::CreateResult(cb, obj);
 			},
 		    cb, obj);

@@ -17,6 +17,7 @@
 #include "bluetooth_log.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_host.h"
+#include "napi_bluetooth_event.h"
 
 
 namespace OHOS {
@@ -101,6 +102,7 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
 napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
     NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
@@ -143,6 +145,7 @@ napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
 napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
     NapiGattClient* gattClient = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -161,6 +164,12 @@ napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
     string type;
     ParseString(env, type, argv[PARAM0]);
     napi_unwrap(env, thisVar, (void **)&gattClient);
+    uint32_t refCount = INVALID_REF_COUNT;
+    napi_reference_unref(env, gattClient->GetCallback().GetCallbackInfo(type)->callback_, &refCount);
+    HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
+    if (refCount == 0) {
+        napi_delete_reference(env, gattClient->GetCallback().GetCallbackInfo(type)->callback_);
+    }
     gattClient->GetCallback().SetCallbackInfo(type, nullptr);
     HILOGI("%{public}s is removed", type.c_str());
     return ret;
