@@ -63,7 +63,7 @@ public:
             return;
         }
         auto func = std::bind(
-		    [](const std::shared_ptr<BluetoothCallbackInfo> &cb, T& obj) -> napi_value {
+            [](const std::shared_ptr<BluetoothCallbackInfo> &cb, T& obj) -> napi_value {
 			    return NapiEvent::CreateResult(cb, obj);
 			},
 		    cb, obj);

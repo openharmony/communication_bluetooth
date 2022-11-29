@@ -21,6 +21,11 @@ namespace Bluetooth {
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
     HILOGI("Enter bluetooth event notify");
+    
+    if (asyncEvent == nullptr || asyncEvent->callback_ == nullptr) {
+        HILOGI("asyncEvent callback_ is null.");
+        return;
+    }
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(asyncEvent->env_, &loop);
 
@@ -32,6 +37,12 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         return;
     }
     
+    napi_value callback = nullptr;
+    napi_status status = napi_get_reference_value(asyncEvent->env_, asyncEvent->callback_, &callback);
+    if (status != napi_ok || callback == nullptr) {
+        HILOGI("reference_value is null.");
+        return;
+    }
     uint32_t refCount = INVALID_REF_COUNT;
     napi_reference_ref(asyncEvent->env_, asyncEvent->callback_, &refCount);
     HILOGI("increments the reference count, refCount: %{public}d", refCount);
@@ -150,13 +161,18 @@ napi_value NapiEvent::OffEvent(napi_env env, napi_callback_info info,
         HILOGE("string expected.");
         return ret;
     }
+    auto it = callbackInfos.find(type);
+    if (it == callbackInfos.end() || it->second == nullptr) {
+        HILOGE("type %{public}s callbackInfos isn't exist.", type.c_str());
+        return ret;
+    }
     uint32_t refCount = INVALID_REF_COUNT;
-    napi_reference_unref(env, callbackInfos[type]->callback_, &refCount);
+    napi_reference_unref(env, it->second->callback_, &refCount);
     HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
     if (refCount == 0) {
-        napi_delete_reference(env, callbackInfos[type]->callback_);
+        napi_delete_reference(env, it->second->callback_);
     }
-    callbackInfos[type] = nullptr;
+    it->second = nullptr;
     HILOGI("%{public}s is unregistered", type.c_str());
     return ret;
 }
