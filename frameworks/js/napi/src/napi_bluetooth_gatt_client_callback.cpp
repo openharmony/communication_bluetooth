@@ -25,7 +25,7 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
     if (!callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]) {
         HILOGI("This callback is not registered by ability.");
         return;
-    }
+    }  
     std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
         std::static_pointer_cast<GattCharacteristicCallbackInfo>(
             callbackInfos_[STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE]);
