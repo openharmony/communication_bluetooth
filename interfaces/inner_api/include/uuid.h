@@ -37,9 +37,11 @@
 #include <string>
 #include <array>
 #include <ctime>
+#include <regex>
 
 namespace OHOS {
 namespace Bluetooth {
+const std::regex uuidRegex("^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$");
 
 /**
  * @brief This class provides framework uuid.

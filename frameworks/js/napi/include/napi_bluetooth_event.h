@@ -47,6 +47,8 @@ public:
     static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb, int value);
     static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb,
         BluetoothOppTransferInformation &information);
+    static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb,
+        GattCharacteristic &characteristic);
     static napi_value OnEvent(napi_env env, napi_callback_info cbinfo,
         std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> &callbackInfos);
     static napi_value OffEvent(napi_env env, napi_callback_info cbinfo,
@@ -60,7 +62,10 @@ public:
             HILOGI("checkAndNotify event cb is nullptr!");
             return;
         }
-        auto func = [cb, obj] () -> napi_value { return NapiEvent::CreateResult(cb, obj); };
+        auto func = std::bind(
+            [](const std::shared_ptr<BluetoothCallbackInfo> &cb, T& obj) -> napi_value {
+			    return NapiEvent::CreateResult(cb, obj);
+			}, cb, obj);
         AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(cb, func);
         if (asyncEvent == nullptr) {
             HILOGI("asyncEvent is nullptr!");

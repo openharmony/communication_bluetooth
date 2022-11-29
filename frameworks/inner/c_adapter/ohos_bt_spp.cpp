@@ -81,6 +81,10 @@ int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned i
 
     string serverName(name);
     string tmpUuid(socketPara->uuid.uuid);
+    if (!regex_match(tmpUuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return BT_SPP_INVALID_ID;
+    }
     UUID serverUuid(UUID::FromString(tmpUuid));
     std::shared_ptr<SppServerSocket> server = std::make_shared<SppServerSocket>(serverName, serverUuid,
         SppSocketType(socketPara->socketType), socketPara->isEncrypt);
@@ -176,6 +180,10 @@ int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
     ConvertAddr(bdAddr->addr, strAddress);
     std::shared_ptr<BluetoothRemoteDevice> device = std::make_shared<BluetoothRemoteDevice>(strAddress, 0);
     string tmpUuid(socketPara->uuid.uuid);
+    if (!regex_match(tmpUuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return BT_SPP_INVALID_ID;
+    }
     UUID serverUuid(UUID::FromString(tmpUuid));
     std::shared_ptr<SppClientSocket> client = std::make_shared<SppClientSocket>(*device, serverUuid,
         SppSocketType(socketPara->socketType), socketPara->isEncrypt);
