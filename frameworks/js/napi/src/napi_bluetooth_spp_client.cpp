@@ -49,6 +49,10 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
     SppConnectCallbackInfo *callbackInfo = new SppConnectCallbackInfo();
     callbackInfo->env_ = env;
     callbackInfo->sppOption_ = GetSppOptionFromJS(env, argv[PARAM1]);
+    if (callbackInfo->sppOption_ == nullptr) {
+        HILOGE("GetSppOptionFromJS faild.");
+        return ret;
+    }
     callbackInfo->deviceId_ = deviceId;
 
     napi_value promise = nullptr;
@@ -81,8 +85,8 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
             HILOGI("SppConnect execute");
             SppConnectCallbackInfo* callbackInfo = (SppConnectCallbackInfo*)data;
             callbackInfo->device_ = std::make_shared<BluetoothRemoteDevice>(callbackInfo->deviceId_, 0);
-            callbackInfo->client_ = std::make_shared<SppClientSocket>(*callbackInfo->device_, 
-                UUID::FromString(callbackInfo->sppOption_->uuid_), 
+            callbackInfo->client_ = std::make_shared<SppClientSocket>(*callbackInfo->device_,
+                UUID::FromString(callbackInfo->sppOption_->uuid_),
                 callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
             HILOGI("SppConnect client_ constructed");
             if (callbackInfo->client_->Connect() == BtStatus::BT_SUCCESS) {
