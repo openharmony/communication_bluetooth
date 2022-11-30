@@ -68,7 +68,10 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
         env, thisVar, gattServer,
         [](napi_env env, void* data, void* hint) {
             NapiGattServer* server = (NapiGattServer*)data;
-            delete server;
+            if (server) {
+                delete server;
+                server = nullptr;
+            }
         },
         nullptr,
         nullptr);
@@ -109,6 +112,10 @@ napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
     callbackInfo->env_ = env;
 
     napi_unwrap(env, thisVar, (void **)&gattServer);
+    if (gattServer == nullptr) {
+        HILOGE("gattServer is nullptr.");
+        return ret;
+    }
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, argv[PARAM1], &valueType);
     if (valueType != napi_function) {
@@ -125,7 +132,7 @@ napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
 napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiGattServer *GattServer = nullptr;
+    NapiGattServer *gattServer = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
@@ -142,8 +149,12 @@ napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
     string type;
     ParseString(env, type, argv[PARAM0]);
 
-    napi_unwrap(env, thisVar, (void **)&GattServer);
-    GattServer->GetCallback().SetCallbackInfo(type, nullptr);
+    napi_unwrap(env, thisVar, (void **)&gattServer);
+    if (gattServer == nullptr) {
+        HILOGE("gattServer is nullptr.");
+        return ret;
+    }
+    gattServer->GetCallback().SetCallbackInfo(type, nullptr);
     HILOGI("%{public}s is removed", type.c_str());
     return ret;
 }
@@ -166,8 +177,16 @@ napi_value NapiGattServer::AddService(napi_env env, napi_callback_info info)
         return ret;
     }
     GattService* gattService = GetServiceFromJS(env, argv[PARAM0], nullptr, nullptr);
+    if (gattService == nullptr) {
+        HILOGE("gattService is nullptr.");
+        return ret;
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattServer);
+    if (gattServer == nullptr) {
+        HILOGE("gattServer is nullptr.");
+        return ret;
+    }
     int status = gattServer->GetServer()->AddService(*gattService);
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
@@ -190,12 +209,15 @@ napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_unwrap(env, thisVar, (void**)&gattServer);
+    if (gattServer == nullptr) {
+        HILOGE("gattServer is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
 
     int status = gattServer->GetServer()->Close();
     if (status == GattStatus::GATT_SUCCESS) {
         HILOGI("successful");
         isOK = true;
-        delete gattServer;
     } else {
         HILOGE("failed, status: %{public}d", status);
     }
@@ -218,9 +240,21 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     NAPI_ASSERT(env, argc == expectedArgsCount, "Requires 1 arguments.");
-    ParseString(env, uuid, argv[PARAM0]);
+    bool isSuccess = ParseString(env, uuid, argv[PARAM0]);
+    if (!isSuccess) {
+        HILOGE("ParseString faild.");
+        return NapiGetBooleanFalse(env);
+    }
+    if (!regex_match(uuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return NapiGetBooleanFalse(env);
+    }
 
     napi_unwrap(env, thisVar, (void**)&gattServer);
+    if (gattServer == nullptr) {
+        HILOGE("gattServer is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
     UUID serviceUuid = UUID::FromString(uuid);
 
     std::optional<std::reference_wrapper<GattService>> gattService =
@@ -265,6 +299,10 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
 
     ServerResponse serverresponse = GetServerResponseFromJS(env, argv[PARAM0]);
     napi_unwrap(env, thisVar, (void**)&gattServer);
+    if (gattServer == nullptr) {
+        HILOGE("gattServer is nullptr.");
+        return NapiGetBooleanFalse(env);
+    }
     BluetoothRemoteDevice remoteDevice =
         BluetoothHost::GetDefaultHost().GetRemoteDevice(serverresponse.deviceId, 1);
     HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice));
@@ -305,6 +343,10 @@ napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callba
         return ret;
     }
     napi_unwrap(env, thisVar, (void**)&gattServer);
+    if (gattServer == nullptr) {
+        HILOGE("gattServer is nullptr.");
+        return ret;
+    }
     ParseString(env, deviceID, argv[PARAM0]);
     BluetoothRemoteDevice remoteDevice = BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceID, 1);
     GattCharacteristic* characteristic = GetCharacteristicFromJS(env, argv[PARAM1], gattServer->GetServer(), nullptr);

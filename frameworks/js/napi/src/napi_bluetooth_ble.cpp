@@ -355,11 +355,15 @@ static napi_value ParseScanFilterDeviceIdParameters(
     NAPI_CALL(env, napi_has_named_property(env, scanFilter, "deviceId", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, scanFilter, "deviceId", &result);
-        ParseString(env, filter.deviceId, result);
+        bool isSuccess = ParseString(env, filter.deviceId, result);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
         bleScanFilter.SetDeviceId(filter.deviceId);
         HILOGI("Scan filter device id is %{public}s", GetEncryptAddr(filter.deviceId).c_str());
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseScanFilterLocalNameParameters(
@@ -372,11 +376,15 @@ static napi_value ParseScanFilterLocalNameParameters(
     NAPI_CALL(env, napi_has_named_property(env, scanFilter, "name", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, scanFilter, "name", &result);
-        ParseString(env, filter.name, result);
+        bool isSuccess = ParseString(env, filter.name, result);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
         bleScanFilter.SetName(filter.name);
         HILOGI("Scan filter name is %{public}s", filter.name.c_str());
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseScanFilterServiceUuidParameters(
@@ -390,9 +398,17 @@ static napi_value ParseScanFilterServiceUuidParameters(
     if (hasProperty) {
         napi_get_named_property(env, scanFilter, "serviceUuid", &result);
         std::string serviceUuid;
-        ParseString(env, serviceUuid, result);
+        bool isSuccess = ParseString(env, serviceUuid, result);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
         HILOGI("Scan filter serviceUuid is %{public}s", serviceUuid.c_str());
         if (!serviceUuid.empty()) {
+            if (!regex_match(serviceUuid, uuidRegex)) {
+                HILOGE("match the UUID faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.serviceUuid = ParcelUuid::FromString(serviceUuid);
             bleScanFilter.SetServiceUuid(filter.serviceUuid);
         }
@@ -402,14 +418,22 @@ static napi_value ParseScanFilterServiceUuidParameters(
     if (hasProperty) {
         napi_get_named_property(env, scanFilter, "serviceUuidMask", &result);
         std::string serviceUuidMask;
-        ParseString(env, serviceUuidMask, result);
+        bool isSuccess = ParseString(env, serviceUuidMask, result);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
         HILOGI("Scan filter serviceUuidMask is %{public}s", serviceUuidMask.c_str());
         if (!serviceUuidMask.empty()) {
+            if (!regex_match(serviceUuidMask, uuidRegex)) {
+                HILOGE("match the UUID faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.serviceUuidMask = ParcelUuid::FromString(serviceUuidMask);
             bleScanFilter.SetServiceUuidMask(filter.serviceUuidMask);
         }
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseScanFilterSolicitationUuidParameters(
@@ -423,9 +447,17 @@ static napi_value ParseScanFilterSolicitationUuidParameters(
     if (hasProperty) {
         napi_get_named_property(env, scanFilter, "serviceSolicitationUuid", &result);
         std::string serviceSolicitationUuid;
-        ParseString(env, serviceSolicitationUuid, result);
+        bool isSuccess = ParseString(env, serviceSolicitationUuid, result);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
         HILOGI("Scan filter serviceSolicitationUuid is %{public}s", serviceSolicitationUuid.c_str());
         if (!serviceSolicitationUuid.empty()) {
+            if (!regex_match(serviceSolicitationUuid, uuidRegex)) {
+                HILOGE("match the UUID faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.serviceSolicitationUuid = ParcelUuid::FromString(serviceSolicitationUuid);
             bleScanFilter.SetServiceSolicitationUuid(filter.serviceSolicitationUuid);
         }
@@ -435,14 +467,22 @@ static napi_value ParseScanFilterSolicitationUuidParameters(
     if (hasProperty) {
         napi_get_named_property(env, scanFilter, "serviceSolicitationUuidMask", &result);
         std::string serviceSolicitationUuidMask;
-        ParseString(env, serviceSolicitationUuidMask, result);
+        bool isSuccess = ParseString(env, serviceSolicitationUuidMask, result);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
         HILOGI("Scan filter serviceSolicitationUuidMask is %{public}s", serviceSolicitationUuidMask.c_str());
         if (!serviceSolicitationUuidMask.empty()) {
+            if (!regex_match(serviceSolicitationUuidMask, uuidRegex)) {
+                HILOGE("match the UUID faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.serviceSolicitationUuidMask = ParcelUuid::FromString(serviceSolicitationUuidMask);
             bleScanFilter.SetServiceSolicitationUuidMask(filter.serviceSolicitationUuidMask);
         }
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseScanFilterServiceDataParameters(
@@ -460,7 +500,11 @@ static napi_value ParseScanFilterServiceDataParameters(
         if (isArrayBuffer) {
             uint8_t *arrayBufferData = nullptr;
             size_t arrayBufferTotal = 0;
-            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            if (!isSuccess) {
+                HILOGE("ParseArrayBuffer faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.serviceData = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
         }
         bleScanFilter.SetServiceData(filter.serviceData);
@@ -474,12 +518,16 @@ static napi_value ParseScanFilterServiceDataParameters(
         if (isArrayBuffer) {
             uint8_t *arrayBufferData = nullptr;
             size_t arrayBufferTotal = 0;
-            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            if (!isSuccess) {
+                HILOGE("ParseArrayBuffer faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.serviceDataMask = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
         }
         bleScanFilter.SetServiceDataMask(filter.serviceDataMask);
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseScanFilterManufactureDataParameters(
@@ -507,7 +555,11 @@ static napi_value ParseScanFilterManufactureDataParameters(
         if (isArrayBuffer) {
             uint8_t *arrayBufferData = nullptr;
             size_t arrayBufferTotal = 0;
-            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            if (!isSuccess) {
+                HILOGE("ParseArrayBuffer faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.manufactureData = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
         }
         bleScanFilter.SetManufactureData(filter.manufactureData);
@@ -521,20 +573,61 @@ static napi_value ParseScanFilterManufactureDataParameters(
         if (isArrayBuffer) {
             uint8_t *arrayBufferData = nullptr;
             size_t arrayBufferTotal = 0;
-            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            if (!isSuccess) {
+                HILOGE("ParseArrayBuffer faild.");
+                return NapiGetBooleanFalse(env);
+            }
             filter.manufactureDataMask =
             std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
         }
         bleScanFilter.SetManufactureDataMask(filter.manufactureDataMask);
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
+}
+
+static bool ParseScanFilter(const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+{
+    HILOGI("enter");
+    bool isSuccess = true;
+    napi_get_value_bool(env, ParseScanFilterDeviceIdParameters(env, scanFilter, bleScanFilter), &isSuccess);
+    if (!isSuccess) {
+        HILOGE("ParseScanFilterDeviceIdParameters faild.");
+        return false;
+    }
+    napi_get_value_bool(env, ParseScanFilterLocalNameParameters(env, scanFilter, bleScanFilter), &isSuccess);
+    if (!isSuccess) {
+        HILOGE("ParseScanFilterLocalNameParameters faild.");
+        return false;
+    }
+    napi_get_value_bool(env, ParseScanFilterServiceUuidParameters(env, scanFilter, bleScanFilter), &isSuccess);
+    if (!isSuccess) {
+        HILOGE("ParseScanFilterServiceUuidParameters faild.");
+        return false;
+    }
+    napi_get_value_bool(env, ParseScanFilterSolicitationUuidParameters(env, scanFilter, bleScanFilter), &isSuccess);
+    if (!isSuccess) {
+        HILOGE("ParseScanFilterSolicitationUuidParameters faild.");
+        return false;
+    }
+    napi_get_value_bool(env, ParseScanFilterServiceDataParameters(env, scanFilter, bleScanFilter), &isSuccess);
+    if (!isSuccess) {
+        HILOGE("ParseScanFilterServiceDataParameters faild.");
+        return false;
+    }
+    napi_get_value_bool(env, ParseScanFilterManufactureDataParameters(env, scanFilter, bleScanFilter), &isSuccess);
+    if (!isSuccess) {
+        HILOGE("ParseScanFilterManufactureDataParameters faild.");
+        return false;
+    }
+    return true;
 }
 
 static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &args, std::vector<BleScanFilter> &params)
 {
     HILOGI("enter");
     if (args == nullptr) {
-        return NapiGetNull(env);
+        return NapiGetBooleanTrue(env);
     }
 
     bool isArray = false;
@@ -550,17 +643,16 @@ static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &arg
             NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
 
             BleScanFilter bleScanFilter;
-            ParseScanFilterDeviceIdParameters(env, scanFilter, bleScanFilter);
-            ParseScanFilterLocalNameParameters(env, scanFilter, bleScanFilter);
-            ParseScanFilterServiceUuidParameters(env, scanFilter, bleScanFilter);
-            ParseScanFilterSolicitationUuidParameters(env, scanFilter, bleScanFilter);
-            ParseScanFilterServiceDataParameters(env, scanFilter, bleScanFilter);
-            ParseScanFilterManufactureDataParameters(env, scanFilter, bleScanFilter);
+            bool isSuccess = ParseScanFilter(env, scanFilter, bleScanFilter);
+            if (!isSuccess) {
+                HILOGE("ParseScanFilter faild.");
+                return NapiGetBooleanFalse(env);
+            }
 
             params.push_back(bleScanFilter);
         }
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 napi_value StartBLEScan(napi_env env, napi_callback_info info)
@@ -577,7 +669,12 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
 
     std::vector<BleScanFilter> scanfilters;
     if (argv[PARAM0] != nullptr) {
-        ParseScanFilterParameters(env, argv[PARAM0], scanfilters);
+        bool isSuccess = true;
+        napi_get_value_bool(env, ParseScanFilterParameters(env, argv[PARAM0], scanfilters), &isSuccess);
+        if (!isSuccess) {
+            HILOGE("ParseScanFilterParameters faild.");
+            return NapiGetNull(env);
+        }
     }
     bleCentralManager->ConfigScanFilter(scanfilters);
 
@@ -658,11 +755,19 @@ static napi_value ParseServiceUuidParameters(const napi_env &env, const napi_val
         napi_value uuid = nullptr;
         napi_get_element(env, result, serviceUuidIter, &uuid);
         std::string serviceUuid;
-        ParseString(env, serviceUuid, uuid);
+        bool isSuccess = ParseString(env, serviceUuid, uuid);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
+        if (!regex_match(serviceUuid, uuidRegex)) {
+            HILOGE("Match the UUID faild.");
+            return NapiGetBooleanFalse(env);
+        }
         data.AddServiceUuid(ParcelUuid::FromString(serviceUuid));
         HILOGI("Service Uuid = %{public}s", serviceUuid.c_str());
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseManufactureDataParameters(const napi_env &env, const napi_value &args, BleAdvertiserData &data)
@@ -678,7 +783,7 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
     napi_get_array_length(env, result, &length);
     if (length == 0) {
         HILOGE("The array is empty.");
-        return NapiGetNull(env);
+        return NapiGetBooleanTrue(env);
     }
     for (size_t manufactureDataIter = 0; manufactureDataIter < length; ++manufactureDataIter) {
         napi_value manufactureData = nullptr;
@@ -703,12 +808,16 @@ static napi_value ParseManufactureDataParameters(const napi_env &env, const napi
         if (isArrayBuffer) {
             uint8_t *arrayBufferData = nullptr;
             size_t arrayBufferTotal = 0;
-            ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
+            if (!isSuccess) {
+                HILOGE("ParseArrayBuffer faild.");
+                return NapiGetBooleanFalse(env);
+            }
             std::string manuData(arrayBufferData, arrayBufferData + arrayBufferTotal);
             data.AddManufacturerData(manufactureId, manuData);
         }
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseServiceDataParameters(const napi_env &env, const napi_value &args, BleAdvertiserData &data)
@@ -724,7 +833,7 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
     napi_get_array_length(env, result, &length);
     if (length == 0) {
         HILOGE("The array is empty.");
-        return NapiGetNull(env);
+        return NapiGetBooleanTrue(env);
     }
     for (size_t serviceDataIter = 0; serviceDataIter < length; ++serviceDataIter) {
         napi_value serviceData = nullptr;
@@ -736,7 +845,15 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
         NAPI_ASSERT(env, hasProperty, "serviceUuid expected.");
         napi_get_named_property(env, serviceData, "serviceUuid", &result);
         std::string serviceBuffer;
-        ParseString(env, serviceBuffer, result);
+        bool isSuccess = ParseString(env, serviceBuffer, result);
+        if (!isSuccess) {
+            HILOGE("ParseString faild.");
+            return NapiGetBooleanFalse(env);
+        }
+        if (!regex_match(serviceBuffer, uuidRegex)) {
+            HILOGE("Match the UUID faild.");
+            return NapiGetBooleanFalse(env);
+        }
         ParcelUuid serviceUuid(ParcelUuid::FromString(serviceBuffer));
         HILOGI("serviceUuid = %{public}s", serviceUuid.ToString().c_str());
 
@@ -752,7 +869,7 @@ static napi_value ParseServiceDataParameters(const napi_env &env, const napi_val
         std::string serviceDataStr(arrayBufferData, arrayBufferData + arrayBufferTotal);
         data.AddServiceData(serviceUuid, serviceDataStr);
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 static napi_value ParseAdvertisDataParameters(
@@ -760,19 +877,32 @@ static napi_value ParseAdvertisDataParameters(
 {
     HILOGI("enter");
     bool hasProperty = false;
+    bool isSuccess = true;
     NAPI_CALL(env, napi_has_named_property(env, args, "serviceUuids", &hasProperty));
     if (hasProperty) {
-        ParseServiceUuidParameters(env, args, data);
+        napi_get_value_bool(env, ParseServiceUuidParameters(env, args, data), &isSuccess);
+        if (!isSuccess) {
+            HILOGE("ParseServiceUuidParameters faild.");
+            return NapiGetBooleanFalse(env);
+        }
     }
     NAPI_CALL(env, napi_has_named_property(env, args, "manufactureData", &hasProperty));
     if (hasProperty) {
-        ParseManufactureDataParameters(env, args, data);
+        napi_get_value_bool(env, ParseManufactureDataParameters(env, args, data), &isSuccess);
+        if (!isSuccess) {
+            HILOGE("ParseManufactureDataParameters faild.");
+            return NapiGetBooleanFalse(env);
+        }
     }
     NAPI_CALL(env, napi_has_named_property(env, args, "serviceData", &hasProperty));
     if (hasProperty) {
-        ParseServiceDataParameters(env, args, data);
+        napi_get_value_bool(env, ParseServiceDataParameters(env, args, data), &isSuccess);
+        if (!isSuccess) {
+            HILOGE("ParseServiceDataParameters faild.");
+            return NapiGetBooleanFalse(env);
+        }
     }
-    return NapiGetNull(env);
+    return NapiGetBooleanTrue(env);
 }
 
 napi_value StartAdvertising(napi_env env, napi_callback_info info)
@@ -789,10 +919,19 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
     BleAdvertiserSettings settings;
     ParseAdvertisingSettingsParameters(env, info, argv[PARAM0], settings);
     BleAdvertiserData AdvData;
-    ParseAdvertisDataParameters(env, info, argv[PARAM1], AdvData);
+    bool isSuccess = true;
+    napi_get_value_bool(env, ParseAdvertisDataParameters(env, info, argv[PARAM1], AdvData), &isSuccess);
+    if (!isSuccess) {
+        HILOGE("ParseAdvertisDataParameters faild.");
+        return NapiGetNull(env);
+    }
     BleAdvertiserData ScanRespData;
     if (argv[PARAM2] != nullptr) {
-        ParseAdvertisDataParameters(env, info, argv[PARAM2], ScanRespData);
+        napi_get_value_bool(env, ParseAdvertisDataParameters(env, info, argv[PARAM2], ScanRespData), &isSuccess);
+        if (!isSuccess) {
+            HILOGE("ParseAdvertisDataParameters faild.");
+            return NapiGetNull(env);
+        }
     }
 
     bleAdvertiser.StartAdvertising(settings, AdvData, ScanRespData, bleAdvertiseCallback);
