@@ -1788,7 +1788,15 @@ static void AttSignWriteCommConfDataAssign(
     uint8_t *data, const uint8_t *dataBuffer, size_t buffSize, uint8_t signature[12])
 {
     LOG_INFO("%{public}s enter", __FUNCTION__);
-
+    if (data == NULL || dataBuffer == NULL) {
+        LOG_ERROR("%{public}s data or dataBuffer is NULL", __FUNCTION__);
+        return;
+    }
+    if (buffSize < STEP_TWO + GAPSIGNATURESIZE) {
+        LOG_ERROR("%{public}s buffSize is small", __FUNCTION__);
+        return;
+    }
+    
     data[0] = SIGNED_WRITE_COMMAND;
     (void)memcpy_s(data + 1, buffSize, dataBuffer, buffSize);
     (void)memcpy_s(signature,
