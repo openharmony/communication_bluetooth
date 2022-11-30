@@ -60,6 +60,10 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
     SppListenCallbackInfo *callbackInfo = new SppListenCallbackInfo();
     callbackInfo->env_ = env;
     callbackInfo->sppOption_ = GetSppOptionFromJS(env, argv[PARAM1]);
+    if (callbackInfo->sppOption_ == nullptr) {
+        HILOGE("GetSppOptionFromJS faild.");
+        return ret;
+    }
     callbackInfo->name_ = name;
 
     napi_value promise = nullptr;

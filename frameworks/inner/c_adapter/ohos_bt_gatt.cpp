@@ -470,6 +470,28 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     return OHOS_BT_STATUS_SUCCESS;
 }
 
+static bool SetServiceUuidParameter(BleScanFilter &scanFilter, BleScanNativeFilter *nativeScanFilter)
+{
+    HILOGI("SetServiceUuidParameter enter");
+    if (nativeScanFilter->serviceUuidLength != 0 && nativeScanFilter->serviceUuid != nullptr) {
+        if (!regex_match(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuid)), uuidRegex)) {
+            HILOGE("match the UUID faild.");
+            return false;
+        }
+        UUID serviceUuid = UUID::FromString((char *)nativeScanFilter->serviceUuid);
+        scanFilter.SetServiceUuid(serviceUuid);
+        if (nativeScanFilter->serviceUuidMask != nullptr) {
+            if (!regex_match(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuidMask)), uuidRegex)) {
+                HILOGE("match the UUID faild.");
+                return false;
+            }
+            UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter->serviceUuidMask);
+            scanFilter.SetServiceUuidMask(serviceUuidMask);
+        }
+    }
+    return true;
+}
+
 /**
  * @brief Sets one scan filter config.
  *
@@ -488,13 +510,10 @@ static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nati
     if (nativeScanFilter->deviceName != nullptr) {
         scanFilter.SetName(nativeScanFilter->deviceName);
     }
-    if (nativeScanFilter->serviceUuidLength != 0 && nativeScanFilter->serviceUuid != nullptr) {
-        UUID serviceUuid = UUID::FromString((char *)nativeScanFilter->serviceUuid);
-        scanFilter.SetServiceUuid(serviceUuid);
-        if (nativeScanFilter->serviceUuidMask != nullptr) {
-            UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter->serviceUuidMask);
-            scanFilter.SetServiceUuidMask(serviceUuidMask);
-        }
+    bool isSuccess = SetServiceUuidParameter(scanFilter, nativeScanFilter);
+    if (!isSuccess) {
+        HILOGE("SetServiceUuidParameter faild.");
+        return OHOS_BT_STATUS_PARM_INVALID;
     }
 
     if (nativeScanFilter->serviceData != nullptr) {
@@ -551,7 +570,11 @@ static int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterS
     for (unsigned int i = 0; i < filterSize; i++) {
         BleScanNativeFilter nativeScanFilter = filter[i];
         BleScanFilter scanFilter;
-        SetOneScanFilter(scanFilter, &nativeScanFilter);
+        int result = SetOneScanFilter(scanFilter, &nativeScanFilter);
+        if (result != OHOS_BT_STATUS_SUCCESS) {
+            HILOGE("SetOneScanFilter faild, result: %{public}d", result);
+            return OHOS_BT_STATUS_PARM_INVALID;
+        }
         scanFilters.push_back(scanFilter);
     }
     g_BleCentralManager->ConfigScanFilter(scanFilters);
@@ -582,7 +605,11 @@ int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigne
     }
 
     if (filter != nullptr && filterSize != 0) {
-        SetConfigScanFilter(filter, filterSize);
+        int result = SetConfigScanFilter(filter, filterSize);
+        if (result != OHOS_BT_STATUS_SUCCESS) {
+            HILOGE("SetConfigScanFilter faild, result: %{public}d", result);
+            return OHOS_BT_STATUS_PARM_INVALID;
+        }
     }
 
     HILOGI("scanMode: %{public}d", configs->scanMode);
