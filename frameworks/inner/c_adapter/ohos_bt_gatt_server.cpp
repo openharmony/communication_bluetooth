@@ -469,6 +469,10 @@ NO_SANITIZE("cfi") int BleGattsAddService(int serverId, BtUuid srvcUuid, bool is
 {
     HILOGI("enter");
     string strUuid(srvcUuid.uuid);
+    if (!regex_match(strUuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     UUID uuid(UUID::FromString(strUuid));
 
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
@@ -543,6 +547,10 @@ NO_SANITIZE("cfi") int BleGattsAddCharacteristic(int serverId, int srvcHandle, B
 {
     HILOGI("properties: %{public}d, permissions:%{public}d", properties, permissions);
     string strUuid(characUuid.uuid);
+    if (!regex_match(strUuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     UUID uuid(UUID::FromString(strUuid));
 
     int chHandle = GATTSERVICES(serverId, srvcHandle).index;
@@ -580,6 +588,10 @@ NO_SANITIZE("cfi") int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUui
 {
     string strUuid(descUuid.uuid);
     HILOGI("descUuid: %{public}s", strUuid.c_str());
+    if (!regex_match(strUuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     UUID uuid(UUID::FromString(strUuid));
     GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
     int desHandle = GATTSERVICES(serverId, srvcHandle).index++;
