@@ -96,6 +96,10 @@ static GattCharacteristic *GattcFindCharacteristic(int clientId, GattClient **cl
     string strUuidChar(characteristic.characteristicUuid.uuid);
     HILOGI("execute, strUuidSvc: %{public}s, strUuidChar: %{public}s",
         strUuidSvc.c_str(), strUuidChar.c_str());
+    if (!regex_match(strUuidSvc, uuidRegex) || (!regex_match(strUuidChar, uuidRegex))) {
+        HILOGE("match the UUID faild.");
+        return nullptr;
+    }
     std::optional<std::reference_wrapper<GattService>> service = (*client)->GetService(UUID::FromString(strUuidSvc));
     if (service == std::nullopt) {
         HILOGE("find service fail.");
@@ -491,6 +495,10 @@ bool BleGattcGetService(int clientId, BtUuid serviceUuid)
     }
 
     string strUuid(serviceUuid.uuid);
+    if (!regex_match(strUuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return false;
+    }
     UUID uuid(UUID::FromString(strUuid));
     HILOGI("service uuid: %{public}s", strUuid.c_str());
     std::optional<std::reference_wrapper<GattService>> gattService = client->GetService(uuid);
@@ -577,6 +585,10 @@ int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
     }
 
     string strUuidDesc(descriptor.descriptorUuid.uuid);
+    if (!regex_match(strUuidDesc, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     GattDescriptor *tmpDescriptor = tmpCharac->GetDescriptor(UUID::FromString(strUuidDesc));
     if (tmpDescriptor == nullptr) {
         HILOGE("find descriptor fail.");
@@ -608,6 +620,10 @@ int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, 
     }
 
     string strUuidDesc(descriptor.descriptorUuid.uuid);
+    if (!regex_match(strUuidDesc, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     GattDescriptor *tmpDescriptor = tmpCharac->GetDescriptor(UUID::FromString(strUuidDesc));
     if (tmpDescriptor == nullptr) {
         HILOGE("find descriptor fail.");

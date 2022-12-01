@@ -134,17 +134,17 @@ void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::
 void ConvertOppTransferInformationToJS(napi_env env,
     napi_value result, BluetoothOppTransferInformation& transferInformation);
 
-void GetServiceVectorFromJS(napi_env env, napi_value object, std::vector<GattService> &services,
+bool GetServiceVectorFromJS(napi_env env, napi_value object, std::vector<GattService> &services,
     std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
 GattService *GetServiceFromJS(
     napi_env env, napi_value object, std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
 
-void GetCharacteristicVectorFromJS(napi_env env, napi_value object, std::vector<GattCharacteristic> &characteristics,
+bool GetCharacteristicVectorFromJS(napi_env env, napi_value object, std::vector<GattCharacteristic> &characteristics,
     std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
 GattCharacteristic *GetCharacteristicFromJS(
     napi_env env, napi_value object, std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
 
-void GetDescriptorVectorFromJS(napi_env env, napi_value object, std::vector<GattDescriptor> &descriptors);
+bool GetDescriptorVectorFromJS(napi_env env, napi_value object, std::vector<GattDescriptor> &descriptors);
 GattDescriptor *GetDescriptorFromJS(
     napi_env env, napi_value object, std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
 
@@ -154,6 +154,9 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName);
 napi_value NapiGetNull(napi_env env);
 napi_value NapiGetBooleanFalse(napi_env env);
+napi_value NapiGetBooleanTrue(napi_env env);
+napi_value NapiGetBooleanRet(napi_env env, bool ret);
+napi_value NapiGetUndefinedRet(napi_env env);
 napi_value RegisterObserver(napi_env env, napi_callback_info info);
 napi_value DeregisterObserver(napi_env env, napi_callback_info info);
 
