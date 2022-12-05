@@ -365,6 +365,20 @@ int BleGattcUnRegister(int clientId)
 }
 
 /**
+ * @brief Set fastest connection of the Gatt connection, add address to the accelerate connection map
+ *  before create a new connection.
+ *
+ * @param clientId Indicates the ID of the GATT client.
+ * @param fastestConnFlag Indicates whether to enable the fastest connection.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int BleGattcSetFastestConn(int clientId, bool fastestConnFlag)
+{
+    HILOGI("clientId: %{public}d, fastestConnFlag: %{public}d", clientId, fastestConnFlag);
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
  * @brief Create a Gatt connection to a remote device.
  *
  * @param clientId Indicates the ID of the GATT client.
@@ -430,6 +444,10 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
  */
 int BleGattcSetPriority(int clientId, const BdAddr *bdAddr, BtGattPriority priority)
 {
+    if (bdAddr == nullptr) {
+        HILOGE("bdAddr is null.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("clientId: %{public}d, has not been registered.", clientId);
