@@ -175,6 +175,16 @@ int BleGattcRegister(BtUuid appUuid);
 int BleGattcUnRegister(int clientId);
 
 /**
+ * @brief Set fastest connection of the Gatt connection, add address to the accelerate connection map
+ *  before create a new connection.
+ *
+ * @param clientId Indicates the ID of the GATT client.
+ * @param fastestConnFlag Indicates whether to enable the fastest connection.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int BleGattcSetFastestConn(int clientId, bool fastestConnFlag);
+
+/**
  * @brief Create a Gatt connection to a remote device.
  *
  * @param clientId Indicates the ID of the GATT client.
