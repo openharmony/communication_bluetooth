@@ -54,7 +54,7 @@ struct GattServerScenarioTest {
     AppStorage.SetOrCreate('curCharacteristicUUID', '00002BE0-0000-1000-8000-00805F9B34FB');
     AppStorage.SetOrCreate('curDescriptorUUID', '00002902-0000-1000-8000-00805F9B34FB');
     AppStorage.SetOrCreate('curDescriptorValue', 'Descriptor');
-    AppStorage.SetOrCreate('curCharacteristicValue', 'DAYU2');
+    AppStorage.SetOrCreate('curCharacteristicValue', 'DaYuBlue2');
     AppStorage.SetOrCreate('isPrimary', true);
     AppStorage.SetOrCreate('advSettings_interval', "1600");
     AppStorage.SetOrCreate('advSettings_txPower', "-7");
@@ -94,7 +94,7 @@ struct GattServerScenarioTest {
             ScenarioContentTable({
               testItem: this.testItem,
               scenarioItems: initGattServerScenarioData(),
-              //            testMessage: this.testMessage,  优化时修改
+//            testMessage: this.testMessage,  优化时修改
               changeIndex: this.changeIndex
             })
           }
@@ -151,96 +151,86 @@ struct GattServerScenarioTest {
           .height(66)
           .margin({ top: "15vp", left: "10vp", right: "10vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
-            //            AlertDialog.show({ message: '开始GattServer场景测试' })
+          .onClick(async (event: ClickEvent) => {
+//            AlertDialog.show({ message: '开始GattServer场景测试' })
             let self = this
-            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,13,14]
 
             let gattServerScenarioMessage = ""
             // 注册状态变化
             gattServerScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOnStateChange success")
             self.changeIndex = arr[0]
+            await sleep(1)
+
             // 开蓝牙
             gattServerScenarioMessage += BrInterface.testEnableBluetooth() + "\n";
             console.log("testEnableBluetooth success")
             self.changeIndex = arr[1]
             AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
+            await sleep(2)
 
-            AppStorage.SetOrCreate('txtScanFilterDeviceId', "08:FB:EA:19:48:0F");
-            AppStorage.SetOrCreate('txtScanFilterName', "dudu-tiger");
-            AppStorage.SetOrCreate('txtScanFilterServiceUuid', "0000180A-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('txtScanOptions_interval', "0");
-            AppStorage.SetOrCreate('txtScanOptionsDutyMode', '0');
-            AppStorage.SetOrCreate('txtScanOptionsMatchMode', '0');
-            AppStorage.SetOrCreate('cbxBleScanFilter', true);
-            AppStorage.SetOrCreate('cbxBleScanOptions', true);
+            // 获取状态
+            gattServerScenarioMessage += BrInterface.testGetState() + "\n";
+            console.log("testGetState success")
+            self.changeIndex = arr[2]
+            await sleep(1)
 
-            AppStorage.SetOrCreate('curServiceUUID', '00001877-0000-1000-8000-00805F9B34FB');
-            AppStorage.SetOrCreate('curCharacteristicUUID', '00002BE0-0000-1000-8000-00805F9B34FB');
-            AppStorage.SetOrCreate('curDescriptorUUID', '00002902-0000-1000-8000-00805F9B34FB');
-            AppStorage.SetOrCreate('curDescriptorValue', 'Descriptor');
-            AppStorage.SetOrCreate('curCharacteristicValue', 'DAYU2');
-            AppStorage.SetOrCreate('isPrimary', true);
-            AppStorage.SetOrCreate('advSettings_interval', "1600");
-            AppStorage.SetOrCreate('advSettings_txPower', "-7");
-            AppStorage.SetOrCreate('advSettings_connectable', true);
-            AppStorage.SetOrCreate('advDataServiceUuids_serviceUuid', "000054F6-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('advDataManufactureData_manufactureId', "7456");
-            AppStorage.SetOrCreate('advDataManufactureData_manufactureValue', "CHN");
-            AppStorage.SetOrCreate('advDataServiceData_serviceUuid', "000054F6-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('advDataServiceData_serviceValue', "AdvValue");
-            AppStorage.SetOrCreate('advResponseServiceUuids_serviceUuid', "000054F6-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('advResponseManufactureData_manufactureId', "6547");
-            AppStorage.SetOrCreate('advResponseManufactureData_manufactureValue', "CHN");
-            AppStorage.SetOrCreate('advResponseServiceData_serviceUuid', "000054F6-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('advResponseServiceData_serviceValue', "AdvValue");
-            AppStorage.SetOrCreate('cbxAdvSettings', true);
-            AppStorage.SetOrCreate('cbxInterval', true);
-            AppStorage.SetOrCreate('cbxTxPower', true);
-            AppStorage.SetOrCreate('cbxAdvResponse', true);
+            //创建Gatt服务器
+            gattServerScenarioMessage += GattServerInterface.testCreateGattServer() + "\n"
+            console.log("testCreateGattServer success")
+            self.changeIndex = arr[3]
+            await sleep(1)
 
-            sleep(2).then(() => {
-              // 获取状态
-              gattServerScenarioMessage += BrInterface.testGetState() + "\n";
-              console.log("testGetState success")
+            // 添加服务
+            gattServerScenarioMessage += GattServerInterface.testAddService() + "\n"
+            console.log("testAddService success")
+            self.changeIndex = arr[4]
 
-              self.changeIndex = arr[2]
-              //创建Gatt服务器
-              gattServerScenarioMessage += GattServerInterface.testCreateGattServer() + "\n"
-              console.log("testCreateGattServer success")
-              self.changeIndex = arr[3]
-              // 添加服务
-              gattServerScenarioMessage += GattServerInterface.testAddService() + "\n"
-              console.log("testAddService success")
-              self.changeIndex = arr[4]
-              // 开启连接状态变化
-              gattServerScenarioMessage += GattServerInterface.testOnConnectStateChange() + "\n"
-              console.log("testOnConnectStateChange success")
-              self.changeIndex = arr[5]
-              // 开始广播
-              gattServerScenarioMessage += GattServerInterface.testStartAdvertising() + "\n"
-              console.log("testStartAdvertising success")
-              self.changeIndex = arr[6]
-              AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
-              sleep(10).then(() => {
-                // 读取特征值
-                gattServerScenarioMessage += GattServerInterface.testOnCharacteristicRead() + "\n"
-                console.log("testOnCharacteristicRead success")
-                self.changeIndex = arr[7]
-                gattServerScenarioMessage += this.characteristicReadMsg + "\n"
-                gattServerScenarioMessage += this.characteristicWriteMsg + "\n"
-                sleep(3).then(() => {
-                  // 读取描述符值
-                  gattServerScenarioMessage += GattServerInterface.testOnDescriptorRead() + "\n"
-                  console.log("testOnDescriptorRead success")
-                  self.changeIndex = arr[8]
-                  gattServerScenarioMessage += this.descriptorReadMsg + "\n"
-                  gattServerScenarioMessage += this.descriptorWriteMsg + "\n"
-                  AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
-                })
-              })
-            })
+            // 开启连接状态变化
+            gattServerScenarioMessage += GattServerInterface.testOnConnectStateChange() + "\n"
+            console.log("testOnConnectStateChange success")
+            self.changeIndex = arr[5]
+            await sleep(1)
+
+            // 开始广播
+            gattServerScenarioMessage += GattServerInterface.testStartAdvertising() + "\n"
+            console.log("testStartAdvertising success")
+            self.changeIndex = arr[6]
+            AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
+            await sleep(10)
+
+            // 读取特征值
+            gattServerScenarioMessage += GattServerInterface.testOnCharacteristicRead() + "\n"
+            console.log("testOnCharacteristicRead success")
+            self.changeIndex = arr[7]
+            gattServerScenarioMessage += AppStorage.Get("characteristicReadMsg") + "\n"
+            AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
+            await sleep(3)
+
+            // 写入特征值
+            gattServerScenarioMessage += GattServerInterface.testOnCharacteristicWrite() + "\n"
+            console.log("testOnCharacteristicWrite success")
+            self.changeIndex = arr[8]
+            gattServerScenarioMessage += AppStorage.Get("characteristicWriteMsg") + "\n"
+            AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
+            await sleep(3)
+
+            // 读取描述符值
+            gattServerScenarioMessage += GattServerInterface.testOnDescriptorRead() + "\n"
+            console.log("testOnDescriptorRead success")
+            self.changeIndex = arr[9]
+            gattServerScenarioMessage += AppStorage.Get("descriptorReadMsg") + "\n"
+            AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
+            await sleep(3)
+
+            // 写入描述符值
+            gattServerScenarioMessage += GattServerInterface.testOnDescriptorWrite() + "\n"
+            console.log("testOnDescriptorWrite success")
+            self.changeIndex = arr[10]
+            gattServerScenarioMessage += AppStorage.Get("descriptorWriteMsg") + "\n"
+            AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
+            await sleep(3)
           })
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
@@ -254,32 +244,38 @@ struct GattServerScenarioTest {
           .height(66)
           .margin({ top: "15vp", left: "10vp", right: "10vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async (event: ClickEvent) => {
             let self = this
-            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
             let gattServerScenarioMessage = ""
             // 停止广播
             gattServerScenarioMessage += GattServerInterface.testStopAdvertising() + "\n"
             console.log("testStopAdvertising success")
-            self.changeIndex = arr[9]
+            self.changeIndex = arr[11]
+            await sleep(1)
             // 关闭连接状态变化
             gattServerScenarioMessage += GattServerInterface.testOnConnectStateChange() + "\n"
             console.log("testOffConnectStateChange success")
+            await sleep(1)
             // 删除服务
             gattServerScenarioMessage += GattServerInterface.testRemoveService() + "\n"
             console.log("testRemoveService success")
-            self.changeIndex = arr[10]
+            self.changeIndex = arr[12]
+            await sleep(1)
             // 关闭服务端
             gattServerScenarioMessage += GattServerInterface.testGattServerClose() + "\n"
             console.log("testGattServerClose success")
-            self.changeIndex = arr[11]
+            self.changeIndex = arr[13]
+            await sleep(1)
             // 关闭注册状态变化
             gattServerScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOffStateChange success")
+            await sleep(1)
             // 关蓝牙
             gattServerScenarioMessage += BrInterface.testDisableBluetooth() + "\n"
             console.log("testDisableBluetooth success")
-            self.changeIndex = arr[12]
+            self.changeIndex = arr[14]
+            await sleep(1)
             AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
           })
 
@@ -294,7 +290,7 @@ struct GattServerScenarioTest {
           .height(66)
           .margin({ top: "15vp", right: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async(event: ClickEvent) => {
             let gattServerScenarioMessage = ""
             AppStorage.SetOrCreate("gattServerScenarioMessage", gattServerScenarioMessage)
           })

@@ -18,17 +18,16 @@
  */
 import { TestImageDisplay } from '../../../../Component/testImageDisplay';
 import Router from '@system.router';
-
 import ConfigData from '../../../../Utils/ConfigData';
 import { initGattClientApiData } from '../../../model/testDataModels'
 import {PageTitle} from '../../../../Component/pageTitle';
 import { ContentTable } from '../../../../Component/contentTable';
-const NO_GATT_CLIENT_OBJECT = "No GattClient object, please CreateGattClient firstly!";
 const G_MAC = '08:FB:EA:19:48:0F'
+
 @Component
 struct GattClientSetting {
   private gattClientInstance=null;
-  private peripheralDeviceId = G_MAC;// '8C:7A:3D:7D:DF:DD';RedMi//
+  private peripheralDeviceId = G_MAC;// '08:FB:EA:19:48:0F';DaYu200//
   private gattClientExist = false;
   @State isOnBLECharacteristicChangeClick: boolean = false;
   @State bleCharacteristicChangeInfo:string = '';
@@ -69,7 +68,7 @@ struct GattClientSetting {
       .padding(5)
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
-      //        .margin( { top: "1vp", left: "20vp", right: "20vp" } )
+
       Column() {
         Stack().height("0.25vp").backgroundColor("#000000");
         Column() {
@@ -90,7 +89,6 @@ struct GattClientSetting {
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
           .backgroundColor($r("app.color.spring"))
-          //      .margin( { top: "1vp", left: "20vp", right: "20vp" } )
 
           Row() {
             Text("特征值UUID:").fontSize(15).width(60);
@@ -109,7 +107,6 @@ struct GattClientSetting {
           .padding(5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
-          //      .margin( { top: "1vp", left: "20vp", right: "20vp" } )
 
           Row() {
             Text("特征值Value:").fontSize(15).width(60);
@@ -128,7 +125,6 @@ struct GattClientSetting {
           .padding(5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
-          //      .margin( { top: "1vp", left: "20vp", right: "20vp" } )
 
           Row() {
             Text("描述符UUID:").fontSize(15).width(60);
@@ -147,7 +143,6 @@ struct GattClientSetting {
           .padding(5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
-          //      .margin( { top: "1vp", left: "20vp", right: "20vp" } )
 
           Row() {
             Text("描述符Value:").fontSize(15).width(60);
@@ -166,7 +161,6 @@ struct GattClientSetting {
           .padding(5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
-          //      .margin( { top: "1vp", left: "20vp", right: "20vp" } )
         }
         Stack().height("0.25vp").backgroundColor("#000000");
       }
@@ -297,8 +291,7 @@ struct GattClient {
           .width("95%")
           .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
-
-//          Stack().height("0.5vp").backgroundColor("#000000");
+          Stack().height("0.5vp").backgroundColor("#000000");
           Column() {
             Text("功能测试:")
               .margin({ top: "5vp",left: "10vp" })
@@ -335,8 +328,8 @@ function string2ArrayBuffer (str) {
     array[i] = str.charCodeAt(i);
   }
   return array.buffer
-
 }
+
 // example: sleep(500).then(()=>{/*TODO after sleeping*/});
 function sleep (time) {
   return new Promise((resolve) => setTimeout(resolve, time));

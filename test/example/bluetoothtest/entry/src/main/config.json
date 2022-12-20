@@ -28,6 +28,9 @@
         "name": "ohos.permission.USE_BLUETOOTH"
       },
       {
+        "name": "ohos.permission.MANAGE_BLUETOOTH"
+      },
+      {
         "name": "ohos.permission.LOCATION"
       }
     ],
@@ -127,7 +130,15 @@
           "pages/subProfileTest/a2dpSourceProfileTest",
           "pages/subProfileTest/handsFreeAudioGatewayProfileTest",
           "pages/subProfileTest/hidHostProfileTest",
-          "pages/subProfileTest/panNetworkProfileTest"
+          "pages/subProfileTest/panNetworkProfileTest",
+          "pages/subBenchmarkTest/brBenchmarkTest",
+          "pages/subBenchmarkTest/bleBenchmarkTest",
+          "pages/subBenchmarkTest/gattClientVelocityBenchmarkTest",
+          "pages/subBenchmarkTest/gattServerVelocityBenchmarkTest",
+          "pages/subBenchmarkTest/sppClientVelocityBenchmarkTest",
+          "pages/subBenchmarkTest/sppServerVelocityBenchmarkTest",
+          "pages/subBenchmarkTest/sppClientBandWidthBenchmarkTest",
+          "pages/subBenchmarkTest/sppServerBandWidthBenchmarkTest"
         ],
         "name": ".MainAbility",
         "window": {
