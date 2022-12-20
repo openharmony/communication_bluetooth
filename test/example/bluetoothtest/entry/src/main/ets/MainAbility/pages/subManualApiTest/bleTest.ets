@@ -42,7 +42,7 @@ struct BleTest {
 
   // input ble scan parameters:
   /*ScanFilter*/
-  @State cbxBleScanFilter: boolean = true;
+  @State cbxBleScanFilter: boolean = false;
   @State txtScanFilter_deviceId: string = "00:1A:7D:DA:71:15";
 
   @State txtScanFilter_name: string = "dudu-tiger"; 
@@ -51,7 +51,7 @@ struct BleTest {
   @State curScanFilters: Array<bluetooth.ScanFilter> = [];
 
   /*ScanOptions*/
-  @State cbxBleScanOptions: boolean = true;
+  @State cbxBleScanOptions: boolean = false;
   @State txtScanOptions_interval: string = "0"; 
 
   @State txtScanOptions_dutyMode: number = 0;//bluetooth.ScanDuty.SCAN_MODE_LOW_POWER; 

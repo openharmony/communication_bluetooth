@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -371,7 +371,7 @@ export function testOnCharacteristicRead():String{
       characteristicReadMsg +="characteristicUuid = "+ characteristicUuid+'\n';
       characteristicReadMsg +="serviceUuid = "+ serviceUuid+'\n';
       AppStorage.SetOrCreate("characteristicReadMsg",characteristicReadMsg)      // build data for response
-      let arrayBufferCCC = string2ArrayBuffer('dayu');
+      let arrayBufferCCC = string2ArrayBuffer('DaYuBlue');
 
       let serverResponse = {
         deviceId: clientDeviceId,

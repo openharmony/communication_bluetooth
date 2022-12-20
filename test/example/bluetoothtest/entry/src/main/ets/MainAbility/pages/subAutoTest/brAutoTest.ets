@@ -35,7 +35,6 @@ import emitter from '@ohos.events.emitter'
 struct BrAutoTest {
   @State message: string = 'BrAutoTest';
 //  @State textMessage: string = 'null';
-//  @State testMessage: string = "";
 //  @State testState: boolean = false;
   private testItem: TestData = router.getParams().testId;
   @State changeIndex:number = -1
@@ -115,64 +114,31 @@ struct BrAutoTest {
         .width(180)
         .height(50)
         .margin({ top: "15vp"})
-        .onClick((event: ClickEvent) => {
-//          AlertDialog.show({ message: 'AutoTest is successful' })
-
-//          autoTestMessage += BRInterface.testEnableBluetooth() + "\n"                   // 开蓝牙
-//          if(BRInterface.testEnableBluetooth()){
-//            console.log(BRInterface.testEnableBluetooth())
-//            emitter.emit({ eventId: 1, priority: emitter.EventPriority.HIGH }
-//              , {data:{"message": BRInterface.testEnableBluetooth(), "id": "listitemclick0"}});
-//          }
-//
-//          message = BRInterface.testEnableBluetooth()  // 开蓝牙
-//          autoTestMessage += message + "\n"
-//          if (message && message.length > 0) {
-//            this.changeIndex = 0
-//            this.testState = true
-//            this.testMessage = message
-//          }
-
+        .onClick(async(event: ClickEvent) => {
           let self = this
           let brAutoTestMessage =""
-//          const arr = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
 
           //拼装数组
-          var a=[{name:"testSetLocalName",para:["dayu"]},
+          var brAutoArray=[{name:"testSetLocalName",para:["DaYuBlue"]},
                  {name:"testSetBluetoothScanMode",para:[4,0]}]
           let Interface = BrAutoTestCase.map(i=>{
-            let para = a.some(itm=>itm.name===i.api.name)?a.find(itm=>itm.name===i.api.name).para:[]
+            let para = brAutoArray.some(itm=>itm.name===i.api.name)?brAutoArray.find(itm=>itm.name===i.api.name).para:[]
             return {name:i.api.name,para}
           })
-          //循环调用
-//          Interface.forEach((i, index) => {
-//            brAutoTestMessage += BrAutoTestCase[index]["api"](...i.para) + "\n"
-//            self.changeIndex=arr[i]
-//            AppStorage.SetOrCreate("brAutoTestMessage", brAutoTestMessage)
-//            sleep(0.5)
-//          })
 
+          //循环调用
           async function forLoop() {
             for (let m=0 ; m<Interface.length ; m++){
               brAutoTestMessage += BrAutoTestCase[m]["api"](...Interface[m].para) + "\n"
               self.changeIndex=m
-              await sleep(0.5)
+              await sleep(1)
               AppStorage.SetOrCreate("brAutoTestMessage", brAutoTestMessage)
             }
           }
           forLoop()
 
-//          async function main() {
-//            for (let i = 0; i < arr.length; i++) {
-//              await sleep(0.5)
-//              self.changeIndex=arr[i]
-//            }
-//          }
-//          main()
-
-
           let msg = ""
-          msg = "测试完成"
+          msg = "测试"
           console.log(msg)
           prompt.showToast({ message: msg })
         })

@@ -48,7 +48,7 @@ struct Index {
   @StorageLink('pairedDeviceInfo') pairingDevice: BluetoothDevice = new BluetoothDevice;
   @StorageLink('pairedDeviceId') pairedDeviceId: string = '';
   @StorageLink('btDeviceController') controller: BluetoothDeviceController = new BluetoothDeviceController;
-  @StorageLink('pairedMac') pairedMac: string = "AC:1E:9E:0B:2E:63";
+  @StorageLink('pairedMac') pairedMac: string = "00:1A:7D:DA:71:15";
   @State pairPinCode: string = '';
   @State btOnState: string = 'on:stateChange';
   @State btPinRequired: string = 'on:pinRequired';
@@ -114,7 +114,6 @@ struct Index {
     .alignItems(HorizontalAlign.Center)
     .backgroundColor($r("app.color.lead"))
     .height("100%")
-
   }
 
   /**

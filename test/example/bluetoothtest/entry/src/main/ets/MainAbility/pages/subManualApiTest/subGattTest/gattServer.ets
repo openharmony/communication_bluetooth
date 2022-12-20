@@ -32,7 +32,7 @@ struct GattServerSetting {
   private curServiceUUID:         string = '00001877-0000-1000-8000-00805F9B34FB';
   private curServiceIsPrimary:    boolean= true;
   private curCharacteristicUUID:  string = '00002BE0-0000-1000-8000-00805F9B34FB';
-  private curCharacteristicValue: string = 'DAYU';//OHOS:BLE NANJING CHINA
+  private curCharacteristicValue: string = 'DaYuBlue';//OHOS:BLE NANJING CHINA
   private curDescriptorUUID:      string = '00002902-0000-1000-8000-00805F9B34FB';
   private curDescriptorValue:     string = 'Descriptor';
 
@@ -316,11 +316,6 @@ struct GattServerSetting {
             .padding(5)
             .backgroundColor(0xAFEEEE);
 
-//            Text("Adv Data:")
-//              .margin({top: "5vp",left: "5vp"})
-//              .padding("5vp")
-//              .fontSize("15vp")
-//              .fontColor("#4444444");
             Column(){
               Row(){
                 Text("服务Uuid").fontSize(17).width(60).padding({left: 10})
@@ -331,7 +326,6 @@ struct GattServerSetting {
                     AppStorage.SetOrCreate('advDataServiceUuids_serviceUuid', strInput);
                   })
                   .width("80%")
-                // .width("60vp")
               }
               .width("100%")
               Column(){
@@ -353,7 +347,8 @@ struct GattServerSetting {
                       AppStorage.SetOrCreate('advDataManufactureData_manufactureValue', strInput)
                     })
                     .width("100vp")
-                }.width("90%")
+                }
+                .width("90%")
               }
               .borderWidth(1)
               .borderColor($r("app.color.lead"))
@@ -376,7 +371,8 @@ struct GattServerSetting {
                       .onChange((strInput) => {
                         this.advDataServiceData_serviceValue = strInput;
                         AppStorage.SetOrCreate('advDataServiceData_serviceValue', strInput)
-                      }).width("80%")
+                      })
+                      .width("80%")
                   }
                   .padding({top: 10})
                 }
@@ -531,7 +527,7 @@ struct GattServer {
   private curServiceUUID:         string = '00001877-0000-1000-8000-00805F9B34FB';
   private curServiceIsPrimary:    boolean= true;
   private curCharacteristicUUID:  string = '00002BE0-0000-1000-8000-00805F9B34FB';
-  private curCharacteristicValue: string = 'DAYU ';//OHOS:BLE NANJING CHINA
+  private curCharacteristicValue: string = 'DaYuBlue ';//OHOS:BLE NANJING CHINA
   private curDescriptorUUID:      string = '00002902-0000-1000-8000-00805F9B34FB';
   private curDescriptorValue:     string = 'Descriptor';
 
@@ -547,7 +543,7 @@ struct GattServer {
   private notifyCharacteristic_characteristicUuid:string  = '00001821-0000-1000-8000-00805F9B34FB';
   private notifyCharacteristic_characteristicValue:string = 'test';
   private notifyCharacteristic_confirm:boolean            =  false;
-  private notifyCharacteristicDeviceId:string             = '88:36:CF:09:C1:90';
+  private notifyCharacteristicDeviceId:string             = '08:FB:EA:19:48:0F'; //'88:36:CF:09:C1:90'
   private notifyCharacteristic_notifyCharacteristic:bluetooth.NotifyCharacteristic = {
     serviceUuid: '00001810-0000-1000-8000-00805F9B34FB',
     characteristicUuid: '00001821-0000-1000-8000-00805F9B34FB',
@@ -556,14 +552,14 @@ struct GattServer {
   }
 
   // ServerResponse
-  private serverResponse_deviceId:string = '88:36:CF:09:C1:90';
+  private serverResponse_deviceId:string = '08:FB:EA:19:48:0F'; //'88:36:CF:09:C1:90'
   private serverResponse_transId:string = '1';
   private serverResponse_status:string = '0';
   private serverResponse_offset:string = '0';
   private serverResponse_value:string 	= 'respond value';
 
   private serverResponse:bluetooth.ServerResponse ={
-    deviceId: '88:36:CF:09:C1:90',
+    deviceId: '08:FB:EA:19:48:0F', //'88:36:CF:09:C1:90'
     transId: 1,
     status: 0,
     offset: 0,
@@ -662,11 +658,8 @@ struct GattServer {
     AppStorage.SetOrCreate('cbxAdvResponse', this.cbxAdvResponse);
   }
 
-  //@StorageLink('on_BLEConnectionStateChange')
   build() {
     Column() {
-//      PageTitle({detail: 'Gatt_Server测试'})
-
       Stack({ alignContent: Alignment.TopStart }) {
         TestImageDisplay({ testItem: this.testItem })
         PageTitle({testItem: this.testItem})
@@ -685,7 +678,8 @@ struct GattServer {
           .onClick(() => {
             this.showList = !this.showList;
           })
-      }.width("100%")
+      }
+      .width("100%")
 
       Column() {
         if (this.showList) {

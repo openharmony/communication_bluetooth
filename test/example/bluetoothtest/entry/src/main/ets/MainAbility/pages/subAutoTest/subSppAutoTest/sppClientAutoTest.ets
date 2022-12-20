@@ -32,7 +32,6 @@ import prompt from '@system.prompt';
 struct SppClientAutoTest {
   @State message: string = 'SppClientAutoTest';
   @State testMessage: string = "";
-//  @State textMessage: string = 'null';
   private testItem: TestData = router.getParams().testId;
   @State changeIndex:number = -1
   @StorageLink ("sppClientAutoTestMessage") sppClientAutoTestMessage:string =""
@@ -126,47 +125,32 @@ struct SppClientAutoTest {
         .width(180)
         .height(50)
         .margin({ top: "15vp"})
-        .onClick((event: ClickEvent) => {
-//          AlertDialog.show({ message: 'AutoTest is successful' })
+        .onClick(async(event: ClickEvent) => {
+
           let self = this
           let sppClientAutoTestMessage =""
 
-//          const arr = [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
-//          async function main() {
-//            for (let i = 0; i < arr.length; i++) {
-//              await sleep(0.5)
-//              self.changeIndex=arr[i]
-//            }
-//          }
-//          main()
-
           //拼装数组
-          var a=[{name:"testSetLocalName",para:["dayu"]},
+          var sppClientAutoArray=[{name:"testSetLocalName",para:["DaYuBlue"]},
                  {name:"testSetBluetoothScanMode",para:[4,0]}]
           let Interface = SppClientAutoTestCase.map(i=>{
-            let para = a.some(itm=>itm.name===i.api.name)?a.find(itm=>itm.name===i.api.name).para:[]
+            let para = sppClientAutoArray.some(itm=>itm.name===i.api.name)?sppClientAutoArray.find(itm=>itm.name===i.api.name).para:[]
             return {name:i.api.name,para}
           })
-          //循环调用
-//          Interface.forEach((i,index)=>{
-//            sppClientAutoTestMessage += SppClientAutoTestCase[index]["api"](...i.para) + "\n"
-//            sleep(0.5)//等500ms
-//            AppStorage.SetOrCreate("sppClientAutoTestMessage",sppClientAutoTestMessage)
-//            //干些事情，刷新@state @prop
-//          })
 
+          //循环调用
           async function forLoop() {
             for (let m=0 ; m<Interface.length ; m++){
               sppClientAutoTestMessage += SppClientAutoTestCase[m]["api"](...Interface[m].para) + "\n"
               self.changeIndex=m
-              await sleep(0.5)
+              await sleep(1)
               AppStorage.SetOrCreate("sppClientAutoTestMessage", sppClientAutoTestMessage)
             }
           }
           forLoop()
 
           let msg = ""
-          msg = "测试完成"
+          msg = "测试"
           console.log(msg)
           prompt.showToast({ message: msg })
         })

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 import ConfigData from '../../../../Utils/ConfigData';
-
 import Router from '@system.router'
 import { TitleComponent } from '../../../../Component/titleComponent';
 import {PageTitle} from '../../../../Component/pageTitle';

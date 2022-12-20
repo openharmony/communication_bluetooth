@@ -37,7 +37,7 @@ struct SppServer {
   @State deviceId: string = AppStorage.Get('inputDeviceId');
   @StorageLink('dataReadMessage') dataReadMessage: string = "";
   private stateBT: string = "";
-  @State writeData: string = '111';
+  @State writeServerData: string = '1';
   private uuid: string = "00001101-0000-1000-8000-00805f9b34fb";
   private serverNumber: number = -1;
   private clientNumber: number = -1;
@@ -76,7 +76,7 @@ struct SppServer {
     })
     AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
     AppStorage.SetOrCreate('inputUuid', this.uuid);
-    AppStorage.SetOrCreate('writeData', this.writeData);
+    AppStorage.SetOrCreate("writeServerData", this.writeServerData);
 
   }
 
@@ -89,21 +89,7 @@ struct SppServer {
             PageTitle({testItem: this.testItem})
           }
           Stack().height("0.5vp").backgroundColor("#000000");
-//          Row() {
-//            Text("目标设备MAC：").fontSize(17).width(70)
-//            TextInput( { text: this.deviceId, placeholder: "请输入mac地址" } )
-//              .fontSize("14vp")
-//              .onChange((str) => {
-//                this.deviceId = str;
-//                AppStorage.SetOrCreate('inputDeviceId', str)
-//              })
-//              .width("80%")
-//              .borderRadius(1)
-//          }
-//          .backgroundColor($r("app.color.moon"))
-//          .padding(5)
-//          .justifyContent(FlexAlign.Start)
-//          .alignItems(VerticalAlign.Center)
+
           Row() {
             Text("本机设备UUID：").fontSize(17).width(85)
             TextInput( { text: this.uuid, placeholder: "请输入uuid" } )
@@ -121,11 +107,11 @@ struct SppServer {
           .alignItems(VerticalAlign.Center)
           Row() {
             Text("写入目标设备数据：").fontSize(17).width(95)
-            TextInput( { text: this.writeData, placeholder: "请输入写入的数据" } )
+            TextInput( { text: this.writeServerData, placeholder: "请输入写入的数据" } )
               .fontSize("14vp")
               .onChange((str) => {
-                this.writeData = str;
-                AppStorage.SetOrCreate('writeData', str);
+                this.writeServerData = str;
+                AppStorage.SetOrCreate("writeServerData", str);
               })
               .width("80%")
               .borderRadius(1)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// @ts-nocheck
 import { TestData, TestApi } from '../MainAbility/model/testData'
 import { initBRApiData } from '../MainAbility/model/testDataModels'
 
@@ -26,12 +27,12 @@ export struct BleFilterTable {
   @State changeIndex: number = -1
   // input ble scan parameters:
   /*ScanFilter*/
-  @State cbxBleScanFilter: boolean = true;
+  @State cbxBleScanFilter: boolean = false;
   @State txtScanFilter_deviceId: string = "08:FB:EA:1B:38:AB";//00:1A:7D:DA:71:15
   @State txtScanFilter_name: string = "dudu-tiger";
   @State txtScanFilter_serviceUuid: string = "0000180A-0000-1000-8000-00805f9b34fb";
   /*ScanOptions*/
-  @State cbxBleScanOptions: boolean = true;
+  @State cbxBleScanOptions: boolean = false;
   @State txtScanOptions_interval: string = "0";
 
   getCurrentState(index: number) {

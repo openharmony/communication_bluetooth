@@ -15,7 +15,7 @@
 // @ts-nocheck
 import { TestAuto, AutoCategory } from './testData'
 import { testEnableBluetooth, testDisableBluetooth, testGetState, testGetBtConnectionState, testSetLocalName,
-  testGetLocalName, testSetBluetoothScanMode, testGetBluetoothScanMode, testStartBluetoothDiscovery, testStopBluetoothDiscovery,
+  testGetLocalName, testSetBluetoothScanMode, testGetBluetoothScanMode, subscribeBluetoothDeviceFind, testStopBluetoothDiscovery,
   testPairDevice, testGetRemoteDeviceName, testGetRemoteDeviceClass, testGetPairedDevices, testUnPairedDevice,
   testGetProfileConnState1,testGetProfileConnState2,testOnStateChange,testOnPinRequired,testOnBondStateChange} from './brInterface'
 import { testCreateGattServerDevice, testCreateGattClientDevice, testGetConnectedBLEDevices, testStartBLEScan,testStopBLEScan,testOnBLEDeviceFind
@@ -31,9 +31,9 @@ import {testCreateGattServer,testStartAdvertising,testStopAdvertising,testAddSer
 import {testSppClientConnectSafe,testSppClientConnectUnSafe,testSppClientWrite,
   testSppClientReadOn,testSppClientReadOff,testSppClientClose} from './sppClientInterface'
 import {testSppServerCreateSafe,testSppServerCreateUnSafe,testSppServerAccept,testSppServerWrite,testSppServerReadOn,
-  testSppServerReadOff,testSppServerClose,testSppCloseClientSocket} from './sppServerInterface'
+  testSppServerReadOff,testSppCloseServerSocket,testSppCloseClientSocket} from './sppServerInterface'
 import { testProfileConnect,testProfileDisConnect,testProfileGetPlayingState,testProfileGetConnectionDevices,testProfileGetDeviceState} from './a2dpSinkProfileInterface'
-
+import BluetoothModel from './BluetoothModel'
 export const BrAutoTestCase: []  = [
   { 'name': '注册状态变化', 'detail': '注册状态变化', 'method': 'on.stateChange', 'api':testOnStateChange, 'result': 'None', 'category': AutoCategory.BrAuto },
   { 'name': '注册pin码变化', 'detail': '注册pin码变化', 'method': 'on.pinRequired','api':testOnPinRequired,'result': 'None', 'category': AutoCategory.BrAuto },
@@ -45,7 +45,8 @@ export const BrAutoTestCase: []  = [
   { 'name': '获取本地名称', 'detail': '获取蓝牙本地名称', 'method': 'getLocalName',  'api': testGetLocalName,'result': 'None', 'category': AutoCategory.BrAuto },
   { 'name': '设置扫描模式', 'detail': '设置蓝牙扫描模式', 'method': 'setBluetoothScanMode','api': testSetBluetoothScanMode,  'result': 'None', 'category': AutoCategory.BrAuto },
   { 'name': '获取扫描模式', 'detail': '获取蓝牙扫描模式', 'method': 'getBluetoothScanMode','api': testGetBluetoothScanMode, 'result': 'None', 'category': AutoCategory.BrAuto },
-//  { 'name': '开始蓝牙发现', 'detail': '发现可配对蓝牙设备', 'method': 'startBluetoothDiscovery', 'api': testStartBluetoothDiscovery, 'result': 'None', 'category': AutoCategory.BrAuto },
+  { 'name': '订阅蓝牙发现', 'detail': '订阅发现蓝牙设备', 'method': 'subscribeBluetoothDeviceFind', 'api': subscribeBluetoothDeviceFind, 'result': 'None', 'category': AutoCategory.BrAuto },
+  { 'name': '开始蓝牙发现', 'detail': '开始发现', 'method': 'startBluetoothDiscovery', 'api': BluetoothModel.startBluetoothDiscovery, 'result': 'None', 'category': AutoCategory.BrAuto },
   { 'name': '停止蓝牙发现', 'detail': '停止发现', 'method': 'stopBluetoothDiscovery', 'api': testStopBluetoothDiscovery, 'result': 'None', 'category': AutoCategory.BrAuto },
   { 'name': '配对设备', 'detail': '进行蓝牙设备配对', 'method': 'pairDevice','api': testPairDevice, 'result': 'None', 'category': AutoCategory.BrAuto },
   { 'name': '获取远程设备名称', 'detail': '获取配对蓝牙设备的名称', 'method': 'getDeviceName','api':testGetRemoteDeviceName, 'result': 'None', 'category': AutoCategory.BrAuto },
@@ -155,7 +156,7 @@ export const SppServerAutoTestCase: []  = [
   { 'name': 'Spp服务器接受', 'detail': 'Spp服务器接受', 'method': 'sppAccept', 'api':testSppServerAccept, 'result': 'None', 'category': AutoCategory.SppServerAuto },
   { 'name': 'Spp服务器读取打开', 'detail': 'Spp服务器读取打开', 'method': 'on.sppRead', 'api':testSppServerReadOn, 'result': 'None', 'category': AutoCategory.SppServerAuto },
   { 'name': 'Spp服务器读取关闭', 'detail': 'Spp服务器读取关闭', 'method': 'off.sppRead', 'api':testSppServerReadOff, 'result': 'None', 'category': AutoCategory.SppServerAuto },
-  { 'name': 'Spp服务器关闭', 'detail': 'Spp服务器关闭', 'method': 'sppCloseServerSocket', 'api':testSppServerClose, 'result': 'None', 'category': AutoCategory.SppServerAuto },
+  { 'name': 'Spp服务器关闭', 'detail': 'Spp服务器关闭', 'method': 'sppCloseServerSocket', 'api':testSppCloseServerSocket, 'result': 'None', 'category': AutoCategory.SppServerAuto },
   { 'name': 'Spp客户端关闭', 'detail': 'Spp客户端关闭', 'method': 'sppCloseClientSocket', 'api':testSppCloseClientSocket,'result': 'None', 'category': AutoCategory.SppServerAuto },
   { 'name': '关蓝牙', 'detail': '去使能蓝牙', 'method': 'disableBluetooth', 'api':testDisableBluetooth,'result': 'None', 'category': AutoCategory.SppServerAuto },
 ]
