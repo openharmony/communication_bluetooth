@@ -12,7 +12,7 @@ Gatt测试分为Client测试和Server测试
 
 1. 使用bluez提供的gatttool命令，此命令是一个gatt client命令行工具。
 2. 使用bluetoothctl的advertise子菜单功能。
-3. APP: 苹果手机上的lightblue，安卓手机上的nRF Connect。
+3. APP: 手机上的lightblue，nRF Connect。
 
 ### Gatt客户端
 
