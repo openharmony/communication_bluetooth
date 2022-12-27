@@ -18,6 +18,7 @@
 #include "interface_adapter_classic.h"
 #include "interface_adapter_manager.h"
 #include "log.h"
+#include "log_util.h"
 
 namespace bluetooth {
 ClassicBatteryObserverHf::ClassicBatteryObserverHf(utility::Dispatcher &dispatcher) : dispatcher_(&dispatcher)
@@ -34,7 +35,7 @@ void ClassicBatteryObserverHf::OnBatteryLevelChanged(const RawAddress &device, i
 {
     LOG_DEBUG("[ClassicBatteryObserverHf]::%{public}s, address: %{public}s, batteryLevel: %{public}d",
         __func__,
-        device.GetAddress().c_str(),
+        GetEncryptAddr(device.GetAddress()).c_str(),
         batteryLevel);
     dispatcher_->PostTask(std::bind(&ClassicBatteryObserverHf::SetBatteryLevel, this, device, batteryLevel));
 }
@@ -60,7 +61,7 @@ void ClassicBatteryObserverAg::OnHfBatteryLevelChanged(const RawAddress &device,
 {
     LOG_DEBUG("[ClassicBatteryObserverAg]::%{public}s, address: %{public}s, batteryLevel: %{public}d",
         __func__,
-        device.GetAddress().c_str(),
+        GetEncryptAddr(device.GetAddress()).c_str(),
         indValue);
     dispatcher_->PostTask(std::bind(&ClassicBatteryObserverAg::SetBatteryLevel, this, device, indValue));
 }

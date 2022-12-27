@@ -434,7 +434,7 @@ void AvrcpCtService::DisconnectNative(RawAddress rawAddr)
 
         if (profile_->Disconnect(rawAddr) != RET_NO_ERROR) {
             LOG_DEBUG(
-                "[AVRCP CT] Call - AvrcCtProfile::Disconnect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+                "[AVRCP CT] Call - AvrcCtProfile::Disconnect - Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     } while (false);
 }
@@ -455,7 +455,7 @@ int AvrcpCtService::GetConnectState(void)
 void AvrcpCtService::OnConnectionStateChanged(const RawAddress &rawAddr, int state) const
 {
     LOG_INFO("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - state[%{public}d]", rawAddr.GetAddress().c_str(), state);
+    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - state[%{public}d]", GetEncryptAddr(rawAddr.GetAddress()).c_str(), state);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnConnectionStateChanged(rawAddr, state);
@@ -478,7 +478,7 @@ void AvrcpCtService::AcceptActiveConnect(const RawAddress &rawAddr)
         }
 
         if (profile_->Connect(rawAddr) != RET_NO_ERROR) {
-            LOG_DEBUG("[AVRCP CT] Call - AvrcCtProfile::Connect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] Call - AvrcCtProfile::Connect - Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     } while (false);
 }
@@ -563,7 +563,7 @@ void AvrcpCtService::PressButtonNative(RawAddress rawAddr, uint8_t button)
 void AvrcpCtService::OnButtonPressed(const RawAddress &rawAddr, uint8_t button, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - button[%x] - result[%{public}d]", rawAddr.GetAddress().c_str(), button, result);
+    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - button[%x] - result[%{public}d]", GetEncryptAddr(rawAddr.GetAddress()).c_str(), button, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnPressButton(rawAddr, button, result);
@@ -619,7 +619,7 @@ void AvrcpCtService::ReleaseButtonNative(RawAddress rawAddr, uint8_t button)
 void AvrcpCtService::OnButtonReleased(const RawAddress &rawAddr, uint8_t button, int result) const
 {
     LOG_DEBUG("[AVRCP CT] AvrcpCtService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - button[%x] - result[%{public}d]", rawAddr.GetAddress().c_str(), button, result);
+    LOG_DEBUG("[AVRCP CT] Address[%{public}s] - button[%x] - result[%{public}d]", GetEncryptAddr(rawAddr.GetAddress()).c_str(), button, result);
 
     if (myObserver_ != nullptr) {
         myObserver_->OnReleaseButton(rawAddr, button, result);

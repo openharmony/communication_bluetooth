@@ -33,19 +33,19 @@ namespace bluetooth {
 void AvrcpTgService::ObserverImpl::OnConnectionStateChanged(const std::string &addr, int state) 
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] addr[%{public}s], state[%{public}d]", addr.c_str(), state);
+    LOG_DEBUG("[AVRCP TG] addr[%{public}s], state[%{public}d]", GetEncryptAddr(addr).c_str(), state);
 }
 
 void AvrcpTgService::ObserverImpl::OnPressButton(const std::string &addr, uint8_t button)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
+    LOG_DEBUG("[AVRCP TG] addr[%{public}s], button[%x]", GetEncryptAddr(addr).c_str(), button);
 }
 
 void AvrcpTgService::ObserverImpl::OnReleaseButton(const std::string &addr, uint8_t button)
 {
     LOG_INFO("[AVRCP TG] AvrcpTgService::ObserverImpl::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] addr[%{public}s], button[%x]", addr.c_str(), button);
+    LOG_DEBUG("[AVRCP TG] addr[%{public}s], button[%x]", GetEncryptAddr(addr).c_str(), button);
 }
 
 void AvrcpTgService::ObserverImpl::OnSetAddressedPlayer(const std::string &addr, uint8_t label, int status)
@@ -658,7 +658,7 @@ std::vector<bluetooth::RawAddress> AvrcpTgService::GetDevicesByStates(const std:
 int AvrcpTgService::GetDeviceState(const RawAddress &rawAddr)
 {
     LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
+    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
 
     int result = static_cast<int>(BTConnectState::DISCONNECTED);
 
@@ -756,7 +756,7 @@ void AvrcpTgService::DisconnectNative(RawAddress rawAddr)
 
         if (profile_->Disconnect(rawAddr) != RET_NO_ERROR) {
             LOG_DEBUG(
-                "[AVRCP TG] Call - AvrcTgProfile::Disconnect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+                "[AVRCP TG] Call - AvrcTgProfile::Disconnect - Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     } while (false);
 }
@@ -777,7 +777,7 @@ int AvrcpTgService::GetConnectState(void)
 void AvrcpTgService::OnConnectionStateChanged(const RawAddress &rawAddr, int state)
 {
     LOG_DEBUG("[AVRCP TG] AvrcpTgService::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] Address[%{public}s] - state[%{public}d]", rawAddr.GetAddress().c_str(), state);
+    LOG_DEBUG("[AVRCP TG] Address[%{public}s] - state[%{public}d]", GetEncryptAddr(rawAddr.GetAddress()).c_str(), state);
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (myObserver_ != nullptr) {
         myObserver_->OnConnectionStateChanged(rawAddr.GetAddress(), state);
@@ -798,7 +798,7 @@ void AvrcpTgService::AcceptActiveConnect(const RawAddress &rawAddr)
         }
 
         if (profile_->Connect(rawAddr) != RET_NO_ERROR) {
-            LOG_DEBUG("[AVRCP CT] Call - AvrcTgProfile::Connect - Failed! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] Call - AvrcTgProfile::Connect - Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     } while (false);
 }

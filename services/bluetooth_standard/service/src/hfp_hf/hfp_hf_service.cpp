@@ -17,6 +17,7 @@
 
 #include "adapter_config.h"
 #include "class_creator.h"
+#include "log_util.h"
 #include "hfp_hf_defines.h"
 #include "profile_service_manager.h"
 #include "stub/telephone_client_service.h"
@@ -604,7 +605,7 @@ void HfpHfService::ProcessDefaultEvent(const HfpHfMessage &event) const
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         it->second->ProcessMessage(event);
     } else {
-        LOG_DEBUG("[HFP HF]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
+        LOG_DEBUG("[HFP HF]%{public}s():invalid address[%{public}s]", __FUNCTION__, GetEncryptAddr(event.dev_).c_str());
     }
 }
 
@@ -617,7 +618,7 @@ void HfpHfService::ProcessEvent(const HfpHfMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = event.dev_;
-    LOG_DEBUG("[HFP HF]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__, address.c_str(), event.what_);
+    LOG_DEBUG("[HFP HF]%{public}s():address[%{public}s] event_no[%{public}d]", __FUNCTION__, GetEncryptAddr(address).c_str(), event.what_);
     switch (event.what_) {
         case HFP_HF_SERVICE_STARTUP_EVT:
             StartUp();
@@ -787,7 +788,7 @@ bool HfpHfService::IsConnected(const std::string &address) const
 {
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_ERROR("[HFP AG]%{public}s():Invalid Device address:%{public}s", __FUNCTION__, address.c_str());
+        LOG_ERROR("[HFP AG]%{public}s():Invalid Device address:%{public}s", __FUNCTION__, GetEncryptAddr(address).c_str());
         return false;
     }
     if (it->second->GetDeviceStateInt() < HFP_HF_STATE_CONNECTED) {
