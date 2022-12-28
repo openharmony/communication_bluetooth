@@ -578,17 +578,19 @@ GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<G
 
         napi_create_string_utf8(env, "characteristics", NAPI_AUTO_LENGTH, &propertyNameValue);
         napi_has_property(env, object, propertyNameValue, &hasProperty);
-        if (hasProperty) {
-            napi_get_property(env, object, propertyNameValue, &value);
-            vector<GattCharacteristic> characteristics;
-            bool ret = GetCharacteristicVectorFromJS(env, value, characteristics, server, client);
-            if (!ret) {
-                HILOGI("GetCharacteristicVectorFromJS faild");
-                return nullptr;
-            }
-            for (auto& characteristic : characteristics) {
-                service->AddCharacteristic(characteristic);
-            }
+        if (!hasProperty) {
+            HILOGE("no characteristics field");
+            return nullptr;
+        }
+        napi_get_property(env, object, propertyNameValue, &value);
+        vector<GattCharacteristic> characteristics;
+        bool ret = GetCharacteristicVectorFromJS(env, value, characteristics, server, client);
+        if (!ret) {
+            HILOGI("GetCharacteristicVectorFromJS faild");
+            return nullptr;
+        }
+        for (auto& characteristic : characteristics) {
+            service->AddCharacteristic(characteristic);
         }
 
         napi_create_string_utf8(env, "includeServices", NAPI_AUTO_LENGTH, &propertyNameValue);
