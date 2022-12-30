@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -141,6 +141,40 @@ export class TestScenario{
   category: ScenarioCategory;
 
   constructor(name: string, detail: string, method: string , api:any ,result: string, category: ScenarioCategory) {
+    this.id = `${ NextId++ }`;
+    this.name = name;
+    this.detail = detail;
+    this.method = method;
+    this.api = api;
+    this.result = result;
+    this.category = category;
+  }
+}
+
+export enum BenchmarkCategory {
+  BrBenchmark,
+  BleBenchmark,
+  GattClientBenchmark,
+  GattServerBenchmark,
+  SppClientBenchmark,
+  SppServerBenchmark,
+  //  A2dpSourceBenchmark,
+  //  HFPBenchmark,
+  //  HitHostBenchmark,
+  //  PanNetworkBenchmark,
+}
+
+export class TestBenchmark{
+  id: string;
+  name: string;
+  detail: string;
+  method: string;
+  api: any;
+  image: Resource;
+  result: string;
+  category: BenchmarkCategory;
+
+  constructor(name: string, detail: string, method: string , api:any ,result: string, category: BenchmarkCategory) {
     this.id = `${ NextId++ }`;
     this.name = name;
     this.detail = detail;

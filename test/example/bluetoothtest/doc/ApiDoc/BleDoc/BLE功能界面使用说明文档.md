@@ -59,7 +59,7 @@
 
 1. 可以使用linux的bluetoothctl的advertise子菜单命令。
 
-2. APP: 苹果手机上的lightblue，安卓手机上的nRF Connect
+2. APP: 手机上的lightblue，nRF Connect
 
 #### 功能
 

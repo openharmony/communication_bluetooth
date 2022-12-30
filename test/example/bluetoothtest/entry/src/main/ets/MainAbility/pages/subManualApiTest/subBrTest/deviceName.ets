@@ -24,7 +24,6 @@ import {PageTitle} from '../../../../Component/pageTitle';
 @Component
 struct DeviceNameCard {
   private deviceName: string = BluetoothModel.getLocalName();
-  //private deviceName: string = 'testName';
   private deviceInfo: any = ''
   private aboutDeviceList: any[] = []
 

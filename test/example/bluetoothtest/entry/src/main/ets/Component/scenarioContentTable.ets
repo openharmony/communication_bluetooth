@@ -23,12 +23,11 @@ import prompt from '@system.prompt';
 @Component
 export struct ScenarioContentTable {
   @State scenarioItems: TestScenario[] = [];
-  private scenarioItemsx:TestScenario[]
-  @State changeIndex: number = -1
-  @State localName: string = 'dayu'
-  @State currentIndex: number = 1
-  @State textResult:string ="None"
-  @StorageLink('pairedMac') pairedMac: string = "";
+  private scenarioItemsX:TestScenario[]
+  @Prop changeIndex: number;
+  @State localName: string = 'DaYuBlue'
+//  @State currentIndex: number = 1
+//  @StorageLink('pairedMac') pairedMac: string = "";
 
   @Builder IngredientItem(scenarioItem: TestScenario, index: number) {
     Stack() {
@@ -54,10 +53,9 @@ export struct ScenarioContentTable {
         }
         .height(30)
         .layoutWeight(6)
+
         Flex({ alignItems: ItemAlign.Center }) {
           Text(this.changeIndex >= 0 ? this.getCurrentState(index) : scenarioItem.result)
-            //          Text(scenarioItem.result=AppStorage.Get("result"))
-            //         Text(scenarioItem.result)
             .margin({left:"10vp"})
             .fontSize("17vp")
             .flexGrow(1)
@@ -74,17 +72,14 @@ export struct ScenarioContentTable {
   }
 
   getCurrentState(index: number) {
-    if(index<=this.changeIndex) this.scenarioItemsx[index].result = 'pass';
-    return this.scenarioItemsx[index].result
+    if(index<=this.changeIndex) this.scenarioItemsX[index].result = 'pass';
+    return this.scenarioItemsX[index].result
   }
 
   aboutToAppear(): void  {
     console.log("scenario组件构建完毕")
-    //    emitter.on({ eventId: 1 }, (eventData) => {
-    //      console.log(JSON.stringify(eventData.data) );
-    //    });
     //初始化私有变量
-    this.scenarioItemsx = this.scenarioItems
+    this.scenarioItemsX = this.scenarioItems
   }
 
   build() {

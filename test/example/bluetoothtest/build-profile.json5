@@ -18,13 +18,13 @@
       {
         "name": "default",
         "material": {
-          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_com.ohos.bttest.cer",
-          "storePassword": "0000001A7D9F7F5057F8F88E6E26081290E3E84C620A53001A4DEE5B2859816B3347485E16D43C2DC13E",
+          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_ohos.samples.bttest.cer",
+          "storePassword": "0000001B46AAC3EF6AAFA2CAB1898D09286A3EF7A39D58891A89BD07C6BBC865D890DAC37AE66DF7E183AF",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001A0A9332DF7E472BCBF1A1F91E99F1640537C3B5A97243875D6D416A1A778AA0EB0517E3DB77B7",
-          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_com.ohos.bttest.p7b",
+          "keyPassword": "0000001BE78AD5715D02D4791A281B2E6289527135DA217BDC7CA3E07238D58FD4C6330979FF5E0084436C",
+          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_ohos.samples.bttest.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_com.ohos.bttest.p12"
+          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_ohos.samples.bttest.p12"
         }
       }
     ],

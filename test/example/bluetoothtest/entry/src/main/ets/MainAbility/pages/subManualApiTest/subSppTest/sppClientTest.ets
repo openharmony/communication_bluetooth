@@ -49,7 +49,7 @@ struct SppClient {
   private clientNumber: number = -1;
   private sppWriteText: string = '';
   @State deviceId: string ="08:FB:EA:19:48:0F";//08:FB:EA:19:48:0F
-  @State writeData: string = '11';
+  @State writeClientData: string = '11';
   private TAG_PAGE = ConfigData.TAG + 'Paired_Device ';
   @StorageLink ('bluetoothIsOn') btEnable: boolean = false;
   @State currentClick: number = -1;
@@ -75,7 +75,7 @@ struct SppClient {
     AppStorage.SetOrCreate('bluetoothIsOn', this.btEnable);
     AppStorage.SetOrCreate('inputDeviceId', this.deviceId);
     AppStorage.SetOrCreate('inputUuid', this.uuid);
-    AppStorage.SetOrCreate('writeData', this.writeData);
+    AppStorage.SetOrCreate("writeClientData", this.writeClientData);
   }
 
   build() {
@@ -86,7 +86,6 @@ struct SppClient {
             TestImageDisplay({ testItem: this.testItem })
             PageTitle({testItem: this.testItem})
           }
-
           Stack().height("0.5vp").backgroundColor("#000000");
           Row() {
             Text("目标设备MAC：").fontSize(17).width(70);
@@ -120,11 +119,11 @@ struct SppClient {
           .alignItems(VerticalAlign.Center)
           Row() {
             Text("写入目标设备数据：").fontSize(17).width(95);
-            TextInput( { text: this.writeData, placeholder: "请输入写入的数据" } )
+            TextInput( { text: this.writeClientData, placeholder: "请输入写入的数据" } )
               .fontSize("15vp")
               .onChange((str) => {
-                this.writeData = str;
-                AppStorage.SetOrCreate('writeData', str);
+                this.writeClientData = str;
+                AppStorage.SetOrCreate("writeClientData", str);
               })
               .width("80%")
               .borderRadius(1)
@@ -135,7 +134,6 @@ struct SppClient {
           .alignItems(VerticalAlign.Center)
           Row() {
             Text("读取的数据为：").fontSize("17vp")
-
             Text(this.dataReadMessage)
               .fontSize("15vp")
               .width("80%")

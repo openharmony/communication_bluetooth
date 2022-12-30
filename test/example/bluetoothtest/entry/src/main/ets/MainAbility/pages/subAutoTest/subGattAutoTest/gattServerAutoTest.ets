@@ -49,7 +49,7 @@ struct GattServerAutoTest {
     AppStorage.SetOrCreate('curCharacteristicUUID', '00002BE0-0000-1000-8000-00805F9B34FB');
     AppStorage.SetOrCreate('curDescriptorUUID', '00002902-0000-1000-8000-00805F9B34FB');
     AppStorage.SetOrCreate('curDescriptorValue', 'Descriptor');
-    AppStorage.SetOrCreate('curCharacteristicValue', 'DAYU');
+    AppStorage.SetOrCreate('curCharacteristicValue', 'DaYuBlue');
     AppStorage.SetOrCreate('isPrimary', true);
     AppStorage.SetOrCreate('advSettings_interval', "1600");
     AppStorage.SetOrCreate('advSettings_txPower', "-7");
@@ -143,47 +143,31 @@ struct GattServerAutoTest {
         .width(180)
         .height(50)
         .margin({ top: "15vp"})
-        .onClick((event: ClickEvent) => {
-//          AlertDialog.show({ message: 'AutoTest is successful' })
+        .onClick(async(event: ClickEvent) => {
           let self = this
           let gattServerAutoTestMessage =""
 
-//          const arr = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
-//          async function main() {
-//            for (let i = 0; i < arr.length; i++) {
-//              await sleep(0.5)
-//              self.changeIndex=arr[i]
-//            }
-//          }
-//          main()
-
           //拼装数组
-          var a=[{name:"testSetLocalName",para:["dayu"]},
+          var gattServerAutoArray=[{name:"testSetLocalName",para:["DaYuBlue"]},
                  {name:"testSetBluetoothScanMode",para:[4,0]}]
           let Interface = GattServerAutoTestCase.map(i=>{
-            let para = a.some(itm=>itm.name===i.api.name)?a.find(itm=>itm.name===i.api.name).para:[]
+            let para = gattServerAutoArray.some(itm=>itm.name===i.api.name)?gattServerAutoArray.find(itm=>itm.name===i.api.name).para:[]
             return {name:i.api.name,para}
           })
-          //循环调用
-//          Interface.forEach((i,index)=>{
-//            gattServerAutoTestMessage += GattServerAutoTestCase[index]["api"](...i.para) + "\n"
-//            sleep(0.5)//等500ms
-//            AppStorage.SetOrCreate("gattServerAutoTestMessage",gattServerAutoTestMessage)
-//            //干些事情，刷新@state @prop
-//          })
 
+          //循环调用
           async function forLoop() {
             for (let m=0 ; m<Interface.length ; m++){
               gattServerAutoTestMessage += GattServerAutoTestCase[m]["api"](...Interface[m].para) + "\n"
               self.changeIndex=m
-              await sleep(0.5)
+              await sleep(1)
               AppStorage.SetOrCreate("gattServerAutoTestMessage", gattServerAutoTestMessage)
             }
           }
           forLoop()
 
           let msg = ""
-          msg = "测试完成"
+          msg = "测试"
           console.log(msg)
           prompt.showToast({ message: msg })
         })
@@ -194,15 +178,6 @@ struct GattServerAutoTest {
     }
   }
 }
-
-function string2ArrayBuffer (str) {
-  let array = new Uint8Array(str.length);
-  for(var i = 0; i < str.length; i++) {
-    array[i] = str.charCodeAt(i);
-  }
-  return array.buffer
-}
-
 
 function sleep(time) {
   return new Promise((resolve, reject) => {

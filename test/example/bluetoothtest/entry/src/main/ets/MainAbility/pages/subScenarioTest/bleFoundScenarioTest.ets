@@ -17,25 +17,26 @@
 /**
  * BLE found Scenario Test Page Of Bluetooth test
  */
-
+import prompt from '@system.prompt';
 import router from '@system.router';
 import { PageTitle } from '../../../Component/pageTitle';
 import { TestImageDisplay } from '../../../Component/testImageDisplay';
 import { TestData } from '../../model/testData'
 import { ScenarioContentTable } from '../../../Component/scenarioContentTable'
-import { initBleFoundScenarioData } from '../../model/scenarioTestDataModel'
+import { BleFoundScenarioTestCase,initBleFoundScenarioData } from '../../model/scenarioTestDataModel'
 import * as BLEInterface from '../../model/bleInterface'
 import * as BrInterface from '../../model/brInterface'
+
 @Entry
 @Component
 struct BleFoundScenarioTest {
   @State message: string = 'BleFoundScenarioTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex:number = -1
-  @StorageLink("bleFoundScenarioMessage") bleFoundScenarioMessage:string =""
+  @State changeIndex: number = -1
+  @StorageLink("bleFoundScenarioMessage") bleFoundScenarioMessage: string = ""
 
   aboutToAppear() {
-    AppStorage.SetOrCreate('txtScanFilterDeviceId', "08:FB:EA:19:48:0F");  // 00:1A:7D:DA:71:15
+    AppStorage.SetOrCreate('txtScanFilterDeviceId', "08:FB:EA:19:48:0F"); // 00:1A:7D:DA:71:15
     AppStorage.SetOrCreate('txtScanFilterName', "dudu-tiger");
     AppStorage.SetOrCreate('txtScanFilterServiceUuid', "0000180A-0000-1000-8000-00805f9b34fb");
     AppStorage.SetOrCreate('txtScanOptions_interval', "0");
@@ -45,26 +46,26 @@ struct BleFoundScenarioTest {
     AppStorage.SetOrCreate('cbxBleScanOptions', true);
   }
 
-
   build() {
     Column() {
       Stack({ alignContent: Alignment.TopStart }) {
         TestImageDisplay({ testItem: this.testItem })
         PageTitle({ testItem: this.testItem })
       }
+
       Stack().height("1vp").backgroundColor("#000000");
       Column() {
         Scroll() {
           Column() {
             Text("场景流程验证:")
               .fontSize("17vp")
-              .margin({ top: "10vp", bottom:"10vp",left: "20vp"})
+              .margin({ top: "10vp", bottom: "10vp", left: "20vp" })
               .textAlign(TextAlign.Start)
               .width("100%")
             ScenarioContentTable({
               testItem: this.testItem,
               scenarioItems: initBleFoundScenarioData(),
-//             testMessage: this.testMessage,  优化时修改
+//            testMessage: this.testMessage,  优化时修改
               changeIndex: this.changeIndex
             })
           }
@@ -80,11 +81,11 @@ struct BleFoundScenarioTest {
           Column() {
             Text("流程日志:")
               .fontSize("17vp")
-              .margin({ top: "8vp", bottom: "8vp", left: "20vp"})
+              .margin({ top: "8vp", bottom: "8vp", left: "20vp" })
               .textAlign(TextAlign.Start)
               .width("100%")
-            List(){
-              ListItem(){
+            List() {
+              ListItem() {
                 Text(this.bleFoundScenarioMessage)
                   .fontSize("17vp")
                   .margin({ top: "5vp", left: "30vp", right: "10vp" })
@@ -119,40 +120,64 @@ struct BleFoundScenarioTest {
           .height(66)
           .margin({ top: "15vp", left: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
-            //          AlertDialog.show({ message: '开始BleFound场景测试' })
+          .onClick(async (event: ClickEvent) => {
+            prompt.showToast({ message: '开始BleFound场景测试' })
             let self = this
-            const arr = [0,1,2,3,4,5,6,7]
+//            const arr = [0, 1, 2, 3, 4, 5, 6, 7]
             let bleFoundScenarioMessage = ""
             // 注册状态变化
-            bleFoundScenarioMessage += BrInterface.testOnStateChange() + "\n"
-            console.log("testOnStateChange success")
-            self.changeIndex=arr[0]
-            // 开蓝牙
-            bleFoundScenarioMessage += BrInterface.testEnableBluetooth() + "\n";
-            console.log("testEnableBluetooth success")
-            self.changeIndex=arr[1]
-            AppStorage.SetOrCreate("bleFoundScenarioMessage", bleFoundScenarioMessage)
-            sleep(2).then(() => {
-              // 获取状态
-              bleFoundScenarioMessage += BrInterface.testGetState() + "\n";
-              AppStorage.SetOrCreate('cbxBleScanOptions', true);
-              AppStorage.SetOrCreate('cbxBleScanFilter', true);
-              self.changeIndex=arr[2]
-              // 开启注册BLE查找状态变化
-              bleFoundScenarioMessage += BLEInterface.testOnBLEDeviceFind() + "\n"
-              console.log("testOnBLEDeviceFind success")
-              self.changeIndex=arr[3]
-              // 开始BLE扫描
-              bleFoundScenarioMessage += BLEInterface.testStartBLEScan() + "\n"
-              console.log("testStartBLEScan success")
-              self.changeIndex=arr[4]
-              // 获取连接的BLE设备
-              bleFoundScenarioMessage += BLEInterface.testGetConnectedBLEDevices() + "\n"
-              console.log("testGetConnectedBLEDevices success")
-              self.changeIndex=arr[5]
-              AppStorage.SetOrCreate("bleFoundScenarioMessage", bleFoundScenarioMessage)
+//            bleFoundScenarioMessage += BrInterface.testOnStateChange() + "\n"
+//            console.log("testOnStateChange success")
+//            self.changeIndex = arr[0]
+//            await sleep(1)
+//            // 开蓝牙
+//            bleFoundScenarioMessage += BrInterface.testEnableBluetooth() + "\n";
+//            console.log("testEnableBluetooth success")
+//            self.changeIndex = arr[1]
+//            AppStorage.SetOrCreate("bleFoundScenarioMessage", bleFoundScenarioMessage)
+//            await sleep(2)
+//            // 获取状态
+//            bleFoundScenarioMessage += BrInterface.testGetState() + "\n";
+//            AppStorage.SetOrCreate('cbxBleScanOptions', true);
+//            AppStorage.SetOrCreate('cbxBleScanFilter', true);
+//            self.changeIndex = arr[2]
+//            await sleep(1)
+//            // 开启注册BLE查找状态变化
+//            bleFoundScenarioMessage += BLEInterface.testOnBLEDeviceFind() + "\n"
+//            console.log("testOnBLEDeviceFind success")
+//            self.changeIndex = arr[3]
+//            await sleep(1)
+//            // 开始BLE扫描
+//            bleFoundScenarioMessage += BLEInterface.testStartBLEScan() + "\n"
+//            console.log("testStartBLEScan success")
+//            self.changeIndex = arr[4]
+//            await sleep(1)
+//            // 获取连接的BLE设备
+//            bleFoundScenarioMessage += BLEInterface.testGetConnectedBLEDevices() + "\n"
+//            console.log("testGetConnectedBLEDevices success")
+//            self.changeIndex = arr[5]
+//            await sleep(1)
+//            AppStorage.SetOrCreate("bleFoundScenarioMessage", bleFoundScenarioMessage)
+
+            //拼装数组
+            var bleScenarioArray=[{name:"testSetLocalName",para:["DaYuBlue"]},
+                                 {name:"testSetBluetoothScanMode",para:[4,0]}]
+            let Interface = BleFoundScenarioTestCase.map(i=>{
+              let para = bleScenarioArray.some(itm=>itm.name===i.api.name)?bleScenarioArray.find(itm=>itm.name===i.api.name).para:[]
+              return {name:i.api.name,para}
             })
+
+            //循环调用
+            async function forLoop() {
+              for (let m=0 ; m<Interface.length ; m++){
+                bleFoundScenarioMessage += BleFoundScenarioTestCase[m]["api"](...Interface[m].para) + "\n"
+                self.changeIndex=m
+                await sleep(1)
+                AppStorage.SetOrCreate("bleFoundScenarioMessage", bleFoundScenarioMessage)
+              }
+            }
+            forLoop()
+
           })
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
@@ -164,26 +189,30 @@ struct BleFoundScenarioTest {
           .backgroundColor($r("app.color.blue"))
           .width(100)
           .height(66)
-          .margin({ top: "15vp",left:"10vp",right:"10vp" })
+          .margin({ top: "15vp", left: "10vp", right: "10vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async (event: ClickEvent) => {
             let self = this
-            const arr = [0,1,2,3,4,5,6,7]
-            let bleFoundScenarioMessage =""
+            const arr = [0, 1, 2, 3, 4, 5, 6, 7]
+            let bleFoundScenarioMessage = ""
             // 停止BLE扫描
             bleFoundScenarioMessage += BLEInterface.testStopBLEScan() + "\n"
             console.log("testStopBLEScan success")
-            self.changeIndex=arr[6]
+//            self.changeIndex = arr[6]
+            await sleep(1)
             // 关闭注册BLE查找状态变化
             bleFoundScenarioMessage += BLEInterface.testOnBLEDeviceFind() + "\n"
             console.log("testOffBLEDeviceFind success")
+            await sleep(1)
             //关闭注册状态变化
             bleFoundScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOffStateChange success")
+            await sleep(1)
             //关蓝牙
             bleFoundScenarioMessage += BrInterface.testDisableBluetooth() + "\n"
             console.log("testDisableBluetooth success")
-            self.changeIndex=arr[7]
+//            self.changeIndex = arr[7]
+            await sleep(1)
             AppStorage.SetOrCreate("bleFoundScenarioMessage", bleFoundScenarioMessage)
           })
 
@@ -196,10 +225,10 @@ struct BleFoundScenarioTest {
           .backgroundColor($r("app.color.moon"))
           .width(80)
           .height(66)
-          .margin({ top: "15vp",right:"20vp" })
+          .margin({ top: "15vp", right: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
-            let bleFoundScenarioMessage =""
+          .onClick(async(event: ClickEvent) => {
+            let bleFoundScenarioMessage = ""
             AppStorage.SetOrCreate("bleFoundScenarioMessage", bleFoundScenarioMessage)
           })
         }
@@ -212,6 +241,7 @@ struct BleFoundScenarioTest {
     }
   }
 }
+
 function sleep(time) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -219,6 +249,3 @@ function sleep(time) {
     }, time * 1000)
   })
 }
-//export function sleep (time) {
-//  return new Promise((resolve) => setTimeout(resolve, time));
-//}

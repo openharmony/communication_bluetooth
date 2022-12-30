@@ -108,48 +108,31 @@ struct PanNetworkAutoTest {
         .width(180)
         .height(50)
         .margin({ top: "15vp"})
-        .onClick((event: ClickEvent) => {
-//          AlertDialog.show({ message: 'AutoTest is successful' })
+        .onClick(async(event: ClickEvent) => {
           let self = this
           let PanNetworkProfileAutoTestMessage =""
 
-//          const arr = [0,1,2,3,4,5,6,7,8]
-//          async function main() {
-//            for (let i = 0; i < arr.length; i++) {
-//              await sleep(0.5)
-//              self.changeIndex=arr[i]
-//            }
-//          }
-//          main()
-
-
           //拼装数组
-          var a=[{name:"testSetLocalName",para:["dayu"]},
+          var panNetworkAutoArray=[{name:"testSetLocalName",para:["DaYuBlue"]},
                  {name:"testSetBluetoothScanMode",para:[4,0]}]
           let Interface = PanNetworkProfileAutoTestCase.map(i=>{
-            let para = a.some(itm=>itm.name===i.api.name)?a.find(itm=>itm.name===i.api.name).para:[]
+            let para = panNetworkAutoArray.some(itm=>itm.name===i.api.name)?panNetworkAutoArray.find(itm=>itm.name===i.api.name).para:[]
             return {name:i.api.name,para}
           })
-          //循环调用
-//          Interface.forEach((i,index)=>{
-//            PanNetworkProfileAutoTestMessage += PanNetworkProfileAutoTestCase[index]["api"](...i.para) + "\n"
-//            sleep(0.5)//等500ms
-//            AppStorage.SetOrCreate("PanNetworkProfileAutoTestMessage",PanNetworkProfileAutoTestMessage)
-//            //干些事情，刷新@state @prop
-//          })
 
+          //循环调用
           async function forLoop() {
             for (let m=0 ; m<Interface.length ; m++){
               PanNetworkProfileAutoTestMessage += PanNetworkProfileAutoTestCase[m]["api"](...Interface[m].para) + "\n"
               self.changeIndex=m
-              await sleep(0.5)
+              await sleep(1)
               AppStorage.SetOrCreate("PanNetworkProfileAutoTestMessage", PanNetworkProfileAutoTestMessage)
             }
           }
           forLoop()
 
           let msg = ""
-          msg = "测试完成"
+          msg = "测试"
           console.log(msg)
           prompt.showToast({ message: msg })
         })
