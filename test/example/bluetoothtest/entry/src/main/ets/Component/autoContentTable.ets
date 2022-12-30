@@ -23,18 +23,16 @@ import prompt from '@system.prompt';
 
 @Component
 export struct AutoContentTable {
-  private autoItemsx:TestAuto[];
+  private autoItemsX:TestAuto[];
   private testItem: TestData
   @State currentAutoItem: TestAuto = {}
   @State autoItems: TestAuto[] = [];
-
+  @State localName: string = 'DaYuBlue'
   @Prop changeIndex: number;
 //  @StorageProp("changeIndex") @Watch("onIndexChange")  changeIndex: number = -1;
 //  @Prop testMessage:string;
 //  @Prop testState:boolean;
-  @State localName: string = 'dayu'
 //  @State currentIndex: number = 1
-//  @State textResult:string ="None"
 //  @StorageLink('pairedMac') pairedMac: string = "";
 
 
@@ -65,10 +63,9 @@ export struct AutoContentTable {
         }
         .height(30)
         .layoutWeight(6)
+
         Flex({ alignItems: ItemAlign.Center }) {
           Text(this.changeIndex >= 0 ? this.getCurrentState(index) : autoItem.result)
-//          Text(autoItem.result=AppStorage.Get("result"))
-//         Text(autoItem.result)
             .margin({left:"10vp"})
             .fontSize("17vp")
             .flexGrow(1)
@@ -84,24 +81,17 @@ export struct AutoContentTable {
   }
 
   getCurrentState(index: number) {
-    //    return this.autoItems[index].result
-    if(index<=this.changeIndex) this.autoItemsx[index].result = 'pass';
-    return this.autoItemsx[index].result
+    if(index<=this.changeIndex) this.autoItemsX[index].result = 'pass';
+    return this.autoItemsX[index].result
   }
 
   aboutToAppear(): void  {
     console.log("auto组件构建完毕")
-//    emitter.on({ eventId: 1 }, (eventData) => {
-//      console.log(JSON.stringify(eventData.data) );
-//    });
     //初始化私有变量
-    this.autoItemsx = this.autoItems
+    this.autoItemsX = this.autoItems
   }
 
-//  onIndexChange(){
-//    this.autoItemsx[this.changeIndex].result = this.testState?"Pass":"Fail"
-//    console.log("属性变化")
-//  }
+
 
 
   build() {

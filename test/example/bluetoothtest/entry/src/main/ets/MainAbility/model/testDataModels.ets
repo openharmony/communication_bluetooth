@@ -32,7 +32,7 @@ testOnCharacteristicRead,testOnCharacteristicWrite,testOnDescriptorRead,testOnDe
 import {testSppClientConnectSafe,testSppClientConnectUnSafe,testSppClientWrite,
 testSppClientReadOn,testSppClientReadOff,testSppClientClose} from './sppClientInterface'
 import {testSppServerCreateSafe,testSppServerCreateUnSafe,testSppServerAccept,testSppServerWrite,testSppServerReadOn,
-testSppServerReadOff,testSppServerClose,testSppCloseClientSocket} from './sppServerInterface'
+testSppServerReadOff,testSppCloseServerSocket,testSppCloseClientSocket} from './sppServerInterface'
 import { testProfileConnect,testProfileDisConnect,testProfileGetPlayingState,testProfileGetConnectionDevices,testProfileGetDeviceState} from './a2dpSinkProfileInterface'
 
 import bluetooth from '@ohos.bluetooth';
@@ -154,7 +154,7 @@ const SppServerTestCase: any[]  = [
   { 'name': 'Spp服务器接受', 'detail': 'Spp服务器接受', 'method': 'sppAccept', 'api': testSppServerAccept,'result': 'None', 'category': CaseCategory.SPPServer },
   { 'name': 'Spp服务器读取打开', 'detail': 'Spp服务器读取打开', 'method': 'on.sppRead', 'api': testSppServerReadOn, 'result': 'None', 'category': CaseCategory.SPPServer },
   { 'name': 'Spp服务器读取关闭', 'detail': 'Spp服务器读取关闭', 'method': 'off.sppRead', 'api': testSppServerReadOff, 'result': 'None', 'category': CaseCategory.SPPServer },
-  { 'name': 'Spp服务器关闭', 'detail': 'Spp服务器关闭', 'method': 'sppCloseServerSocket', 'api': testSppServerClose, 'result': 'None', 'category': CaseCategory.SPPServer },
+  { 'name': 'Spp服务器关闭', 'detail': 'Spp服务器关闭', 'method': 'sppCloseServerSocket', 'api': testSppCloseServerSocket, 'result': 'None', 'category': CaseCategory.SPPServer },
   { 'name': 'Spp客户端关闭', 'detail': 'Spp客户端关闭', 'method': 'sppCloseClientSocket', 'api': testSppCloseClientSocket, 'result': 'None', 'category': CaseCategory.SPPServer },
 ]
 
@@ -214,9 +214,15 @@ const TestComposition: any[] = [
   { 'name': 'HFAudioGateway', 'detail': 'HFAudioGateway配置测试', 'url': 'pages/subProfileTest/handsFreeAudioGatewayProfileTest', 'image': $r('app.media.profile'), 'category': Category.Profile},
   { 'name': 'HidHost', 'detail': 'HidHost配置测试', 'url': 'pages/subProfileTest/hidHostProfileTest', 'image': $r('app.media.profile'), 'category': Category.Profile},
   { 'name': 'PanNetwork', 'detail': 'PanNetwork配置测试', 'url': 'pages/subProfileTest/panNetworkProfileTest', 'image': $r('app.media.profile'), 'category': Category.Profile},
+  { 'name': 'BrBenchmarkTest', 'detail': '经典蓝牙性能测试', 'url': 'pages/subBenchmarkTest/brBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark},
+  { 'name': 'BleBenchmarkTest', 'detail': 'ble蓝牙性能测试', 'url': 'pages/subBenchmarkTest/bleBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark},
+  { 'name': 'GattClientVelocityBenchmarkTest', 'detail': 'GattClient速率性能测试', 'url': 'pages/subBenchmarkTest/gattClientVelocityBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark},
+  { 'name': 'GattServerVelocityBenchmarkTest', 'detail': 'GattServer速率性能测试', 'url': 'pages/subBenchmarkTest/gattServerVelocityBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark},
+  { 'name': 'SppClientVelocityBenchmarkTest', 'detail': 'SppClient速率性能测试', 'url': 'pages/subBenchmarkTest/sppClientVelocityBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark},
+  { 'name': 'SppServerVelocityBenchmarkTest', 'detail': 'SppServer速率性能测试', 'url': 'pages/subBenchmarkTest/sppServerVelocityBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark},
+  { 'name': 'SppClientBandWidthBenchmarkTest', 'detail': 'SppClient带宽性能测试', 'url': 'pages/subBenchmarkTest/sppClientBandWidthBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark},
+  { 'name': 'SppServerBandWidthBenchmarkTest', 'detail': 'SppServer带宽性能测试', 'url': 'pages/subBenchmarkTest/sppServerBandWidthBenchmarkTest', 'image': $r('app.media.Benchmark'), 'category': Category.BenchMark}
 ]
-
-
 
 const GattAutoTestComposition :any[] =[
   { 'name': 'GattClientAutoTest', 'detail': 'GattClient自动测试', 'url': 'pages/subAutoTest/subGattAutoTest/gattClientAutoTest','image': $r("app.media.AutoTestIcon"), 'category': Category.GattAutoTest},

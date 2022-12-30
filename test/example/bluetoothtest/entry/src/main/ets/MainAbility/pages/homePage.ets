@@ -20,6 +20,7 @@ import { ManualApiTest } from '../../Component/manualApiTestComponent';
 import { ManualSceneTest } from '../../Component/manualSceneTest';
 import { AutoTest } from '../../Component/autoTest';
 import { ProfileTest } from '../../Component/profileTest';
+import { BenchmarkTest } from '../../Component/benchmarkTest';
 @Component
 struct TestCategory {
   private testItems: TestData[]
@@ -41,6 +42,10 @@ struct TestCategory {
         TabContent() {
           ProfileTest({ testItems: this.testItems.filter(item => (item.category === Category.Profile)) })
         }.tabBar($r("app.string.profile"))
+
+        TabContent() {
+          BenchmarkTest ({ testItems: this.testItems.filter(item => (item.category === Category.BenchMark)) })
+        }.tabBar($r("app.string.benchmark"))
       }
       .barWidth("80%")
       .barHeight(60)

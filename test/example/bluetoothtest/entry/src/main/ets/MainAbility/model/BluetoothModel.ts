@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -347,7 +347,7 @@ export class BluetoothModel extends BaseModel{
     */
   subscribeBluetoothDeviceFind(callback: (data: Array<string>) => void): void {
     bluetooth.on('bluetoothDeviceFind', (data: Array<string>) => {
-      LogUtil.info(`${this.TAG} subscribeBluetoothDeviceFind->deviceFind return:${JSON.stringify(data)}`);
+      LogUtil.info(`BluetoothModel subscribeBluetoothDeviceFind->deviceFind return:${JSON.stringify(data)}`);
       if (callback) {
         callback(data)
       }
@@ -603,15 +603,15 @@ export class BluetoothModel extends BaseModel{
     switch (arguments.length)
     {
       case 1:
-        LogUtil.info(`${this.TAG} startBLEScan with filters(or null) only `);
+        LogUtil.info(` BluetoothModel_ startBLEScan with filters(or null) only `);
         bluetooth.BLE.startBLEScan(filters);
       break;
       case 2:
-        LogUtil.info(`${this.TAG} startBLEScan with filters and options`);
+        LogUtil.info(`BluetoothModel_  startBLEScan with filters and options`);
         bluetooth.BLE.startBLEScan(filters, options);
       break;
       default:
-        LogUtil.error(`${this.TAG} startBLEScan with unexpected input parameter!`);
+        LogUtil.error(`BluetoothModel_ startBLEScan with unexpected input parameter!`);
     }
   }
   /**
@@ -624,8 +624,8 @@ export class BluetoothModel extends BaseModel{
     * Subscribe BLEDeviceFind
     */
   subscribeBLEDeviceFind(callback: (bleDeviceFindData: Array<bluetooth.ScanResult>) => void): void {
-    bluetooth.BLE.on("BLEDeviceFind", (bleDeviceFindData) => {
-      LogUtil.info(`${this.TAG} subscribeBLEDeviceFind->deviceFind return:${JSON.stringify(bleDeviceFindData)}`);
+    bluetooth.BLE.on("BLEDeviceFind", (bleDeviceFindData: Array<bluetooth.ScanResult>) => {
+      LogUtil.info(`BluetoothModel_ subscribeBLEDeviceFind->deviceFind return:${JSON.stringify(bleDeviceFindData)}`);
       if (callback) {
         callback(bleDeviceFindData);
       }

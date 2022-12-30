@@ -128,7 +128,7 @@ struct SppServerScenarioTest {
           .height(66)
           .margin({ top: "15vp", left: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async (event: ClickEvent) => {
             //AlertDialog.show({ message: '开始SppServer场景测试' })
             let sppServerScenarioMessage = ""
             let self = this
@@ -137,75 +137,75 @@ struct SppServerScenarioTest {
             sppServerScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOnStateChange success")
             self.changeIndex = arr[0]
+            await sleep(1)
+
             // 开蓝牙
             sppServerScenarioMessage += BrInterface.testEnableBluetooth() + "\n";
             console.log("testEnableBluetooth success")
             self.changeIndex = arr[1]
             AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
+            await sleep(2)
 
-            AppStorage.SetOrCreate('txtScanFilterDeviceId', "08:FB:EA:19:48:0F");
-            AppStorage.SetOrCreate('txtScanFilterName', "dudu-tiger");
-            AppStorage.SetOrCreate('txtScanFilterServiceUuid', "0000180A-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('txtScanOptions_interval', "0");
-            AppStorage.SetOrCreate('txtScanOptionsDutyMode', '0');
-            AppStorage.SetOrCreate('txtScanOptionsMatchMode', '0');
-            AppStorage.SetOrCreate('cbxBleScanFilter', true);
-            AppStorage.SetOrCreate('cbxBleScanOptions', true);
+            // 获取状态
+            sppServerScenarioMessage += BrInterface.testGetState() + "\n";
+            console.log("testGetState success")
+            self.changeIndex = arr[2]
+            await sleep(1)
 
-            AppStorage.SetOrCreate('inputUuid', "00001101-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('writeData', this.writeData);
+            // 设置扫描模式
+            sppServerScenarioMessage += BrInterface.testSetBluetoothScanMode(4, 0) + "\n"
+            console.log("testSetBluetoothScanMode success")
+            self.changeIndex = arr[3]
+            await sleep(1)
 
-            sleep(3000).then(() => {
-              // 获取状态
-              sppServerScenarioMessage += BrInterface.testGetState() + "\n";
-              console.log("testGetState success")
-              self.changeIndex = arr[2]
+            // 获取扫描模式
+            sppServerScenarioMessage += BrInterface.testGetBluetoothScanMode() + "\n"
+            console.log("testGetBluetoothScanMode success")
+            self.changeIndex = arr[4]
+            await sleep(1)
 
-              // 设置扫描模式
-              sppServerScenarioMessage += BrInterface.testSetBluetoothScanMode(4, 0) + "\n"
-              console.log("testSetBluetoothScanMode success")
-              self.changeIndex = arr[3]
-              // 获取扫描模式
-              sppServerScenarioMessage += BrInterface.testGetBluetoothScanMode() + "\n"
-              console.log("testGetBluetoothScanMode success")
-              self.changeIndex = arr[4]
-              // 开启注册pin码变化
-              sppServerScenarioMessage += BrInterface.testOnPinRequired() + "\n"
-              console.log("testOnPinRequired success")
-              self.changeIndex = arr[5]
-              // Spp服务器创建
-              sppServerScenarioMessage += SPPServerInterface.testSppServerCreateSafe() + "\n"
-              console.log("testAddService success")
-              self.changeIndex = arr[6]
-              AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
-              sleep(5).then(() => {
-                //获取当前连接状态
-                sppServerScenarioMessage += BrInterface.testGetBtConnectionState() + "\n"
-                console.log("testGetBtConnectionState success")
-                self.changeIndex = arr[7]
-                sleep(1).then(() => {
-                  // Spp服务器接受
-                  sppServerScenarioMessage += SPPServerInterface.testSppServerAccept() + "\n"
-                  console.log("testSppServerAccept success")
-                  self.changeIndex = arr[8]
-                  sleep(1).then(() => {
-                    // Spp服务器写入
-                    let clientNumber = -1
-                    sppServerScenarioMessage += SPPServerInterface.testSppServerWrite() + "\n"
-                    console.log("testOnCharacteristicWrite success")
-                    self.changeIndex = arr[9]
-                    sleep(1).then(() => {
-                      // Spp服务器读取打开
-                      sppServerScenarioMessage += SPPServerInterface.testSppServerReadOn() + "\n"
-                      console.log("testOnCharacteristicRead success")
-                      self.changeIndex = arr[10]
-                      sppServerScenarioMessage += this.dataReadMessage + "\n"
-                      AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
-                    })
-                  })
-                })
-              })
-            })
+            // 开启注册pin码变化
+            sppServerScenarioMessage += BrInterface.testOnPinRequired() + "\n"
+            console.log("testOnPinRequired success")
+            self.changeIndex = arr[5]
+            await sleep(1)
+
+            // Spp服务器创建
+            sppServerScenarioMessage += SPPServerInterface.testSppServerCreateSafe() + "\n"
+            console.log("testAddService success")
+            self.changeIndex = arr[6]
+            AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
+            await sleep(5)
+
+            //获取当前连接状态
+            sppServerScenarioMessage += BrInterface.testGetBtConnectionState() + "\n"
+            console.log("testGetBtConnectionState success")
+            self.changeIndex = arr[7]
+            AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
+            await sleep(1)
+
+            // Spp服务器接受
+            sppServerScenarioMessage += SPPServerInterface.testSppServerAccept() + "\n"
+            console.log("testSppServerAccept success")
+            self.changeIndex = arr[8]
+            AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
+            await sleep(5)
+
+            // Spp服务器读取打开
+            sppServerScenarioMessage += SPPServerInterface.testSppServerReadOn() + "\n"
+            console.log("testOnCharacteristicRead success")
+            self.changeIndex = arr[9]
+            await sleep(3)
+            sppServerScenarioMessage += AppStorage.Get("dataReadMessage") + "\n"
+            AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
+
+            // Spp服务器写入
+            sppServerScenarioMessage += SPPServerInterface.testSppServerWrite() + "\n"
+            console.log("testOnCharacteristicWrite success")
+            self.changeIndex = arr[10]
+            await sleep(2)
+            AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
+
           })
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
@@ -219,7 +219,7 @@ struct SppServerScenarioTest {
           .height(66)
           .margin({ top: "15vp", left: "10vp", right: "10vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async (event: ClickEvent) => {
             let sppServerScenarioMessage = ""
             let self = this
             const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
@@ -227,26 +227,31 @@ struct SppServerScenarioTest {
             sppServerScenarioMessage += SPPServerInterface.testSppServerReadOff() + "\n"
             console.log("testOnCharacteristicRead success")
             self.changeIndex = arr[11]
+            await sleep(1)
             // Spp服务器关闭
-            sppServerScenarioMessage += SPPServerInterface.testSppServerClose() + "\n"
-            console.log("testSppServerClose success")
+            sppServerScenarioMessage += SPPServerInterface.testSppCloseServerSocket() + "\n"
+            console.log("testSppCloseServerSocket success")
             self.changeIndex = arr[12]
+            await sleep(1)
             // Spp客户端关闭
             sppServerScenarioMessage += SPPServerInterface.testSppCloseClientSocket() + "\n"
-            console.log("testSppServerClose success")
+            console.log("testSppCloseServerSocket success")
             self.changeIndex = arr[13]
+            await sleep(1)
             // 关闭注册pin码变化
             sppServerScenarioMessage += BrInterface.testOnPinRequired() + "\n"
             console.log("testOffPinRequired success")
-
+            await sleep(1)
             // 关闭注册状态变化
             sppServerScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOffStateChange success")
+            await sleep(1)
             // 关蓝牙
             sppServerScenarioMessage += BrInterface.testDisableBluetooth() + "\n"
             console.log("testDisableBluetooth success")
             self.changeIndex = arr[14]
             AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
+            await sleep(1)
           })
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
@@ -260,7 +265,7 @@ struct SppServerScenarioTest {
           .height(66)
           .margin({ top: "15vp", right: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async(event: ClickEvent) => {
             let sppServerScenarioMessage = ""
             AppStorage.SetOrCreate("sppServerScenarioMessage", sppServerScenarioMessage)
           })
@@ -275,8 +280,12 @@ struct SppServerScenarioTest {
   }
 }
 
-export function sleep(time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
+function sleep(time) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve()
+    }, time * 1000)
+  })
 }
 
 //async function sleep(ms: number) {

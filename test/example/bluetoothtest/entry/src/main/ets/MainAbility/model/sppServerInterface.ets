@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 
 import prompt from '@system.prompt';
 import bluetooth from '@ohos.bluetooth';
-import bluetooth from '@ohos.bluetooth';
 
+let serverNumber: number = -1;
 export function testSppServerCreateSafe():String{
   let message = "sppServerCreateSafe test"
   console.info('spp server socketId(safe mode) create! ');
@@ -34,6 +34,7 @@ export function testSppServerCreateSafe():String{
       console.info('spp server: serverSocketID(safe mode) - ' + serverSocketID);
       serverNumber = serverSocketID;
       message = "创建server成功";
+//      AppStorage.SetOrCreate("serverNumber",serverNumber)
       prompt.showToast({message: message})
       return message
     }
@@ -42,7 +43,7 @@ export function testSppServerCreateSafe():String{
   return message
 }
 
-let serverNumber: number = -1;
+
 export function testSppServerCreateUnSafe():String{
   let message = "sppServerCreateUnSafe test"
   let uuid =AppStorage.Get('inputUuid')
@@ -59,6 +60,8 @@ export function testSppServerCreateUnSafe():String{
       console.info('spp server: serverSocketID(non-safe mode) ' + serverSocketID);
       serverNumber = serverSocketID;
       message = "创建server成功";
+      prompt.showToast({message: message})
+      return message
     }
   });
   prompt.showToast({message: message})
@@ -68,10 +71,15 @@ export function testSppServerCreateUnSafe():String{
 let clientNumber: number = -1;
 export function testSppServerAccept():String {
   let message = "testSppServerAccept test"
+//  serverNumber = AppStorage.Get("serverNumber")
+  console.info('testSppServerAccept test')
+  console.info('testSppServerAccept serverNumber ' + serverNumber)
   bluetooth.sppAccept(serverNumber, (code, clientSocketID) => {
     if (code.code == 0) {
       console.info('spp server: clientSocketID - ' + clientSocketID);
+      console.info('test serverNumber ' + serverNumber);
       clientNumber = clientSocketID;
+//      AppStorage.SetOrCreate("clientNumber",clientNumber)
       message = "接受客户端成功";
       bluetooth.on('sppRead', clientNumber,
         (dataBuffer: ArrayBuffer) => {
@@ -95,8 +103,8 @@ export function testSppServerAccept():String {
 export function testSppServerWrite():String{
   let message = "sppServerWrite test"
   console.info(MODEL + 'sppWrite clientNumber: ' + JSON.stringify(clientNumber));
-  let writeData =AppStorage.Get("writeData")
-  let writeArrayBuffer = strToArrayBuffer(writeData)
+  let writeServerData =AppStorage.Get("writeServerData")
+  let writeArrayBuffer = strToArrayBuffer(writeServerData)
   const sppWriteSuccess = bluetooth.sppWrite(clientNumber, writeArrayBuffer);
   if (sppWriteSuccess) {
     console.info('sppWrite successfully');
@@ -151,7 +159,7 @@ export function testSppServerReadOff():String{
 
 //关闭服务端serverSocket
 let MODEL = "bluetoothModel:"
-export function testSppServerClose():String{
+export function testSppCloseServerSocket():String{
   let message = "sppServerClose test"
   console.info(MODEL + 'sppCloseServerSocket serverNumber: ' + serverNumber)
   bluetooth.sppCloseServerSocket(serverNumber);
@@ -163,7 +171,7 @@ export function testSppServerClose():String{
 //关闭服务端accept回调的clientSocket
 export function testSppCloseClientSocket():String{
   let message = "sppCloseClientSocket test"
-  console.info(MODEL + 'sppCloseClientSocket serverNumber: ' + clientNumber)
+  console.info(MODEL + 'sppCloseClientSocket clientNumber: ' + clientNumber)
   bluetooth.sppCloseClientSocket(clientNumber);
   message = "关闭客户端";
   prompt.showToast({message: message})

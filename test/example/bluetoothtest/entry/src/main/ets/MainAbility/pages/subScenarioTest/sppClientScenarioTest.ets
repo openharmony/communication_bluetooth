@@ -130,7 +130,7 @@ struct SppClientScenarioTest {
           .height(66)
           .margin({ top: "15vp", left: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async (event: ClickEvent) => {
             //  AlertDialog.show({ message: '开始SppClient场景测试' })
 
             let self = this
@@ -140,65 +140,61 @@ struct SppClientScenarioTest {
             sppClientScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOnStateChange success")
             self.changeIndex = arr[0]
+            await sleep(1)
+
             // 开蓝牙
             sppClientScenarioMessage += BrInterface.testEnableBluetooth() + "\n";
             console.log("testEnableBluetooth success")
             self.changeIndex = arr[1]
+            await sleep(2)
             AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
 
-            AppStorage.SetOrCreate('txtScanFilterDeviceId', "08:FB:EA:19:48:0F");
-            AppStorage.SetOrCreate('txtScanFilterName', "dudu-tiger");
-            AppStorage.SetOrCreate('txtScanFilterServiceUuid', "0000180A-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('txtScanOptions_interval', "0");
-            AppStorage.SetOrCreate('txtScanOptionsDutyMode', '0');
-            AppStorage.SetOrCreate('txtScanOptionsMatchMode', '0');
-            AppStorage.SetOrCreate('cbxBleScanFilter', true);
-            AppStorage.SetOrCreate('cbxBleScanOptions', true);
+            // 获取状态
+            sppClientScenarioMessage += BrInterface.testGetState() + "\n";
+            console.log("testGetState success")
+            self.changeIndex = arr[2]
+            await sleep(1)
 
-            AppStorage.SetOrCreate('inputDeviceId', "08:FB:EA:19:48:0F");
-            AppStorage.SetOrCreate('inputUuid', "00001101-0000-1000-8000-00805f9b34fb");
-            AppStorage.SetOrCreate('writeData', '11');
+            // 设置扫描模式
+            sppClientScenarioMessage += BrInterface.testSetBluetoothScanMode(4, 0) + "\n"
+            console.log("testSetBluetoothScanMode success")
+            self.changeIndex = arr[3]
+            await sleep(1)
 
-            sleep(3).then(() => {
-              // 获取状态
-              sppClientScenarioMessage += BrInterface.testGetState() + "\n";
-              console.log("testGetState success")
-              self.changeIndex = arr[2]
-              // 设置扫描模式
-              sppClientScenarioMessage += BrInterface.testSetBluetoothScanMode(4, 0) + "\n"
-              console.log("testSetBluetoothScanMode success")
-              self.changeIndex = arr[3]
-              // 获取扫描模式
-              sppClientScenarioMessage += BrInterface.testGetBluetoothScanMode() + "\n"
-              console.log("testGetBluetoothScanMode success")
-              self.changeIndex = arr[4]
-              // Spp客户端连接
-              sppClientScenarioMessage += SPPClientInterface.testSppClientConnectSafe() + "\n"
-              console.log("testSppClientConnectSafe success")
-              self.changeIndex = arr[5]
-              AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
-              sleep(10).then(() => {
-                //获取当前连接状态
-                sppClientScenarioMessage += BrInterface.testGetBtConnectionState() + "\n"
-                console.log("testGetBtConnectionState success")
-                self.changeIndex = arr[6]
-                sleep(1).then(() => {
-                  // SPP客户端写入
-                  let clientNumber = -1
-                  sppClientScenarioMessage += SPPClientInterface.testSppClientWrite() + "\n"
-                  console.log("testSppClientWrite success")
-                  self.changeIndex = arr[7]
-                  sleep(1).then(() => {
-                    //spp客户端读取打开
-                    sppClientScenarioMessage += SPPClientInterface.testSppClientReadOn() + "\n"
-                    console.log("testSppClientReadOn success")
-                    self.changeIndex = arr[8]
-                    sppClientScenarioMessage += this.dataReadMessage + "\n"
-                    AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
-                  })
-                })
-              })
-            })
+            // 获取扫描模式
+            sppClientScenarioMessage += BrInterface.testGetBluetoothScanMode() + "\n"
+            console.log("testGetBluetoothScanMode success")
+            self.changeIndex = arr[4]
+            await sleep(1)
+
+            // Spp客户端连接
+            sppClientScenarioMessage += SPPClientInterface.testSppClientConnectSafe() + "\n"
+            console.log("testSppClientConnectSafe success")
+            self.changeIndex = arr[5]
+            AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
+            await sleep(10)
+
+            //获取当前连接状态
+            sppClientScenarioMessage += BrInterface.testGetBtConnectionState() + "\n"
+            console.log("testGetBtConnectionState success")
+            self.changeIndex = arr[6]
+            AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
+            await sleep(2)
+
+            //spp客户端读取打开
+            sppClientScenarioMessage += SPPClientInterface.testSppClientReadOn() + "\n"
+            console.log("testSppClientReadOn success")
+            self.changeIndex = arr[7]
+            sppClientScenarioMessage += AppStorage.Get("dataReadMessage") + "\n"
+            AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
+            await sleep(5)
+
+            // SPP客户端写入
+            sppClientScenarioMessage += SPPClientInterface.testSppClientWrite() + "\n"
+            console.log("testSppClientWrite success")
+            self.changeIndex = arr[8]
+            AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
+            await sleep(2)
           })
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
@@ -212,7 +208,7 @@ struct SppClientScenarioTest {
           .height(66)
           .margin({ top: "15vp", left: "10vp", right: "10vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async (event: ClickEvent) => {
             let self = this
             const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
             let sppClientScenarioMessage = ""
@@ -220,18 +216,24 @@ struct SppClientScenarioTest {
             sppClientScenarioMessage += SPPClientInterface.testSppClientReadOff() + "\n"
             console.log("testSppClientReadOff success")
             self.changeIndex = arr[9]
+            await sleep(1)
+
             // spp客户端关闭
             sppClientScenarioMessage += SPPClientInterface.testSppClientClose() + "\n"
             console.log("testSppClientClose success")
             self.changeIndex = arr[10]
+            await sleep(1)
+
             //关闭注册状态变化
             sppClientScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOffStateChange success")
+            await sleep(1)
 
             //关蓝牙
             sppClientScenarioMessage += BrInterface.testDisableBluetooth() + "\n"
             console.log("testDisableBluetooth success")
             self.changeIndex = arr[11]
+            await sleep(1)
             AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
           })
 
@@ -246,7 +248,7 @@ struct SppClientScenarioTest {
           .height(66)
           .margin({ top: "15vp", right: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async(event: ClickEvent) => {
             let sppClientScenarioMessage = ""
             AppStorage.SetOrCreate("sppClientScenarioMessage", sppClientScenarioMessage)
           })
@@ -279,18 +281,6 @@ function sleep(time) {
   })
 }
 
-//async function sleep(ms: number) {
-//  return new Promise((r) => {
-//    let timer = setInterval(() => {
-//      console.log("timeout");
-//      this.count += 1;
-//      this.message = this.count.toString();
-//      if (this.count == 50) {
-//        clearInterval(timer);
-//      }
-//    }, 1000)
-//  })
-//}
 let clientNumber = -1
 
 export function acceptClientSocket(number) {

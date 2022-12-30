@@ -23,7 +23,7 @@ import { PageTitle } from '../../../Component/pageTitle';
 import { TestImageDisplay } from '../../../Component/testImageDisplay';
 import { TestData } from '../../model/testData'
 import { ScenarioContentTable } from '../../../Component/scenarioContentTable'
-import { initBRFoundScenarioData } from '../../model/scenarioTestDataModel'
+import { BrFoundScenarioTestCase , initBRFoundScenarioData } from '../../model/scenarioTestDataModel'
 import * as BrInterface from '../../model/brInterface'
 import BluetoothModel from '../../model/BluetoothModel'
 import BluetoothDevice from '../../model/BluetoothDevice'
@@ -33,11 +33,8 @@ import BluetoothDevice from '../../model/BluetoothDevice'
 struct BrFoundScenarioTest {
   @State message: string = 'BrFoundScenarioTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex:number = -1
-  @StorageLink("brFoundScenarioMessage") brFoundScenarioMessage:string =""
-  aboutToAppear(){
-//    this.subscribeBluetoothDeviceFind()
-  }
+  @State changeIndex: number = -1
+  @StorageLink("brFoundScenarioMessage") brFoundScenarioMessage: string = ""
 
   build() {
     Column() {
@@ -52,14 +49,14 @@ struct BrFoundScenarioTest {
           Column() {
             Text("场景流程验证:")
               .fontSize("17vp")
-              .margin({ top: "10vp", bottom:"10vp",left: "20vp"})
+              .margin({ top: "10vp", bottom: "10vp", left: "20vp" })
               .textAlign(TextAlign.Start)
               .width("100%")
             ScenarioContentTable({
               testItem: this.testItem,
               scenarioItems: initBRFoundScenarioData(),
 //            testMessage: this.testMessage,  优化时修改
-              changeIndex:this.changeIndex
+              changeIndex: this.changeIndex
             })
           }
           .width("100%")
@@ -77,8 +74,8 @@ struct BrFoundScenarioTest {
               .margin({ top: "8vp", bottom: "8vp", left: "20vp" })
               .textAlign(TextAlign.Start)
               .width("100%")
-            List(){
-              ListItem(){
+            List() {
+              ListItem() {
                 Text(this.brFoundScenarioMessage)
                   .fontSize("17vp")
                   .margin({ top: "5vp", left: "30vp", right: "10vp" })
@@ -111,64 +108,85 @@ struct BrFoundScenarioTest {
           .backgroundColor($r("app.color.blue"))
           .width(100)
           .height(66)
-          .margin({ top: "15vp",left:"20vp" })
+          .margin({ top: "15vp", left: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
-//          AlertDialog.show({ message: '开始Br蓝牙发现场景测试' })
+          .onClick(async (event: ClickEvent) => {
+            prompt.showToast({ message: '开始Br蓝牙发现场景测试' })
 
             let self = this
-            const arr = [0,1,2,3,4,5,6,7,8,9]
-//            async function main() {
-//              for (let i = 0; i < arr.length; i++) {
-//                await sleep(1)
-//                self.changeIndex=arr[i]
-//              }
-//            }
-//            main()
+//            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            let brFoundScenarioMessage = ""
 
-            let brFoundScenarioMessage =""
-            // 开启注册状态变化
-            brFoundScenarioMessage += BrInterface.testOnStateChange() + "\n"
-            console.log("testOnStateChange success")
-            self.changeIndex=arr[0]
-            // 开蓝牙
-            brFoundScenarioMessage += BrInterface.testEnableBluetooth() + "\n"
-            console.log("testEnableBluetooth success")
-            self.changeIndex=arr[1]
-            AppStorage.SetOrCreate("brFoundScenarioMessage", brFoundScenarioMessage)
-            sleep(2).then(() => {
-              // 获取状态
-              brFoundScenarioMessage += BrInterface.testGetState() + "\n"
-              console.log("testGetState success")
-              self.changeIndex=arr[2]
-              // 设置本地名称
-              BrInterface.testSetLocalName("dayu2") + "\n"
-              console.log("testSetLocalName success")
-              self.changeIndex=arr[3]
-              // 获取本地名称
-              brFoundScenarioMessage += BrInterface.testGetLocalName() + "\n"
-              console.log("testGetLocalName success")
-              self.changeIndex=arr[4]
-              // 设置扫描模式
-              BrInterface.testSetBluetoothScanMode(4, 0)
-              console.log("testSetBluetoothScanMode success")
-              self.changeIndex=arr[5]
-              // 获取扫描模式
-              brFoundScenarioMessage += BrInterface.testGetBluetoothScanMode() + "\n"
-              console.log("testGetBluetoothScanMode success")
-              self.changeIndex=arr[6]
-              // 蓝牙发现监听
-              brFoundScenarioMessage += this.subscribeBluetoothDeviceFind() + "\n"
-              console.log("subscribeBluetoothDeviceFind success")
+//            // 开启注册状态变化
+//            brFoundScenarioMessage += BrInterface.testOnStateChange() + "\n"
+//            console.log("testOnStateChange success")
+//            self.changeIndex = arr[0]
+//            await sleep(1)
+//            // 开蓝牙
+//            brFoundScenarioMessage += BrInterface.testEnableBluetooth() + "\n"
+//            console.log("testEnableBluetooth success")
+//            self.changeIndex = arr[1]
+//            AppStorage.SetOrCreate("brFoundScenarioMessage", brFoundScenarioMessage)
+//            await sleep(2)
+//            // 获取状态
+//            brFoundScenarioMessage += BrInterface.testGetState() + "\n"
+//            console.log("testGetState success")
+//            self.changeIndex = arr[2]
+//            await sleep(1)
+//            // 设置本地名称
+//            BrInterface.testSetLocalName("DaYuBlue2") + "\n"
+//            console.log("testSetLocalName success")
+//            self.changeIndex = arr[3]
+//            await sleep(1)
+//            // 获取本地名称
+//            brFoundScenarioMessage += BrInterface.testGetLocalName() + "\n"
+//            console.log("testGetLocalName success")
+//            self.changeIndex = arr[4]
+//            await sleep(1)
+//            // 设置扫描模式
+//            BrInterface.testSetBluetoothScanMode(4, 0)
+//            console.log("testSetBluetoothScanMode success")
+//            self.changeIndex = arr[5]
+//            await sleep(1)
+//            // 获取扫描模式
+//            brFoundScenarioMessage += BrInterface.testGetBluetoothScanMode() + "\n"
+//            console.log("testGetBluetoothScanMode success")
+//            self.changeIndex = arr[6]
+//            await sleep(1)
+//
+//            // 蓝牙发现监听
+//            brFoundScenarioMessage += this.subscribeBluetoothDeviceFind() + "\n"
+//            console.log("subscribeBluetoothDeviceFind success")
+//            await sleep(1)
+//
+//            // 开始蓝牙发现
+//            brFoundScenarioMessage += "startBluetoothDiscovery 执行：" + BluetoothModel.startBluetoothDiscovery() + "\n";
+//            console.log("startBluetoothDiscovery success")
+//            self.changeIndex = arr[7]
+//            await sleep(1)
 
-              // 开始蓝牙发现
-              brFoundScenarioMessage += "startBluetoothDiscovery 执行：" + BluetoothModel.startBluetoothDiscovery() + "\n";
-              console.log("startBluetoothDiscovery success")
-              self.changeIndex=arr[7]
-              let scribeMessage = AppStorage.Get("scribeMessage")
-              brFoundScenarioMessage += scribeMessage
-              AppStorage.SetOrCreate("brFoundScenarioMessage", brFoundScenarioMessage)
+            //拼装数组
+            var brScenarioArray=[{name:"testSetLocalName",para:["DaYuBlue"]},
+                             {name:"testSetBluetoothScanMode",para:[4,0]}]
+            let Interface = BrFoundScenarioTestCase.map(i=>{
+              let para = brScenarioArray.some(itm=>itm.name===i.api.name)?brScenarioArray.find(itm=>itm.name===i.api.name).para:[]
+              return {name:i.api.name,para}
             })
+
+            //循环调用
+            async function forLoop() {
+              for (let m=0 ; m<Interface.length ; m++){
+                brFoundScenarioMessage += BrFoundScenarioTestCase[m]["api"](...Interface[m].para) + "\n"
+                self.changeIndex=m
+                await sleep(1)
+                AppStorage.SetOrCreate("brFoundScenarioMessage", brFoundScenarioMessage)
+              }
+            }
+            forLoop()
+
+//            let scribeMessage = AppStorage.Get("scribeMessage")
+//            brFoundScenarioMessage += scribeMessage
+//            AppStorage.SetOrCreate("brFoundScenarioMessage", brFoundScenarioMessage)
           })
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
@@ -180,23 +198,26 @@ struct BrFoundScenarioTest {
           .backgroundColor($r("app.color.blue"))
           .width(100)
           .height(66)
-          .margin({ top: "15vp",left:"10vp",right:"10vp" })
+          .margin({ top: "15vp", left: "10vp", right: "10vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
+          .onClick(async (event: ClickEvent) => {
             let self = this
-            const arr = [0,1,2,3,4,5,6,7,8,9,10]
-            let brFoundScenarioMessage =""
+//            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            let brFoundScenarioMessage = ""
             // 停止蓝牙发现
             brFoundScenarioMessage += BrInterface.testStopBluetoothDiscovery() + "\n"
             console.log("testStopBluetoothDiscovery success")
-            self.changeIndex=arr[8]
+//            self.changeIndex = arr[8]
+            await sleep(1)
             //关闭注册状态变化
             brFoundScenarioMessage += BrInterface.testOnStateChange() + "\n"
             console.log("testOffStateChange success")
+            await sleep(1)
             //关蓝牙
             brFoundScenarioMessage += BrInterface.testDisableBluetooth() + "\n"
             console.log("testDisableBluetooth success")
-            self.changeIndex=arr[9]
+//            self.changeIndex = arr[9]
+            await sleep(1)
             AppStorage.SetOrCreate("brFoundScenarioMessage", brFoundScenarioMessage)
           })
 
@@ -209,10 +230,10 @@ struct BrFoundScenarioTest {
           .backgroundColor($r("app.color.moon"))
           .width(80)
           .height(66)
-          .margin({ top: "15vp",right:"20vp" })
+          .margin({ top: "15vp", right: "20vp" })
           .align(Alignment.Start)
-          .onClick((event: ClickEvent) => {
-            let brFoundScenarioMessage =""
+          .onClick(async(event: ClickEvent) => {
+            let brFoundScenarioMessage = ""
             AppStorage.SetOrCreate("brFoundScenarioMessage", brFoundScenarioMessage)
           })
         }
@@ -225,9 +246,8 @@ struct BrFoundScenarioTest {
     }
   }
 
-  subscribeBluetoothDeviceFind():string {
-    let brFoundDevices: BluetoothDevice[] = [];
-    let message="subscribeBluetoothDeviceFind test"
+  subscribeBluetoothDeviceFind(): string {
+    let message = "subscribeBluetoothDeviceFind test"
     console.info("subscribeBluetoothDeviceFind")
     BluetoothModel.subscribeBluetoothDeviceFind((deviceIds: Array<string>) => {
       console.log('available bluetooth devices changed.');
@@ -235,15 +255,13 @@ struct BrFoundScenarioTest {
         let device = brFoundDevices.find((availableDevice) => {
           return availableDevice.deviceId === deviceId
         })
-//      console.log('available bluetooth find [' + deviceId + '] ' );
-//        console.log('available bluetooth find [' + deviceId + '] = ' + JSON.stringify(device));
         console.log('available bluetooth find [' + deviceId + '] ')
         let message = ('available bluetooth find [' + deviceId + ']  ')
-        prompt.showToast({message: message})
+        prompt.showToast({ message: message })
         AppStorage.SetOrCreate('bluetoothAvailableDevices', deviceIds);
       })
     });
-    prompt.showToast({message: message})
+    prompt.showToast({ message: message })
     return message
   }
 }
@@ -257,27 +275,5 @@ function sleep(time) {
 }
 
 
-//async function sleep(ms: number) {
-//  return new Promise((r) => {
-//    var timer = setInterval(() => {
-//      console.log("timeout");
-//      this.count += 1;
-//      this.message = this.count.toString();
-//      if (this.count == 50) {
-//        clearInterval(timer);
-//      }
-//    }, 1000)
-//  })
-//}
-
-// 计时器
-//export function timer(start) {
-//  let now = new Date();
-//  let det = now -start;
-//  console.log(det);
-//  now.setTime(det);
-//  now.setHours(0);
-//  window.
-//}
 
 

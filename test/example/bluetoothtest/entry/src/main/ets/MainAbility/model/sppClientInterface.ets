@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,6 +56,7 @@ export function testSppClientConnectSafe():String{
     acceptClientSocket(socketID);
     console.info('bluetoothModel sppConnect callback socketNumber(safe mode): ' + socketID);
     message = "客户端连接成功!";
+    AppStorage.SetOrCreate("clientNumber",clientNumber)
     prompt.showToast({message: message})
     return message
   })
@@ -65,8 +66,10 @@ export function testSppClientConnectSafe():String{
 
 export function testSppClientConnectUnSafe():String{
   let message = "sppClientConnectUnSafe test"
+  console.info('testSppClientConnectUnSafe create! ');
   let uuid =AppStorage.Get('inputUuid')
   let deviceId =AppStorage.Get('inputDeviceId')
+  console.info('bluetoothModel sppConnect: ' + deviceId);
   bluetooth.sppConnect(deviceId, {
     uuid: uuid,
     secure: false,
@@ -74,6 +77,7 @@ export function testSppClientConnectUnSafe():String{
   }, (code, socketID) => {
     if (code.code != 0) {
       message = "客户端连接失败!";
+      console.info('bluetoothModel sppConnect callback socketNumber(non-safe mode): ' + socketID);
       prompt.showToast({message: message})
       return message;
     }
@@ -90,9 +94,10 @@ export function testSppClientConnectUnSafe():String{
 export function testSppClientWrite():String{
   let message = "sppClientWrite test"
   console.info( 'bluetoothModel sppWrite clientNumber: ' + JSON.stringify(clientNumber));
-  let writeData =AppStorage.Get("writeData")
-  let writeArrayBuffer = strToArrayBuffer(writeData)
+  let writeClientData =AppStorage.Get("writeClientData")
+  let writeArrayBuffer = strToArrayBuffer(writeClientData)
   const sppWriteSuccess = bluetooth.sppWrite(clientNumber, writeArrayBuffer);
+  AppStorage.SetOrCreate("clientNumber",clientNumber)
   if (sppWriteSuccess) {
     console.info('sppWrite successfully');
     message = "写入成功 ";
@@ -151,6 +156,7 @@ export function acceptClientSocket(number) {
   console.info('spp clientSocket socketID: ' + number);
   // 获取的clientNumber用作服务端后续读/写操作socket的id。
   clientNumber = number;
+  AppStorage.SetOrCreate("clientNumber",clientNumber)
 }
 
 export function sppClientClose() {
