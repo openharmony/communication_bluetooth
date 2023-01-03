@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 
-module_output_path = "bluetooth/framework_test/gatt/"
+module_output_path = "bluetooth/framework_test/gatt_c/"
 SUBSYSTEM_DIR = "//foundation/communication"
 
 config("module_private_config") {
@@ -23,15 +23,17 @@ config("module_private_config") {
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "//foundation/communication/bluetooth/interfaces/inner_api/include",
+    "//foundation/communication/bluetooth/interfaces/inner_api/include/c_header",
     "//foundation/communication/bluetooth/frameworks/inner/common",
+  ]
+  defines = [
+    "BTFW_LOG_TAG = \"bluetooth_test\"",
+    "BTFW_LOG_DOMAIN = 0xD000103",
   ]
 }
 
 ohos_unittest("btfw_gatt_c_unit_test") {
   module_out_path = module_output_path
-
-  include_dirs =
-      [ "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header" ]
 
   sources = [ "gatt_c_test.cpp" ]
 
@@ -43,7 +45,29 @@ ohos_unittest("btfw_gatt_c_unit_test") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+}
+
+ohos_unittest("btfw_gatt_client_c_unit_test") {
+  module_out_path = module_output_path
+
+  sources = [ "gatt_client_c_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
+    "//base/global/resource_management/frameworks/resmgr:global_resmgr",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }
 
 group("unittest") {
@@ -52,6 +76,9 @@ group("unittest") {
   deps = []
 
   if (is_phone_product) {
-    deps += [ ":btfw_gatt_c_unit_test" ]
+    deps += [
+      ":btfw_gatt_c_unit_test",
+      ":btfw_gatt_client_c_unit_test",
+    ]
   }
 }
