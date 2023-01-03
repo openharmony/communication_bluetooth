@@ -793,7 +793,7 @@ void GattClientService::impl::RequestExchangeMtu(int appId, int mtu)
 
 void GattClientService::impl::RequestConnectionPriority(int appId, int connPriority)
 {
-    LOG_INFO("%{public}s: appId=%{public}d", __FUNCTION__, appId);
+    LOG_INFO("%{public}s: appId=%{public}d, priority=%{public}d", __FUNCTION__, appId, connPriority);
     auto it = GetValidApplication(appId);
     if (it.has_value()) {
         auto &client = it.value()->second;
