@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,12 @@ typedef enum {
     OHOS_BT_TRANSPORT_TYPE_LE,
     OHOS_BT_TRANSPORT_TYPE_CLASSIC,
 } BtTransportType;
+
+typedef enum {
+    OHOS_BT_GATT_PRIORITY_BALANCED = 0x0,
+    OHOS_BT_GATT_PRIORITY_HIGH,
+    OHOS_BT_GATT_PRIORITY_LOW_POWER,
+} BtGattPriority;
 
 typedef struct {
     BtUuid serviceUuid;
@@ -169,6 +175,16 @@ int BleGattcRegister(BtUuid appUuid);
 int BleGattcUnRegister(int clientId);
 
 /**
+ * @brief Set fastest connection of the Gatt connection, add address to the accelerate connection map
+ *  before create a new connection.
+ *
+ * @param clientId Indicates the ID of the GATT client.
+ * @param fastestConnFlag Indicates whether to enable the fastest connection.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int BleGattcSetFastestConn(int clientId, bool fastestConnFlag);
+
+/**
  * @brief Create a Gatt connection to a remote device.
  *
  * @param clientId Indicates the ID of the GATT client.
@@ -179,6 +195,16 @@ int BleGattcUnRegister(int clientId);
  */
 int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdAddr,
     bool isAutoConnect, BtTransportType transport);
+
+/**
+ * @brief Set priority of the Gatt connection.
+ *
+ * @param clientId Indicates the ID of the GATT client.
+ * @param bdAddr Indicates the remote device's address.
+ * @param priority Indicates the priority of Gatt client {@link BtGattPriority}.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int BleGattcSetPriority(int clientId, const BdAddr *bdAddr, BtGattPriority priority);
 
 /**
  * @brief Disconnect a Gatt connection with a remote device.
