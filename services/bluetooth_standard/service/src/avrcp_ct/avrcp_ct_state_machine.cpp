@@ -71,7 +71,7 @@ int AvrcCtStateMachineManager::AddControlStateMachine(const RawAddress &rawAddr)
         stateMachines_.insert(std::make_pair(rawAddr.GetAddress(), std::make_pair(std::move(stateMachine), nullptr)));
     } else {
         result = RET_BAD_PARAM;
-        LOG_DEBUG("[AVRCP CT] The control state machine exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] The control state machine exists! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     }
 
     return result;
@@ -89,14 +89,14 @@ int AvrcCtStateMachineManager::AddBrowseStateMachine(const RawAddress &rawAddr)
     if (pair == nullptr) {
         result = RET_BAD_PARAM;
         LOG_DEBUG(
-            "[AVRCP CT] The pair of state machines doest not exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            "[AVRCP CT] The pair of state machines doest not exists! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     } else if (pair->second == nullptr) {
         pair->second = std::make_unique<StateMachine>(StateMachine::Type::AVRC_CT_SM_TYPE_BROWSE, rawAddr);
         pair->second->AddStates();
         pair->second->InitState(AVRC_CT_SM_STATE_CONNECTING);
     } else {
         result = RET_BAD_PARAM;
-        LOG_DEBUG("[AVRCP CT] The browse state machine exists! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] The browse state machine exists! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     }
 
     return result;
@@ -112,7 +112,7 @@ void AvrcCtStateMachineManager::DeletePairOfStateMachine(const RawAddress &rawAd
     if (pair != nullptr) {
         stateMachines_.erase(rawAddr.GetAddress());
     } else {
-        LOG_DEBUG("[AVRCP CT] The pair of state machines does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] The pair of state machines does not exist! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     }
 }
 
@@ -126,7 +126,7 @@ void AvrcCtStateMachineManager::DeleteBrowseStateMachine(const RawAddress &rawAd
     if (pair != nullptr && pair->second != nullptr) {
         pair->second = nullptr;
     } else {
-        LOG_DEBUG("[AVRCP CT] The browse state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] The browse state machine does not exist! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     }
 }
 
@@ -141,10 +141,10 @@ bool AvrcCtStateMachineManager::SendMessageToControlStateMachine(const RawAddres
     if (pair != nullptr && pair->first != nullptr) {
         result = pair->first->ProcessMessage(msg);
         if (!result) {
-            LOG_DEBUG("[AVRCP CT] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The control state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] The control state machine does not exist! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     }
 
     return result;
@@ -174,10 +174,10 @@ bool AvrcCtStateMachineManager::SendMessageToBrowseStateMachine(const RawAddress
     if (pair != nullptr && pair->second != nullptr) {
         result = pair->second->ProcessMessage(msg);
         if (!result) {
-            LOG_DEBUG("[AVRCP CT] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] Unknown message[%{public}d]! - Address[%{public}s]", msg.what_, GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     } else {
-        LOG_DEBUG("[AVRCP CT] The browse state machine does not exist! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] The browse state machine does not exist! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     }
 
     return result;
@@ -430,7 +430,7 @@ void AvrcCtStateMachineManager::StateMachine::CtConnecting::Entry(void)
 
     if (AVCT_ConnectReq(&connectId, &param, &btAddr) != AVCT_SUCCESS) {
         info->eventCallback_(connectId, AVCT_CONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP CT] Call - AVCT_ConnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] Call - AVCT_ConnectReq Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 
@@ -563,7 +563,7 @@ void AvrcCtStateMachineManager::StateMachine::CtDisconnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP CT] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 
@@ -689,7 +689,7 @@ void AvrcCtStateMachineManager::StateMachine::CtDisable::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
 
-        LOG_DEBUG("[AVRCP CT] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] Call - AVCT_DisconnectReq Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
         info->eventCallback_(info->connectId_, AVCT_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
     }
 }
@@ -735,7 +735,7 @@ void AvrcCtStateMachineManager::StateMachine::BrConnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_BR_CONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP CT] Call - AVCT_BrConnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] Call - AVCT_BrConnectReq Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 
@@ -839,7 +839,7 @@ void AvrcCtStateMachineManager::StateMachine::BrDisconnecting::Entry(void)
         BtAddr btAddr = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 0x00};
         rawAddr_.ConvertToUint8(btAddr.addr);
         info->eventCallback_(info->connectId_, AVCT_BR_DISCONNECT_CFM_EVT, AVCT_FAILED, &btAddr, nullptr);
-        LOG_DEBUG("[AVRCP CT] Call - AVCT_BrDisconnectReq Failed! - Address[%{public}s]", rawAddr_.GetAddress().c_str());
+        LOG_DEBUG("[AVRCP CT] Call - AVCT_BrDisconnectReq Failed! - Address[%{public}s]", GetEncryptAddr(rawAddr_.GetAddress()).c_str());
     }
 }
 

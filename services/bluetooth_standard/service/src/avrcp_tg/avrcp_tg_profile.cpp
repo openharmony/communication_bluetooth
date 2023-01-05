@@ -131,7 +131,7 @@ void AvrcTgProfile::SetEnableFlag(bool isEnabled)
 void AvrcTgProfile::SetActiveDevice(const RawAddress &rawAddr)
 {
     LOG_DEBUG("[AVRCP TG] AvrcTgProfile::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", rawAddr.GetAddress().c_str());
+    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     AvrcTgConnectManager *cnManager = AvrcTgConnectManager::GetInstance();
@@ -1504,7 +1504,7 @@ void AvrcTgProfile::ReceiveVendorCmd(const RawAddress &rawAddr, uint8_t label, P
             std::shared_ptr<AvrcTgVendorPacket> packet =
                 std::make_shared<AvrcTgVendorPacket>(pduId, AVRC_ES_CODE_INVALID_COMMAND, label);
             SendVendorRsp(rawAddr, packet, AVRC_TG_SM_EVENT_GENERAL_REJECT);
-            LOG_DEBUG("[AVRCP TG] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]", rawAddr.GetAddress().c_str(), pduId);
+            LOG_DEBUG("[AVRCP TG] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]", GetEncryptAddr(rawAddr.GetAddress()).c_str(), pduId);
             break;
     }
 }
@@ -1722,7 +1722,7 @@ void AvrcTgProfile::ReceiveBrowseCmd(const RawAddress &rawAddr, uint8_t label, P
             std::shared_ptr<AvrcTgBrowsePacket> packet = std::make_shared<AvrcTgBrowsePacket>(
                 AVRC_TG_PDU_ID_GENERAL_REJECT, AVRC_ES_CODE_INVALID_COMMAND, label);
             SendBrowseRsp(rawAddr, packet, AVRC_TG_SM_EVENT_GENERAL_REJECT);
-            LOG_DEBUG("[AVRCP TG] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]", rawAddr.GetAddress().c_str(), pduId);
+            LOG_DEBUG("[AVRCP TG] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]", GetEncryptAddr(rawAddr.GetAddress()).c_str(), pduId);
             break;
     }
 }
@@ -1735,42 +1735,42 @@ void AvrcTgProfile::ProcessChannelEvent(
         case AVCT_CONNECT_IND_EVT:
             LOG_DEBUG("[AVRCP TG] Receive [AVCT_CONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
                 result,
-                rawAddr.GetAddress().c_str());
+                GetEncryptAddr(rawAddr.GetAddress()).c_str());
             ProcessChannelEventConnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_DISCONNECT_IND_EVT:
             LOG_DEBUG("[AVRCP TG] Receive [AVCT_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
                 result,
-                rawAddr.GetAddress().c_str());
+                GetEncryptAddr(rawAddr.GetAddress()).c_str());
             ProcessChannelEventDisconnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_DISCONNECT_CFM_EVT:
             LOG_DEBUG("[AVRCP TG] Receive [AVCT_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
-                rawAddr.GetAddress().c_str());
+                GetEncryptAddr(rawAddr.GetAddress()).c_str());
             ProcessChannelEventDisconnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_CONNECT_IND_EVT:
-            LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_CONNECT_IND_EVT] - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_CONNECT_IND_EVT] - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
             ProcessChannelEventBrConnectIndEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_CONNECT_CFM_EVT:
             LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
-                rawAddr.GetAddress().c_str());
+                GetEncryptAddr(rawAddr.GetAddress()).c_str());
             ProcessChannelEventBrConnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         case AVCT_BR_DISCONNECT_IND_EVT:
             LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_IND_EVT] - Result[%x] - Address[%{public}s]",
                 result,
-                rawAddr.GetAddress().c_str());
+                GetEncryptAddr(rawAddr.GetAddress()).c_str());
 
             DeleteBrowseStateMachine(rawAddr);
             break;
         case AVCT_BR_DISCONNECT_CFM_EVT:
             LOG_DEBUG("[AVRCP TG] Receive [AVCT_BR_DISCONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
-                rawAddr.GetAddress().c_str());
+                GetEncryptAddr(rawAddr.GetAddress()).c_str());
 
             DeleteBrowseStateMachine(rawAddr);
             break;
@@ -1778,11 +1778,11 @@ void AvrcTgProfile::ProcessChannelEvent(
             /// The AVCTP does not return this message when an passive connection is created.
             LOG_DEBUG("[AVRCP TG] Receive [AVCT_CONNECT_CFM_EVT] - Result[%x] - Address[%{public}s]",
                 result,
-                rawAddr.GetAddress().c_str());
+                GetEncryptAddr(rawAddr.GetAddress()).c_str());
             ProcessChannelEventConnectCfmEvt(rawAddr, connectId, event, result, context);
             break;
         default:
-            LOG_DEBUG("[AVRCP TG] Unknown [%x]! - Address[%{public}s]", event, rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP TG] Unknown [%x]! - Address[%{public}s]", event, GetEncryptAddr(rawAddr.GetAddress()).c_str());
             break;
     };
 }
@@ -1997,7 +1997,7 @@ void AvrcTgProfile::ProcessChannelMessage(
     } else {
         LOG_DEBUG("[AVRCP TG] Active device[%{public}s] - Request device[%{public}s]!",
             cnManager->GetActiveDevice().c_str(),
-            rawAddr.GetAddress().c_str());
+            GetEncryptAddr(rawAddr.GetAddress()).c_str());
     }
 
     PacketFree(pkt);
