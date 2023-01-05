@@ -950,7 +950,7 @@ void AvdtAssembleMsg(AvdtSigCtrl *sigCtrl, uint8_t msgType, uint8_t pktType, Pac
  */
 void AvdtParseMsgAssembled(AvdtSigCtrl *sigCtrl, Packet *pkt)
 {
-    if (sigCtrl == NULL) {
+    if (sigCtrl == NULL || pkt == NULL) {
         return;
     }
     LOG_DEBUG("[AVDT]%{public}s: sigCtrl->rcvSignal(0x%x) sigCtrl->rcvLabel(0x%x) sigCtrl->msgType(0x%x)",
