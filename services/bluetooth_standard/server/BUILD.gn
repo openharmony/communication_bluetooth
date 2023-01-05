@@ -24,6 +24,7 @@ ohos_shared_library("bluetooth_server") {
     "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/framework/common",
     "//foundation/communication/bluetooth/interfaces/innerkits/native_cpp/include",
     "//foundation/communication/bluetooth/services/bluetooth_standard/service/include",
+    "//foundation/communication/bluetooth/services/bluetooth_standard/service/src/permission",
     "$hdf_uhdf_path/include/hdi",
   ]
 
@@ -60,6 +61,7 @@ ohos_shared_library("bluetooth_server") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
