@@ -380,6 +380,10 @@ static uint16_t SdpParseServiceRecordHandleList(
     }
 
     buffer = MEM_MALLOC.alloc(length);
+    if (buffer == NULL) {
+        LOG_ERROR("buffer is NULL");
+        return 0;
+    }
     (void)memset_s(buffer, length, 0, length);
     PacketRead(packet, buffer, 0, length);
 
@@ -427,7 +431,6 @@ static int SdpParseSingleAttributeList(uint8_t *buffer, SdpService *service)
         LOG_ERROR("point to NULL");
         return BT_NO_MEMORY;
     }
-
     (void)memset_s(service->sequenceAttribute,
         sizeof(SdpSequenceAttribute) * SDP_SEQUENCE_ATTRIBUTE_COUNT,
         0,
@@ -541,6 +544,10 @@ static uint16_t SdpParseAttributeListArray(
 
     totalLength = PacketSize(packet);
     uint8_t *buffer = MEM_MALLOC.alloc(totalLength);
+    if (buffer == NULL) {
+        LOG_ERROR("buffer is NULL");
+        return 0;
+    }
     (void)memset_s(buffer, totalLength, 0, totalLength);
     PacketRead(packet, buffer, 0, totalLength);
 
@@ -665,6 +672,10 @@ static void SdpParseSearchResponse(const BtAddr *addr, uint16_t lcid, uint16_t t
         return;
     }
     uint32_t *handleArray = (uint32_t *)MEM_MALLOC.alloc(SDP_UINT32_LENGTH * totalServiceRecordCount);
+    if (handleArray == NULL) {
+        LOG_ERROR("handleArray is NULL");
+        return;
+    }
     (void)memset_s(
         handleArray, SDP_UINT32_LENGTH * totalServiceRecordCount, 0, SDP_UINT32_LENGTH * totalServiceRecordCount);
     /// ServiceRecordHandleList
@@ -1114,6 +1125,10 @@ static int SdpGetLanguageBaseAttributeIdList(uint8_t *buffer, SdpService *servic
         return BT_BAD_PARAM;
     }
     service->baseAttributeId = MEM_MALLOC.alloc(sizeof(SdpLanguageBaseAttributeId) * SDP_LANGUAGE_ATTRIBUTE_MAX);
+    if (service->baseAttributeId == NULL) {
+        LOG_ERROR("baseAttributeId is NULL");
+        return BT_NO_MEMORY;
+    }
     uint16_t setLength = sizeof(SdpLanguageBaseAttributeId) * SDP_LANGUAGE_ATTRIBUTE_MAX;
     (void)memset_s(service->baseAttributeId, setLength, 0, setLength);
 
@@ -1194,6 +1209,10 @@ static int SdpGetBluetoothProfileDescriptorList(uint8_t *buffer, SdpService *ser
     offset += pos;
 
     service->profileDescriptor = MEM_MALLOC.alloc(sizeof(SdpProfileDescriptor) * SDP_PROTOCOL_PARAMETER_MAX_COUNT);
+    if (service->profileDescriptor == NULL) {
+        LOG_ERROR("profileDescriptor is NULL");
+        return BT_NO_MEMORY;
+    }
     (void)memset_s(service->profileDescriptor,
         sizeof(SdpProfileDescriptor) * SDP_PROTOCOL_PARAMETER_MAX_COUNT,
         0,
@@ -1382,6 +1401,10 @@ static int SdpGetAttributeForUint(uint8_t *buffer, uint8_t size, SdpService *ser
             service->attribute[service->attributeNumber].attributeValueLength = SDP_UINT8_LENGTH;
             uint8_t data1 = buffer[1];
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_UINT8_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memset_s(
                 service->attribute[service->attributeNumber].attributeValue, SDP_UINT8_LENGTH, 0, SDP_UINT8_LENGTH);
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
@@ -1395,6 +1418,10 @@ static int SdpGetAttributeForUint(uint8_t *buffer, uint8_t size, SdpService *ser
             service->attribute[service->attributeNumber].attributeValueLength = SDP_UINT16_LENGTH;
             uint16_t data2 = BE2H_16(*(uint16_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_UINT16_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memset_s(
                 service->attribute[service->attributeNumber].attributeValue, SDP_UINT16_LENGTH, 0, SDP_UINT16_LENGTH);
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
@@ -1408,6 +1435,10 @@ static int SdpGetAttributeForUint(uint8_t *buffer, uint8_t size, SdpService *ser
             service->attribute[service->attributeNumber].attributeValueLength = SDP_UINT32_LENGTH;
             uint32_t data3 = BE2H_32(*(uint32_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_UINT32_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memset_s(
                 service->attribute[service->attributeNumber].attributeValue, SDP_UINT32_LENGTH, 0, SDP_UINT32_LENGTH);
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
@@ -1436,6 +1467,10 @@ static int SdpGetAttributeForInt(uint8_t *buffer, uint8_t size, SdpService *serv
             service->attribute[service->attributeNumber].attributeValueLength = SDP_INT8_LENGTH;
             uint8_t data1 = buffer[1];
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_INT8_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(
                 service->attribute[service->attributeNumber].attributeValue, SDP_INT8_LENGTH, &data1, SDP_INT8_LENGTH);
             offset += 1 + SDP_INT8_LENGTH;
@@ -1445,6 +1480,10 @@ static int SdpGetAttributeForInt(uint8_t *buffer, uint8_t size, SdpService *serv
             service->attribute[service->attributeNumber].attributeValueLength = SDP_INT16_LENGTH;
             uint16_t data2 = BE2H_16(*(uint16_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_INT16_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 SDP_INT16_LENGTH,
                 &data2,
@@ -1456,6 +1495,10 @@ static int SdpGetAttributeForInt(uint8_t *buffer, uint8_t size, SdpService *serv
             service->attribute[service->attributeNumber].attributeValueLength = SDP_INT32_LENGTH;
             uint32_t data3 = BE2H_32(*(uint32_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_INT32_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 SDP_INT32_LENGTH,
                 &data3,
@@ -1482,6 +1525,10 @@ static int SdpGetAttributeForUuid(uint8_t *buffer, uint8_t size, SdpService *ser
             service->attribute[service->attributeNumber].attributeValueLength = SDP_UUID16_LENGTH;
             uint16_t data1 = BE2H_16(*(uint16_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_UUID16_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 SDP_UUID16_LENGTH,
                 &data1,
@@ -1493,6 +1540,10 @@ static int SdpGetAttributeForUuid(uint8_t *buffer, uint8_t size, SdpService *ser
             service->attribute[service->attributeNumber].attributeValueLength = SDP_UUID32_LENGTH;
             uint32_t data2 = BE2H_32(*(uint32_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(SDP_UUID32_LENGTH);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 SDP_UUID32_LENGTH,
                 &data2,
@@ -1526,6 +1577,10 @@ static int SdpGetAttributeForString(uint8_t *buffer, uint8_t size, SdpService *s
             length = BE2H_16(*(uint16_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValueLength = length;
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(length);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 length,
                 buffer + 1 + SDP_UINT16_LENGTH,
@@ -1536,6 +1591,10 @@ static int SdpGetAttributeForString(uint8_t *buffer, uint8_t size, SdpService *s
             length = buffer[1];
             service->attribute[service->attributeNumber].attributeValueLength = length;
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(length);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 length,
                 buffer + 1 + SDP_UINT8_LENGTH,
@@ -1563,6 +1622,10 @@ static int SdpGetAttributeForUrl(uint8_t *buffer, uint8_t size, SdpService *serv
             length = buffer[1];
             service->attribute[service->attributeNumber].attributeValueLength = length;
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(length);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 length,
                 buffer + 1 + SDP_UINT8_LENGTH,
@@ -1573,6 +1636,10 @@ static int SdpGetAttributeForUrl(uint8_t *buffer, uint8_t size, SdpService *serv
             length = BE2H_16(*(uint16_t *)(buffer + 1));
             service->attribute[service->attributeNumber].attributeValueLength = length;
             service->attribute[service->attributeNumber].attributeValue = MEM_MALLOC.alloc(length);
+            if (service->attribute[service->attributeNumber].attributeValue == NULL) {
+                LOG_ERROR("attributeValue is NULL");
+                return BT_NO_MEMORY;
+            }
             (void)memcpy_s(service->attribute[service->attributeNumber].attributeValue,
                 length,
                 buffer + 1 + SDP_UINT16_LENGTH,
