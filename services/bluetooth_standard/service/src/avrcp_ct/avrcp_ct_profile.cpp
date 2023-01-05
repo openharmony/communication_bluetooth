@@ -373,11 +373,11 @@ void AvrcCtProfile::SendPassCmd(const RawAddress &rawAddr, const std::shared_ptr
         if (cnManager->GetSizeOfPassQueue(rawAddr) >= AVRC_CT_DEFAULT_SIZE_OF_QUEUE) {
             InformPassRsp(rawAddr, pkt->GetKeyOperation(), pkt->GetKeyState(), RET_BAD_STATUS);
             LOG_DEBUG("[AVRCP CT] The pass through command is full! - Address[%{public}s] - sizeOf[%{public}d]",
-                rawAddr.GetAddress().c_str(),
+                GetEncryptAddr(rawAddr.GetAddress()).c_str(),
                 AVRC_CT_DEFAULT_SIZE_OF_QUEUE);
         } else {
             cnManager->PushPassQueue(rawAddr, pkt);
-            LOG_DEBUG("[AVRCP CT] Waiting for the response! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] Waiting for the response! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     }
 }
@@ -403,7 +403,7 @@ void AvrcCtProfile::ReceivePassRsp(const RawAddress &rawAddr, Packet *pkt)
 
     AvrcCtPassPacket packet(pkt);
     LOG_DEBUG("[AVRCP CT] Address[%{public}s] - key[%x] - state[%x]",
-        rawAddr.GetAddress().c_str(),
+        GetEncryptAddr(rawAddr.GetAddress()).c_str(),
         packet.GetKeyOperation(),
         packet.GetKeyState());
 
@@ -1174,7 +1174,7 @@ void AvrcCtProfile::ReceiveAbortContinuingResponseRsp(const RawAddress &rawAddr,
 
     if (packet != nullptr) {
         if (acrPkt.GetPduId() != packet->GetPduId()) {
-            LOG_DEBUG("[AVRCP CT] PDU ID is wrong! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] PDU ID is wrong! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     } else {
         LOG_DEBUG("[AVRCP CT] The saved continue packet is nullptr!");
@@ -1511,7 +1511,7 @@ void AvrcCtProfile::ReceiveVendorRsp(const RawAddress &rawAddr, Packet *pkt)
             break;
         default:
             LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                rawAddr.GetAddress().c_str(),
+                GetEncryptAddr(rawAddr.GetAddress()).c_str(),
                 AvrcCtPacket::GetVendorPdu(pkt));
             break;
     }
@@ -1669,12 +1669,12 @@ void AvrcCtProfile::ProcessVendorTimeout(RawAddress rawAddr)
                 }
                 default:
                     LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                        rawAddr.GetAddress().c_str(),
+                        GetEncryptAddr(rawAddr.GetAddress()).c_str(),
                         packet->GetPduId());
                     break;
             }
         } else {
-            LOG_DEBUG("[AVRCP CT] The saved packet is nullptr! - Address[%{public}s] - ", rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] The saved packet is nullptr! - Address[%{public}s] - ", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
 
         SendNextVendorCmd(rawAddr);
@@ -1717,7 +1717,7 @@ void AvrcCtProfile::SendBrowseCmd(
             LOG_DEBUG("[AVRCP CT] The queue is oversize[%{public}d]", cnManager->GetSizeOfBrowseQueue(rawAddr));
         } else {
             cnManager->PushBrowseQueue(rawAddr, pkt);
-            LOG_DEBUG("[AVRCP CT] Waiting for the response! - Address[%{public}s]", rawAddr.GetAddress().c_str());
+            LOG_DEBUG("[AVRCP CT] Waiting for the response! - Address[%{public}s]", GetEncryptAddr(rawAddr.GetAddress()).c_str());
         }
     }
 }
@@ -1935,7 +1935,7 @@ void AvrcCtProfile::ReceiveBrowseRsp(const RawAddress &rawAddr, Packet *pkt)
             break;
         default:
             LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                rawAddr.GetAddress().c_str(),
+                GetEncryptAddr(rawAddr.GetAddress()).c_str(),
                 AvrcCtPacket::GetBrowsePdu(pkt));
             break;
     }
@@ -1985,7 +1985,7 @@ void AvrcCtProfile::ProcessBrowseTimeout(RawAddress rawAddr)
                     break;
                 default:
                     LOG_DEBUG("[AVRCP CT] The PDU ID is wrong! - Address[%{public}s] - pduId[%x]",
-                        rawAddr.GetAddress().c_str(),
+                        GetEncryptAddr(rawAddr.GetAddress()).c_str(),
                         packet->GetPduId());
                     break;
             }
@@ -2010,7 +2010,7 @@ void AvrcCtProfile::ProcessChannelEvent(
     LOG_DEBUG("[AVRCP CT] Receive [%{public}s] - Result[%x] - Address[%{public}s]",
         GetEventName(event).c_str(),
         result,
-        rawAddr.GetAddress().c_str());
+        GetEncryptAddr(rawAddr.GetAddress()).c_str());
     switch (event) {
         case AVCT_CONNECT_IND_EVT:
             ProcessChannelEventConnectIndEvt(rawAddr, connectId, event, result, context);

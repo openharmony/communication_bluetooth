@@ -169,7 +169,7 @@ std::list<std::string> AvrcTgConnectManager::GetDeviceAddresses(void)
 void AvrcTgConnectManager::SetActiveDevice(const std::string addr)
 {
     LOG_DEBUG("[AVRCP TG] AvrcTgConnectManager::%{public}s", __func__);
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", addr.c_str());
+    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", GetEncryptAddr(addr).c_str());
 
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -182,7 +182,7 @@ const std::string &AvrcTgConnectManager::GetActiveDevice(void)
 
     std::lock_guard<std::mutex> lock(mutex_);
 
-    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", activeAddr_.c_str());
+    LOG_DEBUG("[AVRCP TG] rawAddr[%{public}s]", GetEncryptAddr(activeAddr_).c_str());
 
     return activeAddr_;
 }

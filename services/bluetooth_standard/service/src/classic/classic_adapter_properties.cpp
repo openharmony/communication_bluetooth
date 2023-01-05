@@ -422,7 +422,7 @@ void ClassicAdapterProperties::SaveConfigFile() const
 
 std::shared_ptr<ClassicRemoteDevice> ClassicAdapterProperties::GetPairedDevice(std::string addr)
 {
-    LOG_DEBUG("[ClassicAdapterProperties]::%{public}s addr: %{public}s", __func__, addr.c_str());
+    LOG_DEBUG("[ClassicAdapterProperties]::%{public}s addr: %{public}s", __func__, GetEncryptAddr(addr).c_str());
 
     std::shared_ptr<ClassicRemoteDevice> remote = std::make_shared<ClassicRemoteDevice>(addr);
 
@@ -471,7 +471,7 @@ std::shared_ptr<ClassicRemoteDevice> ClassicAdapterProperties::GetPairedDevice(s
 
 void ClassicAdapterProperties::SavePairedDeviceInfo(std::shared_ptr<ClassicRemoteDevice> remote)
 {
-    LOG_DEBUG("ClassicAdapterProperties::%{public}s, addr: %{public}s", __func__, remote->GetAddress().c_str());
+    LOG_DEBUG("ClassicAdapterProperties::%{public}s, addr: %{public}s", __func__, GetEncryptAddr(remote->GetAddress()).c_str());
     std::string addr = remote->GetAddress();
 
     std::string name = remote->GetRemoteName();
