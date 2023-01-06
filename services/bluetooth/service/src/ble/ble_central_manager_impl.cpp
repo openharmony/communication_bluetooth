@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -834,7 +834,7 @@ void BleCentralManagerImpl::SetScanModeDuration(int scanMode, int type) const
         default:
             break;
     }
-    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_BLE_SCAN_DUTY_CYCLE",
+    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLE_SCAN_DUTY_CYCLE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "WINDOW", pimpl->scanParams_.scanWindow,
         "INTERVAL", pimpl->scanParams_.scanInterval, "TYPE", pimpl->callBackType_);
 }

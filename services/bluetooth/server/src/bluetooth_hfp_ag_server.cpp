@@ -42,7 +42,7 @@ public:
         HILOGI("device:%{public}s, state:%{public}d", GET_ENCRYPT_ADDR(device), state);
         if (state == static_cast<int>(BTConnectState::CONNECTED) ||
             state == static_cast<int>(BTConnectState::DISCONNECTED)) {
-            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_HFP_CONNECTED_STATE",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "HFP_CONNECTED_STATE",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", state);
         }
         observers_->ForEach([device, state](IBluetoothHfpAgObserver* observer) {
