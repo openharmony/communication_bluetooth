@@ -203,7 +203,9 @@ std::string HfpAgSystemInterface::GetSubscriberNumber()
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
-        subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
+        std::u16string telephoneNumber;
+        CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_, telephoneNumber);
+        subscriberNumber_ = Str16ToStr8(telephoneNumber);
         LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
     return subscriberNumber_;
@@ -392,7 +394,9 @@ void HfpAgSystemInterface::QueryAgIndicator()
         }
         LOG_INFO("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
 
-        subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
+        std::u16string telephoneNumber;
+        CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_, telephoneNumber);
+        subscriberNumber_ = Str16ToStr8(telephoneNumber);
         LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
     SendServiceStateToService();
