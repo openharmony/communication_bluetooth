@@ -397,7 +397,7 @@ void BluetoothBleCentralManagerServer::StartScan()
             HILOGI("start ble scan without params.");
             pimpl->bleService_->StartScan();
             pimpl->isScanning = true;
-            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_BLE_SCAN_START",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLE_SCAN_START",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid, "TYPE", 0);
         } else if (IsNewScanParams()) {
             // Stop an ongoing ble scan, and restart the ble scan with default settings in OnStartOrStopScanEvent().
@@ -447,7 +447,7 @@ void BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings 
             SetScanParams(settings);
             pimpl->bleService_->StartScan(pimpl->scanSettingImpl_);
             pimpl->isScanning = true;
-            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_BLE_SCAN_START",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLE_SCAN_START",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid,
                 "TYPE", (settings.GetReportDelayMillisValue() > 0) ? 1 : 0);
         } else if (IsNewScanParams()) {
@@ -495,7 +495,7 @@ void BluetoothBleCentralManagerServer::StopScan()
             HILOGI("stop ble scan.");
             pimpl->bleService_->StopScan();
             pimpl->isScanning = false;
-            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLUETOOTH_BLE_SCAN_STOP",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "BLE_SCAN_STOP",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "PID", pid, "UID", uid);
         }
     });
