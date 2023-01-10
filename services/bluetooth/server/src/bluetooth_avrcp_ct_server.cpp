@@ -774,7 +774,7 @@ void BluetoothAvrcpCtServer::RegisterObserver(const sptr<IBluetoothAvrcpCtObserv
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
     if (observer == nullptr) {
-        HILOGI("called with NULL binder. Ignoring.");
+        HILOGI("observer is NULL.");
         return ;
     }
     pimpl->observers_.Register(observer);
@@ -790,7 +790,7 @@ void BluetoothAvrcpCtServer::UnregisterObserver(const sptr<IBluetoothAvrcpCtObse
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
     if (observer == nullptr) {
-        HILOGI("called with NULL binder. Ignoring.");
+        HILOGI("observer is NULL.");
         return;
     }
     pimpl->observers_.Deregister(observer);
@@ -1313,6 +1313,6 @@ int32_t BluetoothAvrcpCtServer::GetMeidaPlayerList(const RawAddress &device, int
     return result;
 }
 
-}  // namespace binder
+}  // namespace Bluetooth
 
-}  // namespace ipc
+}  // namespace OHOS
