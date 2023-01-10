@@ -23,10 +23,6 @@
 #include "bluetooth_types.h"
 namespace OHOS {
 namespace Bluetooth {
-/**
- * @brief pbap pce binder server
- * pbap pce binder server
- */
 class BluetoothPbapPceServer : public BluetoothPbapPceStub {
 public:
     /**
