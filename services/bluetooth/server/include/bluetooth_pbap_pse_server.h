@@ -24,10 +24,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-/**
- * @brief pbap pse binder server
- * pbap pse binder server
- */
 class BluetoothPbapPseServer : public BluetoothPbapPseStub {
 public:
     /**

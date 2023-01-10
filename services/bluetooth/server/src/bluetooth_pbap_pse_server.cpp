@@ -223,7 +223,7 @@ void BluetoothPbapPseServer::RegisterObserver(const sptr<IBluetoothPbapPseObserv
 {
     HILOGI("Enter!");
     if (!observer) {
-        HILOGE("called with NULL binder. Ignoring.");
+        HILOGE("observer is NULL.");
     }
     pimpl->observers_.Register(observer);
 }
@@ -232,7 +232,7 @@ void BluetoothPbapPseServer::DeregisterObserver(const sptr<IBluetoothPbapPseObse
 {
     HILOGI("Enter!");
     if (!observer) {
-        HILOGE("called with NULL binder. Ignoring.");
+        HILOGE("observer is NULL.");
     }
     pimpl->observers_.Deregister(observer);
 }
