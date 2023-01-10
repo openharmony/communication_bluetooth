@@ -170,7 +170,7 @@ void BluetoothAvrcpTgServer::RegisterObserver(const sptr<IBluetoothAvrcpTgObserv
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
     if (observer == nullptr) {
-        HILOGI("called with NULL binder. Ignoring.");
+        HILOGI("observer is NULL.");
         return ;
     }
     pimpl->observers_.Register(observer);
@@ -186,7 +186,7 @@ void BluetoothAvrcpTgServer::UnregisterObserver(const sptr<IBluetoothAvrcpTgObse
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
 
     if (observer == nullptr) {
-        HILOGI("called with NULL binder. Ignoring.");
+        HILOGI("observer is NULL.");
         return;
     }
     pimpl->observers_.Deregister(observer);
@@ -470,6 +470,6 @@ void BluetoothAvrcpTgServer::NotifyVolumeChanged(int32_t volume)
     HILOGI("end.");
 }
 
-}  // namespace binder
+}  // namespace Bluetooth
 
-}  // namespace ipc
+}  // namespace OHOS
