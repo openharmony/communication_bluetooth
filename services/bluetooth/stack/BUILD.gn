@@ -207,6 +207,8 @@ config("btstack_config") {
     "-Wno-missing-braces",  #wait-for-fix
     "-Wno-pragma-pack",
   ]
+
+  defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
 }
 
 ohos_shared_library("btstack") {
