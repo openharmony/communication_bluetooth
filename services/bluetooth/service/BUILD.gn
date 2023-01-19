@@ -404,6 +404,7 @@ ohos_shared_library("btservice") {
     "//base/telephony/state_registry/frameworks/native/observer:tel_state_registry_api",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/libxml2:xml2",
+    "//third_party/openssl:libcrypto_shared",
   ]
 
   external_deps = [
