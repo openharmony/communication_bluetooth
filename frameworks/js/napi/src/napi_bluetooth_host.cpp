@@ -746,6 +746,10 @@ napi_value ScanModeInit(napi_env env)
         env, scanMode, static_cast<int>(ScanMode::SCAN_MODE_GENERAL_DISCOVERABLE), "SCAN_MODE_GENERAL_DISCOVERABLE");
     SetNamedPropertyByInteger(env,
         scanMode,
+        static_cast<int>(ScanMode::SCAN_MODE_LIMITED_DISCOVERABLE),
+        "SCAN_MODE_LIMITED_DISCOVERABLE");
+    SetNamedPropertyByInteger(env,
+        scanMode,
         static_cast<int>(ScanMode::SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE),
         "SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE");
     SetNamedPropertyByInteger(env,
