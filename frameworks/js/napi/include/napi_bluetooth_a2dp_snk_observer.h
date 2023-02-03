@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-static std::shared_mutex g_a2dpSinkCallbackInfosMutex;
+
 const std::string STR_BT_A2DP_SINK_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
 class NapiA2dpSinkObserver : public A2dpSinkObserver{
@@ -30,8 +30,9 @@ public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 
     NapiA2dpSinkObserver() = default;
-    virtual ~NapiA2dpSinkObserver() = default;
+    ~NapiA2dpSinkObserver() override = default;
 
+    static std::shared_mutex g_a2dpSinkCallbackInfosMutex;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };
 

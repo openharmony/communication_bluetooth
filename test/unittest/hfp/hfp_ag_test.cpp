@@ -14,6 +14,7 @@
  */
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hfp_ag.h"
 #include "bluetooth_host.h"
 
@@ -105,8 +106,8 @@ HWTEST_F(HandsFreeAudioGatewayTest, HandsFreeAudioGateway_UnitTest_GetConnectedD
     GTEST_LOG_(INFO) << "HandsFreeAudioGateway_UnitTest_GetConnectedDevices start";
  
     profile_ = HandsFreeAudioGateway::GetProfile();
-    vector<BluetoothRemoteDevice> devices = profile_->GetConnectedDevices();
-
+    std::vector<BluetoothRemoteDevice> devices;
+    profile_->GetConnectedDevices(devices);
 
     GTEST_LOG_(INFO) << "HandsFreeAudioGateway_UnitTest_GetConnectedDevices end";
 }
@@ -122,8 +123,8 @@ HWTEST_F(HandsFreeAudioGatewayTest, HandsFreeAudioGateway_UnitTest_GetDevicesByS
  
     profile_ = HandsFreeAudioGateway::GetProfile();
     vector<int> states = {static_cast<int>(BTConnectState::CONNECTED)};
-    vector<BluetoothRemoteDevice> devices = profile_->GetDevicesByStates(states);
-    
+    std::vector<BluetoothRemoteDevice> devices;
+    profile_->GetDevicesByStates(states, devices);
     GTEST_LOG_(INFO) << "HandsFreeAudioGateway_UnitTest_GetDevicesByStates end";
 }
 
@@ -138,7 +139,8 @@ HWTEST_F(HandsFreeAudioGatewayTest, HandsFreeAudioGateway_UnitTest_GetDeviceStat
  
     profile_ = HandsFreeAudioGateway::GetProfile();
     BluetoothRemoteDevice device;
-    int state = profile_->GetDeviceState(device);
+    int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+    int state = profile_->GetDeviceState(device, state);
     EXPECT_EQ(state, 0);
     GTEST_LOG_(INFO) << "HandsFreeAudioGateway_UnitTest_GetDeviceState end";
 }
@@ -155,7 +157,7 @@ HWTEST_F(HandsFreeAudioGatewayTest, HandsFreeAudioGateway_UnitTest_Connect, Test
  
     profile_ = HandsFreeAudioGateway::GetProfile();
     BluetoothRemoteDevice device;
-    bool isOK = profile_->Connect(device);
+    bool isOK = (profile_->Connect(device) == BT_SUCCESS ? true : false);
     EXPECT_EQ(isOK, true);
 
     GTEST_LOG_(INFO) << "HandsFreeAudioGateway_UnitTest_Connect end";
@@ -173,7 +175,7 @@ HWTEST_F(HandsFreeAudioGatewayTest, HandsFreeAudioGateway_UnitTest_Disconnect, T
  
     profile_ = HandsFreeAudioGateway::GetProfile();
     BluetoothRemoteDevice device;
-    bool isOK = profile_->Disconnect(device);
+    bool isOK = (profile_->Disconnect(device) == BT_SUCCESS ? true : false);
     EXPECT_EQ(isOK, true);
     GTEST_LOG_(INFO) << "HandsFreeAudioGateway_UnitTest_Disconnect end";
 }

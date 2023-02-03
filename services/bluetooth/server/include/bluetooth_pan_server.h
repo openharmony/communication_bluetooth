@@ -35,15 +35,11 @@ public:
     BluetoothPanServer();
     ~BluetoothPanServer() override;
 
-    ErrCode Disconnect(
-        const BluetoothRawAddress &device,
-        bool& result) override;
+    int32_t Disconnect(const BluetoothRawAddress &device) override;
 
-    ErrCode GetDeviceState(
-        const BluetoothRawAddress &device,
-        int& result) override;
+    int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) override;
 
-    ErrCode GetDevicesByStates(
+    int32_t GetDevicesByStates(
         const std::vector<int32_t> &states,
         std::vector<BluetoothRawAddress>& result) override;
 
@@ -53,12 +49,9 @@ public:
     ErrCode DeregisterObserver(
         const sptr<IBluetoothPanObserver> observer) override;
 
-    ErrCode SetTethering(
-        const bool enable,
-        bool& result) override;
+    int32_t SetTethering(const bool enable) override;
 
-    ErrCode IsTetheringOn(
-        bool& result) override;
+    int32_t IsTetheringOn(bool& result) override;
 
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothPanServer);

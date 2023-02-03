@@ -16,6 +16,7 @@
 #ifndef NAPI_BLUETOOTH_HFP_AG_OBSERVER_H_
 #define NAPI_BLUETOOTH_HFP_AG_OBSERVER_H_
 
+#include <shared_mutex>
 #include "bluetooth_hfp_ag.h"
 #include "napi_bluetooth_utils.h"
 
@@ -33,8 +34,9 @@ public:
     void OnHfEnhancedDriverSafetyChanged(const BluetoothRemoteDevice &device, int indValue) override{}
 
     NapiHandsFreeAudioGatewayObserver() = default;
-    virtual ~NapiHandsFreeAudioGatewayObserver() = default;
+    ~NapiHandsFreeAudioGatewayObserver() override = default;
 
+    static std::shared_mutex g_handsFreeAudioGatewayCallbackMutex;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };
 }  // namespace Bluetooth

@@ -26,9 +26,7 @@ int BluetoothOppObserverStub::OnRemoteRequest(
     HILOGI("BluetoothOppObserverStub OnRemoteRequest start");
     switch (code) {
         case COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED: {
-            std::u16string descriptor = BluetoothOppObserverStub::GetDescriptor();
-            std::u16string remoteDescriptor = data.ReadInterfaceToken();
-            if (descriptor != remoteDescriptor) {
+            if (BluetoothOppObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
             }
@@ -42,9 +40,7 @@ int BluetoothOppObserverStub::OnRemoteRequest(
             return NO_ERROR;
         }
         case COMMAND_ON_TRANSFER_STATE_CHANGED: {
-            std::u16string descriptor = BluetoothOppObserverStub::GetDescriptor();
-            std::u16string remoteDescriptor = data.ReadInterfaceToken();
-            if (descriptor != remoteDescriptor) {
+            if (BluetoothOppObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
             }

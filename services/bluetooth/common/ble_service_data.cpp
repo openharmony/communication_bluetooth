@@ -900,6 +900,11 @@ bool BlePeripheralDevice::IsServiceUUID() const
     return isServiceUUID_;
 }
 
+bool BlePeripheralDevice::IsName(void) const
+{
+    return isName_;
+}
+
 /**
  * @brief Set device address.
  *

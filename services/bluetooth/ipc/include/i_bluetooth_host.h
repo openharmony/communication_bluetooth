@@ -63,6 +63,7 @@ public:
         BT_FACTORY_RESET,
         BT_DISABLE_BLE,
         BT_ENABLE_BLE,
+        BT_IS_BR_ENABLED,
         BT_IS_BLE_ENABLED,
         BT_GET_PROFILE_LIST,
         BT_GET_MAXNUM_CONNECTED_AUDIODEVICES,
@@ -120,33 +121,34 @@ public:
     virtual void RegisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual bool EnableBt() = 0;
-    virtual bool DisableBt() = 0;
+    virtual int32_t DisableBt() = 0;
     virtual sptr<IRemoteObject> GetProfile(const std::string &name) = 0;
     virtual sptr<IRemoteObject> GetBleRemote(const std::string &name) = 0;
     virtual bool BluetoothFactoryReset() = 0;
-    virtual int32_t GetBtState() = 0;
+    virtual int32_t GetBtState(int &state) = 0;
     virtual std::string GetLocalAddress() = 0;
-    virtual bool DisableBle() = 0;
-    virtual bool EnableBle() = 0;
+    virtual int32_t DisableBle() = 0;
+    virtual int32_t EnableBle() = 0;
+    virtual bool IsBrEnabled() = 0;
     virtual bool IsBleEnabled() = 0;
     virtual std::vector<uint32_t> GetProfileList() = 0;
     virtual int32_t GetMaxNumConnectedAudioDevices() = 0;
-    virtual int32_t GetBtConnectionState() = 0;
-    virtual int32_t GetBtProfileConnState(uint32_t profileId) = 0;
+    virtual int32_t GetBtConnectionState(int &state) = 0;
+    virtual int32_t GetBtProfileConnState(uint32_t profileId, int &state) = 0;
     virtual int32_t GetLocalDeviceClass() = 0;
     virtual bool SetLocalDeviceClass(const int32_t &deviceClass) = 0;
-    virtual std::string GetLocalName() = 0;
-    virtual bool SetLocalName(const std::string &name) = 0;
-    virtual int32_t GetBtScanMode() = 0;
-    virtual bool SetBtScanMode(int32_t mode, int32_t duration) = 0;
+    virtual int32_t GetLocalName(std::string &name) = 0;
+    virtual int32_t SetLocalName(const std::string &name) = 0;
+    virtual int32_t GetBtScanMode(int32_t &scanMode) = 0;
+    virtual int32_t SetBtScanMode(int32_t mode, int32_t duration) = 0;
     virtual int32_t GetBondableMode(const int32_t transport) = 0;
     virtual bool SetBondableMode(int32_t transport, int32_t mode) = 0;
-    virtual bool StartBtDiscovery() = 0;
-    virtual bool CancelBtDiscovery() = 0;
+    virtual int32_t StartBtDiscovery() = 0;
+    virtual int32_t CancelBtDiscovery() = 0;
     virtual bool IsBtDiscovering(const int32_t transport) = 0;
     virtual long GetBtDiscoveryEndMillis() = 0;
-    virtual std::vector<BluetoothRawAddress> GetPairedDevices(const int32_t transport) = 0;
-    virtual bool RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) = 0;
+    virtual int32_t GetPairedDevices(const int32_t transport, std::vector<BluetoothRawAddress> &pairedAddr) = 0;
+    virtual int32_t RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) = 0;
     virtual bool RemoveAllPairs() = 0;
     virtual void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) = 0;
     virtual void DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) = 0;
@@ -157,19 +159,19 @@ public:
     virtual int32_t GetMessagePermission(const std::string &address) = 0;
     virtual bool SetMessagePermission(const std::string &address, int32_t permission) = 0;
     virtual int32_t GetPowerMode(const std::string &address) = 0;
-    virtual std::string GetDeviceName(int32_t transport, const std::string &address) = 0;
+    virtual int32_t GetDeviceName(int32_t transport, const std::string &address, std::string &name) = 0;
     virtual std::string GetDeviceAlias(const std::string &address) = 0;
     virtual bool SetDeviceAlias(const std::string &address, const std::string &aliasName) = 0;
     virtual int32_t GetDeviceBatteryLevel(const std::string &address) = 0;
     virtual int32_t GetPairState(int32_t transport, const std::string &address) = 0;
-    virtual bool StartPair(int32_t transport, const std::string &address) = 0;
+    virtual int32_t StartPair(int32_t transport, const std::string &address) = 0;
     virtual bool CancelPairing(int32_t transport, const std::string &address) = 0;
     virtual bool IsBondedFromLocal(int32_t transport, const std::string &address) = 0;
     virtual bool IsAclConnected(int32_t transport, const std::string &address) = 0;
     virtual bool IsAclEncrypted(int32_t transport, const std::string &address) = 0;
-    virtual int32_t GetDeviceClass(const std::string &address) = 0;
+    virtual int32_t GetDeviceClass(const std::string &address, int &cod) = 0;
     virtual bool SetDevicePin(const std::string &address, const std::string &pin) = 0;
-    virtual bool SetDevicePairingConfirmation(int32_t transport, const std::string &address, bool accept) = 0;
+    virtual int32_t SetDevicePairingConfirmation(int32_t transport, const std::string &address, bool accept) = 0;
     virtual bool SetDevicePasskey(int32_t transport, const std::string &address, int32_t passkey, bool accept) = 0;
     virtual bool PairRequestReply(int32_t transport, const std::string &address, bool accept) = 0;
     virtual bool ReadRemoteRssiValue(const std::string &address) = 0;

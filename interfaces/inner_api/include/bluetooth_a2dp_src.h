@@ -128,6 +128,16 @@ public:
     int GetPlayingState(const BluetoothRemoteDevice &device) const;
 
     /**
+     * @brief Get device playing state by address when peer device is on connected.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param state The playing state of the peer bluetooth device.
+     * @return Returns operation result;
+     * @since 6.0
+     */
+    int GetPlayingState(const BluetoothRemoteDevice &device, int &state) const;
+
+    /**
      * @brief Connect to the peer bluetooth device.
      *
      * @param device The address of the peer bluetooth device.
@@ -136,7 +146,7 @@ public:
                                     or device is not allowed to connect,or the connection fails.
      * @since 6.0
      */
-    bool Connect(const BluetoothRemoteDevice &device);
+    int32_t Connect(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Disconnect with the peer bluetooth service.
@@ -146,7 +156,7 @@ public:
      *         Returns <b>false</b> if target device is on disconnected,or disconnecting,or disconnection fails.
      * @since 6.0
      */
-    bool Disconnect(const BluetoothRemoteDevice &device);
+    int32_t Disconnect(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Set target device as active device.

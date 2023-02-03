@@ -41,7 +41,7 @@ void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env)
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_A2DP_SINK, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_A2DP_SINK, napiProfile);
     HILOGI("finished");
 }
 
@@ -55,7 +55,7 @@ napi_value NapiA2dpSink::A2dpSinkConstructor(napi_env env, napi_callback_info in
 napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(g_a2dpSinkCallbackInfosMutex);
+    std::unique_lock<std::shared_mutex> guard(NapiA2dpSinkObserver::g_a2dpSinkCallbackInfosMutex);
 
     napi_value ret = nullptr;
     ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
@@ -71,7 +71,7 @@ napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(g_a2dpSinkCallbackInfosMutex);
+    std::unique_lock<std::shared_mutex> guard(NapiA2dpSinkObserver::g_a2dpSinkCallbackInfosMutex);
 
     napi_value ret = nullptr;
     ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);

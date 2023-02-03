@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
+const int32_t A2DP_MAX_SNK_CONNECTION_NUMS = 0x07;
 BluetoothA2dpSinkStub::BluetoothA2dpSinkStub()
 {
     HILOGD("%{public}s start.", __func__);
@@ -56,10 +57,8 @@ BluetoothA2dpSinkStub::~BluetoothA2dpSinkStub()
 int BluetoothA2dpSinkStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothA2dpSinkStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothA2dpSinkStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGI("BluetoothA2dpSinkStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothA2dpSinkStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -126,6 +125,9 @@ ErrCode BluetoothA2dpSinkStub::GetDevicesByStatesInner(MessageParcel &data, Mess
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
+    if (stateSize > A2DP_MAX_SNK_CONNECTION_NUMS) {
+        return ERR_INVALID_STATE;
+    }
 
     for (int i = 0; i < stateSize; i++) {
         int32_t state = data.ReadInt32();
@@ -162,15 +164,11 @@ ErrCode BluetoothA2dpSinkStub::GetDeviceStateInner(MessageParcel &data, MessageP
 ErrCode BluetoothA2dpSinkStub::GetPlayingStateInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
+    int32_t state = 0;
+    int result = GetPlayingState(RawAddress(addr), state);
 
-    int result = GetPlayingState(RawAddress(addr));
-
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGE("BluetoothA2dpSinkStub: GetPlayingStateInner reply writing failed in: %{public}s.", __func__);
-        return TRANSACTION_ERR;
-    }
-
+    (void)reply.WriteInt32(result);
+    (void)reply.WriteInt32(state);
     return NO_ERROR;
 }
 

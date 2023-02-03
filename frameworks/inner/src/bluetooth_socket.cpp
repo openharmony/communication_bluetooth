@@ -326,7 +326,7 @@ int SppClientSocket::Connect()
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", pimpl->fd_, "ADDRESS", tempAddress,
         "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
-    return BtStatus::BT_SUCCESS;
+    return BtStatus::BT_SUCC;
 }
 
 void SppClientSocket::Close()
@@ -400,8 +400,8 @@ struct SppServerSocket::impl {
         }
 
         fd_ = proxy_->Listen(name_, serverUuid, (int32_t)getSecurityFlags(), (int32_t)type_);
-        if (fd_ == -1) {
-            HILOGE("failed, fd_ is -1");
+        if (fd_ == BT_INVALID_SOCKET_FD) {
+            HILOGE("listen socket failed, fd_ is -1");
             socketStatus_ = SOCKET_CLOSED;
             return BtStatus::BT_FAILURE;
         }
@@ -415,7 +415,7 @@ struct SppServerSocket::impl {
             return BtStatus::BT_FAILURE;
         }
 
-        return BtStatus::BT_SUCCESS;
+        return BtStatus::BT_SUCC;
     }
 
     int getSecurityFlags()

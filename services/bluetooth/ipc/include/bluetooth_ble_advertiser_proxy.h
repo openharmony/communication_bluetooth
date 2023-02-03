@@ -30,9 +30,9 @@ public:
 
     void RegisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback) override;
     void DeregisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback) override;
-    void StartAdvertising(const BluetoothBleAdvertiserSettings &settings, const BluetoothBleAdvertiserData &advData,
+    int StartAdvertising(const BluetoothBleAdvertiserSettings &settings, const BluetoothBleAdvertiserData &advData,
         const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle, bool isRawData) override;
-    void StopAdvertising(int32_t advHandle) override;
+    int StopAdvertising(int32_t advHandle) override;
     void Close(int32_t advHandle) override;
     int32_t GetAdvertiserHandle() override;
 

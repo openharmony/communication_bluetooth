@@ -19,6 +19,10 @@
 #include <stdbool.h>
 #include "ohos_bt_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BT_SPP_READ_SOCKET_CLOSED (0)
 #define BT_SPP_READ_FAILED (-1)
 #define BT_SPP_WRITE_FAILED (-1)
@@ -120,10 +124,6 @@ int SppRead(int clientId, char *buf, const unsigned int bufLen);
  * Returns {@link BT_SPP_WRITE_FAILED} if the operation failed.
  */
 int SppWrite(int clientId, const char *data, const unsigned int len);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef __cplusplus
 }

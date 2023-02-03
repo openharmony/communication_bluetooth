@@ -26,6 +26,7 @@
 #include "bluetooth_remote_device_observer_stub.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -451,7 +452,7 @@ bool BluetoothHost::EnableBt()
     return pimpl->proxy_->EnableBt();
 }
 
-bool BluetoothHost::DisableBt()
+int BluetoothHost::DisableBt()
 {
     HILOGI("enter");
     if (!pimpl) {
@@ -476,9 +477,26 @@ int BluetoothHost::GetBtState() const
         HILOGE("failed: no proxy");
         return INVALID_VALUE;
     }
-    int state = pimpl->proxy_->GetBtState();
+    int state = BTStateID::STATE_TURN_OFF;
+    pimpl->proxy_->GetBtState(state);
     HILOGI("state: %{public}d", state);
     return state;
+}
+
+int BluetoothHost::GetBtState(int &state) const
+{
+    HILOGI("enter");
+    if (!pimpl) {
+        HILOGE("failed: no pimpl");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (pimpl->proxy_ == nullptr) {
+        HILOGE("failed: no proxy");
+        return BT_ERR_SERVICE_DISCONNECTED;
+    }
+    int ret = pimpl->proxy_->GetBtState(state);
+    HILOGI("state: %{public}d", state);
+    return ret;
 }
 
 bool BluetoothHost::BluetoothFactoryReset()
@@ -526,23 +544,36 @@ BluetoothRemoteDevice BluetoothHost::GetRemoteDevice(const std::string &addr, in
     return remoteDevice;
 }
 
-bool BluetoothHost::EnableBle()
+int BluetoothHost::EnableBle()
 {
     HILOGI("enter");
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->proxy_->EnableBle();
 }
 
-bool BluetoothHost::DisableBle()
+int BluetoothHost::DisableBle()
 {
     HILOGI("enter");
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (pimpl->proxy_ == nullptr) {
+        HILOGE("fails: no proxy");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return pimpl->proxy_->DisableBle();
+}
+
+bool BluetoothHost::IsBrEnabled() const
+{
     if (!pimpl) {
         HILOGE("fails: no pimpl");
         return false;
@@ -551,7 +582,7 @@ bool BluetoothHost::DisableBle()
         HILOGE("fails: no proxy");
         return false;
     }
-    return pimpl->proxy_->DisableBle();
+    return pimpl->proxy_->IsBrEnabled();
 }
 
 bool BluetoothHost::IsBleEnabled() const
@@ -623,21 +654,40 @@ int BluetoothHost::GetBtConnectionState() const
         HILOGE("fails: no proxy");
         return INVALID_VALUE;
     }
-    return pimpl->proxy_->GetBtConnectionState();
+    int state = static_cast<int>(BTConnectState::DISCONNECTED);
+    pimpl->proxy_->GetBtConnectionState(state);
+    HILOGI("state: %{public}d", state);
+    return state;
 }
 
-int BluetoothHost::GetBtProfileConnState(uint32_t profileId) const
+int BluetoothHost::GetBtConnectionState(int &state) const
+{
+    HILOGI("enter");
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (pimpl->proxy_ == nullptr) {
+        HILOGE("fails: no proxy");
+        return BT_ERR_SERVICE_DISCONNECTED;
+    }
+    int ret = pimpl->proxy_->GetBtConnectionState(state);
+    HILOGI("state: %{public}d", state);
+    return ret;
+}
+
+int BluetoothHost::GetBtProfileConnState(uint32_t profileId, int &state) const
 {
     HILOGI("enter, profileId: %{public}d", profileId);
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return INVALID_VALUE;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return INVALID_VALUE;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    return pimpl->proxy_->GetBtProfileConnState(profileId);
+    return pimpl->proxy_->GetBtProfileConnState(profileId, state);
 }
 
 void BluetoothHost::GetLocalSupportedUuids(std::vector<ParcelUuid> &uuids)
@@ -710,47 +760,63 @@ std::string BluetoothHost::GetLocalName() const
         HILOGE("fails: no proxy");
         return std::string();
     }
-    return pimpl->proxy_->GetLocalName();
+    std::string name = INVALID_NAME;
+    pimpl->proxy_->GetLocalName(name);
+    return name;
 }
 
-bool BluetoothHost::SetLocalName(const std::string &name)
+int BluetoothHost::GetLocalName(std::string &name) const
 {
     HILOGI("enter");
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return pimpl->proxy_->GetLocalName(name);
+}
+
+int BluetoothHost::SetLocalName(const std::string &name)
+{
+    HILOGI("enter");
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (pimpl->proxy_ == nullptr) {
+        HILOGE("fails: no proxy");
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->proxy_->SetLocalName(name);
 }
 
-int BluetoothHost::GetBtScanMode() const
+int BluetoothHost::GetBtScanMode(int32_t &scanMode) const
 {
     HILOGI("enter");
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return INVALID_VALUE;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return INVALID_VALUE;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    return pimpl->proxy_->GetBtScanMode();
+    return pimpl->proxy_->GetBtScanMode(scanMode);
 }
 
-bool BluetoothHost::SetBtScanMode(int mode, int duration)
+int BluetoothHost::SetBtScanMode(int mode, int duration)
 {
     HILOGI("enter, mode: %{public}d, duration: %{public}d", mode, duration);
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->proxy_->SetBtScanMode(mode, duration);
 }
@@ -783,30 +849,30 @@ bool BluetoothHost::SetBondableMode(int transport, int mode)
     return pimpl->proxy_->SetBondableMode(transport, mode);
 }
 
-bool BluetoothHost::StartBtDiscovery()
+int BluetoothHost::StartBtDiscovery()
 {
     HILOGI("enter");
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->proxy_->StartBtDiscovery();
 }
 
-bool BluetoothHost::CancelBtDiscovery()
+int BluetoothHost::CancelBtDiscovery()
 {
     HILOGI("enter");
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->proxy_->CancelBtDiscovery();
 }
@@ -839,41 +905,41 @@ long BluetoothHost::GetBtDiscoveryEndMillis() const
     return pimpl->proxy_->GetBtDiscoveryEndMillis();
 }
 
-std::vector<BluetoothRemoteDevice> BluetoothHost::GetPairedDevices(int transport) const
+int32_t BluetoothHost::GetPairedDevices(int transport, std::vector<BluetoothRemoteDevice> &pairedDevices) const
 {
     HILOGI("enter, transport: %{public}d", transport);
-    std::vector<BluetoothRemoteDevice> pairedDevices;
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return pairedDevices;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return pairedDevices;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    std::vector<BluetoothRawAddress> pairedAddr = pimpl->proxy_->GetPairedDevices(transport);
+    std::vector<BluetoothRawAddress> pairedAddr;
+    int32_t ret = pimpl->proxy_->GetPairedDevices(transport, pairedAddr);
 
     for (auto it = pairedAddr.begin(); it != pairedAddr.end(); it++) {
         BluetoothRemoteDevice device((*it).GetAddress(), transport);
         pairedDevices.emplace_back(device);
     }
-    return pairedDevices;
+    return ret;
 }
 
-bool BluetoothHost::RemovePair(const BluetoothRemoteDevice &device)
+int32_t BluetoothHost::RemovePair(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("Invalid remote device.");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (!pimpl) {
         HILOGE("fails: no pimpl");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (pimpl->proxy_ == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     sptr<BluetoothRawAddress> rawAddrSptr = new BluetoothRawAddress(device.GetDeviceAddr());
     return pimpl->proxy_->RemovePair(device.GetTransportType(), rawAddrSptr);
@@ -893,14 +959,13 @@ bool BluetoothHost::RemoveAllPairs()
     return pimpl->proxy_->RemoveAllPairs();
 }
 
-void BluetoothHost::RegisterRemoteDeviceObserver(BluetoothRemoteDeviceObserver &observer)
+void BluetoothHost::RegisterRemoteDeviceObserver(std::shared_ptr<BluetoothRemoteDeviceObserver> observer)
 {
     if (!pimpl) {
         HILOGE("fails: no pimpl");
         return;
     }
-    std::shared_ptr<BluetoothRemoteDeviceObserver> pointer(&observer, [](BluetoothRemoteDeviceObserver *) {});
-    pimpl->remoteObservers_.Register(pointer);
+    pimpl->remoteObservers_.Register(observer);
 }
 
 void BluetoothHost::DeregisterRemoteDeviceObserver(BluetoothRemoteDeviceObserver &observer)

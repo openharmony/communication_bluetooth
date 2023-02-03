@@ -16,6 +16,7 @@
 #include "hfp_ag_service.h"
 
 #include "adapter_config.h"
+#include "bluetooth_errorcode.h"
 #include "class_creator.h"
 #include "hfp_ag_defines.h"
 #include "hfp_ag_system_interface.h"
@@ -155,14 +156,14 @@ int HfpAgService::Connect(const RawAddress &device)
         int state = it->second->GetStateInt();
         if ((state >= HFP_AG_STATE_CONNECTED) || (state == HFP_AG_STATE_CONNECTING)) {
             LOG_INFO("[HFP AG]%{public}s():state:%{public}d", __FUNCTION__, state);
-            return HFP_AG_FAILURE;
+            return Bluetooth::BT_ERR_INTERNAL_ERROR;
         }
     }
 
     int size = GetConnectedDeviceNum();
     if (size >= maxConnectedNum_) {
         LOG_INFO("[HFP AG]%{public}s():Max connection has reached!", __FUNCTION__);
-        return HFP_AG_FAILURE;
+        return Bluetooth::BT_ERR_INTERNAL_ERROR;
     }
 
     HfpAgMessage event(HFP_AG_CONNECT_EVT);
@@ -178,12 +179,12 @@ int HfpAgService::Disconnect(const RawAddress &device)
     std::string address = device.GetAddress();
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        return HFP_AG_FAILURE;
+        return Bluetooth::BT_ERR_INTERNAL_ERROR;
     }
 
     int slcState = it->second->GetStateInt();
     if ((slcState != HFP_AG_STATE_CONNECTING) && (slcState < HFP_AG_STATE_CONNECTED)) {
-        return HFP_AG_FAILURE;
+        return Bluetooth::BT_ERR_INTERNAL_ERROR;
     }
 
     HfpAgMessage event(HFP_AG_DISCONNECT_EVT);

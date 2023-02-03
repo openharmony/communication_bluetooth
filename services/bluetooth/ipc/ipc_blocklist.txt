@@ -27,3 +27,4 @@ type:*OHOS::Bluetooth::IBluetoothGattClientCallback*
 type:*OHOS::Bluetooth::IBluetoothA2dpSourceObserver*
 src:*bluetooth_opp_observer_stub.cpp
 src:*bluetooth_pan_observer_stub.cpp
+src:*bluetooth_hid_host_observer_stub.cpp
