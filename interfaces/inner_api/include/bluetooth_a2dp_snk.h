@@ -103,6 +103,17 @@ public:
     int GetPlayingState(const BluetoothRemoteDevice &device) const;
 
     /**
+     * @brief Get device playing state by address when peer device is on connected.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param state The playing state of the peer bluetooth device.
+     * @return Returns <b>1</b> if device is on playing;
+     *         Returns <b>0</b> if device is not on playing.
+     * @since 6.0
+     */
+    int GetPlayingState(const BluetoothRemoteDevice &device, int &state) const;
+
+    /**
      * @brief Connect to the peer bluetooth device.
      *
      * @param device The address of the peer bluetooth device.

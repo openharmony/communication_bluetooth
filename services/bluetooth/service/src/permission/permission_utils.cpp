@@ -14,8 +14,10 @@
  */
 
 #include "permission_utils.h"
-#include "ipc_skeleton.h"
 #include "auth_center.h"
+#include "ipc_skeleton.h"
+#include "log.h"
+#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -45,6 +47,12 @@ int PermissionUtils::VerifyLocationPermission()
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 
+int PermissionUtils::VerifyApproximatelyPermission()
+{
+    return AuthCenter::GetInstance().VerifyApproximatelyPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
 int PermissionUtils::VerifyUseBluetoothPermission(const std::uint32_t  &tokenID)
 {
     return AuthCenter::GetInstance().VerifyUseBluetoothPermission(tokenID);
@@ -53,6 +61,22 @@ int PermissionUtils::VerifyUseBluetoothPermission(const std::uint32_t  &tokenID)
 int PermissionUtils::VerifyDiscoverBluetoothPermission(const std::uint32_t  &tokenID)
 {
     return AuthCenter::GetInstance().VerifyDiscoverBluetoothPermission(tokenID);
+}
+
+bool PermissionUtils::CheckSystemHapApp()
+{
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    ATokenTypeEnum callingType = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
+    bool isSystemApp = TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
+    HILOGI("tokenId:0x%{public}x, callingType:0x%{public}x, fullTokenId:0x%{public}llx, isSystemApp:%{public}d",
+        tokenId, callingType, static_cast<unsigned long long>(fullTokenId), isSystemApp);
+    // Only the system app can invoke the system interface.
+    if (callingType == TOKEN_HAP && !isSystemApp) {
+        HILOGE("The caller is not a system app.");
+        return false;
+    }
+    return true;
 }
 }  // namespace bluetooth
 }  // namespace OHOS

@@ -24,11 +24,14 @@ namespace Bluetooth {
 class BluetoothBleScanResult : public Parcelable, public bluetooth::ScanResult {
 public:
     explicit BluetoothBleScanResult() = default;
-    BluetoothBleScanResult(const bluetooth::ScanResult &other) : bluetooth::ScanResult(other)
+    explicit BluetoothBleScanResult(const bluetooth::ScanResult &other) : bluetooth::ScanResult(other)
     {}
-    BluetoothBleScanResult(const BluetoothBleScanResult &other) : bluetooth::ScanResult(other)
+    explicit BluetoothBleScanResult(const BluetoothBleScanResult &other) : bluetooth::ScanResult(other)
     {}
-    ~BluetoothBleScanResult() = default;
+    explicit BluetoothBleScanResult(const bluetooth::BleScanResultImpl &other) : bluetooth::ScanResult(other)
+    {}
+
+    ~BluetoothBleScanResult() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
     static BluetoothBleScanResult *Unmarshalling(Parcel &parcel);

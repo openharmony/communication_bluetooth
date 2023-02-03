@@ -16,8 +16,18 @@
 #ifndef BLUETOOTH_UTILS_H
 #define BLUETOOTH_UTILS_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
+
+#include "bluetooth_errorcode.h"
+#include "bluetooth_log.h"
+
+#define CHECK_PROXY_RETURN(proxy) do { \
+    if ((proxy) == nullptr) { \
+        HILOGE("proxy_ is nullptr"); \
+        return BT_ERR_INTERNAL_ERROR; \
+    } \
+} while (0)
 
 namespace OHOS {
 namespace Bluetooth {
@@ -29,6 +39,7 @@ std::string GetEncryptAddr(std::string addr);
 std::string GetBtStateName(int state);
 std::string GetBtTransportName(int transport);
 std::string GetProfileConnStateName(int state);
+std::string GetErrorCode(int32_t errCode);
 }  // namespace Bluetooth
 }  // namespace OHOS
 

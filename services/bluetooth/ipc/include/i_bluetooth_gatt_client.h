@@ -49,6 +49,8 @@ public:
 
     virtual int RegisterApplication(
         const sptr<IBluetoothGattClientCallback> &callback, const BluetoothRawAddress &addr, int32_t transport) = 0;
+    virtual int RegisterApplication(const sptr<IBluetoothGattClientCallback> &callback,
+        const BluetoothRawAddress &addr, int32_t transport, int &appId) = 0;
     virtual int DeregisterApplication(int32_t appId) = 0;
     virtual int Connect(int32_t appId, bool autoConnect) = 0;
     virtual int Disconnect(int32_t appId) = 0;

@@ -19,6 +19,7 @@
 
 #include "bluetooth_gatt_client_server.h"
 #include "bluetooth_hitrace.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "hisysevent.h"
 #include "interface_adapter_ble.h"
@@ -232,7 +233,7 @@ void BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecip
 {
     HILOGI("enter");
     if (owner_.pimpl == nullptr || owner_.pimpl->clientService_ == nullptr) {
-        HILOGE("gattClientServer clientService_ is not support.");
+        HILOGE("gattClientServerImpl clientService_ is not support.");
         return;
     }
     std::lock_guard<std::mutex> lck(owner_.pimpl->registerMutex_);
@@ -247,7 +248,6 @@ void BluetoothGattClientServer::impl::GattClientCallbackImpl::CallbackDeathRecip
             owner_.pimpl->clientService_->Disconnect((*it)->GetAppId());
             owner_.pimpl->clientService_->DeregisterApplication((*it)->GetAppId());
             owner_.pimpl->callbacks_.erase(it);
-            *it = nullptr;
             return;
         }
     }
@@ -275,25 +275,36 @@ BluetoothGattClientServer::~BluetoothGattClientServer()
 int BluetoothGattClientServer::RegisterApplication(
     const sptr<IBluetoothGattClientCallback> &callback, const BluetoothRawAddress &addr, int32_t transport)
 {
+    int appId = 0;
+    int ret = RegisterApplication(callback, addr, transport, appId);
+    return (ret == BT_SUCCESS) ? appId : ret;
+}
+
+int BluetoothGattClientServer::RegisterApplication(
+    const sptr<IBluetoothGattClientCallback> &callback, const BluetoothRawAddress &addr, int32_t transport, int &appId)
+{
     HILOGI("address: %{public}s, transport: %{public}d", GetEncryptAddr(addr.GetAddress()).c_str(), transport);
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     pimpl->clientService_ = pimpl->GetServicePtr();
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     auto it = pimpl->callbacks_.emplace(
         pimpl->callbacks_.begin(), std::make_unique<impl::GattClientCallbackImpl>(callback, *this));
-    int appId = pimpl->clientService_->RegisterSharedApplication(*it->get(), (RawAddress)addr, transport);
-    (*it)->SetAppId(appId);
-    HILOGI("appId: %{public}d", appId);
+    appId = pimpl->clientService_->RegisterSharedApplication(*it->get(), (RawAddress)addr, transport);
     if (appId >= 0) {
-        HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "GATT_APP_REGISTER",
+        HILOGI("appId: %{public}d", appId);
+        (*it)->SetAppId(appId);
+        OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
             OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register",
-            "SIDE", "client", "ADDRESS", addr.GetAddress(), "PID", OHOS::IPCSkeleton::GetCallingPid(),
+            "SIDE", "client", "ADDRESS", GetEncryptAddr(addr.GetAddress()), "PID", OHOS::IPCSkeleton::GetCallingPid(),
             "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
+    } else {
+        HILOGE("RegisterSharedApplication failed, appId: %{public}d", appId);
+        pimpl->callbacks_.erase(it);
     }
-    return appId;
+    return BT_SUCCESS;
 }
 
 int BluetoothGattClientServer::DeregisterApplication(int32_t appId)
@@ -312,7 +323,17 @@ int BluetoothGattClientServer::DeregisterApplication(int32_t appId)
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "deregister",
         "SIDE", "client", "ADDRESS", "empty", "PID", OHOS::IPCSkeleton::GetCallingPid(),
         "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
-    return pimpl->clientService_->DeregisterApplication(appId);
+
+    auto it = std::find_if(pimpl->callbacks_.begin(), pimpl->callbacks_.end(),
+        [appId](const std::unique_ptr<impl::GattClientCallbackImpl> &p) { return p->GetAppId() == appId; });
+    if (it == pimpl->callbacks_.end()) {
+        HILOGE("Unknown appId: %{public}d", appId);
+        return INVALID_PARAMETER;
+    }
+
+    int ret = pimpl->clientService_->DeregisterApplication(appId);
+    pimpl->callbacks_.erase(it);
+    return ret;
 }
 
 int BluetoothGattClientServer::Connect(int32_t appId, bool autoConnect)
@@ -320,12 +341,12 @@ int BluetoothGattClientServer::Connect(int32_t appId, bool autoConnect)
     HILOGI("appId: %{public}d, autoConnect: %{public}d", appId, autoConnect);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return REQUEST_NOT_SUPPORT;
+        return BT_ERR_PERMISSION_FAILED;
     }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     OHOS::Bluetooth::BluetoothHiTrace::BluetoothStartAsyncTrace("GATT_CLIENT_CONNECT", 1);
     int result = pimpl->clientService_->Connect(appId, autoConnect);
@@ -338,12 +359,12 @@ int BluetoothGattClientServer::Disconnect(int32_t appId)
     HILOGI("appId: %{public}d", appId);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return REQUEST_NOT_SUPPORT;
+        return BT_ERR_PERMISSION_FAILED;
     }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->clientService_->Disconnect(appId);
 }
@@ -354,7 +375,7 @@ int BluetoothGattClientServer::DiscoveryServices(int32_t appId)
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->clientService_->DiscoveryServices(appId);
 }
@@ -364,12 +385,12 @@ int BluetoothGattClientServer::ReadCharacteristic(int32_t appId, const Bluetooth
     HILOGI("appId: %{public}d", appId);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return REQUEST_NOT_SUPPORT;
+        return BT_ERR_PERMISSION_FAILED;
     }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->clientService_->ReadCharacteristic(appId, (Characteristic)characteristic);
 }
@@ -380,7 +401,7 @@ int BluetoothGattClientServer::WriteCharacteristic(
     HILOGI("appId: %{public}d, withoutRespond: %{public}d", appId, withoutRespond);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return REQUEST_NOT_SUPPORT;
+        return BT_ERR_PERMISSION_FAILED;
     }
     Characteristic character(characteristic->handle_);
     character.length_ = characteristic->length_;
@@ -389,7 +410,7 @@ int BluetoothGattClientServer::WriteCharacteristic(
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->clientService_->WriteCharacteristic(appId, character, withoutRespond);
 }
@@ -413,12 +434,12 @@ int BluetoothGattClientServer::ReadDescriptor(int32_t appId, const BluetoothGatt
     HILOGI("appId: %{public}d", appId);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return REQUEST_NOT_SUPPORT;
+        return BT_ERR_PERMISSION_FAILED;
     }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->clientService_->ReadDescriptor(appId, (Descriptor)descriptor);
 }
@@ -428,7 +449,7 @@ int BluetoothGattClientServer::WriteDescriptor(int32_t appId, BluetoothGattDescr
     HILOGI("appId: %{public}d", appId);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return REQUEST_NOT_SUPPORT;
+        return BT_ERR_PERMISSION_FAILED;
     }
     Descriptor desc(descriptor->handle_);
     desc.length_ = descriptor->length_;
@@ -437,7 +458,7 @@ int BluetoothGattClientServer::WriteDescriptor(int32_t appId, BluetoothGattDescr
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->clientService_->WriteDescriptor(appId, desc);
 }
@@ -447,12 +468,12 @@ int BluetoothGattClientServer::RequestExchangeMtu(int32_t appId, int32_t mtu)
     HILOGI("appId: %{public}d, mtu: %{public}d", appId, mtu);
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return REQUEST_NOT_SUPPORT;
+        return BT_ERR_PERMISSION_FAILED;
     }
     std::lock_guard<std::mutex> lck(pimpl->registerMutex_);
     if (pimpl->clientService_ == nullptr) {
         HILOGE("request not support.");
-        return bluetooth::GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return pimpl->clientService_->RequestExchangeMtu(appId, mtu);
 }

@@ -36,9 +36,9 @@ public:
     virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
     virtual void DeregisterBleCentralManagerCallback(
         const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
-    virtual void StartScan() override;
-    virtual void StartScan(const BluetoothBleScanSettings &settings) override;
-    virtual void StopScan() override;
+    virtual int StartScan() override;
+    virtual int StartScan(const BluetoothBleScanSettings &settings) override;
+    virtual int StopScan() override;
     virtual int ConfigScanFilter(const int clientId, const std::vector<BluetoothBleScanFilter> &filters) override;
     virtual void RemoveScanFilter(const int clientId) override;
     virtual bool ProxyUid(int32_t uid, bool isProxy) override;

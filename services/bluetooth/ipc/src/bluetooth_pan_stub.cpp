@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "bluetooth_errorcode.h"
 #include "bluetooth_pan_stub.h"
 #include "bluetooth_log.h"
 
@@ -19,7 +20,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothPanStub::BluetoothPanStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(COMMAND_DISCONNECT)] =
         &BluetoothPanStub::DisconnectInner;
     memberFuncMap_[static_cast<uint32_t>(COMMAND_GET_DEVICE_STATE)] =
@@ -34,22 +35,20 @@ BluetoothPanStub::BluetoothPanStub()
         &BluetoothPanStub::SetTetheringInner;
     memberFuncMap_[static_cast<uint32_t>(COMMAND_IS_TETHERING_ON)] =
         &BluetoothPanStub::IsTetheringOnInner;
-    HILOGD("%{public}s ends.", __func__);
+    HILOGD("ends.");
 }
 
 BluetoothPanStub::~BluetoothPanStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 
 int BluetoothPanStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothPanStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothPanStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGI("BluetoothPanStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothPanStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGE("local descriptor is not equal to remote");
         return IPC_INVOKER_TRANSLATE_ERR;
     }
@@ -64,53 +63,71 @@ int BluetoothPanStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothPanStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothPanStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    bool result;
-    HILOGD("BluetoothPanStub::DisconnectInner");
-    ErrCode ec = Disconnect(*device, result);
-    reply.WriteInt32(ec);
-    if (SUCCEEDED(ec)) {
-        reply.WriteInt32(NO_ERROR);
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    int32_t errCode = Disconnect(*device);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return ERR_NONE;
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothPanStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothPanStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    int result;
-    HILOGD("BluetoothPanStub::GetDeviceStateInner");
-    ErrCode ec = GetDeviceState(*device, result);
-    reply.WriteInt32(ec);
-    if (SUCCEEDED(ec)) {
-        reply.WriteInt32(result);
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    int32_t state;
+    int32_t errCode = GetDeviceState(*device, state);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return ERR_NONE;
+    if (errCode != BT_SUCCESS) {
+        HILOGE("internal error.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    // write state
+    if (!reply.WriteInt32(state)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothPanStub::GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothPanStub::GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply)
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
-    HILOGD("BluetoothPanStub::GetDevicesByStatesInner");
     for (int i = 0; i < stateSize; i++) {
         int32_t state = data.ReadInt32();
         states.push_back(state);
     }
     std::vector<BluetoothRawAddress> rawAdds;
-    ErrCode ec = GetDevicesByStates(states, rawAdds);
-    if (ec != ERR_OK) {
-        return ec;
+    int32_t errCode = GetDevicesByStates(states, rawAdds);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    reply.WriteInt32(rawAdds.size());
+    if (errCode != BT_SUCCESS) {
+        HILOGE("internal error.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    // write size
+    if (!reply.WriteInt32(rawAdds.size())) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    // write devices
     for (auto rawAdd : rawAdds) {
         if (!reply.WriteParcelable(&rawAdd)) {
-            return ERR_INVALID_STATE;
+            return BT_ERR_IPC_TRANS_FAILED;
         }
     }
-    return ERR_NONE;
+    return BT_SUCCESS;
 }
 
 ErrCode BluetoothPanStub::RegisterObserverInner(MessageParcel &data, MessageParcel &reply)
@@ -131,29 +148,38 @@ ErrCode BluetoothPanStub::DeregisterObserverInner(MessageParcel &data, MessagePa
     return NO_ERROR;
 }
 
-ErrCode BluetoothPanStub::SetTetheringInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothPanStub::SetTetheringInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGD("BluetoothPanStub::SetTetheringInner");
     const bool value = data.ReadBool();
-    bool result;
-    ErrCode ec = SetTethering(value, result);
-    reply.WriteInt32(ec);
-    if (SUCCEEDED(ec)) {
-        reply.WriteInt32(result);
+    int32_t errCode = SetTethering(value);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return ERR_NONE;
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothPanStub::IsTetheringOnInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothPanStub::IsTetheringOnInner(MessageParcel &data, MessageParcel &reply)
 {
-    bool result;
-    HILOGD("BluetoothPanStub::IsTetheringOnInner");
-    ErrCode ec = IsTetheringOn(result);
-    reply.WriteInt32(ec);
-    if (SUCCEEDED(ec)) {
-        reply.WriteInt32(result);
+    bool result = false;
+    int32_t errCode = IsTetheringOn(result);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return ERR_NONE;
+    if (errCode != BT_SUCCESS) {
+        HILOGE("internal error.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    // write result
+    if (!reply.WriteInt32(result)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    return BT_SUCCESS;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

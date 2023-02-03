@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include "bluetooth_a2dp_src.h"
 #include "bluetooth_host.h"
+#include "bluetooth_errorcode.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -183,8 +184,8 @@ HWTEST_F(A2dpSourceTest, A2dpSource_UnitTest_Connect, TestSize.Level1)
  
     profile_ = A2dpSource::GetProfile();
     BluetoothRemoteDevice device;
-    bool isOK = profile_->Connect(device);
-    EXPECT_EQ(isOK, true);
+    int32_t ret = profile_->Connect(device);
+    EXPECT_NE(ret, RET_NO_ERROR);
     GTEST_LOG_(INFO) << "A2dpSource_UnitTest_Connect end";
 }
 
@@ -199,8 +200,8 @@ HWTEST_F(A2dpSourceTest, A2dpSource_UnitTest_Disconnect, TestSize.Level1)
  
     profile_ = A2dpSource::GetProfile();
     BluetoothRemoteDevice device;
-    bool isOK = profile_->Disconnect(device);
-    EXPECT_EQ(isOK, true);
+    int32_t ret = profile_->Disconnect(device);
+    EXPECT_NE(ret, RET_NO_ERROR);
     GTEST_LOG_(INFO) << "A2dpSource_UnitTest_Disconnect end";
 }
 
@@ -215,7 +216,7 @@ HWTEST_F(A2dpSourceTest, A2dpSource_UnitTest_SetActiveSinkDevice, TestSize.Level
  
     profile_ = A2dpSource::GetProfile();
     BluetoothRemoteDevice device;
-    EXPECT_EQ(profile_->SetActiveSinkDevice(device), 0);
+    EXPECT_EQ(profile_->SetActiveSinkDevice(device), -3);
 
     GTEST_LOG_(INFO) << "A2dpSource_UnitTest_SetActiveSinkDevice end";
 }

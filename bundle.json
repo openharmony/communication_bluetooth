@@ -77,7 +77,7 @@
         "base_group": [],
         "fwk_group": [
           "//foundation/communication/bluetooth/frameworks/inner:btframework",
-          "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth"
+          "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi"
         ],
         "service_group": [
           "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_sa_profile",

@@ -35,19 +35,16 @@ public:
     explicit BluetoothHidHostServer();
     ~BluetoothHidHostServer() override;
 
-    ErrCode Connect(
-        const BluetoothRawAddress &device,
-        bool& result) override;
+    int32_t Connect(
+        const BluetoothRawAddress &device) override;
 
-    ErrCode Disconnect(
-        const BluetoothRawAddress &device,
-        bool& result) override;
+    int32_t Disconnect(
+        const BluetoothRawAddress &device) override;
 
-    ErrCode GetDeviceState(
-        const BluetoothRawAddress &device,
-        int& result) override;
+    int32_t GetDeviceState(
+        const BluetoothRawAddress &device, int32_t &state) override;
 
-    ErrCode GetDevicesByStates(
+    int32_t GetDevicesByStates(
         const std::vector<int32_t> &states,
         std::vector<BluetoothRawAddress>& result) override;
 

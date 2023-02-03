@@ -13,9 +13,13 @@
  * limitations under the License.
  */
 #include "bluetooth_a2dp_src.h"
+#include "bluetooth_errorcode.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_a2dp_src.h"
 #include "napi_bluetooth_event.h"
+#include "napi_bluetooth_error.h"
+#include "napi_bluetooth_host.h"
+#include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -42,7 +46,7 @@ void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env)
 
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_A2DP_SOURCE, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_A2DP_SOURCE, napiProfile);
     HILOGI("finished");
 }
 
@@ -56,7 +60,7 @@ napi_value NapiA2dpSource::A2dpSourceConstructor(napi_env env, napi_callback_inf
 napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(g_a2dpSrcCallbackInfosMutex);
+    std::unique_lock<std::shared_mutex> guard(NapiA2dpSourceObserver::g_a2dpSrcCallbackInfosMutex);
 
     napi_value ret = nullptr;
     ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
@@ -72,7 +76,7 @@ napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info)
 napi_value NapiA2dpSource::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(g_a2dpSrcCallbackInfosMutex);
+    std::unique_lock<std::shared_mutex> guard(NapiA2dpSourceObserver::g_a2dpSrcCallbackInfosMutex);
 
     napi_value ret = nullptr;
     ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
@@ -132,103 +136,55 @@ napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info)
 
 napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
+    HILOGI("start");
+    int state = PlayingState::STATE_NOT_PLAYING;
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
+    napi_create_int32(env, state, &ret);
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, ret);
 
+    int transport = GetDeviceTransport(remoteAddr);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
     A2dpSource *profile = A2dpSource::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    int res = profile->GetPlayingState(device);
-    if (res != PlayingState::STATE_PLAYING) {
-        res = PlayingState::STATE_NOT_PLAYING;
-    }
-    napi_value result = nullptr;
-    napi_create_int32(env, res, &result);
+    int32_t res = profile->GetPlayingState(remoteDevice, state);
     HILOGI("res: %{public}d", res);
-    return result;
+    NAPI_BT_ASSERT_RETURN(env, (res == BT_SUCCESS), res, ret);
+
+    return NapiGetInt32Ret(env, state);
 }
 
 napi_value NapiA2dpSource::Connect(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGI("start");
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-
+    int transport = GetDeviceTransport(remoteAddr);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
     A2dpSource *profile = A2dpSource::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    bool res = profile->Connect(device);
+    int32_t ret = profile->Connect(remoteDevice);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
 
-    napi_value result = nullptr;
-    napi_get_boolean(env, res, &result);
-    HILOGI("res: %{public}d", res);
-    return result;
+    return NapiGetBooleanTrue(env);
 }
 
 napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGI("start");
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-
+    int transport = GetDeviceTransport(remoteAddr);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
     A2dpSource *profile = A2dpSource::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    bool res = profile->Disconnect(device);
+    int32_t ret = profile->Disconnect(remoteDevice);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
 
-    napi_value result = nullptr;
-    napi_get_boolean(env, res, &result);
-    HILOGI("res: %{public}d", res);
-    return result;
+    return NapiGetBooleanTrue(env);
 }
 } // namespace Bluetooth
 } // namespace OHOS

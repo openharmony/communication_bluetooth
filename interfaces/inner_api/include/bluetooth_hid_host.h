@@ -82,7 +82,7 @@ public:
      * @param states List of remote device states.
      * @return Returns the list of devices.
      */
-    std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states);
+    int32_t GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice> &result);
 
     /**
      * @brief Get the connection state of the specified remote Hid device.
@@ -90,7 +90,7 @@ public:
      * @param device Remote device object.
      * @return Returns the connection state of the remote device.
      */
-    int GetDeviceState(const BluetoothRemoteDevice &device);
+    int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state);
 
     /**
      * @brief Initiate the establishment of a service level connection to remote Hid device.
@@ -98,7 +98,7 @@ public:
      * @param device Remote device object.
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      */
-    bool Connect(const BluetoothRemoteDevice &device);
+    int32_t Connect(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Release the connection from remote Hid device.
@@ -106,7 +106,7 @@ public:
      * @param device Remote device object.
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      */
-    bool Disconnect(const BluetoothRemoteDevice &device);
+    int32_t Disconnect(const BluetoothRemoteDevice &device);
 
         /**
      * @brief Register Hid Host observer instance.

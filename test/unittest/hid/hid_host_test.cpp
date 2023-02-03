@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hid_host.h"
 #include "bluetooth_remote_device.h"
 
@@ -101,8 +102,9 @@ HWTEST_F(HidHostTest, HID_ModuleTest_GetDevicesByStates_00100, TestSize.Level1)
     profile_ = HidHost::GetProfile();
     std::vector<int> states;
     std::vector<std::string> bluetoothRemoteDeviceAddr;
-    std::vector<BluetoothRemoteDevice> bluetoothRemoteDeviceByState = profile_->GetDevicesByStates(states);
-    EXPECT_TRUE(CompareDevice(bluetoothRemoteDeviceByState, bluetoothRemoteDeviceAddr));
+    std::vector<BluetoothRemoteDevice> devices;
+    profile_->GetDevicesByStates(states, devices);
+    EXPECT_TRUE(CompareDevice(devices, bluetoothRemoteDeviceAddr));
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_GetDevicesByStates_00100 end";
 }
@@ -122,7 +124,9 @@ HWTEST_F(HidHostTest, HID_ModuleTest_GetDeviceState_00100, TestSize.Level1)
     int sucess = static_cast<int>(BTConnectState::DISCONNECTED);
     BluetoothRemoteDevice device;
     profile_ = HidHost::GetProfile();
-    EXPECT_EQ(sucess, profile_->GetDeviceState(device));
+    int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+    profile_->GetDeviceState(device, state);
+    EXPECT_EQ(sucess, state);
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_GetDeviceState_00100 end";
 }
@@ -140,7 +144,8 @@ HWTEST_F(HidHostTest, HID_ModuleTest_Connect_00100, TestSize.Level1)
 
     BluetoothRemoteDevice device;
     profile_ = HidHost::GetProfile();
-    EXPECT_FALSE(profile_->Connect(device));
+    bool isOK = (profile_->Connect(device) == BT_SUCCESS ? true : false);
+    EXPECT_FALSE(isOK);
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_Connect_00100 end";
 }
@@ -158,7 +163,8 @@ HWTEST_F(HidHostTest, HID_ModuleTest_Disconnect_00100, TestSize.Level1)
 
     BluetoothRemoteDevice device;
     profile_ = HidHost::GetProfile();
-    EXPECT_FALSE(profile_->Disconnect(device));
+    bool isOK = (profile_->Disconnect(device) == BT_SUCCESS ? true : false);
+    EXPECT_FALSE(isOK);
 
     GTEST_LOG_(INFO) << "HID_ModuleTest_Disconnect_00100 end";
 }
