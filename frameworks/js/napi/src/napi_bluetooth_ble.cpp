@@ -16,13 +16,16 @@
 
 #include "napi_bluetooth_ble_advertise_callback.h"
 #include "napi_bluetooth_ble_central_manager_callback.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
 #include "napi_bluetooth_utils.h"
 
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
+#include "parser/napi_parser_utils.h"
 
 #include <memory>
 namespace OHOS {
@@ -297,653 +300,390 @@ static void ConvertDutyMode(ScanOptions &params, int32_t dutyMode)
     }
 }
 
-static napi_value ParseScanParameters(
+static napi_status ParseScanParameters(
     const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params)
 {
-    size_t argc = ARGS_SIZE_THREE;
-    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    if (argc == 0) {
-        return NapiGetNull(env);
+    (void)info;
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanArg, {"interval", "dutyMode", "matchMode"}));
+
+    bool exist = false;
+    int32_t interval = 0;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "interval", exist, interval));
+    if (exist) {
+        HILOGI("Scan interval is %{public}d", interval);
+        params.interval = interval;
     }
 
-    bool hasProperty = false;
-    napi_valuetype valuetype = napi_undefined;
-    napi_value result = nullptr;
-
-    NAPI_CALL(env, napi_has_named_property(env, scanArg, "interval", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanArg, "interval", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        napi_get_value_int32(env, result, &params.interval);
-        HILOGI("Scan interval is %{public}d", params.interval);
-    }
-
-    NAPI_CALL(env, napi_has_named_property(env, scanArg, "dutyMode", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanArg, "dutyMode", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        int32_t dutyMode = 0;
-        napi_get_value_int32(env, result, &dutyMode);
+    int32_t dutyMode = 0;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "dutyMode", exist, dutyMode));
+    if (exist) {
         HILOGI("Scan dutyMode is %{public}d", dutyMode);
         ConvertDutyMode(params, dutyMode);
     }
 
-    NAPI_CALL(env, napi_has_named_property(env, scanArg, "matchMode", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanArg, "matchMode", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        int32_t matchMode = -1;
-        napi_get_value_int32(env, result, &matchMode);
+    int32_t matchMode = 0;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "matchMode", exist, matchMode));
+    if (exist) {
         HILOGI("Scan matchMode is %{public}d", matchMode);
         ConvertMatchMode(params, matchMode);
     }
-    return NapiGetNull(env);
+    return napi_ok;
 }
 
-static napi_value ParseScanFilterDeviceIdParameters(
+static napi_status ParseScanFilterDeviceIdParameters(
     const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
-    napi_value result;
-    bool hasProperty = false;
-    ScanFilter filter;
-
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "deviceId", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "deviceId", &result);
-        bool isSuccess = ParseString(env, filter.deviceId, result);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
+    bool exist = false;
+    std::string deviceId {};
+    NAPI_BT_CALL_RETURN(ParseStringParams(env, scanFilter, "deviceId", exist, deviceId));
+    if (exist) {
+        if (!IsValidAddress(deviceId)) {
+            HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+            return napi_invalid_arg;
         }
-        bleScanFilter.SetDeviceId(filter.deviceId);
-        HILOGI("Scan filter device id is %{public}s", GetEncryptAddr(filter.deviceId).c_str());
+
+        HILOGI("Scan filter device id is %{public}s", GetEncryptAddr(deviceId).c_str());
+        bleScanFilter.SetDeviceId(deviceId);
     }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseScanFilterLocalNameParameters(
+static napi_status ParseScanFilterLocalNameParameters(
     const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
-    napi_value result;
-    bool hasProperty = false;
-    ScanFilter filter;
-
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "name", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "name", &result);
-        bool isSuccess = ParseString(env, filter.name, result);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
+    bool exist = false;
+    std::string name {};
+    NAPI_BT_CALL_RETURN(ParseStringParams(env, scanFilter, "name", exist, name));
+    if (exist) {
+        if (name.empty()) {
+            HILOGE("name is empty");
+            return napi_invalid_arg;
         }
-        bleScanFilter.SetName(filter.name);
-        HILOGI("Scan filter name is %{public}s", filter.name.c_str());
+        HILOGI("Scan filter name is %{public}s", name.c_str());
+        bleScanFilter.SetName(name);
     }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseScanFilterServiceUuidParameters(
+static napi_status ParseScanFilterServiceUuidParameters(
     const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
-    napi_value result;
-    bool hasProperty = false;
-    ScanFilter filter;
-
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceUuid", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "serviceUuid", &result);
-        std::string serviceUuid;
-        bool isSuccess = ParseString(env, serviceUuid, result);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        HILOGI("Scan filter serviceUuid is %{public}s", serviceUuid.c_str());
-        if (!serviceUuid.empty()) {
-            if (!regex_match(serviceUuid, uuidRegex)) {
-                HILOGE("match the UUID faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.serviceUuid = ParcelUuid::FromString(serviceUuid);
-            bleScanFilter.SetServiceUuid(filter.serviceUuid);
-        }
+    bool exist = false;
+    UUID uuid {};
+    NAPI_BT_CALL_RETURN(ParseUuidParams(env, scanFilter, "serviceUuid", exist, uuid));
+    if (exist) {
+        HILOGI("Scan filter serviceUuid is %{public}s", uuid.ToString().c_str());
+        bleScanFilter.SetServiceUuid(uuid);
     }
 
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceUuidMask", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "serviceUuidMask", &result);
-        std::string serviceUuidMask;
-        bool isSuccess = ParseString(env, serviceUuidMask, result);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        HILOGI("Scan filter serviceUuidMask is %{public}s", serviceUuidMask.c_str());
-        if (!serviceUuidMask.empty()) {
-            if (!regex_match(serviceUuidMask, uuidRegex)) {
-                HILOGE("match the UUID faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.serviceUuidMask = ParcelUuid::FromString(serviceUuidMask);
-            bleScanFilter.SetServiceUuidMask(filter.serviceUuidMask);
-        }
+    UUID uuidMask {};
+    NAPI_BT_CALL_RETURN(ParseUuidParams(env, scanFilter, "serviceUuidMask", exist, uuidMask));
+    if (exist) {
+        HILOGI("Scan filter serviceUuidMask is %{public}s", uuidMask.ToString().c_str());
+        bleScanFilter.SetServiceUuidMask(uuidMask);
     }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseScanFilterSolicitationUuidParameters(
+static napi_status ParseScanFilterSolicitationUuidParameters(
     const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
-    napi_value result;
-    bool hasProperty = false;
-    ScanFilter filter;
-
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceSolicitationUuid", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "serviceSolicitationUuid", &result);
-        std::string serviceSolicitationUuid;
-        bool isSuccess = ParseString(env, serviceSolicitationUuid, result);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        HILOGI("Scan filter serviceSolicitationUuid is %{public}s", serviceSolicitationUuid.c_str());
-        if (!serviceSolicitationUuid.empty()) {
-            if (!regex_match(serviceSolicitationUuid, uuidRegex)) {
-                HILOGE("match the UUID faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.serviceSolicitationUuid = ParcelUuid::FromString(serviceSolicitationUuid);
-            bleScanFilter.SetServiceSolicitationUuid(filter.serviceSolicitationUuid);
-        }
+    bool exist = false;
+    UUID uuid {};
+    NAPI_BT_CALL_RETURN(ParseUuidParams(env, scanFilter, "serviceSolicitationUuid", exist, uuid));
+    if (exist) {
+        HILOGI("Scan filter serviceSolicitationUuid is %{public}s", uuid.ToString().c_str());
+        bleScanFilter.SetServiceSolicitationUuid(uuid);
     }
 
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceSolicitationUuidMask", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "serviceSolicitationUuidMask", &result);
-        std::string serviceSolicitationUuidMask;
-        bool isSuccess = ParseString(env, serviceSolicitationUuidMask, result);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        HILOGI("Scan filter serviceSolicitationUuidMask is %{public}s", serviceSolicitationUuidMask.c_str());
-        if (!serviceSolicitationUuidMask.empty()) {
-            if (!regex_match(serviceSolicitationUuidMask, uuidRegex)) {
-                HILOGE("match the UUID faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.serviceSolicitationUuidMask = ParcelUuid::FromString(serviceSolicitationUuidMask);
-            bleScanFilter.SetServiceSolicitationUuidMask(filter.serviceSolicitationUuidMask);
-        }
+    UUID uuidMask {};
+    NAPI_BT_CALL_RETURN(ParseUuidParams(env, scanFilter, "serviceSolicitationUuidMask", exist, uuidMask));
+    if (exist) {
+        HILOGI("Scan filter serviceSolicitationUuidMask is %{public}s", uuidMask.ToString().c_str());
+        bleScanFilter.SetServiceSolicitationUuidMask(uuidMask);
     }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseScanFilterServiceDataParameters(
+static napi_status ParseScanFilterServiceDataParameters(
     const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
-    napi_value result;
-    bool hasProperty = false;
-    ScanFilter filter;
-
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceData", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "serviceData", &result);
-        bool isArrayBuffer = false;
-        napi_is_arraybuffer(env, result, &isArrayBuffer);
-        if (isArrayBuffer) {
-            uint8_t *arrayBufferData = nullptr;
-            size_t arrayBufferTotal = 0;
-            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
-            if (!isSuccess) {
-                HILOGE("ParseArrayBuffer faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.serviceData = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
-        }
-        bleScanFilter.SetServiceData(filter.serviceData);
+    bool exist = false;
+    std::vector<uint8_t> data {};
+    NAPI_BT_CALL_RETURN(ParseArrayBufferParams(env, scanFilter, "serviceData", exist, data));
+    if (exist) {
+        bleScanFilter.SetServiceData(std::move(data));
     }
 
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "serviceDataMask", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "serviceDataMask", &result);
-        bool isArrayBuffer = false;
-        napi_is_arraybuffer(env, result, &isArrayBuffer);
-        if (isArrayBuffer) {
-            uint8_t *arrayBufferData = nullptr;
-            size_t arrayBufferTotal = 0;
-            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
-            if (!isSuccess) {
-                HILOGE("ParseArrayBuffer faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.serviceDataMask = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
-        }
-        bleScanFilter.SetServiceDataMask(filter.serviceDataMask);
+    std::vector<uint8_t> dataMask {};
+    NAPI_BT_CALL_RETURN(ParseArrayBufferParams(env, scanFilter, "serviceDataMask", exist, dataMask));
+    if (exist) {
+        bleScanFilter.SetServiceDataMask(std::move(dataMask));
     }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseScanFilterManufactureDataParameters(
+static napi_status ParseScanFilterManufactureDataParameters(
     const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
+    bool exist = false;
     napi_value result;
-    bool hasProperty = false;
-    ScanFilter filter;
-
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "manufacturerId", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "manufacturerId", &result);
+    NAPI_BT_CALL_RETURN(ParseNumberParams(env, scanFilter, "manufactureId", exist, result));
+    if (exist) {
         uint32_t manufacturerId = 0;
-        napi_get_value_uint32(env, result, &manufacturerId);
-        filter.manufacturerId = manufacturerId;
-        bleScanFilter.SetManufacturerId(filter.manufacturerId);
-        HILOGI("Scan filter manufacturerId is %{public}d", filter.manufacturerId);
+        NAPI_BT_CALL_RETURN(napi_get_value_uint32(env, result, &manufacturerId));
+        bleScanFilter.SetManufacturerId(manufacturerId);
+        HILOGI("Scan filter manufacturerId is %{public}#x", manufacturerId);
     }
 
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "manufactureData", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "manufactureData", &result);
-        bool isArrayBuffer = false;
-        napi_is_arraybuffer(env, result, &isArrayBuffer);
-        if (isArrayBuffer) {
-            uint8_t *arrayBufferData = nullptr;
-            size_t arrayBufferTotal = 0;
-            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
-            if (!isSuccess) {
-                HILOGE("ParseArrayBuffer faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.manufactureData = std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
-        }
-        bleScanFilter.SetManufactureData(filter.manufactureData);
+    exist = false;
+    std::vector<uint8_t> data {};
+    NAPI_BT_CALL_RETURN(ParseArrayBufferParams(env, scanFilter, "manufactureData", exist, data));
+    if (exist) {
+        bleScanFilter.SetManufactureData(std::move(data));
     }
 
-    NAPI_CALL(env, napi_has_named_property(env, scanFilter, "manufactureDataMask", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, scanFilter, "manufactureDataMask", &result);
-        bool isArrayBuffer = false;
-        napi_is_arraybuffer(env, result, &isArrayBuffer);
-        if (isArrayBuffer) {
-            uint8_t *arrayBufferData = nullptr;
-            size_t arrayBufferTotal = 0;
-            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
-            if (!isSuccess) {
-                HILOGE("ParseArrayBuffer faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            filter.manufactureDataMask =
-            std::vector<uint8_t>(arrayBufferData, arrayBufferData + arrayBufferTotal);
-        }
-        bleScanFilter.SetManufactureDataMask(filter.manufactureDataMask);
+    std::vector<uint8_t> dataMask {};
+    NAPI_BT_CALL_RETURN(ParseArrayBufferParams(env, scanFilter, "manufactureDataMask", exist, dataMask));
+    if (exist) {
+        bleScanFilter.SetManufactureDataMask(std::move(dataMask));
     }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static bool ParseScanFilter(const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+static napi_status ParseScanFilter(const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
     HILOGI("enter");
-    bool isSuccess = true;
-    napi_get_value_bool(env, ParseScanFilterDeviceIdParameters(env, scanFilter, bleScanFilter), &isSuccess);
-    if (!isSuccess) {
-        HILOGE("ParseScanFilterDeviceIdParameters faild.");
-        return false;
-    }
-    napi_get_value_bool(env, ParseScanFilterLocalNameParameters(env, scanFilter, bleScanFilter), &isSuccess);
-    if (!isSuccess) {
-        HILOGE("ParseScanFilterLocalNameParameters faild.");
-        return false;
-    }
-    napi_get_value_bool(env, ParseScanFilterServiceUuidParameters(env, scanFilter, bleScanFilter), &isSuccess);
-    if (!isSuccess) {
-        HILOGE("ParseScanFilterServiceUuidParameters faild.");
-        return false;
-    }
-    napi_get_value_bool(env, ParseScanFilterSolicitationUuidParameters(env, scanFilter, bleScanFilter), &isSuccess);
-    if (!isSuccess) {
-        HILOGE("ParseScanFilterSolicitationUuidParameters faild.");
-        return false;
-    }
-    napi_get_value_bool(env, ParseScanFilterServiceDataParameters(env, scanFilter, bleScanFilter), &isSuccess);
-    if (!isSuccess) {
-        HILOGE("ParseScanFilterServiceDataParameters faild.");
-        return false;
-    }
-    napi_get_value_bool(env, ParseScanFilterManufactureDataParameters(env, scanFilter, bleScanFilter), &isSuccess);
-    if (!isSuccess) {
-        HILOGE("ParseScanFilterManufactureDataParameters faild.");
-        return false;
-    }
-    return true;
+    std::vector<std::string> expectedNames {"deviceId", "name", "serviceUuid", "serviceUuidMask",
+        "serviceSolicitationUuid", "serviceSolicitationUuidMask", "serviceData", "serviceDataMask", "manufactureId",
+        "manufactureData", "manufactureDataMask"};
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanFilter, expectedNames));
+
+    NAPI_BT_CALL_RETURN(ParseScanFilterDeviceIdParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterLocalNameParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterServiceUuidParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterSolicitationUuidParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterServiceDataParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterManufactureDataParameters(env, scanFilter, bleScanFilter));
+    return napi_ok;
 }
 
-static napi_value ParseScanFilterParameters(const napi_env &env, napi_value &args, std::vector<BleScanFilter> &params)
+static napi_status ParseScanFilterParameters(const napi_env &env, napi_value &args, std::vector<BleScanFilter> &params)
 {
     HILOGI("enter");
-    if (args == nullptr) {
-        return NapiGetBooleanTrue(env);
+    NAPI_BT_CALL_RETURN(NapiIsArray(env, args));
+
+    uint32_t length = 0;
+    NAPI_BT_CALL_RETURN(napi_get_array_length(env, args, &length));
+    NAPI_BT_RETURN_IF(length == 0, "Requires array length > 0", napi_invalid_arg);
+    for (uint32_t i = 0; i < length; i++) {
+        napi_value scanFilter;
+        NAPI_BT_CALL_RETURN(napi_get_element(env, args, i, &scanFilter));
+        NAPI_BT_CALL_RETURN(NapiIsObject(env, scanFilter));
+        BleScanFilter bleScanFilter;
+        NAPI_BT_CALL_RETURN(ParseScanFilter(env, scanFilter, bleScanFilter));
+        params.push_back(bleScanFilter);
+    }
+    return napi_ok;
+}
+
+static napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
+    BleScanSettings &outSettinngs)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF((argc == 0 || argc > ARGS_SIZE_TWO), "Requires 1 or 2 arguments.", napi_invalid_arg);
+
+    std::vector<BleScanFilter> scanfilters;
+    // Support null param
+    napi_valuetype type = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM0], &type));
+    if (type == napi_null) {
+        BleScanFilter emptyFilter;
+        scanfilters.push_back(emptyFilter);
+    } else {
+        NAPI_BT_CALL_RETURN(ParseScanFilterParameters(env, argv[PARAM0], scanfilters));
     }
 
-    bool isArray = false;
-    napi_is_array(env, args, &isArray);
-    if (isArray) {
-        uint32_t length = 0;
-        napi_get_array_length(env, args, &length);
-        for (size_t i = 0; i < length; i++) {
-            napi_value scanFilter;
-            napi_valuetype valuetype = napi_undefined;
-            napi_get_element(env, args, i, &scanFilter);
-            NAPI_CALL(env, napi_typeof(env, scanFilter, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-
-            BleScanFilter bleScanFilter;
-            bool isSuccess = ParseScanFilter(env, scanFilter, bleScanFilter);
-            if (!isSuccess) {
-                HILOGE("ParseScanFilter faild.");
-                return NapiGetBooleanFalse(env);
-            }
-
-            params.push_back(bleScanFilter);
-        }
+    if (argc == ARGS_SIZE_TWO) {
+        ScanOptions scanOptions;
+        NAPI_BT_CALL_RETURN(ParseScanParameters(env, info, argv[PARAM1], scanOptions));
+        outSettinngs.SetReportDelay(scanOptions.interval);
+        outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
     }
-    return NapiGetBooleanTrue(env);
+
+    outScanfilters = std::move(scanfilters);
+    return napi_ok;
 }
 
 napi_value StartBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    if (argc == 0) {
-        HILOGE("Requires 1 or 2 arguments.");
-        return NapiGetNull(env);
-    }
-
     std::vector<BleScanFilter> scanfilters;
-    if (argv[PARAM0] != nullptr) {
-        bool isSuccess = true;
-        napi_get_value_bool(env, ParseScanFilterParameters(env, argv[PARAM0], scanfilters), &isSuccess);
-        if (!isSuccess) {
-            HILOGE("ParseScanFilterParameters faild.");
-            return NapiGetNull(env);
-        }
-    }
-    bleCentralManager->ConfigScanFilter(scanfilters);
-
     BleScanSettings settinngs;
-    if (argv[PARAM1] != nullptr) {
-        ScanOptions scanOptions;
-        ParseScanParameters(env, info, argv[PARAM1], scanOptions);
-        settinngs.SetReportDelay(scanOptions.interval);
-        settinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
-    }
+    auto status = CheckBleScanParams(env, info, scanfilters, settinngs);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    bleCentralManager->StartScan(settinngs);
-    return NapiGetNull(env);
+    if (bleCentralManager) {
+        int ret = bleCentralManager->ConfigScanFilter(scanfilters);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
+        ret = bleCentralManager->StartScan(settinngs);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
+    }
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value StopBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    bleCentralManager->StopScan();
-    return NapiGetNull(env);
+    auto status = CheckEmptyParam(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    int ret = bleCentralManager->StopScan();
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
+    return NapiGetUndefinedRet(env);
 }
 
-static napi_value ParseAdvertisingSettingsParameters(
-    const napi_env &env, const napi_callback_info &info, const napi_value &args, BleAdvertiserSettings &settings)
+static napi_status ParseAdvertisingSettingsParameters(
+    const napi_env &env, const napi_callback_info &info, const napi_value &object, BleAdvertiserSettings &outSettings)
 {
     HILOGI("enter");
-    bool hasProperty = false;
-    napi_valuetype valuetype = napi_undefined;
-    napi_value result = nullptr;
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"interval", "txPower", "connectable"}));
 
-    NAPI_CALL(env, napi_has_named_property(env, args, "interval", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, args, "interval", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        int32_t interval = 0;
-        napi_get_value_int32(env, result, &interval);
-        HILOGI("interval is %{public}d", interval);
-        settings.SetInterval(interval);
+    bool exist = false;
+    uint32_t interval = 0;
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32Optional(env, object, "interval", interval, exist));
+    if (exist) {
+        HILOGI("interval: %{public}u", interval);
+        outSettings.SetInterval(interval);
     }
-    NAPI_CALL(env, napi_has_named_property(env, args, "txPower", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, args, "txPower", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        int32_t txPower = 0;
-        napi_get_value_int32(env, result, &txPower);
+
+    int32_t txPower = 0;
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32Optional(env, object, "txPower", txPower, exist));
+    if (exist) {
+        const int32_t minTxPower = -127;
+        const int32_t maxTxPower = 1;
+        if (txPower < minTxPower || txPower > maxTxPower) {
+            HILOGE("Invalid tx power: %{public}d", txPower);
+            return napi_invalid_arg;
+        }
         HILOGI("txPower is %{public}d", txPower);
-        settings.SetTxPower(txPower);
+        outSettings.SetTxPower(txPower);
     }
 
-    NAPI_CALL(env, napi_has_named_property(env, args, "connectable", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, args, "connectable", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Boolean expected.");
-        bool connectable = true;
-        napi_get_value_bool(env, result, &connectable);
-        HILOGI("connectable is %{public}d", connectable);
-        settings.SetConnectable(connectable);
+    bool connectable = false;
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, object, "connectable", connectable, exist));
+    if (exist) {
+        HILOGI("connectable: %{public}d", connectable);
+        outSettings.SetConnectable(connectable);
     }
-    return NapiGetNull(env);
+    return napi_ok;
 }
 
-static napi_value ParseServiceUuidParameters(const napi_env &env, const napi_value &args, BleAdvertiserData &data)
+static napi_status ParseServiceUuidParameters(napi_env env, napi_value object, BleAdvertiserData &outData)
 {
     HILOGI("enter");
-    napi_value result = nullptr;
-
-    napi_get_named_property(env, args, "serviceUuids", &result);
-    bool isArray = false;
-    napi_is_array(env, result, &isArray);
-    NAPI_ASSERT(env, isArray, "Wrong argument type. Array expected.");
-    uint32_t length = 0;
-    napi_get_array_length(env, result, &length);
-    NAPI_ASSERT(env, length > 0, "The array is empty.");
-    for (size_t serviceUuidIter = 0; serviceUuidIter < length; ++serviceUuidIter) {
-        napi_value uuid = nullptr;
-        napi_get_element(env, result, serviceUuidIter, &uuid);
-        std::string serviceUuid;
-        bool isSuccess = ParseString(env, serviceUuid, uuid);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        if (!regex_match(serviceUuid, uuidRegex)) {
-            HILOGE("Match the UUID faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        data.AddServiceUuid(ParcelUuid::FromString(serviceUuid));
-        HILOGI("Service Uuid = %{public}s", serviceUuid.c_str());
+    std::vector<UUID> vec {};
+    NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "serviceUuids", vec));
+    for (size_t i = 0; i < vec.size(); ++i) {
+        outData.AddServiceUuid(vec[i]);
+        HILOGI("Service Uuid = %{public}s", vec[i].ToString().c_str());
     }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseManufactureDataParameters(const napi_env &env, const napi_value &args, BleAdvertiserData &data)
+static napi_status ParseManufactureDataParameters(napi_env env, napi_value object, BleAdvertiserData &outData)
 {
     HILOGI("enter");
-    napi_value result = nullptr;
-
-    napi_get_named_property(env, args, "manufactureData", &result);
-    bool isArray = false;
-    napi_is_array(env, result, &isArray);
-    NAPI_ASSERT(env, isArray, "Wrong argument type. Array expected.");
-    uint32_t length = 0;
-    napi_get_array_length(env, result, &length);
-    if (length == 0) {
-        HILOGE("The array is empty.");
-        return NapiGetBooleanTrue(env);
+    std::vector<NapiAdvManufactureData> vec {};
+    NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "manufactureData", vec));
+    for (size_t i = 0; i < vec.size(); ++i) {
+        outData.AddManufacturerData(vec[i].id, vec[i].value);
     }
-    for (size_t manufactureDataIter = 0; manufactureDataIter < length; ++manufactureDataIter) {
-        napi_value manufactureData = nullptr;
-        napi_valuetype valuetype = napi_undefined;
-        napi_get_element(env, result, manufactureDataIter, &manufactureData);
-        NAPI_CALL(env, napi_typeof(env, manufactureData, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-        bool hasProperty = false;
-        NAPI_CALL(env, napi_has_named_property(env, manufactureData, "manufactureId", &hasProperty));
-        NAPI_ASSERT(env, hasProperty, "manufactureId expected.");
-        napi_get_named_property(env, manufactureData, "manufactureId", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        int32_t manufactureId = 0;
-        napi_get_value_int32(env, result, &manufactureId);
-        HILOGI("manufactureId = %{public}d", manufactureId);
-        NAPI_CALL(env, napi_has_named_property(env, manufactureData, "manufactureValue", &hasProperty));
-        NAPI_ASSERT(env, hasProperty, "manufactureValue expected.");
-        napi_get_named_property(env, manufactureData, "manufactureValue", &result);
-        bool isArrayBuffer = false;
-        napi_is_arraybuffer(env, result, &isArrayBuffer);
-        if (isArrayBuffer) {
-            uint8_t *arrayBufferData = nullptr;
-            size_t arrayBufferTotal = 0;
-            bool isSuccess = ParseArrayBuffer(env, &arrayBufferData, arrayBufferTotal, result);
-            if (!isSuccess) {
-                HILOGE("ParseArrayBuffer faild.");
-                return NapiGetBooleanFalse(env);
-            }
-            std::string manuData(arrayBufferData, arrayBufferData + arrayBufferTotal);
-            data.AddManufacturerData(manufactureId, manuData);
-        }
-    }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseServiceDataParameters(const napi_env &env, const napi_value &args, BleAdvertiserData &data)
+static napi_status ParseServiceDataParameters(napi_env env, napi_value object, BleAdvertiserData &outData)
 {
     HILOGI("enter");
-    napi_valuetype valuetype = napi_undefined;
-    napi_value result = nullptr;
-    napi_get_named_property(env, args, "serviceData", &result);
-    bool isArray = false;
-    napi_is_array(env, result, &isArray);
-    NAPI_ASSERT(env, isArray, "Wrong argument type. Array expected.");
-    uint32_t length = 0;
-    napi_get_array_length(env, result, &length);
-    if (length == 0) {
-        HILOGE("The array is empty.");
-        return NapiGetBooleanTrue(env);
+    std::vector<NapiAdvServiceData> vec {};
+    NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "serviceData", vec));
+    for (size_t i = 0; i < vec.size(); ++i) {
+        outData.AddServiceData(
+            ParcelUuid::FromString(vec[i].uuid),
+            std::string(vec[i].value.begin(), vec[i].value.end()));
     }
-    for (size_t serviceDataIter = 0; serviceDataIter < length; ++serviceDataIter) {
-        napi_value serviceData = nullptr;
-        napi_get_element(env, result, serviceDataIter, &serviceData);
-        NAPI_CALL(env, napi_typeof(env, serviceData, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-        bool hasProperty = false;
-        NAPI_CALL(env, napi_has_named_property(env, serviceData, "serviceUuid", &hasProperty));
-        NAPI_ASSERT(env, hasProperty, "serviceUuid expected.");
-        napi_get_named_property(env, serviceData, "serviceUuid", &result);
-        std::string serviceBuffer;
-        bool isSuccess = ParseString(env, serviceBuffer, result);
-        if (!isSuccess) {
-            HILOGE("ParseString faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        if (!regex_match(serviceBuffer, uuidRegex)) {
-            HILOGE("Match the UUID faild.");
-            return NapiGetBooleanFalse(env);
-        }
-        ParcelUuid serviceUuid(ParcelUuid::FromString(serviceBuffer));
-        HILOGI("serviceUuid = %{public}s", serviceUuid.ToString().c_str());
-
-        NAPI_CALL(env, napi_has_named_property(env, serviceData, "serviceValue", &hasProperty));
-        NAPI_ASSERT(env, hasProperty, "serviceValue expected.");
-        napi_get_named_property(env, serviceData, "serviceValue", &result);
-        bool isArrayBuffer = false;
-        napi_is_arraybuffer(env, result, &isArrayBuffer);
-        NAPI_ASSERT(env, isArrayBuffer, "Array buffer expected.");
-        uint8_t *arrayBufferData = nullptr;
-        size_t arrayBufferTotal;
-        napi_get_arraybuffer_info(env, result, reinterpret_cast<void **>(&arrayBufferData), &arrayBufferTotal);
-        std::string serviceDataStr(arrayBufferData, arrayBufferData + arrayBufferTotal);
-        data.AddServiceData(serviceUuid, serviceDataStr);
-    }
-    return NapiGetBooleanTrue(env);
+    return napi_ok;
 }
 
-static napi_value ParseAdvertisDataParameters(
-    const napi_env &env, const napi_callback_info &info, const napi_value &args, BleAdvertiserData &data)
+static napi_status ParseAdvertisDataParameters(const napi_env &env, const napi_callback_info &info,
+    const napi_value &object, BleAdvertiserData &outData)
 {
-    HILOGI("enter");
-    bool hasProperty = false;
-    bool isSuccess = true;
-    NAPI_CALL(env, napi_has_named_property(env, args, "serviceUuids", &hasProperty));
-    if (hasProperty) {
-        napi_get_value_bool(env, ParseServiceUuidParameters(env, args, data), &isSuccess);
-        if (!isSuccess) {
-            HILOGE("ParseServiceUuidParameters faild.");
-            return NapiGetBooleanFalse(env);
-        }
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"serviceUuids", "manufactureData", "serviceData"}));
+
+    NAPI_BT_CALL_RETURN(ParseServiceUuidParameters(env, object, outData));
+    NAPI_BT_CALL_RETURN(ParseManufactureDataParameters(env, object, outData));
+    NAPI_BT_CALL_RETURN(ParseServiceDataParameters(env, object, outData));
+    return napi_ok;
+}
+
+napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdvertiserSettings &outSettings,
+    BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData)
+{
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_THREE), "need 2 or 3 arguments.", napi_invalid_arg);
+
+    BleAdvertiserSettings settings;
+    NAPI_BT_CALL_RETURN(ParseAdvertisingSettingsParameters(env, info, argv[PARAM0], settings));
+    BleAdvertiserData advData;
+    NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, info, argv[PARAM1], advData));
+    BleAdvertiserData rspData;
+    if (argc == ARGS_SIZE_THREE) {
+        NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, info, argv[PARAM2], rspData));
     }
-    NAPI_CALL(env, napi_has_named_property(env, args, "manufactureData", &hasProperty));
-    if (hasProperty) {
-        napi_get_value_bool(env, ParseManufactureDataParameters(env, args, data), &isSuccess);
-        if (!isSuccess) {
-            HILOGE("ParseManufactureDataParameters faild.");
-            return NapiGetBooleanFalse(env);
-        }
-    }
-    NAPI_CALL(env, napi_has_named_property(env, args, "serviceData", &hasProperty));
-    if (hasProperty) {
-        napi_get_value_bool(env, ParseServiceDataParameters(env, args, data), &isSuccess);
-        if (!isSuccess) {
-            HILOGE("ParseServiceDataParameters faild.");
-            return NapiGetBooleanFalse(env);
-        }
-    }
-    return NapiGetBooleanTrue(env);
+
+    outSettings = std::move(settings);
+    outAdvData = std::move(advData);
+    outRspData = std::move(rspData);
+    return napi_ok;
 }
 
 napi_value StartAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t argc = ARGS_SIZE_THREE;
-    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    if (argc == 0) {
-        HILOGE("Requires 2 or 3 arguments.");
-        return NapiGetNull(env);
-    }
     BleAdvertiserSettings settings;
-    ParseAdvertisingSettingsParameters(env, info, argv[PARAM0], settings);
-    BleAdvertiserData AdvData;
-    bool isSuccess = true;
-    napi_get_value_bool(env, ParseAdvertisDataParameters(env, info, argv[PARAM1], AdvData), &isSuccess);
-    if (!isSuccess) {
-        HILOGE("ParseAdvertisDataParameters faild.");
-        return NapiGetNull(env);
-    }
-    BleAdvertiserData ScanRespData;
-    if (argv[PARAM2] != nullptr) {
-        napi_get_value_bool(env, ParseAdvertisDataParameters(env, info, argv[PARAM2], ScanRespData), &isSuccess);
-        if (!isSuccess) {
-            HILOGE("ParseAdvertisDataParameters faild.");
-            return NapiGetNull(env);
-        }
-    }
+    BleAdvertiserData advData;
+    BleAdvertiserData rspData;
+    auto status = CheckAdvertisingData(env, info, settings, advData, rspData);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    bleAdvertiser.StartAdvertising(settings, AdvData, ScanRespData, bleAdvertiseCallback);
-    return NapiGetNull(env);
+    int ret = bleAdvertiser.StartAdvertising(settings, advData, rspData, bleAdvertiseCallback);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_SUCCESS, ret);
+    return NapiGetUndefinedRet(env);
+}
+
+static napi_status CheckEmptyArgs(napi_env env, napi_callback_info info)
+{
+    size_t argc = 0;
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc > 0, "no needed arguments.", napi_invalid_arg);
+    return napi_ok;
 }
 
 napi_value StopAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    bleAdvertiser.StopAdvertising(bleAdvertiseCallback);
+    auto status = CheckEmptyArgs(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    return NapiGetNull(env);
+    int ret = bleAdvertiser.StopAdvertising(bleAdvertiseCallback);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_SUCCESS, ret);
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
@@ -952,7 +692,8 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_array(env, &result);
 
-    ConvertStringVectorToJS(env, result, NapiGattServer::deviceList);
+    auto status = ConvertStringVectorToJS(env, result, NapiGattServer::deviceList);
+    NAPI_BT_ASSERT_RETURN(env, status == napi_ok, BT_ERR_INTERNAL_ERROR, result);
     return result;
 }
 

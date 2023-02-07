@@ -14,8 +14,12 @@
  */
 
 #include "bluetooth_hid_host.h"
+
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "napi_bluetooth_hid_host_observer.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_hid_host.h"
@@ -126,23 +130,20 @@ napi_value NapiBluetoothHidHost::GetConnectionDevices(napi_env env, napi_callbac
 {
     HILOGI("enter");
 
-    size_t expectedArgsCount = ARGS_SIZE_ZERO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ZERO] = {};
-    napi_value thisVar = nullptr;
-
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("No Requires argument.");
-        return ret;
+    if (napi_create_array(env, &ret) != napi_ok) {
+        HILOGE("napi_create_array failed.");
     }
-    napi_create_array(env, &ret);
+    napi_status checkRet = CheckEmptyParam(env, info);
+    NAPI_BT_ASSERT_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
+
     HidHost *profile = HidHost::GetProfile();
     vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
-    vector<BluetoothRemoteDevice> devices = profile->GetDevicesByStates(states);
+    vector<BluetoothRemoteDevice> devices;
+    int errorCode = profile->GetDevicesByStates(states, devices);
+    HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, ret);
+
     vector<string> deviceVector;
     for (auto &device: devices) {
         deviceVector.push_back(device.GetDeviceAddr());
@@ -154,31 +155,27 @@ napi_value NapiBluetoothHidHost::GetConnectionDevices(napi_env env, napi_callbac
 napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
+    napi_value result = nullptr;
+    int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
+    if (napi_create_int32(env, profileState, &result) != napi_ok) {
+        HILOGE("napi_create_int32 failed.");
     }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, result);
 
     HidHost *profile = HidHost::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    int state = profile->GetDeviceState(device);
-    int profileState = GetProfileConnectionState(state);
-    napi_value result = nullptr;
-    napi_create_int32(env, profileState, &result);
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+    int32_t errorCode = profile->GetDeviceState(device, state);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, result);
+
+    profileState = GetProfileConnectionState(state);
+    if (napi_create_int32(env, profileState, &result) != napi_ok) {
+        HILOGE("napi_create_int32 failed.");
+    }
     HILOGI("profileState: %{public}d", profileState);
     return result;
 }
@@ -186,63 +183,31 @@ napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info
 napi_value NapiBluetoothHidHost::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     HidHost *profile = HidHost::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    bool isOK = profile->Connect(device);
-    napi_value result = nullptr;
-    napi_get_boolean(env, isOK, &result);
-    HILOGI("isOK: %{public}d", isOK);
-    return result;
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t errorCode = profile->Connect(device);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    return NapiGetBooleanTrue(env);
 }
 
 napi_value NapiBluetoothHidHost::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     HidHost *profile = HidHost::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    bool isOK = profile->Disconnect(device);
-    napi_value result = nullptr;
-    napi_get_boolean(env, isOK, &result);
-    HILOGI("isOK: %{public}d", isOK);
-    return result;
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t errorCode = profile->Disconnect(device);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    return NapiGetBooleanTrue(env);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -130,6 +130,14 @@ public:
     std::string GetDeviceName() const;
 
     /**
+     * @brief Get device name.
+     *
+     * @return Returns device name.
+     * @since 6
+     */
+    int GetDeviceName(std::string &name) const;
+
+    /**
      * @brief Get device alias.
      *
      * @return Returns device alias.
@@ -178,7 +186,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool StartPair();
+    int StartPair();
 
     /**
      * @brief Cancel pair operation.
@@ -222,7 +230,7 @@ public:
      * @return Returns device class;
      * @since 6
      */
-    BluetoothDeviceClass GetDeviceClass() const;
+    int GetDeviceClass(int &cod) const;
 
     /**
      * @brief Get device uuids.
@@ -250,7 +258,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool SetDevicePairingConfirmation(bool accept);
+    int SetDevicePairingConfirmation(bool accept);
 
     /**
      * @brief Set device pair passkey.

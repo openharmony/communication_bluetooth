@@ -32,6 +32,9 @@ public:
     ~BluetoothGattClientServer() override;
 
     int RegisterApplication(const sptr<IBluetoothGattClientCallback> &callback, const BluetoothRawAddress &addr,
+        int32_t transport, int &appId) override;
+
+    int RegisterApplication(const sptr<IBluetoothGattClientCallback> &callback, const BluetoothRawAddress &addr,
         int32_t transport) override;
     int DeregisterApplication(int32_t appId) override;
     int Connect(int32_t appId, bool autoConnect) override;

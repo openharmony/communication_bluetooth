@@ -34,10 +34,10 @@ public:
         MessageOption& option) override;
 
 private:
-    ErrCode ConnectInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode DisconnectInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply);
+    int32_t ConnectInner(MessageParcel &data, MessageParcel &reply);
+    int32_t DisconnectInner(MessageParcel &data, MessageParcel &reply);
+    int32_t GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
+    int32_t GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RegisterObserverInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DeregisterObserverInner(MessageParcel &data, MessageParcel &reply);
     ErrCode HidHostVCUnplugInner(MessageParcel &data, MessageParcel &reply);

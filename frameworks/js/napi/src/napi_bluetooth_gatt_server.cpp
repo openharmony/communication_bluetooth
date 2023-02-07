@@ -13,12 +13,15 @@
  * limitations under the License.
  */
 #include "napi_bluetooth_gatt_server.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_ble.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
+#include "parser/napi_parser_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -79,292 +82,294 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
     return thisVar;
 }
 
-napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
+static NapiGattServer *NapiGetGattServer(napi_env env, napi_value thisVar)
 {
-    HILOGI("enter");
     NapiGattServer *gattServer = nullptr;
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 2 arguments.");
-        return ret;
+    auto status = napi_unwrap(env, thisVar, (void **)&gattServer);
+    if (status != napi_ok) {
+        return nullptr;
     }
-    string type;
-    ParseString(env, type, argv[PARAM0]);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo ;
-    
-    if (type.c_str() == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ || 
-        type.c_str() == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE) {
+    return gattServer;
+}
+
+napi_status CheckGattsOn(napi_env env, napi_callback_info info)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+
+    std::string type {};
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo {nullptr};
+
+    if (type == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ ||
+        type == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE) {
         callbackInfo = std::make_shared<GattCharacteristicCallbackInfo>();
-    } else if (type.c_str() == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE ||
-        type.c_str() == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ){
+    } else if (type == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE ||
+        type == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ) {
         callbackInfo = std::make_shared<GattDescriptorCallbackInfo>();
     } else {
-       callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+        callbackInfo = std::make_shared<BluetoothCallbackInfo>();
     }
     callbackInfo->env_ = env;
 
-    napi_unwrap(env, thisVar, (void **)&gattServer);
-    if (gattServer == nullptr) {
-        HILOGE("gattServer is nullptr.");
-        return ret;
-    }
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[PARAM1], &valueType);
-    if (valueType != napi_function) {
-        HILOGE("Wrong argument type. Function expected.");
-        return ret;
-    }
-    napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    gattServer->GetCallback().SetCallbackInfo(type, callbackInfo);
+    auto gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
 
+    NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
+    NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_));
+    gattServer->GetCallback().SetCallbackInfo(type, callbackInfo);
     HILOGI("%{public}s is registered", type.c_str());
-    return ret;
+    return napi_ok;
+}
+
+napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    auto status = CheckGattsOn(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
+}
+
+napi_status CheckGattsOff(napi_env env, napi_callback_info info)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};  // argv[PARAM1] is not used.
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
+
+    std::string type {};
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
+
+    auto gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+    // callback_ need unref before, see napi_bluetooth_gatt_client
+    auto &gattServerCallback = gattServer->GetCallback();
+    gattServerCallback.SetCallbackInfo(type, nullptr);
+    HILOGI("%{public}s is removed", type.c_str());
+    return napi_ok;
 }
 
 napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiGattServer *gattServer = nullptr;
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
+    auto status = CheckGattsOff(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
+}
+
+static napi_status CheckGattsAddService(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer,
+    std::unique_ptr<GattService> &outService)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
     napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 arguments.", napi_invalid_arg);
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
+    // std::unique_ptr<GattService> service {nullptr};
+    NapiGattService napiGattService;
+    NAPI_BT_CALL_RETURN(NapiParseGattService(env, argv[PARAM0], napiGattService));
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+    outServer = gattServer->GetServer();
+
+    // Build GattService
+    using Permission = GattCharacteristic::Permission;
+    using Propertie = GattCharacteristic::Propertie;
+    int permissions = Permission::READABLE | Permission::WRITEABLE;
+    int properties = Propertie::NOTIFY | Propertie::READ | Propertie::WRITE;
+    GattServiceType type = napiGattService.isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY;
+
+    outService = std::make_unique<GattService>(napiGattService.serviceUuid, type);
+    for (const auto &napiCharacter : napiGattService.characteristics) {
+        GattCharacteristic character(napiCharacter.characteristicUuid, permissions, properties);
+        character.SetValue(napiCharacter.characteristicValue.data(), napiCharacter.characteristicValue.size());
+
+        for (const auto &napiDescriptor : napiCharacter.descriptors) {
+            GattDescriptor descriptor(napiDescriptor.descriptorUuid, permissions);
+            descriptor.SetValue(napiDescriptor.descriptorValue.data(), napiDescriptor.descriptorValue.size());
+            character.AddDescriptor(descriptor);
+        }
+        outService->AddCharacteristic(character);
     }
-    string type;
-    ParseString(env, type, argv[PARAM0]);
 
-    napi_unwrap(env, thisVar, (void **)&gattServer);
-    if (gattServer == nullptr) {
-        HILOGE("gattServer is nullptr.");
-        return ret;
-    }
-    gattServer->GetCallback().SetCallbackInfo(type, nullptr);
-    HILOGI("%{public}s is removed", type.c_str());
-    return ret;
+    return napi_ok;
 }
 
 napi_value NapiGattServer::AddService(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiGattServer *gattServer = nullptr;
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
+    std::shared_ptr<GattServer> server {nullptr};
+    std::unique_ptr<GattService> gattService {nullptr};
+    auto status = CheckGattsAddService(env, info, server, gattService);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+
+    int ret = server->AddService(*gattService);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    return NapiGetBooleanTrue(env);
+}
+
+static napi_status CheckGattsClose(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer)
+{
+    size_t argc = 0;
     napi_value thisVar = nullptr;
-    bool isOK = false;
-    napi_value ret = nullptr;
-    napi_get_boolean(env, isOK, &ret);
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc > 0, "no needed arguments.", napi_invalid_arg);
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    GattService* gattService = GetServiceFromJS(env, argv[PARAM0], nullptr, nullptr);
-    if (gattService == nullptr) {
-        HILOGE("gattService is nullptr.");
-        return ret;
-    }
-
-    napi_unwrap(env, thisVar, (void**)&gattServer);
-    if (gattServer == nullptr) {
-        HILOGE("gattServer is nullptr.");
-        return ret;
-    }
-    int status = gattServer->GetServer()->AddService(*gattService);
-    if (status == GattStatus::GATT_SUCCESS) {
-        HILOGI("successful");
-        isOK = true;
-    } else {
-        HILOGE("failed, status: %{public}d", status);
-    }
-
-    delete gattService;
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+    outServer = gattServer->GetServer();
+    return napi_ok;
 }
 
 napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiGattServer* gattServer = nullptr;
-    bool isOK = false;
+    std::shared_ptr<GattServer> server {nullptr};
+    auto status = CheckGattsClose(env, info, server);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+
+    int ret = server->Close();
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_SUCCESS, ret);
+    return NapiGetUndefinedRet(env);
+}
+
+static napi_status CheckGattsRemoveService(napi_env env, napi_callback_info info,
+    std::shared_ptr<GattServer> &outServer, UUID &outUuid)
+{
+    size_t argc = 1;
+    napi_value argv[1] = {nullptr};
     napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc != 1, "Requires 1 arguments.", napi_invalid_arg);
 
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    napi_unwrap(env, thisVar, (void**)&gattServer);
-    if (gattServer == nullptr) {
-        HILOGE("gattServer is nullptr.");
-        return NapiGetBooleanFalse(env);
-    }
+    std::string uuid {};
+    NAPI_BT_CALL_RETURN(NapiParseUuid(env, argv[0], uuid));
 
-    int status = gattServer->GetServer()->Close();
-    if (status == GattStatus::GATT_SUCCESS) {
-        HILOGI("successful");
-        isOK = true;
-    } else {
-        HILOGE("failed, status: %{public}d", status);
-    }
-
-    napi_value ret = nullptr;
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+    outServer = gattServer->GetServer();
+    outUuid = UUID::FromString(uuid);
+    return napi_ok;
 }
 
 napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiGattServer* gattServer = nullptr;
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
+    std::shared_ptr<GattServer> server {nullptr};
+    UUID serviceUuid;
+    auto status = CheckGattsRemoveService(env, info, server, serviceUuid);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+
+    int ret = BT_ERR_INTERNAL_ERROR;
+    auto primaryService = server->GetService(serviceUuid, true);
+    if (primaryService.has_value()) {
+        ret = server->RemoveGattService(*primaryService);
+        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    }
+    auto secondService = server->GetService(serviceUuid, false);
+    if (secondService.has_value()) {
+        ret = server->RemoveGattService(*secondService);
+        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    }
+    NAPI_BT_ASSERT_RETURN_FALSE(env, (primaryService.has_value() || secondService.has_value()), BT_ERR_INVALID_PARAM);
+    return NapiGetBooleanRet(env, ret == BT_SUCCESS);
+}
+
+static napi_status CheckGattsSendRsp(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer,
+    NapiGattsServerResponse &outRsp)
+{
+    size_t argc = 1;
+    napi_value argv[1] = {nullptr};
     napi_value thisVar = nullptr;
-    std::string uuid;
-    bool isOK = false;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc != 1, "Requires 1 arguments.", napi_invalid_arg);
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    NAPI_ASSERT(env, argc == expectedArgsCount, "Requires 1 arguments.");
-    bool isSuccess = ParseString(env, uuid, argv[PARAM0]);
-    if (!isSuccess) {
-        HILOGE("ParseString faild.");
-        return NapiGetBooleanFalse(env);
-    }
-    if (!regex_match(uuid, uuidRegex)) {
-        HILOGE("match the UUID faild.");
-        return NapiGetBooleanFalse(env);
-    }
+    NapiGattsServerResponse rsp;
+    NAPI_BT_CALL_RETURN(NapiParseGattsServerResponse(env, argv[0], rsp));
 
-    napi_unwrap(env, thisVar, (void**)&gattServer);
-    if (gattServer == nullptr) {
-        HILOGE("gattServer is nullptr.");
-        return NapiGetBooleanFalse(env);
-    }
-    UUID serviceUuid = UUID::FromString(uuid);
-
-    std::optional<std::reference_wrapper<GattService>> gattService =
-        gattServer->GetServer()->GetService(serviceUuid, true);
-    if (gattService != std::nullopt) {
-        int status = gattServer->GetServer()->RemoveGattService(*gattService);
-        if (status == GattStatus::GATT_SUCCESS) {
-            HILOGI("successful");
-            isOK = true;
-        } else {
-            HILOGE("failed, status: %{public}d", status);
-        }
-    }
-    gattService = gattServer->GetServer()->GetService(serviceUuid, false);
-    if (gattService != std::nullopt) {
-        int status = gattServer->GetServer()->RemoveGattService(*gattService);
-        if (status == GattStatus::GATT_SUCCESS) {
-            HILOGI("successful");
-            isOK = true;
-        } else {
-            HILOGE("failed, status: %{public}d", status);
-        }
-    }
-
-    napi_value ret = nullptr;
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+    outServer = gattServer->GetServer();
+    outRsp = std::move(rsp);
+    return napi_ok;
 }
 
 napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiGattServer* gattServer = nullptr;
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-    bool isOK = false;
+    std::shared_ptr<GattServer> server {nullptr};
+    NapiGattsServerResponse rsp;
+    auto status = CheckGattsSendRsp(env, info, server, rsp);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    NAPI_ASSERT(env, argc == expectedArgsCount, "Requires 1 arguments.");
-
-    ServerResponse serverresponse = GetServerResponseFromJS(env, argv[PARAM0]);
-    napi_unwrap(env, thisVar, (void**)&gattServer);
-    if (gattServer == nullptr) {
-        HILOGE("gattServer is nullptr.");
-        return NapiGetBooleanFalse(env);
-    }
-    BluetoothRemoteDevice remoteDevice =
-        BluetoothHost::GetDefaultHost().GetRemoteDevice(serverresponse.deviceId, 1);
+    BluetoothRemoteDevice remoteDevice(rsp.deviceId, BTTransport::ADAPTER_BLE);
     HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice));
-    int status = gattServer->GetServer()->SendResponse(
-        remoteDevice, serverresponse.transId,
-        serverresponse.status,
-        serverresponse.offset,
-        serverresponse.value,
-        serverresponse.length);
-    if (status == GattStatus::GATT_SUCCESS) {
-        HILOGI("successful");
-        isOK = true;
-    } else {
-        HILOGE("failed, status: %{public}d", status);
-    }
+    int ret = server->SendResponse(remoteDevice, rsp.transId, rsp.status, rsp.offset, rsp.value.data(),
+        static_cast<int>(rsp.value.size()));
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    return NapiGetBooleanTrue(env);
+}
 
-    napi_value ret = nullptr;
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+static napi_status CheckGattsNotify(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer,
+    std::string &outDeviceId, NapiNotifyCharacteristic &outCharacter)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+
+    std::string deviceId {};
+    NapiNotifyCharacteristic character;
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], deviceId));
+    NAPI_BT_CALL_RETURN(NapiParseNotifyCharacteristic(env, argv[PARAM1], character));
+
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+    outServer = gattServer->GetServer();
+    outDeviceId = std::move(deviceId);
+    outCharacter = std::move(character);
+    return napi_ok;
+}
+
+static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServer> &server, const UUID &serviceUuid,
+    const UUID &characterUuid)
+{
+    auto service = server->GetService(serviceUuid, true);
+    if (!service.has_value()) {
+        service = server->GetService(serviceUuid, false);
+    }
+    if (!service.has_value()) {
+        HILOGE("not found service uuid: %{public}s", serviceUuid.ToString().c_str());
+        return nullptr;
+    }
+    GattCharacteristic *character = service.value().get().GetCharacteristic(characterUuid);
+    return character;
 }
 
 napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiGattServer* gattServer = nullptr;
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    std::string deviceID;
-    napi_value argv[ARGS_SIZE_TWO] = {0, 0};
-    napi_value thisVar = nullptr;
-    bool isOK = false;
-    napi_value ret = nullptr;
-    napi_get_boolean(env, isOK, &ret);
+    std::shared_ptr<GattServer> server {nullptr};
+    std::string deviceId {};
+    NapiNotifyCharacteristic notifyCharacter;
+    auto status = CheckGattsNotify(env, info, server, deviceId, notifyCharacter);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 2 argument.");
-        return ret;
-    }
-    napi_unwrap(env, thisVar, (void**)&gattServer);
-    if (gattServer == nullptr) {
-        HILOGE("gattServer is nullptr.");
-        return ret;
-    }
-    ParseString(env, deviceID, argv[PARAM0]);
-    BluetoothRemoteDevice remoteDevice = BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceID, 1);
-    GattCharacteristic* characteristic = GetCharacteristicFromJS(env, argv[PARAM1], gattServer->GetServer(), nullptr);
+    auto character = GetGattCharacteristic(server, notifyCharacter.serviceUuid, notifyCharacter.characterUuid);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, character != nullptr, BT_ERR_INVALID_PARAM);
+    character->SetValue(notifyCharacter.characterValue.data(), notifyCharacter.characterValue.size());
 
-    if (characteristic == nullptr) {
-        HILOGI("characteristic is nullptr");
-        return ret;
-    }
-    int status = gattServer->GetServer()->NotifyCharacteristicChanged(remoteDevice, *characteristic, false);
-    if (status == GattStatus::GATT_SUCCESS) {
-        HILOGI("successful");
-        isOK = true;
-    } else {
-        HILOGE("failed, status: %{public}d", status);
-    }
-
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+    BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
+    int ret = server->NotifyCharacteristicChanged(remoteDevice, *character, notifyCharacter.confirm);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    return NapiGetBooleanTrue(env);
 }
 } // namespace Bluetooth
 } // namespace OHOS

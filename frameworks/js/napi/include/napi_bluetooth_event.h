@@ -64,8 +64,9 @@ public:
         }
         auto func = std::bind(
             [](const std::shared_ptr<BluetoothCallbackInfo> &cb, T& obj) -> napi_value {
-			    return NapiEvent::CreateResult(cb, obj);
-			}, cb, obj);
+                return NapiEvent::CreateResult(cb, obj);
+            },
+            cb, obj);
         AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(cb, func);
         if (asyncEvent == nullptr) {
             HILOGI("asyncEvent is nullptr!");

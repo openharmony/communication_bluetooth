@@ -14,13 +14,17 @@
  */
 
 #include "napi_bluetooth_utils.h"
+#include <algorithm>
 #include <functional>
 #include <optional>
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_spp_client.h"
+#include "parser/napi_parser_utils.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -121,21 +125,22 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
     return true;
 }
 
-void ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string>& stringVector)
+napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string>& stringVector)
 {
     HILOGI("vector size: %{public}zu", stringVector.size());
     size_t idx = 0;
 
     if (stringVector.empty()) {
-        return;
+        return napi_ok;
     }
 
     for (auto& str : stringVector) {
         napi_value obj = nullptr;
-        napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &obj);
-        napi_set_element(env, result, idx, obj);
+        NAPI_BT_CALL_RETURN(napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &obj));
+        NAPI_BT_CALL_RETURN(napi_set_element(env, result, idx, obj));
         idx++;
     }
+    return napi_ok;
 }
 
 void ConvertGattServiceVectorToJS(napi_env env, napi_value result, vector<GattService>& services)
@@ -578,19 +583,17 @@ GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<G
 
         napi_create_string_utf8(env, "characteristics", NAPI_AUTO_LENGTH, &propertyNameValue);
         napi_has_property(env, object, propertyNameValue, &hasProperty);
-        if (!hasProperty) {
-            HILOGE("no characteristics field");
-            return nullptr;
-        }
-        napi_get_property(env, object, propertyNameValue, &value);
-        vector<GattCharacteristic> characteristics;
-        bool ret = GetCharacteristicVectorFromJS(env, value, characteristics, server, client);
-        if (!ret) {
-            HILOGI("GetCharacteristicVectorFromJS faild");
-            return nullptr;
-        }
-        for (auto& characteristic : characteristics) {
-            service->AddCharacteristic(characteristic);
+        if (hasProperty) {
+            napi_get_property(env, object, propertyNameValue, &value);
+            vector<GattCharacteristic> characteristics;
+            bool ret = GetCharacteristicVectorFromJS(env, value, characteristics, server, client);
+            if (!ret) {
+                HILOGI("GetCharacteristicVectorFromJS faild");
+                return nullptr;
+            }
+            for (auto& characteristic : characteristics) {
+                service->AddCharacteristic(characteristic);
+            }
         }
 
         napi_create_string_utf8(env, "includeServices", NAPI_AUTO_LENGTH, &propertyNameValue);
@@ -598,8 +601,8 @@ GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<G
         if (hasProperty) {
             napi_get_property(env, object, propertyNameValue, &value);
             vector<GattService> services;
-            bool ret = GetServiceVectorFromJS(env, value, services, server, client);
-            if (!ret) {
+            bool res = GetServiceVectorFromJS(env, value, services, server, client);
+            if (!res) {
                 HILOGI("GetServiceVectorFromJS faild");
                 return nullptr;
             }
@@ -640,7 +643,7 @@ bool GetCharacteristicVectorFromJS(napi_env env, napi_value object, vector<GattC
         napi_create_object(env, &result);
         napi_get_element(env, object, idx, &result);
         GattCharacteristic* characteristic = GetCharacteristicFromJS(env, result, server, client);
-        if (characteristic ==nullptr) {
+        if (characteristic == nullptr) {
             HILOGE("characteristic is nullptr");
             return false;
         }
@@ -785,6 +788,32 @@ napi_value NapiGetUndefinedRet(napi_env env)
     return ret;
 }
 
+napi_value NapiGetInt32Ret(napi_env env, int32_t res)
+{
+    napi_value ret = nullptr;
+    napi_create_int32(env, res, &ret);
+    return ret;
+}
+
+static napi_status CheckObserverParams(napi_env env, size_t argc, napi_value *argv, std::string &outType,
+    std::shared_ptr<BluetoothCallbackInfo> &outpCallbackInfo)
+{
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+    std::string type;
+    bool ok = ParseString(env, type, argv[PARAM0]);
+    if (!ok) {
+        return napi_invalid_arg;
+    }
+    napi_valuetype valueType = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM1], &valueType));
+    NAPI_BT_RETURN_IF(valueType != napi_function, "Requires a function argument", napi_function_expected);
+    NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &outpCallbackInfo->callback_));
+
+    outType = type;
+    outpCallbackInfo->env_ = env;
+    return napi_ok;
+}
+
 napi_value RegisterObserver(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -796,15 +825,10 @@ napi_value RegisterObserver(napi_env env, napi_callback_info info)
     if (argc == expectedArgsCount + 1) {
         NapiSppClient::On(env, info);
     } else {
-        NAPI_ASSERT(env, argc == expectedArgsCount, "Requires 2 arguments.");
         std::string type;
-        ParseString(env, type, argv[PARAM0]);
         std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
-        pCallbackInfo->env_ = env;
-        napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[PARAM1], &valueType);
-        NAPI_ASSERT(env, valueType == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_);
+        auto status = CheckObserverParams(env, argc, argv, type, pCallbackInfo);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         std::lock_guard<std::mutex> lock(g_observerMutex);
         g_Observer[type] = pCallbackInfo;
         HILOGI("%{public}s is registered", type.c_str());
@@ -829,7 +853,7 @@ static std::map<std::string, int32_t> registerTypeMap = {
     {REGISTER_DEVICE_FIND_TYPE, BLUETOOTH_DEVICE_FIND_TYPE},
     {REGISTER_STATE_CHANGE_TYPE, STATE_CHANGE_TYPE},
     {REGISTER_PIN_REQUEST_TYPE, PIN_REQUEST_TYPE},
-    {REGISTER_BONE_STATE_TYPE, BOND_STATE_CHANGE_TYPE},
+    {REGISTER_BOND_STATE_TYPE, BOND_STATE_CHANGE_TYPE},
     {REGISTER_BLE_FIND_DEVICE_TYPE, BLE_DEVICE_FIND_TYPE}
 };
 
@@ -879,47 +903,9 @@ napi_value CallbackObserver(int32_t typeNum, std::shared_ptr<BluetoothCallbackIn
 napi_value DeregisterObserver(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    HILOGI("argc: %{public}zu", argc);
-    if (argc == ARGS_SIZE_ONE) {
-        std::string type;
-        ParseString(env, type, argv[PARAM0]);
-        RemoveObserver(type);
-    } else if (argc == expectedArgsCount + 1) {
-        NapiSppClient::Off(env, info);
-    } else {
-        NAPI_ASSERT(env, argc == expectedArgsCount, "Requires 2 argument.");
-        std::string type;
-        ParseString(env, type, argv[PARAM0]);
-
-        std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
-        pCallbackInfo->env_ = env;
-        napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[PARAM1], &valueType);
-        NAPI_ASSERT(env, valueType == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_);
-        if (pCallbackInfo != nullptr) {
-            napi_value callback = 0;
-            napi_value undefined = 0;
-            napi_value callResult = 0;
-            napi_get_undefined(pCallbackInfo->env_, &undefined);
-            int32_t typeNum = 0;
-            if (registerTypeMap.find(type) != registerTypeMap.end()) {
-                typeNum = registerTypeMap[type];
-            }
-            napi_value result = CallbackObserver(typeNum, pCallbackInfo);
-            napi_get_reference_value(pCallbackInfo->env_, pCallbackInfo->callback_, &callback);
-            napi_call_function(pCallbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        }
-
-        RemoveObserver(type);
-    }
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-    return ret;
+    auto status = CheckDeregisterObserver(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
 }
 
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver()
@@ -1235,7 +1221,7 @@ bool GetCurrentAppOperate()
 void RegisterSysBLEObserver(
     const std::shared_ptr<BluetoothCallbackInfo> &info, int32_t callbackIndex, const std::string &type)
 {
-    if (callbackIndex >= ARGS_SIZE_THREE) {
+    if (callbackIndex >= static_cast<int32_t>(ARGS_SIZE_THREE)) {
         return;
     }
     std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
@@ -1251,5 +1237,331 @@ void UnregisterSysBLEObserver(const std::string &type)
         g_sysBLEObserver.erase(itor);
     }
 }
+
+bool IsValidAddress(std::string bdaddr)
+{
+    const std::regex deviceIdRegex("^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$");
+    return regex_match(bdaddr, deviceIdRegex);
+}
+
+bool IsValidUuid(std::string uuid)
+{
+    return regex_match(uuid, uuidRegex);
+}
+
+napi_status NapiIsBoolean(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_boolean, "Wrong argument type. Boolean expected.", napi_boolean_expected);
+    return napi_ok;
+}
+
+napi_status NapiIsNumber(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_number, "Wrong argument type. Number expected.", napi_number_expected);
+    return napi_ok;
+}
+
+napi_status NapiIsString(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_string, "Wrong argument type. String expected.", napi_string_expected);
+    return napi_ok;
+}
+
+napi_status NapiIsFunction(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_function, "Wrong argument type. Function expected.", napi_function_expected);
+    return napi_ok;
+}
+
+napi_status NapiIsArrayBuffer(napi_env env, napi_value value)
+{
+    bool isArrayBuffer = false;
+    NAPI_BT_CALL_RETURN(napi_is_arraybuffer(env, value, &isArrayBuffer));
+    NAPI_BT_RETURN_IF(!isArrayBuffer, "Expected arraybuffer type", napi_arraybuffer_expected);
+    return napi_ok;
+}
+
+napi_status NapiIsArray(napi_env env, napi_value value)
+{
+    bool isArray = false;
+    NAPI_BT_CALL_RETURN(napi_is_array(env, value, &isArray));
+    NAPI_BT_RETURN_IF(!isArray, "Expected array type", napi_array_expected);
+    return napi_ok;
+}
+
+napi_status NapiIsObject(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_object, "Wrong argument type. Object expected.", napi_object_expected);
+    return napi_ok;
+}
+
+napi_status ParseNumberParams(napi_env env, napi_value object, const char *name, bool &outExist,
+    napi_value &outParam)
+{
+    bool hasProperty = false;
+    NAPI_BT_CALL_RETURN(napi_has_named_property(env, object, name, &hasProperty));
+    if (hasProperty) {
+        napi_value property;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, object, name, &property));
+        napi_valuetype valuetype;
+        NAPI_BT_CALL_RETURN(napi_typeof(env, property, &valuetype));
+        NAPI_BT_RETURN_IF(valuetype != napi_number, "Wrong argument type, number expected", napi_number_expected);
+        outParam = property;
+    }
+    outExist = hasProperty;
+    return napi_ok;
+}
+
+napi_status ParseInt32Params(napi_env env, napi_value object, const char *name, bool &outExist,
+    int32_t &outParam)
+{
+    bool exist = false;
+    napi_value param;
+    NAPI_BT_CALL_RETURN(ParseNumberParams(env, object, name, exist, param));
+    if (exist) {
+        int32_t num = 0;
+        NAPI_BT_CALL_RETURN(napi_get_value_int32(env, param, &num));
+        outParam = num;
+    }
+    outExist = exist;
+    return napi_ok;
+}
+
+napi_status ParseUint32Params(napi_env env, napi_value object, const char *name, bool &outExist,
+    uint32_t &outParam)
+{
+    bool exist = false;
+    napi_value param;
+    NAPI_BT_CALL_RETURN(ParseNumberParams(env, object, name, exist, param));
+    if (exist) {
+        uint32_t num = 0;
+        NAPI_BT_CALL_RETURN(napi_get_value_uint32(env, param, &num));
+        outParam = num;
+    }
+    outExist = exist;
+    return napi_ok;
+}
+
+napi_status ParseBooleanParams(napi_env env, napi_value object, const char *name, bool &outExist, bool &outParam)
+{
+    bool hasProperty = false;
+    NAPI_BT_CALL_RETURN(napi_has_named_property(env, object, name, &hasProperty));
+    if (hasProperty) {
+        napi_value property;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, object, name, &property));
+        napi_valuetype valuetype;
+        NAPI_BT_CALL_RETURN(napi_typeof(env, property, &valuetype));
+        NAPI_BT_RETURN_IF(valuetype != napi_boolean, "Wrong argument type, boolean expected", napi_boolean_expected);
+
+        bool param = false;
+        NAPI_BT_CALL_RETURN(napi_get_value_bool(env, property, &param));
+        outParam = param;
+    }
+    outExist = hasProperty;
+    return napi_ok;
+}
+
+// Only used for optional paramters
+napi_status ParseStringParams(napi_env env, napi_value object, const char *name, bool &outExist,
+    std::string &outParam)
+{
+    bool hasProperty = false;
+    NAPI_BT_CALL_RETURN(napi_has_named_property(env, object, name, &hasProperty));
+    if (hasProperty) {
+        napi_value property;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, object, name, &property));
+        napi_valuetype valuetype;
+        NAPI_BT_CALL_RETURN(napi_typeof(env, property, &valuetype));
+        NAPI_BT_RETURN_IF(valuetype != napi_string, "Wrong argument type, string expected", napi_string_expected);
+
+        std::string param {};
+        bool isSuccess = ParseString(env, param, property);
+        if (!isSuccess) {
+            return napi_invalid_arg;
+        }
+        outParam = std::move(param);
+    }
+    outExist = hasProperty;
+    return napi_ok;
+}
+
+napi_status ParseArrayBufferParams(napi_env env, napi_value object, const char *name, bool &outExist,
+    std::vector<uint8_t> &outParam)
+{
+    bool hasProperty = false;
+    NAPI_BT_CALL_RETURN(napi_has_named_property(env, object, name, &hasProperty));
+    if (hasProperty) {
+        napi_value property;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, object, name, &property));
+        bool isArrayBuffer = false;
+        NAPI_BT_CALL_RETURN(napi_is_arraybuffer(env, property, &isArrayBuffer));
+        NAPI_BT_RETURN_IF(!isArrayBuffer, "Wrong argument type, arraybuffer expected", napi_arraybuffer_expected);
+
+        uint8_t *data = nullptr;
+        size_t size = 0;
+        bool isSuccess = ParseArrayBuffer(env, &data, size, property);
+        if (!isSuccess) {
+            HILOGE("ParseArrayBuffer faild.");
+            return napi_invalid_arg;
+        }
+        outParam = std::vector<uint8_t>(data, data + size);
+    }
+    outExist = hasProperty;
+    return napi_ok;
+}
+
+napi_status ParseUuidParams(napi_env env, napi_value object, const char *name, bool &outExist, UUID &outUuid)
+{
+    bool exist = false;
+    std::string uuid {};
+    NAPI_BT_CALL_RETURN(ParseStringParams(env, object, name, exist, uuid));
+    if (exist) {
+        if (!regex_match(uuid, uuidRegex)) {
+            HILOGE("match the UUID faild.");
+            return napi_invalid_arg;
+        }
+        outUuid = ParcelUuid::FromString(uuid);
+    }
+    outExist = exist;
+    return napi_ok;
+}
+
+// This function applies to interfaces with a single address as a parameter.
+bool CheckDeivceIdParam(napi_env env, napi_callback_info info, std::string &addr)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Wrong argument type", false);
+    NAPI_BT_RETURN_IF(!ParseString(env, addr, argv[PARAM0]), "ParseString failed", false);
+    NAPI_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
+    return true;
+}
+
+bool CheckProfileIdParam(napi_env env, napi_callback_info info, int &profileId)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Wrong argument type", false);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, profileId, argv[PARAM0]), "ParseInt32 failed", false);
+    return true;
+}
+
+bool CheckSetDevicePairingConfirmationParam(napi_env env, napi_callback_info info, std::string &addr, bool &accept)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Wrong argument type", false);
+    NAPI_BT_RETURN_IF(!ParseString(env, addr, argv[PARAM0]), "ParseString failed", false);
+    NAPI_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
+    NAPI_BT_RETURN_IF(!ParseBool(env, accept, argv[PARAM1]), "ParseBool failed", false);
+    return true;
+}
+
+bool CheckLocalNameParam(napi_env env, napi_callback_info info, std::string &name)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Wrong argument type", false);
+    NAPI_BT_RETURN_IF(!ParseString(env, name, argv[PARAM0]), "ParseString failed", false);
+    return true;
+}
+
+bool CheckSetBluetoothScanModeParam(napi_env env, napi_callback_info info, int32_t &mode, int32_t &duration)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Wrong argument type", false);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, mode, argv[PARAM0]), "ParseInt32 failed", false);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, duration, argv[PARAM1]), "ParseInt32 failed", false);
+    return true;
+}
+
+napi_status CheckDeregisterObserver(napi_env env, napi_callback_info info)
+{
+    size_t expectedArgsCount = ARGS_SIZE_TWO;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_TWO] = {0};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    if (argc == ARGS_SIZE_ONE) {
+        std::string type;
+        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
+        RemoveObserver(type);
+    } else if (argc == expectedArgsCount + 1) {
+        NapiSppClient::Off(env, info);
+    } else {
+        NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+        std::string type;
+        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
+
+        std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
+        pCallbackInfo->env_ = env;
+        NAPI_BT_RETURN_IF(pCallbackInfo == nullptr, "pCallbackInfo is nullptr.", napi_invalid_arg);
+        NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
+        NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_));
+        if (pCallbackInfo != nullptr) {
+            napi_value callback = 0;
+            napi_value undefined = 0;
+            napi_value callResult = 0;
+            napi_get_undefined(pCallbackInfo->env_, &undefined);
+            int32_t typeNum = 0;
+            if (registerTypeMap.find(type) != registerTypeMap.end()) {
+                typeNum = registerTypeMap[type];
+            }
+            napi_value result = CallbackObserver(typeNum, pCallbackInfo);
+            napi_get_reference_value(pCallbackInfo->env_, pCallbackInfo->callback_, &callback);
+            napi_call_function(pCallbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+        }
+        RemoveObserver(type);
+    }
+    return napi_ok;
+}
+
+napi_status CheckEmptyParam(napi_env env, napi_callback_info info)
+{
+    size_t argc = ARGS_SIZE_ZERO;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ZERO, "Requires 0 argument.", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const std::vector<std::string> &names)
+{
+    uint32_t len = 0;
+    napi_value properties;
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(napi_get_property_names(env, object, &properties));
+    NAPI_BT_CALL_RETURN(napi_get_array_length(env, properties, &len));
+    for (uint32_t i = 0; i < len; ++i) {
+        std::string name {};
+        napi_value actualName;
+        NAPI_BT_CALL_RETURN(napi_get_element(env, properties, i, &actualName));
+        NAPI_BT_CALL_RETURN(NapiParseString(env, actualName, name));
+        if (std::find(names.begin(), names.end(), name) == names.end()) {
+            HILOGE("Unexpect object property name: \"%{public}s\"", name.c_str());
+            return napi_invalid_arg;
+        }
+    }
+    return napi_ok;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

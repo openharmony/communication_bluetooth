@@ -194,10 +194,13 @@ bool EnableBle(void)
         HILOGI("ble enabled already");
         return true;
     }
-
-    bool ret = g_BluetoothHost->EnableBle();
+    bool  isEnabled = false;
+    int32_t ret = g_BluetoothHost->EnableBle();
     HILOGI("result: %{public}d", ret);
-    return ret;
+    if (ret == BT_SUCCESS) {
+        isEnabled = true;
+    }
+    return isEnabled;
 }
 
 bool DisableBle(void)
@@ -211,10 +214,13 @@ bool DisableBle(void)
         HILOGI("ble disabled already");
         return true;
     }
-
-    bool ret = g_BluetoothHost->DisableBle();
+    bool  isEnabled = false;
+    int ret = g_BluetoothHost->DisableBle();
     HILOGI("result: %{public}d", ret);
-    return ret;
+    if (ret == BT_SUCCESS) {
+        isEnabled = true;
+    }
+    return isEnabled;
 }
 
 bool EnableBt(void)
@@ -224,15 +230,20 @@ bool EnableBt(void)
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
-    int state = g_BluetoothHost->GetBtState();
+    int state;
+    g_BluetoothHost->GetBtState(state);
     if (state == BTStateID::STATE_TURNING_ON ||
         state == BTStateID::STATE_TURN_ON) {
         HILOGI("br state is %{public}d", state);
         return true;
     }
-    bool ret = g_BluetoothHost->EnableBt();
+    bool  isEnabled = false;
+    int ret = g_BluetoothHost->EnableBt();
     HILOGI("result: %{public}d", ret);
-    return ret;
+    if (ret == BT_SUCCESS) {
+        isEnabled = true;
+    }
+    return isEnabled;
 }
 
 bool DisableBt(void)
@@ -242,7 +253,8 @@ bool DisableBt(void)
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
-    int state = g_BluetoothHost->GetBtState();
+    int state;
+    g_BluetoothHost->GetBtState(state);
     if (state == BTStateID::STATE_TURNING_OFF ||
         state == BTStateID::STATE_TURN_OFF) {
         HILOGI("br state is %{public}d", state);
@@ -260,7 +272,8 @@ int GetBtState()
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
-    int state = g_BluetoothHost->GetBtState();
+    int state;
+    g_BluetoothHost->GetBtState(state);
     HILOGI("br state: %{public}d", state);
     return state;
 }
@@ -306,9 +319,13 @@ bool SetLocalName(unsigned char *localName, unsigned char length)
     }
 
     string newName(reinterpret_cast<const char *>(localName));
-    bool ret = g_BluetoothHost->SetLocalName(newName);
+    bool isSuccess = false;
+    int ret = g_BluetoothHost->SetLocalName(newName);
+    if (ret == BT_SUCCESS) {
+        isSuccess = true;
+    }
     HILOGI("result %{public}d: LocalName : %{public}s", ret, g_BluetoothHost->GetLocalName().c_str());
-    return ret;
+    return isSuccess;
 }
 
 bool SetBtScanMode(int mode, int duration)
@@ -317,9 +334,13 @@ bool SetBtScanMode(int mode, int duration)
     if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
-    bool ret = g_BluetoothHost->SetBtScanMode(mode, duration);
+    bool isSuccess = false;
+    int ret = g_BluetoothHost->SetBtScanMode(mode, duration);
+    if (ret == BT_SUCCESS) {
+        isSuccess = true;
+    }
     g_BluetoothHost->SetBondableMode(BT_TRANSPORT_BREDR, BONDABLE_MODE_ON);
-    return ret;
+    return isSuccess;
 }
 
 bool PairRequestReply(const BdAddr *bdAddr, int transport, bool accept)
@@ -355,9 +376,13 @@ bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool acce
         HILOGE("transport: %{public}d is invalid", transport);
         return false;
     }
-    bool ret = remoteDevice.SetDevicePairingConfirmation(accept);
+    bool isSuccess = false;
+    int ret = remoteDevice.SetDevicePairingConfirmation(accept);
     HILOGI("ret: %{public}d", ret);
-    return ret;
+    if (ret == BT_SUCCESS) {
+        isSuccess = true;
+    }
+    return isSuccess;
 }
 
 int GapRegisterCallbacks(BtGapCallBacks *func)

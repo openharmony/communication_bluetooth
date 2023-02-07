@@ -848,7 +848,7 @@ MapMasInstanceInfoList MapClient::GetMasInstanceInfo(const BluetoothRemoteDevice
     // process
     if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
         BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        BluetoothIProfileMasInstanceInfoList infoList = pimpl->proxy_->GetMasInstanceInfo(rawDevice);
+        infoList = pimpl->proxy_->GetMasInstanceInfo(rawDevice);
 
         HILOGI("Test!");
         if (infoList.isValid == true) {

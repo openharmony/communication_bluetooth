@@ -229,7 +229,7 @@ int BluetoothHfpHfServer::GetDevicesByStates(const std::vector<int> &states,
     for (RawAddress device : rawDevices) {
         devices.push_back(BluetoothRawAddress(device));
     }
-    return BT_SUCCESS;
+    return BT_SUCC;
 }
 
 int BluetoothHfpHfServer::GetDeviceState(const BluetoothRawAddress &device) {
@@ -422,7 +422,7 @@ int BluetoothHfpHfServer::StartDial(const BluetoothRawAddress &device, const std
         return BT_FAILURE;
     } else {
         call = *ret;
-        return BT_SUCCESS;
+        return BT_SUCC;
     }
 }
 

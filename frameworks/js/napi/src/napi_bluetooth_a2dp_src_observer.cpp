@@ -19,6 +19,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
+
+std::shared_mutex NapiA2dpSourceObserver::g_a2dpSrcCallbackInfosMutex;
 void NapiA2dpSourceObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);

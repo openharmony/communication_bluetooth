@@ -13,8 +13,13 @@
  * limitations under the License.
  */
 #include "bluetooth_hfp_ag.h"
+
+#include "bluetooth_errorcode.h"
+#include "bluetooth_utils.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_hfp_ag.h"
 #include "napi_bluetooth_profile.h"
+#include "napi_bluetooth_event.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -58,68 +63,28 @@ napi_value NapiHandsFreeAudioGateway::HandsFreeAudioGatewayConstructor(napi_env 
 napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
+    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex);
 
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 2 argument.");
-        return ret;
-    }
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
-    callbackInfo->env_ = env;
-
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[PARAM1], &valueType);
-    if (valueType != napi_function) {
-        HILOGE("Wrong argument type. Function expected.");
-        return ret;
-    }
-    napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    observer_.callbackInfos_[type] = callbackInfo;
-    HILOGI("%{public}s is registered", type.c_str());
-
+    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
     if (!isRegistered_) {
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
         profile->RegisterObserver(&observer_);
         isRegistered_ = true;
     }
+
+    HILOGI("Hands Free Audio Gateway is registered");
     return ret;
 }
 
 napi_value NapiHandsFreeAudioGateway::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
+    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex);
 
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    } 
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    observer_.callbackInfos_[type] = nullptr;
-    HILOGI("%{public}s is unregistered", type.c_str());
+    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    HILOGI("Hands Free Audio Gateway is unregistered");
     return ret;
 }
 
@@ -127,9 +92,18 @@ napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_ca
 {
     HILOGI("enter");
     napi_value ret = nullptr;
-    napi_create_array(env, &ret);
+    if (napi_create_array(env, &ret) != napi_ok) {
+        HILOGE("napi_create_array failed.");
+    }
+    napi_status checkRet = CheckEmptyParam(env, info);
+    NAPI_BT_ASSERT_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
+
     HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-    vector<BluetoothRemoteDevice> devices = profile->GetConnectedDevices();
+    vector<BluetoothRemoteDevice> devices;
+    int errorCode = profile->GetConnectedDevices(devices);
+    HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, ret);
+
     vector<string> deviceVector;
     for (auto &device: devices) {
         deviceVector.push_back(device.GetDeviceAddr());
@@ -141,32 +115,27 @@ napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_ca
 napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
+    napi_value result = nullptr;
+    int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
+    if (napi_create_int32(env, profileState, &result) != napi_ok) {
+        HILOGE("napi_create_int32 failed.");
     }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, result);
 
     HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    int state = profile->GetDeviceState(device);
-    int status = GetProfileConnectionState(state);
-    napi_value result = nullptr;
-    napi_create_int32(env, status, &result);
-    HILOGI("status: %{public}d", status);
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+    int32_t errorCode = profile->GetDeviceState(device, state);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, result);
+
+    profileState = GetProfileConnectionState(state);
+    if (napi_create_int32(env, profileState, &result) != napi_ok) {
+        HILOGE("napi_create_int32 failed.");
+    }
     return result;
 }
 
@@ -335,65 +304,31 @@ napi_value NapiHandsFreeAudioGateway::CloseVoiceRecognition(napi_env env, napi_c
 napi_value NapiHandsFreeAudioGateway::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    bool res = profile->Connect(device);
-
-    napi_value result = nullptr;
-    napi_get_boolean(env, res, &result);
-    HILOGI("res: %{public}d", res);
-    return result;
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t errorCode = profile->Connect(device);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    return NapiGetBooleanTrue(env);
 }
 
 napi_value NapiHandsFreeAudioGateway::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    bool res = profile->Disconnect(device);
-
-    napi_value result = nullptr;
-    napi_get_boolean(env, res, &result);
-    HILOGI("res: %{public}d", res);
-    return result;
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t errorCode = profile->Disconnect(device);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    return NapiGetBooleanTrue(env);
 }
 } // namespace Bluetooth
 } // namespace OHOS

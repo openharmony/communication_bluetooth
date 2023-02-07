@@ -13,12 +13,15 @@
  * limitations under the License.
  */
 
-#include "bluetooth_pan.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
-#include "napi_bluetooth_pan_observer.h"
-#include "napi_bluetooth_utils.h"
-#include "napi_bluetooth_profile.h"
+#include "bluetooth_pan.h"
+#include "bluetooth_utils.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_pan.h"
+#include "napi_bluetooth_pan_observer.h"
+#include "napi_bluetooth_profile.h"
+#include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -127,24 +130,21 @@ napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
 napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
-    size_t expectedArgsCount = ARGS_SIZE_ZERO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ZERO] = {};
-    napi_value thisVar = nullptr;
-
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("No Requires argument.");
-        return ret;
+    if (napi_create_array(env, &ret) != napi_ok) {
+        HILOGE("napi_create_array failed.");
     }
-    napi_create_array(env, &ret);
+
+    napi_status checkRet = CheckEmptyParam(env, info);
+    NAPI_BT_ASSERT_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
+
     Pan *profile = Pan::GetProfile();
     vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
-    vector<BluetoothRemoteDevice> devices = profile->GetDevicesByStates(states);
+    vector<BluetoothRemoteDevice> devices;
+    int errorCode = profile->GetDevicesByStates(states, devices);
+    HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, ret);
+
     vector<string> deviceVector;
     for (auto &device : devices) {
         deviceVector.push_back(device.GetDeviceAddr());
@@ -156,32 +156,27 @@ napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_in
 napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
+    napi_value result = nullptr;
+    int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
+    if (napi_create_int32(env, profileState, &result) != napi_ok) {
+        HILOGE("napi_create_int32 failed.");
     }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, result);
 
     Pan *profile = Pan::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    int state = profile->GetDeviceState(device);
-    int profileState = GetProfileConnectionState(state);
-    napi_value result = nullptr;
-    napi_create_int32(env, profileState, &result);
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+    int32_t errorCode = profile->GetDeviceState(device, state);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, result);
+
+    profileState = GetProfileConnectionState(state);
+    if (napi_create_int32(env, profileState, &result) != napi_ok) {
+        HILOGE("napi_create_int32 failed.");
+    }
     HILOGI("profileState: %{public}d", profileState);
     return result;
 }
@@ -189,88 +184,58 @@ napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info inf
 napi_value NapiBluetoothPan::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     Pan *profile = Pan::GetProfile();
-    BluetoothRemoteDevice device(deviceId, 1);
-    bool res = profile->Disconnect(device);
-    napi_value result = nullptr;
-    napi_get_boolean(env, res, &result);
-    HILOGI("res: %{public}d", res);
-    return result;
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t errorCode = profile->Disconnect(device);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+
+    return NapiGetBooleanTrue(env);
+}
+
+static bool CheckSetTetheringParam(napi_env env, napi_callback_info info, bool &out)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", false);
+    NAPI_BT_RETURN_IF(!ParseBool(env, out, argv[PARAM0]), "Bool expected.", false);
+    return true;
 }
 
 napi_value NapiBluetoothPan::SetTethering(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    bool value;
-    if (!ParseBool(env, value, argv[PARAM0])) {
-        HILOGE("Bool expected.");
-        return ret;
-    }
+    bool value = false;
+    bool checkRet = CheckSetTetheringParam(env, info, value);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
 
     Pan *profile = Pan::GetProfile();
-    bool res = profile->SetTethering(value);
-    napi_value result = nullptr;
-    napi_get_boolean(env, res, &result);
-    HILOGI("res: %{public}d", res);
-    return result;
+    int32_t errorCode = profile->SetTethering(value);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_SUCCESS, errorCode);
+
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBluetoothPan::IsTetheringOn(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ZERO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ZERO] = {};
-    napi_value thisVar = nullptr;
+    napi_status checkRet = CheckEmptyParam(env, info);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("No Requires argument.");
-        return ret;
-    }
     Pan *profile = Pan::GetProfile();
-    bool res = profile->IsTetheringOn();
-    napi_value result = nullptr;
-    napi_get_boolean(env, res, &result);
-    HILOGI("res: %{public}d", res);
-    return result;
+    bool result = false;
+    int32_t errorCode = profile->IsTetheringOn(result);
+    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+
+    HILOGI("IsTetheringOn: %{public}d", result);
+    return NapiGetBooleanRet(env, result);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
