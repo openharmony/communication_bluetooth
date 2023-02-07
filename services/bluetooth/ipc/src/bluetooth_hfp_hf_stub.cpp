@@ -40,7 +40,7 @@ BluetoothHfpHfStub::BluetoothHfpHfStub() {
         &BluetoothHfpHfStub::SendDTMFToneInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfStub::Code::BT_HFP_HF_CONNECT)] =
-        &BluetoothHfpHfStub::ConnectInner;
+        nullptr;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfStub::Code::BT_HFP_HF_DISCONNECT)] =
         &BluetoothHfpHfStub::DisconnectInner;

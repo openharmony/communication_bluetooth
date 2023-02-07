@@ -26,7 +26,7 @@ BluetoothMapMceStub::BluetoothMapMceStub()
     memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMce::Code::MCE_DE_REGISTER_OBSERVER)] =
         &BluetoothMapMceStub::DeregisterObserverInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMce::Code::MCE_CONNECT)] =
-        &BluetoothMapMceStub::ConnectInner;
+        nullptr;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMce::Code::MCE_DISCONNECT)] =
         &BluetoothMapMceStub::DisconnectInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMce::Code::MCE_ISCONNECTED)] =
