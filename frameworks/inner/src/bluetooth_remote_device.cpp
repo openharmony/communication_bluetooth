@@ -20,6 +20,7 @@
 #include "bluetooth_host.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_remote_device.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -62,11 +63,11 @@ int BluetoothRemoteDevice::GetDeviceType() const
 bool BluetoothRemoteDevice::IsValidBluetoothRemoteDevice() const
 {
     if (!BluetoothHost::IsValidBluetoothAddr(address_)) {
-        HILOGI("invalid bluetooth addr.");
+        HILOGI("invalid bluetooth addr, address_: %{public}s", GetEncryptAddr(address_).c_str());
         return false;
     }
 
-    if ((BT_TRANSPORT_BREDR != transport_) && (BT_TRANSPORT_BLE != transport_)) {
+    if ((transport_ != BT_TRANSPORT_BREDR) && (transport_ != BT_TRANSPORT_BLE)) {
         HILOGI("invalid transport type.");
         return false;
     }
@@ -164,7 +165,23 @@ std::string BluetoothRemoteDevice::GetDeviceName() const
         HILOGE("fails: no proxy");
         return INVALID_NAME;
     }
-    return hostProxy->GetDeviceName(transport_, address_);
+    std::string name = INVALID_NAME;
+    hostProxy->GetDeviceName(transport_, address_, name);
+    return name;
+}
+
+int BluetoothRemoteDevice::GetDeviceName(std::string &name) const
+{
+    if (!IsValidBluetoothRemoteDevice()) {
+        HILOGW("Invalid remote device");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
+    if (hostProxy == nullptr) {
+        HILOGE("fails: no proxy");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return hostProxy->GetDeviceName(transport_, address_, name);
 }
 
 std::string BluetoothRemoteDevice::GetDeviceAlias() const
@@ -227,17 +244,17 @@ int BluetoothRemoteDevice::GetPairState() const
     return hostProxy->GetPairState(transport_, address_);
 }
 
-bool BluetoothRemoteDevice::StartPair()
+int BluetoothRemoteDevice::StartPair()
 {
     HILOGI("enter");
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
     if (hostProxy == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return hostProxy->StartPair(transport_, address_);
 }
@@ -302,20 +319,20 @@ bool BluetoothRemoteDevice::IsAclEncrypted() const
     return hostProxy->IsAclEncrypted(transport_, address_);
 }
 
-BluetoothDeviceClass BluetoothRemoteDevice::GetDeviceClass() const
+int BluetoothRemoteDevice::GetDeviceClass(int &cod) const
 {
     HILOGI("enter");
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
-        return BluetoothDeviceClass(0);
+        return BT_ERR_INTERNAL_ERROR;
     }
     sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
     if (hostProxy == nullptr) {
         HILOGE("fails: no proxy");
-        return BluetoothDeviceClass(0);
+        return BT_ERR_INTERNAL_ERROR;
     }
-    int cod = hostProxy->GetDeviceClass(address_);
-    return BluetoothDeviceClass(cod);
+    int ret = hostProxy->GetDeviceClass(address_, cod);
+    return ret;
 }
 
 std::vector<ParcelUuid> BluetoothRemoteDevice::GetDeviceUuids() const
@@ -354,17 +371,17 @@ bool BluetoothRemoteDevice::SetDevicePin(const std::string &pin)
     return hostProxy->SetDevicePin(address_, pin);
 }
 
-bool BluetoothRemoteDevice::SetDevicePairingConfirmation(bool accept)
+int BluetoothRemoteDevice::SetDevicePairingConfirmation(bool accept)
 {
     HILOGI("enter, accept: %{public}d", accept);
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
     if (hostProxy == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return hostProxy->SetDevicePairingConfirmation(transport_, address_, accept);
 }

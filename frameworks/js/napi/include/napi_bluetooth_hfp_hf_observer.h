@@ -16,6 +16,7 @@
 #ifndef NAPI_BLUETOOTH_HFP_HF_OBSERVER_H_
 #define NAPI_BLUETOOTH_HFP_HF_OBSERVER_H_
 
+#include <shared_mutex>
 #include "bluetooth_hfp_hf.h"
 #include "napi_bluetooth_utils.h"
 
@@ -40,7 +41,7 @@ public:
 
     NapiHandsFreeUnitObserver() = default;
     virtual ~NapiHandsFreeUnitObserver() = default;
-
+    static std::shared_mutex g_handsFreeUnitCallbackInfosMutex;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };
 

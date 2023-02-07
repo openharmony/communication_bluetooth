@@ -20,28 +20,25 @@
 #include "ipc_types.h"
 #include "parcel_bt_uuid.h"
 
+using std::placeholders::_1;
+using std::placeholders::_2;
+using std::placeholders::_3;
 namespace OHOS {
 namespace Bluetooth {
 const std::map<uint32_t, std::function<ErrCode(BluetoothBleAdvertiserStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleAdvertiserStub::interfaces_ = {
         {IBluetoothBleAdvertiser::Code::BLE_REGISTER_BLE_ADVERTISER_CALLBACK,
-            std::bind(&BluetoothBleAdvertiserStub::RegisterBleAdvertiserCallbackInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiserStub::RegisterBleAdvertiserCallbackInner, _1, _2, _3)},
         {IBluetoothBleAdvertiser::Code::BLE_DE_REGISTER_BLE_ADVERTISER_CALLBACK,
-            std::bind(&BluetoothBleAdvertiserStub::DeregisterBleAdvertiserCallbackInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiserStub::DeregisterBleAdvertiserCallbackInner, _1, _2, _3)},
         {IBluetoothBleAdvertiser::Code::BLE_START_ADVERTISING,
-            std::bind(&BluetoothBleAdvertiserStub::StartAdvertisingInner, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiserStub::StartAdvertisingInner, _1, _2, _3)},
         {IBluetoothBleAdvertiser::Code::BLE_STOP_ADVERTISING,
-            std::bind(&BluetoothBleAdvertiserStub::StopAdvertisingInner, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiserStub::StopAdvertisingInner, _1, _2, _3)},
         {IBluetoothBleAdvertiser::Code::BLE_CLOSE,
-            std::bind(&BluetoothBleAdvertiserStub::CloseInner, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiserStub::CloseInner, _1, _2, _3)},
         {IBluetoothBleAdvertiser::Code::BLE_GET_ADVERTISER_HANDLE,
-            std::bind(&BluetoothBleAdvertiserStub::GetAdvertiserHandleInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiserStub::GetAdvertiserHandleInner, _1, _2, _3)},
 };
 
 BluetoothBleAdvertiserStub::BluetoothBleAdvertiserStub()
@@ -53,9 +50,7 @@ BluetoothBleAdvertiserStub::~BluetoothBleAdvertiserStub()
 int BluetoothBleAdvertiserStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    std::u16string descriptor = BluetoothBleAdvertiserStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothBleAdvertiserStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGW("[OnRemoteRequest] fail: invalid interface token!");
         return OBJECT_NULL;
     }
@@ -118,14 +113,22 @@ ErrCode BluetoothBleAdvertiserStub::StartAdvertisingInner(MessageParcel &data, M
 
     int32_t advHandle = data.ReadInt32();
     bool isRawData = data.ReadBool();
-    StartAdvertising(*settings, *advData, *scanResponse, advHandle, isRawData);
+    int32_t ret = StartAdvertising(*settings, *advData, *scanResponse, advHandle, isRawData);
+    if (!reply.WriteInt32(ret)) {
+        HILOGE("reply writing failed.");
+        return ERR_INVALID_VALUE;
+    }
     return NO_ERROR;
 }
 
 ErrCode BluetoothBleAdvertiserStub::StopAdvertisingInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t advHandle = data.ReadInt32();
-    StopAdvertising(advHandle);
+    int32_t ret = StopAdvertising(advHandle);
+    if (!reply.WriteInt32(ret)) {
+        HILOGE("reply writing failed.");
+        return ERR_INVALID_VALUE;
+    }
     return NO_ERROR;
 }
 

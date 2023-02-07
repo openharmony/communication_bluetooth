@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_def.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils_server.h"
 #include "interface_profile.h"
@@ -171,17 +172,17 @@ ErrCode BluetoothHidHostServer::DeregisterObserver(const sptr<IBluetoothHidHostO
     return ERR_OK;
 }
 
-ErrCode BluetoothHidHostServer::GetDevicesByStates(
+int32_t BluetoothHidHostServer::GetDevicesByStates(
     const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result)
 {
     HILOGI("start");
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return false;
+        return BT_ERR_PERMISSION_FAILED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("hidHostService_ is null");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::vector<bluetooth::RawAddress> serviceDeviceList = pimpl->hidHostService_->GetDevicesByStates(states);
@@ -190,55 +191,59 @@ ErrCode BluetoothHidHostServer::GetDevicesByStates(
         result.push_back(bluetoothDevice);
         HILOGI("%{public}s", GET_ENCRYPT_ADDR(bluetoothDevice));
     }
-    return ERR_OK;
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothHidHostServer::GetDeviceState(const BluetoothRawAddress &device, int& result)
+int32_t BluetoothHidHostServer::GetDeviceState(const BluetoothRawAddress &device, int32_t &state)
 {
     HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_PERMISSION_FAILED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("hidHostService_ is null");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    result = pimpl->hidHostService_->GetDeviceState(device);
-    HILOGI("end, result:%{public}d", result);
-    return ERR_OK;
+    state = pimpl->hidHostService_->GetDeviceState(device);
+    HILOGI("end, result:%{public}d", state);
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothHidHostServer::Connect(const BluetoothRawAddress &device, bool& result)
+int32_t BluetoothHidHostServer::Connect(const BluetoothRawAddress &device)
 {
     HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
+    if (!PermissionUtils::CheckSystemHapApp()) {
+        HILOGE("check system api failed.");
+        return BT_ERR_SYSTEM_PERMISSION_FAILED;
+    }
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return ERR_INVALID_VALUE;
+        return BT_ERR_PERMISSION_FAILED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGE("hidHostService_ is null");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    result = pimpl->hidHostService_->Connect(device);
-    HILOGI("end, result:%{public}d", result);
-    return ERR_OK;
+    return pimpl->hidHostService_->Connect(device);
 }
 
-ErrCode BluetoothHidHostServer::Disconnect(const BluetoothRawAddress &device, bool& result)
+int32_t BluetoothHidHostServer::Disconnect(const BluetoothRawAddress &device)
 {
     HILOGI("start, addr:%{public}s", GET_ENCRYPT_ADDR(device));
+    if (!PermissionUtils::CheckSystemHapApp()) {
+        HILOGE("check system api failed.");
+        return BT_ERR_SYSTEM_PERMISSION_FAILED;
+    }
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return ERR_INVALID_VALUE;
+        return BT_ERR_PERMISSION_FAILED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("hidHostService_ is null");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    result = pimpl->hidHostService_->Disconnect(device);
-    HILOGI("end, result:%{public}d", result);
-    return ERR_OK;
+    return pimpl->hidHostService_->Disconnect(device);
 }
 
 ErrCode BluetoothHidHostServer::HidHostVCUnplug(std::string &device,
@@ -247,7 +252,7 @@ ErrCode BluetoothHidHostServer::HidHostVCUnplug(std::string &device,
     HILOGI("start");
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return ERR_INVALID_VALUE;
+        return ERR_PERMISSION_DENIED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("hidHostService_ is null");
@@ -264,7 +269,7 @@ ErrCode BluetoothHidHostServer::HidHostSendData(std::string &device,
     HILOGI("start");
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return ERR_INVALID_VALUE;
+        return ERR_PERMISSION_DENIED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("hidHostService_ is null");
@@ -281,7 +286,7 @@ ErrCode BluetoothHidHostServer::HidHostSetReport(std::string &device,
     HILOGI("start");
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return ERR_INVALID_VALUE;
+        return ERR_PERMISSION_DENIED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("hidHostService_ is null");
@@ -298,7 +303,7 @@ ErrCode BluetoothHidHostServer::HidHostGetReport(std::string &device,
     HILOGI("start");
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return ERR_INVALID_VALUE;
+        return ERR_PERMISSION_DENIED;
     }
     if (pimpl == nullptr || pimpl->hidHostService_ == nullptr) {
         HILOGI("hidHostService_ is null");

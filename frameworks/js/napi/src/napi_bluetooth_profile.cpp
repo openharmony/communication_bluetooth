@@ -24,6 +24,7 @@ void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getProfile", GetProfile),
         DECLARE_NAPI_FUNCTION("getProfileInst", GetProfile),
+        DECLARE_NAPI_FUNCTION("getProfileInstance", GetProfile),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     ProfileEnumInit(env, exports);
@@ -41,7 +42,6 @@ void NapiProfile::SetProfile(napi_env env, ProfileId code, napi_value profile)
 
 napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};

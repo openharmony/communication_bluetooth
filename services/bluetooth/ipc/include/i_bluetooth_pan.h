@@ -30,14 +30,14 @@ class IBluetoothPan : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothPan");
 
-    virtual ErrCode Disconnect(const BluetoothRawAddress &device, bool& result) = 0;
-    virtual ErrCode GetDeviceState(const BluetoothRawAddress &device, int& result) = 0;
-    virtual ErrCode GetDevicesByStates(const std::vector<int32_t> &states,
+    virtual int32_t Disconnect(const BluetoothRawAddress &device) = 0;
+    virtual int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) = 0;
+    virtual int32_t GetDevicesByStates(const std::vector<int32_t> &states,
         std::vector<BluetoothRawAddress>& result) = 0;
     virtual ErrCode RegisterObserver(const sptr<IBluetoothPanObserver> observer) = 0;
     virtual ErrCode DeregisterObserver(const sptr<IBluetoothPanObserver> observer) = 0;
-    virtual ErrCode SetTethering(const bool value, bool& result) = 0;
-    virtual ErrCode IsTetheringOn(bool& result) = 0;
+    virtual int32_t SetTethering(const bool value) = 0;
+    virtual int32_t IsTetheringOn(bool &result) = 0;
 
 protected:
     static constexpr int COMMAND_DISCONNECT = MIN_TRANSACTION_ID + 0;

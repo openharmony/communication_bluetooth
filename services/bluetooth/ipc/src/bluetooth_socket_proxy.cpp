@@ -66,31 +66,31 @@ int BluetoothSocketProxy::Connect(std::string &addr, bluetooth::Uuid &uuid, int3
 
 int BluetoothSocketProxy::Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
 {
-    HILOGI("BluetoothSocketProxy::Listen starts");
+    HILOGI("Listen starts");
     MessageParcel data;
 
     if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("BluetoothSocketProxy::Listen WriteInterfaceToken error");
-        return ERROR;
+        HILOGE("WriteInterfaceToken error");
+        return BT_INVALID_SOCKET_FD;
     }
     if (!data.WriteString(name)) {
-        HILOGE("BluetoothSocketProxy::Listen write name error");
-        return ERROR;
+        HILOGE("write name error");
+        return BT_INVALID_SOCKET_FD;
     }
     BluetoothUuid btUuid(uuid);
     if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("BluetoothSocketProxy::Listen write uuid error");
-        return ERROR;
+        HILOGE("write uuid error");
+        return BT_INVALID_SOCKET_FD;
     }
 
     if (!data.WriteInt32(securityFlag)) {
-        HILOGE("BluetoothSocketProxy::Listen write securityFlag error");
-        return ERROR;
+        HILOGE("write securityFlag error");
+        return BT_INVALID_SOCKET_FD;
     }
 
     if (!data.WriteInt32(type)) {
-        HILOGE("BluetoothSocketProxy::Listen write type error");
-        return ERROR;
+        HILOGE("write type error");
+        return BT_INVALID_SOCKET_FD;
     }
 
     MessageParcel reply;
@@ -100,8 +100,8 @@ int BluetoothSocketProxy::Listen(std::string &name, bluetooth::Uuid &uuid, int32
 
     int error = Remote()->SendRequest(BluetoothSocketProxy::Code::SOCKET_LISTEN, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothSocketProxy::Listen done fail, error: %{public}d", error);
-        return ERROR;
+        HILOGE("Listen done fail, error: %{public}d", error);
+        return BT_INVALID_SOCKET_FD;
     }
 
     return reply.ReadFileDescriptor();

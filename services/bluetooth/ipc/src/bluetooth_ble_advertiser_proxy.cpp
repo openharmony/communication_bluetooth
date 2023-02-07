@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_ble_advertiser_proxy.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "parcel_bt_uuid.h"
 
@@ -71,68 +72,72 @@ void BluetoothBleAdvertiserProxy::DeregisterBleAdvertiserCallback(const sptr<IBl
     }
 }
 
-void BluetoothBleAdvertiserProxy::StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
+int BluetoothBleAdvertiserProxy::StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
     const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle,
     bool isRawData)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
-        HILOGW("[StartAdvertising] fail: write interface token failed.");
-        return;
+        HILOGE("[StartAdvertising] fail: write interface token failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteParcelable(&settings)) {
-        HILOGW("[StartAdvertising] fail:write settings failed");
-        return;
+        HILOGE("[StartAdvertising] fail:write settings failed");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteParcelable(&advData)) {
-        HILOGW("[StartAdvertising] fail:write advData failed");
-        return;
+        HILOGE("[StartAdvertising] fail:write advData failed");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteParcelable(&scanResponse)) {
-        HILOGW("[StartAdvertising] fail:write scanResponse failed");
-        return;
+        HILOGE("[StartAdvertising] fail:write scanResponse failed");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteInt32(advHandle)) {
-        HILOGW("[StartAdvertising] fail: write advHandle failed.");
-        return;
+        HILOGE("[StartAdvertising] fail: write advHandle failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteBool(isRawData)) {
-        HILOGW("[StartAdvertising] fail: write isRawData failed.");
-        return;
+        HILOGE("[StartAdvertising] fail: write isRawData failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     ErrCode result = InnerTransact(BLE_START_ADVERTISING, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGW("[StartAdvertising] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[StartAdvertising] fail: transact ErrCode=%{public}d", result);
+        return BT_ERR_IPC_TRANS_FAILED;
     }
+    return reply.ReadInt32();
 }
 
-void BluetoothBleAdvertiserProxy::StopAdvertising(int32_t advHandle)
+int BluetoothBleAdvertiserProxy::StopAdvertising(int32_t advHandle)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
-        HILOGW("[StopAdvertising] fail: write interface token failed.");
-        return;
+        HILOGE("[StopAdvertising] fail: write interface token failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteInt32(advHandle)) {
-        HILOGW("[StopAdvertising] fail: write advHandle failed.");
-        return;
+        HILOGE("[StopAdvertising] fail: write advHandle failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     ErrCode result = InnerTransact(BLE_STOP_ADVERTISING, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGW("[StopAdvertising] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[StopAdvertising] fail: transact ErrCode=%{public}d", result);
+        return BT_ERR_IPC_TRANS_FAILED;
     }
+    return reply.ReadInt32();
 }
 
 void BluetoothBleAdvertiserProxy::Close(int32_t advHandle)

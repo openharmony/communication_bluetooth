@@ -60,7 +60,7 @@ void BluetoothHostDumper::BtCommStateDump(std::string& result)
 {
     sptr<BluetoothHostServer> hostServer = BluetoothHostServer::GetInstance();
     // bt conn state
-    std::string btState = hostServer->GetBtState() ? "enabled\n" : "disabled\n";
+    std::string btState = hostServer->IsBrEnabled() ? "enabled\n" : "disabled\n";
     result.append("Bt enable state: ").append(btState);
 
     // ble conn state

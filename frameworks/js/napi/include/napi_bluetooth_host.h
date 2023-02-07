@@ -18,6 +18,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "bluetooth_remote_device.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -57,6 +58,9 @@ napi_value NapiGetRemoteDeviceAddr(napi_env env, napi_callback_info info, napi_v
 
 void RegisterObserverToHost();
 napi_value GetProfileConnState(napi_env env, napi_callback_info info);
+void AddDiscoveryDevice(std::shared_ptr<BluetoothRemoteDevice> &device);
+void ClearDiscoveryDevice();
+int GetDeviceTransport(std::string &device);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_H_ */

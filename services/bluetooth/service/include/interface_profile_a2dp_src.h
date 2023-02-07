@@ -169,7 +169,7 @@ public:
      *         Returns <b>0</b> if device is not on playing;
      * @since 6.0
      */
-    virtual int GetPlayingState(const RawAddress &device) const = 0;
+    virtual int GetPlayingState(const RawAddress &device, int &state) const = 0;
 
     /**
      * @brief Set target device as active device.

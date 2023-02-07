@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "bluetooth_errorcode.h"
 #include "napi_bluetooth_spp_client.h"
+#include "napi_bluetooth_error.h"
+#include "napi_bluetooth_utils.h"
 #include "securec.h"
+#include <limits>
 #include <unistd.h>
 #include <uv.h>
 
@@ -23,41 +26,29 @@ namespace Bluetooth {
 const int sleepTime = 5;
 std::map<int, std::shared_ptr<NapiSppClient>> NapiSppClient::clientMap;
 int NapiSppClient::count = 0;
+const int SOCKET_BUFFER_SIZE = 1024;
 
-napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
+static napi_status CheckSppConnectParams(
+    napi_env env, napi_callback_info info, std::string &deviceId, SppConnectCallbackInfo *callbackInfo)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_THREE;
-    size_t argc = expectedArgsCount;
+    size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {0};
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE && argc != ARGS_SIZE_THREE - CALLBACK_SIZE),
+        "Requires 2 or 3 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseString(env, deviceId, argv[PARAM0]),
+        "Wrong argument type. String expected.", napi_invalid_arg);
 
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    if (argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
-        HILOGE("Requires 2 or 3 arguments.");
-        return ret;
-    }
-
-    std::string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("Wrong argument type. String expected.");
-        return ret;
-    }
-
-    SppConnectCallbackInfo *callbackInfo = new SppConnectCallbackInfo();
     callbackInfo->env_ = env;
     callbackInfo->sppOption_ = GetSppOptionFromJS(env, argv[PARAM1]);
-    if (callbackInfo->sppOption_ == nullptr) {
-        HILOGE("GetSppOptionFromJS faild.");
-        return ret;
-    }
+    NAPI_BT_RETURN_IF((callbackInfo->sppOption_ == nullptr), "GetSppOptionFromJS faild.", napi_invalid_arg);
     callbackInfo->deviceId_ = deviceId;
 
     napi_value promise = nullptr;
 
-    if (argc == expectedArgsCount) {
+    if (argc == ARGS_SIZE_THREE) {
         // Callback mode
         HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
@@ -66,7 +57,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
             HILOGE("Wrong argument type. Function expected.");
             delete callbackInfo;
             callbackInfo = nullptr;
-            return ret;
+            return napi_invalid_arg;
         }
         napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
@@ -75,6 +66,16 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         HILOGI("promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
+    return napi_ok;
+}
+
+napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string deviceId;
+    SppConnectCallbackInfo *callbackInfo = new SppConnectCallbackInfo();
+    auto status = CheckSppConnectParams(env, info, deviceId, callbackInfo);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     napi_value resource = nullptr;
     napi_create_string_utf8(env, "SppConnect", NAPI_AUTO_LENGTH, &resource);
@@ -89,7 +90,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
                 UUID::FromString(callbackInfo->sppOption_->uuid_),
                 callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
             HILOGI("SppConnect client_ constructed");
-            if (callbackInfo->client_->Connect() == BtStatus::BT_SUCCESS) {
+            if (callbackInfo->client_->Connect() == BtStatus::BT_SUCC) {
                 HILOGI("SppConnect successfully");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
             } else {
@@ -144,34 +145,36 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         (void*)callbackInfo,
         &callbackInfo->asyncWork_);
     napi_queue_async_work(env, callbackInfo->asyncWork_);
-    return ret;
+    return NapiGetUndefinedRet(env);
+}
+
+static napi_status CheckSppCloseClientSocketParams(napi_env env, napi_callback_info info, int &id)
+{
+    HILOGI("enter");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
+
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_ONE), "Requires 1 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected.", napi_invalid_arg);
+    return napi_ok;
 }
 
 napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-    bool isOK = false;
-    napi_value ret = nullptr;
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-
     std::shared_ptr<NapiSppClient> client = nullptr;
     int id =  -1;
-    ParseInt32(env, id, argv[PARAM0]);
+    bool isOK = false;
+    auto status = CheckSppCloseClientSocketParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     if (clientMap[id]) {
         client = clientMap[id];
     } else {
         HILOGE("no such key in map.");
-        return ret;
+        return NapiGetUndefinedRet(env);
     }
 
     if (client->client_) {
@@ -179,140 +182,126 @@ napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info 
         isOK = true;
     }
     clientMap.erase(id);
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+    return NapiGetBooleanRet(env, isOK);
+}
+
+static napi_status CheckSppWriteParams(
+    napi_env env, napi_callback_info info, int &id, char** totalBuf, size_t &totalSize)
+{
+    HILOGI("enter");
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {0};
+    napi_value thisVar = nullptr;
+
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_TWO), "Requires 2 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseArrayBuffer(env, (uint8_t**)(totalBuf), totalSize, argv[PARAM1]),
+        "ParseArrayBuffer failed.", napi_invalid_arg);
+    return napi_ok;
 }
 
 napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
     char* totalBuf = nullptr;
     size_t totalSize = 0;
     bool isOK = false;
     int id = -1;
-    napi_get_boolean(env, isOK, &ret);
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 3 argument.");
-        return ret;
+    auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, clientMap[id] > 0, BT_ERR_INTERNAL_ERROR);
+    OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
+    while (totalSize) {
+        int result = outputStream.Write(totalBuf, totalSize);
+        NAPI_BT_ASSERT_RETURN_FALSE(env, result > 0, BT_ERR_SPP_IO);
+        totalSize = totalSize - result;
+        totalBuf += result;
+        isOK = true;
     }
-
-    ParseInt32(env, id, argv[PARAM0]);
-
-    if (!ParseArrayBuffer(env, (uint8_t**)(&totalBuf), totalSize, argv[PARAM1])) {
-        HILOGE("ParseArrayBuffer failed");
-        return ret;
-    }
-
-    if (clientMap[id]) {
-        OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
-        while (totalSize) {
-            int result = outputStream.Write(totalBuf, totalSize);
-            if (result > 0) {
-                totalSize = totalSize - result;
-                totalBuf += result;
-                isOK = true;
-            } else if (result < 0) {
-                HILOGI("Write socket exception!");
-                return ret;
-            }
-        }
-    } else {
-        HILOGI("Client socket not exit!");
-    }
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+    return NapiGetBooleanRet(env, isOK);
 }
 
-void NapiSppClient::On(napi_env env, napi_callback_info info)
+napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_THREE;
-    size_t argc = expectedArgsCount;
+    size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {0};
     napi_value thisVar = nullptr;
     int id = -1;
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 3 argument.");
-        return;
-    }
     std::string type;
-    ParseString(env, type, argv[PARAM0]);
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo;
-    if (type.c_str() == STR_BT_SPP_READ) {
-        callbackInfo = std::make_shared<BufferCallbackInfo>();
-    } else {
-        HILOGE("Invalid type!");
-        return;
-    }
+
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
+        "Wrong argument type. String expected.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(type.c_str() != STR_BT_SPP_READ, "Invalid type.", napi_invalid_arg);
+
+    callbackInfo = std::make_shared<BufferCallbackInfo>();
     callbackInfo->env_ = env;
 
     napi_valuetype valueType1 = napi_undefined;
     napi_valuetype valueType2 = napi_undefined;
-    napi_typeof(env, argv[PARAM1], &valueType1);
-    napi_typeof(env, argv[PARAM2], &valueType2);
-    if (valueType1 != napi_number && valueType2 != napi_function) {
-        HILOGE("Wrong argument type. Function expected.");
-        return;
-    }
+    NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM1], &valueType1));
+    NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM2], &valueType2));
+    NAPI_BT_RETURN_IF(valueType1 != napi_number && valueType2 != napi_function,
+        "Wrong argument type. Function expected.", napi_invalid_arg);
 
     napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
 
-    ParseInt32(env, id, argv[PARAM1]);
-    std::shared_ptr<NapiSppClient> client = clientMap[id];
-    if (!client) {
-        HILOGI("client is nullptr");
-        return;
-    }
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
+
+    std::shared_ptr<NapiSppClient> client = NapiSppClient::clientMap[id];
+    NAPI_BT_RETURN_IF(!client, "client is nullptr.", napi_invalid_arg);
     client->sppReadFlag = true;
     client->callbackInfos_[type] = callbackInfo;
     HILOGI("sppRead begin");
-    client->thread_ = std::make_shared<std::thread>(SppRead, id);
+    client->thread_ = std::make_shared<std::thread>(NapiSppClient::SppRead, id);
     client->thread_->detach();
-    return;
+    return napi_ok;
 }
 
-void NapiSppClient::Off(napi_env env, napi_callback_info info)
+napi_value NapiSppClient::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_THREE;
-    size_t argc = expectedArgsCount;
+    auto status = CheckSppClientOn(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
+}
+
+napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {0};
     napi_value thisVar = nullptr;
     int id = -1;
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 3 argument.");
-        return;
-    }
-
     std::string type;
-    ParseString(env, type, argv[PARAM0]);
 
-    ParseInt32(env, id, argv[PARAM1]);
-    std::shared_ptr<NapiSppClient> client = clientMap[id];
-    if (!client) {
-        HILOGE("client is nullptr");
-        return;
-    }
-    if (type.c_str() != STR_BT_SPP_READ) {
-        HILOGE("type is wrong");
-        return;
-    }
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
+        "Wrong argument type. String expected.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(type.c_str() != STR_BT_SPP_READ, "Invalid type.", napi_invalid_arg);
+
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
+
+    std::shared_ptr<NapiSppClient> client = NapiSppClient::clientMap[id];
+    NAPI_BT_RETURN_IF(!client, "client is nullptr.", napi_invalid_arg);
     client->callbackInfos_[type] = nullptr;
     client->sppReadFlag = false;
     sleep(sleepTime);
-    return;
+    return napi_ok;
+}
+
+napi_value NapiSppClient::Off(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    auto status = CheckSppClientOff(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
 }
 
 void NapiSppClient::SppRead(int id)
@@ -323,7 +312,7 @@ void NapiSppClient::SppRead(int id)
         return;
     }
     InputStream inputStream = clientMap[id]->client_->GetInputStream();
-    char buf[1024];
+    char buf[SOCKET_BUFFER_SIZE];
     int ret = 0;
 
     while (true) {
@@ -363,7 +352,19 @@ void NapiSppClient::SppRead(int id)
                 [](uv_work_t *work, int status) {
                     BufferCallbackInfo *callbackInfo = (BufferCallbackInfo *)work->data;
                     int size = callbackInfo->info_;
+                    if (size < 0 || size > SOCKET_BUFFER_SIZE) {
+                        HILOGE("malloc size error");
+                        delete work;
+                        work = nullptr;
+                        return;
+                    }
                     uint8_t* totalBuf = (uint8_t*) malloc(size);
+                    if (totalBuf == nullptr) {
+                        HILOGE("malloc failed");
+                        delete work;
+                        work = nullptr;
+                        return;
+                    }
                     if (memcpy_s(totalBuf, size, callbackInfo->buffer_, size) != EOK) {
                         HILOGE("memcpy_s failed!");
                     }

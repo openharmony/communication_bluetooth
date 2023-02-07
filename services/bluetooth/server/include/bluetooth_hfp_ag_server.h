@@ -24,22 +24,22 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothHfpAgServer : public BluetoothHfpAgStub{ 
+class BluetoothHfpAgServer : public BluetoothHfpAgStub{
 public:
     explicit BluetoothHfpAgServer();
     ~BluetoothHfpAgServer() override;
 
-    int GetConnectDevices(std::vector<BluetoothRawAddress> &devices) override;
+    int32_t GetConnectDevices(std::vector<BluetoothRawAddress> &devices) override;
     int GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRawAddress> &devices) override;
-    int GetDeviceState(const BluetoothRawAddress &device) override;
-    int Connect(const BluetoothRawAddress &device) override;
-    int Disconnect(const BluetoothRawAddress &device) override;
+    int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) override;
+    int32_t Connect(const BluetoothRawAddress &device) override;
+    int32_t Disconnect(const BluetoothRawAddress &device) override;
     int GetScoState(const BluetoothRawAddress &device) override;
     bool ConnectSco() override;
     bool DisconnectSco() override;
-    void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type, 
+    void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type,
         const std::string &name) override;
-    void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number, 
+    void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number,
         int type) override;
     bool OpenVoiceRecognition(const BluetoothRawAddress &device) override;
     bool CloseVoiceRecognition(const BluetoothRawAddress &device) override;

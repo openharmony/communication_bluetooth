@@ -16,6 +16,7 @@
 #include "bluetooth_ble_advertiser_server.h"
 
 #include "bluetooth_ble_central_manager_server.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
@@ -67,6 +68,8 @@ private:
 struct BluetoothBleAdvertiserServer::impl {
     impl();
     ~impl();
+
+    BleAdvertiserDataImpl ConvertAdvertisingData(const BluetoothBleAdvertiserData &data) const;
 
     /// sys state observer
     class SystemStateObserver;
@@ -133,14 +136,36 @@ BluetoothBleAdvertiserServer::~BluetoothBleAdvertiserServer()
     IAdapterManager::GetInstance()->DeregisterSystemStateObserver(*(pimpl->systemStateObserver_));
 }
 
-void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
+BleAdvertiserDataImpl BluetoothBleAdvertiserServer::impl::ConvertAdvertisingData(
+    const BluetoothBleAdvertiserData &data) const
+{
+    BleAdvertiserDataImpl outData;
+
+    std::map<uint16_t, std::string> manufacturerData = data.GetManufacturerData();
+    for (auto iter = manufacturerData.begin(); iter != manufacturerData.end(); iter++) {
+        outData.AddManufacturerData(iter->first, iter->second);
+    }
+    std::map<Uuid, std::string> serviceData = data.GetServiceData();
+    for (auto it = serviceData.begin(); it != serviceData.end(); it++) {
+        outData.AddServiceData(it->first, it->second);
+    }
+    std::vector<Uuid> serviceUuids = data.GetServiceUuids();
+    for (auto it = serviceUuids.begin(); it != serviceUuids.end(); it++) {
+        outData.AddServiceUuid(*it);
+    }
+    outData.AddData(data.GetPayload());
+
+    return outData;
+}
+
+int BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
     const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle,
     bool isRawData)
 {
     HILOGI("enter");
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return;
+        return BT_ERR_PERMISSION_FAILED;
     }
 
     pimpl->bleService_ =
@@ -153,51 +178,23 @@ void BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiser
         settingsImpl.SetLegacyMode(settings.IsLegacyMode());
         settingsImpl.SetTxPower(settings.GetTxPower());
 
-        BleAdvertiserDataImpl bleAdvertiserData;
+        BleAdvertiserDataImpl bleAdvertiserData = pimpl->ConvertAdvertisingData(advData);
         if (!isRawData) {
             bleAdvertiserData.SetFlags(advData.GetAdvFlag());
         }
-        std::map<uint16_t, std::string> manufacturerData = advData.GetManufacturerData();
-        for (auto iter = manufacturerData.begin(); iter != manufacturerData.end(); iter++) {
-            bleAdvertiserData.AddManufacturerData(iter->first, iter->second);
-        }
-        std::map<Uuid, std::string> serviceData = advData.GetServiceData();
-        for (auto it = serviceData.begin(); it != serviceData.end(); it++) {
-            bleAdvertiserData.AddServiceData(it->first, it->second);
-        }
-        std::vector<Uuid> serviceUuids = advData.GetServiceUuids();
-        for (auto it = serviceUuids.begin(); it != serviceUuids.end(); it++) {
-            bleAdvertiserData.AddServiceUuid(*it);
-        }
-        bleAdvertiserData.AddData(advData.GetPayload());
+        BleAdvertiserDataImpl bleScanResponse = pimpl->ConvertAdvertisingData(scanResponse);
 
-        BleAdvertiserDataImpl bleScanResponse;
-        manufacturerData = scanResponse.GetManufacturerData();
-        for (auto it = manufacturerData.begin(); it != manufacturerData.end(); it++) {
-            bleScanResponse.AddManufacturerData(it->first, it->second);
-        }
-        serviceData = scanResponse.GetServiceData();
-        for (auto it = serviceData.begin(); it != serviceData.end(); it++) {
-            bleScanResponse.AddServiceData(it->first, it->second);
-        }
-        serviceUuids = scanResponse.GetServiceUuids();
-        for (auto it = serviceUuids.begin(); it != serviceUuids.end(); it++) {
-            bleScanResponse.AddServiceUuid(*it);
-        }
-        bleScanResponse.AddData(scanResponse.GetPayload());
-
-        if (pimpl->bleService_ != nullptr) {
-            pimpl->bleService_->StartAdvertising(settingsImpl, bleAdvertiserData, bleScanResponse, advHandle);
-        }
+        pimpl->bleService_->StartAdvertising(settingsImpl, bleAdvertiserData, bleScanResponse, advHandle);
     }
+    return BT_SUCCESS;
 }
 
-void BluetoothBleAdvertiserServer::StopAdvertising(int32_t advHandle)
+int BluetoothBleAdvertiserServer::StopAdvertising(int32_t advHandle)
 {
     HILOGI("enter, advHandle: %{public}d", advHandle);
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("check permission failed");
-        return;
+        return BT_ERR_PERMISSION_FAILED;
     }
 
     pimpl->bleService_ =
@@ -206,6 +203,7 @@ void BluetoothBleAdvertiserServer::StopAdvertising(int32_t advHandle)
     if (pimpl->bleService_ != nullptr) {
         pimpl->bleService_->StopAdvertising(advHandle);
     }
+    return BT_SUCCESS;
 }
 
 void BluetoothBleAdvertiserServer::Close(int32_t advHandle)

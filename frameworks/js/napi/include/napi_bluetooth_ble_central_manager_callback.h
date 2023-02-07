@@ -24,7 +24,7 @@ namespace Bluetooth {
 class NapiBluetoothBleCentralManagerCallback : public BleCentralManagerCallback {
 public:
     NapiBluetoothBleCentralManagerCallback() = default;
-    virtual ~NapiBluetoothBleCentralManagerCallback() = default;
+    ~NapiBluetoothBleCentralManagerCallback() override = default;
 
     void OnScanCallback(const BleScanResult &result) override;
     void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override;
