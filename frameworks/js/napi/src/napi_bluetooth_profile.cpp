@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-thread_local std::map<ProfileId, napi_value> NapiProfile::profiles_;
+thread_local std::map<ProfileId, napi_ref> NapiProfile::profiles_;
 
 void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
 {
@@ -29,9 +29,14 @@ void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
     ProfileEnumInit(env, exports);
 }
 
-void NapiProfile::SetProfile(ProfileId code, napi_value profile)
+void NapiProfile::SetProfile(napi_env env, ProfileId code, napi_value profile)
 {
-    profiles_[code] = profile;
+    napi_ref profileRef;
+    if (napi_create_reference(env, profile, 1, &profileRef) != napi_ok) {
+        HILOGE("napi create reference failed, profileId:%{public}d", code);
+        return;
+    }
+    profiles_[code] = profileRef;
 }
 
 napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
@@ -41,25 +46,23 @@ napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
     napi_value thisVar = nullptr;
-    bool isOK = false;
-    napi_value ret = nullptr;
-    napi_get_boolean(env, isOK, &ret);
+    napi_value ret = NapiGetNull(env);
+    napi_status funcRet = napi_generic_failure;
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
+    funcRet =  napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    NAPI_BT_RETURN_IF(funcRet != napi_ok, "call napi_get_cb_info failed.", ret);
+    NAPI_BT_RETURN_IF(argc != expectedArgsCount, "Requires 1 argument", ret);
+
     int32_t profileId;
-    if (!ParseInt32(env, profileId, argv[PARAM0])) {
-        HILOGE("False type! Int32 required.");
-        return ret;
-    }
+    NAPI_BT_RETURN_IF(!ParseInt32(env, profileId, argv[PARAM0]), "False type! Int32 required.", ret);
 
-    napi_value profile = profiles_[static_cast<ProfileId>(profileId)];
-    if (!profile) {
-        return ret;
-    }
+    napi_ref profileRef = profiles_[static_cast<ProfileId>(profileId)];
+    napi_value profile = nullptr;
+    funcRet = napi_get_reference_value(env, profileRef, &profile);
+    NAPI_BT_RETURN_IF(funcRet != napi_ok, "call napi_get_reference_value failed", ret);
+    NAPI_BT_RETURN_IF(profile == nullptr, "napi get reference failed.", ret);
+
+    HILOGI("profileId:%{public}d", profileId);
     return profile;
 }
 

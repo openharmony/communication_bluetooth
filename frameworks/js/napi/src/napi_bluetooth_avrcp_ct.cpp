@@ -29,7 +29,7 @@ void NapiAvrcpController::DefineAvrcpControllerJSClass(napi_env env)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
-        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
@@ -39,7 +39,7 @@ void NapiAvrcpController::DefineAvrcpControllerJSClass(napi_env env)
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_AVRCP_CT, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_AVRCP_CT, napiProfile);
     HILOGI("finished");
 }
 
