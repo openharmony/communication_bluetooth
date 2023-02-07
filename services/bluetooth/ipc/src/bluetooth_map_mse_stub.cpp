@@ -42,7 +42,7 @@ BluetoothMapMseStub::BluetoothMapMseStub()
     memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMse::Code::MSE_GET_CONNECTION_STRATEGY)] =
         &BluetoothMapMseStub::GetConnectionStrategyInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMse::Code::MSE_GRANT_PERMISSION)] =
-        &BluetoothMapMseStub::GrantPermissionInner;
+        nullptr;
 }
 
 BluetoothMapMseStub::~BluetoothMapMseStub()

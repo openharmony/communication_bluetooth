@@ -19,6 +19,7 @@
 #include "bluetooth_log.h"
 #include "bluetooth_utils_server.h"
 #include "remote_observer_list.h"
+#include "permission_utils.h"
 
 using namespace OHOS::bluetooth;
 
@@ -170,6 +171,10 @@ void BluetoothMapMseServer::GetConnectedDevices(
     std::vector<BluetoothRawAddress> &devices)
 {
     HILOGI("enter");
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("false, check permission failed");
+        return;
+    }
     if (pimpl->mapMseService_ != nullptr) {
         for (auto &device : pimpl->mapMseService_->GetConnectDevices()) {
             devices.push_back(device);
