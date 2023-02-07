@@ -42,7 +42,7 @@ void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env)
 
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_A2DP_SOURCE, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_A2DP_SOURCE, napiProfile);
     HILOGI("finished");
 }
 

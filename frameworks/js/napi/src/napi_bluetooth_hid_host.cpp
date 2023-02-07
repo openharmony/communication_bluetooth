@@ -42,7 +42,7 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env)
 
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_HID_HOST, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HID_HOST, napiProfile);
     HidHost *profile = HidHost::GetProfile();
     profile->RegisterObserver(&observer_);
     HILOGI("finished");
