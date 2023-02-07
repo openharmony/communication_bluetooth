@@ -210,7 +210,10 @@ void BluetoothAvrcpTgServer::SetActiveDevice(const BluetoothRawAddress &addr)
 int32_t BluetoothAvrcpTgServer::Connect(const BluetoothRawAddress &addr)
 {
     HILOGI("address: %{public}s", GetEncryptAddr(addr.GetAddress()).c_str());
-
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("Connect error, check permission failed");
+        return BT_FAILURE;
+    }
     int32_t result = 0;
 
     if (pimpl->IsEnabled()) {
