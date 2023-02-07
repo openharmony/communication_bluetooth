@@ -533,6 +533,14 @@ void AfterWorkCallback(uv_work_t *work, int status)
     delete work;
     work = nullptr;
 }
+
+#define NAPI_BT_RETURN_IF(condition, msg, ret)              \
+    do {                                                    \
+        if ((condition)) {                                  \
+            HILOGE(msg);                                    \
+            return (ret);                                   \
+        }                                                   \
+    } while (0)
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H

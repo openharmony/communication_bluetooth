@@ -34,17 +34,17 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getScoState", GetScoState),
         DECLARE_NAPI_FUNCTION("connectSco", ConnectSco),
         DECLARE_NAPI_FUNCTION("disconnectSco", DisconnectSco),
-        DECLARE_NAPI_FUNCTION("on", On),       
+        DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("openVoiceRecognition", OpenVoiceRecognition),
         DECLARE_NAPI_FUNCTION("closeVoiceRecognition", CloseVoiceRecognition),
     };
 
-    napi_define_class(env, "HandsFreeAudioGateway", NAPI_AUTO_LENGTH, HandsFreeAudioGatewayConstructor, nullptr, 
+    napi_define_class(env, "HandsFreeAudioGateway", NAPI_AUTO_LENGTH, HandsFreeAudioGatewayConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
     HILOGI("finished");
 }
 
