@@ -34,7 +34,7 @@ BluetoothAvrcpCtStub::BluetoothAvrcpCtStub()
     memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCt::Code::AVRCP_CT_GET_DEVICE_STATE)] =
         &BluetoothAvrcpCtStub::GetDeviceStateInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCt::Code::AVRCP_CT_CONNECT)] =
-        &BluetoothAvrcpCtStub::ConnectInner;
+        nullptr;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCt::Code::AVRCP_CT_DISCONNECT)] =
         &BluetoothAvrcpCtStub::DisconnectInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCt::Code::AVRCP_CT_PRESS_BUTTON)] =

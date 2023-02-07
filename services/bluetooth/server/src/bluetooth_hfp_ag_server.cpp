@@ -252,6 +252,10 @@ int BluetoothHfpAgServer::GetScoState(const BluetoothRawAddress &device)
 bool BluetoothHfpAgServer::ConnectSco()
 {
     HILOGI("Enter!");
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("error, check permission failed");
+        return false;
+    }
     if (pimpl->HfpAgService_ != nullptr) {
         return pimpl->HfpAgService_->ConnectSco();
     }
@@ -291,6 +295,10 @@ void BluetoothHfpAgServer::ClccResponse(int index, int direction, int status, in
 bool BluetoothHfpAgServer::OpenVoiceRecognition(const BluetoothRawAddress &device)
 {
     HILOGI("target device:%{public}s()", GET_ENCRYPT_ADDR(device));
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("error, check permission failed");
+        return false;
+    }
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpAgService_ != nullptr) {
         return pimpl->HfpAgService_->OpenVoiceRecognition(addr);

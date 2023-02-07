@@ -25,7 +25,7 @@ BluetoothPbapPceStub::BluetoothPbapPceStub()
     memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceStub::Code::PBAP_PCE_GET_DEVICE_STATE)] =
         &BluetoothPbapPceStub::GetDeviceStateInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceStub::Code::PBAP_PCE_CONNECT)] =
-        &BluetoothPbapPceStub::ConnectInner;
+        nullptr;
     memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceStub::Code::PBAP_PCE_PULL_PHONEBOOK)] =
         &BluetoothPbapPceStub::PullPhoneBookInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceStub::Code::PBAP_PCE_SET_PHONEBOOK)] =

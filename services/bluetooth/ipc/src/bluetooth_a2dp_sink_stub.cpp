@@ -26,7 +26,7 @@ BluetoothA2dpSinkStub::BluetoothA2dpSinkStub()
 {
     HILOGD("%{public}s start.", __func__);
     memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSink::Code::BT_A2DP_SINK_CONNECT)] =
-        &BluetoothA2dpSinkStub::ConnectInner;
+        nullptr;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSink::Code::BT_A2DP_SINK_DISCONNECT)] =
         &BluetoothA2dpSinkStub::DisconnectInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSink::Code::BT_A2DP_SINK_REGISTER_OBSERVER)] =
