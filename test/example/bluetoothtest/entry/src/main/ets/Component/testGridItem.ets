@@ -44,7 +44,7 @@ export struct TestGridItem {
     .height(184)
     .width('100%')
     .onClick(() => {
-      router.push({ uri: 'pages/TestDetail', params: { testId: this.testItem } })
+      router.push({ uri: 'MainAbility/pagesTestDetail', params: { testId: this.testItem } })
     })
   }
 }

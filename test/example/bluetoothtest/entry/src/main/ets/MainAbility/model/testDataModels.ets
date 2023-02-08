@@ -236,7 +236,7 @@ const SppAutoTestComposition :any[] =[
 
 const ProfileAutoTestComposition :any[] =[
   { 'name': 'A2dpSourceAutoTest', 'detail': 'A2dpSource自动测试', 'url': 'pages/subAutoTest/subProfileAutoTest/a2dpSourceAutoTest','image': $r("app.media.AutoTestIcon"), 'category': Category.ProfileAutoTest},
-  { 'name': 'HandsFreeAudioGatewayAutoTest', 'detail': 'HandsFreeAudioGateway自动测试', 'url': 'pages/subAutoTest/subProfileAutoTest/handsFreeAudioGatewayAutoTest','image': $r("app.media.AutoTestIcon"), 'category': Category.ProfileAutoTest},
+  { 'name': 'HFAudioGatewayAutoTest', 'detail': 'HFAudioGateway自动测试', 'url': 'pages/subAutoTest/subProfileAutoTest/handsFreeAudioGatewayAutoTest','image': $r("app.media.AutoTestIcon"), 'category': Category.ProfileAutoTest},
   { 'name': 'HitHostAutoTest', 'detail': 'HitHost自动测试', 'url': 'pages/subAutoTest/subProfileAutoTest/hitHostAutoTest','image': $r("app.media.AutoTestIcon"), 'category': Category.ProfileAutoTest},
   { 'name': 'PanNetworkAutoTest', 'detail': 'PanNetwork自动测试', 'url': 'pages/subAutoTest/subProfileAutoTest/panNetworkAutoTest','image': $r("app.media.AutoTestIcon"), 'category': Category.ProfileAutoTest},
 

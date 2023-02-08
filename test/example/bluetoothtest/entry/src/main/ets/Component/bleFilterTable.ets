@@ -28,7 +28,7 @@ export struct BleFilterTable {
   // input ble scan parameters:
   /*ScanFilter*/
   @State cbxBleScanFilter: boolean = false;
-  @State txtScanFilter_deviceId: string = "08:FB:EA:1B:38:AB";//00:1A:7D:DA:71:15
+  @State txtScanFilter_deviceId: string = "10:2C:6B:11:B3:17";//00:1A:7D:DA:71:15
   @State txtScanFilter_name: string = "dudu-tiger";
   @State txtScanFilter_serviceUuid: string = "0000180A-0000-1000-8000-00805f9b34fb";
   /*ScanOptions*/

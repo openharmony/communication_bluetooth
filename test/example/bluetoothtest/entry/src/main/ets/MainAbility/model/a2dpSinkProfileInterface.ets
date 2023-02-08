@@ -21,7 +21,7 @@ import btProfileModel from './btProfileModel'
 
 export function testProfileConnect() {
   let message="ProfileConnect test"
-  let textMessage=""
+//  let textMessage=""
   let btConnectionState = AppStorage.Get("btConnectionState")
   let deviceId = AppStorage.Get("deviceId")
   let profileType = AppStorage.Get("profileType")
@@ -33,9 +33,10 @@ export function testProfileConnect() {
   if (ret) {
     btConnectionState = 1;
   }
-  textMessage = "connect ret：" + ret;
+//  textMessage = "connect ret：" + ret;
   message = "connect ret：" + ret;
-  AppStorage.SetOrCreate("textMessage",textMessage)
+  AppStorage.SetOrCreate("textMessage",message)
+  console.info("------------------textMessage:",message)
   prompt.showToast({message: message});
   return message
 }
@@ -66,7 +67,7 @@ export function testProfileGetPlayingState() {
   let textMessage=""
   let deviceId=AppStorage.Get("deviceId")
   let profileType = AppStorage.Get("profileType")
-  prompt.showToast({message:profileType})
+//  prompt.showToast({message:profileType})
   console.info("profileType:"+profileType)
   let profile = btProfileModel.getProfile(parseInt(profileType))
   let ret = -1

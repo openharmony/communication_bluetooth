@@ -55,7 +55,7 @@ struct EntryComponentTable {
               .textAlign(TextAlign.Start)
               .maxLines(ComponentConfig.MAX_LINES_1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .visibility('pages/applicationInfo' === this.settingUri ? Visibility.Visible : Visibility.None)
+              .visibility('MainAbility/pagesapplicationInfo' === this.settingUri ? Visibility.Visible : Visibility.None)
               .margin({ top:$r('sys.float.ohos_id_text_margin_vertical') });
             Text(this.settingSummary)
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
