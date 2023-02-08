@@ -61,6 +61,14 @@ public:
     static int VerifyLocationPermission(const int &pid, const int &uid);
 
     /**
+     * @Description Verify where the app has the permission to Approximately Location
+     *
+     * @param pid the app's process id.
+     * @param uid the app id.
+     * @return int PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    static int VerifyApproximatelyPermission(const int &pid, const int &uid);
+    /**
      * @Description Verify where the app has the permission to use bluetooth
      *
      * @param tokenID the app's token id.

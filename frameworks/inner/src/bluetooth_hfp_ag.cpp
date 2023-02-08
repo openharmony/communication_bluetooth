@@ -16,6 +16,7 @@
 #include "bluetooth_hfp_ag.h"
 #include <unistd.h>
 #include "bluetooth_device.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
@@ -88,18 +89,27 @@ std::string HfpAgServiceName = "bluetooth-hfp-ag-server";
 struct HandsFreeAudioGateway::impl {
     impl();
     ~impl();
-    std::vector<BluetoothRemoteDevice> GetConnectedDevices()
+    int32_t GetConnectedDevices(std::vector<BluetoothRemoteDevice>& devices)
     {
         HILOGI("enter");
-        std::vector<BluetoothRemoteDevice> devices;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            std::vector<BluetoothRawAddress> ori;
-            proxy_->GetConnectDevices(ori);
-            for (auto it = ori.begin(); it != ori.end(); it++) {
-                devices.push_back(BluetoothRemoteDevice(it->GetAddress(), 0));
-            }
+        if (!proxy_) {
+            HILOGE("proxy_ is nullptr.");
+            return BT_ERR_SERVICE_DISCONNECTED;
         }
-        return devices;
+        if (!IS_BT_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
+        }
+        std::vector<BluetoothRawAddress> ori;
+        int32_t ret = proxy_->GetConnectDevices(ori);
+        if (ret != BT_SUCCESS) {
+            HILOGE("inner error.");
+            return ret;
+        }
+        for (auto it = ori.begin(); it != ori.end(); it++) {
+            devices.push_back(BluetoothRemoteDevice(it->GetAddress(), 0));
+        }
+        return BT_SUCCESS;
     }
 
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states)
@@ -122,81 +132,61 @@ struct HandsFreeAudioGateway::impl {
         return remoteDevices;
     }
 
-    int GetDeviceState(const BluetoothRemoteDevice &device)
+    int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-        if (proxy_ == nullptr) {
-            HILOGE("proxy_ is nullptr");
-            return HFP_AG_SLC_STATE_DISCONNECTED;
+        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+            HILOGE("invalid param.");
+            return BT_ERR_INVALID_PARAM;
         }
-
         if (!IS_BT_ENABLED()) {
-            HILOGE("Not IS_BT_ENABLED");
-            return HFP_AG_SLC_STATE_DISCONNECTED;
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
         }
 
-        if (device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()));
-        }
-        return HFP_AG_SLC_STATE_DISCONNECTED;
+        return proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
     }
 
-    bool Connect(const BluetoothRemoteDevice &device)
+    int32_t Connect(const BluetoothRemoteDevice &device)
     {
         HILOGI("hfp connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-
-        if (proxy_ == nullptr) {
-            HILOGE("proxy_ is nullptr");
-            return false;
+        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+            HILOGE("invalid param.");
+            return BT_ERR_INVALID_PARAM;
         }
-
         if (!IS_BT_ENABLED()) {
             HILOGE("Not IS_BT_ENABLED");
-            return false;
+            return BT_ERR_INVALID_STATE;
         }
 
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            HILOGE("Addr is invalid");
-            return false;
+        int cod = 0;
+        int32_t err = device.GetDeviceClass(cod);
+        if (err != BT_SUCCESS) {
+            HILOGE("GetDeviceClass Failed.");
+            return BT_ERR_INVALID_PARAM;
         }
-
-        if (!device.GetDeviceClass().IsProfileSupported(BluetoothDevice::PROFILE_HEADSET)) {
+        BluetoothDeviceClass devClass = BluetoothDeviceClass(cod);
+        if (!devClass.IsProfileSupported(BluetoothDevice::PROFILE_HEADSET)) {
             HILOGE("hfp connect failed. The remote device does not support HFP service.");
-            return false;
+            return BT_ERR_PROFILE_DISABLED;
         }
-
-        if (proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr())) == NO_ERROR) {
-            return true;
-        }
-
-        return false;
+        return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
-    bool Disconnect(const BluetoothRemoteDevice &device)
+    int32_t Disconnect(const BluetoothRemoteDevice &device)
     {
         HILOGI("hfp disconnect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-        if (proxy_ == nullptr) {
-            HILOGE("proxy_ == nullptr");
-            return false;
+        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+            HILOGE("invalid param.");
+            return BT_ERR_INVALID_PARAM;
         }
-
-        if (!IS_BT_ENABLED())
-        {
-            HILOGE("Not IS_BT_ENABLED");
-            return false;
+        if (!IS_BT_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
         }
-
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            HILOGE("Addr is invalid");
-            return false;
-        }
-
-        if (proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr())) == NO_ERROR) {
-            return true;
-        }
-        return false;
+        return proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
     int GetScoState(const BluetoothRemoteDevice &device)
@@ -444,8 +434,15 @@ HandsFreeAudioGateway::~HandsFreeAudioGateway()
 
 std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetConnectedDevices() const
 {
+    std::vector<BluetoothRemoteDevice> devices;
+    pimpl->GetConnectedDevices(devices);
+    return devices;
+}
+
+int32_t HandsFreeAudioGateway::GetConnectedDevices(std::vector<BluetoothRemoteDevice> &devices)
+{
     HILOGI("enter");
-    return pimpl->GetConnectedDevices();
+    return pimpl->GetConnectedDevices(devices);
 }
 
 std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetDevicesByStates(std::vector<int> states)
@@ -454,19 +451,19 @@ std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetDevicesByStates(std
     return pimpl->GetDevicesByStates(states);
 }
 
-int HandsFreeAudioGateway::GetDeviceState(const BluetoothRemoteDevice &device) const
+int32_t HandsFreeAudioGateway::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    return pimpl->GetDeviceState(device);
+    return pimpl->GetDeviceState(device, state);
 }
 
-bool HandsFreeAudioGateway::Connect(const BluetoothRemoteDevice &device)
+int32_t HandsFreeAudioGateway::Connect(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->Connect(device);
 }
 
-bool HandsFreeAudioGateway::Disconnect(const BluetoothRemoteDevice &device)
+int32_t HandsFreeAudioGateway::Disconnect(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     return pimpl->Disconnect(device);

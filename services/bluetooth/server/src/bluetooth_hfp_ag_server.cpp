@@ -15,6 +15,7 @@
 #include <list>
 
 #include "bluetooth_def.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hfp_ag_server.h"
 #include "bluetooth_hitrace.h"
 #include "bluetooth_log.h"
@@ -42,7 +43,7 @@ public:
         HILOGI("device:%{public}s, state:%{public}d", GET_ENCRYPT_ADDR(device), state);
         if (state == static_cast<int>(BTConnectState::CONNECTED) ||
             state == static_cast<int>(BTConnectState::DISCONNECTED)) {
-            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_HFP_CONNECTED_STATE",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "HFP_CONNECTED_STATE",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", state);
         }
         observers_->ForEach([device, state](IBluetoothHfpAgObserver* observer) {
@@ -153,18 +154,18 @@ BluetoothHfpAgServer::~BluetoothHfpAgServer()
     }
 }
 
-int BluetoothHfpAgServer::GetConnectDevices(std::vector<BluetoothRawAddress> &devices)
+int32_t BluetoothHfpAgServer::GetConnectDevices(std::vector<BluetoothRawAddress> &devices)
 {
     HILOGI("Enter!");
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("GetConnectDevices() false, check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_PERMISSION_FAILED;
     }
     std::list<RawAddress> deviceList;
     if (pimpl->HfpAgService_  != nullptr) {
         deviceList = pimpl->HfpAgService_->GetConnectDevices();
     } else {
-        return BT_FAILURE;
+        return BT_ERR_INTERNAL_ERROR;
     }
     for (RawAddress device : deviceList) {
         devices.push_back(BluetoothRawAddress(device));
@@ -188,55 +189,54 @@ int BluetoothHfpAgServer::GetDevicesByStates(const std::vector<int> &states, std
     for (RawAddress device : rawDevices) {
         devices.push_back(BluetoothRawAddress(device));
     }
-    return BT_SUCCESS;
+    return BT_SUCC;
 }
 
-int BluetoothHfpAgServer::GetDeviceState(const BluetoothRawAddress &device)
+int32_t BluetoothHfpAgServer::GetDeviceState(const BluetoothRawAddress &device, int32_t &state)
 {
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("GetDeviceState() false, check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_PERMISSION_FAILED;
     }
     RawAddress addr(device.GetAddress());
-    if (pimpl->HfpAgService_ ) {
-        int state = pimpl->HfpAgService_->GetDeviceState(addr);
+    if (pimpl->HfpAgService_) {
+        state = pimpl->HfpAgService_->GetDeviceState(addr);
         HILOGI("state:%{public}d", state);
-        return state;
     } else {
-        return BT_FAILURE;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return BT_SUCCESS;
 }
 
-int BluetoothHfpAgServer::Connect(const BluetoothRawAddress &device)
+int32_t BluetoothHfpAgServer::Connect(const BluetoothRawAddress &device)
 {
     HILOGI("target device:%{public}s()", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("Connect error, check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_PERMISSION_FAILED;
     }
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpAgService_ != nullptr) {
         OHOS::Bluetooth::BluetoothHiTrace::BluetoothStartAsyncTrace("HFP_AG_CONNECT", 1);
-        int result = pimpl->HfpAgService_->Connect(addr);
+        int32_t result = pimpl->HfpAgService_->Connect(addr);
         OHOS::Bluetooth::BluetoothHiTrace::BluetoothFinishAsyncTrace("HFP_AG_CONNECT", 1);
         return result;
     }
-    return BT_FAILURE;
+    return BT_ERR_INTERNAL_ERROR;
 }
 
-int BluetoothHfpAgServer::Disconnect(const BluetoothRawAddress &device)
+int32_t BluetoothHfpAgServer::Disconnect(const BluetoothRawAddress &device)
 {
     HILOGI("target device:%{public}s()", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("Disconnect error, check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_PERMISSION_FAILED;
     }
     RawAddress addr(device.GetAddress());
     if (pimpl->HfpAgService_ != nullptr) {
         return pimpl->HfpAgService_->Disconnect(addr);
     }
-    return BT_FAILURE;
+    return BT_ERR_INTERNAL_ERROR;
 }
 
 int BluetoothHfpAgServer::GetScoState(const BluetoothRawAddress &device)

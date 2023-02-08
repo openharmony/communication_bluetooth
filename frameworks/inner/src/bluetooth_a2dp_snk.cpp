@@ -251,12 +251,29 @@ int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device) const
 
     int ret = RET_BAD_STATUS;
     if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
-        ret = pimpl->proxy_->GetPlayingState(RawAddress(device.GetDeviceAddr()));
+        pimpl->proxy_->GetPlayingState(RawAddress(device.GetDeviceAddr()), ret);
     } else {
         HILOGI("proxy or bt disable.");
     }
 
     return ret;
+}
+
+int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device, int &state) const
+{
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+
+    if (!device.IsValidBluetoothRemoteDevice()) {
+        HILOGI("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
+    }
+
+    if (pimpl->proxy_ != nullptr && IS_BT_ENABLED()) {
+        return pimpl->proxy_->GetPlayingState(RawAddress(device.GetDeviceAddr()), state);
+    } else {
+        HILOGI("proxy or bt disable.");
+        return BT_ERR_SERVICE_DISCONNECTED;
+    }
 }
 
 bool A2dpSink::Connect(const BluetoothRemoteDevice &device)
@@ -275,7 +292,7 @@ bool A2dpSink::Connect(const BluetoothRemoteDevice &device)
         HILOGI("proxy or bt disable.");
         return false;
     }
-    return (RET_NO_ERROR == ret);
+    return (ret == RET_NO_ERROR);
 }
 
 bool A2dpSink::Disconnect(const BluetoothRemoteDevice &device)
@@ -294,7 +311,7 @@ bool A2dpSink::Disconnect(const BluetoothRemoteDevice &device)
         HILOGI("proxy or bt disable.");
         return false;
     }
-    return (RET_NO_ERROR == ret);
+    return (ret == RET_NO_ERROR);
 }
 
 A2dpSink *A2dpSink::GetProfile()
@@ -308,8 +325,9 @@ bool A2dpSink::SetConnectStrategy(const BluetoothRemoteDevice &device, int strat
 {
     HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
 
-    if ((!device.IsValidBluetoothRemoteDevice()) || (((int)BTStrategyType::CONNECTION_ALLOWED != strategy) &&
-                                                        ((int)BTStrategyType::CONNECTION_FORBIDDEN != strategy))) {
+    if ((!device.IsValidBluetoothRemoteDevice()) || (
+        (strategy != static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)) &&
+        (strategy != static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN)))) {
         HILOGI("input parameter error.");
         return false;
     }
@@ -322,7 +340,7 @@ bool A2dpSink::SetConnectStrategy(const BluetoothRemoteDevice &device, int strat
         return false;
     }
 
-    return (RET_NO_ERROR == ret);
+    return (ret == RET_NO_ERROR);
 }
 
 int A2dpSink::GetConnectStrategy(const BluetoothRemoteDevice &device) const
@@ -361,7 +379,7 @@ bool A2dpSink::SendDelay(const BluetoothRemoteDevice &device, uint16_t delayValu
         return false;
     }
 
-    return (RET_NO_ERROR == ret);
+    return (ret == RET_NO_ERROR);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -38,7 +38,7 @@ public:
     int Disconnect(const RawAddress &device) override;
     int GetDeviceState(const RawAddress &device) override;
     std::vector<RawAddress> GetDevicesByStates(const std::vector<int32_t> &states) override;
-    int GetPlayingState(const RawAddress &device) override;
+    int GetPlayingState(const RawAddress &device, int &state) override;
     int SetConnectStrategy(const RawAddress &device, int strategy) override;
     int GetConnectStrategy(const RawAddress &device) override;
     int SendDelay(const RawAddress &device, int32_t delayValue) override;

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 #include "bluetooth_hid_host_stub.h"
+
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 
 namespace OHOS {
@@ -52,10 +54,8 @@ BluetoothHidHostStub::~BluetoothHidHostStub()
 int BluetoothHidHostStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothHidHostStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothHidHostStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGI("BluetoothHidHostStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothHidHostStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGE("local descriptor is not equal to remote");
         return IPC_INVOKER_TRANSLATE_ERR;
     }
@@ -70,50 +70,56 @@ int BluetoothHidHostStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothHidHostStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHidHostStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    bool result;
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     HILOGD("BluetoothHidHostStub::ConnectInner");
-    ErrCode ec = Connect(*device, result);
-    reply.WriteInt32(ec);
-    if (SUCCEEDED(ec)) {
-        if (result == NO_ERROR) {
-            reply.WriteInt32(NO_ERROR);
-        }
+    int32_t errCode = Connect(*device);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return ERR_NONE;
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothHidHostStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHidHostStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    bool result;
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     HILOGD("BluetoothHidHostStub::DisconnectInner");
-    ErrCode ec = Disconnect(*device, result);
-    reply.WriteInt32(ec);
-    if (SUCCEEDED(ec)) {
-        if (result == NO_ERROR) {
-            reply.WriteInt32(NO_ERROR);
-        }
+    int32_t errCode = Disconnect(*device);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return ERR_NONE;
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothHidHostStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHidHostStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply)
 {
-    const BluetoothRawAddress *device = data.ReadParcelable<BluetoothRawAddress>();
-    int result;
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     HILOGD("BluetoothHidHostStub::GetDeviceStateInner");
-    ErrCode ec = GetDeviceState(*device, result);
-    reply.WriteInt32(ec);
-    if (SUCCEEDED(ec)) {
-        reply.WriteInt32(result);
+    int32_t state;
+    int32_t errCode = GetDeviceState(*device, state);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return ERR_NONE;
+    if (errCode != BT_SUCCESS) {
+        HILOGE("internal error.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    // write state
+    if (!reply.WriteInt32(state)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothHidHostStub::GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHidHostStub::GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply)
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
@@ -123,17 +129,28 @@ ErrCode BluetoothHidHostStub::GetDevicesByStatesInner(MessageParcel &data, Messa
         states.push_back(state);
     }
     std::vector<BluetoothRawAddress> rawAdds;
-    ErrCode ec = GetDevicesByStates(states, rawAdds);
-    if (ec != ERR_OK) {
-        return ec;
+    int32_t errCode = GetDevicesByStates(states, rawAdds);
+    // write error code
+    if (!reply.WriteInt32(errCode)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    reply.WriteInt32(rawAdds.size());
+    if (errCode != BT_SUCCESS) {
+        HILOGE("internal error.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    // write size
+    if (!reply.WriteInt32(rawAdds.size())) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    // write devices
     for (auto rawAdd : rawAdds) {
         if (!reply.WriteParcelable(&rawAdd)) {
-            return ERR_INVALID_STATE;
+            return BT_ERR_IPC_TRANS_FAILED;
         }
     }
-    return ERR_NONE;
+    return BT_SUCCESS;
 }
 
 ErrCode BluetoothHidHostStub::RegisterObserverInner(MessageParcel &data, MessageParcel &reply)

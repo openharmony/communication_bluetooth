@@ -27,13 +27,13 @@ public:
     virtual ~BluetoothPanProxy()
     {}
 
-    ErrCode Disconnect(const BluetoothRawAddress &device, bool& result) override;
-    ErrCode GetDeviceState(const BluetoothRawAddress &device, int& result) override;
-    ErrCode GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result) override;
+    int32_t Disconnect(const BluetoothRawAddress &device) override;
+    int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) override;
+    int32_t GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRawAddress> &result) override;
     ErrCode RegisterObserver(const sptr<IBluetoothPanObserver> observer) override;
     ErrCode DeregisterObserver(const sptr<IBluetoothPanObserver> observer) override;
-    ErrCode SetTethering(const bool value, bool& result) override;
-    ErrCode IsTetheringOn(bool& result) override;
+    int32_t SetTethering(const bool value) override;
+    int32_t IsTetheringOn(bool &result) override;
 
 private:
     static inline BrokerDelegator<BluetoothPanProxy> delegator_;

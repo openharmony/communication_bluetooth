@@ -37,7 +37,7 @@
 #define BLUETOOTH_GATT_CHARACTERISTIC_H
 
 #include <cstddef>
-#include <stdint.h>
+#include <cstdint>
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "cstdint"

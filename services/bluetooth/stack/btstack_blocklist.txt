@@ -15,8 +15,13 @@
  src:*/bluetooth/services/bluetooth/stack/src/btm/btm_sco.c
  src:*/bluetooth/services/bluetooth/stack/src/btm/btm.c
  src:*/bluetooth/services/bluetooth/stack/src/l2cap/l2cap_cmn.c
+ src:*/bluetooth/services/bluetooth/stack/src/l2cap/l2cap_core.c
+ src:*/bluetooth/services/bluetooth/stack/src/l2cap/l2cap_if.c
  src:*/bluetooth/services/bluetooth/stack/src/gap/gap_le_sec.c
  src:*/bluetooth/services/bluetooth/stack/src/gap/gap_le_adv.c
+ src:*/bluetooth/services/bluetooth/stack/src/gap/gap_le_conn.c
+ src:*/bluetooth/services/bluetooth/stack/src/gap/gap_br_sec.c
  src:*/bluetooth/services/bluetooth/stack/src/att/att_receive.c
  src:*/bluetooth/services/bluetooth/stack/src/att/att_common.c
  src:*/bluetooth/services/bluetooth/stack/src/att/att_connect.c
+ src:*/bluetooth/services/bluetooth/stack/platform/src/queue.c

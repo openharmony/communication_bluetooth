@@ -121,7 +121,7 @@ public:
      * @return Returns the list of devices.
      * @since 6
      */
-    std::vector<BluetoothRemoteDevice> GetConnectedDevices() const;
+    int32_t GetConnectedDevices(std::vector<BluetoothRemoteDevice>& devices);
 
     /**
      * @brief Get remote HF device list which are in the specified states.
@@ -139,7 +139,7 @@ public:
      * @return Returns the connection state of the remote device.
      * @since 6
      */
-    int GetDeviceState(const BluetoothRemoteDevice &device) const;
+    int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state);
 
     /**
      * @brief Initiate the establishment of a service level connection to remote HF device.
@@ -148,7 +148,7 @@ public:
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool Connect(const BluetoothRemoteDevice &device);
+    int32_t Connect(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Release the audio connection from remote HF device.
@@ -157,7 +157,7 @@ public:
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool Disconnect(const BluetoothRemoteDevice &device);
+    int32_t Disconnect(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Get the Audio connection state of the specified remote HF device.
@@ -268,6 +268,14 @@ public:
      * @since 6
      */
     void DeregisterObserver(HandsFreeAudioGatewayObserver *observer);
+
+    /**
+     * @brief Get remote HF device list which are in the connected state.
+     *
+     * @return Returns the list of devices.
+     * @since 6
+     */
+    std::vector<BluetoothRemoteDevice> GetConnectedDevices() const;
 
     /**
      * @brief Static HandsFree AudioGateway observer instance.

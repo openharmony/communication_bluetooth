@@ -37,12 +37,10 @@ BluetoothMapMseObserverStub::~BluetoothMapMseObserverStub()
 int BluetoothMapMseObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothMapMseObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
+    HILOGI("BluetoothMapMseObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
         code,
         option.GetFlags());
-    std::u16string descriptor = BluetoothMapMseObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothMapMseObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }

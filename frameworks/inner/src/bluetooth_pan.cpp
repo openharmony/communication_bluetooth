@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "bluetooth_errorcode.h"
 #include "bluetooth_pan.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
@@ -56,49 +57,64 @@ struct Pan::impl {
     impl();
     ~impl();
 
-    std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states)
+    int32_t GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice>& result)
     {
         HILOGI("enter");
-        std::vector<BluetoothRemoteDevice> remoteDevices;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            std::vector<BluetoothRawAddress> rawDevices;
-            std::vector<int32_t> tmpStates;
-            for (int state : states) {
-                tmpStates.push_back((int32_t)state);
-            }
-            if (proxy_ != nullptr) {
-                HILOGI("proxy_ != nullptr !");
-                proxy_->GetDevicesByStates(tmpStates, rawDevices);
-            }
-            for (BluetoothRawAddress rawDevice : rawDevices) {
-                BluetoothRemoteDevice remoteDevice(rawDevice.GetAddress(), 1);
-                remoteDevices.push_back(remoteDevice);
-            }
+        if (!proxy_) {
+            HILOGE("proxy_ is nullptr.");
+            return BT_ERR_SERVICE_DISCONNECTED;
         }
-        return remoteDevices;
+        if (!IS_BT_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
+        }
+
+        std::vector<BluetoothRawAddress> rawDevices;
+        std::vector<int32_t> tmpStates;
+        for (int32_t state : states) {
+            tmpStates.push_back((int32_t)state);
+        }
+
+        int32_t ret = proxy_->GetDevicesByStates(tmpStates, rawDevices);
+        if (ret != BT_SUCCESS) {
+            HILOGE("inner error.");
+            return ret;
+        }
+
+        for (BluetoothRawAddress rawDevice : rawDevices) {
+            BluetoothRemoteDevice remoteDevice(rawDevice.GetAddress(), 1);
+            result.push_back(remoteDevice);
+        }
+
+        return BT_SUCCESS;
     }
 
-    int GetDeviceState(const BluetoothRemoteDevice &device)
+    int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
-            int state;
-            proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
-            return state;
+        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+            HILOGE("invalid param.");
+            return BT_ERR_INVALID_PARAM;
         }
-        return (int)BTConnectState::DISCONNECTED;
+        if (!IS_BT_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
+        }
+        return proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
     }
 
-    bool Disconnect(const BluetoothRemoteDevice &device)
+    int32_t Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
-            bool isOk;
-            proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()), isOk);
-            return isOk;
+        HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
+        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+            HILOGE("invalid param.");
+            return BT_ERR_INVALID_PARAM;
         }
-        HILOGE("fw return false!");
-        return false;
+        if (!IS_BT_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
+        }
+        return proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
     void RegisterObserver(std::shared_ptr<PanObserver> observer)
@@ -113,28 +129,34 @@ struct Pan::impl {
         observers_.Deregister(observer);
     }
 
-    bool SetTethering(bool value)
+    int32_t SetTethering(bool value)
     {
         HILOGI("enter");
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            bool isOk;
-            proxy_->SetTethering(value, isOk);
-            return isOk;
+        if (!proxy_) {
+            HILOGE("proxy_ is nullptr.");
+            return BT_ERR_SERVICE_DISCONNECTED;
         }
-        HILOGE("fw return false!");
-        return false;
+        if (!IS_BT_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
+        }
+        int32_t ret = proxy_->SetTethering(value);
+        HILOGI("fwk ret:%{public}d", ret);
+        return ret;
     }
 
-    bool IsTetheringOn()
+    int32_t IsTetheringOn(bool &value)
     {
         HILOGI("enter");
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            bool isOk;
-            proxy_->IsTetheringOn(isOk);
-            return isOk;
+        if (!proxy_) {
+            HILOGE("proxy_ is nullptr.");
+            return BT_ERR_SERVICE_DISCONNECTED;
         }
-        HILOGE("fw return false!");
-        return false;
+        if (!IS_BT_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INVALID_STATE;
+        }
+        return proxy_->IsTetheringOn(value);
     }
 
 private:
@@ -213,17 +235,17 @@ Pan *Pan::GetProfile()
     return &instance;
 }
 
-std::vector<BluetoothRemoteDevice> Pan::GetDevicesByStates(std::vector<int> states)
+int32_t Pan::GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice> &result)
 {
-    return pimpl->GetDevicesByStates(states);
+    return pimpl->GetDevicesByStates(states, result);
 }
 
-int Pan::GetDeviceState(const BluetoothRemoteDevice &device)
+int32_t Pan::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
 {
-    return pimpl->GetDeviceState(device);
+    return pimpl->GetDeviceState(device, state);
 }
 
-bool Pan::Disconnect(const BluetoothRemoteDevice &device)
+int32_t Pan::Disconnect(const BluetoothRemoteDevice &device)
 {
     return pimpl->Disconnect(device);
 }
@@ -240,14 +262,14 @@ void Pan::DeregisterObserver(PanObserver *observer)
     return pimpl->DeregisterObserver(observerPtr);
 }
 
-bool Pan::SetTethering(bool value)
+int32_t Pan::SetTethering(bool value)
 {
     return pimpl->SetTethering(value);
 }
 
-bool Pan::IsTetheringOn()
+int32_t Pan::IsTetheringOn(bool &value)
 {
-    return pimpl->IsTetheringOn();
+    return pimpl->IsTetheringOn(value);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

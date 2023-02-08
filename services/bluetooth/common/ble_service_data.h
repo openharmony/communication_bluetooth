@@ -730,6 +730,8 @@ public:
      */
     bool IsServiceUUID() const;
 
+    bool IsName(void) const;
+
     /**
      * @brief set device address.
      *

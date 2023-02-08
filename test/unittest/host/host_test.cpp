@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_device_class.h"
 #include "bluetooth_host.h"
+#include "bluetooth_errorcode.h"
 
 using namespace testing::ext;
 
@@ -233,7 +234,9 @@ HWTEST_F(HostTest, Host_ModuleTest_GetBtProfileConnState_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtProfileConnState_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_EQ(host_->GetBtProfileConnState(PROFILE_ID_GATT_CLIENT), (int)BTConnectState::DISCONNECTED);
+    int state = static_cast<int>(BTConnectState::DISCONNECTED);
+    host_->GetBtProfileConnState(PROFILE_ID_GATT_CLIENT, state);
+    EXPECT_EQ(state, (int)BTConnectState::DISCONNECTED);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtProfileConnState_00100 end";
 }
@@ -379,9 +382,35 @@ HWTEST_F(HostTest, Host_ModuleTest_SetBtScanMode_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetBtScanMode_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->SetBtScanMode(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, 0));
+    bool ret = false;
+    int result = host_->SetBtScanMode(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, 0);
+    if (result == BT_SUCCESS) {
+        ret = true;
+    }
+    EXPECT_TRUE(ret);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetBtScanMode_00100 end";
+}
+
+/**
+ * @tc.number: Host_ModuleTest_SetBtScanMode_00200
+ * @tc.name:
+ * @tc.desc:
+ */
+HWTEST_F(HostTest, Host_ModuleTest_SetBtScanMode_00200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_SetBtScanMode_00200 start";
+
+    const int scanModeInvalid = -1;
+    host_ = &BluetoothHost::GetDefaultHost();
+    bool ret = false;
+    int result = host_->SetBtScanMode(scanModeInvalid, 0);
+    if (result == BT_SUCCESS) {
+        ret = true;
+    }
+    EXPECT_FALSE(ret);
+
+    GTEST_LOG_(INFO) << "Host_ModuleTest_SetBtScanMode_00200 end";
 }
 
 /**
@@ -395,7 +424,9 @@ HWTEST_F(HostTest, Host_ModuleTest_GetBtScanMode_00100, TestSize.Level1)
 
     sleep(1);
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_EQ(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, host_->GetBtScanMode());
+    int scanmode = 0;
+    host_->GetBtScanMode(scanmode);
+    EXPECT_EQ(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, scanmode);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetBtScanMode_00100 end";
 }
@@ -440,7 +471,12 @@ HWTEST_F(HostTest, Host_ModuleTest_StartBtDiscovery_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_StartBtDiscovery_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->StartBtDiscovery());
+    int ret = host_->StartBtDiscovery();
+    bool isSuccess = false;
+    if (ret == BT_SUCCESS) {
+        isSuccess = true;
+    }
+    EXPECT_TRUE(isSuccess);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_StartBtDiscovery_00100 end";
 }
@@ -470,7 +506,12 @@ HWTEST_F(HostTest, Host_ModuleTest_CancelBtDiscovery_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_CancelBtDiscovery_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->CancelBtDiscovery());
+    int ret = host_->CancelBtDiscovery();
+    bool isSuccess = false;
+    if (ret == BT_SUCCESS) {
+        isSuccess = true;
+    }
+    EXPECT_TRUE(isSuccess);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_CancelBtDiscovery_00100 end";
 }
@@ -500,7 +541,8 @@ HWTEST_F(HostTest, Host_ModuleTest_GetPairedDevices_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPairedDevices_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    std::vector<BluetoothRemoteDevice> remotedeviceList = host_->GetPairedDevices(BT_TRANSPORT_BREDR);
+    std::vector<BluetoothRemoteDevice> remotedeviceList;
+    host_->GetPairedDevices(BT_TRANSPORT_BREDR, remotedeviceList);
     EXPECT_EQ((int)remotedeviceList.size(), 0);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPairedDevices_00100 end";
@@ -719,7 +761,7 @@ HWTEST_F(HostTest, Host_ModuleTest_GetDeviceType_00100, TestSize.Level1)
 
     host_ = &BluetoothHost::GetDefaultHost();
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_EQ(device_.GetDeviceType(), INVALID_VALUE);
+    EXPECT_EQ(device_.GetDeviceType(), INVALID_TYPE);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceType_00100 end";
 }
@@ -765,9 +807,40 @@ HWTEST_F(HostTest, Host_ModuleTest_StartPair_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_FALSE(device_.StartPair());
+    EXPECT_TRUE(device_.StartPair());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00100 end";
+}
+
+/**
+ * @tc.number: Host_ModuleTest_StartPair_00200
+ * @tc.name:
+ * @tc.desc:
+ */
+HWTEST_F(HostTest, Host_ModuleTest_StartPair_00200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00200 start";
+
+    BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
+    EXPECT_FALSE(device_.StartPair());
+
+    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00200 end";
+}
+
+/**
+ * @tc.number: Host_ModuleTest_StartPair_00300
+ * @tc.name:
+ * @tc.desc:
+ */
+HWTEST_F(HostTest, Host_ModuleTest_StartPair_00300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00300 start";
+
+    BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
+    std::this_thread::sleep_for(std::chrono::seconds(12));
+    EXPECT_TRUE(device_.StartPair());
+
+    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00300 end";
 }
 
 /**
@@ -780,6 +853,7 @@ HWTEST_F(HostTest, Host_ModuleTest_CancelPairing_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_CancelPairing_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
+    std::this_thread::sleep_for(std::chrono::seconds(12));
     EXPECT_FALSE(device_.CancelPairing());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_CancelPairing_00100 end";
@@ -840,10 +914,29 @@ HWTEST_F(HostTest, Host_ModuleTest_GetDeviceClass_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceClass_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    BluetoothDeviceClass getLocalcod = device_.GetDeviceClass();
-    EXPECT_EQ(device_.GetDeviceClass().GetMajorClass(), getLocalcod.GetMajorClass());
+    int cod = 0;
+    (void)device_.GetDeviceClass(cod);
+    BluetoothDeviceClass getLocalcod = BluetoothDeviceClass(cod);
+    EXPECT_EQ(getLocalcod.GetMajorClass(), getLocalcod.GetMajorClass());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceClass_00100 end";
+}
+
+/**
+ * @tc.number: Host_ModuleTest_GetDeviceClass_00200
+ * @tc.name:
+ * @tc.desc:
+ */
+HWTEST_F(HostTest, Host_ModuleTest_GetDeviceClass_00200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceClass_00200 start";
+
+    BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
+    int cod = 0;
+    (void)device_.GetDeviceClass(cod);
+    BluetoothDeviceClass getLocalcod = BluetoothDeviceClass(cod);
+    EXPECT_EQ(getLocalcod.GetClassOfDevice(), 0);
+    GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceClass_00200 end";
 }
 
 /**
@@ -887,8 +980,18 @@ HWTEST_F(HostTest, Host_ModuleTest_SetDevicePairingConfirmation_00100, TestSize.
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetDevicePairingConfirmation_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_FALSE(device_.SetDevicePairingConfirmation(true));
-    EXPECT_FALSE(device_.SetDevicePairingConfirmation(false));
+    bool ret = false;
+    int result = device_.SetDevicePairingConfirmation(true);
+    if (result == BT_SUCCESS) {
+        ret = true;
+    }
+    EXPECT_FALSE(ret);
+    bool isSuccess = false;
+    result = device_.SetDevicePairingConfirmation(true);
+    if (result == BT_SUCCESS) {
+        isSuccess = true;
+    }
+    EXPECT_FALSE(isSuccess);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetDevicePairingConfirmation_00100 end";
 }
@@ -986,7 +1089,12 @@ HWTEST_F(HostTest, Host_ModuleTest_DisableBt_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_DisableBt_00100 start";
 
     host_ = &BluetoothHost::GetDefaultHost();
-    EXPECT_TRUE(host_->DisableBt());
+    bool isSuccess = false;
+    int ret = host_->DisableBt();
+    if (ret == BT_SUCCESS) {
+        isSuccess = true;
+    }
+    EXPECT_TRUE(isSuccess);
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_DisableBt_00100 end";

@@ -15,6 +15,7 @@
 #include "napi_bluetooth_hfp_hf.h"
 #include "napi_bluetooth_profile.h"
 #include "bluetooth_hfp_hf.h"
+#include "napi_bluetooth_event.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -44,7 +45,7 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
 
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
     HILOGI("finished");
 }
 
@@ -59,69 +60,28 @@ napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callba
 napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
+    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 2 argument.");
-        return ret;
-    }
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
-    callbackInfo->env_ = env;
-
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[PARAM1], &valueType);
-    if (valueType != napi_function) {
-        HILOGE("Wrong argument type. Function expected.");
-        return ret;
-    }
-    napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    observer_.callbackInfos_[type] = callbackInfo;
-
-    HILOGI("%{public}s is registered", type.c_str());
-
+    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
     if (!isRegistered_) {
         HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
         profile->RegisterObserver(&observer_);
         isRegistered_ = true;
     }
+
+    HILOGI("Hands Free Unit is registered");
     return ret;
 }
 
 napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
+    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    observer_.callbackInfos_[type] = nullptr;
-    HILOGI("%{public}s is unregistered", type.c_str());
+    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    HILOGI("Hands Free Unit is unregistered");
     return ret;
 }
 

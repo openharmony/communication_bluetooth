@@ -25,15 +25,17 @@ int BluetoothHidHostObserverStub::OnRemoteRequest(
 {
     switch (code) {
         case COMMAND_ON_CONNECTION_STATE_CHANGED: {
-            std::u16string descriptor = BluetoothHidHostObserverStub::GetDescriptor();
-            std::u16string remoteDescriptor = data.ReadInterfaceToken();
-            if (descriptor != remoteDescriptor) {
+            if (BluetoothHidHostObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
             }
-            const BluetoothRawAddress *address = data.ReadParcelable<BluetoothRawAddress>();
+            std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+            if (!device) {
+                HILOGE("COMMAND_ON_CONNECTION_STATE_CHANGED device is null");
+                return IPC_INVOKER_TRANSLATE_ERR;
+            }
             int state = data.ReadInt32();
-            OnConnectionStateChanged(*address, state);
+            OnConnectionStateChanged(*device, state);
             return NO_ERROR;
         }
         default:

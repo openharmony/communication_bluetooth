@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
+const int32_t A2DP_MAX_SRC_CONNECTION_NUMS = 0x07;
 BluetoothA2dpSrcStub::BluetoothA2dpSrcStub()
 {
     HILOGD("%{public}s start.", __func__);
@@ -76,10 +77,8 @@ BluetoothA2dpSrcStub::~BluetoothA2dpSrcStub()
 int BluetoothA2dpSrcStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothA2dpSrcStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothA2dpSrcStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGI("BluetoothA2dpSrcStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothA2dpSrcStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -94,11 +93,11 @@ int BluetoothA2dpSrcStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothA2dpSrcStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
 
-    int result = Connect(RawAddress(addr));
+    int32_t result = Connect(RawAddress(addr));
 
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -109,11 +108,11 @@ ErrCode BluetoothA2dpSrcStub::ConnectInner(MessageParcel &data, MessageParcel &r
     return NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
 
-    int result = Disconnect(RawAddress(addr));
+    int32_t result = Disconnect(RawAddress(addr));
 
     bool ret = reply.WriteInt32(result);
     if (!ret) {
@@ -146,6 +145,9 @@ ErrCode BluetoothA2dpSrcStub::GetDevicesByStatesInner(MessageParcel &data, Messa
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
+    if (stateSize > A2DP_MAX_SRC_CONNECTION_NUMS) {
+        return ERR_INVALID_STATE;
+    }
 
     for (int i = 0; i < stateSize; i++) {
         int32_t state = data.ReadInt32();
@@ -179,18 +181,14 @@ ErrCode BluetoothA2dpSrcStub::GetDeviceStateInner(MessageParcel &data, MessagePa
     return NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcStub::GetPlayingStateInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcStub::GetPlayingStateInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
+    int32_t state = 0;
+    int32_t result = GetPlayingState(RawAddress(addr), state);
 
-    int result = GetPlayingState(RawAddress(addr));
-
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGE("BluetoothA2dpSrcStub: GetPlayingStateInner reply writing failed in: %{public}s.", __func__);
-        return TRANSACTION_ERR;
-    }
-
+    (void)reply.WriteInt32(result);
+    (void)reply.WriteInt32(state);
     return NO_ERROR;
 }
 
