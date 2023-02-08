@@ -192,12 +192,12 @@ export function testStartAdvertising():String{
     let advDataManufactureDataList = []
     let advDataServiceDataList =[]
     let advDataManufactureDataInstance = {
-      advDataManufactureId : parseInt(advDataManufactureData_manufactureId),
-      advDataManufactureValue : string2ArrayBuffer(advDataManufactureData_manufactureValue)
+      manufactureId : parseInt(advDataManufactureData_manufactureId),
+      manufactureValue : string2ArrayBuffer(advDataManufactureData_manufactureValue)
     }
     let advDataServiceDataInstance = {
-      advDataServiceUuid : advDataServiceData_serviceUuid,
-      advDataServiceValue : string2ArrayBuffer(advDataServiceData_serviceValue)
+      serviceUuid : advDataServiceData_serviceUuid,
+      serviceValue : string2ArrayBuffer(advDataServiceData_serviceValue)
     }
     let advDataServiceUuidListLength = advDataServiceUuidList.push(advDataServiceUuids_serviceUuid)
     let advDataManufactureDataListLength = advDataManufactureDataList.push(advDataManufactureDataInstance)
@@ -246,7 +246,7 @@ export function testStartAdvertising():String{
     if(!cbxAdvResponse)
     {
       console.log("advData.serviceUuids:"+ advData.serviceUuids + "\n")
-      console.log("advData.manufactureData:" +advData.manufactureData + "\n")
+      console.log("advData.manufactureData:" +advData.manufactureData + (typeof advData.manufactureData) + "\n")
       console.log("advData.serviceData:" +advData.serviceData + "\n")
       gattServerInstance.startAdvertising(setting,advData);
     } else {
