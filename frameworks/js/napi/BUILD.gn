@@ -13,6 +13,8 @@
 
 import("//build/ohos.gni")
 
+SUBSYSTEM_DIR = "//foundation/communication"
+
 ohos_shared_library("bluetooth") {
   sanitize = {
     cfi = true
@@ -76,6 +78,7 @@ ohos_shared_library("bluetooth") {
     "src/napi_bluetooth_spp_server.cpp",
     "src/napi_bluetooth_utils.cpp",
     "src/native_module.cpp",
+    "src/parser/napi_parser_utils.cpp",
   ]
 
   deps = [
@@ -98,4 +101,96 @@ ohos_shared_library("bluetooth") {
   relative_install_dir = "module"
   part_name = "bluetooth"
   subsystem_name = "communication"
+}
+
+ohos_shared_library("bluetoothmanager") {
+  #install_enable = true
+  include_dirs = [
+    "include",
+    "//third_party/node/src",
+    "//native_engine",
+    "//commonlibrary/c_utils/base/include",
+    "//utils/system/safwk/native/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/adapter/interfaces/innerkits/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/communication/bluetooth/frameworks/inner/common",
+  ]
+
+  defines = [
+    "BT_LOG_TAG = \"bluetooth_napi\"",
+    "BT_LOG_DOMAIN = 0xD000100",
+    "ENABLE_NAPI_BLUETOOTH_MANAGER",
+  ]
+
+  sources = [
+    "src/napi_bluetooth_a2dp_snk.cpp",
+    "src/napi_bluetooth_a2dp_snk_observer.cpp",
+    "src/napi_bluetooth_a2dp_src.cpp",
+    "src/napi_bluetooth_a2dp_src_observer.cpp",
+    "src/napi_bluetooth_avrcp_ct.cpp",
+    "src/napi_bluetooth_avrcp_ct_observer.cpp",
+    "src/napi_bluetooth_avrcp_tg.cpp",
+    "src/napi_bluetooth_avrcp_tg_observer.cpp",
+    "src/napi_bluetooth_ble.cpp",
+    "src/napi_bluetooth_ble_advertise_callback.cpp",
+    "src/napi_bluetooth_ble_central_manager_callback.cpp",
+    "src/napi_bluetooth_error.cpp",
+    "src/napi_bluetooth_event.cpp",
+    "src/napi_bluetooth_gatt_client.cpp",
+    "src/napi_bluetooth_gatt_client_callback.cpp",
+    "src/napi_bluetooth_gatt_server.cpp",
+    "src/napi_bluetooth_gatt_server_callback.cpp",
+    "src/napi_bluetooth_hfp_ag.cpp",
+    "src/napi_bluetooth_hfp_ag_observer.cpp",
+    "src/napi_bluetooth_hfp_hf.cpp",
+    "src/napi_bluetooth_hfp_hf_observer.cpp",
+    "src/napi_bluetooth_hid_host.cpp",
+    "src/napi_bluetooth_hid_host_observer.cpp",
+    "src/napi_bluetooth_host.cpp",
+    "src/napi_bluetooth_host_observer.cpp",
+    "src/napi_bluetooth_opp.cpp",
+    "src/napi_bluetooth_opp_observer.cpp",
+    "src/napi_bluetooth_pan.cpp",
+    "src/napi_bluetooth_pan_observer.cpp",
+    "src/napi_bluetooth_pbap_pce.cpp",
+    "src/napi_bluetooth_pbap_pce_observer.cpp",
+    "src/napi_bluetooth_pbap_pse.cpp",
+    "src/napi_bluetooth_pbap_pse_observer.cpp",
+    "src/napi_bluetooth_profile.cpp",
+    "src/napi_bluetooth_remote_device_observer.cpp",
+    "src/napi_bluetooth_spp_client.cpp",
+    "src/napi_bluetooth_spp_server.cpp",
+    "src/napi_bluetooth_utils.cpp",
+    "src/native_module.cpp",
+    "src/parser/napi_parser_utils.cpp",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/arkui/napi:ace_napi",
+    "//foundation/communication/bluetooth/frameworks/inner:btframework",
+    "//third_party/libuv:uv",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+
+  relative_install_dir = "module"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+group("bluetooth_napi") {
+  deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi:bluetooth",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi:bluetoothmanager",
+  ]
 }

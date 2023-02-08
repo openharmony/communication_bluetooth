@@ -28,8 +28,8 @@ struct NapiSppClient {
     static napi_value SppConnect(napi_env env, napi_callback_info info);
     static napi_value SppCloseClientSocket(napi_env env, napi_callback_info info);
     static napi_value SppWrite(napi_env env, napi_callback_info info);
-    static void On(napi_env env, napi_callback_info info);
-    static void Off(napi_env env, napi_callback_info info);
+    static napi_value On(napi_env env, napi_callback_info info);
+    static napi_value Off(napi_env env, napi_callback_info info);
     static void SppRead(int id);
 
     static std::map<int, std::shared_ptr<NapiSppClient>> clientMap;

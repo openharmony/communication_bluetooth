@@ -14,6 +14,8 @@
  */
 
 #include "bluetooth_hfp_ag_stub.h"
+
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 
 namespace OHOS {
@@ -86,9 +88,7 @@ BluetoothHfpAgStub::~BluetoothHfpAgStub() {
 int BluetoothHfpAgStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
     HILOGI("BluetoothHfpAgStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothHfpAgStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothHfpAgStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -101,24 +101,24 @@ int BluetoothHfpAgStub::OnRemoteRequest(
         }
     }
     HILOGW("BluetoothHfpAgStub::OnRemoteRequest, default case, need check.");
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);   
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothHfpAgStub::GetConnectDevicesInner(MessageParcel &data, MessageParcel &reply) {
+int32_t BluetoothHfpAgStub::GetConnectDevicesInner(MessageParcel &data, MessageParcel &reply) {
     std::vector<BluetoothRawAddress> devices;
     GetConnectDevices(devices);
     uint32_t DevNum = devices.size();
     if (!reply.WriteUint32(DevNum)) {
         HILOGE("BluetoothHfpAgStub:WriteInt32 failed in: %{public}s.", __func__);
-        return ERR_INVALID_VALUE;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     for (uint32_t i = 0; i < DevNum; i++) {
         if (!reply.WriteParcelable(&devices[i])) {
             HILOGE("BluetoothHfpAgStub:WriteParcelable failed in: %{public}s.", __func__);
-            return ERR_INVALID_VALUE;
+            return BT_ERR_IPC_TRANS_FAILED;
         }
     }
-    return NO_ERROR;
+    return BT_SUCCESS;
 }
 
 ErrCode BluetoothHfpAgStub::GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply) {
@@ -143,40 +143,52 @@ ErrCode BluetoothHfpAgStub::GetDevicesByStatesInner(MessageParcel &data, Message
 ErrCode BluetoothHfpAgStub::GetDeviceStateInner(MessageParcel &data, MessageParcel &reply) {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    int result = GetDeviceState(*device);
-    if (!reply.WriteInt32(result)) {
+    int32_t state;
+    int32_t errCode = GetDeviceState(*device, state);
+    if (!reply.WriteInt32(errCode)) {
         HILOGE("BluetoothHfpAgStub: reply writing failed in: %{public}s.", __func__);
-        return ERR_INVALID_VALUE;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return NO_ERROR;
+    if (errCode != BT_SUCCESS) {
+        HILOGE("internal error.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    // write state
+    if (!reply.WriteInt32(state)) {
+        HILOGE("reply write failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothHfpAgStub::ConnectInner(MessageParcel &data, MessageParcel &reply) {
+int32_t BluetoothHfpAgStub::ConnectInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    int result = Connect(*device);
-    if (!reply.WriteInt32(result)) {
+    int32_t errCode = Connect(*device);
+    if (!reply.WriteInt32(errCode)) {
         HILOGE("BluetoothHfpAgStub: reply writing failed in: %{public}s.", __func__);
-        return ERR_INVALID_VALUE;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return NO_ERROR;
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothHfpAgStub::DisconnectInner(MessageParcel &data, MessageParcel &reply) {
+int32_t BluetoothHfpAgStub::DisconnectInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    int result = Disconnect(*device);
-    if (!reply.WriteInt32(result)) {
+    int32_t errCode = Disconnect(*device);
+    if (!reply.WriteInt32(errCode)) {
         HILOGE("BluetoothHfpAgStub: reply writing failed in: %{public}s.", __func__);
-        return ERR_INVALID_VALUE;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return NO_ERROR;
+    return BT_SUCCESS;
 }
 
 ErrCode BluetoothHfpAgStub::GetScoStateInner(MessageParcel &data, MessageParcel &reply) {

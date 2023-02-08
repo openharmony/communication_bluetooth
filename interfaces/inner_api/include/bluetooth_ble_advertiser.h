@@ -314,7 +314,7 @@ public:
      * @param callback Advertise callback.
      * @since 6
      */
-    void StartAdvertising(const BleAdvertiserSettings &settings, const BleAdvertiserData &advData,
+    int StartAdvertising(const BleAdvertiserSettings &settings, const BleAdvertiserData &advData,
         const BleAdvertiserData &scanResponse, BleAdvertiseCallback &callback);
 
     /**
@@ -326,10 +326,10 @@ public:
      * @param callback Advertise callback.
      * @since 6
      */
-    void StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
+    int StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
         const std::vector<uint8_t> &scanResponse, BleAdvertiseCallback &callback);
 
-    void StopAdvertising(BleAdvertiseCallback &callback);
+    int StopAdvertising(BleAdvertiseCallback &callback);
 
     /**
      * @brief Cleans up advertisers.

@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const int32_t BLE_CENTRAL_MANAGER_STUB_READ_DATA_SIZE_MAX_LEN = 0x100;
 const std::map<uint32_t, std::function<ErrCode(BluetoothBleCentralManagerStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleCentralManagerStub::interfaces_ = {
         {IBluetoothBleCentralManager::Code::BLE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK,
@@ -62,9 +63,7 @@ BluetoothBleCentralManagerStub::~BluetoothBleCentralManagerStub()
 int BluetoothBleCentralManagerStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    std::u16string descriptor = BluetoothBleCentralManagerStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothBleCentralManagerStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGW("[OnRemoteRequest] fail: invalid interface token!");
         return OBJECT_NULL;
     }
@@ -112,7 +111,11 @@ ErrCode BluetoothBleCentralManagerStub::DeregisterBleCentralManagerCallbackInner
 
 ErrCode BluetoothBleCentralManagerStub::StartScanInner(MessageParcel &data, MessageParcel &reply)
 {
-    StartScan();
+    int ret = StartScan();
+    if (!reply.WriteInt32(ret)) {
+        HILOGE("reply writing faileded");
+        return ERR_INVALID_VALUE;
+    }
     return NO_ERROR;
 }
 
@@ -124,20 +127,32 @@ ErrCode BluetoothBleCentralManagerStub::StartScanWithSettingsInner(MessageParcel
         return TRANSACTION_ERR;
     }
 
-    StartScan(*settings);
+    int ret = StartScan(*settings);
+    if (!reply.WriteInt32(ret)) {
+        HILOGE("reply writing faileded");
+        return ERR_INVALID_VALUE;
+    }
     return NO_ERROR;
 }
 
 ErrCode BluetoothBleCentralManagerStub::StopScanInner(MessageParcel &data, MessageParcel &reply)
 {
-    StopScan();
+    int ret = StopScan();
+    if (!reply.WriteInt32(ret)) {
+        HILOGE("reply writing faileded");
+        return ERR_INVALID_VALUE;
+    }
     return NO_ERROR;
 }
 ErrCode BluetoothBleCentralManagerStub::ConfigScanFilterInner(MessageParcel &data, MessageParcel &reply)
 {
     std::vector<BluetoothBleScanFilter> filters {};
     int32_t clientId = data.ReadInt32();
-    int32_t itemsSize = data.ReadInt32();
+    int32_t itemsSize = 0;
+    if (!data.ReadInt32(itemsSize) || itemsSize > BLE_CENTRAL_MANAGER_STUB_READ_DATA_SIZE_MAX_LEN) {
+        HILOGE("read Parcelable size failed.");
+        return ERR_INVALID_VALUE;
+    }
     for (int i = 0; i < itemsSize; i++) {
         BluetoothBleScanFilter item = *(data.ReadParcelable<BluetoothBleScanFilter>());
         filters.push_back(item);

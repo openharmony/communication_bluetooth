@@ -143,17 +143,16 @@ napi_value NapiEvent::OnEvent(napi_env env, napi_callback_info info,
 napi_value NapiEvent::OffEvent(napi_env env, napi_callback_info info,
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> &callbackInfos)
 {
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_value thisVar = nullptr;
 
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
+    if (argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO) {
+        HILOGE("Requires 1 or 2 argument.");
         return ret;
     }
     std::string type;
@@ -166,6 +165,7 @@ napi_value NapiEvent::OffEvent(napi_env env, napi_callback_info info,
         HILOGE("type %{public}s callbackInfos isn't exist.", type.c_str());
         return ret;
     }
+
     uint32_t refCount = INVALID_REF_COUNT;
     napi_reference_unref(env, it->second->callback_, &refCount);
     HILOGI("decrements the refernce count, refCount: %{public}d", refCount);

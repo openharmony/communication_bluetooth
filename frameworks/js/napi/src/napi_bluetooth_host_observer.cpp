@@ -20,6 +20,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_bluetooth_host.h"
 
 #include <uv.h>
 
@@ -60,13 +61,11 @@ void NapiBluetoothHostObserver::OnStateChanged(const int transport, const int st
     if (!DealStateChange(transport, status, state)) {
         return;
     }
-
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_STATE_CHANGE_TYPE);
     if (callbackInfo == nullptr) {
         HILOGI("This callback is not registered by ability.");
         return;
     }
-    
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     if (loop == nullptr) {
@@ -183,7 +182,10 @@ void NapiBluetoothHostObserver::OnDiscoveryResult(const BluetoothRemoteDevice &d
     callbackData->function = &NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult;
     callbackData->env = callbackInfo->env_;
     callbackData->callback = callbackInfo->callback_;
-    callbackData->data = std::make_shared<BluetoothRemoteDevice>(device);
+    std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
+    callbackData->data = remoteDevice;
+
+    AddDiscoveryDevice(remoteDevice);
 
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {

@@ -191,14 +191,14 @@ std::vector<RawAddress> BluetoothA2dpSinkServer::GetDevicesByStates(const std::v
     return rawDevices;
 }
 
-int BluetoothA2dpSinkServer::GetPlayingState(const RawAddress &device)
+int BluetoothA2dpSinkServer::GetPlayingState(const RawAddress &device, int &state)
 {
     HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("false, check permission failed");
         return BT_FAILURE;
     }
-    return pimpl->a2dpSnkService_->GetPlayingState(device);
+    return pimpl->a2dpSnkService_->GetPlayingState(device, state);
 }
 
 int BluetoothA2dpSinkServer::SetConnectStrategy(const RawAddress &device, int strategy)

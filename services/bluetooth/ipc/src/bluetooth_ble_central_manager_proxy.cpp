@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_ble_central_manager_proxy.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "parcel_bt_uuid.h"
 
@@ -42,7 +43,7 @@ void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK, option, data, reply);
+    int32_t result = InnerTransact(BLE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[RegisterBleCentralManagerCallback] fail: transact ErrCode=%{public}d", result);
     }
@@ -64,63 +65,66 @@ void BluetoothBleCentralManagerProxy::DeregisterBleCentralManagerCallback(
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_DE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK, option, data, reply);
+    int32_t result = InnerTransact(BLE_DE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[DeregisterBleCentralManagerCallback] fail: transact ErrCode=%{public}d", result);
     }
 }
 
-void BluetoothBleCentralManagerProxy::StartScan()
+int BluetoothBleCentralManagerProxy::StartScan()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
         HILOGW("[StartScan] fail: write interface token failed.");
-        return;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_START_SCAN, option, data, reply);
+    int32_t result = InnerTransact(BLE_START_SCAN, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[StartScan] fail: transact ErrCode=%{public}d", result);
     }
+    return reply.ReadInt32();
 }
 
-void BluetoothBleCentralManagerProxy::StartScan(const BluetoothBleScanSettings &settings)
+int BluetoothBleCentralManagerProxy::StartScan(const BluetoothBleScanSettings &settings)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
         HILOGW("[StartScan] fail: write interface token failed.");
-        return;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     if (!data.WriteParcelable(&settings)) {
         HILOGW("[StartScan] fail:write settings failed");
-        return;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_START_SCAN_WITH_SETTINGS, option, data, reply);
+    int32_t result = InnerTransact(BLE_START_SCAN_WITH_SETTINGS, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[StartScan] fail: transact ErrCode=%{public}d", result);
     }
+    return reply.ReadInt32();
 }
 
-void BluetoothBleCentralManagerProxy::StopScan()
+int BluetoothBleCentralManagerProxy::StopScan()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
         HILOGW("[StopScan] fail: write interface token failed.");
-        return;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_STOP_SCAN, option, data, reply);
+    int32_t result = InnerTransact(BLE_STOP_SCAN, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[StopScan] fail: transact ErrCode=%{public}d", result);
     }
+    return reply.ReadInt32();
 }
 
 int BluetoothBleCentralManagerProxy::ConfigScanFilter(
@@ -150,7 +154,7 @@ int BluetoothBleCentralManagerProxy::ConfigScanFilter(
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_CONFIG_SCAN_FILTER, option, data, reply);
+    int32_t result = InnerTransact(BLE_CONFIG_SCAN_FILTER, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[ConfigScanFilter] fail: transact ErrCode=%{public}d", result);
         return 0;
@@ -173,7 +177,7 @@ void BluetoothBleCentralManagerProxy::RemoveScanFilter(const int clientId)
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_REMOVE_SCAN_FILTER, option, data, reply);
+    int32_t result = InnerTransact(BLE_REMOVE_SCAN_FILTER, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[RemoveScanFilter] fail: transact ErrCode=%{public}d", result);
     }
@@ -194,7 +198,7 @@ bool BluetoothBleCentralManagerProxy::ProxyUid(int32_t uid, bool isProxy)
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
-    ErrCode result = InnerTransact(BLE_PROXY_UID, option, data, reply);
+    int32_t result = InnerTransact(BLE_PROXY_UID, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[ProxyUid] fail: transact ErrCode=%{public}d", result);
         return false;
@@ -212,7 +216,7 @@ bool BluetoothBleCentralManagerProxy::ResetAllProxy()
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
-    ErrCode result = InnerTransact(BLE_RESET_ALL_PROXY, option, data, reply);
+    int32_t result = InnerTransact(BLE_RESET_ALL_PROXY, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[ResetAllProxy] fail: transact ErrCode=%{public}d", result);
         return false;
@@ -220,7 +224,7 @@ bool BluetoothBleCentralManagerProxy::ResetAllProxy()
     return true;
 }
 
-ErrCode BluetoothBleCentralManagerProxy::InnerTransact(
+int32_t BluetoothBleCentralManagerProxy::InnerTransact(
     uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
 {
     auto remote = Remote();

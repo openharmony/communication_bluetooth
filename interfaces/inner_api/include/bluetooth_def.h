@@ -18,7 +18,7 @@
 
 #include <string>
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -133,6 +133,7 @@ const uint32_t PROFILE_ID_DI = 0x00002000;
 const std::string INVALID_MAC_ADDRESS = "00:00:00:00:00:00";
 const std::string INVALID_NAME = "";
 const int INVALID_VALUE = 0;
+const int INVALID_TYPE = -1;
 const int ADDRESS_LENGTH = 17;
 const int ADDRESS_COLON_INDEX = 2;
 const int ADDRESS_SEPARATOR_UNIT = 3;
@@ -264,7 +265,7 @@ enum GattStatus {
 };
 
 enum BtStatus{
-    BT_SUCCESS = 0,
+    BT_SUCC = 0,
     BT_FAILURE = -1,
 };
 

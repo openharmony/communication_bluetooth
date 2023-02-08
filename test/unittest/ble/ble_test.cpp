@@ -15,6 +15,7 @@
 
 #include "ble_test.h"
 #include "bluetooth_def.h"
+#include "bluetooth_errorcode.h"
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -64,7 +65,11 @@ bool BleTest::EnableBle()
 {
     GTEST_LOG_(INFO) << "enable ble start";
     std::unique_lock lock(g_mx);
-    bool isEnable = host_->EnableBle();
+    bool isEnable = false;
+    int32_t ret = host_->EnableBle();
+    if (ret == BT_SUCCESS) {
+        isEnable = true;
+    }
     EXPECT_TRUE(isEnable);
     while (!g_ready) {
         g_cv.wait(lock);
@@ -79,7 +84,11 @@ bool BleTest::DisableBle()
 {
     GTEST_LOG_(INFO) << "disable ble start";
     std::unique_lock lock(g_mx);
-    bool isEnable = host_->DisableBle();
+    bool isEnable = false;
+    int ret = host_->DisableBle();
+    if (ret == BT_SUCCESS) {
+        isEnable = true;
+    }
     EXPECT_TRUE(isEnable);
     while (!g_ready) {
         g_cv.wait(lock);

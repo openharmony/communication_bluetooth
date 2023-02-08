@@ -269,7 +269,7 @@ public:
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    bool DisableBt();
+    int DisableBt();
 
     /**
      * @brief Get classic enable/disable state.
@@ -284,13 +284,25 @@ public:
     int GetBtState() const;
 
     /**
+     * @brief Get classic enable/disable state.
+     *
+     * @param Returns classic enable/disable state.
+     *         BTStateID::STATE_TURNING_ON;
+     *         BTStateID::STATE_TURN_ON;
+     *         BTStateID::STATE_TURNING_OFF;
+     *         BTStateID::STATE_TURN_OFF.
+     * @since 6
+     */
+    int GetBtState(int &state) const;
+
+    /**
      * @brief Disable ble.
      *
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    bool DisableBle();
+    int DisableBle();
 
     /**
      * @brief Enable ble.
@@ -299,7 +311,16 @@ public:
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    bool EnableBle();
+    int EnableBle();
+
+    /**
+     * @brief Get br/edr enable/disable state.
+     *
+     * @return Returns <b>true</b> if br is enabled;
+     *         returns <b>false</b> if br is not enabled.
+     * @since 6
+     */
+    bool IsBrEnabled() const;
 
     /**
      * @brief Get ble enable/disable state.
@@ -348,6 +369,18 @@ public:
     int GetBtConnectionState() const;
 
     /**
+     * @brief Get bluetooth connects state.
+     *
+     * @return Returns bluetooth connects state.
+     *         BTConnectState::CONNECTING;
+     *         BTConnectState::CONNECTED;
+     *         BTConnectState::DISCONNECTING;
+     *         BTConnectState::DISCONNECTED.
+     * @since 6
+     */
+    int GetBtConnectionState(int &state) const;
+
+    /**
      * @brief Get profile service connect state.
      *
      * @param profileID Profile service ID.
@@ -358,7 +391,7 @@ public:
      *         BTConnectState::DISCONNECTED.
      * @since 6
      */
-    int GetBtProfileConnState(uint32_t profileId) const;
+    int GetBtProfileConnState(uint32_t profileId, int &state) const;
 
     /**
      * @brief Get local device supported uuids.
@@ -420,6 +453,14 @@ public:
     std::string GetLocalName() const;
 
     /**
+     * @brief Get local device name.
+     *
+     * @return Returns local device name.
+     * @since 6
+     */
+    int GetLocalName(std::string &name) const;
+
+    /**
      * @brief Set local device name.
      *
      * @param name Device name.
@@ -427,7 +468,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool SetLocalName(const std::string &name);
+    int SetLocalName(const std::string &name);
 
     /**
      * @brief Get device scan mode.
@@ -435,7 +476,7 @@ public:
      * @return Returns bluetooth scan mode.
      * @since 6
      */
-    int GetBtScanMode() const;
+    int GetBtScanMode(int32_t &scanMode) const;
 
     /**
      * @brief Set device scan mode.
@@ -446,7 +487,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool SetBtScanMode(int mode, int duration);
+    int SetBtScanMode(int mode, int duration);
 
     /**
      * @brief Get local device bondable mode.
@@ -474,7 +515,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool StartBtDiscovery();
+    int StartBtDiscovery();
 
     /**
      * @brief Cancel device discovery.
@@ -483,7 +524,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool CancelBtDiscovery();
+    int CancelBtDiscovery();
 
     /**
      * @brief Check if device is discovering.
@@ -509,7 +550,7 @@ public:
      * @return Returns paired devices vector.
      * @since 6
      */
-    std::vector<BluetoothRemoteDevice> GetPairedDevices(int transport) const;
+    int32_t GetPairedDevices(int transport, std::vector<BluetoothRemoteDevice> &pairedDevices) const;
 
     /**
      * @brief Remove pair.
@@ -519,7 +560,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool RemovePair(const BluetoothRemoteDevice &device);
+    int32_t RemovePair(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Remove all pairs.
@@ -548,7 +589,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    void RegisterRemoteDeviceObserver(BluetoothRemoteDeviceObserver &observer);
+    void RegisterRemoteDeviceObserver(std::shared_ptr<BluetoothRemoteDeviceObserver> observer);
 
     /**
      * @brief Deregister remote device observer.

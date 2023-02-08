@@ -82,7 +82,7 @@ public:
      * @param states List of remote device states.
      * @return Returns the list of devices.
      */
-    std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states);
+    int32_t GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice> &result);
 
     /**
      * @brief Get the connection state of the specified remote Pan device.
@@ -90,7 +90,7 @@ public:
      * @param device Remote device object.
      * @return Returns the connection state of the remote device.
      */
-    int GetDeviceState(const BluetoothRemoteDevice &device);
+    int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state);
 
     /**
      * @brief Release the connection from remote Pan device.
@@ -98,7 +98,7 @@ public:
      * @param device Remote device object.
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      */
-    bool Disconnect(const BluetoothRemoteDevice &device);
+    int32_t Disconnect(const BluetoothRemoteDevice &device);
 
         /**
      * @brief Register Pan observer instance.
@@ -119,13 +119,13 @@ public:
      *
      * @param value Set Network Sharing.
      */
-    bool SetTethering(bool value);
+    int32_t SetTethering(bool value);
 
     /**
      * @brief Is Tethering On.
      *
      */
-    bool IsTetheringOn();
+    int32_t IsTetheringOn(bool &value);
 
     /**
      * @brief Static Pan observer instance.

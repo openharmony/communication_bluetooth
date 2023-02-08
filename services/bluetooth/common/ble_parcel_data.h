@@ -37,6 +37,7 @@
 #include <map>
 #include <vector>
 
+#include "ble_service_data.h"
 #include "bt_uuid.h"
 #include "raw_address.h"
 
@@ -56,7 +57,7 @@ public:
      *
      * @since 6
      */
-    ~AdvertiserData(){};
+    virtual ~AdvertiserData(){};
 
     std::map<uint16_t, std::string> GetManufacturerData() const
     {
@@ -190,7 +191,7 @@ public:
      *
      * @since 6
      */
-    ~AdvertiserSettings(){};
+    virtual ~AdvertiserSettings(){};
 
     /**
      * @brief Check if device service is connectable.
@@ -344,12 +345,14 @@ public:
      */
     ScanResult(){};
 
+    explicit ScanResult(const BleScanResultImpl &other);
+
     /**
      * @brief A destructor used to delete the <b>BleScanResult</b> instance.
      *
      * @since 6
      */
-    ~ScanResult(){};
+    virtual ~ScanResult(){};
 
     /**
      * @brief Get service uuids.
@@ -390,7 +393,7 @@ public:
      * @return Returns peripheral device pointer.
      * @since 6
      */
-    RawAddress &GetPeripheralDevice()
+    const RawAddress &GetPeripheralDevice() const
     {
         return addr_;
     }
@@ -517,6 +520,16 @@ public:
         return payload_;
     }
 
+    void SetName(const std::string &name)
+    {
+        name_ = name;
+    }
+
+    std::string GetName(void) const
+    {
+        return name_;
+    }
+
 public:
     std::vector<Uuid> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
@@ -526,6 +539,7 @@ public:
     bool connectable_ {};
     uint8_t advertiseFlag_ {};
     std::string payload_ {};
+    std::string name_ {};
 };
 
 /**
@@ -547,7 +561,7 @@ public:
      *
      * @since 6
      */
-    ~ScanSettings(){};
+    virtual ~ScanSettings(){};
 
     /**
      * @brief Set report delay time.
@@ -661,7 +675,7 @@ public:
      * @brief A destructor used to delete the <b>BleScanFilter</b> instance.
      *
      */
-    ~ScanFilter() {}
+    virtual ~ScanFilter() {}
 
     /**
      * @brief Set device id.
@@ -699,7 +713,7 @@ public:
         hasServiceUuid_ = true;
     }
 
-    bool HasServiceUuid()
+    bool HasServiceUuid() const
     {
         return hasServiceUuid_;
     }
@@ -715,7 +729,7 @@ public:
         hasServiceUuidMask_ = true;
     }
 
-    bool HasServiceUuidMask()
+    bool HasServiceUuidMask() const
     {
         return hasServiceUuidMask_;
     }

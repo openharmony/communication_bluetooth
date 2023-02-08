@@ -27,10 +27,10 @@ public:
     virtual ~BluetoothHidHostProxy()
     {}
 
-    ErrCode Connect(const BluetoothRawAddress &device, bool& result) override;
-    ErrCode Disconnect(const BluetoothRawAddress &device, bool& result) override;
-    ErrCode GetDeviceState(const BluetoothRawAddress &device, int& result) override;
-    ErrCode GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result) override;
+    int32_t Connect(const BluetoothRawAddress &device) override;
+    int32_t Disconnect(const BluetoothRawAddress &device) override;
+    int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) override;
+    int32_t GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result) override;
     ErrCode RegisterObserver(const sptr<IBluetoothHidHostObserver> observer) override;
     ErrCode DeregisterObserver(const sptr<IBluetoothHidHostObserver> observer) override;
     ErrCode HidHostVCUnplug(std::string &device,
