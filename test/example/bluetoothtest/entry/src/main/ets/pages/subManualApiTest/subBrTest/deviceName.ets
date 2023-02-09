@@ -15,7 +15,7 @@
 import ConfigData from '../../../Utils/ConfigData';
 import BluetoothModel from '../../../MainAbility/model/BluetoothModel';
 import Router from '@system.router';
-import InputMethod from '@ohos.inputmethod';
+import InputMethod from '@ohos.inputMethod';
 import {PageTitle} from '../../../Component/pageTitle';
 /**
  * about phone

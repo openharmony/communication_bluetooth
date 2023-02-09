@@ -16,7 +16,7 @@ import ConfigData from '../../../../Utils/ConfigData';
 import BluetoothModel from '../../../model/BluetoothModel';
 import Router from '@system.router'
 import { TitleComponent } from '../../../../Component/titleComponent';
-import InputMethod from '@ohos.inputmethod';
+import InputMethod from '@ohos.inputMethod';
 import bluetooth from '@ohos.bluetooth';
 
 import {PageTitle} from '../../../../Component/pageTitle';
