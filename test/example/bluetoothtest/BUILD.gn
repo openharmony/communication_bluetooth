@@ -13,9 +13,9 @@
 
 import("//test/xts/tools/build/suite.gni")
 
-ohos_hap("bluetoothTest") {
+ohos_hap("bluetoothtest") {
   hap_profile = "entry/src/main/config.json"
-  hap_name = "bluetoothTest"
+  hap_name = "bluetoothtest"
   subsystem_name = "communication"
   final_hap_path =
       "${SUITES_OUTPUT_ROOT}/${XTS_SUITENAME}/testcases/${hap_name}.hap"
