@@ -182,7 +182,8 @@ void HfpHfDisconnecting::Exit()
 bool HfpHfDisconnecting::Dispatch(const utility::Message &msg)
 {
     HfpHfMessage &event = (HfpHfMessage &)msg;
-    LOG_DEBUG("[HFP HF]%{public}s():[Disconnecting][%{public}s]", __FUNCTION__, HfpHfStateMachine::GetEventName(event.what_).c_str());
+    LOG_DEBUG("[HFP HF]%{public}s():[Disconnecting][%{public}s]", __FUNCTION__,
+        HfpHfStateMachine::GetEventName(event.what_).c_str());
     switch (event.what_) {
         case HFP_HF_CONNECT_EVT:
             stateMachine_.AddDeferredMessage(event);

@@ -1048,7 +1048,7 @@ void A2dpService::DeleteDeviceFromList(const RawAddress &device)
             a2dpDevices_.erase(it);
             break;
         }
-        LOG_INFO("[A2dpService]%{public}s device[%{public}s]\n", __func__, it->first.c_str());
+        HILOGI("[A2dpService] device[%{public}s]\n", GetEncryptAddr(it->first).c_str());
     }
 }
 

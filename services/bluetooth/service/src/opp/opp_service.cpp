@@ -19,6 +19,7 @@
 #include "adapter_config.h"
 #include "class_creator.h"
 #include "log.h"
+#include "log_util.h"
 #include "profile_service_manager.h"
 #include "rfcomm.h"
 
@@ -432,8 +433,7 @@ void OppService::ProcessEvent(const OppMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = event.dev_;
-    HILOGI("[OPP Service]:address[%{public}s] event_no[%{public}d]",
-        address.c_str(), event.what_);
+    HILOGI("[OPP Service] address[%{public}s] event_no[%{public}d]", GetEncryptAddr(address).c_str(), event.what_);
     switch (event.what_) {
         case OPP_SERVICE_STARTUP_EVT:
             StartUp();
@@ -484,7 +484,7 @@ void OppService::ProcessDefaultEvent(const OppMessage &event) const
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         it->second->ProcessMessage(event);
     } else {
-        HILOGE("[OPP Service]:invalid address[%{public}s]", event.dev_.c_str());
+        HILOGE("[OPP Service]:invalid address[%{public}s]", GetEncryptAddr(event.dev_).c_str());
     }
 }
 
