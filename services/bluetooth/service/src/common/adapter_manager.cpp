@@ -21,6 +21,7 @@
 #include "btm.h"
 #include "btstack.h"
 #include "log.h"
+#include "log_util.h"
 
 #include "adapter_config.h"
 #include "adapter_device_config.h"
@@ -522,8 +523,7 @@ void AdapterManager::OnSysStateChange(const std::string &state) const
     // notify systerm state update
     BTSystemState notifySysState = (newSysState == SYS_STATE_STARTED) ? BTSystemState::ON : BTSystemState::OFF;
     if ((newSysState != oldSysState) && ((newSysState == SYS_STATE_STARTED) || (oldSysState == SYS_STATE_STARTED))) {
-        LOG_DEBUG(
-            "%{public}s oldSysState is %{public}s, newSysState is %{public}s", __PRETTY_FUNCTION__, oldSysState.c_str(), newSysState.c_str());
+        HILOGE("oldSysState is %{public}s, newSysState is %{public}s", oldSysState.c_str(), newSysState.c_str());
         pimpl->systemObservers_.ForEach(
             [notifySysState](ISystemStateObserver &observer) { observer.OnSystemStateChange(notifySysState); });
     }
@@ -659,7 +659,8 @@ int AdapterManager::GetMaxNumConnectedAudioDevices() const
     IAdapterConfig *config = AdapterConfig::GetInstance();
 
     if (!config->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_MAX_CONNECTED_DEVICES, value)) {
-        LOG_ERROR("%{public}s %{public}s not found", SECTION_A2DP_SRC_SERVICE.c_str(), PROPERTY_MAX_CONNECTED_DEVICES.c_str());
+        HILOGE("%{public}s %{public}s not found", SECTION_A2DP_SRC_SERVICE.c_str(),
+            PROPERTY_MAX_CONNECTED_DEVICES.c_str());
     }
     return value;
 }
@@ -694,7 +695,8 @@ BTPermissionType AdapterManager::GetPhonebookPermission(const std::string &addre
     bool value = false;
 
     if (!config->GetValue(address, SECTION_PERMISSION, PROPERTY_PHONEBOOK_PERMISSION, value)) {
-        LOG_DEBUG("%{public}s %{public}s not found", address.c_str(), PROPERTY_PHONEBOOK_PERMISSION.c_str());
+        HILOGE("%{public}s %{public}s not found", GetEncryptAddr(address).c_str(),
+            PROPERTY_PHONEBOOK_PERMISSION.c_str());
         return BTPermissionType::ACCESS_UNKNOWN;
     }
 
@@ -736,7 +738,8 @@ BTPermissionType AdapterManager::GetMessagePermission(const std::string &address
     bool value = false;
 
     if (!config->GetValue(address, SECTION_PERMISSION, PROPERTY_MESSAGE_PERMISSION, value)) {
-        LOG_DEBUG("%{public}s %{public}s not found", address.c_str(), PROPERTY_MESSAGE_PERMISSION.c_str());
+        HILOGE("%{public}s %{public}s not found", GetEncryptAddr(address).c_str(),
+            PROPERTY_MESSAGE_PERMISSION.c_str());
         return BTPermissionType::ACCESS_UNKNOWN;
     }
 

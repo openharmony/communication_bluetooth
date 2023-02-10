@@ -313,7 +313,7 @@ bool PanService::IsConnected(const std::string &address) const
 
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_ERROR("[PAN Service]%{public}s():Invalid Device address:%{public}s", __FUNCTION__, address.c_str());
+        HILOGE("[PAN Service] Invalid Device address:%{public}s", GetEncryptAddr(address).c_str());
         return false;
     }
     if (it->second->GetDeviceStateInt() < PAN_STATE_CONNECTED) {
@@ -442,8 +442,7 @@ void PanService::ProcessEvent(const PanMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = event.dev_;
-    LOG_DEBUG("[PAN Service]%{public}s():address[%{public}s] event_no[%{public}d]",
-        __FUNCTION__, address.c_str(), event.what_);
+    HILOGE("[PAN Service] address[%{public}s] event_no[%{public}d]", GetEncryptAddr(address).c_str(), event.what_);
     switch (event.what_) {
         case PAN_SERVICE_STARTUP_EVT:
             StartUp();
@@ -529,7 +528,7 @@ void PanService::ProcessDefaultEvent(const PanMessage &event) const
             it->second->ProcessMessage(event);
         }
     } else {
-        LOG_ERROR("[PAN Service]%{public}s():invalid address[%{public}s]", __FUNCTION__, event.dev_.c_str());
+        HILOGE("[PAN Service] invalid address[%{public}s]", GetEncryptAddr(event.dev_).c_str());
     }
 }
 REGISTER_CLASS_CREATOR(PanService);

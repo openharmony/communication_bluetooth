@@ -2015,7 +2015,7 @@ void AvrcTgProfile::ProcessChannelMessage(
         }
     } else {
         HILOGI("Active device: %{public}s Request device: %{public}s!",
-            cnManager->GetActiveDevice().c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
+            GetEncryptAddr(cnManager->GetActiveDevice()).c_str(), GET_ENCRYPT_AVRCP_ADDR(rawAddr));
     }
 
     PacketFree(pkt);

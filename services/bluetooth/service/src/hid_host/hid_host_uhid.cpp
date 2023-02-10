@@ -15,6 +15,7 @@
 
 #include "hid_host_uhid.h"
 #include "hid_host_service.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {

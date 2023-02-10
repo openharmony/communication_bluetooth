@@ -15,6 +15,7 @@
 
 #include "obex_transport.h"
 #include "log.h"
+#include "log_util.h"
 #include "obex_utils.h"
 
 namespace OHOS {
@@ -24,12 +25,12 @@ ObexServerTransport::ObexServerTransport(ObexTransportObserver &observer) : obse
 
 void ObexTransportObserver::OnTransportConnectIncoming(ObexIncomingConnect &incomingConnect)
 {
-    OBEX_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
 }
 
 void ObexTransportObserver::OnTransportIncomingDisconnected(const std::string &btAddr)
 {
-    OBEX_LOG_INFO("Call %{public}s, %{public}s", __PRETTY_FUNCTION__, btAddr.c_str());
+    HILOGI("addr: %{public}s", GetEncryptAddr(btAddr).c_str());
 }
 }  // namespace bluetooth
 }  // namespace OHOS

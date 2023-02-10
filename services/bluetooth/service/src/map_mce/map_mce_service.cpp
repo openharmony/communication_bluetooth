@@ -274,7 +274,8 @@ int MapMceService::GetConnectionStrategy(const RawAddress &device) const
     int value = 0;
     const std::string dev = device.GetAddress();
     if (!config->GetValue(dev, SECTION_CONNECTION_POLICIES, PROPERTY_MAP_CLIENT_CONNECTION_POLICY, value)) {
-        LOG_DEBUG("%{public}s %{public}s not found", dev.c_str(), PROPERTY_MAP_CLIENT_CONNECTION_POLICY.c_str());
+        HILOGI("%{public}s %{public}s not found",
+            GetEncryptAddr(dev).c_str(), PROPERTY_MAP_CLIENT_CONNECTION_POLICY.c_str());
         return int(BTStrategyType::CONNECTION_UNKNOWN);
     }
     if (value) {
@@ -1113,7 +1114,7 @@ void MapMceService::MnsProcessMessage(utility::Message msg, std::string btAddr)
     if (it != serviceBtDeviceInstMgrMap_.end()) {
         it->second->ProcessMessage(msg);
     } else {
-        LOG_ERROR("%{public}s address error = %{public}s", __PRETTY_FUNCTION__, btAddr.c_str());
+        HILOGE("address error = %{public}s", GetEncryptAddr(btAddr).c_str());
     }
     LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }
@@ -1127,7 +1128,7 @@ void MapMceService::MnsProcessMessageWithHeader(utility::Message msg, std::strin
     if (it != serviceBtDeviceInstMgrMap_.end()) {
         it->second->ProcessMnsObexObserverMessage(req, msg);
     } else {
-        LOG_ERROR("%{public}s address error = %{public}s", __PRETTY_FUNCTION__, btAddr.c_str());
+        HILOGE("address error = %{public}s", GetEncryptAddr(btAddr).c_str());
     }
     LOG_INFO("%{public}s end", __PRETTY_FUNCTION__);
 }

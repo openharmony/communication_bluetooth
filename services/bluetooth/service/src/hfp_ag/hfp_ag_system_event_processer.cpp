@@ -18,6 +18,8 @@
 #include "hfp_ag_defines.h"
 #include "hfp_ag_message.h"
 #include "hfp_ag_service.h"
+#include "log.h"
+#include "log_util.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -122,13 +124,13 @@ void HfpAgSystemEventProcesser::ExecuteEventProcess(const HfpAgMessage &event)
 
 void HfpAgSystemEventProcesser::ProcessAnswerCallEvent() const
 {
-    LOG_INFO("[HFP AG]%{public}s():Answer call! address:%{public}s", __FUNCTION__, address_.c_str());
+    HILOGI("[HFP AG] Answer call! address:%{public}s", GetEncryptAddr(address_).c_str());
     systemInterface_.AnswerCall(address_);
 }
 
 void HfpAgSystemEventProcesser::ProcessHangupCallEvent() const
 {
-    LOG_INFO("[HFP AG]%{public}s():Hang up call! address:%{public}s", __FUNCTION__, address_.c_str());
+    HILOGI("[HFP AG] Hang up call! address:%{public}s", GetEncryptAddr(address_).c_str());
     systemInterface_.HangupCall(address_);
 }
 
