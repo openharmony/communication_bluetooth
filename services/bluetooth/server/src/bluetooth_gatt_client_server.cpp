@@ -296,7 +296,7 @@ int BluetoothGattClientServer::RegisterApplication(
     if (appId >= 0) {
         HILOGI("appId: %{public}d", appId);
         (*it)->SetAppId(appId);
-        OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_APP_REGISTER",
+        HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "GATT_APP_REGISTER",
             OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ACTION", "register",
             "SIDE", "client", "ADDRESS", GetEncryptAddr(addr.GetAddress()), "PID", OHOS::IPCSkeleton::GetCallingPid(),
             "UID", OHOS::IPCSkeleton::GetCallingUid(), "APPID", appId);
