@@ -33,70 +33,6 @@
 |     注册pin码变化     |     on.pinRequired      | (data: bluetooth.PinRequiredParam) |    string     |      |
 |   注册绑定状态变化    |   on.bondStateChange    |  (data: bluetooth.BondStateParam)  |    string     |      |
 
-#### 验证工具
-
-经典蓝牙的功能 可以使用linux的bluetoothctl命令
-
-1. bluetooth
-
->**bluetoothctl** — 在 shell 中配对设备是最简单可靠的方法之一。
->
->Bluetoothctl是用于控制蓝牙设备的交互式且易于使用的工具。它是在基于Linux的操作系统上管理蓝牙的主要实用程序。实质上是由bluez源码下的client目录的相关文件编译生成的可执行程序(命令)。bluetoothctl 主要是bluez官方提供的一个命令行交互的一个客户端，用于和bluetooth的通信进行BLE广播包的设置、BLE相关配置、创建服务、特征等. 具体的功能请打开终端，运行bluetoothctl 进行查看。
-
-2. 启动bluetoothctl交互式命令：
-
-> bluetoothctl是一个交互式实用程序。通常应该使用交互式模式，操作起来更快，更容易。要进入交互方式，只需运行不带参数的**bluetoothctl**命令，要退出蓝牙交互模式，只需在提示中键入**exit** 。
-
-$ bluetoothctl
-
-![bluetoothctl](bluetoothctl.png)
-
-3. help
-
-- 输入help命令以获取可用命令的列表
-
-~~~
-[bluetooth]# help
-Menu main:
-Available commands:
-//命令                                             //命令功能的解释    
--------------------
-advertise                                         Advertise Options Submenu
-scan                                              Scan Options Submenu
-gatt                                              Generic Attribute Submenu
-list                                              List available controllers
-show [ctrl]                                       Controller information
-select <ctrl>                                     Select default controller
-devices                                           List available devices
-paired-devices                                    List paired devices
-system-alias <name>                               Set controller alias
-reset-alias                                       Reset controller alias
-power <on/off>                                    Set controller power
-pairable <on/off>                                 Set controller pairable mode
-discoverable <on/off>                             Set controller discoverable mode
-discoverable-timeout [value]                      Set discoverable timeout
-agent <on/off/capability>                         Enable/disable agent with given capability
-default-agent                                     Set agent as the default one
-advertise <on/off/type>                           Enable/disable advertising with given type
-set-alias <alias>                                 Set device alias
-scan <on/off>                                     Scan for devices
-info [dev]                                        Device information
-pair [dev]                                        Pair with device
-trust [dev]                                       Trust device
-untrust [dev]                                     Untrust device
-block [dev]                                       Block device
-unblock [dev]                                     Unblock device
-remove <dev>                                      Remove device
-connect <dev>                                     Connect device
-disconnect [dev]                                  Disconnect device
-menu <name>                                       Select submenu
-version                                           Display version
-quit                                              Quit program
-exit                                              Quit program
-help                                              Display help about this program
-export                                            Print environment variables
-~~~
-
 
 
 #### 功能
@@ -198,7 +134,7 @@ export                                            Print environment variables
 
    - 限制条件：必须要与设备配对成功，才能显示配对设备的MAC地址。
 
-   - 验证方法：在"开始蓝牙发现"功能中查看配对设备的MAC地址；用其他工具，如bluetoothctl查看配对设备的MAC地址。                                                            
+   - 验证方法：在"开始蓝牙发现"功能中查看配对设备的MAC地址。                                                            
 
 10. 获取配置文件连接状态1、获取配置文件连接状态2 
 

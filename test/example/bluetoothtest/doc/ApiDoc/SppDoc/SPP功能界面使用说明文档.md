@@ -8,26 +8,6 @@ SPP测试分为SPPClient测试和SPPServer测试
 
 ![主界面与SPP跳转](主界面与SPP跳转.png)
 
-### 验证工具
-
-1. APP:SPP蓝牙串口
-
-2. 使用电脑蓝牙，设置传入传出COM端口，并在Moba中查看信息。（当电脑端作为Server时选择传入，作为Client端时选择传出） 
-
-   ![SPP与SPPClient跳转1](主机蓝牙.png)
-
-   传入：
-
-   ![传入](传入.png)
-
-   传出：
-
-   ![传出](传出.png)
-
-3. 使用MobaXterm，点击Serial，选择对应的端口
-
-   ![moba-serial](moba-serial.png)
-
 ### SPPClient
 
 选择SPP_Client测试，进行SPP客户端的测试![SPP与SPPClient跳转1](SPP与SPPClient跳转1.png)

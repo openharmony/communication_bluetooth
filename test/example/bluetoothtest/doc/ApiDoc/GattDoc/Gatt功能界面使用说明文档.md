@@ -8,12 +8,6 @@ Gatt测试分为Client测试和Server测试
 
 ![主界面与Gatt跳转](主界面与Gatt跳转.png)
 
-### 验证工具
-
-1. 使用bluez提供的gatttool命令，此命令是一个gatt client命令行工具。
-2. 使用bluetoothctl的advertise子菜单功能。
-3. APP: 手机上的lightblue，nRF Connect。
-
 ### Gatt客户端
 
 选择GattClient测试，进行Gatt客户端的测试
@@ -85,7 +79,7 @@ Gatt测试分为Client测试和Server测试
 
    - 限制条件：只有蓝牙打开且连接成功后，"连接"的返回信息才会显示"成功"，才能成功取消连接设备。
 
-   - 验证方法：在设备设置，bluetoothctl，gatttool或APP上查看连接状态。如果成功连接正在advertise on的服务端，服务端会有连接响应。
+   - 验证方法：在设备设置上查看连接状态。如果成功连接正在advertise on的服务端，服务端会有连接响应。
 
 3. ble连接状态
 
@@ -181,7 +175,7 @@ Gatt测试分为Client测试和Server测试
 
 #### GattServerSetting界面
 
-点击"switch"图标<img src="C:\Users\kaihong\Desktop\使用说明文档\switch.png" alt="switch" style="zoom: 50%;" />，同样可以在setting界面修改MAC地址,ServerUUID,characteristicUuid,descriptorUuid的值。并且可以设置广播配置。默认值已经设置好，默认"设置"和"connectable"为已勾选的true，其他为false，如果测试时需要，可以手动设置"interval","txPower","Response"
+点击"switch"图标<img src="switch.png" alt="switch" style="zoom: 50%;" />，同样可以在setting界面修改MAC地址,ServerUUID,characteristicUuid,descriptorUuid的值。并且可以设置广播配置。默认值已经设置好，默认"设置"和"connectable"为已勾选的true，其他为false，如果测试时需要，可以手动设置"interval","txPower","Response"
 
 ![GattServer与GattServerSetting跳转](GattServer与GattServerSetting跳转.png)
 
@@ -205,7 +199,7 @@ Gatt测试分为Client测试和Server测试
 
 1. 创建Gatt服务器
 
-   - 使用指导：创建JavaScript网关服务器实例。return返回JavaScript网关服务器实例{@code网关服务器。
+   - 使用指导：创建JavaScript网关服务器实例。return返回JavaScript网关服务器实例code网关服务器。
    - 限制条件：蓝牙状态要打开，且GattServer不存在实例。
    - 验证方法：可以尝试用Client端去搜索本设备的GattServer端。
 
