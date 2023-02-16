@@ -22,6 +22,7 @@
 #include "hfp_ag_audio_connection.h"
 #include "hfp_ag_defines.h"
 #include "hfp_ag_profile_event_sender.h"
+#include "log_util.h"
 #include "packet.h"
 #include "securec.h"
 
@@ -318,11 +319,9 @@ void HfpAgCommandProcessor::ChldTester(HfpAgDataConnection &dataConn, const std:
 void HfpAgCommandProcessor::ChupExecuter(HfpAgDataConnection &dataConn, const std::string &arg)
 {
     if (HfpAgAudioConnection::GetActiveDevice().compare(dataConn.remoteAddr_) != 0) {
-        LOG_INFO("[HFP AG]%{public}s():AT+CHUP failed because of device is not active, "
-            "activeAddr[%{public}s], remoteAddr_[%{public}s]",
-            __FUNCTION__,
-            HfpAgAudioConnection::GetActiveDevice().c_str(),
-            dataConn.remoteAddr_.c_str());
+        HILOGI("[HFP AG] AT+CHUP failed because of device is not active, activeAddr[%{public}s], "
+            "remoteAddr_[%{public}s]", GetEncryptAddr(HfpAgAudioConnection::GetActiveDevice()).c_str(),
+            GetEncryptAddr(dataConn.remoteAddr_).c_str());
         SendErrorCode(dataConn, HFP_AG_ERROR_OPERATION_NOT_ALLOWED);
     } else {
         SendAtCommand(dataConn, OK);
@@ -528,10 +527,9 @@ void HfpAgCommandProcessor::BccExecuter(HfpAgDataConnection &dataConn, const std
 {
     if (HfpAgAudioConnection::GetActiveDevice().compare(dataConn.remoteAddr_) != 0) {
         SendErrorCode(dataConn, HFP_AG_ERROR_OPERATION_NOT_ALLOWED);
-        LOG_WARN("[HFP AG]%{public}s():AT+BCC be rejected because activeAddr[%{public}s], remoteAddr[%{public}s]",
-            __FUNCTION__,
-            HfpAgAudioConnection::GetActiveDevice().c_str(),
-            dataConn.remoteAddr_.c_str());
+        HILOGI("[HFP AG] AT+BCC be rejected because activeAddr[%{public}s], remoteAddr[%{public}s]",
+            GetEncryptAddr(HfpAgAudioConnection::GetActiveDevice()).c_str(),
+            GetEncryptAddr(dataConn.remoteAddr_).c_str());
     } else {
         SendAtCommand(dataConn, OK);
         HfpAgProfileEventSender::GetInstance().ProcessAtBcc(dataConn.remoteAddr_);

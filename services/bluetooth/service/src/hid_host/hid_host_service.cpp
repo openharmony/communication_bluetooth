@@ -255,7 +255,7 @@ bool HidHostService::IsConnected(const std::string &address) const
 
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_ERROR("[HIDH Service] IsConnected:Invalid Device address:%{public}s", address.c_str());
+        HILOGE("[HIDH Service] IsConnected:Invalid Device address:%{public}s", GetEncryptAddr(address).c_str());
         return false;
     }
     if (it->second->GetDeviceStateInt() < HID_HOST_STATE_CONNECTED) {
@@ -383,8 +383,8 @@ void HidHostService::ProcessEvent(const HidHostMessage &event)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     std::string address = event.dev_;
-    LOG_INFO("[HIDH Service] ProcessEvent:address[%{public}s], event_no[%{public}d]",
-        address.c_str(), event.what_);
+    HILOGI("[HIDH Service] ProcessEvent:address[%{public}s], event_no[%{public}d]",
+        GetEncryptAddr(address).c_str(), event.what_);
     switch (event.what_) {
         case HID_HOST_SERVICE_STARTUP_EVT:
             StartUp();
@@ -466,7 +466,7 @@ void HidHostService::ProcessDefaultEvent(const HidHostMessage &event) const
             it->second->ProcessMessage(event);
         }
     } else {
-        LOG_ERROR("[HIDH Service] ProcessDefaultEvent:invalid address[%{public}s]", event.dev_.c_str());
+        HILOGE("[HIDH Service] ProcessDefaultEvent:invalid address[%{public}s]", GetEncryptAddr(event.dev_).c_str());
     }
 }
 REGISTER_CLASS_CREATOR(HidHostService);

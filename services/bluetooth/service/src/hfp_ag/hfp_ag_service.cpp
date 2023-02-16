@@ -374,15 +374,13 @@ bool HfpAgService::DisconnectSingleSco(const std::string &address)
     LOG_INFO("[HFP AG]%{public}s():==========<start>==========", __FUNCTION__);
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_ERROR("[HFP AG]%{public}s():Invalid Device address:%{public}s", __FUNCTION__, address.c_str());
+        HILOGE("[HFP AG] Invalid Device address:%{public}s", GetEncryptAddr(address).c_str());
         return false;
     }
 
     if (it->second->GetStateInt() == HFP_AG_AUDIO_STATE_DISCONNECTED) {
-        LOG_ERROR("[HFP AG]%{public}s():Sco is already disconnected on specific device! address:%{public}s, state[%{public}d]",
-            __FUNCTION__,
-            address.c_str(),
-            it->second->GetStateInt());
+        HILOGE("[HFP AG] Sco is already disconnected on specific device! address:%{public}s, state[%{public}d]",
+            GetEncryptAddr(address).c_str(), it->second->GetStateInt());
         return false;
     }
 
@@ -832,7 +830,7 @@ bool HfpAgService::DialOutCallByHf(const std::string &address)
     }
 
     if (!SetActiveDevice(RawAddress(address))) {
-        LOG_ERROR("[HFP AG]%{public}s():It's failed to set active device to %{public}s", __FUNCTION__, address.c_str());
+        HILOGE("[HFP AG] It's failed to set active device to %{public}s", GetEncryptAddr(address).c_str());
         return false;
     }
 
@@ -1106,14 +1104,12 @@ bool HfpAgService::IsConnected(const std::string &address) const
 {
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
-        LOG_ERROR("[HFP AG]%{public}s():Invalid Device address:%{public}s", __FUNCTION__, address.c_str());
+        HILOGE("[HFP AG] Invalid Device address:%{public}s", GetEncryptAddr(address).c_str());
         return false;
     }
     if (it->second->GetStateInt() < HFP_AG_STATE_CONNECTED) {
-        LOG_ERROR("[HFP AG]%{public}s():Device not connected! address:%{public}s, state[%{public}d]",
-            __FUNCTION__,
-            address.c_str(),
-            it->second->GetStateInt());
+        HILOGE("[HFP AG] Device not connected! address:%{public}s, state[%{public}d]",
+            GetEncryptAddr(address).c_str(), it->second->GetStateInt());
         return false;
     }
     return true;
@@ -1125,8 +1121,8 @@ bool HfpAgService::IsActiveDevice(const std::string &address) const
     if (activeDevice == address) {
         return true;
     } else {
-        LOG_INFO("[HFP AG]%{public}s():Current Device is not active device, address:%{public}s, activeDevice:%{public}s",
-            __FUNCTION__, address.c_str(), activeDevice.c_str());
+        HILOGE("[HFP AG] Current Device is not active device, address:%{public}s, activeDevice:%{public}s",
+            GetEncryptAddr(address).c_str(), GetEncryptAddr(activeDevice).c_str());
         return false;
     }
 }
@@ -1134,8 +1130,8 @@ bool HfpAgService::IsActiveDevice(const std::string &address) const
 void HfpAgService::ModifyActiveDevice(const std::string &newAddress)
 {
     std::string preActiveDevice = HfpAgProfile::GetActiveDevice();
-    LOG_INFO("[HFP AG]%{public}s():preActiveDevice address:%{public}s, activeDevice newAddress:%{public}s",
-        __FUNCTION__, preActiveDevice.c_str(), newAddress.c_str());
+    HILOGI("[HFP AG] preActiveDevice address:%{public}s, activeDevice newAddress:%{public}s",
+        GetEncryptAddr(preActiveDevice).c_str(), GetEncryptAddr(newAddress).c_str());
 
     HfpAgProfile::SetActiveDevice(newAddress);
     if (IsIncall()) {

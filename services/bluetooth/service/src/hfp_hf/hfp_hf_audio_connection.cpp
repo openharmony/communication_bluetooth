@@ -49,7 +49,7 @@ BtAddr HfpHfAudioConnection::ConvertToBtAddr(const std::string &address)
 
 int HfpHfAudioConnection::Register()
 {
-    LOG_INFO("[HFP HF]%{public}s(): Audio Register start", __FUNCTION__);
+    HILOGI("[HFP HF] Audio Register start");
     std::vector<HfpHfAudioConnection::AudioDevice>().swap(g_audioDevices);
     int ret = BTM_RegisterScoCallbacks(&g_cbs, nullptr);
     HFP_HF_RETURN_IF_FAIL(ret);
@@ -58,7 +58,7 @@ int HfpHfAudioConnection::Register()
 
 int HfpHfAudioConnection::Deregister()
 {
-    LOG_INFO("[HFP HF]%{public}s(): Audio Deregister start", __FUNCTION__);
+    HILOGI("[HFP HF] Audio Deregister start");
     std::vector<HfpHfAudioConnection::AudioDevice>().swap(g_audioDevices);
     int ret = BTM_DeregisterScoCallbacks(&g_cbs);
     HFP_HF_RETURN_IF_FAIL(ret);
@@ -81,11 +81,8 @@ void HfpHfAudioConnection::SetSupportFeatures(bool escoSupport, bool escoS4Suppo
     escoSupport_ = escoSupport;
     escoS4Support_ = escoS4Support;
     inUseCodec_ = inUseCodec;
-    LOG_INFO("[HFP HF]%{public}s(): escoSupport_[%{public}d], escoS4Support_[%{public}d], inUseCodec_[%{public}d]",
-        __FUNCTION__,
-        escoSupport_,
-        escoS4Support_,
-        inUseCodec_);
+    HILOGI("[HFP HF] escoSupport_[%{public}d], escoS4Support_[%{public}d], inUseCodec_[%{public}d]",
+        escoSupport_, escoS4Support_, inUseCodec_);
 }
 
 std::vector<HfpHfAudioConnection::AudioDevice>::iterator HfpHfAudioConnection::GetDeviceByAddr(const std::string &addr)
@@ -118,14 +115,14 @@ int HfpHfAudioConnection::ConnectByCvsd(AudioDevice &dev, BtAddr btAddr, bool cv
     if (escoSupport_ && !cvsdEscoFailed) {
         dev.linkType = LINK_TYPE_ESCO;
         if (escoS4Support_) {
-            LOG_INFO("[HFP HF]%{public}s():Try connect by CVSD ESCO S4.", __FUNCTION__);
+            HILOGI("[HFP HF] Try connect by CVSD ESCO S4.");
             dev.lastParam = CVSD_ESCO_S4;
             BtmCreateEscoConnectionParam param = CVSD_ESCO_S4_PARAM;
             param.addr = btAddr;
             ret = BTM_CreateEscoConnection(&param);
             HFP_HF_RETURN_IF_FAIL(ret);
         } else {
-            LOG_INFO("[HFP HF]%{public}s():Try connect by CVSD ESCO S1.", __FUNCTION__);
+            HILOGI("[HFP HF] Try connect by CVSD ESCO S1.");
             dev.lastParam = CVSD_ESCO_S1;
             BtmCreateEscoConnectionParam param = CVSD_ESCO_S1_PARAM;
             param.addr = btAddr;
@@ -135,7 +132,7 @@ int HfpHfAudioConnection::ConnectByCvsd(AudioDevice &dev, BtAddr btAddr, bool cv
     } else {
         if (!BTM_IsSecureConnection(&btAddr)) {
             dev.linkType = LINK_TYPE_SCO;
-            LOG_INFO("[HFP HF]%{public}s():Try connect by CVSD SCO.", __FUNCTION__);
+            HILOGI("[HFP HF] Try connect by CVSD SCO.");
             dev.lastParam = CVSD_SCO;
             BtmCreateScoConnectionParam param = CVSD_SCO_PARAM;
             param.addr = btAddr;
@@ -153,7 +150,7 @@ int HfpHfAudioConnection::ConnectByCvsd(AudioDevice &dev, BtAddr btAddr, bool cv
 
 int HfpHfAudioConnection::ConnectAudio() const
 {
-    LOG_INFO("[HFP HF]%{public}s():Connect SCO to %{public}s", __FUNCTION__, remoteAddr_.c_str());
+    HILOGI("[HFP HF] Connect SCO to %{public}s", GetEncryptAddr(remoteAddr_).c_str());
 
     auto dev = GetDeviceByAddr(remoteAddr_);
     if (dev == g_audioDevices.end()) {
@@ -162,10 +159,9 @@ int HfpHfAudioConnection::ConnectAudio() const
         audioDev.addr = remoteAddr_;
         g_audioDevices.push_back(audioDev);
         dev = GetDeviceByAddr(remoteAddr_);
-        LOG_INFO("[HFP HF]%{public}s():Create Audio device for [%{public}s]", __FUNCTION__, remoteAddr_.c_str());
+        HILOGI("[HFP HF] Create Audio device for [%{public}s]", GetEncryptAddr(remoteAddr_).c_str());
     } else {
-        LOG_INFO("[HFP HF]%{public}s():Audio device [%{public}s] already in device list ", __FUNCTION__,
-            remoteAddr_.c_str());
+        HILOGI("[HFP HF] Audio device [%{public}s] already in device list ", GetEncryptAddr(remoteAddr_).c_str());
     }
 
     bool cvsdEscoFailed = false;
@@ -173,11 +169,8 @@ int HfpHfAudioConnection::ConnectAudio() const
         if (dev->lastParam == CVSD_ESCO_S4 || dev->lastParam == CVSD_ESCO_S1) {
             cvsdEscoFailed = true;
         } else {
-            LOG_INFO(
-                "[HFP HF]%{public}s():Audio device [%{public}s], lastParam[%{public}d]",
-                __FUNCTION__,
-                remoteAddr_.c_str(),
-                dev->lastParam);
+            LOG_INFO("[HFP HF] Audio device [%{public}s], lastParam[%{public}d]",
+                GetEncryptAddr(remoteAddr_).c_str(), dev->lastParam);
         }
     }
 
@@ -187,7 +180,7 @@ int HfpHfAudioConnection::ConnectAudio() const
 
 int HfpHfAudioConnection::DisconnectAudio() const
 {
-    LOG_INFO("[HFP HF]%{public}s():Disconnect SCO from %{public}s", __FUNCTION__, remoteAddr_.c_str());
+    HILOGI("[HFP HF] Disconnect SCO from %{public}s", GetEncryptAddr(remoteAddr_).c_str());
 
     int ret;
     auto dev = GetDeviceByAddr(remoteAddr_);
@@ -196,7 +189,7 @@ int HfpHfAudioConnection::DisconnectAudio() const
         HFP_HF_RETURN_IF_FAIL(ret);
         HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(remoteAddr_, HFP_HF_AUDIO_DISCONNECTING_EVT);
     } else {
-        LOG_WARN("[HFP HF]%{public}s():Invalid Address", remoteAddr_.c_str());
+        HILOGE("[HFP HF] Invalid Address remoteAddr_ %{public}s", GetEncryptAddr(remoteAddr_).c_str());
         ret = BT_DEVICE_ERROR;
     }
     return ret;
@@ -208,13 +201,13 @@ int HfpHfAudioConnection::AcceptByMsbc(BtAddr btAddr)
     HFP_HF_RETURN_IF_FAIL(ret);
 
     if (BTM_IsSecureConnection(&btAddr)) {
-        LOG_INFO("[HFP HF]%{public}s():Accept by MSBC T2.", __FUNCTION__);
+        HILOGI("[HFP HF] Accept by MSBC T2.");
         BtmCreateEscoConnectionParam param = MSBC_T2_PARAM;
         param.addr = btAddr;
         ret = BTM_AcceptEscoConnectionRequest(&param);
         HFP_HF_RETURN_IF_FAIL(ret);
     } else {
-        LOG_INFO("[HFP HF]%{public}s():Accept by MSBC T1.", __FUNCTION__);
+        HILOGI("[HFP HF] Accept by MSBC T1.");
         BtmCreateEscoConnectionParam param = MSBC_T1_PARAM;
         param.addr = btAddr;
         ret = BTM_AcceptEscoConnectionRequest(&param);
@@ -230,31 +223,27 @@ int HfpHfAudioConnection::AcceptByCvsd(AudioDevice &dev, BtAddr btAddr) const
 
     if (dev.linkType == LINK_TYPE_ESCO && escoSupport_) {
         if (escoS4Support_) {
-            LOG_INFO("[HFP HF]%{public}s():Accept by CVSD ESCO S4.", __FUNCTION__);
+            HILOGI("[HFP HF] Accept by CVSD ESCO S4.");
             BtmCreateEscoConnectionParam param = CVSD_ESCO_S4_PARAM;
             param.addr = btAddr;
             ret = BTM_AcceptEscoConnectionRequest(&param);
             HFP_HF_RETURN_IF_FAIL(ret);
         } else {
-            LOG_INFO("[HFP HF]%{public}s():Accept by CVSD ESCO S1.", __FUNCTION__);
+            HILOGI("[HFP HF] Accept by CVSD ESCO S1.");
             BtmCreateEscoConnectionParam param = CVSD_ESCO_S1_PARAM;
             param.addr = btAddr;
             ret = BTM_AcceptEscoConnectionRequest(&param);
             HFP_HF_RETURN_IF_FAIL(ret);
         }
     } else if (dev.linkType == LINK_TYPE_SCO) {
-        LOG_INFO("[HFP HF]%{public}s():Accept by CVSD SCO.", __FUNCTION__);
+        HILOGI("[HFP HF] Accept by CVSD SCO.");
         BtmCreateScoConnectionParam param = CVSD_SCO_PARAM;
         param.addr = btAddr;
         ret = BTM_AcceptScoConnectionRequest(&param);
         HFP_HF_RETURN_IF_FAIL(ret);
     } else {
-        LOG_INFO(
-            "[HFP HF]%{public}s():Can not cvsd e(sco) connection, "
-            "because linktype[%{public}d] and escoSupport[%{public}d] are not matched!",
-            __FUNCTION__,
-            dev.linkType,
-            escoSupport_);
+        HILOGE("[HFP HF] Can not cvsd e(sco) connection, "
+            "because linktype[%{public}d] and escoSupport[%{public}d] are not matched!", dev.linkType, escoSupport_);
         return BT_BAD_PARAM;
     }
     return ret;
@@ -272,21 +261,18 @@ int HfpHfAudioConnection::AcceptAudioConnection() const
             if (dev->linkType == LINK_TYPE_ESCO && escoSupport_) {
                 return AcceptByMsbc(btAddr);
             } else {
-                LOG_INFO("[HFP HF]%{public}s():Accpet MSBC ESCO connection failed, "
-                    "linktype[%hhu] and escoSupport[%{public}d] are not matched!",
-                    __FUNCTION__,
-                    dev->linkType,
-                    escoSupport_);
+                HILOGI("[HFP HF] Accpet MSBC ESCO connection failed, "
+                    "linktype[%{public}hhu] and escoSupport[%{public}d] are not matched", dev->linkType, escoSupport_);
                 return BT_BAD_PARAM;
             }
         } else if (inUseCodec_ == HFP_HF_CODEC_CVSD) {
             return AcceptByCvsd(*dev, btAddr);
         } else {
-            LOG_INFO("[HFP HF]%{public}s():Invalid Codec[%{public}d]!", __FUNCTION__, inUseCodec_);
+            HILOGI("[HFP HF] Invalid Codec[%{public}d]!", inUseCodec_);
             return BT_BAD_PARAM;
         }
     } else {
-        LOG_WARN("[HFP HF]%{public}s:Invalid Address", remoteAddr_.c_str());
+        HILOGE("[HFP HF] %{public}s:Invalid Address", GetEncryptAddr(remoteAddr_).c_str());
         return BT_BAD_PARAM;
     }
 
@@ -295,7 +281,7 @@ int HfpHfAudioConnection::AcceptAudioConnection() const
 
 int HfpHfAudioConnection::RejectAudioConnection() const
 {
-    LOG_INFO("[HFP HF]%{public}s():Reject sco connect request from %{public}s", __FUNCTION__, remoteAddr_.c_str());
+    HILOGI("[HFP HF] Reject sco connect request from %{public}s", GetEncryptAddr(remoteAddr_).c_str());
     BtAddr btAddr = ConvertToBtAddr(remoteAddr_);
     BtmRejectScoConnectionRequestParam param = {btAddr, REJECT_DUE_TO_LIMITED_RESOURCES};
 
@@ -307,7 +293,7 @@ int HfpHfAudioConnection::RejectAudioConnection() const
 
 void HfpHfAudioConnection::OnConnectRequest(const BtmScoConnectionRequestParam *param, void *context)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
+    HILOGI("[HFP HF] enter");
     HfpScoConnectionRequestParam parameters;
     parameters.linkType = param->linkType;
     (void)memcpy_s(&parameters.addr, sizeof(BtAddr), param->addr, sizeof(BtAddr));
@@ -317,7 +303,7 @@ void HfpHfAudioConnection::OnConnectRequest(const BtmScoConnectionRequestParam *
 
 void HfpHfAudioConnection::ProcessOnConnectRequest(HfpScoConnectionRequestParam parameters)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
+    HILOGI("[HFP HF] enter");
 
     RawAddress btAddr = RawAddress::ConvertToString(parameters.addr.addr);
     std::string address = btAddr.GetAddress();
@@ -328,12 +314,10 @@ void HfpHfAudioConnection::ProcessOnConnectRequest(HfpScoConnectionRequestParam 
         audioDev.addr = address;
         audioDev.linkType = parameters.linkType;
         g_audioDevices.push_back(audioDev);
-        LOG_INFO("[HFP HF]%{public}s():Create Audio device for [%{public}s]", __FUNCTION__,
-            address.c_str());
+        HILOGI("[HFP HF] Create Audio device for [%{public}s]", GetEncryptAddr(address).c_str());
     } else {
         dev->linkType = parameters.linkType;
-        LOG_INFO("[HFP HF]%{public}s():Audio device [%{public}s] already in device list ", __FUNCTION__,
-            address.c_str());
+        HILOGI("[HFP HF] Audio device [%{public}s] already in device list", GetEncryptAddr(address).c_str());
     }
     HfpHfProfileEventSender::GetInstance().ScoConnectRequest(
         btAddr.GetAddress(), HFP_HF_AUDIO_CONNECT_REQUEST_EVT, parameters.linkType);
@@ -341,7 +325,7 @@ void HfpHfAudioConnection::ProcessOnConnectRequest(HfpScoConnectionRequestParam 
 
 void HfpHfAudioConnection::OnConnectCompleted(const BtmScoConnectionCompleteParam *param, void *context)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
+    HILOGI("[HFP HF] enter");
     HfpScoConnectionCompleteParam parameters;
     parameters.status = param->status;
     parameters.connectionHandle = param->connectionHandle;
@@ -352,7 +336,7 @@ void HfpHfAudioConnection::OnConnectCompleted(const BtmScoConnectionCompletePara
 
 void HfpHfAudioConnection::ProcessOnConnectCompleted(HfpScoConnectionCompleteParam parameters)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
+    HILOGI("[HFP HF] enter");
 
     RawAddress btAddr = RawAddress::ConvertToString(parameters.addr.addr);
     std::string address = btAddr.GetAddress();
@@ -361,14 +345,14 @@ void HfpHfAudioConnection::ProcessOnConnectCompleted(HfpScoConnectionCompletePar
         dev->addr = address;
         dev->handle = parameters.connectionHandle;
         if (!parameters.status) {
-            LOG_INFO("[HFP HF]%{public}s(): SCO connect successfully!", __FUNCTION__);
+            HILOGI("[HFP HF] SCO connect successfully!");
             dev->lastConnectResult = CONNECT_SUCCESS;
             HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(dev->addr, HFP_HF_AUDIO_CONNECTED_EVT);
         } else {
             ProcessOnConnectCompletedFail(dev, address);
         }
     } else {
-        LOG_INFO("[HFP HF]%{public}s:Invalid audio device", address.c_str());
+        HILOGI("[HFP HF] %{public}s: Invalid audio device", GetEncryptAddr(address).c_str());
     }
 }
 
@@ -378,28 +362,25 @@ void HfpHfAudioConnection::ProcessOnConnectCompletedFail(
     dev->lastConnectResult = CONNECT_FAIL;
     if (dev->role == ROLE_INITIATOR) {
         if (dev->lastParam == CVSD_ESCO_S4 || dev->lastParam == CVSD_ESCO_S1) {
-            LOG_INFO("[HFP HF]%{public}s():CVSD ESCO failed, try CVSD SCO", __FUNCTION__);
+            HILOGI("[HFP HF] CVSD ESCO failed, try CVSD SCO");
             HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(dev->addr, HFP_HF_RETRY_CONNECT_AUDIO_EVT);
         } else if (dev->lastParam == CVSD_SCO) {
-            LOG_INFO("[HFP HF]%{public}s():CVSD SCO failed, report fail event to service", __FUNCTION__);
+            HILOGI("[HFP HF] CVSD SCO failed, report fail event to service");
             HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(dev->addr, HFP_HF_AUDIO_CONNECT_FAILED_EVT);
         } else {
-            LOG_INFO(
-                "[HFP HF]%{public}s():address[%{public}s] lastParam[%{public}d] is invalid",
-                __FUNCTION__,
-                address.c_str(),
-                dev->lastParam);
+            HILOGI("[HFP HF] address[%{public}s] lastParam[%{public}d] is invalid",
+                GetEncryptAddr(address).c_str(), dev->lastParam);
         }
     } else {
         // As acceptor, report connect failed event to service directly.
         HfpHfProfileEventSender::GetInstance().UpdateScoConnectState(dev->addr, HFP_HF_AUDIO_CONNECT_FAILED_EVT);
-        LOG_INFO("[HFP HF]%{public}s(): Accept SCO from address[%{public}s]failed", __FUNCTION__, address.c_str());
+        HILOGI("[HFP HF] Accept SCO from address[%{public}s]failed", GetEncryptAddr(address).c_str());
     }
 }
 
 void HfpHfAudioConnection::OnDisconnectCompleted(const BtmScoDisconnectionCompleteParam *param, void *context)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
+    HILOGI("[HFP HF] enter");
     HfpScoDisconnectionCompleteParam parameters;
     parameters.connectionHandle = param->connectionHandle;
     parameters.reason = param->reason;
@@ -410,7 +391,7 @@ void HfpHfAudioConnection::OnDisconnectCompleted(const BtmScoDisconnectionComple
 
 void HfpHfAudioConnection::ProcessOnDisconnectCompleted(HfpScoDisconnectionCompleteParam parameters)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
+    HILOGI("[HFP HF] enter");
 
     auto it = GetDeviceByHandle(parameters.connectionHandle);
     if (it != g_audioDevices.end()) {
@@ -424,20 +405,18 @@ void HfpHfAudioConnection::ProcessOnDisconnectCompleted(HfpScoDisconnectionCompl
                 it->addr, HFP_HF_AUDIO_DISCONNECT_FAILED_EVT);
         }
     } else {
-        LOG_DEBUG("[HFP HF]%{public}s():Invalid audio device", __FUNCTION__);
+        HILOGE("[HFP HF] Invalid audio device");
     }
 }
 
 void HfpHfAudioConnection::OnConnectionChanged(const BtmScoConnectionChangedParam *param, void *context)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
-    LOG_INFO("[HFP HF]%{public}s():connectionHandle[%hu]", __FUNCTION__, param->connectionHandle);
+    HILOGI("[HFP HF] connectionHandle[%{public}hu]", param->connectionHandle);
 }
 
 void HfpHfAudioConnection::OnWriteVoiceSettingCompleted(uint8_t status, void *context)
 {
-    LOG_INFO("[HFP HF]%{public}s():", __PRETTY_FUNCTION__);
-    LOG_INFO("[HFP HF]%{public}s(): status[%hhu]", __FUNCTION__, status);
+    HILOGI("[HFP HF] status[%{public}hhu]", status);
 }
 }  // namespace bluetooth
 }  // namespace OHOS

@@ -18,6 +18,7 @@
 #include <memory>
 #include "../obex/obex_mp_server.h"
 #include "log.h"
+#include "log_util.h"
 #include "pbap_pse_header_msg.h"
 
 namespace OHOS {
@@ -26,24 +27,24 @@ PbapPseObexServer::PbapPseObexServer(
     const std::string &serverName, const ObexServerConfig &config, PbapPseService &service)
     : obexConfig_(config), pbapPseService_(service)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     pseObexObserver_ = std::make_unique<PseObexObserver>(*this);
     obexServer_ = std::make_unique<ObexMpServer>(serverName, obexConfig_, *pseObexObserver_, *service.GetDispatcher());
 }
 
 int PbapPseObexServer::StartUp() const
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     int ret = obexServer_->Startup();
     if (ret != RET_NO_ERROR) {
-        PBAP_PSE_LOG_ERROR("Obex Startup Error ret = %{public}d", ret);
+        HILOGE("Obex Startup Error ret = %{public}d", ret);
     }
     return ret;
 }
 
 int PbapPseObexServer::ShutDown() const
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     obexServer_->Shutdown();
     utility::Message msg(PSE_SHUTDOWN_COMPLETED);
     pbapPseService_.PostMessage(msg);
@@ -52,59 +53,59 @@ int PbapPseObexServer::ShutDown() const
 
 void PbapPseObexServer::PseObexObserver::OnTransportDisconnected(const std::string &btAddr)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     RawAddress device(btAddr);
     pseObexServer_.pbapPseService_.ProcessObexRequest(PSE_DEVICE_DISCONNECTED, device);
 }
 
 void PbapPseObexServer::PseObexObserver::OnTransportError(const std::string &btAddr, int errCd, const std::string &msg)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
-    PBAP_PSE_LOG_ERROR("%{public}s transport error, errCd=%{public}d, msg=%{public}s", btAddr.c_str(), errCd, msg.c_str());
+    HILOGE("%{public}s transport error, errCd=%{public}d, msg=%{public}s",
+        GetEncryptAddr(btAddr).c_str(), errCd, msg.c_str());
     RawAddress device(btAddr);
     pseObexServer_.pbapPseService_.ProcessObexRequest(PSE_DEVICE_TRANSPORT_ERROR, device);
 }
 
 void PbapPseObexServer::PseObexObserver::OnTransportConnect(ObexIncomingConnect &incomingConnect)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     pseObexServer_.pbapPseService_.ProcessObexRequest(
         PSE_DEVICE_CONNECT_INCOMING, incomingConnect.GetRemoteAddress(), incomingConnect);
 }
 
 void PbapPseObexServer::PseObexObserver::OnConnect(ObexServerSession &session, const ObexHeader &req)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     pseObexServer_.pbapPseService_.ProcessObexRequest(PSE_REQ_OBEX_CONNECT, session.GetRemoteAddr(), session, req);
 }
 
 void PbapPseObexServer::PseObexObserver::OnDisconnect(ObexServerSession &session, const ObexHeader &req)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     pseObexServer_.pbapPseService_.ProcessObexRequest(PSE_REQ_OBEX_DISCONNECT, session.GetRemoteAddr(), session, req);
 }
 
 void PbapPseObexServer::PseObexObserver::OnPut(ObexServerSession &session, const ObexHeader &req)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     session.SendSimpleResponse(ObexRspCode::BAD_REQUEST);
 }
 
 void PbapPseObexServer::PseObexObserver::OnGet(ObexServerSession &session, const ObexHeader &req)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     pseObexServer_.pbapPseService_.ProcessObexRequest(PSE_REQ_OBEX_GET, session.GetRemoteAddr(), session, req);
 }
 
 void PbapPseObexServer::PseObexObserver::OnSetPath(ObexServerSession &session, const ObexHeader &req)
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("enter");
     pseObexServer_.pbapPseService_.ProcessObexRequest(PSE_REQ_OBEX_SETPATH, session.GetRemoteAddr(), session, req);
 }
 
 void PbapPseObexServer::PseObexObserver::OnBusy(ObexServerSession &session, bool isBusy) const
 {
-    PBAP_PSE_LOG_INFO("Call %{public}s", __PRETTY_FUNCTION__);
+    HILOGI("isBusy: %{public}d", isBusy);
     pseObexServer_.pbapPseService_.ProcessObexBusy(session.GetRemoteAddr(), isBusy);
 }
 }  // namespace bluetooth
