@@ -540,7 +540,7 @@ void A2dpProfile::Disable()
 
     for (const auto &it : peers_) {
         peer = it.second;
-        LOG_INFO("[A2dpProfile]%{public}s matched peers_addr(%{public}s) [role%u]\n", __func__, it.first.c_str(), role);
+        HILOGI("[A2dpProfile] matched peers_addr(%{public}s) [role%u]\n", GetEncryptAddr(it.first).c_str(), role);
         if (peer != nullptr && it.first.c_str() != nullptr) {
             data.a2dpMsg.connectInfo.addr = peer->GetPeerAddress();
             data.role = role;
@@ -965,10 +965,10 @@ A2dpProfilePeer *A2dpProfile::FindPeerByAddress(const BtAddr &peerAddress) const
     for (const auto &it : peers_) {
         if (strcmp(it.first.c_str(), RawAddress::ConvertToString(peerAddress.addr).GetAddress().c_str()) == 0) {
             peer = it.second;
-            LOG_INFO("[A2dpProfile]%{public}s matched peers_addr(%{public}s)\n", __func__, it.first.c_str());
+            HILOGI("[A2dpProfile] matched peers_addr(%{public}s)\n", GetEncryptAddr(it.first).c_str());
             return peer;
         }
-        LOG_INFO("[A2dpProfile]%{public}s peers_addr(%{public}s)\n", __func__, it.first.c_str());
+        HILOGI("[A2dpProfile] peers_addr(%{public}s)\n", GetEncryptAddr(it.first).c_str());
     }
     return peer;
 }
@@ -1031,7 +1031,7 @@ bool A2dpProfile::DeletePeer(const BtAddr &peerAddress)
                 GetEncryptAddr(RawAddress::ConvertToString(peerAddress.addr).GetAddress()).c_str());
             break;
         }
-        LOG_INFO("[A2dpProfile]%{public}s peers_addr(%{public}s)\n", __func__, it->first.c_str());
+        HILOGI("[A2dpProfile] peers_addr(%{public}s)\n", GetEncryptAddr(it->first).c_str());
     }
 
     return ret;

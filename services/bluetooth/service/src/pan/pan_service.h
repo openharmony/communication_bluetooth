@@ -23,6 +23,7 @@
 #include <cmath>
 #include <cstring>
 #include "log.h"
+#include "log_util.h"
 #include "packet.h"
 #include "securec.h"
 #include "adapter_config.h"

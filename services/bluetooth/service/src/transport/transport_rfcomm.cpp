@@ -40,7 +40,7 @@ RfcommTransport::~RfcommTransport()
 
 int RfcommTransport::Connect()
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
     BtAddr btAddr;
     remoteAddr_.ConvertToUint8(btAddr.addr);
     btAddr.type = BT_PUBLIC_DEVICE_ADDRESS;
@@ -57,14 +57,14 @@ int RfcommTransport::Connect()
 
 int RfcommTransport::Disconnect()
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
 
     return RFCOMM_DisconnectChannel(rfcHandle_);
 }
 
 int RfcommTransport::RegisterServer()
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
 
     isServer_ = true;
 
@@ -73,7 +73,7 @@ int RfcommTransport::RegisterServer()
 
 int RfcommTransport::RemoveServer(bool isDisable)
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
 
     RFCOMM_FreeServerNum(this->scn_);
     if (isDisable) {
@@ -89,7 +89,7 @@ int RfcommTransport::AcceptConnection(const RawAddress &addr, uint16_t scn)
     if (this->handleMap_.find(addr) != this->handleMap_.end()) {
         this->rfcHandle_ = this->handleMap_.at(addr);
     } else {
-        LOG_ERROR("[RfcommTransport]%{public}s handle:%hu: handle does not exist", __FUNCTION__, this->rfcHandle_);
+        HILOGE("[RfcommTransport] handle:%{public}hu: handle does not exist", this->rfcHandle_);
     }
 
     return RFCOMM_AcceptConnection(this->rfcHandle_);
@@ -97,12 +97,12 @@ int RfcommTransport::AcceptConnection(const RawAddress &addr, uint16_t scn)
 
 int RfcommTransport::RejectConnection(const RawAddress &addr, uint16_t scn)
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
 
     if (this->handleMap_.find(addr) != this->handleMap_.end()) {
         this->rfcHandle_ = this->handleMap_.at(addr);
     } else {
-        LOG_ERROR("[RfcommTransport]%{public}s handle:%hu: handle does not exist", __FUNCTION__, this->rfcHandle_);
+        HILOGE("[RfcommTransport] handle:%{public}hu: handle does not exist", this->rfcHandle_);
     }
 
     return RFCOMM_RejectConnection(this->rfcHandle_);
@@ -110,7 +110,7 @@ int RfcommTransport::RejectConnection(const RawAddress &addr, uint16_t scn)
 
 RawAddress RfcommTransport::GetRemoteAddress()
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
 
     if (IsServer()) {
         return remoteAddrMap_.at(this);
@@ -121,21 +121,22 @@ RawAddress RfcommTransport::GetRemoteAddress()
 
 int RfcommTransport::Read(Packet **pkt)
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
 
     return RFCOMM_Read(this->rfcHandle_, pkt);
 }
 
 int RfcommTransport::Write(Packet *pkt)
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport]enter");
 
     return RFCOMM_Write(this->rfcHandle_, pkt);
 }
 
 RfcommTransport *RfcommTransport::AddTransportInternal(RawAddress addr, uint16_t handle)
 {
-    LOG_INFO("[RfcommTransport]%{public}s", __func__);
+    HILOGI("[RfcommTransport] RawAddress:%{public}s, handle: %{public}d",
+        GetEncryptAddr(addr.GetAddress()).c_str(), handle);
 
     RfcommTransport *newTransport = new (std::nothrow) RfcommTransport(&addr, scn_, mtu_, observer_, dispatcher_);
     if (newTransport != nullptr) {
@@ -153,7 +154,7 @@ RfcommTransport *RfcommTransport::AddTransportInternal(RawAddress addr, uint16_t
 void RfcommTransport::TransportRfcEventCallback(uint16_t handle, uint32_t event,
                                                 const void *eventData, void *context)
 {
-    LOG_INFO("[RfcommTransport]%{public}s handle:%hu event:%u", __func__, handle, event);
+    HILOGI("[RfcommTransport] handle:%{public}hu event:%{public}u", handle, event);
 
     auto transport = static_cast<RfcommTransport *>(context);
 
@@ -163,10 +164,8 @@ void RfcommTransport::TransportRfcEventCallback(uint16_t handle, uint32_t event,
             (void)memcpy_s(&incomingEvent, sizeof(RfcommIncomingInfo), eventData, sizeof(RfcommIncomingInfo));
             transport->addressMap_.insert(
                 std::pair<uint16_t, RawAddress>(handle, RawAddress::ConvertToString(incomingEvent.addr.addr)));
-            LOG_INFO("[RfcommTransport]%{public}s handle:%hu RawAddress:%{public}s",
-                __func__,
-                handle,
-                RawAddress::ConvertToString(incomingEvent.addr.addr).GetAddress().c_str());
+            HILOGI("[RfcommTransport] handle:%{public}hu RawAddress:%{public}s",
+                handle, GetEncryptAddr(RawAddress::ConvertToString(incomingEvent.addr.addr).GetAddress()).c_str());
             transport->handleMap_.insert(
                 std::pair<RawAddress, uint16_t>(RawAddress::ConvertToString(incomingEvent.addr.addr), handle));
             transport->observer_.OnConnectIncoming(
