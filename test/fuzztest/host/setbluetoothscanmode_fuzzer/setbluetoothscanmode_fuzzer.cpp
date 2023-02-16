@@ -30,7 +30,7 @@ namespace OHOS {
         bool result = false;
         int scanMode = data[0] % 5;
         BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-        result = host->SetBtScanMode(scanMode, 0);
+        host->SetBtScanMode(scanMode, 0);
         return result;
     }
 }

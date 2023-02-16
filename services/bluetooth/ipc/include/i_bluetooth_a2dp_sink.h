@@ -50,7 +50,7 @@ public:
     virtual void DeregisterObserver(const sptr<IBluetoothA2dpSinkObserver> &observer) = 0;
     virtual std::vector<RawAddress> GetDevicesByStates(const std::vector<int32_t> &states) = 0;
     virtual int GetDeviceState(const RawAddress &device) = 0;
-    virtual int GetPlayingState(const RawAddress &device) = 0;
+    virtual int GetPlayingState(const RawAddress &device, int &state) = 0;
     virtual int SetConnectStrategy(const RawAddress &device, int32_t strategy) = 0;
     virtual int GetConnectStrategy(const RawAddress &device) = 0;
     virtual int SendDelay(const RawAddress &device, int32_t delayValue) = 0;

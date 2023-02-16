@@ -90,9 +90,11 @@ ErrCode BluetoothGattClientStub::RegisterApplicationInner(MessageParcel &data, M
         return TRANSACTION_ERR;
     }
     int32_t transport = data.ReadInt32();
-    int result = RegisterApplication(callback, *addr, transport);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
+    int appId = 0;
+    int result = RegisterApplication(callback, *addr, transport, appId);
+    bool resultRet = reply.WriteInt32(result);
+    bool appIdRet = reply.WriteInt32(appId);
+    if (!(resultRet && appIdRet)) {
         HILOGE("BluetoothGattClientStub: reply writing failed in: %{public}s.", __func__);
         return ERR_INVALID_VALUE;
     }

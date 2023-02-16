@@ -30,11 +30,11 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode GetConnectDevicesInner(MessageParcel &data, MessageParcel &reply);
+    int32_t GetConnectDevicesInner(MessageParcel &data, MessageParcel &reply);
     ErrCode GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode ConnectInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode DisconnectInner(MessageParcel &data, MessageParcel &reply);
+    int32_t GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
+    int32_t ConnectInner(MessageParcel &data, MessageParcel &reply);
+    int32_t DisconnectInner(MessageParcel &data, MessageParcel &reply);
     ErrCode GetScoStateInner(MessageParcel &data, MessageParcel &reply);
     ErrCode ConnectScoInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DisconnectScoInner(MessageParcel &data, MessageParcel &reply);

@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_spp_server.h"
+#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -35,48 +37,35 @@ void DefineSppFunctions(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
-napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
+static napi_status CheckSppListenParams(
+    napi_env env, napi_callback_info info, string &name, SppListenCallbackInfo *callbackInfo)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_THREE;
-    size_t argc = expectedArgsCount;
+    size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {0};
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE && argc != ARGS_SIZE_THREE - CALLBACK_SIZE),
+        "Requires 2 or 3 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseString(env, name, argv[PARAM0]),
+        "Wrong argument type. String expected.", napi_invalid_arg);
 
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    if (argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
-        HILOGE("Requires 2 or 3 arguments.");
-        return ret;
-    }
-
-    string name;
-    if (!ParseString(env, name, argv[PARAM0])) {
-        HILOGE("Wrong argument type. String expected.");
-        return ret;
-    }
-
-    SppListenCallbackInfo *callbackInfo = new SppListenCallbackInfo();
     callbackInfo->env_ = env;
     callbackInfo->sppOption_ = GetSppOptionFromJS(env, argv[PARAM1]);
-    if (callbackInfo->sppOption_ == nullptr) {
-        HILOGE("GetSppOptionFromJS faild.");
-        return ret;
-    }
+    NAPI_BT_RETURN_IF((callbackInfo->sppOption_ == nullptr), "GetSppOptionFromJS faild.", napi_invalid_arg);
     callbackInfo->name_ = name;
 
     napi_value promise = nullptr;
 
-    if (argc == expectedArgsCount) {
+    if (argc == ARGS_SIZE_THREE) {
         HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[PARAM2], &valueType);
+        NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM2], &valueType));
         if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
             delete callbackInfo;
             callbackInfo = nullptr;
-            return ret;
+            return napi_invalid_arg;
         }
         napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
@@ -84,6 +73,16 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
         HILOGI("promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
+    return napi_ok;
+}
+
+napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    string name;
+    SppListenCallbackInfo *callbackInfo = new SppListenCallbackInfo();
+    auto status = CheckSppListenParams(env, info, name, callbackInfo);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     napi_value resource = nullptr;
     napi_create_string_utf8(env, "SppListen", NAPI_AUTO_LENGTH, &resource);
@@ -150,52 +149,41 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 
     napi_queue_async_work(env, callbackInfo->asyncWork_);
 
-    return ret;
+    return NapiGetUndefinedRet(env);
 }
 
-
-napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
+static napi_status CheckSppAcceptParams(
+    napi_env env, napi_callback_info info, int32_t &serverSocketNum, SppAcceptCallbackInfo *callbackInfo)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
+    size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_TWO - CALLBACK_SIZE),
+        "Requires 1 or 2 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, serverSocketNum, argv[PARAM0]),
+        "Wrong argument type. int expected.", napi_invalid_arg);
 
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    if (argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE) {
-        HILOGE("Requires 2 or 3 arguments.");
-        return ret;
-    }
-
-    int32_t serverSocketNum = -1;
-    if (!ParseInt32(env, serverSocketNum, argv[PARAM0])) {
-        HILOGE("Wrong argument type. int expected.");
-        return ret;
-    }
-    std::shared_ptr<NapiSppServer> server = serverMap[serverSocketNum];
+    std::shared_ptr<NapiSppServer> server = NapiSppServer::serverMap[serverSocketNum];
     if (!server) {
         HILOGE("server is null");
-        return ret;
+        return napi_invalid_arg;
     }
-
-    SppAcceptCallbackInfo *callbackInfo = new SppAcceptCallbackInfo();
     callbackInfo->env_ = env;
     callbackInfo->server_ = server->server_;
 
     napi_value promise = nullptr;
 
-    if (argc == expectedArgsCount) {
+    if (argc == ARGS_SIZE_TWO) {
         HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[PARAM1], &valueType);
+        NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM1], &valueType));
         if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
             delete callbackInfo;
             callbackInfo = nullptr;
-            return ret;
+            return napi_invalid_arg;
         }
         napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
@@ -203,6 +191,16 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
         HILOGI("promise mode");
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
+    return napi_ok;
+}
+
+napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    int32_t serverSocketNum = -1;
+    SppAcceptCallbackInfo *callbackInfo = new SppAcceptCallbackInfo();
+    auto status = CheckSppAcceptParams(env, info, serverSocketNum, callbackInfo);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     napi_value resource = nullptr;
     napi_create_string_utf8(env, "SppAccept", NAPI_AUTO_LENGTH, &resource);
@@ -259,29 +257,33 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
 
     napi_queue_async_work(env, callbackInfo->asyncWork_);
 
-    return ret;
+    return NapiGetUndefinedRet(env);
+}
+
+static napi_status CheckSppCloseServerSockeParams(napi_env env, napi_callback_info info, int &id)
+{
+    HILOGI("enter");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
+
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_ONE), "Requires 1 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected.", napi_invalid_arg);
+    return napi_ok;
 }
 
 napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-    bool isOK = false;
-    napi_value ret = nullptr;
+    int id =  -1;
+    auto status = CheckSppCloseServerSockeParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
+    bool isOK = false;
 
     std::shared_ptr<NapiSppServer> server = nullptr;
     std::shared_ptr<NapiSppClient> client = nullptr;
-    int id =  -1;
-    ParseInt32(env, id, argv[PARAM0]);
 
     if (NapiSppClient::clientMap[id] != nullptr) {
         client = NapiSppClient::clientMap[id];
@@ -304,8 +306,7 @@ napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info 
         HILOGE("no such key in serverMap.");
     }
 
-    napi_get_boolean(env, isOK, &ret);
-    return ret;
+    return NapiGetBooleanRet(env, isOK);
 }
 } // namespace Bluetooth
 } // namespace OHOS

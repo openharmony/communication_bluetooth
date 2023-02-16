@@ -29,7 +29,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -91,7 +91,7 @@ struct SppOption {
 const std::string REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const std::string REGISTER_STATE_CHANGE_TYPE = "stateChange";
 const std::string REGISTER_PIN_REQUEST_TYPE = "pinRequired";
-const std::string REGISTER_BONE_STATE_TYPE = "bondStateChange";
+const std::string REGISTER_BOND_STATE_TYPE = "bondStateChange";
 const std::string REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
 const std::string REGISTER_SYS_BLE_SCAN_TYPE = "sysBLEScan";
 const std::string REGISTER_SYS_BLE_FIND_DEVICE_TYPE = "sysBLEDeviceFonud";
@@ -105,7 +105,7 @@ bool ParseBool(napi_env env, bool &param, napi_value args);
 bool ParseArrayBuffer(napi_env env, uint8_t **data, size_t &size, napi_value args);
 napi_value GetCallbackErrorValue(napi_env env, int errCode);
 
-void ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string> &stringVector);
+napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string> &stringVector);
 
 void ConvertGattServiceToJS(napi_env env, napi_value result, GattService &service);
 void ConvertGattServiceVectorToJS(napi_env env, napi_value result, std::vector<GattService> &services);
@@ -155,6 +155,9 @@ void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName,
 napi_value NapiGetNull(napi_env env);
 napi_value NapiGetBooleanFalse(napi_env env);
 napi_value NapiGetBooleanTrue(napi_env env);
+napi_value NapiGetBooleanRet(napi_env env, bool ret);
+napi_value NapiGetUndefinedRet(napi_env env);
+napi_value NapiGetInt32Ret(napi_env env, int32_t res);
 napi_value RegisterObserver(napi_env env, napi_callback_info info);
 napi_value DeregisterObserver(napi_env env, napi_callback_info info);
 
@@ -270,7 +273,6 @@ std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
 const sysBLEMap &GetSysBLEObserver();
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
-std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type);
 
 void SetRssiValueCallbackInfo(std::shared_ptr<GattGetRssiValueCallbackInfo> &callback);
 std::shared_ptr<GattGetRssiValueCallbackInfo> GetRssiValueCallbackInfo();
@@ -279,6 +281,7 @@ void SetCurrentAppOperate(const bool &isCurrentApp);
 bool GetCurrentAppOperate();
 void RegisterSysBLEObserver(const std::shared_ptr<BluetoothCallbackInfo> &, int32_t, const std::string &);
 void UnregisterSysBLEObserver(const std::string &);
+std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type);
 
 struct ScanFilter {
     std::string deviceId;     // The name of a BLE peripheral device
@@ -318,6 +321,32 @@ struct ScanResult {
     int32_t rssi;               // RSSI of the remote device
     std::vector<uint8_t> data;  // The raw data of broadcast packet
 };
+
+struct NapiAdvManufactureData {
+    uint16_t id = 0;
+    std::string value {};
+};
+
+struct NapiAdvServiceData {
+    std::string uuid {};
+    std::vector<uint8_t> value {};
+};
+
+struct NapiNotifyCharacteristic {
+    UUID serviceUuid;
+    UUID characterUuid;
+    std::vector<uint8_t> characterValue {};
+    bool confirm;
+};
+
+struct NapiGattsServerResponse {
+    std::string deviceId {};
+    int transId;
+    int status;
+    int offset;
+    std::vector<uint8_t> value;
+};
+
 enum ProfileConnectionState {
     STATE_DISCONNECTED = 0,  // the current profile is disconnected
     STATE_CONNECTING = 1,    // the current profile is being connected
@@ -533,6 +562,52 @@ void AfterWorkCallback(uv_work_t *work, int status)
     delete work;
     work = nullptr;
 }
+
+#define NAPI_BT_CALL_RETURN(func)                                          \
+    do {                                                                   \
+        napi_status ret = (func);                                          \
+        if (ret != napi_ok) {                                              \
+            HILOGE("napi call function failed. ret:%{public}d", ret);      \
+            return ret;                                                    \
+        }                                                                  \
+    } while (0)
+
+#define NAPI_BT_RETURN_IF(condition, msg, ret)              \
+    do {                                                    \
+        if ((condition)) {                                  \
+            HILOGE(msg);                                    \
+            return (ret);                                   \
+        }                                                   \
+    } while (0)
+
+bool IsValidAddress(std::string bdaddr);
+bool IsValidUuid(std::string uuid);
+napi_status NapiIsBoolean(napi_env env, napi_value value);
+napi_status NapiIsNumber(napi_env env, napi_value value);
+napi_status NapiIsString(napi_env env, napi_value value);
+napi_status NapiIsFunction(napi_env env, napi_value value);
+napi_status NapiIsArray(napi_env env, napi_value value);
+napi_status NapiIsArrayBuffer(napi_env env, napi_value value);
+napi_status NapiIsObject(napi_env env, napi_value value);
+napi_status ParseNumberParams(napi_env env, napi_value object, const char *name, bool &outExist, napi_value &outParam);
+napi_status ParseInt32Params(napi_env env, napi_value object, const char *name, bool &outExist, int32_t &outParam);
+napi_status ParseUint32Params(napi_env env, napi_value object, const char *name, bool &outExist, uint32_t &outParam);
+napi_status ParseBooleanParams(napi_env env, napi_value object, const char *name, bool &outExist, bool &outParam);
+napi_status ParseStringParams(napi_env env, napi_value object, const char *name, bool &outExist,
+    std::string &outParam);
+napi_status ParseArrayBufferParams(napi_env env, napi_value object, const char *name, bool &outExist,
+    std::vector<uint8_t> &outParam);
+napi_status ParseUuidParams(napi_env env, napi_value object, const char *name, bool &outExist, UUID &outUuid);
+
+bool CheckDeivceIdParam(napi_env env, napi_callback_info info, std::string &addr);
+bool CheckProfileIdParam(napi_env env, napi_callback_info info, int &profileId);
+bool CheckSetDevicePairingConfirmationParam(napi_env env, napi_callback_info info, std::string &addr, bool &accept);
+bool CheckLocalNameParam(napi_env env, napi_callback_info info, std::string &name);
+bool CheckSetBluetoothScanModeParam(napi_env env, napi_callback_info info, int32_t &mode, int32_t &duration);
+napi_status CheckDeregisterObserver(napi_env env, napi_callback_info info);
+napi_status CheckEmptyParam(napi_env env, napi_callback_info info);
+napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const std::vector<std::string> &names);
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H

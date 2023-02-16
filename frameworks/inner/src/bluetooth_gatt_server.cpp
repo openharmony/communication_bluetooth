@@ -93,9 +93,10 @@ struct GattServer::impl {
     std::mutex deviceListMutex_;
     GattService *GetIncludeService(uint16_t handle);
     bluetooth::GattDevice *FindConnectedDevice(const BluetoothRemoteDevice &device);
-    GattService BuildService(const BluetoothGattService &svc);
+    GattService BuildService(const BluetoothGattService &service);
     void BuildIncludeService(GattService &svc, const std::vector<bluetooth::Service> &iSvcs);
     impl(GattServerCallback &callback, GattServer &server);
+    int CheckInterface(void);
     class BluetoothGattServerDeathRecipient;
     sptr<BluetoothGattServerDeathRecipient> deathRecipient_;
     sptr<IBluetoothGattServer> proxy_;
@@ -337,6 +338,23 @@ private:
     GattServer &server_;
 };
 
+int GattServer::impl::CheckInterface(void)
+{
+    if (proxy_ == nullptr) {
+        HILOGE("proxy_ is nullptr.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!BluetoothHost::GetDefaultHost().IsBleEnabled()) {
+        HILOGE("BLE is not enabled.");
+        return BT_ERR_INVALID_STATE;
+    }
+    if (!isRegisterSucceeded_) {
+        HILOGE("isRegisterSucceeded_ is false.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return BT_SUCCESS;
+}
+
 GattService GattServer::impl::BuildService(const BluetoothGattService &service)
 {
     GattService gattService(UUID::ConvertFrom128Bits(service.uuid_.ConvertTo128Bits()),
@@ -534,13 +552,9 @@ int GattServer::impl::RespondDescriptorWrite(const bluetooth::GattDevice &device
 int GattServer::AddService(GattService &service)
 {
     HILOGI("enter");
-    if (!pimpl->proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
-    }
-    if (!pimpl->isRegisterSucceeded_) {
-        HILOGE("isRegisterSucceeded_ is false");
-        return GattStatus::REQUEST_NOT_SUPPORT;
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
+        return ret;
     }
 
     BluetoothGattService svc;
@@ -575,19 +589,16 @@ int GattServer::AddService(GattService &service)
         svc.characteristics_.push_back(std::move(c));
     }
     int appId = pimpl->applicationId_;
-    int result = pimpl->proxy_->AddService(appId, &svc);
-    HILOGI("appId = %{public}d, result = %{public}d.", appId, result);
-    return result;
+    ret = pimpl->proxy_->AddService(appId, &svc);
+    HILOGI("appId = %{public}d, ret = %{public}d.", appId, ret);
+    return ret;
 }
 
 void GattServer::ClearServices()
 {
     HILOGI("enter");
-    if (!pimpl->proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return;
-    }
-    if (!pimpl->isRegisterSucceeded_) {
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
         return;
     }
     int appId = pimpl->applicationId_;
@@ -598,30 +609,27 @@ void GattServer::ClearServices()
 int GattServer::Close()
 {
     HILOGI("enter");
-    if (pimpl->isRegisterSucceeded_) {
-        if (!pimpl->proxy_) {
-            HILOGE("proxy_ is null");
-            return GattStatus::REQUEST_NOT_SUPPORT;
-        } else {
-            int32_t result = pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
-            HILOGI("result: %{public}d", result);
-            if (result == RET_NO_ERROR) {
-                pimpl->isRegisterSucceeded_ = false;
-            }
-            return result;
-        }
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
+        return ret;
     }
-    return GattStatus::REQUEST_NOT_SUPPORT;
+
+    ret = pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
+    HILOGI("ret: %{public}d", ret);
+    if (ret == BT_SUCCESS) {
+        pimpl->isRegisterSucceeded_ = false;
+    }
+    return ret;
 }
 
 void GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 {
     HILOGI("remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-    if (!pimpl->proxy_) {
-        HILOGE("proxy_ is nullptr");
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
         return;
     }
-    if (!device.IsValidBluetoothRemoteDevice() || !pimpl->isRegisterSucceeded_) {
+    if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("Request not supported");
         return;
     }
@@ -637,6 +645,10 @@ void GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const UUID &uuid, bool isPrimary)
 {
     HILOGI("enter");
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
+        return std::nullopt;
+    }
     std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
 
     for (auto &svc : pimpl->gattServices_) {
@@ -652,6 +664,7 @@ std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const 
 std::list<GattService> &GattServer::GetServices()
 {
     HILOGI("enter");
+    pimpl->CheckInterface();
     std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
     return pimpl->gattServices_;
 }
@@ -660,23 +673,17 @@ int GattServer::NotifyCharacteristicChanged(
 {
     HILOGI("remote device: %{public}s, handle: 0x%{public}04X, confirm: %{public}d",
         GET_ENCRYPT_ADDR(device), characteristic.GetHandle(), confirm);
-    if (!pimpl->proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
+        return ret;
     }
-    if (!device.IsValidBluetoothRemoteDevice() || !pimpl->isRegisterSucceeded_) {
+    if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("Invalid remote device");
-        return GattStatus::INVALID_REMOTE_DEVICE;
+        return BT_ERR_INTERNAL_ERROR;
     }
-
     if (pimpl->FindConnectedDevice(device) == nullptr) {
         HILOGE("No connection to device: %{public}s", GET_ENCRYPT_ADDR(device));
-        return GattStatus::REQUEST_NOT_SUPPORT;
-    }
-
-    if (!pimpl->proxy_ || !pimpl->isRegisterSucceeded_) {
-        HILOGE("Request not supported");
-        return GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     size_t length = 0;
@@ -685,56 +692,50 @@ int GattServer::NotifyCharacteristicChanged(
     BluetoothGattCharacteristic character(
         bluetooth::Characteristic(characteristic.GetHandle(), characterValue.get(), length));
     std::string address = device.GetDeviceAddr();
-    int result = pimpl->proxy_->NotifyClient(
+    ret = pimpl->proxy_->NotifyClient(
         bluetooth::GattDevice(bluetooth::RawAddress(address), 0), &character, confirm);
-    HILOGI("result = %{public}d.", result);
-    return result;
+    HILOGI("ret = %{public}d.", ret);
+    return ret;
 }
 
 int GattServer::RemoveGattService(const GattService &service)
 {
     HILOGI("enter");
-    if (!pimpl->proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
+        return ret;
     }
-    if (!pimpl->isRegisterSucceeded_) {
-        HILOGE("not registered");
-        return GattStatus::REQUEST_NOT_SUPPORT;
-    }
-
-    int result = GattStatus::INVALID_PARAMETER;
+    ret = BT_ERR_INVALID_PARAM;
     for (auto sIt = pimpl->gattServices_.begin(); sIt != pimpl->gattServices_.end(); sIt++) {
         if (sIt->GetHandle() == service.GetHandle()) {
-            pimpl->proxy_->RemoveService(
+            ret = pimpl->proxy_->RemoveService(
                 pimpl->applicationId_, (BluetoothGattService)bluetooth::Service(service.GetHandle()));
             pimpl->gattServices_.erase(sIt);
-            result = GattStatus::GATT_SUCCESS;
             break;
         }
     }
-    HILOGI("result = %{public}d.", result);
-    return result;
+    HILOGI("ret = %{public}d.", ret);
+    return ret;
 }
 int GattServer::SendResponse(
     const BluetoothRemoteDevice &device, int requestId, int status, int offset, const uint8_t *value, int length)
 {
     HILOGI("remote device: %{public}s, status: %{public}d", GET_ENCRYPT_ADDR(device), status);
-    if (!pimpl->proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
+    int ret = pimpl->CheckInterface();
+    if (ret != BT_SUCCESS) {
+        return ret;
     }
-    if (!device.IsValidBluetoothRemoteDevice() || !pimpl->isRegisterSucceeded_) {
+    if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("Invalid remote device");
-        return GattStatus::INVALID_REMOTE_DEVICE;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     if (pimpl->FindConnectedDevice(device) == nullptr) {
         HILOGE("No connection to device: %{public}s", GET_ENCRYPT_ADDR(device));
-        return GattStatus::REQUEST_NOT_SUPPORT;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    int result = GattStatus::INVALID_PARAMETER;
+    int result = BT_ERR_INTERNAL_ERROR;
     uint8_t requestType = requestId >> EIGHT_BITS;
     uint8_t transport = requestId & 0xFF;
     if (transport != GATT_TRANSPORT_TYPE_CLASSIC && transport != GATT_TRANSPORT_TYPE_LE) {
@@ -765,7 +766,7 @@ int GattServer::SendResponse(
                 HILOGE("Error request Id!");
                 break;
         }
-        if (result == GattStatus::GATT_SUCCESS) {
+        if (result == BT_SUCCESS) {
             pimpl->requests_.erase(request);
         }
     }

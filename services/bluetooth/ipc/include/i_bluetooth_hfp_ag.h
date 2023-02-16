@@ -47,11 +47,11 @@ public:
         BT_HFP_AG_INTO_MOCK,
     };
 
-    virtual int GetConnectDevices(std::vector<BluetoothRawAddress> &devices) = 0;
+    virtual int32_t GetConnectDevices(std::vector<BluetoothRawAddress> &devices) = 0;
     virtual int GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRawAddress> &devices) = 0;
-    virtual int GetDeviceState(const BluetoothRawAddress &device) = 0;
-    virtual int Connect(const BluetoothRawAddress &device) = 0;
-    virtual int Disconnect(const BluetoothRawAddress &device) = 0;
+    virtual int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) = 0;
+    virtual int32_t Connect(const BluetoothRawAddress &device) = 0;
+    virtual int32_t Disconnect(const BluetoothRawAddress &device) = 0;
     virtual int GetScoState(const BluetoothRawAddress &device) = 0;
     virtual bool ConnectSco() = 0;
     virtual bool DisconnectSco() = 0;

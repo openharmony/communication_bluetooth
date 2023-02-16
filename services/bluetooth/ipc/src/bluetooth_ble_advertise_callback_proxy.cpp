@@ -62,12 +62,12 @@ void BluetoothBleAdvertiseCallbackProxy::OnAutoStopAdvEvent(int32_t advHandle)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiseCallbackProxy::GetDescriptor())) {
-        HILOGE("[OnStartResultEvent] fail: write interface token failed.");
+        HILOGE("[OnAutoStopAdvEvent] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteInt32(advHandle)) {
-        HILOGE("[OnStartResultEvent] fail: write result failed");
+        HILOGE("[OnAutoStopAdvEvent] fail: write result failed");
         return;
     }
 

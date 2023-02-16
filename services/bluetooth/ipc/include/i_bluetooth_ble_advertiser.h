@@ -41,10 +41,10 @@ public:
 
     virtual void RegisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback) = 0;
     virtual void DeregisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback) = 0;
-    virtual void StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
+    virtual int StartAdvertising(const BluetoothBleAdvertiserSettings &settings,
         const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse,
         int32_t advHandle, bool isRawData) = 0;
-    virtual void StopAdvertising(int32_t advHandle) = 0;
+    virtual int StopAdvertising(int32_t advHandle) = 0;
     virtual void Close(int32_t advHandle) = 0;
     virtual int32_t GetAdvertiserHandle() = 0;
 };

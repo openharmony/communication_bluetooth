@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_def.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hitrace.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils_server.h"
@@ -37,7 +38,7 @@ public:
         HILOGI("addr: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
         if (state == static_cast<int>(BTConnectState::CONNECTED) ||
             state == static_cast<int>(BTConnectState::DISCONNECTED)) {
-            OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "BLUETOOTH_A2DP_CONNECTED_STATE",
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "A2DP_CONNECTED_STATE",
                 OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", state);
         }
         observers_->ForEach([device, state](sptr<IBluetoothA2dpSourceObserver> observer) {
@@ -199,25 +200,25 @@ void BluetoothA2dpSourceServer::DeregisterObserver(const sptr<IBluetoothA2dpSour
     }
 }
 
-int BluetoothA2dpSourceServer::Connect(const RawAddress &device)
+int32_t BluetoothA2dpSourceServer::Connect(const RawAddress &device)
 {
     HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("Connect error, check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_SYSTEM_PERMISSION_FAILED;
     }
     OHOS::Bluetooth::BluetoothHiTrace::BluetoothStartAsyncTrace("A2DP_SRC_CONNECT", 1);
-    int result = pimpl->a2dpSrcService_->Connect(device);
+    int32_t result = pimpl->a2dpSrcService_->Connect(device);
     OHOS::Bluetooth::BluetoothHiTrace::BluetoothFinishAsyncTrace("A2DP_SRC_CONNECT", 1);
     return result;
 }
 
-int BluetoothA2dpSourceServer::Disconnect(const RawAddress &device)
+int32_t BluetoothA2dpSourceServer::Disconnect(const RawAddress &device)
 {
     HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("Disconnect error, check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_SYSTEM_PERMISSION_FAILED;
     }
     return pimpl->a2dpSrcService_->Disconnect(device);
 }
@@ -250,14 +251,18 @@ std::vector<RawAddress> BluetoothA2dpSourceServer::GetDevicesByStates(const std:
     return rawDevices;
 }
 
-int BluetoothA2dpSourceServer::GetPlayingState(const RawAddress &device)
+int32_t BluetoothA2dpSourceServer::GetPlayingState(const RawAddress &device, int &state)
 {
     HILOGI("addr: %{public}s", GET_ENCRYPT_ADDR(device));
     if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("false, check permission failed");
-        return BT_FAILURE;
+        return BT_ERR_SYSTEM_PERMISSION_FAILED;
     }
-    return pimpl->a2dpSrcService_->GetPlayingState(device);
+    int ret = pimpl->a2dpSrcService_->GetPlayingState(device, state);
+    if (ret != BT_SUCCESS) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return BT_SUCCESS;
 }
 
 int BluetoothA2dpSourceServer::SetConnectStrategy(const RawAddress &device, int strategy)

@@ -191,6 +191,8 @@ public:
      */
     void SetAdvertiseFlag(uint8_t flag);
 
+    void SetName(const std::string &name);
+    std::string GetName(void);
 
 private:
     std::vector<UUID> serviceUuids_ {};
@@ -201,6 +203,7 @@ private:
     bool connectable_ {};
     uint8_t advertiseFlag_ {};
     std::vector<uint8_t> payload_ {};
+    std::string name_ {};
 };
 /**
  * @brief Represents central manager callback.
@@ -454,7 +457,7 @@ public:
      *
      * @since 6
      */
-    void StartScan();
+    int StartScan();
 
     /**
      * @brief Start scan.
@@ -462,20 +465,20 @@ public:
      * @param settings Scan settings.
      * @since 6
      */
-    void StartScan(const BleScanSettings &settings);
+    int StartScan(const BleScanSettings &settings);
 
     /**
      * @brief Stop scan.
      *
      * @since 6
      */
-    void StopScan();
+    int StopScan();
 
     /**
      * @brief Config scan filter.
      *
      */
-    void ConfigScanFilter(const std::vector<BleScanFilter> &filter);
+    int ConfigScanFilter(const std::vector<BleScanFilter> &filter);
 
 private:
     BleCentralManagerCallback *callback_ = nullptr;

@@ -33,13 +33,13 @@ public:
         MessageOption& option) override;
 
 private:
-    ErrCode DisconnectInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply);
+    int32_t DisconnectInner(MessageParcel &data, MessageParcel &reply);
+    int32_t GetDeviceStateInner(MessageParcel &data, MessageParcel &reply);
+    int32_t GetDevicesByStatesInner(MessageParcel &data, MessageParcel &reply);
     ErrCode RegisterObserverInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DeregisterObserverInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode SetTetheringInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode IsTetheringOnInner(MessageParcel &data, MessageParcel &reply);
+    int32_t SetTetheringInner(MessageParcel &data, MessageParcel &reply);
+    int32_t IsTetheringOnInner(MessageParcel &data, MessageParcel &reply);
 
     using BluetoothPanFunc = ErrCode (BluetoothPanStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothPanFunc> memberFuncMap_;

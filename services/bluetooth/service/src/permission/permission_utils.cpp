@@ -14,8 +14,8 @@
  */
 
 #include "permission_utils.h"
-#include "ipc_skeleton.h"
 #include "auth_center.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -42,6 +42,12 @@ int PermissionUtils::VerifyManageBluetoothPermission()
 int PermissionUtils::VerifyLocationPermission()
 {
     return AuthCenter::GetInstance().VerifyLocationPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int PermissionUtils::VerifyApproximatelyPermission()
+{
+    return AuthCenter::GetInstance().VerifyApproximatelyPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 

@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 #include "bluetooth_utils.h"
+#include <map>
 #include "__config"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "iosfwd"
@@ -82,6 +84,40 @@ std::string GetProfileConnStateName(int state)
         default:
             return "Unknown";
     }
+}
+
+static std::map<int32_t, std::string> BtErrCodeMap {
+    { BtErrCode::BT_SUCCESS, "BT_SUCCESS" },
+    { BtErrCode::BT_ERR_PERMISSION_FAILED, "BT_ERR_PERMISSION_FAILED" },
+    { BtErrCode::BT_ERR_SYSTEM_PERMISSION_FAILED, "BT_ERR_SYSTEM_PERMISSION_FAILED" },
+    { BtErrCode::BT_ERR_INVALID_PARAM, "BT_ERR_INVALID_PARAM" },
+    { BtErrCode::BT_ERR_API_NOT_SUPPORT, "BT_ERR_API_NOT_SUPPORT" },
+    { BtErrCode::BT_ERR_SERVICE_DISCONNECTED, "BT_ERR_SERVICE_DISCONNECTED" },
+    { BtErrCode::BT_ERR_UNBONDED_DEVICE, "BT_ERR_UNBONDED_DEVICE" },
+    { BtErrCode::BT_ERR_INVALID_STATE, "BT_ERR_INVALID_STATE" },
+    { BtErrCode::BT_ERR_PROFILE_DISABLED, "BT_ERR_PROFILE_DISABLED" },
+    { BtErrCode::BT_ERR_DEVICE_DISCONNECTED, "BT_ERR_DEVICE_DISCONNECTED" },
+    { BtErrCode::BT_ERR_MAX_CONNECTION, "BT_ERR_MAX_CONNECTION" },
+    { BtErrCode::BT_ERR_INTERNAL_ERROR, "BT_ERR_INTERNAL_ERROR" },
+    { BtErrCode::BT_ERR_IPC_TRANS_FAILED, "BT_ERR_IPC_TRANS_FAILED" },
+    { BtErrCode::BT_ERR_GATT_READ_NOT_PERMITTED, "BT_ERR_GATT_READ_NOT_PERMITTED" },
+    { BtErrCode::BT_ERR_GATT_WRITE_NOT_PERMITTED, "BT_ERR_GATT_WRITE_NOT_PERMITTED" },
+    { BtErrCode::BT_ERR_GATT_MAX_SERVER, "BT_ERR_GATT_MAX_SERVER" },
+    { BtErrCode::BT_ERR_SPP_SERVER_STATE, "BT_ERR_SPP_SERVER_STATE" },
+    { BtErrCode::BT_ERR_SPP_BUSY, "BT_ERR_SPP_BUSY" },
+    { BtErrCode::BT_ERR_SPP_DEVICE_NOT_FOUND, "BT_ERR_SPP_DEVICE_NOT_FOUND" },
+    { BtErrCode::BT_ERR_SPP_IO, "BT_ERR_SPP_IO" },
+};
+
+std::string GetErrorCode(int32_t errCode)
+{
+    std::string errlog = "unknown error code: ";
+    auto iter = BtErrCodeMap.find(errCode);
+    if (iter != BtErrCodeMap.end()) {
+        errlog = iter->second;
+    }
+    errlog.append("(").append(std::to_string(errCode)).append(")");
+    return errlog;
 }
 
 }  // namespace Bluetooth
