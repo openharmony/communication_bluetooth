@@ -34,11 +34,11 @@ void NapiPbapServer::DefinePbapServerJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
     };
 
-    napi_define_class(env, "PbapServer", NAPI_AUTO_LENGTH, PbapServerConstructor, nullptr, 
+    napi_define_class(env, "PbapServer", NAPI_AUTO_LENGTH, PbapServerConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(ProfileId::PROFILE_PBAP_SERVER, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_PBAP_SERVER, napiProfile);
     HILOGI("finished");
 }
 

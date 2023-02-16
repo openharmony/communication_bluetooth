@@ -30,6 +30,7 @@ ohos_static_library("btcommon") {
 
   sources = [
     "avrcp_media.cpp",
+    "ble_parcel_data.cpp",
     "ble_service_data.cpp",
     "bt_uuid.cpp",
     "gatt_data.cpp",

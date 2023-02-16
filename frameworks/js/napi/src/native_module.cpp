@@ -79,7 +79,11 @@ static napi_module bluetoothModule = {.nm_version = 1,
     .nm_flags = 0,
     .nm_filename = NULL,
     .nm_register_func = Init,
+#ifdef ENABLE_NAPI_BLUETOOTH_MANAGER
+    .nm_modname = "bluetoothMananger",
+#else
     .nm_modname = "bluetooth",
+#endif
     .nm_priv = ((void *)0),
     .reserved = {0}};
 /*
@@ -87,6 +91,7 @@ static napi_module bluetoothModule = {.nm_version = 1,
  */
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
+    HILOGI("Register bluetoothModule nm_modname:%{public}s", bluetoothModule.nm_modname);
     napi_module_register(&bluetoothModule);
 }
 }  // namespace Bluetooth

@@ -257,7 +257,7 @@ public:
      *         Returns <b>0</b> if device is not on playing;
      * @since 6.0
      */
-    int GetPlayingState(const RawAddress &device) const override;
+    int GetPlayingState(const RawAddress &device, int &state) const override;
 
     /**
      * @brief Set target device as active device.

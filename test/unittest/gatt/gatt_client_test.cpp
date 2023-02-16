@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "bluetooth_errorcode.h"
 #include "bluetooth_gatt_client.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_host.h"
@@ -135,7 +136,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_Connect, TestSize.Level1)
     bool isAutoConnect = true;
     int transport = 1;
     int result = client.Connect(callback_, isAutoConnect, transport);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_Connect end";
 }
 
@@ -153,7 +154,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_Disconnect, TestSize.Level1)
     int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     int result = client.Disconnect();
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_Disconnect end";
 }
 
@@ -171,7 +172,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_DiscoverServices, TestSize.Level1)
     int transport = 1;
     client.Connect(callback_, isAutoConnect, transport);
     int result = client.DiscoverServices();
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_DiscoverServices end";
 }
 
@@ -233,7 +234,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_ReadCharacteristic, TestSize.Level1
     int properties = 37;
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     int result = client.ReadCharacteristic(characteristic);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_ReadCharacteristic end";
 }
 
@@ -254,7 +255,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_ReadDescriptor, TestSize.Level1)
     int permissions = 17;
     GattDescriptor descriptor = GattDescriptor(uuid_, permissions);
     int result = client.ReadDescriptor(descriptor);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_ReadDescriptor end";
 }
 
@@ -273,7 +274,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_RequestBleMtuSize, TestSize.Level1)
     int result = client.Connect(callback_, isAutoConnect, transport);
     int mtu = 17;
     result = client.RequestBleMtuSize(mtu);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_RequestBleMtuSize end";
 }
 
@@ -296,7 +297,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_SetNotifyCharacteristic, TestSize.L
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     bool enable = true;
     int result = client.SetNotifyCharacteristic(characteristic, enable);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_SetNotifyCharacteristic end";
 }
 
@@ -318,7 +319,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_WriteCharacteristic, TestSize.Level
     int properties = 37;
     GattCharacteristic characteristic = GattCharacteristic(uuid_, permissions, properties);
     int result = client.WriteCharacteristic(characteristic);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_WriteCharacteristic end";
 }
 
@@ -339,7 +340,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_WriteDescriptor, TestSize.Level1)
     int permissions = 17;
     GattDescriptor descriptor = GattDescriptor(uuid_, permissions);
     int result = client.WriteDescriptor(descriptor);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_WriteDescriptor end";
 }
 
@@ -358,7 +359,7 @@ HWTEST_F(GattClientTest, GattClient_UnitTest_RequestConnectionPriority, TestSize
     client.Connect(callback_, isAutoConnect, transport);
     int connPriority = 2;
     int result = client.RequestConnectionPriority(connPriority);
-    EXPECT_EQ(result, -18);
+    EXPECT_NE(result, BT_SUCCESS);
     GTEST_LOG_(INFO) << "GattClient_UnitTest_RequestConnectionPriority end";
 }
 

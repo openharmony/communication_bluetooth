@@ -100,8 +100,9 @@ HWTEST_F(PanTest, PAN_ModuleTest_GetDevicesByStates_00100, TestSize.Level1)
     profile_ = Pan::GetProfile();
     std::vector<int> states;
     std::vector<std::string> bluetoothRemoteDeviceAddr;
-    std::vector<BluetoothRemoteDevice> bluetoothRemoteDeviceByState = profile_->GetDevicesByStates(states);
-    EXPECT_TRUE(CompareDevice(bluetoothRemoteDeviceByState, bluetoothRemoteDeviceAddr));
+    std::vector<BluetoothRemoteDevice> devices;
+    profile_->GetDevicesByStates(states, devices);
+    EXPECT_TRUE(CompareDevice(devices, bluetoothRemoteDeviceAddr));
 
     GTEST_LOG_(INFO) << "PAN_ModuleTest_GetDevicesByStates_00100 end";
 }
@@ -120,7 +121,9 @@ HWTEST_F(PanTest, PAN_ModuleTest_GetDeviceState_00100, TestSize.Level1)
     int sucess = static_cast<int>(BTConnectState::DISCONNECTED);
     BluetoothRemoteDevice device;
     profile_ = Pan::GetProfile();
-    EXPECT_EQ(sucess, profile_->GetDeviceState(device));
+    int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+    profile_->GetDeviceState(device, state);
+    EXPECT_EQ(sucess, state);
 
     GTEST_LOG_(INFO) << "PAN_ModuleTest_GetDeviceState_00100 end";
 }
@@ -225,7 +228,9 @@ HWTEST_F(PanTest, PAN_ModuleTest_IsTetheringOn_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "IsTetheringOn function test";
 
     profile_ = Pan::GetProfile();
-    EXPECT_FALSE(profile_->IsTetheringOn());
+    bool result = false;
+    profile_->IsTetheringOn(result);
+    EXPECT_FALSE(result);
 
     GTEST_LOG_(INFO) << "PAN_ModuleTest_IsTetheringOn_00100 end";
 }

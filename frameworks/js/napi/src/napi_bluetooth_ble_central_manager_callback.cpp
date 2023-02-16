@@ -195,10 +195,11 @@ void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback(
 static void OnSysScanCallback(const BleScanResult &result, const std::string type)
 {
     std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
-        auto sysObservers = GetSysBLEObserver();
-        if (sysObservers.find(type) != sysObservers.end()) {
-            SysOnScanCallBack(sysObservers, result);
-        }
+    auto sysObservers = GetSysBLEObserver();
+    if (!sysObservers.empty() &&
+        sysObservers.find(type) != sysObservers.end()) {
+        SysOnScanCallBack(sysObservers, result);
+    }
 }
 
 void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
@@ -210,6 +211,7 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
         HILOGI("This callback is not registered by ability.");
         return;
     }
+
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     if (loop == nullptr) {
@@ -330,18 +332,21 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
 void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
     HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
-    
     std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE> callbackInfos;
     {
         std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
         auto observers = GetSysBLEObserver();
+        if (observers.empty()) {
+            HILOGI("observers is empty.");
+            return;
+        }
         if (observers.find(REGISTER_SYS_BLE_SCAN_TYPE) == observers.end()) {
-            HILOGE("sys BEL callback is not registered by ability.");
+            HILOGI("sys BEL callback is not registered by ability.");
             return;
         }
         callbackInfos = observers[REGISTER_SYS_BLE_SCAN_TYPE];
     }
-    
+
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfos[PARAM0]->env_, &loop);
     if (loop == nullptr) {
@@ -353,14 +358,12 @@ void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCo
         HILOGE("create uv_work_t failed!");
         return;
     }
-
     SysBLEStartScanCallbackData *data = new (std::nothrow) SysBLEStartScanCallbackData();
     if (data == nullptr) {
         HILOGE("create SysBLECallbackData failed!");
         delete work;
         return;
     }
-
     data->resultCode = resultCode;
     data->env = callbackInfos[PARAM0]->env_;
     data->callbackSuccess = callbackInfos[PARAM0]->callback_;

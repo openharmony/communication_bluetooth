@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
+#include "bluetooth_errorcode.h"
 #include "bluetooth_pan_server.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils_server.h"
 #include "interface_profile.h"
 #include "interface_profile_pan.h"
 #include "i_bluetooth_host_observer.h"
+#include "permission_utils.h"
 #include "remote_observer_list.h"
 #include "hilog/log.h"
 
@@ -166,14 +168,13 @@ ErrCode BluetoothPanServer::DeregisterObserver(const sptr<IBluetoothPanObserver>
     return ERR_OK;
 }
 
-ErrCode BluetoothPanServer::GetDevicesByStates(
-    const std::vector<int32_t> &states,
+int32_t BluetoothPanServer::GetDevicesByStates(const std::vector<int32_t> &states,
     std::vector<BluetoothRawAddress>& result)
 {
-    HILOGI("Triggered!");
+    HILOGI("enter");
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
         HILOGI("not init.");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::vector<bluetooth::RawAddress> serviceDeviceList = pimpl->panService_->GetDevicesByStates(states);
@@ -181,57 +182,57 @@ ErrCode BluetoothPanServer::GetDevicesByStates(
         BluetoothRawAddress bluetoothDevice(device.GetAddress());
         result.push_back(bluetoothDevice);
     }
-    return ERR_OK;
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothPanServer::GetDeviceState(const BluetoothRawAddress &device,
-    int& result)
+int32_t BluetoothPanServer::GetDeviceState(const BluetoothRawAddress &device, int32_t &state)
 {
-    HILOGI("addr:%{public}s, res:%{public}d", GET_ENCRYPT_ADDR(device), result);
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
         HILOGI("not init.");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    result = pimpl->panService_->GetDeviceState(device);
-    return ERR_OK;
+    state = pimpl->panService_->GetDeviceState(device);
+    HILOGI("addr:%{public}s, res:%{public}d", GET_ENCRYPT_ADDR(device), state);
+    return BT_SUCCESS;
 }
 
-ErrCode BluetoothPanServer::Disconnect(
-    const BluetoothRawAddress &device,
-    bool& result)
+int32_t BluetoothPanServer::Disconnect(const BluetoothRawAddress &device)
 {
-    HILOGI("addr:%{public}s, res:%{public}d", GET_ENCRYPT_ADDR(device), result);
-    if (pimpl == nullptr || pimpl->panService_ == nullptr) {
-        HILOGI("not init.");
-        return ERR_NO_INIT;
+    HILOGI("addr:%{public}s", GET_ENCRYPT_ADDR(device));
+    if (PermissionUtils::VerifyUseBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("check permission failed");
+        return BT_ERR_PERMISSION_FAILED;
     }
-    result = pimpl->panService_->Disconnect(device);
-    return ERR_OK;
-}
-
-ErrCode BluetoothPanServer::SetTethering(
-    const bool enable,
-    bool& result)
-{
-    HILOGI("enable:%{public}d, res:%{public}d", enable, result);
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
         HILOGI("not init.");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    result = pimpl->panService_->SetTethering(enable);
-    return ERR_OK;
+    return pimpl->panService_->Disconnect(device);
 }
 
-ErrCode BluetoothPanServer::IsTetheringOn(
-    bool& result)
+int32_t BluetoothPanServer::SetTethering(const bool enable)
 {
-    HILOGI("res:%{public}d", result);
+    HILOGI("enable:%{public}d", enable);
+    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+        HILOGE("check permission failed");
+        return BT_ERR_PERMISSION_FAILED;
+    }
     if (pimpl == nullptr || pimpl->panService_ == nullptr) {
         HILOGI("not init.");
-        return ERR_NO_INIT;
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return pimpl->panService_->SetTethering(enable);
+}
+
+int32_t BluetoothPanServer::IsTetheringOn(bool& result)
+{
+    if (pimpl == nullptr || pimpl->panService_ == nullptr) {
+        HILOGI("not init.");
+        return BT_ERR_INTERNAL_ERROR;
     }
     result = pimpl->panService_->IsTetheringOn();
-    return ERR_OK;
+    HILOGI("IsTetheringOn:%{public}d", result);
+    return BT_SUCCESS;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

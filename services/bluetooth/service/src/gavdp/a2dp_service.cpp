@@ -551,7 +551,7 @@ int A2dpService::GetDeviceState(const RawAddress &device) const
     return info->GetConnectState();
 }
 
-int A2dpService::GetPlayingState(const RawAddress &device) const
+int A2dpService::GetPlayingState(const RawAddress &device, int &state) const
 {
     A2dpDeviceInfo *info = nullptr;
     std::lock_guard<std::recursive_mutex> lock(g_a2dpServiceMutex);
@@ -562,8 +562,8 @@ int A2dpService::GetPlayingState(const RawAddress &device) const
     } else {
         info = iter->second;
     }
-
-    return info->GetPlayingState();
+    state = info->GetPlayingState() ? A2DP_IS_PLAYING : A2DP_NOT_PLAYING;
+    return RET_NO_ERROR;
 }
 
 int A2dpService::SetActiveSinkDevice(const RawAddress &device)

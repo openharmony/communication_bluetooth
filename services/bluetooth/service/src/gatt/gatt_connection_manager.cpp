@@ -523,7 +523,7 @@ void GattConnectionManager::impl::NotifyObserver(
     const GattDevice &device, uint8_t event, uint16_t connectionHandle, int ret)
 {
     std::lock_guard<std::mutex> lck(registerMutex_);
-    OHOS::HiviewDFX::HiSysEvent::Write("BLUETOOTH", "GATT_CONNECT_STATE",
+    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "GATT_CONNECT_STATE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "ADDRESS", device.addr_.GetAddress(), "STATE",
         event, "ROLE", device.role_);
     for (auto &item : observers_) {

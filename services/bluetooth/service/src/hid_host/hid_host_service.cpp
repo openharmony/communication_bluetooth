@@ -15,6 +15,8 @@
 
 #include "hid_host_service.h"
 
+#include "bluetooth_errorcode.h"
+
 namespace OHOS {
 namespace bluetooth {
 HidHostService::HidHostService() : utility::Context(PROFILE_NAME_HID_HOST, "1.1.1")
@@ -152,13 +154,13 @@ int HidHostService::Connect(const RawAddress &device)
     if ((it != stateMachines_.end()) && (it->second != nullptr)) {
         int slcState = it->second->GetDeviceStateInt();
         if ((slcState >= HID_HOST_STATE_CONNECTED) || (slcState == HID_HOST_STATE_CONNECTING)) {
-            return HID_HOST_FAILURE;
+            return Bluetooth::BT_ERR_INTERNAL_ERROR;
         }
     }
 
     if (GetConnectionsDeviceNum() >= maxConnectionsNum_) {
         LOG_INFO("[HIDH Service]%{public}s():Max connection number has reached!", __FUNCTION__);
-        return HID_HOST_FAILURE;
+        return Bluetooth::BT_ERR_INTERNAL_ERROR;
     }
 
     HidHostMessage event(HID_HOST_API_OPEN_EVT);
@@ -176,13 +178,13 @@ int HidHostService::Disconnect(const RawAddress &device)
     auto it = stateMachines_.find(address);
     if (it == stateMachines_.end() || it->second == nullptr) {
         LOG_DEBUG("[HIDH Service]%{public}s():The state machine is not available!", __FUNCTION__);
-        return HID_HOST_FAILURE;
+        return Bluetooth::BT_ERR_INTERNAL_ERROR;
     }
 
     int slcState = it->second->GetDeviceStateInt();
     if ((slcState != HID_HOST_STATE_CONNECTING) && (slcState < HID_HOST_STATE_CONNECTED)) {
         LOG_DEBUG("[HIDH Service]%{public}s():slcState:%{public}d", __FUNCTION__, slcState);
-        return HID_HOST_FAILURE;
+        return Bluetooth::BT_ERR_INTERNAL_ERROR;
     }
 
     HidHostMessage event(HID_HOST_API_CLOSE_EVT);
@@ -228,7 +230,7 @@ int HidHostService::HidHostSetReport(std::string device, uint8_t type, uint16_t 
         event.data_ = std::make_unique<uint8_t[]>(size);
         if (memcpy_s(event.data_.get(), size, report, size) != EOK) {
             LOG_ERROR("[HIDH Service]%{public}s():memcpy error", __FUNCTION__);
-            return HID_HOST_FAILURE;
+            return Bluetooth::BT_ERR_INTERNAL_ERROR;
         }
     }
     PostEvent(event);

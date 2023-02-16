@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+constexpr int BT_INVALID_SOCKET_FD = -1;
 class BluetoothSocketProxy : public IRemoteProxy<IBluetoothSocket> {
 public:
     explicit BluetoothSocketProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothSocket>(impl)
