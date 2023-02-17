@@ -30,6 +30,8 @@ using namespace OHOS;
 using namespace OHOS::Telephony;
 namespace OHOS {
 namespace bluetooth {
+constexpr int32_t INVALID_SLOT_ID = -1;
+
 HfpAgSystemInterface::HfpAgSystemInterface()
 {}
 
@@ -82,7 +84,7 @@ void HfpAgSystemInterface::RegisterObserver()
     if (observer_ == nullptr) {
         observer_ = new (std::nothrow) AgTelephonyObserver(*this);
     }
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
         return;
@@ -98,7 +100,7 @@ void HfpAgSystemInterface::UnregisterObserver()
     if (observer_ == nullptr) {
         return;
     }
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
         return;
@@ -132,7 +134,8 @@ void HfpAgSystemInterface::HangupCall(const std::string &address) const
     }
 
     std::vector<CallAttributeInfo> callList;
-    int slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    int32_t slotId = INVALID_SLOT_ID;
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId);
     bool isActiveCallHangUp = false;
     if (slotId < 0) {
         LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
@@ -182,16 +185,17 @@ bool HfpAgSystemInterface::HoldCall(int chld) const
 
 std::string HfpAgSystemInterface::GetNetworkOperator()
 {
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
-        sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
-        if (netWorkState != nullptr) {
-            operatorName_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->GetLongOperatorName();
-            LOG_INFO("[HFP AG]%{public}s(): operatorName_ is %{public}s",  __FUNCTION__, operatorName_.c_str());
+        sptr<NetworkState> networkState = nullptr;
+        CoreServiceClient::GetInstance().GetNetworkState(slotId_, networkState);
+        if (networkState != nullptr) {
+            operatorName_ = networkState->GetLongOperatorName();
+            LOG_INFO("[HFP AG]%{public}s(): operatorName_ is %{public}s", __FUNCTION__, operatorName_.c_str());
         } else {
-            LOG_INFO("[HFP AG]%{public}s(): netWorkState is nullptr",  __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s(): networkState is nullptr", __FUNCTION__);
         }
     }
     return operatorName_;
@@ -199,11 +203,13 @@ std::string HfpAgSystemInterface::GetNetworkOperator()
 
 std::string HfpAgSystemInterface::GetSubscriberNumber()
 {
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
-        subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
+        std::u16string telephoneNumber;
+        CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_, telephoneNumber);
+        subscriberNumber_ = Str16ToStr8(telephoneNumber);
         LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
     return subscriberNumber_;
@@ -221,7 +227,7 @@ bool HfpAgSystemInterface::QueryCurrentCallsList(const std::string &address)
     if (service->GetMockState() == HFP_AG_MOCK) {
         return HandleClccMock(address);
     }
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     if (slotId_ < 0) {
         LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
         service->ResponesOK(address);
@@ -304,15 +310,16 @@ std::string HfpAgSystemInterface::GetLastDialNumber()
 
 int HfpAgSystemInterface::GetServiceState()
 {
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     LOG_INFO("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
-        sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
-        if (netWorkState != nullptr) {
-            serviceState_ = static_cast<std::underlying_type<RegServiceState>::type>(netWorkState->GetRegStatus());
-            LOG_DEBUG("[HFP AG]%{public}s(): serviceState_ is %{public}d",  __FUNCTION__, serviceState_);
+        sptr<NetworkState> networkState = nullptr;
+        CoreServiceClient::GetInstance().GetNetworkState(slotId_, networkState);
+        if (networkState != nullptr) {
+            serviceState_ = static_cast<std::underlying_type<RegServiceState>::type>(networkState->GetRegStatus());
+            LOG_DEBUG("[HFP AG]%{public}s(): serviceState_ is %{public}d", __FUNCTION__, serviceState_);
         }
     }
     return serviceState_;
@@ -324,8 +331,9 @@ int HfpAgSystemInterface::GetSignalStrength()
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
-        if (!CoreServiceClient::GetInstance().GetSignalInfoList(slotId_).empty()) {
-            signalStrength_ = CoreServiceClient::GetInstance().GetSignalInfoList(slotId_)[0]->GetSignalLevel();
+        std::vector<sptr<SignalInformation>> signals;
+        if (CoreServiceClient::GetInstance().GetSignalInfoList(slotId_, signals) == 0 && !signals.empty()) {
+            signalStrength_ = signals[0]->GetSignalLevel();
         } else {
             signalStrength_ = 0;
             LOG_INFO("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
@@ -337,15 +345,16 @@ int HfpAgSystemInterface::GetSignalStrength()
 
 int HfpAgSystemInterface::GetRoamState()
 {
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     LOG_INFO("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
-        sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
-        if (netWorkState != nullptr) {
-            roamState_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->IsRoaming();
-            LOG_INFO("[HFP AG]%{public}s(): roamState_ is %{public}d",  __FUNCTION__, roamState_);
+        sptr<NetworkState> networkState = nullptr;
+        CoreServiceClient::GetInstance().GetNetworkState(slotId_, networkState);
+        if (networkState != nullptr) {
+            roamState_ = networkState->IsRoaming();
+            LOG_INFO("[HFP AG]%{public}s(): roamState_ is %{public}d", __FUNCTION__, roamState_);
         }
     }
     return roamState_;
@@ -367,32 +376,36 @@ void HfpAgSystemInterface::QueryAgIndicator()
     operatorName_ = "";
     signalStrength_ = 0;
     subscriberNumber_ = "";
-    slotId_ = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId_);
     LOG_INFO("[HFP AG]%{public}s(): slotId_ is %{public}d",  __FUNCTION__, slotId_);
     if (slotId_ < 0) {
         LOG_INFO("[HFP AG]%{public}s(): slotId_ is invalid",  __FUNCTION__);
     } else {
-        sptr<NetworkState> netWorkState = CoreServiceClient::GetInstance().GetNetworkState(slotId_);
-        if (netWorkState != nullptr) {
-            serviceState_ = static_cast<std::underlying_type<RegServiceState>::type>(netWorkState->GetRegStatus());
-            LOG_INFO("[HFP AG]%{public}s(): serviceState_ is %{public}d",  __FUNCTION__, serviceState_);
-            roamState_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->IsRoaming();
-            LOG_INFO("[HFP AG]%{public}s(): roamState_ is %{public}d",  __FUNCTION__, roamState_);
-            operatorName_ = CoreServiceClient::GetInstance().GetNetworkState(slotId_)->GetLongOperatorName();
-            LOG_INFO("[HFP AG]%{public}s(): operatorName_ is %{public}s",  __FUNCTION__, operatorName_.c_str());
+        sptr<NetworkState> networkState = nullptr;
+        CoreServiceClient::GetInstance().GetNetworkState(slotId_, networkState);
+        if (networkState != nullptr) {
+            serviceState_ = static_cast<std::underlying_type<RegServiceState>::type>(networkState->GetRegStatus());
+            LOG_INFO("[HFP AG]%{public}s(): serviceState_ is %{public}d", __FUNCTION__, serviceState_);
+            roamState_ = networkState->IsRoaming();
+            LOG_INFO("[HFP AG]%{public}s(): roamState_ is %{public}d", __FUNCTION__, roamState_);
+            operatorName_ = networkState->GetLongOperatorName();
+            LOG_INFO("[HFP AG]%{public}s(): operatorName_ is %{public}s", __FUNCTION__, operatorName_.c_str());
         } else {
-            LOG_INFO("[HFP AG]%{public}s(): netWorkState is nullptr",  __FUNCTION__);
+            LOG_INFO("[HFP AG]%{public}s(): networkState is nullptr", __FUNCTION__);
         }
-        LOG_DEBUG("[HFP AG]%{public}s(): serviceState_ is %{public}d",  __FUNCTION__, serviceState_);
-        if (!CoreServiceClient::GetInstance().GetSignalInfoList(slotId_).empty()) {
-            signalStrength_ = CoreServiceClient::GetInstance().GetSignalInfoList(slotId_)[0]->GetSignalLevel();
+        LOG_DEBUG("[HFP AG]%{public}s(): serviceState_ is %{public}d", __FUNCTION__, serviceState_);
+        std::vector<sptr<SignalInformation>> signals;
+        if (CoreServiceClient::GetInstance().GetSignalInfoList(slotId_, signals) == 0 && !signals.empty()) {
+            signalStrength_ = signals[0]->GetSignalLevel();
         } else {
             signalStrength_ = 0;
             LOG_INFO("[HFP AG]%{public}s(): GetSignalInfoList is empty",  __FUNCTION__);
         }
         LOG_INFO("[HFP AG]%{public}s(): signalStrength_ is %{public}d",  __FUNCTION__, signalStrength_);
 
-        subscriberNumber_ = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_));
+        std::u16string telephoneNumber;
+        CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId_, telephoneNumber);
+        subscriberNumber_ = Str16ToStr8(telephoneNumber);
         LOG_INFO("[HFP AG]%{public}s(): subscriberNumber_ is %{public}s",  __FUNCTION__, subscriberNumber_.c_str());
     }
     SendServiceStateToService();
@@ -438,8 +451,8 @@ int HfpAgSystemInterface::GetCallWithState(int state) const
 void HfpAgSystemInterface::UpdateCallList()
 {
     std::vector<CallAttributeInfo> callList;
-    int slotId;
-    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    int slotId = INVALID_SLOT_ID;
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId);
     if (slotId < 0) {
         LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
     }
@@ -495,8 +508,8 @@ void HfpAgSystemInterface::GetResponseHoldState(std::string address)
     if (service == nullptr) {
         LOG_ERROR("[HFP AG]%{public}s():no service",  __FUNCTION__);
     }
-    int slotId;
-    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    int slotId = INVALID_SLOT_ID;
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId);
     if (slotId < 0) {
         LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
     }
@@ -525,8 +538,8 @@ void HfpAgSystemInterface::SetResponseHoldState(std::string address, int btrh)
     if (service == nullptr) {
         LOG_ERROR("[HFP AG]%{public}s():no service",  __FUNCTION__);
     }
-    int slotId;
-    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    int slotId = INVALID_SLOT_ID;
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId);
     if (slotId < 0) {
         LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
     }
@@ -903,8 +916,8 @@ bool HfpAgSystemInterface::HandleChld(int chld) const
         return HandleChldMock(chld);
     }
     std::vector<CallAttributeInfo> callList;
-    int slotId;
-    slotId = CoreServiceClient::GetInstance().GetPrimarySlotId();
+    int slotId = INVALID_SLOT_ID;
+    CoreServiceClient::GetInstance().GetPrimarySlotId(slotId);
     if (slotId < 0) {
         LOG_ERROR("[HFP AG]%{public}s():slotId_ is invalid",  __FUNCTION__);
     }
