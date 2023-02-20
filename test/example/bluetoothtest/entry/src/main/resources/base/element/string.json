@@ -21,6 +21,15 @@
       "value": "description"
     },
     {
+      "name": "btn_fullscreen",
+      "value": "全屏截屏"
+    },
+    {
+      "name": "btn_fixedsize",
+      "value": "部分截屏"
+    },
+
+    {
       "name": "MainAbility2_label",
       "value": "label"
     },    {

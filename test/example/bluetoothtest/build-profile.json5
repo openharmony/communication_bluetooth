@@ -18,18 +18,18 @@
       {
         "name": "default",
         "material": {
-          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_ohos.samples.bttest.cer",
-          "storePassword": "0000001B46AAC3EF6AAFA2CAB1898D09286A3EF7A39D58891A89BD07C6BBC865D890DAC37AE66DF7E183AF",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_com.example.myapplicationbt.cer",
+          "storePassword": "0000001B0A198A36D631FEF0F239499A8166FFF20DC90E1CB24C784BA7D5A18C9B7D773630A4F8B8ADFA29",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001BE78AD5715D02D4791A281B2E6289527135DA217BDC7CA3E07238D58FD4C6330979FF5E0084436C",
-          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_ohos.samples.bttest.p7b",
+          "keyPassword": "0000001BD6169BB014C1A5066DD85B3C2C86A8F613C2B7891DF224FB3DE7BAB5E354BD1D170E95E9D9F446",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_com.example.myapplicationbt.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_ohos.samples.bttest.p12"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_com.example.myapplicationbt.p12"
         }
       }
     ],
-    "compileSdkVersion": 8,
-    "compatibleSdkVersion": 8,
+    "compileSdkVersion": 9,
+    "compatibleSdkVersion": 9,
     "products": [
       {
         "name": "default",

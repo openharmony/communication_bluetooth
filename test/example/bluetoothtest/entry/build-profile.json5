@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-  "apiType": 'faMode',
+ {
+  "apiType": 'stageMode',
   "buildOption": {
   },
   "targets": [
     {
-      "name": "default",
+      "name": "default"
     },
     {
       "name": "ohosTest",
