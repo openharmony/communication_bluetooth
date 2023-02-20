@@ -93,7 +93,7 @@ export function testSppClientConnectUnSafe():String{
 
 export function testSppClientWrite():String{
   let message = "sppClientWrite test"
-  console.info( 'bluetoothModel sppWrite clientNumber: ' + JSON.stringify(clientNumber));
+  console.info( 'bluetoothModel sppWrite clientNumber1: ' + JSON.stringify(clientNumber));
   let writeClientData =AppStorage.Get("writeClientData")
   let writeArrayBuffer = strToArrayBuffer(writeClientData)
   const sppWriteSuccess = bluetooth.sppWrite(clientNumber, writeArrayBuffer);

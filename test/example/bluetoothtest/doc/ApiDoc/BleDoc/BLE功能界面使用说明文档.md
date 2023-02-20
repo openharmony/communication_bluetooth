@@ -55,12 +55,6 @@
 
 
 
-#### 验证工具
-
-1. 可以使用linux的bluetoothctl的advertise子菜单命令。
-
-2. APP: 手机上的lightblue，nRF Connect
-
 #### 功能
 
 **"蓝牙打开"是其他功能测试的前提**
@@ -79,10 +73,7 @@
 
    - 限制条件：只能扫描到指定BLE设备。
 
-   - 验证方法：
-
-     - 使用bluetoothctl的advertise子菜单命令，打开广播后，让设备开始扫描；
-     - 使用APP（nRF Connect），进行扫描。
+   - 验证方法：根据弹窗消息查看已扫描到的BLE
 
 2. BLE设备查找变化
 

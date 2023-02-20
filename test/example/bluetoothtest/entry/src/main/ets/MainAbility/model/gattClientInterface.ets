@@ -141,6 +141,7 @@ export function testOnBLEConnectionStateChange():String{
     })
     message = "关闭BLE连接状态变化"
   } else {
+    let bleConnectionStateInfo = "UNDEFINED"
     gattClientInstance.on('BLEConnectionStateChange', (bleConnectionState) => {
       switch (bleConnectionState) {
         case bluetooth.ProfileConnectionState.STATE_DISCONNECTED:
