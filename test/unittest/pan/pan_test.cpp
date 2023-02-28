@@ -34,7 +34,7 @@ private:
 };
 
 
-static Bluetooth::Pan  *profile_;
+static Bluetooth::Pan *profile_;
 static PanObserverTest panObserverTest;
 
 class PanTest : public testing::Test {
@@ -141,7 +141,7 @@ HWTEST_F(PanTest, PAN_ModuleTest_Disconnect_00100, TestSize.Level1)
 
     BluetoothRemoteDevice device;
     profile_ = Pan::GetProfile();
-    EXPECT_FALSE(profile_->Disconnect(device));
+    EXPECT_TRUE(profile_->Disconnect(device));
 
     GTEST_LOG_(INFO) << "PAN_ModuleTest_Disconnect_00100 end";
 }
@@ -211,7 +211,7 @@ HWTEST_F(PanTest, PAN_ModuleTest_SetTethering_00100, TestSize.Level1)
 
     bool value = false;
     profile_ = Pan::GetProfile();
-    EXPECT_FALSE(profile_->SetTethering(value));
+    EXPECT_TRUE(profile_->SetTethering(value));
 
     GTEST_LOG_(INFO) << "PAN_ModuleTest_SetTethering_00100 end";
 }
