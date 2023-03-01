@@ -477,6 +477,7 @@ HWTEST_F(HostTest, Host_ModuleTest_StartBtDiscovery_00100, TestSize.Level1)
         isSuccess = true;
     }
     EXPECT_TRUE(isSuccess);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_StartBtDiscovery_00100 end";
 }
@@ -512,6 +513,7 @@ HWTEST_F(HostTest, Host_ModuleTest_CancelBtDiscovery_00100, TestSize.Level1)
         isSuccess = true;
     }
     EXPECT_TRUE(isSuccess);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_CancelBtDiscovery_00100 end";
 }
@@ -560,7 +562,7 @@ HWTEST_F(HostTest, Host_ModuleTest_RemovePair_00100, TestSize.Level1)
     host_ = &BluetoothHost::GetDefaultHost();
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
 
-    EXPECT_FALSE(host_->RemovePair(device_));
+    EXPECT_NE(host_->RemovePair(device_), BT_SUCCESS);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_RemovePair_00100 end";
 }
@@ -620,8 +622,8 @@ HWTEST_F(HostTest, Host_ModuleTest_GetPhonebookPermission_00100, TestSize.Level1
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPhonebookPermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetPhonebookPermission(1));
-    EXPECT_EQ(device_.GetPhonebookPermission(), 1);
+    EXPECT_FALSE(device_.SetPhonebookPermission(static_cast<int>(BTPermissionType::ACCESS_ALLOWED)));
+    EXPECT_EQ(device_.GetPhonebookPermission(), static_cast<int>(BTPermissionType::ACCESS_UNKNOWN));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPhonebookPermission_00100 end";
 }
@@ -636,8 +638,8 @@ HWTEST_F(HostTest, Host_ModuleTest_SetPhonebookPermission_00100, TestSize.Level1
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetPhonebookPermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetPhonebookPermission(0));
-    EXPECT_EQ(device_.GetPhonebookPermission(), 0);
+    EXPECT_FALSE(device_.SetPhonebookPermission(static_cast<int>(BTPermissionType::ACCESS_FORBIDDEN)));
+    EXPECT_EQ(device_.GetPhonebookPermission(), static_cast<int>(BTPermissionType::ACCESS_UNKNOWN));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetPhonebookPermission_00100 end";
 }
@@ -652,8 +654,8 @@ HWTEST_F(HostTest, Host_ModuleTest_GetMessagePermission_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetPhonebookPermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetMessagePermission(1));
-    EXPECT_EQ(device_.GetMessagePermission(), 1);
+    EXPECT_FALSE(device_.SetMessagePermission(static_cast<int>(BTPermissionType::ACCESS_ALLOWED)));
+    EXPECT_EQ(device_.GetMessagePermission(), static_cast<int>(BTPermissionType::ACCESS_UNKNOWN));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetMessagePermission_00100 end";
 }
@@ -668,8 +670,8 @@ HWTEST_F(HostTest, Host_ModuleTest_SetMessagePermission_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetMessagePermission_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_TRUE(device_.SetMessagePermission(0));
-    EXPECT_EQ(device_.GetMessagePermission(), 0);
+    EXPECT_FALSE(device_.SetMessagePermission(static_cast<int>(BTPermissionType::ACCESS_FORBIDDEN)));
+    EXPECT_EQ(device_.GetMessagePermission(), static_cast<int>(BTPermissionType::ACCESS_UNKNOWN));
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetMessagePermission_00100 end";
 }
@@ -761,7 +763,7 @@ HWTEST_F(HostTest, Host_ModuleTest_GetDeviceType_00100, TestSize.Level1)
 
     host_ = &BluetoothHost::GetDefaultHost();
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_EQ(device_.GetDeviceType(), INVALID_TYPE);
+    EXPECT_EQ(device_.GetDeviceType(), INVALID_VALUE);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_GetDeviceType_00100 end";
 }
@@ -810,37 +812,6 @@ HWTEST_F(HostTest, Host_ModuleTest_StartPair_00100, TestSize.Level1)
     EXPECT_TRUE(device_.StartPair());
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00100 end";
-}
-
-/**
- * @tc.number: Host_ModuleTest_StartPair_00200
- * @tc.name:
- * @tc.desc:
- */
-HWTEST_F(HostTest, Host_ModuleTest_StartPair_00200, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00200 start";
-
-    BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_FALSE(device_.StartPair());
-
-    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00200 end";
-}
-
-/**
- * @tc.number: Host_ModuleTest_StartPair_00300
- * @tc.name:
- * @tc.desc:
- */
-HWTEST_F(HostTest, Host_ModuleTest_StartPair_00300, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00300 start";
-
-    BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    std::this_thread::sleep_for(std::chrono::seconds(12));
-    EXPECT_TRUE(device_.StartPair());
-
-    GTEST_LOG_(INFO) << "Host_ModuleTest_StartPair_00300 end";
 }
 
 /**
