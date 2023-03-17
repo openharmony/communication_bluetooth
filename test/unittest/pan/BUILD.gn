@@ -38,7 +38,7 @@ config("module_private_config") {
   ]
 }
 
-ohos_moduletest("btfw_pan_unit_test") {
+ohos_unittest("btfw_pan_unit_test") {
   module_out_path = module_output_path
   sources = [ "pan_test.cpp" ]
 
