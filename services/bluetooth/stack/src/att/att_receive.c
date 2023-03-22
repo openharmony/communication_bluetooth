@@ -651,6 +651,10 @@ void AttFindByTypeValueRequest(AttConnectInfo *connect, const Buffer *buffer)
 
     buffSize = BufferGetSize(buffer);
     data = (uint8_t *)BufferPtr(buffer);
+    if (data == NULL || buffSize < STEP_SIX) {
+        LOG_ERROR("%{public}s error request", __FUNCTION__);
+        return;
+    }
     attFindObj.findByTypeValueRequest.handleRange.startHandle = ((uint16_t *)data)[0];
     attFindObj.findByTypeValueRequest.handleRange.endHandle = ((uint16_t *)(data + STEP_TWO))[0];
     attFindObj.findByTypeValueRequest.attType = ((uint16_t *)(data + STEP_FOUR))[0];
