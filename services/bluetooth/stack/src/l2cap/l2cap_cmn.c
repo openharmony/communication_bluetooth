@@ -119,7 +119,7 @@ static void L2capRecombineContinue(uint16_t handle, const Packet *pkt)
 {
     L2capFragmentationPacket *frag = NULL;
     ListNode *node = NULL;
-    uint16_t pktLength;
+    uint32_t pktLength;
 
     if (g_fragmentationList == NULL) {
         return;
@@ -130,7 +130,7 @@ static void L2capRecombineContinue(uint16_t handle, const Packet *pkt)
         frag = ListGetNodeData(node);
         if (frag->handle == handle) {
             PacketAssemble(frag->pkt, pkt);
-            pktLength = (uint16_t) PacketSize(frag->pkt);
+            pktLength = PacketSize(frag->pkt);
             if (frag->length == (pktLength - L2CAP_HEADER_LENGTH)) {
                 L2capProcessPacket(handle, frag->cid, frag->pkt);
 
