@@ -17,7 +17,7 @@
 #include <cstring>
 #include <map>
 #include "__config"
-#include "__functional_base"
+#include <functional>
 
 #include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_client.h"
