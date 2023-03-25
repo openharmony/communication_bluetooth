@@ -28,6 +28,7 @@
 #include "hci/hci_error.h"
 
 #include "hci_evt.h"
+#include "log.h"
 
 typedef void (*HciLeEventFunc)(const uint8_t *param, size_t length);
 
@@ -302,9 +303,16 @@ static void HciEventOnLePHYUpdateCompleteEvent(const uint8_t *param, size_t leng
     HCI_FOREACH_EVT_CALLBACKS_END;
 }
 
-static void HciParseLeExtendedAdvertisingReport(
-    HciLeExtendedAdvertisingReport *report, const uint8_t *param, int *offset)
+static bool HciParseLeExtendedAdvertisingReport(
+    HciLeExtendedAdvertisingReport *report, const uint8_t *param, size_t length, int *offset)
 {
+    const size_t EXT_ADV_COMMON_REPORT_SIZE = 24;  // A extended advertising report size except 'Data' field.
+    if (*offset + EXT_ADV_COMMON_REPORT_SIZE > length) {
+        LOG_ERROR("%{public}s: Error length, offset(%{public}d), length(%{public}zu)",
+            __FUNCTION__, *offset, length);
+        return false;
+    }
+
     report->eventType = param[*offset];
     *offset += sizeof(uint16_t);
 
@@ -312,7 +320,7 @@ static void HciParseLeExtendedAdvertisingReport(
     *offset += sizeof(uint8_t);
 
     if (memcpy_s(report->address.raw, BT_ADDRESS_SIZE, param + *offset, BT_ADDRESS_SIZE) != EOK) {
-        return;
+        return false;
     }
     *offset += BT_ADDRESS_SIZE;
 
@@ -338,15 +346,21 @@ static void HciParseLeExtendedAdvertisingReport(
     *offset += sizeof(uint8_t);
 
     if (memcpy_s(report->directAddress.raw, BT_ADDRESS_SIZE, param + *offset, BT_ADDRESS_SIZE) != EOK) {
-        return;
+        return false;
     }
     *offset += BT_ADDRESS_SIZE;
 
     report->dataLength = param[*offset];
     *offset += sizeof(uint8_t);
 
+    if (*offset + report->dataLength > length) {
+        LOG_ERROR("%{public}s: Error data length, offset(%{public}d), dataLength(%{public}u), "
+        "length(%{public}zu)", __FUNCTION__, *offset, report->dataLength, length);
+        return false;
+    }
     report->data = (uint8_t *)(param + *offset);
     *offset += report->dataLength;
+    return true;
 }
 
 static void HciEventOnLeExtendedAdvertisingReportEvent(const uint8_t *param, size_t length)
@@ -370,7 +384,12 @@ static void HciEventOnLeExtendedAdvertisingReportEvent(const uint8_t *param, siz
         MEM_MALLOC.alloc(sizeof(HciLeExtendedAdvertisingReport) * eventParam.numReports);
     if (reports != NULL) {
         for (uint8_t i = 0; i < eventParam.numReports; i++) {
-            HciParseLeExtendedAdvertisingReport(reports + i, param, &offset);
+            bool ret = HciParseLeExtendedAdvertisingReport(reports + i, param, length, &offset);
+            if (!ret) {
+                LOG_ERROR("HciParseLeExtendedAdvertisingReport failed");
+                MEM_MALLOC.free(reports);
+                return;
+            }
         }
 
         eventParam.reports = reports;
