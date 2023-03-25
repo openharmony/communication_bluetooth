@@ -1178,10 +1178,14 @@ static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, BufferI
     uint16_t pos;
 
     /// ServiceSearchPattern
+    if (bufferInfo->length == 0) {
+        LOG_ERROR("bufferInfo->length is 0");
+        return;
+    }
     uint8_t type = bufferInfo->buffer[offset];
     offset++;
     pos = SdpGetLengthFromType(bufferInfo->buffer + offset, type, &length);
-    if (bufferInfo->length < length) {
+    if (bufferInfo->length < offset + pos + length + SDP_UINT16_LENGTH + 1) {
         LOG_ERROR("[%{public}s][%{public}d] Wrong length.", __FUNCTION__, __LINE__);
         return;
     }
@@ -1199,7 +1203,8 @@ static void SdpParseSearchRequest(uint16_t lcid, uint16_t transactionId, BufferI
     offset++;
     LOG_INFO("[%{public}s][%{public}d] continuationStateLen [%hhu].", __FUNCTION__, __LINE__, continuationStateLen);
     /// ContinuationStateLen
-    if (continuationStateLen > SDP_MAX_CONTINUATION_LEN) {
+    if (continuationStateLen > SDP_MAX_CONTINUATION_LEN || offset + continuationStateLen > bufferInfo->length) {
+        LOG_ERROR("%{public}s: continuationStateLen(%{public}u) error", __FUNCTION__, continuationStateLen);
         SdpSendErrorResponse(lcid, transactionId, SDP_INVALID_CONT_STATE);
         return;
     }
