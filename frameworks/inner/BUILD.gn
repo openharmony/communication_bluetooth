@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 
@@ -55,10 +56,6 @@ ohos_shared_library("btframework") {
     "c_adapter/ohos_bt_gatt_client.cpp",
     "c_adapter/ohos_bt_gatt_server.cpp",
     "c_adapter/ohos_bt_spp.cpp",
-    "src/bluetooth_a2dp_snk.cpp",
-    "src/bluetooth_a2dp_src.cpp",
-    "src/bluetooth_avrcp_ct.cpp",
-    "src/bluetooth_avrcp_tg.cpp",
     "src/bluetooth_ble_advertiser.cpp",
     "src/bluetooth_ble_central_manager.cpp",
     "src/bluetooth_device_class.cpp",
@@ -68,16 +65,7 @@ ohos_shared_library("btframework") {
     "src/bluetooth_gatt_manager.cpp",
     "src/bluetooth_gatt_server.cpp",
     "src/bluetooth_gatt_service.cpp",
-    "src/bluetooth_hfp_ag.cpp",
-    "src/bluetooth_hfp_hf.cpp",
-    "src/bluetooth_hid_host.cpp",
     "src/bluetooth_host.cpp",
-    "src/bluetooth_map_mce.cpp",
-    "src/bluetooth_map_mse.cpp",
-    "src/bluetooth_opp.cpp",
-    "src/bluetooth_pan.cpp",
-    "src/bluetooth_pbap_pce.cpp",
-    "src/bluetooth_pbap_pse.cpp",
     "src/bluetooth_proxy_manager.cpp",
     "src/bluetooth_remote_device.cpp",
     "src/bluetooth_socket.cpp",
@@ -85,6 +73,139 @@ ohos_shared_library("btframework") {
     "src/bluetooth_socket_outputstream.cpp",
     "src/bluetooth_utils.cpp",
   ]
+
+  defines = []
+  
+  if (bluetooth_a2dp_sink_feature) {
+    sources += [
+      "src/bluetooth_a2dp_snk.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_a2dp_snk.cpp",
+    ]
+  }
+  
+  if (bluetooth_a2dp_source_feature) {
+    sources += [
+      "src/bluetooth_a2dp_src.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_a2dp_src.cpp",
+    ]  
+  }
+
+  if (bluetooth_avrcp_ct_feature) {
+    sources += [
+      "src/bluetooth_avrcp_ct.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_avrcp_ct.cpp",
+    ]  
+  }
+  
+  if (bluetooth_avrcp_tg_feature) {
+    sources += [
+      "src/bluetooth_avrcp_tg.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_avrcp_tg.cpp",
+    ]  
+  }
+  
+  if (bluetooth_hfp_ag_feature) {
+    sources += [
+      "src/bluetooth_hfp_ag.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_hfp_ag.cpp",
+    ]  
+  }
+
+  if (bluetooth_hfp_hf_feature) {
+    sources += [
+      "src/bluetooth_hfp_hf.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_hfp_hf.cpp",
+    ]  
+  }
+
+  if (bluetooth_hid_host_feature) {
+    sources += [
+      "src/bluetooth_hid_host.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_hid_host.cpp",
+    ]  
+  }
+  
+  if (bluetooth_map_client_feature) {
+    sources += [
+      "src/bluetooth_map_mce.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_map_mce.cpp",
+    ]  
+  }
+  
+  if (bluetooth_map_server_feature) {
+    sources += [
+      "src/bluetooth_map_mse.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_map_mse.cpp",
+    ]  
+  }
+  
+  if (bluetooth_opp_feature) {
+    sources += [
+      "src/bluetooth_opp.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_opp.cpp",
+    ]  
+  }
+  
+  if (bluetooth_pan_feature) {
+    sources += [
+      "src/bluetooth_pan.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_pan.cpp",
+    ]  
+  }
+  
+  if (bluetooth_pbap_client_feature) {
+    sources += [
+      "src/bluetooth_pbap_pce.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_pbap_pce.cpp",
+    ]  
+  }
+
+  if (bluetooth_pbap_server_feature) {
+    sources += [
+      "src/bluetooth_pbap_pse.cpp",
+    ]
+  } else {
+    sources += [
+      "src/mock/bluetooth_pbap_pse.cpp",
+    ]  
+  }
+
 
   deps = [ "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static" ]
 

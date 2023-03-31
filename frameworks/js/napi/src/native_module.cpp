@@ -54,18 +54,40 @@ static napi_value Init(napi_env env, napi_value exports)
     DefineBLEJSObject(env, exports);
     DefineSppFunctions(env, exports);
     NapiProfile::DefineProfileFunctions(env, exports);
+#ifdef BLUETOOTH_HFP_AG_FEATURE
     NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(env);
+#endif
+#ifdef BLUETOOTH_HFP_HF_FEATURE
     NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(env);
+#endif
     BluetoothHostInit(env, exports);
+#ifdef BLUETOOTH_A2DP_SINK_FEATURE
     NapiA2dpSink::DefineA2dpSinkJSClass(env);
+#endif
+#ifdef BLUETOOTH_A2DP_SRC_FEATURE
     NapiA2dpSource::DefineA2dpSourceJSClass(env);
+#endif
+#ifdef BLUETOOTH_PBAP_CLIENT_FEATURE
     NapiPbapClient::DefinePbapClientJSClass(env);
+#endif
+#ifdef BLUETOOTH_PBAP_SERVER_FEATURE
     NapiPbapServer::DefinePbapServerJSClass(env);
+#endif
+#ifdef BLUETOOTH_AVRCP_CT_FEATURE
     NapiAvrcpController::DefineAvrcpControllerJSClass(env);
+#endif
+#ifdef BLUETOOTH_AVRCP_TG_FEATURE
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
+#endif
+#ifdef BLUETOOTH_HID_HOST_FEATURE	
     NapiBluetoothHidHost::DefineHidHostJSClass(env);
+#endif
+#ifdef BLUETOOTH_PAN_FEATURE	
     NapiBluetoothPan::DefinePanJSClass(env);
+#endif
+#ifdef BLUETOOTH_OPP_FEATURE	
     NapiBluetoothOpp::DefineOppJSClass(env);
+#endif
     DefineSystemBLEInterface(env, exports);
 
     HILOGI("-----Init end------");

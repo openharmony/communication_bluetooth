@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 module_output_path = "bluetooth/framework_test/hid"
 SUBSYSTEM_DIR = "//foundation/communication"
@@ -66,7 +67,7 @@ group("unittest") {
 
   deps = []
 
-  if (is_phone_product) {
+  if (is_phone_product && bluetooth_hid_host_feature) {
     deps += [ ":btfw_hid_unit_test" ]
   }
 }
