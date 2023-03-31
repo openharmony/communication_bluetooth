@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 PART_DIR = "$SUBSYSTEM_DIR/bluetooth/services/bluetooth"
@@ -21,43 +22,7 @@ declare_args() {
   bluetooth_avrcp_avsession = false
 }
 
-ServiceA2dpSnkSrc = [ "src/a2dp_snk/a2dp_snk_service.cpp" ]
-
-ServiceA2dpSrcSrc = [ "src/a2dp_src/a2dp_src_service.cpp" ]
-
 ServiceBleScanFilter = [ "src/ble/ble_scan_filter/src/ble_scan_filter_lsf.cpp" ]
-
-ServiceAvrcpCtSrc = [
-  "src/avrcp_ct/avrcp_ct_connection.cpp",
-  "src/avrcp_ct/avrcp_ct_gap.cpp",
-  "src/avrcp_ct/avrcp_ct_packet.cpp",
-  "src/avrcp_ct/avrcp_ct_pass_through.cpp",
-  "src/avrcp_ct/avrcp_ct_profile.cpp",
-  "src/avrcp_ct/avrcp_ct_sdp.cpp",
-  "src/avrcp_ct/avrcp_ct_service.cpp",
-  "src/avrcp_ct/avrcp_ct_state_machine.cpp",
-  "src/avrcp_ct/avrcp_ct_sub_unit_info.cpp",
-  "src/avrcp_ct/avrcp_ct_unit_info.cpp",
-  "src/avrcp_ct/avrcp_ct_vendor.cpp",
-  "src/avrcp_ct/avrcp_ct_browse.cpp",
-  "src/avrcp_ct/avrcp_ct_notification.cpp",
-]
-
-ServiceAvrcpTgSrc = [
-  "src/avrcp_tg/avrcp_tg_connection.cpp",
-  "src/avrcp_tg/avrcp_tg_gap.cpp",
-  "src/avrcp_tg/avrcp_tg_packet.cpp",
-  "src/avrcp_tg/avrcp_tg_pass_through.cpp",
-  "src/avrcp_tg/avrcp_tg_profile.cpp",
-  "src/avrcp_tg/avrcp_tg_sdp.cpp",
-  "src/avrcp_tg/avrcp_tg_service.cpp",
-  "src/avrcp_tg/avrcp_tg_state_machine.cpp",
-  "src/avrcp_tg/avrcp_tg_sub_unit_info.cpp",
-  "src/avrcp_tg/avrcp_tg_unit_info.cpp",
-  "src/avrcp_tg/avrcp_tg_vendor.cpp",
-  "src/avrcp_tg/avrcp_tg_browse.cpp",
-  "src/avrcp_tg/avrcp_tg_notification.cpp",
-]
 
 ServiceBleSrc = [
   "src/ble/ble_adapter.cpp",
@@ -137,70 +102,6 @@ ServiceGavdpSrc = [
   "src/gavdp/a2dp_shared_buffer.cpp",
 ]
 
-ServiceHfpAgSrc = [
-  "src/hfp_ag/hfp_ag_audio_connection.cpp",
-  "src/hfp_ag/hfp_ag_command_parser.cpp",
-  "src/hfp_ag/hfp_ag_command_processor.cpp",
-  "src/hfp_ag/hfp_ag_data_connection.cpp",
-  "src/hfp_ag/hfp_ag_data_connection_server.cpp",
-  "src/hfp_ag/hfp_ag_gap_client.cpp",
-  "src/hfp_ag/hfp_ag_gap_server.cpp",
-  "src/hfp_ag/hfp_ag_profile.cpp",
-  "src/hfp_ag/hfp_ag_profile_event_sender.cpp",
-  "src/hfp_ag/hfp_ag_rfcomm_connection.cpp",
-  "src/hfp_ag/hfp_ag_rfcomm_connection_server.cpp",
-  "src/hfp_ag/hfp_ag_sdp_client.cpp",
-  "src/hfp_ag/hfp_ag_sdp_server.cpp",
-  "src/hfp_ag/hfp_ag_service.cpp",
-  "src/hfp_ag/hfp_ag_statemachine.cpp",
-  "src/hfp_ag/hfp_ag_system_event_processer.cpp",
-  "src/hfp_ag/hfp_ag_system_interface.cpp",
-]
-
-ServiceHfpHfSrc = [
-  "src/hfp_hf/hfp_hf_audio_connection.cpp",
-  "src/hfp_hf/hfp_hf_call_manager.cpp",
-  "src/hfp_hf/hfp_hf_command_parser.cpp",
-  "src/hfp_hf/hfp_hf_command_processor.cpp",
-  "src/hfp_hf/hfp_hf_data_connection.cpp",
-  "src/hfp_hf/hfp_hf_data_connection_server.cpp",
-  "src/hfp_hf/hfp_hf_gap_client.cpp",
-  "src/hfp_hf/hfp_hf_gap_server.cpp",
-  "src/hfp_hf/hfp_hf_profile.cpp",
-  "src/hfp_hf/hfp_hf_profile_event_sender.cpp",
-  "src/hfp_hf/hfp_hf_rfcomm_connection.cpp",
-  "src/hfp_hf/hfp_hf_rfcomm_connection_server.cpp",
-  "src/hfp_hf/hfp_hf_sdp_client.cpp",
-  "src/hfp_hf/hfp_hf_sdp_server.cpp",
-  "src/hfp_hf/hfp_hf_service.cpp",
-  "src/hfp_hf/hfp_hf_statemachine.cpp",
-]
-
-ServiceMapMceSrc = [
-  "src/map_mce/map_mce_data_analyse.cpp",
-  "src/map_mce/map_mce_device_ctrl.cpp",
-  "src/map_mce/map_mce_instance_client.cpp",
-  "src/map_mce/map_mce_instance_request.cpp",
-  "src/map_mce/map_mce_instance_stm.cpp",
-  "src/map_mce/map_mce_mns_server.cpp",
-  "src/map_mce/map_mce_observer_manager.cpp",
-  "src/map_mce/map_mce_service.cpp",
-  "src/map_mce/map_mce_xml.cpp",
-]
-
-ServiceMapMseSrc = [
-  "src/map_mse/map_mse_bmsg.cpp",
-  "src/map_mse/map_mse_event.cpp",
-  "src/map_mse/map_mse_folder.cpp",
-  "src/map_mse/map_mse_instance.cpp",
-  "src/map_mse/map_mse_mnscli.cpp",
-  "src/map_mse/map_mse_params.cpp",
-  "src/map_mse/map_mse_resource.cpp",
-  "src/map_mse/map_mse_server.cpp",
-  "src/map_mse/map_mse_service.cpp",
-  "src/map_mse/map_mse_vcard.cpp",
-]
-
 ServiceObexSrc = [
   "src/obex/obex_body.cpp",
   "src/obex/obex_client.cpp",
@@ -212,30 +113,6 @@ ServiceObexSrc = [
   "src/obex/obex_socket_transport.cpp",
   "src/obex/obex_transport.cpp",
   "src/obex/obex_utils.cpp",
-]
-
-ServicePbapPceSrc = [
-  "src/pbap_pce/pbap_pce_app_params.cpp",
-  "src/pbap_pce/pbap_pce_base_state.cpp",
-  "src/pbap_pce/pbap_pce_connected_state.cpp",
-  "src/pbap_pce/pbap_pce_connecting_state.cpp",
-  "src/pbap_pce/pbap_pce_disconnected_state.cpp",
-  "src/pbap_pce/pbap_pce_disconnecting_state.cpp",
-  "src/pbap_pce/pbap_pce_gap.cpp",
-  "src/pbap_pce/pbap_pce_obex_client.cpp",
-  "src/pbap_pce/pbap_pce_sdp.cpp",
-  "src/pbap_pce/pbap_pce_service.cpp",
-  "src/pbap_pce/pbap_pce_state_machine.cpp",
-]
-
-ServicePbapPseSrc = [
-  "src/pbap_pse/pbap_pse_gap.cpp",
-  "src/pbap_pse/pbap_pse_obex_server.cpp",
-  "src/pbap_pse/pbap_pse_sdp.cpp",
-  "src/pbap_pse/pbap_pse_service.cpp",
-  "src/pbap_pse/pbap_pse_state_machine.cpp",
-  "src/pbap_pse/pbap_pse_app_params.cpp",
-  "src/pbap_pse/pbap_pse_vcard_manager.cpp",
 ]
 
 ServiceSockSrc = [
@@ -269,39 +146,10 @@ ServiceUtilSrc = [
   "src/util/log_util.cpp",
 ]
 
-ServiceHidHostSrc = [
-  "src/hid_host/hid_host_service.cpp",
-  "src/hid_host/hid_host_sdp_client.cpp",
-  "src/hid_host/hid_host_l2cap_connection.cpp",
-  "src/hid_host/hid_host_statemachine.cpp",
-  "src/hid_host/hid_host_uhid.cpp",
-  "src/hid_host/hid_host_hogp.cpp",
-]
-
 ServicePermissionSrc = [
   "src/permission/auth_center.cpp",
   "src/permission/permission_helper.cpp",
   "src/permission/permission_utils.cpp",
-]
-
-ServicePanSrc = [
-  "src/pan/pan_service.cpp",
-  "src/pan/pan_statemachine.cpp",
-  "src/pan/pan_sdp.cpp",
-  "src/pan/pan_bnep.cpp",
-  "src/pan/pan_network.cpp",
-]
-
-ServiceOppSrc = [
-  "src/opp/opp_obex_client.cpp",
-  "src/opp/opp_obex_server.cpp",
-  "src/opp/opp_sdp_client.cpp",
-  "src/opp/opp_sdp_server.cpp",
-  "src/opp/opp_gap_client.cpp",
-  "src/opp/opp_gap_server.cpp",
-  "src/opp/opp_service.cpp",
-  "src/opp/opp_statemachine.cpp",
-  "src/opp/opp_transfer.cpp",
 ]
 
 config("btservice_public_config") {
@@ -371,29 +219,195 @@ ohos_shared_library("btservice") {
   }
 
   sources = ServiceCommonSrc + ServiceUtilSrc
-  sources += ServiceA2dpSnkSrc
-  sources += ServiceA2dpSrcSrc
-  sources += ServiceAvrcpCtSrc
-  sources += ServiceAvrcpTgSrc
   sources += ServiceBleScanFilter
   sources += ServiceBleSrc
   sources += ServiceClassicSrc
   sources += ServiceGattSrc
   sources += ServiceGavdpSrc
-  sources += ServiceHfpAgSrc
-  sources += ServiceHfpHfSrc
-  sources += ServiceMapMceSrc
-  sources += ServiceMapMseSrc
   sources += ServiceObexSrc
-  sources += ServicePbapPceSrc
-  sources += ServicePbapPseSrc
   sources += ServiceSockSrc
   sources += ServiceTransportSrc
   sources += ServiceDISrc
-  sources += ServiceHidHostSrc
   sources += ServicePermissionSrc
-  sources += ServicePanSrc
-  sources += ServiceOppSrc
+  
+  if (bluetooth_a2dp_sink_feature) {
+    sources += [ "src/a2dp_snk/a2dp_snk_service.cpp" ]
+  }
+  
+  if (bluetooth_a2dp_source_feature) {
+    sources += [ "src/a2dp_src/a2dp_src_service.cpp" ]
+  }
+  
+  if (bluetooth_avrcp_ct_feature) {
+    sources += [
+      "src/avrcp_ct/avrcp_ct_connection.cpp",
+      "src/avrcp_ct/avrcp_ct_gap.cpp",
+      "src/avrcp_ct/avrcp_ct_packet.cpp",
+      "src/avrcp_ct/avrcp_ct_pass_through.cpp",
+      "src/avrcp_ct/avrcp_ct_profile.cpp",
+      "src/avrcp_ct/avrcp_ct_sdp.cpp",
+      "src/avrcp_ct/avrcp_ct_service.cpp",
+      "src/avrcp_ct/avrcp_ct_state_machine.cpp",
+      "src/avrcp_ct/avrcp_ct_sub_unit_info.cpp",
+      "src/avrcp_ct/avrcp_ct_unit_info.cpp",
+      "src/avrcp_ct/avrcp_ct_vendor.cpp",
+      "src/avrcp_ct/avrcp_ct_browse.cpp",
+      "src/avrcp_ct/avrcp_ct_notification.cpp",
+    ]
+  }
+  
+  if (bluetooth_avrcp_tg_feature) {
+    sources += [
+      "src/avrcp_tg/avrcp_tg_connection.cpp",
+      "src/avrcp_tg/avrcp_tg_gap.cpp",
+      "src/avrcp_tg/avrcp_tg_packet.cpp",
+      "src/avrcp_tg/avrcp_tg_pass_through.cpp",
+      "src/avrcp_tg/avrcp_tg_profile.cpp",
+      "src/avrcp_tg/avrcp_tg_sdp.cpp",
+      "src/avrcp_tg/avrcp_tg_service.cpp",
+      "src/avrcp_tg/avrcp_tg_state_machine.cpp",
+      "src/avrcp_tg/avrcp_tg_sub_unit_info.cpp",
+      "src/avrcp_tg/avrcp_tg_unit_info.cpp",
+      "src/avrcp_tg/avrcp_tg_vendor.cpp",
+      "src/avrcp_tg/avrcp_tg_browse.cpp",
+      "src/avrcp_tg/avrcp_tg_notification.cpp",
+    ]
+  }
+  
+  if (bluetooth_hfp_ag_feature) {
+    sources += [
+      "src/hfp_ag/hfp_ag_audio_connection.cpp",
+      "src/hfp_ag/hfp_ag_command_parser.cpp",
+      "src/hfp_ag/hfp_ag_command_processor.cpp",
+      "src/hfp_ag/hfp_ag_data_connection.cpp",
+      "src/hfp_ag/hfp_ag_data_connection_server.cpp",
+      "src/hfp_ag/hfp_ag_gap_client.cpp",
+      "src/hfp_ag/hfp_ag_gap_server.cpp",
+      "src/hfp_ag/hfp_ag_profile.cpp",
+      "src/hfp_ag/hfp_ag_profile_event_sender.cpp",
+      "src/hfp_ag/hfp_ag_rfcomm_connection.cpp",
+      "src/hfp_ag/hfp_ag_rfcomm_connection_server.cpp",
+      "src/hfp_ag/hfp_ag_sdp_client.cpp",
+      "src/hfp_ag/hfp_ag_sdp_server.cpp",
+      "src/hfp_ag/hfp_ag_service.cpp",
+      "src/hfp_ag/hfp_ag_statemachine.cpp",
+      "src/hfp_ag/hfp_ag_system_event_processer.cpp",
+      "src/hfp_ag/hfp_ag_system_interface.cpp",
+    ]
+  }
+  
+  if (bluetooth_hfp_hf_feature) {
+    sources += [
+      "src/hfp_hf/hfp_hf_audio_connection.cpp",
+      "src/hfp_hf/hfp_hf_call_manager.cpp",
+      "src/hfp_hf/hfp_hf_command_parser.cpp",
+      "src/hfp_hf/hfp_hf_command_processor.cpp",
+      "src/hfp_hf/hfp_hf_data_connection.cpp",
+      "src/hfp_hf/hfp_hf_data_connection_server.cpp",
+      "src/hfp_hf/hfp_hf_gap_client.cpp",
+      "src/hfp_hf/hfp_hf_gap_server.cpp",
+      "src/hfp_hf/hfp_hf_profile.cpp",
+      "src/hfp_hf/hfp_hf_profile_event_sender.cpp",
+      "src/hfp_hf/hfp_hf_rfcomm_connection.cpp",
+      "src/hfp_hf/hfp_hf_rfcomm_connection_server.cpp",
+      "src/hfp_hf/hfp_hf_sdp_client.cpp",
+      "src/hfp_hf/hfp_hf_sdp_server.cpp",
+      "src/hfp_hf/hfp_hf_service.cpp",
+      "src/hfp_hf/hfp_hf_statemachine.cpp",
+    ]
+  }
+  
+  if (bluetooth_map_client_feature) {
+    sources += [
+      "src/map_mce/map_mce_data_analyse.cpp",
+      "src/map_mce/map_mce_device_ctrl.cpp",
+      "src/map_mce/map_mce_instance_client.cpp",
+      "src/map_mce/map_mce_instance_request.cpp",
+      "src/map_mce/map_mce_instance_stm.cpp",
+      "src/map_mce/map_mce_mns_server.cpp",
+      "src/map_mce/map_mce_observer_manager.cpp",
+      "src/map_mce/map_mce_service.cpp",
+      "src/map_mce/map_mce_xml.cpp",
+    ]
+  }
+  
+  if (bluetooth_map_server_feature) { 
+    sources += [
+      "src/map_mse/map_mse_bmsg.cpp",
+      "src/map_mse/map_mse_event.cpp",
+      "src/map_mse/map_mse_folder.cpp",
+      "src/map_mse/map_mse_instance.cpp",
+      "src/map_mse/map_mse_mnscli.cpp",
+      "src/map_mse/map_mse_params.cpp",
+      "src/map_mse/map_mse_resource.cpp",
+      "src/map_mse/map_mse_server.cpp",
+      "src/map_mse/map_mse_service.cpp",
+      "src/map_mse/map_mse_vcard.cpp",
+    ]
+  }
+  
+  if (bluetooth_pbap_client_feature) { 
+    sources += [
+      "src/pbap_pce/pbap_pce_app_params.cpp",
+      "src/pbap_pce/pbap_pce_base_state.cpp",
+      "src/pbap_pce/pbap_pce_connected_state.cpp",
+      "src/pbap_pce/pbap_pce_connecting_state.cpp",
+      "src/pbap_pce/pbap_pce_disconnected_state.cpp",
+      "src/pbap_pce/pbap_pce_disconnecting_state.cpp",
+      "src/pbap_pce/pbap_pce_gap.cpp",
+      "src/pbap_pce/pbap_pce_obex_client.cpp",
+      "src/pbap_pce/pbap_pce_sdp.cpp",
+      "src/pbap_pce/pbap_pce_service.cpp",
+      "src/pbap_pce/pbap_pce_state_machine.cpp",
+    ]
+  }
+  
+  if (bluetooth_pbap_server_feature) { 
+    sources += [
+      "src/pbap_pse/pbap_pse_gap.cpp",
+      "src/pbap_pse/pbap_pse_obex_server.cpp",
+      "src/pbap_pse/pbap_pse_sdp.cpp",
+      "src/pbap_pse/pbap_pse_service.cpp",
+      "src/pbap_pse/pbap_pse_state_machine.cpp",
+      "src/pbap_pse/pbap_pse_app_params.cpp",
+      "src/pbap_pse/pbap_pse_vcard_manager.cpp",
+    ]
+  }
+  
+  if (bluetooth_hid_host_feature) { 
+    sources += [
+      "src/hid_host/hid_host_service.cpp",
+      "src/hid_host/hid_host_sdp_client.cpp",
+      "src/hid_host/hid_host_l2cap_connection.cpp",
+      "src/hid_host/hid_host_statemachine.cpp",
+      "src/hid_host/hid_host_uhid.cpp",
+      "src/hid_host/hid_host_hogp.cpp",
+    ]
+  }
+
+  if (bluetooth_pan_feature) {
+    sources += [
+      "src/pan/pan_service.cpp",
+      "src/pan/pan_statemachine.cpp",
+      "src/pan/pan_sdp.cpp",
+      "src/pan/pan_bnep.cpp",
+      "src/pan/pan_network.cpp",
+    ]
+  }
+  
+  if (bluetooth_opp_feature) {
+    sources += [
+      "src/opp/opp_obex_client.cpp",
+      "src/opp/opp_obex_server.cpp",
+      "src/opp/opp_sdp_client.cpp",
+      "src/opp/opp_sdp_server.cpp",
+      "src/opp/opp_gap_client.cpp",
+      "src/opp/opp_gap_server.cpp",
+      "src/opp/opp_service.cpp",
+      "src/opp/opp_statemachine.cpp",
+      "src/opp/opp_transfer.cpp",
+    ]
+  }
 
   deps = [
     "$PART_DIR/external:btdummy",

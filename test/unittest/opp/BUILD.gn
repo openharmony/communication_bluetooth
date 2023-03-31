@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 module_output_path = "bluetooth/framework_test/opp"
 SUBSYSTEM_DIR = "//foundation/communication"
@@ -69,7 +70,7 @@ group("unittest") {
 
   deps = []
 
-  if (is_phone_product) {
+  if (is_phone_product && bluetooth_opp_feature) {
     deps += [ ":btfw_opp_unit_test" ]
   }
 }

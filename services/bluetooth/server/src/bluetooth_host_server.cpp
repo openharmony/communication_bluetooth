@@ -616,17 +616,25 @@ void BluetoothHostServer::impl::createServers()
     sptr<BluetoothGattClientServer> gattclient = new BluetoothGattClientServer();
     servers_[PROFILE_GATT_CLIENT] = gattclient->AsObject();
 
+#ifdef BLUETOOTH_HFP_AG_FEATURE
     sptr<BluetoothHfpAgServer> hfpAg = new BluetoothHfpAgServer();
     servers_[PROFILE_HFP_AG] = hfpAg->AsObject();
+#endif
 
+#ifdef BLUETOOTH_HFP_HF_FEATURE
     sptr<BluetoothHfpHfServer> hfpHf = new BluetoothHfpHfServer();
     servers_[PROFILE_HFP_HF] = hfpHf->AsObject();
+#endif
 
+#ifdef BLUETOOTH_AVRCP_CT_FEATURE
     sptr<BluetoothAvrcpCtServer> avrcpCtServer = new BluetoothAvrcpCtServer();
     servers_[PROFILE_AVRCP_CT] = avrcpCtServer->AsObject();
+#endif
 
+#ifdef BLUETOOTH_AVRCP_TG_FEATURE
     sptr<BluetoothAvrcpTgServer> avrcpTgServer = new BluetoothAvrcpTgServer();
     servers_[PROFILE_AVRCP_TG] = avrcpTgServer->AsObject();
+#endif
 
     sptr<BluetoothBleAdvertiserServer> bleAdvertiser = new BluetoothBleAdvertiserServer();
     bleServers_[BLE_ADVERTISER_SERVER] = bleAdvertiser->AsObject();
@@ -634,32 +642,50 @@ void BluetoothHostServer::impl::createServers()
     sptr<BluetoothBleCentralManagerServer> bleCentralManger = new BluetoothBleCentralManagerServer();
     bleServers_[BLE_CENTRAL_MANAGER_SERVER] = bleCentralManger->AsObject();
 
+#ifdef BLUETOOTH_PBAP_CLIENT_FEATURE
     sptr<BluetoothPbapPceServer> pbapPce = new BluetoothPbapPceServer();
     servers_[PROFILE_PBAP_PCE] = pbapPce->AsObject();
+#endif
 
+#ifdef BLUETOOTH_PBAP_SERVER_FEATURE
     sptr<BluetoothPbapPseServer> pbapPse = new BluetoothPbapPseServer();
     servers_[PROFILE_PBAP_PSE] = pbapPse->AsObject();
+#endif
 
+#ifdef BLUETOOTH_MAP_SERVER_FEATURE
     sptr<BluetoothMapMceServer> mapMce = new BluetoothMapMceServer();
     servers_[PROFILE_MAP_MCE] = mapMce->AsObject();
+#endif
 
+#ifdef BLUETOOTH_MAP_CLIENT_FEATURE
     sptr<BluetoothMapMseServer> mapMse = new BluetoothMapMseServer();
     servers_[PROFILE_MAP_MSE] = mapMse->AsObject();
+#endif
 
+#ifdef BLUETOOTH_A2DP_SRC_FEATURE
     sptr<BluetoothA2dpSourceServer> a2dpSource = new BluetoothA2dpSourceServer();
     servers_[PROFILE_A2DP_SRC] = a2dpSource->AsObject();
+#endif
 
+#ifdef BLUETOOTH_A2DP_SINK_FEATURE
     sptr<BluetoothA2dpSinkServer> a2dpSink = new BluetoothA2dpSinkServer();
     servers_[PROFILE_A2DP_SINK] = a2dpSink->AsObject();
+#endif
 
+#ifdef BLUETOOTH_HID_HOST_FEATURE
     sptr<BluetoothHidHostServer> hidHostServer = new BluetoothHidHostServer();
     servers_[PROFILE_HID_HOST_SERVER] = hidHostServer->AsObject();
+#endif
 
+#ifdef BLUETOOTH_PAN_FEATURE
     sptr<BluetoothPanServer> panServer = new BluetoothPanServer();
     servers_[PROFILE_PAN_SERVER] = panServer->AsObject();
+#endif
 
+#ifdef BLUETOOTH_OPP_FEATURE
     sptr<BluetoothOppServer> oppServer = new BluetoothOppServer();
     servers_[PROFILE_OPP_SERVER] = oppServer->AsObject();
+#endif
 
     HILOGI("servers_ constructed, size is %{public}zu", servers_.size());
 }

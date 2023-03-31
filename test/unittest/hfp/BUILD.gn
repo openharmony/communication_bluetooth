@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 module_output_path = "bluetooth/framework_test/hfp/"
 SUBSYSTEM_DIR = "//foundation/communication"
@@ -118,8 +119,18 @@ group("unittest") {
   if (is_phone_product) {
     deps += [
       ":btfw_hf_call_unit_test",
-      ":btfw_hfp_ag_unit_test",
-      ":btfw_hfp_hf_unit_test",
     ]
+	
+    if (bluetooth_hfp_ag_feature) {
+      deps += [
+        ":btfw_hfp_ag_unit_test",
+      ]
+    }
+    
+    if (bluetooth_hfp_hf_feature) {
+      deps += [
+        ":btfw_hfp_hf_unit_test",
+      ]
+    }
   }
 }
