@@ -98,15 +98,11 @@ group("unittest") {
 
   if (is_phone_product) {
     if (bluetooth_pbap_client_feature) {
-      deps += [
-        ":btfw_pbap_client_test",
-      ]
+      deps += [ ":btfw_pbap_client_test" ]
     }
-	
+
     if (bluetooth_pbap_server_feature) {
-      deps += [
-        ":btfw_pbap_server_test",
-      ]
+      deps += [ ":btfw_pbap_server_test" ]
     }
   }
 }

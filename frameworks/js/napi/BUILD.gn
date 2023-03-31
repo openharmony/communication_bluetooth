@@ -60,109 +60,87 @@ ohos_shared_library("bluetooth") {
   ]
 
   if (bluetooth_a2dp_sink_feature) {
-    defines += [
-      "BLUETOOTH_A2DP_SINK_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_A2DP_SINK_FEATURE" ]
     sources += [
       "src/napi_bluetooth_a2dp_snk.cpp",
       "src/napi_bluetooth_a2dp_snk_observer.cpp",
     ]
   }
-  
+
   if (bluetooth_a2dp_source_feature) {
-    defines += [
-      "BLUETOOTH_A2DP_SRC_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_A2DP_SRC_FEATURE" ]
     sources += [
       "src/napi_bluetooth_a2dp_src.cpp",
       "src/napi_bluetooth_a2dp_src_observer.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_ct_feature) {
-    defines += [
-      "BLUETOOTH_AVRCP_CT_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_AVRCP_CT_FEATURE" ]
     sources += [
       "src/napi_bluetooth_avrcp_ct.cpp",
       "src/napi_bluetooth_avrcp_ct_observer.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_tg_feature) {
-    defines += [
-      "BLUETOOTH_AVRCP_TG_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_AVRCP_TG_FEATURE" ]
     sources += [
       "src/napi_bluetooth_avrcp_tg.cpp",
       "src/napi_bluetooth_avrcp_tg_observer.cpp",
     ]
   }
-  
-  if (bluetooth_hfp_ag_feature){
-    defines += [
-      "BLUETOOTH_HFP_AG_FEATURE"
-    ]
+
+  if (bluetooth_hfp_ag_feature) {
+    defines += [ "BLUETOOTH_HFP_AG_FEATURE" ]
     sources += [
       "src/napi_bluetooth_hfp_ag.cpp",
       "src/napi_bluetooth_hfp_ag_observer.cpp",
     ]
   }
-  
-  if (bluetooth_hfp_hf_feature){
-    defines += [
-      "BLUETOOTH_HFP_HF_FEATURE"
-    ]
+
+  if (bluetooth_hfp_hf_feature) {
+    defines += [ "BLUETOOTH_HFP_HF_FEATURE" ]
     sources += [
       "src/napi_bluetooth_hfp_hf.cpp",
       "src/napi_bluetooth_hfp_hf_observer.cpp",
     ]
   }
-  
-  if (bluetooth_hid_host_feature){
-    defines += [
-      "BLUETOOTH_HID_HOST_FEATURE"
-    ]
+
+  if (bluetooth_hid_host_feature) {
+    defines += [ "BLUETOOTH_HID_HOST_FEATURE" ]
     sources += [
       "src/napi_bluetooth_hid_host.cpp",
       "src/napi_bluetooth_hid_host_observer.cpp",
     ]
   }
-  
-  if (bluetooth_opp_feature){
-    defines += [
-      "BLUETOOTH_OPP_FEATURE"
-    ]
+
+  if (bluetooth_opp_feature) {
+    defines += [ "BLUETOOTH_OPP_FEATURE" ]
     sources += [
       "src/napi_bluetooth_opp.cpp",
       "src/napi_bluetooth_opp_observer.cpp",
     ]
   }
-  
-  if (bluetooth_pan_feature){
-    defines += [
-      "BLUETOOTH_PAN_FEATURE"
-    ]
+
+  if (bluetooth_pan_feature) {
+    defines += [ "BLUETOOTH_PAN_FEATURE" ]
     sources += [
       "src/napi_bluetooth_pan.cpp",
       "src/napi_bluetooth_pan_observer.cpp",
     ]
   }
-  
-  if (bluetooth_pbap_client_feature){
-    defines += [
-      "BLUETOOTH_PBAP_CLIENT_FEATURE"
-    ]
+
+  if (bluetooth_pbap_client_feature) {
+    defines += [ "BLUETOOTH_PBAP_CLIENT_FEATURE" ]
     sources += [
       "src/napi_bluetooth_pbap_pce.cpp",
       "src/napi_bluetooth_pbap_pce_observer.cpp",
     ]
   }
-  
-  if (bluetooth_pbap_server_feature){
-    defines += [
-      "BLUETOOTH_PBAP_SERVER_FEATURE"
-    ]
+
+  if (bluetooth_pbap_server_feature) {
+    defines += [ "BLUETOOTH_PBAP_SERVER_FEATURE" ]
     sources += [
       "src/napi_bluetooth_pbap_pse.cpp",
       "src/napi_bluetooth_pbap_pse_observer.cpp",
@@ -233,109 +211,87 @@ ohos_shared_library("bluetoothmanager") {
   ]
 
   if (bluetooth_a2dp_sink_feature) {
-    defines += [
-      "BLUETOOTH_A2DP_SINK_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_A2DP_SINK_FEATURE" ]
     sources += [
       "src/napi_bluetooth_a2dp_snk.cpp",
       "src/napi_bluetooth_a2dp_snk_observer.cpp",
     ]
   }
-  
+
   if (bluetooth_a2dp_source_feature) {
-    defines += [
-      "BLUETOOTH_A2DP_SRC_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_A2DP_SRC_FEATURE" ]
     sources += [
       "src/napi_bluetooth_a2dp_src.cpp",
       "src/napi_bluetooth_a2dp_src_observer.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_ct_feature) {
-    defines += [
-      "BLUETOOTH_AVRCP_CT_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_AVRCP_CT_FEATURE" ]
     sources += [
       "src/napi_bluetooth_avrcp_ct.cpp",
       "src/napi_bluetooth_avrcp_ct_observer.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_tg_feature) {
-    defines += [
-      "BLUETOOTH_AVRCP_TG_FEATURE"
-    ]
+    defines += [ "BLUETOOTH_AVRCP_TG_FEATURE" ]
     sources += [
       "src/napi_bluetooth_avrcp_tg.cpp",
       "src/napi_bluetooth_avrcp_tg_observer.cpp",
     ]
   }
-  
-  if (bluetooth_hfp_ag_feature){
-    defines += [
-      "BLUETOOTH_HFP_AG_FEATURE"
-    ]
+
+  if (bluetooth_hfp_ag_feature) {
+    defines += [ "BLUETOOTH_HFP_AG_FEATURE" ]
     sources += [
       "src/napi_bluetooth_hfp_ag.cpp",
       "src/napi_bluetooth_hfp_ag_observer.cpp",
     ]
   }
-  
-  if (bluetooth_hfp_hf_feature){
-    defines += [
-      "BLUETOOTH_HFP_HF_FEATURE"
-    ]
+
+  if (bluetooth_hfp_hf_feature) {
+    defines += [ "BLUETOOTH_HFP_HF_FEATURE" ]
     sources += [
       "src/napi_bluetooth_hfp_hf.cpp",
       "src/napi_bluetooth_hfp_hf_observer.cpp",
     ]
   }
-  
-  if (bluetooth_hid_host_feature){
-    defines += [
-      "BLUETOOTH_HID_HOST_FEATURE"
-    ]
+
+  if (bluetooth_hid_host_feature) {
+    defines += [ "BLUETOOTH_HID_HOST_FEATURE" ]
     sources += [
       "src/napi_bluetooth_hid_host.cpp",
       "src/napi_bluetooth_hid_host_observer.cpp",
     ]
   }
-  
-  if (bluetooth_opp_feature){
-    defines += [
-      "BLUETOOTH_OPP_FEATURE"
-    ]
+
+  if (bluetooth_opp_feature) {
+    defines += [ "BLUETOOTH_OPP_FEATURE" ]
     sources += [
       "src/napi_bluetooth_opp.cpp",
       "src/napi_bluetooth_opp_observer.cpp",
     ]
   }
-  
-  if (bluetooth_pan_feature){
-    defines += [
-      "BLUETOOTH_PAN_FEATURE"
-    ]
+
+  if (bluetooth_pan_feature) {
+    defines += [ "BLUETOOTH_PAN_FEATURE" ]
     sources += [
       "src/napi_bluetooth_pan.cpp",
       "src/napi_bluetooth_pan_observer.cpp",
     ]
   }
-  
-  if (bluetooth_pbap_client_feature){
-    defines += [
-      "BLUETOOTH_PBAP_CLIENT_FEATURE"
-    ]
+
+  if (bluetooth_pbap_client_feature) {
+    defines += [ "BLUETOOTH_PBAP_CLIENT_FEATURE" ]
     sources += [
       "src/napi_bluetooth_pbap_pce.cpp",
       "src/napi_bluetooth_pbap_pce_observer.cpp",
     ]
   }
-  
-  if (bluetooth_pbap_server_feature){
-    defines += [
-      "BLUETOOTH_PBAP_SERVER_FEATURE"
-    ]
+
+  if (bluetooth_pbap_server_feature) {
+    defines += [ "BLUETOOTH_PBAP_SERVER_FEATURE" ]
     sources += [
       "src/napi_bluetooth_pbap_pse.cpp",
       "src/napi_bluetooth_pbap_pse_observer.cpp",

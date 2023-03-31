@@ -94,15 +94,11 @@ group("unittest") {
 
   if (is_phone_product) {
     if (bluetooth_a2dp_sink_feature) {
-      deps += [
-        ":btfw_a2dp_snk_unit_test",
-      ]
+      deps += [ ":btfw_a2dp_snk_unit_test" ]
     }
-    
+
     if (bluetooth_a2dp_source_feature) {
-      deps += [
-        ":btfw_a2dp_src_unit_test",
-      ]
+      deps += [ ":btfw_a2dp_src_unit_test" ]
     }
   }
 }
