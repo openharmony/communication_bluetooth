@@ -34,11 +34,19 @@ using namespace std;
 napi_value GetCallbackErrorValue(napi_env env, int errCode)
 {
     HILOGE("errCode: %{public}d", errCode);
-    napi_value result = nullptr;
-    napi_value eCode = nullptr;
-    napi_create_int32(env, errCode, &eCode);
-    napi_create_object(env, &result);
-    napi_set_named_property(env, result, "code", eCode);
+    napi_value result = NapiGetNull(env);
+    napi_value eCode = NapiGetNull(env);
+    if (errCode == BT_SUCCESS) {
+        return result;
+    }
+    NAPI_CALL(env, napi_create_int32(env, errCode, &eCode));
+    NAPI_CALL(env, napi_create_object(env, &result));
+    NAPI_CALL(env, napi_set_named_property(env, result, "code", eCode));
+
+    std::string errMsg = GetNapiErrMsg(env, errCode);
+    napi_value message = nullptr;
+    napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
+    napi_set_named_property(env, result, "message", message);
     return result;
 }
 
