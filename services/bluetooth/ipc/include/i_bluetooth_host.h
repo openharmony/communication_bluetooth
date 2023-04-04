@@ -170,7 +170,7 @@ public:
     virtual bool IsAclConnected(int32_t transport, const std::string &address) = 0;
     virtual bool IsAclEncrypted(int32_t transport, const std::string &address) = 0;
     virtual int32_t GetDeviceClass(const std::string &address, int &cod) = 0;
-    virtual bool SetDevicePin(const std::string &address, const std::string &pin) = 0;
+    virtual int32_t SetDevicePin(const std::string &address, const std::string &pin) = 0;
     virtual int32_t SetDevicePairingConfirmation(int32_t transport, const std::string &address, bool accept) = 0;
     virtual bool SetDevicePasskey(int32_t transport, const std::string &address, int32_t passkey, bool accept) = 0;
     virtual bool PairRequestReply(int32_t transport, const std::string &address, bool accept) = 0;

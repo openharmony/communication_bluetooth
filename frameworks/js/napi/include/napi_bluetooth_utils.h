@@ -219,10 +219,18 @@ struct CallbackPromiseInfo {
     int errorCode = CODE_FAILED;
 };
 
-struct GattGetDeviceNameCallbackInfo {
+struct SetDevicePinCodeCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
     std::string deviceId = "";
+    std::string pinCode = "";
+    CallbackPromiseInfo promise;
+};
+
+struct GattGetDeviceNameCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string deviceName = "";
     CallbackPromiseInfo promise;
 };
 

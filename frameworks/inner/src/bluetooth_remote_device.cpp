@@ -356,17 +356,17 @@ std::vector<ParcelUuid> BluetoothRemoteDevice::GetDeviceUuids() const
     return parcelUuids;
 }
 
-bool BluetoothRemoteDevice::SetDevicePin(const std::string &pin)
+int BluetoothRemoteDevice::SetDevicePin(const std::string &pin)
 {
     HILOGI("enter");
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
     if (hostProxy == nullptr) {
         HILOGE("fails: no proxy");
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
     return hostProxy->SetDevicePin(address_, pin);
 }

@@ -1158,29 +1158,29 @@ int32_t BluetoothHostProxy::GetDeviceClass(const std::string &address, int &cod)
     return exception;
 }
 
-bool BluetoothHostProxy::SetDevicePin(const std::string &address, const std::string &pin)
+int32_t BluetoothHostProxy::SetDevicePin(const std::string &address, const std::string &pin)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::SetDevicePin WriteInterfaceToken error");
-        return false;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(address)) {
         HILOGE("BluetoothHostProxy::SetDevicePin address error");
-        return false;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(pin)) {
         HILOGE("BluetoothHostProxy::SetDevicePin pin error");
-        return false;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(IBluetoothHost::Code::SET_DEVICE_PIN, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetDevicePin done fail, error: %{public}d", error);
-        return false;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return reply.ReadBool();
+    return reply.ReadInt32();
 }
 
 int32_t BluetoothHostProxy::SetDevicePairingConfirmation(int32_t transport, const std::string &address, bool accept)

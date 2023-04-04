@@ -921,25 +921,25 @@ ErrCode BluetoothHostStub::IsBondedFromLocalInner(MessageParcel &data, MessagePa
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostStub::SetDevicePinInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostStub::SetDevicePinInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string address;
     if (!data.ReadString(address)) {
         HILOGE("BluetoothHostStub::SetDevicePin address failed");
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     std::string pin;
     if (!data.ReadString(pin)) {
         HILOGE("BluetoothHostStub::SetDevicePin pin failed");
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    bool result = SetDevicePin(address, pin);
+    int32_t result = SetDevicePin(address, pin);
     bool ret = reply.WriteBool(result);
     if (!ret) {
         HILOGE("BluetoothHostStub: reply writing failed in: %{public}s.", __func__);
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return NO_ERROR;
+    return BT_SUCCESS;
 }
 
 ErrCode BluetoothHostStub::IsAclConnectedInner(MessageParcel &data, MessageParcel &reply)
