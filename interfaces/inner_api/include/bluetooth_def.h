@@ -157,17 +157,6 @@ const int PAIR_PAIRING = 0x02;
 const int PAIR_PAIRED = 0x03;
 
 /**
- * @brief user confirm type during paring process.
- * use to
- * OnPairConfirmed()
- */
-const int PAIR_CONFIRM_TYPE_PIN_CODE = 0x01;
-const int PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY = 0x02;
-const int PAIR_CONFIRM_TYPE_PASSKEY_INPUT = 0x03;
-const int PAIR_CONFIRM_TYPE_NUMERIC = 0x04;
-const int PAIR_CONFIRM_TYPE_CONSENT = 0x05;
-
-/**
  * @brief discoverable mode and connect mode
  * use to
  * GetBtScanMode(), SetBtScanMode()
@@ -213,6 +202,22 @@ const int DEVICE_TYPE_DUAL_MONO = 2;
 constexpr uint8_t GATT_TRANSPORT_TYPE_AUTO = 0x0;
 constexpr uint8_t GATT_TRANSPORT_TYPE_LE = 0x1;
 constexpr uint8_t GATT_TRANSPORT_TYPE_CLASSIC = 0x2;
+
+/**
+ * @brief user confirm type during paring process.
+ * use to
+ * OnPairConfirmed()
+ */
+enum PinType {
+    PIN_TYPE_ENTER_PIN_CODE = 0,      // enter the pin code displayed on the peer device
+    PIN_TYPE_ENTER_PASSKEY = 1,       // enter the passkey displayed on the peer device
+    PIN_TYPE_CONFIRM_PASSKEY = 2,     // confirm the passkey displayed on the local device
+    PIN_TYPE_NO_PASSKEY_CONSENT = 3,  // accept or deny the pairing request
+    PIN_TYPE_NOTIFY_PASSKEY = 4,      // enter the passkey displayed on the local device on the peer device
+    PIN_TYPE_DISPLAY_PIN_CODE = 5,    // enter the pin code displayed on the peer device, used for bluetooth 2.0
+    PIN_TYPE_OOB_CONSENT = 6,         // accept or deny the OOB pairing request, not support now
+    PIN_TYPE_PIN_16_DIGITS = 7,       // enter the 16-digit pin code displayed on the peer device
+};
 
 /** A GATT Attribute Permission.
  *  Define GATT Attribute permissions.

@@ -38,11 +38,12 @@ private:
     bool DealStateChange(const int transport, const int status, BluetoothState &state);
     void DealBredrPairComfirmed(const std::string &addr, const int reqType, const int number);
     void DealBlePairComfirmed(const std::string &addr, const int reqType, const int number);
-    void OnPairConfirmedCallBack(const std::string &addr, const int number);
+    void OnPairConfirmedCallBack(const std::shared_ptr<PairConfirmedCallBackInfo> &PairConfirmInfo);
 
     void UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state);
     void UvQueueWorkOnDiscoveryResult(uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device);
-    void UvQueueWorkOnPairConfirmedCallBack(uv_work_t *work, std::pair<std::string, int> &data);
+    void UvQueueWorkOnPairConfirmedCallBack(uv_work_t *work,
+        const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo);
 
     void EnableBt();
     void DisableBle();
