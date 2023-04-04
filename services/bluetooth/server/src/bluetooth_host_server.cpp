@@ -1442,20 +1442,23 @@ std::vector<bluetooth::Uuid> BluetoothHostServer::GetDeviceUuids(int32_t transpo
     return parcelUuids;
 }
 
-bool BluetoothHostServer::SetDevicePin(const std::string &address, const std::string &pin)
+int32_t BluetoothHostServer::SetDevicePin(const std::string &address, const std::string &pin)
 {
     HILOGI("address: %{public}s, pin: %{public}s", GetEncryptAddr(address).c_str(), pin.c_str());
     if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("false, check permission failed");
-        return false;
+        return BT_ERR_PERMISSION_FAILED;
     }
     if (IsBtEnabled()) {
         RawAddress addr(address);
-        return pimpl->classicService_->SetDevicePin(addr, pin);
+        if (pimpl->classicService_->SetDevicePin(addr, pin)) {
+            return BT_SUCCESS;
+        }
     } else {
         HILOGE("BT current state is not enabled!");
+        return BT_ERR_INVALID_STATE;
     }
-    return false;
+    return BT_ERR_INTERNAL_ERROR;
 }
 
 int32_t BluetoothHostServer::SetDevicePairingConfirmation(int32_t transport, const std::string &address, bool accept)

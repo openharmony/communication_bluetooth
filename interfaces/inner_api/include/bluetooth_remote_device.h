@@ -248,7 +248,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool SetDevicePin(const std::string &pin);
+    int SetDevicePin(const std::string &pin);
 
     /**
      * @brief Set device pairing confirmation.
