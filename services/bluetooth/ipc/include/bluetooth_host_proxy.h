@@ -81,7 +81,7 @@ public:
     bool IsAclConnected(int32_t transport, const std::string &address) override;
     bool IsAclEncrypted(int32_t transport, const std::string &address) override;
     int32_t GetDeviceClass(const std::string &address, int &cod) override;
-    bool SetDevicePin(const std::string &address, const std::string &pin) override;
+    int32_t SetDevicePin(const std::string &address, const std::string &pin) override;
     int32_t SetDevicePairingConfirmation(int32_t transport, const std::string &address, bool accept) override;
     bool SetDevicePasskey(int32_t transport, const std::string &address, int32_t passkey, bool accept) override;
     bool PairRequestReply(int32_t transport, const std::string &address, bool accept) override;

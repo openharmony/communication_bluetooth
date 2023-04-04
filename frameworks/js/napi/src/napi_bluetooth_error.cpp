@@ -43,7 +43,7 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { BtErrCode::BT_ERR_SPP_IO, "SPP IO error." },
 };
 
-static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
+std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
 {
     auto iter = napiErrMsgMap.find(errCode);
     if (iter != napiErrMsgMap.end()) {

@@ -51,6 +51,7 @@ ohos_shared_library("bluetooth") {
     "src/napi_bluetooth_ble.cpp",
     "src/napi_bluetooth_ble_advertise_callback.cpp",
     "src/napi_bluetooth_ble_central_manager_callback.cpp",
+    "src/napi_bluetooth_error.cpp",
     "src/napi_bluetooth_event.cpp",
     "src/napi_bluetooth_gatt_client.cpp",
     "src/napi_bluetooth_gatt_client_callback.cpp",

@@ -2211,8 +2211,7 @@ void ClassicAdapter::SaveRemoteIoCapability(const BtAddr &addr, uint8_t ioCapabi
 
 bool ClassicAdapter::SetDevicePin(const RawAddress &device, const std::string &pinCode) const
 {
-    HILOGI("enter");
-
+    HILOGI("pinCode:%{public}s", pinCode.c_str());
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
     if ((it == devices_.end()) || (it->second->GetPairedStatus() == PAIR_NONE) ||

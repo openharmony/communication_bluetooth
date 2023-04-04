@@ -936,7 +936,7 @@ HWTEST_F(HostTest, Host_ModuleTest_SetDevicePin_00100, TestSize.Level1)
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetDevicePin_00100 start";
 
     BluetoothRemoteDevice device_("00:00:00:00:00:00", BT_TRANSPORT_BREDR);
-    EXPECT_FALSE(device_.SetDevicePin("000000"));
+    EXPECT_FALSE(device_.SetDevicePin("000000") == BT_SUCCESS);
 
     GTEST_LOG_(INFO) << "Host_ModuleTest_SetDevicePin_00100 end";
 }
