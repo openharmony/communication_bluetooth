@@ -130,11 +130,11 @@ public:
             return;
         }
         if (transport == BT_TRANSPORT_BREDR) {
-            if (reqType == PAIR_CONFIRM_TYPE_NUMERIC || reqType == PAIR_CONFIRM_TYPE_CONSENT) {
+            if (reqType == PIN_TYPE_CONFIRM_PASSKEY || reqType == PIN_TYPE_NO_PASSKEY_CONSENT) {
                 g_GapCallback->pairConfiremedCallback(&remoteAddr, OHOS_BT_TRANSPORT_BR_EDR, reqType, number);
             }
         } else if (transport == BT_TRANSPORT_BLE) {
-            if (reqType == PAIR_CONFIRM_TYPE_NUMERIC) {
+            if (reqType == PIN_TYPE_CONFIRM_PASSKEY) {
                 g_GapCallback->pairConfiremedCallback(&remoteAddr, OHOS_BT_TRANSPORT_LE, reqType, number);
             }
         } else {
