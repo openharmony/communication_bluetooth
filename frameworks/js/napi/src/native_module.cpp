@@ -80,7 +80,7 @@ static napi_module bluetoothModule = {.nm_version = 1,
     .nm_filename = NULL,
     .nm_register_func = Init,
 #ifdef ENABLE_NAPI_BLUETOOTH_MANAGER
-    .nm_modname = "bluetoothMananger",
+    .nm_modname = "bluetoothManager",
 #else
     .nm_modname = "bluetooth",
 #endif
