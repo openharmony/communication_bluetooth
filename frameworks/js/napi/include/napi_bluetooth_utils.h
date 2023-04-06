@@ -251,6 +251,18 @@ struct BluetoothCallbackInfo {
     int info_;
 };
 
+struct PairConfirmedCallBackInfo {
+    int number;
+    int pinType;
+    std::string deviceAddr;
+
+    PairConfirmedCallBackInfo(int number, int pinType, std::string deviceAddr)
+    {
+        this->number = number;
+        this->pinType = pinType;
+        this->deviceAddr = deviceAddr;
+    }
+};
 struct GattCharacteristicCallbackInfo : public BluetoothCallbackInfo {
     GattCharacteristic characteristic_ = {UUID::FromString("0"), 0, 0};
 };
