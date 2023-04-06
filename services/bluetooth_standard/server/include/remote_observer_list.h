@@ -145,7 +145,7 @@ bool RemoteObserverList<T>::UnregisterInternal(typename ObserverMap::iterator it
     observers_.erase(iter);
 
     if (!dr->GetObserver()->AsObject()->RemoveDeathRecipient(dr)) {
-        HILOGE("Failed to unlink death recipient from binder");
+        HILOGE("Failed to unlink death recipient");
         return false;
     }
 
