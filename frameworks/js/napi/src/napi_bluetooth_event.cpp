@@ -36,13 +36,6 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         asyncEvent = nullptr;
         return;
     }
-    
-    napi_value callback = nullptr;
-    napi_status status = napi_get_reference_value(asyncEvent->env_, asyncEvent->callback_, &callback);
-    if (status != napi_ok || callback == nullptr) {
-        HILOGI("reference_value is null.");
-        return;
-    }
     uint32_t refCount = INVALID_REF_COUNT;
     napi_reference_ref(asyncEvent->env_, asyncEvent->callback_, &refCount);
     HILOGI("increments the reference count, refCount: %{public}d", refCount);
