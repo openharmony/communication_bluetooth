@@ -199,7 +199,7 @@ int BTM_Initialize()
     return result;
 }
 
-int BTM_Close()
+NO_SANITIZE("cfi") int BTM_Close()
 {
     LOG_DEBUG("%{public}s start", __FUNCTION__);
 
