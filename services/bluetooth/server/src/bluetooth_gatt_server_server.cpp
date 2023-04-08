@@ -226,7 +226,9 @@ BluetoothGattServerServer::impl::GattServerCallbackImpl::GattServerCallbackImpl(
     const sptr<IBluetoothGattServerCallback> &callback, BluetoothGattServerServer &owner)
     : callback_(callback), deathRecipient_(new GattServerCallbackDeathRecipient(callback, owner))
 {
-    if (!callback_->AsObject()->AddDeathRecipient(deathRecipient_)) {
+    if (callback_ != nullptr &&
+        callback_->AsObject() != nullptr &&
+        !callback_->AsObject()->AddDeathRecipient(deathRecipient_)) {
         HILOGE("Failed to link death recipient to callback");
     }
     tokenId_ = IPCSkeleton::GetCallingTokenID();
