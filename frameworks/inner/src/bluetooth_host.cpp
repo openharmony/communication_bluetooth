@@ -399,8 +399,6 @@ void BluetoothHost::impl::GetHostProxy()
     }
 }
 
-BluetoothHost BluetoothHost::hostAdapter_;
-
 BluetoothHost::BluetoothHost()
 {
     pimpl = std::make_unique<impl>();
@@ -414,7 +412,9 @@ BluetoothHost::~BluetoothHost()
 
 BluetoothHost &BluetoothHost::GetDefaultHost()
 {
-    return hostAdapter_;
+    // C++11 static local variable initialization is thread-safe
+    static BluetoothHost hostAdapter;
+    return hostAdapter;
 }
 
 void BluetoothHost::RegisterObserver(BluetoothHostObserver &observer)
