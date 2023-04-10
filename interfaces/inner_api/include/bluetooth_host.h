@@ -610,7 +610,6 @@ public:
     int GetBleMaxAdvertisingDataLength() const;
 
 private:
-    static BluetoothHost hostAdapter_;
 
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
