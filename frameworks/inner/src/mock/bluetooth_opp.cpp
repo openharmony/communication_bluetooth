@@ -158,158 +158,58 @@ struct Opp::impl {
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         std::vector<BluetoothRemoteDevice> remoteDevices;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            std::vector<BluetoothRawAddress> rawDevices;
-            std::vector<int32_t> tmpStates;
-            for (int state : states) {
-                tmpStates.push_back((int32_t)state);
-            }
-
-            proxy_->GetDevicesByStates(tmpStates, rawDevices);
-            for (BluetoothRawAddress rawDevice : rawDevices) {
-                BluetoothRemoteDevice remoteDevice(rawDevice.GetAddress(), 0);
-                remoteDevices.push_back(remoteDevice);
-            }
-        }
         return remoteDevices;
     }
 
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
-            int state;
-            proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
-            return state;
-        }
         return (int)BTConnectState::DISCONNECTED;
     }
 
     bool SendFile(std::string device, std::vector<std::string>filePaths, std::vector<std::string>mimeTypes)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            bool isOk;
-            proxy_->SendFile(device, filePaths, mimeTypes, isOk);
-            return isOk;
-        }
-        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
         return false;
     }
 
     bool SetIncomingFileConfirmation(bool accept)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            bool isOk;
-            proxy_->SetIncomingFileConfirmation(accept, isOk);
-            return isOk;
-        }
-        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
         return false;
     }
 
     BluetoothOppTransferInformation GetCurrentTransferInformation()
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        BluetoothIOppTransferInformation oppInformation;
         BluetoothOppTransferInformation transferInformation;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            proxy_->GetCurrentTransferInformation(oppInformation);
-            transferInformation.SetId(oppInformation.GetId());
-            transferInformation.SetFileName(oppInformation.GetFileName());
-            transferInformation.SetFilePath(oppInformation.GetFilePath());
-            transferInformation.SetMimeType(oppInformation.GetFileType());
-            transferInformation.SetDeviceName(oppInformation.GetDeviceName());
-            transferInformation.SetDeviceAddress(oppInformation.GetDeviceAddress());
-            transferInformation.SetFailedReason(oppInformation.GetFailedReason());
-            transferInformation.SetStatus(oppInformation.GetStatus());
-            transferInformation.SetDirection(oppInformation.GetDirection());
-            transferInformation.SetTimeStamp(oppInformation.GetTimeStamp());
-            transferInformation.SetCurrentBytes(oppInformation.GetCurrentBytes());
-            transferInformation.SetTotalBytes(oppInformation.GetTotalBytes());
-        }
         return transferInformation;
     }
 
     bool CancelTransfer()
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            bool isOk;
-            proxy_->CancelTransfer(isOk);
-            return isOk;
-        }
-        HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
         return false;
     }
 
     void RegisterObserver(std::shared_ptr<OppObserver> observer)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        observers_.Register(observer);
+        return;
     }
 
     void DeregisterObserver(std::shared_ptr<OppObserver> observer)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        observers_.Deregister(observer);
+        return;
     }
 
 private:
     BluetoothObserverList<OppObserver> observers_;
     sptr<IBluetoothOpp> proxy_;
-    class OppDeathRecipient;
-    sptr<OppDeathRecipient> deathRecipient_;
-};
-
-class Opp::impl::OppDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    OppDeathRecipient(Opp::impl &impl) : impl_(impl)
-    {};
-    ~OppDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(OppDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("Opp::impl::OppDeathRecipient::OnRemoteDied starts");
-        impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
-        impl_.proxy_ = nullptr;
-    }
-
-private:
-    Opp::impl &impl_;
 };
 
 Opp::impl::impl()
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGE("Opp::impl:impl() failed: no hostRemote");
-        return;
-    }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_OPP_SERVER);
-
-    if (!remote) {
-        HILOGE("Opp::impl:impl() failed: no remote");
-        return;
-    }
-    HILOGI("Opp::impl:impl() remote obtained");
-	
-    proxy_ = iface_cast<IBluetoothOpp>(remote);
-    deathRecipient_ = new OppDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    return;
 }
 
 Opp::impl::~impl()
-{
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-}
+{}
 
 Opp::Opp()
 {

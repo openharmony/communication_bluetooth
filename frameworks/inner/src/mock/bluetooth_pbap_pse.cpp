@@ -32,63 +32,30 @@
 namespace OHOS {
 namespace Bluetooth {
 struct PbapServer::impl {
-    sptr<IBluetoothPbapPse> proxy_;
-    class BluetoothPbapPseDeathRecipient;
-    sptr<BluetoothPbapPseDeathRecipient> deathRecipient_ = nullptr;
     impl();
 
     ~impl()
-    {
-        if (proxy_ != nullptr) {
-            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-        }
-    }
+    {}
 
     void RegisterObserver(std::shared_ptr<PbapObserver> &observer)
     {
-        HILOGI("enter");
-        if (observer) {
-            observers_.Register(observer);
-        }
+        return;
     }
 
     void DeregisterObserver(std::shared_ptr<PbapObserver> &observer)
     {
-        HILOGI("enter");
-        if (observer) {
-            observers_.Deregister(observer);
-        }
+        return;
     }
 
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            return static_cast<int>(BTConnectState::DISCONNECTED);
-        }
-        int32_t state = static_cast<int>(BTConnectState::DISCONNECTED);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            state = proxy_->GetDeviceState(bluetooth::RawAddress(device.GetDeviceAddr()));
-        }
-        return (int)state;
+        return static_cast<int>(BTConnectState::DISCONNECTED);
     }
 
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(const std::vector<int> &states)
     {
         HILOGI("enter");
         std::vector<BluetoothRemoteDevice> remoteDevices;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            std::vector<int32_t> tmpStates;
-            for (int state : states) {
-                tmpStates.push_back((int32_t)state);
-            }
-            std::vector<BluetoothRawAddress> rawDevices;
-            proxy_->GetDevicesByStates(tmpStates, rawDevices);
-            for (BluetoothRawAddress rawDevice : rawDevices) {
-                BluetoothRemoteDevice remoteDevice(rawDevice.GetAddress(), 0);
-                remoteDevices.push_back(remoteDevice);
-            }
-        }
         return remoteDevices;
     }
 
@@ -101,64 +68,26 @@ struct PbapServer::impl {
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            return false;
-        }
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            int32_t ret = proxy_->Disconnect(bluetooth::RawAddress(device.GetDeviceAddr()));
-            return ret == RET_NO_ERROR;
-        }
         return false;
     }
 
     bool SetConnectionStrategy(const BluetoothRemoteDevice &device, int strategy)
     {
-        HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            return false;
-        }
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            int32_t ret = proxy_->SetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()), strategy);
-            return ret == RET_NO_ERROR;
-        }
         return false;
     }
 
     int GetConnectionStrategy(const BluetoothRemoteDevice &device) const
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            return static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
-        }
-        int32_t ret = static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            ret = proxy_->GetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()));
-        }
-        return (int)ret;
+        return static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
     }
 
     void GrantPermission(const BluetoothRemoteDevice &device, bool allow, bool save)
     {
-        HILOGI("enter, device: %{public}s, allow: %{public}d, save: %{public}d", GET_ENCRYPT_ADDR(device), allow, save);
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            return;
-        }
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            proxy_->GrantPermission(bluetooth::RawAddress(device.GetDeviceAddr()), allow, save);
-        }
+        return;
     }
     int SetDevicePassword(const BluetoothRemoteDevice &device, const std::string &password, std::string userId)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (!device.IsValidBluetoothRemoteDevice()) {
-            return RET_BAD_PARAM;
-        }
-        int32_t ret = RET_NO_SUPPORT;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            ret = proxy_->SetDevicePassword(bluetooth::RawAddress(device.GetDeviceAddr()), password, userId);
-        }
-        return (int)ret;
+        return (int)RET_NO_SUPPORT;
     }
 
 private:
@@ -166,47 +95,9 @@ private:
     BluetoothObserverList<PbapObserver> observers_;
 };
 
-class PbapServer::impl::BluetoothPbapPseDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    BluetoothPbapPseDeathRecipient(PbapServer::impl &pbapPse) : pbapPse_(pbapPse) {};
-    ~BluetoothPbapPseDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothPbapPseDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("starts");
-        pbapPse_.proxy_->AsObject()->RemoveDeathRecipient(pbapPse_.deathRecipient_);
-        pbapPse_.proxy_ = nullptr;
-    }
-
-private:
-    PbapServer::impl &pbapPse_;
-};
-
 PbapServer::impl::impl()
 {
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGI("failed: no hostRemote");
-        return;
-    }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_PBAP_PSE);
-
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return;
-    }
-    HILOGI("remote obtained");
-
-    proxy_ = iface_cast<IBluetoothPbapPse>(remote);
-    if (proxy_ == nullptr) {
-        return;
-    }
-    deathRecipient_ = new BluetoothPbapPseDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    return;
 }
 
 PbapServer *PbapServer::GetProfile()

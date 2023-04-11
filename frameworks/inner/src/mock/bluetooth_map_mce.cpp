@@ -42,62 +42,16 @@ struct MapClient::impl {
     impl();
     ~impl()
     {
-        if (proxy_ != nullptr) {
-            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-        }
+        return;
     }
     sptr<IBluetoothMapMce> proxy_;
-    class BluetoothMapMceDeathRecipient;
-    sptr<BluetoothMapMceDeathRecipient> deathRecipient_ = nullptr;
     std::mutex mutex_;
     BluetoothObserverList<MapClientObserver> mapClientObserverList_;
-    IProfileMapVcard ConvertVcardToProfileFormat(MapVcard frameworkVcard);
-    void ConvertEnvelopeToProfileFormat(
-        IProfileSendMessageParameters &iProfileMsg, const MapSendMessageParameters &msg);
-};
-
-class MapClient::impl::BluetoothMapMceDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    BluetoothMapMceDeathRecipient(MapClient::impl &MapMce) : MapMce_(MapMce) {};
-    ~BluetoothMapMceDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothMapMceDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("starts");
-        MapMce_.proxy_->AsObject()->RemoveDeathRecipient(MapMce_.deathRecipient_);
-        MapMce_.proxy_ = nullptr;
-    }
-
-private:
-    MapClient::impl &MapMce_;
 };
 
 MapClient::impl::impl()
 {
-    HILOGI("starts");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGE("failed: no hostRemote");
-        return;
-    }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_MAP_MCE);
-
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return;
-    }
-    HILOGI("remote obtained");
-
-    proxy_ = iface_cast<IBluetoothMapMce>(remote);
-    if (proxy_ == nullptr) {
-        return;
-    }
-    deathRecipient_ = new BluetoothMapMceDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    return;
 }
 
 MapClient *MapClient::GetProfile()
@@ -118,82 +72,33 @@ MapClient::~MapClient()
 
 void MapClient::RegisterObserver(MapClientObserver &observer)
 {
-    HILOGI("enter");
-    std::shared_ptr<MapClientObserver> pointer(&observer, [](MapClientObserver *) {});
-    pimpl->mapClientObserverList_.Register(pointer);
+    return;
 }
 
 void MapClient::DeregisterObserver(MapClientObserver &observer)
 {
-    HILOGI("enter");
-    std::shared_ptr<MapClientObserver> pointer(&observer, [](MapClientObserver *) {});
-    pimpl->mapClientObserverList_.Deregister(pointer);
+    return;
 }
 
 bool MapClient::Connect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int retInt = RET_BAD_PARAM;
-    bool ret = false;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    BluetoothRawAddress rawAddress(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        retInt = pimpl->proxy_->Connect(rawAddress);
-        if (retInt == RET_NO_ERROR) {
-            ret = true;
-        }
-    }
-    return ret;
+    return false;
 }
 
 bool MapClient::Disconnect(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int retInt = RET_BAD_PARAM;
-    bool ret = false;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    BluetoothRawAddress rawAddress(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        retInt = pimpl->proxy_->Disconnect(rawAddress);
-        if (retInt == RET_NO_ERROR) {
-            ret = true;
-        }
-    }
-    return ret;
+    return false;
 }
 
 bool MapClient::IsConnected(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int retInt = 0;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return false;
-    }
-    BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        retInt = pimpl->proxy_->IsConnected(rawDevice);
-    }
-    return (bool)retInt;
+    return false;
 }
 
 std::vector<BluetoothRemoteDevice> MapClient::GetConnectedDevices() const
 {
     HILOGI("enter");
     std::vector<BluetoothRemoteDevice> btDeviceList;
-    std::vector<BluetoothRawAddress> btDevice;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetConnectDevices(btDevice);
-        for (auto it = btDevice.begin(); it != btDevice.end(); it++) {
-            btDeviceList.push_back(BluetoothRemoteDevice(it->GetAddress(), 0));
-        }
-    }
     return btDeviceList;
 }
 
@@ -201,393 +106,86 @@ std::vector<BluetoothRemoteDevice> MapClient::GetDevicesByStates(const std::vect
 {
     HILOGI("enter");
     std::vector<BluetoothRemoteDevice> btDeviceList;
-    std::vector<BluetoothRawAddress> btDevice;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        pimpl->proxy_->GetDevicesByStates(statesList, btDevice);
-        for (auto it = btDevice.begin(); it != btDevice.end(); it++) {
-            btDeviceList.push_back(BluetoothRemoteDevice(it->GetAddress(), 0));
-        }
-    }
     return btDeviceList;
 }
 
 int MapClient::GetConnectionState(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int retState = (int)BTConnectState::DISCONNECTED;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return retState;
-    }
-    BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        retState = pimpl->proxy_->GetConnectionState(rawDevice);
-    }
-    return retState;
+    return (int)BTConnectState::DISCONNECTED;
 }
 
 bool MapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, const int strategy)
 {
-    HILOGI("enter, device: %{public}s, device: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
-    int retInt = RET_BAD_PARAM;
-    bool ret = false;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        retInt = pimpl->proxy_->SetConnectionStrategy(rawDevice, strategy);
-        if (retInt == RET_NO_ERROR) {
-            ret = true;
-        }
-    }
-    return ret;
+    return false;
 }
 
 int MapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = (int)BTStrategyType::CONNECTION_FORBIDDEN;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = (int)BTStrategyType::CONNECTION_FORBIDDEN;
-    BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        ret = pimpl->proxy_->GetConnectionStrategy(rawDevice);
-    }
-    return ret;
+    return (int)BTStrategyType::CONNECTION_FORBIDDEN;
 }
 
 int MapClient::GetUnreadMessages(const BluetoothRemoteDevice &device, MapMessageType type, uint8_t max)
 {
-    HILOGI("enter, device: %{public}s, max: %{public}d", GET_ENCRYPT_ADDR(device), max);
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        ret = pimpl->proxy_->GetUnreadMessages(rawDevice, (int)type, max);
-    }
-    return ret;
+    return RET_BAD_STATUS;
 }
 
 int MapClient::GetSupportedFeatures(const BluetoothRemoteDevice &device) const
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = RET_BAD_STATUS;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        ret = pimpl->proxy_->GetSupportedFeatures(rawDevice);
-    }
-    return ret;
-}
-
-
-IProfileMapVcard MapClient::impl::ConvertVcardToProfileFormat(MapVcard frameVcard)
-{
-    HILOGI("enter");
-    IProfileMapVcard serviceVcard;
-    serviceVcard.VERSION = frameVcard.VERSION;    // shall be included
-    serviceVcard.N = frameVcard.N;                // shall be included
-    serviceVcard.TEL = frameVcard.TEL;            // may be used
-    serviceVcard.EMAIL = frameVcard.EMAIL;        // may be used
-    serviceVcard.X_BT_UID = frameVcard.X_BT_UID;  // bmsg V1.1
-    serviceVcard.X_BT_UCI = frameVcard.X_BT_UCI;  // bmsg V1.1
-    serviceVcard.FN = frameVcard.FN;              // vcard 3.0 , shall be included
-    return serviceVcard;
-}
-
-void MapClient::impl::ConvertEnvelopeToProfileFormat(
-    IProfileSendMessageParameters &iProfileMsg, const MapSendMessageParameters &msg)
-{
-    HILOGI("enter");
-    MapVcard frameVcard;
-    IProfileMapVcard serviceVcard;
-    if (msg.message.originator_.size() == 1) {
-        auto itVcard = msg.message.originator_.begin();
-        frameVcard = *itVcard;
-        serviceVcard = ConvertVcardToProfileFormat(frameVcard);
-        iProfileMsg.bmessage_.originator_.push_back(serviceVcard);
-    }
-    for (auto it = msg.message.envelope_.recipientLevel1_.begin(); it != msg.message.envelope_.recipientLevel1_.end();
-        it++) {
-        frameVcard = *it;
-        serviceVcard = ConvertVcardToProfileFormat(frameVcard);
-        iProfileMsg.bmessage_.envelope_.recipientLevel1_.push_back(serviceVcard);
-    }
-    for (auto it2 = msg.message.envelope_.recipientLevel2_.begin();
-        it2 != msg.message.envelope_.recipientLevel2_.end();
-        it2++) {
-        frameVcard = *it2;
-        serviceVcard = ConvertVcardToProfileFormat(frameVcard);
-        iProfileMsg.bmessage_.envelope_.recipientLevel2_.push_back(serviceVcard);
-    }
-    for (auto it3 = msg.message.envelope_.recipientLevel3_.begin();
-        it3 != msg.message.envelope_.recipientLevel3_.end();
-        it3++) {
-        frameVcard = *it3;
-        serviceVcard = ConvertVcardToProfileFormat(frameVcard);
-        iProfileMsg.bmessage_.envelope_.recipientLevel3_.push_back(serviceVcard);
-    }
-
-    iProfileMsg.bmessage_.envelope_.maxLevelOfEnvelope_ = msg.message.envelope_.maxLevelOfEnvelope_;
-    iProfileMsg.bmessage_.envelope_.msgBody_.bodyPartID = msg.message.envelope_.msgBody_.bodyPartID;
-    iProfileMsg.bmessage_.envelope_.msgBody_.body_encoding = msg.message.envelope_.msgBody_.body_encoding;
-    iProfileMsg.bmessage_.envelope_.msgBody_.body_charset = msg.message.envelope_.msgBody_.body_charset;
-    iProfileMsg.bmessage_.envelope_.msgBody_.body_language = msg.message.envelope_.msgBody_.body_language;
-    iProfileMsg.bmessage_.envelope_.msgBody_.body_content = msg.message.envelope_.msgBody_.body_content;
-    iProfileMsg.bmessage_.envelope_.msgBody_.body_content_length = msg.message.envelope_.msgBody_.body_content_length;
+    return RET_BAD_STATUS;
 }
 
 int MapClient::SendMessage(const BluetoothRemoteDevice &device, const MapSendMessageParameters &msg)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = RET_BAD_STATUS;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return RET_BAD_PARAM;
-    }
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothIProfileSendMessageParameters iProfileMsg;
-        iProfileMsg.Charset = (bluetooth::MapCharsetType)msg.Charset;
-        iProfileMsg.ConversationID = msg.ConversationID;
-        iProfileMsg.MessageHandle = msg.MessageHandle;
-        iProfileMsg.Attachment = (bluetooth::MapAttachmentType)msg.Attachment;
-        iProfileMsg.ModifyText = (bluetooth::MapModifyTextType)msg.ModifyText;
-        iProfileMsg.Retry = (bluetooth::MapOnOffType)msg.Retry;
-        iProfileMsg.Transparent = (bluetooth::MapOnOffType)msg.Transparent;
-        iProfileMsg.bmessage_.version_property = msg.message.version_property;
-        iProfileMsg.bmessage_.readstatus_property = (bluetooth::MapMessageStatus)msg.message.readstatus_property;
-        iProfileMsg.bmessage_.type_property = (bluetooth::MapMessageType)msg.message.type_property;
-        iProfileMsg.bmessage_.folder_property = msg.message.folder_property;
-        iProfileMsg.bmessage_.extendeddata_property = msg.message.extendeddata_property;
-
-        pimpl->ConvertEnvelopeToProfileFormat(iProfileMsg, msg);
-
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        ret = pimpl->proxy_->SendMessage(rawDevice, iProfileMsg);
-    }
-    return ret;
+    return RET_BAD_STATUS;
 }
 
 int MapClient::SetNotificationFilter(const BluetoothRemoteDevice &device, const int mask)
 {
-    HILOGI("enter, device: %{public}s, mask: %{public}d", GET_ENCRYPT_ADDR(device), mask);
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        ret = pimpl->proxy_->SetNotificationFilter(rawDevice, mask);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 int MapClient::GetMessagesListing(const BluetoothRemoteDevice &device, const GetMessagesListingParameters &para) const
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        BluetoothIProfileGetMessagesListingParameters servicePara;
-        servicePara.folder = para.folder;
-        servicePara.MaxListCount = para.MaxListCount;
-        servicePara.ListStartOffset = para.ListStartOffset;
-        servicePara.SubjectLength = para.SubjectLength;
-        servicePara.ParameterMask = para.ParameterMask;
-        servicePara.FilterMessageType = para.FilterMessageType;
-        servicePara.FilterPeriodBegin = para.FilterPeriodBegin;
-        servicePara.FilterPeriodEnd = para.FilterPeriodEnd;
-        servicePara.FilterReadStatus = para.FilterReadStatus;
-        servicePara.FilterRecipient = para.FilterRecipient;
-        servicePara.FilterOriginator = para.FilterOriginator;
-        servicePara.FilterPriority = para.FilterPriority;
-        servicePara.ConversationID = para.ConversationID;
-        servicePara.FilterMessageHandle = para.FilterMessageHandle;
-        ret = pimpl->proxy_->GetMessagesListing(rawDevice, servicePara);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 int MapClient::GetMessage(const BluetoothRemoteDevice &device, MapMessageType type, const std::u16string &msgHandle,
     const GetMessageParameters &para) const
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    std::string u8Str;
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        BluetoothIProfileGetMessageParameters servicePara;
-        servicePara.Attachment = (bluetooth::MapAttachmentType)para.Attachment;
-        servicePara.Charset = (bluetooth::MapCharsetType)para.Charset;
-        servicePara.FractionRequest = (bluetooth::MapFractionRequestType)para.FractionRequest;
-
-        ret = pimpl->proxy_->GetMessage(
-            rawDevice, (int)type, msgHandle, servicePara);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 int MapClient::UpdateInbox(const BluetoothRemoteDevice &device, MapMessageType type)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        ret = pimpl->proxy_->UpdateInbox(rawDevice, (int)type);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 int MapClient::GetConversationListing(
     const BluetoothRemoteDevice &device, const GetConversationListingParameters &para) const
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        BluetoothIProfileGetConversationListingParameters servicePara;
-        servicePara.MaxListCount = para.MaxListCount;
-        servicePara.ListStartOffset = para.ListStartOffset;
-        servicePara.FilterReadStatus = para.FilterReadStatus;
-        servicePara.FilterRecipient = para.FilterRecipient;
-        servicePara.ConversationID = para.ConversationID;
-        servicePara.FilterLastActivityBegin = para.FilterLastActivityBegin;
-        servicePara.FilterLastActivityEnd = para.FilterLastActivityEnd;
-        servicePara.ConvParameterMask = para.ConvParameterMask;
-
-        ret = pimpl->proxy_->GetConversationListing(rawDevice, servicePara);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 int MapClient::SetMessageStatus(
     const BluetoothRemoteDevice &device, MapMessageType type, const MapSetMessageStatus &msgStatus)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-
-        ret = pimpl->proxy_->SetMessageStatus(rawDevice,
-            (int)type,
-            msgStatus.msgHandle,
-            (int)msgStatus.statusIndicator,
-            (int)msgStatus.statusValue,
-            msgStatus.extendedData);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 int MapClient::SetOwnerStatus(const BluetoothRemoteDevice &device, const SetOwnerStatusParameters &para)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothIProfileSetOwnerStatusParameters servicePara;
-        servicePara.ConversationID = para.conversationId_;
-        servicePara.ownerStatus_.PresenceAvailability = para.ownerStatus_.PresenceAvailability;
-        servicePara.ownerStatus_.PresenceText = para.ownerStatus_.PresenceText;  // utf8
-        servicePara.ownerStatus_.LastActivity = para.ownerStatus_.LastActivity;  // utf8
-        servicePara.ownerStatus_.ChatState = para.ownerStatus_.ChatState;
-
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-
-        ret = pimpl->proxy_->SetOwnerStatus(rawDevice, servicePara);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 int MapClient::GetOwnerStatus(const BluetoothRemoteDevice &device, const std::string &conversationId) const
 {
-    HILOGI("enter, device: %{public}s, conversationId: %{public}s", GET_ENCRYPT_ADDR(device), conversationId.c_str());
-    int ret = RET_BAD_PARAM;
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return ret;
-    }
-    ret = RET_BAD_STATUS;
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        ret = pimpl->proxy_->GetOwnerStatus(rawDevice, conversationId);
-    }
-    return ret;
+    return RET_BAD_PARAM;
 }
 
 MapMasInstanceInfoList MapClient::GetMasInstanceInfo(const BluetoothRemoteDevice &device) const
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     MapMasInstanceInfoList frameworkMasInfoList;
-    frameworkMasInfoList.isValid = false;
-    BluetoothIProfileMasInstanceInfoList infoList;
-    std::vector<MapMasInstanceInfo> instanceinfoList;
-
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("BluetoothRemoteDevice error");
-        return frameworkMasInfoList;
-    }
-    // process
-    if ((pimpl->proxy_ != nullptr) && IS_BT_ENABLED()) {
-        BluetoothRawAddress rawDevice(device.GetDeviceAddr());
-        infoList = pimpl->proxy_->GetMasInstanceInfo(rawDevice);
-
-        HILOGI("Test!");
-        if (infoList.isValid == true) {
-            MapMasInstanceInfo info;
-            frameworkMasInfoList.isValid = true;
-            for (auto it = infoList.masInfoList.begin(); it != infoList.masInfoList.end(); it++) {
-                info.OwnerUCI = it->OwnerUCI;
-                info.MASInstanceInformation = it->MASInstanceInformation;
-                info.supportedMsgTypes_ = it->supportedMsgTypes_;
-                info.instanceId = it->instanceId;
-                frameworkMasInfoList.masInfoList.push_back(info);
-            }
-        }
-    }
     return frameworkMasInfoList;
 }
 }  // namespace Bluetooth
