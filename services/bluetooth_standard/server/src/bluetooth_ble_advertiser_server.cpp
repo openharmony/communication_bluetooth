@@ -206,8 +206,7 @@ void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBlu
     HILOGI("BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback");
 
     if (callback == nullptr) {
-        HILOGE("BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback:RegisterBleAdvertiserCallback called with "
-               "NULL binder. "
+        HILOGE("BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback:RegisterBleAdvertiserCallback called "
                "Ignoring.");
     }
     pimpl->observers_.Register(callback);
@@ -218,8 +217,7 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
     HILOGI("BluetoothBleAdvertiserServer::DeregisterObserver");
 
     if (callback == nullptr) {
-        HILOGE("BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback:DeregisterBleAdvertiserCallback called "
-               "with NULL binder."
+        HILOGE("BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback:DeregisterBleAdvertiserCallback "
                "Ignoring.");
     }
     pimpl->observers_.Deregister(callback);

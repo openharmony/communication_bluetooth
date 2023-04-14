@@ -266,7 +266,7 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
 
     if (callback == nullptr) {
         HILOGI(
-            "BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback called with NULL binder. Ignoring.");
+            "BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback called Ignoring.");
         return;
     }
     pimpl->observers_.Register(callback);
@@ -279,7 +279,7 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
 
     if (callback == nullptr) {
         HILOGI(
-            "BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback called with NULL binder. Ignoring.");
+            "BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback called Ignoring.");
         return;
     }
     pimpl->observers_.Deregister(callback);

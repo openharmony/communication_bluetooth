@@ -145,8 +145,8 @@ uint16_t AvctCbCtrlChUnbind(AvctCbDev *cbDev, const AvctEvtData *data)
 
 /*
  * Function     AvctCbCtrlChCheckDisconn
- * Description  This function is called to check if the channel has other
- *              binder. If it is the last binder,disconnect the channel.
+ * Description  This function is called to check if the connect is the last one which is using the br channel.
+ *              If it is the last one, disconnect the channel.
  * Param[in]    *cbDev  The point to the device block.
  * Param[in]    *data  Event data
  * Return       AVCT_SUCCESS. Others: Fail
