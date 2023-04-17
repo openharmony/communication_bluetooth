@@ -65,7 +65,7 @@ NO_SANITIZE("cfi") void ModuleShutdown(const char *name)
     }
 }
 
-void ModuleCleanup(const char *name)
+NO_SANITIZE("cfi") void ModuleCleanup(const char *name)
 {
     Module *module = ModuleGet(name);
     if (module != NULL) {
