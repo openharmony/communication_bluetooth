@@ -14,6 +14,8 @@
  */
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_utils.h"
+#include "bluetooth_errorcode.h"
+#include "napi_bluetooth_error.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -59,8 +61,8 @@ napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
     napi_ref profileRef = profiles_[static_cast<ProfileId>(profileId)];
     napi_value profile = nullptr;
     funcRet = napi_get_reference_value(env, profileRef, &profile);
-    NAPI_BT_RETURN_IF(funcRet != napi_ok, "call napi_get_reference_value failed", ret);
-    NAPI_BT_RETURN_IF(profile == nullptr, "napi get reference failed.", ret);
+    NAPI_BT_ASSERT_RETURN(env, funcRet == napi_ok, BtErrCode::BT_ERR_API_NOT_SUPPORT, ret);
+    NAPI_BT_ASSERT_RETURN(env, profile != nullptr, BtErrCode::BT_ERR_API_NOT_SUPPORT, ret);
 
     HILOGI("profileId:%{public}d", profileId);
     return profile;

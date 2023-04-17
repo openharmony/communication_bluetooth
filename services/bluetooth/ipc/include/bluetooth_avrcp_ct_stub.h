@@ -21,7 +21,6 @@
 #include "iremote_stub.h"
 #include "i_bluetooth_host.h"
 #include "i_bluetooth_avrcp_ct.h"
-#include "bluetooth_avrcp_ct_observer_proxy.h"
 
 namespace OHOS {
 namespace Bluetooth {
