@@ -12,9 +12,9 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
-
 ohos_shared_library("bluetooth") {
   sanitize = {
     cfi = true
@@ -40,14 +40,6 @@ ohos_shared_library("bluetooth") {
   ]
 
   sources = [
-    "src/napi_bluetooth_a2dp_snk.cpp",
-    "src/napi_bluetooth_a2dp_snk_observer.cpp",
-    "src/napi_bluetooth_a2dp_src.cpp",
-    "src/napi_bluetooth_a2dp_src_observer.cpp",
-    "src/napi_bluetooth_avrcp_ct.cpp",
-    "src/napi_bluetooth_avrcp_ct_observer.cpp",
-    "src/napi_bluetooth_avrcp_tg.cpp",
-    "src/napi_bluetooth_avrcp_tg_observer.cpp",
     "src/napi_bluetooth_ble.cpp",
     "src/napi_bluetooth_ble_advertise_callback.cpp",
     "src/napi_bluetooth_ble_central_manager_callback.cpp",
@@ -57,22 +49,8 @@ ohos_shared_library("bluetooth") {
     "src/napi_bluetooth_gatt_client_callback.cpp",
     "src/napi_bluetooth_gatt_server.cpp",
     "src/napi_bluetooth_gatt_server_callback.cpp",
-    "src/napi_bluetooth_hfp_ag.cpp",
-    "src/napi_bluetooth_hfp_ag_observer.cpp",
-    "src/napi_bluetooth_hfp_hf.cpp",
-    "src/napi_bluetooth_hfp_hf_observer.cpp",
-    "src/napi_bluetooth_hid_host.cpp",
-    "src/napi_bluetooth_hid_host_observer.cpp",
     "src/napi_bluetooth_host.cpp",
     "src/napi_bluetooth_host_observer.cpp",
-    "src/napi_bluetooth_opp.cpp",
-    "src/napi_bluetooth_opp_observer.cpp",
-    "src/napi_bluetooth_pan.cpp",
-    "src/napi_bluetooth_pan_observer.cpp",
-    "src/napi_bluetooth_pbap_pce.cpp",
-    "src/napi_bluetooth_pbap_pce_observer.cpp",
-    "src/napi_bluetooth_pbap_pse.cpp",
-    "src/napi_bluetooth_pbap_pse_observer.cpp",
     "src/napi_bluetooth_profile.cpp",
     "src/napi_bluetooth_remote_device_observer.cpp",
     "src/napi_bluetooth_spp_client.cpp",
@@ -81,6 +59,94 @@ ohos_shared_library("bluetooth") {
     "src/native_module.cpp",
     "src/parser/napi_parser_utils.cpp",
   ]
+
+  if (bluetooth_a2dp_sink_feature) {
+    defines += [ "BLUETOOTH_A2DP_SINK_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_a2dp_snk.cpp",
+      "src/napi_bluetooth_a2dp_snk_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_a2dp_source_feature) {
+    defines += [ "BLUETOOTH_A2DP_SRC_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_a2dp_src.cpp",
+      "src/napi_bluetooth_a2dp_src_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_avrcp_ct_feature) {
+    defines += [ "BLUETOOTH_AVRCP_CT_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_avrcp_ct.cpp",
+      "src/napi_bluetooth_avrcp_ct_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_avrcp_tg_feature) {
+    defines += [ "BLUETOOTH_AVRCP_TG_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_avrcp_tg.cpp",
+      "src/napi_bluetooth_avrcp_tg_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_hfp_ag_feature) {
+    defines += [ "BLUETOOTH_HFP_AG_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_hfp_ag.cpp",
+      "src/napi_bluetooth_hfp_ag_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_hfp_hf_feature) {
+    defines += [ "BLUETOOTH_HFP_HF_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_hfp_hf.cpp",
+      "src/napi_bluetooth_hfp_hf_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_hid_host_feature) {
+    defines += [ "BLUETOOTH_HID_HOST_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_hid_host.cpp",
+      "src/napi_bluetooth_hid_host_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_opp_feature) {
+    defines += [ "BLUETOOTH_OPP_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_opp.cpp",
+      "src/napi_bluetooth_opp_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_pan_feature) {
+    defines += [ "BLUETOOTH_PAN_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_pan.cpp",
+      "src/napi_bluetooth_pan_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_pbap_client_feature) {
+    defines += [ "BLUETOOTH_PBAP_CLIENT_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_pbap_pce.cpp",
+      "src/napi_bluetooth_pbap_pce_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_pbap_server_feature) {
+    defines += [ "BLUETOOTH_PBAP_SERVER_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_pbap_pse.cpp",
+      "src/napi_bluetooth_pbap_pse_observer.cpp",
+    ]
+  }
 
   deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
@@ -125,14 +191,6 @@ ohos_shared_library("bluetoothmanager") {
   ]
 
   sources = [
-    "src/napi_bluetooth_a2dp_snk.cpp",
-    "src/napi_bluetooth_a2dp_snk_observer.cpp",
-    "src/napi_bluetooth_a2dp_src.cpp",
-    "src/napi_bluetooth_a2dp_src_observer.cpp",
-    "src/napi_bluetooth_avrcp_ct.cpp",
-    "src/napi_bluetooth_avrcp_ct_observer.cpp",
-    "src/napi_bluetooth_avrcp_tg.cpp",
-    "src/napi_bluetooth_avrcp_tg_observer.cpp",
     "src/napi_bluetooth_ble.cpp",
     "src/napi_bluetooth_ble_advertise_callback.cpp",
     "src/napi_bluetooth_ble_central_manager_callback.cpp",
@@ -142,22 +200,8 @@ ohos_shared_library("bluetoothmanager") {
     "src/napi_bluetooth_gatt_client_callback.cpp",
     "src/napi_bluetooth_gatt_server.cpp",
     "src/napi_bluetooth_gatt_server_callback.cpp",
-    "src/napi_bluetooth_hfp_ag.cpp",
-    "src/napi_bluetooth_hfp_ag_observer.cpp",
-    "src/napi_bluetooth_hfp_hf.cpp",
-    "src/napi_bluetooth_hfp_hf_observer.cpp",
-    "src/napi_bluetooth_hid_host.cpp",
-    "src/napi_bluetooth_hid_host_observer.cpp",
     "src/napi_bluetooth_host.cpp",
     "src/napi_bluetooth_host_observer.cpp",
-    "src/napi_bluetooth_opp.cpp",
-    "src/napi_bluetooth_opp_observer.cpp",
-    "src/napi_bluetooth_pan.cpp",
-    "src/napi_bluetooth_pan_observer.cpp",
-    "src/napi_bluetooth_pbap_pce.cpp",
-    "src/napi_bluetooth_pbap_pce_observer.cpp",
-    "src/napi_bluetooth_pbap_pse.cpp",
-    "src/napi_bluetooth_pbap_pse_observer.cpp",
     "src/napi_bluetooth_profile.cpp",
     "src/napi_bluetooth_remote_device_observer.cpp",
     "src/napi_bluetooth_spp_client.cpp",
@@ -166,6 +210,94 @@ ohos_shared_library("bluetoothmanager") {
     "src/native_module.cpp",
     "src/parser/napi_parser_utils.cpp",
   ]
+
+  if (bluetooth_a2dp_sink_feature) {
+    defines += [ "BLUETOOTH_A2DP_SINK_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_a2dp_snk.cpp",
+      "src/napi_bluetooth_a2dp_snk_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_a2dp_source_feature) {
+    defines += [ "BLUETOOTH_A2DP_SRC_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_a2dp_src.cpp",
+      "src/napi_bluetooth_a2dp_src_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_avrcp_ct_feature) {
+    defines += [ "BLUETOOTH_AVRCP_CT_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_avrcp_ct.cpp",
+      "src/napi_bluetooth_avrcp_ct_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_avrcp_tg_feature) {
+    defines += [ "BLUETOOTH_AVRCP_TG_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_avrcp_tg.cpp",
+      "src/napi_bluetooth_avrcp_tg_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_hfp_ag_feature) {
+    defines += [ "BLUETOOTH_HFP_AG_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_hfp_ag.cpp",
+      "src/napi_bluetooth_hfp_ag_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_hfp_hf_feature) {
+    defines += [ "BLUETOOTH_HFP_HF_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_hfp_hf.cpp",
+      "src/napi_bluetooth_hfp_hf_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_hid_host_feature) {
+    defines += [ "BLUETOOTH_HID_HOST_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_hid_host.cpp",
+      "src/napi_bluetooth_hid_host_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_opp_feature) {
+    defines += [ "BLUETOOTH_OPP_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_opp.cpp",
+      "src/napi_bluetooth_opp_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_pan_feature) {
+    defines += [ "BLUETOOTH_PAN_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_pan.cpp",
+      "src/napi_bluetooth_pan_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_pbap_client_feature) {
+    defines += [ "BLUETOOTH_PBAP_CLIENT_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_pbap_pce.cpp",
+      "src/napi_bluetooth_pbap_pce_observer.cpp",
+    ]
+  }
+
+  if (bluetooth_pbap_server_feature) {
+    defines += [ "BLUETOOTH_PBAP_SERVER_FEATURE" ]
+    sources += [
+      "src/napi_bluetooth_pbap_pse.cpp",
+      "src/napi_bluetooth_pbap_pse_observer.cpp",
+    ]
+  }
 
   deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",

@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 module_output_path = "bluetooth/framework_test/a2dp/"
 SUBSYSTEM_DIR = "//foundation/communication"
@@ -92,9 +93,12 @@ group("unittest") {
   deps = []
 
   if (is_phone_product) {
-    deps += [
-      ":btfw_a2dp_snk_unit_test",
-      ":btfw_a2dp_src_unit_test",
-    ]
+    if (bluetooth_a2dp_sink_feature) {
+      deps += [ ":btfw_a2dp_snk_unit_test" ]
+    }
+
+    if (bluetooth_a2dp_source_feature) {
+      deps += [ ":btfw_a2dp_src_unit_test" ]
+    }
   }
 }

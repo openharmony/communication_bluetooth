@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 module_output_path = "bluetooth/framework_test/avrcp/"
 SUBSYSTEM_DIR = "//foundation/communication"
@@ -92,9 +93,12 @@ group("unittest") {
   deps = []
 
   if (is_phone_product) {
-    deps += [
-      ":btfw_avrcp_ct_unit_test",
-      ":btfw_avrcp_tg_unit_test",
-    ]
+    if (bluetooth_avrcp_ct_feature) {
+      deps += [ ":btfw_avrcp_ct_unit_test" ]
+    }
+
+    if (bluetooth_avrcp_tg_feature) {
+      deps += [ ":btfw_avrcp_tg_unit_test" ]
+    }
   }
 }
