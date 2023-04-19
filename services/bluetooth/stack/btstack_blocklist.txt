@@ -26,3 +26,4 @@
  src:*/bluetooth/services/bluetooth/stack/src/att/att_common.c
  src:*/bluetooth/services/bluetooth/stack/src/att/att_connect.c
  src:*/bluetooth/services/bluetooth/stack/platform/src/queue.c
+ src:*/bluetooth/services/bluetooth/stack/platform/src/module.c
