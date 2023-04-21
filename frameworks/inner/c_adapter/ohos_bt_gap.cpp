@@ -131,7 +131,7 @@ public:
         }
         if (transport == BT_TRANSPORT_BREDR) {
             if (reqType == PIN_TYPE_CONFIRM_PASSKEY || reqType == PIN_TYPE_NO_PASSKEY_CONSENT) {
-                g_GapCallback->pairConfiremedCallback(&remoteAddr, OHOS_BT_TRANSPORT_BR_EDR, reqType, number);
+                HILOGI("should not call back reqType: %{public}d", reqType);
             }
         } else if (transport == BT_TRANSPORT_BLE) {
             if (reqType == PIN_TYPE_CONFIRM_PASSKEY) {
