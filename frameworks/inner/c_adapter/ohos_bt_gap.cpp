@@ -125,21 +125,7 @@ public:
         BdAddr remoteAddr;
         GetAddrFromString(device.GetDeviceAddr(), remoteAddr.addr);
         HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (g_GapCallback == nullptr || g_GapCallback->pairConfiremedCallback == nullptr) {
-            HILOGW("callback func is null!");
-            return;
-        }
-        if (transport == BT_TRANSPORT_BREDR) {
-            if (reqType == PIN_TYPE_CONFIRM_PASSKEY || reqType == PIN_TYPE_NO_PASSKEY_CONSENT) {
-                HILOGI("should not call back reqType: %{public}d", reqType);
-            }
-        } else if (transport == BT_TRANSPORT_BLE) {
-            if (reqType == PIN_TYPE_CONFIRM_PASSKEY) {
-                g_GapCallback->pairConfiremedCallback(&remoteAddr, OHOS_BT_TRANSPORT_LE, reqType, number);
-            }
-        } else {
-            HILOGE("transport: %{public}d is invalid", transport);
-        }
+        return;
     };
 
     /**
