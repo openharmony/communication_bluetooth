@@ -181,7 +181,7 @@ typedef struct {
  * @brief       authentication callback structure.
  */
 typedef struct {
-    void (*userConfirmReq)(const BtAddr *addr, uint32_t number, int localMITMRequired, int remoteMITMRequired, void *context);
+    void (*userConfirmReq)(const BtAddr *addr, uint32_t number, int localMitmRequired, int remoteMitmRequired, void *context);
     void (*userPasskeyReq)(const BtAddr *addr, void *context);
     void (*userPasskeyNotification)(const BtAddr *addr, uint32_t number, void *context);
     void (*remoteOobReq)(const BtAddr *addr, void *context);

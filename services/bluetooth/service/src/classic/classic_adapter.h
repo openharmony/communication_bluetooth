@@ -460,7 +460,7 @@ private:
      * @param number Pass key.
      * @param context Classic adapter object.
      */
-    static void UserConfirmReqCallback(const BtAddr *addr, uint32_t number, int localMITMRequired, int remoteMITMRequired, void *context);
+    static void UserConfirmReqCallback(const BtAddr *addr, uint32_t number, int localMitmRequired, int remoteMitmRequired, void *context);
 
     /**
      * @brief User pass key request callback.
@@ -868,7 +868,7 @@ private:
      * @param reqType  Request type.
      * @param number Pass key.
      */
-    void SSPConfirmReq(const BtAddr &addr, int reqType, int number, int localMITMRequired, int remoteMITMRequired);
+    void SSPConfirmReq(const BtAddr &addr, int reqType, int number, int localMitmRequired, int remoteMitmRequired);
 
     /**
      * @brief Set authorize response.
@@ -958,7 +958,7 @@ private:
      * @return Returns <b>true</b> if the operation is successful;
      *         returns <b>false</b> if the operation fails.
      */
-    bool CheckAutoReply(int remoteIo, int localMITMRequired, int remoteMITMRequired) const;
+    bool CheckAutoReply(int remoteIo, int localMitmRequired, int remoteMitmRequired) const;
 
     /**
      * @brief Check ssp confirm type.

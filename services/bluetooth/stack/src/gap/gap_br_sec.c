@@ -1157,23 +1157,24 @@ NO_SANITIZE("cfi") void GapOnUserConfirmationRequestEvent(const HciUserConfirmat
     BtAddr addr = BT_ADDR_NULL;
     GapChangeHCIAddr(&addr, &eventParam->bdAddr, BT_PUBLIC_DEVICE_ADDRESS);
 
-    int localMITMRequired = GAP_MITM_REQUIRED;
-    int remoteMITMRequired = GAP_MITM_REQUIRED;
+    int localMitmRequired = GAP_MITM_REQUIRED;
+    int remoteMitmRequired = GAP_MITM_REQUIRED;
     DeviceInfo *devInfo = ListForEachData(GapGetConnectionInfoBlock()->devicelist, GapFindConnectionDeviceByAddr, (void*)&addr);
 
     if (devInfo != NULL) {
-        remoteMITMRequired = devInfo->remoteAuthReq & 0x01;
+        remoteMitmRequired = devInfo->remoteAuthReq & GAP_MITM_REQUIRED;
         if (devInfo->actionReq != NULL) {
             if (!devInfo->actionReq->needAuthentication && devInfo->actionReq->needUnauthentication) {
-                localMITMRequired = GAP_MITM_NOT_REQUIRED;
+                localMitmRequired = GAP_MITM_NOT_REQUIRED;
             }
-            localMITMRequired = remoteMITMRequired;
+        } else {
+            localMitmRequired = remoteMitmRequired;
         }
     }
      
     if (g_authenticationCallback.callback.userConfirmReq) {
         g_authenticationCallback.callback.userConfirmReq(
-            &addr, eventParam->numericValue,localMITMRequired, remoteMITMRequired, g_authenticationCallback.context);
+            &addr, eventParam->numericValue,localMitmRequired, remoteMitmRequired, g_authenticationCallback.context);
     } else {
         GapUserConfirmationRequestNegativeReply(&addr);
     }
