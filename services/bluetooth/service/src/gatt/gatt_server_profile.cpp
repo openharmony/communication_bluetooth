@@ -1237,8 +1237,11 @@ bool GattServerProfile::impl::FindCharacteristicDescriptorByUuid(uint16_t attHan
  */
 Buffer *GattServerProfile::impl::AssembleServicePackage(uint16_t attHandle)
 {
+    if (db_.GetService(attHandle) == nullptr) {
+        HILOGE("null pointer");
+        return nullptr;
+    }
     uint8_t uuid128Bit[UUID_128BIT_LEN] = {0};
-
     Buffer *value = BufferMalloc(db_.GetService(attHandle)->uuid_.GetUuidType());
     if (db_.GetService(attHandle)->uuid_.GetUuidType() == UUID_16BIT_LEN) {
         uint16_t uuid16Bit = db_.GetService(attHandle)->uuid_.ConvertTo16Bits();
@@ -1353,6 +1356,10 @@ void GattServerProfile::impl::AssembleAttReadByGroupTypeRspPackage(
 void GattServerProfile::impl::AssembleAttReadByTypeRspSvcPackage(
     AttReadByTypeRspDataList *list, uint16_t attHandle, uint8_t num, uint8_t *offset)
 {
+    if (db_.GetService(attHandle) == nullptr) {
+        HILOGE("null pointer");
+        return;
+    }
     list[num].attHandle.attHandle = db_.GetService(attHandle)->handle_;
     if (db_.GetService(attHandle)->uuid_.GetUuidType() == UUID_16BIT_LEN) {
         uint16_t uuid16Bit = db_.GetService(attHandle)->uuid_.ConvertTo16Bits();
@@ -1437,6 +1444,10 @@ bool GattServerProfile::impl::AssembleAttReadByTypeRspDescPackage(
 void GattServerProfile::impl::AssembleAttFindInforRspSvcPackage(
     AttHandleUuid *pairs, uint16_t attHandle, uint8_t num, uint16_t *len)
 {
+    if (db_.GetService(attHandle) == nullptr) {
+        HILOGE("null pointer");
+        return;
+    }
     pairs[num].attHandle = db_.GetService(attHandle)->handle_;
     if (db_.GetService(attHandle)->isPrimary_) {
         pairs[num].uuid.uuid16 = UUID_PRIMARY_SERVICE;
