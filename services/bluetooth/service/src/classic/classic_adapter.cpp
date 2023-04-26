@@ -701,7 +701,8 @@ void ClassicAdapter::RemoteNameCallback(
     }
 }
 
-void ClassicAdapter::UserConfirmReqCallback(const BtAddr *addr, uint32_t number, void *context)
+void ClassicAdapter::UserConfirmReqCallback(const BtAddr *addr, uint32_t number, 
+    int localMitmRequired, int remoteMitmRequired, void *context)
 {
     HILOGI("enter");
 
@@ -709,6 +710,8 @@ void ClassicAdapter::UserConfirmReqCallback(const BtAddr *addr, uint32_t number,
     (void)memcpy_s((void *)&param.userConfirmReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
     param.userConfirmReqParam_.number = number;
     param.userConfirmReqParam_.reqType = PAIR_CONFIRM_TYPE_NUMERIC;
+    param.userConfirmReqParam_.localMitmRequired = localMitmRequired;
+    param.userConfirmReqParam_.remoteMitmRequired = remoteMitmRequired;
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     if (adapter != nullptr) {
@@ -941,7 +944,8 @@ void ClassicAdapter::HandleSecurityEvent(GAP_CB_EVENT event, const GapCallbackPa
     switch (event) {
         case GAP_SSP_CONFIRM_REQ_EVT:
             SSPConfirmReq(
-                param.userConfirmReqParam_.addr, param.userConfirmReqParam_.reqType, param.userConfirmReqParam_.number);
+                param.userConfirmReqParam_.addr, param.userConfirmReqParam_.reqType, param.userConfirmReqParam_.number,
+                param.userConfirmReqParam_.localMitmRequired, param.userConfirmReqParam_.remoteMitmRequired);
             break;
         case GAP_PIN_CODE_REQ_EVT:
             PinCodeReq(param.pinCodeReqParam_.addr);
@@ -1154,7 +1158,8 @@ void ClassicAdapter::SendRemoteCodChanged(const RawAddress &device, int cod) con
         [device, cod](IClassicRemoteDeviceObserver &observer) { observer.OnRemoteCodChanged(device, cod); });
 }
 
-void ClassicAdapter::SSPConfirmReq(const BtAddr &addr, int reqType, int number)
+void ClassicAdapter::SSPConfirmReq(const BtAddr &addr, int reqType, int number, 
+    int localMitmRequired, int remoteMitmRequired)
 {
     HILOGI("reqTyep: %{public}d", reqType);
 
@@ -1165,7 +1170,7 @@ void ClassicAdapter::SSPConfirmReq(const BtAddr &addr, int reqType, int number)
     int remoteIo = remoteDevice->GetIoCapability();
     if (remoteDevice->GetPairedStatus() == PAIR_CANCELING) {
         UserConfirmAutoReply(device, reqType, false);
-    } else if (CheckAutoReply(remoteIo) == true) {
+    } else if (CheckAutoReply(remoteIo, localMitmRequired, remoteMitmRequired) == true) {
         UserConfirmAutoReply(device, reqType, true);
     } else {
         reqType = CheckSspConfirmType(remoteIo, reqType);
@@ -2343,13 +2348,20 @@ bool ClassicAdapter::DeregisterRemoteDeviceObserver(IClassicRemoteDeviceObserver
     return pimpl->remoteObservers_.Deregister(observer);
 }
 
-bool ClassicAdapter::CheckAutoReply(int remoteIo) const
+bool ClassicAdapter::CheckAutoReply(int remoteIo, int localMitmRequired, int remoteMitmRequired) const
 {
     HILOGI("enter");
 
     bool autoReply = false;
     int localIo = adapterProperties_.GetIoCapability();
-    HILOGI("local io capability = %{public}d <==> remote io capability = %{public}d", localIo, remoteIo);
+    HILOGI("local io capability = %{public}d <==> remote io capability = %{public}d"
+        "local mitm = %{public}d <==> remote mitm = %{public}d", localIo, remoteIo, 
+        localMitmRequired, remoteMitmRequired);
+    
+    if (localMitmRequired == GAP_MITM_NOT_REQUIRED && remoteMitmRequired == GAP_MITM_NOT_REQUIRED) {
+        return true;
+    }
+
     switch (localIo) {
         case GAP_IO_DISPLAYONLY:
             autoReply = (remoteIo != GAP_IO_KEYBOARDONLY) ? true : false;
