@@ -71,91 +71,91 @@ ohos_static_library("btipc_static") {
     "src/bluetooth_remote_device_observer_stub.cpp",
     "src/bluetooth_socket_proxy.cpp",
   ]
-  
+
   if (bluetooth_a2dp_sink_feature) {
     sources += [
       "src/bluetooth_a2dp_sink_observer_stub.cpp",
       "src/bluetooth_a2dp_sink_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_a2dp_source_feature) {
     sources += [
       "src/bluetooth_a2dp_src_observer_stub.cpp",
       "src/bluetooth_a2dp_src_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_ct_feature) {
     sources += [
       "src/bluetooth_avrcp_ct_observer_stub.cpp",
       "src/bluetooth_avrcp_ct_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_tg_feature) {
     sources += [
       "src/bluetooth_avrcp_tg_observer_stub.cpp",
       "src/bluetooth_avrcp_tg_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_hfp_ag_feature) {
     sources += [
       "src/bluetooth_hfp_ag_observer_stub.cpp",
       "src/bluetooth_hfp_ag_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_hfp_hf_feature) {
     sources += [
       "src/bluetooth_hfp_hf_observer_stub.cpp",
       "src/bluetooth_hfp_hf_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_hid_host_feature) {
     sources += [
       "src/bluetooth_hid_host_observer_stub.cpp",
       "src/bluetooth_hid_host_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_map_client_feature) {
     sources += [
       "src/bluetooth_map_mce_observer_stub.cpp",
       "src/bluetooth_map_mce_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_map_server_feature) {
     sources += [
       "src/bluetooth_map_mse_observer_stub.cpp",
       "src/bluetooth_map_mse_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_opp_feature) {
     sources += [
       "src/bluetooth_opp_observer_stub.cpp",
       "src/bluetooth_opp_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_pan_feature) {
     sources += [
       "src/bluetooth_pan_observer_stub.cpp",
       "src/bluetooth_pan_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_pbap_client_feature) {
     sources += [
       "src/bluetooth_pbap_pce_observer_stub.cpp",
       "src/bluetooth_pbap_pce_proxy.cpp",
     ]
   }
-  
+
   if (bluetooth_pbap_server_feature) {
     sources += [
       "src/bluetooth_pbap_pse_observer_stub.cpp",
@@ -173,7 +173,6 @@ ohos_static_library("btipc_static") {
     "ipc:ipc_core",
   ]
 }
-
 
 ohos_static_library("btipc_service") {
   sanitize = {
@@ -221,91 +220,91 @@ ohos_static_library("btipc_service") {
     "src/bluetooth_remote_device_observer_proxy.cpp",
     "src/bluetooth_socket_stub.cpp",
   ]
-  
+
   if (bluetooth_a2dp_sink_feature) {
     sources += [
       "src/bluetooth_a2dp_sink_observer_proxy.cpp",
       "src/bluetooth_a2dp_sink_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_a2dp_source_feature) {
     sources += [
       "src/bluetooth_a2dp_src_observer_proxy.cpp",
       "src/bluetooth_a2dp_src_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_ct_feature) {
     sources += [
       "src/bluetooth_avrcp_ct_observer_proxy.cpp",
       "src/bluetooth_avrcp_ct_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_avrcp_tg_feature) {
     sources += [
       "src/bluetooth_avrcp_tg_observer_proxy.cpp",
       "src/bluetooth_avrcp_tg_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_hfp_ag_feature) {
     sources += [
       "src/bluetooth_hfp_ag_observer_proxy.cpp",
       "src/bluetooth_hfp_ag_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_hfp_hf_feature) {
     sources += [
       "src/bluetooth_hfp_hf_observer_proxy.cpp",
       "src/bluetooth_hfp_hf_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_hid_host_feature) {
     sources += [
       "src/bluetooth_hid_host_observer_proxy.cpp",
       "src/bluetooth_hid_host_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_map_client_feature) {
     sources += [
       "src/bluetooth_map_mce_observer_proxy.cpp",
       "src/bluetooth_map_mce_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_map_server_feature) {
     sources += [
       "src/bluetooth_map_mse_observer_proxy.cpp",
       "src/bluetooth_map_mse_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_opp_feature) {
     sources += [
       "src/bluetooth_opp_observer_proxy.cpp",
       "src/bluetooth_opp_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_pan_feature) {
     sources += [
       "src/bluetooth_pan_observer_proxy.cpp",
       "src/bluetooth_pan_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_pbap_client_feature) {
     sources += [
       "src/bluetooth_pbap_pce_observer_proxy.cpp",
       "src/bluetooth_pbap_pce_stub.cpp",
     ]
   }
-  
+
   if (bluetooth_pbap_server_feature) {
     sources += [
       "src/bluetooth_pbap_pse_observer_proxy.cpp",
