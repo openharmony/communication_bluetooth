@@ -172,6 +172,8 @@ typedef union {
         const BtAddr addr;
         uint32_t number;
         int reqType;
+        int localMitmRequired;
+        int remoteMitmRequired;
     } userConfirmReqParam_;
 
     struct RemoteOobReqParam {
