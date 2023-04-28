@@ -531,6 +531,7 @@ std::vector<uint32_t> ProfileServiceManager::GetProfileServicesList() const
     std::vector<uint32_t> profileServicesList;
     for (auto &sp : GET_SUPPORT_PROFILES()) {
         if (pimpl->startedProfiles_.Contains(sp.name_)) {
+            HILOGI("%{public}s", sp.name_.c_str());
             profileServicesList.push_back(sp.id_);
         }
     }
