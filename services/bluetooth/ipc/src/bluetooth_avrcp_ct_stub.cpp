@@ -475,7 +475,7 @@ ErrCode BluetoothAvrcpCtStub::GetItemAttributesInner(MessageParcel &data, Messag
     int32_t uidCounter = data.ReadInt32();
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
-    if (static_cast<unit32_t>(attributesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
+    if (static_cast<uint32_t>(attributesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
         return BT_ERR_INTERNAL_ERROR;
     }
     for (int i = 0; i < attributesSize; i++) {

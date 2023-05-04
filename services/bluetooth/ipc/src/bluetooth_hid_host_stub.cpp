@@ -124,7 +124,7 @@ int32_t BluetoothHidHostStub::GetDevicesByStatesInner(MessageParcel &data, Messa
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
-    if (static_cast<unit32_t>(stateSize) > HID_DEVICE_BY_STATES_NUM_MAX) {
+    if (static_cast<uint32_t>(stateSize) > HID_DEVICE_BY_STATES_NUM_MAX) {
         return BT_ERR_INTERNAL_ERROR;
     }
     HILOGD("BluetoothHidHostStub::GetDevicesByStatesInner");
