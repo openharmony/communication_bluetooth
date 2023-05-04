@@ -164,7 +164,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnSetBrowsedPlayerInner(MessageParcel &dat
     std::vector<std::string> folderNames {};
     int32_t namesSize = data.ReadInt32();
     if (static_cast<uint32_t>(namesSize) > AVRCP_FOLDER_DEPTH_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < namesSize; i++) {
         std::string name = data.ReadString();
@@ -183,7 +183,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetCapabilitiesInner(MessageParcel &data
     std::vector<uint32_t> companies {};
     int32_t companiesSize = data.ReadInt32();
     if (static_cast<uint32_t>(companiesSize) > AVRCP_COMPANY_ID_COUNT_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < companiesSize; i++) {
         uint32_t company = data.ReadUint32();
@@ -193,7 +193,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetCapabilitiesInner(MessageParcel &data
     std::vector<uint8_t> events {};
     int32_t eventsSize = data.ReadInt32();
     if (static_cast<uint32_t>(eventsSize) > AVRCP_CAPABILITY_COUNT_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < eventsSize; i++) {
         uint8_t event = data.ReadInt32();
@@ -213,7 +213,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingAttributesInner(Messa
     std::vector<uint8_t> attributes {};
     int32_t attributesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attributesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attributesSize; i++) {
         uint8_t attrbute = data.ReadInt32();
@@ -234,7 +234,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingValuesInner(MessagePa
     std::vector<uint8_t> values {};
     int32_t valuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valuesSize) > AVRCP_PLAYER_APP_SEETING_VALUE_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valuesSize; i++) {
         uint8_t value = data.ReadInt32();
@@ -252,7 +252,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingCurrentValueInner(Mes
     std::vector<uint8_t> attrbutes {};
     int32_t attrbutesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attrbutesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attrbutesSize; i++) {
         uint8_t attrbute = data.ReadInt32();
@@ -262,7 +262,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingCurrentValueInner(Mes
     std::vector<uint8_t> values {};
     int32_t valuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valuesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valuesSize; i++) {
         uint8_t value = data.ReadInt32();
@@ -289,7 +289,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingAttributeTextInner(Me
     std::vector<uint8_t> attrbutes {};
     int32_t attrbutesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attrbutesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attrbutesSize; i++) {
         uint8_t attrbute = data.ReadInt32();
@@ -299,7 +299,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingAttributeTextInner(Me
     std::vector<std::string> attributeNames {};
     int32_t valuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valuesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valuesSize; i++) {
         std::string value = data.ReadString();
@@ -318,7 +318,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingValueTextInner(Messag
     std::vector<uint8_t> values {};
     int32_t valuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valuesSize) > AVRCP_PLAYER_APP_SEETING_VALUE_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valuesSize; i++) {
         uint8_t attrbute = data.ReadInt32();
@@ -328,7 +328,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingValueTextInner(Messag
     std::vector<std::string> valueNames {};
     int32_t valueNamesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valueNamesSize) > AVRCP_PLAYER_APP_SEETING_VALUE_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valueNamesSize; i++) {
         std::string value = data.ReadString();
@@ -347,7 +347,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetElementAttributesInner(MessageParcel 
     std::vector<uint32_t> attribtues {};
     int32_t valuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valuesSize) > AVRCP_ELEMENT_ATTRIBUTE_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valuesSize; i++) {
         uint32_t attrbute = data.ReadUint32();
@@ -357,7 +357,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetElementAttributesInner(MessageParcel 
     std::vector<std::string> valueNames {};
     int32_t valueNamesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valueNamesSize) > AVRCP_ELEMENT_ATTRIBUTE_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valueNamesSize; i++) {
         std::string value = data.ReadString();
@@ -411,7 +411,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetItemAttributesInner(MessageParcel &da
     std::vector<uint32_t> attribtues {};
     int32_t attribtuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attribtuesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attribtuesSize; i++) {
         uint32_t attrbute = data.ReadUint32();
@@ -421,7 +421,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetItemAttributesInner(MessageParcel &da
     std::vector<std::string> valueNames {};
     int32_t valuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valuesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valuesSize; i++) {
         std::string value = data.ReadString();
@@ -499,7 +499,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnPlayerAppSettingChangedInner(MessageParc
     std::vector<uint8_t> attribtues {};
     int32_t attribtuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attribtuesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attribtuesSize; i++) {
         int32_t attrbute = data.ReadInt32();
@@ -509,7 +509,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnPlayerAppSettingChangedInner(MessageParc
     std::vector<uint8_t> values {};
     int32_t valuesSize = data.ReadInt32();
     if (static_cast<uint32_t>(valuesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < valuesSize; i++) {
         int32_t attrbute = data.ReadInt32();
@@ -576,7 +576,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetMediaPlayersInner(MessageParcel &data
     std::vector<BluetoothAvrcpMpItem> items {};
     int32_t itemsSize = data.ReadInt32();
     if (static_cast<uint32_t>(itemsSize) > AVRCP_MEDIA_PLAYER_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < itemsSize; i++) {
         std::shared_ptr<BluetoothAvrcpMpItem> item(data.ReadParcelable<BluetoothAvrcpMpItem>());
@@ -599,7 +599,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetFolderItemsInner(MessageParcel &data,
     std::vector<BluetoothAvrcpMeItem> items {};
     int32_t itemsSize = data.ReadInt32();
     if (static_cast<uint32_t>(itemsSize) > AVRCP_FOLDER_ITEMS_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < itemsSize; i++) {
         std::shared_ptr<BluetoothAvrcpMeItem> item(data.ReadParcelable<BluetoothAvrcpMeItem>());
