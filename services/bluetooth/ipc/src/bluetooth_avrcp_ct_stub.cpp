@@ -436,7 +436,7 @@ ErrCode BluetoothAvrcpCtStub::EnableNotificationInner(MessageParcel &data, Messa
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
-    if (static_cast<unit32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
+    if (static_cast<uint32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
         return BT_ERR_INTERNAL_ERROR;
     }
     for (int i = 0; i < attributesSize; i++) {
@@ -455,7 +455,7 @@ ErrCode BluetoothAvrcpCtStub::DisableNotificationInner(MessageParcel &data, Mess
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
-    if (static_cast<unit32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
+    if (static_cast<uint32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
         return BT_ERR_INTERNAL_ERROR;
     }
     for (int i = 0; i < attributesSize; i++) {
