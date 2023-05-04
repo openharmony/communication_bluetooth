@@ -65,7 +65,7 @@ napi_status NapiParseGattService(napi_env env, napi_value object, NapiGattServic
 napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBleCharacteristic &outCharacteristic)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"serviceUuid", "characteristicUuid",
-        "characteristicValue", "descriptors"}));
+        "characteristicValue", "descriptors", "properties"}));
 
     std::string serviceUuid {};
     std::string characterUuid {};
