@@ -18,6 +18,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const uint32_t PAN_DEVICES_STATES_MAX_NUMS = 0XFF;
 BluetoothPanStub::BluetoothPanStub()
 {
     HILOGD("start.");
@@ -101,6 +102,9 @@ int32_t BluetoothPanStub::GetDevicesByStatesInner(MessageParcel &data, MessagePa
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
+    if (static_cast<unit32_t>(stateSize) > PAN_DEVICES_STATES_MAX_NUMS) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
     for (int i = 0; i < stateSize; i++) {
         int32_t state = data.ReadInt32();
         states.push_back(state);
