@@ -437,7 +437,7 @@ ErrCode BluetoothAvrcpCtStub::EnableNotificationInner(MessageParcel &data, Messa
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
@@ -456,7 +456,7 @@ ErrCode BluetoothAvrcpCtStub::DisableNotificationInner(MessageParcel &data, Mess
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
@@ -476,7 +476,7 @@ ErrCode BluetoothAvrcpCtStub::GetItemAttributesInner(MessageParcel &data, Messag
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
     if (static_cast<uint32_t>(attributesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
-        return BT_ERR_INTERNAL_ERROR;
+        return ERR_INVALID_STATE;
     }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
