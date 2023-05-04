@@ -20,6 +20,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const uint32_t AVRCP_NOTIDICATION_EVENT_COUNT_MAX = 0XFF;
+const uint32_t AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX = 0XFF;
 BluetoothAvrcpCtStub::BluetoothAvrcpCtStub()
 {
     HILOGD("%{public}s start.", __func__);
@@ -434,7 +436,9 @@ ErrCode BluetoothAvrcpCtStub::EnableNotificationInner(MessageParcel &data, Messa
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
-
+    if (static_cast<unit32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         events.push_back(attribute);
@@ -451,7 +455,9 @@ ErrCode BluetoothAvrcpCtStub::DisableNotificationInner(MessageParcel &data, Mess
     RawAddress raw = RawAddress(data.ReadString());
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
-
+    if (static_cast<unit32_t>(attributesSize) > AVRCP_NOTIDICATION_EVENT_COUNT_MAX) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         events.push_back(attribute);
@@ -469,7 +475,9 @@ ErrCode BluetoothAvrcpCtStub::GetItemAttributesInner(MessageParcel &data, Messag
     int32_t uidCounter = data.ReadInt32();
     std::vector<int32_t> events = {};
     int32_t attributesSize = data.ReadInt32();
-
+    if (static_cast<unit32_t>(attributesSize) > AVRCP_PLAYER_APP_SETTING_ATTRIBUTES_NUM_MAX) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
     for (int i = 0; i < attributesSize; i++) {
         int32_t attribute = data.ReadInt32();
         events.push_back(attribute);
