@@ -301,7 +301,7 @@ std::set<int32_t> BluetoothBleCentralManagerServer::proxyUids_;
 
 bool BluetoothBleCentralManagerServer::ProxyUid(int32_t uid, bool isProxy)
 {
-    HILOGI("Start bluetooth proxy, uid: %{public}d, isProxy: %{public}d", uid, isProxy);
+    HILOGD("Start bluetooth proxy, uid: %{public}d, isProxy: %{public}d", uid, isProxy);
     std::lock_guard<std::mutex> lock(proxyMutex_);
     if (isProxy) {
         proxyUids_.insert(uid);

@@ -1471,7 +1471,7 @@ std::vector<bluetooth::Uuid> BluetoothHostServer::GetDeviceUuids(int32_t transpo
 int32_t BluetoothHostServer::SetDevicePin(const std::string &address, const std::string &pin)
 {
     HILOGI("address: %{public}s, pin: %{public}s", GetEncryptAddr(address).c_str(), pin.c_str());
-    if (PermissionUtils::VerifyDiscoverBluetoothPermission() == PERMISSION_DENIED) {
+    if (PermissionUtils::VerifyManageBluetoothPermission() == PERMISSION_DENIED) {
         HILOGE("false, check permission failed");
         return BT_ERR_PERMISSION_FAILED;
     }
