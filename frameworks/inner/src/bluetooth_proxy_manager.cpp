@@ -33,7 +33,7 @@ BluetoothProxyManager& BluetoothProxyManager::GetInstance()
 
 bool BluetoothProxyManager::ProxyUid(int32_t uid, bool isProxy)
 {
-    HILOGI("ProxyUid start. uid:%{public}d , isProxy:%{public}d", uid, isProxy);
+    HILOGD("ProxyUid start. uid:%{public}d , isProxy:%{public}d", uid, isProxy);
     if (!GetBleCentralManagerProxy()) {
         HILOGE("GetBleCentralManagerProxy failed.");
         return false;
