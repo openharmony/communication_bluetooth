@@ -26,7 +26,10 @@ config("btdummy_config") {
 }
 
 config("btdummy_public_config") {
-  include_dirs = [ "dummy/include" ]
+  include_dirs = [
+    "dummy/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
+  ]
 }
 
 ohos_shared_library("btdummy") {
@@ -37,7 +40,7 @@ ohos_shared_library("btdummy") {
   configs = [ ":btdummy_config" ]
   public_configs = [ ":btdummy_public_config" ]
   sources = [ "dummy/src/stub.cpp" ]
-  deps = [ "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon" ]
+  deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon" ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   subsystem_name = "communication"
   part_name = "bluetooth"

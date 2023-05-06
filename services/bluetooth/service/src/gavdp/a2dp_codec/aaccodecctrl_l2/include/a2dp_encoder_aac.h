@@ -17,7 +17,7 @@
 #define A2DP_ENCODER_AAC_H
 
 #include <cstdint>
-#include "../../include/a2dp_codec_wrapper.h"
+#include "a2dp_codec_wrapper.h"
 
 namespace OHOS {
 namespace bluetooth {

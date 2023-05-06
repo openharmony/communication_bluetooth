@@ -14,7 +14,6 @@
 import("//build/test.gni")
 
 module_output_path = "bluetooth/framework_test/ble"
-SUBSYSTEM_DIR = "//foundation/communication"
 
 ###############################################################################
 #1. intent(c++) get/set test without transport
@@ -44,7 +43,6 @@ ohos_moduletest("btfw_ble_unit_test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
     "//third_party/bounds_checking_function:libsec_shared",
