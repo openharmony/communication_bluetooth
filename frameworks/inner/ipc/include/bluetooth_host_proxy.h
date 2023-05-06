@@ -16,7 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_HOST_PROXY_H
 #define OHOS_BLUETOOTH_STANDARD_HOST_PROXY_H
 
-#include "../../../../services/bluetooth/ipc/parcel/bluetooth_raw_address.h"
+#include "bluetooth_raw_address.h"
 #include "i_bluetooth_host.h"
 #include "iremote_proxy.h"
 

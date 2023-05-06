@@ -155,7 +155,7 @@ ServicePermissionSrc = [
 config("btservice_public_config") {
   include_dirs = [
     "include",
-    "$PART_DIR/ipc/common",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "//third_party/bounds_checking_function/include",
@@ -176,6 +176,12 @@ config("btservice_config") {
     "//base/telephony/state_registry/frameworks/native/observer/include",
     "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocommon/include",
     "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiomanager/include",
+    "//foundation/communication/bluetooth/frameworks/inner/ipc/common",
+    "//foundation/communication/bluetooth/frameworks/inner/ipc/interface",
+    "//foundation/communication/bluetooth/frameworks/inner/ipc/parcel",
+    "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/sbclib/include",
+    "$BT_SERVICE_DIR/src/gavdp/a2dp_codec/include",
+    "$BT_SERVICE_DIR/src/gavdp",
   ]
 
   cflags_cc = [
@@ -412,7 +418,7 @@ ohos_shared_library("btservice") {
   deps = [
     "$PART_DIR/external:btdummy",
     "$PART_DIR/stack:btstack",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon",
     "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//base/telephony/state_registry/frameworks/native/observer:tel_state_registry_api",
@@ -426,6 +432,7 @@ ohos_shared_library("btservice") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "audio_framework:audio_client",
+    "c_utils:utils",
     "core_service:tel_core_service_api",
     "hdf_core:libhdi",
     "hisysevent_native:libhisysevent",

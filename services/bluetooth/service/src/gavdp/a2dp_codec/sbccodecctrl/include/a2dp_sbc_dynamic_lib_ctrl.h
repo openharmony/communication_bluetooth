@@ -15,7 +15,7 @@
 
 #ifndef A2DP_SBC_DYNAMIC_LIB_CTRL_H
 #define A2DP_SBC_DYNAMIC_LIB_CTRL_H
-#include "../../sbclib/include/sbc_codec.h"
+#include "sbc_codec.h"
 
 namespace OHOS {
 namespace bluetooth {

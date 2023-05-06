@@ -48,8 +48,6 @@ ohos_unittest("btfw_gatt_service_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -71,8 +69,6 @@ ohos_unittest("btfw_gatt_client_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -94,8 +90,6 @@ ohos_unittest("btfw_gatt_server_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/server:bluetooth_server",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
@@ -118,8 +112,6 @@ ohos_unittest("btfw_gatt_manager_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -141,8 +133,6 @@ ohos_unittest("btfw_gatt_descriptor_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/server:bluetooth_server",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
@@ -167,8 +157,6 @@ ohos_unittest("btfw_gatt_characteristic_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",

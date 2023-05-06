@@ -33,10 +33,7 @@ ohos_fuzztest("PairDeviceFuzzTest") {
 
   sources = [ "pairdevice_fuzzer.cpp" ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework" ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }

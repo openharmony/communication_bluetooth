@@ -21,8 +21,8 @@
 #include <memory>
 #include <vector>
 #include "a2dp_sbc_dynamic_lib_ctrl.h"
-#include "../../include/a2dp_codec_config.h"
-#include "../../include/a2dp_codec_wrapper.h"
+#include "a2dp_codec_config.h"
+#include "a2dp_codec_wrapper.h"
 #include "packet.h"
 
 namespace OHOS {
