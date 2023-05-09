@@ -17,6 +17,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const uint32_t OPP_FILE_PATH_SIZE_MAX = 0XFF;
+const uint32_t OPP_MIME_SEND_SIZE_MAX = 0XFF;
+const uint32_t OPP_DEVICE_BY_STATES_SIZE_MAX = 0XFF;
 BluetoothOppStub::BluetoothOppStub()
 {
     HILOGD("%{public}s start.", __func__);
@@ -74,12 +77,18 @@ ErrCode BluetoothOppStub::SendFileInner(MessageParcel &data, MessageParcel &repl
     std::vector<std::string> filePaths = {};
     std::vector<std::string> mimeTypes = {};
     int32_t fileSize = data.ReadInt32();
+    if (static_cast<uint32_t>(fileSize) > OPP_FILE_PATH_SIZE_MAX) {
+        return ERR_INVALID_STATE;
+    }
     HILOGI("BluetoothOppStub::GetDevicesByStatesInner");
     for (int32_t i = 0; i < fileSize; i++) {
         std::string filePath = data.ReadString();
         filePaths.push_back(filePath);
     }
     int32_t mimeSize = data.ReadInt32();
+    if (static_cast<uint32_t>(mimeSize) > OPP_MIME_SEND_SIZE_MAX) {
+        return ERR_INVALID_STATE;
+    }
     for (int32_t i = 0; i < mimeSize; i++) {
         std::string mimeType = data.ReadString();
         mimeTypes.push_back(mimeType);
@@ -163,6 +172,9 @@ ErrCode BluetoothOppStub::GetDevicesByStatesInner(MessageParcel &data, MessagePa
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
+    if (static_cast<uint32_t>(stateSize) > OPP_DEVICE_BY_STATES_SIZE_MAX) {
+        return ERR_INVALID_STATE;
+    }
     HILOGI("BluetoothOppStub::GetDevicesByStatesInner");
     for (int i = 0; i < stateSize; i++) {
         int32_t state = data.ReadInt32();
