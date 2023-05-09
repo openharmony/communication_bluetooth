@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const uint32_t HID_DEVICE_BY_STATES_NUM_MAX = 0XFF;
 BluetoothHidHostStub::BluetoothHidHostStub()
 {
     HILOGD("%{public}s start.", __func__);
@@ -123,6 +124,9 @@ int32_t BluetoothHidHostStub::GetDevicesByStatesInner(MessageParcel &data, Messa
 {
     std::vector<int32_t> states = {};
     int32_t stateSize = data.ReadInt32();
+    if (static_cast<uint32_t>(stateSize) > HID_DEVICE_BY_STATES_NUM_MAX) {
+        return ERR_INVALID_STATE;
+    }
     HILOGD("BluetoothHidHostStub::GetDevicesByStatesInner");
     for (int i = 0; i < stateSize; i++) {
         int32_t state = data.ReadInt32();
