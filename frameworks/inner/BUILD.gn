@@ -44,7 +44,7 @@ config("btframework_public_config") {
   ]
 }
 
-ohos_shared_library("btframework") {
+ohos_static_library("btframework") {
   # uncomment to enable cfi for libbtframework.z.so
   # sanitize = {
   #   cfi = true
