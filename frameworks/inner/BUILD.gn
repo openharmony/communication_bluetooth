@@ -44,7 +44,7 @@ config("btframework_public_config") {
   ]
 }
 
-ohos_static_library("btframework") {
+ohos_shared_library("btframework") {
   # uncomment to enable cfi for libbtframework.z.so
   # sanitize = {
   #   cfi = true
@@ -292,6 +292,82 @@ ohos_static_library("btcommon") {
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+  ]
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+ohos_static_library("btaudiodriver") {
+  stack_protector_ret = true
+  configs = [ ":btframework_config" ]
+  public_configs = [ ":btframework_public_config" ]
+  sources = [
+    "c_adapter/ohos_bt_adapter_utils.cpp",
+    "c_adapter/ohos_bt_gap.cpp",
+    "c_adapter/ohos_bt_gatt.cpp",
+    "c_adapter/ohos_bt_gatt_client.cpp",
+    "c_adapter/ohos_bt_gatt_server.cpp",
+    "c_adapter/ohos_bt_spp.cpp",
+    "ipc/src/bluetooth_ble_advertise_callback_stub.cpp",
+    "ipc/src/bluetooth_ble_advertiser_proxy.cpp",
+    "ipc/src/bluetooth_ble_central_manager_callback_stub.cpp",
+    "ipc/src/bluetooth_ble_central_manager_proxy.cpp",
+    "ipc/src/bluetooth_ble_peripheral_observer_stub.cpp",
+    "ipc/src/bluetooth_gatt_client_callback_stub.cpp",
+    "ipc/src/bluetooth_gatt_client_proxy.cpp",
+    "ipc/src/bluetooth_gatt_server_callback_stub.cpp",
+    "ipc/src/bluetooth_gatt_server_proxy.cpp",
+    "ipc/src/bluetooth_host_observer_stub.cpp",
+    "ipc/src/bluetooth_host_proxy.cpp",
+    "ipc/src/bluetooth_remote_device_observer_stub.cpp",
+    "ipc/src/bluetooth_socket_proxy.cpp",
+    "src/bluetooth_ble_advertiser.cpp",
+    "src/bluetooth_ble_central_manager.cpp",
+    "src/bluetooth_device_class.cpp",
+    "src/bluetooth_gatt_characteristic.cpp",
+    "src/bluetooth_gatt_client.cpp",
+    "src/bluetooth_gatt_descriptor.cpp",
+    "src/bluetooth_gatt_manager.cpp",
+    "src/bluetooth_gatt_server.cpp",
+    "src/bluetooth_gatt_service.cpp",
+    "src/bluetooth_host.cpp",
+    "src/bluetooth_proxy_manager.cpp",
+    "src/bluetooth_remote_device.cpp",
+    "src/bluetooth_socket.cpp",
+    "src/bluetooth_socket_inputstream.cpp",
+    "src/bluetooth_socket_outputstream.cpp",
+    "src/bluetooth_utils.cpp",
+  ]
+
+  if (bluetooth_a2dp_sink_feature) {
+    sources += [
+      "ipc/src/bluetooth_a2dp_sink_observer_stub.cpp",
+      "ipc/src/bluetooth_a2dp_sink_proxy.cpp",
+      "src/bluetooth_a2dp_snk.cpp",
+    ]
+  } else {
+    sources += [ "src/mock/bluetooth_a2dp_snk.cpp" ]
+  }
+
+  if (bluetooth_a2dp_source_feature) {
+    sources += [
+      "ipc/src/bluetooth_a2dp_src_observer_stub.cpp",
+      "ipc/src/bluetooth_a2dp_src_proxy.cpp",
+      "src/bluetooth_a2dp_src.cpp",
+    ]
+  } else {
+    sources += [ "src/mock/bluetooth_a2dp_src.cpp" ]
+  }
+  
+  deps = [ ":btcommon" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hisysevent_native:libhisysevent",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "communication"
