@@ -29,6 +29,7 @@
 #include "adapter_state_machine.h"
 #include "base_def.h"
 #include "base_observer_list.h"
+#include "bluetooth_common_event_helper.h"
 #include "class_creator.h"
 #include "permission_utils.h"
 #include "power_manager.h"
@@ -40,6 +41,7 @@ namespace OHOS {
 namespace bluetooth {
 // data define
 const int TRANSPORT_MAX = 2;
+const std::string PERMISSIONS = "ohos.permission.USE_BLUETOOTH"; 
 
 struct AdapterInfo {
     AdapterInfo(std::unique_ptr<IAdapter> instance, std::unique_ptr<AdapterStateMachine> stateMachine)
@@ -547,6 +549,14 @@ void AdapterManager::OnSysStateExit(const std::string &state) const
         // Nothing to do.
     }
 }
+void AdapterManager::PublishBluetoothStateChangeEvent(const BTTransport transport, const BTStateID state) const
+{
+    if (transport == ADAPTER_BREDR && (state == BTStateID::STATE_TURN_ON || state == BTStateID::STATE_TURN_OFF)) {
+        std::vector<std::string> permissions;
+        permissions.emplace_back(PERMISSIONS);
+        BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(state, permissions);
+    }
+}
 
 void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTStateID state) const
 {
@@ -561,6 +571,7 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     if (pimpl->adapters_[transport]->state_ != state) {
         pimpl->adapters_[transport]->state_ = state;
         if (GetSysState() != SYS_STATE_RESETTING) {
+            PublishBluetoothStateChangeEvent(transport, state);
             pimpl->adapterObservers_.ForEach(
                 [transport, state](IAdapterStateObserver &observer) { observer.OnStateChange(transport, state); });
         }
