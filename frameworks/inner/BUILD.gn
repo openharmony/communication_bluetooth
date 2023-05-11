@@ -359,7 +359,7 @@ ohos_static_library("btaudiodriver") {
   } else {
     sources += [ "src/mock/bluetooth_a2dp_src.cpp" ]
   }
-  
+
   deps = [ ":btcommon" ]
 
   external_deps = [
