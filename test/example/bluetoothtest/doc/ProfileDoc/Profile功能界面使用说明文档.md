@@ -1,10 +1,16 @@
-## Profile蓝牙部分
+## Profile测试使用说明文档
+
+​      本文档主要介绍了蓝牙专项测试程序的Profile测试模块的功能使用说明。
+
+
+
+### Profile测试界面
 
 ![Profile主界面](Profile主界面.png)
 
 
 
-#### Profile的主要接口
+#### Profile的主要接口（ohos.bluetooth.d.ts）
 
 |  method名称  |       API名称        |     所需参数     |             返回值             | 备注 |
 | :----------: | :------------------: | :--------------: | :----------------------------: | :--: |
@@ -187,3 +193,133 @@ BaseProfile：基础通用协议
 
   - 验证方法：查看之前连接的播放设备是否还可以使用。
 
+
+
+#### ProfileManager的主要接口（ohos.bluetoothManager.d.ts）
+
+|  method名称  |       API名称        |     所需参数     |             返回值             | 备注 |
+| :----------: | :------------------: | :--------------: | :----------------------------: | :--: |
+| 获取连接状态 | getConnectionDevices |        ()        |         Array<string>          | Base |
+| 获取设备状态 |    getDeviceState    | (device: string) | ProfileConnectionState（枚举） | Base |
+|     连接     |       connect        | (device: string) |            boolean             |      |
+|   取消连接   |      disconnect      | (device: string) |            boolean             |      |
+| 获取播放状态 |   getPlayingState    | (device: string) |      PlayingState（枚举）      |      |
+
+>配置：
+>
+>#### ProfileConnectionState  枚举，蓝牙设备的profile连接状态
+>
+>| 名称                | 值   | 说明                  |
+>| :------------------ | :--- | :-------------------- |
+>| STATE_DISCONNECTED  | 0    | 表示profile已断连。   |
+>| STATE_CONNECTING    | 1    | 表示profile正在连接。 |
+>| STATE_CONNECTED     | 2    | 表示profile已连接。   |
+>| STATE_DISCONNECTING | 3    | 表示profile正在断连。 |
+>
+>
+>
+>#### ProfileId  蓝牙profile枚举，API9新增PROFILE_HID_HOST，PROFILE_PAN_NETWORK。
+>
+>| 名称                             | 值   | 说明               |
+>| :------------------------------- | :--- | :----------------- |
+>| PROFILE_A2DP_SOURCE              | 1    | 表示A2DP profile。 |
+>| PROFILE_HANDS_FREE_AUDIO_GATEWAY | 4    | 表示HFP profile。  |
+>| PROFILE_HID_HOST                 | 6    | 表示HID profile。  |
+>| PROFILE_PAN_NETWORK              | 7    | 表示PAN profile。  |
+
+
+
+#### 功能 
+
+BaseProfile：基础通用协议
+
+- getConnectionDevices
+
+  - 使用指导：获取配置文件的已连接设备列表，返回值为已连接设备列表的地址。
+
+  - 限制条件：
+
+    - 必须有已连接的设备。
+    - @throws { BusinessError } 201 - Permission denied.
+    * @throws { BusinessError } 801 - Capability not supported.
+    * @throws { BusinessError } 2900001 - Service stopped.
+    * @throws { BusinessError } 2900003 - Bluetooth switch is off.
+    * @throws { BusinessError } 2900004 - Profile is not supported.
+    - @throws { BusinessError } 2900099 - Operation failed.
+
+  - 验证方法：查看返回值。
+
+    
+
+- getDeviceState
+
+  - 使用指导：获取设备的配置文件状态，device为蓝牙设备的地址，返回值为｛连接配置文件的连接状态｝
+
+  - 限制条件：
+
+    - 有连接的配置文件
+    - @throws { BusinessError } 201 - Permission denied.
+    - @throws { BusinessError } 401 - Invalid parameter.
+    - @throws { BusinessError } 801 - Capability not supported.
+    - @throws { BusinessError } 2900001 - Service stopped.
+    - @throws { BusinessError } 2900003 - Bluetooth switch is off.
+    - @throws { BusinessError } 2900004 - Profile is not supported.
+    - @throws { BusinessError } 2900099 - Operation failed.
+
+  - 验证方法：查看返回值。
+
+    
+
+- connect
+
+  - 使用指导：使用a2dp连接到设备。device为要连接的远程设备的地址。如果连接正在进行，返回值为true；否则返回 false。
+
+
+    - 限制条件：
+
+      - 之前未成功连接。
+      - @throws { BusinessError } 201 - Permission denied.
+      * @throws { BusinessError } 401 - Invalid parameter.
+      * @throws { BusinessError } 801 - Capability not supported.
+      * @throws { BusinessError } 2900001 - Service stopped.
+      * @throws { BusinessError } 2900003 - Bluetooth switch is off.
+      * @throws { BusinessError } 2900004 - Profile is not supported.
+      - @throws { BusinessError } 2900099 - Operation failed.
+
+
+    - 验证方法：查看连接的播放设备是否正常使用。
+
+      
+
+
+- disconnect
+
+  - 使用指导：用a2dp断开与设备的连接。device为要断开连接的远程设备的地址。如果正在断开连接，则返回true；否则返回 false。
+
+  - 限制条件：
+
+    - 已成功连接。
+    - @throws { BusinessError } 201 - Permission denied.
+    * @throws { BusinessError } 401 - Invalid parameter.
+    * @throws { BusinessError } 801 - Capability not supported.
+    * @throws { BusinessError } 2900001 - Service stopped.
+    * @throws { BusinessError } 2900003 - Bluetooth switch is off.
+    * @throws { BusinessError } 2900004 - Profile is not supported.
+    * @throws { BusinessError } 2900099 - Operation failed.
+
+  - 验证方法：查看之前连接的播放设备是否还可以使用。
+
+    
+
+- getPlayingState
+
+  - 使用指导：获取设备的播放状态。device为远程设备的地址。返回值为远程设备的播放状态。
+  - 限制条件：
+    - 已成功连接。
+    - @throws { BusinessError } 401 - Invalid parameter.
+    * @throws { BusinessError } 801 - Capability not supported.
+    * @throws { BusinessError } 2900001 - Service stopped.
+    * @throws { BusinessError } 2900003 - Bluetooth switch is off.
+    * @throws { BusinessError } 2900004 - Profile is not supported.
+    * @throws { BusinessError } 2900099 - Operation failed.
+  - 验证方法：查看之前连接的播放设备是否正常播放。
