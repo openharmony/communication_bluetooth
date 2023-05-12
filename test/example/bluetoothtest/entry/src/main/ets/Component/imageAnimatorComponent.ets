@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Shenzhen Kaihong Digital Industry Development Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
 import ComponentConfig from './componentConfig';
 
 /**
- * ImageAnimator component
+ * ImageAnimator component of bluetooth test
  */
 @Component
 export default struct ImageAnimatorComponent {
@@ -26,57 +26,57 @@ export default struct ImageAnimatorComponent {
   build() {
     Column() {
       ImageAnimator()
-      .images([
-        {
-          src: '../MainAbility/res/image/hdpi/ic_loading01.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading02.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading03.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading04.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading05.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading06.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }])
-      .width(this.imageWidth)
-      .height(this.imageHeight)
-      .iterations(-1)
-      .fixedSize(true)
-      .reverse(true)
-      .fillMode(FillMode.None)
-      .state(AnimationStatus.Running)
+        .images( [
+          {
+            src : '../MainAbility/res/image/hdpi/ic_loading01.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading02.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading03.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading04.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading05.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading06.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          } ] )
+        .width( this.imageWidth )
+        .height( this.imageHeight )
+        .iterations( - 1 )
+        .fixedSize( true )
+        .reverse( true )
+        .fillMode( FillMode.None )
+        .state( AnimationStatus.Running )
     }
   }
 }

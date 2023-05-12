@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Shenzhen Kaihong Digital Industry Development Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,29 +13,33 @@
  * limitations under the License.
  */
 
+/**
+ *  ISettingsController Of Bluetooth test
+ */
+
 export default interface ISettingsController {
   /**
-    * Bind component.
-    */
+   * Bind component.
+   */
   bindComponent(component: any): ISettingsController;
 
   /**
-    *  Bind component's properties.
-    */
+   *  Bind component's properties.
+   */
   bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController
 
   /**
-    * Initialize data.
-    */
+   * Initialize data.
+   */
   initData(): ISettingsController;
 
   /**
-    * Subscribe listeners.
-    */
+   * Subscribe listeners.
+   */
   subscribe(): ISettingsController;
 
   /**
-    * Unsubscribe listeners.
-    */
+   * Unsubscribe listeners.
+   */
   unsubscribe(): ISettingsController;
 }

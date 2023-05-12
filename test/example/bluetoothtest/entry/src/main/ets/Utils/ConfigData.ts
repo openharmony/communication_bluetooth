@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Shenzhen Kaihong Digital Industry Development Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,7 @@
  */
 
 export class ConfigData {
-
-  TAG='Bluetooth_Test '
-
+  TAG = 'Bluetooth_Test '
   WH_100_100 = '100%';
   WH_25_100 = '25%';
   WH_30_100 = '30%';
@@ -28,10 +26,8 @@ export class ConfigData {
   WH_55_100 = '55%';
   WH_83_100 = '83%';
   WH_90_100 = '90%';
-
   value_20 = 20;
   font_20 = 20;
-
   MAX_LINES_1 = 1;
   MAX_LINES_2 = 2;
   MAX_LINES_3 = 3;
@@ -40,4 +36,5 @@ export class ConfigData {
 }
 
 let configData = new ConfigData();
+
 export default configData as ConfigData;
