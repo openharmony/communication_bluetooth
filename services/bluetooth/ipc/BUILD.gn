@@ -159,7 +159,7 @@ ohos_static_library("btipc_static") {
   sources = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/src/bluetooth_host_proxy.cpp" ]
 
   if (bluetooth_a2dp_sink_feature) {
-    sources += [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/src/bluetooth_a2dp_sink_proxy.cpp" ]
+    sources += [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/src/bluetooth_a2dp_src_proxy.cpp" ]
   }
 
   deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon" ]
