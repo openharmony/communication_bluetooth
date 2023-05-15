@@ -17,11 +17,11 @@
 #include <cmath>
 #include <cstring>
 #include <mutex>
-#include "a2dp_sbc_param_ctrl.h"
+#include "../../include/a2dp_sbc_param_ctrl.h"
 #include "log.h"
 #include "packet.h"
 #include "securec.h"
-#include "a2dp_service.h"
+#include "../../../a2dp_service.h"
 
 namespace OHOS {
 namespace bluetooth {
