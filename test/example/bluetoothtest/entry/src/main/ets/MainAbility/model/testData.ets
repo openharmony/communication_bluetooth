@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,33 @@
  * limitations under the License.
  */
 
-export enum Category  {
-  All,
-  API,
-  Scenario,
-  AutoTest,
-  GattAutoTest,
-  SppAutoTest,
-  ProfileAutoTest,
-  Profile,
-  BenchMark
+export enum Category {
+  All ,
+  API ,
+  Gatt ,
+  SPP ,
+  Scenario ,
+  AutoTest ,
+  GattAutoTest ,
+  SppAutoTest ,
+  ProfileAutoTest ,
+  Profile ,
+  BenchMark ,
+
+  APIManager ,
+  GattManager ,
+  SPPManager ,
+  ScenarioManager ,
+  AutoTestManager ,
+  GattAutoTestManager ,
+  SppAutoTestManager ,
+  ProfileAutoTestManager ,
+  ProfileManager ,
+  BenchMarkManager
 }
 
 let NextId = 0;
+
 export class TestData {
   id: string;
   name: string;
@@ -34,8 +48,8 @@ export class TestData {
   image: Resource
   category: Category;
 
-  constructor(name: string, detail: string, url: string, image: Resource, category: Category) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , url: string , image: Resource , category: Category ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.url = url;
     this.detail = detail;
@@ -44,22 +58,23 @@ export class TestData {
   }
 }
 
-export enum CaseCategory  {
-  BR,
-  BLE,
-  Gatt,
-  SPP,
-  Profile,
-  GattClient,
-  GattServer,
-  SPPClient,
-  SPPServer,
-  ProfileA2dpSource,
-  ProfileHandsFreeAudioGateway,
-  ProfileHitHost,
-  ProfilePanNetwork,
-  GattAutoTest,
-  SppAutoTest,
+export enum CaseCategory {
+  BR ,
+  BRManager ,
+  BLE ,
+  BLEManager ,
+  GattClient ,
+  GattClientManager ,
+  GattServer ,
+  GattServerManager ,
+  SPPClient ,
+  SPPClientManager ,
+  SPPServer ,
+  SPPServerManager ,
+  ProfileA2dpSource ,
+  ProfileHandsFreeAudioGateway ,
+  ProfileHitHost ,
+  ProfilePanNetwork ,
 }
 
 export class TestApi {
@@ -71,8 +86,8 @@ export class TestApi {
   result: string;
   category: CaseCategory;
 
-  constructor(name: string, detail: string, method: string, api: any, result: string, category: CaseCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: CaseCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;
@@ -83,19 +98,19 @@ export class TestApi {
 }
 
 export enum AutoCategory {
-  BrAuto,
-  BleAuto,
-  GattClientAuto,
-  GattServerAuto,
-  SppClientAuto,
-  SppServerAuto,
-  A2dpSourceAuto,
-  HandsFreeAudioGatewayAuto,
-  HitHostAuto,
+  BrAuto ,
+  BleAuto ,
+  GattClientAuto ,
+  GattServerAuto ,
+  SppClientAuto ,
+  SppServerAuto ,
+  A2dpSourceAuto ,
+  HandsFreeAudioGatewayAuto ,
+  HitHostAuto ,
   PanNetworkAuto
 }
 
-export class TestAuto{
+export class TestAuto {
   id: string;
   name: string;
   detail: string;
@@ -105,8 +120,8 @@ export class TestAuto{
   result: string;
   category: AutoCategory;
 
-  constructor(name: string, detail: string, method: string , api:any ,result: string, category: AutoCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: AutoCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;
@@ -118,19 +133,15 @@ export class TestAuto{
 
 
 export enum ScenarioCategory {
-  BrFoundScenario,
-  BleFoundScenario,
-  GattClientScenario,
-  GattServerScenario,
-  SppClientScenario,
-  SppServerScenario,
-//  A2dpSourceScenario,
-//  HandsFreeAudioGatewayAuto,
-//  HitHostAuto,
-//  PanNetworkAuto,
+  BrFoundScenario ,
+  BleFoundScenario ,
+  GattClientScenario ,
+  GattServerScenario ,
+  SppClientScenario ,
+  SppServerScenario ,
 }
 
-export class TestScenario{
+export class TestScenario {
   id: string;
   name: string;
   detail: string;
@@ -140,8 +151,8 @@ export class TestScenario{
   result: string;
   category: ScenarioCategory;
 
-  constructor(name: string, detail: string, method: string , api:any ,result: string, category: ScenarioCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: ScenarioCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;
@@ -152,19 +163,15 @@ export class TestScenario{
 }
 
 export enum BenchmarkCategory {
-  BrBenchmark,
-  BleBenchmark,
-  GattClientBenchmark,
-  GattServerBenchmark,
-  SppClientBenchmark,
-  SppServerBenchmark,
-  //  A2dpSourceBenchmark,
-  //  HFPBenchmark,
-  //  HitHostBenchmark,
-  //  PanNetworkBenchmark,
+  BrBenchmark ,
+  BleBenchmark ,
+  GattClientBenchmark ,
+  GattServerBenchmark ,
+  SppClientBenchmark ,
+  SppServerBenchmark ,
 }
 
-export class TestBenchmark{
+export class TestBenchmark {
   id: string;
   name: string;
   detail: string;
@@ -174,8 +181,8 @@ export class TestBenchmark{
   result: string;
   category: BenchmarkCategory;
 
-  constructor(name: string, detail: string, method: string , api:any ,result: string, category: BenchmarkCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: BenchmarkCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;

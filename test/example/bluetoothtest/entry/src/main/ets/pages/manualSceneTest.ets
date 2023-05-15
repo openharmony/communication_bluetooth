@@ -23,13 +23,13 @@ struct ManualSceneTest {
 
   build() {
     Column() {
-      Text(this.message)
-        .fontSize($r('app.float.font_20'))
-        .lineHeight($r('app.float.wh_value_22'))
-        .fontColor($r('app.color.font_color_182431'))
-        .fontWeight(FontWeight.Medium)
-        .margin({left: $r('app.float.distance_8')})
-        .textAlign(TextAlign.Start);
+      Text( this.message )
+        .fontSize( $r( 'app.float.font_20' ) )
+        .lineHeight( $r( 'app.float.wh_value_22' ) )
+        .fontColor( $r( 'app.color.font_color_182431' ) )
+        .fontWeight( FontWeight.Medium )
+        .margin( { left : $r( 'app.float.distance_8' ) } )
+        .textAlign( TextAlign.Start );
     }
   }
 }

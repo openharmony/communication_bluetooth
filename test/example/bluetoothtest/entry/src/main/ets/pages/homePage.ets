@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { Category, TestData } from '../MainAbility/model/testData'
+import { Category , TestData } from '../MainAbility/model/testData'
 import { initTestData } from '../MainAbility/model/testDataModels'
 import { MainPageTitle } from '../Component/mainPageTitle';
 import { ManualApiTest } from '../Component/manualApiTestComponent';
@@ -26,37 +26,62 @@ import image from '@ohos.multimedia.image'
 
 import MediaUtils from '../MainAbility/model/MediaUtils'
 import Logger from '../MainAbility/model/Logger'
+
 const TAG = '[Screenshot]'
+
 @Component
 struct TestCategory {
   private testItems: TestData[]
+
   build() {
     Stack() {
       Tabs() {
         TabContent() {
-          ManualApiTest({ testItems: this.testItems.filter(item => (item.category === Category.API)) })
-        }.tabBar($r("app.string.api"))
+          ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.API ) ) } )
+        }.tabBar( $r( "app.string.api" ) )
 
         TabContent() {
-          AutoTest({ testItems: this.testItems.filter(item => (item.category === Category.AutoTest)) })
-        }.tabBar($r("app.string.autotest"))
+          ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.APIManager ) ) } )
+        }.tabBar( $r( "app.string.api_M" ) )
 
         TabContent() {
-          ManualSceneTest({ testItems: this.testItems.filter(item => (item.category === Category.Scenario)) })
-        }.tabBar($r("app.string.scenario"))
+          AutoTest( { testItems : this.testItems.filter( item => ( item.category === Category.AutoTest ) ) } )
+        }.tabBar( $r( "app.string.autotest" ) )
 
         TabContent() {
-          ProfileTest({ testItems: this.testItems.filter(item => (item.category === Category.Profile)) })
-        }.tabBar($r("app.string.profile"))
+          AutoTest( { testItems : this.testItems.filter( item => ( item.category === Category.AutoTestManager ) ) } )
+        }.tabBar( $r( "app.string.autotest_M" ) )
 
         TabContent() {
-          BenchmarkTest ({ testItems: this.testItems.filter(item => (item.category === Category.BenchMark)) })
-        }.tabBar($r("app.string.benchmark"))
+          ManualSceneTest( { testItems : this.testItems.filter( item => ( item.category === Category.Scenario ) ) } )
+        }.tabBar( $r( "app.string.scenario" ) )
+
+        TabContent() {
+          ManualSceneTest( { testItems : this.testItems.filter( item => ( item.category === Category.ScenarioManager ) ) } )
+        }.tabBar( $r( "app.string.scenario_M" ) )
+
+        TabContent() {
+          ProfileTest( { testItems : this.testItems.filter( item => ( item.category === Category.Profile ) ) } )
+        }.tabBar( $r( "app.string.profile" ) )
+
+        TabContent() {
+          ProfileTest( { testItems : this.testItems.filter( item => ( item.category === Category.ProfileManager ) ) } )
+        }.tabBar( $r( "app.string.profile_M" ) )
+
+        TabContent() {
+          BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.BenchMark ) ) } )
+        }.tabBar( $r( "app.string.benchmark" ) )
+
+        TabContent() {
+          BenchmarkTest( {
+            testItems : this.testItems.filter( item => ( item.category === Category.BenchMarkManager ) )
+          } )
+        }.tabBar( $r( "app.string.benchmark_M" ) )
       }
-      .barWidth("80%")
-      .barHeight(60)
-      .barMode(BarMode.Scrollable)
-      .backgroundColor($r("app.color.white"))
+      .barWidth( "80%" )
+      .barHeight( 60 )
+      .barMode( BarMode.Scrollable )
+      .backgroundColor( $r( "app.color.white" ) )
     }
   }
 }
@@ -68,18 +93,20 @@ struct TestCategory {
 @Component
 struct HomePage {
   private testItems: TestData[] = initTestData()
+
   build() {
     Column() {
       MainPageTitle()
-      Stack({ alignContent: Alignment.TopEnd }) {
-        TestCategory({ testItems: this.testItems })
-        Image($r('app.media.Switch'))
-          .height(30)
-          .width(30)
-          .margin({ top: 15, right: 10 })
-          .onClick(() => {})
+      Stack( { alignContent : Alignment.TopEnd } ) {
+        TestCategory( { testItems : this.testItems } )
+        Image( $r( 'app.media.Switch' ) )
+          .height( 30 )
+          .width( 30 )
+          .margin( { top : 15 , right : 10 } )
+          .onClick( () => {
+          } )
       }
-      .height('100%')
+      .height( '100%' )
     }
   }
 }

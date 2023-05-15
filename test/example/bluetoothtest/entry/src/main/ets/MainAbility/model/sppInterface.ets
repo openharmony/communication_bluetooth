@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,20 @@
 
 import Router from '@system.router';
 import prompt from '@system.prompt';
+
 const PAGE_URI_GET_SPP_CLIENT_TEST = 'pages/subManualApiTest/subSppTest/sppClientTest';
 const PAGE_URI_GET_SPP_SERVER_TEST = 'pages/subManualApiTest/subSppTest/sppServerTest';
 
-export function testSppClient():string{
-  Router.push({ uri: PAGE_URI_GET_SPP_CLIENT_TEST })
+export function testSppClient(): string {
+  Router.push( { uri : PAGE_URI_GET_SPP_CLIENT_TEST } )
   let message = "跳转成功"
-  prompt.showToast({message: message})
+  prompt.showToast( { message : message } )
   return message
 }
 
-export function testSppServer():string{
-  Router.push({ uri: PAGE_URI_GET_SPP_SERVER_TEST })
+export function testSppServer(): string {
+  Router.push( { uri : PAGE_URI_GET_SPP_SERVER_TEST } )
   let message = "跳转成功"
-  prompt.showToast({message: message})
+  prompt.showToast( { message : message } )
   return message
 }
