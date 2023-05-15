@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <memory>
 #include "a2dp_sbc_dynamic_lib_ctrl.h"
-#include "a2dp_codec_wrapper.h"
+#include "../../include/a2dp_codec_wrapper.h"
 
 namespace OHOS {
 namespace bluetooth {
