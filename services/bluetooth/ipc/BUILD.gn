@@ -29,11 +29,8 @@ ohos_static_library("btipc_service") {
   stack_protector_ret = true
   public_configs = [ ":btipc_public_config" ]
   include_dirs = [
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/common",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/interface",
   ]
   sources = [
     "src/bluetooth_ble_advertise_callback_proxy.cpp",
@@ -152,30 +149,17 @@ ohos_static_library("btipc_service") {
   ]
 }
 
-config("btipcstatic_public_config") {
-  include_dirs = [
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/common",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/interface",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
-  ]
-}
-
+# temporary used in drivers_peripheral\bluetooth\audio
 ohos_static_library("btipc_static") {
   stack_protector_ret = true
 
-  public_configs = [ ":btipcstatic_public_config" ]
-  
-  sources = [
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/src/bluetooth_host_proxy.cpp",
-  ]
+  public_configs =
+      [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework_public_config" ]
+
+  sources = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/src/bluetooth_host_proxy.cpp" ]
 
   if (bluetooth_a2dp_sink_feature) {
-    sources += [
-      "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/src/bluetooth_a2dp_sink_proxy.cpp",
-    ]
+    sources += [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/src/bluetooth_a2dp_sink_proxy.cpp" ]
   }
 
   deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon" ]

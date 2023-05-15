@@ -26,10 +26,7 @@ config("btdummy_config") {
 }
 
 config("btdummy_public_config") {
-  include_dirs = [
-    "dummy/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
-  ]
+  include_dirs = [ "dummy/include" ]
 }
 
 ohos_shared_library("btdummy") {
