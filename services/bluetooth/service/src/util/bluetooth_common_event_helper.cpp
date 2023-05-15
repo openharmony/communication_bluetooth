@@ -24,7 +24,7 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace BluetoothHelper {
-bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code,
+bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction,int code,
     const std::vector<std::string> &permissions)
 {
     Want want;
@@ -49,7 +49,7 @@ bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction, co
     return true;
 }
 
-bool BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(const int &code,
+bool BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(int code,
     const std::vector<std::string> &permissions)
 {
     return BluetoothCommonEventHelper::PublishEvent(COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE , code, permissions);
