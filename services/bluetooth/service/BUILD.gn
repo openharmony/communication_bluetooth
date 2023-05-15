@@ -155,7 +155,6 @@ ServicePermissionSrc = [
 config("btservice_public_config") {
   include_dirs = [
     "include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "//third_party/bounds_checking_function/include",

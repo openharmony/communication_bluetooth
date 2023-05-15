@@ -27,9 +27,6 @@ ohos_shared_library("bluetooth_server") {
   include_dirs = [
     "include",
     "//foundation/communication/bluetooth/frameworks/inner/common",
-    "//foundation/communication/bluetooth/frameworks/inner/ipc/common",
-    "//foundation/communication/bluetooth/frameworks/inner/ipc/interface",
-    "//foundation/communication/bluetooth/frameworks/inner/ipc/parcel",
     "//foundation/communication/bluetooth/interfaces/inner_api/include",
     "//foundation/communication/bluetooth/services/bluetooth/service/include",
     "//foundation/communication/bluetooth/services/bluetooth/service/src/ble",
