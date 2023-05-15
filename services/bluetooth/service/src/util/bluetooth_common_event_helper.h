@@ -24,9 +24,9 @@ const std::string COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE = "usual.event.blueto
 
 class BluetoothCommonEventHelper {
 public:
-    static bool PublishEvent(const std::string &eventAction, const int &code,
+    static bool PublishEvent(const std::string &eventAction,int code,
         const std::vector<std::string> &permissions);
-    static bool PublishBluetoothStateChangeEvent(const int &code, const std::vector<std::string> &permissions);
+    static bool PublishBluetoothStateChangeEvent(int code, const std::vector<std::string> &permissions);
 };
 }  // namespace BluetoothHelper
 }  // namespace OHOS
