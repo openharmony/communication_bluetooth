@@ -23,74 +23,67 @@ import bt from '@ohos.bluetooth';
 export class BTProfileModel extends BaseModel {
   private TAG = ConfigData.TAG + 'BTProfileModel';
   private profiles: any[] = new Array();
-
   public PROFILE_A2DP_SOURCE = 1;
-
   public PROFILE_HANDS_FREE_AUDIO_GATEWAY = 4;
-
   public PROFILE_HID_HOST = 6;
-
-  public PROFILE_PAN_NETWORK =7;
-
-
+  public PROFILE_PAN_NETWORK = 7;
   public BLUETOOTH_STATE_OFF = 0;
 
   constructor() {
     super();
   }
+
   initProfile() {
-    console.log('bt_test BTProfileModel start');
+    console.log( 'bt_test BTProfileModel start' );
 
-    this.profiles[this.PROFILE_A2DP_SOURCE] = bt.getProfile(this.PROFILE_A2DP_SOURCE);
+    this.profiles[this.PROFILE_A2DP_SOURCE] = bt.getProfile( this.PROFILE_A2DP_SOURCE );
 
-    this.profiles[this.PROFILE_HANDS_FREE_AUDIO_GATEWAY] = bt.getProfile(this.PROFILE_HANDS_FREE_AUDIO_GATEWAY);
+    this.profiles[this.PROFILE_HANDS_FREE_AUDIO_GATEWAY] = bt.getProfile( this.PROFILE_HANDS_FREE_AUDIO_GATEWAY );
 
-    this.profiles[this.PROFILE_HID_HOST] = bt.getProfile(this.PROFILE_HID_HOST);
+    this.profiles[this.PROFILE_HID_HOST] = bt.getProfile( this.PROFILE_HID_HOST );
 
-    this.profiles[this.PROFILE_PAN_NETWORK] = bt.getProfile(this.PROFILE_PAN_NETWORK);
+    this.profiles[this.PROFILE_PAN_NETWORK] = bt.getProfile( this.PROFILE_PAN_NETWORK );
 
-    console.log('bt_test BTProfileModel end');
+    console.log( 'bt_test BTProfileModel end' );
   }
 
-  hasProfile(type: number): boolean {
-    if (!this.profiles[type]) {
+  hasProfile( type: number ): boolean {
+    if ( !this.profiles[type] ) {
       return false;
     }
     return true;
   }
 
   getA2DPSourceProfile(): bt.A2dpSourceProfile {
-    if (this.profiles[this.PROFILE_A2DP_SOURCE] != null) {
+    if ( this.profiles[this.PROFILE_A2DP_SOURCE] != null ) {
       return this.profiles[this.PROFILE_A2DP_SOURCE]
     }
     return null;
   }
 
   getHandsFreeAudioGatewayProfile(): bt.HandsFreeAudioGatewayProfile {
-    if (this.profiles[this.PROFILE_HANDS_FREE_AUDIO_GATEWAY] != null) {
+    if ( this.profiles[this.PROFILE_HANDS_FREE_AUDIO_GATEWAY] != null ) {
       return this.profiles[this.PROFILE_HANDS_FREE_AUDIO_GATEWAY];
     }
     return null;
   }
 
-
-  getHidHostProfile() :bt.HidHostProfile {
-    if (this.profiles[this.PROFILE_HID_HOST] != null) {
+  getHidHostProfile(): bt.HidHostProfile {
+    if ( this.profiles[this.PROFILE_HID_HOST] != null ) {
       return this.profiles[this.PROFILE_HID_HOST];
     }
     return null;
   }
 
-  getPanNetworkProfile() :bt.PanNetworkProfile {
-    if (this.profiles[this.PROFILE_PAN_NETWORK] != null) {
+  getPanNetworkProfile(): bt.PanNetworkProfile {
+    if ( this.profiles[this.PROFILE_PAN_NETWORK] != null ) {
       return this.profiles[this.PROFILE_PAN_NETWORK];
     }
     return null;
   }
 
-
-  getProfile(type: number) {
-    if (this.profiles[type] != null) {
+  getProfile( type: number ) {
+    if ( this.profiles[type] != null ) {
       return this.profiles[type];
     }
     return null;
@@ -102,4 +95,5 @@ export class BTProfileModel extends BaseModel {
 }
 
 let btProfileModel = new BTProfileModel();
+
 export default btProfileModel as BTProfileModel;

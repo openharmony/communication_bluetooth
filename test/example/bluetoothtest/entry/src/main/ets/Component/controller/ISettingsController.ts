@@ -13,29 +13,33 @@
  * limitations under the License.
  */
 
+/**
+ *  ISettingsController Of Bluetooth test
+ */
+
 export default interface ISettingsController {
   /**
-    * Bind component.
-    */
+   * Bind component.
+   */
   bindComponent(component: any): ISettingsController;
 
   /**
-    *  Bind component's properties.
-    */
+   *  Bind component's properties.
+   */
   bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController
 
   /**
-    * Initialize data.
-    */
+   * Initialize data.
+   */
   initData(): ISettingsController;
 
   /**
-    * Subscribe listeners.
-    */
+   * Subscribe listeners.
+   */
   subscribe(): ISettingsController;
 
   /**
-    * Unsubscribe listeners.
-    */
+   * Unsubscribe listeners.
+   */
   unsubscribe(): ISettingsController;
 }

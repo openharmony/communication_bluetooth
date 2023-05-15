@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ export enum ProfileCode {
   CODE_BT_PROFILE_PAN_NETWORK,
   CODE_BT_PROFILE_PBAP_CLIENT,
   CODE_BT_PROFILE_PBAP_SERVER,
-};
+}
+;
 
 export enum BondState {
   /** Indicate the bond state is invalid */
@@ -124,7 +125,7 @@ enum ProfileConnectionState {
   STATE_DISCONNECTING = 3
 }
 
-export class BluetoothModel extends BaseModel{
+export class BluetoothModel extends BaseModel {
   private TAG = 'BluetoothModel ';
   private profiles: any[] = new Array(10);
   public canUse: boolean = false;
@@ -133,19 +134,20 @@ export class BluetoothModel extends BaseModel{
    */
   constructor() {
     super();
-    try{
+    try {
       LogUtil.info('bluetooth.getProfile start')
       this.profiles[1] = bluetooth.getProfile(1);
       this.profiles[4] = bluetooth.getProfile(4);
       LogUtil.info('bluetooth.getProfile end')
       this.canUse = true;
     }
-    catch(error){
+    catch (error) {
       LogUtil.info('bluetooth.getProfile error')
       this.canUse = false;
       LogUtil.info(`BluetoothModel error: ${JSON.stringify(error)}.`);
     }
   }
+
   getProfileConnState(profileId: ProfileId): string {
     let state = bluetooth.getProfileConnState(profileId);
     switch (state) {
@@ -189,9 +191,9 @@ export class BluetoothModel extends BaseModel{
   }
 
   /**
-    * Get Bluetooth status
-    * @return value of bluetooth.BluetoothState type
-    */
+   * Get Bluetooth status
+   * @return value of bluetooth.BluetoothState type
+   */
   getState(): number {
     let bluetoothState = bluetooth.getState();
     LogUtil.info(`${this.TAG} getState: bluetoothState = ${bluetoothState}`);
@@ -202,7 +204,7 @@ export class BluetoothModel extends BaseModel{
     return bluetooth.setBluetoothScanMode(mode, duration);
   }
 
-  getBluetoothScanMode() : string {
+  getBluetoothScanMode(): string {
     let scanMode = bluetooth.getBluetoothScanMode();
     LogUtil.info(`${this.TAG} getBluetoothScanMode: scanMode = ${scanMode}`);
     switch (scanMode) {
@@ -231,8 +233,8 @@ export class BluetoothModel extends BaseModel{
   }
 
   /**
-    * Get Bluetooth switch status
-    */
+   * Get Bluetooth switch status
+   */
   isStateOn(): boolean {
     let result = false;
     let state = bluetooth.getState();
@@ -248,8 +250,8 @@ export class BluetoothModel extends BaseModel{
     return result;
   }
   /**
-    * Subscribe Bluetooth switch status Change
-    */
+   * Subscribe Bluetooth switch status Change
+   */
   subscribeStateChange(callback: (data: boolean) => void): void {
     bluetooth.on('stateChange', (data) => {
       LogUtil.info(`${this.TAG} subscribeStateChange->stateChange data:${data}`);
@@ -271,8 +273,8 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * unsubscribe Bluetooth switch status Change
-    */
+   * unsubscribe Bluetooth switch status Change
+   */
   unsubscribeStateChange(callback?: (data: boolean) => void): void {
     bluetooth.off('stateChange', (data) => {
       LogUtil.info(`${this.TAG} unsubscribeStateChange->stateChange data:${data}`);
@@ -294,45 +296,45 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * Turn on Bluetooth
-    */
+   * Turn on Bluetooth
+   */
   enableBluetooth(): boolean {
     return bluetooth.enableBluetooth();
   }
   /**
-    * Turn off Bluetooth
-    */
+   * Turn off Bluetooth
+   */
   disableBluetooth(): boolean {
     return bluetooth.disableBluetooth();
   }
   /**
-    * Get local name
-    */
+   * Get local name
+   */
   getLocalName(): string {
     return bluetooth.getLocalName();
   }
   /**
-    * Set local name
-    */
+   * Set local name
+   */
   setLocalName(name: string): boolean {
     return bluetooth.setLocalName(name);
   }
   /**
-    * Get paired device ids
-    */
+   * Get paired device ids
+   */
   getPairedDeviceIds(): Array<string> {
     return bluetooth.getPairedDevices();
   }
 
   /**
-    * Start Bluetooth discovery
-    */
+   * Start Bluetooth discovery
+   */
   startBluetoothDiscovery(): boolean {
     return bluetooth.startBluetoothDiscovery();
   }
   /**
-    * Stop Bluetooth discovery
-    */
+   * Stop Bluetooth discovery
+   */
   stopBluetoothDiscovery(): boolean {
     let ret = bluetooth.stopBluetoothDiscovery();
     this.unsubscribeStateChange();
@@ -343,8 +345,8 @@ export class BluetoothModel extends BaseModel{
   }
 
   /**
-    * Subscribe Bluetooth status Change
-    */
+   * Subscribe Bluetooth status Change
+   */
   subscribeBluetoothDeviceFind(callback: (data: Array<string>) => void): void {
     bluetooth.on('bluetoothDeviceFind', (data: Array<string>) => {
       LogUtil.info(`BluetoothModel subscribeBluetoothDeviceFind->deviceFind return:${JSON.stringify(data)}`);
@@ -354,8 +356,8 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * unsubscribe Bluetooth status Change
-    */
+   * unsubscribe Bluetooth status Change
+   */
   unsubscribeBluetoothDeviceFind(callback?: (data: Array<string>) => void): void {
     bluetooth.off('bluetoothDeviceFind', (data) => {
       LogUtil.info(`${this.TAG} unsubscribeBluetoothDeviceFind->deviceFind return:${JSON.stringify(data)}`);
@@ -365,14 +367,14 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * Pair device
-    */
+   * Pair device
+   */
   pairDevice(deviceId: string): boolean {
     return bluetooth.pairDevice(deviceId);
   }
   /**
-    * Subscribe PinRequired
-    */
+   * Subscribe PinRequired
+   */
   subscribePinRequired(callback: (data: {
     deviceId: string;
     pinCode: string;
@@ -388,8 +390,8 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * Unsubscribe PinRequired
-    */
+   * Unsubscribe PinRequired
+   */
   unsubscribePinRequired(callback?: (data: {
     deviceId: string;
     pinCode: string;
@@ -405,14 +407,14 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * Set device PairingConfirmation
-    */
+   * Set device PairingConfirmation
+   */
   setDevicePairingConfirmation(deviceId: string, accept: boolean): boolean {
     return bluetooth.setDevicePairingConfirmation(deviceId, accept);
   }
   /**
-    * Subscribe bondStateChange
-    */
+   * Subscribe bondStateChange
+   */
   subscribeBondStateChange(callback): void {
     bluetooth.on('bondStateChange', (data) => {
       LogUtil.info(`${this.TAG} subscribeBondStateChange->bondStateChange data:${JSON.stringify(data)}`);
@@ -427,8 +429,8 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * Unsubscribe bondStateChange
-    */
+   * Unsubscribe bondStateChange
+   */
   unsubscribeBondStateChange(callback?: (data: {
     deviceId: string;
     bondState: number;
@@ -446,23 +448,23 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * Get device name
-    */
+   * Get device name
+   */
   getDeviceName(deviceId: string): string {
     return bluetooth.getRemoteDeviceName(deviceId);
   }
   /**
-    * Get device type
-    */
+   * Get device type
+   */
   getDeviceType(deviceId: string): string {
     let deviceType = '';
     let deviceClass = bluetooth.getRemoteDeviceClass(deviceId);
-    deviceType = "Major:"+deviceClass.majorClass.toString();
+    deviceType = "Major:" + deviceClass.majorClass.toString();
     return deviceType;
   }
   /**
-    * Get device state
-    */
+   * Get device state
+   */
   getDeviceState(deviceId: string): Array<{
     profileId: number;
     profileConnectionState: number;
@@ -480,15 +482,15 @@ export class BluetoothModel extends BaseModel{
     return result;
   }
   /**
-    * Unpair device
-    */
+   * Unpair device
+   */
   unpairDevice(deviceId: string): boolean {
-//  return bluetooth.cancelPairedDevice(deviceId);
+    //  return bluetooth.cancelPairedDevice(deviceId);
     return true;
   }
   /**
-    * Connect device
-    */
+   * Connect device
+   */
   connectDevice(deviceId: string): Array<{
     profileId: number;
     connectRet: boolean;
@@ -508,8 +510,8 @@ export class BluetoothModel extends BaseModel{
   }
 
   /**
-    * Disconnect device
-    */
+   * Disconnect device
+   */
   disconnectDevice(deviceId: string): Array<{
     profileId: number;
     disconnectRet: boolean;
@@ -535,8 +537,8 @@ export class BluetoothModel extends BaseModel{
   }
 
   /**
-    * Subscribe device connection state Change
-    */
+   * Subscribe device connection state Change
+   */
   subscribeDeviceStateChange(callback: (data: {
     profileId: number;
     deviceId: string;
@@ -562,8 +564,8 @@ export class BluetoothModel extends BaseModel{
   }
 
   /**
-    * unsubscribe device connection state Change
-    */
+   * unsubscribe device connection state Change
+   */
   unsubscribeDeviceStateChange(callback?: (data: {
     profileId: number;
     deviceId: string;
@@ -589,40 +591,41 @@ export class BluetoothModel extends BaseModel{
   }
 
   // BLE public
-  createGattServer():bluetooth.GattServer{
+  createGattServer(): bluetooth.GattServer {
     return bluetooth.BLE.createGattServer();
   }
-  createGattClient(deviceId: string):bluetooth.GattClientDevice{
+
+  createGattClient(deviceId: string): bluetooth.GattClientDevice {
     return bluetooth.BLE.createGattClientDevice(deviceId);
   }
+
   getConnectedBLEDevices(): Array<string> {
     return bluetooth.BLE.getConnectedBLEDevices();
   }
   // start BLE scanning
   startBLEScan(filters: Array<bluetooth.ScanFilter>, options?: bluetooth.ScanOptions): void {
-    switch (arguments.length)
-    {
+    switch (arguments.length) {
       case 1:
         LogUtil.info(` BluetoothModel_ startBLEScan with filters(or null) only `);
         bluetooth.BLE.startBLEScan(filters);
-      break;
+        break;
       case 2:
         LogUtil.info(`BluetoothModel_  startBLEScan with filters and options`);
         bluetooth.BLE.startBLEScan(filters, options);
-      break;
+        break;
       default:
         LogUtil.error(`BluetoothModel_ startBLEScan with unexpected input parameter!`);
     }
   }
   /**
-    * Stops BLE scanning.
-    */
-  stopBLEScan():void {
+   * Stops BLE scanning.
+   */
+  stopBLEScan(): void {
     bluetooth.BLE.stopBLEScan();
   }
   /**
-    * Subscribe BLEDeviceFind
-    */
+   * Subscribe BLEDeviceFind
+   */
   subscribeBLEDeviceFind(callback: (bleDeviceFindData: Array<bluetooth.ScanResult>) => void): void {
     bluetooth.BLE.on("BLEDeviceFind", (bleDeviceFindData: Array<bluetooth.ScanResult>) => {
       LogUtil.info(`BluetoothModel_ subscribeBLEDeviceFind->deviceFind return:${JSON.stringify(bleDeviceFindData)}`);
@@ -632,8 +635,8 @@ export class BluetoothModel extends BaseModel{
     })
   }
   /**
-    * unsubscribe BLEDeviceFind
-    */
+   * unsubscribe BLEDeviceFind
+   */
   unsubscribeBLEDeviceFind(callback?: (bleDeviceFindData: Array<bluetooth.ScanResult>) => void): void {
     bluetooth.BLE.off('BLEDeviceFind', (bleDeviceFindData) => {
       LogUtil.info(`${this.TAG} unsubscribeBLEDeviceFind->deviceFind return:${JSON.stringify(bleDeviceFindData)}`);
@@ -645,4 +648,5 @@ export class BluetoothModel extends BaseModel{
 }
 
 let bluetoothModel = new BluetoothModel();
+
 export default bluetoothModel as BluetoothModel;

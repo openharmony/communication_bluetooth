@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,16 @@ import { TestList } from './testList';
 /**
  * AutoTest Of Bluetooth test
  */
+
 @Component
 export struct AutoTest {
   private testItems: TestData[]
+
   build() {
     Column() {
-      TestList({
-        testItems: this.testItems
-      })
+      TestList( {
+        testItems : this.testItems
+      } )
     }
   }
 }

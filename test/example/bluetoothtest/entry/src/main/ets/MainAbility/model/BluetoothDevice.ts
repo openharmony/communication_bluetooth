@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,13 @@
  * BT Device Page Of Bluetooth test
  */
 import { DeviceState } from './BluetoothModel'
+
 export class Profile {
   profileId: number = -1;
   profileConnectionState: number = -1
-  constructor() {}
+
+  constructor() {
+  }
 }
 
 /**
@@ -30,21 +33,24 @@ export default class BluetoothDevice {
   deviceId: string = '';
   deviceName: string = '';
   deviceType: string = '';
-  connectionState: number = 0;
+  connectionState: number = 1;
   profiles: Map<number, Profile> = new Map();
-  constructor() {}
+
+  constructor() {
+  }
+
   setProfiles(data: Array<{
     profileId: number;
     profileConnectionState: number;
-  }>): void{
+  }>): void {
     data.forEach((item: {
       profileId: number;
       profileConnectionState: number;
     }) => {
       this.setProfile({
-      profileId: item.profileId,
-      deviceId: this.deviceId,
-      profileConnectionState: item.profileConnectionState
+        profileId: item.profileId,
+        deviceId: this.deviceId,
+        profileConnectionState: item.profileConnectionState
       })
     })
   }
@@ -53,9 +59,9 @@ export default class BluetoothDevice {
     profileId: number;
     deviceId: string;
     profileConnectionState: number;
-  }): void{
+  }): void {
     if (this.deviceId !== data.deviceId) {
-    return;
+      return;
     }
     this.profiles.set(data.profileId, data)
     let countStateDisconnect = 0;
@@ -64,16 +70,16 @@ export default class BluetoothDevice {
     let countStateDisconnecting = 0;
     this.profiles.forEach((profile, key) => {
       if (profile.profileConnectionState == 0) {
-      // 0:the current profile is disconnected
+        // 0:the current profile is disconnected
         countStateDisconnect++;
       } else if (profile.profileConnectionState == 1) {
-      // 1:the current profile is being connected
+        // 1:the current profile is being connected
         countStateConnecting++;
       } else if (profile.profileConnectionState == 2) {
-      // 2:the current profile is connected
+        // 2:the current profile is connected
         countStateConnected++;
       } else if (profile.profileConnectionState == 3) {
-      // 3:the current profile is being disconnected
+        // 3:the current profile is being disconnected
         countStateDisconnecting++;
       }
     });

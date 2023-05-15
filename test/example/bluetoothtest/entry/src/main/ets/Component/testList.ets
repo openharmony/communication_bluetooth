@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,29 @@
  * limitations under the License.
  */
 // @ts-nocheck
-/**
- * Test-List
- */
+
 import { TestData } from '../MainAbility/model/testData'
 import { TestListItem } from './testListItems';
-
+/**
+ * Test-List of bluetooth test
+ */
 @Component
 export struct TestList {
   private testItems: TestData[]
+
   build() {
     Column() {
       List() {
-        ForEach(this.testItems, item => {
+        ForEach( this.testItems , item => {
           ListItem() {
-            TestListItem({
-              testItem: item
-            })
+            TestListItem( {
+              testItem : item
+            } )
           }
-        }, item => item.id.toString())
+        } , item => item.id.toString() )
       }
-      .height('93%')
-      .backgroundColor($r("app.color.lead"))
+      .height( '93%' )
+      .backgroundColor( $r( "app.color.lead" ) )
     }
   }
 }

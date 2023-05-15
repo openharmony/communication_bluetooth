@@ -12,116 +12,124 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 // @ts-nocheck
+
 import ConfigData from '../../../Utils/ConfigData';
 import LogUtil from '../../../Utils/LogUtil';
 import BluetoothDeviceController from '../../../MainAbility/controller/BluetoothDeviceController';
 import BluetoothDevice from '../../../MainAbility/model/BluetoothDevice'
 import Router from '@system.router';
-import { DeviceType, DeviceState, BluetoothModel } from '../../../MainAbility/model/BluetoothModel';
+import { DeviceType , DeviceState , BluetoothModel } from '../../../MainAbility/model/BluetoothModel';
 import ImageAnimatorComponent from '../../../Component/imageAnimatorComponent';
 import prompt from '@system.prompt';
-import {PageTitle} from '../../../Component/pageTitle';
+import { PageTitle } from '../../../Component/pageTitle';
 import bluetooth from '@ohos.bluetooth';
+
 /**
- * deviceFound
+ * deviceFound page of bluetooth Test
  */
+
 const PAIRED_ITEM_NUMBER = 3;
-const PAGE_URI_BLUETOOTH_PAIRED_DEVICE_INFO = 'pages/subManualApiTest/subBrTest/BluetoothPairedDeviceInfo';
+const PAGE_URI_BLUETOOTH_PAIRED_DEVICE_INFO = 'pages/subManualApiTest/subBrTest/bluetoothPairedDeviceInfo';
 
 @Entry
 @Component
-struct deviceFound {
+struct DeviceFound {
   private PAGE_TAG = ConfigData.TAG + 'Bluetooth page '
   private deviceController: BluetoothDeviceController = new BluetoothDeviceController();
   @State message: string = 'BrTest';
   @State bluetoothSwitch: boolean = false;
   @State scanSwitch: boolean = false;
-
-  @StorageLink('bluetoothIsOn') isOn: boolean = false;
-  @StorageLink('bluetoothToggleEnabled') enabled: boolean = true;
-  @StorageLink('bluetoothLocalName') localName: string = '';
+  @StorageLink( 'bluetoothIsOn' ) isOn: boolean = false;
+  @StorageLink( 'bluetoothToggleEnabled' ) enabled: boolean = true;
+  @StorageLink( 'bluetoothLocalName' ) localName: string = '';
 
   aboutToAppear(): void {
-    LogUtil.log(this.PAGE_TAG + 'aboutToAppear in : isOn = ' + this.isOn )
+    LogUtil.log( this.PAGE_TAG + 'aboutToAppear in : isOn = ' + this.isOn )
     this.deviceController
       .initData()
       .subscribe();
-    LogUtil.log(this.PAGE_TAG + 'aboutToAppear out : isOn = ' + this.isOn )
+    LogUtil.log( this.PAGE_TAG + 'aboutToAppear out : isOn = ' + this.isOn )
   }
 
   onPageShow(): void {
-    LogUtil.log(this.PAGE_TAG + 'onPageShow in : localName = ' + this.localName )
+    LogUtil.log( this.PAGE_TAG + 'onPageShow in : localName = ' + this.localName )
     this.deviceController.getLocalName();
-    AppStorage.SetOrCreate('btDeviceController', this.deviceController);
-    LogUtil.log(this.PAGE_TAG + 'onPageShow out : localName = ' + this.localName )
+    AppStorage.SetOrCreate( 'btDeviceController' , this.deviceController );
+    LogUtil.log( this.PAGE_TAG + 'onPageShow out : localName = ' + this.localName )
   }
 
   build() {
     Column() {
-      GridContainer({ columns: 12, sizeType: SizeType.Auto, gutter: vp2px(1) === 2 ? '12vp' : '0vp', margin: vp2px(1) === 2 ? '24vp' : '0vp' }) {
-        Row({}) {
+      GridContainer( {
+        columns : 12 ,
+        sizeType : SizeType.Auto ,
+        gutter : vp2px( 1 ) === 2 ? '12vp' : '0vp' ,
+        margin : vp2px( 1 ) === 2 ? '24vp' : '0vp'
+      } ) {
+        Row( {} ) {
           Column() {
           }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 0 }, sm: { span: 0, offset: 0 },
-            md: { span: 0, offset: 0 }, lg: { span: 2, offset: 0 }
-          });
-          Column({space: '12vp'}) {
-            PageTitle({detail: '扫描蓝牙设备'})
+          .width( ConfigData.WH_100_100 )
+          .height( ConfigData.WH_100_100 )
+          .useSizeType( {
+            xs : { span : 0 , offset : 0 } , sm : { span : 0 , offset : 0 } ,
+            md : { span : 0 , offset : 0 } , lg : { span : 2 , offset : 0 }
+          } );
+          Column( { space : '12vp' } ) {
+            PageTitle( { detail : '扫描蓝牙设备' } )
             Scroll() {
               Column() {
-                if (this.isOn) {
-                  PairedDeviceComponent({
-                    controller: this.deviceController
-                  })
+                if ( this.isOn ) {
+                  PairedDeviceComponent( {
+                    controller : this.deviceController
+                  } )
 
-                  AvailableDeviceComponent({
-                    controller: this.deviceController
-                  })
+                  AvailableDeviceComponent( {
+                    controller : this.deviceController
+                  } )
 
                 }
               }
-              .width(ConfigData.WH_100_100)
-              .margin({ bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed') })
+              .width( ConfigData.WH_100_100 )
+              .margin( { bottom : $r( 'sys.float.ohos_id_default_padding_bottom_fixed' ) } )
             }
-            .width(ConfigData.WH_100_100)
-            .align(Alignment.TopStart)
-            .layoutWeight(1)
-            .margin({ top: $r('sys.float.ohos_id_card_margin_middle') })
+            .width( ConfigData.WH_100_100 )
+            .align( Alignment.TopStart )
+            .layoutWeight( 1 )
+            .margin( { top : $r( 'sys.float.ohos_id_card_margin_middle' ) } )
           }
-          .padding({
-            left: $r('app.float.distance_24'),
-            right: $r('app.float.distance_24'),
-            bottom: $r('app.float.distance_32')
-          })
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 12, offset: 0 }, sm: { span: 12, offset: 0 },
-            md: { span: 12, offset: 0 }, lg: { span: 8, offset: 2 }
-          });
+          .padding( {
+            left : $r( 'app.float.distance_24' ) ,
+            right : $r( 'app.float.distance_24' ) ,
+            bottom : $r( 'app.float.distance_32' )
+          } )
+          .width( ConfigData.WH_100_100 )
+          .height( ConfigData.WH_100_100 )
+          .useSizeType( {
+            xs : { span : 12 , offset : 0 } , sm : { span : 12 , offset : 0 } ,
+            md : { span : 12 , offset : 0 } , lg : { span : 8 , offset : 2 }
+          } );
 
           Column() {
           }
-          .width(ConfigData.WH_100_100)
-          .height(ConfigData.WH_100_100)
-          .useSizeType({
-            xs: { span: 0, offset: 12 }, sm: { span: 0, offset: 12 },
-            md: { span: 0, offset: 12 }, lg: { span: 2, offset: 10 }
-          })
+          .width( ConfigData.WH_100_100 )
+          .height( ConfigData.WH_100_100 )
+          .useSizeType( {
+            xs : { span : 0 , offset : 12 } , sm : { span : 0 , offset : 12 } ,
+            md : { span : 0 , offset : 12 } , lg : { span : 2 , offset : 10 }
+          } )
         }
-        .width(ConfigData.WH_100_100)
-        .height(ConfigData.WH_100_100);
+        .width( ConfigData.WH_100_100 )
+        .height( ConfigData.WH_100_100 );
       }
-      .width(ConfigData.WH_100_100)
-      .height(ConfigData.WH_100_100);
+      .width( ConfigData.WH_100_100 )
+      .height( ConfigData.WH_100_100 );
     }
-    .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
-    .width(ConfigData.WH_100_100)
-    .height(ConfigData.WH_100_100);
+    .backgroundColor( $r( "sys.color.ohos_id_color_sub_background" ) )
+    .width( ConfigData.WH_100_100 )
+    .height( ConfigData.WH_100_100 );
   }
 }
 
@@ -133,66 +141,68 @@ struct deviceFound {
 export struct PairedDeviceComponent {
   private TAG_PAGE = ConfigData.TAG + 'PairedDeviceComponent ';
   private controller: BluetoothDeviceController;
-  @StorageLink('bluetoothPairedDevices') pairedDevices: BluetoothDevice[] = [];
+  @StorageLink( 'bluetoothPairedDevices' ) pairedDevices: BluetoothDevice[] = [];
   @State isTouched: boolean = false;
   @State hide: boolean = true;
   @State currentPairedDevice: string = "";
 
-  aboutToAppear(): void{
-    if (this.controller) {
+  aboutToAppear(): void {
+    if ( this.controller ) {
       // bind component and initialize
-      this.controller.bindComponent(this)
-        .bindProperties(["pairedDevices"])
+      this.controller.bindComponent( this )
+        .bindProperties( [ "pairedDevices" ] )
         .initData();
     }
   }
+
   build() {
     Column() {
-      if (this.pairedDevices && this.pairedDevices.length > 0) {
+      if ( this.pairedDevices && this.pairedDevices.length > 0 ) {
         // paired devices title
         Row() {
-          Text($r('app.string.bluetooth_paired_devices'))
-            .fontSize($r('app.float.font_14'))
-            .fontColor($r('app.color.font_color_182431'))
+          Text( $r( 'app.string.bluetooth_paired_devices' ) )
+            .fontSize( $r( 'app.float.font_14' ) )
+            .fontColor( $r( 'app.color.font_color_182431' ) )
         }
-        .width(ConfigData.WH_100_100)
-        .padding({
-          left: $r('app.float.distance_24'),
-          top: $r('app.float.distance_19_5'),
-          bottom: $r('app.float.distance_9_5')
-        })
+        .width( ConfigData.WH_100_100 )
+        .padding( {
+          left : $r( 'app.float.distance_24' ) ,
+          top : $r( 'app.float.distance_19_5' ) ,
+          bottom : $r( 'app.float.distance_9_5' )
+        } )
+
         List() {
           // paired devices list
-          ForEach(this.pairedDevices, (item: BluetoothDevice, index: number) => {
+          ForEach( this.pairedDevices , ( item: BluetoothDevice , index: number ) => {
             ListItem() {
               Row() {
-                PairedItem({
-                  name: item.deviceName,
-                  type: item.deviceType,
-                  state: item.connectionState.toString(),
-                  mac: item.deviceId
-                })
+                PairedItem( {
+                  name : item.deviceName ,
+                  type : item.deviceType ,
+                  state : item.connectionState.toString() ,
+                  mac : item.deviceId
+                } )
               }
-              .width(ConfigData.WH_100_100)
-              .borderRadius($r("app.float.radius_24"))
-              .padding($r('app.float.distance_4'))
-              .backgroundColor($r("app.color.white_bg_color"))
-              .onClick(() => {
-                this.itemClicked(item);
-              })
+              .width( ConfigData.WH_100_100 )
+              .borderRadius( $r( "app.float.radius_24" ) )
+              .padding( $r( 'app.float.distance_4' ) )
+              .backgroundColor( $r( "app.color.white_bg_color" ) )
+              .onClick( () => {
+                this.itemClicked( item );
+              } )
 
             }
-          }, item => JSON.stringify(item));
+          } , item => JSON.stringify( item ) );
         }
-        .height(200)
-        .divider({
-          strokeWidth: 1,
-          color: $r('app.color.color_E3E3E3_grey'),
-          startMargin: $r('app.float.wh_value_52'),
-          endMargin: $r('app.float.wh_value_12')
-        })
-        .backgroundColor($r("app.color.white_bg_color"))
-        .borderRadius($r("app.float.radius_24"))
+        .height( 200 )
+        .divider( {
+          strokeWidth : 1 ,
+          color : $r( 'app.color.color_E3E3E3_grey' ) ,
+          startMargin : $r( 'app.float.wh_value_52' ) ,
+          endMargin : $r( 'app.float.wh_value_12' )
+        } )
+        .backgroundColor( $r( "app.color.white_bg_color" ) )
+        .borderRadius( $r( "app.float.radius_24" ) )
 
       }
     }
@@ -203,7 +213,7 @@ export struct PairedDeviceComponent {
    * @param item device
    * @return headphone connected or not
    */
-  private isHeadPhoneConnected(item: BluetoothDevice): boolean {
+  private isHeadPhoneConnected( item: BluetoothDevice ): boolean {
     return item.deviceType === DeviceType.HEADPHONE && item.connectionState === DeviceState.STATE_CONNECTED
   }
 
@@ -212,15 +222,15 @@ export struct PairedDeviceComponent {
    * @param item device
    */
 
-  private gotoPairedDeviceInfo(item: BluetoothDevice) {
-    if (item.connectionState != DeviceState.STATE_CONNECTING
-    && item.connectionState != DeviceState.STATE_DISCONNECTING) {
-      LogUtil.info(this.TAG_PAGE + 'item right icon on click : ' + JSON.stringify(item));
-      let param = { 'bluetoothDevice': JSON.stringify(item) }
-      Router.push({
-        uri: PAGE_URI_BLUETOOTH_PAIRED_DEVICE_INFO,
-        params: param
-      });
+  private gotoPairedDeviceInfo( item: BluetoothDevice ) {
+    if ( item.connectionState != DeviceState.STATE_CONNECTING
+    && item.connectionState != DeviceState.STATE_DISCONNECTING ) {
+      LogUtil.info( this.TAG_PAGE + 'item right icon on click : ' + JSON.stringify( item ) );
+      let param = { 'bluetoothDevice' : JSON.stringify( item ) }
+      Router.push( {
+        uri : PAGE_URI_BLUETOOTH_PAIRED_DEVICE_INFO ,
+        params : param
+      } );
     }
   }
 
@@ -228,15 +238,15 @@ export struct PairedDeviceComponent {
    * Item clicked
    * @param item device
    */
-  private itemClicked(item: BluetoothDevice) {
-    switch (item.connectionState) {
+  private itemClicked( item: BluetoothDevice ) {
+    switch ( item.connectionState ) {
       case DeviceState.STATE_CONNECTED:
-        this.showDisconnectDialog(item.deviceName, () => {
-          this.controller.disconnect(item.deviceId)
-        });
+        this.showDisconnectDialog( item.deviceName , () => {
+          this.controller.disconnect( item.deviceId )
+        } );
         break;
       case DeviceState.STATE_DISCONNECTED:
-        if (!this.controller.connect(item.deviceId)) {
+        if ( !this.controller.connect( item.deviceId ) ) {
           this.showConnectFailedDialog();
         }
         break;
@@ -248,36 +258,35 @@ export struct PairedDeviceComponent {
    */
   private showConnectFailedDialog() {
     showDialog(
-    $r("app.string.bluetooth_connect_failed"),
-    $r("app.string.bluetooth_connect_failed_msg"),
-    $r("app.string.bluetooth_know_button")
+    $r( "app.string.bluetooth_connect_failed" ) ,
+    $r( "app.string.bluetooth_connect_failed_msg" ) ,
+    $r( "app.string.bluetooth_know_button" )
     );
   }
 
   /**
    * Disconnect Dialog
    */
-  showDisconnectDialog(deviceName, callback) {
-    AlertDialog.show({
-      title: $r('app.string.bluetooth_disconnect'),
-      message: $r("app.string.bluetooth_disconnect_device", deviceName),
-      primaryButton: {
-        value: $r('app.string.cancel'),
-        action: () => {
-          LogUtil.info(ConfigData.TAG + 'Closed callbacks');
+  showDisconnectDialog( deviceName , callback ) {
+    AlertDialog.show( {
+      title : $r( 'app.string.bluetooth_disconnect' ) ,
+      message : $r( "app.string.bluetooth_disconnect_device" , deviceName ) ,
+      primaryButton : {
+        value : $r( 'app.string.cancel' ) ,
+        action : () => {
+          LogUtil.info( ConfigData.TAG + 'Closed callbacks' );
         }
-      },
-      secondaryButton: {
-        value: $r('app.string.confirm'),
-        action: () => {
-          LogUtil.info(ConfigData.TAG + `AlertDialog success:`);
+      } ,
+      secondaryButton : {
+        value : $r( 'app.string.confirm' ) ,
+        action : () => {
+          LogUtil.info( ConfigData.TAG + `AlertDialog success:` );
           callback();
         }
-      },
-      alignment: DialogAlignment.Bottom
-    })
+      } ,
+      alignment : DialogAlignment.Bottom
+    } )
   }
-
 }
 
 /**
@@ -288,14 +297,13 @@ struct DiscoveringAnimatorComponent {
   build() {
     Column() {
       Row() {
-        ImageAnimatorComponent({
-          imageWidth: $r('app.float.wh_value_40'),
-          imageHeight: $r('app.float.wh_value_40') })
+        ImageAnimatorComponent( {
+          imageWidth : $r( 'app.float.wh_value_40' ) ,
+          imageHeight : $r( 'app.float.wh_value_40' ) } )
       }
     }
   }
 }
-
 
 /**
  * AvailableItem
@@ -306,42 +314,45 @@ export struct AvailableItem {
   private type: string
   private name: string
   private state: string
+
   build() {
     Row() {
       Row() {
-        Image($r('app.media.bleSmall'))
-          .objectFit(ImageFit.Contain)
-          .autoResize(false)
-          .height(30)
-          .width(30)
+        Image( $r( 'app.media.bleSmall' ) )
+          .objectFit( ImageFit.Contain )
+          .autoResize( false )
+          .height( 30 )
+          .width( 30 )
       }
-      .width("10%")
-      .padding({left: 10})
+      .width( "10%" )
+      .padding( { left : 10 } )
+
       Column() {
-        Text(this.name)
-          .fontSize(17.4)
-          .fontWeight(FontWeight.Bold)
-          .width("90%")
-          .height(40)
-          .padding({ left: 10, top: 15 })
-        Text(this.mac)
-          .fontSize(17.4)
-          .fontWeight(FontWeight.Bold)
-          .width("90%")
-          .height(30)
-          .padding({ left: 10, top: 5 })
+        Text( this.name )
+          .fontSize( 17.4 )
+          .fontWeight( FontWeight.Bold )
+          .width( "90%" )
+          .height( 40 )
+          .padding( { left : 10 , top : 15 } )
+        Text( this.mac )
+          .fontSize( 17.4 )
+          .fontWeight( FontWeight.Bold )
+          .width( "90%" )
+          .height( 30 )
+          .padding( { left : 10 , top : 5 } )
       }
-      .height(80)
-      .width("80%")
+      .height( 80 )
+      .width( "80%" )
+
       Row() {
-        Text(this.state)
-          .fontSize(17.4)
-          .flexGrow(1)
+        Text( this.state )
+          .fontSize( 17.4 )
+          .flexGrow( 1 )
         //        Text(value)
         //          .fontSize(17.4)
       }
-      .width("10%")
-      .padding({left: 10})
+      .width( "10%" )
+      .padding( { left : 10 } )
     }
   }
 }
@@ -355,59 +366,59 @@ export struct PairedItem {
   private type: string
   private name: string
   private state: string
+
   build() {
     Row() {
       Row() {
-        Image($r('app.media.bleSmall'))
-          .objectFit(ImageFit.Contain)
-          .autoResize(false)
-          .height(30)
-          .width(30)
+        Image( $r( 'app.media.bleSmall' ) )
+          .objectFit( ImageFit.Contain )
+          .autoResize( false )
+          .height( 30 )
+          .width( 30 )
       }
-      .width("10%")
-      .padding({left: 10})
+      .width( "10%" )
+      .padding( { left : 10 } )
+
       Column() {
-        Text(this.name)
-          .fontSize(17.4)
-          .fontWeight(FontWeight.Bold)
-          .width("90%")
-          .height(40)
-          .padding({ left: 10, top: 15 })
-        Text(this.mac)
-          .fontSize(17.4)
-          .fontWeight(FontWeight.Bold)
-          .width("90%")
-          .height(30)
-          .padding({ left: 10, top: 5 })
+        Text( this.name )
+          .fontSize( 17.4 )
+          .fontWeight( FontWeight.Bold )
+          .width( "90%" )
+          .height( 40 )
+          .padding( { left : 10 , top : 15 } )
+        Text( this.mac )
+          .fontSize( 17.4 )
+          .fontWeight( FontWeight.Bold )
+          .width( "90%" )
+          .height( 30 )
+          .padding( { left : 10 , top : 5 } )
       }
-      .height(80)
-      .width("70%")
+      .height( 80 )
+      .width( "70%" )
+
       Row() {
-        Text(this.state)
-          .fontSize(17.4)
-          .flexGrow(1)
-        //        Text(value)
-        //          .fontSize(17.4)
+        Text( this.state )
+          .fontSize( 17.4 )
+          .flexGrow( 1 )
       }
-      .width("10%")
-      .padding({left: 10})
+      .width( "10%" )
+      .padding( { left : 10 } )
+
       Row() {
-        Text("取消")
-          .fontSize(17.4)
-          .flexGrow(1)
-        //        Text(value)
-        //          .fontSize(17.4)
+        Text( "取消" )
+          .fontSize( 17.4 )
+          .flexGrow( 1 )
       }
-      .width("10%")
-      .padding({left: 10})
-      .onClick(() => {
-        let ret = bluetooth.cancelPairedDevice(this.mac)
-        if (ret) {
-          prompt.showToast({message: "取消配对成功！"})
+      .width( "10%" )
+      .padding( { left : 10 } )
+      .onClick( () => {
+        let ret = bluetooth.cancelPairedDevice( this.mac )
+        if ( ret ) {
+          prompt.showToast( { message : "取消配对成功！" } )
         } else {
-          prompt.showToast({message: "取消配对失败！"})
+          prompt.showToast( { message : "取消配对失败！" } )
         }
-      })
+      } )
     }
   }
 }
@@ -420,29 +431,28 @@ export struct AvailableDeviceComponent {
   private TAG_PAGE = ConfigData.TAG + 'AvailableDeviceComponent ';
   private controller: BluetoothDeviceController;
   @State isDeviceDiscovering: boolean = false;
-  @StorageLink('bluetoothAvailableDevices') availableDevices: BluetoothDevice[] = [];
+  @StorageLink( 'bluetoothAvailableDevices' ) availableDevices: BluetoothDevice[] = [];
   @State pairPinCode: string = '';
   private pairingDevice: BluetoothDevice = undefined;
   @State pairDeviceInfo: string = '未配对';
-
   pairDialog: CustomDialogController = new CustomDialogController({
-    builder: PairDialog({
-      deviceName: this.pairingDevice.deviceName,
-      pinCode: this.pairPinCode,
-      action: (accept: boolean) => {
-        this.confirmPairing(accept);
+    builder : PairDialog( {
+      deviceName : this.pairingDevice.deviceName ,
+      pinCode : this.pairPinCode ,
+      action : ( accept: boolean ) => {
+        this.confirmPairing( accept );
       }
-    }),
-    alignment: DialogAlignment.Bottom,
-    autoCancel: true
+    } ) ,
+    alignment : DialogAlignment.Bottom ,
+    autoCancel : true
   });
 
-  aboutToAppear(): void{
-    if (this.controller) {
+  aboutToAppear(): void {
+    if ( this.controller ) {
 
       // bind component and initialize
-      this.controller.bindComponent(this)
-        .bindProperties(["isDeviceDiscovering", "availableDevices", "pairPinCode"])
+      this.controller.bindComponent( this )
+        .bindProperties( [ "isDeviceDiscovering", "availableDevices", "pairPinCode" ] )
         .initData();
 
       this.controller.startBluetoothDiscovery();
@@ -453,69 +463,69 @@ export struct AvailableDeviceComponent {
     Column() {
       Row() {
         // available devices title
-        Text($r('app.string.bluetooth_available_devices'))
-          .fontSize($r('app.float.font_14'))
-          .fontColor($r('app.color.font_color_182431'))
-          .width(ConfigData.WH_100_100)
-          .padding({
-            left: $r('app.float.distance_24'),
-            top: $r('app.float.distance_19_5'),
-            bottom: $r('app.float.distance_9_5')
-          })
+        Text( $r( 'app.string.bluetooth_available_devices' ) )
+          .fontSize( $r( 'app.float.font_14' ) )
+          .fontColor( $r( 'app.color.font_color_182431' ) )
+          .width( ConfigData.WH_100_100 )
+          .padding( {
+            left : $r( 'app.float.distance_24' ) ,
+            top : $r( 'app.float.distance_19_5' ) ,
+            bottom : $r( 'app.float.distance_9_5' )
+          } )
         Blank()
 
         // bluetooth discovering
-        if (this.isDeviceDiscovering) {
+        if ( this.isDeviceDiscovering ) {
           DiscoveringAnimatorComponent()
         }
       }
-      .width(ConfigData.WH_100_100)
+      .width( ConfigData.WH_100_100 )
 
-      if (this.availableDevices && this.availableDevices.length >= 1) {
+      if ( this.availableDevices && this.availableDevices.length >= 1 ) {
         Scroll() {
           List() {
             // paired devices list
-            ForEach(this.availableDevices, (item: BluetoothDevice) => {
+            ForEach( this.availableDevices , ( item: BluetoothDevice ) => {
               ListItem() {
                 Row() {
-                  AvailableItem({
-                    name: item.deviceName,
-                    type: item.deviceType,
-                    state: item.connectionState.toString(),
-                    mac: item.deviceId
-                  })
+                  AvailableItem( {
+                    name : item.deviceName ,
+                    type : item.deviceType ,
+                    state : item.connectionState.toString() ,
+                    mac : item.deviceId
+                  } )
                 }
-                .width(ConfigData.WH_100_100)
-                .borderRadius($r("app.float.radius_24"))
-                .padding($r('app.float.distance_4'))
-                .backgroundColor($r("app.color.white_bg_color"))
-                .onClick(() => {
-                  LogUtil.info(this.TAG_PAGE + 'item on click : ' + JSON.stringify(item));
-                  AppStorage.SetOrCreate('pairedMac', item.deviceId);
-//                AppStorage.SetOrCreate('pairedName', item.deviceName);
-                  this.pairDevice(item)
-                })
+                .width( ConfigData.WH_100_100 )
+                .borderRadius( $r( "app.float.radius_24" ) )
+                .padding( $r( 'app.float.distance_4' ) )
+                .backgroundColor( $r( "app.color.white_bg_color" ) )
+                .onClick( () => {
+                  LogUtil.info( this.TAG_PAGE + 'item on click : ' + JSON.stringify( item ) );
+                  AppStorage.SetOrCreate( 'pairedMac' , item.deviceId );
+                  //                AppStorage.SetOrCreate('pairedName', item.deviceName);
+                  this.pairDevice( item )
+                } )
               }
-            }, item => JSON.stringify(item));
+            } , item => JSON.stringify( item ) );
           }
-          .backgroundColor($r("app.color.white_bg_color"))
-          .borderRadius($r("app.float.radius_24"))
-          .height("80%")
-          .divider({
-            strokeWidth: 1,
-            color: $r('app.color.color_E3E3E3_grey'),
-            startMargin: $r('app.float.wh_value_52'),
-            endMargin: $r('app.float.wh_value_12')
-          })
+          .backgroundColor( $r( "app.color.white_bg_color" ) )
+          .borderRadius( $r( "app.float.radius_24" ) )
+          .height( "80%" )
+          .divider( {
+            strokeWidth : 1 ,
+            color : $r( 'app.color.color_E3E3E3_grey' ) ,
+            startMargin : $r( 'app.float.wh_value_52' ) ,
+            endMargin : $r( 'app.float.wh_value_12' )
+          } )
         }
-        .scrollBar(BarState.Auto)
-        .scrollBarWidth(20)
+        .scrollBar( BarState.Auto )
+        .scrollBarWidth( 20 )
       } else {
         Row() {
           // Scanning...
-          Text($r('app.string.scanning'))
-            .fontSize($r('app.float.font_20'))
-            .textCase(TextCase.UpperCase);
+          Text( $r( 'app.string.scanning' ) )
+            .fontSize( $r( 'app.float.font_20' ) )
+            .textCase( TextCase.UpperCase );
         }
       }
     }
@@ -525,29 +535,29 @@ export struct AvailableDeviceComponent {
    * Pair device
    * @param device
    */
-  pairDevice(device: BluetoothDevice) {
-    this.controller.pair(device.deviceId, (pinCode: string) => {
-      LogUtil.info(this.TAG_PAGE + 'pairDevice success callback : pinCode = ' + pinCode);
+  pairDevice( device: BluetoothDevice ) {
+    this.controller.pair( device.deviceId , ( pinCode: string ) => {
+      LogUtil.info( this.TAG_PAGE + 'pairDevice success callback : pinCode = ' + pinCode );
       // show pair pin dialog
       this.pairPinCode = pinCode;
       this.pairingDevice = device;
-      AppStorage.SetOrCreate('pairedDeviceInfo', device);
-      AppStorage.SetOrCreate('pairedDeviceId', device.deviceId);
+      AppStorage.SetOrCreate( 'pairedDeviceInfo' , device );
+      AppStorage.SetOrCreate( 'pairedDeviceId' , device.deviceId );
       this.pairDialog.open();
-      this.pairDeviceInfo = 'pairDeviceID: ' + device.deviceId  + ' true';
-    }, () => {
-      this.pairDeviceInfo = 'pairDeviceID: ' + device.deviceId  + ' false';
-      LogUtil.info(this.TAG_PAGE + 'pairDevice error callback');
+      this.pairDeviceInfo = 'pairDeviceID: ' + device.deviceId + ' true';
+    } , () => {
+      this.pairDeviceInfo = 'pairDeviceID: ' + device.deviceId + ' false';
+      LogUtil.info( this.TAG_PAGE + 'pairDevice error callback' );
       this.showPairFailedDialog()
-    })
+    } )
   }
 
   /**
    * Confirm pairing
    */
-  confirmPairing(accept: boolean) {
-    LogUtil.info(this.TAG_PAGE + 'confirmPairing : pairingDevice + ' + JSON.stringify(this.pairingDevice));
-    this.controller.confirmPairing(this.pairingDevice.deviceId, accept);
+  confirmPairing( accept: boolean ) {
+    LogUtil.info( this.TAG_PAGE + 'confirmPairing : pairingDevice + ' + JSON.stringify( this.pairingDevice ) );
+    this.controller.confirmPairing( this.pairingDevice.deviceId , accept );
   }
 
   /**
@@ -560,24 +570,24 @@ export struct AvailableDeviceComponent {
   /**
    * Show device illegal prompt dialog
    */
-  private showDeviceIllegalPromptDialog(action) {
-    AlertDialog.show({
-      message: $r("app.string.bluetooth_address_error_msg"),
-      primaryButton: {
-        value: $r('app.string.cancel'),
-        action: () => {
-          LogUtil.info(this.TAG_PAGE + 'Closed callbacks');
+  private showDeviceIllegalPromptDialog( action ) {
+    AlertDialog.show( {
+      message : $r( "app.string.bluetooth_address_error_msg" ) ,
+      primaryButton : {
+        value : $r( 'app.string.cancel' ) ,
+        action : () => {
+          LogUtil.info( this.TAG_PAGE + 'Closed callbacks' );
         }
-      },
-      secondaryButton: {
-        value: $r('app.string.bluetooth_pair_button'),
-        action: () => {
+      } ,
+      secondaryButton : {
+        value : $r( 'app.string.bluetooth_pair_button' ) ,
+        action : () => {
           action();
-          LogUtil.info(this.TAG_PAGE + `AlertDialog success:`);
+          LogUtil.info( this.TAG_PAGE + `AlertDialog success:` );
         }
-      },
-      alignment: DialogAlignment.Bottom
-    })
+      } ,
+      alignment : DialogAlignment.Bottom
+    } )
   }
 
   /**
@@ -585,9 +595,9 @@ export struct AvailableDeviceComponent {
    */
   private showConnectFailedDialog() {
     showDialog(
-    $r("app.string.bluetooth_connect_failed"),
-    $r("app.string.bluetooth_connect_failed_msg"),
-    $r("app.string.bluetooth_know_button")
+    $r( "app.string.bluetooth_connect_failed" ) ,
+    $r( "app.string.bluetooth_connect_failed_msg" ) ,
+    $r( "app.string.bluetooth_know_button" )
     );
   }
 
@@ -596,9 +606,9 @@ export struct AvailableDeviceComponent {
    */
   private showPairingFailedDialog() {
     showDialog(
-    $r("app.string.pairing_failed_title"),
-    $r("app.string.pairing_failed_message"),
-    $r("app.string.bluetooth_know_button")
+    $r( "app.string.pairing_failed_title" ) ,
+    $r( "app.string.pairing_failed_message" ) ,
+    $r( "app.string.bluetooth_know_button" )
     );
   }
 }
@@ -609,110 +619,110 @@ export struct AvailableDeviceComponent {
 @CustomDialog
 struct PairDialog {
   dialogController: CustomDialogController;
-  action: (accept: boolean) => void;
+  action: ( accept: boolean ) => void;
   private deviceName: string = undefined;
   private pinCode: string;
 
   aboutToAppear(): void {
-    LogUtil.log(ConfigData.TAG + `bluetooth PairDialog aboutToAppear pinCode = ${this.pinCode}`)
+    LogUtil.log( ConfigData.TAG + `bluetooth PairDialog aboutToAppear pinCode = ${ this.pinCode }` )
   }
 
   build() {
     Column() {
-      Text($r('app.string.bluetooth_pairing_request'))
-        .fontSize($r('app.float.font_22'))
-        .height($r('app.float.wh_value_60'))
-        .width(ConfigData.WH_100_100)
-        .padding({
-          left: $r('app.float.distance_24'),
-          top: $r('app.float.distance_14'),
-          bottom: $r('app.float.distance_14')
-        })
+      Text( $r( 'app.string.bluetooth_pairing_request' ) )
+        .fontSize( $r( 'app.float.font_22' ) )
+        .height( $r( 'app.float.wh_value_60' ) )
+        .width( ConfigData.WH_100_100 )
+        .padding( {
+          left : $r( 'app.float.distance_24' ) ,
+          top : $r( 'app.float.distance_14' ) ,
+          bottom : $r( 'app.float.distance_14' )
+        } )
       Column() {
-        if (this.pinCode) {
-          Text($r('app.string.bluetooth_pairing_intelligent_device_hit', this.deviceName, this.deviceName))
-            .fontSize($r('app.float.font_16'))
-            .width(ConfigData.WH_100_100)
-            .margin({
-              top: $r('app.float.distance_14'),
-              bottom: $r('app.float.distance_14')
-            })
+        if ( this.pinCode ) {
+          Text( $r( 'app.string.bluetooth_pairing_intelligent_device_hit' , this.deviceName , this.deviceName ) )
+            .fontSize( $r( 'app.float.font_16' ) )
+            .width( ConfigData.WH_100_100 )
+            .margin( {
+              top : $r( 'app.float.distance_14' ) ,
+              bottom : $r( 'app.float.distance_14' )
+            } )
 
-          Text(`${this.pinCode}`)
-            .fontSize($r('app.float.pinCode_font_size'))
-            .fontWeight(FontWeight.Bolder)
-            .width(ConfigData.WH_100_100)
-            .textAlign(TextAlign.Center)
-            .margin({
-              top: $r('app.float.item_common_horizontal_margin'),
-              bottom: $r('app.float.item_common_horizontal_margin')
-            })
+          Text( `${ this.pinCode }` )
+            .fontSize( $r( 'app.float.pinCode_font_size' ) )
+            .fontWeight( FontWeight.Bolder )
+            .width( ConfigData.WH_100_100 )
+            .textAlign( TextAlign.Center )
+            .margin( {
+              top : $r( 'app.float.item_common_horizontal_margin' ) ,
+              bottom : $r( 'app.float.item_common_horizontal_margin' )
+            } )
 
         } else {
-          Text($r('app.string.bluetooth_pairing_media_device_hit'))
-            .fontSize($r('app.float.font_16'))
-            .width(ConfigData.WH_100_100)
-            .margin({
-              bottom: $r('app.float.switch_summary_margin')
-            })
+          Text( $r( 'app.string.bluetooth_pairing_media_device_hit' ) )
+            .fontSize( $r( 'app.float.font_16' ) )
+            .width( ConfigData.WH_100_100 )
+            .margin( {
+              bottom : $r( 'app.float.switch_summary_margin' )
+            } )
 
-          Text(this.deviceName)
-            .fontSize($r('app.float.font_16'))
-            .width(ConfigData.WH_100_100)
-            .fontWeight(FontWeight.Bold)
+          Text( this.deviceName )
+            .fontSize( $r( 'app.float.font_16' ) )
+            .width( ConfigData.WH_100_100 )
+            .fontWeight( FontWeight.Bold )
         }
 
         // button
-        Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+        Flex( { justifyContent : FlexAlign.Center , alignItems : ItemAlign.Center } ) {
 
           Button() {
-            Text($r('app.string.cancel'))
-              .fontSize($r('app.float.font_16'))
-              .fontColor(Color.Blue)
+            Text( $r( 'app.string.cancel' ) )
+              .fontSize( $r( 'app.float.font_16' ) )
+              .fontColor( Color.Blue )
           }
-          .backgroundColor($r("app.color.white_bg_color"))
-          .width($r("app.float.wh_value_160"))
-          .height($r("app.float.wh_value_40"))
-          .flexGrow(1)
-          .onClick(() => {
+          .backgroundColor( $r( "app.color.white_bg_color" ) )
+          .width( $r( "app.float.wh_value_160" ) )
+          .height( $r( "app.float.wh_value_40" ) )
+          .flexGrow( 1 )
+          .onClick( () => {
             this.dialogController.close();
-            this.action(false);
-          })
+            this.action( false );
+          } )
 
           Divider()
-            .height($r("app.float.wh_value_24"))
-            .strokeWidth(0.5)
-            .vertical(true)
-            .color(($r("app.color.color_E3E3E3_grey")))
+            .height( $r( "app.float.wh_value_24" ) )
+            .strokeWidth( 0.5 )
+            .vertical( true )
+            .color( ( $r( "app.color.color_E3E3E3_grey" ) ) )
 
           Button() {
-            Text($r('app.string.bluetooth_pair_button'))
-              .fontSize($r('app.float.font_16'))
-              .fontColor(Color.Blue)
+            Text( $r( 'app.string.bluetooth_pair_button' ) )
+              .fontSize( $r( 'app.float.font_16' ) )
+              .fontColor( Color.Blue )
           }
-          .backgroundColor($r("app.color.white_bg_color"))
-          .width($r("app.float.wh_value_160"))
-          .height($r("app.float.wh_value_40"))
-          .flexGrow(1)
-          .onClick(() => {
+          .backgroundColor( $r( "app.color.white_bg_color" ) )
+          .width( $r( "app.float.wh_value_160" ) )
+          .height( $r( "app.float.wh_value_40" ) )
+          .flexGrow( 1 )
+          .onClick( () => {
             this.dialogController.close();
-            this.action(true);
-          })
+            this.action( true );
+          } )
         }
-        .width(ConfigData.WH_100_100)
-        .height($r('app.float.wh_value_60'));
+        .width( ConfigData.WH_100_100 )
+        .height( $r( 'app.float.wh_value_60' ) );
       }
-      .width(ConfigData.WH_100_100)
-      .padding({
-        left: $r('app.float.distance_24'),
-        right: $r('app.float.distance_24')
-      })
+      .width( ConfigData.WH_100_100 )
+      .padding( {
+        left : $r( 'app.float.distance_24' ) ,
+        right : $r( 'app.float.distance_24' )
+      } )
     }
-    .padding({
-      left: $r('app.float.distance_24'),
-      right: $r('app.float.distance_24')
-    })
-    .width(ConfigData.WH_100_100);
+    .padding( {
+      left : $r( 'app.float.distance_24' ) ,
+      right : $r( 'app.float.distance_24' )
+    } )
+    .width( ConfigData.WH_100_100 );
   }
 }
 
@@ -721,9 +731,9 @@ struct PairDialog {
  * @param type
  * @return device icon path
  */
-function getDeviceIconPath(deviceType: string): string {
+function getDeviceIconPath( deviceType: string ): string {
   let path: string = "/res/image/ic_bluetooth_device.svg";
-  switch (deviceType) {
+  switch ( deviceType ) {
     case DeviceType.HEADPHONE:
       path = "/res/image/ic_device_earphone_hero.svg";
       break;
@@ -747,31 +757,31 @@ function getDeviceIconPath(deviceType: string): string {
  * Get connection state text
  * @param connectionState
  */
-function getConnectionStateText(device: BluetoothDevice): Resource {
+function getConnectionStateText( device: BluetoothDevice ): Resource {
   let stateText: Resource = null;
-  switch (device.connectionState) {
+  switch ( device.connectionState ) {
     case DeviceState.STATE_DISCONNECTED:
       stateText = null;
       break;
 
     case DeviceState.STATE_CONNECTING:
-      stateText = $r('app.string.bluetooth_state_connecting');
+      stateText = $r( 'app.string.bluetooth_state_connecting' );
       break;
 
     case DeviceState.STATE_CONNECTED:
-      if (device.deviceType === DeviceType.HEADPHONE) {
-        stateText = $r('app.string.bluetooth_state_connected');
+      if ( device.deviceType === DeviceType.HEADPHONE ) {
+        stateText = $r( 'app.string.bluetooth_state_connected' );
       } else {
         stateText = null;
       }
       break;
 
     case DeviceState.STATE_DISCONNECTING:
-      stateText = $r('app.string.bluetooth_state_disconnecting');
+      stateText = $r( 'app.string.bluetooth_state_disconnecting' );
       break;
 
     case DeviceState.STATE_PAIRING:
-      stateText = $r('app.string.bluetooth_state_pairing');
+      stateText = $r( 'app.string.bluetooth_state_pairing' );
       break;
 
   }
@@ -784,19 +794,19 @@ function getConnectionStateText(device: BluetoothDevice): Resource {
  * @param dialogMessage Dialog message
  * @param buttonValue Dialog buttonValue
  */
-function showDialog(dialogTitle: string | Resource, dialogMessage: string | Resource, buttonValue: string | Resource){
-  AlertDialog.show({
-    title: dialogTitle,
-    message: dialogMessage,
-    confirm: {
-      value: buttonValue,
-      action: () => {
-        LogUtil.info('Button-clicking callback')
+function showDialog( dialogTitle: string | Resource , dialogMessage: string | Resource , buttonValue: string | Resource ) {
+  AlertDialog.show( {
+    title : dialogTitle ,
+    message : dialogMessage ,
+    confirm : {
+      value : buttonValue ,
+      action : () => {
+        LogUtil.info( 'Button-clicking callback' )
       }
-    },
-    cancel: () => {
-      LogUtil.info('Closed callbacks')
-    },
-    alignment: DialogAlignment.Bottom
-  })
+    } ,
+    cancel : () => {
+      LogUtil.info( 'Closed callbacks' )
+    } ,
+    alignment : DialogAlignment.Bottom
+  } )
 }

@@ -61,6 +61,10 @@
       "value": "接口测试"
     },
     {
+      "name": "api_M",
+      "value": "接口测试_M"
+    },
+    {
       "name": "scenario",
       "value": "场景测试"
     },
@@ -73,16 +77,32 @@
       "value": "Profile测试"
     },
     {
+      "name": "scenario_M",
+      "value": "场景测试_M"
+    },
+    {
+      "name": "autotest_M",
+      "value": "自动测试_M"
+    },
+    {
+      "name": "profile_M",
+      "value": "Profile测试_M"
+    },
+    {
+      "name": "benchmark",
+      "value": "性能测试"
+    },
+    {
+      "name": "benchmark_M",
+      "value": "性能测试_M"
+    },
+    {
       "name": "testcase",
       "value": "接口"
     },
     {
       "name": "result",
       "value": "结果"
-    },
-    {
-      "name": "benchmark",
-      "value": "性能测试"
     },
     {
       "name": "test_title",

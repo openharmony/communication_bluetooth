@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { TestData } from '../MainAbility/model/testData'
 import { TestList } from './testList';
-
 
 /**
  * Profile-Test Of Bluetooth test
@@ -22,11 +22,12 @@ import { TestList } from './testList';
 @Component
 export struct ProfileTest {
   private testItems: TestData[]
+
   build() {
     Column() {
-      TestList({
-        testItems: this.testItems
-      })
+      TestList( {
+        testItems : this.testItems
+      } )
     }
   }
 }
