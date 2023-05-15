@@ -302,6 +302,7 @@ private:
     void RegisterHciResetCallback();
     void DeregisterHciResetCallback() const;
     void RemoveDeviceProfileConfig(const BTTransport transport, const std::vector<RawAddress> &devices) const;
+    void PublishBluetoothStateChangeEvent(const BTTransport transport, const BTStateID state) const;
 
     static void HciFailedReset(void *context);
 
