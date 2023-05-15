@@ -29,7 +29,6 @@ config("btframework_config") {
     "//foundation/communication/bluetooth/interfaces/inner_api/include",
     "//foundation/communication/bluetooth/frameworks/inner/common",
     "//foundation/communication/bluetooth/interfaces/inner_api/include/c_header",
-    "//foundation/communication/bluetooth/frameworks/inner/ipc/include",
   ]
 }
 
