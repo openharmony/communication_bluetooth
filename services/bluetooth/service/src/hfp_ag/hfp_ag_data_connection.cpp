@@ -28,6 +28,10 @@ void HfpAgDataConnection::DataConnectionCallback(uint16_t handle, uint32_t event
                                                  const void *eventData, void *context)
 {
     LOG_INFO("[HFP AG]%{public}s():", __PRETTY_FUNCTION__);
+    if (HfpAgProfileEventSender::GetInstance().GetDispatchter() == nullptr) {
+        HILOGI("GetDispatchter() return nullptr");
+        return;
+    }
     HfpAgProfileEventSender::GetInstance().GetDispatchter()->PostTask(
         std::bind(&HfpAgDataConnection::ProcessDataConnectionCallback, handle, eventId));
     return;
