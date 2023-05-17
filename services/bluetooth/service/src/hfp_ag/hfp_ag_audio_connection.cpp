@@ -373,6 +373,10 @@ void HfpAgAudioConnection::OnConnectRequest(const BtmScoConnectionRequestParam *
     HfpScoConnectionRequestParam parameters;
     parameters.linkType = param->linkType;
     (void)memcpy_s(&parameters.addr, sizeof(BtAddr), param->addr, sizeof(BtAddr));
+    if (HfpAgProfileEventSender::GetInstance().GetDispatchter() == nullptr) {
+        HILOGI("GetDispatchter() return nullptr");
+        return;
+    }
     HfpAgProfileEventSender::GetInstance().GetDispatchter()->PostTask(
         std::bind(&HfpAgAudioConnection::ProcessOnConnectRequest, parameters));
 }
@@ -408,6 +412,10 @@ void HfpAgAudioConnection::OnConnectCompleted(const BtmScoConnectionCompletePara
     parameters.status = param->status;
     parameters.connectionHandle = param->connectionHandle;
     (void)memcpy_s(&parameters.addr, sizeof(BtAddr), param->addr, sizeof(BtAddr));
+    if (HfpAgProfileEventSender::GetInstance().GetDispatchter() == nullptr) {
+        HILOGI("GetDispatchter() return nullptr");
+        return;
+    }
     HfpAgProfileEventSender::GetInstance().GetDispatchter()->PostTask(
         std::bind(&HfpAgAudioConnection::ProcessOnConnectCompleted, parameters));
 }
@@ -466,6 +474,10 @@ void HfpAgAudioConnection::OnDisconnectCompleted(const BtmScoDisconnectionComple
     parameters.connectionHandle = param->connectionHandle;
     parameters.reason = param->reason;
     parameters.status = param->status;
+    if (HfpAgProfileEventSender::GetInstance().GetDispatchter() == nullptr) {
+        HILOGI("GetDispatchter() return nullptr");
+        return;
+    }
     HfpAgProfileEventSender::GetInstance().GetDispatchter()->PostTask(
         std::bind(&HfpAgAudioConnection::ProcessOnDisconnectCompleted, parameters));
 }
