@@ -38,6 +38,7 @@ ohos_static_library("btipc_service") {
     "src/bluetooth_ble_central_manager_callback_proxy.cpp",
     "src/bluetooth_ble_central_manager_stub.cpp",
     "src/bluetooth_ble_peripheral_observer_proxy.cpp",
+    "src/bluetooth_gatt_client_callback_proxy.cpp",
     "src/bluetooth_gatt_client_stub.cpp",
     "src/bluetooth_gatt_server_callback_proxy.cpp",
     "src/bluetooth_gatt_server_stub.cpp",
