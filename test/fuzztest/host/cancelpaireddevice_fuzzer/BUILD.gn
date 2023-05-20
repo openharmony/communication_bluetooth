@@ -33,12 +33,12 @@ ohos_fuzztest("CancelPairedDeviceFuzzTest") {
 
   sources = [ "cancelpaireddevice_fuzzer.cpp" ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework" ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }
 
 ###############################################################################

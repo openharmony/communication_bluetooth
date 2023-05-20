@@ -55,8 +55,6 @@ ohos_unittest("btfw_gatt_spp_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",

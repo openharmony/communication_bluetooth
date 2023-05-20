@@ -49,8 +49,6 @@ ohos_unittest("btfw_hfp_ag_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -72,8 +70,6 @@ ohos_unittest("btfw_hfp_hf_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -95,8 +91,6 @@ ohos_unittest("btfw_hf_call_unit_test") {
 
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/server:bluetooth_server",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gmock_main",

@@ -16,9 +16,8 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_HOST_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_HOST_INTERFACE_H
 
-#include "../../../../services/bluetooth/ipc/parcel/bluetooth_raw_address.h"
-#include "../../../../services/bluetooth/ipc/parcel/parcel_bt_uuid.h"
-#include "../parcel/parcel_bt_uuid.h"
+#include "bluetooth_raw_address.h"
+#include "parcel_bt_uuid.h"
 #include "i_bluetooth_ble_peripheral_observer.h"
 #include "i_bluetooth_host_observer.h"
 #include "i_bluetooth_remote_device_observer.h"

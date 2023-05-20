@@ -15,7 +15,6 @@ import("//build/test.gni")
 import("//foundation/communication/bluetooth/bluetooth.gni")
 
 module_output_path = "bluetooth/framework_test/opp"
-SUBSYSTEM_DIR = "//foundation/communication"
 
 ###############################################################################
 #1. intent(c++) get/set test without transport
@@ -47,9 +46,6 @@ ohos_unittest("btfw_opp_unit_test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_static",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
     "//third_party/bounds_checking_function:libsec_shared",

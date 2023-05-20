@@ -156,7 +156,6 @@ ServicePermissionSrc = [
 config("btservice_public_config") {
   include_dirs = [
     "include",
-    "$PART_DIR/ipc/common",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "//third_party/bounds_checking_function/include",
@@ -413,7 +412,7 @@ ohos_shared_library("btservice") {
   deps = [
     "$PART_DIR/external:btdummy",
     "$PART_DIR/stack:btstack",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon",
     "$SUBSYSTEM_DIR/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//base/telephony/state_registry/frameworks/native/observer:tel_state_registry_api",
