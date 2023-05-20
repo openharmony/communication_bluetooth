@@ -79,6 +79,10 @@ void HfpAgDataConnectionServer::DataConnectionServerCallback(
         auto evtData = const_cast<RfcommIncomingInfo *>(static_cast<const RfcommIncomingInfo *>(eventData));
         addr = RawAddress::ConvertToString(evtData->addr.addr).GetAddress();
     }
+    if (HfpAgProfileEventSender::GetInstance().GetDispatchter() == nullptr) {
+        HILOGI("GetDispatchter() return nullptr");
+        return;
+    }
 
     HfpAgProfileEventSender::GetInstance().GetDispatchter()->PostTask(
         std::bind(&HfpAgDataConnectionServer::ProcessDataConnectionServerCallback, handle, eventId, addr));
