@@ -18,8 +18,6 @@
 #include <mutex>
 
 #include "bluetooth_avrcp_ct.h"
-
-#include "bluetooth_avrcp_ct_stub.h"
 #include "bluetooth_avrcp_ct_observer_stub.h"
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"

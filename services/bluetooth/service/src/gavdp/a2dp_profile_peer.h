@@ -33,7 +33,7 @@
 #include "interface_profile_a2dp_src.h"
 #include "sdp.h"
 #include "timer.h"
-#include "../stack/platform/include/queue.h"
+#include "../../../stack/platform/include/queue.h"
 
 namespace OHOS {
 namespace bluetooth {

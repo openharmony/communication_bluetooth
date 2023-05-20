@@ -15,7 +15,7 @@
 
 #include "bluetooth_ble_peripheral_observer_proxy.h"
 
-#include "../../../../services/bluetooth/ipc/parcel/bluetooth_raw_address.h"
+#include "bluetooth_raw_address.h"
 #include "bluetooth_log.h"
 #include "ipc_types.h"
 

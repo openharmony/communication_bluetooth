@@ -128,7 +128,7 @@ ohos_shared_library("bluetooth_server") {
 
   deps = [
     "$BT_ROOT/etc/init:etc",
-    "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/common:btcommon",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/ipc:btipc_service",
     "$SUBSYSTEM_DIR/bluetooth/services/bluetooth/service:btservice",
     "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
