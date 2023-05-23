@@ -491,11 +491,13 @@ void HfpAgService::PhoneStateChanged(
     int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
 {
     LOG_INFO("[HFP AG]%{public}s(): ==========<start>==========", __FUNCTION__);
+    
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (mockState_ == HFP_AG_MOCK) {
         UpdateMockCallList(callState, number, type);
         return;
     }
-    std::lock_guard<std::recursive_mutex> lk(mutex_);
+
     if (dialingOutTimeout_ != nullptr) {
         if ((callState == HFP_AG_CALL_STATE_ACTIVE) || (callState == HFP_AG_CALL_STATE_IDLE)) {
             dialingOutTimeout_->Stop();
