@@ -1019,6 +1019,7 @@ void ClassicAdapter::HandleInquiryResult(
 std::shared_ptr<ClassicRemoteDevice> ClassicAdapter::FindRemoteDevice(const RawAddress &device)
 {
     std::shared_ptr<ClassicRemoteDevice> remoteDevice;
+    std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = devices_.find(device.GetAddress());
     if (it != devices_.end()) {
         remoteDevice = it->second;
