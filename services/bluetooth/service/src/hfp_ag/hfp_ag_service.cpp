@@ -476,6 +476,8 @@ void HfpAgService::UpdateMockCallList(int callState, const std::string &number, 
     call.type = CALL_TYPE_DEFAULT;
     int sameindex = -1;
     LOG_INFO("HFP AG MOCK moko changed number = %{public}s, state = %{public}d", number.c_str(), callState);
+
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
     for (int i = 0; i < callList_.size(); i++) {
         if (strcmp(callList_[i].number.c_str(), number.c_str()) == 0) {
             sameindex = i;
@@ -491,13 +493,11 @@ void HfpAgService::PhoneStateChanged(
     int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
 {
     LOG_INFO("[HFP AG]%{public}s(): ==========<start>==========", __FUNCTION__);
-    
-    std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (mockState_ == HFP_AG_MOCK) {
         UpdateMockCallList(callState, number, type);
         return;
     }
-
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (dialingOutTimeout_ != nullptr) {
         if ((callState == HFP_AG_CALL_STATE_ACTIVE) || (callState == HFP_AG_CALL_STATE_IDLE)) {
             dialingOutTimeout_->Stop();
