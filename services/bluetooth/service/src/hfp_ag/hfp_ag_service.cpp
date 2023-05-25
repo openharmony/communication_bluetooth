@@ -476,6 +476,8 @@ void HfpAgService::UpdateMockCallList(int callState, const std::string &number, 
     call.type = CALL_TYPE_DEFAULT;
     int sameindex = -1;
     LOG_INFO("HFP AG MOCK moko changed number = %{public}s, state = %{public}d", number.c_str(), callState);
+
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
     for (int i = 0; i < callList_.size(); i++) {
         if (strcmp(callList_[i].number.c_str(), number.c_str()) == 0) {
             sameindex = i;
