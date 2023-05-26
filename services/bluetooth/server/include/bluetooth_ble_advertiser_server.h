@@ -39,7 +39,6 @@ public:
     virtual int32_t GetAdvertiserHandle() override;
 
 private:
-    std::recursive_mutex mutex_ {};
     BLUETOOTH_DECLARE_IMPL();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleAdvertiserServer);
 };
