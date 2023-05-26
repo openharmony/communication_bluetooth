@@ -1,0 +1,12 @@
+{
+    "process": "bluetooth_service",
+    "systemability": [
+        {
+            "name": 1130,
+            "libpath": "libbluetooth_server.z.so",
+            "run-on-create": true,
+            "distributed": false,
+            "dump_level": 1
+        }
+    ]
+}
