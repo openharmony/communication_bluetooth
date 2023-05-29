@@ -438,8 +438,8 @@ ohos_shared_library("btservice") {
   if (bluetooth_avrcp_avsession) {
     external_deps += [
       "ability_runtime:wantagent_innerkits",
+      "av_session:avsession_client",
       "input:libmmi-client",
-      "multimedia_av_session:avsession_client",
       "multimedia_image_framework:image_native",
     ]
   }
