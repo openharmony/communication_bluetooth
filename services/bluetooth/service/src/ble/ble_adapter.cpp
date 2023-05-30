@@ -546,6 +546,7 @@ std::string BleAdapter::ReadRemoteDeviceNameByGatt(const RawAddress &addr, int a
         return name;
     }
 
+    std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     auto it = pimpl->peerConnDeviceList_.find(addr.GetAddress());
     if (it != pimpl->peerConnDeviceList_.end()) {
         LOG_DEBUG("[BleAdapter] isAclConnect %{public}d ", it->second.IsAclConnected());
