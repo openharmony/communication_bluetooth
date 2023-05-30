@@ -728,6 +728,8 @@ void ClassicAdapter::UserPasskeyReqCallback(const BtAddr *addr, void *context)
     (void)memcpy_s((void *)&param.userConfirmReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
     param.userConfirmReqParam_.reqType = PAIR_CONFIRM_TYPE_PASSKEY_INPUT;
     param.userConfirmReqParam_.number = 0;
+    param.userConfirmReqParam_.localMitmRequired = GAP_MITM_REQUIRED;
+    param.userConfirmReqParam_.remoteMitmRequired = GAP_MITM_REQUIRED;
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     if (adapter != nullptr) {
@@ -744,6 +746,8 @@ void ClassicAdapter::UserPasskeyNotificationCallback(const BtAddr *addr, uint32_
     (void)memcpy_s((void *)&param.userConfirmReqParam_.addr, sizeof(BtAddr), addr, sizeof(BtAddr));
     param.userConfirmReqParam_.reqType = PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY;
     param.userConfirmReqParam_.number = number;
+    param.userConfirmReqParam_.localMitmRequired = GAP_MITM_REQUIRED;
+    param.userConfirmReqParam_.remoteMitmRequired = GAP_MITM_REQUIRED;
 
     auto adapter = static_cast<ClassicAdapter *>(context);
     if (adapter != nullptr) {
