@@ -226,6 +226,7 @@ void BluetoothBleAdvertiserServer::RegisterBleAdvertiserCallback(const sptr<IBlu
         HILOGE("callback is null");
         return;
     }
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (pimpl != nullptr) {
         pimpl->observerImp_->observersUid_[callback->AsObject()] = IPCSkeleton::GetCallingUid();
         pimpl->observers_.Register(callback);
@@ -241,6 +242,7 @@ void BluetoothBleAdvertiserServer::DeregisterBleAdvertiserCallback(const sptr<IB
         HILOGE("callback is null, or pimpl is null");
         return;
     }
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     for (auto iter = pimpl->advCallBack_.begin(); iter != pimpl->advCallBack_.end(); ++iter) {
         if ((*iter)->AsObject() == callback->AsObject()) {
             HILOGI("Deregister observer");
