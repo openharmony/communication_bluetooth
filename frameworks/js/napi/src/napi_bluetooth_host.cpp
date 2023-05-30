@@ -41,6 +41,7 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getState", GetState),
         DECLARE_NAPI_FUNCTION("getBtConnectionState", GetBtConnectionState),
         DECLARE_NAPI_FUNCTION("pairDevice", PairDevice),
+        DECLARE_NAPI_FUNCTION("pairCredibleDevice", PairCredibleDevice),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDevice),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
@@ -373,9 +374,17 @@ napi_value PairDevice(napi_env env, napi_callback_info info)
     return NapiGetBooleanTrue(env);
 }
 
-napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
+napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 {
     HILOGI("start");
+    napi_value res = nullptr;
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, false, BT_ERR_API_NOT_SUPPORT);
+    return res;
+}
+
+napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
+{
+        HILOGI("start");
     std::string remoteAddr {};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
