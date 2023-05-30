@@ -384,7 +384,7 @@ napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 
 napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
 {
-        HILOGI("start");
+    HILOGI("start");
     std::string remoteAddr {};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
