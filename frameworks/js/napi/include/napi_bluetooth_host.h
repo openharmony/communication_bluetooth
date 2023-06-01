@@ -37,6 +37,7 @@ napi_value StopBluetoothDiscovery(napi_env env, napi_callback_info info);
 napi_value GetState(napi_env env, napi_callback_info info);
 napi_value GetBtConnectionState(napi_env env, napi_callback_info info);
 napi_value PairDevice(napi_env env, napi_callback_info info);
+napi_value PairCredibleDevice(napi_env env, napi_callback_info info);
 napi_value CancelPairedDevice(napi_env env, napi_callback_info info);
 napi_value GetPairedDevices(napi_env env, napi_callback_info info);
 napi_value SetDevicePairingConfirmation(napi_env env, napi_callback_info info);
