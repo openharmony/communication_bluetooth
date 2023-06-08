@@ -234,6 +234,7 @@ ohos_shared_library("btframework") {
   ]
 
   subsystem_name = "communication"
+  innerapi_tags = [ "platformsdk" ]
   part_name = "bluetooth"
 }
 
