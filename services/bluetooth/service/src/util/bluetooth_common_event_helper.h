@@ -17,16 +17,24 @@
 #define OHOS_BLUETOOTH_COMMON_EVENT_HELPER_H
 
 #include <string>
+#include "common_event_data.h"
+#include "raw_address.h"
 
 namespace OHOS {
 namespace BluetoothHelper {
 const std::string COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE = "usual.event.bluetooth.host.STATE_UPDATE";
-
+const std::string COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_PAIRING_REQ = "usual.event.bluetooth.remotedevice.PAIRING_REQ";
+    
 class BluetoothCommonEventHelper {
 public:
+    static bool PublishEvent(const std::string &eventAction, EventFwk::CommonEventData& commonData, 
+        const std::vector<std::string> &permissions);
     static bool PublishEvent(const std::string &eventAction,int code,
         const std::vector<std::string> &permissions);
+    static bool PublishEvent(const std::string &eventAction, const std::string &data,
+        const std::vector<std::string> &permissions);
     static bool PublishBluetoothStateChangeEvent(int code, const std::vector<std::string> &permissions);
+    static void PublishPairReqEvent(const bluetooth::RawAddress& device, int reqType, int number);
 };
 }  // namespace BluetoothHelper
 }  // namespace OHOS

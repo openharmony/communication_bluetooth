@@ -19,6 +19,7 @@
 #include <sys/time.h>
 #include "adapter_manager.h"
 #include "base_observer_list.h"
+#include "bluetooth_common_event_helper.h"
 #include "btstack.h"
 #include "class_creator.h"
 #include "classic_data_structure.h"
@@ -1238,6 +1239,7 @@ void ClassicAdapter::SendPairConfirmed(const RawAddress &device, int reqType, in
     pimpl->adapterObservers_.ForEach([transport, device, reqType, number](IAdapterClassicObserver &observer) {
         observer.OnPairConfirmed(transport, device, reqType, number);
     });
+    BluetoothHelper::BluetoothCommonEventHelper::PublishPairReqEvent(device, reqType, number);
 }
 
 void ClassicAdapter::UserConfirmAutoReply(const RawAddress &device, int reqType, bool accept) const

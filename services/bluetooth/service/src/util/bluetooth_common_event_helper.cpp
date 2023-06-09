@@ -18,20 +18,20 @@
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_subscriber.h"
+#include "bt_def.h"
 #include "log.h"
 
 using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace BluetoothHelper {
-bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction,int code,
+constexpr uint32_t FORMAT_PINCODE_LENGTH = 6;
+bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction, CommonEventData &commonData, 
     const std::vector<std::string> &permissions)
 {
     Want want;
     want.SetAction(eventAction);
-    CommonEventData commonData;
     commonData.SetWant(want);
-    commonData.SetCode(code);
     if (permissions.size() > 0) {
         CommonEventPublishInfo publishInfo;
         publishInfo.SetSubscriberPermissions(permissions);
@@ -49,10 +49,45 @@ bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction,int
     return true;
 }
 
+bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction, int code,
+    const std::vector<std::string> &permissions)
+{
+    CommonEventData commonData;
+    commonData.SetCode(code);
+    return BluetoothCommonEventHelper::PublishEvent(eventAction, commonData, permissions);
+}
+
+bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction, const std::string &data,
+    const std::vector<std::string> &permissions)
+{
+    CommonEventData commonData;
+    commonData.SetData(data);
+    return BluetoothCommonEventHelper::PublishEvent(eventAction, commonData, permissions);
+}
+
 bool BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(int code,
     const std::vector<std::string> &permissions)
 {
-    return BluetoothCommonEventHelper::PublishEvent(COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE , code, permissions);
+    return BluetoothCommonEventHelper::PublishEvent(COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE, code, permissions);
+}
+
+void BluetoothCommonEventHelper::PublishPairReqEvent(const bluetooth::RawAddress& device, int reqType, int number)
+{
+    std::vector<std::string> permissions;
+    permissions.emplace_back("ohos.permission.DISCOVER_BLUETOOTH");
+
+    std::string pinCodeStr = std::to_string(number);
+    if (reqType == bluetooth::PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY || reqType == bluetooth::PAIR_CONFIRM_TYPE_NUMERIC) {
+        while (pinCodeStr.length() < FORMAT_PINCODE_LENGTH) {
+            pinCodeStr = "0" + pinCodeStr;
+        }
+    }
+
+    std::string jsondata = "{\"deviceId\":\"" + device.GetAddress()
+        + "\", \"pinType\":" + std::to_string(reqType) + ", \"code\":\"" + pinCodeStr + "\"}";
+    HILOGD("PublishPairReqEvent, jsondata:%{public}s", jsondata.c_str());
+    
+    BluetoothCommonEventHelper::PublishEvent(COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_PAIRING_REQ, jsondata, permissions);
 }
 }
 }
