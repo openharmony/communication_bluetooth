@@ -27,12 +27,9 @@ const std::string COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_PAIRING_REQ = "usual.event
     
 class BluetoothCommonEventHelper {
 public:
-    static bool PublishEvent(const std::string &eventAction, EventFwk::CommonEventData& commonData, 
-        const std::vector<std::string> &permissions);
     static bool PublishEvent(const std::string &eventAction,int code,
         const std::vector<std::string> &permissions);
-    static bool PublishEvent(const std::string &eventAction, const std::string &data,
-        const std::vector<std::string> &permissions);
+    static bool PublishEvent(OHOS::EventFwk::Want want, const std::vector<std::string> &permissions);
     static bool PublishBluetoothStateChangeEvent(int code, const std::vector<std::string> &permissions);
     static void PublishPairReqEvent(const bluetooth::RawAddress& device, int reqType, int number);
 };
