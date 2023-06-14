@@ -51,7 +51,7 @@ bool BluetoothCommonEventHelper::PublishEvent(const std::string &eventAction,int
     return true;
 }
 
-bool BluetoothCommonEventHelper::PublishEvent(Want want, const std::vector<std::string> &permissions)
+bool BluetoothCommonEventHelper::PublishEvent(Want& want, const std::vector<std::string> &permissions)
 {
     bool rtn;
     CommonEventData commonData;
