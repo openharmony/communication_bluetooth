@@ -29,7 +29,7 @@ class BluetoothCommonEventHelper {
 public:
     static bool PublishEvent(const std::string &eventAction,int code,
         const std::vector<std::string> &permissions);
-    static bool PublishEvent(OHOS::EventFwk::Want want, const std::vector<std::string> &permissions);
+    static bool PublishEvent(OHOS::EventFwk::Want& want, const std::vector<std::string> &permissions);
     static bool PublishBluetoothStateChangeEvent(int code, const std::vector<std::string> &permissions);
     static void PublishPairReqEvent(const bluetooth::RawAddress& device, int reqType, int number);
 };
