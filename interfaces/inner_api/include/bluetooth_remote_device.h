@@ -195,7 +195,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool CancelPairing();
+    int CancelPairing();
 
     /**
      * @brief Check if device was bonded from local.

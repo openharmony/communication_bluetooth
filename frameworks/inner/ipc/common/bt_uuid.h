@@ -21,6 +21,7 @@
 #include <array>
 #include "cstdint"
 #include "iosfwd"
+#include <string>
 
 /**
  * @brief The bluetooth subsystem.
@@ -234,6 +235,34 @@ public:
     bool operator<(const Uuid &uuid) const
     {
         return *this != uuid;
+    }
+
+    /**
+     * @brief Convert UUID to string.
+     *
+     * @return Returns a String object representing this UUID.
+     * @since 6
+     */
+    std::string ToString() const
+    {
+        std::string tmp = "";
+        std::string ret = "";
+        static const char *hex = "0123456789ABCDEF";
+        const uint8_t size4 = 4;
+        const uint8_t pos8 = 8;
+        const uint8_t pos12 = 12;
+        const uint8_t pos16 = 16;
+        const uint8_t pos20 = 20;
+
+        for (auto it = this->uuid_.begin(); it != this->uuid_.end(); ++it) {
+            tmp.push_back(hex[(((*it) >> size4) & 0xF)]);
+            tmp.push_back(hex[(*it) & 0xF]);
+        }
+        // 00000000-0000-1000-8000-00805F9B34FB
+        ret = tmp.substr(0, pos8) + "-" + tmp.substr(pos8, size4) + "-" + tmp.substr(pos12, size4) + "-" +
+            tmp.substr(pos16, size4) + "-" + tmp.substr(pos20);
+
+        return ret;
     }
 
 protected:

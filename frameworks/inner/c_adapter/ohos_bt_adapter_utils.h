@@ -17,18 +17,7 @@
 #define OHOS_BT_ADAPTER_UTILS_H
 
 #include "iosfwd"
-
-#ifndef NO_SANITIZE
-#ifdef __has_attribute
-#if __has_attribute(no_sanitize)
-#define NO_SANITIZE(type) __attribute__((no_sanitize(type)))
-#endif
-#endif
-#endif
-
-#ifndef NO_SANITIZE
-#define NO_SANITIZE(type)
-#endif
+#include "ohos_bt_gap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +29,9 @@ void ConvertAddr(const unsigned char in[6], std::string &out);
 void GetAddrFromString(std::string in, unsigned char out[6]);
 int GetGattcResult(int ret);
 void GetAddrFromByte(unsigned char in[6], std::string &out);
+void GetAclStateName(int transport, int state, std::string &out);
+GapAclState ConvertAclState(int transport, int state);
+void ConvertDataToHex(const unsigned char *data, unsigned int dataLen, std::string &outStr);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #ifdef __cplusplus

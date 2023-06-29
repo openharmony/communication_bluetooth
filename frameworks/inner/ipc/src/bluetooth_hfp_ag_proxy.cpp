@@ -32,7 +32,7 @@ int32_t BluetoothHfpAgProxy::GetConnectDevices(std::vector<BluetoothRawAddress> 
     };
     int error = Remote()->SendRequest(
         IBluetoothHfpAg::Code::BT_HFP_AG_GET_CONNECT_DEVICES, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHfpAgProxy::GetConnectDevices done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
@@ -44,10 +44,11 @@ int32_t BluetoothHfpAgProxy::GetConnectDevices(std::vector<BluetoothRawAddress> 
         }
         devices.push_back(*dev);
     }
-    return BT_SUCCESS;
+    return BT_NO_ERROR;
 }
 
-int BluetoothHfpAgProxy::GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRawAddress> &devices) {
+int BluetoothHfpAgProxy::GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRawAddress> &devices)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::GetDevicesByStates WriteInterfaceToken error");
@@ -94,19 +95,19 @@ int32_t BluetoothHfpAgProxy::GetDeviceState(const BluetoothRawAddress &device, i
     };
     int error = Remote()->SendRequest(
         IBluetoothHfpAg::Code::BT_HFP_AG_GET_DEVICE_STATE, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHfpAgProxy::GetDeviceState done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     // read error code
     int32_t errCode = reply.ReadInt32();
-    if (errCode != BT_SUCCESS) {
+    if (errCode != BT_NO_ERROR) {
         HILOGE("reply errCode: %{public}d", errCode);
         return errCode;
     }
     // read state
     state = reply.ReadInt32();
-    return BT_SUCCESS;
+    return BT_NO_ERROR;
 }
 
 int32_t BluetoothHfpAgProxy::Connect(const BluetoothRawAddress &device)
@@ -126,7 +127,7 @@ int32_t BluetoothHfpAgProxy::Connect(const BluetoothRawAddress &device)
     };
     int error = Remote()->SendRequest(
         IBluetoothHfpAg::Code::BT_HFP_AG_CONNECT, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHfpAgProxy::Connect done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
@@ -150,14 +151,15 @@ int32_t BluetoothHfpAgProxy::Disconnect(const BluetoothRawAddress &device)
     };
     int error = Remote()->SendRequest(
         IBluetoothHfpAg::Code::BT_HFP_AG_DISCONNECT, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHfpAgProxy::Disconnect done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
 }
 
-int BluetoothHfpAgProxy::GetScoState(const BluetoothRawAddress &device) {
+int BluetoothHfpAgProxy::GetScoState(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::GetScoState WriteInterfaceToken error");
@@ -177,10 +179,11 @@ int BluetoothHfpAgProxy::GetScoState(const BluetoothRawAddress &device) {
         HILOGE("BluetoothHfpAgProxy::GetScoState done fail, error: %{public}d", error);
         return ERROR;
     }
-    return reply.ReadInt32();   
+    return reply.ReadInt32();
 }
 
-bool BluetoothHfpAgProxy::ConnectSco() {
+bool BluetoothHfpAgProxy::ConnectSco()
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::ConnectSco WriteInterfaceToken error");
@@ -196,10 +199,11 @@ bool BluetoothHfpAgProxy::ConnectSco() {
         HILOGE("BluetoothHfpAgProxy::ConnectSco done fail, error: %{public}d", error);
         return false;
     }
-    return reply.ReadBool();   
+    return reply.ReadBool();
 }
 
-bool BluetoothHfpAgProxy::DisconnectSco() {
+bool BluetoothHfpAgProxy::DisconnectSco()
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::DisconnectSco WriteInterfaceToken error");
@@ -215,11 +219,12 @@ bool BluetoothHfpAgProxy::DisconnectSco() {
         HILOGE("BluetoothHfpAgProxy::DisconnectSco done fail, error: %{public}d", error);
         return false;
     }
-    return reply.ReadBool();       
+    return reply.ReadBool();
 }
 
-void BluetoothHfpAgProxy::PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, 
-    int type, const std::string &name) {
+void BluetoothHfpAgProxy::PhoneStateChanged(
+    int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteInterfaceToken error");
@@ -258,11 +263,12 @@ void BluetoothHfpAgProxy::PhoneStateChanged(int numActive, int numHeld, int call
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpAgProxy::PhoneStateChanged done fail, error: %{public}d", error);
         return;
-    }    
+    }
 }
 
-void BluetoothHfpAgProxy::ClccResponse(int index, int direction, int status, int mode, bool mpty, 
-    const std::string &number, int type) {
+void BluetoothHfpAgProxy::ClccResponse(
+    int index, int direction, int status, int mode, bool mpty, const std::string &number, int type)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::ClccResponse WriteInterfaceToken error");
@@ -305,10 +311,11 @@ void BluetoothHfpAgProxy::ClccResponse(int index, int direction, int status, int
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpAgProxy::ClccResponse done fail, error: %{public}d", error);
         return;
-    } 
+    }
 }
 
-bool BluetoothHfpAgProxy::OpenVoiceRecognition(const BluetoothRawAddress &device) {
+bool BluetoothHfpAgProxy::OpenVoiceRecognition(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::OpenVoiceRecognition WriteInterfaceToken error");
@@ -331,7 +338,8 @@ bool BluetoothHfpAgProxy::OpenVoiceRecognition(const BluetoothRawAddress &device
     return reply.ReadBool();
 }
 
-bool BluetoothHfpAgProxy::CloseVoiceRecognition(const BluetoothRawAddress &device) {
+bool BluetoothHfpAgProxy::CloseVoiceRecognition(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::CloseVoiceRecognition WriteInterfaceToken error");
@@ -354,7 +362,8 @@ bool BluetoothHfpAgProxy::CloseVoiceRecognition(const BluetoothRawAddress &devic
     return reply.ReadBool();
 }
 
-bool BluetoothHfpAgProxy::SetActiveDevice(const BluetoothRawAddress &device) {
+bool BluetoothHfpAgProxy::SetActiveDevice(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::SetActiveDevice WriteInterfaceToken error");
@@ -431,7 +440,8 @@ bool BluetoothHfpAgProxy::SendNoCarrier(const BluetoothRawAddress &device)
     return reply.ReadBool();
 }
 
-std::string BluetoothHfpAgProxy::GetActiveDevice() {
+std::string BluetoothHfpAgProxy::GetActiveDevice()
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::GetActiveDevice WriteInterfaceToken error");
@@ -450,7 +460,8 @@ std::string BluetoothHfpAgProxy::GetActiveDevice() {
     return reply.ReadString();
 }
 
-void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) {
+void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::RegisterObserver WriteInterfaceToken error");
@@ -472,7 +483,8 @@ void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &
     }
 }
 
-void BluetoothHfpAgProxy::DeregisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) {
+void BluetoothHfpAgProxy::DeregisterObserver(const sptr<IBluetoothHfpAgObserver> &observer)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpAgProxy::DeregisterObserver WriteInterfaceToken error");
@@ -493,6 +505,5 @@ void BluetoothHfpAgProxy::DeregisterObserver(const sptr<IBluetoothHfpAgObserver>
         return;
     }
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

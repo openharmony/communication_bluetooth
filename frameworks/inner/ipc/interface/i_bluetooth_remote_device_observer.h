@@ -27,14 +27,16 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothRemoteDeviceObserver");
 
     enum Code {
-        BT_REMOTE_DEVICE_OBSERVER_PSIR_STATUS = 0,
+        BT_REMOTE_DEVICE_OBSERVER_ACL_STATE = 0,
+        BT_REMOTE_DEVICE_OBSERVER_PAIR_STATUS,
         BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID,
         BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME,
-        BT_REMOTE_DEVICE_OBSERVER_ALIAS_CHANGED,
+        BT_REMOTE_DEVICE_OBSERVER_REMOTE_ALIAS,
         BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD,
         BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL,
     };
 
+    virtual void OnAclStateChanged(const BluetoothRawAddress &device, int32_t state, uint32_t reason) = 0;
     virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int32_t status) = 0;
     virtual void OnRemoteUuidChanged(const BluetoothRawAddress &device, const std::vector<bluetooth::Uuid> uuids) = 0;
     virtual void OnRemoteNameChanged(const BluetoothRawAddress &device, const std::string deviceName) = 0;

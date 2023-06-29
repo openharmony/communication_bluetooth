@@ -28,10 +28,12 @@ public:
     enum Code {
         BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT = 0,
         BT_BLE_ADVERTISE_CALLBACK_RESULT_EVENT,
+        BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
     };
 
     virtual void OnAutoStopAdvEvent(int32_t advHandle) = 0;
     virtual void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) = 0;
+    virtual void OnSetAdvDataEvent(int32_t result, int32_t advHandle) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

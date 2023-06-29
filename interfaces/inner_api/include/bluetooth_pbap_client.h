@@ -450,6 +450,18 @@ public:
      */
     int AbortDownloading(const BluetoothRemoteDevice &device);
 
+    /**
+     * @brief The external process calls the PbapClient profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * PbapClient proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of PbapClient profile.
+     */
+    void UnInit();
+
 private:
     /**
      * @brief constructor

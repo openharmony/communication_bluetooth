@@ -23,5 +23,7 @@ void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result)
 {
     HILOGI("enter, result: %{public}d", result);
 }
+void NapiBluetoothBleAdvertiseCallback::OnSetAdvDataEvent(int result)
+{}
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -21,8 +21,9 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothPbapPceObserverStub::BluetoothPbapPceObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
-    memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceObserverStub::Code::PBAP_PCE_ON_SERVICE_CONNECTION_STATE_CHANGED)] =
+    HILOGI("start.");
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothPbapPceObserverStub::Code::PBAP_PCE_ON_SERVICE_CONNECTION_STATE_CHANGED)] =
         &BluetoothPbapPceObserverStub::OnServiceConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceObserverStub::Code::PBAP_PCE_ON_SERVICE_PASSWORD_REQUIRED)] =
         &BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner;
@@ -32,16 +33,14 @@ BluetoothPbapPceObserverStub::BluetoothPbapPceObserverStub()
 
 BluetoothPbapPceObserverStub::~BluetoothPbapPceObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 int BluetoothPbapPceObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothPbapPceObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothPbapPceObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGD("PbapPceObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothPbapPceObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -59,7 +58,7 @@ int BluetoothPbapPceObserverStub::OnRemoteRequest(
 
 ErrCode BluetoothPbapPceObserverStub::OnServiceConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -67,13 +66,13 @@ ErrCode BluetoothPbapPceObserverStub::OnServiceConnectionStateChangedInner(Messa
     int state = data.ReadInt32();
 
     OnServiceConnectionStateChanged(*device, state);
-    
+
     return NO_ERROR;
 }
 
 ErrCode BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -84,17 +83,15 @@ ErrCode BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner(MessageParc
         return INVALID_DATA;
     }
     const ::std::vector<uint8_t> description = *des;
-    int8_t charset = data.ReadInt8();
+    uint8_t charset = data.ReadInt8();
     bool fullAccess = data.ReadBool();
-    
     OnServicePasswordRequired(*device, description, charset, fullAccess);
-    
     return NO_ERROR;
 }
 
 ErrCode BluetoothPbapPceObserverStub::OnActionCompletedInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;

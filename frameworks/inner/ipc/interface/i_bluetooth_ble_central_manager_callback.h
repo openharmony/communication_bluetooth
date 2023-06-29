@@ -30,11 +30,14 @@ public:
         BT_BLE_CENTRAL_MANAGER_CALLBACK = 0,
         BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK,
         BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED,
+        BT_BLE_SENSORHUB_CALLBACK_NOTIFY_MSG_REPORT,
     };
 
     virtual void OnScanCallback(const BluetoothBleScanResult &result) = 0;
     virtual void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) = 0;
     virtual void OnStartOrStopScanEvent(int resultCode, bool isStartScan) = 0;
+    virtual void OnNotifyMsgReportFromSh(const bluetooth::Uuid &uuid, int msgType,
+        const std::vector<uint8_t> &notifyValue) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

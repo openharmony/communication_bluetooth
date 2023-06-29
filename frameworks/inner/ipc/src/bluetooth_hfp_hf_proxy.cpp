@@ -18,7 +18,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-bool BluetoothHfpHfProxy::ConnectSco(const BluetoothRawAddress &device) {
+bool BluetoothHfpHfProxy::ConnectSco(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::ConnectSco WriteInterfaceToken error");
@@ -41,7 +42,8 @@ bool BluetoothHfpHfProxy::ConnectSco(const BluetoothRawAddress &device) {
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::DisconnectSco(const BluetoothRawAddress &device) {
+bool BluetoothHfpHfProxy::DisconnectSco(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::DisconnectSco WriteInterfaceToken error");
@@ -64,7 +66,8 @@ bool BluetoothHfpHfProxy::DisconnectSco(const BluetoothRawAddress &device) {
     return reply.ReadBool();
 }
 
-int BluetoothHfpHfProxy::GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRawAddress> &devices) {
+int BluetoothHfpHfProxy::GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRawAddress> &devices)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::GetDevicesByStates WriteInterfaceToken error");
@@ -95,7 +98,8 @@ int BluetoothHfpHfProxy::GetDevicesByStates(const std::vector<int> &states, std:
     return NO_ERROR;
 }
 
-int BluetoothHfpHfProxy::GetDeviceState(const BluetoothRawAddress &device) {
+int BluetoothHfpHfProxy::GetDeviceState(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::GetDeviceState WriteInterfaceToken error");
@@ -118,7 +122,8 @@ int BluetoothHfpHfProxy::GetDeviceState(const BluetoothRawAddress &device) {
     return reply.ReadInt32();
 }
 
-int BluetoothHfpHfProxy::GetScoState(const BluetoothRawAddress &device) {
+int BluetoothHfpHfProxy::GetScoState(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::GetScoState WriteInterfaceToken error");
@@ -141,7 +146,8 @@ int BluetoothHfpHfProxy::GetScoState(const BluetoothRawAddress &device) {
     return reply.ReadInt32();
 }
 
-bool BluetoothHfpHfProxy::SendDTMFTone(const BluetoothRawAddress &device, uint8_t code) {
+bool BluetoothHfpHfProxy::SendDTMFTone(const BluetoothRawAddress &device, uint8_t code)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::SendDTMFTone WriteInterfaceToken error");
@@ -168,7 +174,8 @@ bool BluetoothHfpHfProxy::SendDTMFTone(const BluetoothRawAddress &device, uint8_
     return reply.ReadBool();
 }
 
-int BluetoothHfpHfProxy::Connect(const BluetoothRawAddress &device) {
+int BluetoothHfpHfProxy::Connect(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::Connect WriteInterfaceToken error");
@@ -191,7 +198,8 @@ int BluetoothHfpHfProxy::Connect(const BluetoothRawAddress &device) {
     return reply.ReadInt32();
 }
 
-int BluetoothHfpHfProxy::Disconnect(const BluetoothRawAddress &device) {
+int BluetoothHfpHfProxy::Disconnect(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::Disconnect WriteInterfaceToken error");
@@ -214,7 +222,8 @@ int BluetoothHfpHfProxy::Disconnect(const BluetoothRawAddress &device) {
     return reply.ReadInt32();
 }
 
-bool BluetoothHfpHfProxy::OpenVoiceRecognition(const BluetoothRawAddress &device) {
+bool BluetoothHfpHfProxy::OpenVoiceRecognition(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::OpenVoiceRecognition WriteInterfaceToken error");
@@ -237,7 +246,8 @@ bool BluetoothHfpHfProxy::OpenVoiceRecognition(const BluetoothRawAddress &device
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::CloseVoiceRecognition(const BluetoothRawAddress &device) {
+bool BluetoothHfpHfProxy::CloseVoiceRecognition(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::CloseVoiceRecognition WriteInterfaceToken error");
@@ -260,7 +270,8 @@ bool BluetoothHfpHfProxy::CloseVoiceRecognition(const BluetoothRawAddress &devic
     return reply.ReadBool();
 }
 
-int BluetoothHfpHfProxy::GetCurrentCallList(const BluetoothRawAddress &device, std::vector<BluetoothHfpHfCall> &calls) {
+int BluetoothHfpHfProxy::GetCurrentCallList(const BluetoothRawAddress &device, std::vector<BluetoothHfpHfCall> &calls)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::GetCurrentCallList WriteInterfaceToken error");
@@ -291,7 +302,8 @@ int BluetoothHfpHfProxy::GetCurrentCallList(const BluetoothRawAddress &device, s
     return NO_ERROR;
 }
 
-bool BluetoothHfpHfProxy::AcceptIncomingCall(const BluetoothRawAddress &device, int flag) {
+bool BluetoothHfpHfProxy::AcceptIncomingCall(const BluetoothRawAddress &device, int flag)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::AcceptIncomingCall WriteInterfaceToken error");
@@ -318,7 +330,8 @@ bool BluetoothHfpHfProxy::AcceptIncomingCall(const BluetoothRawAddress &device, 
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::HoldActiveCall(const BluetoothRawAddress &device) {
+bool BluetoothHfpHfProxy::HoldActiveCall(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::HoldActiveCall WriteInterfaceToken error");
@@ -341,7 +354,8 @@ bool BluetoothHfpHfProxy::HoldActiveCall(const BluetoothRawAddress &device) {
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::RejectIncomingCall(const BluetoothRawAddress &device) {
+bool BluetoothHfpHfProxy::RejectIncomingCall(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::RejectIncomingCall WriteInterfaceToken error");
@@ -508,11 +522,11 @@ bool BluetoothHfpHfProxy::SendVoiceTag(const BluetoothRawAddress &device, int in
 bool BluetoothHfpHfProxy::SendKeyPressed(const BluetoothRawAddress &device) {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
-        HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteInterfaceToken error");
+        HILOGE("BluetoothHfpHfProxy::SendKeyPressed WriteInterfaceToken error");
         return false;
     }
     if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteParcelable error");
+        HILOGE("BluetoothHfpHfProxy::SendKeyPressed WriteParcelable error");
         return false;
     }
 
@@ -529,7 +543,8 @@ bool BluetoothHfpHfProxy::SendKeyPressed(const BluetoothRawAddress &device) {
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::FinishActiveCall(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call) {
+bool BluetoothHfpHfProxy::FinishActiveCall(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::FinishActiveCall WriteInterfaceToken error");
@@ -556,8 +571,9 @@ bool BluetoothHfpHfProxy::FinishActiveCall(const BluetoothRawAddress &device, co
     return reply.ReadBool();
 }
 
-int BluetoothHfpHfProxy::StartDial(const BluetoothRawAddress &device, const std::string &number, 
-    BluetoothHfpHfCall &call) {
+int BluetoothHfpHfProxy::StartDial(
+    const BluetoothRawAddress &device, const std::string &number, BluetoothHfpHfCall &call)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::StartDial WriteInterfaceToken error");
@@ -588,7 +604,8 @@ int BluetoothHfpHfProxy::StartDial(const BluetoothRawAddress &device, const std:
     return reply.ReadInt32();
 }
 
-void BluetoothHfpHfProxy::RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) {
+void BluetoothHfpHfProxy::RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::RegisterObserver WriteInterfaceToken error");
@@ -610,7 +627,8 @@ void BluetoothHfpHfProxy::RegisterObserver(const sptr<IBluetoothHfpHfObserver> &
     }
 }
 
-void BluetoothHfpHfProxy::DeregisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) {
+void BluetoothHfpHfProxy::DeregisterObserver(const sptr<IBluetoothHfpHfObserver> &observer)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::DeregisterObserver WriteInterfaceToken error");

@@ -49,15 +49,17 @@ namespace Bluetooth {
 class GattClientCallbackWrapper;
 
 struct GattClientWrapper {
-    GattClient *gattClient;
+    std::shared_ptr<GattClient> gattClient;
     GattClientCallbackWrapper *gattClientCallback;
     string remoteAddr;
+    bool fastestConnFlag;
 };
 
 using ClientIterator = std::map<int, struct GattClientWrapper>::iterator;
 
 static int g_clientIncrease = 0;
 static std::map<int, struct GattClientWrapper> g_MapGattClient;
+static std::mutex g_MapGattClientMutex;
 
 #define GATTCLIENT g_MapGattClient
 
@@ -77,30 +79,31 @@ int ConverWriteType(BtGattWriteType writeType)
     return outWriteType;
 }
 
-static GattCharacteristic *GattcFindCharacteristic(int clientId, GattClient **client,
+static GattCharacteristic *GattcFindCharacteristic(int clientId, std::shared_ptr<GattClient> &client,
     BtGattCharacteristic characteristic)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("clientId: %{public}d, has not been registered.", clientId);
         return nullptr;
     }
 
-    *client = iter->second.gattClient;
-    if (*client == nullptr) {
+    client = iter->second.gattClient;
+    if (client == nullptr) {
         HILOGE("client is null.");
         return nullptr;
     }
 
     string strUuidSvc(characteristic.serviceUuid.uuid);
     string strUuidChar(characteristic.characteristicUuid.uuid);
-    HILOGI("execute, strUuidSvc: %{public}s, strUuidChar: %{public}s",
+    HILOGD("execute, strUuidSvc: %{public}s, strUuidChar: %{public}s",
         strUuidSvc.c_str(), strUuidChar.c_str());
     if (!regex_match(strUuidSvc, uuidRegex) || (!regex_match(strUuidChar, uuidRegex))) {
         HILOGE("match the UUID faild.");
         return nullptr;
     }
-    std::optional<std::reference_wrapper<GattService>> service = (*client)->GetService(UUID::FromString(strUuidSvc));
+    std::optional<std::reference_wrapper<GattService>> service = client->GetService(UUID::FromString(strUuidSvc));
     if (service == std::nullopt) {
         HILOGE("find service fail.");
         return nullptr;
@@ -121,19 +124,22 @@ public:
         clientId_ = clientId;
     }
 
-    void OnConnectionStateChanged(int connectionState, int ret)
+    void OnConnectionStateChanged(int connectionState, int ret) override
     {
         if (appCallback_ == nullptr || appCallback_->ConnectionStateCb == nullptr) {
             HILOGI("callback is null.");
             return;
         }
 
-        HILOGI("clientId: %{public}d, connectionState: %{public}d, ret: %{public}d",
+        HILOGD("clientId: %{public}d, connectionState: %{public}d, ret: %{public}d",
             clientId_, connectionState, ret);
+        if (connectionState == static_cast<int>(BTConnectState::CONNECTED)) {
+            HILOGI("GattcOnConnectionStateChanged Connected, clientId: %{public}d", clientId_);
+        }
         appCallback_->ConnectionStateCb(clientId_, connectionState, GetGattcResult(ret));
     }
 
-    void OnConnectionParameterChanged(int interval, int latency, int timeout, int status)
+    void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override
     {
         if (appCallback_ == nullptr || appCallback_->connectParaUpdateCb == nullptr) {
             HILOGI("callback is null.");
@@ -145,18 +151,18 @@ public:
         appCallback_->connectParaUpdateCb(clientId_, interval, latency, timeout, GetGattcResult(status));
     }
 
-    void OnServicesDiscovered(int status)
+    void OnServicesDiscovered(int status) override
     {
         if (appCallback_ == nullptr || appCallback_->searchServiceCompleteCb == nullptr) {
             HILOGI("callback is null.");
             return;
         }
 
-        HILOGI("clientId: %{public}d, status: %{public}d", clientId_, status);
+        HILOGI("GattcOnServicesDiscovered complete, clientId: %{public}d, status: %{public}d", clientId_, status);
         appCallback_->searchServiceCompleteCb(clientId_, GetGattcResult(status));
     }
 
-    void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
+    void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret) override
     {
         if (appCallback_ == nullptr || appCallback_->readCharacteristicCb == nullptr) {
             HILOGI("callback is null.");
@@ -183,7 +189,7 @@ public:
         appCallback_->readCharacteristicCb(clientId_, &characData, GetGattcResult(ret));
     }
 
-    void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret)
+    void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret) override
     {
         if (appCallback_ == nullptr || appCallback_->writeCharacteristicCb == nullptr) {
             HILOGI("callback is null.");
@@ -205,7 +211,7 @@ public:
         appCallback_->writeCharacteristicCb(clientId_, &tmpCharac, GetGattcResult(ret));
     }
 
-    void OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
+    void OnDescriptorReadResult(const GattDescriptor &descriptor, int ret) override
     {
         if (appCallback_ == nullptr || appCallback_->readDescriptorCb == nullptr) {
             HILOGI("callback is null.");
@@ -235,7 +241,7 @@ public:
         appCallback_->readDescriptorCb(clientId_, &descData, GetGattcResult(ret));
     }
 
-    void OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret)
+    void OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret) override
     {
         if (appCallback_ == nullptr || appCallback_->writeDescriptorCb == NULL) {
             HILOGI("callback is null.");
@@ -262,7 +268,7 @@ public:
         appCallback_->writeDescriptorCb(clientId_, &tmpDesc, GetGattcResult(ret));
     }
 
-    void OnMtuUpdate(int mtu, int ret)
+    void OnMtuUpdate(int mtu, int ret) override
     {
         if (appCallback_ == nullptr || appCallback_->configureMtuSizeCb == nullptr) {
             HILOGI("callback is null.");
@@ -273,7 +279,7 @@ public:
         appCallback_->configureMtuSizeCb(clientId_, mtu, GetGattcResult(ret));
     }
 
-    void OnSetNotifyCharacteristic(int status)
+    void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override
     {
         if (appCallback_ == nullptr || appCallback_->registerNotificationCb == nullptr) {
             HILOGI("callback is null.");
@@ -284,7 +290,7 @@ public:
         appCallback_->registerNotificationCb(clientId_, GetGattcResult(status));
     }
 
-    void OnCharacteristicChanged(const GattCharacteristic &characteristic)
+    void OnCharacteristicChanged(const GattCharacteristic &characteristic) override
     {
         if (appCallback_ == nullptr || appCallback_->notificationCb == nullptr) {
             HILOGI("callback is null.");
@@ -304,8 +310,8 @@ public:
         notificationData.data = characteristic.GetValue(&tmpLen).get();
         notificationData.dataLen = (unsigned short)tmpLen;
 
-        HILOGI("clientId: %{public}d, dataLen: %{public}d, ", clientId_, notificationData.dataLen);
-        HILOGI("srvUuid: %{public}s, charcUuid: %{public}s", srvUuid.c_str(), charcUuid.c_str());
+        HILOGD("clientId: %{public}d, dataLen: %{public}d, ", clientId_, notificationData.dataLen);
+        HILOGD("srvUuid: %{public}s, charcUuid: %{public}s", srvUuid.c_str(), charcUuid.c_str());
         appCallback_->notificationCb(clientId_, &notificationData, OHOS_BT_STATUS_SUCCESS);
     }
 private:
@@ -328,11 +334,13 @@ private:
  */
 int BleGattcRegister(BtUuid appUuid)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     g_clientIncrease++;
     struct GattClientWrapper clientWrapper;
     clientWrapper.gattClient = nullptr;
     clientWrapper.gattClientCallback = nullptr;
     clientWrapper.remoteAddr = "";
+    clientWrapper.fastestConnFlag = false;
     int clientId = g_clientIncrease;
     GATTCLIENT.insert(std::pair<int, struct GattClientWrapper>(clientId, clientWrapper));
     HILOGI("clientId: %{public}d", clientId);
@@ -347,12 +355,12 @@ int BleGattcRegister(BtUuid appUuid)
  */
 int BleGattcUnRegister(int clientId)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     HILOGI("clientId: %{public}d", clientId);
     ClientIterator it = GATTCLIENT.find(clientId);
     if (it != GATTCLIENT.end()) {
         auto &clientWrapper = it->second;
         if (clientWrapper.gattClient != nullptr) {
-            delete clientWrapper.gattClient;
             clientWrapper.gattClient = nullptr;
         }
         if (clientWrapper.gattClientCallback != nullptr) {
@@ -374,8 +382,15 @@ int BleGattcUnRegister(int clientId)
  */
 int BleGattcSetFastestConn(int clientId, bool fastestConnFlag)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     HILOGI("clientId: %{public}d, fastestConnFlag: %{public}d", clientId, fastestConnFlag);
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    ClientIterator iter = GATTCLIENT.find(clientId);
+    if (iter == GATTCLIENT.end()) {
+        HILOGE("clientId: %{public}d, has not been registered.", clientId);
+        return OHOS_BT_STATUS_FAIL;
+    }
+    iter->second.fastestConnFlag = fastestConnFlag;
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -390,6 +405,7 @@ int BleGattcSetFastestConn(int clientId, bool fastestConnFlag)
 int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdAddr,
     bool isAutoConnect, BtTransportType transport)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     if (func == nullptr || bdAddr == nullptr) {
         HILOGE("func or bdAddr is null.");
         return OHOS_BT_STATUS_PARM_INVALID;
@@ -402,9 +418,9 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
 
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
-    HILOGI("clientId: %{public}d, addr: %{public}s, isAutoConnect: %{public}d",
+    HILOGI("BleGattcConnect start, clientId: %{public}d, addr: %{public}s, isAutoConnect: %{public}d",
         clientId, GetEncryptAddr(strAddress).c_str(), isAutoConnect);
-    GattClient *client = nullptr;
+    std::shared_ptr<GattClient> client = nullptr;
     if (iter->second.gattClient != nullptr && iter->second.remoteAddr == strAddress) {
         HILOGI("connect to the same remote device again.");
         client = iter->second.gattClient;
@@ -412,26 +428,34 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
         iter->second.gattClientCallback = nullptr;
     } else {
         BluetoothRemoteDevice device(strAddress, transport);
-        client = new GattClient(device);
+        client = std::make_shared<GattClient>(device);
+        client->Init();
+    }
+
+    if (iter->second.fastestConnFlag) {
+        int result = client->RequestFastestConn();
+        if (result != OHOS_BT_STATUS_SUCCESS) {
+            HILOGE("request fastest connect fail.");
+        }
+        iter->second.fastestConnFlag = false;
     }
 
     GattClientCallbackWrapper *clientWrapper = new GattClientCallbackWrapper(func, clientId);
+    iter->second.gattClient = client;
+    iter->second.gattClientCallback = clientWrapper;
+    iter->second.remoteAddr = strAddress;
     int result = client->Connect(*(clientWrapper), isAutoConnect, transport);
     HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
-    if (result == OHOS_BT_STATUS_SUCCESS) {
-        iter->second.gattClient = client;
-        iter->second.gattClientCallback = clientWrapper;
-        iter->second.remoteAddr = strAddress;
-        return OHOS_BT_STATUS_SUCCESS;
-    } else {
-        HILOGE("fail.");
-        delete client;
+    if (result != OHOS_BT_STATUS_SUCCESS) {
+        client = nullptr;
         delete clientWrapper;
         iter->second.gattClient = nullptr;
         iter->second.gattClientCallback = nullptr;
         iter->second.remoteAddr = "";
         return OHOS_BT_STATUS_FAIL;
     }
+
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -444,6 +468,7 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
  */
 int BleGattcSetPriority(int clientId, const BdAddr *bdAddr, BtGattPriority priority)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     if (bdAddr == nullptr) {
         HILOGE("bdAddr is null.");
         return OHOS_BT_STATUS_PARM_INVALID;
@@ -463,7 +488,7 @@ int BleGattcSetPriority(int clientId, const BdAddr *bdAddr, BtGattPriority prior
         return OHOS_BT_STATUS_FAIL;
     }
 
-    GattClient *client = iter->second.gattClient;
+    std::shared_ptr<GattClient> client = iter->second.gattClient;
     int result = client->RequestConnectionPriority(priority);
     HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
     return GetGattcResult(result);
@@ -477,13 +502,14 @@ int BleGattcSetPriority(int clientId, const BdAddr *bdAddr, BtGattPriority prior
  */
 int BleGattcDisconnect(int clientId)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("clientId: %{public}d, has not been registered.", clientId);
         return OHOS_BT_STATUS_FAIL;
     }
 
-    GattClient *client = iter->second.gattClient;
+    std::shared_ptr<GattClient> client = iter->second.gattClient;
     if (client == nullptr) {
         HILOGE("clientId: %{public}d, has not been connected.", clientId);
         return OHOS_BT_STATUS_FAIL;
@@ -502,14 +528,15 @@ int BleGattcDisconnect(int clientId)
  */
 int BleGattcSearchServices(int clientId)
 {
-    HILOGI("clientId: %{public}d", clientId);
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
+    HILOGI("BleGattcSearchServices start, clientId: %{public}d", clientId);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
         HILOGE("clientId: %{public}d, has not been registered.", clientId);
         return OHOS_BT_STATUS_FAIL;
     }
 
-    GattClient *client = iter->second.gattClient;
+    std::shared_ptr<GattClient> client = iter->second.gattClient;
     if (client == nullptr) {
         HILOGE("clientId: %{public}d, has not been connected.", clientId);
         return OHOS_BT_STATUS_FAIL;
@@ -530,6 +557,7 @@ int BleGattcSearchServices(int clientId)
  */
 bool BleGattcGetService(int clientId, BtUuid serviceUuid)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     HILOGI("clientId: %{public}d", clientId);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
@@ -537,7 +565,7 @@ bool BleGattcGetService(int clientId, BtUuid serviceUuid)
         return false;
     }
 
-    GattClient *client = iter->second.gattClient;
+    std::shared_ptr<GattClient> client = iter->second.gattClient;
     if (client == nullptr) {
         HILOGE("gatt is not connected.");
         return false;
@@ -575,8 +603,8 @@ bool BleGattcGetService(int clientId, BtUuid serviceUuid)
 int BleGattcReadCharacteristic(int clientId, BtGattCharacteristic characteristic)
 {
     HILOGI("clientId: %{public}d", clientId);
-    GattClient *client = nullptr;
-    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, characteristic);
+    std::shared_ptr<GattClient> client = nullptr;
+    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, client, characteristic);
     if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
@@ -600,18 +628,18 @@ int BleGattcReadCharacteristic(int clientId, BtGattCharacteristic characteristic
 int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristic,
     BtGattWriteType writeType, int len, const char *value)
 {
-    HILOGI("clientId:%{public}d, writeType:%{public}d, len:%{public}d", clientId, writeType, len);
-    GattClient *client = nullptr;
-    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, characteristic);
+    HILOGD("clientId:%{public}d, writeType:%{public}d, len:%{public}d", clientId, writeType, len);
+    std::shared_ptr<GattClient> client = nullptr;
+    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, client, characteristic);
     if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
     }
 
-    tmpCharac->SetValue((unsigned char *)value, len);
     int newWriteType = ConverWriteType(writeType);
     tmpCharac->SetWriteType(newWriteType);
-    int result = client->WriteCharacteristic(*tmpCharac);
+    std::vector<uint8_t> characterValue(value, value + len);
+    int result = client->WriteCharacteristic(*tmpCharac, std::move(characterValue));
     HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
     return GetGattcResult(result);
 }
@@ -626,8 +654,8 @@ int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristi
 int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
 {
     HILOGI("clientId: %{public}d", clientId);
-    GattClient *client = nullptr;
-    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, descriptor.characteristic);
+    std::shared_ptr<GattClient> client = nullptr;
+    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, client, descriptor.characteristic);
     if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
@@ -661,8 +689,8 @@ int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
 int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, const char *value)
 {
     HILOGI("clientId:%{public}d, len:%{public}d", clientId, len);
-    GattClient *client = nullptr;
-    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, descriptor.characteristic);
+    std::shared_ptr<GattClient> client = nullptr;
+    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, client, descriptor.characteristic);
     if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;
@@ -679,7 +707,7 @@ int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, 
         return OHOS_BT_STATUS_FAIL;
     }
 
-    tmpDescriptor->SetValue((unsigned char *)value, len);
+    tmpDescriptor->SetValue(reinterpret_cast<unsigned char *>(const_cast<char *>(value)), len);
     int result = client->WriteDescriptor(*tmpDescriptor);
     HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
     return GetGattcResult(result);
@@ -694,6 +722,7 @@ int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, 
  */
 int BleGattcConfigureMtuSize(int clientId, int mtuSize)
 {
+    std::lock_guard<std::mutex> lock(g_MapGattClientMutex);
     HILOGI("clientId:%{public}d, mtuSize:%{public}d", clientId, mtuSize);
     ClientIterator iter = GATTCLIENT.find(clientId);
     if (iter == GATTCLIENT.end()) {
@@ -701,14 +730,14 @@ int BleGattcConfigureMtuSize(int clientId, int mtuSize)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    GattClient *client = iter->second.gattClient;
+    std::shared_ptr<GattClient> client = iter->second.gattClient;
     if (client == nullptr) {
         HILOGE("client is null.");
         return OHOS_BT_STATUS_FAIL;
     }
 
     int result = client->RequestBleMtuSize(mtuSize);
-    HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
+    HILOGD("clientId: %{public}d, result: %{public}d", clientId, result);
     return GetGattcResult(result);
 }
 
@@ -723,8 +752,8 @@ int BleGattcConfigureMtuSize(int clientId, int mtuSize)
 int BleGattcRegisterNotification(int clientId, BtGattCharacteristic characteristic, bool enable)
 {
     HILOGI("clientId:%{public}d, enable:%{public}d", clientId, enable);
-    GattClient *client = nullptr;
-    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, &client, characteristic);
+    std::shared_ptr<GattClient> client = nullptr;
+    GattCharacteristic *tmpCharac = GattcFindCharacteristic(clientId, client, characteristic);
     if (tmpCharac == nullptr || client == nullptr) {
         HILOGE("find characteristic fail.");
         return OHOS_BT_STATUS_FAIL;

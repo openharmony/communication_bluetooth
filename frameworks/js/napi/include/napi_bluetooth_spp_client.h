@@ -38,7 +38,7 @@ struct NapiSppClient {
     bool sppReadFlag = false;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 
-    std::shared_ptr<SppClientSocket> client_ = nullptr;
+    std::shared_ptr<ClientSocket> client_ = nullptr;
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
     std::shared_ptr<std::thread> thread_;
     int id_ = -1;

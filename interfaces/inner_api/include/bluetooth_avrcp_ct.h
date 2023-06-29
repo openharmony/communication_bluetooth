@@ -46,7 +46,7 @@ public:
      */
     class Button {
     public:
-        Button(uint8_t code) : code_(code)
+        explicit Button(uint8_t code) : code_(code)
         {};
         ~Button()
         {};
@@ -63,9 +63,9 @@ public:
      */
     class Capabilities {
     public:
-        Capabilities(std::vector<uint32_t> companies) : companies_(companies)
+        explicit Capabilities(std::vector<uint32_t> companies) : companies_(companies)
         {};
-        Capabilities(std::vector<uint8_t> events) : events_(events)
+        explicit Capabilities(std::vector<uint8_t> events) : events_(events)
         {};
         ~Capabilities()
         {
@@ -86,7 +86,7 @@ public:
      */
     class PlayerSettingAttributes {
     public:
-        PlayerSettingAttributes(std::vector<uint8_t> attributes) : attributes_(attributes)
+        explicit PlayerSettingAttributes(std::vector<uint8_t> attributes) : attributes_(attributes)
         {};
         ~PlayerSettingAttributes()
         {
@@ -288,7 +288,7 @@ public:
             uint32_t attribute_;
             std::string value_;
         };
-        ItemAttributes(const std::vector<ItemAttribute> &itemAttrs) : itemAttrs_(itemAttrs)
+        explicit ItemAttributes(const std::vector<ItemAttribute> &itemAttrs) : itemAttrs_(itemAttrs)
         {};
         ~ItemAttributes()
         {};
@@ -324,7 +324,7 @@ public:
      */
     class AbsoluteVolume {
     public:
-        AbsoluteVolume(uint8_t volume) : volume_(volume)
+        explicit AbsoluteVolume(uint8_t volume) : volume_(volume)
         {};
         ~AbsoluteVolume()
         {};
@@ -343,16 +343,16 @@ public:
     public:
         Notification(uint8_t playStatus, uint8_t volume) : playStatus_(playStatus), volume_(volume)
         {};
-        Notification(uint64_t uid) : uid_(uid)
+        explicit Notification(uint64_t uid) : uid_(uid)
         {};
-        Notification(uint32_t playbackPos) : playbackPos_(playbackPos)
+        explicit Notification(uint32_t playbackPos) : playbackPos_(playbackPos)
         {};
         Notification(const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
             : attributes_(attributes), values_(values)
             {};
         Notification(uint16_t playerId, uint16_t uidCounter) : playerId_(playerId), uidCounter_(uidCounter)
         {};
-        Notification(uint16_t uidCounter) : uidCounter_(uidCounter)
+        explicit Notification(uint16_t uidCounter) : uidCounter_(uidCounter)
         {};
         ~Notification()
         {};
@@ -1011,6 +1011,18 @@ public:
      * @since 6
      */
     int DisableNotification(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &events);
+
+    /**
+     * @brief The external process calls the A2dpsrc profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * A2dpsrc proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of A2dpsrc profile.
+     */
+    void UnInit();
 
 private:
     /**

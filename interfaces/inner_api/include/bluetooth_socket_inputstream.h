@@ -52,7 +52,7 @@ public:
      * @param socketFd Socket fd.
      * @since 6
      */
-    InputStream(int socketFd);
+    explicit InputStream(int socketFd);
 
     /**
      * @brief Destroy the inputStream object.
@@ -71,7 +71,7 @@ public:
      *         Returns <b>-1</b> if the operation fails.
      * @since 6
      */
-    ssize_t Read(char *buf, const size_t length);
+    ssize_t Read(uint8_t *buf, size_t length);
 
 private:
     int socketFd_;

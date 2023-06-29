@@ -75,7 +75,7 @@ int BleScanSettingsImpl::GetPhy() const
     return phy_;
 }
 
-void BleScanFilterImpl::SetDeviceId(std::string deviceId)
+void BleScanFilterImpl::SetDeviceId(const std::string &deviceId)
 {
     deviceId_ = deviceId;
 }
@@ -85,7 +85,7 @@ std::string BleScanFilterImpl::GetDeviceId() const
     return deviceId_;
 }
 
-void BleScanFilterImpl::SetName(std::string name)
+void BleScanFilterImpl::SetName(const std::string &name)
 {
     name_ = name;
 }
@@ -159,7 +159,7 @@ Uuid BleScanFilterImpl::GetServiceSolicitationUuidMask() const
     return serviceSolicitationUuidMask_;
 }
 
-void BleScanFilterImpl::SetServiceData(std::vector<uint8_t> serviceData)
+void BleScanFilterImpl::SetServiceData(const std::vector<uint8_t> &serviceData)
 {
     serviceData_ = serviceData;
 }
@@ -169,7 +169,7 @@ std::vector<uint8_t> BleScanFilterImpl::GetServiceData() const
     return serviceData_;
 }
 
-void BleScanFilterImpl::SetServiceDataMask(std::vector<uint8_t> serviceDataMask)
+void BleScanFilterImpl::SetServiceDataMask(const std::vector<uint8_t> &serviceDataMask)
 {
     serviceDataMask_ = serviceDataMask;
 }
@@ -189,7 +189,7 @@ uint16_t BleScanFilterImpl::GetManufacturerId() const
     return manufacturerId_;
 }
 
-void BleScanFilterImpl::SetManufactureData(std::vector<uint8_t> manufactureData)
+void BleScanFilterImpl::SetManufactureData(const std::vector<uint8_t> &manufactureData)
 {
     manufactureData_ = manufactureData;
 }
@@ -199,7 +199,7 @@ std::vector<uint8_t> BleScanFilterImpl::GetManufactureData() const
     return manufactureData_;
 }
 
-void BleScanFilterImpl::SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask)
+void BleScanFilterImpl::SetManufactureDataMask(const std::vector<uint8_t> &manufactureDataMask)
 {
     manufactureDataMask_ = manufactureDataMask;
 }
@@ -209,14 +209,14 @@ std::vector<uint8_t> BleScanFilterImpl::GetManufactureDataMask() const
     return manufactureDataMask_;
 }
 
-void BleScanFilterImpl::SetClientId(int clientId)
+void BleScanFilterImpl::SetScannerId(int scannerId)
 {
-    clientId_ = clientId;
+    scannerId_ = scannerId;
 }
 
-int BleScanFilterImpl::GetClientId() const
+int BleScanFilterImpl::GetScannerId() const
 {
-    return clientId_;
+    return scannerId_;
 }
 
 void BleScanFilterImpl::SetFiltIndex(uint8_t filtIndex)
@@ -660,9 +660,10 @@ std::string BleAdvertiserDataImpl::GetPayload() const
 void BleAdvertiserDataImpl::SetLongName(const std::string &name)
 {
     char cdata[BLE_ADV_DATA_FIELD_TYPE_AND_LEN];
-    cdata[0] = name.length() + 1;
+    // A shortened name only contain 26 contiguous characters from the beginning of the full name.
+    cdata[0] = DEVICE_NAME_MAX_LEN + 1;
     cdata[1] = BLE_AD_TYPE_NAME_SHORT;  /// 0x08
-    AddData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) + name);
+    AddData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) + name.substr(0, DEVICE_NAME_MAX_LEN));
 }
 
 /**
@@ -779,7 +780,8 @@ std::vector<std::string> BlePeripheralDevice::GetServiceData() const
  */
 std::string BlePeripheralDevice::GetServiceData(int index) const
 {
-    return serviceData_.empty() ? "" : ((size_t)index < serviceData_.size() ? serviceData_[index] : "");
+    return serviceData_.empty() ? "" :
+        (static_cast<size_t>(index) < serviceData_.size() ? serviceData_[index] : "");
 }
 
 /**
@@ -1216,7 +1218,7 @@ int BlePeripheralDevice::GetConnectionHandle() const
  */
 uint8_t BlePeripheralDevice::GetDeviceType() const
 {
-    if (adFlag_ & BLE_ADV_FLAG_BREDR_NOT_SPT) {
+    if ((adFlag_ & BLE_ADV_FLAG_BREDR_NOT_SPT) > 0) {
         return BLE_BT_DEVICE_TYPE_DUMO;
     }
     return BLE_BT_DEVICE_TYPE_BLE;
@@ -1341,8 +1343,8 @@ void BlePeripheralDevice::SetManufacturerData(std::string manufacturerData)
 {
     if (manufacturerData.size() > BLE_UUID_LEN_16) {
         uint16_t manufacturerId = uint8_t(manufacturerData[0]) | (uint16_t(manufacturerData[1]) << BLE_ONE_BYTE_LEN);
-        auto iter = manufacturerData_.find(manufacturerId);
-        if (iter == manufacturerData_.end()) {
+        std::map<uint16_t, std::string>::const_iterator iter = manufacturerData_.find(manufacturerId);
+        if (iter == manufacturerData_.cend()) {
             manufacturerData_.insert(std::make_pair(manufacturerId, manufacturerData.substr(BLE_UUID_LEN_16)));
         }
         isManufacturerData_ = true;

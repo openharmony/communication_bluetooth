@@ -14,9 +14,11 @@
  */
 
 #include "bluetooth_ble_scan_result.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
+const int32_t BLE_SCAN_READ_DATA_SIZE_MAX_LEN = 0x400;
 bool BluetoothBleScanResult::Marshalling(Parcel &parcel) const
 {
     if (!WirteServiceUuidsToParcel(parcel)) {
@@ -115,7 +117,8 @@ bool BluetoothBleScanResult::WirteServiceUuidsToParcel(Parcel &parcel) const
 bool BluetoothBleScanResult::ReadServiceUuidsFromParcel(Parcel &parcel)
 {
     int32_t uuidSize = 0;
-    if (!parcel.ReadInt32(uuidSize)) {
+    if (!parcel.ReadInt32(uuidSize) || uuidSize > BLE_SCAN_READ_DATA_SIZE_MAX_LEN) {
+        HILOGE("read Parcelable size failed.");
         return false;
     }
     for (int i = 0; i < uuidSize; ++i) {
@@ -148,7 +151,8 @@ bool BluetoothBleScanResult::WirteManufacturerDataToParcel(Parcel &parcel) const
 bool BluetoothBleScanResult::ReadManufacturerDataFromParcel(Parcel &parcel)
 {
     int32_t manuSize = 0;
-    if (!parcel.ReadInt32(manuSize)) {
+    if (!parcel.ReadInt32(manuSize) || manuSize > BLE_SCAN_READ_DATA_SIZE_MAX_LEN) {
+        HILOGE("read Parcelable size failed.");
         return false;
     }
     for (int i = 0; i < manuSize; i++) {
@@ -184,7 +188,8 @@ bool BluetoothBleScanResult::WirteServiceDataToParcel(Parcel &parcel) const
 bool BluetoothBleScanResult::ReadServiceDataFromParcel(Parcel &parcel)
 {
     int32_t serviceDataSize = 0;
-    if (!parcel.ReadInt32(serviceDataSize)) {
+    if (!parcel.ReadInt32(serviceDataSize) || serviceDataSize > BLE_SCAN_READ_DATA_SIZE_MAX_LEN) {
+        HILOGE("read Parcelable size failed.");
         return false;
     }
     for (int i = 0; i < serviceDataSize; i++) {

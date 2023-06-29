@@ -49,6 +49,60 @@
 #define OHOS_BLE_UUID_MAX_LEN 16
 
 /**
+ * @brief Defines the maximum duration of burst advertise, *10 = 655350 ms(spec_5.3_7.8.56)
+ *
+ */
+#define BURST_ADVERTISING_DURATION_MAX 65535
+
+/**
+ * @brief Defines the minmum duration of burst advertise. no_duration(spec_5.3_7.8.56)
+ *
+ */
+#define BURST_ADVERTISING_DURATION_MIN 0
+
+/**
+ * @brief Defines the maximum burst advertise adv event, 1 octet(spec_5.3_7.8.56)
+ *
+ */
+#define BURST_ADVERTISING_EXTADVEVENT_MAX 255
+
+/**
+ * @brief Defines the minmum burst advertise adv event. no max number of adv events(spec_5.3_7.8.56)
+ *
+ */
+#define BURST_ADVERTISING_EXTADVEVENT_MIN 0
+
+/**
+ * @brief Defines the maxmum burst advertise interval. ms (1105 support)
+ *
+ */
+#define BURST_ADVERTISING_INTERVAL_MAX 16777215
+
+/**
+ * @brief Defines the minmum burst advertise interval. ms (1105 support)
+ *
+ */
+#define BURST_ADVERTISING_INTERVAL_MIN 0
+
+/**
+ * @brief Defines the maxmum burst advertise window. ms (1105 support)
+ *
+ */
+#define BURST_ADVERTISING_WINDOW_MAX 16777215
+
+/**
+ * @brief Defines the minmum burst advertise window. ms (1105 support)
+ *
+ */
+#define BURST_ADVERTISING_WINDOW_MIN 0
+
+/**
+ * @brief Defines the device id length
+ *
+ */
+#define OHOS_ACTIVE_DEVICE_ID_LEN 8
+
+/**
  * @brief Enumerates characteristic properties.
  *
  * Characteristic properties determine how characteristic values are used and\n
@@ -304,6 +358,16 @@ typedef enum {
     OHOS_STATE_DISCONNECTING,
     OHOS_STATE_DISCONNECTED,
 } BtConnectState;
+
+/**
+ * @brief Enumerates Acl connection states of the device.
+ *
+ * @since 6
+ */
+typedef enum {
+    ACL_CONNECTION_STATE_DISCONNECTED = 0x00,
+    ACL_CONNECTION_STATE_CONNECTED = 0x01,
+} BtAclState;
 
 /**
  * @brief Defines the Bluetooth address of the device.

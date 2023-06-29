@@ -22,18 +22,23 @@ namespace Bluetooth {
 using namespace OHOS::bluetooth;
 BluetoothA2dpSinkObserverStub::BluetoothA2dpSinkObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 }
 
 BluetoothA2dpSinkObserverStub::~BluetoothA2dpSinkObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 }
 
 int BluetoothA2dpSinkObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothA2dpSinkObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    HILOGE("cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+
+    if (BluetoothA2dpSinkObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
+        HILOGI("local descriptor is not equal to remote");
+        return ERR_INVALID_STATE;
+    }
 
     ErrCode errCode = NO_ERROR;
     BluetoothA2dpSinkObserverStub::Code msgCode = static_cast<BluetoothA2dpSinkObserverStub::Code>(code);
@@ -42,7 +47,7 @@ int BluetoothA2dpSinkObserverStub::OnRemoteRequest(
             errCode = OnConnectionStateChangedInner(data, reply);
             break;
         default:
-            HILOGW("BluetoothA2dpSinkObserverStub::OnRemoteRequest, default case, need check.");
+            HILOGW("default case, need check.");
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 
@@ -52,7 +57,7 @@ int BluetoothA2dpSinkObserverStub::OnRemoteRequest(
 ErrCode BluetoothA2dpSinkObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     if (BluetoothA2dpSinkObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
-        HILOGE("BluetoothA2dpSinkObserverStub::check interface token failed in: %{public}s.", __func__);
+        HILOGE("check interface token failed");
         return ERR_INVALID_STATE;
     }
     std::string addr = data.ReadString();

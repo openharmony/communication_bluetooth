@@ -24,12 +24,12 @@ namespace Bluetooth {
 class BluetoothBleAdvertiserSettings : public Parcelable, public bluetooth::AdvertiserSettings {
 public:
     explicit BluetoothBleAdvertiserSettings() = default;
-    BluetoothBleAdvertiserSettings(const bluetooth::AdvertiserSettings &other)
+    explicit BluetoothBleAdvertiserSettings(const bluetooth::AdvertiserSettings &other)
         : bluetooth::AdvertiserSettings(other)
     {}
     BluetoothBleAdvertiserSettings(const BluetoothBleAdvertiserSettings &other) : bluetooth::AdvertiserSettings(other)
     {}
-    ~BluetoothBleAdvertiserSettings() = default;
+    ~BluetoothBleAdvertiserSettings() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
     static BluetoothBleAdvertiserSettings *Unmarshalling(Parcel &parcel);

@@ -17,6 +17,7 @@
 
 #include <shared_mutex>
 #include "bluetooth_gatt_client.h"
+#include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {
@@ -37,8 +38,8 @@ public:
     void OnMtuUpdate(int mtu, int ret) override {}
     void OnServicesDiscovered(int status) override;
     void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override {}
-    void OnSetNotifyCharacteristic(int status) override {}
-
+    void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override {}
+    void OnReadRemoteRssiValueResult(int rssi, int status)  override;
     void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo)
     {
         callbackInfos_[type] = callbackInfo;
@@ -52,8 +53,10 @@ public:
         return callbackInfos_[type];
     }
     NapiGattClientCallback() = default;
-    virtual ~NapiGattClientCallback() = default;
+    ~NapiGattClientCallback() override = default;
     static std::shared_mutex g_gattClientCallbackInfosMutex;
+
+    NapiAsyncWorkMap asyncWorkMap_ {};
 
 private:
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};

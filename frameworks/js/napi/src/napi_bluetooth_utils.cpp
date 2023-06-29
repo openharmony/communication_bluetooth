@@ -36,7 +36,7 @@ napi_value GetCallbackErrorValue(napi_env env, int errCode)
     HILOGE("errCode: %{public}d", errCode);
     napi_value result = NapiGetNull(env);
     napi_value eCode = NapiGetNull(env);
-    if (errCode == BT_SUCCESS) {
+    if (errCode == BT_NO_ERROR) {
         return result;
     }
     NAPI_CALL(env, napi_create_int32(env, errCode, &eCode));
@@ -267,6 +267,35 @@ void ConvertBLECharacteristicVectorToJS(napi_env env, napi_value result,
     }
 }
 
+namespace {
+bool HasProperty(int properties, int propertyMask)
+{
+    return (properties & propertyMask) != 0;
+}
+napi_value ConvertGattPropertiesToJs(napi_env env, int properties)
+{
+    napi_value object;
+    napi_create_object(env, &object);
+
+    napi_value value;
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::WRITE), &value);
+    napi_set_named_property(env, object, "write", value);
+
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::WRITE_WITHOUT_RESPONSE), &value);
+    napi_set_named_property(env, object, "writeNoResponse", value);
+
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::READ), &value);
+    napi_set_named_property(env, object, "read", value);
+
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::NOTIFY), &value);
+    napi_set_named_property(env, object, "notify", value);
+
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::INDICATE), &value);
+    napi_set_named_property(env, object, "indicate", value);
+    return object;
+}
+} // namespace {}
+
 void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacteristic& characteristic)
 {
     napi_value characteristicUuid;
@@ -283,16 +312,20 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
 
     size_t valueSize = 0;
     uint8_t* valueData = characteristic.GetValue(&valueSize).get();
-    if (valueSize != 0) {
+    {
         napi_value value = nullptr;
         uint8_t* bufferData = nullptr;
         napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-        if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+        if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
             HILOGE("memcpy_s failed");
             return;
         }
         napi_set_named_property(env, result, "characteristicValue", value);
     }
+
+    napi_value propertiesValue = ConvertGattPropertiesToJs(env, characteristic.GetProperties());
+    napi_set_named_property(env, result, "properties", propertiesValue);
+
     napi_value descriptors;
     napi_create_array(env, &descriptors);
     ConvertBLEDescriptorVectorToJS(env, descriptors, characteristic.GetDescriptors());
@@ -533,226 +566,6 @@ void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::
     napi_set_named_property(env, result, "state", profileState);
 }
 
-bool GetServiceVectorFromJS(napi_env env, napi_value object, vector<GattService>& services,
-    std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client)
-{
-    size_t idx = 0;
-    bool hasElement = false;
-    napi_has_element(env, object, idx, &hasElement);
-    while (hasElement) {
-        napi_value result = nullptr;
-        napi_create_object(env, &result);
-        napi_get_element(env, object, idx, &result);
-        GattService* service = GetServiceFromJS(env, result, nullptr, nullptr);
-        if (service == nullptr) {
-            HILOGE("characteristic is nullptr");
-            return false;
-        }
-        services.push_back(*service);
-        delete service;
-        idx++;
-        napi_has_element(env, object, idx, &hasElement);
-    }
-    HILOGI("services size is %{public}zu", services.size());
-    return true;
-}
-
-GattService* GetServiceFromJS(napi_env env, napi_value object, std::shared_ptr<GattServer> server,
-    std::shared_ptr<GattClient> client)
-{
-    string serviceUuid;
-    bool isPrimary = false;
-
-    napi_value propertyNameValue = nullptr;
-    napi_value value = nullptr;
-    bool hasProperty = false;
-
-    napi_create_string_utf8(env, "serviceUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    bool isSuccess = ParseString(env, serviceUuid, value);
-    if (!isSuccess || (!regex_match(serviceUuid, uuidRegex))) {
-        HILOGE("Parse UUID faild.");
-        return nullptr;
-    }
-
-    napi_create_string_utf8(env, "isPrimary", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    ParseBool(env, isPrimary, value);
-    HILOGI("serviceUuid: %{public}s, isPrimary: %{public}d", serviceUuid.c_str(), isPrimary);
-
-    GattServiceType serviceType = GattServiceType::PRIMARY;
-    if (!isPrimary) {
-        serviceType = GattServiceType::SECONDARY;
-    }
-
-    GattService* service = nullptr;
-    if (server == nullptr && client == nullptr) {
-        service =  new GattService(UUID::FromString(serviceUuid), serviceType);
-
-        napi_create_string_utf8(env, "characteristics", NAPI_AUTO_LENGTH, &propertyNameValue);
-        napi_has_property(env, object, propertyNameValue, &hasProperty);
-        if (hasProperty) {
-            napi_get_property(env, object, propertyNameValue, &value);
-            vector<GattCharacteristic> characteristics;
-            bool ret = GetCharacteristicVectorFromJS(env, value, characteristics, server, client);
-            if (!ret) {
-                HILOGI("GetCharacteristicVectorFromJS faild");
-                return nullptr;
-            }
-            for (auto& characteristic : characteristics) {
-                service->AddCharacteristic(characteristic);
-            }
-        }
-
-        napi_create_string_utf8(env, "includeServices", NAPI_AUTO_LENGTH, &propertyNameValue);
-        napi_has_property(env, object, propertyNameValue, &hasProperty);
-        if (hasProperty) {
-            napi_get_property(env, object, propertyNameValue, &value);
-            vector<GattService> services;
-            bool res = GetServiceVectorFromJS(env, value, services, server, client);
-            if (!res) {
-                HILOGI("GetServiceVectorFromJS faild");
-                return nullptr;
-            }
-            for (auto& serv : services) {
-                service->AddService(serv);
-            }
-        }
-    } else {
-        std::optional<std::reference_wrapper<GattService>> obtainedService;
-        if (server != nullptr) {
-            obtainedService = server->GetService(UUID::FromString(serviceUuid), isPrimary);
-        } else if (client != nullptr) {
-            if (client->DiscoverServices()) {
-                obtainedService = client->GetService(UUID::FromString(serviceUuid));
-            } else {
-                return nullptr;
-            }
-        }
-
-        if (obtainedService == std::nullopt) {
-            return nullptr;
-        } else {
-            service = &(obtainedService->get());
-        }
-    }
-    return service;
-}
-
-bool GetCharacteristicVectorFromJS(napi_env env, napi_value object, vector<GattCharacteristic>& characteristics,
-    std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client)
-{
-    size_t idx = 0;
-
-    bool hasElement = false;
-    napi_has_element(env, object, idx, &hasElement);
-    while (hasElement) {
-        napi_value result = nullptr;
-        napi_create_object(env, &result);
-        napi_get_element(env, object, idx, &result);
-        GattCharacteristic* characteristic = GetCharacteristicFromJS(env, result, server, client);
-        if (characteristic == nullptr) {
-            HILOGE("characteristic is nullptr");
-            return false;
-        }
-        characteristics.push_back(*characteristic);
-        if (server == nullptr && client == nullptr) {
-            delete characteristic;
-        }
-        idx++;
-        napi_has_element(env, object, idx, &hasElement);
-    };
-    HILOGI("characteristics size is %{public}zu", characteristics.size());
-    return true;
-}
-
-GattCharacteristic* GetCharacteristicFromJS(napi_env env, napi_value object, std::shared_ptr<GattServer> server,
-    std::shared_ptr<GattClient> client)
-{
-    string serviceUuid;
-    string characteristicUuid;
-    uint8_t *characteristicValue = nullptr;
-    size_t characteristicValueSize = 0;
-
-    napi_value propertyNameValue = nullptr;
-    napi_value value = nullptr;
-    bool hasProperty = false;
-
-    napi_create_string_utf8(env, "serviceUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    bool parseServUuid = ParseString(env, serviceUuid, value);
-    if (!parseServUuid || (!regex_match(serviceUuid, uuidRegex))) {
-        HILOGE("Parse UUID faild.");
-        return nullptr;
-    }
-    HILOGI("serviceUuid is %{public}s", serviceUuid.c_str());
-
-    napi_create_string_utf8(env, "characteristicUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    bool parseCharacUuid = ParseString(env, characteristicUuid, value);
-    if (!parseCharacUuid || (!regex_match(characteristicUuid, uuidRegex))) {
-        HILOGE("Parse UUID faild.");
-        return nullptr;
-    }
-    HILOGI("characteristicUuid is %{public}s", characteristicUuid.c_str());
-
-    GattCharacteristic* characteristic = nullptr;
-    std::optional<std::reference_wrapper<GattService>> service = nullopt;
-
-    if (server == nullptr && client == nullptr) {
-        characteristic = new GattCharacteristic(UUID::FromString(characteristicUuid),
-            (GattCharacteristic::Permission::READABLE | GattCharacteristic::Permission::WRITEABLE),
-                GattCharacteristic::Propertie::NOTIFY | GattCharacteristic::Propertie::READ
-                | GattCharacteristic::Propertie::WRITE);
-
-        napi_create_string_utf8(env, "descriptors", NAPI_AUTO_LENGTH, &propertyNameValue);
-        napi_has_property(env, object, propertyNameValue, &hasProperty);
-        if (hasProperty) {
-            napi_get_property(env, object, propertyNameValue, &value);
-            vector<GattDescriptor> descriptors;
-            bool ret = GetDescriptorVectorFromJS(env, value, descriptors);
-            if (!ret) {
-                HILOGE("GetDescriptorVectorFromJS faild");
-                return nullptr;
-            }
-            for (auto& descriptor : descriptors) {
-                characteristic->AddDescriptor(descriptor);
-            }
-        } else {
-            HILOGE("descriptor is nullptr");
-            return nullptr;
-        }
-    } else {
-        if (server != nullptr) {
-            service = server->GetService(UUID::FromString(serviceUuid), true);
-            if (service == std::nullopt) {
-                service = server->GetService(UUID::FromString(serviceUuid), false);
-            }
-        } else if (client != nullptr) {
-            service = client->GetService(UUID::FromString(serviceUuid));
-        }
-        if (service == std::nullopt) {
-            HILOGI("service is null");
-            return nullptr;
-        } else {
-            characteristic = service->get().GetCharacteristic(UUID::FromString(characteristicUuid));
-        }
-    }
-
-    if (characteristic == nullptr) {
-        HILOGI("characteristic is null");
-        return nullptr;
-    }
-    napi_create_string_utf8(env, "characteristicValue", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    if (!ParseArrayBuffer(env, &characteristicValue, characteristicValueSize, value)) {
-        HILOGE("ParseArrayBuffer failed");
-        return nullptr;
-    }
-    characteristic->SetValue(characteristicValue, characteristicValueSize);
-    return characteristic;
-}
-
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName)
 {
     napi_value prop = nullptr;
@@ -926,152 +739,6 @@ const sysBLEMap &GetSysBLEObserver()
     return g_sysBLEObserver;
 }
 
-bool GetDescriptorVectorFromJS(napi_env env, napi_value object, vector<GattDescriptor>& descriptors)
-{
-    size_t idx = 0;
-    bool hasElement = false;
-    napi_has_element(env, object, idx, &hasElement);
-
-    while (hasElement) {
-        napi_value result = nullptr;
-        napi_create_object(env, &result);
-        napi_get_element(env, object, idx, &result);
-        GattDescriptor* descriptor = GetDescriptorFromJS(env, result, nullptr, nullptr);
-        if (descriptor == nullptr) {
-            HILOGE("descriptor is nullptr");
-            return false;
-        }
-        descriptors.push_back(*descriptor);
-        delete descriptor;
-        idx++;
-        napi_has_element(env, object, idx, &hasElement);
-    }
-    HILOGI("descriptors size: %{public}zu", descriptors.size());
-    return true;
-}
-
-GattDescriptor* GetDescriptorFromJS(napi_env env, napi_value object, std::shared_ptr<GattServer> server,
-    std::shared_ptr<GattClient> client)
-{
-    string serviceUuid;
-    string characteristicUuid;
-    string descriptorUuid;
-    uint8_t *descriptorValue = nullptr;
-    size_t descriptorValueSize = 0;
-
-    napi_value propertyNameValue = nullptr;
-    napi_value value = nullptr;
-
-    napi_create_string_utf8(env, "serviceUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    bool parseServUuid = ParseString(env, serviceUuid, value);
-    if (!parseServUuid || (!regex_match(serviceUuid, uuidRegex))) {
-        HILOGE("Parse UUID faild.");
-        return nullptr;
-    }
-    HILOGI("serviceUuid is %{public}s", serviceUuid.c_str());
-
-    napi_create_string_utf8(env, "characteristicUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    bool parseCharacUuid = ParseString(env, characteristicUuid, value);
-    if (!parseCharacUuid || (!regex_match(characteristicUuid, uuidRegex))) {
-        HILOGE("Parse UUID faild.");
-        return nullptr;
-    }
-    HILOGI("characteristicUuid is %{public}s", characteristicUuid.c_str());
-
-    napi_create_string_utf8(env, "descriptorUuid", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    bool parseDescUuid = ParseString(env, descriptorUuid, value);
-    if (!parseDescUuid || (!regex_match(descriptorUuid, uuidRegex))) {
-        HILOGE("Parse UUID faild.");
-        return nullptr;
-    }
-    HILOGI("descriptorUuid is %{public}s", descriptorUuid.c_str());
-
-    GattDescriptor* descriptor = nullptr;
-    GattCharacteristic* characteristic = nullptr;
-    std::optional<std::reference_wrapper<GattService>> service = nullopt;
-
-    if (server == nullptr && client == nullptr) {
-        descriptor = new GattDescriptor(UUID::FromString(descriptorUuid),
-            GattCharacteristic::Permission::READABLE | GattCharacteristic::Permission::WRITEABLE);
-    } else {
-        if (server != nullptr) {
-            service = server->GetService(UUID::FromString(serviceUuid), true);
-            if (service == std::nullopt) {
-                service = server->GetService(UUID::FromString(serviceUuid), false);
-            }
-        } else if (client != nullptr) {
-            service = client->GetService(UUID::FromString(serviceUuid));
-        }
-
-        if (service == std::nullopt) {
-            return nullptr;
-        } else {
-            characteristic = service->get().GetCharacteristic(UUID::FromString(characteristicUuid));
-        }
-
-        if (characteristic == nullptr) {
-            return nullptr;
-        } else {
-            descriptor = characteristic->GetDescriptor(UUID::FromString(descriptorUuid));
-        }
-    }
-
-    if (descriptor == nullptr) {
-        HILOGE("descriptor is nullptr");
-        return nullptr;
-    }
-
-    napi_create_string_utf8(env, "descriptorValue", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    if (!ParseArrayBuffer(env, &descriptorValue, descriptorValueSize, value)) {
-        HILOGE("ParseArrayBuffer failed");
-        return nullptr;
-    } else {
-        HILOGI("descriptorValue is %{public}d", descriptorValue[0]);
-    }
-    descriptor->SetValue(descriptorValue, descriptorValueSize);
-
-    return descriptor;
-}
-
-ServerResponse GetServerResponseFromJS(napi_env env, napi_value object)
-{
-    ServerResponse serverResponse;
-    napi_value propertyNameValue = nullptr;
-    napi_value value = nullptr;
-    uint8_t *values = nullptr;
-    size_t valuesSize = 0;
-
-    napi_create_string_utf8(env, "deviceId", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    ParseString(env, serverResponse.deviceId, value);
-
-    napi_create_string_utf8(env, "transId", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    ParseInt32(env, serverResponse.transId, value);
-
-    napi_create_string_utf8(env, "status", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    ParseInt32(env, serverResponse.status, value);
-    HILOGI("deviceId: %{public}s, transId: %{public}d, status: %{public}d",
-        GetEncryptAddr(serverResponse.deviceId).c_str(), serverResponse.transId, serverResponse.status);
-
-    napi_create_string_utf8(env, "offset", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    ParseInt32(env, serverResponse.offset, value);
-
-    napi_create_string_utf8(env, "value", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    if (!ParseArrayBuffer(env, &values, valuesSize, value)) {
-        HILOGE("ParseArrayBuffer failed");
-    }
-    serverResponse.SetValue(values, valuesSize);
-    return serverResponse;
-}
-
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
 {
     std::shared_ptr<SppOption> sppOption = std::make_shared<SppOption>();
@@ -1096,7 +763,7 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     napi_create_string_utf8(env, "type", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     ParseInt32(env, type, value);
-    sppOption->type_ = SppSocketType(type);
+    sppOption->type_ = BtSocketType(type);
     HILOGI("uuid: %{public}s, secure: %{public}d, type: %{public}d",
         sppOption->uuid_.c_str(), sppOption->secure_, sppOption->type_);
     return sppOption;
@@ -1246,6 +913,43 @@ void UnregisterSysBLEObserver(const std::string &type)
     }
 }
 
+struct UvWorkData {
+    std::function<void(void)> func;
+};
+
+int DoInJsMainThread(napi_env env, std::function<void(void)> func)
+{
+    uv_loop_s *loop = nullptr;
+    auto status = napi_get_uv_event_loop(env, &loop);
+    if (status != napi_ok) {
+        HILOGE("napi_get_uv_event_loop failed");
+        return -1;
+    }
+
+    UvWorkData *data = new UvWorkData;
+    data->func = func;
+    uv_work_t *work = new uv_work_t;
+    work->data = data;
+
+    auto emptyWork = [](uv_work_t *work) {};
+    int ret = uv_queue_work(loop, work, emptyWork,
+        [](uv_work_t *work, int status) {
+            UvWorkData *data = static_cast<UvWorkData *>(work->data);
+            if (data) {
+                data->func();
+                delete data;
+            }
+            delete work;
+        });
+    if (ret != 0) {
+        HILOGE("uv_queue_work failed");
+        delete data;
+        delete work;
+        return -1;
+    }
+    return 0;
+}
+
 bool IsValidAddress(std::string bdaddr)
 {
     const std::regex deviceIdRegex("^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$");
@@ -1255,6 +959,11 @@ bool IsValidAddress(std::string bdaddr)
 bool IsValidUuid(std::string uuid)
 {
     return regex_match(uuid, uuidRegex);
+}
+
+bool IsValidTransport(int transport)
+{
+    return transport == BT_TRANSPORT_BREDR || transport == BT_TRANSPORT_BLE;
 }
 
 napi_status NapiIsBoolean(napi_env env, napi_value value)
@@ -1521,8 +1230,8 @@ napi_status CheckDeregisterObserver(napi_env env, napi_callback_info info)
         NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
 
         std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
-        pCallbackInfo->env_ = env;
         NAPI_BT_RETURN_IF(pCallbackInfo == nullptr, "pCallbackInfo is nullptr.", napi_invalid_arg);
+        pCallbackInfo->env_ = env;
         NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
         NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_));
         if (pCallbackInfo != nullptr) {

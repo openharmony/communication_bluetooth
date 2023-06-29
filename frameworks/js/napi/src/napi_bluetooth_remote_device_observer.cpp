@@ -58,6 +58,9 @@ void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
     napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
+void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
+    const BluetoothRemoteDevice &device, int state, unsigned int reason) {}
+
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
 {
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BOND_STATE_TYPE);

@@ -28,7 +28,7 @@ public:
     BluetoothA2dpSrcObserverStub();
     virtual ~BluetoothA2dpSrcObserverStub();
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:

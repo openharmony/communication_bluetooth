@@ -23,7 +23,7 @@ namespace Bluetooth {
 std::shared_mutex NapiAvrcpTargetObserver::g_avrcpTgCallbackInfosMutex;
 void NapiAvrcpTargetObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     std::unique_lock<std::shared_mutex> guard(g_avrcpTgCallbackInfosMutex);
 
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =

@@ -125,6 +125,14 @@ int SppRead(int clientId, char *buf, const unsigned int bufLen);
  */
 int SppWrite(int clientId, const char *data, const unsigned int len);
 
+/**
+ * @brief Adjust the socket send and recv buffer size, limit range is 4KB to 50KB
+ *
+ * @param clientId The relative ID used to identify the current client socket.
+ * @param bufferSize The buffer size want to set, unit is byte.
+ * @return  Returns the operation result status {@link BtStatus}.
+ */
+int SppSetSocketBufferSize(int clientId, int bufferSize);
 #ifdef __cplusplus
 }
 #endif

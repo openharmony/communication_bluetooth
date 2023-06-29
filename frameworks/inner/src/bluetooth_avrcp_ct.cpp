@@ -21,6 +21,7 @@
 #include "bluetooth_avrcp_ct_observer_stub.h"
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"
+#include "bluetooth_load_system_ability.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
@@ -52,7 +53,7 @@ public:
 
         void OnConnectionStateChanged(const RawAddress &rawAddr, int state) override
         {
-            HILOGI("enter, address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
+            HILOGD("enter, address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnConnectionStateChanged(device, static_cast<int>(state));
@@ -436,7 +437,10 @@ public:
     ~impl()
     {
         HILOGI("enter");
-        proxy_->UnregisterObserver(observer_);
+        if (proxy_ != nullptr) {
+            proxy_->UnregisterObserver(observer_);
+            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+        }
     }
 
     bool IsEnabled(void)
@@ -880,6 +884,9 @@ public:
         });
     }
 
+    bool InitAvrcpCtProxy(void);
+    void UnInitAvrcpCtProxy(void);
+
     std::mutex observerMutex_;
     BluetoothObserverList<AvrcpController::IObserver> observers_;
 
@@ -891,13 +898,17 @@ public:
 
 class AvrcpController::impl::BluetoothAvrcpCtDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothAvrcpCtDeathRecipient(AvrcpController::impl &AvrcpController) : avrcpCt_(AvrcpController) {};
+    explicit BluetoothAvrcpCtDeathRecipient(AvrcpController::impl &AvrcpController) : avrcpCt_(AvrcpController) {};
     ~BluetoothAvrcpCtDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothAvrcpCtDeathRecipient);
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        if (!avrcpCt_.proxy_) {
+            return;
+        }
+        avrcpCt_.proxy_->UnregisterObserver(avrcpCt_.observer_);
         avrcpCt_.proxy_->AsObject()->RemoveDeathRecipient(avrcpCt_.deathRecipient_);
         avrcpCt_.proxy_ = nullptr;
     }
@@ -908,29 +919,50 @@ private:
 
 AvrcpController::impl::impl()
 {
+    if (proxy_) {
+        return;
+    }
+    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_AVRCP_CT);
+    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+        return;
+    }
+    InitAvrcpCtProxy();
+}
+
+bool AvrcpController::impl::InitAvrcpCtProxy(void)
+{
+    if (proxy_) {
+        return true;
+    }
+    proxy_ = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    if (!proxy_) {
+        HILOGE("get AvrcpController proxy failed");
+        return false;
+    }
+
     observer_ = new (std::nothrow) ObserverImpl(this);
-    HILOGI("starts");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGI("failed: no hostRemote");
-        return;
+    if (observer_ != nullptr) {
+        proxy_->RegisterObserver(observer_);
     }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_AVRCP_CT);
-
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return;
-    }
-    HILOGI("remote obtained");
-
-    proxy_ = iface_cast<IBluetoothAvrcpCt>(remote);
-    proxy_->RegisterObserver(observer_);
 
     deathRecipient_ = new BluetoothAvrcpCtDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    if (deathRecipient_ != nullptr) {
+        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    }
+    return true;
+}
+
+void AvrcpController::impl::UnInitAvrcpCtProxy(void)
+{
+    if (!proxy_) {
+        HILOGE("UnInitAvrcpCtProxy failed");
+        return;
+    }
+    proxy_->UnregisterObserver(observer_);
+    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+    proxy_ = nullptr;
+    HILOGI("UnInitAvrcpCtProxy success");
 }
 
 AvrcpController *AvrcpController::GetProfile(void)
@@ -942,6 +974,27 @@ AvrcpController *AvrcpController::GetProfile(void)
     return &instance;
 }
 
+void AvrcpController::Init()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    if (!pimpl->InitAvrcpCtProxy()) {
+        HILOGE("get AvrcpController proxy failed");
+        return;
+    }
+}
+
+void AvrcpController::UnInit()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    pimpl->UnInitAvrcpCtProxy();
+}
+
 /******************************************************************
  * REGISTER / UNREGISTER OBSERVER                                 *
  ******************************************************************/
@@ -951,11 +1004,8 @@ void AvrcpController::RegisterObserver(IObserver *observer)
     HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-
-    if (pimpl->IsEnabled()) {
-        std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
-        pimpl->observers_.Register(pointer);
-    }
+    std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
+    pimpl->observers_.Register(pointer);
 }
 
 void AvrcpController::UnregisterObserver(IObserver *observer)
@@ -963,11 +1013,8 @@ void AvrcpController::UnregisterObserver(IObserver *observer)
     HILOGI("enter");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-
-    if (pimpl->IsEnabled()) {
-        std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
-        pimpl->observers_.Deregister(pointer);
-    }
+    std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
+    pimpl->observers_.Deregister(pointer);
 }
 
 /******************************************************************
@@ -977,19 +1024,23 @@ void AvrcpController::UnregisterObserver(IObserver *observer)
 std::vector<BluetoothRemoteDevice> AvrcpController::GetConnectedDevices(void)
 {
     HILOGI("enter");
-
-    std::vector<BluetoothRemoteDevice> devices;
-
-    if (pimpl->IsEnabled()) {
-        std::vector<RawAddress> rawAddrs;
-        rawAddrs = pimpl->proxy_->GetConnectedDevices();
-
-        for (auto rawAddr : rawAddrs) {
-            BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
-            devices.push_back(device);
-        }
+    std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return std::vector<BluetoothRemoteDevice>();
     }
 
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return std::vector<BluetoothRemoteDevice>();
+    }
+
+    std::vector<BluetoothRemoteDevice> devices;
+    std::vector<RawAddress> rawAddrs = pimpl->proxy_->GetConnectedDevices();
+    for (auto rawAddr : rawAddrs) {
+        BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
+        devices.push_back(device);
+    }
     return devices;
 }
 
@@ -997,16 +1048,23 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetDevicesByStates(const std
 {
     HILOGI("enter");
 
-    std::vector<BluetoothRemoteDevice> devices;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return std::vector<BluetoothRemoteDevice>();
+    }
 
-    if (pimpl->IsEnabled()) {
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return std::vector<BluetoothRemoteDevice>();
+    }
+
+    std::vector<BluetoothRemoteDevice> devices;
+    if (pimpl->proxy_ != nullptr) {
         std::vector<int32_t> convertStates;
         for (auto state : states) {
             convertStates.push_back(static_cast<int32_t>(state));
         }
-        std::vector<RawAddress> rawAddrs;
-        rawAddrs = pimpl->proxy_->GetDevicesByStates(convertStates);
-
+        std::vector<RawAddress> rawAddrs = pimpl->proxy_->GetDevicesByStates(convertStates);
         for (auto rawAddr : rawAddrs) {
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             devices.push_back(device);
@@ -1020,42 +1078,56 @@ int AvrcpController::GetDeviceState(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = static_cast<int>(BTConnectState::DISCONNECTED);
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetDeviceState(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return static_cast<int>(BTConnectState::DISCONNECTED);
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return static_cast<int>(BTConnectState::DISCONNECTED);
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetDeviceState(rawAddr);
 }
 
 bool AvrcpController::Connect(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->Connect(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result == RET_NO_ERROR ? true : false;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    int result = pimpl->proxy_->Connect(rawAddr);
+    return result == RET_NO_ERROR;
 }
 
 bool AvrcpController::Disconnect(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->Disconnect(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result == RET_NO_ERROR ? true : false;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    int result = pimpl->proxy_->Disconnect(rawAddr);
+    return result == RET_NO_ERROR;
 }
 
 /******************************************************************
@@ -1066,32 +1138,38 @@ int AvrcpController::PressButton(const BluetoothRemoteDevice &device, uint8_t bu
 {
     HILOGI("enter, device: %{public}s, button: %{public}d", GET_ENCRYPT_ADDR(device), button);
 
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        switch (button) {
-            case AVRC_KEY_OPERATION_VOLUME_UP:
-            case AVRC_KEY_OPERATION_VOLUME_DOWN:
-            case AVRC_KEY_OPERATION_MUTE:
-            case AVRC_KEY_OPERATION_PLAY:
-            case AVRC_KEY_OPERATION_STOP:
-            case AVRC_KEY_OPERATION_PAUSE:
-            case AVRC_KEY_OPERATION_REWIND:
-            case AVRC_KEY_OPERATION_FAST_FORWARD:
-            case AVRC_KEY_OPERATION_FORWARD:
-            case AVRC_KEY_OPERATION_BACKWARD: {
-                BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-                result = pimpl->proxy_->PressButton(rawAddr, static_cast<int32_t>(button));
-                break;
-            }
-            default:
-                result = RET_NO_SUPPORT;
-
-                if (button >= AVRC_KEY_OPERATION_INVALID) {
-                    result = RET_BAD_PARAM;
-                }
-                break;
+    switch (button) {
+        case AVRC_KEY_OPERATION_VOLUME_UP:
+        case AVRC_KEY_OPERATION_VOLUME_DOWN:
+        case AVRC_KEY_OPERATION_MUTE:
+        case AVRC_KEY_OPERATION_PLAY:
+        case AVRC_KEY_OPERATION_STOP:
+        case AVRC_KEY_OPERATION_PAUSE:
+        case AVRC_KEY_OPERATION_REWIND:
+        case AVRC_KEY_OPERATION_FAST_FORWARD:
+        case AVRC_KEY_OPERATION_FORWARD:
+        case AVRC_KEY_OPERATION_BACKWARD: {
+            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+            result = pimpl->proxy_->PressButton(rawAddr, static_cast<int32_t>(button));
+            break;
         }
+        default:
+            result = RET_NO_SUPPORT;
+            if (button >= AVRC_KEY_OPERATION_INVALID) {
+                result = RET_BAD_PARAM;
+            }
+            break;
     }
     return result;
 }
@@ -1100,32 +1178,38 @@ int AvrcpController::ReleaseButton(const BluetoothRemoteDevice &device, uint8_t 
 {
     HILOGI("enter, device: %{public}s, button: %{public}d", GET_ENCRYPT_ADDR(device), button);
 
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        switch (button) {
-            case AVRC_KEY_OPERATION_VOLUME_UP:
-            case AVRC_KEY_OPERATION_VOLUME_DOWN:
-            case AVRC_KEY_OPERATION_MUTE:
-            case AVRC_KEY_OPERATION_PLAY:
-            case AVRC_KEY_OPERATION_STOP:
-            case AVRC_KEY_OPERATION_PAUSE:
-            case AVRC_KEY_OPERATION_REWIND:
-            case AVRC_KEY_OPERATION_FAST_FORWARD:
-            case AVRC_KEY_OPERATION_FORWARD:
-            case AVRC_KEY_OPERATION_BACKWARD: {
-                BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-                result = pimpl->proxy_->ReleaseButton(rawAddr, static_cast<int32_t>(button));
-                break;
-            }
-            default:
-                result = RET_NO_SUPPORT;
-
-                if (button >= AVRC_KEY_OPERATION_INVALID) {
-                    result = RET_BAD_PARAM;
-                }
-                break;
+    switch (button) {
+        case AVRC_KEY_OPERATION_VOLUME_UP:
+        case AVRC_KEY_OPERATION_VOLUME_DOWN:
+        case AVRC_KEY_OPERATION_MUTE:
+        case AVRC_KEY_OPERATION_PLAY:
+        case AVRC_KEY_OPERATION_STOP:
+        case AVRC_KEY_OPERATION_PAUSE:
+        case AVRC_KEY_OPERATION_REWIND:
+        case AVRC_KEY_OPERATION_FAST_FORWARD:
+        case AVRC_KEY_OPERATION_FORWARD:
+        case AVRC_KEY_OPERATION_BACKWARD: {
+            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+            result = pimpl->proxy_->ReleaseButton(rawAddr, static_cast<int32_t>(button));
+            break;
         }
+        default:
+            result = RET_NO_SUPPORT;
+            if (button >= AVRC_KEY_OPERATION_INVALID) {
+                result = RET_BAD_PARAM;
+            }
+            break;
     }
     return result;
 }
@@ -1138,28 +1222,36 @@ int AvrcpController::GetUnitInfo(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetUnitInfo(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetUnitInfo(rawAddr);
 }
 
 int AvrcpController::GetSubUnitInfo(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetSubUnitInfo(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetSubUnitInfo(rawAddr);
 }
 
 /******************************************************************
@@ -1170,28 +1262,36 @@ int AvrcpController::GetSupportedCompanies(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetSupportedCompanies(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetSupportedCompanies(rawAddr);
 }
 
 int AvrcpController::GetSupportedEvents(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetSupportedEvents(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetSupportedEvents(rawAddr);
 }
 
 /******************************************************************
@@ -1202,38 +1302,47 @@ int AvrcpController::GetPlayerAppSettingAttributes(const BluetoothRemoteDevice &
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetPlayerAppSettingAttributes(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetPlayerAppSettingAttributes(rawAddr);
 }
 
 int AvrcpController::GetPlayerAppSettingValues(const BluetoothRemoteDevice &device, uint8_t attribute)
 {
     HILOGI("enter, device: %{public}s, attribute: %{public}d", GET_ENCRYPT_ADDR(device), attribute);
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        do {
-            if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
-                result = RET_BAD_PARAM;
-                break;
-            }
-
-            if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN && attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
-                result = RET_BAD_PARAM;
-                break;
-            }
-
-            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-            result = pimpl->proxy_->GetPlayerAppSettingValues(rawAddr, static_cast<int32_t>(attribute));
-        } while (false);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    int result = RET_BAD_STATUS;
+    do {
+        if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
+            result = RET_BAD_PARAM;
+            break;
+        }
+        if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN && attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
+            result = RET_BAD_PARAM;
+            break;
+        }
+        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+        result = pimpl->proxy_->GetPlayerAppSettingValues(rawAddr, static_cast<int32_t>(attribute));
+    } while (false);
 
     return result;
 }
@@ -1243,35 +1352,36 @@ int AvrcpController::GetPlayerAppSettingCurrentValue(
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_NO_ERROR;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     int result = RET_NO_ERROR;
-
-    if (pimpl->IsEnabled()) {
-        do {
-            std::vector<int32_t> attrs;
-
-            for (auto attribute : attributes) {
-                if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
-                    result = RET_BAD_PARAM;
-                    break;
-                }
-
-                if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN &&
-                    attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
-                    result = RET_BAD_PARAM;
-                    break;
-                }
-
-                attrs.push_back(attribute);
-            }
-
-            if (result != RET_NO_ERROR) {
+    do {
+        std::vector<int32_t> attrs;
+        for (auto attribute : attributes) {
+            if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
+                result = RET_BAD_PARAM;
                 break;
             }
-
-            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-            result = pimpl->proxy_->GetPlayerAppSettingCurrentValue(rawAddr, attrs);
-        } while (false);
-    }
+            if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN && attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
+                result = RET_BAD_PARAM;
+                break;
+            }
+            attrs.push_back(attribute);
+        }
+        if (result != RET_NO_ERROR) {
+            break;
+        }
+        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+        result = pimpl->proxy_->GetPlayerAppSettingCurrentValue(rawAddr, attrs);
+    } while (false);
 
     return result;
 }
@@ -1281,44 +1391,45 @@ int AvrcpController::SetPlayerAppSettingCurrentValue(
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     int result = RET_NO_ERROR;
     std::vector<int32_t> myAttributes;
     std::vector<int32_t> myValues;
-
-    if (pimpl->IsEnabled()) {
-        do {
-            if (attributes.size() != values.size()) {
+    do {
+        if (attributes.size() != values.size()) {
+            break;
+        }
+        for (auto attribute : attributes) {
+            if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
+                result = RET_BAD_PARAM;
                 break;
             }
-
-            for (auto attribute : attributes) {
-                if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
-                    result = RET_BAD_PARAM;
-                    break;
-                }
-
-                if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN &&
-                    attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
-                    result = RET_BAD_PARAM;
-                    break;
-                }
-            }
-
-            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-            for (auto attribute : attributes) {
-                myAttributes.push_back(static_cast<int32_t>(attribute));
-            }
-            for (auto value : values) {
-                myValues.push_back(static_cast<int32_t>(value));
-            }
-
-            if (result != RET_NO_ERROR) {
+            if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN && attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
+                result = RET_BAD_PARAM;
                 break;
             }
-
-            result = pimpl->proxy_->SetPlayerAppSettingCurrentValue(rawAddr, myAttributes, myValues);
-        } while (false);
-    }
+        }
+        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+        for (auto attribute : attributes) {
+            myAttributes.push_back(static_cast<int32_t>(attribute));
+        }
+        for (auto value : values) {
+            myValues.push_back(static_cast<int32_t>(value));
+        }
+        if (result != RET_NO_ERROR) {
+            break;
+        }
+        result = pimpl->proxy_->SetPlayerAppSettingCurrentValue(rawAddr, myAttributes, myValues);
+    } while (false);
 
     return result;
 }
@@ -1328,29 +1439,32 @@ int AvrcpController::GetPlayerApplicationSettingAttributeText(
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-    if (pimpl->IsEnabled()) {
-        do {
-            std::vector<int32_t> attrs;
-
-            for (auto attribute : attributes) {
-                if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
-                    break;
-                }
-
-                if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN &&
-                    attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
-                    break;
-                }
-
-                attrs.push_back(static_cast<int32_t>(attribute));
-            }
-
-            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-
-            result = pimpl->proxy_->GetPlayerAppSettingAttributeText(rawAddr, attrs);
-        } while (false);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    int result = RET_BAD_STATUS;
+    do {
+        std::vector<int32_t> attrs;
+        for (auto attribute : attributes) {
+            if (attribute == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
+                break;
+            }
+            if (attribute >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN && attribute <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
+                break;
+            }
+            attrs.push_back(static_cast<int32_t>(attribute));
+        }
+        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+        result = pimpl->proxy_->GetPlayerAppSettingAttributeText(rawAddr, attrs);
+    } while (false);
+
     return result;
 }
 
@@ -1359,32 +1473,33 @@ int AvrcpController::GetPlayerApplicationSettingValueText(
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        do {
-            std::vector<int32_t> myValues;
-
-            if (attributeId == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
-                result = RET_BAD_PARAM;
-                break;
-            }
-
-            if (attributeId >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN &&
-                attributeId <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
-                result = RET_BAD_PARAM;
-                break;
-            }
-
-            for (auto value : values) {
-                myValues.push_back(static_cast<int32_t>(value));
-            }
-
-            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-            result = pimpl->proxy_->GetPlayerAppSettingValueText(
-                rawAddr, static_cast<int32_t>(attributeId), myValues);
-        } while (false);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    int result = RET_BAD_STATUS;
+    do {
+        std::vector<int32_t> myValues;
+        if (attributeId == AVRC_PLAYER_ATTRIBUTE_ILLEGAL) {
+            result = RET_BAD_PARAM;
+            break;
+        }
+        if (attributeId >= AVRC_PLAYER_ATTRIBUTE_RESERVED_MIN && attributeId <= AVRC_PLAYER_ATTRIBUTE_RESERVED_MAX) {
+            result = RET_BAD_PARAM;
+            break;
+        }
+        for (auto value : values) {
+            myValues.push_back(static_cast<int32_t>(value));
+        }
+        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+        result = pimpl->proxy_->GetPlayerAppSettingValueText(rawAddr, static_cast<int32_t>(attributeId), myValues);
+    } while (false);
 
     return result;
 }
@@ -1397,20 +1512,22 @@ int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, c
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
 
     std::vector<int32_t> attrs;
-
     for (auto attribute : attributes) {
         attrs.push_back(static_cast<int32_t>(attribute));
     }
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetElementAttributes(rawAddr, attrs);
-    }
-
-    return result;
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetElementAttributes(rawAddr, attrs);
 }
 
 /******************************************************************
@@ -1421,32 +1538,39 @@ int AvrcpController::GetPlayStatus(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetPlayStatus(rawAddr);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetPlayStatus(rawAddr);
 }
 
 int AvrcpController::PlayItem(const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter)
 {
     HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->PlayItem(rawAddr,
-            static_cast<int32_t>(AVRC_MEDIA_SCOPE_NOW_PLAYING),
-            static_cast<int64_t>(uid),
-            static_cast<int32_t>(uidCounter)
-            );
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->PlayItem(rawAddr,
+        static_cast<int32_t>(AVRC_MEDIA_SCOPE_NOW_PLAYING),
+        static_cast<int64_t>(uid),
+        static_cast<int32_t>(uidCounter));
 }
 
 /******************************************************************
@@ -1459,37 +1583,39 @@ int AvrcpController::GetFolderItems(
     HILOGI("enter, device: %{public}s, startItem: %{public}d, endItem: %{public}d",
         GET_ENCRYPT_ADDR(device), startItem, endItem);
 
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     int result = RET_NO_ERROR;
-
-    if (pimpl->IsEnabled()) {
-
-        do {
-            if (startItem > endItem) {
+    do {
+        if (startItem > endItem) {
+            result = RET_BAD_PARAM;
+            break;
+        }
+        for (auto attribute : attributes) {
+            if (attribute <= AVRC_MEDIA_ATTRIBUTE_NOT_USED || attribute >= AVRC_MEDIA_ATTRIBUTE_RESERVED) {
                 result = RET_BAD_PARAM;
                 break;
             }
-
-            for (auto attribute : attributes) {
-                if (attribute <= AVRC_MEDIA_ATTRIBUTE_NOT_USED || attribute >= AVRC_MEDIA_ATTRIBUTE_RESERVED) {
-                    result = RET_BAD_PARAM;
-                    break;
-                }
-            }
-
-            if (result != RET_NO_ERROR) {
-                break;
-            }
-
-            BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-            std::vector<int32_t> attrs;
-
-            for (auto attribute : attributes) {
-                attrs.push_back(static_cast<int32_t>(attribute));
-            }
-            result = pimpl->proxy_->GetFolderItems(
-                rawAddr, static_cast<int32_t>(startItem), static_cast<int32_t>(endItem), attrs);
-        } while (false);
-    }
+        }
+        if (result != RET_NO_ERROR) {
+            break;
+        }
+        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+        std::vector<int32_t> attrs;
+        for (auto attribute : attributes) {
+            attrs.push_back(static_cast<int32_t>(attribute));
+        }
+        result = pimpl->proxy_->GetFolderItems(
+            rawAddr, static_cast<int32_t>(startItem), static_cast<int32_t>(endItem), attrs);
+    } while (false);
 
     return result;
 }
@@ -1498,28 +1624,37 @@ int AvrcpController::GetMeidaPlayerList(const BluetoothRemoteDevice &device, uin
 {
     HILOGI("enter, device: %{public}s, startItem: %{public}d, endItem: %{public}d",
         GET_ENCRYPT_ADDR(device), startItem, endItem);
-    int result = RET_BAD_STATUS;
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetMeidaPlayerList(
-            rawAddr, static_cast<int32_t>(startItem), static_cast<int32_t>(endItem));
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetMeidaPlayerList(rawAddr, static_cast<int32_t>(startItem), static_cast<int32_t>(endItem));
 }
 
 int AvrcpController::GetTotalNumberOfItems(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
-    uint8_t scope = AVRC_MEDIA_SCOPE_NOW_PLAYING;
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetTotalNumberOfItems(rawAddr, static_cast<int32_t>(scope));
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    uint8_t scope = AVRC_MEDIA_SCOPE_NOW_PLAYING;
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetTotalNumberOfItems(rawAddr, static_cast<int32_t>(scope));
 }
 
 /******************************************************************
@@ -1530,14 +1665,18 @@ int AvrcpController::SetAbsoluteVolume(const BluetoothRemoteDevice &device, uint
 {
     HILOGI("enter, device: %{public}s, volume: %{public}d", GET_ENCRYPT_ADDR(device), volume);
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->SetAbsoluteVolume(rawAddr, static_cast<int32_t>(volume));
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->SetAbsoluteVolume(rawAddr, static_cast<int32_t>(volume));
 }
 
 /******************************************************************
@@ -1549,38 +1688,46 @@ int AvrcpController::EnableNotification(
 {
     HILOGI("enter, device: %{public}s, interval: %{public}d", GET_ENCRYPT_ADDR(device), interval);
 
-    int result = RET_BAD_STATUS;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
 
     std::vector<int32_t> myEvents;
     for (auto event : events) {
         myEvents.push_back(static_cast<int32_t>(event));
     }
 
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->EnableNotification(rawAddr, myEvents, static_cast<int32_t>(interval));
-    }
-
-    return result;
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->EnableNotification(rawAddr, myEvents, static_cast<int32_t>(interval));
 }
 
 int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &events)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
 
-    int result = RET_BAD_STATUS;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
 
     std::vector<int32_t> myEvents;
     for (auto event : events) {
         myEvents.push_back(static_cast<int32_t>(event));
     }
 
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->DisableNotification(rawAddr, myEvents);
-    }
-
-    return result;
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->DisableNotification(rawAddr, myEvents);
 }
 
 /******************************************************************
@@ -1590,24 +1737,35 @@ int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, co
 int AvrcpController::SetAddressedPlayer(const BluetoothRemoteDevice &device, uint16_t playerId)
 {
     HILOGI("enter, device: %{public}s, playerId: %{public}d", GET_ENCRYPT_ADDR(device), playerId);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
 
-    int result = RET_BAD_STATUS;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
 
-    return result;
+    return RET_BAD_STATUS;
 }
 
 int AvrcpController::SetBrowsedPlayer(const BluetoothRemoteDevice &device, uint16_t playerId)
 {
     HILOGI("enter, device: %{public}s, playerId: %{public}d", GET_ENCRYPT_ADDR(device), playerId);
 
-    int result = RET_BAD_STATUS;
-
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->SetBrowsedPlayer(rawAddr, (int32_t)playerId);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
     }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->SetBrowsedPlayer(rawAddr, (int32_t)playerId);
 }
 
 int AvrcpController::ChangePath(
@@ -1616,9 +1774,17 @@ int AvrcpController::ChangePath(
     HILOGI("enter, device: %{public}s, uidCounter: %{public}d, direction: %{public}d",
         GET_ENCRYPT_ADDR(device), uidCounter, direction);
 
-    int result = RET_BAD_STATUS;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    return RET_BAD_STATUS;
 }
 
 int AvrcpController::GetItemAttributes(
@@ -1626,27 +1792,40 @@ int AvrcpController::GetItemAttributes(
 {
     HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
-    int result = RET_BAD_STATUS;
-    std::vector<int32_t> attrs;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
 
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    std::vector<int32_t> attrs;
     for (auto attribute : attributes) {
         attrs.push_back(static_cast<int32_t>(attribute));
     }
 
-    if (pimpl->IsEnabled()) {
-        BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetItemAttributes(rawAddr, (int64_t)uid, (int32_t)uidCounter, attrs);
-    }
-    return result;
+    BluetoothRawAddress rawAddr(device.GetDeviceAddr());
+    return pimpl->proxy_->GetItemAttributes(rawAddr, (int64_t)uid, (int32_t)uidCounter, attrs);
 }
 
 int AvrcpController::RequestContinuingResponse(const BluetoothRemoteDevice &device, uint8_t pduId)
 {
     HILOGI("enter, device: %{public}s, pduId: %{public}d", GET_ENCRYPT_ADDR(device), pduId);
 
-    int result = RET_BAD_STATUS;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    return RET_BAD_STATUS;
 }
 
 int AvrcpController::AbortContinuingResponse(const BluetoothRemoteDevice &device, uint8_t pduId)
@@ -1662,9 +1841,17 @@ int AvrcpController::AddToNowPlaying(const BluetoothRemoteDevice &device, uint64
 {
     HILOGI("enter, device: %{public}s, uidCounter: %{public}d", GET_ENCRYPT_ADDR(device), uidCounter);
 
-    int result = RET_BAD_STATUS;
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return RET_BAD_STATUS;
+    }
 
-    return result;
+    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
+    return RET_BAD_STATUS;
 }
 
 AvrcpController::AvrcpController(void)
@@ -1677,6 +1864,9 @@ AvrcpController::AvrcpController(void)
 AvrcpController::~AvrcpController(void)
 {
     HILOGI("enter");
+    if (!pimpl || !pimpl->proxy_) {
+        return;
+    }
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     pimpl = nullptr;
 }

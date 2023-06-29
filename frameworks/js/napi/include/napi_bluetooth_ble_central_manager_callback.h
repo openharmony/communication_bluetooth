@@ -29,6 +29,7 @@ public:
     void OnScanCallback(const BleScanResult &result) override;
     void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override;
     void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override;
+    void OnNotifyMsgReportFromSh(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) override {};
 
 private:
     void UvQueueWorkOnScanCallback(uv_work_t *work, std::shared_ptr<BleScanResult> &result);
