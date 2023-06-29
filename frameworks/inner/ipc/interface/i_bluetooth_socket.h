@@ -23,6 +23,20 @@
 
 namespace OHOS {
 namespace Bluetooth {
+struct ListenSocketParam {
+    std::string name;
+    bluetooth::Uuid uuid;
+    int32_t securityFlag;
+    int32_t type;
+};
+
+struct ConnectSocketParam {
+    std::string addr;
+    bluetooth::Uuid uuid;
+    int32_t securityFlag;
+    int32_t type;
+    int32_t psm;
+};
 class IBluetoothSocket : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothSocket");
@@ -32,8 +46,8 @@ public:
         SOCKET_LISTEN,
     };
 
-    virtual int Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) = 0;
-    virtual int Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type) = 0;
+    virtual int Connect(ConnectSocketParam &param, int &fd) = 0;
+    virtual int Listen(ListenSocketParam &param, int &fd) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

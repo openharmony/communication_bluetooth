@@ -58,7 +58,7 @@ public:
      * @param address Address string.
      * @since 6
      */
-    RawAddress(const std::string &address) : address_(address) {};
+    explicit RawAddress(const std::string &address) : address_(address) {};
 
     /**
      * @brief A destructor used to delete the <b>RawAddress</b> instance.

@@ -13,9 +13,95 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("//foundation/communication/bluetooth/bluetooth.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
+
+FwkCAdapterSrc = [
+  "c_adapter/ohos_bt_adapter_utils.cpp",
+  "c_adapter/ohos_bt_gap.cpp",
+  "c_adapter/ohos_bt_gatt.cpp",
+  "c_adapter/ohos_bt_gatt_client.cpp",
+  "c_adapter/ohos_bt_gatt_server.cpp",
+  "c_adapter/ohos_bt_spp.cpp",
+  "c_adapter/ohos_bt_socket.cpp",
+]
+
+FwkSrc = [
+  "src/bluetooth_a2dp_snk.cpp",
+  "src/bluetooth_a2dp_src.cpp",
+  "src/bluetooth_avrcp_ct.cpp",
+  "src/bluetooth_avrcp_tg.cpp",
+  "src/bluetooth_ble_advertiser.cpp",
+  "src/bluetooth_ble_central_manager.cpp",
+  "src/bluetooth_device_class.cpp",
+  "src/bluetooth_gatt_characteristic.cpp",
+  "src/bluetooth_gatt_client.cpp",
+  "src/bluetooth_gatt_descriptor.cpp",
+  "src/bluetooth_gatt_manager.cpp",
+  "src/bluetooth_gatt_server.cpp",
+  "src/bluetooth_gatt_service.cpp",
+  "src/bluetooth_hfp_ag.cpp",
+  "src/bluetooth_hfp_hf.cpp",
+  "src/bluetooth_hid_host.cpp",
+  "src/bluetooth_host.cpp",
+  "src/bluetooth_map_mce.cpp",
+  "src/bluetooth_map_mse.cpp",
+  "src/bluetooth_opp.cpp",
+  "src/bluetooth_pan.cpp",
+  "src/bluetooth_pbap_pce.cpp",
+  "src/bluetooth_pbap_pse.cpp",
+  "src/bluetooth_proxy_manager.cpp",
+  "src/bluetooth_remote_device.cpp",
+  "src/bluetooth_socket.cpp",
+  "src/bluetooth_socket_inputstream.cpp",
+  "src/bluetooth_socket_outputstream.cpp",
+  "src/bluetooth_utils.cpp",
+  "src/bluetooth_host_load_callback.cpp",
+  "src/bluetooth_load_system_ability.cpp",
+]
+
+BT_IPCSRC_DIR = "ipc/src"
+FwkIpcSrc = [
+  "$BT_IPCSRC_DIR/bluetooth_a2dp_sink_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_a2dp_sink_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_a2dp_src_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_a2dp_src_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_avrcp_ct_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_avrcp_ct_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_avrcp_tg_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_avrcp_tg_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_ble_advertise_callback_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_ble_advertiser_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_ble_central_manager_callback_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_ble_central_manager_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_ble_peripheral_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_gatt_client_callback_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_gatt_client_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_gatt_server_callback_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_gatt_server_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hfp_ag_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hfp_ag_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hfp_hf_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hfp_hf_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hid_host_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hid_host_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_host_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_host_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_map_mce_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_map_mce_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_map_mse_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_map_mse_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_opp_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_opp_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_pan_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_pan_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_pbap_pce_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_pbap_pce_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_pbap_pse_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_pbap_pse_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_remote_device_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_socket_proxy.cpp",
+]
 
 config("btframework_config") {
   cflags_cc = [
@@ -24,228 +110,57 @@ config("btframework_config") {
     "-Wunused-private-field",
   ]
   include_dirs = [
-    "//utils/system/safwk/native/include",
     "include",
-    "//foundation/communication/bluetooth/interfaces/inner_api/include",
-    "//foundation/communication/bluetooth/frameworks/inner/common",
-    "//foundation/communication/bluetooth/interfaces/inner_api/include/c_header",
+    "ipc/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/common",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
   ]
 }
 
 config("btframework_public_config") {
+  visibility = [ "*" ]
   include_dirs = [
-    "//foundation/communication/bluetooth/interfaces/inner_api/include",
-    "//foundation/communication/bluetooth/frameworks/inner/common",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/interface",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
   ]
 }
 
 ohos_shared_library("btframework") {
-  # uncomment to enable cfi for libbtframework.z.so
-  # sanitize = {
-  #   cfi = true
-  #   blocklist = "./frameworks_inner_blocklist.txt"
-  # }
   stack_protector_ret = true
   configs = [ ":btframework_config" ]
   public_configs = [ ":btframework_public_config" ]
-  sources = [
-    "c_adapter/ohos_bt_adapter_utils.cpp",
-    "c_adapter/ohos_bt_gap.cpp",
-    "c_adapter/ohos_bt_gatt.cpp",
-    "c_adapter/ohos_bt_gatt_client.cpp",
-    "c_adapter/ohos_bt_gatt_server.cpp",
-    "c_adapter/ohos_bt_spp.cpp",
-    "ipc/src/bluetooth_ble_advertise_callback_stub.cpp",
-    "ipc/src/bluetooth_ble_advertiser_proxy.cpp",
-    "ipc/src/bluetooth_ble_central_manager_callback_stub.cpp",
-    "ipc/src/bluetooth_ble_central_manager_proxy.cpp",
-    "ipc/src/bluetooth_ble_peripheral_observer_stub.cpp",
-    "ipc/src/bluetooth_gatt_client_callback_stub.cpp",
-    "ipc/src/bluetooth_gatt_client_proxy.cpp",
-    "ipc/src/bluetooth_gatt_server_callback_stub.cpp",
-    "ipc/src/bluetooth_gatt_server_proxy.cpp",
-    "ipc/src/bluetooth_host_observer_stub.cpp",
-    "ipc/src/bluetooth_host_proxy.cpp",
-    "ipc/src/bluetooth_remote_device_observer_stub.cpp",
-    "ipc/src/bluetooth_socket_proxy.cpp",
-    "src/bluetooth_ble_advertiser.cpp",
-    "src/bluetooth_ble_central_manager.cpp",
-    "src/bluetooth_device_class.cpp",
-    "src/bluetooth_gatt_characteristic.cpp",
-    "src/bluetooth_gatt_client.cpp",
-    "src/bluetooth_gatt_descriptor.cpp",
-    "src/bluetooth_gatt_manager.cpp",
-    "src/bluetooth_gatt_server.cpp",
-    "src/bluetooth_gatt_service.cpp",
-    "src/bluetooth_host.cpp",
-    "src/bluetooth_proxy_manager.cpp",
-    "src/bluetooth_remote_device.cpp",
-    "src/bluetooth_socket.cpp",
-    "src/bluetooth_socket_inputstream.cpp",
-    "src/bluetooth_socket_outputstream.cpp",
-    "src/bluetooth_utils.cpp",
+  innerapi_tags = [ "platformsdk" ]
+  sources = FwkSrc
+  sources += FwkCAdapterSrc
+  sources += FwkIpcSrc
+
+  deps = [
+    ":btcommon",
   ]
-
-  defines = []
-
-  if (bluetooth_a2dp_sink_feature) {
-    sources += [
-      "ipc/src/bluetooth_a2dp_sink_observer_stub.cpp",
-      "ipc/src/bluetooth_a2dp_sink_proxy.cpp",
-      "src/bluetooth_a2dp_snk.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_a2dp_snk.cpp" ]
-  }
-
-  if (bluetooth_a2dp_source_feature) {
-    sources += [
-      "ipc/src/bluetooth_a2dp_src_observer_stub.cpp",
-      "ipc/src/bluetooth_a2dp_src_proxy.cpp",
-      "src/bluetooth_a2dp_src.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_a2dp_src.cpp" ]
-  }
-
-  if (bluetooth_avrcp_ct_feature) {
-    sources += [
-      "ipc/src/bluetooth_avrcp_ct_observer_stub.cpp",
-      "ipc/src/bluetooth_avrcp_ct_proxy.cpp",
-      "src/bluetooth_avrcp_ct.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_avrcp_ct.cpp" ]
-  }
-
-  if (bluetooth_avrcp_tg_feature) {
-    sources += [
-      "ipc/src/bluetooth_avrcp_tg_observer_stub.cpp",
-      "ipc/src/bluetooth_avrcp_tg_proxy.cpp",
-      "src/bluetooth_avrcp_tg.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_avrcp_tg.cpp" ]
-  }
-
-  if (bluetooth_hfp_ag_feature) {
-    sources += [
-      "ipc/src/bluetooth_hfp_ag_observer_stub.cpp",
-      "ipc/src/bluetooth_hfp_ag_proxy.cpp",
-      "src/bluetooth_hfp_ag.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_hfp_ag.cpp" ]
-  }
-
-  if (bluetooth_hfp_hf_feature) {
-    sources += [
-      "ipc/src/bluetooth_hfp_hf_observer_stub.cpp",
-      "ipc/src/bluetooth_hfp_hf_proxy.cpp",
-      "src/bluetooth_hfp_hf.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_hfp_hf.cpp" ]
-  }
-
-  if (bluetooth_hid_host_feature) {
-    sources += [
-      "ipc/src/bluetooth_hid_host_observer_stub.cpp",
-      "ipc/src/bluetooth_hid_host_proxy.cpp",
-      "src/bluetooth_hid_host.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_hid_host.cpp" ]
-  }
-
-  if (bluetooth_map_client_feature) {
-    sources += [
-      "ipc/src/bluetooth_map_mce_observer_stub.cpp",
-      "ipc/src/bluetooth_map_mce_proxy.cpp",
-      "src/bluetooth_map_mce.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_map_mce.cpp" ]
-  }
-
-  if (bluetooth_map_server_feature) {
-    sources += [
-      "ipc/src/bluetooth_map_mse_observer_stub.cpp",
-      "ipc/src/bluetooth_map_mse_proxy.cpp",
-      "src/bluetooth_map_mse.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_map_mse.cpp" ]
-  }
-
-  if (bluetooth_opp_feature) {
-    sources += [
-      "ipc/src/bluetooth_opp_observer_stub.cpp",
-      "ipc/src/bluetooth_opp_proxy.cpp",
-      "src/bluetooth_opp.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_opp.cpp" ]
-  }
-
-  if (bluetooth_pan_feature) {
-    sources += [
-      "ipc/src/bluetooth_pan_observer_stub.cpp",
-      "ipc/src/bluetooth_pan_proxy.cpp",
-      "src/bluetooth_pan.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_pan.cpp" ]
-  }
-
-  if (bluetooth_pbap_client_feature) {
-    sources += [
-      "ipc/src/bluetooth_pbap_pce_observer_stub.cpp",
-      "ipc/src/bluetooth_pbap_pce_proxy.cpp",
-      "src/bluetooth_pbap_pce.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_pbap_pce.cpp" ]
-  }
-
-  if (bluetooth_pbap_server_feature) {
-    sources += [
-      "ipc/src/bluetooth_pbap_pse_observer_stub.cpp",
-      "ipc/src/bluetooth_pbap_pse_proxy.cpp",
-      "src/bluetooth_pbap_pse.cpp",
-    ]
-  } else {
-    sources += [ "src/mock/bluetooth_pbap_pse.cpp" ]
-  }
-
-  deps = [ ":btcommon" ]
 
   external_deps = [
     "c_utils:utils",
-    "hisysevent_native:libhisysevent",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "hisysevent:libhisysevent",
+    "hilog:libhilog",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
 
   subsystem_name = "communication"
-  innerapi_tags = [ "platformsdk" ]
   part_name = "bluetooth"
 }
 
-ohos_static_library("btcommon") {
-  sanitize = {
-    cfi = true
-    blocklist = "./ipc_blocklist.txt"
-  }
-  stack_protector_ret = true
+config("btcommon_public_config") {
+  include_dirs = [
+    "common",
+    "ipc/common",
+    "ipc/interface",
+    "ipc/parcel",
+  ]
+}
 
-  public_configs = [ ":btframework_public_config" ]
+ohos_shared_library("btcommon") {
+  stack_protector_ret = true
+  public_configs = [ ":btcommon_public_config" ]
   sources = [
     "ipc/common/avrcp_media.cpp",
     "ipc/common/ble_parcel_data.cpp",
@@ -266,10 +181,10 @@ ohos_static_library("btcommon") {
     "ipc/parcel/bluetooth_ble_scan_result.cpp",
     "ipc/parcel/bluetooth_ble_scan_settings.cpp",
     "ipc/parcel/bluetooth_bt_uuid.cpp",
-    "ipc/parcel/bluetooth_gatt_characteristic.cpp",
-    "ipc/parcel/bluetooth_gatt_descriptor.cpp",
+    "ipc/parcel/bluetooth_gatt_characteristic_parcel.cpp",
+    "ipc/parcel/bluetooth_gatt_descriptor_parcel.cpp",
     "ipc/parcel/bluetooth_gatt_device.cpp",
-    "ipc/parcel/bluetooth_gatt_service.cpp",
+    "ipc/parcel/bluetooth_gatt_service_parcel.cpp",
     "ipc/parcel/bluetooth_hfp_hf_call.cpp",
     "ipc/parcel/bluetooth_map_mce_parameter.cpp",
     "ipc/parcel/bluetooth_opp_transfer_information.cpp",
@@ -278,11 +193,13 @@ ohos_static_library("btcommon") {
     "ipc/parcel/parcel_bt_uuid.cpp",
   ]
 
+  deps = []
+
   external_deps = [
     "c_utils:utils",
-    "hisysevent_native:libhisysevent",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_single",
   ]
 
   subsystem_name = "communication"

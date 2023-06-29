@@ -28,7 +28,7 @@ public:
     {}
     BluetoothGattDevice(const BluetoothGattDevice &other) : bluetooth::GattDevice(other)
     {}
-    ~BluetoothGattDevice() = default;
+    ~BluetoothGattDevice() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 

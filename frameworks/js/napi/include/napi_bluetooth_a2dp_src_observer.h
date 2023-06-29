@@ -30,7 +30,7 @@ public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 
     NapiA2dpSourceObserver() = default;
-    virtual ~NapiA2dpSourceObserver() = default;
+    ~NapiA2dpSourceObserver() override = default;
     static std::shared_mutex g_a2dpSrcCallbackInfosMutex;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };

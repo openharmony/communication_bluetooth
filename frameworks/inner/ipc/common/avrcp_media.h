@@ -39,13 +39,13 @@ public:
     AvrcMpItem(const AvrcMpItem& other) = default;
     ~AvrcMpItem() = default;
 
-    uint8_t itemType_;               // The value of the "Item Type ".
-    uint16_t playerId_;              // The value of the "Player Id".
-    uint8_t majorType_;              // The value of the "Major Player Type". Refer to <b>AvrcMediaMajorPlayerType</b>.
-    uint32_t subType_;               // The value of the "Player Sub Type". Refer to <b>AvrcMediaPlayerSubType</b>.
-    uint8_t playStatus_;             // The value of the "Play Status". Refer to <b>AvrcPlayStatus</b>.
-    std::vector<uint8_t> features_;  // The value of the "Feature Bit Mask".
-    std::string name_;               // The value of the "Displayable Name".
+    uint8_t itemType_ = 0;         // The value of the "Item Type ".
+    uint16_t playerId_ = 0;        // The value of the "Player Id".
+    uint8_t majorType_ = 0;        // The value of the "Major Player Type". Refer to <b>AvrcMediaMajorPlayerType</b>.
+    uint32_t subType_ = 0;         // The value of the "Player Sub Type". Refer to <b>AvrcMediaPlayerSubType</b>.
+    uint8_t playStatus_ = 0;             // The value of the "Play Status". Refer to <b>AvrcPlayStatus</b>.
+    std::vector<uint8_t> features_ {};  // The value of the "Feature Bit Mask".
+    std::string name_ {};               // The value of the "Displayable Name".
 };
 
 /**
@@ -62,20 +62,20 @@ public:
     AvrcMeItem(const AvrcMeItem& other) = default;
     ~AvrcMeItem() = default;
 
-    uint8_t itemType_;  // The value of the "Item Type ".
+    uint8_t itemType_ = 0;  // The value of the "Item Type ".
     // The value of the "Folder UID" and the "Media Element UID".
-    uint64_t uid_;
+    uint64_t uid_ = 0;
     // The value of the "Folder Type" and the "Media Type". Refer to <b>AvrcMediaFolderType</b> and
     // <b>AvrcMediaElementType</b>.
-    uint8_t type_;
+    uint8_t type_ = 0;
     // The value of the "Is Playable". Refer to <b>AvrcMediaFolderPlayable</b>.
-    uint8_t playable_;
+    uint8_t playable_ = 0;
     // The value of the "Displayable Name".
-    std::string name_;
+    std::string name_ {};
     // The list of the "Attribute ID".  Refer to <b>AvrcMediaAttribute</b>.
-    std::vector<uint32_t> attributes_;
+    std::vector<uint32_t> attributes_ {};
     // The list of the "Attribute Value".
-    std::vector<std::string> values_;
+    std::vector<std::string> values_ {};
 };
 }  // namespace bluetooth
 }  // namespace OHOS

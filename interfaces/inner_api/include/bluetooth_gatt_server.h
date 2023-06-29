@@ -39,6 +39,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_remote_device.h"
+#include <memory>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -172,7 +173,7 @@ public:
  * @since 6
  *
  */
-class BLUETOOTH_API GattServer {
+class BLUETOOTH_API GattServer : public std::enable_shared_from_this<GattServer> {
 public:
     /**
      * @brief A constructor of GattServerCallback.
@@ -181,7 +182,7 @@ public:
      * @since 6
      *
      */
-    explicit GattServer(GattServerCallback &callback);
+    static std::shared_ptr<GattServer> CreateInstance(GattServerCallback &callback);
     /**
      * @brief The function to add service.
      *
@@ -288,7 +289,16 @@ public:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(GattServer);
 
 private:
+    explicit GattServer(GattServerCallback &callback);
     BLUETOOTH_DECLARE_IMPL();
+
+    //The passkey pattern of C++
+    struct PassKey {
+      PassKey() {};
+    };
+public:
+    explicit GattServer(PassKey, GattServerCallback &callback) : GattServer(callback) {};
+    
 };
 } // namespace Bluetooth
 } // namespace OHOS

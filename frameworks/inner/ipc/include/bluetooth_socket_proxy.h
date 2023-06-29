@@ -29,9 +29,8 @@ public:
     ~BluetoothSocketProxy()
     {}
 
-    int Connect(std::string &addr, bluetooth::Uuid &uuid, int securityFlag, int type) override;
-    int Listen(std::string &name, bluetooth::Uuid &uuid, int securityFlag, int type) override;
-
+    int Connect(ConnectSocketParam &param, int &fd) override;
+    int Listen(ListenSocketParam &param, int &fd) override;
 private:
     static inline BrokerDelegator<BluetoothSocketProxy> delegator_;
 };

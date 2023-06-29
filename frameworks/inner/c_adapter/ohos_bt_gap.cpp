@@ -53,7 +53,8 @@ public:
      *        BTStateID::STATE_TURN_OFF.
      * @since 6
      */
-    NO_SANITIZE("cfi") void OnStateChanged(const int transport, const int status) {
+    void OnStateChanged(const int transport, const int status) override
+    {
         int cvtTransport = OHOS_BT_TRANSPORT_LE;
         if (transport == BTTransport::ADAPTER_BREDR) {
             cvtTransport = OHOS_BT_TRANSPORT_BR_EDR;
@@ -62,7 +63,7 @@ public:
         if (g_GapCallback != nullptr && g_GapCallback->stateChangeCallback != nullptr) {
             g_GapCallback->stateChangeCallback(cvtTransport, status);
         } else {
-            HILOGI("callback func is null!");
+            HILOGW("callback func is null!");
         }
     }
 
@@ -72,9 +73,9 @@ public:
      * @param status Device discovery status.
      * @since 6
      */
-    void OnDiscoveryStateChanged(int status)
+    void OnDiscoveryStateChanged(int status) override
     {
-        (void)status;
+        return;
     }
 
     /**
@@ -83,7 +84,10 @@ public:
      * @param device Remote device.
      * @since 6
      */
-    void OnDiscoveryResult(const BluetoothRemoteDevice &device) {}
+    void OnDiscoveryResult(const BluetoothRemoteDevice &device) override
+    {
+        return;
+    }
 
     /**
      * @brief Pair request observer.
@@ -91,22 +95,9 @@ public:
      * @param device Remote device.
      * @since 6
      */
-    NO_SANITIZE("cfi") void OnPairRequested(const BluetoothRemoteDevice &device)
+    void OnPairRequested(const BluetoothRemoteDevice &device) override
     {
-        BdAddr remoteAddr;
-        GetAddrFromString(device.GetDeviceAddr(), remoteAddr.addr);
-        int transport = device.GetTransportType();
-        if (transport == BT_TRANSPORT_BREDR) {
-            transport = OHOS_BT_TRANSPORT_BR_EDR;
-        } else if (transport == BT_TRANSPORT_BLE) {
-            transport = OHOS_BT_TRANSPORT_LE;
-        }
-        HILOGI("device: %{public}s, transport:%{public}d", GET_ENCRYPT_ADDR(device), transport);
-        if (g_GapCallback != nullptr && g_GapCallback->pairRequestedCallback != nullptr) {
-            g_GapCallback->pairRequestedCallback(&remoteAddr, transport);
-        } else {
-            HILOGW("callback func is null!");
-        }
+        return;
     }
 
     /**
@@ -117,16 +108,10 @@ public:
      * @param number Paired passkey.
      * @since 6
      */
-    NO_SANITIZE("cfi") void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
+    void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number) override
     {
-        int transport = device.GetTransportType();
-        HILOGI("reqType: %{public}d, number: %{public}d, transport: %{public}d",
-            reqType, number, transport);
-        BdAddr remoteAddr;
-        GetAddrFromString(device.GetDeviceAddr(), remoteAddr.addr);
-        HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
         return;
-    };
+    }
 
     /**
      * @brief Scan mode changed observer.
@@ -134,7 +119,7 @@ public:
      * @param mode Device scan mode.
      * @since 6
      */
-    void OnScanModeChanged(int mode)
+    void OnScanModeChanged(int mode) override
     {
         HILOGI("mode: %{public}d", mode);
         if (g_GapCallback != nullptr && g_GapCallback->scanModeChangedCallback != nullptr) {
@@ -150,10 +135,10 @@ public:
      * @param deviceName Device name.
      * @since 6
      */
-    void OnDeviceNameChanged(const std::string &deviceName)
+    void OnDeviceNameChanged(const std::string &deviceName) override
     {
-        (void)deviceName;
-    };
+        return;
+    }
 
     /**
      * @brief Device address changed observer.
@@ -161,13 +146,125 @@ public:
      * @param address Device address.
      * @since 6
      */
-    void OnDeviceAddrChanged(const std::string &address)
+    void OnDeviceAddrChanged(const std::string &address) override
     {
-        (void)address;
-    };
+        return;
+    }
+};
+
+class BluetoothRemoteDeviceObserverWapper : public BluetoothRemoteDeviceObserver {
+public:
+    /**
+     * @brief Acl state changed observer.
+     *
+     * @param device Remote device.
+     * @param state Remote device acl state.
+     * @param reason Remote device reason.
+     * @since 6
+     */
+    void OnAclStateChanged(const BluetoothRemoteDevice &device, int state, unsigned int reason) override
+    {
+        if (g_GapCallback == nullptr || g_GapCallback->aclStateChangedCallbak == nullptr) {
+            HILOGW("callback func is null!");
+            return;
+        }
+        std::string stateStr;
+        GetAclStateName(device.GetTransportType(), state, stateStr);
+        HILOGD("device: %{public}s, state: %{public}s, reason: %{public}u",
+            GetEncryptAddr(device.GetDeviceAddr()).c_str(), stateStr.c_str(), reason);
+        BdAddr remoteAddr;
+        GetAddrFromString(device.GetDeviceAddr(), remoteAddr.addr);
+        g_GapCallback->aclStateChangedCallbak(&remoteAddr, ConvertAclState(device.GetTransportType(), state), reason);
+    }
+
+    /**
+     * @brief Pair status changed observer.
+     *
+     * @param device Remote device.
+     * @param status Remote device pair status.
+     * @since 6
+     */
+    void OnPairStatusChanged(const BluetoothRemoteDevice &device, int status) override
+    {
+        return;
+    }
+
+    /**
+     * @brief Remote uuid changed observer.
+     *
+     * @param device Remote device.
+     * @param uuids Remote device uuids.
+     * @since 6
+     */
+    void OnRemoteUuidChanged(const BluetoothRemoteDevice &device, const std::vector<ParcelUuid> &uuids) override
+    {
+        return;
+    }
+
+    /**
+     * @brief Remote name changed observer.
+     *
+     * @param device Remote device.
+     * @param deviceName Remote device name.
+     * @since 6
+     */
+    void OnRemoteNameChanged(const BluetoothRemoteDevice &device, const std::string &deviceName) override
+    {
+        return;
+    }
+
+    /**
+     * @brief Remote alias changed observer.
+     *
+     * @param device Remote device.
+     * @param alias Remote device alias.
+     * @since 6
+     */
+    void OnRemoteAliasChanged(const BluetoothRemoteDevice &device, const std::string &alias) override
+    {
+        return;
+    }
+
+    /**
+     * @brief Remote cod changed observer.
+     *
+     * @param device Remote device.
+     * @param cod Remote device cod.
+     * @since 6
+     */
+    void OnRemoteCodChanged(const BluetoothRemoteDevice &device, const BluetoothDeviceClass &cod) override
+    {
+        return;
+    }
+
+    /**
+     * @brief Remote battery level changed observer.
+     *
+     * @param device Remote device.
+     * @param cod Remote device battery Level.
+     * @since 6
+     */
+    void OnRemoteBatteryLevelChanged(const BluetoothRemoteDevice &device, int batteryLevel) override
+    {
+        return;
+    }
+
+    /**
+     * @brief Remote rssi event observer.
+     *
+     * @param device Remote device.
+     * @param rssi Remote device rssi.
+     * @param status Read status.
+     * @since 6
+     */
+    void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override
+    {
+        return;
+    }
 };
 
 static BluetoothHostObserverWapper g_hostObserver;
+static std::shared_ptr<BluetoothRemoteDeviceObserverWapper> g_remoteDeviceObserver;
 
 bool EnableBle(void)
 {
@@ -183,7 +280,7 @@ bool EnableBle(void)
     bool  isEnabled = false;
     int32_t ret = g_BluetoothHost->EnableBle();
     HILOGI("result: %{public}d", ret);
-    if (ret == BT_SUCCESS) {
+    if (ret == BT_NO_ERROR) {
         isEnabled = true;
     }
     return isEnabled;
@@ -203,7 +300,7 @@ bool DisableBle(void)
     bool  isEnabled = false;
     int ret = g_BluetoothHost->DisableBle();
     HILOGI("result: %{public}d", ret);
-    if (ret == BT_SUCCESS) {
+    if (ret == BT_NO_ERROR) {
         isEnabled = true;
     }
     return isEnabled;
@@ -226,7 +323,7 @@ bool EnableBt(void)
     bool  isEnabled = false;
     int ret = g_BluetoothHost->EnableBt();
     HILOGI("result: %{public}d", ret);
-    if (ret == BT_SUCCESS) {
+    if (ret == BT_NO_ERROR) {
         isEnabled = true;
     }
     return isEnabled;
@@ -246,9 +343,13 @@ bool DisableBt(void)
         HILOGI("br state is %{public}d", state);
         return true;
     }
-    bool ret = g_BluetoothHost->DisableBt();
+    bool  isDisabled = false;
+    int ret = g_BluetoothHost->DisableBt();
     HILOGI("result: %{public}d", ret);
-    return ret;
+    if (ret == BT_NO_ERROR) {
+        isDisabled = true;
+    }
+    return isDisabled;
 }
 
 int GetBtState()
@@ -307,7 +408,7 @@ bool SetLocalName(unsigned char *localName, unsigned char length)
     string newName(reinterpret_cast<const char *>(localName));
     bool isSuccess = false;
     int ret = g_BluetoothHost->SetLocalName(newName);
-    if (ret == BT_SUCCESS) {
+    if (ret == BT_NO_ERROR) {
         isSuccess = true;
     }
     HILOGI("result %{public}d: LocalName : %{public}s", ret, g_BluetoothHost->GetLocalName().c_str());
@@ -322,7 +423,7 @@ bool SetBtScanMode(int mode, int duration)
     }
     bool isSuccess = false;
     int ret = g_BluetoothHost->SetBtScanMode(mode, duration);
-    if (ret == BT_SUCCESS) {
+    if (ret == BT_NO_ERROR) {
         isSuccess = true;
     }
     g_BluetoothHost->SetBondableMode(BT_TRANSPORT_BREDR, BONDABLE_MODE_ON);
@@ -365,7 +466,7 @@ bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool acce
     bool isSuccess = false;
     int ret = remoteDevice.SetDevicePairingConfirmation(accept);
     HILOGI("ret: %{public}d", ret);
-    if (ret == BT_SUCCESS) {
+    if (ret == BT_NO_ERROR) {
         isSuccess = true;
     }
     return isSuccess;
@@ -382,7 +483,9 @@ int GapRegisterCallbacks(BtGapCallBacks *func)
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
     g_GapCallback = func;
+    g_remoteDeviceObserver = std::make_shared<BluetoothRemoteDeviceObserverWapper>();
     g_BluetoothHost->RegisterObserver(g_hostObserver);
+    g_BluetoothHost->RegisterRemoteDeviceObserver(g_remoteDeviceObserver);
     return OHOS_BT_STATUS_SUCCESS;
 }
 }  // namespace Bluetooth

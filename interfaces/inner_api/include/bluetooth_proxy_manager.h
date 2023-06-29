@@ -41,7 +41,7 @@ private:
     class BleCentralManagerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit BleCentralManagerDeathRecipient(BluetoothProxyManager &bleProxyManager);
-        ~BleCentralManagerDeathRecipient();
+        ~BleCentralManagerDeathRecipient() override;
 
         void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 

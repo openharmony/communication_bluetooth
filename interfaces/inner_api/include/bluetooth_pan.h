@@ -128,6 +128,18 @@ public:
     int32_t IsTetheringOn(bool &value);
 
     /**
+     * @brief The external process calls the Pan profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * Pan proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of Pan profile.
+     */
+    void UnInit();
+
+    /**
      * @brief Static Pan observer instance.
      *
      */

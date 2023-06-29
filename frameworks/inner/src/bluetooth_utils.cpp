@@ -17,9 +17,12 @@
 #include "__config"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_def.h"
+#include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
 #include "iosfwd"
+#include "iservice_registry.h"
 #include "string"
+#include "system_ability_definition.h"
 
 using namespace std;
 
@@ -87,7 +90,7 @@ std::string GetProfileConnStateName(int state)
 }
 
 static std::map<int32_t, std::string> BtErrCodeMap {
-    { BtErrCode::BT_SUCCESS, "BT_SUCCESS" },
+    { BtErrCode::BT_NO_ERROR, "BT_NO_ERROR" },
     { BtErrCode::BT_ERR_PERMISSION_FAILED, "BT_ERR_PERMISSION_FAILED" },
     { BtErrCode::BT_ERR_SYSTEM_PERMISSION_FAILED, "BT_ERR_SYSTEM_PERMISSION_FAILED" },
     { BtErrCode::BT_ERR_INVALID_PARAM, "BT_ERR_INVALID_PARAM" },
@@ -118,6 +121,37 @@ std::string GetErrorCode(int32_t errCode)
     }
     errlog.append("(").append(std::to_string(errCode)).append(")");
     return errlog;
+}
+
+sptr<IRemoteObject> GetRemoteObject(const std::string &objectName)
+{
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!samgr) {
+        HILOGE("samgr is null");
+        return nullptr;
+    }
+    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    if (!hostRemote) {
+        HILOGE("hostRemote is null");
+        return nullptr;
+    }
+    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+    if (!hostProxy) {
+        HILOGE("hostProxy is null");
+        return nullptr;
+    }
+
+    sptr<IRemoteObject> remote = nullptr;
+    if (objectName == BLE_ADVERTISER_SERVER || objectName == BLE_CENTRAL_MANAGER_SERVER) {
+        remote = hostProxy->GetBleRemote(objectName);
+    } else {
+        remote = hostProxy->GetProfile(objectName);
+    }
+    if (!remote) {
+        HILOGE("%{public}s remote is null", objectName.c_str());
+        return nullptr;
+    }
+    return remote;
 }
 
 }  // namespace Bluetooth

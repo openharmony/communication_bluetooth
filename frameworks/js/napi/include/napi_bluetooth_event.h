@@ -42,6 +42,9 @@ public:
     }
 };
 
+void UpdateCallbackInfo(std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos,
+    const std::string &type);
+
 class NapiEvent {
 public:
     static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb, int value);

@@ -124,6 +124,13 @@ const uint32_t PROFILE_ID_PBAP_PCE = 0x00000400;
 const uint32_t PROFILE_ID_PBAP_PSE = 0x00000800;
 const uint32_t PROFILE_ID_SPP = 0x00001000;
 const uint32_t PROFILE_ID_DI = 0x00002000;
+const uint32_t PROFILE_ID_BEL_ADVERTISER = 0x00004000;
+const uint32_t PROFILE_ID_BLE_CENTRAL_MANAGER_SERVER = 0x00008000;
+const uint32_t PROFILE_ID_BLE_GATT_MANAGER = 0x00010000;
+const uint32_t PROFILE_ID_HID_HOST_SERVER = 0x00020000;
+const uint32_t PROFILE_ID_OPP_SERVER = 0x00040000;
+const uint32_t PROFILE_ID_PAN_SERVER = 0x00080000;
+const uint32_t PROFILE_ID_HOST = 0x00100000;
 
 /**
  * @brief default value
@@ -209,25 +216,28 @@ constexpr uint8_t GATT_TRANSPORT_TYPE_CLASSIC = 0x2;
  * OnPairConfirmed()
  */
 enum PinType {
-    PIN_TYPE_ENTER_PIN_CODE = 0,      // enter the pin code displayed on the peer device
-    PIN_TYPE_ENTER_PASSKEY = 1,       // enter the passkey displayed on the peer device
-    PIN_TYPE_CONFIRM_PASSKEY = 2,     // confirm the passkey displayed on the local device
-    PIN_TYPE_NO_PASSKEY_CONSENT = 3,  // accept or deny the pairing request
-    PIN_TYPE_NOTIFY_PASSKEY = 4,      // enter the passkey displayed on the local device on the peer device
-    PIN_TYPE_DISPLAY_PIN_CODE = 5,    // enter the pin code displayed on the peer device, used for bluetooth 2.0
-    PIN_TYPE_OOB_CONSENT = 6,         // accept or deny the OOB pairing request, not support now
-    PIN_TYPE_PIN_16_DIGITS = 7,       // enter the 16-digit pin code displayed on the peer device
+    PIN_TYPE_ENTER_PIN_CODE = 0,     // enter the pin code displayed on the peer device
+    PIN_TYPE_ENTER_PASSKEY = 1,      // enter the passkey displayed on the peer device
+    PIN_TYPE_CONFIRM_PASSKEY = 2,    // confirm the passkey displayed on the local device
+    PIN_TYPE_NO_PASSKEY_CONSENT = 3, // accept or deny the pairing request
+    PIN_TYPE_NOTIFY_PASSKEY = 4,     // enter the passkey displayed on the local device on the peer device
+    PIN_TYPE_DISPLAY_PIN_CODE = 5,   // enter the pin code displayed on the peer device, used for bluetooth 2.0
+    PIN_TYPE_OOB_CONSENT = 6,        // accept or deny the OOB pairing request, not suppport now
+    PIN_TYPE_PIN_16_DIGITS = 7,      // enter the 16-digit pin code displayed on the peer device
 };
 
 /** A GATT Attribute Permission.
  *  Define GATT Attribute permissions.
  */
-enum class GattPermission : uint8_t {
+enum class GattPermission : uint16_t {
     READABLE = 1 << 0, /**< readable */
-    WRITABLE = 1 << 1,
-    ENCRYPTION = 1 << 2,
-    AUTHENTICATION = 1 << 3,
-    AUTHORIZATION = 1 << 4
+    READ_ENCRYPTED = 1 << 1,
+    READ_ENCRYPTED_MITM = 1 << 2,
+    WRITEABLE = 1 << 4,
+    WRITE_ENCRYPTED = 1 << 5,
+    WRITE_ENCRYPTED_MITM = 1 << 6,
+    WRITE_SIGNED = 1 << 7,
+    WRITE_SIGNED_MITM = 1 << 8,
 };
 
 enum class GattConnectionPriority : int {
@@ -270,7 +280,7 @@ enum GattStatus {
 };
 
 enum BtStatus{
-    BT_SUCC = 0,
+    BT_SUCCESS = 0,
     BT_FAILURE = -1,
 };
 
@@ -299,6 +309,11 @@ const int BLE_UUID_LEN_16 = 2;
 const int BLE_UUID_LEN_32 = 4;
 const int BLE_UUID_LEN_128 = 16;
 const int DEVICE_NAME_MAX_LEN = 26;
+
+const uint32_t BLE_ADV_PER_FIELD_OVERHEAD_LENGTH = 2;
+const uint32_t BLE_ADV_MANUFACTURER_ID_LENGTH = 2;
+const uint32_t BLE_ADV_FLAGS_FIELD_LENGTH = 3;
+const uint32_t BLE_ADV_MAX_LEGACY_ADVERTISING_DATA_BYTES = 31;
 
 // BLE acl connect status
 const int BLE_CONNECTION_STATE_DISCONNECTED = 0x00;
@@ -347,6 +362,7 @@ typedef enum {
     SCAN_MODE_OP_P10_60_600 = 0x04,
     SCAN_MODE_OP_P25_60_240 = 0x05,
     SCAN_MODE_OP_P100_1000_1000 = 0x06,
+    SCAN_MODE_OP_P50_100_200 = 0x07,
     SCAN_MODE_INVALID
 } SCAN_MODE;
 
@@ -1405,8 +1421,16 @@ enum PbapResponseCode : uint8_t {
     PBAP_DATABASE_LOCKED = 0xE1              // Database Locked
 };
 
-#define IS_BT_ENABLED() \
-    ((BluetoothHost::GetDefaultHost().GetBtState() == (int)(BTStateID::STATE_TURN_ON)) ? true : false)
+constexpr int32_t BLE_SCAN_INVALID_ID = 0;
+constexpr int BLE_SH_SCAN_SETTING_VALID_BIT = 0x01;
+constexpr int BLE_SH_SCAN_FILTER_VALID_BIT = 0x02;
+constexpr int BLE_SH_ADV_SETTING_VALID_BIT = 0x04;
+constexpr int BLE_SH_ADVDATA_VALID_BIT = 0x08;
+constexpr int BLE_SH_RESPDATA_VALID_BIT = 0x10;
+constexpr int BLE_SH_ADV_DEVICEINFO_VALID_BIT = 0x20;
+
+#define IS_BT_ENABLED() (BluetoothHost::GetDefaultHost().IsBrEnabled())
+
 #define IS_BLE_ENABLED() (BluetoothHost::GetDefaultHost().IsBleEnabled())
 
 #ifdef BLUETOOTH_EXPORT

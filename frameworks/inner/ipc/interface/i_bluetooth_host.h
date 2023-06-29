@@ -38,7 +38,7 @@ const std::string PROFILE_MAP_MCE = "MapMceServer";
 const std::string PROFILE_MAP_MSE = "MapMseServer";
 const std::string PROFILE_PBAP_PCE = "PbapPceServer";
 const std::string PROFILE_PBAP_PSE = "PbapPseServer";
-const std::string PROFILE_SPP = "SocketServer";
+const std::string PROFILE_SOCKET = "SocketServer";
 const std::string PROFILE_DI = "DIServer";
 const std::string BLE_ADVERTISER_SERVER = "BleAdvertiserServer";
 const std::string BLE_CENTRAL_MANAGER_SERVER = "BleCentralMangerServer";
@@ -119,7 +119,7 @@ public:
 
     virtual void RegisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
-    virtual bool EnableBt() = 0;
+    virtual int32_t EnableBt() = 0;
     virtual int32_t DisableBt() = 0;
     virtual sptr<IRemoteObject> GetProfile(const std::string &name) = 0;
     virtual sptr<IRemoteObject> GetBleRemote(const std::string &name) = 0;

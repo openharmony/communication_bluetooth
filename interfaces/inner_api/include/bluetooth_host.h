@@ -39,7 +39,9 @@
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_device_class.h"
+#include "refbase.h"
 
+namespace OHOS { class IRemoteObject; }
 namespace OHOS {
 namespace Bluetooth {
 /**
@@ -145,6 +147,16 @@ public:
      * @since 6
      */
     virtual ~BluetoothRemoteDeviceObserver() = default;
+
+    /**
+     * @brief Acl state changed observer.
+     *
+     * @param device Remote device.
+     * @param state Remote device acl state.
+     * @param reason Remote device reason.
+     * @since 6
+     */
+    virtual void OnAclStateChanged(const BluetoothRemoteDevice &device, int state, unsigned int reason) = 0;
 
     /**
      * @brief Pair status changed observer.
@@ -260,7 +272,7 @@ public:
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    bool EnableBt();
+    int EnableBt();
 
     /**
      * @brief Disable classic.
@@ -609,8 +621,13 @@ public:
      */
     int GetBleMaxAdvertisingDataLength() const;
 
-private:
+    void LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject);
 
+    void LoadSystemAbilityFail();
+
+    void Init();
+
+private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
      *

@@ -36,6 +36,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
+#include "bluetooth_ble_advertiser.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -243,6 +244,16 @@ public:
      * @since 6
      */
     virtual void OnStartOrStopScanEvent(int resultCode, bool isStartScan) = 0;
+
+    /**
+     * @brief SensorHub msg report event callback.
+     *
+     * @param uuid Service uuid.
+     * @param msgType Report msg type.
+     * @param value Msg data.
+     * @since 6
+     */
+    virtual void OnNotifyMsgReportFromSh(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) {};
 };
 
 /**
@@ -430,6 +441,26 @@ public:
         std::vector<uint8_t> manufactureDataMask_;
 };
 
+struct BleAdvDeviceInfo {
+    std::vector<int8_t> advDeviceId;
+    int32_t status;
+    int32_t timeOut;
+};
+
+struct BleAdvFilterParamSet {
+    BleScanSettings scanSettings;
+    std::vector<BleScanFilter> scanFilters;
+    BleAdvertiserSettings advSettings;
+    std::vector<uint8_t> advData;
+    std::vector<uint8_t> respData;
+    UUID uuid;
+    std::vector<BleAdvDeviceInfo> advDeviceInfos;
+    int deliveryMode;
+    int advHandle;
+    int duration;
+    int fieldValidFlagBit;
+};
+
 /**
  * @brief Represents central manager.
  *
@@ -444,6 +475,14 @@ public:
      * @since 6
      */
     explicit BleCentralManager(BleCentralManagerCallback &callback);
+
+    /**
+     * @brief A constructor used to create a <b>BleCentralManager</b> instance.
+     *
+     * @param cllback Central manager callback to create an <b>BleCentralManagerCallback</b> instance.
+     * @since 6
+     */
+    explicit BleCentralManager(std::shared_ptr<BleCentralManagerCallback> callback);
 
     /**
      * @brief A destructor used to delete the <b>BleCentralManager</b> instance.
@@ -480,10 +519,77 @@ public:
      */
     int ConfigScanFilter(const std::vector<BleScanFilter> &filter);
 
-private:
-    BleCentralManagerCallback *callback_ = nullptr;
-    int clientId_ = 0;
+    /**
+    * @brief set burst work param.
+    *
+    * @param duration advertise duration.
+    * @param maxExtAdvEvents maximum number of extended advertising events.
+    * @param burstWindow burst work window.
+    * @param burstInterval burst work interval.
+    * @param advHandle Indicates the advertisement handle.
+    * @return Result.
+    */
+    int SetBurstParam(int duration, int maxExtAdvEvents, int burstWindow, int burstInterval, int advHandle);
 
+    /**
+    * @brief set scan result report channel.
+    *
+    * @param isToAp the switch of report.(0:report msg to sensorhub; 1:report msg to ap;).
+    * @return Result.
+    */
+    int SetScanReportChannelToSensorHub(const int isToAp);
+
+    /**
+    * @brief Set scan state start sync to sensorHub.
+    *
+    * @return Result.
+    */
+    int StartScanInShSync();
+
+    /**
+    * @brief Set scan state stop sync to sensorHub.
+    *
+    * @return Result.
+    */
+    int StopScanInShSync();
+
+    /**
+    * @brief Translate ParamData to sensorHub.
+    *
+    * @param data Indicates the pointer to the data.
+    * @param dataSize Indicates the data size.
+    * @param type Indicates the data type.
+    * @return Result.
+    */
+    int SendParamsToSensorhub(const std::vector<uint8_t> &dataValue, int32_t type);
+
+    /**
+    * @brief Get whether support sensorAdvertiseFilter.
+    *
+    * @return true: support; false: not support.
+    * @since 6
+    */
+    bool IsSupportSensorAdvertiseFilter();
+
+    /**
+    * @brief Set advFilterParam.
+    *
+    * @param bleAdvFilterParamSet AdvFilterParam data.
+    * @return Result
+    * @since 6
+    */
+    int SetAdvFilterParam(const BleAdvFilterParamSet &bleAdvFilterParamSet);
+
+    /**
+    * @brief Remove advFilterParam.
+    *
+    * @param uuid Uuid.
+    * @return Result
+    * @since 6
+    */
+    int RemoveAdvFilter(const UUID &uuid);
+
+private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManager);
     BLUETOOTH_DECLARE_IMPL();
 };

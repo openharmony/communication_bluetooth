@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+#include "napi_async_callback.h"
+
 namespace OHOS {
 namespace Bluetooth {
 
@@ -62,10 +64,59 @@ napi_status NapiParseGattService(napi_env env, napi_value object, NapiGattServic
     return napi_ok;
 }
 
+namespace {
+const NapiGattPermission DEFAULT_GATT_PERMISSIONS = {
+    .readable = true,
+    .writeable = true,
+};
+const NapiGattProperties DEFAULT_GATT_PROPERTIES = {
+    .write = true,
+    .writeNoResponse = true,
+    .read = true,
+};
+int ConvertGattPermissions(const NapiGattPermission &napiPermissions)
+{
+    int permissions = 0;
+    if (napiPermissions.readable) {
+        permissions |= static_cast<int>(GattPermission::READABLE);
+    }
+    if (napiPermissions.writeable) {
+        permissions |= static_cast<int>(GattPermission::WRITEABLE);
+    }
+    if (napiPermissions.readEncrypted) {
+        permissions |= static_cast<int>(GattPermission::READ_ENCRYPTED_MITM);
+    }
+    if (napiPermissions.writeEncrypted) {
+        permissions |= static_cast<int>(GattPermission::WRITE_ENCRYPTED_MITM);
+    }
+    return permissions;
+}
+int ConvertGattProperties(const NapiGattProperties &napiProperties)
+{
+    int properties = 0;
+    if (napiProperties.read) {
+        properties |= GattCharacteristic::READ;
+    }
+    if (napiProperties.write) {
+        properties |= GattCharacteristic::WRITE;
+    }
+    if (napiProperties.writeNoResponse) {
+        properties |= GattCharacteristic::WRITE_WITHOUT_RESPONSE;
+    }
+    if (napiProperties.notify) {
+        properties |= GattCharacteristic::NOTIFY;
+    }
+    if (napiProperties.indicate) {
+        properties |= GattCharacteristic::INDICATE;
+    }
+    return properties;
+}
+}  // namespace {}
+
 napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBleCharacteristic &outCharacteristic)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"serviceUuid", "characteristicUuid",
-        "characteristicValue", "descriptors", "properties"}));
+        "characteristicValue", "descriptors", "properties", "permissions"}));
 
     std::string serviceUuid {};
     std::string characterUuid {};
@@ -77,17 +128,28 @@ napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBle
     NAPI_BT_CALL_RETURN(NapiParseObjectArrayBuffer(env, object, "characteristicValue", characterValue));
     NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "descriptors", descriptors));
 
+    NapiGattProperties properties = DEFAULT_GATT_PROPERTIES;
+    if (NapiIsObjectPropertyExist(env, object, "properties"))  {
+        NAPI_BT_CALL_RETURN(NapiParseObjectGattProperties(env, object, "properties", properties));
+    }
+    NapiGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
+    if (NapiIsObjectPropertyExist(env, object, "permissions")) {
+        NAPI_BT_CALL_RETURN(NapiParseObjectGattPermissions(env, object, "permissions", permissions));
+    }
+
     outCharacteristic.serviceUuid = UUID::FromString(serviceUuid);
     outCharacteristic.characteristicUuid = UUID::FromString(characterUuid);
     outCharacteristic.characteristicValue = std::move(characterValue);
     outCharacteristic.descriptors = std::move(descriptors);
+    outCharacteristic.properties = ConvertGattProperties(properties);
+    outCharacteristic.permissions = ConvertGattPermissions(permissions);
     return napi_ok;
 }
 
 napi_status NapiParseGattDescriptor(napi_env env, napi_value object, NapiBleDescriptor &outDescriptor)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"serviceUuid", "characteristicUuid",
-        "descriptorUuid", "descriptorValue"}));
+        "descriptorUuid", "descriptorValue", "permissions"}));
 
     std::string serviceUuid {};
     std::string characterUuid {};
@@ -99,10 +161,16 @@ napi_status NapiParseGattDescriptor(napi_env env, napi_value object, NapiBleDesc
     NAPI_BT_CALL_RETURN(NapiParseObjectUuid(env, object, "descriptorUuid", descriptorUuid));
     NAPI_BT_CALL_RETURN(NapiParseObjectArrayBuffer(env, object, "descriptorValue", descriptorValue));
 
+    NapiGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
+    if (NapiIsObjectPropertyExist(env, object, "permissions")) {
+        NAPI_BT_CALL_RETURN(NapiParseObjectGattPermissions(env, object, "permissions", permissions));
+    }
+
     outDescriptor.serviceUuid = UUID::FromString(serviceUuid);
     outDescriptor.characteristicUuid = UUID::FromString(characterUuid);
     outDescriptor.descriptorUuid = UUID::FromString(descriptorUuid);
     outDescriptor.descriptorValue = std::move(descriptorValue);
+    outDescriptor.permissions = ConvertGattPermissions(permissions);
     return napi_ok;
 }
 
@@ -150,6 +218,56 @@ napi_status NapiParseGattsServerResponse(napi_env env, napi_value object, NapiGa
     rsp.status = status;
     rsp.offset = offset;
     rsp.value = std::move(value);
+    return napi_ok;
+}
+
+napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, const char *name,
+    NapiGattPermission &outPermissions)
+{
+    napi_value permissionObject;
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, permissionObject));
+    // Parse permission object
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, permissionObject, {"readable", "writeable",
+        "readEncrypted", "writeEncrypted"}));
+
+    bool isExist;
+    NapiGattPermission permissions {};
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "readable", permissions.readable, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "writeable", permissions.writeable, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "readEncrypted", permissions.readEncrypted, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "writeEncrypted", permissions.writeEncrypted, isExist));
+    outPermissions = permissions;
+    return napi_ok;
+}
+
+napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const char *name,
+    NapiGattProperties &outProperties)
+{
+    napi_value propertiesObject;
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, propertiesObject));
+    // Parse properties object
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, propertiesObject, {"write", "writeNoResponse",
+        "read", "notify", "indicate"}));
+
+    bool isExist;
+    NapiGattProperties properties {};
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "write", properties.write, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "writeNoResponse", properties.writeNoResponse, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "read", properties.read, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "notify", properties.notify, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "indicate", properties.indicate, isExist));
+    outProperties = properties;
     return napi_ok;
 }
 
@@ -220,6 +338,33 @@ napi_status NapiParseArrayBuffer(napi_env env, napi_value value, std::vector<uin
     std::vector<uint8_t> vec(data, data + size);
     outVec = std::move(vec);
     return napi_ok;
+}
+
+std::shared_ptr<NapiAsyncCallback> NapiParseAsyncCallback(napi_env env, napi_callback_info info)
+{
+    size_t argc = ARGS_SIZE_FOUR;
+    napi_value argv[ARGS_SIZE_FOUR] = {nullptr};
+    auto status = napi_get_cb_info(env, info, &argc, argv, nullptr, NULL);
+    if (status != napi_ok) {
+        HILOGE("napi_get_cb_info failed");
+        return nullptr;
+    }
+    if (argc > ARGS_SIZE_FOUR) {
+        HILOGE("size of parameters is larger than ARGS_SIZE_FOUR");
+        return nullptr;
+    }
+
+    // "argc - 1" is AsyncCallback parameter's index
+    auto asyncCallback = std::make_shared<NapiAsyncCallback>();
+    asyncCallback->env = env;
+    if (argc > 0 && NapiIsFunction(env, argv[argc - 1]) == napi_ok) {
+        HILOGD("callback mode");
+        asyncCallback->callback = std::make_shared<NapiCallback>(env, argv[argc - 1]);
+    } else {
+        HILOGD("promise mode");
+        asyncCallback->promise = std::make_shared<NapiPromise>(env);
+    }
+    return asyncCallback;
 }
 
 static napi_status NapiGetObjectProperty(napi_env env, napi_value object, const char *name, napi_value &outProperty,
@@ -319,11 +464,11 @@ napi_status NapiParseObjectBooleanOptional(napi_env env, napi_value object, cons
     bool &outExist)
 {
     napi_value property;
-    bool boolean = true;
     bool exist = false;
     NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
     NAPI_BT_CALL_RETURN(NapiGetObjectPropertyOptional(env, object, name, property, exist));
     if (exist) {
+        bool boolean = true;
         NAPI_BT_CALL_RETURN(NapiParseBoolean(env, property, boolean));
         outBoolean = boolean;
     }
@@ -334,11 +479,11 @@ napi_status NapiParseObjectInt32Optional(napi_env env, napi_value object, const 
     bool &outExist)
 {
     napi_value property;
-    int32_t num = 0;
     bool exist = false;
     NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
     NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, property, exist));
     if (exist) {
+        int32_t num = 0;
         NAPI_BT_CALL_RETURN(NapiParseInt32(env, property, num));
         outNum = num;
     }
@@ -349,11 +494,11 @@ napi_status NapiParseObjectUint32Optional(napi_env env, napi_value object, const
     bool &outExist)
 {
     napi_value property;
-    uint32_t num = 0;
     bool exist = false;
     NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
     NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, property, exist));
     if (exist) {
+        uint32_t num = 0;
         NAPI_BT_CALL_RETURN(NapiParseUint32(env, property, num));
         outNum = num;
     }

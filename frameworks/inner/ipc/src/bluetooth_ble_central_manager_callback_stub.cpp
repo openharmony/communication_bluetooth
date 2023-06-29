@@ -14,12 +14,14 @@
  */
 
 #include "bluetooth_ble_central_manager_callback_stub.h"
+#include "bluetooth_bt_uuid.h"
 #include "bluetooth_log.h"
 #include "ipc_types.h"
 #include "string_ex.h"
 
 namespace OHOS {
 namespace Bluetooth {
+const int32_t BLE_CENTRAL_MANAGER_READ_DATA_SIZE_MAX_LEN = 0x100;
 const std::map<uint32_t,
     std::function<ErrCode(BluetoothBleCentralManagerCallBackStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleCentralManagerCallBackStub::memberFuncMap_ = {
@@ -32,25 +34,26 @@ const std::map<uint32_t,
         {IBluetoothBleCentralManagerCallback::Code::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED,
             std::bind(&BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
+        {IBluetoothBleCentralManagerCallback::Code::BT_BLE_SENSORHUB_CALLBACK_NOTIFY_MSG_REPORT,
+            std::bind(&BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromShInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
 };
 
 BluetoothBleCentralManagerCallBackStub::BluetoothBleCentralManagerCallBackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 }
 
 BluetoothBleCentralManagerCallBackStub::~BluetoothBleCentralManagerCallBackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 }
 
 int BluetoothBleCentralManagerCallBackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothBleCentralManagerCallBackStub::OnRemoteRequest, cmd = %d, flags= %d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothBleCentralManagerCallBackStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothBleCentralManagerCallBackStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -80,16 +83,16 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner(
     MessageParcel &data, MessageParcel &reply)
 {
     int32_t infoSize = 0;
-    if (!data.ReadInt32(infoSize)) {
-        HILOGD("read Parcelable size failed.");
+    if (!data.ReadInt32(infoSize) || infoSize > BLE_CENTRAL_MANAGER_READ_DATA_SIZE_MAX_LEN) {
+        HILOGE("read Parcelable size failed.");
         return ERR_INVALID_STATE;
     }
 
     std::vector<BluetoothBleScanResult> parcelableInfos;
     for (int32_t index = 0; index < infoSize; index++) {
-        sptr<BluetoothBleScanResult> info = data.ReadStrongParcelable<BluetoothBleScanResult>();
+        sptr<BluetoothBleScanResult> info(data.ReadParcelable<BluetoothBleScanResult>());
         if (info == nullptr) {
-            HILOGD("read Parcelable infos failed.");
+            HILOGI("read Parcelable infos failed.");
             return ERR_INVALID_STATE;
         }
         parcelableInfos.emplace_back(*info);
@@ -105,5 +108,24 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner(Mess
     OnStartOrStopScanEvent(resultCode, isStartScan);
     return NO_ERROR;
 }
+
+ErrCode BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromShInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothUuid> uuid(data.ReadParcelable<BluetoothUuid>());
+    if (uuid == nullptr) {
+        HILOGE("[OnNotifyMsgReportFromShInner] read uuid failed");
+        return ERR_INVALID_VALUE;
+    }
+    bluetooth::Uuid btUuid = bluetooth::Uuid(*uuid);
+    int32_t msgType = data.ReadInt32();
+    std::vector<uint8_t> dataValue;
+    if (!data.ReadUInt8Vector(&dataValue)) {
+        HILOGE("[OnNotifyMsgReportFromShInner] read dataValue failed");
+        return ERR_INVALID_VALUE;
+    }
+    OnNotifyMsgReportFromSh(btUuid, msgType, dataValue);
+    return NO_ERROR;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

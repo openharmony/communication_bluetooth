@@ -39,9 +39,11 @@
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_remote_device.h"
+#include <memory>
 
 namespace OHOS {
 namespace Bluetooth {
+
 /**
  * @brief Class for GattClientCallback functions.
  *
@@ -81,6 +83,8 @@ public:
     virtual void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
     {}
 
+    virtual void OnReadRemoteRssiValueResult(int rssi, int status)
+    {}
     /**
      * @brief The function to OnCharacteristicWriteResult.
      *
@@ -155,7 +159,7 @@ public:
      * @since 6
      *
      */
-    virtual void OnSetNotifyCharacteristic(int status)
+    virtual void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status)
     {}
 
     /**
@@ -174,8 +178,18 @@ public:
  * @since 6
  *
  */
-class BLUETOOTH_API GattClient {
+class BLUETOOTH_API GattClient : public std::enable_shared_from_this<GattClient> {
 public:
+
+    /**
+     * @brief init gattClient.
+     *
+     * @return init   api init result.
+     * @since 6
+     *
+     */
+    bool Init();
+
     /**
      * @brief The function to Connect.
      *
@@ -197,6 +211,13 @@ public:
      *
      */
     int RequestConnectionPriority(int connPriority);
+
+    /**
+     * @brief The function to request fastest connection.
+     *
+     * @return int   api accept status.
+     */
+    int RequestFastestConn();
 
     /**
      * @brief The function to disconnect.
@@ -298,6 +319,17 @@ public:
     /**
      * @brief The function to write characteristic.
      *
+     * @param characteristic characteristic object.
+     * @param value characteristic value.
+     * @return int write characteristic.
+     * @since 6
+     *
+     */
+    int WriteCharacteristic(GattCharacteristic &characteristic, std::vector<uint8_t> value);
+
+    /**
+     * @brief The function to write characteristic.
+     *
      * @param descriptor descriptor object.
      * @return int write descriptor.
      * @since 6
@@ -305,6 +337,7 @@ public:
      */
     int WriteDescriptor(GattDescriptor &descriptor);
 
+    int ReadRemoteRssiValue();
     /**
      * @brief A constructor of GattClient.
      *

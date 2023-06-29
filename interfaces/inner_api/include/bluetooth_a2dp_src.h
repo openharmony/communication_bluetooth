@@ -102,7 +102,7 @@ public:
      * @return Returns devices that match the connection states.
      * @since 6.0
      */
-    std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states) const;
+    int GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRemoteDevice> &devices) const;
 
     /**
      * @brief Get device connection state by address.
@@ -115,7 +115,7 @@ public:
      *         Returns <b>A2DP_INVALID_STATUS</b> if can not find peer device.
      * @since 6.0
      */
-    int GetDeviceState(const BluetoothRemoteDevice &device) const;
+    int GetDeviceState(const BluetoothRemoteDevice &device, int &state) const;
 
     /**
      * @brief Get device playing state by address when peer device is on connected.
@@ -301,7 +301,7 @@ public:
      * @since 6.0
      */
     int WriteFrame(const uint8_t *data, uint32_t size);
-    
+
     /**
      * @brief Get the information of the current rendered position.
      * @param[out] dalayValue is the delayed time
@@ -310,6 +310,18 @@ public:
      * @since 6.0
      */
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp);
+
+    /**
+     * @brief The external process calls the A2dpSrc profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * A2dpSrc proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of A2dpSrc profile.
+     */
+    void UnInit();
 
 private:
     /**

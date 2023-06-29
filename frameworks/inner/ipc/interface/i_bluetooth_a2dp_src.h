@@ -59,8 +59,8 @@ public:
     virtual int Disconnect(const RawAddress &device) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer) = 0;
-    virtual std::vector<RawAddress> GetDevicesByStates(const std::vector<int32_t> &states) = 0;
-    virtual int GetDeviceState(const RawAddress &device) = 0;
+    virtual int GetDevicesByStates(const std::vector<int32_t> &states, std::vector<RawAddress> &rawAddrs) = 0;
+    virtual int GetDeviceState(const RawAddress &device, int &state) = 0;
     virtual int GetPlayingState(const RawAddress &device, int &state) = 0;
     virtual int SetConnectStrategy(const RawAddress &device, int32_t strategy) = 0;
     virtual int GetConnectStrategy(const RawAddress &device) = 0;

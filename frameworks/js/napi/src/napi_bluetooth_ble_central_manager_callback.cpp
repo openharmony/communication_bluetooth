@@ -73,6 +73,8 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
         }
         napi_create_typedarray(env, napi_uint8_array, bleScanResult.GetPayload().size(), buffer, 0, &value);
         napi_set_named_property(env, result, "data", value);
+        napi_create_string_utf8(env, bleScanResult.GetName().c_str(), NAPI_AUTO_LENGTH, &value);
+        napi_set_named_property(env, result, "deviceName", value);
         napi_set_element(env, scanResultArray, count, result);
         ++count;
     }
@@ -204,11 +206,11 @@ static void OnSysScanCallback(const BleScanResult &result, const std::string typ
 
 void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
 {
-    HILOGI("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
+    HILOGD("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
     OnSysScanCallback(result, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BLE_FIND_DEVICE_TYPE);
     if (callbackInfo == nullptr) {
-        HILOGI("This callback is not registered by ability.");
+        HILOGD("This callback is not registered by ability.");
         return;
     }
 
@@ -331,13 +333,13 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
 
 void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
-    HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+    HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
     std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE> callbackInfos;
     {
         std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
         auto observers = GetSysBLEObserver();
         if (observers.empty()) {
-            HILOGI("observers is empty.");
+            HILOGD("observers is empty.");
             return;
         }
         if (observers.find(REGISTER_SYS_BLE_SCAN_TYPE) == observers.end()) {

@@ -26,7 +26,7 @@ public:
     BluetoothHfpAgObserverStub();
     virtual ~BluetoothHfpAgObserverStub();
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
@@ -35,7 +35,7 @@ private:
     ErrCode OnActiveDeviceChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnHfEnhancedDriverSafetyChangedInner(MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothHfpAgObserverFunc = 
+    using BluetoothHfpAgObserverFunc =
         ErrCode (BluetoothHfpAgObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHfpAgObserverFunc> memberFuncMap_;
 

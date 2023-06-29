@@ -162,17 +162,6 @@ const int PAIR_PAIRING = 0x02;
 const int PAIR_PAIRED = 0x03;
 
 /**
- * @brief user confirm type during paring process.
- * use to
- * OnPairConfirmed()
- */
-const int PAIR_CONFIRM_TYPE_PIN_CODE = 0x01;
-const int PAIR_CONFIRM_TYPE_PASSKEY_DISPLAY = 0x02;
-const int PAIR_CONFIRM_TYPE_PASSKEY_INPUT = 0x03;
-const int PAIR_CONFIRM_TYPE_NUMERIC = 0x04;
-const int PAIR_CONFIRM_TYPE_CONSENT = 0x05;
-
-/**
  * @brief discoverable mode and connect mode
  * use to
  * GetBtScanMode(), SetBtScanMode()
@@ -222,15 +211,35 @@ constexpr uint8_t GATT_ROLE_MASTER = 0x00;
 constexpr uint8_t GATT_ROLE_SLAVE = 0x01;
 constexpr uint8_t GATT_ROLE_INVALID = 0xFF;
 
+/**
+ * @brief user confirm type during paring process.
+ * use to
+ * OnPairConfirmed()
+ */
+enum PinType {
+    PIN_TYPE_ENTER_PIN_CODE = 0,         // enter the pin code displayed on the peer device
+    PIN_TYPE_ENTER_PASSKEY = 1,          // enter the passkey displayed on the peer device
+    PIN_TYPE_CONFIRM_PASSKEY = 2,        // confirm the passkey displayed on the local device
+    PIN_TYPE_NO_PASSKEY_CONSENT = 3,     // accept or deny the pairing request
+    PIN_TYPE_NOTIFY_PASSKEY = 4,         // enter the passkey displayed on the local device on the peer device
+    PIN_TYPE_DISPLAY_PIN_CODE = 5,       // enter the pin code displayed on the peer device, used for bluetooth 2.0
+    PIN_TYPE_OOB_CONSENT = 6,            // accept or deny the OOB pairing request, not suppport now
+    PIN_TYPE_PIN_16_DIGITS = 7,          // enter the 16-digit pin code displayed on the peer device
+};
+
 /** A GATT Attribute Permission.
  *  Define GATT Attribute permissions.
  */
-enum class GattPermission : uint8_t {
+enum class GattPermission : uint16_t {
     READABLE = 1 << 0, /**< readable */
-    WRITABLE = 1 << 1,
-    ENCRYPTION = 1 << 2,
-    AUTHENTICATION = 1 << 3,
-    AUTHORIZATION = 1 << 4
+    READ_ENCRYPTED = 1 << 1,
+    READ_ENCRYPTED_MITM = 1 << 2,
+    WRITEABLE = 1 << 4,
+    WRITE_ENCRYPTED = 1 << 5,
+    WRITE_ENCRYPTED_MITM = 1 << 6,
+    WRITE_SIGNED = 1 << 7,
+    WRITE_SIGNED_MITM = 1 << 8,
+    PERMISSON_MAX = 1 << 9,
 };
 
 enum class GattConnectionPriority : int { BALANCED, HIGH, LOW_POWER };
@@ -343,8 +352,68 @@ typedef enum {
     SCAN_MODE_OP_P2_60_3000 = 0x03,
     SCAN_MODE_OP_P10_60_600 = 0x04,
     SCAN_MODE_OP_P25_60_240 = 0x05,
-    SCAN_MODE_OP_P100_1000_1000 = 0x06
+    SCAN_MODE_OP_P100_1000_1000 = 0x06,
+    SCAN_MODE_OP_P50_100_200 = 0x07,
 } SCAN_MODE;
+/// Regular scan params
+constexpr uint16_t BLE_SCAN_MODE_LOW_POWER_WINDOW_MS = 512;
+constexpr uint16_t BLE_SCAN_MODE_LOW_POWER_INTERVAL_MS = 5120;
+constexpr uint16_t BLE_SCAN_MODE_BALANCED_WINDOW_MS = 1024;
+constexpr uint16_t BLE_SCAN_MODE_BALANCED_INTERVAL_MS = 4096;
+constexpr uint16_t BLE_SCAN_MODE_LOW_LATENCY_WINDOW_MS = 4096;
+constexpr uint16_t BLE_SCAN_MODE_LOW_LATENCY_INTERVAL_MS = 4096;
+constexpr uint16_t BLE_SCAN_MODE_OP_P2_60_3000_WINDOW_MS = 60;
+constexpr uint16_t BLE_SCAN_MODE_OP_P2_60_3000_INTERVAL_MS = 3000;
+constexpr uint16_t BLE_SCAN_MODE_OP_P10_60_600_WINDOW_MS = 60;
+constexpr uint16_t BLE_SCAN_MODE_OP_P10_60_600_INTERVAL_MS = 600;
+constexpr uint16_t BLE_SCAN_MODE_OP_P25_60_240_WINDOW_MS = 60;
+constexpr uint16_t BLE_SCAN_MODE_OP_P25_60_240_INTERVAL_MS = 240;
+constexpr uint16_t BLE_SCAN_MODE_OP_P100_1000_1000_WINDOW_MS = 1000;
+constexpr uint16_t BLE_SCAN_MODE_OP_P100_1000_1000_INTERVAL_MS = 1000;
+constexpr uint16_t BLE_SCAN_MODE_OP_P50_100_200_WINDOW_MS = 100;
+constexpr uint16_t BLE_SCAN_MODE_OP_P50_100_200_INTERVAL_MS = 200;
+constexpr float BLE_SCAN_UNIT_TIME = 0.625;
+void ConvertBleScanMode(int scanMode, uint16_t &outScanWindow, uint16_t &outScanInterval);
+
+// SensorHub
+constexpr int32_t BLE_SH_SCAN_SETTING_VALID_BIT = 0x01;
+constexpr int32_t BLE_SH_SCAN_FILTER_VALID_BIT = 0x02;
+constexpr int32_t BLE_SH_ADV_SETTING_VALID_BIT = 0x04;
+constexpr int32_t BLE_SH_ADVDATA_VALID_BIT = 0x08;
+constexpr int32_t BLE_SH_RESPDATA_VALID_BIT = 0x10;
+constexpr int32_t BLE_SH_ADV_DEVICEINFO_VALID_BIT = 0x20;
+
+constexpr int8_t BLE_SENSORHUB_MSG_DEV_INFO = 0x00;
+constexpr int8_t BLE_SENSORHUB_MSG_SOFT_FILTER = 0x01;
+constexpr int8_t BLE_SENSORHUB_MSG_ADV_PARAM = 0x02;
+constexpr int8_t BLE_SENSORHUB_MSG_ADV_DATA = 0x03;
+constexpr int8_t BLE_SENSORHUB_MSG_ADV_RSP_DATA = 0x04;
+constexpr int8_t BLE_SENSORHUB_MSG_UUID_DATA = 0x0a;
+constexpr int8_t BLE_SENSORHUB_MSG_ADV_HANDLE = 0x0b;
+constexpr int8_t BLE_SENSORHUB_MSG_SCAN_STATUS = 0x0c;
+constexpr int8_t BLE_SENSORHUB_MSG_SCAN_PARAM = 0x0d;
+
+constexpr uint8_t BLE_SENSORHUB_MSG_TYPE_NOTICE_UP_DATA = 0x02;
+
+constexpr int8_t BLE_SENSORHUB_DISABLE_SCAN_IN_SENSORHUB = 0;
+constexpr int8_t BLE_SENSORHUB_ENABLE_SCAN_IN_SENSORHUB = 1;
+
+constexpr int8_t BLE_SENSORHUB_DEVICE_TYPE_ALL = 2;
+
+constexpr uint32_t BLE_SENSORHUB_RECOVERY_DOING = 1;
+constexpr uint32_t BLE_SENSORHUB_RECOVERY_DONE = 2;
+
+constexpr int32_t BLE_SENSORHUB_HANDLE_RESOURCE_NOT_APPLY = -100;
+
+constexpr uint8_t BLE_DATA_LEN_1 = 1;
+constexpr uint8_t BLE_DATA_LEN_2 = 2;
+constexpr uint8_t BLE_DATA_LEN_3 = 3;
+constexpr uint8_t BLE_DATA_LEN_4 = 4;
+
+constexpr uint8_t BLE_DEVICE_ADDR_LEN = 6;
+constexpr uint8_t BLE_ADV_DEVICE_ID_LEN = 8;
+constexpr uint8_t BLE_UUID_LEN = 16;
+constexpr uint8_t BLE_UUID_HALF_LEN = 8;
 
 // Phy type
 using PHY_TYPE = enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 };

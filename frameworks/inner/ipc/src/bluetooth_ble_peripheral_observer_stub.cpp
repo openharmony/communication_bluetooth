@@ -22,28 +22,29 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothBlePeripheralObserverStub::BluetoothBlePeripheralObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_ = {
         {static_cast<uint32_t>(IBluetoothBlePeripheralObserver::Code::BLE_ON_READ_REMOTE_RSSI_EVENT),
             &BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner},
         {static_cast<uint32_t>(IBluetoothBlePeripheralObserver::Code::BLE_PAIR_STATUS_CHANGED),
             &BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner},
+        {static_cast<uint32_t>(IBluetoothBlePeripheralObserver::Code::BLE_ACL_STATE_CHANGED),
+            &BluetoothBlePeripheralObserverStub::OnAclStateChangedInner},
     };
 }
 
 BluetoothBlePeripheralObserverStub::~BluetoothBlePeripheralObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 
 int BluetoothBlePeripheralObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BleCentralManagerCallBackStub::OnRemoteRequest, cmd = %d, flags= %d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothBlePeripheralObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGD("BleCentralManagerCallBackStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
+        code, option.GetFlags());
+    if (BluetoothBlePeripheralObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -82,6 +83,19 @@ ErrCode BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner(MessageParc
     const int32_t status = static_cast<int32_t>(data.ReadInt32());
 
     OnPairStatusChanged(transport, *device, status);
+    return NO_ERROR;
+}
+
+ErrCode BluetoothBlePeripheralObserverStub::OnAclStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (!device) {
+        return TRANSACTION_ERR;
+    }
+    const int32_t state = static_cast<int32_t>(data.ReadInt32());
+    const uint32_t reason = static_cast<uint32_t>(data.ReadUint32());
+
+    OnAclStateChanged(*device, state, reason);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
