@@ -145,7 +145,7 @@ ohos_static_library("btipc_service") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 }
@@ -167,8 +167,8 @@ ohos_static_library("btipc_static") {
 
   external_deps = [
     "c_utils:utils",
-    "hisysevent_native:libhisysevent",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
