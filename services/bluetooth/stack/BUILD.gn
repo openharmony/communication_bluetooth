@@ -232,7 +232,7 @@ ohos_shared_library("btstack") {
     "//third_party/openssl:libcrypto_shared",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [ "hilog:libhilog" ]
 
   subsystem_name = "communication"
   part_name = "bluetooth"

@@ -72,8 +72,8 @@
         "base",
         "bundle_framework",
         "hilog",
-        "hisysevent_native",
-        "hiviewdfx_hilog_native",
+        "hisysevent",
+        "hitrace",
         "ipc",
         "samgr_proxy",
         "samgr"
