@@ -38,7 +38,7 @@ ohos_shared_library("bluetooth_hdi_adapter") {
       "c_utils:utils",
       "drivers_interface_bluetooth:libbluetooth_hci_proxy_1.0",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_core",
     ]
   } else {
