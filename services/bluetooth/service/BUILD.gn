@@ -427,8 +427,8 @@ ohos_shared_library("btservice") {
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "hdf_core:libhdi",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
+    "hisysevent_native:libhisysevent",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
@@ -463,7 +463,7 @@ ohos_shared_library("btsbc") {
     "//third_party/bounds_checking_function:libsec_shared",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   cflags = [ "-Wno-array-bounds" ]
   subsystem_name = "communication"
