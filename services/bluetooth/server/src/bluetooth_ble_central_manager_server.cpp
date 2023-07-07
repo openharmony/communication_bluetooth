@@ -325,7 +325,7 @@ bool BluetoothBleCentralManagerServer::IsProxyUid(int32_t uid)
     return proxyUids_.find(uid) != proxyUids_.end();
 }
 
-int BluetoothBleCentralManagerServer::StartScan()
+int BluetoothBleCentralManagerServer::StartScan(int32_t scannerId)
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
@@ -375,7 +375,7 @@ int BluetoothBleCentralManagerServer::StartScan()
     return NO_ERROR;
 }
 
-int BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings &settings)
+int BluetoothBleCentralManagerServer::StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings)
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
@@ -431,7 +431,7 @@ int BluetoothBleCentralManagerServer::StartScan(const BluetoothBleScanSettings &
     return NO_ERROR;
 }
 
-int BluetoothBleCentralManagerServer::StopScan()
+int BluetoothBleCentralManagerServer::StopScan(int32_t scannerId)
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
@@ -473,9 +473,9 @@ int BluetoothBleCentralManagerServer::StopScan()
 }
 
 int BluetoothBleCentralManagerServer::ConfigScanFilter(
-    const int clientId, const std::vector<BluetoothBleScanFilter> &filters)
+    int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters)
 {
-    HILOGI("enter, clientId: %{public}d", clientId);
+    HILOGI("enter, scannerId: %{public}d", scannerId);
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
@@ -505,24 +505,24 @@ int BluetoothBleCentralManagerServer::ConfigScanFilter(
             filterImpl.SetManufactureDataMask(filter.GetManufactureDataMask());
             filterImpls.push_back(filterImpl);
         }
-        return pimpl->bleService_->ConfigScanFilter(clientId, filterImpls);
+        return pimpl->bleService_->ConfigScanFilter(scannerId, filterImpls);
     }
     return 0;
 }
 
-void BluetoothBleCentralManagerServer::RemoveScanFilter(const int clientId)
+void BluetoothBleCentralManagerServer::RemoveScanFilter(int32_t scannerId)
 {
-    HILOGI("enter, clientId: %{public}d", clientId);
+    HILOGI("enter, scannerId: %{public}d", scannerId);
 
     pimpl->bleService_ =
         static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
 
     if (pimpl->bleService_ != nullptr) {
-        pimpl->bleService_->RemoveScanFilter(clientId);
+        pimpl->bleService_->RemoveScanFilter(scannerId);
     }
 }
 
-void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
+void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(int32_t &scannerId,
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     int32_t pid = IPCSkeleton::GetCallingPid();
@@ -531,6 +531,18 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
 
     if (callback == nullptr) {
         HILOGE("callback is null");
+        return;
+    }
+    pimpl->bleService_ =
+        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+
+    if (pimpl->bleService_ == nullptr) {
+        HILOGE("bleService_ is null");
+        return;
+    }
+    scannerId = pimpl->bleService_->AllocScannerId();
+    if (scannerId == 0) {
+        HILOGE("Alloc ScannerId fail.");
         return;
     }
 
@@ -549,10 +561,10 @@ void BluetoothBleCentralManagerServer::RegisterBleCentralManagerCallback(
     });
 }
 
-void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
+void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(int32_t scannerId,
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
-    HILOGI("enter");
+    HILOGI("enter, scannerId: %{public}d", scannerId);
     pimpl->eventHandler_->PostSyncTask([&]() {
         if (callback == nullptr || pimpl == nullptr) {
             HILOGE("DeregisterBleCentralManagerCallback(): callback is null, or pimpl is null");
@@ -578,6 +590,14 @@ void BluetoothBleCentralManagerServer::DeregisterBleCentralManagerCallback(
             }
         }
     });
+
+    pimpl->bleService_ =
+        static_cast<IAdapterBle *>(IAdapterManager::GetInstance()->GetAdapter(BTTransport::ADAPTER_BLE));
+    if (pimpl->bleService_ == nullptr) {
+        HILOGE("bleService_ is null");
+        return;
+    }
+    pimpl->bleService_->RemoveScannerId(scannerId);
 }
 
 void BluetoothBleCentralManagerServer::SetScanParams(const BluetoothBleScanSettings &settings)

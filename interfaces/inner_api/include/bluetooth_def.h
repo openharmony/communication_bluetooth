@@ -1405,6 +1405,8 @@ enum PbapResponseCode : uint8_t {
     PBAP_DATABASE_LOCKED = 0xE1              // Database Locked
 };
 
+constexpr int32_t BLE_SCAN_INVALID_ID = 0;
+
 #define IS_BT_ENABLED() \
     ((BluetoothHost::GetDefaultHost().GetBtState() == (int)(BTStateID::STATE_TURN_ON)) ? true : false)
 #define IS_BLE_ENABLED() (BluetoothHost::GetDefaultHost().IsBleEnabled())

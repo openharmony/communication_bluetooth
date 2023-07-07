@@ -38,6 +38,7 @@
 #define OHOS_BT_GATT_H
 
 #include "ohos_bt_def.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -450,6 +451,26 @@ typedef struct {
     unsigned char *advData;
 } BtScanResultData;
 
+typedef struct {
+    char deviceId[OHOS_ACTIVE_DEVICE_ID_LEN];
+    int status;
+    int timeOut;
+} BtActiveDeviceInfo;
+
+typedef struct {
+    BleScanConfigs *scanConfig;
+    BleScanNativeFilter *filter;
+    unsigned int filterSize;
+    BleAdvParams advParam;
+    StartAdvRawData rawData;
+    BtUuid uuid;
+    BtActiveDeviceInfo *activeDeviceInfo;
+    unsigned int activeDeviceSize;
+    int advHandle;
+    int duration;
+    int deliveryMode;
+} BtLpDeviceParam;
+
 /**
  * @brief Called when advertising is enabled. For details, see {@link BleStartAdv}.
  *
@@ -501,6 +522,9 @@ typedef void (*ScanResultCallback)(BtScanResultData *scanResultdata);
  */
 typedef void (*ScanParameterSetCompletedCallback)(int clientId, int status);
 
+typedef void (*LpDeviceInfoCallback)(BtUuid *uuid, int32_t type, uint8_t *data, uint32_t dataSize);
+
+typedef void (*ScanStateChangeCallback)(int32_t resultCode, bool isStartScan);
 /**
  * @brief Defines GATT callbacks.
  *
@@ -517,11 +541,21 @@ typedef struct {
     AdvUpdateCallback advUpdateCb;
     /** Called when a secure access request is received. */
     SecurityRespondCallback securityRespondCb;
+} BtGattCallbacks;
+
+/**
+ * @brief Defines ble scan callbacks.
+ *
+ * @since 6
+ */
+typedef struct {
     /** Called when the scan result is received. */
     ScanResultCallback scanResultCb;
-    /** Called when scan parameters are set. */
-    ScanParameterSetCompletedCallback scanParamSetCb;
-} BtGattCallbacks;
+    /** Called when scan state change. */
+    ScanStateChangeCallback scanStateChangeCb;
+    /** Called when low power device notify msg. */
+    LpDeviceInfoCallback lpDeviceInfoCb;
+}BleScanCallbacks;
 
 /**
  * @brief Initializes the Bluetooth protocol stack.
@@ -670,11 +704,12 @@ int BleStartScan(void);
 /**
  * @brief Stops a scan.
  *
+ * @param scannerId Indicates the scanner id.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is stopped;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleStopScan(void);
+int BleStopScan(int32_t scannerId);
 
 /**
  * @brief Registers GATT callbacks.
@@ -685,6 +720,27 @@ int BleStopScan(void);
  * @since 6
  */
 int BleGattRegisterCallbacks(BtGattCallbacks *func);
+
+/**
+ * @brief Registers ble scan callbacks.
+ *
+ * @param func Indicates the pointer to the callbacks to register. For details, see {@link BleScanCallbacks}.
+ * @param scannerId Indicates the pointer to the scannerId, identify one scan.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the BLE callbacks are registered;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleRegisterScanCallbacks(BleScanCallbacks *func, int32_t *scannerId);
+
+/**
+ * @brief Deregister ble scan callbacks.
+ *
+ * @param scannerId Indicates the scanner id.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the BLE callbacks are deregistered;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+ int BleDeregisterScanCallbacks(int32_t scannerId);
 
 /**
  * @brief Sets advertising data and parameters and starts advertising.
@@ -708,6 +764,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
  * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
  * The manufactureId need to be set a related number when you need a filtering condition of manufactureData.
  *
+ * @param scannerId Indicates the scanner id.
  * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
  * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
  * @param filterSize Indicates the number of the scan filter.
@@ -715,7 +772,102 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigned int filterSize);
+int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleScanNativeFilter *filter,
+    uint32_t filterSize);
+
+/**
+ * @brief set low power device adv param.
+ *
+ * @param duration advertise duration.
+ * @param maxExtAdvEvents maximum number of extended advertising events.
+ * @param window work window.
+ * @param interval work interval.
+ * @param advHandle Indicates the advertise handle.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+*/
+int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle);
+
+/**
+ * @brief Set scan report channel.
+ *
+ * @param scannerId Indicates the scanner id.
+ * @param enable true：report to low power device; false：not report to low power device.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set report channel success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable);
+
+/**
+ * @brief Enable synchronizing data to low power device.
+ *
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if enable sync success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int EnableSyncDataToLpDevice(void);
+
+/**
+ * @brief Disable synchronizing data to low power device.
+ *
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if disable sync success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int DisableSyncDataToLpDevice(void);
+
+/**
+ * @brief Get advertiser handle.
+ *
+ * @param advId Indicates the advertisement ID.
+ * @param advHandle Indicates the pointer to the advertiser handle.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if get success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int GetAdvHandle(int advId, int *advHandle);
+
+/**
+ * @brief Translate ParamData to low power device.
+ *
+ * @param data Indicates the pointer to the data.
+ * @param dataSize Indicates the data size.
+ * @param type Indicates the data type.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set param to low power device success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int SendParamsToLpDevice(const uint8_t *data, uint32_t dataSize, int32_t type);
+
+/**
+ * @brief Get whether low power device available.
+ *
+ * @return true: available; false: not available.
+ * @since 6
+ */
+bool IsLpDeviceAvailable();
+
+/**
+ * @brief Set low power device Param.
+ *
+ * @param lpDeviceParam the param set to low power device.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set lpDeviceParam success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam);
+
+/**
+ * @brief Remove low power device Param.
+ *
+ * @param uuid Uuid.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if remove success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int RemoveLpDeviceParam(BtUuid uuid);
 
 #ifdef __cplusplus
 }
