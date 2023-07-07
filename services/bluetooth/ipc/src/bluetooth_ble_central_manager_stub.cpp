@@ -95,25 +95,32 @@ ErrCode BluetoothBleCentralManagerStub::RegisterBleCentralManagerCallbackInner(
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     const sptr<IBluetoothBleCentralManagerCallback> callBack =
         OHOS::iface_cast<IBluetoothBleCentralManagerCallback>(remote);
-    RegisterBleCentralManagerCallback(callBack);
+    int32_t scannerId = 0;
+    RegisterBleCentralManagerCallback(scannerId, callBack);
+    if (!reply.WriteInt32(scannerId)) {
+        HILOGE("reply writing failed");
+        return ERR_INVALID_VALUE;
+    }
     return NO_ERROR;
 }
 
 ErrCode BluetoothBleCentralManagerStub::DeregisterBleCentralManagerCallbackInner(
     MessageParcel &data, MessageParcel &reply)
 {
+    int32_t scannerId = data.ReadInt32();
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     const sptr<IBluetoothBleCentralManagerCallback> callBack =
         OHOS::iface_cast<IBluetoothBleCentralManagerCallback>(remote);
-    DeregisterBleCentralManagerCallback(callBack);
+    DeregisterBleCentralManagerCallback(scannerId, callBack);
     return NO_ERROR;
 }
 
 ErrCode BluetoothBleCentralManagerStub::StartScanInner(MessageParcel &data, MessageParcel &reply)
 {
-    int ret = StartScan();
+    int32_t scannerId = data.ReadInt32();
+    int ret = StartScan(scannerId);
     if (!reply.WriteInt32(ret)) {
-        HILOGE("reply writing faileded");
+        HILOGE("reply writing failed");
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
@@ -121,15 +128,16 @@ ErrCode BluetoothBleCentralManagerStub::StartScanInner(MessageParcel &data, Mess
 
 ErrCode BluetoothBleCentralManagerStub::StartScanWithSettingsInner(MessageParcel &data, MessageParcel &reply)
 {
+    int32_t scannerId = data.ReadInt32();
     std::shared_ptr<BluetoothBleScanSettings> settings(data.ReadParcelable<BluetoothBleScanSettings>());
     if (settings == nullptr) {
         HILOGW("[StartScanWithSettingsInner] fail: read settings failed");
         return TRANSACTION_ERR;
     }
 
-    int ret = StartScan(*settings);
+    int ret = StartScan(scannerId, *settings);
     if (!reply.WriteInt32(ret)) {
-        HILOGE("reply writing faileded");
+        HILOGE("reply writing failed");
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
@@ -137,9 +145,10 @@ ErrCode BluetoothBleCentralManagerStub::StartScanWithSettingsInner(MessageParcel
 
 ErrCode BluetoothBleCentralManagerStub::StopScanInner(MessageParcel &data, MessageParcel &reply)
 {
-    int ret = StopScan();
+    int32_t scannerId = data.ReadInt32();
+    int ret = StopScan(scannerId);
     if (!reply.WriteInt32(ret)) {
-        HILOGE("reply writing faileded");
+        HILOGE("reply writing failed");
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
@@ -147,7 +156,7 @@ ErrCode BluetoothBleCentralManagerStub::StopScanInner(MessageParcel &data, Messa
 ErrCode BluetoothBleCentralManagerStub::ConfigScanFilterInner(MessageParcel &data, MessageParcel &reply)
 {
     std::vector<BluetoothBleScanFilter> filters {};
-    int32_t clientId = data.ReadInt32();
+    int32_t scannerId = data.ReadInt32();
     int32_t itemsSize = 0;
     if (!data.ReadInt32(itemsSize) || itemsSize > BLE_CENTRAL_MANAGER_STUB_READ_DATA_SIZE_MAX_LEN) {
         HILOGE("read Parcelable size failed.");
@@ -158,10 +167,9 @@ ErrCode BluetoothBleCentralManagerStub::ConfigScanFilterInner(MessageParcel &dat
         filters.push_back(item);
     }
 
-    int result = ConfigScanFilter(clientId, filters);
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        HILOGE("BluetoothBleCentralManagerStub: reply writing failed in: %{public}s.", __func__);
+    int ret = ConfigScanFilter(scannerId, filters);
+    if (!reply.WriteInt32(ret)) {
+        HILOGE("reply writing failed.");
         return ERR_INVALID_VALUE;
     }
     return NO_ERROR;
@@ -169,9 +177,9 @@ ErrCode BluetoothBleCentralManagerStub::ConfigScanFilterInner(MessageParcel &dat
 
 ErrCode BluetoothBleCentralManagerStub::RemoveScanFilterInner(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t clientId = data.ReadInt32();
+    int32_t scannerId = data.ReadInt32();
 
-    RemoveScanFilter(clientId);
+    RemoveScanFilter(scannerId);
     return NO_ERROR;
 }
 

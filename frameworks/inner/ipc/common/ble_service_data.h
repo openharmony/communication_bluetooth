@@ -346,9 +346,9 @@ public:
 
     std::vector<uint8_t> GetManufactureDataMask() const;
 
-    void SetClientId(int clientId);
+    void SetScannerId(int scannerId);
 
-    int GetClientId() const;
+    int GetScannerId() const;
 
     void SetFiltIndex(uint8_t filtIndex);
 
@@ -378,7 +378,7 @@ private:
     std::vector<uint8_t> manufactureData_;
     std::vector<uint8_t> manufactureDataMask_;
 
-    int clientId_ = 0;
+    int scannerId_ = 0;
     uint8_t filtIndex_ = 0;
     uint8_t action_ = -1;
 };

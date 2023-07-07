@@ -446,6 +446,14 @@ public:
     explicit BleCentralManager(BleCentralManagerCallback &callback);
 
     /**
+     * @brief A constructor used to create a <b>BleCentralManager</b> instance.
+     *
+     * @param cllback Central manager callback to create an <b>BleCentralManagerCallback</b> instance.
+     * @since 6
+     */
+    explicit BleCentralManager(std::shared_ptr<BleCentralManagerCallback> callback);
+
+    /**
      * @brief A destructor used to delete the <b>BleCentralManager</b> instance.
      *
      * @since 6
@@ -481,9 +489,6 @@ public:
     int ConfigScanFilter(const std::vector<BleScanFilter> &filter);
 
 private:
-    BleCentralManagerCallback *callback_ = nullptr;
-    int clientId_ = 0;
-
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManager);
     BLUETOOTH_DECLARE_IMPL();
 };

@@ -28,14 +28,15 @@ public:
     ~BluetoothBleCentralManagerProxy() override;
     DISALLOW_COPY_AND_MOVE(BluetoothBleCentralManagerProxy);
 
-    virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
-    virtual void DeregisterBleCentralManagerCallback(
+    virtual void RegisterBleCentralManagerCallback(int32_t &scannerId,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
-    int StartScan() override;
-    int StartScan(const BluetoothBleScanSettings &settings) override;
-    int StopScan() override;
-    virtual int ConfigScanFilter(const int clientId, const std::vector<BluetoothBleScanFilter> &filters) override;
-    virtual void RemoveScanFilter(const int clientId) override;
+    virtual void DeregisterBleCentralManagerCallback(int32_t scannerId,
+        const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
+    int StartScan(int32_t scannerId) override;
+    int StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings) override;
+    int StopScan(int32_t scannerId) override;
+    virtual int ConfigScanFilter(int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters) override;
+    virtual void RemoveScanFilter(int32_t scannerId) override;
     virtual bool ProxyUid(int32_t uid, bool isProxy) override;
     virtual bool ResetAllProxy() override;
 
