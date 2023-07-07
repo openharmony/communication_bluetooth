@@ -37,7 +37,7 @@ ohos_fuzztest("CancelPairedDeviceFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "hilog:libhilog",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 }
 
