@@ -55,7 +55,7 @@ ohos_unittest("btfw_opp_unit_test") {
 
   external_deps = [
     "c_utils:utils",
-    "hilog:libhilog",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
 }

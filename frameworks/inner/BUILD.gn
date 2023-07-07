@@ -227,8 +227,8 @@ ohos_shared_library("btframework") {
 
   external_deps = [
     "c_utils:utils",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
+    "hisysevent_native:libhisysevent",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
@@ -280,8 +280,8 @@ ohos_static_library("btcommon") {
 
   external_deps = [
     "c_utils:utils",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
+    "hisysevent_native:libhisysevent",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
 

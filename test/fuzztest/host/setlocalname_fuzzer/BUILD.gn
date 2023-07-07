@@ -36,7 +36,7 @@ ohos_fuzztest("SetLocalNameFuzzTest") {
 
   deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
 ###############################################################################
