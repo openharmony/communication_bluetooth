@@ -36,6 +36,7 @@
 #include "streambuf"
 #include "string"
 #include "uuid.h"
+#include "bluetooth_object_map.h"
 
 
 #ifdef __cplusplus
@@ -52,11 +53,12 @@ class BleCentralManagerCallbackWapper;
 class BleAdvCallback;
 
 static BtGattCallbacks *g_AppCallback;
-static BleCentralManager *g_BleCentralManager;
-static BleCentralManagerCallbackWapper *g_scanCallback;
 
 static BleAdvCallback *g_bleAdvCallbacks[MAX_BLE_ADV_NUM];
 static BleAdvertiser *g_BleAdvertiser = nullptr;
+
+constexpr int32_t MAX_BLE_SCAN_NUM = 5;
+static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -92,8 +94,8 @@ public:
         strStream >> strs;
         string address = result.GetPeripheralDevice().GetDeviceAddr();
         HILOGI("device: %{public}s, scan data: %{public}s", GetEncryptAddr(address).c_str(), strs.c_str());
-        if (g_AppCallback != nullptr && g_AppCallback->scanResultCb != nullptr) {
-            g_AppCallback->scanResultCb(&scanResult);
+        if (appCallback != nullptr && appCallback->scanResultCb != nullptr) {
+            appCallback->scanResultCb(&scanResult);
         } else {
             HILOGW("call back is null.");
         }
@@ -115,6 +117,9 @@ public:
      * @since 6
      */
     void OnStartOrStopScanEvent(int resultCode, bool isStartScan) {}
+
+public:
+    BleScanCallbacks *appCallback = nullptr;
 };
 
 class BleAdvCallback : public BleAdvertiseCallback {
@@ -356,32 +361,28 @@ int BleSetScanParameters(int clientId, BleScanParams *param)
  */
 int BleStartScan(void)
 {
-    HILOGI("BleStartScan enter");
-    if (g_BleCentralManager == nullptr) {
-        HILOGE("BleStartScan fail, ble centra manager is null.");
-        return OHOS_BT_STATUS_FAIL;
-    }
-
-    g_BleCentralManager->StartScan();
-    return OHOS_BT_STATUS_SUCCESS;
+    HILOGE("This interface is deprecated. BleStartScanEx is recommended.");
+    return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
 /**
  * @brief Stops a scan.
- *
+ * 
+ * @param scannerId Indicates the scanner id.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is stopped;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleStopScan(void)
+int BleStopScan(int32_t scannerId)
 {
-    HILOGI("BleStopScan enter");
-    if (g_BleCentralManager == nullptr) {
-        HILOGE("BleStopScan fail, ble centra manager is null.");
+    HILOGI("BleStopScan enter scannerId: %{public}d", scannerId);
+    std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
+    if (bleCentralManager == nullptr) {
+        HILOGE("BleStopScan fail, scannerId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleCentralManager->StopScan();
+    bleCentralManager->StopScan();
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -401,16 +402,56 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
         return OHOS_BT_STATUS_PARM_INVALID;
     }
     g_AppCallback = func;
-
-    if (g_scanCallback == nullptr) {
-        g_scanCallback = new BleCentralManagerCallbackWapper();
-    }
-
-    if (g_BleCentralManager == nullptr) {
-        g_BleCentralManager = new BleCentralManager(*g_scanCallback);
-    }
     return OHOS_BT_STATUS_SUCCESS;
 }
+
+/**
+ * @brief Registers ble scan callbacks.
+ *
+ * @param func Indicates the pointer to the callbacks to register. For details, see {@link BleScanCallbacks}.
+ * @param scannerId Indicates the pointer to the scannerId, identify a scan.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the BLE callbacks are registered;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleRegisterScanCallbacks(BleScanCallbacks *func, int32_t *scannerId)
+{
+    HILOGI("BleRegisterScanCallbacks enter");
+    if (scannerId == nullptr || func == nullptr) {
+        HILOGE("BleRegisterScanCallbacks scannerId or func is null.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    std::shared_ptr<BleCentralManagerCallbackWapper> callback = std::make_shared<BleCentralManagerCallbackWapper>();
+    callback->appCallback = func;
+    std::shared_ptr<BleCentralManager> bleCentralManager = std::make_shared<BleCentralManager>(callback);
+    int id = g_bleCentralManagerMap.AddLimitedObject(bleCentralManager);
+    if (id == -1) {
+        HILOGE("BleRegisterScanCallbacks fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    *scannerId = id;
+    HILOGI("BleRegisterScanCallbacks success scannerId: %{public}d", *scannerId);
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Deregister ble scan callbacks.
+ *
+ * @param scannerId Indicates the scanner id.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the BLE callbacks are deregistered;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+ int BleDeregisterScanCallbacks(int32_t scannerId)
+ {
+    HILOGI("BleDeregisterScanCallbacks enter. scannerId: %{public}d", scannerId);
+    if (g_bleCentralManagerMap.GetObject(scannerId) == nullptr) {
+        HILOGE("BleDeregisterScanCallbacks fail, scannerId is invalid.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    g_bleCentralManagerMap.RemoveObject(scannerId);
+    return OHOS_BT_STATUS_SUCCESS;
+ }
 
 /**
  * @brief Sets advertising data and parameters and starts advertising.
@@ -557,13 +598,14 @@ static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nati
 /**
  * @brief Sets scan filter configs.
  *
+ * @param scannerId Indicates the scanner id.
  * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
  * @param filterSize Indicates the number of the scan filter.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set scan filter configs success;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-static int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterSize)
+static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *filter, uint32_t filterSize)
 {
     HILOGI("SetConfigScanFilter enter");
     vector<BleScanFilter> scanFilters;
@@ -577,7 +619,12 @@ static int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterS
         }
         scanFilters.push_back(scanFilter);
     }
-    g_BleCentralManager->ConfigScanFilter(scanFilters);
+    std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
+    if (bleCentralManager == nullptr) {
+        HILOGE("SetConfigScanFilter fail, scannerId is invalid.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    bleCentralManager->ConfigScanFilter(scanFilters);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -589,6 +636,7 @@ static int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterS
  * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
  * The manufactureId need to be set a related number when you need a filtering condition of manufactureData.
  *
+ * @param scannerId Indicates the scanner id.
  * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
  * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
  * @param filterSize Indicates the number of the scan filter.
@@ -596,16 +644,22 @@ static int SetConfigScanFilter(BleScanNativeFilter *filter, unsigned int filterS
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigned int filterSize)
+int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleScanNativeFilter *filter,
+    uint32_t filterSize)
 {
-    HILOGI("BleStartScanEx enter, filterSize %{public}u", filterSize);
-    if (g_BleCentralManager == nullptr || configs == nullptr) {
-        HILOGE("BleStartScanEx fail, ble centra manager is null or configs is null.");
+    HILOGI("BleStartScanEx enter, scannerId: %{public}d, filterSize: %{public}u", scannerId, filterSize);
+    if (configs == nullptr) {
+        HILOGE("BleStartScanEx fail, configs is null.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
+    if (bleCentralManager == nullptr) {
+        HILOGE("BleStartScanEx fail, scannerId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
 
     if (filter != nullptr && filterSize != 0) {
-        int result = SetConfigScanFilter(filter, filterSize);
+        int result = SetConfigScanFilter(scannerId, filter, filterSize);
         if (result != OHOS_BT_STATUS_SUCCESS) {
             HILOGE("SetConfigScanFilter faild, result: %{public}d", result);
             return OHOS_BT_STATUS_PARM_INVALID;
@@ -615,9 +669,141 @@ int BleStartScanEx(BleScanConfigs *configs, BleScanNativeFilter *filter, unsigne
     HILOGI("scanMode: %{public}d", configs->scanMode);
     BleScanSettings settings;
     settings.SetScanMode(configs->scanMode);
-    g_BleCentralManager->StartScan(settings);
+    bleCentralManager->StartScan(settings);
     return OHOS_BT_STATUS_SUCCESS;
 }
+
+/**
+ * @brief set low power device adv param.
+ *
+ * @param duration advertise duration.
+ * @param maxExtAdvEvents maximum number of extended advertising events.
+ * @param window work window.
+ * @param interval work interval.
+ * @param advHandle Indicates the advertise handle.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+*/
+int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
+ * @brief Set scan report channel.
+ *
+ * @param scannerId Indicates the scanner id.
+ * @param enable true：report to low power device; false：not report to low power device.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set report channel success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
+ * @brief Enable synchronizing data to low power device.
+ *
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if enable sync success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int EnableSyncDataToLpDevice(void)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
+ * @brief Disable synchronizing data to low power device.
+ *
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if disable sync success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int DisableSyncDataToLpDevice(void)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
+ * @brief Get advertiser handle.
+ *
+ * @param advId Indicates the advertisement ID.
+ * @param advHandle Indicates the pointer to the advertiser handle.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if get success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int GetAdvHandle(int advId, int *advHandle)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
+ * @brief Translate ParamData to low power device.
+ *
+ * @param data Indicates the pointer to the data.
+ * @param dataSize Indicates the data size.
+ * @param type Indicates the data type.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set param to low power device success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int SendParamsToLpDevice(const uint8_t *data, uint32_t dataSize, int32_t type)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
+ * @brief Get whether low power device available.
+ *
+ * @return true: available; false: not available.
+ * @since 6
+ */
+bool IsLpDeviceAvailable(void)
+{
+    HILOGI("not support");
+    return false;
+}
+
+/**
+ * @brief Set low power device Param.
+ *
+ * @param lpDeviceParam the param set to low power device.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set lpDeviceParam success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+/**
+ * @brief Remove low power device Param.
+ *
+ * @param uuid Uuid.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if remove success;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int RemoveLpDeviceParam(BtUuid uuid)
+{
+    HILOGI("not support");
+    return OHOS_BT_STATUS_UNSUPPORTED;
+}
+
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #ifdef __cplusplus

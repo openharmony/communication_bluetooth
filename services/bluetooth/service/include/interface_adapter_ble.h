@@ -428,17 +428,32 @@ public:
     /**
      * @brief Config scan filter
      *
+     * @param scannerId indicate one scan.
      * @param filter Scan filter.
-     * @return client id
+     * @return ret
      */
-    virtual int ConfigScanFilter(const int clientId, const std::vector<BleScanFilterImpl> &filters) = 0;
+    virtual int ConfigScanFilter(int32_t scannerId, const std::vector<BleScanFilterImpl> &filters) = 0;
 
     /**
      * @brief Remove scan filter
      *
-     * @param clientId client id.
+     * @param scannerId scanner id.
      */
-    virtual void RemoveScanFilter(const int clientId) = 0;
+    virtual void RemoveScanFilter(int32_t scannerId) = 0;
+
+    /**
+     * @brief Alloc scan object id.
+     *
+     * @return scanner id.
+     */
+    virtual int32_t AllocScannerId() = 0;
+
+    /**
+     * @brief Remove scan object id.
+     *
+     * @param scannerId scanner id.
+     */
+    virtual void RemoveScannerId(int32_t scannerId) = 0;
 };
 }  // namespace bluetooth
 }  // namespace OHOS

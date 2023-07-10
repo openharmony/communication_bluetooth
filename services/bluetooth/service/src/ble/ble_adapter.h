@@ -133,8 +133,8 @@ public:
     void StartScan() const override;
     void StartScan(const BleScanSettingsImpl &setting) const override;
     void StopScan() const override;
-    int ConfigScanFilter(const int clientId, const std::vector<BleScanFilterImpl> &filters) override;
-    void RemoveScanFilter(const int clientId) override;
+    int ConfigScanFilter(int32_t scannerId, const std::vector<BleScanFilterImpl> &filters) override;
+    void RemoveScanFilter(int32_t scannerId) override;
     int GetAdvertisingStatus() const override;
     bool IsLlPrivacySupported() const override;
     void AddCharacteristicValue(uint8_t adtype, const std::string &data) const override;
@@ -171,6 +171,9 @@ public:
     uint8_t GetAdvertiserHandle() const override;
     bool RemovePairWithDisConnect(const RawAddress &device, bool isDisconnect = true) const;
 
+    int32_t AllocScannerId() override;
+    void RemoveScannerId(int32_t scannerId) override;
+
 private:
     int RegisterCallbackToBtm();
     int DeregisterCallbackToBtm() const;
@@ -205,6 +208,7 @@ private:
     static void LeDisconnectionComplete(uint8_t status, uint16_t connectionHandle, uint8_t reason, void *context);
     static void OnReadRemoteRssiEvent(uint8_t status, const BtAddr *addr, int8_t rssi, void *context);
     static void GenResPriAddrResult(uint8_t result, const uint8_t addr[BT_ADDRESS_SIZE], void *context);
+    void ClearScannerIdInfo() const;
 
     BT_DISALLOW_COPY_AND_ASSIGN(BleAdapter);
     DECLARE_IMPL();

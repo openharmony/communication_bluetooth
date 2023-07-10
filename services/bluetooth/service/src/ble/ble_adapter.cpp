@@ -259,6 +259,7 @@ bool BleAdapter::DisableTask()
     }
     ClearScanResultInfo();
     DeregisterAllCallback();
+    ClearScannerIdInfo();
 
     ret = (BTM_Disable(LE_CONTROLLER) == BT_NO_ERROR);
     if (!ret) {
@@ -1159,6 +1160,16 @@ void BleAdapter::ClearScanResultInfo() const
     }
 }
 
+void BleAdapter::ClearScannerIdInfo() const
+{
+    LOG_DEBUG("[BleAdapter] %{public}s", __func__);
+
+    std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
+    if (pimpl->bleCentralManager_ != nullptr) {
+        pimpl->bleCentralManager_->ClearScannerIds();
+    }
+}
+
 void BleAdapter::SavePeerDevices2BTM(const std::map<std::string, BlePeripheralDevice> &peerConnDeviceList) const
 {
     LOG_DEBUG("[BleAdapter] %{public}s", __func__);
@@ -1536,25 +1547,45 @@ void BleAdapter::StopScan() const
     }
 }
 
-int BleAdapter::ConfigScanFilter(const int clientId, const std::vector<BleScanFilterImpl> &filters)
+int BleAdapter::ConfigScanFilter(int32_t scannerId, const std::vector<BleScanFilterImpl> &filters)
 {
     LOG_DEBUG("[BleAdapter] %{public}s", __func__);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (pimpl->bleCentralManager_ != nullptr) {
-        return pimpl->bleCentralManager_->ConfigScanFilter(clientId, filters);
+        return pimpl->bleCentralManager_->ConfigScanFilter(scannerId, filters);
     }
     return 0;
 }
 
-void BleAdapter::RemoveScanFilter(const int clientId)
+void BleAdapter::RemoveScanFilter(int32_t scannerId)
 {
     LOG_DEBUG("[BleAdapter] %{public}s", __func__);
 
     std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
     if (pimpl->bleCentralManager_ != nullptr) {
-        pimpl->bleCentralManager_->RemoveScanFilter(clientId);
+        pimpl->bleCentralManager_->RemoveScanFilter(scannerId);
     }
+}
+
+int32_t BleAdapter::AllocScannerId()
+{
+    std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
+    if (pimpl->bleCentralManager_ == nullptr) {
+        LOG_DEBUG("[BleAdapter] bleCentralManager is null.");
+        return 0;
+    }
+    return pimpl->bleCentralManager_->AllocScannerId();
+}
+
+void BleAdapter::RemoveScannerId(int32_t scannerId)
+{
+    std::lock_guard<std::recursive_mutex> lk(pimpl->syncMutex_);
+    if (pimpl->bleCentralManager_ == nullptr) {
+        LOG_DEBUG("[BleAdapter] bleCentralManager is null.");
+        return;
+    }
+    return pimpl->bleCentralManager_->RemoveScannerId(scannerId);
 }
 
 void BleAdapter::OnStartAdvertisingEvt() const

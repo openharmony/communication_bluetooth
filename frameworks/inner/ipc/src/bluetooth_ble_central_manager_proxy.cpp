@@ -27,7 +27,7 @@ BluetoothBleCentralManagerProxy::BluetoothBleCentralManagerProxy(const sptr<IRem
 BluetoothBleCentralManagerProxy::~BluetoothBleCentralManagerProxy()
 {}
 
-void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(
+void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(int32_t &scannerId,
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     MessageParcel data;
@@ -47,14 +47,19 @@ void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(
     if (result != NO_ERROR) {
         HILOGW("[RegisterBleCentralManagerCallback] fail: transact ErrCode=%{public}d", result);
     }
+    scannerId = reply.ReadInt32();
 }
 
-void BluetoothBleCentralManagerProxy::DeregisterBleCentralManagerCallback(
+void BluetoothBleCentralManagerProxy::DeregisterBleCentralManagerCallback(int32_t scannerId,
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
         HILOGW("[DeregisterBleCentralManagerCallback] fail: write interface token failed.");
+        return;
+    }
+    if (!data.WriteInt32(scannerId)) {
+        HILOGE("[DeregisterBleCentralManagerCallback] fail: write scannerId failed.");
         return;
     }
 
@@ -71,7 +76,7 @@ void BluetoothBleCentralManagerProxy::DeregisterBleCentralManagerCallback(
     }
 }
 
-int BluetoothBleCentralManagerProxy::StartScan()
+int BluetoothBleCentralManagerProxy::StartScan(int32_t scannerId)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -79,6 +84,10 @@ int BluetoothBleCentralManagerProxy::StartScan()
         return BT_ERR_INTERNAL_ERROR;
     }
 
+    if (!data.WriteInt32(scannerId)) {
+        HILOGE("[StartScan] fail: write scannerId failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t result = InnerTransact(BLE_START_SCAN, option, data, reply);
@@ -88,7 +97,7 @@ int BluetoothBleCentralManagerProxy::StartScan()
     return reply.ReadInt32();
 }
 
-int BluetoothBleCentralManagerProxy::StartScan(const BluetoothBleScanSettings &settings)
+int BluetoothBleCentralManagerProxy::StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -96,6 +105,10 @@ int BluetoothBleCentralManagerProxy::StartScan(const BluetoothBleScanSettings &s
         return BT_ERR_INTERNAL_ERROR;
     }
 
+    if (!data.WriteInt32(scannerId)) {
+        HILOGE("[StartScan] fail: write scannerId failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     if (!data.WriteParcelable(&settings)) {
         HILOGW("[StartScan] fail:write settings failed");
         return BT_ERR_INTERNAL_ERROR;
@@ -110,11 +123,15 @@ int BluetoothBleCentralManagerProxy::StartScan(const BluetoothBleScanSettings &s
     return reply.ReadInt32();
 }
 
-int BluetoothBleCentralManagerProxy::StopScan()
+int BluetoothBleCentralManagerProxy::StopScan(int32_t scannerId)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
         HILOGW("[StopScan] fail: write interface token failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!data.WriteInt32(scannerId)) {
+        HILOGE("[StopScan] fail: write scannerId failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -128,7 +145,7 @@ int BluetoothBleCentralManagerProxy::StopScan()
 }
 
 int BluetoothBleCentralManagerProxy::ConfigScanFilter(
-    const int clientId, const std::vector<BluetoothBleScanFilter> &filters)
+    int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -136,8 +153,8 @@ int BluetoothBleCentralManagerProxy::ConfigScanFilter(
         return 0;
     }
 
-    if (!data.WriteInt32(clientId)) {
-        HILOGE("[ConfigScanFilter] fail: write clientId failed");
+    if (!data.WriteInt32(scannerId)) {
+        HILOGE("[ConfigScanFilter] fail: write scannerId failed");
         return 0;
     }
 
@@ -162,7 +179,7 @@ int BluetoothBleCentralManagerProxy::ConfigScanFilter(
     return reply.ReadInt32();
 }
 
-void BluetoothBleCentralManagerProxy::RemoveScanFilter(const int clientId)
+void BluetoothBleCentralManagerProxy::RemoveScanFilter(int32_t scannerId)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -170,8 +187,8 @@ void BluetoothBleCentralManagerProxy::RemoveScanFilter(const int clientId)
         return;
     }
 
-    if (!data.WriteInt32(clientId)) {
-        HILOGE("[RemoveScanFilter] fail: write clientId failed");
+    if (!data.WriteInt32(scannerId)) {
+        HILOGE("[RemoveScanFilter] fail: write scannerId failed");
         return;
     }
 

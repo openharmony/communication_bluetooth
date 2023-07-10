@@ -49,6 +49,12 @@
 #define OHOS_BLE_UUID_MAX_LEN 16
 
 /**
+ * @brief Defines the device id length.
+ *
+ */
+#define OHOS_ACTIVE_DEVICE_ID_LEN 8
+
+/**
  * @brief Enumerates characteristic properties.
  *
  * Characteristic properties determine how characteristic values are used and\n

@@ -30,7 +30,6 @@ struct BleCentralManager::impl {
     impl();
     ~impl();
 
-    void BindServer();
     bool MatchesScanFilters(const BluetoothBleScanResult &result);
     bool MatchesScanFilter(const BluetoothBleScanFilter &filter, const BluetoothBleScanResult &result);
     bool MatchesAddrAndName(const BluetoothBleScanFilter &filter, const BluetoothBleScanResult &result);
@@ -140,6 +139,8 @@ struct BleCentralManager::impl {
     std::vector<BluetoothBleScanFilter> bleScanFilters_;
     bool IsNeedFilterMatches_ = true;
     std::mutex blesCanFiltersMutex_;
+
+    int32_t scannerId_ = BLE_SCAN_INVALID_ID;
 };
 
 BleCentralManager::impl::impl()
@@ -171,7 +172,7 @@ BleCentralManager::impl::impl()
         return;
     }
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
-    proxy_->RegisterBleCentralManagerCallback(callbackImp_);
+    proxy_->RegisterBleCentralManagerCallback(scannerId_, callbackImp_);
 }
 
 bool BleCentralManager::impl::MatchesScanFilters(const BluetoothBleScanResult &result)
@@ -390,10 +391,10 @@ bool BleCentralManager::impl::MatchesData(std::vector<uint8_t> fData, std::strin
 
 BleCentralManager::impl::~impl()
 {
-    proxy_->DeregisterBleCentralManagerCallback(callbackImp_);
+    proxy_->DeregisterBleCentralManagerCallback(scannerId_, callbackImp_);
 }
 
-BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : callback_(&callback), pimpl(nullptr)
+BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : pimpl(nullptr)
 {
     if (pimpl == nullptr) {
         pimpl = std::make_unique<impl>();
@@ -407,12 +408,23 @@ BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : call
     bool ret = pimpl->callbacks_.Register(pointer);
     if (ret)
         return;
-    callback_ = &callback;
+}
+
+BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> callback) : pimpl(nullptr)
+{
+    if (pimpl == nullptr) {
+        pimpl = std::make_unique<impl>();
+        if (pimpl == nullptr) {
+            HILOGE("failed, no pimpl");
+        }
+    }
+
+    HILOGI("successful");
+    pimpl->callbacks_.Register(callback);
 }
 
 BleCentralManager::~BleCentralManager()
 {
-    callback_ = nullptr;
 }
 
 int BleCentralManager::StartScan()
@@ -422,9 +434,13 @@ int BleCentralManager::StartScan()
         HILOGE("BLE is not enabled");
         return BT_ERR_INVALID_STATE;
     }
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
+        HILOGE("scannerId is invalid");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
-    HILOGI("StartScan without param.");
-    return pimpl->proxy_->StartScan();
+    HILOGI("StartScan without param, scannerId: %{public}d", pimpl->scannerId_);
+    return pimpl->proxy_->StartScan(pimpl->scannerId_);
 }
 
 int BleCentralManager::StartScan(const BleScanSettings &settings)
@@ -434,15 +450,19 @@ int BleCentralManager::StartScan(const BleScanSettings &settings)
         HILOGE("BLE is not enabled");
         return BT_ERR_INVALID_STATE;
     }
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
+        HILOGE("scannerId is invalid");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
-    HILOGI("StartScan with params.");
+    HILOGI("StartScan with params, scannerId: %{public}d", pimpl->scannerId_);
     BluetoothBleScanSettings setting;
     // not use report delay scan. settings.GetReportDelayMillisValue()
     setting.SetReportDelay(0);
     setting.SetScanMode(settings.GetScanMode());
     setting.SetLegacy(settings.GetLegacy());
     setting.SetPhy(settings.GetPhy());
-    return pimpl->proxy_->StartScan(setting);
+    return pimpl->proxy_->StartScan(pimpl->scannerId_, setting);
 }
 
 int BleCentralManager::StopScan()
@@ -452,15 +472,16 @@ int BleCentralManager::StopScan()
         HILOGE("BLE is not enabled");
         return BT_ERR_INVALID_STATE;
     }
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
+        HILOGE("scannerId is invalid");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
-    HILOGI("clientId: %{public}d", clientId_);
+    HILOGI("scannerId_: %{public}d", pimpl->scannerId_);
     std::lock_guard<std::mutex> lock(pimpl->blesCanFiltersMutex_);
 
-    int ret = pimpl->proxy_->StopScan();
-    if (clientId_ != 0) {
-        pimpl->proxy_->RemoveScanFilter(clientId_);
-        clientId_ = 0;
-    }
+    int ret = pimpl->proxy_->StopScan(pimpl->scannerId_);
+    pimpl->proxy_->RemoveScanFilter(pimpl->scannerId_);
     pimpl->bleScanFilters_.clear();
     pimpl->IsNeedFilterMatches_ = true;
     return ret;
@@ -504,8 +525,11 @@ int BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter> &filter
         bluetoothBleScanFilters.push_back(scanFilter);
         pimpl->bleScanFilters_.push_back(scanFilter);
     }
-    clientId_ = pimpl->proxy_->ConfigScanFilter(clientId_, bluetoothBleScanFilters);
-    HILOGI("clientId: %{public}d", clientId_);
+    int ret = pimpl->proxy_->ConfigScanFilter(pimpl->scannerId_, bluetoothBleScanFilters);
+    if (ret != BT_SUCCESS) {
+        HILOGE("failed.");
+        return ret;
+    }
 
     if (filters.empty()) {
         HILOGI("filters is empty can not config");
