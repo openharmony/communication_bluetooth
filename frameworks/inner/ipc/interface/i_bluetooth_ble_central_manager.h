@@ -39,13 +39,15 @@ public:
         BLE_RESET_ALL_PROXY,
     };
 
-    virtual void RegisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
-    virtual void DeregisterBleCentralManagerCallback(const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
-    virtual int StartScan() = 0;
-    virtual int StartScan(const BluetoothBleScanSettings &settings) = 0;
-    virtual int StopScan() = 0;
-    virtual int ConfigScanFilter(const int clientId, const std::vector<BluetoothBleScanFilter> &filters) = 0;
-    virtual void RemoveScanFilter(const int clientId) = 0;
+    virtual void RegisterBleCentralManagerCallback(int32_t &scannerId,
+        const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
+    virtual void DeregisterBleCentralManagerCallback(int32_t scannerId,
+        const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
+    virtual int StartScan(int32_t scannerId) = 0;
+    virtual int StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings) = 0;
+    virtual int StopScan(int32_t scannerId) = 0;
+    virtual int ConfigScanFilter(int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters) = 0;
+    virtual void RemoveScanFilter(int32_t scannerId) = 0;
     virtual bool ProxyUid(int32_t uid, bool isProxy) = 0;
     virtual bool ResetAllProxy() = 0;
 };

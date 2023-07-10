@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace bluetooth {
 constexpr char BLE_SCAN_FILTER_LIB_NAME[] = "libble_scan_filter.z.so";
+constexpr int32_t BLE_SCAN_MAX_NUM = 1000;
 
 struct BleCentralManagerImpl::impl {
     /**
@@ -73,7 +74,6 @@ struct BleCentralManagerImpl::impl {
     std::map<uint8_t, BleScanFilterImpl> filters_;
     std::list<uint8_t> releaseFiltIndex_;
     std::queue<BleScanFilterImpl> waitFilters_;
-    int currentFilterClientId_ = 0;
     uint8_t currentFiltIndex_ = 0;
     uint8_t venderMaxFilterNumber_ = 0;
     int filterStatus_ = BLE_SCAN_FILTER_STATUS_IDLE;
@@ -1159,46 +1159,34 @@ void BleCentralManagerImpl::UnloadBleScanFilterLib()
     bleScanFilter_ = nullptr;
 }
 
-int BleCentralManagerImpl::ConfigScanFilter(const int oldClientId, const std::vector<BleScanFilterImpl> &filters)
+int BleCentralManagerImpl::ConfigScanFilter(int32_t scannerId, const std::vector<BleScanFilterImpl> &filters)
 {
     LOG_DEBUG("[BleCentralManagerImpl] %{public}s:-> Config scan filter filterStatus_=%{public}d",
         __func__, pimpl->filterStatus_);
     std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
-
-    int clientId = 0;
     if (!CheckScanFilterConfig(filters)) {
-        return clientId;
-    }
-
-    if (oldClientId != 0) {
-        clientId = oldClientId;
-    } else {
-        if (pimpl->currentFilterClientId_ >= INT_MAX) {
-            pimpl->currentFilterClientId_ = 0;
-        }
-        clientId = ++pimpl->currentFilterClientId_;
+        return 0;
     }
 
     if (filters.empty()) {
         BleScanFilterImpl filter;
-        PushFilterToWaitList(filter, clientId, FILTER_ACTION_ADD);
+        PushFilterToWaitList(filter, scannerId, FILTER_ACTION_ADD);
     } else {
         for (auto filter : filters) {
-            PushFilterToWaitList(filter, clientId, FILTER_ACTION_ADD);
+            PushFilterToWaitList(filter, scannerId, FILTER_ACTION_ADD);
         }
     }
-    PushStartOrStopAction(clientId, FILTER_ACTION_START);
+    PushStartOrStopAction(scannerId, FILTER_ACTION_START);
 
     if ((pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_BAD) &&
         (pimpl->filters_.size() <= pimpl->venderMaxFilterNumber_)) {
-        TryConfigScanFilter(clientId);
+        TryConfigScanFilter(scannerId);
     }
 
     if (pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_IDLE) {
         HandleWaitFilters();
     }
-
-    return clientId;
+    return 0;
 }
 
 bool BleCentralManagerImpl::CheckScanFilterConfig(const std::vector<BleScanFilterImpl> &filters)
@@ -1237,11 +1225,11 @@ bool BleCentralManagerImpl::CheckScanFilterConfig(const std::vector<BleScanFilte
     return true;
 }
 
-void BleCentralManagerImpl::PushFilterToWaitList(BleScanFilterImpl filter, int clientId, uint8_t action)
+void BleCentralManagerImpl::PushFilterToWaitList(BleScanFilterImpl filter, int scannerId, uint8_t action)
 {
     filter.SetFilterAction(action);
     if (action == FILTER_ACTION_ADD) {
-        filter.SetClientId(clientId);
+        filter.SetScannerId(scannerId);
         if (pimpl->releaseFiltIndex_.empty()) {
             filter.SetFiltIndex(pimpl->currentFiltIndex_++);
         } else {
@@ -1257,10 +1245,10 @@ void BleCentralManagerImpl::PushFilterToWaitList(BleScanFilterImpl filter, int c
     }
 }
 
-void BleCentralManagerImpl::PushStartOrStopAction(const int clientId, uint8_t action)
+void BleCentralManagerImpl::PushStartOrStopAction(const int scannerId, uint8_t action)
 {
     BleScanFilterImpl filterImpl;
-    PushFilterToWaitList(filterImpl, clientId, action);
+    PushFilterToWaitList(filterImpl, scannerId, action);
 }
 
 void BleCentralManagerImpl::HandleWaitFilters()
@@ -1297,7 +1285,7 @@ void BleCentralManagerImpl::HandleWaitFilters()
     }
 }
 
-void BleCentralManagerImpl::TryConfigScanFilter(int clientId)
+void BleCentralManagerImpl::TryConfigScanFilter(int scannerId)
 {
     LOG_ERROR("[BleCentralManagerImpl] %{public}s: ", __func__);
     pimpl->filterStatus_ = BLE_SCAN_FILTER_STATUS_IDLE;
@@ -1314,10 +1302,10 @@ void BleCentralManagerImpl::TryConfigScanFilter(int clientId)
     }
     pimpl->filters_ = filters;
 
-    PushStartOrStopAction(clientId, FILTER_ACTION_START);
+    PushStartOrStopAction(scannerId, FILTER_ACTION_START);
 }
 
-void BleCentralManagerImpl::RemoveScanFilter(const int clientId)
+void BleCentralManagerImpl::RemoveScanFilter(int32_t scannerId)
 {
     LOG_DEBUG("[BleCentralManagerImpl] %{public}s:-> Remove scan filter", __func__);
     std::lock_guard<std::recursive_mutex> lk(pimpl->mutex_);
@@ -1327,8 +1315,8 @@ void BleCentralManagerImpl::RemoveScanFilter(const int clientId)
     }
 
     for (auto it = pimpl->filters_.begin(); it != pimpl->filters_.end();) {
-        if (it->second.GetClientId() == clientId) {
-            PushFilterToWaitList(it->second, clientId, FILTER_ACTION_DELETE);
+        if (it->second.GetScannerId() == scannerId) {
+            PushFilterToWaitList(it->second, scannerId, FILTER_ACTION_DELETE);
             pimpl->releaseFiltIndex_.push_back(it->first);
             pimpl->filters_.erase(it++);
         } else {
@@ -1336,11 +1324,37 @@ void BleCentralManagerImpl::RemoveScanFilter(const int clientId)
         }
     }
     pimpl->releaseFiltIndex_.sort();
-    PushStartOrStopAction(clientId, FILTER_ACTION_STOP);
+    PushStartOrStopAction(scannerId, FILTER_ACTION_STOP);
 
     if (pimpl->filterStatus_ == BLE_SCAN_FILTER_STATUS_IDLE) {
         HandleWaitFilters();
     }
+}
+
+int32_t BleCentralManagerImpl::AllocScannerId()
+{
+    int32_t scannerId = 0;
+    for (int32_t i = 1; i < BLE_SCAN_MAX_NUM; i++) {
+        if (scannerIds_.find(i) == scannerIds_.end()) {
+            scannerId = i;
+            scannerIds_.insert(scannerId);
+            break;
+        }
+    }
+    LOG_DEBUG("[BleCentralManagerImpl] AllocScannerId scannerId: %{public}d", scannerId);
+    return scannerId;
+}
+
+void BleCentralManagerImpl::RemoveScannerId(int32_t scannerId)
+{
+    LOG_DEBUG("[BleCentralManagerImpl] RemoveScannerId scannerId: %{public}d", scannerId);
+    scannerIds_.erase(scannerId);
+}
+
+void BleCentralManagerImpl::ClearScannerIds()
+{
+    LOG_DEBUG("[BleCentralManagerImpl] %{public}s", __func__);
+    scannerIds_.clear();
 }
 
 void BleCentralManagerImpl::AddBleScanFilter(BleScanFilterImpl filter)

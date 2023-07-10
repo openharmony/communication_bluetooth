@@ -30,13 +30,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    int scanerId;
 };
 
 void GattCTest::SetUpTestCase(void) {}
 
 void GattCTest::TearDownTestCase(void) {}
 
-void GattCTest::SetUp() {}
+void GattCTest::SetUp()
+{
+    BleScanCallbacks callbacks;
+    BleRegisterScanCallbacks(&callbacks, &scanerId);
+}
 
 void GattCTest::TearDown() {}
 
@@ -51,12 +56,12 @@ HWTEST_F(GattCTest, GattCTest_001, TestSize.Level1)
     BleScanConfigs configs;
     BleScanNativeFilter filter[1];
     int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
-    int res = BleStartScanEx(&configs, filter, filterSize);
-    EXPECT_EQ(res, OHOS_BT_STATUS_FAIL);
+    int res = BleStartScanEx(scanerId, &configs, filter, filterSize);
+    EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 
     BtGattCallbacks btGattCallbacks;
     BleGattRegisterCallbacks(&btGattCallbacks);
-    res = BleStartScanEx(nullptr, filter, filterSize);
+    res = BleStartScanEx(scanerId, nullptr, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_FAIL);
 }
 
@@ -76,10 +81,10 @@ HWTEST_F(GattCTest, GattCTest_002, TestSize.Level1)
 
     BleScanNativeFilter filter[1];
     int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
-    int res = BleStartScanEx(&configs, nullptr, filterSize);
+    int res = BleStartScanEx(scanerId, &configs, nullptr, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 
-    res = BleStartScanEx(&configs, filter, 0);
+    res = BleStartScanEx(scanerId, &configs, filter, 0);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 }
 
@@ -119,7 +124,7 @@ HWTEST_F(GattCTest, GattCTest_003, TestSize.Level1)
     filter[0].manufactureDataLength = 1;
     filter[0].manufactureId = 1;
     int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
-    int res = BleStartScanEx(&configs, filter, filterSize);
+    int res = BleStartScanEx(scanerId, &configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 
     filter[0].address = nullptr;
@@ -127,7 +132,7 @@ HWTEST_F(GattCTest, GattCTest_003, TestSize.Level1)
     filter[0].serviceUuidMask = nullptr;
     filter[0].serviceData = nullptr;
     filter[0].manufactureData = nullptr;
-    res = BleStartScanEx(&configs, filter, filterSize);
+    res = BleStartScanEx(scanerId, &configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 
     filter[0].serviceData = test1;
@@ -135,7 +140,7 @@ HWTEST_F(GattCTest, GattCTest_003, TestSize.Level1)
     filter[0].serviceDataMask = nullptr;
     filter[0].manufactureDataMask = nullptr;
     filter[0].serviceUuid = nullptr;
-    res = BleStartScanEx(&configs, filter, filterSize);
+    res = BleStartScanEx(scanerId, &configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 }
 
@@ -162,13 +167,13 @@ HWTEST_F(GattCTest, GattCTest_004, TestSize.Level1)
     filter[0].serviceData = nullptr;
     filter[0].manufactureData = nullptr;
     int filterSize = sizeof(filter) / sizeof(BleScanNativeFilter);
-    int res = BleStartScanEx(&configs, filter, filterSize);
+    int res = BleStartScanEx(scanerId, &configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 
     filter[0].serviceUuid = (unsigned char*)"FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
     filter[0].serviceUuidMask = (unsigned char*)"FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
     filter[0].serviceUuidLength = sizeof("FFFFFFF0-FFFF-FFFF-FFFF-FFFFFFFFFFFF");
-    res = BleStartScanEx(&configs, filter, filterSize);
+    res = BleStartScanEx(scanerId, &configs, filter, filterSize);
     EXPECT_EQ(res, OHOS_BT_STATUS_SUCCESS);
 }
 }  // namespace Bluetooth

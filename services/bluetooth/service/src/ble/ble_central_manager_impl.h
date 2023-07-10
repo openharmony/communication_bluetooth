@@ -18,6 +18,7 @@
 
 #include <map>
 #include <vector>
+#include <set>
 
 #include "ble_defs.h"
 #include "ble_scan_filter/include/i_ble_scan_filter.h"
@@ -79,16 +80,16 @@ public:
      * @brief config scan filter.
      *
      * @param [in] filter filter list
-     * @return @c client id
+     * @return ret
      */
-    int ConfigScanFilter(const int clientId, const std::vector<BleScanFilterImpl> &filter);
+    int ConfigScanFilter(int32_t scannerId, const std::vector<BleScanFilterImpl> &filter);
 
     /**
      * @brief remove scan filter.
      *
-     * @param [in] clientId client id
+     * @param [in] scannerId scanner id
      */
-    void RemoveScanFilter(const int clientId);
+    void RemoveScanFilter(int32_t scannerId);
 
     /**
      * @brief Get device address type
@@ -132,6 +133,26 @@ public:
      *
      */
     void ClearResults() const;
+
+    /**
+     * @brief Alloc scan object id
+     *
+     * @return scannerId.
+     */
+    int32_t AllocScannerId();
+
+    /**
+     * @brief Remove scan object id.
+     *
+     * @param scannerId scanner id.
+     */
+    void RemoveScannerId(int32_t scannerId);
+
+    /**
+     * @brief clear scannerIds
+     *
+     */
+    void ClearScannerIds();
 
 private:
     /**
@@ -348,15 +369,15 @@ private:
     void LoadBleScanFilterLib();
     void UnloadBleScanFilterLib();
     bool CheckScanFilterConfig(const std::vector<BleScanFilterImpl> &filters);
-    void PushFilterToWaitList(BleScanFilterImpl filter, int clientId, uint8_t action);
-    void PushStartOrStopAction(const int clientId, uint8_t action);
+    void PushFilterToWaitList(BleScanFilterImpl filter, int scannerId, uint8_t action);
+    void PushStartOrStopAction(const int scannerId, uint8_t action);
     void AddBleScanFilter(BleScanFilterImpl filter);
     void DeleteBleScanFilter(BleScanFilterImpl filter);
     void StartBleScanFilter();
     void StopBleScanFilter();
     void HandleWaitFilters();
     void DoFilterStatusBad();
-    void TryConfigScanFilter(int clientId);
+    void TryConfigScanFilter(int scannerId);
     void BleScanFilterParamAddDeviceAddress(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
     void BleScanFilterParamAddName(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
     void BleScanFilterParamAddServiceUuid(BleScanFilterParam &filterParam, BleScanFilterImpl filter);
@@ -379,6 +400,8 @@ private:
     static const uint8_t FILTER_ACTION_DELETE = 0x01;
     static const uint8_t FILTER_ACTION_START = 0x02;
     static const uint8_t FILTER_ACTION_STOP = 0x03;
+
+    std::set<int32_t> scannerIds_ {};
 
     BT_DISALLOW_COPY_AND_ASSIGN(BleCentralManagerImpl);
     DECLARE_IMPL();
