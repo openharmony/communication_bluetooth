@@ -27,7 +27,7 @@ OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 OutputStream::~OutputStream()
 {}
 
-size_t OutputStream::Write(const char *buf, const size_t length)
+size_t OutputStream::Write(const uint8_t *buf, size_t length)
 {
     HILOGI("(2 parameters) starts");
     if (socketFd_ == -1) {

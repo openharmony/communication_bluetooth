@@ -86,16 +86,16 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
             HILOGI("SppConnect execute");
             SppConnectCallbackInfo* callbackInfo = (SppConnectCallbackInfo*)data;
             callbackInfo->device_ = std::make_shared<BluetoothRemoteDevice>(callbackInfo->deviceId_, 0);
-            callbackInfo->client_ = std::make_shared<SppClientSocket>(*callbackInfo->device_,
+            callbackInfo->client_ = std::make_shared<ClientSocket>(*callbackInfo->device_,
                 UUID::FromString(callbackInfo->sppOption_->uuid_),
                 callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
             HILOGI("SppConnect client_ constructed");
-            if (callbackInfo->client_->Connect() == BtStatus::BT_SUCC) {
+            callbackInfo->errorCode_ = callbackInfo->client_->Connect(SPP_SOCKET_PSM_VALUE);
+            if (callbackInfo->errorCode_ == BtStatus::BT_SUCCESS) {
                 HILOGI("SppConnect successfully");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
             } else {
-                HILOGI("SppConnect failed");
-                callbackInfo->errorCode_ = CODE_FAILED;
+                HILOGE("SppConnect failed");
             }
         },
         [](napi_env env, napi_status status, void* data) {
@@ -186,7 +186,7 @@ napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info 
 }
 
 static napi_status CheckSppWriteParams(
-    napi_env env, napi_callback_info info, int &id, char** totalBuf, size_t &totalSize)
+    napi_env env, napi_callback_info info, int &id, uint8_t** totalBuf, size_t &totalSize)
 {
     HILOGI("enter");
     size_t argc = ARGS_SIZE_TWO;
@@ -196,7 +196,7 @@ static napi_status CheckSppWriteParams(
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_TWO), "Requires 2 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected.", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(!ParseArrayBuffer(env, (uint8_t**)(totalBuf), totalSize, argv[PARAM1]),
+    NAPI_BT_RETURN_IF(!ParseArrayBuffer(env, totalBuf, totalSize, argv[PARAM1]),
         "ParseArrayBuffer failed.", napi_invalid_arg);
     return napi_ok;
 }
@@ -204,7 +204,7 @@ static napi_status CheckSppWriteParams(
 napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    char* totalBuf = nullptr;
+    uint8_t* totalBuf = nullptr;
     size_t totalSize = 0;
     bool isOK = false;
     int id = -1;
@@ -312,7 +312,7 @@ void NapiSppClient::SppRead(int id)
         return;
     }
     InputStream inputStream = clientMap[id]->client_->GetInputStream();
-    char buf[SOCKET_BUFFER_SIZE];
+    uint8_t buf[SOCKET_BUFFER_SIZE];
     int ret = 0;
 
     while (true) {

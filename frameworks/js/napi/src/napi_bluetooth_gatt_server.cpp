@@ -178,20 +178,16 @@ static napi_status CheckGattsAddService(napi_env env, napi_callback_info info, s
     NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
     outServer = gattServer->GetServer();
 
-    // Build GattService
-    using Permission = GattCharacteristic::Permission;
-    using Propertie = GattCharacteristic::Propertie;
-    int permissions = Permission::READABLE | Permission::WRITEABLE;
-    int properties = Propertie::NOTIFY | Propertie::READ | Propertie::WRITE;
     GattServiceType type = napiGattService.isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY;
-
     outService = std::make_unique<GattService>(napiGattService.serviceUuid, type);
     for (const auto &napiCharacter : napiGattService.characteristics) {
-        GattCharacteristic character(napiCharacter.characteristicUuid, permissions, properties);
+        int charPermissions = napiCharacter.permissions;
+        int charProperties = napiCharacter.properties;
+        GattCharacteristic character(napiCharacter.characteristicUuid, charPermissions, charProperties);
         character.SetValue(napiCharacter.characteristicValue.data(), napiCharacter.characteristicValue.size());
 
         for (const auto &napiDescriptor : napiCharacter.descriptors) {
-            GattDescriptor descriptor(napiDescriptor.descriptorUuid, permissions);
+            GattDescriptor descriptor(napiDescriptor.descriptorUuid, napiDescriptor.permissions);
             descriptor.SetValue(napiDescriptor.descriptorValue.data(), napiDescriptor.descriptorValue.size());
             character.AddDescriptor(descriptor);
         }
@@ -210,7 +206,7 @@ napi_value NapiGattServer::AddService(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
     int ret = server->AddService(*gattService);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
@@ -235,7 +231,7 @@ napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
     int ret = server->Close();
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_SUCCESS, ret);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
 
@@ -270,15 +266,15 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
     auto primaryService = server->GetService(serviceUuid, true);
     if (primaryService.has_value()) {
         ret = server->RemoveGattService(*primaryService);
-        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     }
     auto secondService = server->GetService(serviceUuid, false);
     if (secondService.has_value()) {
         ret = server->RemoveGattService(*secondService);
-        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     }
     NAPI_BT_ASSERT_RETURN_FALSE(env, (primaryService.has_value() || secondService.has_value()), BT_ERR_INVALID_PARAM);
-    return NapiGetBooleanRet(env, ret == BT_SUCCESS);
+    return NapiGetBooleanRet(env, ret == BT_NO_ERROR);
 }
 
 static napi_status CheckGattsSendRsp(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer,
@@ -312,7 +308,7 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
     HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice));
     int ret = server->SendResponse(remoteDevice, rsp.transId, rsp.status, rsp.offset, rsp.value.data(),
         static_cast<int>(rsp.value.size()));
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
@@ -368,7 +364,7 @@ napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callba
 
     BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
     int ret = server->NotifyCharacteristicChanged(remoteDevice, *character, notifyCharacter.confirm);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 } // namespace Bluetooth

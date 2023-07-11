@@ -77,22 +77,22 @@ public:
      */
     UUID(const long mostSigBits, const long leastSigBits)
     {
-        this->uuid_[15] = (uint8_t)(leastSigBits & 0x00000000000000FF);
-        this->uuid_[14] = (uint8_t)((leastSigBits & 0x000000000000FF00) >> 8);
-        this->uuid_[13] = (uint8_t)((leastSigBits & 0x0000000000FF0000) >> 16);
-        this->uuid_[12] = (uint8_t)((leastSigBits & 0x00000000FF000000) >> 24);
-        this->uuid_[11] = (uint8_t)((leastSigBits & 0x000000FF00000000) >> 32);
-        this->uuid_[10] = (uint8_t)((leastSigBits & 0x0000FF0000000000) >> 40);
-        this->uuid_[9] = (uint8_t)((leastSigBits & 0x00FF000000000000) >> 48);
-        this->uuid_[8] = (uint8_t)((leastSigBits & 0xFF00000000000000) >> 56);
-        this->uuid_[7] = (uint8_t)(mostSigBits & 0x00000000000000FF);
-        this->uuid_[6] = (uint8_t)((mostSigBits & 0x000000000000FF00) >> 8);
-        this->uuid_[5] = (uint8_t)((mostSigBits & 0x0000000000FF0000) >> 16);
-        this->uuid_[4] = (uint8_t)((mostSigBits & 0x00000000FF000000) >> 24);
-        this->uuid_[3] = (uint8_t)((mostSigBits & 0x000000FF00000000) >> 32);
-        this->uuid_[2] = (uint8_t)((mostSigBits & 0x0000FF0000000000) >> 40);
-        this->uuid_[1] = (uint8_t)((mostSigBits & 0x00FF000000000000) >> 48);
-        this->uuid_[0] = (uint8_t)((mostSigBits & 0xFF00000000000000) >> 56);
+        this->uuid_[15] = static_cast<uint8_t>(leastSigBits & 0x00000000000000FF);
+        this->uuid_[14] = static_cast<uint8_t>((leastSigBits & 0x000000000000FF00) >> 8);
+        this->uuid_[13] = static_cast<uint8_t>((leastSigBits & 0x0000000000FF0000) >> 16);
+        this->uuid_[12] = static_cast<uint8_t>((leastSigBits & 0x00000000FF000000) >> 24);
+        this->uuid_[11] = static_cast<uint8_t>((leastSigBits & 0x000000FF00000000) >> 32);
+        this->uuid_[10] = static_cast<uint8_t>((leastSigBits & 0x0000FF0000000000) >> 40);
+        this->uuid_[9] = static_cast<uint8_t>((leastSigBits & 0x00FF000000000000) >> 48);
+        this->uuid_[8] = static_cast<uint8_t>((leastSigBits & 0xFF00000000000000) >> 56);
+        this->uuid_[7] = static_cast<uint8_t>(mostSigBits & 0x00000000000000FF);
+        this->uuid_[6] = static_cast<uint8_t>((mostSigBits & 0x000000000000FF00) >> 8);
+        this->uuid_[5] = static_cast<uint8_t>((mostSigBits & 0x0000000000FF0000) >> 16);
+        this->uuid_[4] = static_cast<uint8_t>((mostSigBits & 0x00000000FF000000) >> 24);
+        this->uuid_[3] = static_cast<uint8_t>((mostSigBits & 0x000000FF00000000) >> 32);
+        this->uuid_[2] = static_cast<uint8_t>((mostSigBits & 0x0000FF0000000000) >> 40);
+        this->uuid_[1] = static_cast<uint8_t>((mostSigBits & 0x00FF000000000000) >> 48);
+        this->uuid_[0] = static_cast<uint8_t>((mostSigBits & 0xFF00000000000000) >> 56);
     }
 
     /**

@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace Bluetooth {
 constexpr uint32_t FORMAT_PINCODE_LENGTH = 6;
+
 void NapiBluetoothHostObserver::UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state)
 {
     HILOGI("start");
@@ -127,7 +128,7 @@ void NapiBluetoothHostObserver::OnDiscoveryStateChanged(int status)
 void NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult(
     uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device)
 {
-    HILOGI("start");
+    HILOGD("start");
 
     if (work == nullptr) {
         HILOGE("work is null");
@@ -158,10 +159,10 @@ void NapiBluetoothHostObserver::UvQueueWorkOnDiscoveryResult(
 
 void NapiBluetoothHostObserver::OnDiscoveryResult(const BluetoothRemoteDevice &device)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_DEVICE_FIND_TYPE);
     if (callbackInfo == nullptr) {
-        HILOGI("This callback is not registered by ability.");
+        HILOGD("This callback is not registered by ability.");
         return;
     }
     uv_loop_s *loop = nullptr;
@@ -223,7 +224,7 @@ void NapiBluetoothHostObserver::OnPairRequested(const BluetoothRemoteDevice &dev
 void NapiBluetoothHostObserver::OnPairConfirmed(const BluetoothRemoteDevice &device, int pinType, int number)
 {
     HILOGI("OnPairConfirmed");
-    std::shared_ptr<PairConfirmedCallBackInfo> pairConfirmInfo = std::make_shared<PairConfirmedCallBackInfo>(number,
+    std::shared_ptr<PairConfirmedCallBackInfo> pairConfirmInfo  = std::make_shared<PairConfirmedCallBackInfo>(number,
         pinType, device.GetDeviceAddr());
     OnPairConfirmedCallBack(pairConfirmInfo);
 }
@@ -247,8 +248,8 @@ void NapiBluetoothHostObserver::EnableBt()
 {
     HILOGI("start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    bool enabled = host->EnableBt();
-    if (!enabled) {
+    int ret = host->EnableBt();
+    if (ret != BT_NO_ERROR) {
         HILOGE("failed");
     }
     SetCurrentAppOperate(false);
@@ -323,10 +324,9 @@ bool NapiBluetoothHostObserver::DealStateChange(const int transport, const int s
     return isCallback;
 }
 
-
 static std::string GetFormatPinCode(const uint32_t pinType, const uint32_t pinCode)
 {
-    std::string pinCodeStr = std:: to_string(pinCode);
+    std::string pinCodeStr = std::to_string(pinCode);
     if (pinType != PIN_TYPE_CONFIRM_PASSKEY && pinType != PIN_TYPE_NOTIFY_PASSKEY) {
         return pinCodeStr;
     }
@@ -337,7 +337,7 @@ static std::string GetFormatPinCode(const uint32_t pinType, const uint32_t pinCo
 }
 
 void NapiBluetoothHostObserver::UvQueueWorkOnPairConfirmedCallBack(uv_work_t *work,
-const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo)
+    const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo)
 {
     HILOGI("start");
     if (work == nullptr) {

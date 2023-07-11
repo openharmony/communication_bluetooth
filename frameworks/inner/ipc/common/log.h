@@ -16,8 +16,11 @@
 #ifndef LOG_H
 #define LOG_H
 
+#undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD000102
+#ifndef LOG_TAG
 #define LOG_TAG "Bluetooth"
+#endif
 
 #include "hilog/log.h"
 
@@ -79,10 +82,40 @@
 #undef LOG_FATAL
 #endif
 
+#ifdef DEBUG
+#include <assert.h>
+#define ASSERT(x) assert(x)
+#else
+#define ASSERT(x)
+#endif
+
+#ifdef DEBUG
+#include <assert.h>
+#define ASSERT_LOG(x, fmt, args...)                                        \
+  do {                                                                      \
+    if (!(x)) {                                                     \
+      HILOGE("assertion '" #x"' failed - " fmt, ##args); \
+    }                                                                       \
+  } while (false)
+#else
+#define ASSERT_LOG(x, fmt, args...)
+#endif
+
+#define LOG_VERBOSE(...) HILOG_DEBUG(LOG_CORE, __VA_ARGS__)
 #define LOG_DEBUG(...) HILOG_DEBUG(LOG_CORE, __VA_ARGS__)
 #define LOG_INFO(...) HILOG_INFO(LOG_CORE, __VA_ARGS__)
 #define LOG_WARN(...) HILOG_WARN(LOG_CORE, __VA_ARGS__)
 #define LOG_ERROR(...) HILOG_ERROR(LOG_CORE, __VA_ARGS__)
 #define LOG_FATAL(...) HILOG_FATAL(LOG_CORE, __VA_ARGS__)
+
+#define ALOGV(...) HILOG_DEBUG(LOG_CORE, __VA_ARGS__)
+#define ALOGD(...) HILOG_DEBUG(LOG_CORE, __VA_ARGS__)
+#define ALOGI(...) HILOG_WARN(LOG_CORE, __VA_ARGS__)
+#define ALOGW(...) HILOG_WARN(LOG_CORE, __VA_ARGS__)
+#define ALOGE(...) HILOG_ERROR(LOG_CORE, __VA_ARGS__)
+
+#ifndef LOG_EVENT_INT
+#define LOG_EVENT_INT(tag, subTag) LOG_ERROR("ERROR tag num: 0x%x, opcode: %ld", tag, subTag)
+#endif
 
 #endif  // LOG_H

@@ -14,9 +14,12 @@
  */
 #include <uv.h>
 #include "bluetooth_log.h"
+#include "napi_async_work.h"
 #include "napi_bluetooth_event.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_client_callback.h"
+#include "napi_bluetooth_utils.h"
+#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -39,32 +42,16 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
 {
-    ReadCharacteristicValueCallbackInfo *callbackInfo = client_->readCharacteristicValueCallbackInfo_;
-    if (!callbackInfo) {
-        HILOGE("CallbackInfo does not exist");
-        return;
-    }
-    HILOGI("asyncState: %{public}d", callbackInfo->asyncState_);
-    if (callbackInfo->asyncState_ == ASYNC_START) {
-        callbackInfo->ret = ret;
-        callbackInfo->outputCharacteristic_ = &characteristic;
-        callbackInfo->asyncState_ = ASYNC_DONE;
-    }
+    HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
+    auto napiCharacter = std::make_shared<NapiNativeBleCharacteristic>(characteristic);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_CHARACTER, napiCharacter, ret);
 }
 
 void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
 {
-    ReadDescriptorValueCallbackInfo *callbackInfo = client_->readDescriptorValueCallbackInfo_;
-    if (!callbackInfo) {
-        HILOGE("CallbackInfo does not exist");
-        return;
-    }
-    HILOGI("asyncState: %{public}d", callbackInfo->asyncState_);
-    if (callbackInfo->asyncState_ == ASYNC_START) {
-        callbackInfo->ret = ret;
-        callbackInfo->outputDescriptor_ = &descriptor;
-        callbackInfo->asyncState_ = ASYNC_DONE;
-    }
+    HILOGI("UUID: %{public}s, ret: %{public}d", descriptor.GetUuid().ToString().c_str(), ret);
+    auto napiDescriptor = std::make_shared<NapiNativeBleDescriptor>(descriptor);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_DESCRIPTOR, napiDescriptor, ret);
 }
 
 void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
@@ -87,5 +74,13 @@ void NapiGattClientCallback::OnServicesDiscovered(int status)
 {
     HILOGI("status:%{public}d", status);
 }
+
+void NapiGattClientCallback::OnReadRemoteRssiValueResult(int rssi, int ret)
+{
+    HILOGI("rssi: %{public}d, ret: %{public}d", rssi, ret);
+    auto napiRssi = std::make_shared<NapiNativeInt>(rssi);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_REMOTE_RSSI_VALUE, napiRssi, ret);
+}
+
 } // namespace Bluetooth
 } // namespace OHOS

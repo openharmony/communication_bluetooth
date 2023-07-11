@@ -19,6 +19,8 @@
 #include <string.h>
 #include <vector>
 #include <map>
+#include <mutex>
+#include <algorithm>
 
 #include "ohos_bt_adapter_utils.h"
 #include "bluetooth_gatt_server.h"
@@ -40,10 +42,20 @@ static BtGattServerCallbacks *g_GattsCallback;
 struct ConnectedDevice {
     int serverId;
     BdAddr remoteAddr;
+
+    bool operator==(const ConnectedDevice& device) const
+    {
+        if (serverId == device.serverId &&
+            memcmp(remoteAddr.addr, device.remoteAddr.addr, sizeof(remoteAddr.addr)) == 0) {
+            return true;
+        }
+        return false;
+    }
 };
 static int g_connId = 0;
 
 static std::map<int, struct ConnectedDevice> g_MapConnectedDevice;
+static std::mutex g_mapConnDeviceMutex;
 
 #define MAXIMUM_NUMBER_APPLICATION 64
 #define MAXIMUM_NUMBER_GATTSERVICE 64
@@ -56,7 +68,7 @@ struct GattServiceWapper {
 };
 
 struct GattServerWapper {
-    GattServer *gattServer;
+    std::shared_ptr<GattServer> gattServer = nullptr;
     struct GattServiceWapper gattServices[MAXIMUM_NUMBER_GATTSERVICE];
 };
 
@@ -67,6 +79,10 @@ GattServerWapper g_gattServers[MAXIMUM_NUMBER_APPLICATION];
 #define GATTSERVICE(x, y) GATTSERVICES(x, y).gattService
 
 static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle);
+static int AddDeviceRecord(struct ConnectedDevice &device);
+static void RemoveDeviceRecord(int connId);
+static std::optional<ConnectedDevice> GetDeviceInfoByConnId(int connId);
+static std::optional<int> GetConnIdByDeviceInfo(struct ConnectedDevice &device);
 
 class GattServerCallbackWapper : public GattServerCallback {
 public:
@@ -76,7 +92,7 @@ public:
         serverId_ = serverId;
     }
 
-    void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
+    void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state) override
     {
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
@@ -88,17 +104,9 @@ public:
                 HILOGW("call back is null.");
                 return;
             }
-            std::map<int, struct ConnectedDevice>::iterator iter;
-            iter = FindDeviceRecord(dev);
-            if (iter != g_MapConnectedDevice.end()) {
-                HILOGW("device already in maps! connId: %{public}d", iter->first);
-                g_GattsCallback->connectServerCb(iter->first, serverId_, &dev.remoteAddr);
-            } else {
-                g_MapConnectedDevice.insert(std::pair<int, struct ConnectedDevice>(g_connId, dev));
-                HILOGI("device connected. connId: %{public}d", g_connId);
-                g_GattsCallback->connectServerCb(g_connId, serverId_, &dev.remoteAddr);
-                g_connId++;
-            }
+
+            int connId = AddDeviceRecord(dev);
+            g_GattsCallback->connectServerCb(connId, serverId_, &dev.remoteAddr);
         }
 
         if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
@@ -106,20 +114,23 @@ public:
                 HILOGW("call back is null.");
                 return;
             }
-            std::map<int, struct ConnectedDevice>::iterator iter;
-            iter = FindDeviceRecord(dev);
-            if (iter != g_MapConnectedDevice.end()) {
-                HILOGI("device disconnected. connId: %{public}d", iter->first);
-                g_GattsCallback->disconnectServerCb(iter->first, serverId_, &dev.remoteAddr);
-                g_MapConnectedDevice.erase(iter);
+            std::optional<int> connId = GetConnIdByDeviceInfo(dev);
+            if (connId.has_value()) {
+                HILOGI("device disconnected. connId: %{public}d", connId.value());
+                g_GattsCallback->disconnectServerCb(connId.value(), serverId_, &dev.remoteAddr);
+                RemoveDeviceRecord(connId.value());
             }
         }
     }
 
-    NO_SANITIZE("cfi") void OnServiceAdded(GattService *Service, int ret)
+    void OnServiceAdded(GattService *Service, int ret) override
     {
         int i;
         int err = OHOS_BT_STATUS_SUCCESS;
+        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
+            HILOGE("serverId_ is invalid!");
+            return;
+        }
         for (i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
             if (GATTSERVICE(serverId_, i) != nullptr) {
                 HILOGI("isAdding: %{public}d, srvcUuid: %{public}s, ind: %{public}s",
@@ -163,27 +174,35 @@ public:
     }
 
     void OnCharacteristicReadRequest(
-        const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId)
+        const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId) override
     {
+        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
+            HILOGE("serverId_ is invalid!");
+            return;
+        }
+
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
 
-        std::map<int, struct ConnectedDevice>::iterator iter;
-        iter = FindDeviceRecord(dev);
+        std::optional<int> connId = GetConnIdByDeviceInfo(dev);
+        if (!connId.has_value()) {
+            HILOGW("device is not exist.");
+            return;
+        }
 
         int srvcHandle = 0;
         FindCharacteristic(serverId_, characteristic.GetHandle(), true, &srvcHandle);
 
         BtReqReadCbPara readInfo;
-        readInfo.connId = iter->first;
+        readInfo.connId = connId.value();
         readInfo.transId = requestId;
         readInfo.bdAddr = &dev.remoteAddr;
         readInfo.attrHandle = characteristic.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
         readInfo.offset = 0;
         readInfo.isLong = false;
         HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d",
-            iter->first, requestId, readInfo.attrHandle);
+            connId.value(), requestId, readInfo.attrHandle);
         if (g_GattsCallback != nullptr && g_GattsCallback->requestReadCb != nullptr) {
             g_GattsCallback->requestReadCb(readInfo);
         } else {
@@ -192,21 +211,28 @@ public:
     }
 
     void OnCharacteristicWriteRequest(
-        const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId)
+        const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId) override
     {
+        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
+            HILOGE("serverId_ is invalid!");
+            return;
+        }
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
 
-        std::map<int, struct ConnectedDevice>::iterator iter;
-        iter = FindDeviceRecord(dev);
+        std::optional<int> connId = GetConnIdByDeviceInfo(dev);
+        if (!connId.has_value()) {
+            HILOGW("device is not exist.");
+            return;
+        }
 
         int srvcHandle = 0;
         FindCharacteristic(serverId_, characteristic.GetHandle(), true, &srvcHandle);
 
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
-        writeInfo.connId = iter->first;
+        writeInfo.connId = connId.value();
         writeInfo.transId = requestId;
         writeInfo.bdAddr = &dev.remoteAddr;
         writeInfo.attrHandle = characteristic.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
@@ -216,7 +242,7 @@ public:
         writeInfo.needRsp = (characteristic.GetWriteType() == GattCharacteristic::WriteType::DEFAULT);
         writeInfo.isPrep = false;
         HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d, valueLen: %{public}d",
-            iter->first, requestId, writeInfo.attrHandle, writeInfo.length);
+            connId.value(), requestId, writeInfo.attrHandle, writeInfo.length);
         if (g_GattsCallback != nullptr && g_GattsCallback->requestWriteCb != nullptr) {
             g_GattsCallback->requestWriteCb(writeInfo);
         } else {
@@ -224,21 +250,29 @@ public:
         }
     }
 
-    void OnDescriptorReadRequest(const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId)
+    void OnDescriptorReadRequest(
+        const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId) override
     {
+        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
+            HILOGE("serverId_ is invalid!");
+            return;
+        }
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
 
-        std::map<int, struct ConnectedDevice>::iterator iter;
-        iter = FindDeviceRecord(dev);
+        std::optional<int> connId = GetConnIdByDeviceInfo(dev);
+        if (!connId.has_value()) {
+            HILOGW("device is not exist.");
+            return;
+        }
 
         const GattCharacteristic *characteristic = descriptor.GetCharacteristic();
         int srvcHandle = 0;
         FindCharacteristic(serverId_, characteristic->GetHandle(), true, &srvcHandle);
 
         BtReqReadCbPara readInfo;
-        readInfo.connId = iter->first;
+        readInfo.connId = connId.value();
         readInfo.transId = requestId;
         readInfo.bdAddr = &dev.remoteAddr;
         readInfo.attrHandle = descriptor.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
@@ -252,14 +286,21 @@ public:
     }
 
     void OnDescriptorWriteRequest(
-        const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId)
+        const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId) override
     {
+        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
+            HILOGE("serverId_ is invalid!");
+            return;
+        }
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
 
-        std::map<int, struct ConnectedDevice>::iterator iter;
-        iter = FindDeviceRecord(dev);
+        std::optional<int> connId = GetConnIdByDeviceInfo(dev);
+        if (!connId.has_value()) {
+            HILOGW("device is not exist.");
+            return;
+        }
 
         const GattCharacteristic *characteristic = descriptor.GetCharacteristic();
         int srvcHandle = 0;
@@ -267,7 +308,7 @@ public:
 
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
-        writeInfo.connId = iter->first;
+        writeInfo.connId = connId.value();
         writeInfo.transId = requestId;
         writeInfo.bdAddr = &dev.remoteAddr;
         writeInfo.attrHandle = descriptor.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
@@ -283,65 +324,111 @@ public:
         }
     }
 
-    void OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu)
+    void OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu) override
     {
         HILOGI("mtu: %{public}d", mtu);
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
 
-        std::map<int, struct ConnectedDevice>::iterator iter;
-        iter = FindDeviceRecord(dev);
+        std::optional<int> connId = GetConnIdByDeviceInfo(dev);
+        if (!connId.has_value()) {
+            HILOGW("device is not exist.");
+            return;
+        }
         if (g_GattsCallback != nullptr && g_GattsCallback->mtuChangeCb != nullptr) {
-            g_GattsCallback->mtuChangeCb(iter->first, mtu);
+            g_GattsCallback->mtuChangeCb(connId.value(), mtu);
         } else {
             HILOGW("call back is null.");
         }
     }
 
-    void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int result)
+    void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int result) override
     {
         HILOGI("result: %{public}d", result);
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
 
-        std::map<int, struct ConnectedDevice>::iterator iter;
-        iter = FindDeviceRecord(dev);
+        std::optional<int> connId = GetConnIdByDeviceInfo(dev);
+        if (!connId.has_value()) {
+            HILOGW("device is not exist.");
+            return;
+        }
         if (g_GattsCallback != nullptr && g_GattsCallback->indicationSentCb != nullptr) {
-            g_GattsCallback->indicationSentCb(iter->first, result);
+            g_GattsCallback->indicationSentCb(connId.value(), result);
         } else {
             HILOGW("call back is null.");
         }
     }
 
     void OnConnectionParameterChanged(
-        const BluetoothRemoteDevice &device, int interval, int latency, int timeout, int status)
+        const BluetoothRemoteDevice &device, int interval, int latency, int timeout, int status) override
     {
         HILOGI("enter");
     }
 
 private:
-    std::map<int, struct ConnectedDevice>::iterator FindDeviceRecord(struct ConnectedDevice &device)
-    {
-        std::map<int, struct ConnectedDevice>::iterator iter;
-        for (iter = g_MapConnectedDevice.begin(); iter != g_MapConnectedDevice.end(); iter++) {
-            struct ConnectedDevice value = iter->second;
-            if (value.serverId == device.serverId &&
-                memcmp(value.remoteAddr.addr, device.remoteAddr.addr, sizeof(value.remoteAddr.addr)) == 0) {
-                return iter;
-            }
-        }
-        return iter;
-    }
-
     BtGattServerCallbacks *appCallback_;
     int serverId_;
 };
 
+static int AddDeviceRecord(struct ConnectedDevice &device)
+{
+    std::lock_guard<std::mutex> lock(g_mapConnDeviceMutex);
+    std::map<int, struct ConnectedDevice>::iterator iter =
+        std::find_if(g_MapConnectedDevice.begin(), g_MapConnectedDevice.end(),
+        [&device](const std::pair<int, ConnectedDevice> &it)->bool { return it.second == device; });
+
+    int connId;
+    if (iter != g_MapConnectedDevice.end()) {
+        connId = iter->first;
+        HILOGW("device already in maps! connId: %{public}d", connId);
+    } else {
+        g_MapConnectedDevice.insert(std::pair<int, struct ConnectedDevice>(g_connId, device));
+        connId = g_connId++;
+        HILOGI("device connected. connId: %{public}d", connId);
+    }
+    return connId;
+}
+
+static void RemoveDeviceRecord(int connId)
+{
+    std::lock_guard<std::mutex> lock(g_mapConnDeviceMutex);
+    g_MapConnectedDevice.erase(connId);
+}
+
+static std::optional<ConnectedDevice> GetDeviceInfoByConnId(int connId)
+{
+    std::lock_guard<std::mutex> lock(g_mapConnDeviceMutex);
+    std::map<int, struct ConnectedDevice>::iterator iter = g_MapConnectedDevice.find(connId);
+    if (iter == g_MapConnectedDevice.end()) {
+        return std::nullopt;
+    }
+    return iter->second;
+}
+
+static std::optional<int> GetConnIdByDeviceInfo(struct ConnectedDevice &device)
+{
+    std::lock_guard<std::mutex> lock(g_mapConnDeviceMutex);
+    std::map<int, struct ConnectedDevice>::iterator iter =
+        std::find_if(g_MapConnectedDevice.begin(), g_MapConnectedDevice.end(),
+        [&device](const std::pair<int, ConnectedDevice> &it)->bool { return it.second == device; });
+    if (iter == g_MapConnectedDevice.end()) {
+        return std::nullopt;
+    }
+    return iter->first;
+}
+
 static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle)
 {
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
+        HILOGE("serverId is invalid!");
+        return nullptr;
+    }
+
     if (srvcHandle == nullptr) {
+        HILOGE("srvcHandle is null!");
         return nullptr;
     }
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
@@ -373,7 +460,7 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-NO_SANITIZE("cfi") int BleGattsRegister(BtUuid appUuid)
+int BleGattsRegister(BtUuid appUuid)
 {
     HILOGI("enter");
     if (g_GattsCallback == nullptr) {
@@ -383,8 +470,8 @@ NO_SANITIZE("cfi") int BleGattsRegister(BtUuid appUuid)
     for (int i = 0; i < MAXIMUM_NUMBER_APPLICATION; i++) {
         if (GATTSERVER(i) == nullptr) {
             GattServerCallbackWapper *callbackWapper = new GattServerCallbackWapper(g_GattsCallback, i);
-            GATTSERVER(i) = new GattServer(*callbackWapper);
-            HILOGI("register gattServer: %{public}d", i);
+            GATTSERVER(i) = GattServer::CreateInstance(*callbackWapper);
+            HILOGD("register gattServer: %{public}d", i);
             if (g_GattsCallback->registerServerCb != nullptr) {
                 g_GattsCallback->registerServerCb(0, i, &appUuid);
             }
@@ -411,7 +498,6 @@ int BleGattsUnRegister(int serverId)
     HILOGI("serverId: %{public}d", serverId);
     if (serverId >= 0 && serverId < MAXIMUM_NUMBER_APPLICATION) {
         if (GATTSERVER(serverId) != nullptr) {
-            delete GATTSERVER(serverId);
             GATTSERVER(serverId) = nullptr;
             return OHOS_BT_STATUS_SUCCESS;
         }
@@ -434,10 +520,12 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
 {
     HILOGI("serverId: %{public}d, connId: %{public}d", serverId, connId);
     if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
+        HILOGE("serverId is invalid!");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
     if (GATTSERVER(serverId) == nullptr) {
+        HILOGE("GATTSERVER(serverId) is null!");
         return OHOS_BT_STATUS_UNHANDLED;
     }
 
@@ -465,9 +553,9 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-NO_SANITIZE("cfi") int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number)
+int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     string strUuid(srvcUuid.uuid);
     if (!regex_match(strUuid, uuidRegex)) {
         HILOGE("match the UUID faild.");
@@ -475,9 +563,14 @@ NO_SANITIZE("cfi") int BleGattsAddService(int serverId, BtUuid srvcUuid, bool is
     }
     UUID uuid(UUID::FromString(strUuid));
 
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
+        HILOGE("serverId is invalid!");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
         if (GATTSERVICE(serverId, i) == nullptr) {
-            HILOGI("add srvcHandle: %{public}d", i);
+            HILOGD("add srvcHandle: %{public}d", i);
             GATTSERVICE(serverId, i) = new GattService(
                 uuid, i, number, isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
             GATTSERVICES(serverId, i).maxNum = number;
@@ -511,21 +604,6 @@ int BleGattsAddIncludedService(int serverId, int srvcHandle, int includedHandle)
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
-static int ConvertPermissions(int permission)
-{
-    int newPermission = 0;
-
-    if ((permission & OHOS_GATT_PERMISSION_READ) == OHOS_GATT_PERMISSION_READ) {
-        newPermission = static_cast<int>(GattPermission::READABLE);
-    }
-
-    if ((permission & OHOS_GATT_PERMISSION_WRITE) == OHOS_GATT_PERMISSION_WRITE) {
-        newPermission += static_cast<int>(GattPermission::WRITABLE);
-    }
-
-    return newPermission;
-}
-
 /**
  * @brief Adds a characteristic to a specified service.
  *
@@ -542,10 +620,16 @@ static int ConvertPermissions(int permission)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-NO_SANITIZE("cfi") int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
+int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
                               int properties, int permissions)
 {
-    HILOGI("properties: %{public}d, permissions:%{public}d", properties, permissions);
+    HILOGD("properties: %{public}d, permissions:%{public}d", properties, permissions);
+
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0 ||
+        srvcHandle >= MAXIMUM_NUMBER_GATTSERVICE || srvcHandle < 0) {
+        HILOGE("serverId srvcHandle is invalid!");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     string strUuid(characUuid.uuid);
     if (!regex_match(strUuid, uuidRegex)) {
         HILOGE("match the UUID faild.");
@@ -555,13 +639,18 @@ NO_SANITIZE("cfi") int BleGattsAddCharacteristic(int serverId, int srvcHandle, B
 
     int chHandle = GATTSERVICES(serverId, srvcHandle).index;
     GATTSERVICES(serverId, srvcHandle).index += 2;
-    GattCharacteristic characteristic(uuid, chHandle, ConvertPermissions(permissions), properties);
+    GattCharacteristic characteristic(uuid, chHandle, permissions, properties);
 
     unsigned char stubValue[1] = {0x31};
     characteristic.SetValue(stubValue, sizeof(stubValue));
+
+    if (GATTSERVICE(serverId, srvcHandle) == nullptr) {
+        HILOGE("GATTSERVICE(serverId, srvcHandle) is null!");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
     GATTSERVICE(serverId, srvcHandle)->AddCharacteristic(characteristic);
 
-    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, charHandle: %{public}d", serverId, srvcHandle, chHandle);
+    HILOGD("serverId: %{public}d, srvcHandle: %{public}d, charHandle: %{public}d", serverId, srvcHandle, chHandle);
     if (g_GattsCallback != nullptr && g_GattsCallback->characteristicAddCb != nullptr) {
         g_GattsCallback->characteristicAddCb(0, serverId, &characUuid, srvcHandle, chHandle);
     } else {
@@ -584,24 +673,34 @@ NO_SANITIZE("cfi") int BleGattsAddCharacteristic(int serverId, int srvcHandle, B
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-NO_SANITIZE("cfi") int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int permissions)
+int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int permissions)
 {
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0 ||
+        srvcHandle >= MAXIMUM_NUMBER_GATTSERVICE || srvcHandle < 0) {
+        HILOGE("serverId srvcHandle is invalid!");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
     string strUuid(descUuid.uuid);
-    HILOGI("descUuid: %{public}s", strUuid.c_str());
+    HILOGD("descUuid: %{public}s", strUuid.c_str());
     if (!regex_match(strUuid, uuidRegex)) {
         HILOGE("match the UUID faild.");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
     UUID uuid(UUID::FromString(strUuid));
+
+    if (GATTSERVICE(serverId, srvcHandle) == nullptr) {
+        HILOGE("GATTSERVICE(serverId, srvcHandle) is null!");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
     GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
     int desHandle = GATTSERVICES(serverId, srvcHandle).index++;
-    GattDescriptor descriptor(uuid, desHandle, ConvertPermissions(permissions));
+    GattDescriptor descriptor(uuid, desHandle, permissions);
 
     unsigned char stubValue[2] = {0x01, 0x00};
     descriptor.SetValue(stubValue, sizeof(stubValue));
 
     characteristic.AddDescriptor(descriptor);
-    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, desHandle: %{public}d", serverId, srvcHandle, desHandle);
+    HILOGD("serverId: %{public}d, srvcHandle: %{public}d, desHandle: %{public}d", serverId, srvcHandle, desHandle);
     if (g_GattsCallback != nullptr && g_GattsCallback->descriptorAddCb != nullptr) {
         g_GattsCallback->descriptorAddCb(0, serverId, &descUuid, srvcHandle, desHandle);
     } else {
@@ -622,8 +721,17 @@ NO_SANITIZE("cfi") int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUui
  */
 int BleGattsStartService(int serverId, int srvcHandle)
 {
-    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, uuid: %{public}s",
-        serverId, srvcHandle, GATTSERVICE(serverId, srvcHandle)->GetUuid().ToString().c_str());
+    HILOGD("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0 ||
+        srvcHandle >= MAXIMUM_NUMBER_GATTSERVICE || srvcHandle < 0) {
+        HILOGE("serverId srvcHandle is invalid!");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (GATTSERVER(serverId) == nullptr) {
+        HILOGE("GATTSERVER(serverId) is null!");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
     GATTSERVICES(serverId, srvcHandle).isAdding = true;
     GATTSERVER(serverId)->AddService(*GATTSERVICE(serverId, srvcHandle));
     return OHOS_BT_STATUS_SUCCESS;
@@ -641,6 +749,17 @@ int BleGattsStartService(int serverId, int srvcHandle)
 int BleGattsStopService(int serverId, int srvcHandle)
 {
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0 ||
+        srvcHandle >= MAXIMUM_NUMBER_GATTSERVICE || srvcHandle < 0) {
+        HILOGE("serverId srvcHandle is invalid!");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serverId, srvcHandle) == nullptr) {
+        HILOGE("param is null!");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
+
     GATTSERVICES(serverId, srvcHandle).isAdding = false;
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     if (g_GattsCallback != nullptr && g_GattsCallback->serviceStopCb != nullptr) {
@@ -660,9 +779,19 @@ int BleGattsStopService(int serverId, int srvcHandle)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-NO_SANITIZE("cfi") int BleGattsDeleteService(int serverId, int srvcHandle)
+int BleGattsDeleteService(int serverId, int srvcHandle)
 {
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d", serverId, srvcHandle);
+
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0 ||
+        srvcHandle >= MAXIMUM_NUMBER_GATTSERVICE || srvcHandle < 0) {
+        HILOGE("serverId srvcHandle is invalid!");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serverId, srvcHandle) == nullptr) {
+        HILOGE("param is null!");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     delete GATTSERVICE(serverId, srvcHandle);
     GATTSERVICE(serverId, srvcHandle) = nullptr;
@@ -702,20 +831,34 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
         HILOGE("param is null, serverId: %{public}d", serverId);
         return OHOS_BT_STATUS_FAIL;
     }
-    HILOGI("serverId:%{public}d, attrHandle:%{public}d, valueLen:%{public}d",
-        serverId, param->attrHandle, param->valueLen);
-    std::map<int, struct ConnectedDevice>::iterator iter;
-    iter = g_MapConnectedDevice.find(param->connectId);
 
-    struct ConnectedDevice value = iter->second;
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
+        HILOGE("serverId is invalid!");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    if (GATTSERVER(serverId) == nullptr) {
+        HILOGE("param is null!");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
+
+    HILOGI("serverId:%{public}d, requestId:%{public}d, valueLen:%{public}d",
+        serverId, param->attrHandle, param->valueLen);
+    std::optional<ConnectedDevice> deviceInfo = GetDeviceInfoByConnId(param->connectId);
+    if (!deviceInfo.has_value()) {
+        HILOGE("connectId is invalid!");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    struct ConnectedDevice value = deviceInfo.value();
 
     string strAddress;
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
 
     BluetoothRemoteDevice device(strAddress, 1);
 
+    // param->attrHandle is used as requestId
     int ret = GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
-        param->status, 0, (unsigned char *)param->value, param->valueLen);
+        param->status, 0, reinterpret_cast<unsigned char *>(param->value), param->valueLen);
 
     if (g_GattsCallback != nullptr && g_GattsCallback->responseConfirmationCb != nullptr) {
         g_GattsCallback->responseConfirmationCb(ret, param->attrHandle);
@@ -742,12 +885,19 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
         HILOGE("param is null, serverId: %{public}d", serverId);
         return OHOS_BT_STATUS_FAIL;
     }
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0 ||
+        GATTSERVER(serverId) == nullptr) {
+        HILOGE("param is null!");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
     HILOGI("serverId: %{public}d, attrHandle:%{public}d, confirm:%{public}d, valueLen:%{public}d",
         serverId, param->attrHandle, param->confirm, param->valueLen);
-    std::map<int, struct ConnectedDevice>::iterator iter;
-    iter = g_MapConnectedDevice.find(param->connectId);
-
-    struct ConnectedDevice value = iter->second;
+    std::optional<ConnectedDevice> deviceInfo = GetDeviceInfoByConnId(param->connectId);
+    if (!deviceInfo.has_value()) {
+        HILOGE("connectId is invalid!");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    struct ConnectedDevice value = deviceInfo.value();
 
     string strAddress;
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
@@ -767,7 +917,7 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
         appCharacteristic->GetPermissions(),
         appCharacteristic->GetProperties());
 
-    characteristic.SetValue((unsigned char*)param->value, param->valueLen);
+    characteristic.SetValue(reinterpret_cast<unsigned char*>(param->value), param->valueLen);
 
     GATTSERVER(serverId)->NotifyCharacteristicChanged(device, characteristic,
         (param->confirm == 1) ? true : false);

@@ -312,6 +312,16 @@ typedef enum {
 } BtConnectState;
 
 /**
+ * @brief Enumerates Acl connection states of the device.
+ *
+ * @since 6
+ */
+typedef enum {
+    ACL_CONNECTION_STATE_DISCONNECTED = 0x00,
+    ACL_CONNECTION_STATE_CONNECTED = 0x01,
+} BtAclState;
+
+/**
  * @brief Defines the Bluetooth address of the device.
  *
  * @since 6

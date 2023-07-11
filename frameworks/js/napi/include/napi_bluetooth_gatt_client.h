@@ -48,6 +48,7 @@ public:
     static napi_value WriteDescriptorValue(napi_env env, napi_callback_info info);
     static napi_value SetBLEMtuSize(napi_env env, napi_callback_info info);
     static napi_value SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info);
+    static napi_value GetRssiValue(napi_env env, napi_callback_info info);
 
     std::shared_ptr<GattClient> &GetClient()
     {
@@ -69,13 +70,12 @@ public:
         HILOGI("enter");
         device_ = std::make_shared<BluetoothRemoteDevice>(deviceId, 1);
         client_ = std::make_shared<GattClient>(*device_);
+        client_->Init();
         callback_.SetClient(this);
     }
     ~NapiGattClient() = default;
 
     static thread_local napi_ref consRef_;
-    ReadCharacteristicValueCallbackInfo *readCharacteristicValueCallbackInfo_;
-    ReadDescriptorValueCallbackInfo *readDescriptorValueCallbackInfo_;
 
 private:
     std::shared_ptr<GattClient> client_ = nullptr;

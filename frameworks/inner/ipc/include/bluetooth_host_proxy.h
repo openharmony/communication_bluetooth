@@ -31,7 +31,7 @@ public:
 
     void RegisterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) override;
-    bool EnableBt() override;
+    int32_t EnableBt() override;
     int32_t DisableBt() override;
     sptr<IRemoteObject> GetProfile(const std::string &name) override;
     sptr<IRemoteObject> GetBleRemote(const std::string &name) override;
@@ -58,7 +58,7 @@ public:
     int32_t CancelBtDiscovery() override;
     bool IsBtDiscovering(const int32_t transport) override;
     long GetBtDiscoveryEndMillis() override;
-    int32_t GetPairedDevices(const int32_t transport, std::vector<BluetoothRawAddress> &pairedAddr) override;
+    int32_t GetPairedDevices(int32_t transport, std::vector<BluetoothRawAddress> &pairedAddr) override;
     int32_t RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) override;
     bool RemoveAllPairs() override;
     void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) override;

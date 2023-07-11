@@ -30,10 +30,11 @@ public:
     explicit BluetoothRemoteDeviceObserverstub();
     ~BluetoothRemoteDeviceObserverstub() override;
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
+    ErrCode OnAclStateChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnRemoteNameUuidChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnRemoteNameChangedInner(MessageParcel &data, MessageParcel &reply);

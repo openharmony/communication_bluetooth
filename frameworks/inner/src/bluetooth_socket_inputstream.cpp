@@ -27,7 +27,7 @@ InputStream::InputStream(int socketFd) : socketFd_(socketFd)
 InputStream::~InputStream()
 {}
 
-ssize_t InputStream::Read(char *buf, const size_t length)
+ssize_t InputStream::Read(uint8_t *buf, size_t length)
 {
     HILOGI("(2 parameters) starts");
     if (socketFd_ == -1) {

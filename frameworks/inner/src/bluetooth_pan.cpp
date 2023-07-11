@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "bluetooth_errorcode.h"
 #include "bluetooth_pan.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
+#include "bluetooth_load_system_ability.h"
 #include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"
 #include "bluetooth_pan_observer_stub.h"
@@ -52,10 +53,12 @@ private:
     BluetoothObserverList<PanObserver> &observers_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(PanInnerObserver);
 };
-
+    std::mutex panProxyMutex;
 struct Pan::impl {
     impl();
     ~impl();
+    bool InitPanProxy(void);
+    void UnInitPanProxy(void);
 
     int32_t GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice>& result)
     {
@@ -63,10 +66,6 @@ struct Pan::impl {
         if (!proxy_) {
             HILOGE("proxy_ is nullptr.");
             return BT_ERR_SERVICE_DISCONNECTED;
-        }
-        if (!IS_BT_ENABLED()) {
-            HILOGE("bluetooth is off.");
-            return BT_ERR_INVALID_STATE;
         }
 
         std::vector<BluetoothRawAddress> rawDevices;
@@ -76,7 +75,7 @@ struct Pan::impl {
         }
 
         int32_t ret = proxy_->GetDevicesByStates(tmpStates, rawDevices);
-        if (ret != BT_SUCCESS) {
+        if (ret != BT_NO_ERROR) {
             HILOGE("inner error.");
             return ret;
         }
@@ -86,7 +85,7 @@ struct Pan::impl {
             result.push_back(remoteDevice);
         }
 
-        return BT_SUCCESS;
+        return BT_NO_ERROR;
     }
 
     int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
@@ -96,10 +95,7 @@ struct Pan::impl {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
         }
-        if (!IS_BT_ENABLED()) {
-            HILOGE("bluetooth is off.");
-            return BT_ERR_INVALID_STATE;
-        }
+
         return proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
     }
 
@@ -110,10 +106,7 @@ struct Pan::impl {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
         }
-        if (!IS_BT_ENABLED()) {
-            HILOGE("bluetooth is off.");
-            return BT_ERR_INVALID_STATE;
-        }
+
         return proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
@@ -136,10 +129,7 @@ struct Pan::impl {
             HILOGE("proxy_ is nullptr.");
             return BT_ERR_SERVICE_DISCONNECTED;
         }
-        if (!IS_BT_ENABLED()) {
-            HILOGE("bluetooth is off.");
-            return BT_ERR_INVALID_STATE;
-        }
+
         int32_t ret = proxy_->SetTethering(value);
         HILOGI("fwk ret:%{public}d", ret);
         return ret;
@@ -152,14 +142,12 @@ struct Pan::impl {
             HILOGE("proxy_ is nullptr.");
             return BT_ERR_SERVICE_DISCONNECTED;
         }
-        if (!IS_BT_ENABLED()) {
-            HILOGE("bluetooth is off.");
-            return BT_ERR_INVALID_STATE;
-        }
+
         return proxy_->IsTetheringOn(value);
     }
 
 private:
+
     BluetoothObserverList<PanObserver> observers_;
     sptr<PanInnerObserver> innerObserver_;
     sptr<IBluetoothPan> proxy_;
@@ -169,7 +157,7 @@ private:
 
 class Pan::impl::PanDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    PanDeathRecipient(Pan::impl &impl) : impl_(impl)
+    explicit PanDeathRecipient(Pan::impl &impl) : impl_(impl)
     {};
     ~PanDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(PanDeathRecipient);
@@ -177,6 +165,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        if (!impl_.proxy_) {
+            return;
+        }
+        impl_.proxy_->DeregisterObserver(impl_.innerObserver_);
         impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
     }
@@ -187,29 +179,15 @@ private:
 
 Pan::impl::impl()
 {
-    HILOGI("enter");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGE("failed: no hostRemote");
+    if (proxy_) {
         return;
     }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_PAN_SERVER);
-
-    if (!remote) {
-        HILOGE("failed: no remote");
+    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_PAN_SERVER);
+    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
         return;
     }
-    HILOGI("remote obtained");
-
-    innerObserver_ = new PanInnerObserver(observers_);
-
-    proxy_ = iface_cast<IBluetoothPan>(remote);
-    proxy_->RegisterObserver(innerObserver_);
-    deathRecipient_ = new PanDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    InitPanProxy();
 }
 
 Pan::impl::~impl()
@@ -217,8 +195,47 @@ Pan::impl::~impl()
     HILOGI("enter");
     if (proxy_ != nullptr) {
         proxy_->DeregisterObserver(innerObserver_);
+        proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
     }
+}
+
+bool Pan::impl::InitPanProxy(void)
+{
+    HILOGI("enter");
+    std::lock_guard<std::mutex> lock(panProxyMutex);
+    if (proxy_) {
+        return true;
+    }
+    proxy_ = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
+    if (!proxy_) {
+        HILOGE("get Pan proxy_ failed");
+        return false;
+    }
+
+    innerObserver_ = new PanInnerObserver(observers_);
+    if (innerObserver_ != nullptr) {
+        proxy_->RegisterObserver(innerObserver_);
+    }
+
+    deathRecipient_ = new PanDeathRecipient(*this);
+    if (deathRecipient_ != nullptr) {
+        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    }
+    return true;
+}
+
+void Pan::impl::UnInitPanProxy(void)
+{
+    HILOGI("enter");
+    std::lock_guard<std::mutex> lock(panProxyMutex);
+    if (!proxy_) {
+        HILOGE("UnInitPanProxy failed");
+        return;
+    }
+    proxy_->DeregisterObserver(innerObserver_);
     proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+    proxy_ = nullptr;
+    HILOGI("UnInitPanProxy success");
 }
 
 Pan::Pan()
@@ -229,6 +246,27 @@ Pan::Pan()
 Pan::~Pan()
 {}
 
+void Pan::Init()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    if (!pimpl->InitPanProxy()) {
+        HILOGE("Pan proxy_ is nullptr");
+        return;
+    }
+}
+
+void Pan::UnInit()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    pimpl->UnInitPanProxy();
+}
+
 Pan *Pan::GetProfile()
 {
     static Pan instance;
@@ -237,16 +275,46 @@ Pan *Pan::GetProfile()
 
 int32_t Pan::GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice> &result)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+        HILOGE("pimpl or pan proxy_ is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
     return pimpl->GetDevicesByStates(states, result);
 }
 
 int32_t Pan::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+        HILOGE("pimpl or pan proxy_ is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
     return pimpl->GetDeviceState(device, state);
 }
 
 int32_t Pan::Disconnect(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+        HILOGE("pimpl or pan proxy_ is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
     return pimpl->Disconnect(device);
 }
 
@@ -264,11 +332,31 @@ void Pan::DeregisterObserver(PanObserver *observer)
 
 int32_t Pan::SetTethering(bool value)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+        HILOGE("pimpl or pan proxy_ is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
     return pimpl->SetTethering(value);
 }
 
 int32_t Pan::IsTetheringOn(bool &value)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+        HILOGE("pimpl or pan proxy_ is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
     return pimpl->IsTetheringOn(value);
 }
 }  // namespace Bluetooth

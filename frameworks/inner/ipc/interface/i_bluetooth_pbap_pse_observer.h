@@ -36,7 +36,7 @@ public:
     virtual void OnServiceConnectionStateChanged(const BluetoothRawAddress &device, int state) = 0;
     virtual void OnServicePermission(const BluetoothRawAddress &device) = 0;
     virtual void OnServicePasswordRequired(const BluetoothRawAddress &device,
-        const ::std::vector<uint8_t> &description, int8_t charset, bool fullAccess) = 0;
+        const ::std::vector<uint8_t> &description, uint8_t charset, bool fullAccess) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -41,10 +41,10 @@ public:
         BT_HFP_AG_CLOSE_VOICE_RECOGNITION,
         BT_HFP_AG_SET_ACTIVE_DEVICE,
         BT_HFP_AG_GET_ACTIVE_DEVICE,
+        BT_HFP_AG_INTO_MOCK,
+        BT_HFP_AG_SEND_NO_CARRIER,
         BT_HFP_AG_REGISTER_OBSERVER,
         BT_HFP_AG_DEREGISTER_OBSERVER,
-        BT_HFP_AG_SEND_NO_CARRIER,
-        BT_HFP_AG_INTO_MOCK,
     };
 
     virtual int32_t GetConnectDevices(std::vector<BluetoothRawAddress> &devices) = 0;
@@ -55,16 +55,16 @@ public:
     virtual int GetScoState(const BluetoothRawAddress &device) = 0;
     virtual bool ConnectSco() = 0;
     virtual bool DisconnectSco() = 0;
-    virtual void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type,
+    virtual void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type, 
         const std::string &name) = 0;
     virtual void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number, 
         int type) = 0;
     virtual bool OpenVoiceRecognition(const BluetoothRawAddress &device) = 0;
     virtual bool CloseVoiceRecognition(const BluetoothRawAddress &device) = 0;
     virtual bool SetActiveDevice(const BluetoothRawAddress &device) = 0;
+    virtual std::string GetActiveDevice() = 0;
     virtual bool IntoMock(const BluetoothRawAddress &device, int state) = 0;
     virtual bool SendNoCarrier(const BluetoothRawAddress &device) = 0;
-    virtual std::string GetActiveDevice() = 0;
     virtual void RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) = 0;
 };

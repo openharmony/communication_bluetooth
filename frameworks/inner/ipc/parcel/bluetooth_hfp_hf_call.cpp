@@ -21,22 +21,22 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-bool BluetoothHfpHfCall::Marshalling(Parcel &parcel) const 
+bool BluetoothHfpHfCall::Marshalling(Parcel &parcel) const
 {
     return WriteToParcel(parcel);
 }
 
-BluetoothHfpHfCall *BluetoothHfpHfCall::Unmarshalling(Parcel &parcel) 
+BluetoothHfpHfCall *BluetoothHfpHfCall::Unmarshalling(Parcel &parcel)
 {
     BluetoothHfpHfCall *call = new BluetoothHfpHfCall();
-    if (call!= nullptr && !call->ReadFromParcel(parcel)) {
+    if (call != nullptr && !call->ReadFromParcel(parcel)) {
         delete call;
         call = nullptr;
     }
     return call;
 }
 
-bool BluetoothHfpHfCall::WriteToParcel(Parcel &parcel) const 
+bool BluetoothHfpHfCall::WriteToParcel(Parcel &parcel) const
 {
     if (!parcel.WriteString(device_)) {
         return false;

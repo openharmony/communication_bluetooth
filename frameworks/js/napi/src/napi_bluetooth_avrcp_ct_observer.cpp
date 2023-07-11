@@ -24,7 +24,7 @@ std::shared_mutex NapiAvrcpControllerObserver::g_avrcpCtCallbackInfosMutex;
 
 void NapiAvrcpControllerObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     std::unique_lock<std::shared_mutex> guard(g_avrcpCtCallbackInfosMutex);
 
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =

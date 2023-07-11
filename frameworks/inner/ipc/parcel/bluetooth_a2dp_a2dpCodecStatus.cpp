@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const uint32_t A2DP_A2DPCODECSTATUS_PARCEL_SIZE_MAX = 0x400;
 bool BluetoothA2dpCodecStatus::Marshalling(Parcel &parcel) const
 {
     BluetoothA2dpCodecInfo info = bluetooth::CodecInfo(codecInfo);
@@ -70,7 +71,7 @@ bool BluetoothA2dpCodecStatus::ReadFromParcel(Parcel &parcel)
     }
     codecInfo = bluetooth::CodecInfo(*info);
     uint32_t size = 0;
-    if (!parcel.ReadUint32(size)) {
+    if (!parcel.ReadUint32(size) || size > A2DP_A2DPCODECSTATUS_PARCEL_SIZE_MAX) {
         return false;
     }
     for (size_t i = 0; i < size; i++) {
@@ -80,7 +81,7 @@ bool BluetoothA2dpCodecStatus::ReadFromParcel(Parcel &parcel)
         }
         codecInfoLocalCap.push_back(*infoLocalCap);
     }
-    if (!parcel.ReadUint32(size)) {
+    if (!parcel.ReadUint32(size) || size > A2DP_A2DPCODECSTATUS_PARCEL_SIZE_MAX) {
         return false;
     }
     for (size_t i = 0; i < size; i++) {

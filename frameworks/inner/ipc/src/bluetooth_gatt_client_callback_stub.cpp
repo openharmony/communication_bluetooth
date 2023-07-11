@@ -15,12 +15,14 @@
 
 #include "bluetooth_gatt_client_callback_stub.h"
 #include "bluetooth_log.h"
+#include "raw_address.h"
 
 namespace OHOS {
 namespace Bluetooth {
+const int32_t GATT_CLIENT_CALLBACK_READ_DATA_SIZE_MAX_LEN = 0x100;
 BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE)] =
         &BluetoothGattClientCallbackStub::OnConnectionStateChangedInner;
@@ -47,11 +49,14 @@ BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(
         IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED)] =
         &BluetoothGattClientCallbackStub::OnServicesChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::
+        BT_GATT_CLIENT_CALLBACK_READ_REMOTE_RSSI_VALUE)] =
+        &BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner;
 }
 
 BluetoothGattClientCallbackStub::~BluetoothGattClientCallbackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 
@@ -59,11 +64,8 @@ int BluetoothGattClientCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothGattClientCallbackStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
-        code,
-        option.GetFlags());
-    std::u16string descriptor = BluetoothGattClientCallbackStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+        code, option.GetFlags());
+    if (BluetoothGattClientCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -80,7 +82,7 @@ int BluetoothGattClientCallbackStub::OnRemoteRequest(
 
 ErrCode BluetoothGattClientCallbackStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothGattClientCallbackStub::OnConnectionStateChangedInner Triggered!");
+    HILOGD("BluetoothGattClientCallbackStub::OnConnectionStateChangedInner Triggered!");
     int32_t state = data.ReadInt32();
     int32_t newState = data.ReadInt32();
     OnConnectionStateChanged(state, newState);
@@ -89,7 +91,6 @@ ErrCode BluetoothGattClientCallbackStub::OnConnectionStateChangedInner(MessagePa
 
 ErrCode BluetoothGattClientCallbackStub::OnCharacteristicChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothGattClientCallbackStub::OnCharacteristicChangedInner Triggered!");
     std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
     if (!characteristic) {
         return TRANSACTION_ERR;
@@ -178,7 +179,11 @@ ErrCode BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner(Messa
 ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnServicesChangedInner Triggered!");
-    int32_t num = data.ReadInt32();
+    int32_t num = 0;
+    if (!data.ReadInt32(num) || num > GATT_CLIENT_CALLBACK_READ_DATA_SIZE_MAX_LEN) {
+        HILOGE("read Parcelable size failed.");
+        return TRANSACTION_ERR;
+    }
     std::vector<BluetoothGattService> service;
     for (int i = num; i > 0; i--) {
         std::shared_ptr<BluetoothGattService> dev(data.ReadParcelable<BluetoothGattService>());
@@ -190,5 +195,16 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &d
     OnServicesChanged(service);
     return NO_ERROR;
 }
+
+ErrCode BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner(MessageParcel &data, MessageParcel &reply)
+{
+    HILOGI("BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner Triggered!");
+    bluetooth::RawAddress address(data.ReadString());
+    int32_t rssi = data.ReadInt32();
+    int32_t state = data.ReadInt32();
+    OnReadRemoteRssiValue(address, rssi, state);
+    return NO_ERROR;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

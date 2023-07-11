@@ -12,17 +12,4 @@
 # limitations under the License.
 
 declare_args() {
-  bluetooth_a2dp_sink_feature = false
-  bluetooth_a2dp_source_feature = true
-  bluetooth_avrcp_ct_feature = true
-  bluetooth_avrcp_tg_feature = false
-  bluetooth_hfp_ag_feature = true
-  bluetooth_hfp_hf_feature = false
-  bluetooth_hid_host_feature = true
-  bluetooth_pan_feature = true
-  bluetooth_pbap_client_feature = false
-  bluetooth_pbap_server_feature = false
-  bluetooth_opp_feature = true
-  bluetooth_map_client_feature = false
-  bluetooth_map_server_feature = false
 }

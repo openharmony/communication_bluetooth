@@ -164,12 +164,35 @@ public:
         serviceUuids_.push_back(serviceUuid);
     }
 
+    /**
+     * @brief Get whether the device name will be included in the advertisement packet.
+     *
+     * @return Returns includeDeviceName flag.
+     * @since 6
+     */
+    bool GetIncludeDeviceName() const
+    {
+        return includeDeviceName_;
+    }
+
+    /**
+     * @brief Set whether the device name will be included in the advertisement packet.
+     *
+     * @param flag includeDeviceName flag.
+     * @since 6
+     */
+    void SetIncludeDeviceName(bool flag)
+    {
+        includeDeviceName_ = flag;
+    }
+
 public:
     std::vector<Uuid> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
     std::map<Uuid, std::string> serviceData_ {};
     uint8_t advFlag_ {};
     std::string payload_ = "";
+    bool includeDeviceName_ = false;
 };
 
 /**
@@ -510,7 +533,7 @@ public:
         advertiseFlag_ = flag;
     }
 
-    void SetPayload(const std::string payload)
+    void SetPayload(const std::string &payload)
     {
         payload_ = payload;
     }
@@ -682,7 +705,7 @@ public:
      *
      * @param deviceId device id.
      */
-    void SetDeviceId(std::string deviceId)
+    void SetDeviceId(const std::string &deviceId)
     {
         deviceId_ = deviceId;
     }
@@ -697,7 +720,7 @@ public:
         return deviceId_;
     }
 
-    void SetName(std::string name)
+    void SetName(const std::string &name)
     {
         name_ = name;
     }
@@ -707,7 +730,7 @@ public:
         return name_;
     }
 
-    void SetServiceUuid(const Uuid uuid)
+    void SetServiceUuid(const Uuid &uuid)
     {
         serviceUuid_ = uuid;
         hasServiceUuid_ = true;
@@ -723,7 +746,7 @@ public:
         return serviceUuid_;
     }
 
-    void SetServiceUuidMask(const Uuid serviceUuidMask)
+    void SetServiceUuidMask(const Uuid &serviceUuidMask)
     {
         serviceUuidMask_ = serviceUuidMask;
         hasServiceUuidMask_ = true;
@@ -739,13 +762,13 @@ public:
         return serviceUuidMask_;
     }
 
-    void SetServiceSolicitationUuid(const Uuid serviceSolicitationUuid)
+    void SetServiceSolicitationUuid(const Uuid &serviceSolicitationUuid)
     {
         serviceSolicitationUuid_ = serviceSolicitationUuid;
         hasSolicitationUuid_ = true;
     }
 
-    bool HasSolicitationUuid()
+    bool HasSolicitationUuid() const
     {
         return hasSolicitationUuid_;
     }
@@ -755,13 +778,13 @@ public:
         return serviceSolicitationUuid_;
     }
 
-    void SetServiceSolicitationUuidMask(const Uuid serviceSolicitationUuidMask)
+    void SetServiceSolicitationUuidMask(const Uuid &serviceSolicitationUuidMask)
     {
         serviceSolicitationUuidMask_ = serviceSolicitationUuidMask;
         hasSolicitationUuidMask_ = true;
     }
 
-    bool HasSolicitationUuidMask()
+    bool HasSolicitationUuidMask() const
     {
         return hasSolicitationUuidMask_;
     }
@@ -771,7 +794,7 @@ public:
         return serviceSolicitationUuidMask_;
     }
 
-    void SetServiceData(std::vector<uint8_t> serviceData)
+    void SetServiceData(const std::vector<uint8_t> &serviceData)
     {
         serviceData_ = serviceData;
     }
@@ -781,7 +804,7 @@ public:
         return serviceData_;
     }
 
-    void SetServiceDataMask(std::vector<uint8_t> serviceDataMask)
+    void SetServiceDataMask(const std::vector<uint8_t> &serviceDataMask)
     {
         serviceDataMask_ = serviceDataMask;
     }
@@ -801,7 +824,7 @@ public:
         return manufacturerId_;
     }
 
-    void SetManufactureData(std::vector<uint8_t> manufactureData)
+    void SetManufactureData(const std::vector<uint8_t> &manufactureData)
     {
         manufactureData_ = manufactureData;
     }
@@ -811,7 +834,7 @@ public:
         return manufactureData_;
     }
 
-    void SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask)
+    void SetManufactureDataMask(const std::vector<uint8_t> &manufactureDataMask)
     {
         manufactureDataMask_ = manufactureDataMask;
     }

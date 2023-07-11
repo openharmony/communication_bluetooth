@@ -28,7 +28,7 @@ enum BtErrCode {
     BT_ERR_API_NOT_SUPPORT = 801,
 
     // Customized error codes
-    BT_SUCCESS = 0,
+    BT_NO_ERROR = 0,
 
     BT_ERR_BASE_SYSCAP = 2900000,
     BT_ERR_SERVICE_DISCONNECTED     = BT_ERR_BASE_SYSCAP + 1,
@@ -37,6 +37,7 @@ enum BtErrCode {
     BT_ERR_PROFILE_DISABLED         = BT_ERR_BASE_SYSCAP + 4,
     BT_ERR_DEVICE_DISCONNECTED      = BT_ERR_BASE_SYSCAP + 5,
     BT_ERR_MAX_CONNECTION           = BT_ERR_BASE_SYSCAP + 6,
+    BT_ERR_UNAVAILABLE_PROXY        = BT_ERR_BASE_SYSCAP + 8,
 
     BT_ERR_INTERNAL_ERROR           = BT_ERR_BASE_SYSCAP + 99,
     BT_ERR_IPC_TRANS_FAILED         = BT_ERR_BASE_SYSCAP + 100,
@@ -51,7 +52,7 @@ enum BtErrCode {
     BT_ERR_SPP_IO                   = BT_ERR_BASE_SYSCAP + 1054,
 
     // will deprected
-    NO_ERROR = BT_SUCCESS,
+    NO_ERROR = BT_NO_ERROR,
     ERROR = BT_ERR_INTERNAL_ERROR,
     ERR_INVALID_STATE = BT_ERR_INVALID_STATE,
 };

@@ -18,10 +18,10 @@
 
 #include "i_bluetooth_gatt_server_callback.h"
 #include "iremote_broker.h"
-#include "../parcel/bluetooth_gatt_characteristic.h"
-#include "../parcel/bluetooth_gatt_descriptor.h"
+#include "../parcel/bluetooth_gatt_characteristic_parcel.h"
+#include "../parcel/bluetooth_gatt_descriptor_parcel.h"
 #include "../parcel/bluetooth_gatt_device.h"
-#include "../parcel/bluetooth_gatt_service.h"
+#include "../parcel/bluetooth_gatt_service_parcel.h"
 #include "gatt_data.h"
 namespace OHOS {
 namespace Bluetooth {

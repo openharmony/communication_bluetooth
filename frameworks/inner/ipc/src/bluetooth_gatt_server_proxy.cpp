@@ -42,8 +42,8 @@ int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService *se
     };
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_ADD_SERVICE, data, reply, option);
-    if (error != BT_SUCCESS) {
-        HILOGE("BluetoothGattServerProxy::AddService done fail, error: %d", error);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothGattServerProxy::AddService done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
@@ -66,7 +66,7 @@ void BluetoothGattServerProxy::ClearServices(int appId)
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CLEAR_SERVICES, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::ClearServices done fail, error: %d", error);
+        HILOGE("BluetoothGattServerProxy::ClearServices done fail, error: %{public}d", error);
         return;
     }
     return;
@@ -88,7 +88,7 @@ void BluetoothGattServerProxy::CancelConnection(const BluetoothGattDevice &devic
     };
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_CANCEL_CONNECTION, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::CancelConnection done fail, error: %d", error);
+        HILOGE("BluetoothGattServerProxy::CancelConnection done fail, error: %{public}d", error);
         return;
     }
     return;
@@ -111,7 +111,7 @@ int BluetoothGattServerProxy::RegisterApplication(const sptr<IBluetoothGattServe
     };
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REGISTER, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RegisterApplication done fail, error: %d", error);
+        HILOGE("BluetoothGattServerProxy::RegisterApplication done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -134,7 +134,7 @@ int BluetoothGattServerProxy::DeregisterApplication(int appId)
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_DEREGISTER, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::DeregisterApplication done fail, error: %d", error);
+        HILOGE("BluetoothGattServerProxy::DeregisterApplication done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
@@ -165,8 +165,8 @@ int BluetoothGattServerProxy::NotifyClient(
     };
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_NOTIFY_CLIENT, data, reply, option);
-    if (error != BT_SUCCESS) {
-        HILOGE("BluetoothGattServerProxy::NotifyClient done fail, error: %d", error);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothGattServerProxy::NotifyClient done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
@@ -193,7 +193,7 @@ int BluetoothGattServerProxy::RemoveService(int32_t appId, const BluetoothGattSe
 
     int error = Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_REMOVE_SERVICE, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RemoveService done fail, error: %d", error);
+        HILOGE("BluetoothGattServerProxy::RemoveService done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
@@ -224,8 +224,8 @@ int BluetoothGattServerProxy::RespondCharacteristicRead(
     };
     int error =
         Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_READ, data, reply, option);
-    if (error != BT_SUCCESS) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead done fail, error: %d", error);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
@@ -256,8 +256,8 @@ int BluetoothGattServerProxy::RespondCharacteristicWrite(
     };
     int error = Remote()->SendRequest(
         IBluetoothGattServer::Code::GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE, data, reply, option);
-    if (error != BT_SUCCESS) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite done fail, error: %d", error);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
@@ -288,8 +288,8 @@ int BluetoothGattServerProxy::RespondDescriptorRead(
     };
     int error =
         Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_READ, data, reply, option);
-    if (error != BT_SUCCESS) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorRead done fail, error: %d", error);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothGattServerProxy::RespondDescriptorRead done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
@@ -320,8 +320,8 @@ int BluetoothGattServerProxy::RespondDescriptorWrite(
     };
     int error =
         Remote()->SendRequest(IBluetoothGattServer::Code::GATT_SERVER_RESPOND_DESCRIPTOR_WRITE, data, reply, option);
-    if (error != BT_SUCCESS) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite done fail, error: %d", error);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();

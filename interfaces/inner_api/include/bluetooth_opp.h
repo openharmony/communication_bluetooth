@@ -360,13 +360,25 @@ public:
      */
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states);
 
-     /**
+    /**
      * @brief Get the connection state of the specified remote Opp device.
      *
      * @param device Remote device object.
      * @return Returns the connection state of the remote device.
      */
     int GetDeviceState(const BluetoothRemoteDevice &device);
+
+    /**
+     * @brief The external process calls the Opp profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * Opp proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of Opp profile.
+     */
+    void UnInit();
 
     /**
      * @brief Static Opp observer instance.

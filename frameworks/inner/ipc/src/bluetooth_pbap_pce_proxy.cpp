@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Bluetooth {
 int BluetoothPbapPceProxy::GetDeviceState(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::GetDeviceState WriteInterfaceToken error");
@@ -41,7 +41,7 @@ int BluetoothPbapPceProxy::GetDeviceState(const BluetoothRawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_GET_DEVICE_STATE, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::GetDeviceState done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::GetDeviceState done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -49,7 +49,7 @@ int BluetoothPbapPceProxy::GetDeviceState(const BluetoothRawAddress &device)
 
 int BluetoothPbapPceProxy::Connect(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::Connect WriteInterfaceToken error");
@@ -68,15 +68,16 @@ int BluetoothPbapPceProxy::Connect(const BluetoothRawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::Connect done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::Connect done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
 }
 
-int BluetoothPbapPceProxy::PullPhoneBook(const BluetoothRawAddress &device, const BluetoothIPbapPullPhoneBookParam &param)
+int BluetoothPbapPceProxy::PullPhoneBook(
+    const BluetoothRawAddress &device, const BluetoothIPbapPullPhoneBookParam &param)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::PullPhoneBook WriteInterfaceToken error");
@@ -100,7 +101,7 @@ int BluetoothPbapPceProxy::PullPhoneBook(const BluetoothRawAddress &device, cons
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_PULL_PHONEBOOK, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::PullPhoneBook done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::PullPhoneBook done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -108,7 +109,7 @@ int BluetoothPbapPceProxy::PullPhoneBook(const BluetoothRawAddress &device, cons
 
 int BluetoothPbapPceProxy::SetPhoneBook(const BluetoothRawAddress &device, const std::u16string &name, int32_t flag)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::SetPhoneBook WriteInterfaceToken error");
@@ -137,15 +138,16 @@ int BluetoothPbapPceProxy::SetPhoneBook(const BluetoothRawAddress &device, const
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_SET_PHONEBOOK, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::SetPhoneBook done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::SetPhoneBook done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
 }
 
-int BluetoothPbapPceProxy::PullvCardListing(const BluetoothRawAddress &device, const BluetoothIPbapPullvCardListingParam &param)
+int BluetoothPbapPceProxy::PullvCardListing(
+    const BluetoothRawAddress &device, const BluetoothIPbapPullvCardListingParam &param)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::PullvCardListing WriteInterfaceToken error");
@@ -169,7 +171,7 @@ int BluetoothPbapPceProxy::PullvCardListing(const BluetoothRawAddress &device, c
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_PULL_VCARD_LISTING, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::PullvCardListing done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::PullvCardListing done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -177,7 +179,7 @@ int BluetoothPbapPceProxy::PullvCardListing(const BluetoothRawAddress &device, c
 
 int BluetoothPbapPceProxy::PullvCardEntry(const BluetoothRawAddress &device, const BluetoothIPbapPullvCardEntryParam &param)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::PullvCardEntry WriteInterfaceToken error");
@@ -201,7 +203,7 @@ int BluetoothPbapPceProxy::PullvCardEntry(const BluetoothRawAddress &device, con
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_PULL_VCARD_ENTRY, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::PullvCardEntry done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::PullvCardEntry done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -209,7 +211,7 @@ int BluetoothPbapPceProxy::PullvCardEntry(const BluetoothRawAddress &device, con
 
 bool BluetoothPbapPceProxy::IsDownloading(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::IsDownloading WriteInterfaceToken error");
@@ -228,7 +230,7 @@ bool BluetoothPbapPceProxy::IsDownloading(const BluetoothRawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_PULL_ISDOWNLOAGING, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::IsDownloading done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::IsDownloading done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadBool();
@@ -236,7 +238,7 @@ bool BluetoothPbapPceProxy::IsDownloading(const BluetoothRawAddress &device)
 
 int BluetoothPbapPceProxy::AbortDownloading(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::AbortDownloading WriteInterfaceToken error");
@@ -255,15 +257,16 @@ int BluetoothPbapPceProxy::AbortDownloading(const BluetoothRawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_ABORT_DOWNLOADING, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::AbortDownloading done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::AbortDownloading done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
 }
 
-int BluetoothPbapPceProxy::SetDevicePassword(const BluetoothRawAddress &device, const std::string &password, const std::string &userId)
+int BluetoothPbapPceProxy::SetDevicePassword(
+    const BluetoothRawAddress &device, const std::string &password, const std::string &userId)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::SetDevicePassword WriteInterfaceToken error");
@@ -292,7 +295,7 @@ int BluetoothPbapPceProxy::SetDevicePassword(const BluetoothRawAddress &device, 
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_SET_DEVICE_PASSWORD, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::SetDevicePassword done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::SetDevicePassword done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -300,7 +303,7 @@ int BluetoothPbapPceProxy::SetDevicePassword(const BluetoothRawAddress &device, 
 
 int BluetoothPbapPceProxy::Disconnect(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::Disconnect WriteInterfaceToken error");
@@ -319,7 +322,7 @@ int BluetoothPbapPceProxy::Disconnect(const BluetoothRawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::Disconnect done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::Disconnect done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -327,7 +330,7 @@ int BluetoothPbapPceProxy::Disconnect(const BluetoothRawAddress &device)
 
 int BluetoothPbapPceProxy::SetConnectionStrategy(const BluetoothRawAddress &device, int32_t strategy)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::SetConnectionStrategy WriteInterfaceToken error");
@@ -351,7 +354,7 @@ int BluetoothPbapPceProxy::SetConnectionStrategy(const BluetoothRawAddress &devi
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_SET_CONNECT_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::SetConnectionStrategy done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::SetConnectionStrategy done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
@@ -359,7 +362,7 @@ int BluetoothPbapPceProxy::SetConnectionStrategy(const BluetoothRawAddress &devi
 
 int BluetoothPbapPceProxy::GetConnectionStrategy(const BluetoothRawAddress &device)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::GetConnectionStrategy WriteInterfaceToken error");
@@ -378,13 +381,14 @@ int BluetoothPbapPceProxy::GetConnectionStrategy(const BluetoothRawAddress &devi
 
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_GET_CONNECT_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::GetConnectionStrategy done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::GetConnectionStrategy done fail, error: %{public}d", error);
         return ERROR;
     }
     return reply.ReadInt32();
 }
 
-void BluetoothPbapPceProxy::GetDevicesByStates(const std::vector<int32_t> tmpStates, std::vector<BluetoothRawAddress> &rawDevices)
+void BluetoothPbapPceProxy::GetDevicesByStates(
+    const std::vector<int32_t> tmpStates, std::vector<BluetoothRawAddress> &rawDevices)
 {
     HILOGI("BluetoothPbapPceProxy::GetServices start");
     MessageParcel data;
@@ -402,7 +406,7 @@ void BluetoothPbapPceProxy::GetDevicesByStates(const std::vector<int32_t> tmpSta
     };
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_GET_DEVICES_BY_STATE, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::GetServices done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::GetServices done fail, error: %{public}d", error);
     }
     int DevNum = reply.ReadInt32();
     for (int i = DevNum; i > 0; i--) {
@@ -416,7 +420,7 @@ void BluetoothPbapPceProxy::GetDevicesByStates(const std::vector<int32_t> tmpSta
 
 void BluetoothPbapPceProxy::RegisterObserver(const sptr<IBluetoothPbapPceObserver> &observer)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::RegisterObserver WriteInterfaceToken error");
@@ -433,7 +437,7 @@ void BluetoothPbapPceProxy::RegisterObserver(const sptr<IBluetoothPbapPceObserve
     };
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::RegisterObserver done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
     }
     return;
@@ -441,7 +445,7 @@ void BluetoothPbapPceProxy::RegisterObserver(const sptr<IBluetoothPbapPceObserve
 
 void BluetoothPbapPceProxy::DeregisterObserver(const sptr<IBluetoothPbapPceObserver> &observer)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPbapPceProxy::GetDescriptor())) {
         HILOGE("BluetoothPbapPceProxy::RegisterObserver WriteInterfaceToken error");
@@ -458,7 +462,7 @@ void BluetoothPbapPceProxy::DeregisterObserver(const sptr<IBluetoothPbapPceObser
     };
     int error = Remote()->SendRequest(IBluetoothPbapPce::Code::PBAP_PCE_DEREGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothPbapPceProxy::RegisterObserver done fail, error: %d", error);
+        HILOGE("BluetoothPbapPceProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
     }
     return;

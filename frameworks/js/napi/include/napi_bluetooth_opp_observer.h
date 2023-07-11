@@ -27,7 +27,7 @@ const std::string STR_BT_OPP_OBSERVER_TRANSFER_STATE_CHANGE = "transferStateChan
 class NapiBluetoothOppObserver : public OppObserver {
 public:
     NapiBluetoothOppObserver() = default;
-    virtual ~NapiBluetoothOppObserver() = default;
+    ~NapiBluetoothOppObserver() override = default;
 
     void OnReceiveIncomingFileChanged(const BluetoothOppTransferInformation &transferInformation) override;
     void OnTransferStateChanged(const BluetoothOppTransferInformation &transferInformation) override;

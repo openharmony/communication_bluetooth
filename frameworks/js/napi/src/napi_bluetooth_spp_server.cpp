@@ -92,16 +92,17 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
         [](napi_env env, void* data) {
             HILOGI("SppListen execute");
             SppListenCallbackInfo* callbackInfo = (SppListenCallbackInfo*)data;
-            callbackInfo->server_ = std::make_shared<SppServerSocket>(callbackInfo->name_,
+            callbackInfo->server_ = std::make_shared<ServerSocket>(callbackInfo->name_,
                 UUID::FromString(callbackInfo->sppOption_->uuid_), callbackInfo->sppOption_->type_,
                 callbackInfo->sppOption_->secure_);
-            HILOGI("SppListen SppServerSocket constructor end");
+            int errorCode = callbackInfo->server_->Listen();
+            HILOGI("SppListen ServerSocket constructor end");
             if (callbackInfo->server_ ->GetStringTag() != "") {
                 HILOGI("SppListen execute listen success");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
             } else {
                 HILOGI("SppListen execute listen failed");
-                callbackInfo->errorCode_ = CODE_FAILED;
+                callbackInfo->errorCode_ = errorCode;
             }
         },
         [](napi_env env, napi_status status, void* data) {

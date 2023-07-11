@@ -17,6 +17,7 @@
 
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_def.h"
+#include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "i_bluetooth_ble_central_manager.h"
 #include "i_bluetooth_host.h"
@@ -34,6 +35,10 @@ BluetoothProxyManager& BluetoothProxyManager::GetInstance()
 bool BluetoothProxyManager::ProxyUid(int32_t uid, bool isProxy)
 {
     HILOGD("ProxyUid start. uid:%{public}d , isProxy:%{public}d", uid, isProxy);
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
     if (!GetBleCentralManagerProxy()) {
         HILOGE("GetBleCentralManagerProxy failed.");
         return false;
@@ -44,6 +49,10 @@ bool BluetoothProxyManager::ProxyUid(int32_t uid, bool isProxy)
 bool BluetoothProxyManager::ResetAllProxy()
 {
     HILOGI("ResetAllProxy start.");
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
     if (!GetBleCentralManagerProxy()) {
         HILOGE("GetBleCentralManagerProxy failed.");
         return false;

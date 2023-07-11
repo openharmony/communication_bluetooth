@@ -23,7 +23,7 @@ namespace Bluetooth {
 std::shared_mutex NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex;
 void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     std::unique_lock<std::shared_mutex> guard(g_handsFreeAudioGatewayCallbackMutex);
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
         callbackInfos_.find(STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE);

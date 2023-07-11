@@ -19,8 +19,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void BluetoothMapMseProxy::RegisterObserver(
-    const sptr<IBluetoothMapMseObserver> &observer)
+void BluetoothMapMseProxy::RegisterObserver(const sptr<IBluetoothMapMseObserver> &observer)
 {
     HILOGI("BluetoothMapMseProxy::RegisterObserver Triggered!");
     MessageParcel data;
@@ -44,8 +43,7 @@ void BluetoothMapMseProxy::RegisterObserver(
     }
 }
 
-void BluetoothMapMseProxy::DeregisterObserver(
-    const sptr<IBluetoothMapMseObserver> &observer)
+void BluetoothMapMseProxy::DeregisterObserver(const sptr<IBluetoothMapMseObserver> &observer)
 {
     HILOGI("BluetoothMapMseProxy::DeregisterObserver Triggered!");
     MessageParcel data;
@@ -69,8 +67,7 @@ void BluetoothMapMseProxy::DeregisterObserver(
     }
 }
 
-void BluetoothMapMseProxy::GetState(
-    int32_t &ret)
+void BluetoothMapMseProxy::GetState(int32_t &ret)
 {
     HILOGI("BluetoothMapMseProxy::Connect Triggered!");
     MessageParcel data;
@@ -91,8 +88,7 @@ void BluetoothMapMseProxy::GetState(
     ret = reply.ReadInt32();
 }
 
-void BluetoothMapMseProxy::Disconnect(
-    const BluetoothRawAddress &device, int32_t &ret)
+void BluetoothMapMseProxy::Disconnect(const BluetoothRawAddress &device, int32_t &ret)
 {
     HILOGI("BluetoothMapMseProxy::Disconnect Triggered!");
     MessageParcel data;
@@ -117,8 +113,7 @@ void BluetoothMapMseProxy::Disconnect(
     ret = reply.ReadInt32();
 }
 
-void BluetoothMapMseProxy::IsConnected(
-    const BluetoothRawAddress &device, bool &ret)
+void BluetoothMapMseProxy::IsConnected(const BluetoothRawAddress &device, bool &ret)
 {
     HILOGI("BluetoothMapMseProxy::IsConnected Triggered!");
     MessageParcel data;
@@ -143,8 +138,7 @@ void BluetoothMapMseProxy::IsConnected(
     ret = reply.ReadBool();
 }
 
-void BluetoothMapMseProxy::GetConnectedDevices(
-    std::vector<BluetoothRawAddress> &devices)
+void BluetoothMapMseProxy::GetConnectedDevices(std::vector<BluetoothRawAddress> &devices)
 {
     HILOGI("BluetoothMapMseProxy::GetConnectDevices Triggered!");
     MessageParcel data;
@@ -205,8 +199,7 @@ void BluetoothMapMseProxy::GetDevicesByStates(
     }
 }
 
-void BluetoothMapMseProxy::GetConnectionState(
-    const BluetoothRawAddress &device, int32_t &ret)
+void BluetoothMapMseProxy::GetConnectionState(const BluetoothRawAddress &device, int32_t &ret)
 {
     HILOGI("BluetoothMapMseProxy::GetConnectionState Triggered!");
     MessageParcel data;
@@ -231,8 +224,7 @@ void BluetoothMapMseProxy::GetConnectionState(
     ret = reply.ReadInt32();
 }
 
-void BluetoothMapMseProxy::SetConnectionStrategy(
-    const BluetoothRawAddress &device, int strategy, bool &ret)
+void BluetoothMapMseProxy::SetConnectionStrategy(const BluetoothRawAddress &device, int strategy, bool &ret)
 {
     HILOGI("BluetoothMapMseProxy::SetConnectionStrategy Triggered!");
     MessageParcel data;
@@ -261,8 +253,7 @@ void BluetoothMapMseProxy::SetConnectionStrategy(
     ret = reply.ReadBool();
 }
 
-void BluetoothMapMseProxy::GetConnectionStrategy(
-    const BluetoothRawAddress &device, int32_t &ret)
+void BluetoothMapMseProxy::GetConnectionStrategy(const BluetoothRawAddress &device, int32_t &ret)
 {
     HILOGI("BluetoothMapMseProxy::GetConnectionStrategy Triggered!");
     MessageParcel data;
@@ -287,8 +278,7 @@ void BluetoothMapMseProxy::GetConnectionStrategy(
     ret = reply.ReadInt32();
 }
 
-void BluetoothMapMseProxy::GrantPermission(
-    const BluetoothRawAddress &device, bool allow, bool save)
+void BluetoothMapMseProxy::GrantPermission(const BluetoothRawAddress &device, bool allow, bool save)
 {
     HILOGI("BluetoothMapMseProxy::GrantPermission Triggered!");
     MessageParcel data;

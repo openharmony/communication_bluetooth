@@ -503,7 +503,8 @@ void BluetoothAvrcpTgProxy::NotifyVolumeChanged(int32_t volume)
     return;
 }
 
-ErrCode BluetoothAvrcpTgProxy::InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothAvrcpTgProxy::InnerTransact(
+    uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
 {
     auto remote = Remote();
     if (remote == nullptr) {

@@ -15,6 +15,7 @@
 
 #include "bluetooth_hfp_hf.h"
 #include "bluetooth_host.h"
+#include "bluetooth_load_system_ability.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
@@ -39,7 +40,7 @@ public:
 
     void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
+        HILOGD("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
@@ -152,11 +153,13 @@ std::string HfpHfServiceName = "bluetooth-hfp-hf-server";
 struct HandsFreeUnit::impl {
     impl();
     ~impl();
+    bool InitHfpHfProxy(void);
+    void UnInitHfpHfProxy(void);
 
     bool ConnectSco(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->ConnectSco(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
@@ -165,7 +168,7 @@ struct HandsFreeUnit::impl {
     bool DisconnectSco(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->DisconnectSco(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
@@ -175,7 +178,7 @@ struct HandsFreeUnit::impl {
     {
         HILOGI("enter");
         std::vector<BluetoothRemoteDevice> remoteDevices;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+        if (proxy_ != nullptr) {
             std::vector<BluetoothRawAddress> rawDevices;
             std::vector<int32_t> tmpStates;
             for (int state : states) {
@@ -194,7 +197,7 @@ struct HandsFreeUnit::impl {
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return HFP_HF_SLC_STATE_DISCONNECTED;
@@ -203,7 +206,7 @@ struct HandsFreeUnit::impl {
     int GetScoState(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->GetScoState(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return HFP_HF_SCO_STATE_DISCONNECTED;
@@ -212,7 +215,7 @@ struct HandsFreeUnit::impl {
     bool SendDTMFTone(const BluetoothRemoteDevice &device, uint8_t code)
     {
         HILOGI("enter, device: %{public}s, code: %{public}d", GET_ENCRYPT_ADDR(device), code);
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->SendDTMFTone(BluetoothRawAddress(device.GetDeviceAddr()), code);
         }
         return false;
@@ -221,9 +224,9 @@ struct HandsFreeUnit::impl {
     bool Connect(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && !BluetoothHost::GetDefaultHost().IsBtDiscovering() &&
+        if (proxy_ != nullptr && !BluetoothHost::GetDefaultHost().IsBtDiscovering() &&
             device.IsValidBluetoothRemoteDevice()) {
-                return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
+            return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         HILOGE("fw return false!");
         return false;
@@ -232,7 +235,7 @@ struct HandsFreeUnit::impl {
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         HILOGE("fw return false!");
@@ -242,7 +245,7 @@ struct HandsFreeUnit::impl {
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->OpenVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
@@ -251,7 +254,7 @@ struct HandsFreeUnit::impl {
     bool CloseVoiceRecognition(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->CloseVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
@@ -262,7 +265,7 @@ struct HandsFreeUnit::impl {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         std::vector<HandsFreeUnitCall> calls;
         std::vector<BluetoothHfpHfCall> callsList;
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             proxy_->GetCurrentCallList(BluetoothRawAddress(device.GetDeviceAddr()), callsList);
             for (BluetoothHfpHfCall call : callsList) {
                 UUID uuid = UUID::ConvertFrom128Bits(call.GetUuid().ConvertTo128Bits());
@@ -284,7 +287,7 @@ struct HandsFreeUnit::impl {
     bool AcceptIncomingCall(const BluetoothRemoteDevice &device, int flag)
     {
         HILOGI("enter, device: %{public}s, flag: %{public}d", GET_ENCRYPT_ADDR(device), flag);
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->AcceptIncomingCall(BluetoothRawAddress(device.GetDeviceAddr()), (int32_t)flag);
         }
         return false;
@@ -293,7 +296,7 @@ struct HandsFreeUnit::impl {
     bool HoldActiveCall(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->HoldActiveCall(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
@@ -302,7 +305,7 @@ struct HandsFreeUnit::impl {
     bool RejectIncomingCall(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->RejectIncomingCall(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
@@ -320,7 +323,7 @@ struct HandsFreeUnit::impl {
     bool HandleIncomingCall(const BluetoothRemoteDevice &device, int flag)
     {
         HILOGI("Enter!");
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->HandleIncomingCall(BluetoothRawAddress(device.GetDeviceAddr()), (int32_t)flag);
         }
         return false;
@@ -329,7 +332,7 @@ struct HandsFreeUnit::impl {
     bool HandleMultiCall(const BluetoothRemoteDevice &device, int flag, int index)
     {
         HILOGI("Enter!");
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->HandleMultiCall(BluetoothRawAddress(device.GetDeviceAddr()), (int32_t)flag, (int32_t)index);
         }
         return false;
@@ -338,7 +341,7 @@ struct HandsFreeUnit::impl {
     bool DialLastNumber(const BluetoothRemoteDevice &device)
     {
         HILOGI("Enter!");
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->DialLastNumber(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
@@ -347,7 +350,7 @@ struct HandsFreeUnit::impl {
     bool DialMemory(const BluetoothRemoteDevice &device, int index)
     {
         HILOGD("Enter! index = %{public}d", index);
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->DialMemory(BluetoothRawAddress(device.GetDeviceAddr()), index);
         }
         return false;
@@ -365,7 +368,7 @@ struct HandsFreeUnit::impl {
     bool FinishActiveCall(const BluetoothRemoteDevice &device, const HandsFreeUnitCall &call)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             bluetooth::Uuid uuid = bluetooth::Uuid::ConvertFrom128Bits(call.GetUuid().ConvertTo128Bits());
             bluetooth::HandsFreeUnitCalls calls(call.GetRemoteDevice(),
                 call.GetId(),
@@ -384,7 +387,7 @@ struct HandsFreeUnit::impl {
     std::optional<HandsFreeUnitCall> StartDial(const BluetoothRemoteDevice &device, const std::string &number)
     {
         HILOGI("enter, device: %{public}s, number: %{public}s", GET_ENCRYPT_ADDR(device), number.c_str());
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
             BluetoothHfpHfCall calls;
             proxy_->StartDial(BluetoothRawAddress(device.GetDeviceAddr()), number, calls);
             UUID uuid = UUID::ConvertFrom128Bits(calls.GetUuid().ConvertTo128Bits());
@@ -415,7 +418,7 @@ struct HandsFreeUnit::impl {
     }
 
 private:
-    const static int HFP_HF_SLC_STATE_DISCONNECTED = (int)BTConnectState::DISCONNECTED;
+    const static int HFP_HF_SLC_STATE_DISCONNECTED = static_cast<int>(BTConnectState::DISCONNECTED);
     const static int HFP_HF_SCO_STATE_DISCONNECTED = 3;
 
     BluetoothObserverList<HandsFreeUnitObserver> observers_;
@@ -427,7 +430,7 @@ private:
 
 class HandsFreeUnit::impl::HandsFreeUnitDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    HandsFreeUnitDeathRecipient(HandsFreeUnit::impl &impl) : impl_(impl)
+    explicit HandsFreeUnitDeathRecipient(HandsFreeUnit::impl &impl) : impl_(impl)
     {};
     ~HandsFreeUnitDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(HandsFreeUnitDeathRecipient);
@@ -435,6 +438,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        if (!impl_.proxy_) {
+            return;
+        }
+        impl_.proxy_->DeregisterObserver(&impl_.serviceObserver_);
         impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
     }
@@ -445,27 +452,15 @@ private:
 
 HandsFreeUnit::impl::impl()
 {
-    HILOGI("enter");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGE("failed: no hostRemote");
+    if (proxy_) {
         return;
     }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_HFP_HF);
-
-    if (!remote) {
-        HILOGE("failed: no remote");
+    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_HFP_HF);
+    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
         return;
     }
-    HILOGI("remote obtained");
-
-    proxy_ = iface_cast<IBluetoothHfpHf>(remote);
-    proxy_->RegisterObserver(&serviceObserver_);
-    deathRecipient_ = new HandsFreeUnitDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    InitHfpHfProxy();
 }
 
 HandsFreeUnit::impl::~impl()
@@ -478,6 +473,37 @@ HandsFreeUnit::impl::~impl()
     proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }
 
+bool HandsFreeUnit::impl::InitHfpHfProxy(void)
+{
+    if (proxy_) {
+        return true;
+    }
+    proxy_ = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
+    if (!proxy_) {
+        HILOGE("get HfpHf proxy fail");
+        return false;
+    }
+
+    proxy_->RegisterObserver(&serviceObserver_);
+    deathRecipient_ = new HandsFreeUnitDeathRecipient(*this);
+    if (deathRecipient_ != nullptr) {
+        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    }
+    return true;
+}
+
+void HandsFreeUnit::impl::UnInitHfpHfProxy(void)
+{
+    if (!proxy_) {
+        HILOGE("UnInitHfpHfProxy failed");
+        return;
+    }
+    proxy_->DeregisterObserver(&serviceObserver_);
+    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+    proxy_ = nullptr;
+    HILOGI("UnInitHfpHfProxy success");
+}
+
 HandsFreeUnit::HandsFreeUnit()
 {
     pimpl = std::make_unique<impl>();
@@ -485,6 +511,27 @@ HandsFreeUnit::HandsFreeUnit()
 
 HandsFreeUnit::~HandsFreeUnit()
 {}
+
+void HandsFreeUnit::Init()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    if (!pimpl->InitHfpHfProxy()) {
+        HILOGE("HfpHf proxy is nullptr");
+        return;
+    }
+}
+
+void HandsFreeUnit::UnInit()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    pimpl->UnInitHfpHfProxy();
+}
 
 HandsFreeUnit *HandsFreeUnit::GetProfile()
 {
@@ -494,71 +541,211 @@ HandsFreeUnit *HandsFreeUnit::GetProfile()
 
 bool HandsFreeUnit::ConnectSco(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->ConnectSco(device);
 }
 
 bool HandsFreeUnit::DisconnectSco(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->DisconnectSco(device);
 }
 
 std::vector<BluetoothRemoteDevice> HandsFreeUnit::GetDevicesByStates(std::vector<int> states) const
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return std::vector<BluetoothRemoteDevice>();
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return std::vector<BluetoothRemoteDevice>();
+    }
+
     return pimpl->GetDevicesByStates(states);
 }
 
 int HandsFreeUnit::GetDeviceState(const BluetoothRemoteDevice &device) const
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return static_cast<int>(BTConnectState::DISCONNECTED);
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return static_cast<int>(BTConnectState::DISCONNECTED);
+    }
+
     return pimpl->GetDeviceState(device);
 }
 
 int HandsFreeUnit::GetScoState(const BluetoothRemoteDevice &device) const
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return static_cast<int>(HfpScoConnectState::SCO_DISCONNECTED);
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return static_cast<int>(HfpScoConnectState::SCO_DISCONNECTED);
+    }
+
     return pimpl->GetScoState(device);
 }
 
 bool HandsFreeUnit::SendDTMFTone(const BluetoothRemoteDevice &device, uint8_t code)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->SendDTMFTone(device, code);
 }
 
 bool HandsFreeUnit::Connect(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->Connect(device);
 }
 
 bool HandsFreeUnit::Disconnect(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->Disconnect(device);
 }
 
 bool HandsFreeUnit::OpenVoiceRecognition(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->OpenVoiceRecognition(device);
 }
 
 bool HandsFreeUnit::CloseVoiceRecognition(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->CloseVoiceRecognition(device);
 }
 
 std::vector<HandsFreeUnitCall> HandsFreeUnit::GetExistingCalls(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return std::vector<HandsFreeUnitCall>();
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return std::vector<HandsFreeUnitCall>();
+    }
+
     return pimpl->GetExistingCalls(device);
 }
 
 bool HandsFreeUnit::AcceptIncomingCall(const BluetoothRemoteDevice &device, int flag)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->AcceptIncomingCall(device, flag);
 }
 
 bool HandsFreeUnit::HoldActiveCall(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->HoldActiveCall(device);
 }
 
 bool HandsFreeUnit::RejectIncomingCall(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->RejectIncomingCall(device);
 }
 
@@ -569,21 +756,61 @@ bool HandsFreeUnit::SendKeyPressed(const BluetoothRemoteDevice &device)
 
 bool HandsFreeUnit::HandleIncomingCall(const BluetoothRemoteDevice &device, int flag)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->HandleIncomingCall(device, flag);
 }
 
 bool HandsFreeUnit::HandleMultiCall(const BluetoothRemoteDevice &device, int flag, int index)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->HandleMultiCall(device, flag, index);
 }
 
 bool HandsFreeUnit::DialLastNumber(const BluetoothRemoteDevice &device)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->DialLastNumber(device);
 }
 
 bool HandsFreeUnit::DialMemory(const BluetoothRemoteDevice &device, int index)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->DialMemory(device, index);
 }
 
@@ -592,14 +819,35 @@ bool HandsFreeUnit::SendVoiceTag(const BluetoothRemoteDevice &device, int index)
     return pimpl->SendVoiceTag(device, index);
 }
 
+
 bool HandsFreeUnit::FinishActiveCall(const BluetoothRemoteDevice &device, const HandsFreeUnitCall &call)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return false;
+    }
+
     return pimpl->FinishActiveCall(device, call);
 }
 
 std::optional<HandsFreeUnitCall> HandsFreeUnit::StartDial(
     const BluetoothRemoteDevice &device, const std::string &number)
 {
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return std::nullopt;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+        HILOGE("pimpl or hfpHf proxy is nullptr");
+        return std::nullopt;
+    }
+
     return pimpl->StartDial(device, number);
 }
 

@@ -38,7 +38,7 @@ int32_t BluetoothHidHostProxy::Connect(const BluetoothRawAddress &device)
     };
 
     int error = Remote()->SendRequest(COMMAND_CONNECT, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHidHostProxy::Connect done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
@@ -64,7 +64,7 @@ int32_t BluetoothHidHostProxy::Disconnect(const BluetoothRawAddress &device)
     };
 
     int error = Remote()->SendRequest(COMMAND_DISCONNECT, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHidHostProxy::Disconnect done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
@@ -90,21 +90,21 @@ int32_t BluetoothHidHostProxy::GetDeviceState(const BluetoothRawAddress &device,
     };
 
     int error = Remote()->SendRequest(COMMAND_GET_DEVICE_STATE, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHidHostProxy::GetDeviceState done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
     // read error code
     int32_t errCode = reply.ReadInt32();
-    if (errCode != BT_SUCCESS) {
+    if (errCode != BT_NO_ERROR) {
         HILOGE("reply errCode: %{public}d", errCode);
         return errCode;
     }
 
     // read state
     state = reply.ReadInt32();
-    return BT_SUCCESS;
+    return BT_NO_ERROR;
 }
 
 int32_t BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &states,
@@ -123,13 +123,13 @@ int32_t BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &st
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int error = Remote()->SendRequest(COMMAND_GET_DEVICES_BY_STATES, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHidHostProxy::GetDevicesByStates done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     // read error code
     int32_t errCode = reply.ReadInt32();
-    if (errCode != BT_SUCCESS) {
+    if (errCode != BT_NO_ERROR) {
         HILOGE("reply errCode: %{public}d", errCode);
         return errCode;
     }
@@ -142,7 +142,7 @@ int32_t BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &st
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
         result.push_back(*address);
     }
-    return BT_SUCCESS;
+    return BT_NO_ERROR;
 }
 
 ErrCode BluetoothHidHostProxy::RegisterObserver(

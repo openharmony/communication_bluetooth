@@ -1,5 +1,5 @@
 {
-  "name": "@ohos/communication_bluetooth",
+  "name": "@ohos/bluetooth",
   "version": "",
   "description": "Provides basic Bluetooth and BLE functions for applications",
   "homePage": "https://gitee.com/openharmony",
@@ -42,20 +42,6 @@
       "SystemCapability.Communication.Bluetooth.Lite"
     ],
     "features": [
-      "bluetooth_avrcp_avsession",
-      "bluetooth_a2dp_sink_feature",
-      "bluetooth_a2dp_source_feature",
-      "bluetooth_avrcp_ct_feature",
-      "bluetooth_avrcp_tg_feature",
-      "bluetooth_hfp_ag_feature",
-      "bluetooth_hfp_hf_feature",
-      "bluetooth_hid_host_feature",
-      "bluetooth_pan_feature",
-      "bluetooth_pbap_client_feature",
-      "bluetooth_pbap_server_feature",
-      "bluetooth_opp_feature",
-      "bluetooth_map_client_feature",
-      "bluetooth_map_server_feature"
     ],
     "adapted_system_type": [
       "standard"
@@ -90,12 +76,10 @@
         "base_group": [],
         "fwk_group": [
           "//foundation/communication/bluetooth/frameworks/inner:btframework",
+          "//foundation/communication/bluetooth/frameworks/inner:btcommon",
           "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi"
         ],
         "service_group": [
-          "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_sa_profile",
-          "//foundation/communication/bluetooth/services/bluetooth/server:bluetooth_server",
-          "//foundation/communication/bluetooth/services/bluetooth/service:btsbc"
         ]
       },
       "inner_kits": [
@@ -129,18 +113,15 @@
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/inner:btframework"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/inner/ipc/include",
+            "header_files": [
+            ]
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/inner:btcommon"
         }
-      ],
-      "test": [
-        "//foundation/communication/bluetooth/test/unittest/spp:unittest",
-        "//foundation/communication/bluetooth/test/unittest/host:unittest",
-        "//foundation/communication/bluetooth/test/unittest/ble:unittest",
-        "//foundation/communication/bluetooth/test/unittest/hid:unittest",
-        "//foundation/communication/bluetooth/test/unittest/pan:unittest",
-        "//foundation/communication/bluetooth/test/unittest/opp:unittest",
-        "//foundation/communication/bluetooth/test/unittest/gatt_c:unittest",
-        "//foundation/communication/bluetooth/test/fuzztest/host:fuzztest",
-        "//foundation/communication/bluetooth/test/example/bluetoothtest:bluetoothtest"
       ]
     }
   }

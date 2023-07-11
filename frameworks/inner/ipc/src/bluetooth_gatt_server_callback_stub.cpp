@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothGattServerCallbackStub::BluetoothGattServerCallbackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CHARACTERISTIC_READREQUEST)] =
         &BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner;
@@ -47,12 +47,12 @@ BluetoothGattServerCallbackStub::BluetoothGattServerCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner;
-    HILOGD("%{public}s ends.", __func__);
+    HILOGI("ends.");
 }
 
 BluetoothGattServerCallbackStub::~BluetoothGattServerCallbackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 int BluetoothGattServerCallbackStub::OnRemoteRequest(
@@ -60,9 +60,7 @@ int BluetoothGattServerCallbackStub::OnRemoteRequest(
 {
     HILOGD("BluetoothGattServerCallbackStub::OnRemoteRequest, cmd = %{public}u, flags= %{public}d",
         code, option.GetFlags());
-    std::u16string descriptor = BluetoothGattServerCallbackStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothGattServerCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -94,7 +92,7 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(Messag
 }
 ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner Triggered!");
+    HILOGD("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner Triggered!");
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
         HILOGE("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner device is null");
