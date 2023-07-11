@@ -26,7 +26,7 @@ const std::string STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE = "connectionState
 class NapiBluetoothPanObserver : public PanObserver {
 public:
     NapiBluetoothPanObserver() = default;
-    virtual ~NapiBluetoothPanObserver() = default;
+    ~NapiBluetoothPanObserver() override = default;
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 

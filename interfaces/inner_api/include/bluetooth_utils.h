@@ -21,14 +21,10 @@
 
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
+#include "iremote_broker.h"
+#include "refbase.h"
 
-#define CHECK_PROXY_RETURN(proxy) do { \
-    if ((proxy) == nullptr) { \
-        HILOGE("proxy_ is nullptr"); \
-        return BT_ERR_INTERNAL_ERROR; \
-    } \
-} while (0)
-
+class IRemoteObject;
 namespace OHOS {
 namespace Bluetooth {
 static constexpr int GET_PROXY_SLEEP_SEC = 1; // 1s
@@ -40,6 +36,13 @@ std::string GetBtStateName(int state);
 std::string GetBtTransportName(int transport);
 std::string GetProfileConnStateName(int state);
 std::string GetErrorCode(int32_t errCode);
+
+sptr<IRemoteObject> GetRemoteObject(const std::string &objectName);
+template <typename T>
+sptr<T> GetRemoteProxy(const std::string &objectName)
+{
+    return iface_cast<T>(GetRemoteObject(objectName));
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
 

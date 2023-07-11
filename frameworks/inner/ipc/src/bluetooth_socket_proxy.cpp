@@ -20,34 +20,39 @@
 
 namespace OHOS {
 namespace Bluetooth {
-int BluetoothSocketProxy::Connect(std::string &addr, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
+int BluetoothSocketProxy::Connect(ConnectSocketParam &param, int &fd)
 {
-    HILOGI("BluetoothSocketProxy::Connect starts");
+    HILOGI("Connect starts");
     MessageParcel data;
 
     if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("BluetoothSocketProxy::Connect WriteInterfaceToken error");
-        return ERROR;
+        HILOGE("Connect WriteInterfaceToken error");
+        return BT_ERR_INTERNAL_ERROR;
     }
-    if (!data.WriteString(addr)) {
-        HILOGE("BluetoothSocketProxy::Connect write addr error");
-        return ERROR;
+    if (!data.WriteString(param.addr)) {
+        HILOGE("Connect write addr error");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    BluetoothUuid btUuid(uuid);
+    BluetoothUuid btUuid(param.uuid);
     if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("BluetoothSocketProxy::Connect write uuid error");
-        return ERROR;
+        HILOGE("Connect write uuid error");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (!data.WriteInt32(securityFlag)) {
-        HILOGE("BluetoothSocketProxy::Connect write securityFlag error");
-        return ERROR;
+    if (!data.WriteInt32(param.securityFlag)) {
+        HILOGE("Connect write securityFlag error");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (!data.WriteInt32(type)) {
-        HILOGE("BluetoothSocketProxy::Connect write type error");
-        return ERROR;
+    if (!data.WriteInt32(param.type)) {
+        HILOGE("Connect write type error");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    if (!data.WriteInt32(param.psm)) {
+        HILOGE("Connect write psm error");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
@@ -57,40 +62,45 @@ int BluetoothSocketProxy::Connect(std::string &addr, bluetooth::Uuid &uuid, int3
 
     int error = Remote()->SendRequest(BluetoothSocketProxy::Code::SOCKET_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothSocketProxy::Connect done fail, error: %{public}d", error);
-        return ERROR;
+        HILOGE("Connect done fail, error: %{public}d", error);
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    return reply.ReadFileDescriptor();
+    int errorCode = reply.ReadInt32();
+    if (errorCode == NO_ERROR) {
+        fd = reply.ReadFileDescriptor();
+    }
+    return errorCode;
 }
 
-int BluetoothSocketProxy::Listen(std::string &name, bluetooth::Uuid &uuid, int32_t securityFlag, int32_t type)
+int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
 {
-    HILOGI("Listen starts");
+    HILOGI("starts");
+    fd = BT_INVALID_SOCKET_FD;
     MessageParcel data;
 
     if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return BT_INVALID_SOCKET_FD;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    if (!data.WriteString(name)) {
+    if (!data.WriteString(param.name)) {
         HILOGE("write name error");
-        return BT_INVALID_SOCKET_FD;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    BluetoothUuid btUuid(uuid);
+    BluetoothUuid btUuid(param.uuid);
     if (!data.WriteParcelable(&btUuid)) {
         HILOGE("write uuid error");
-        return BT_INVALID_SOCKET_FD;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (!data.WriteInt32(securityFlag)) {
+    if (!data.WriteInt32(param.securityFlag)) {
         HILOGE("write securityFlag error");
-        return BT_INVALID_SOCKET_FD;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (!data.WriteInt32(type)) {
+    if (!data.WriteInt32(param.type)) {
         HILOGE("write type error");
-        return BT_INVALID_SOCKET_FD;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
@@ -101,10 +111,15 @@ int BluetoothSocketProxy::Listen(std::string &name, bluetooth::Uuid &uuid, int32
     int error = Remote()->SendRequest(BluetoothSocketProxy::Code::SOCKET_LISTEN, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("Listen done fail, error: %{public}d", error);
-        return BT_INVALID_SOCKET_FD;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    return reply.ReadFileDescriptor();
+    int errorCode = reply.ReadInt32();
+    if (errorCode == NO_ERROR) {
+        fd = reply.ReadFileDescriptor();
+    }
+
+    return errorCode;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

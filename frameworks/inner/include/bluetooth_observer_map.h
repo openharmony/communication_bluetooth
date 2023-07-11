@@ -36,6 +36,7 @@ public:
     T *PopAdvertiserObserver(uint8_t advHandle);
     T *GetAdvertiserObserver(uint8_t advHandle);
     bool IsExistAdvertiserCallback(T *observer, int &handle);
+    void Clear(void);
 
 private:
     std::mutex lock_;
@@ -43,6 +44,13 @@ private:
 
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothObserverMap);
 };
+
+template<typename T>
+void BluetoothObserverMap<T>::Clear(void)
+{
+    std::lock_guard<std::mutex> lock(lock_);
+    observers_.clear();
+}
 
 template<typename T>
 BluetoothObserverMap<T>::~BluetoothObserverMap()

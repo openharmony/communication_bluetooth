@@ -21,11 +21,6 @@ namespace Bluetooth {
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
     HILOGI("Enter bluetooth event notify");
-    
-    if (asyncEvent == nullptr || asyncEvent->callback_ == nullptr) {
-        HILOGI("asyncEvent callback_ is null.");
-        return;
-    }
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(asyncEvent->env_, &loop);
 
@@ -36,9 +31,6 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         asyncEvent = nullptr;
         return;
     }
-    uint32_t refCount = INVALID_REF_COUNT;
-    napi_reference_ref(asyncEvent->env_, asyncEvent->callback_, &refCount);
-    HILOGI("increments the reference count, refCount: %{public}d", refCount);
     work->data = asyncEvent;
 
     uv_queue_work(
@@ -47,22 +39,20 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             AsyncEventData *callbackInfo = static_cast<AsyncEventData*>(work->data);
-            napi_value result = nullptr;
             napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            result = callbackInfo->packResult();
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            if (callback != nullptr) {
-                HILOGI("napi_call_function called");
-                napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            }
-            uint32_t refCount = INVALID_REF_COUNT;
-            napi_reference_unref(callbackInfo->env_, callbackInfo->callback_, &refCount);
-            HILOGI("uv_queue_work unref, refCount: %{public}d", refCount);
-            if (refCount == 0) {
-                napi_delete_reference(callbackInfo->env_, callbackInfo->callback_);
+            napi_status ret = napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+            if (ret == napi_ok && callback != nullptr) {
+                napi_value result = nullptr;
+                napi_value undefined = nullptr;
+                napi_value callResult = nullptr;
+                if (napi_get_undefined(callbackInfo->env_, &undefined) == napi_ok) {
+                    result = callbackInfo->packResult();
+                    if (result != nullptr) {
+                        HILOGI("napi_call_function called");
+                        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE,
+                            &result, &callResult);
+                    }
+                }
             }
             delete callbackInfo;
             delete work;
@@ -74,6 +64,10 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 napi_value NapiEvent::CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb, int value)
 {
     napi_value result = nullptr;
+    if (cb == nullptr) {
+        HILOGE("CreateResult cb is null!");
+        return result;
+    }
     napi_create_object(cb->env_, &result);
     ConvertStateChangeParamToJS(cb->env_, result, cb->deviceId_, value);
     return result;
@@ -95,6 +89,40 @@ napi_value NapiEvent::CreateResult(const std::shared_ptr<BluetoothCallbackInfo> 
     napi_create_object(cb->env_, &result);
     ConvertBLECharacteristicToJS(cb->env_, result, characteristic);
     return result;
+}
+
+// if callbackInfos contains specific type, new callbackInfo will cover the old.
+// If exist, covered event happen, this function will clear rest reference of old callbackInfo in napi framework.
+void UpdateCallbackInfo(std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos,
+    const std::string &type)
+{
+    auto it = callbackInfos.find(type);
+    if (it != callbackInfos.end() && it->second != nullptr) {
+        HILOGW("repetition type %{public}s is register, old callbackInfo will be deleted.", type.c_str());
+        // as long as the type is same, callbackInfo will be covered.
+        uint32_t refCount = INVALID_REF_COUNT;
+        napi_value handlerTemp = nullptr;
+        napi_status status = napi_get_reference_value(it->second->env_, it->second->callback_, &handlerTemp);
+        if (status != napi_ok) {
+            HILOGE("napi_get_reference_value failed. napi status is %{public}d", status);
+            return;
+        }
+        // if handlerTemp exist clear it. no exist, memory leak safe
+        if (handlerTemp != nullptr) {
+            HILOGI("napi_get_reference_value succeed");
+            napi_reference_unref(it->second->env_, it->second->callback_, &refCount);
+            HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
+            // other place like EventNotify before use will add refCount, happen refCount != 0,
+            // ensure other place copy the prepare covered callbackInfo、add refCount and unref and delete refCount
+            if (refCount == 0) {
+                HILOGI("delete the reference");
+                napi_delete_reference(it->second->env_, it->second->callback_);
+            }
+            HILOGI("old %{public}s is deleted", type.c_str());
+        } else {
+            HILOGI("napi_get_reference_value is nullptr");
+        }
+    }
 }
 
 napi_value NapiEvent::OnEvent(napi_env env, napi_callback_info info,
@@ -127,6 +155,8 @@ napi_value NapiEvent::OnEvent(napi_env env, napi_callback_info info,
         HILOGE("Wrong argument type. Function expected.");
         return ret;
     }
+
+    UpdateCallbackInfo(callbackInfos, type);
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     callbackInfos[type] = callbackInfo;
     HILOGI("%{public}s is registered", type.c_str());
@@ -158,13 +188,11 @@ napi_value NapiEvent::OffEvent(napi_env env, napi_callback_info info,
         HILOGE("type %{public}s callbackInfos isn't exist.", type.c_str());
         return ret;
     }
-
-    uint32_t refCount = INVALID_REF_COUNT;
-    napi_reference_unref(env, it->second->callback_, &refCount);
-    HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
-    if (refCount == 0) {
-        napi_delete_reference(env, it->second->callback_);
+    if (env != it->second->env_) {
+        HILOGE("env doesn't match, please check.");
+        return ret;
     }
+    napi_delete_reference(env, it->second->callback_);
     it->second = nullptr;
     HILOGI("%{public}s is unregistered", type.c_str());
     return ret;

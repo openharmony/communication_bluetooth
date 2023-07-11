@@ -13,14 +13,20 @@
  * limitations under the License.
  */
 
+#include "bluetooth_log.h"
 #include "bluetooth_map_mce_parameter.h"
 
 namespace OHOS {
 namespace Bluetooth {
+const int MAP_MCE_VCARD_COUNT_MAX = 0xFFFF;
+const int MAP_MCE_MASINSTANCEINFO_COUNT_MAX = 0xFFFF;
+const int MAP_MCE_PARTICIPANTLIST_COUNT_MAX = 0xFFFF;
+const int MAP_MCE_CONVOUTLINELIST_COUNT_MAX = 0xFFFF;
+const int MAP_MCE_OUTLINE_COUNT_MAX = 0xFFFF;
 bool BluetoothIProfileMapAction::Marshalling(Parcel &parcel) const
 {
     bool status;
-    status = parcel.WriteInt32((int)action_);
+    status = parcel.WriteInt32(static_cast<int>(action_));
     if (!status) {
         return status;
     }
@@ -168,7 +174,10 @@ bool BluetoothIProfileMasInstanceInfoList::ReadFromParcel(Parcel &parcel)
     if (!status) {
         return status;
     }
-
+    if (tempInt > MAP_MCE_MASINSTANCEINFO_COUNT_MAX) {
+        HILOGE("check fail, invalid parameter.");
+        return false;
+    }
     bluetooth::IProfileMasInstanceInfo tempInfo;
     for (int i = 0; i < tempInt; i++) {
         status = parcel.ReadString(tempInfo.OwnerUCI);
@@ -293,12 +302,12 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
         return status;
     }
 
-    status = parcel.WriteInt32((int)msgStruct.readstatus_property);
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.readstatus_property));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)msgStruct.type_property);
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.type_property));
     if (!status) {
         return status;
     }
@@ -313,7 +322,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
         return status;
     }
 
-    status = parcel.WriteInt32((int)msgStruct.originator_.size());
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.originator_.size()));
     if (!status) {
         return status;
     }
@@ -325,7 +334,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
             return status;
     }
 
-    status = parcel.WriteInt32((int)msgStruct.envelope_.recipientLevel1_.size());
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.envelope_.recipientLevel1_.size()));
     if (!status) {
         return status;
     }
@@ -338,7 +347,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
             return status;
     }
 
-    status = parcel.WriteInt32((int)msgStruct.envelope_.recipientLevel2_.size());
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.envelope_.recipientLevel2_.size()));
     if (!status) {
         return status;
     }
@@ -351,7 +360,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
             return status;
     }
 
-    status = parcel.WriteInt32((int)msgStruct.envelope_.recipientLevel3_.size());
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.envelope_.recipientLevel3_.size()));
     if (!status) {
         return status;
     }
@@ -363,7 +372,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
         if (!status)
             return status;
     }
-    status = parcel.WriteInt32((int)msgStruct.envelope_.maxLevelOfEnvelope_);
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.envelope_.maxLevelOfEnvelope_));
     if (!status) {
         return status;
     }
@@ -388,7 +397,7 @@ bool BluetoothIProfileBMessageStruct::WriteToParcel(
         return status;
     }
 
-    status = parcel.WriteInt32((int)msgStruct.envelope_.msgBody_.body_content_length);
+    status = parcel.WriteInt32(static_cast<int>(msgStruct.envelope_.msgBody_.body_content_length));
     if (!status) {
         return status;
     }
@@ -450,7 +459,10 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     if (!status) {
         return status;
     }
-
+    if (tempInt > MAP_MCE_VCARD_COUNT_MAX) {
+        HILOGE("check fail, invalid parameter.");
+        return false;
+    }
     for (i = 0; i < tempInt; i++) {
         ReadFromParcelIProfileMapVcard(parcel, vcard);
         msgStruct.envelope_.recipientLevel1_.push_back(vcard);
@@ -460,7 +472,10 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     if (!status) {
         return status;
     }
-
+    if (tempInt > MAP_MCE_VCARD_COUNT_MAX) {
+        HILOGE("check fail, invalid parameter.");
+        return false;
+    }
     for (i = 0; i < tempInt; i++) {
         ReadFromParcelIProfileMapVcard(parcel, vcard);
         msgStruct.envelope_.recipientLevel2_.push_back(vcard);
@@ -470,7 +485,10 @@ bool BluetoothIProfileBMessageStruct::ReadFromParcel(
     if (!status) {
         return status;
     }
-
+    if (tempInt > MAP_MCE_VCARD_COUNT_MAX) {
+        HILOGE("check fail, invalid parameter.");
+        return false;
+    }
     for (i = 0; i < tempInt; i++) {
         ReadFromParcelIProfileMapVcard(parcel, vcard);
         msgStruct.envelope_.recipientLevel3_.push_back(vcard);
@@ -525,22 +543,22 @@ bool BluetoothIProfileSendMessageParameters::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    status = parcel.WriteInt32((int)Attachment);
+    status = parcel.WriteInt32(static_cast<int>(Attachment));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)Charset);
+    status = parcel.WriteInt32(static_cast<int>(Charset));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)Transparent);
+    status = parcel.WriteInt32(static_cast<int>(Transparent));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)Retry);
+    status = parcel.WriteInt32(static_cast<int>(Retry));
     if (!status) {
         return status;
     }
@@ -550,7 +568,7 @@ bool BluetoothIProfileSendMessageParameters::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    status = parcel.WriteInt32((int)ModifyText);
+    status = parcel.WriteInt32(static_cast<int>(ModifyText));
     if (!status) {
         return status;
     }
@@ -581,7 +599,6 @@ BluetoothIProfileSendMessageParameters *BluetoothIProfileSendMessageParameters::
 
 bool BluetoothIProfileSendMessageParameters::ReadFromParcel(Parcel &parcel)
 {
-    std::string tempStr;
     bool status;
     int tempInt;
 
@@ -828,17 +845,17 @@ bool BluetoothIProfileGetMessageParameters::Marshalling(Parcel &parcel) const
 {
     bool status;
 
-    status = parcel.WriteInt32((int)Attachment);
+    status = parcel.WriteInt32(static_cast<int>(Attachment));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)Charset);
+    status = parcel.WriteInt32(static_cast<int>(Charset));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)FractionRequest);
+    status = parcel.WriteInt32(static_cast<int>(FractionRequest));
     return status;
 }
 
@@ -1053,7 +1070,7 @@ bool BluetoothIProfileBMessage::Marshalling(Parcel &parcel) const
 {
     bool status;
 
-    status = parcel.WriteInt32((int)FractionDeliver);
+    status = parcel.WriteInt32(static_cast<int>(FractionDeliver));
     if (!status) {
         return status;
     }
@@ -1157,52 +1174,52 @@ bool BluetoothIProfileMessagesListing::WriteToParcelIProfileMessageOutline(
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.type);
+    status = parcel.WriteInt32(static_cast<int>(outline.type));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.receptionStatus);
+    status = parcel.WriteInt32(static_cast<int>(outline.receptionStatus));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.size);
+    status = parcel.WriteInt32(static_cast<int>(outline.size));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.attachment_size);
+    status = parcel.WriteInt32(static_cast<int>(outline.attachment_size));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.text);
+    status = parcel.WriteInt32(static_cast<int>(outline.text));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.read);
+    status = parcel.WriteInt32(static_cast<int>(outline.read));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.sent);
+    status = parcel.WriteInt32(static_cast<int>(outline.sent));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.protected_);
+    status = parcel.WriteInt32(static_cast<int>(outline.protected_));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.priority);
+    status = parcel.WriteInt32(static_cast<int>(outline.priority));
     if (!status) {
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.delivery_status);
+    status = parcel.WriteInt32(static_cast<int>(outline.delivery_status));
     if (!status) {
         return status;
     }
@@ -1216,7 +1233,7 @@ bool BluetoothIProfileMessagesListing::WriteToParcelIProfileMessageOutline(
     if (!status) {
         return status;
     }
-    status = parcel.WriteInt32((int)outline.direction);
+    status = parcel.WriteInt32(static_cast<int>(outline.direction));
     if (!status) {
         return status;
     }
@@ -1434,6 +1451,10 @@ bool BluetoothIProfileMessagesListing::ReadFromParcel(Parcel &parcel)
 
     // get the outlineListSize first
     status = parcel.ReadInt32(outlineListSize);
+    if (outlineListSize > MAP_MCE_OUTLINE_COUNT_MAX) {
+        HILOGE("check fail, invalid parameter.");
+        return false;
+    }
     if (!status) {
         return status;
     }
@@ -1518,7 +1539,7 @@ bool BluetoothIProfileConversationListing::WriteToParcelIProfileConversation(
         return status;
     }
 
-    status = parcel.WriteInt32((int)outline.participantList_.size());
+    status = parcel.WriteInt32(static_cast<int>(outline.participantList_.size()));
     if (!status) {
         return status;
     }
@@ -1573,7 +1594,10 @@ bool BluetoothIProfileConversationListing::ReadFromParcelIProfileConversation(
         return status;
     }
     participantListNum_ = tmpInt;
-
+    if (participantListNum_ > MAP_MCE_PARTICIPANTLIST_COUNT_MAX) {
+        HILOGE("check fail, invalid parameter.");
+        return false;
+    }
     bluetooth::IProfileParticipant participant;
     for (int i = 0; i < participantListNum_; i++) {
         ReadFromParcelIProfileParticipant(parcel, participant);
@@ -1762,7 +1786,10 @@ bool BluetoothIProfileConversationListing::ReadFromParcel(Parcel &parcel)
         return status;
     }
     conversationOutlineListNum_ = tmpInt;
-
+    if (conversationOutlineListNum_ > MAP_MCE_CONVOUTLINELIST_COUNT_MAX) {
+        HILOGE("check fail, invalid parameter.");
+        return false;
+    }
     bluetooth::IProfileConversation conversation;
     for (int i = 0; i < conversationOutlineListNum_; i++) {
         ReadFromParcelIProfileConversation(parcel, conversation);
@@ -1804,9 +1831,7 @@ bool BluetoothIProfileConversationListing::ReadFromParcel(Parcel &parcel)
 
 bool BluetoothIProfileMapEventReport::Marshalling(Parcel &parcel) const
 {
-    bool status;
-    std::string u8Str;
-    status = parcel.WriteString(type);
+    bool status = parcel.WriteString(type);
     if (!status) {
         return status;
     }
@@ -1826,7 +1851,7 @@ bool BluetoothIProfileMapEventReport::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    status = parcel.WriteInt32((int)msg_type);
+    status = parcel.WriteInt32(static_cast<int>(msg_type));
     if (!status) {
         return status;
     }
@@ -1846,7 +1871,7 @@ bool BluetoothIProfileMapEventReport::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    status = parcel.WriteInt32((int)priority);
+    status = parcel.WriteInt32(static_cast<int>(priority));
     if (!status) {
         return status;
     }
@@ -1881,7 +1906,7 @@ bool BluetoothIProfileMapEventReport::Marshalling(Parcel &parcel) const
         return status;
     }
 
-    status = parcel.WriteInt32((int)read_status);
+    status = parcel.WriteInt32(static_cast<int>(read_status));
     if (!status) {
         return status;
     }

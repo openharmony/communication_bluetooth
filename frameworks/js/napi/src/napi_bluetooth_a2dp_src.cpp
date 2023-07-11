@@ -92,7 +92,10 @@ napi_value NapiA2dpSource::GetConnectionDevices(napi_env env, napi_callback_info
     A2dpSource *profile = A2dpSource::GetProfile();
     vector<int> states;
     states.push_back(1);
-    vector<BluetoothRemoteDevice> devices = profile->GetDevicesByStates(states);
+    vector<BluetoothRemoteDevice> devices;
+    int errorCode = profile->GetDevicesByStates(states, devices);
+    NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
+
     vector<string> deviceVector;
     for (auto &device: devices) {
         deviceVector.push_back(device.GetDeviceAddr());
@@ -126,9 +129,18 @@ napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info)
 
     A2dpSource *profile = A2dpSource::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
-    int state = profile->GetDeviceState(device);
+
+    int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
+    if (napi_create_int32(env, profileState, &ret) != napi_ok) {
+        HILOGE("napi_create_int32 failed.");
+    }
+
+    int btConnectState = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+    int errorCode = profile->GetDeviceState(device, btConnectState);
+    NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
+
     napi_value result = nullptr;
-    int status = GetProfileConnectionState(state);
+    int status = GetProfileConnectionState(btConnectState);
     napi_create_int32(env, status, &result);
     HILOGI("status: %{public}d", status);
     return result;
@@ -148,9 +160,9 @@ napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info
     int transport = GetDeviceTransport(remoteAddr);
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
     A2dpSource *profile = A2dpSource::GetProfile();
-    int32_t res = profile->GetPlayingState(remoteDevice, state);
-    HILOGI("res: %{public}d", res);
-    NAPI_BT_ASSERT_RETURN(env, (res == BT_SUCCESS), res, ret);
+    int32_t errorCode = profile->GetPlayingState(remoteDevice, state);
+    HILOGI("errorCode: %{public}d", errorCode);
+    NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
 
     return NapiGetInt32Ret(env, state);
 }
@@ -166,7 +178,7 @@ napi_value NapiA2dpSource::Connect(napi_env env, napi_callback_info info)
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
     A2dpSource *profile = A2dpSource::GetProfile();
     int32_t ret = profile->Connect(remoteDevice);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
 
     return NapiGetBooleanTrue(env);
 }
@@ -182,7 +194,7 @@ napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
     A2dpSource *profile = A2dpSource::GetProfile();
     int32_t ret = profile->Disconnect(remoteDevice);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_SUCCESS, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
 
     return NapiGetBooleanTrue(env);
 }

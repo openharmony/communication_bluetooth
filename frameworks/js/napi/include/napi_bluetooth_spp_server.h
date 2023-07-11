@@ -32,7 +32,7 @@ struct NapiSppServer {
     static std::map<int, std::shared_ptr<NapiSppServer>> serverMap;
     static int count;
 
-    std::shared_ptr<SppServerSocket> server_ = nullptr;
+    std::shared_ptr<ServerSocket> server_ = nullptr;
     int id_ = -1;
 };
 } // namespace Bluetooth

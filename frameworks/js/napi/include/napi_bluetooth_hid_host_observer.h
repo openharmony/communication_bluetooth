@@ -26,7 +26,7 @@ const std::string STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE = "connection
 class NapiBluetoothHidHostObserver : public HidHostObserver {
 public:
     NapiBluetoothHidHostObserver() = default;
-    virtual ~NapiBluetoothHidHostObserver() = default;
+    ~NapiBluetoothHidHostObserver() override = default;
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 

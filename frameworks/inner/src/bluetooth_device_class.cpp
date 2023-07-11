@@ -113,7 +113,6 @@ bool BluetoothDeviceClass::IsHeadSetSupported() const
         case BluetoothDevice::AUDIO_VIDEO_HANDSFREE:
         case BluetoothDevice::AUDIO_VIDEO_WEARABLE_HEADSET:
         case BluetoothDevice::AUDIO_VIDEO_CAR_AUDIO:
-        case BluetoothDevice::AUDIO_VIDEO_HANDSFREE_HEADSET:
             return true;
         default:
             return false;

@@ -22,28 +22,29 @@ namespace Bluetooth {
 using namespace OHOS::bluetooth;
 BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED)] =
+    HILOGI("start.");
+    memberFuncMap_[static_cast<uint32_t>(
+        IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner;
 }
 
 BluetoothA2dpSrcObserverStub::~BluetoothA2dpSrcObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 
 int BluetoothA2dpSrcObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothA2dpSrcObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothA2dpSrcObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGD("cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothA2dpSrcObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -54,7 +55,7 @@ int BluetoothA2dpSrcObserverStub::OnRemoteRequest(
             return (this->*memberFunc)(data, reply);
         }
     }
-    HILOGW("BluetoothA2dpSrcObserverStub::OnRemoteRequest, default case, need check.");
+    HILOGW("default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 

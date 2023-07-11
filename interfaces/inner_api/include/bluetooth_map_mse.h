@@ -197,6 +197,18 @@ public:
      */
     void GrantPermission(const BluetoothRemoteDevice &device, bool allow, bool save = false);
 
+    /**
+     * @brief The external process calls the MapServer profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * MapServer proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of MapServer profile.
+     */
+    void UnInit();
+
 private:
     /**
      * @brief A constructor used to create a Map Server instance.

@@ -28,12 +28,13 @@ public:
     BluetoothBleAdvertiseCallbackStub();
     ~BluetoothBleAdvertiseCallbackStub() override;
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     ErrCode OnAutoStopAdvEventInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnStartResultEventInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnSetAdvDataEventInner(MessageParcel &data, MessageParcel &reply);
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
         memberFuncMap_;

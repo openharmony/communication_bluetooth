@@ -37,7 +37,7 @@ int32_t BluetoothPanProxy::Disconnect(const BluetoothRawAddress &device)
     };
 
     int error = Remote()->SendRequest(COMMAND_DISCONNECT, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothPanProxy::Disconnect done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
@@ -62,19 +62,19 @@ int32_t BluetoothPanProxy::GetDeviceState(const BluetoothRawAddress &device, int
     };
 
     int error = Remote()->SendRequest(COMMAND_GET_DEVICE_STATE, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     // read error code
     int32_t errCode = reply.ReadInt32();
-    if (errCode != BT_SUCCESS) {
+    if (errCode != BT_NO_ERROR) {
         HILOGE("reply errCode: %{public}d", errCode);
         return errCode;
     }
     // read state
     state = reply.ReadInt32();
-    return BT_SUCCESS;
+    return BT_NO_ERROR;
 }
 
 int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states,
@@ -93,13 +93,13 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int error = Remote()->SendRequest(COMMAND_GET_DEVICES_BY_STATES, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("SendRequest failed, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     // read error code
     int32_t errCode = reply.ReadInt32();
-    if (errCode != BT_SUCCESS) {
+    if (errCode != BT_NO_ERROR) {
         HILOGE("reply errCode: %{public}d", errCode);
         return errCode;
     }
@@ -112,11 +112,10 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
         result.push_back(*address);
     }
-    return BT_SUCCESS;
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothPanProxy::RegisterObserver(
-    const sptr<IBluetoothPanObserver> observer)
+ErrCode BluetoothPanProxy::RegisterObserver(const sptr<IBluetoothPanObserver> observer)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
@@ -141,8 +140,7 @@ ErrCode BluetoothPanProxy::RegisterObserver(
     return error;
 }
 
-ErrCode BluetoothPanProxy::DeregisterObserver(
-    const sptr<IBluetoothPanObserver> observer)
+ErrCode BluetoothPanProxy::DeregisterObserver(const sptr<IBluetoothPanObserver> observer)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
@@ -185,7 +183,7 @@ int32_t BluetoothPanProxy::SetTethering(const bool value)
     };
 
     int error = Remote()->SendRequest(COMMAND_SET_TETHERING, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothPanProxy::SetTethering done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
@@ -206,23 +204,22 @@ int32_t BluetoothPanProxy::IsTetheringOn(bool &result)
     };
 
     int error = Remote()->SendRequest(COMMAND_IS_TETHERING_ON, data, reply, option);
-    if (error != BT_SUCCESS) {
+    if (error != BT_NO_ERROR) {
         HILOGE("BluetoothPanProxy::IsTetheringOn done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
     int32_t ret = reply.ReadInt32();
-    if (ret != BT_SUCCESS) {
+    if (ret != BT_NO_ERROR) {
         HILOGE("internal error. ret:%{public}d", ret);
         return ret;
     }
 
     result = reply.ReadInt32();
-    return BT_SUCCESS;
+    return BT_NO_ERROR;
 }
 
-bool BluetoothPanProxy::WriteParcelableInt32Vector(
-    const std::vector<int32_t> &parcelableVector, Parcel &reply)
+bool BluetoothPanProxy::WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply)
 {
     if (!reply.WriteInt32(parcelableVector.size())) {
         HILOGE("write ParcelableVector failed");

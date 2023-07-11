@@ -304,14 +304,6 @@ public:
      */
     bool RejectIncomingCall(const BluetoothRemoteDevice &device);
 
-    /**
-     * @brief send key pressed event.
-     *
-     * @param device Remote device object.
-     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
-     * @since 9
-     */
-
     bool SendKeyPressed(const BluetoothRemoteDevice &device);
 
     /**
@@ -354,16 +346,6 @@ public:
      */
     bool DialMemory(const BluetoothRemoteDevice &device, int index);
 
-
-    /**
-     * @brief send voice tag.
-     *
-     * @param device Remote device object.
-     * @param index voice tag index.
-     * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
-     * @since 9
-     */
-
     bool SendVoiceTag(const BluetoothRemoteDevice &device, int index);
 
     /**
@@ -401,6 +383,18 @@ public:
      * @since 6
      */
     void DeregisterObserver(HandsFreeUnitObserver *observer);
+
+    /**
+     * @brief The external process calls the HfpHf profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * HfpHf proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of HfpHf profile.
+     */
+    void UnInit();
 
     /**
      * @brief Static HandsFree Unit observer instance.

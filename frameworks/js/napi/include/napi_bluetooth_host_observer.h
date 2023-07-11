@@ -23,7 +23,7 @@ namespace Bluetooth {
 class NapiBluetoothHostObserver : public BluetoothHostObserver {
 public:
     NapiBluetoothHostObserver() = default;
-    virtual ~NapiBluetoothHostObserver() = default;
+    ~NapiBluetoothHostObserver() override = default;
 
     void OnStateChanged(const int transport, const int status) override;
     void OnDiscoveryStateChanged(int status) override;
@@ -38,7 +38,7 @@ private:
     bool DealStateChange(const int transport, const int status, BluetoothState &state);
     void DealBredrPairComfirmed(const std::string &addr, const int reqType, const int number);
     void DealBlePairComfirmed(const std::string &addr, const int reqType, const int number);
-    void OnPairConfirmedCallBack(const std::shared_ptr<PairConfirmedCallBackInfo> &PairConfirmInfo);
+    void OnPairConfirmedCallBack(const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo);
 
     void UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state);
     void UvQueueWorkOnDiscoveryResult(uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device);

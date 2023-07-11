@@ -20,10 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-namespace {
-const int32_t BLE_INVALID_ADVERTISING_HANDLE = 0xFF;
-}
-
 BluetoothBleAdvertiserProxy::BluetoothBleAdvertiserProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IBluetoothBleAdvertiser>(impl)
 {}
@@ -161,12 +157,12 @@ void BluetoothBleAdvertiserProxy::Close(int32_t advHandle)
     }
 }
 
-int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle()
+int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle(int32_t &advHandle)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
         HILOGW("[GetAdvertiserHandle] fail: write interface token failed.");
-        return BLE_INVALID_ADVERTISING_HANDLE;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
@@ -174,9 +170,43 @@ int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle()
     ErrCode result = InnerTransact(BLE_GET_ADVERTISER_HANDLE, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[GetAdvertiserHandle] fail: transact ErrCode=%{public}d", result);
-        return BLE_INVALID_ADVERTISING_HANDLE;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    return reply.ReadInt32();
+    int32_t ret = reply.ReadInt32();
+    advHandle = reply.ReadInt32();
+    return ret;
+}
+
+void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
+    const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
+        HILOGW("[SetAdvertisingData] fail: write interface token failed.");
+        return;
+    }
+
+    if (!data.WriteParcelable(&advData)) {
+        HILOGW("[SetAdvertisingData] fail:write advData failed");
+        return;
+    }
+
+    if (!data.WriteParcelable(&scanResponse)) {
+        HILOGW("[SetAdvertisingData] fail:write scanResponse failed");
+        return;
+    }
+
+    if (!data.WriteInt32(advHandle)) {
+        HILOGW("[SetAdvertisingData] fail: write advHandle failed.");
+        return;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(BLE_SET_ADVERTISING_DATA, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGW("[SetAdvertisingData] fail: transact ErrCode=%{public}d", result);
+    }
 }
 
 ErrCode BluetoothBleAdvertiserProxy::InnerTransact(

@@ -183,6 +183,18 @@ public:
      */
     void DeregisterObserver(A2dpSinkObserver *observer);
 
+    /**
+     * @brief The external process calls the A2dpSink profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * A2dpSink proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of A2dpSink profile.
+     */
+    void UnInit();
+
 private:
     /**
      * @brief A constructor used to create a a2dp sink instance.

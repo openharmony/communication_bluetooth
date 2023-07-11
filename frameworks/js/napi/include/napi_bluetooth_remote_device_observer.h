@@ -24,8 +24,9 @@ namespace Bluetooth {
 class NapiBluetoothRemoteDeviceObserver : public BluetoothRemoteDeviceObserver {
 public:
     NapiBluetoothRemoteDeviceObserver() = default;
-    virtual ~NapiBluetoothRemoteDeviceObserver() = default;
+    ~NapiBluetoothRemoteDeviceObserver() override = default;
 
+    void OnAclStateChanged(const BluetoothRemoteDevice &device, int state, unsigned int reason) override;
     void OnPairStatusChanged(const BluetoothRemoteDevice &device, int status) override;
     void OnRemoteUuidChanged(const BluetoothRemoteDevice &device, const std::vector<ParcelUuid> &uuids) override;
     void OnRemoteNameChanged(const BluetoothRemoteDevice &device, const std::string &deviceName) override;

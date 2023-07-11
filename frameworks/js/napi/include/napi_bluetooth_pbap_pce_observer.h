@@ -34,7 +34,7 @@ public:
     {}
 
     NapiPbapPceObserver() = default;
-    virtual ~NapiPbapPceObserver() = default;
+    ~NapiPbapPceObserver() override = default;
 
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };

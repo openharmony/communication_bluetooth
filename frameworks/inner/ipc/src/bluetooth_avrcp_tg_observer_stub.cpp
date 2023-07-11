@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothAvrcpTgObserverStub::BluetoothAvrcpTgObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
         IBluetoothAvrcpTgObserver::Code::BT_AVRCP_TG_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner;
@@ -28,16 +28,15 @@ BluetoothAvrcpTgObserverStub::BluetoothAvrcpTgObserverStub()
 
 BluetoothAvrcpTgObserverStub::~BluetoothAvrcpTgObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 
 int BluetoothAvrcpTgObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGI("BluetoothAvrcpTgObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
-        code,
-        option.GetFlags());
+    HILOGD("BluetoothAvrcpTgObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
+        code, option.GetFlags());
     if (BluetoothAvrcpTgObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;

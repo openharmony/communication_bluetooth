@@ -62,16 +62,6 @@ class GattService;
  */
 class BLUETOOTH_API GattCharacteristic {
 public:
-
-    /** A GATT characteristic value permission.
-     *  Define GATT characteristic permission.
-     */
-    enum Permission {
-        READABLE = 0x01,
-        WRITEABLE = 0x02,
-    };
-
-
     /** A GATT characteristic value write type.
      *  Define GATT characteristic value write types.
      */

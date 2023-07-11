@@ -18,6 +18,7 @@
 #include <set>
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_host.h"
+#include "bluetooth_load_system_ability.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_host_proxy.h"
@@ -95,8 +96,9 @@ struct GattServer::impl {
     bluetooth::GattDevice *FindConnectedDevice(const BluetoothRemoteDevice &device);
     GattService BuildService(const BluetoothGattService &service);
     void BuildIncludeService(GattService &svc, const std::vector<bluetooth::Service> &iSvcs);
-    impl(GattServerCallback &callback, GattServer &server);
-    int CheckInterface(void);
+    impl(GattServerCallback &callback);
+    bool Init(std::weak_ptr<GattServer>);
+
     class BluetoothGattServerDeathRecipient;
     sptr<BluetoothGattServerDeathRecipient> deathRecipient_;
     sptr<IBluetoothGattServer> proxy_;
@@ -104,45 +106,68 @@ struct GattServer::impl {
 
 class GattServer::impl::BluetoothGattServerDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothGattServerDeathRecipient(GattServer::impl &gattserver) : gattserver_(gattserver){};
+    explicit BluetoothGattServerDeathRecipient(std::weak_ptr<GattServer> gattserver) : gattServer_(gattserver){};
     ~BluetoothGattServerDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothGattServerDeathRecipient);
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("enter");
-        gattserver_.proxy_->AsObject()->RemoveDeathRecipient(gattserver_.deathRecipient_);
-        gattserver_.proxy_ = nullptr;
+        auto sptr = gattServer_.lock();
+        if (sptr && sptr->pimpl && sptr->pimpl->proxy_) {
+            HILOGI("Clear gattServer proxy");
+            sptr->pimpl->proxy_->DeregisterApplication(sptr->pimpl->applicationId_);
+            sptr->pimpl->proxy_->AsObject()->RemoveDeathRecipient(sptr->pimpl->deathRecipient_);
+            sptr->pimpl->proxy_ = nullptr;
+        }
     }
 
 private:
-    GattServer::impl &gattserver_;
+    std::weak_ptr<GattServer> gattServer_;
 };
 
 class GattServer::impl::BluetoothGattServerCallbackStubImpl : public BluetoothGattServerCallbackStub {
 public:
+    inline std::shared_ptr<GattServer> GetServerSptr(void)
+    {
+        auto serverSptr = server_.lock();
+        if (!serverSptr) {
+            HILOGE("server_ is nullptr");
+            return nullptr;
+        }
+        if (!serverSptr->pimpl) {
+            HILOGE("impl is nullptr");
+            return nullptr;
+        }
+        return serverSptr;
+    }
     void OnCharacteristicReadRequest(
         const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) override
     {
         HILOGI("remote device: %{public}s, handle: 0x%{public}04X",
             GET_ENCRYPT_GATT_ADDR(device), characteristic.handle_);
-        std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
-        auto gattcharacter = server_.pimpl->FindCharacteristic(characteristic.handle_);
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        std::lock_guard<std::mutex> lock(serverSptr->pimpl->serviceListMutex_);
+        auto gattcharacter = serverSptr->pimpl->FindCharacteristic(characteristic.handle_);
         if (gattcharacter.has_value()) {
             {
-                std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                auto ret = server_.pimpl->requests_.emplace(
+                std::lock_guard<std::mutex> lck(serverSptr->pimpl->requestListMutex_);
+                auto ret = serverSptr->pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_CHARACTERISTICS_READ, device, &gattcharacter.value().get()));
                 if (!ret.second) {
                     HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
                         REQUEST_TYPE_CHARACTERISTICS_READ, GET_ENCRYPT_GATT_ADDR(device));
                 }
             }
-            server_.pimpl->callback_.OnCharacteristicReadRequest(
+            serverSptr->pimpl->callback_.OnCharacteristicReadRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 gattcharacter.value().get(),
-                server_.pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_READ, device.transport_));
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_READ, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Characteristic!");
@@ -153,18 +178,23 @@ public:
     void OnCharacteristicWriteRequest(const BluetoothGattDevice &device,
         const BluetoothGattCharacteristic &characteristic, bool needRespones) override
     {
-        HILOGI("remote device: %{public}s, handle: 0x%{public}04X",
-            GET_ENCRYPT_GATT_ADDR(device), characteristic.handle_);
-        std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
-        auto gattcharacter = server_.pimpl->FindCharacteristic(characteristic.handle_);
+        HILOGI("remote device: %{public}s, handle: 0x%{public}04X, length: %{public}zu",
+            GET_ENCRYPT_GATT_ADDR(device), characteristic.handle_, characteristic.length_);
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        std::lock_guard<std::mutex> lock(serverSptr->pimpl->serviceListMutex_);
+        auto gattcharacter = serverSptr->pimpl->FindCharacteristic(characteristic.handle_);
         if (gattcharacter.has_value()) {
             gattcharacter.value().get().SetValue(characteristic.value_.get(), characteristic.length_);
             gattcharacter.value().get().SetWriteType(
                 needRespones ? GattCharacteristic::WriteType::DEFAULT : GattCharacteristic::WriteType::NO_RESPONSE);
 
             if (needRespones) {
-                std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                auto ret = server_.pimpl->requests_.emplace(
+                std::lock_guard<std::mutex> lck(serverSptr->pimpl->requestListMutex_);
+                auto ret = serverSptr->pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_CHARACTERISTICS_WRITE, device, &gattcharacter.value().get()));
                 if (!ret.second) {
                     HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
@@ -172,11 +202,11 @@ public:
                 }
             }
 
-            server_.pimpl->callback_.OnCharacteristicWriteRequest(
+            serverSptr->pimpl->callback_.OnCharacteristicWriteRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 gattcharacter.value().get(),
-                server_.pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_WRITE, device.transport_));
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_WRITE, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Characteristic!");
@@ -189,23 +219,28 @@ public:
     {
         HILOGI("remote device: %{public}s, handle: 0x%{public}04X",
             GET_ENCRYPT_GATT_ADDR(device), descriptor.handle_);
-        std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
-        auto gattdesc = server_.pimpl->FindDescriptor(descriptor.handle_);
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        std::lock_guard<std::mutex> lock(serverSptr->pimpl->serviceListMutex_);
+        auto gattdesc = serverSptr->pimpl->FindDescriptor(descriptor.handle_);
         if (gattdesc.has_value()) {
             {
-                std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                auto ret = server_.pimpl->requests_.emplace(
+                std::lock_guard<std::mutex> lck(serverSptr->pimpl->requestListMutex_);
+                auto ret = serverSptr->pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_DESCRIPTOR_READ, device, &gattdesc.value().get()));
                 if (!ret.second) {
                     HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
                         REQUEST_TYPE_DESCRIPTOR_READ, GET_ENCRYPT_GATT_ADDR(device));
                 }
             }
-            server_.pimpl->callback_.OnDescriptorReadRequest(
+            serverSptr->pimpl->callback_.OnDescriptorReadRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 gattdesc.value().get(),
-                server_.pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_READ, device.transport_));
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_READ, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Descriptor!");
@@ -218,25 +253,30 @@ public:
     {
         HILOGI("remote device: %{public}s, handle: 0x%{public}04X",
             GET_ENCRYPT_GATT_ADDR(device), descriptor.handle_);
-        std::lock_guard<std::mutex> lock(server_.pimpl->serviceListMutex_);
-        auto gattdesc = server_.pimpl->FindDescriptor(descriptor.handle_);
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        std::lock_guard<std::mutex> lock(serverSptr->pimpl->serviceListMutex_);
+        auto gattdesc = serverSptr->pimpl->FindDescriptor(descriptor.handle_);
         if (gattdesc.has_value()) {
             gattdesc.value().get().SetValue(descriptor.value_.get(), descriptor.length_);
 
             {
-                std::lock_guard<std::mutex> lck(server_.pimpl->requestListMutex_);
-                auto ret = server_.pimpl->requests_.emplace(
+                std::lock_guard<std::mutex> lck(serverSptr->pimpl->requestListMutex_);
+                auto ret = serverSptr->pimpl->requests_.emplace(
                     RequestInformation(REQUEST_TYPE_DESCRIPTOR_WRITE, device, &gattdesc.value().get()));
                 if (!ret.second) {
                     HILOGE("insert request failed, type: %{public}u, addr: %{public}s",
                         REQUEST_TYPE_DESCRIPTOR_WRITE, GET_ENCRYPT_GATT_ADDR(device));
                 }
             }
-            server_.pimpl->callback_.OnDescriptorWriteRequest(
+            serverSptr->pimpl->callback_.OnDescriptorWriteRequest(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 gattdesc.value().get(),
-                server_.pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_WRITE, device.transport_));
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_WRITE, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Descriptor!");
@@ -249,7 +289,12 @@ public:
     {
         HILOGI("remote device: %{public}s, handle: 0x%{public}04X",
             GET_ENCRYPT_GATT_ADDR(device), characteristic.handle_);
-        server_.pimpl->callback_.OnNotificationCharacteristicChanged(
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        serverSptr->pimpl->callback_.OnNotificationCharacteristicChanged(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
             result);
@@ -258,21 +303,26 @@ public:
 
     void OnConnectionStateChanged(const BluetoothGattDevice &device, int32_t ret, int32_t state) override
     {
-        HILOGI("gattServer conn state, remote device: %{public}s, ret: %{public}d, state: %{public}s",
+        HILOGD("gattServer conn state, remote device: %{public}s, ret: %{public}d, state: %{public}s",
             GET_ENCRYPT_GATT_ADDR(device), ret, GetProfileConnStateName(state).c_str());
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
         if (state == static_cast<int>(BTConnectState::CONNECTED)) {
-            std::lock_guard<std::mutex> lck(server_.pimpl->deviceListMutex_);
-            server_.pimpl->devices_.push_back((bluetooth::GattDevice)device);
+            std::lock_guard<std::mutex> lck(serverSptr->pimpl->deviceListMutex_);
+            serverSptr->pimpl->devices_.push_back((bluetooth::GattDevice)device);
         } else if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
-            std::lock_guard<std::mutex> lck(server_.pimpl->deviceListMutex_);
-            for (auto it = server_.pimpl->devices_.begin(); it != server_.pimpl->devices_.end(); it++) {
+            std::lock_guard<std::mutex> lck(serverSptr->pimpl->deviceListMutex_);
+            for (auto it = serverSptr->pimpl->devices_.begin(); it != serverSptr->pimpl->devices_.end(); it++) {
                 if (*it == (bluetooth::GattDevice)device) {
-                    server_.pimpl->devices_.erase(it);
+                    serverSptr->pimpl->devices_.erase(it);
                     break;
                 }
             }
         }
-        server_.pimpl->callback_.OnConnectionStateUpdate(
+        serverSptr->pimpl->callback_.OnConnectionStateUpdate(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
             state);
@@ -283,7 +333,12 @@ public:
     void OnMtuChanged(const BluetoothGattDevice &device, int32_t mtu) override
     {
         HILOGI("remote device: %{public}s, mtu: %{public}d", GET_ENCRYPT_GATT_ADDR(device), mtu);
-        server_.pimpl->callback_.OnMtuUpdate(
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        serverSptr->pimpl->callback_.OnMtuUpdate(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
             mtu);
@@ -293,18 +348,24 @@ public:
     void OnAddService(int32_t ret, const BluetoothGattService &service) override
     {
         HILOGI("enter, ret: %{public}d", ret);
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
         GattService *ptr = nullptr;
-        if (GattStatus::GATT_SUCCESS == ret) {
-            GattService gattSvc = server_.pimpl->BuildService(service);
-            server_.pimpl->BuildIncludeService(gattSvc, service.includeServices_);
+        if (ret == GattStatus::GATT_SUCCESS) {
+            GattService gattSvc = serverSptr->pimpl->BuildService(service);
+            serverSptr->pimpl->BuildIncludeService(gattSvc, service.includeServices_);
             {
-                std::lock_guard<std::mutex> lck(server_.pimpl->serviceListMutex_);
-                auto it = server_.pimpl->gattServices_.emplace(server_.pimpl->gattServices_.end(), std::move(gattSvc));
+                std::lock_guard<std::mutex> lck(serverSptr->pimpl->serviceListMutex_);
+                auto it = serverSptr->pimpl->gattServices_.emplace(
+                    serverSptr->pimpl->gattServices_.end(), std::move(gattSvc));
                 ptr = &(*it);
             }
         }
 
-        server_.pimpl->callback_.OnServiceAdded(ptr, ret);
+        serverSptr->pimpl->callback_.OnServiceAdded(ptr, ret);
         return;
     }
 
@@ -314,7 +375,12 @@ public:
         HILOGI("remote device: %{public}s, interval: %{public}d, "
             "latency: %{public}d, timeout: %{public}d, status: %{public}d",
             GET_ENCRYPT_GATT_ADDR(device), interval, latency, timeout, status);
-        server_.pimpl->callback_.OnConnectionParameterChanged(
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        serverSptr->pimpl->callback_.OnConnectionParameterChanged(
             BluetoothRemoteDevice(device.addr_.GetAddress(),
                 (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
             interval,
@@ -325,35 +391,18 @@ public:
         return;
     }
 
-    BluetoothGattServerCallbackStubImpl(GattServer &server) : server_(server)
+    explicit BluetoothGattServerCallbackStubImpl(std::weak_ptr<GattServer> server) : server_(server)
     {
         HILOGI("enter");
     }
-    ~BluetoothGattServerCallbackStubImpl()
+    ~BluetoothGattServerCallbackStubImpl() override
     {
         HILOGI("enter");
     }
 
 private:
-    GattServer &server_;
+    std::weak_ptr<GattServer> server_;
 };
-
-int GattServer::impl::CheckInterface(void)
-{
-    if (proxy_ == nullptr) {
-        HILOGE("proxy_ is nullptr.");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!BluetoothHost::GetDefaultHost().IsBleEnabled()) {
-        HILOGE("BLE is not enabled.");
-        return BT_ERR_INVALID_STATE;
-    }
-    if (!isRegisterSucceeded_) {
-        HILOGE("isRegisterSucceeded_ is false.");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    return BT_SUCCESS;
-}
 
 GattService GattServer::impl::BuildService(const BluetoothGattService &service)
 {
@@ -407,47 +456,52 @@ GattService *GattServer::impl::GetIncludeService(uint16_t handle)
     return nullptr;
 }
 
-GattServer::impl::impl(GattServerCallback &callback, GattServer &server)
-    : serviceCallback_(new BluetoothGattServerCallbackStubImpl(server)), callback_(callback), applicationId_(0)
+GattServer::impl::impl(GattServerCallback &callback)
+    : isRegisterSucceeded_(false), callback_(callback), applicationId_(0)
 {
     HILOGI("enter");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGE("failed: hostRemote is null");
-        return;
-    }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_GATT_SERVER);
-
-    if (!remote) {
-        HILOGE("failed: remote is null");
-        return;
-    }
-    HILOGI("remote obtained");
-
-    proxy_ = iface_cast<IBluetoothGattServer>(remote);
-
-    deathRecipient_ = new BluetoothGattServerDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 };
 
-GattServer::GattServer(GattServerCallback &callback) : pimpl(new GattServer::impl(callback, *this))
+GattServer::GattServer(GattServerCallback &callback) : pimpl(new GattServer::impl(callback))
 {
     HILOGI("enter");
-    int result = GattStatus::REQUEST_NOT_SUPPORT;
-    if (!pimpl->proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return;
+}
+
+bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
+{
+    if (proxy_) {
+        return true;
     }
-    result = pimpl->proxy_->RegisterApplication(pimpl->serviceCallback_);
+    proxy_ = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    if (!proxy_) {
+        HILOGE("get gattServer proxy_ failed");
+        return false;
+    }
+    serviceCallback_ = new BluetoothGattServerCallbackStubImpl(server);
+    deathRecipient_ = new BluetoothGattServerDeathRecipient(server);
+
+    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    int result = proxy_->RegisterApplication(serviceCallback_);
     if (result > 0) {
-        pimpl->applicationId_ = result;
-        pimpl->isRegisterSucceeded_ = true;
+        applicationId_ = result;
+        isRegisterSucceeded_ = true;
     } else {
         HILOGE("Can not Register to gatt server service! result = %{public}d", result);
     }
+    return true;
+}
+
+std::shared_ptr<GattServer> GattServer::CreateInstance(GattServerCallback &callback)
+{
+    // The passkey pattern used here.
+    auto instance = std::make_shared<GattServer>(PassKey(), callback);
+    if (!instance->pimpl) {
+        HILOGE("failed: no impl");
+        return nullptr;
+    }
+
+    instance->pimpl->Init(instance);
+    return instance;
 }
 
 std::optional<std::reference_wrapper<GattCharacteristic>> GattServer::impl::FindCharacteristic(uint16_t handle)
@@ -504,7 +558,7 @@ int GattServer::impl::RespondCharacteristicRead(
         HILOGE("proxy_ is nullptr");
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
-    if (GattStatus::GATT_SUCCESS == ret) {
+    if (ret == GattStatus::GATT_SUCCESS) {
         BluetoothGattCharacteristic character(bluetooth::Characteristic(handle, value, length));
 
         return proxy_->RespondCharacteristicRead(device, &character, ret);
@@ -531,7 +585,7 @@ int GattServer::impl::RespondDescriptorRead(
         HILOGE("proxy_ is nullptr");
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
-    if (GattStatus::GATT_SUCCESS == ret) {
+    if (ret == GattStatus::GATT_SUCCESS) {
         BluetoothGattDescriptor desc(bluetooth::Descriptor(handle, value, length));
         return proxy_->RespondDescriptorRead(device, &desc, ret);
     }
@@ -552,9 +606,14 @@ int GattServer::impl::RespondDescriptorWrite(const bluetooth::GattDevice &device
 int GattServer::AddService(GattService &service)
 {
     HILOGI("enter");
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
-        return ret;
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     BluetoothGattService svc;
@@ -589,7 +648,7 @@ int GattServer::AddService(GattService &service)
         svc.characteristics_.push_back(std::move(c));
     }
     int appId = pimpl->applicationId_;
-    ret = pimpl->proxy_->AddService(appId, &svc);
+    int ret = pimpl->proxy_->AddService(appId, &svc);
     HILOGI("appId = %{public}d, ret = %{public}d.", appId, ret);
     return ret;
 }
@@ -597,10 +656,16 @@ int GattServer::AddService(GattService &service)
 void GattServer::ClearServices()
 {
     HILOGI("enter");
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return;
     }
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return;
+    }
+
     int appId = pimpl->applicationId_;
     pimpl->proxy_->ClearServices(int(appId));
     pimpl->gattServices_.clear();
@@ -609,14 +674,19 @@ void GattServer::ClearServices()
 int GattServer::Close()
 {
     HILOGI("enter");
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
-        return ret;
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
     }
 
-    ret = pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    int ret = pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
     HILOGI("ret: %{public}d", ret);
-    if (ret == BT_SUCCESS) {
+    if (ret == BT_NO_ERROR) {
         pimpl->isRegisterSucceeded_ = false;
     }
     return ret;
@@ -625,10 +695,16 @@ int GattServer::Close()
 void GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 {
     HILOGI("remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return;
     }
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("Request not supported");
         return;
@@ -645,10 +721,16 @@ void GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const UUID &uuid, bool isPrimary)
 {
     HILOGI("enter");
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return std::nullopt;
     }
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return std::nullopt;
+    }
+
     std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
 
     for (auto &svc : pimpl->gattServices_) {
@@ -664,7 +746,16 @@ std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const 
 std::list<GattService> &GattServer::GetServices()
 {
     HILOGI("enter");
-    pimpl->CheckInterface();
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return pimpl->gattServices_;
+    }
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return pimpl->gattServices_;
+    }
+
     std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
     return pimpl->gattServices_;
 }
@@ -673,10 +764,16 @@ int GattServer::NotifyCharacteristicChanged(
 {
     HILOGI("remote device: %{public}s, handle: 0x%{public}04X, confirm: %{public}d",
         GET_ENCRYPT_ADDR(device), characteristic.GetHandle(), confirm);
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
-        return ret;
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
     }
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("Invalid remote device");
         return BT_ERR_INTERNAL_ERROR;
@@ -692,7 +789,7 @@ int GattServer::NotifyCharacteristicChanged(
     BluetoothGattCharacteristic character(
         bluetooth::Characteristic(characteristic.GetHandle(), characterValue.get(), length));
     std::string address = device.GetDeviceAddr();
-    ret = pimpl->proxy_->NotifyClient(
+    int ret = pimpl->proxy_->NotifyClient(
         bluetooth::GattDevice(bluetooth::RawAddress(address), 0), &character, confirm);
     HILOGI("ret = %{public}d.", ret);
     return ret;
@@ -701,11 +798,17 @@ int GattServer::NotifyCharacteristicChanged(
 int GattServer::RemoveGattService(const GattService &service)
 {
     HILOGI("enter");
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
-        return ret;
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
     }
-    ret = BT_ERR_INVALID_PARAM;
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    int ret = BT_ERR_INVALID_PARAM;
     for (auto sIt = pimpl->gattServices_.begin(); sIt != pimpl->gattServices_.end(); sIt++) {
         if (sIt->GetHandle() == service.GetHandle()) {
             ret = pimpl->proxy_->RemoveService(
@@ -721,12 +824,13 @@ int GattServer::SendResponse(
     const BluetoothRemoteDevice &device, int requestId, int status, int offset, const uint8_t *value, int length)
 {
     HILOGI("remote device: %{public}s, status: %{public}d", GET_ENCRYPT_ADDR(device), status);
-    int ret = pimpl->CheckInterface();
-    if (ret != BT_SUCCESS) {
-        return ret;
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
     }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("Invalid remote device");
+        HILOGE("pimpl or gatt server proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -766,7 +870,7 @@ int GattServer::SendResponse(
                 HILOGE("Error request Id!");
                 break;
         }
-        if (result == BT_SUCCESS) {
+        if (result == BT_NO_ERROR) {
             pimpl->requests_.erase(request);
         }
     }

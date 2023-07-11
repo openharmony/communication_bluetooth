@@ -28,12 +28,13 @@ public:
     BluetoothBlePeripheralObserverStub();
     ~BluetoothBlePeripheralObserverStub() override;
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     ErrCode OnReadRemoteRssiEventInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnAclStateChangedInner(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t,
         ErrCode (BluetoothBlePeripheralObserverStub::*)(MessageParcel &data, MessageParcel &reply)>

@@ -68,7 +68,7 @@ typedef struct {
     /** Read/write status, as enumerated in {@link GattStatus} */
     int status;
     /** Attribute handle ID */
-    int attrHandle;
+    int attrHandle;     // attrHandle is used as requestId now
     /** Length of the response data */
     int valueLen;
     /** Response data */

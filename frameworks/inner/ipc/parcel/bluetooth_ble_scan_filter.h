@@ -24,7 +24,7 @@ namespace Bluetooth {
 class BluetoothBleScanFilter : public Parcelable, public bluetooth::ScanFilter {
 public:
     BluetoothBleScanFilter() = default;
-    ~BluetoothBleScanFilter() = default;
+    ~BluetoothBleScanFilter() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
     static BluetoothBleScanFilter *Unmarshalling(Parcel &parcel);

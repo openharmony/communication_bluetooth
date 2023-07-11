@@ -126,11 +126,28 @@ public:
      */
     void SetAdvFlag(uint8_t flag);
 
+    /**
+     * @brief Get whether the device name will be included in the advertisement packet.
+     *
+     * @return Returns includeDeviceName flag.
+     * @since 6
+     */
+    bool GetIncludeDeviceName() const;
+
+    /**
+     * @brief Set whether the device name will be included in the advertisement packet.
+     *
+     * @param flag includeDeviceName flag.
+     * @since 6
+     */
+    void SetIncludeDeviceName(bool flag);
+
 private:
     std::vector<ParcelUuid> serviceUuids_{};
     std::map<uint16_t, std::string> manufacturerSpecificData_{};
     std::map<ParcelUuid, std::string> serviceData_{};
     uint8_t advFlag_ = BLE_ADV_FLAG_GEN_DISC;
+    bool includeDeviceName_ = false;
 };
 
 /**
@@ -282,6 +299,14 @@ public:
      * @since 6
      */
     virtual void OnStartResultEvent(int result) = 0;
+
+    /**
+     * @brief Set advertising data result event callback.
+     *
+     * @param result Set advertising data result
+     * @since 6
+     */
+    virtual void OnSetAdvDataEvent(int result) = 0;
 };
 
 /**
@@ -329,6 +354,8 @@ public:
     int StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
         const std::vector<uint8_t> &scanResponse, BleAdvertiseCallback &callback);
 
+    void SetAdvertisingData(const std::vector<uint8_t> &advData, const std::vector<uint8_t> &scanResponse,
+        BleAdvertiseCallback &callback);
     int StopAdvertising(BleAdvertiseCallback &callback);
 
     /**
@@ -338,6 +365,14 @@ public:
      * @since 6
      */
     void Close(BleAdvertiseCallback &callback);
+
+    /**
+     * @brief Get Advertise handle.
+     *
+     * @param callback Advertise callback.
+     * @since 6
+     */
+    uint8_t GetAdvHandle(BleAdvertiseCallback &callback);
 
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiser);
