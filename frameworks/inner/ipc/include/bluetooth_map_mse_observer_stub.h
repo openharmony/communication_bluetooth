@@ -28,7 +28,7 @@ public:
     BluetoothMapMseObserverStub();
     virtual ~BluetoothMapMseObserverStub();
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:

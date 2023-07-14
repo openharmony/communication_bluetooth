@@ -38,10 +38,11 @@ struct SysStopBLEContext {
     napi_ref callbackComplete = nullptr;
 };
 
-NapiBluetoothBleCentralManagerCallback bleCentralMangerCallback;
-NapiBluetoothBleAdvertiseCallback bleAdvertiseCallback;
-BleAdvertiser bleAdvertiser;
-std::unique_ptr<BleCentralManager> bleCentralManager = std::make_unique<BleCentralManager>(bleCentralMangerCallback);
+NapiBluetoothBleCentralManagerCallback g_bleCentralMangerCallback;
+NapiBluetoothBleAdvertiseCallback g_bleAdvertiseCallback;
+BleAdvertiser g_bleAdvertiser;
+std::unique_ptr<BleCentralManager> g_bleCentralManager =
+    std::make_unique<BleCentralManager>(g_bleCentralMangerCallback);
 
 napi_value GetPropertyValueByNamed(napi_env env, napi_value object, std::string_view propertyName, napi_valuetype type)
 {
@@ -116,14 +117,14 @@ napi_value SysStartBLEScan(napi_env env, napi_callback_info info)
     settinngs.SetReportDelay(scanOptions.interval);
     settinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
 
-    bleCentralManager->StartScan(settinngs);
+    g_bleCentralManager->StartScan(settinngs);
     return NapiGetNull(env);
 }
 
 void SysStopBLEScanExec(napi_env env, void *data)
 {
     HILOGI("SysStopBLEScanExec");
-    bleCentralManager->StopScan();
+    g_bleCentralManager->StopScan();
     UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
 }
 
@@ -526,10 +527,10 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
     auto status = CheckBleScanParams(env, info, scanfilters, settinngs);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    if (bleCentralManager) {
-        int ret = bleCentralManager->ConfigScanFilter(scanfilters);
+    if (g_bleCentralManager) {
+        int ret = g_bleCentralManager->ConfigScanFilter(scanfilters);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
-        ret = bleCentralManager->StartScan(settinngs);
+        ret = g_bleCentralManager->StartScan(settinngs);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
     }
     return NapiGetUndefinedRet(env);
@@ -540,7 +541,8 @@ napi_value StopBLEScan(napi_env env, napi_callback_info info)
     HILOGI("enter");
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    int ret = bleCentralManager->StopScan();
+
+    int ret = g_bleCentralManager->StopScan();
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
@@ -620,11 +622,18 @@ static napi_status ParseServiceDataParameters(napi_env env, napi_value object, B
 static napi_status ParseAdvertisDataParameters(const napi_env &env, const napi_callback_info &info,
     const napi_value &object, BleAdvertiserData &outData)
 {
-    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"serviceUuids", "manufactureData", "serviceData"}));
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
+        env, object, {"serviceUuids", "manufactureData", "serviceData", "includeDeviceName"}));
 
     NAPI_BT_CALL_RETURN(ParseServiceUuidParameters(env, object, outData));
     NAPI_BT_CALL_RETURN(ParseManufactureDataParameters(env, object, outData));
     NAPI_BT_CALL_RETURN(ParseServiceDataParameters(env, object, outData));
+    bool exist = false;
+    bool includeDeviceName = false;
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, object, "includeDeviceName", includeDeviceName, exist));
+    HILOGI("includeDeviceName: %{public}d", includeDeviceName);
+    outData.SetIncludeDeviceName(includeDeviceName);
+
     return napi_ok;
 }
 
@@ -661,8 +670,8 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
     auto status = CheckAdvertisingData(env, info, settings, advData, rspData);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = bleAdvertiser.StartAdvertising(settings, advData, rspData, bleAdvertiseCallback);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_SUCCESS, ret);
+    int ret = g_bleAdvertiser.StartAdvertising(settings, advData, rspData, g_bleAdvertiseCallback);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
 
@@ -681,8 +690,8 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
     auto status = CheckEmptyArgs(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = bleAdvertiser.StopAdvertising(bleAdvertiseCallback);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_SUCCESS, ret);
+    int ret = g_bleAdvertiser.StopAdvertising(g_bleAdvertiseCallback);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
 

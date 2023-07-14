@@ -21,8 +21,9 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothPbapPseObserverStub::BluetoothPbapPseObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
-    memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPseObserverStub::Code::PBAP_PSE_ON_SERVICE_CONNECTION_STATE_CHANGE)] =
+    HILOGI("start.");
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothPbapPseObserverStub::Code::PBAP_PSE_ON_SERVICE_CONNECTION_STATE_CHANGE)] =
         &BluetoothPbapPseObserverStub::OnServiceConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPseObserverStub::Code::PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED)] =
         &BluetoothPbapPseObserverStub::OnServicePermissionInner;
@@ -32,16 +33,14 @@ BluetoothPbapPseObserverStub::BluetoothPbapPseObserverStub()
 
 BluetoothPbapPseObserverStub::~BluetoothPbapPseObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 int BluetoothPbapPseObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOGD("BluetoothPbapPseObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothPbapPseObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    HILOGD("PbapPseObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothPbapPseObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -53,13 +52,13 @@ int BluetoothPbapPseObserverStub::OnRemoteRequest(
             return (this->*memberFunc)(data, reply);
         }
     }
-    HILOGW("BluetoothPbapPseObserverStub::OnRemoteRequest, default case, need check.");
+    HILOGW("OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 };
 
 ErrCode BluetoothPbapPseObserverStub::OnServiceConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -67,41 +66,39 @@ ErrCode BluetoothPbapPseObserverStub::OnServiceConnectionStateChangedInner(Messa
     int state = data.ReadInt32();
 
     OnServiceConnectionStateChanged(*device, state);
-    
+
     return NO_ERROR;
 }
 
 ErrCode BluetoothPbapPseObserverStub::OnServicePasswordRequiredInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
     }
     std::vector<uint8_t>* des = nullptr;
     if (!data.ReadUInt8Vector(des)) {
-        HILOGW("BluetoothPbapPseObserverStub::OnServicePasswordRequiredInner: get description failed.");
+        HILOGW("OnServicePasswordRequiredInner: get description failed.");
         return INVALID_DATA;
     }
     const ::std::vector<uint8_t> description = *des;
-    int8_t charset = data.ReadInt8();
+    uint8_t charset = data.ReadInt8();
     bool fullAccess = data.ReadBool();
-    
     OnServicePasswordRequired(*device, description, charset, fullAccess);
-    
     return NO_ERROR;
 }
 
 ErrCode BluetoothPbapPseObserverStub::OnServicePermissionInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+    HILOGI("Enter!");
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
     }
 
     OnServicePermission(*device);
-    
+
     return NO_ERROR;
 }
 }  // namespace Bluetooth

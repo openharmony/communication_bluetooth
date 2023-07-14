@@ -18,10 +18,7 @@
 namespace OHOS {
 namespace Bluetooth {
 int BluetoothPanObserverStub::OnRemoteRequest(
-    uint32_t code,
-    MessageParcel& data,
-    MessageParcel& reply,
-    MessageOption& option)
+    uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     switch (code) {
         case COMMAND_ON_CONNECTION_STATE_CHANGED: {
@@ -29,7 +26,11 @@ int BluetoothPanObserverStub::OnRemoteRequest(
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
             }
-            const BluetoothRawAddress *address = data.ReadParcelable<BluetoothRawAddress>();
+            std::shared_ptr<BluetoothRawAddress> address(data.ReadParcelable<BluetoothRawAddress>());
+            if (address == nullptr) {
+                HILOGE("null pointer");
+                return ERR_TRANSACTION_FAILED;
+            }
             int state = data.ReadInt32();
             OnConnectionStateChanged(*address, state);
             return NO_ERROR;

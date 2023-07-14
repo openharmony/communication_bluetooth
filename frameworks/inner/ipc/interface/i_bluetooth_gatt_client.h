@@ -18,10 +18,10 @@
 
 #include "iremote_broker.h"
 #include "i_bluetooth_gatt_client_callback.h"
-#include "../parcel/bluetooth_gatt_characteristic.h"
-#include "../parcel/bluetooth_gatt_descriptor.h"
+#include "../parcel/bluetooth_gatt_characteristic_parcel.h"
+#include "../parcel/bluetooth_gatt_descriptor_parcel.h"
 #include "../parcel/bluetooth_gatt_device.h"
-#include "../parcel/bluetooth_gatt_service.h"
+#include "../parcel/bluetooth_gatt_service_parcel.h"
 #include "../parcel/bluetooth_raw_address.h"
 
 namespace OHOS {
@@ -45,6 +45,9 @@ public:
         BT_GATT_CLIENT_GET_ALL_DEVICE,
         BT_GATT_CLIENT_REQUEST_CONNECTION_PRIORITY,
         BT_GATT_CLIENT_GET_SERVICES,
+        BT_GATT_CLIENT_REQUEST_FASTEST_CONNECTION,
+        BT_GATT_CLIENT_READ_REMOTE_RSSI_VALUE,
+        BT_GATT_CLIENT_REQUEST_NOTIFICATION,
     };
 
     virtual int RegisterApplication(
@@ -64,7 +67,10 @@ public:
     virtual int RequestExchangeMtu(int32_t appId, int32_t mtu) = 0;
     virtual void GetAllDevice(std::vector<BluetoothGattDevice> &device) = 0;
     virtual int RequestConnectionPriority(int32_t appId, int32_t connPriority) = 0;
-    virtual void GetServices(int32_t appId, std::vector<BluetoothGattService> &service) = 0;
+    virtual int GetServices(int32_t appId, std::vector<BluetoothGattService> &service) = 0;
+    virtual int RequestFastestConn(const BluetoothRawAddress &addr) = 0;
+    virtual int ReadRemoteRssiValue(int32_t appId) = 0;
+    virtual int RequestNotification(int32_t appId, uint16_t characterHandle, bool enable) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -25,11 +25,11 @@ class BluetoothAvrcpMpItem : public Parcelable,
                              public bluetooth::AvrcMpItem {
 public:
     BluetoothAvrcpMpItem() = default;
-    BluetoothAvrcpMpItem(const bluetooth::AvrcMpItem &other) : bluetooth::AvrcMpItem(other)
+    explicit BluetoothAvrcpMpItem(const bluetooth::AvrcMpItem &other) : bluetooth::AvrcMpItem(other)
     {}  // NOLINT(implicit)
     BluetoothAvrcpMpItem(const BluetoothAvrcpMpItem &other) : bluetooth::AvrcMpItem(other)
     {}  // NOLINT(implicit)
-    ~BluetoothAvrcpMpItem() = default;
+    ~BluetoothAvrcpMpItem() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 

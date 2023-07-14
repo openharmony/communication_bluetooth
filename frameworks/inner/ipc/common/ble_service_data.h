@@ -134,6 +134,14 @@ public:
      */
     int GetPhy() const;
 
+    bool operator == (const BleScanSettingsImpl &rhs) const
+    {
+        return (legacy_ == rhs.GetLegacy()) &&
+               (phy_ == rhs.GetPhy()) &&
+               (reportDelayMillis_ == rhs.GetReportDelayMillisValue()) &&
+               (scanMode_ == rhs.GetScanMode());
+    }
+
 private:
     /// delay millistime
     long reportDelayMillis_ = 0;
@@ -289,7 +297,7 @@ public:
      *
      * @param deviceId filter device id.
      */
-    void SetDeviceId(std::string deviceId);
+    void SetDeviceId(const std::string &deviceId);
 
     /**
      * @brief Get filter device id.
@@ -298,7 +306,7 @@ public:
      */
     std::string GetDeviceId() const;
 
-    void SetName(std::string name);
+    void SetName(const std::string &name);
 
     std::string GetName() const;
 
@@ -326,11 +334,11 @@ public:
 
     Uuid GetServiceSolicitationUuidMask() const;
 
-    void SetServiceData(std::vector<uint8_t> serviceData);
+    void SetServiceData(const std::vector<uint8_t> &serviceData);
 
     std::vector<uint8_t> GetServiceData() const;
 
-    void SetServiceDataMask(std::vector<uint8_t> serviceDataMask);
+    void SetServiceDataMask(const std::vector<uint8_t> &serviceDataMask);
 
     std::vector<uint8_t> GetServiceDataMask() const;
 
@@ -338,11 +346,11 @@ public:
 
     uint16_t GetManufacturerId() const;
 
-    void SetManufactureData(std::vector<uint8_t> manufactureData);
+    void SetManufactureData(const std::vector<uint8_t> &manufactureData);
 
     std::vector<uint8_t> GetManufactureData() const;
 
-    void SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask);
+    void SetManufactureDataMask(const std::vector<uint8_t> &manufactureDataMask);
 
     std::vector<uint8_t> GetManufactureDataMask() const;
 
@@ -1279,6 +1287,42 @@ private:
     bool connectable_ {};
     uint8_t advertiseFlag_ {};
 };
+
+struct BleAdvDeviceInfoImpl {
+    std::vector<int8_t> advDeviceId;
+    int32_t status;
+    int32_t timeOut;
+};
+
+struct BleFilterParamSetImpl {
+    BleScanSettingsImpl scanSettingImpl;
+    std::vector<BleScanFilterImpl> scanFliterImpls;
+    BleAdvertiserSettingsImpl advSettingsImpl;
+    BleAdvertiserDataImpl advDataImpl;
+    BleAdvertiserDataImpl respDataImpl;
+    std::vector<BleAdvDeviceInfoImpl> advDeviceInfoImpls;
+    int advHandle;
+    int duration;
+    int deliveryMode;
+    int fieldValidFlagBit;
+};
+
+struct FilterIdxInfo {
+    FilterIdxInfo() = default;
+    FilterIdxInfo(int pid, int uid, const Uuid &uuid) : pid(pid), uid(uid), uuid(uuid) {}
+    bool operator == (const FilterIdxInfo &info) const
+    {
+        if (pid == info.pid && uid == info.uid && uuid == info.uuid) {
+            return true;
+        }
+        return false;
+    }
+
+    int32_t pid = 0;
+    int32_t uid = 0;
+    Uuid uuid;
+};
+
 }  // namespace bluetooth
 }  // namespace OHOS
 #endif  /// BLE_SERVICE_DATA_H

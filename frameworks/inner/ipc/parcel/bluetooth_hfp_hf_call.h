@@ -26,7 +26,7 @@ public:
     BluetoothHfpHfCall() = default;
     BluetoothHfpHfCall(const bluetooth::HandsFreeUnitCalls& other): bluetooth::HandsFreeUnitCalls(other) {}
     BluetoothHfpHfCall(const BluetoothHfpHfCall& other): bluetooth::HandsFreeUnitCalls(other) {}
-    ~BluetoothHfpHfCall() = default;
+    ~BluetoothHfpHfCall() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 

@@ -151,6 +151,18 @@ public:
     void HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type);
 
     /**
+     * @brief The external process calls the HidHost profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * HidHost proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of HidHost profile.
+     */
+    void UnInit();
+
+    /**
      * @brief Static Hid Host observer instance.
      *
      */

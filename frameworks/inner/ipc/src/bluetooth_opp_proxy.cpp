@@ -127,8 +127,7 @@ ErrCode BluetoothOppProxy::CancelTransfer(bool &result)
     return error;
 }
 
-ErrCode BluetoothOppProxy::RegisterObserver(
-    const sptr<IBluetoothOppObserver> observer)
+ErrCode BluetoothOppProxy::RegisterObserver(const sptr<IBluetoothOppObserver> observer)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
@@ -153,8 +152,7 @@ ErrCode BluetoothOppProxy::RegisterObserver(
     return error;
 }
 
-ErrCode BluetoothOppProxy::DeregisterObserver(
-    const sptr<IBluetoothOppObserver> observer)
+ErrCode BluetoothOppProxy::DeregisterObserver(const sptr<IBluetoothOppObserver> observer)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
@@ -211,8 +209,8 @@ ErrCode BluetoothOppProxy::GetDeviceState(const BluetoothRawAddress &device, int
     return ERR_OK;
 }
 
-ErrCode BluetoothOppProxy::GetDevicesByStates(const std::vector<int32_t> &states,
-    std::vector<BluetoothRawAddress>& result)
+ErrCode BluetoothOppProxy::GetDevicesByStates(
+    const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
@@ -239,8 +237,7 @@ ErrCode BluetoothOppProxy::GetDevicesByStates(const std::vector<int32_t> &states
     return ERR_OK;
 }
 
-bool BluetoothOppProxy::WriteParcelableStringVector(
-    const std::vector<std::string> &parcelableVector, Parcel &reply)
+bool BluetoothOppProxy::WriteParcelableStringVector(const std::vector<std::string> &parcelableVector, Parcel &reply)
 {
     if (!reply.WriteInt32(parcelableVector.size())) {
         HILOGE("write ParcelableVector failed");
@@ -256,8 +253,7 @@ bool BluetoothOppProxy::WriteParcelableStringVector(
     return true;
 }
 
-bool BluetoothOppProxy::WriteParcelableInt32Vector(
-    const std::vector<int32_t> &parcelableVector, Parcel &reply)
+bool BluetoothOppProxy::WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply)
 {
     if (!reply.WriteInt32(parcelableVector.size())) {
         HILOGE("write ParcelableVector failed");

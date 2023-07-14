@@ -19,8 +19,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
-BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub() {
-    HILOGD("%{public}s start.", __func__);
+BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub()
+{
+    HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpAgObserverStub::Code::BT_HFP_AG_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnConnectionStateChangedInner;
@@ -34,20 +35,20 @@ BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub() {
         BluetoothHfpAgObserverStub::Code::BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner;
 
-    HILOGD("%{public}s ends.", __func__);
+    HILOGI("ends.");
 }
 
-BluetoothHfpAgObserverStub::~BluetoothHfpAgObserverStub() {
-    HILOGD("%{public}s start.", __func__);
+BluetoothHfpAgObserverStub::~BluetoothHfpAgObserverStub()
+{
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 
-int BluetoothHfpAgObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, 
-    MessageOption &option) {
+int BluetoothHfpAgObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
     HILOGD("BluetoothHfpAgObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothHfpAgObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothHfpAgObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -60,10 +61,11 @@ int BluetoothHfpAgObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &da
         }
     }
     HILOGW("BluetoothHfpAgObserverStub::OnRemoteRequest, default case, need check.");
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);   
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothHfpAgObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpAgObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -73,7 +75,8 @@ ErrCode BluetoothHfpAgObserverStub::OnConnectionStateChangedInner(MessageParcel 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpAgObserverStub::OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpAgObserverStub::OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -83,7 +86,8 @@ ErrCode BluetoothHfpAgObserverStub::OnScoStateChangedInner(MessageParcel &data, 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpAgObserverStub::OnActiveDeviceChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpAgObserverStub::OnActiveDeviceChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -92,7 +96,8 @@ ErrCode BluetoothHfpAgObserverStub::OnActiveDeviceChangedInner(MessageParcel &da
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -101,7 +106,5 @@ ErrCode BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner(Message
     OnScoStateChanged(*device, indValue);
     return NO_ERROR;
 }
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS

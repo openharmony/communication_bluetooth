@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+const uint32_t AVRCP_READ_FROM_PARCEL_COUNT_MAX = 0xFFFF;
 bool BluetoothAvrcpMeItem::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteUint8(itemType_)) {
@@ -86,7 +87,7 @@ bool BluetoothAvrcpMeItem::ReadFromParcel(Parcel &parcel)
         return false;
     }
     uint32_t size = 0;
-    if (!parcel.ReadUint32(size)) {
+    if (!parcel.ReadUint32(size) || size > AVRCP_READ_FROM_PARCEL_COUNT_MAX) {
         return false;
     }
     for (size_t i = 0; i < size; i++) {
@@ -96,7 +97,7 @@ bool BluetoothAvrcpMeItem::ReadFromParcel(Parcel &parcel)
         }
         attributes_.push_back(attribute);
     }
-    if (!parcel.ReadUint32(size)) {
+    if (!parcel.ReadUint32(size) || size > AVRCP_READ_FROM_PARCEL_COUNT_MAX) {
         return false;
     }
     for (size_t i = 0; i < size; i++) {

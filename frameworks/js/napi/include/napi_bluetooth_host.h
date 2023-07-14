@@ -43,6 +43,7 @@ napi_value GetPairedDevices(napi_env env, napi_callback_info info);
 napi_value SetDevicePairingConfirmation(napi_env env, napi_callback_info info);
 napi_value SetDevicePinCode(napi_env env, napi_callback_info info);
 
+
 napi_value GetDeviceName(napi_env env, napi_callback_info info);
 napi_value GetRssiValue(napi_env env, napi_callback_info info);
 

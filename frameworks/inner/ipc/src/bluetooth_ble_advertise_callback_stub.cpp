@@ -18,37 +18,37 @@
 #include "ipc_types.h"
 #include "string_ex.h"
 
+using std::placeholders::_1;
+using std::placeholders::_2;
+using std::placeholders::_3;
 namespace OHOS {
 namespace Bluetooth {
 const std::map<uint32_t, std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleAdvertiseCallbackStub::memberFuncMap_ = {
         {IBluetoothBleAdvertiseCallback::Code::BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner, _1, _2, _3)},
         {IBluetoothBleAdvertiseCallback::Code::BT_BLE_ADVERTISE_CALLBACK_RESULT_EVENT,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
+            std::bind(&BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner, _1, _2, _3)},
+        {IBluetoothBleAdvertiseCallback::Code::BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
+            std::bind(&BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner, _1, _2, _3)},
 };
 
 BluetoothBleAdvertiseCallbackStub::BluetoothBleAdvertiseCallbackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 }
 
 BluetoothBleAdvertiseCallbackStub::~BluetoothBleAdvertiseCallbackStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
 }
 
 int BluetoothBleAdvertiseCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothBleAdvertiseCallbackStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d",
-        code,
-        option.GetFlags());
-    std::u16string descriptor = BluetoothBleAdvertiseCallbackStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+        code, option.GetFlags());
+    if (BluetoothBleAdvertiseCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -79,6 +79,14 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner(MessageParcel
 {
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
     OnAutoStopAdvEvent(advHandle);
+    return NO_ERROR;
+}
+
+ErrCode BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner(MessageParcel &data, MessageParcel &reply)
+{
+    const int32_t result = static_cast<int32_t>(data.ReadInt32());
+    const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
+    OnSetAdvDataEvent(result, advHandle);
     return NO_ERROR;
 }
 }  // namespace Bluetooth

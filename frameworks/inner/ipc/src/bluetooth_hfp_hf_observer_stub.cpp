@@ -18,8 +18,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
-BluetoothHfpHfObserverStub::BluetoothHfpHfObserverStub() {
-    HILOGD("%{public}s start.", __func__);
+BluetoothHfpHfObserverStub::BluetoothHfpHfObserverStub()
+{
+    HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnConnectionStateChangedInner;
@@ -51,20 +52,20 @@ BluetoothHfpHfObserverStub::BluetoothHfpHfObserverStub() {
         BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_IN_BAND_RING_TONE_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnInBandRingToneChangedInner;
 
-    HILOGD("%{public}s ends.", __func__);
+    HILOGI("ends.");
 }
 
-BluetoothHfpHfObserverStub::~BluetoothHfpHfObserverStub() {
-    HILOGD("%{public}s start.", __func__);
+BluetoothHfpHfObserverStub::~BluetoothHfpHfObserverStub()
+{
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 
 int BluetoothHfpHfObserverStub::OnRemoteRequest(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
     HILOGD("BluetoothHfpHfObserverStub::OnRemoteRequest, cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = BluetoothHfpHfObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothHfpHfObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -77,10 +78,11 @@ int BluetoothHfpHfObserverStub::OnRemoteRequest(
         }
     }
     HILOGW("BluetoothHfpHfObserverStub::OnRemoteRequest, default case, need check.");
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);   
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -90,7 +92,8 @@ ErrCode BluetoothHfpHfObserverStub::OnConnectionStateChangedInner(MessageParcel 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -100,7 +103,8 @@ ErrCode BluetoothHfpHfObserverStub::OnScoStateChangedInner(MessageParcel &data, 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnCallChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnCallChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -113,7 +117,8 @@ ErrCode BluetoothHfpHfObserverStub::OnCallChangedInner(MessageParcel &data, Mess
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnSignalStrengthChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnSignalStrengthChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -123,7 +128,8 @@ ErrCode BluetoothHfpHfObserverStub::OnSignalStrengthChangedInner(MessageParcel &
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnRegistrationStatusChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnRegistrationStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -133,7 +139,8 @@ ErrCode BluetoothHfpHfObserverStub::OnRegistrationStatusChangedInner(MessageParc
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnRoamingStatusChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnRoamingStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -143,7 +150,8 @@ ErrCode BluetoothHfpHfObserverStub::OnRoamingStatusChangedInner(MessageParcel &d
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnOperatorSelectionChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnOperatorSelectionChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -153,7 +161,8 @@ ErrCode BluetoothHfpHfObserverStub::OnOperatorSelectionChangedInner(MessageParce
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnSubscriberNumberChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnSubscriberNumberChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -163,7 +172,8 @@ ErrCode BluetoothHfpHfObserverStub::OnSubscriberNumberChangedInner(MessageParcel
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnVoiceRecognitionStatusChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnVoiceRecognitionStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;
@@ -173,7 +183,8 @@ ErrCode BluetoothHfpHfObserverStub::OnVoiceRecognitionStatusChangedInner(Message
     return NO_ERROR;
 }
 
-ErrCode BluetoothHfpHfObserverStub::OnInBandRingToneChangedInner(MessageParcel &data, MessageParcel &reply) {
+ErrCode BluetoothHfpHfObserverStub::OnInBandRingToneChangedInner(MessageParcel &data, MessageParcel &reply)
+{
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
         return TRANSACTION_ERR;

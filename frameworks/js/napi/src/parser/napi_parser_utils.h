@@ -26,6 +26,7 @@ struct NapiBleDescriptor {
     UUID characteristicUuid;
     UUID descriptorUuid;
     std::vector<uint8_t> descriptorValue;
+    int permissions;
 };
 
 struct NapiBleCharacteristic {
@@ -33,6 +34,8 @@ struct NapiBleCharacteristic {
     UUID characteristicUuid;
     std::vector<uint8_t> characteristicValue;
     std::vector<NapiBleDescriptor> descriptors;
+    int properties;
+    int permissions;
 };
 
 struct NapiGattService {
@@ -40,6 +43,21 @@ struct NapiGattService {
     bool isPrimary;
     std::vector<NapiBleCharacteristic> characteristics;
     std::vector<NapiGattService> includeServices;
+};
+
+struct NapiGattPermission {
+    bool readable = false;
+    bool writeable = false;
+    bool readEncrypted = false;
+    bool writeEncrypted = false;
+};
+
+struct NapiGattProperties {
+    bool write = false;
+    bool writeNoResponse = false;
+    bool read = false;
+    bool notify = false;
+    bool indicate = false;
 };
 
 napi_status NapiParseBoolean(napi_env env, napi_value value, bool &outBoolean);
@@ -55,14 +73,21 @@ napi_status NapiParseGattDescriptor(napi_env env, napi_value object, NapiBleDesc
 napi_status NapiParseNotifyCharacteristic(napi_env env, napi_value object, NapiNotifyCharacteristic &outCharacter);
 napi_status NapiParseGattsServerResponse(napi_env env, napi_value object, NapiGattsServerResponse &rsp);
 
+struct NapiAsyncCallback;
+std::shared_ptr<NapiAsyncCallback> NapiParseAsyncCallback(napi_env env, napi_callback_info info);
+
 // must have the 'name' property
 napi_status NapiGetObjectProperty(napi_env env, napi_value object, const char *name, napi_value &outProperty);
 napi_status NapiParseObjectBoolean(napi_env env, napi_value object, const char *name, bool &outBoolean);
 napi_status NapiParseObjectUuid(napi_env env, napi_value object, const char *name, std::string &outUuid);
-napi_status NapiParseObjectArrayBuffer(napi_env env, napi_value value, const char *name, std::vector<uint8_t> &outVec);
+napi_status NapiParseObjectArrayBuffer(napi_env env, napi_value object, const char *name, std::vector<uint8_t> &outVec);
 napi_status NapiParseObjectBdAddr(napi_env env, napi_value object, const char *name, std::string &outAddr);
 napi_status NapiParseObjectInt32(napi_env env, napi_value object, const char *name, int32_t &outNum);
 napi_status NapiParseObjectUint32(napi_env env, napi_value object, const char *name, uint32_t &outNum);
+napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, const char *name,
+    NapiGattPermission &outPermissions);
+napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const char *name,
+    NapiGattProperties &outProperties);
 
 napi_status NapiGetObjectPropertyOptional(napi_env env, napi_value object, const char *name, napi_value &outProperty,
     bool &outExist);
@@ -75,7 +100,7 @@ napi_status NapiParseObjectUint32Optional(napi_env env, napi_value object, const
 
 // Parse type Array<XXX>, must implete NapiParseObject<XXX> in napi_parser_utils.cpp.
 template <typename T>
-napi_status NapiParseArray(napi_env env, napi_value value, std::vector<T> &outVec);
+napi_status NapiParseArray(napi_env env, napi_value array, std::vector<T> &outVec);
 template <typename T>
 napi_status NapiParseObjectArray(napi_env env, napi_value object, const char *name, std::vector<T> &outVec);
 }  // namespace Bluetooth

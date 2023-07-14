@@ -143,7 +143,7 @@ napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_in
     vector<BluetoothRemoteDevice> devices;
     int errorCode = profile->GetDevicesByStates(states, devices);
     HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
-    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, ret);
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, ret);
 
     vector<string> deviceVector;
     for (auto &device : devices) {
@@ -171,7 +171,7 @@ napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info inf
     int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
     int32_t errorCode = profile->GetDeviceState(device, state);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, result);
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, result);
 
     profileState = GetProfileConnectionState(state);
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
@@ -192,7 +192,7 @@ napi_value NapiBluetoothPan::Disconnect(napi_env env, napi_callback_info info)
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t errorCode = profile->Disconnect(device);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
 
     return NapiGetBooleanTrue(env);
 }
@@ -217,7 +217,7 @@ napi_value NapiBluetoothPan::SetTethering(napi_env env, napi_callback_info info)
     Pan *profile = Pan::GetProfile();
     int32_t errorCode = profile->SetTethering(value);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_SUCCESS, errorCode);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_NO_ERROR, errorCode);
 
     return NapiGetUndefinedRet(env);
 }
@@ -232,7 +232,7 @@ napi_value NapiBluetoothPan::IsTetheringOn(napi_env env, napi_callback_info info
     bool result = false;
     int32_t errorCode = profile->IsTetheringOn(result);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
 
     HILOGI("IsTetheringOn: %{public}d", result);
     return NapiGetBooleanRet(env, result);

@@ -24,11 +24,11 @@ int BluetoothA2dpSinkProxy::Connect(const RawAddress &device)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::Connect WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSinkProxy::Connect write device error");
+        HILOGE("write device error");
         return ERROR;
     }
 
@@ -39,7 +39,7 @@ int BluetoothA2dpSinkProxy::Connect(const RawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::Connect done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return ERROR;
     }
 
@@ -50,11 +50,11 @@ int BluetoothA2dpSinkProxy::Disconnect(const RawAddress &device)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::Disconnect WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSinkProxy::Disconnect write device error");
+        HILOGE("write device error");
         return ERROR;
     }
 
@@ -65,7 +65,7 @@ int BluetoothA2dpSinkProxy::Disconnect(const RawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::Disconnect done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return ERROR;
     }
 
@@ -76,11 +76,11 @@ void BluetoothA2dpSinkProxy::RegisterObserver(const sptr<IBluetoothA2dpSinkObser
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::RegisterObserver WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return;
     }
     if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothA2dpSinkProxy::RegisterObserver error");
+        HILOGE("error");
         return;
     }
 
@@ -91,7 +91,7 @@ void BluetoothA2dpSinkProxy::RegisterObserver(const sptr<IBluetoothA2dpSinkObser
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::RegisterObserver done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return;
     }
 }
@@ -100,11 +100,11 @@ void BluetoothA2dpSinkProxy::DeregisterObserver(const sptr<IBluetoothA2dpSinkObs
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::DeregisterObserver WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return;
     }
     if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothA2dpSinkProxy::DeregisterObserver error");
+        HILOGE("error");
         return;
     }
 
@@ -115,7 +115,7 @@ void BluetoothA2dpSinkProxy::DeregisterObserver(const sptr<IBluetoothA2dpSinkObs
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_DEREGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::DeregisterObserver done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return;
     }
 }
@@ -138,7 +138,7 @@ std::vector<RawAddress> BluetoothA2dpSinkProxy::GetDevicesByStates(const std::ve
     MessageOption option = {MessageOption::TF_SYNC};
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_DEVICE_BY_STATES, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::GetDevicesByStates done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return rawAdds;
     }
     int32_t rawAddsSize = reply.ReadInt32();
@@ -152,11 +152,11 @@ int BluetoothA2dpSinkProxy::GetDeviceState(const RawAddress &device)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::GetDeviceState WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSinkProxy::GetDeviceState write device error");
+        HILOGE("write device error");
         return ERROR;
     }
 
@@ -167,7 +167,7 @@ int BluetoothA2dpSinkProxy::GetDeviceState(const RawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_DEVICE_STATE, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::GetDeviceState done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return ERROR;
     }
 
@@ -178,11 +178,11 @@ int BluetoothA2dpSinkProxy::GetPlayingState(const RawAddress &device, int &state
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::GetPlayingState WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSinkProxy::GetPlayingState write device error");
+        HILOGE("write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
@@ -193,7 +193,7 @@ int BluetoothA2dpSinkProxy::GetPlayingState(const RawAddress &device, int &state
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_PLAYING_STATE, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::GetPlayingState done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
@@ -208,15 +208,15 @@ int BluetoothA2dpSinkProxy::SetConnectStrategy(const RawAddress &device, int32_t
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::SetConnectStrategy WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSinkProxy::SetConnectStrategy write device error");
+        HILOGE("write device error");
         return ERROR;
     }
     if (!data.WriteInt32(strategy)) {
-        HILOGE("BluetoothA2dpSinkProxy::SetConnectStrategy write strategy error");
+        HILOGE("write strategy error");
         return ERROR;
     }
 
@@ -227,7 +227,7 @@ int BluetoothA2dpSinkProxy::SetConnectStrategy(const RawAddress &device, int32_t
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_SET_CONNECT_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::SetConnectStrategy done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return ERROR;
     }
 
@@ -238,11 +238,11 @@ int BluetoothA2dpSinkProxy::GetConnectStrategy(const RawAddress &device)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::GetConnectStrategy WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSinkProxy::GetConnectStrategy write device error");
+        HILOGE("write device error");
         return ERROR;
     }
 
@@ -253,7 +253,7 @@ int BluetoothA2dpSinkProxy::GetConnectStrategy(const RawAddress &device)
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_GET_CONNECT_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::GetConnectStrategy done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return ERROR;
     }
 
@@ -264,15 +264,15 @@ int BluetoothA2dpSinkProxy::SendDelay(const RawAddress &device, int32_t delayVal
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSinkProxy::GetDescriptor())) {
-        HILOGE("BluetoothA2dpSinkProxy::SendDelay WriteInterfaceToken error");
+        HILOGE("WriteInterfaceToken error");
         return ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
-        HILOGE("BluetoothA2dpSinkProxy::SendDelay write device error");
+        HILOGE("write device error");
         return ERROR;
     }
     if (!data.WriteInt32(delayValue)) {
-        HILOGE("BluetoothA2dpSinkProxy::SendDelay write delayValue error");
+        HILOGE("write delayValue error");
         return ERROR;
     }
 
@@ -283,7 +283,7 @@ int BluetoothA2dpSinkProxy::SendDelay(const RawAddress &device, int32_t delayVal
 
     int error = Remote()->SendRequest(IBluetoothA2dpSink::Code::BT_A2DP_SINK_SEND_DELAY, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothA2dpSinkProxy::SendDelay done fail, error: %{public}d", error);
+        HILOGE("error: %{public}d", error);
         return ERROR;
     }
 

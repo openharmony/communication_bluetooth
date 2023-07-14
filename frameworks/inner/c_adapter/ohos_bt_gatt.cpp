@@ -54,8 +54,8 @@ class BleAdvCallback;
 
 static BtGattCallbacks *g_AppCallback;
 
-static BleAdvCallback *g_bleAdvCallbacks[MAX_BLE_ADV_NUM];
-static BleAdvertiser *g_BleAdvertiser = nullptr;
+static std::shared_ptr<BleAdvCallback> g_bleAdvCallbacks[MAX_BLE_ADV_NUM];
+static std::shared_ptr<BleAdvertiser> g_BleAdvertiser = nullptr;
 
 constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
@@ -68,7 +68,8 @@ public:
      * @param result Scan result.
      * @since 6
      */
-    void OnScanCallback(const BleScanResult &result) {
+    void OnScanCallback(const BleScanResult &result) override
+    {
         BtScanResultData scanResult;
         scanResult.eventType = OHOS_BLE_EVT_LEGACY_CONNECTABLE; // result.IsConnectable();
         scanResult.dataStatus = OHOS_BLE_DATA_COMPLETE;
@@ -107,7 +108,7 @@ public:
      * @param results Scan results.
      * @since 6
      */
-    void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) {}
+    void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override {}
 
     /**
      * @brief Start or Stop scan event callback.
@@ -116,7 +117,31 @@ public:
      * @param isStartScan true->start scan, false->stop scan.
      * @since 6
      */
-    void OnStartOrStopScanEvent(int resultCode, bool isStartScan) {}
+    void OnStartOrStopScanEvent(int32_t resultCode, bool isStartScan) override
+    {
+        return;
+    }
+
+    /**
+     * @brief Notify sensorHub msg callback.
+     *
+     * @param btUuid uuid.
+     * @param msgType notify msgType.
+     * @param value notify msg value.
+     * @since 6
+     */
+    void OnNotifyMsgReportFromSh(const UUID &btUuid, int msgType, const std::vector<uint8_t> &value) override
+    {
+        HILOGD("btUuid: %{public}s, msgType: %{public}d, len: %{public}zu", btUuid.ToString().c_str(), msgType,
+            value.size());
+        if (appCallback != nullptr && appCallback->lpDeviceInfoCb != nullptr) {
+            BtUuid retUuid;
+            string strUuid = btUuid.ToString();
+            retUuid.uuid = (char *)strUuid.c_str();
+            retUuid.uuidLen = strUuid.size();
+            appCallback->lpDeviceInfoCb(&retUuid, msgType, (uint8_t*)value.data(), value.size());
+        }
+    }
 
 public:
     BleScanCallbacks *appCallback = nullptr;
@@ -129,24 +154,30 @@ public:
         advId_ = advId;
     }
 
-    NO_SANITIZE("cfi") void OnStartResultEvent(int result) {
-        if (result != 0) {
-            HILOGE("result : %{public}d", result);
-            return;
-        }
-
-        HILOGI("adv started. advId_: %{public}d", advId_);
+    void OnStartResultEvent(int result) override
+    {
+        HILOGI("advId: %{public}d, ret: %{public}d", advId_, result);
+        int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
         if (g_AppCallback != nullptr && g_AppCallback->advEnableCb != nullptr) {
-            g_AppCallback->advEnableCb(advId_, 0);
+            g_AppCallback->advEnableCb(advId_, ret);
         } else {
             HILOGW("call back is null.");
         }
     }
 
+    void OnSetAdvDataEvent(int result) override
+    {
+        HILOGI("advId: %{public}d, ret: %{public}d", advId_, result);
+        int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
+        if (g_AppCallback != nullptr && g_AppCallback->advDataCb  != nullptr) {
+            g_AppCallback->advDataCb(advId_, ret);
+        }
+    }
+
 protected:
-    BleAdvertiserData *advData;
-    BleAdvertiserData *advResponseData;
-    BleAdvertiserSettings *advSetting;
+    BleAdvertiserData *advData = nullptr;
+    BleAdvertiserData *advResponseData = nullptr;
+    BleAdvertiserSettings *advSetting = nullptr;
 
 private:
     int advId_;
@@ -198,6 +229,15 @@ int SetDeviceName(const char *name, unsigned int len) {
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
+static vector<uint8_t> ConvertDataToVec(uint8_t *data, unsigned int len)
+{
+    if (data == nullptr || len == 0) {
+        return {};
+    }
+
+    return vector<uint8_t>(data, data + len);
+}
+
 /**
  * @brief Sets advertising data.
  *
@@ -209,7 +249,21 @@ int SetDeviceName(const char *name, unsigned int len) {
  */
 int BleSetAdvData(int advId, const StartAdvRawData data)
 {
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGE("Invalid advId (%{public}d)", advId);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
+        HILOGE("Adv is not started, need call 'BleStartAdvEx' first.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    HILOGI("advId: %{public}d, advLen: %{public}u, scanRspLen: %{public}u", advId, data.advDataLen, data.rspDataLen);
+
+    auto advData = ConvertDataToVec(data.advData, data.advDataLen);
+    auto rspData = ConvertDataToVec(data.rspData, data.rspDataLen);
+    g_BleAdvertiser->SetAdvertisingData(advData, rspData, *g_bleAdvCallbacks[advId]);
+
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -244,7 +298,7 @@ static bool IsAllAdvStopped()
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-NO_SANITIZE("cfi") int BleStopAdv(int advId)
+int BleStopAdv(int advId)
 {
     HILOGI("BleStopAdv, advId: %{public}d.", advId);
     if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
@@ -263,13 +317,10 @@ NO_SANITIZE("cfi") int BleStopAdv(int advId)
         HILOGI("adv stopped advId: %{public}d.", advId);
         g_AppCallback->advDisableCb(advId, 0);
     }
-    delete g_bleAdvCallbacks[advId];
     g_bleAdvCallbacks[advId] = nullptr;
 
     if (IsAllAdvStopped()) {
         HILOGI("All adv have been stopped.");
-        delete g_BleAdvertiser;
-        g_BleAdvertiser = nullptr;
     }
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -469,12 +520,12 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 {
     HILOGI("BleStartAdvEx enter");
     if (g_BleAdvertiser == nullptr) {
-        g_BleAdvertiser = new BleAdvertiser();
+        g_BleAdvertiser = std::make_shared<BleAdvertiser>();
     }
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
         if (g_bleAdvCallbacks[i] == nullptr) {
-            g_bleAdvCallbacks[i] = new BleAdvCallback(i);
+            g_bleAdvCallbacks[i] = std::make_shared<BleAdvCallback>(i);
             break;
         }
     }
@@ -493,20 +544,8 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
         settings.SetConnectable(false);
     }
 
-    vector<uint8_t> advData;
-    if (rawData.advData != nullptr) {
-        for (unsigned int i = 0; i < rawData.advDataLen; i++) {
-            advData.push_back(rawData.advData[i]);
-        }
-    }
-
-    vector<uint8_t> scanResponse;
-    if (rawData.rspData != nullptr) {
-        for (unsigned int i = 0; i < rawData.rspDataLen; i++) {
-            scanResponse.push_back(rawData.rspData[i]);
-        }
-    }
-
+    auto advData = ConvertDataToVec(rawData.advData, rawData.advDataLen);
+    auto scanResponse = ConvertDataToVec(rawData.rspData, rawData.rspDataLen);
     g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, *g_bleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;
 }

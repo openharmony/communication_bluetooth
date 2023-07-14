@@ -175,7 +175,7 @@ public:
      * @return Returns the connection police of the specified bluetooth address.
      * @since 6
      */
-    int GetConnectionStrategy(const BluetoothRemoteDevice &device) const;
+    int GetConnectionStrategy(const BluetoothRemoteDevice &device);
     /**
      * @brief Set whether to authorize the connection.
      *
@@ -198,6 +198,18 @@ public:
      * @since 6
      */
     int SetDevicePassword(const BluetoothRemoteDevice &device, const std::string &password, std::string userId = "");
+
+    /**
+     * @brief The external process calls the PbapServer profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * PbapServer proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of PbapServer profile.
+     */
+    void UnInit();
 
 private:
     /**

@@ -18,10 +18,7 @@
 namespace OHOS {
 namespace Bluetooth {
 int BluetoothOppObserverStub::OnRemoteRequest(
-    uint32_t code,
-    MessageParcel& data,
-    MessageParcel& reply,
-    MessageOption& option)
+    uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     HILOGI("BluetoothOppObserverStub OnRemoteRequest start");
     switch (code) {
@@ -30,8 +27,8 @@ int BluetoothOppObserverStub::OnRemoteRequest(
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
             }
-            const BluetoothIOppTransferInformation *oppInformation =
-                data.ReadParcelable<BluetoothIOppTransferInformation>();
+            std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
+                data.ReadParcelable<BluetoothIOppTransferInformation>());
             if (oppInformation == nullptr) {
                 return ERR_NULL_OBJECT;
             }
@@ -44,8 +41,8 @@ int BluetoothOppObserverStub::OnRemoteRequest(
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
             }
-            const BluetoothIOppTransferInformation *oppInformation =
-                data.ReadParcelable<BluetoothIOppTransferInformation>();
+            std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
+                data.ReadParcelable<BluetoothIOppTransferInformation>());
             if (oppInformation == nullptr) {
                 return ERR_NULL_OBJECT;
             }

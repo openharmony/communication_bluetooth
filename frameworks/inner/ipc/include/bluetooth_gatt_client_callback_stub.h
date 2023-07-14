@@ -26,9 +26,9 @@ namespace Bluetooth {
 class BluetoothGattClientCallbackStub : public IRemoteStub<IBluetoothGattClientCallback> {
 public:
     BluetoothGattClientCallbackStub();
-    virtual ~BluetoothGattClientCallbackStub();
+    ~BluetoothGattClientCallbackStub() override;
 
-    virtual int32_t OnRemoteRequest(
+    int32_t OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
@@ -42,7 +42,7 @@ private:
     ErrCode OnServicesDiscoveredInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnServicesChangedInner(MessageParcel &data, MessageParcel &reply);
-
+    ErrCode OnReadRemoteRssiValueInner(MessageParcel &data, MessageParcel &reply);
     using BluetoothHostFunc = ErrCode (BluetoothGattClientCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHostFunc> memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothGattClientCallbackStub);

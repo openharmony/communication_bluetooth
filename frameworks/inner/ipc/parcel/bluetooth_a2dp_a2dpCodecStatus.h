@@ -30,7 +30,7 @@ public:
         : bluetooth::CodecStatus(other) {} // NOLINT(implicit)
     BluetoothA2dpCodecStatus(const BluetoothA2dpCodecStatus& other)
         : bluetooth::CodecStatus(other) {} // NOLINT(implicit)
-    ~BluetoothA2dpCodecStatus() = default;
+    ~BluetoothA2dpCodecStatus() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 

@@ -62,7 +62,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    BluetoothDeviceClass(int deviceClass);
+    explicit BluetoothDeviceClass(int deviceClass);
 
     /**
      * @brief A destructor used to delete the <b>BluetoothDeviceClass</b> instance.

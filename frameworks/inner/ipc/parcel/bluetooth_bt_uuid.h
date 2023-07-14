@@ -41,7 +41,7 @@ public:
      * @param other Other Uuid to create a new BluetoothUuid.
      * @since 6
      */
-    BluetoothUuid(const bluetooth::Uuid &other) : bluetooth::Uuid(other)
+    explicit BluetoothUuid(const bluetooth::Uuid &other) : bluetooth::Uuid(other)
     {}  // NOLINT(implicit)
 
     /**
@@ -58,7 +58,7 @@ public:
      *
      * @since 6
      */
-    ~BluetoothUuid() = default;
+    ~BluetoothUuid() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 

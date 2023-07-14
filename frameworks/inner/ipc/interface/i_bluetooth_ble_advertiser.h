@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Bluetooth {
 class IBluetoothBleAdvertiser : public OHOS::IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetootBleAdvertiser");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleAdvertiser");
 
     enum Code {
         BLE_REGISTER_BLE_ADVERTISER_CALLBACK = 0,
@@ -37,6 +37,7 @@ public:
         BLE_STOP_ADVERTISING,
         BLE_CLOSE,
         BLE_GET_ADVERTISER_HANDLE,
+        BLE_SET_ADVERTISING_DATA,
     };
 
     virtual void RegisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback) = 0;
@@ -46,7 +47,9 @@ public:
         int32_t advHandle, bool isRawData) = 0;
     virtual int StopAdvertising(int32_t advHandle) = 0;
     virtual void Close(int32_t advHandle) = 0;
-    virtual int32_t GetAdvertiserHandle() = 0;
+    virtual int32_t GetAdvertiserHandle(int32_t &advHandle) = 0;
+    virtual void SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
+        const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

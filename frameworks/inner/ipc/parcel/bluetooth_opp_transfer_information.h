@@ -24,7 +24,7 @@ namespace Bluetooth {
 class BluetoothIOppTransferInformation : public Parcelable, public bluetooth::IOppTransferInformation {
 public:
     BluetoothIOppTransferInformation() = default;
-    virtual ~BluetoothIOppTransferInformation() = default;
+    ~BluetoothIOppTransferInformation() override = default;
     explicit BluetoothIOppTransferInformation(const bluetooth::IOppTransferInformation& other);
 
     bool Marshalling(Parcel &parcel) const override;

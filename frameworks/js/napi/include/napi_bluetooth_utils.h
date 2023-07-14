@@ -85,7 +85,7 @@ struct ServerResponse {
 struct SppOption {
     std::string uuid_ = "";
     bool secure_ = false;
-    SppSocketType type_;
+    BtSocketType type_;
 };
 
 const std::string REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
@@ -134,21 +134,6 @@ void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::
 void ConvertOppTransferInformationToJS(napi_env env,
     napi_value result, BluetoothOppTransferInformation& transferInformation);
 
-bool GetServiceVectorFromJS(napi_env env, napi_value object, std::vector<GattService> &services,
-    std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
-GattService *GetServiceFromJS(
-    napi_env env, napi_value object, std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
-
-bool GetCharacteristicVectorFromJS(napi_env env, napi_value object, std::vector<GattCharacteristic> &characteristics,
-    std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
-GattCharacteristic *GetCharacteristicFromJS(
-    napi_env env, napi_value object, std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
-
-bool GetDescriptorVectorFromJS(napi_env env, napi_value object, std::vector<GattDescriptor> &descriptors);
-GattDescriptor *GetDescriptorFromJS(
-    napi_env env, napi_value object, std::shared_ptr<GattServer> server, std::shared_ptr<GattClient> client);
-
-ServerResponse GetServerResponseFromJS(napi_env env, napi_value object);
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName);
@@ -173,40 +158,24 @@ struct AsyncCallbackInfo {
     int errorCode_ = 0;
 };
 
-struct ReadCharacteristicValueCallbackInfo : public AsyncCallbackInfo {
-    GattCharacteristic *inputCharacteristic_ = nullptr;
-    const GattCharacteristic *outputCharacteristic_ = nullptr;
-    int ret = -1;
-    std::shared_ptr<GattClient> client_ = nullptr;
-    int asyncState_ = ASYNC_IDLE;
-};
-
-struct ReadDescriptorValueCallbackInfo : public AsyncCallbackInfo {
-    GattDescriptor *inputDescriptor_ = nullptr;
-    const GattDescriptor *outputDescriptor_ = nullptr;
-    int ret = -1;
-    std::shared_ptr<GattClient> client_ = nullptr;
-    int asyncState_ = ASYNC_IDLE;
-};
-
 struct GetServiceCallbackInfo : public AsyncCallbackInfo {
     std::vector<GattService> services_;
     std::shared_ptr<GattClient> client_ = nullptr;
 };
 
 struct SppListenCallbackInfo : public AsyncCallbackInfo {
-    std::shared_ptr<SppServerSocket> server_ = nullptr;
+    std::shared_ptr<ServerSocket> server_ = nullptr;
     std::string name_ = "";
     std::shared_ptr<SppOption> sppOption_;
 };
 
 struct SppAcceptCallbackInfo : public AsyncCallbackInfo {
-    std::shared_ptr<SppServerSocket> server_ = nullptr;
-    std::shared_ptr<SppClientSocket> client_ = nullptr;
+    std::shared_ptr<ServerSocket> server_ = nullptr;
+    std::shared_ptr<ClientSocket> client_ = nullptr;
 };
 
 struct SppConnectCallbackInfo : public AsyncCallbackInfo {
-    std::shared_ptr<SppClientSocket> client_ = nullptr;
+    std::shared_ptr<ClientSocket> client_ = nullptr;
     std::string deviceId_ = "";
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
     std::shared_ptr<SppOption> sppOption_ = nullptr;
@@ -263,6 +232,7 @@ struct PairConfirmedCallBackInfo {
         this->deviceAddr = deviceAddr;
     }
 };
+
 struct GattCharacteristicCallbackInfo : public BluetoothCallbackInfo {
     GattCharacteristic characteristic_ = {UUID::FromString("0"), 0, 0};
 };
@@ -600,8 +570,11 @@ void AfterWorkCallback(uv_work_t *work, int status)
         }                                                   \
     } while (0)
 
+int DoInJsMainThread(napi_env env, std::function<void(void)> func);
+
 bool IsValidAddress(std::string bdaddr);
 bool IsValidUuid(std::string uuid);
+bool IsValidTransport(int transport);
 napi_status NapiIsBoolean(napi_env env, napi_value value);
 napi_status NapiIsNumber(napi_env env, napi_value value);
 napi_status NapiIsString(napi_env env, napi_value value);

@@ -23,7 +23,7 @@ std::shared_mutex NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex;
 
 void NapiHandsFreeUnitObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     std::unique_lock<std::shared_mutex> guard(g_handsFreeUnitCallbackInfosMutex);
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
         callbackInfos_.find(STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE);

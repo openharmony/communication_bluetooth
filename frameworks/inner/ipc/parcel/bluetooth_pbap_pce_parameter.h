@@ -30,8 +30,8 @@ namespace Bluetooth {
 class BluetoothIPbapPullPhoneBookParam : public Parcelable, public bluetooth::IPbapPullPhoneBookParam {
 public:
     BluetoothIPbapPullPhoneBookParam() = default;
-    virtual ~BluetoothIPbapPullPhoneBookParam() = default;
-    BluetoothIPbapPullPhoneBookParam(const bluetooth::IPbapPullPhoneBookParam& other);
+    ~BluetoothIPbapPullPhoneBookParam() override = default;
+    explicit BluetoothIPbapPullPhoneBookParam(const bluetooth::IPbapPullPhoneBookParam& other);
     BluetoothIPbapPullPhoneBookParam(const BluetoothIPbapPullPhoneBookParam& other);
     /*
      * @brief Write BluetoothIPbapPullPhoneBookParam values to parcel.
@@ -66,8 +66,8 @@ public:
 class BluetoothIPbapPullvCardListingParam : public Parcelable, public bluetooth::IPbapPullvCardListingParam {
 public:
     BluetoothIPbapPullvCardListingParam() = default;
-    virtual ~BluetoothIPbapPullvCardListingParam() = default;
-    BluetoothIPbapPullvCardListingParam(const bluetooth::IPbapPullvCardListingParam& other);
+    ~BluetoothIPbapPullvCardListingParam() override = default;
+    explicit BluetoothIPbapPullvCardListingParam(const bluetooth::IPbapPullvCardListingParam& other);
     BluetoothIPbapPullvCardListingParam(const BluetoothIPbapPullvCardListingParam& other);
 
     bool Marshalling(Parcel &parcel) const override;
@@ -103,8 +103,8 @@ public:
 class BluetoothIPbapPullvCardEntryParam : public Parcelable, public bluetooth::IPbapPullvCardEntryParam {
 public:
     BluetoothIPbapPullvCardEntryParam() = default;
-    virtual ~BluetoothIPbapPullvCardEntryParam() = default;
-    BluetoothIPbapPullvCardEntryParam(const bluetooth::IPbapPullvCardEntryParam& other);
+    ~BluetoothIPbapPullvCardEntryParam() override = default;
+    explicit BluetoothIPbapPullvCardEntryParam(const bluetooth::IPbapPullvCardEntryParam& other);
     BluetoothIPbapPullvCardEntryParam(const BluetoothIPbapPullvCardEntryParam& other);
     bool Marshalling(Parcel &parcel) const override;
 
@@ -140,8 +140,8 @@ public:
 class BluetoothIPbapPhoneBookData : public Parcelable, public bluetooth::IPbapPhoneBookData {
 public:
     explicit BluetoothIPbapPhoneBookData() = default;
-    virtual ~BluetoothIPbapPhoneBookData() = default;
-    BluetoothIPbapPhoneBookData(const bluetooth::IPbapPhoneBookData& other);
+    ~BluetoothIPbapPhoneBookData() override = default;
+    explicit BluetoothIPbapPhoneBookData(const bluetooth::IPbapPhoneBookData& other);
     BluetoothIPbapPhoneBookData(const BluetoothIPbapPhoneBookData& other);
     bool Marshalling(Parcel &parcel) const override;
 
