@@ -1279,6 +1279,10 @@ void ClassicAdapter::ParserEirData(std::shared_ptr<ClassicRemoteDevice> remote, 
     for (auto &dataStruc : dataList) {
         int type = dataStruc.GetType();
         std::vector<uint8_t> valueVec = dataStruc.GetDataValue();
+        if (valueVec.empty()) {
+            HILOGI("valueVec empty");
+            return;
+        }
         switch (type) {
             case BLUETOOTH_DATA_TYPE_SHORTENED_LOCAL_NAME:
             case BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME:
