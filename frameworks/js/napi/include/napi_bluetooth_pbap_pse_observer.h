@@ -27,11 +27,11 @@ class NapiPbapPseObserver : public PbapObserver{
 public:
     void OnServiceConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
     void OnServicePasswordRequired(const BluetoothRemoteDevice &device,
-        const std::vector<uint8_t> &description, uint8_t charset, bool fullAccess = true) override {}
+    const std::vector<uint8_t> &description, uint8_t charset, bool fullAccess = true) override {}
     void OnServicePermission(const BluetoothRemoteDevice &device) override {}
 
     NapiPbapPseObserver() = default;
-    virtual ~NapiPbapPseObserver() = default;
+    ~NapiPbapPseObserver() override = default;
 
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };

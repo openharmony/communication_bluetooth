@@ -44,12 +44,13 @@
 
 namespace OHOS {
 namespace Bluetooth {
-enum SppSocketType {
-    TYPE_RFCOMM,
-    TYPE_L2CAP,
+enum BtSocketType {
+    TYPE_RFCOMM = 0x0,
+    TYPE_L2CAP = 0x01,
+    TYPE_L2CAP_LE = 0x02,
 };
 
-enum SppSocketState {
+enum SocketState {
     SOCKET_INIT,
     SOCKET_CONNECTED,
     SOCKET_LISTENING,
@@ -59,15 +60,17 @@ enum SppSocketState {
 const int FLAG_ENCRYPT = 1;
 const int FLAG_AUTH = 1 << 1;
 
+const int SPP_SOCKET_PSM_VALUE = -1;
+
 /**
- * @brief Class for spp client socket functions.
+ * @brief Class for client socket functions.
  *
  * @since 6
  */
-class BLUETOOTH_API SppClientSocket {
+class BLUETOOTH_API ClientSocket {
 public:
     /**
-     * @brief A constructor used to create an SppClientSocket instance.
+     * @brief A constructor used to create an ClientSocket instance.
      *
      * @param bda Remote device object.
      * @param uuid Uuid.
@@ -75,33 +78,35 @@ public:
      * @param auth Connection state.
      * @since 6
      */
-    SppClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, SppSocketType type, bool auth);
+    ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth);
 
     /**
-     * @brief A constructor used to create an SppClientSocket instance. This constructor to construct the
-     * SppClientSocket object when the Accept function is called.
+     * @brief A constructor used to create an ClientSocket instance. This constructor to construct the
+     * ClientSocket object when the Accept function is called.
      *
      * @param fd Socket fd.
      * @param address Remote bluetooth address.
+     * @param type Socket type.
      * @since 6
      */
-    SppClientSocket(int fd, std::string address);
+    ClientSocket(int fd, std::string address, BtSocketType type);
 
     /**
-     * @brief Destroy the SppClientSocket object.
+     * @brief Destroy the ClientSocket object.
      *
      * @since 6
      */
-    virtual ~SppClientSocket();
+    virtual ~ClientSocket();
 
     /**
      * @brief The function is used to connect to a remote device.
      *
+     * @param psm dynamic PSM value from remote device.
      * @return Returns <b>0</b> if the operation is successful.
      *         Returns <b>-1</b> if the operation fails.
      * @since 6
      */
-    int Connect();
+    int Connect(int psm);
 
     /**
      * @brief Client disconnected.
@@ -143,20 +148,28 @@ public:
      */
     bool IsConnected() const;
 
+    /**
+     * @brief Set socket send & recv buffer size, The size limit ranges from 4KB to 50KB.
+     *
+     * @return the operation status
+     * @since 6
+     */
+    int SetBufferSize(int bufferSize);
+
 private:
-    SppClientSocket() = delete;
+    ClientSocket() = delete;
     BLUETOOTH_DECLARE_IMPL();
 };
 
 /**
- * @brief Class for spp server socket functions.
+ * @brief Class for server socket functions.
  *
  * @since 6
  */
-class BLUETOOTH_API SppServerSocket {
+class BLUETOOTH_API ServerSocket {
 public:
     /**
-     * @brief A constructor used to create an SppServerSocket instance.
+     * @brief A constructor used to create an ServerSocket instance.
      *
      * @param name Server name.
      * @param uuid Uuid.
@@ -164,23 +177,31 @@ public:
      * @param encrypt Remote device auth and encrypt connection.
      * @since 6
      */
-    SppServerSocket(const std::string &name, UUID uuid, SppSocketType type, bool encrypt);
+    ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
 
     /**
-     * @brief Destroy the SppServerSocket object.
+     * @brief Destroy the ServerSocket object.
      *
      * @since 6
      */
-    ~SppServerSocket();
+    ~ServerSocket();
+
+    /**
+     * @brief Listen the client connect event.
+     *
+     * @return listen error code.
+     * @since 6
+     */
+    int Listen();
 
     /**
      * @brief Accept a client connection and return an acceptClientSocket to interact with the client.
      *
      * @param timeout Timeout for the accept.
-     * @return A SppClientSocket.
+     * @return A ClientSocket.
      * @since 6
      */
-    std::unique_ptr<SppClientSocket> Accept(int timeout);
+    std::shared_ptr<ClientSocket> Accept(int timeout);
 
     /**
      * @brief Server disconnected.
@@ -197,6 +218,13 @@ public:
      */
     const std::string &GetStringTag();
 
+    /**
+     * @brief Get dynamic PSM value.
+     *
+     * @return int psm.
+     * @since 6
+     */
+    int GetPsm();
 private:
     BLUETOOTH_DECLARE_IMPL();
 };
@@ -208,30 +236,31 @@ public:
      *
      * @param name Server name.
      * @param uuid Uuid.
-     * @return A SppServerSocket.
+     * @return A ServerSocket.
      * @since 6
      */
-    static SppServerSocket *DataListenInsecureRfcommByServiceRecord(const std::string &name, const UUID &uuid);
+    static std::shared_ptr<ServerSocket> DataListenInsecureRfcommByServiceRecord(
+        const std::string &name, const UUID &uuid);
 
     /**
      * @brief Create a server record to listen to the rfcomm.
      *
      * @param name Server name.
      * @param uuid Uuid.
-     * @return A SppServerSocket.
+     * @return A ServerSocket.
      * @since 6
      */
-    static SppServerSocket *DataListenRfcommByServiceRecord(const std::string &name, const UUID &uuid);
+    static std::shared_ptr<ServerSocket> DataListenRfcommByServiceRecord(const std::string &name, const UUID &uuid);
 
     /**
      * @brief Build insecure rfcomm data socket by service record.
      *
      * @param device Remote device object.
      * @param uuid Uuid.
-     * @return A SppClientSocket.
+     * @return A ClientSocket.
      * @since 6
      */
-    static SppClientSocket *BuildInsecureRfcommDataSocketByServiceRecord(
+    static std::shared_ptr<ClientSocket> BuildInsecureRfcommDataSocketByServiceRecord(
         const BluetoothRemoteDevice &device, const UUID &uuid);
 
     /**
@@ -239,10 +268,11 @@ public:
      *
      * @param device Remote device object.
      * @param uuid Uuid.
-     * @return A SppClientSocket.
+     * @return A ClientSocket.
      * @since 6
      */
-    static SppClientSocket *BuildRfcommDataSocketByServiceRecord(const BluetoothRemoteDevice &device, const UUID &uuid);
+    static std::shared_ptr<ClientSocket> BuildRfcommDataSocketByServiceRecord(
+        const BluetoothRemoteDevice &device, const UUID &uuid);
 };
 } // namespace Bluetooth
 } // namespace OHOS

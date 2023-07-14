@@ -28,9 +28,9 @@ public:
     {}
     BluetoothRawAddress(const BluetoothRawAddress &other) : bluetooth::RawAddress(other)
     {}
-    BluetoothRawAddress(const std::string &address) : bluetooth::RawAddress(address)
+    explicit BluetoothRawAddress(const std::string &address) : bluetooth::RawAddress(address)
     {}
-    ~BluetoothRawAddress() = default;
+    ~BluetoothRawAddress() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 

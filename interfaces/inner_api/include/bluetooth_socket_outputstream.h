@@ -52,7 +52,7 @@ public:
      * @param socketFd Socket fd.
      * @since 6
      */
-    OutputStream(int socketFd);
+    explicit OutputStream(int socketFd);
 
     /**
      * @brief Destroy the OutputStream object.
@@ -71,7 +71,7 @@ public:
      *         Returns <b> -1 </b> operation failed.
      * @since 6
      */
-    size_t Write(const char *buf, const size_t length);
+    size_t Write(const uint8_t *buf, size_t length);
 
 private:
     int socketFd_;

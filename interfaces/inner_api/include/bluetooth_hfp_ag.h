@@ -59,7 +59,7 @@ public:
      * @param state Connection state.
      * @since 6
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state)
     {}
 
     /**
@@ -69,7 +69,7 @@ public:
      * @param state Audio connection state.
      * @since 6
      */
-    virtual void OnScoStateChanged(const BluetoothRemoteDevice &device, int state)
+    virtual void OnScoStateChanged(const BluetoothRemoteDevice &device, int32_t state)
     {}
 
     /**
@@ -88,7 +88,7 @@ public:
      * @param indValue Enhanced driver safety value.
      * @since 6
      */
-    virtual void OnHfEnhancedDriverSafetyChanged(const BluetoothRemoteDevice &device, int indValue)
+    virtual void OnHfEnhancedDriverSafetyChanged(const BluetoothRemoteDevice &device, int32_t indValue)
     {}
 
     /**
@@ -243,7 +243,6 @@ public:
 
     bool SendNoCarrier(const BluetoothRemoteDevice &device);
 
-
     /**
      * @brief Get the active device object.
      *
@@ -283,6 +282,18 @@ public:
      * @since 6
      */
     static HandsFreeAudioGateway *instance_;
+
+    /**
+     * @brief The external process calls the HfpAg profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * HfpAg proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of HfpAg profile.
+     */
+    void UnInit();
 
 private:
     HandsFreeAudioGateway();

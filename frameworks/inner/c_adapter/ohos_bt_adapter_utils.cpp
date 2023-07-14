@@ -15,6 +15,7 @@
 
 #include "ohos_bt_adapter_utils.h"
 #include "__config"
+#include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "ohos_bt_def.h"
 #include "securec.h"
@@ -62,6 +63,60 @@ void GetAddrFromByte(unsigned char in[6], std::string &out)
     (void)sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
         in[0], in[1], in[2], in[3], in[4], in[5]);
     out = string(temp);
+}
+
+void GetAclStateName(int transport, int state, std::string &out)
+{
+    switch (transport) {
+        case ADAPTER_BREDR:
+            if (state == ACL_CONNECTION_STATE_CONNECTED) {
+                out = "OHOS_GAP_ACL_STATE_CONNECTED(0)";
+            } else if (state == ACL_CONNECTION_STATE_DISCONNECTED) {
+                out = "OHOS_GAP_ACL_STATE_DISCONNECTED(1)";
+            } else {
+                out = "Unknown state";
+            }
+            break;
+        case ADAPTER_BLE:
+            if (state == ACL_CONNECTION_STATE_CONNECTED) {
+                out = "OHOS_GAP_ACL_STATE_LE_CONNECTED(2)";
+            } else if (state == ACL_CONNECTION_STATE_DISCONNECTED) {
+                out = "OHOS_GAP_ACL_STATE_LE_DISCONNECTED(3)";
+            } else {
+                out = "Unknown state";
+            }
+            break;
+        default:
+            out = "Unknown transport";
+            break;
+    }
+}
+
+GapAclState ConvertAclState(int transport, int state)
+{
+    if (transport == ADAPTER_BREDR && state == ACL_CONNECTION_STATE_CONNECTED) {
+        return OHOS_GAP_ACL_STATE_CONNECTED;
+    } else if (transport == ADAPTER_BREDR && state == ACL_CONNECTION_STATE_DISCONNECTED) {
+        return OHOS_GAP_ACL_STATE_DISCONNECTED;
+    } else if (transport == ADAPTER_BLE && state == ACL_CONNECTION_STATE_CONNECTED) {
+        return OHOS_GAP_ACL_STATE_LE_CONNECTED;
+    } else if (transport == ADAPTER_BLE && state == ACL_CONNECTION_STATE_DISCONNECTED) {
+        return OHOS_GAP_ACL_STATE_LE_DISCONNECTED;
+    }
+
+    HILOGE("invalid transport: %{public}d, state: %{public}d", transport, state);
+    return OHOS_GAP_ACL_STATE_INVALID;
+}
+
+void ConvertDataToHex(const unsigned char *data, unsigned int dataLen, std::string &outStr)
+{
+    const std::string hex = "0123456789ABCDEF";
+    const uint8_t sizeFour = 4;
+    for (size_t i = 0; i < dataLen; ++i) {
+        uint8_t n = data[i];
+        outStr.push_back(hex[n >> sizeFour]);
+        outStr.push_back(hex[n & 0xF]);
+    }
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

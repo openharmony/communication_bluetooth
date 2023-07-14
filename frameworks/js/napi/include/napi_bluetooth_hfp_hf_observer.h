@@ -40,7 +40,7 @@ public:
     void OnInBandRingToneChanged(const BluetoothRemoteDevice &device, int status) override{}
 
     NapiHandsFreeUnitObserver() = default;
-    virtual ~NapiHandsFreeUnitObserver() = default;
+    ~NapiHandsFreeUnitObserver() override = default;
     static std::shared_mutex g_handsFreeUnitCallbackInfosMutex;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };

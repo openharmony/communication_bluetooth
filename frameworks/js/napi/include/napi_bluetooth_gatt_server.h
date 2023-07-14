@@ -52,7 +52,7 @@ public:
     NapiGattServer()
     {
         HILOGI("enter");
-        server_ = std::make_shared<GattServer>(callback_);
+        server_ = GattServer::CreateInstance(callback_);
     }
     ~NapiGattServer() = default;
 

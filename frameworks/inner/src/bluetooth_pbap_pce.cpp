@@ -23,6 +23,7 @@
 #include "bluetooth_remote_device.h"
 #include "bluetooth_pbap_pce_observer_stub.h"
 #include "bluetooth_observer_list.h"
+#include "bluetooth_load_system_ability.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "iservice_registry.h"
@@ -403,7 +404,7 @@ private:
 class BluetoothPbapPceObserverImpl : public BluetoothPbapPceObserverStub {
 public:
     BluetoothPbapPceObserverImpl() = default;
-    ~BluetoothPbapPceObserverImpl() = default;
+    ~BluetoothPbapPceObserverImpl() override = default;
     void SetObserver(BluetoothObserverList<PbapClientObserver> *frameworkObserverListPtr)
     {
         frameworkObserverListPtr_ = frameworkObserverListPtr;
@@ -485,7 +486,7 @@ struct PbapClient::impl {
         if (proxy_ != nullptr) {
             return proxy_->GetDeviceState(bluetooth::RawAddress(device.GetDeviceAddr()));
         }
-        return 0;
+        return static_cast<int>(BTConnectState::DISCONNECTED);
     }
 
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(const std::vector<int> &states)
@@ -620,7 +621,7 @@ struct PbapClient::impl {
     int GetConnectionStrategy(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        int ret = (int)BTStrategyType::CONNECTION_UNKNOWN;
+        int ret = static_cast<int>(BTStrategyType::CONNECTION_UNKNOWN);
         if (proxy_ != nullptr) {
             ret = proxy_->GetConnectionStrategy(bluetooth::RawAddress(device.GetDeviceAddr()));
         }
@@ -632,13 +633,17 @@ struct PbapClient::impl {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         int ret = -1;
         if (proxy_ != nullptr) {
-            ret = proxy_->SetDevicePassword(bluetooth::RawAddress(device.GetDeviceAddr()), 
-                                                                        password.c_str(), userId.c_str());
+            ret = proxy_->SetDevicePassword(
+                bluetooth::RawAddress(device.GetDeviceAddr()), password.c_str(), userId.c_str());
         }
         return ret;
     }
 
+    bool InitPbapClientProxy(void);
+    void UnInitPbapClientProxy(void);
+
 private:
+
     std::mutex mutex_;
     BluetoothObserverList<PbapClientObserver> frameworkObserverList_ {};
     sptr<BluetoothPbapPceObserverImpl> serviceObserverImpl_;
@@ -646,15 +651,16 @@ private:
 
 class PbapClient::impl::BluetoothPbapPceDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothPbapPceDeathRecipient(PbapClient::impl &pbapPce) : pbapPce_(pbapPce) {};
+    explicit BluetoothPbapPceDeathRecipient(PbapClient::impl &pbapPce) : pbapPce_(pbapPce) {};
     ~BluetoothPbapPceDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothPbapPceDeathRecipient);
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
-        pbapPce_.proxy_->AsObject()->RemoveDeathRecipient(pbapPce_.deathRecipient_);
-        pbapPce_.proxy_ = nullptr;
+        if (!pbapPce_.proxy_) {
+            return;
+        }
     }
 
 private:
@@ -662,33 +668,54 @@ private:
 };
 PbapClient::impl::impl()
 {
+    if (proxy_) {
+        return;
+    }
+    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_PBAP_PCE);
+    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+        return;
+    }
+    InitPbapClientProxy();
+}
+
+bool PbapClient::impl::InitPbapClientProxy(void)
+{
+    if (proxy_) {
+        return true;
+    }
+
+    proxy_ = GetRemoteProxy<IBluetoothPbapPce>(PROFILE_PBAP_PCE);
+    if (!proxy_) {
+        HILOGE("get PbapClient proxy_ failed");
+        return false;
+    }
+
     serviceObserverImpl_ = new BluetoothPbapPceObserverImpl();
     serviceObserverImpl_->SetObserver(&frameworkObserverList_);  // bind frameworkObserverList_
-    HILOGI("starts");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    if (!hostRemote) {
-        HILOGI("failed: no hostRemote");
-        return;
+    if (serviceObserverImpl_ != nullptr) {
+        proxy_->RegisterObserver(serviceObserverImpl_);
     }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_PBAP_PCE);
 
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return;
-    }
-    HILOGI("remote obtained");
-
-    proxy_ = iface_cast<IBluetoothPbapPce>(remote);
-    if (proxy_ == nullptr) {
-        return;
-    }
     deathRecipient_ = new BluetoothPbapPceDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    proxy_->RegisterObserver(serviceObserverImpl_);
+    if (deathRecipient_ != nullptr) {
+        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    }
+    return true;
 }
+
+void PbapClient::impl::UnInitPbapClientProxy(void)
+{
+    if (!proxy_) {
+        HILOGE("UnInitPbapClientProxy failed");
+        return;
+    }
+    proxy_->DeregisterObserver(serviceObserverImpl_);
+    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+    proxy_ = nullptr;
+    HILOGI("UnInitPbapClientProxy success");
+}
+
 PbapClient *PbapClient::GetProfile()
 {
     static PbapClient instance;
@@ -702,6 +729,27 @@ PbapClient::PbapClient()
 
 PbapClient::~PbapClient()
 {}
+
+void PbapClient::Init()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    if (!pimpl->InitPbapClientProxy()) {
+        HILOGE("PbapClient proxy_ is nullptr");
+        return;
+    }
+}
+
+void PbapClient::UnInit()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    pimpl->UnInitPbapClientProxy();
+}
 
 void PbapClient::RegisterObserver(PbapClientObserver *observer)
 {
@@ -721,11 +769,19 @@ int PbapClient::GetDeviceState(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
-        return (int)BTConnectState::DISCONNECTED;
+        HILOGE("bluetooth is off.");
+        return static_cast<int>(BTConnectState::DISCONNECTED);
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return static_cast<int>(BTConnectState::DISCONNECTED);
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
-        return (int)BTConnectState::DISCONNECTED;
+        return static_cast<int>(BTConnectState::DISCONNECTED);
     }
+
     return pimpl->GetDeviceState(device);
 }
 
@@ -733,8 +789,15 @@ std::vector<BluetoothRemoteDevice> PbapClient::GetDevicesByStates(const std::vec
 {
     HILOGI("enter");
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return std::vector<BluetoothRemoteDevice>();
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return std::vector<BluetoothRemoteDevice>();
+    }
+
     return pimpl->GetDevicesByStates(states);
 }
 
@@ -742,8 +805,15 @@ std::vector<BluetoothRemoteDevice> PbapClient::GetConnectedDevices()
 {
     HILOGI("enter");
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return std::vector<BluetoothRemoteDevice>();
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return std::vector<BluetoothRemoteDevice>();
+    }
+
     return pimpl->GetConnectedDevices();
 }
 
@@ -751,11 +821,19 @@ bool PbapClient::Connect(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return false;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return false;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return false;
     }
+
     return pimpl->Connect(device);
 }
 
@@ -763,8 +841,15 @@ bool PbapClient::Disconnect(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return false;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return false;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return false;
     }
@@ -775,8 +860,15 @@ bool PbapClient::SetConnectionStrategy(const BluetoothRemoteDevice &device, int 
 {
     HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return false;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return false;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return false;
     }
@@ -787,11 +879,19 @@ int PbapClient::GetConnectionStrategy(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
-        return (int)BTStrategyType::CONNECTION_FORBIDDEN;
+        HILOGE("bluetooth is off.");
+        return static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
-        return (int)BTStrategyType::CONNECTION_FORBIDDEN;
+        return static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
     }
+
     return pimpl->GetConnectionStrategy(device);
 }
 
@@ -800,11 +900,19 @@ int PbapClient::SetDevicePassword(
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return RET_BAD_PARAM;
     }
+
     return pimpl->SetDevicePassword(device, password, userId);
 }
 
@@ -812,11 +920,19 @@ int PbapClient::PullPhoneBook(const BluetoothRemoteDevice &device, const PbapPul
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return RET_BAD_STATUS;
     }
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        return RET_BAD_PARAM;
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return RET_BAD_STATUS;
     }
+
+    if (!device.IsValidBluetoothRemoteDevice()) {
+        return RET_BAD_STATUS;
+    }
+
     return pimpl->PullPhoneBook(device, BluetoothIPbapPullPhoneBookParamAdapter(param));
 }
 
@@ -824,8 +940,15 @@ int PbapClient::SetPhoneBook(const BluetoothRemoteDevice &device, const std::u16
 {
     HILOGI("enter, device: %{public}s, flag: %{public}d", GET_ENCRYPT_ADDR(device), flag);
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return RET_BAD_PARAM;
     }
@@ -836,8 +959,15 @@ int PbapClient::PullvCardListing(const BluetoothRemoteDevice &device, const Pbap
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return RET_BAD_PARAM;
     }
@@ -848,8 +978,15 @@ int PbapClient::PullvCardEntry(const BluetoothRemoteDevice &device, const PbapPu
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return RET_BAD_PARAM;
     }
@@ -860,8 +997,15 @@ bool PbapClient::IsDownloading(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return false;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return false;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return false;
     }
@@ -872,8 +1016,15 @@ int PbapClient::AbortDownloading(const BluetoothRemoteDevice &device)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
         return RET_BAD_STATUS;
     }
+
+    if (pimpl == nullptr || !pimpl->InitPbapClientProxy()) {
+        HILOGE("pimpl or pbapClient proxy_ is nullptr");
+        return RET_BAD_STATUS;
+    }
+
     if (!device.IsValidBluetoothRemoteDevice()) {
         return RET_BAD_PARAM;
     }

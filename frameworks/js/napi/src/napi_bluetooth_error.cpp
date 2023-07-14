@@ -56,7 +56,7 @@ std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
 
 void HandleSyncErr(const napi_env &env, int32_t errCode)
 {
-    if (errCode == BtErrCode::BT_SUCCESS) {
+    if (errCode == BtErrCode::BT_NO_ERROR) {
         return;
     }
     std::string errMsg = GetNapiErrMsg(env, errCode);

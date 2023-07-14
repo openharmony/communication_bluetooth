@@ -755,8 +755,8 @@ public:
      *                          the excute result will return by observer
      * @since 6
      */
-    int GetConversationListing
-        (const BluetoothRemoteDevice &device, const GetConversationListingParameters &para) const;
+    int GetConversationListing(
+        const BluetoothRemoteDevice &device, const GetConversationListingParameters &para) const;
     /**
      * @brief Set the Message Status object
      * @param  device
@@ -794,6 +794,18 @@ public:
      * @since 6
      */
     MapMasInstanceInfoList GetMasInstanceInfo(const BluetoothRemoteDevice &device) const;
+
+    /**
+     * @brief The external process calls the MapClient profile interface before the Bluetooth process starts. At this
+     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
+     * MapClient proflie.
+     */
+    void Init();
+
+    /**
+     * @brief After closing the Bluetooth process, call this interface for uninitialization of MapClient profile.
+     */
+    void UnInit();
 
 private:
     /**

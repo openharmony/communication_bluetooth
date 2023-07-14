@@ -17,7 +17,7 @@
 #define MAP_MCE_PARAMETER_H
 
 #include <string>
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 #include "bt_def.h"

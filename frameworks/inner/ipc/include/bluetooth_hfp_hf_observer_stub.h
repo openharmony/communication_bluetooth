@@ -22,12 +22,12 @@
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothHfpHfObserverStub : public IRemoteStub<IBluetoothHfpHfObserver> {
-    
+
 public:
     BluetoothHfpHfObserverStub();
     virtual ~BluetoothHfpHfObserverStub();
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:

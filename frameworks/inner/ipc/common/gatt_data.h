@@ -16,7 +16,6 @@
 #ifndef GATT_DATA_H
 #define GATT_DATA_H
 
-#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <vector>

@@ -102,7 +102,7 @@ napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_ca
     vector<BluetoothRemoteDevice> devices;
     int errorCode = profile->GetConnectedDevices(devices);
     HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
-    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, ret);
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, ret);
 
     vector<string> deviceVector;
     for (auto &device: devices) {
@@ -130,7 +130,7 @@ napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback
     int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
     int32_t errorCode = profile->GetDeviceState(device, state);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_SUCCESS, errorCode, result);
+    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, result);
 
     profileState = GetProfileConnectionState(state);
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
@@ -312,7 +312,7 @@ napi_value NapiHandsFreeAudioGateway::Connect(napi_env env, napi_callback_info i
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t errorCode = profile->Connect(device);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetBooleanTrue(env);
 }
 
@@ -327,7 +327,7 @@ napi_value NapiHandsFreeAudioGateway::Disconnect(napi_env env, napi_callback_inf
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t errorCode = profile->Disconnect(device);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_SUCCESS, errorCode);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetBooleanTrue(env);
 }
 } // namespace Bluetooth

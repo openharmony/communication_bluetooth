@@ -28,13 +28,14 @@ public:
     BluetoothBleCentralManagerCallBackStub();
     ~BluetoothBleCentralManagerCallBackStub() override;
 
-    virtual int OnRemoteRequest(
+    int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     ErrCode OnScanCallbackInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnBleBatchScanResultsEventInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnStartOrStopScanEventInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnNotifyMsgReportFromShInner(MessageParcel &data, MessageParcel &reply);
 
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothBleCentralManagerCallBackStub *, MessageParcel &, MessageParcel &)>>

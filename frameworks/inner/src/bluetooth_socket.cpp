@@ -19,29 +19,32 @@
 #include "bluetooth_log.h"
 #include "bluetooth_host.h"
 #include "bluetooth_host_proxy.h"
+#include "bluetooth_utils.h"
 #include "bluetooth_socket_proxy.h"
-#include "bluetooth_socket.h"
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "securec.h"
 #include "system_ability_definition.h"
 #include "raw_address.h"
+#include "bluetooth_socket.h"
 
 namespace OHOS {
 namespace Bluetooth {
 const int LENGTH = 18;
-struct SppClientSocket::impl {
-    impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSocketType type, bool auth);
-    impl(int fd, std::string address);
+const int MIN_BUFFER_SIZE_TO_SET = 4 * 1024; // 4KB
+const int MAX_BUFFER_SIZE_TO_SET = 50 * 1024; // 50KB
+const int PSM_BUFFER_SIZE = 4;
+struct ClientSocket::impl {
+    impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth);
+    impl(int fd, std::string address, BtSocketType type);
     ~impl()
     {
-        if (!proxy_) {
+        if (proxy_ != nullptr && proxy_->AsObject() != nullptr) {
+            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+        } else {
             HILOGI("failed: no proxy_");
-            return;
         }
-
-        proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
@@ -104,8 +107,8 @@ struct SppClientSocket::impl {
             return false;
         }
         char token[LENGTH] = {0};
-        (void)sprintf_s(token,
-            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
+        (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
+            buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
         BluetoothRawAddress rawAddr {
             token
         };
@@ -153,6 +156,51 @@ struct SppClientSocket::impl {
         return socketStatus_ == SOCKET_CONNECTED;
     }
 
+    int SetBufferSize(int bufferSize)
+    {
+        HILOGI("SetBufferSize bufferSize is %{public}d.", bufferSize);
+        if (bufferSize < MIN_BUFFER_SIZE_TO_SET || bufferSize > MAX_BUFFER_SIZE_TO_SET) {
+            HILOGE("SetBufferSize param is invalid.");
+            return RET_BAD_PARAM;
+        }
+
+        if (fd_ <= 0) {
+            HILOGE("SetBufferSize socket fd invalid.");
+            return RET_BAD_STATUS;
+        }
+
+        const std::pair<const char*, int> sockOpts[] = {
+            {"recvBuffer", SO_RCVBUF},
+            {"sendBuffer", SO_SNDBUF},
+        };
+        for (auto opt : sockOpts) {
+            int curSize = 0;
+            socklen_t optlen = sizeof(curSize);
+            if (getsockopt(fd_, SOL_SOCKET, opt.second, &curSize, &optlen) != 0) {
+                HILOGE("SetBufferSize getsockopt %{public}s failed.", opt.first);
+                return RET_BAD_STATUS;
+            }
+            HILOGI("SetBufferSize %{public}s before set size is %{public}d.", opt.first, curSize);
+
+            if (curSize != bufferSize) {
+                int setSize = bufferSize / 2;
+                if (setsockopt(fd_, SOL_SOCKET, opt.second, &setSize, sizeof(setSize)) != 0) {
+                    HILOGE("SetBufferSize setsockopt  %{public}s failed.", opt.first);
+                    return RET_BAD_STATUS;
+                }
+
+                curSize = 0;
+                if (getsockopt(fd_, SOL_SOCKET, opt.second, &curSize, &optlen) != 0) {
+                    HILOGE("SetBufferSize after getsockopt %{public}s failed.", opt.first);
+                    return RET_BAD_STATUS;
+                }
+                HILOGI("SetBufferSize %{public}s after set size is %{public}d.", opt.first, curSize);
+            }
+        }
+
+        return RET_NO_ERROR;
+    }
+
     class BluetoothClientSocketDeathRecipient;
     sptr<BluetoothClientSocketDeathRecipient> deathRecipient_;
 
@@ -165,16 +213,16 @@ struct SppClientSocket::impl {
     };
     BluetoothRemoteDevice remoteDevice_;
     UUID uuid_;
-    SppSocketType type_;
+    BtSocketType type_;
     std::string address_;
     int fd_;
     bool auth_;
     int socketStatus_;
 };
 
-class SppClientSocket::impl::BluetoothClientSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
+class ClientSocket::impl::BluetoothClientSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothClientSocketDeathRecipient(SppClientSocket::impl &host) : host_(host) {};
+    explicit BluetoothClientSocketDeathRecipient(ClientSocket::impl &host) : host_(host) {};
     ~BluetoothClientSocketDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothClientSocketDeathRecipient);
 
@@ -186,10 +234,10 @@ public:
     }
 
 private:
-    SppClientSocket::impl &host_;
+    ClientSocket::impl &host_;
 };
 
-SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSocketType type, bool auth)
+ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth)
     : inputStream_(nullptr),
       outputStream_(nullptr),
       remoteDevice_(addr),
@@ -209,7 +257,7 @@ SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSoc
     }
 
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SPP);
+    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
 
     if (!remote) {
         HILOGI("failed: no remote");
@@ -229,11 +277,11 @@ SppClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, SppSoc
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
-SppClientSocket::impl::impl(int fd, std::string address)
+ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
     : inputStream_(std::make_unique<InputStream>(fd)),
       outputStream_(std::make_unique<OutputStream>(fd)),
       remoteDevice_(BluetoothRemoteDevice(address, 0)),
-      type_(TYPE_RFCOMM),
+      type_(type),
       address_(address),
       fd_(fd),
       auth_(false),
@@ -249,7 +297,7 @@ SppClientSocket::impl::impl(int fd, std::string address)
     }
 
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SPP);
+    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
 
     if (!remote) {
         HILOGI("failed: no remote");
@@ -269,23 +317,25 @@ SppClientSocket::impl::impl(int fd, std::string address)
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
-SppClientSocket::SppClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, SppSocketType type, bool auth)
-    : pimpl(new SppClientSocket::impl(bda, uuid, type, auth))
+ClientSocket::ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth)
+    : pimpl(new ClientSocket::impl(bda, uuid, type, auth))
 {}
 
-SppClientSocket::SppClientSocket(int fd, std::string address) : pimpl(new SppClientSocket::impl(fd, address))
+ClientSocket::ClientSocket(int fd, std::string address, BtSocketType type)
+    : pimpl(new ClientSocket::impl(fd, address, type))
 {}
 
-SppClientSocket::~SppClientSocket()
+ClientSocket::~ClientSocket()
 {}
 
-int SppClientSocket::Connect()
+int ClientSocket::Connect(int psm)
 {
     HILOGI("starts");
     if (!IS_BT_ENABLED()) {
         HILOGI("BR is not TURN_ON");
-        return BtStatus::BT_FAILURE;
+        return BT_ERR_INVALID_STATE;
     }
+
     pimpl->address_ = pimpl->remoteDevice_.GetDeviceAddr();
 
     std::string tempAddress = pimpl->address_;
@@ -294,18 +344,26 @@ int SppClientSocket::Connect()
     }
     if (pimpl->socketStatus_ == SOCKET_CLOSED) {
         HILOGE("socket closed");
-        return BtStatus::BT_FAILURE;
+        return BT_ERR_INVALID_STATE;
     }
-
-    bluetooth::Uuid serverUuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits());
 
     if (!pimpl->proxy_) {
         HILOGE("proxy_ is nullptr");
-        return BtStatus::BT_FAILURE;
+        return BT_ERR_SERVICE_DISCONNECTED;
     }
 
-    pimpl->fd_ =
-        pimpl->proxy_->Connect(tempAddress, serverUuid, (int32_t)pimpl->getSecurityFlags(), (int32_t)pimpl->type_);
+    ConnectSocketParam param {
+        .addr = tempAddress,
+        .uuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits()),
+        .securityFlag = (int32_t)pimpl->getSecurityFlags(),
+        .type = (int32_t)pimpl->type_,
+        .psm = psm
+    };
+    int ret = pimpl->proxy_->Connect(param, pimpl->fd_);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("Connect error %{public}d.", ret);
+        return ret;
+    }
 
     HILOGI("fd_: %{public}d", pimpl->fd_);
     if (pimpl->fd_ == -1) {
@@ -324,51 +382,57 @@ int SppClientSocket::Connect()
     }
     pimpl->socketStatus_ = SOCKET_CONNECTED;
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
-        HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", pimpl->fd_, "ADDRESS", tempAddress,
-        "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
-    return BtStatus::BT_SUCC;
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", pimpl->fd_, "ADDRESS",
+        GetEncryptAddr(tempAddress), "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
+    return BtStatus::BT_SUCCESS;
 }
 
-void SppClientSocket::Close()
+void ClientSocket::Close()
 {
     HILOGI("starts");
     return pimpl->Close();
 }
 
-InputStream &SppClientSocket::GetInputStream()
+InputStream &ClientSocket::GetInputStream()
 {
     HILOGI("starts");
     return pimpl->GetInputStream();
 }
 
-OutputStream &SppClientSocket::GetOutputStream()
+OutputStream &ClientSocket::GetOutputStream()
 {
     HILOGI("starts");
     return pimpl->GetOutputStream();
 }
 
-BluetoothRemoteDevice &SppClientSocket::GetRemoteDevice()
+BluetoothRemoteDevice &ClientSocket::GetRemoteDevice()
 {
     HILOGI("starts");
     return pimpl->GetRemoteDevice();
 }
 
-bool SppClientSocket::IsConnected() const
+bool ClientSocket::IsConnected() const
 {
     HILOGI("starts");
     return pimpl->IsConnected();
 }
 
-struct SppServerSocket::impl {
-    impl(const std::string &name, UUID uuid, SppSocketType type, bool encrypt);
+int ClientSocket::SetBufferSize(int bufferSize)
+{
+    HILOGI("starts");
+    return pimpl->SetBufferSize(bufferSize);
+}
+
+struct ServerSocket::impl {
+    impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
     ~impl()
     {
-        if (!proxy_) {
+        HILOGI("enter");
+        if (proxy_ != nullptr && proxy_->AsObject() != nullptr) {
+            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+        } else {
             HILOGE("proxy_ is nullptr");
-            return;
         }
-
-        proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
@@ -383,27 +447,41 @@ struct SppServerSocket::impl {
     {
         HILOGI("starts");
         if (!IS_BT_ENABLED()) {
-            HILOGI("BR is not TURN_ON");
-            return BtStatus::BT_FAILURE;
+            HILOGE("BR is not TURN_ON");
+            return BT_ERR_INVALID_STATE;
         }
-        if (socketStatus_ == SOCKET_CLOSED) {
-            HILOGE("failed, socketStatus_ is SOCKET_CLOSED");
-            return BtStatus::BT_FAILURE;
-        }
-
-        bluetooth::Uuid serverUuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits());
-
         if (!proxy_) {
             HILOGE("failed, proxy_ is nullptr");
             socketStatus_ = SOCKET_CLOSED;
-            return BtStatus::BT_FAILURE;
+            return BT_ERR_SERVICE_DISCONNECTED;
+        }
+        if (socketStatus_ == SOCKET_CLOSED) {
+            HILOGE("failed, socketStatus_ is SOCKET_CLOSED");
+            return BT_ERR_INVALID_STATE;
         }
 
-        fd_ = proxy_->Listen(name_, serverUuid, (int32_t)getSecurityFlags(), (int32_t)type_);
+        ListenSocketParam param {
+            name_,
+            bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits()),
+            (int32_t)getSecurityFlags(),
+            (int32_t)type_
+        };
+        int ret = proxy_->Listen(param, fd_);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("Listen error %{public}d.", ret);
+            return ret;
+        }
         if (fd_ == BT_INVALID_SOCKET_FD) {
             HILOGE("listen socket failed, fd_ is -1");
             socketStatus_ = SOCKET_CLOSED;
-            return BtStatus::BT_FAILURE;
+            return BT_ERR_INVALID_STATE;
+        }
+
+        if (type_ == TYPE_L2CAP_LE) {
+            psm_ = RecvSocketPsm();
+            if (psm_ <= 0) {
+                return BT_ERR_INVALID_STATE;
+            }
         }
 
         if (socketStatus_ == SOCKET_INIT) {
@@ -412,10 +490,10 @@ struct SppServerSocket::impl {
             HILOGE("failed, socketStatus_: %{public}d is not SOCKET_INIT", socketStatus_);
             close(fd_);
             socketStatus_ = SOCKET_CLOSED;
-            return BtStatus::BT_FAILURE;
+            return BT_ERR_INVALID_STATE;
         }
 
-        return BtStatus::BT_SUCC;
+        return BT_NO_ERROR;
     }
 
     int getSecurityFlags()
@@ -428,7 +506,7 @@ struct SppServerSocket::impl {
         return flags;
     }
 
-    std::unique_ptr<SppClientSocket> Accept(int timeout)
+    std::shared_ptr<ClientSocket> Accept(int timeout)
     {
         HILOGI("starts");
         if (socketStatus_ != SOCKET_LISTENING) {
@@ -450,11 +528,11 @@ struct SppServerSocket::impl {
             setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time, sizeof(time));
         }
 
-        std::unique_ptr<SppClientSocket> clientSocket = std::make_unique<SppClientSocket>(acceptFd_, acceptAddress_);
+        std::shared_ptr<ClientSocket> clientSocket = std::make_shared<ClientSocket>(acceptFd_, acceptAddress_, type_);
 
         HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
             HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", acceptFd_, "ADDRESS",
-            acceptAddress_, "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
+            GetEncryptAddr(acceptAddress_), "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
 
         return clientSocket;
     }
@@ -485,13 +563,13 @@ struct SppServerSocket::impl {
             return BtStatus::BT_FAILURE;
         }
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
-        if ((cmptr != NULL) && (cmptr->cmsg_len == CMSG_LEN(sizeof(int)))) {
+        if ((cmptr != nullptr) && (cmptr->cmsg_len == CMSG_LEN(sizeof(int)))) {
             if (cmptr->cmsg_level != SOL_SOCKET || cmptr->cmsg_type != SCM_RIGHTS) {
                 HILOGE("[sock] control level: %{public}d", cmptr->cmsg_level);
                 HILOGE("[sock] control type: %{public}d", cmptr->cmsg_type);
                 return BtStatus::BT_FAILURE;
             }
-            clientFd = *((int *)CMSG_DATA(cmptr));
+            clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
         } else {
             return BtStatus::BT_FAILURE;
         }
@@ -509,11 +587,24 @@ struct SppServerSocket::impl {
         }
 
         char token[LENGTH] = {0};
-        (void)sprintf_s(token,
-            sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X", buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
+        (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
+            buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
         BluetoothRawAddress rawAddr {token};
         acceptAddress_ = rawAddr.GetAddress().c_str();
         return clientFd;
+    }
+
+    int RecvSocketPsm()
+    {
+        uint8_t recvBuf[PSM_BUFFER_SIZE];
+        int recvBufSize = recv(fd_, recvBuf, sizeof(recvBuf), MSG_WAITALL);
+        if (recvBufSize <= 0) {
+            HILOGE("[sock] recv error  %{public}d, fd: %{public}d", errno, fd_);
+            return BtStatus::BT_FAILURE;
+        }
+        int psm = recvBuf[0];
+        HILOGI("[sock] RecvSocketPsm psm: %{public}d", psm);
+        return psm;
     }
 
     void Close()
@@ -545,10 +636,26 @@ struct SppServerSocket::impl {
             HILOGE("socketStatus_ is SOCKET_CLOSED");
             socketServiceType_ = "";
         } else {
-            socketServiceType_ = "ServerSocket: Type: TYPE_RFCOMM";
-            socketServiceType_.append(" ServerName: ").append(name_);
+            socketServiceType_ = "ServerSocket:";
+            socketServiceType_.append(" Type: ").append(ConvertTypeToString(type_))
+                .append(" ServerName: ").append(name_);
         }
         return socketServiceType_;
+    }
+
+    static std::string ConvertTypeToString(BtSocketType type)
+    {
+        std::string retStr;
+        if (type == TYPE_RFCOMM) {
+            retStr = "TYPE_RFCOMM";
+        } else if (type == TYPE_L2CAP) {
+            retStr = "TYPE_L2CAP";
+        } else if (type == TYPE_L2CAP_LE) {
+            retStr = "TYPE_L2CAP_LE";
+        } else {
+            retStr = "TYPE_UNKNOW";
+        }
+        return retStr;
     }
 
     class BluetoothServerSocketDeathRecipient;
@@ -556,7 +663,7 @@ struct SppServerSocket::impl {
 
     sptr<IBluetoothSocket> proxy_;
     UUID uuid_;
-    SppSocketType type_;
+    BtSocketType type_;
     bool encrypt_;
     int fd_;
     int socketStatus_;
@@ -568,26 +675,31 @@ struct SppServerSocket::impl {
     std::string socketServiceType_ {
         ""
     };
+    int psm_;
 };
 
-class SppServerSocket::impl::BluetoothServerSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
+class ServerSocket::impl::BluetoothServerSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    BluetoothServerSocketDeathRecipient(SppServerSocket::impl &host) : host_(host) {};
+    explicit BluetoothServerSocketDeathRecipient(ServerSocket::impl &host) : host_(host) {};
     ~BluetoothServerSocketDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothServerSocketDeathRecipient);
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        if (!host_.proxy_) {
+            return;
+        }
+        host_.proxy_->AsObject()->RemoveDeathRecipient(host_.deathRecipient_);
         host_.proxy_ = nullptr;
     }
 
 private:
-    SppServerSocket::impl &host_;
+    ServerSocket::impl &host_;
 };
 
-SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType type, bool encrypt)
-    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
+ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
+    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name), psm_(-1)
 {
     HILOGI("(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -598,7 +710,7 @@ SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType ty
         return;
     }
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SPP);
+    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
 
     if (!remote) {
         HILOGE("failed: no remote");
@@ -614,71 +726,79 @@ SppServerSocket::impl::impl(const std::string &name, UUID uuid, SppSocketType ty
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
 }
 
-SppServerSocket::SppServerSocket(const std::string &name, UUID uuid, SppSocketType type, bool encrypt)
-    : pimpl(new SppServerSocket::impl(name, uuid, type, encrypt))
+ServerSocket::ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
+    : pimpl(new ServerSocket::impl(name, uuid, type, encrypt))
 {
     HILOGI("(4 parameters) starts");
-    int ret = pimpl->Listen();
-    if (ret < 0) {
-        HILOGE("bind listen failed!");
-    }
 }
 
-SppServerSocket::~SppServerSocket()
+ServerSocket::~ServerSocket()
 {}
 
-std::unique_ptr<SppClientSocket> SppServerSocket::Accept(int timeout)
+int ServerSocket::Listen()
+{
+    HILOGI("starts");
+    return pimpl->Listen();
+}
+
+std::shared_ptr<ClientSocket> ServerSocket::Accept(int timeout)
 {
     HILOGI("starts");
     return pimpl->Accept(timeout);
 }
 
-void SppServerSocket::Close()
+void ServerSocket::Close()
 {
     HILOGI("starts");
     return pimpl->Close();
 }
 
-const std::string &SppServerSocket::GetStringTag()
+const std::string &ServerSocket::GetStringTag()
 {
     HILOGI("starts");
     return pimpl->GetStringTag();
 }
 
-SppClientSocket *SocketFactory::BuildInsecureRfcommDataSocketByServiceRecord(
+int ServerSocket::GetPsm()
+{
+    return pimpl->psm_;
+}
+
+std::shared_ptr<ClientSocket> SocketFactory::BuildInsecureRfcommDataSocketByServiceRecord(
     const BluetoothRemoteDevice &device, const UUID &uuid)
 {
     HILOGI("starts");
     if (device.IsValidBluetoothRemoteDevice()) {
-        return new SppClientSocket(device, uuid, TYPE_RFCOMM, false);
+        return std::make_shared<ClientSocket>(device, uuid, TYPE_RFCOMM, false);
     } else {
         HILOGE("[sock] Device is not valid.");
         return nullptr;
     }
 }
 
-SppClientSocket *SocketFactory::BuildRfcommDataSocketByServiceRecord(
+std::shared_ptr<ClientSocket> SocketFactory::BuildRfcommDataSocketByServiceRecord(
     const BluetoothRemoteDevice &device, const UUID &uuid)
 {
     HILOGI("starts");
     if (device.IsValidBluetoothRemoteDevice()) {
-        return new SppClientSocket(device, uuid, TYPE_RFCOMM, true);
+        return std::make_shared<ClientSocket>(device, uuid, TYPE_RFCOMM, true);
     } else {
         HILOGE("[sock] Device is not valid.");
         return nullptr;
     }
 }
 
-SppServerSocket *SocketFactory::DataListenInsecureRfcommByServiceRecord(const std::string &name, const UUID &uuid)
+std::shared_ptr<ServerSocket> SocketFactory::DataListenInsecureRfcommByServiceRecord(
+    const std::string &name, const UUID &uuid)
 {
     HILOGI("starts");
-    return new SppServerSocket(name, uuid, TYPE_RFCOMM, false);
+    return std::make_shared<ServerSocket>(name, uuid, TYPE_RFCOMM, false);
 }
 
-SppServerSocket *SocketFactory::DataListenRfcommByServiceRecord(const std::string &name, const UUID &uuid)
+std::shared_ptr<ServerSocket> SocketFactory::DataListenRfcommByServiceRecord(const std::string &name, const UUID &uuid)
 {
     HILOGI("starts");
-    return new SppServerSocket(name, uuid, TYPE_RFCOMM, true);
+    return std::make_shared<ServerSocket>(name, uuid, TYPE_RFCOMM, true);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -23,9 +23,10 @@ namespace Bluetooth {
 class NapiBluetoothBleAdvertiseCallback : public BleAdvertiseCallback {
 public:
     NapiBluetoothBleAdvertiseCallback() = default;
-    virtual ~NapiBluetoothBleAdvertiseCallback() = default;
+    ~NapiBluetoothBleAdvertiseCallback() override = default;
 
     void OnStartResultEvent(int result) override;
+    void OnSetAdvDataEvent(int result) override;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

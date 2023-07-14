@@ -29,7 +29,7 @@ public:
     {}
     BluetoothBleAdvertiserData& operator=(const bluetooth::AdvertiserData &other) = delete;
     BluetoothBleAdvertiserData& operator=(const BluetoothBleAdvertiserData &other) = delete;
-    ~BluetoothBleAdvertiserData() = default;
+    ~BluetoothBleAdvertiserData() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 
@@ -40,10 +40,10 @@ public:
 
 private:
     bool WriteServiceUuids(Parcel &parcel) const;
-    bool ReadServiceUuids(std::vector<bluetooth::Uuid> &ser_Uuids, Parcel &parcel);
+    bool ReadServiceUuids(std::vector<bluetooth::Uuid> &serviceUuids, Parcel &parcel);
 
     bool WriteManufacturerData(Parcel &parcel) const;
-    bool ReadManufacturerData(std::map<uint16_t, std::string> &manu, Parcel &parcel);
+    bool ReadManufacturerData(std::map<uint16_t, std::string> &manufacturerData, Parcel &parcel);
 
     bool WriteServiceData(Parcel &parcel) const;
     bool ReadServiceData(std::map<bluetooth::Uuid, std::string> &serviceData, Parcel &parcel);

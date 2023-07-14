@@ -38,7 +38,15 @@ public:
     virtual int ConfigScanFilter(int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters) override;
     virtual void RemoveScanFilter(int32_t scannerId) override;
     virtual bool ProxyUid(int32_t uid, bool isProxy) override;
-    virtual bool ResetAllProxy() override;
+    bool ResetAllProxy() override;
+    int SetBurstParam(int duration, int maxExtAdvEvents, int burstWindow, int burstInterval, int advHandle) override;
+    int SetScanReportChannelToSensorHub(const int clientId, const int isToAp) override;
+    int StartScanInShSync() override;
+    int StopScanInShSync() override;
+    int SendParamsToSensorhub(const std::vector<uint8_t> &dataValue, int32_t type) override;
+    bool IsSupportSensorAdvertiseFilter() override;
+    int SetAdvFilterParam(const BluetoothBleFilterParamSet &paramSet) override;
+    int RemoveAdvFilter(const bluetooth::Uuid &uuid) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

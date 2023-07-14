@@ -1,0 +1,69 @@
+# Copyright (C) 2022-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[cfi]
+# xmlFree check failed for CFI.
+type:*OHOS::Bluetooth::BluetoothRemoteDevice
+type:*OHOS::Bluetooth::A2dpSinkObserver
+type:*OHOS::Bluetooth::A2dpSourceObserver
+type:*OHOS::Bluetooth::AvrcpCtResponse
+type:*OHOS::Bluetooth::AvrcpTarget
+type:*OHOS::Bluetooth::BleAdvertiserData
+type:*OHOS::Bluetooth::BleScanResult
+type:*OHOS::Bluetooth::BleCentralManagerCallback
+type:*OHOS::Bluetooth::BleScanSettings
+type:*OHOS::Bluetooth::BleScanFilter
+type:*OHOS::Bluetooth::BleCentralManager
+type:*OHOS::Bluetooth::BluetoothDeviceClass
+type:*OHOS::Bluetooth::BluetoothDevice
+type:*OHOS::Bluetooth::GattCharacteristic
+type:*OHOS::Bluetooth::GattClientCallback
+type:*OHOS::Bluetooth::GattDescriptor
+type:*OHOS::Bluetooth::GattClientCallback
+type:*OHOS::Bluetooth::GattManager
+type:*OHOS::Bluetooth::GattServerCallback
+type:*OHOS::Bluetooth::GattService
+type:*OHOS::Bluetooth::HandsFreeUnitCall
+type:*OHOS::Bluetooth::HandsFreeAudioGatewayObserver
+type:*OHOS::Bluetooth::HandsFreeAudioGateway
+type:*OHOS::Bluetooth::HandsFreeAudioGateway
+type:*OHOS::Bluetooth::HandsFreeUnit
+type:*OHOS::Bluetooth::HidHostObserver
+type:*OHOS::Bluetooth::HidHost
+type:*OHOS::Bluetooth::BluetoothHostObserver
+type:*OHOS::Bluetooth::BluetoothRemoteDeviceObserver
+type:*OHOS::Bluetooth::BluetoothHost
+type:*OHOS::Bluetooth::MapClientObserver
+type:*OHOS::Bluetooth::MapClient
+type:*OHOS::Bluetooth::MapServerObserver
+type:*OHOS::Bluetooth::MapServer
+type:*OHOS::Bluetooth::BluetoothOppTransferInformation
+type:*OHOS::Bluetooth::OppObserver
+type:*OHOS::Bluetooth::PanObserver
+type:*OHOS::Bluetooth::Pan
+type:*OHOS::Bluetooth::PbapPullPhoneBookParam
+type:*OHOS::Bluetooth::PbapPullvCardListingParam
+type:*OHOS::Bluetooth::PbapObserver
+type:*OHOS::Bluetooth::PbapServer
+type:*OHOS::Bluetooth::IBluetoothBleCentralManager
+type:*OHOS::Bluetooth::InputStream
+type:*OHOS::Bluetooth::OutputStream
+type:*OHOS::Bluetooth::ClientSocket
+type:*OHOS::Bluetooth::ServerSocket
+type:*OHOS::Bluetooth::SocketFactory
+type:*OHOS::Bluetooth::NapiCallback*
+type:*OHOS::Bluetooth::NapiPromise*
+type:*OHOS::Bluetooth::NapiAsyncCallback
+type:*OHOS::Bluetooth::NapiAsyncWork*
+type:*OHOS::Bluetooth::NapiNative*
+type:*OHOS::Bluetooth::NapiTimer

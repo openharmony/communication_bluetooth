@@ -102,7 +102,6 @@ public:
     static const int AUDIO_VIDEO_UNCATEGORIZED = 0x0400;
     static const int AUDIO_VIDEO_WEARABLE_HEADSET = 0x0404;
     static const int AUDIO_VIDEO_HANDSFREE = 0x0408;
-    static const int AUDIO_VIDEO_HANDSFREE_HEADSET = 0X0104;
     // static const int AUDIO_VIDEO_RESERVED  = 0x040C;
     static const int AUDIO_VIDEO_MICROPHONE = 0x0410;
     static const int AUDIO_VIDEO_LOUDSPEAKER = 0x0414;

@@ -29,7 +29,7 @@ class BluetoothA2dpCodecInfo : public Parcelable,
         : bluetooth::CodecInfo(other) {} // NOLINT(implicit)
     BluetoothA2dpCodecInfo(const BluetoothA2dpCodecInfo& other)
         : bluetooth::CodecInfo(other) {} // NOLINT(implicit)
-    ~BluetoothA2dpCodecInfo() = default;
+    ~BluetoothA2dpCodecInfo() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
 

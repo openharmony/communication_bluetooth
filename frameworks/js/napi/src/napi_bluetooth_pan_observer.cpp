@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Bluetooth {
 void NapiBluetoothPanObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     if (!callbackInfos_[STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE]) {
         HILOGW("This callback is not registered by ability.");
         return;

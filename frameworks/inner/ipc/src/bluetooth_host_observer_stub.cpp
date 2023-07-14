@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothHostObserverStub::BluetoothHostObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_STATE_CHANGE)] =
         &BluetoothHostObserverStub::OnStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE)] =
@@ -41,7 +41,7 @@ BluetoothHostObserverStub::BluetoothHostObserverStub()
 
 BluetoothHostObserverStub::~BluetoothHostObserverStub()
 {
-    HILOGD("%{public}s start.", __func__);
+    HILOGI("start.");
     memberFuncMap_.clear();
 }
 
@@ -49,9 +49,7 @@ int32_t BluetoothHostObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOGD("BluetoothHostObserverStub: transaction of code: %{public}d is received", code);
-    std::u16string descriptor = BluetoothHostObserverStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    if (BluetoothHostObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGE("BluetoothHostObserverStub::OnRemoteRequest, local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
@@ -73,7 +71,7 @@ ErrCode BluetoothHostObserverStub::OnStateChangedInner(MessageParcel &data, Mess
     int32_t transport = data.ReadInt32();
     int32_t status = data.ReadInt32();
 
-    HILOGI("BluetoothHostObserverStub::OnStateChangedInner starts");
+    HILOGD("BluetoothHostObserverStub::OnStateChangedInner starts");
     OnStateChanged(transport, status);
 
     return NO_ERROR;
@@ -97,7 +95,7 @@ ErrCode BluetoothHostObserverStub::OnDiscoveryResultInner(MessageParcel &data, M
         return TRANSACTION_ERR;
     }
 
-    HILOGI("BluetoothHostObserverStub::OnDiscoveryResultInner starts");
+    HILOGD("BluetoothHostObserverStub::OnDiscoveryResultInner starts");
     OnDiscoveryResult(*device);
 
     return NO_ERROR;

@@ -33,7 +33,7 @@ std::string IOppTransferInformation::GetFileName() const
     return fileName_;
 }
 
-void IOppTransferInformation::SetFileName(std::string fileName)
+void IOppTransferInformation::SetFileName(const std::string &fileName)
 {
     fileName_ = fileName;
 }
@@ -43,7 +43,7 @@ std::string IOppTransferInformation::GetFilePath() const
     return filePath_;
 }
 
-void IOppTransferInformation::SetFilePath(std::string filePath)
+void IOppTransferInformation::SetFilePath(const std::string &filePath)
 {
     filePath_ = filePath;
 }
@@ -53,7 +53,7 @@ std::string IOppTransferInformation::GetFileType() const
     return fileType_;
 }
 
-void IOppTransferInformation::SetFileType(std::string fileType)
+void IOppTransferInformation::SetFileType(const std::string &fileType)
 {
     fileType_ = fileType;
 }
@@ -63,7 +63,7 @@ std::string IOppTransferInformation::GetDeviceName() const
     return deviceName_;
 }
 
-void IOppTransferInformation::SetDeviceName(std::string deviceName)
+void IOppTransferInformation::SetDeviceName(const std::string &deviceName)
 {
     deviceName_ = deviceName;
 }
@@ -73,7 +73,7 @@ std::string IOppTransferInformation::GetDeviceAddress() const
     return deviceAddress_;
 }
 
-void IOppTransferInformation::SetDeviceAddress(std::string deviceAddress)
+void IOppTransferInformation::SetDeviceAddress(const std::string &deviceAddress)
 {
     deviceAddress_ = deviceAddress;
 }
