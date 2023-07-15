@@ -34,7 +34,7 @@ bool BluetoothHfpHfProxy::ConnectSco(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_CONNECT_SCO, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_CONNECT_SCO, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::ConnectSco done fail, error: %{public}d", error);
         return false;
@@ -58,7 +58,7 @@ bool BluetoothHfpHfProxy::DisconnectSco(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_DISCONNECT_SCO, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_DISCONNECT_SCO, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::DisconnectSco done fail, error: %{public}d", error);
         return false;
@@ -82,7 +82,7 @@ int BluetoothHfpHfProxy::GetDevicesByStates(const std::vector<int> &states, std:
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_GET_DEVICES_BY_STATES, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_GET_DEVICES_BY_STATES, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::GetDevicesByStates done fail, error: %{public}d", error);
         return ERROR;
@@ -114,7 +114,7 @@ int BluetoothHfpHfProxy::GetDeviceState(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_GET_DEVICE_STATE, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_GET_DEVICE_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::GetDeviceState done fail, error: %{public}d", error);
         return ERROR;
@@ -138,7 +138,7 @@ int BluetoothHfpHfProxy::GetScoState(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_GET_SCO_STATE, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_GET_SCO_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::GetScoState done fail, error: %{public}d", error);
         return ERROR;
@@ -166,7 +166,7 @@ bool BluetoothHfpHfProxy::SendDTMFTone(const BluetoothRawAddress &device, uint8_
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_SEND_DTMF_TONE, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_SEND_DTMF_TONE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::SendDTMFTone done fail, error: %{public}d", error);
         return false;
@@ -190,7 +190,7 @@ int BluetoothHfpHfProxy::Connect(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_CONNECT, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::Connect done fail, error: %{public}d", error);
         return ERROR;
@@ -214,7 +214,7 @@ int BluetoothHfpHfProxy::Disconnect(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_DISCONNECT, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::Disconnect done fail, error: %{public}d", error);
         return ERROR;
@@ -238,7 +238,7 @@ bool BluetoothHfpHfProxy::OpenVoiceRecognition(const BluetoothRawAddress &device
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_OPEN_VOICE_RECOGNITION, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_OPEN_VOICE_RECOGNITION, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::OpenVoiceRecognition done fail, error: %{public}d", error);
         return false;
@@ -262,7 +262,7 @@ bool BluetoothHfpHfProxy::CloseVoiceRecognition(const BluetoothRawAddress &devic
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_CLOSE_VOICE_RECOGNITION, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_CLOSE_VOICE_RECOGNITION, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::CloseVoiceRecognition done fail, error: %{public}d", error);
         return false;
@@ -286,7 +286,7 @@ int BluetoothHfpHfProxy::GetCurrentCallList(const BluetoothRawAddress &device, s
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_GET_CURRENT_CALL_LIST, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_GET_CURRENT_CALL_LIST, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::GetCurrentCallList done fail, error: %{public}d", error);
         return ERROR;
@@ -322,7 +322,7 @@ bool BluetoothHfpHfProxy::AcceptIncomingCall(const BluetoothRawAddress &device, 
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_ACCEPT_INCOMING_CALL, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_ACCEPT_INCOMING_CALL, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::AcceptIncomingCall done fail, error: %{public}d", error);
         return false;
@@ -346,7 +346,7 @@ bool BluetoothHfpHfProxy::HoldActiveCall(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_HOLD_ACTIVE_CALL, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_HOLD_ACTIVE_CALL, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::HoldActiveCall done fail, error: %{public}d", error);
         return false;
@@ -370,7 +370,7 @@ bool BluetoothHfpHfProxy::RejectIncomingCall(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_REJECT_INCOMING_CALL, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_REJECT_INCOMING_CALL, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::RejectIncomingCall done fail, error: %{public}d", error);
         return false;
@@ -398,7 +398,7 @@ bool BluetoothHfpHfProxy::HandleIncomingCall(const BluetoothRawAddress &device, 
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_HANDLE_INCOMING_CALL, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_HANDLE_INCOMING_CALL, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::HandleIncomingCall done fail, error: %{public}d", error);
         return false;
@@ -430,7 +430,7 @@ bool BluetoothHfpHfProxy::HandleMultiCall(const BluetoothRawAddress &device, int
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_HANDLE_MULLTI_CALL, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_HANDLE_MULLTI_CALL, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::HandleMultiCall done fail, error: %{public}d", error);
         return false;
@@ -454,7 +454,7 @@ bool BluetoothHfpHfProxy::DialLastNumber(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_DIAL_LAST_NUMBER, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_DIAL_LAST_NUMBER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::DialLastNumber done fail, error: %{public}d", error);
         return false;
@@ -483,7 +483,7 @@ bool BluetoothHfpHfProxy::DialMemory(const BluetoothRawAddress &device, int inde
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_DIAL_MEMORY, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_DIAL_MEMORY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::DialMemory done fail, error: %{public}d", error);
         return false;
@@ -511,7 +511,7 @@ bool BluetoothHfpHfProxy::SendVoiceTag(const BluetoothRawAddress &device, int in
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_SEND_VOICE_TAG, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_SEND_VOICE_TAG, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::SendVoiceTag done fail, error: %{public}d", error);
         return false;
@@ -535,7 +535,7 @@ bool BluetoothHfpHfProxy::SendKeyPressed(const BluetoothRawAddress &device) {
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_SEND_KEY_PRESSED, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_SEND_KEY_PRESSED, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::SendKeyPressed done fail, error: %{public}d", error);
         return false;
@@ -563,7 +563,7 @@ bool BluetoothHfpHfProxy::FinishActiveCall(const BluetoothRawAddress &device, co
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_FINISH_ATIVE_CALL, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_FINISH_ATIVE_CALL, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::FinishActiveCall done fail, error: %{public}d", error);
         return false;
@@ -596,7 +596,7 @@ int BluetoothHfpHfProxy::StartDial(
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_START_DIAL, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_START_DIAL, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::StartDial done fail, error: %{public}d", error);
         return ERROR;
@@ -620,7 +620,7 @@ void BluetoothHfpHfProxy::RegisterObserver(const sptr<IBluetoothHfpHfObserver> &
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_REGISTER_OBSERVER, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
@@ -643,7 +643,7 @@ void BluetoothHfpHfProxy::DeregisterObserver(const sptr<IBluetoothHfpHfObserver>
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothHfpHf::Code::BT_HFP_HF_DEREGISTER_OBSERVER, data, reply, option);
+        BluetoothHfpHfInterfaceCode::BT_HFP_HF_DEREGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHfpHfProxy::DeregisterObserver done fail, error: %{public}d", error);
         return;

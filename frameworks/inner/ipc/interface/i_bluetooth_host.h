@@ -17,6 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_HOST_INTERFACE_H
 
 #include "bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "parcel_bt_uuid.h"
 #include "i_bluetooth_ble_peripheral_observer.h"
 #include "i_bluetooth_host_observer.h"
@@ -50,72 +51,6 @@ const std::string PROFILE_OPP_SERVER = "BluetoothOppServer";
 class IBluetoothHost : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothHost");
-
-    enum Code {
-        BT_REGISTER_OBSERVER = 0,
-        BT_DEREGISTER_OBSERVER,
-        BT_ENABLE,
-        BT_DISABLE,
-        BT_GETSTATE,
-        BT_GETPROFILE,
-        BT_GET_BLE,
-        BT_FACTORY_RESET,
-        BT_DISABLE_BLE,
-        BT_ENABLE_BLE,
-        BT_IS_BR_ENABLED,
-        BT_IS_BLE_ENABLED,
-        BT_GET_PROFILE_LIST,
-        BT_GET_MAXNUM_CONNECTED_AUDIODEVICES,
-        BT_GET_BT_STATE,
-        BT_GET_BT_PROFILE_CONNSTATE,
-        BT_GET_LOCAL_DEVICE_CLASS,
-        BT_SET_LOCAL_DEVICE_CLASS,
-        BT_GET_LOCAL_ADDRESS,
-        BT_GET_LOCAL_NAME,
-        BT_SET_LOCAL_NAME,
-        BT_GET_BT_SCAN_MODE,
-        BT_SET_BT_SCAN_MODE,
-        BT_GET_BONDABLE_MODE,
-        BT_SET_BONDABLE_MODE,
-        BT_START_BT_DISCOVERY,
-        BT_CANCEL_BT_DISCOVERY,
-        BT_IS_BT_DISCOVERING,
-        BT_GET_BT_DISCOVERY_END_MILLIS,
-        BT_GET_PAIRED_DEVICES,
-        BT_REMOVE_PAIR,
-        BT_REMOVE_ALL_PAIRS,
-        BT_REGISTER_REMOTE_DEVICE_OBSERVER,
-        BT_DEREGISTER_REMOTE_DEVICE_OBSERVER,
-        BT_GET_BLE_MAX_ADVERTISING_DATALENGTH,
-        GET_DEVICE_TYPE,
-        GET_PHONEBOOK_PERMISSION,
-        SET_PHONEBOOK_PERMISSION,
-        GET_MESSAGE_PERMISSION,
-        SET_MESSAGE_PERMISSION,
-        GET_POWER_MODE,
-        GET_DEVICE_NAME,
-        GET_DEVICE_ALIAS,
-        SET_DEVICE_ALIAS,
-        GET_DEVICE_BATTERY_LEVEL,
-        GET_PAIR_STATE,
-        START_PAIR,
-        CANCEL_PAIRING,
-        IS_BONDED_FROM_LOCAL,
-        IS_ACL_CONNECTED,
-        IS_ACL_ENCRYPTED,
-        GET_DEVICE_CLASS,
-        SET_DEVICE_PIN,
-        SET_DEVICE_PAIRING_CONFIRMATION,
-        SET_DEVICE_PASSKEY,
-        PAIR_REQUEST_PEPLY,
-        READ_REMOTE_RSSI_VALUE,
-        GET_LOCAL_SUPPORTED_UUIDS,
-        GET_DEVICE_UUIDS,
-        BT_REGISTER_BLE_ADAPTER_OBSERVER,
-        BT_DEREGISTER_BLE_ADAPTER_OBSERVER,
-        BT_REGISTER_BLE_PERIPHERAL_OBSERVER,
-        BT_DEREGISTER_BLE_PERIPHERAL_OBSERVER,
-    };
 
     virtual void RegisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
@@ -175,11 +110,13 @@ public:
     virtual bool PairRequestReply(int32_t transport, const std::string &address, bool accept) = 0;
     virtual bool ReadRemoteRssiValue(const std::string &address) = 0;
     virtual void GetLocalSupportedUuids(std::vector<std::string> &uuids) = 0;
-    virtual std::vector<bluetooth::Uuid> GetDeviceUuids(int32_t transport, const std::string &address) = 0;
+    virtual int32_t GetDeviceUuids(const std::string &address, std::vector<std::string> &uuids) = 0;
+    virtual int32_t GetLocalProfileUuids(std::vector<std::string> &uuids) = 0;
     virtual void RegisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual void DeregisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual void RegisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer) = 0;
     virtual void DeregisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer) = 0;
+    virtual int32_t SetFastScan(bool isEnable) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

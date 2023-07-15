@@ -17,6 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_HOST_OBSERVER_INTERFACE_H
 
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -24,19 +25,6 @@ namespace Bluetooth {
 class IBluetoothHostObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothHostObserver");
-
-    enum Code {
-        BT_HOST_OBSERVER_STATE_CHANGE = 0,
-
-        // ON_DIS_STA_CHANGE_CODE
-        BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE,
-        BT_HOST_OBSERVER_DISCOVERY_RESULT,
-        BT_HOST_OBSERVER_PAIR_REQUESTED,
-        BT_HOST_OBSERVER_PAIR_CONFIRMED,
-        BT_HOST_OBSERVER_SCAN_MODE_CHANGED,
-        BT_HOST_OBSERVER_DEVICE_NAME_CHANGED,
-        BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED,
-    };
 
     virtual void OnStateChanged(int32_t transport, int32_t status) = 0;
 

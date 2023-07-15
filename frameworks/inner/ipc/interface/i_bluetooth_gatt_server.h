@@ -16,6 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_GATT_SERVER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_GATT_SERVER_INTERFACE_H
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_gatt_server_callback.h"
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_gatt_characteristic_parcel.h"
@@ -28,20 +29,6 @@ namespace Bluetooth {
 class IBluetoothGattServer : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattServer");
-
-    enum Code {
-        GATT_SERVER_CLEAR_SERVICES = 0,
-        GATT_SERVER_ADD_SERVICE,
-        GATT_SERVER_REGISTER,
-        GATT_SERVER_DEREGISTER,
-        GATT_SERVER_CANCEL_CONNECTION,
-        GATT_SERVER_NOTIFY_CLIENT,
-        GATT_SERVER_REMOVE_SERVICE,
-        GATT_SERVER_RESPOND_CHARACTERISTIC_READ,
-        GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE,
-        GATT_SERVER_RESPOND_DESCRIPTOR_READ,
-        GATT_SERVER_RESPOND_DESCRIPTOR_WRITE,
-    };
 
     virtual int AddService(int32_t appId, BluetoothGattService *services) = 0;
     virtual void ClearServices(int appId) = 0;

@@ -41,7 +41,8 @@ public:
         uint8_t &type, uint16_t &size, uint8_t &report, int& reuslt) override;
     ErrCode HidHostGetReport(std::string &device,
         uint8_t &id, uint16_t &size, uint8_t &type, int& result) override;
-
+    int32_t SetConnectStrategy(const BluetoothRawAddress &device, int strategy) override;
+    int32_t GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) override;
 private:
     static inline BrokerDelegator<BluetoothHidHostProxy> delegator_;
     bool WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply);

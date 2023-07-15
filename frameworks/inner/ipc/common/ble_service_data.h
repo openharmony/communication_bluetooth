@@ -354,9 +354,9 @@ public:
 
     std::vector<uint8_t> GetManufactureDataMask() const;
 
-    void SetScannerId(int scannerId);
+    void SetClientId(int clientId);
 
-    int GetScannerId() const;
+    int GetClientId() const;
 
     void SetFiltIndex(uint8_t filtIndex);
 
@@ -386,7 +386,7 @@ private:
     std::vector<uint8_t> manufactureData_;
     std::vector<uint8_t> manufactureDataMask_;
 
-    int scannerId_ = 0;
+    int clientId_ = 0;
     uint8_t filtIndex_ = 0;
     uint8_t action_ = -1;
 };
@@ -1288,23 +1288,23 @@ private:
     uint8_t advertiseFlag_ {};
 };
 
-struct BleAdvDeviceInfoImpl {
-    std::vector<int8_t> advDeviceId;
+struct BleActiveDeviceInfoImpl {
+    std::vector<int8_t> deviceId;
     int32_t status;
     int32_t timeOut;
 };
 
-struct BleFilterParamSetImpl {
+struct BleLpDeviceParamSetImpl {
     BleScanSettingsImpl scanSettingImpl;
     std::vector<BleScanFilterImpl> scanFliterImpls;
     BleAdvertiserSettingsImpl advSettingsImpl;
     BleAdvertiserDataImpl advDataImpl;
     BleAdvertiserDataImpl respDataImpl;
-    std::vector<BleAdvDeviceInfoImpl> advDeviceInfoImpls;
-    int advHandle;
-    int duration;
-    int deliveryMode;
-    int fieldValidFlagBit;
+    std::vector<BleActiveDeviceInfoImpl> activeDeviceInfoImpls;
+    int32_t advHandle;
+    int32_t duration;
+    int32_t deliveryMode;
+    uint32_t fieldValidFlagBit;
 };
 
 struct FilterIdxInfo {

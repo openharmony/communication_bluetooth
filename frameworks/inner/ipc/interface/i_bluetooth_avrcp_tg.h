@@ -16,6 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_AVRCP_TG_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_AVRCP_TG_INTERFACE_H
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_avrcp_tg_observer.h"
 
@@ -24,28 +25,6 @@ namespace Bluetooth {
 class IBluetoothAvrcpTg : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpTg");
-
-    enum Code {
-        BT_AVRCP_TG_REGISTER_OBSERVER = 0,
-        BT_AVRCP_TG_UNREGISTER_OBSERVER,
-        BT_AVRCP_TG_SET_ACTIVE_DEVICE,
-        BT_AVRCP_TG_CONNECT,
-        BT_AVRCP_TG_DISCONNECT,
-        BT_AVRCP_TG_GET_CONNECTED_DEVICES,
-        BT_AVRCP_TG_GET_DEVICES_BY_STATES,
-        BT_AVRCP_TG_GET_DEVICE_STATE,
-        BT_AVRCP_TG_NOTIFY_PLAYBACK_STATUS_CHANGED,
-        BT_AVRCP_TG_NOTIFY_TRACK_CHANGED,
-        BT_AVRCP_TG_NOTIFY_TRACK_REACHED_END,
-        BT_AVRCP_TG_NOTIFY_TRACK_REACHED_START,
-        BT_AVRCP_TG_NOTIFY_PLAYBACK_POS_CHANGED,
-        BT_AVRCP_TG_NOTIFY_PLAYER_APP_SETTING_CHANGED,
-        BT_AVRCP_TG_NOTIFY_NOWPLAYING_CONTENT_CHANGED,
-        BT_AVRCP_TG_NOTIFY_AVAILABLE_PLAYERS_CHANGED,
-        BT_AVRCP_TG_NOTIFY_ADDRESSED_PLAYER_CHANGED,
-        BT_AVRCP_TG_NOTIFY_UID_CHANGED,
-        BT_AVRCP_TG_NOTIFY_VOLUME_CHANGED,
-    };
 
     virtual void RegisterObserver(const sptr<IBluetoothAvrcpTgObserver> &observer) = 0;
     virtual void UnregisterObserver(const sptr<IBluetoothAvrcpTgObserver> &observer) = 0;

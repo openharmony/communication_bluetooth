@@ -33,7 +33,7 @@ void BluetoothAvrcpTgProxy::RegisterObserver(const sptr<IBluetoothAvrcpTgObserve
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_REGISTER_OBSERVER, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_REGISTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
@@ -56,7 +56,7 @@ void BluetoothAvrcpTgProxy::UnregisterObserver(const sptr<IBluetoothAvrcpTgObser
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_UNREGISTER_OBSERVER, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_UNREGISTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
@@ -80,7 +80,7 @@ void BluetoothAvrcpTgProxy::SetActiveDevice(const BluetoothRawAddress &addr)
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int error = InnerTransact(
-        IBluetoothAvrcpTg::Code::BT_AVRCP_TG_SET_ACTIVE_DEVICE, option, data, reply);
+        BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_SET_ACTIVE_DEVICE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpCtProxy::SetActiveDevice done fail, error: %{public}d", error);
         return;
@@ -102,7 +102,7 @@ int32_t BluetoothAvrcpTgProxy::Connect(const BluetoothRawAddress &addr)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_SYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_CONNECT, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_CONNECT, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::Connect done fail, error: %{public}d", error);
         return -1;
@@ -125,7 +125,7 @@ int32_t BluetoothAvrcpTgProxy::Disconnect(const BluetoothRawAddress &addr)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_SYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_DISCONNECT, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_DISCONNECT, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::Disconnect done fail, error: %{public}d", error);
         return -1;
@@ -144,7 +144,7 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgProxy::GetConnectedDevices()
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_GET_CONNECTED_DEVICES, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_GET_CONNECTED_DEVICES, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::GetConnectedDevices done fail, error: %{public}d", error);
         return vec;
@@ -182,7 +182,7 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgProxy::GetDevicesByStates(const
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_GET_DEVICES_BY_STATES, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_GET_DEVICES_BY_STATES, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::GetConnectedDevices done fail, error: %{public}d", error);
         return vec;
@@ -210,7 +210,7 @@ int32_t BluetoothAvrcpTgProxy::GetDeviceState(const BluetoothRawAddress &addr)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_SYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_GET_DEVICE_STATE, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_GET_DEVICE_STATE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::GetDeviceState done fail, error: %{public}d", error);
         return -1;
@@ -237,7 +237,7 @@ void BluetoothAvrcpTgProxy::NotifyPlaybackStatusChanged(int32_t playStatus, int3
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_PLAYBACK_STATUS_CHANGED,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_PLAYBACK_STATUS_CHANGED,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyPlaybackStatusChanged done fail, error: %{public}d", error);
@@ -265,7 +265,7 @@ void BluetoothAvrcpTgProxy::NotifyTrackChanged(int64_t uid, int32_t playbackPos)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_TRACK_CHANGED, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_TRACK_CHANGED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyPlaybackStatusChanged done fail, error: %{public}d", error);
         return;
@@ -288,7 +288,7 @@ void BluetoothAvrcpTgProxy::NotifyTrackReachedEnd(int32_t playbackPos)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_TRACK_REACHED_END,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_TRACK_REACHED_END,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyTrackReachedEnd done fail, error: %{public}d", error);
@@ -312,7 +312,7 @@ void BluetoothAvrcpTgProxy::NotifyTrackReachedStart(int32_t playbackPos)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_TRACK_REACHED_START,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_TRACK_REACHED_START,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyTrackReachedStart done fail, error: %{public}d", error);
@@ -336,7 +336,7 @@ void BluetoothAvrcpTgProxy::NotifyPlaybackPosChanged(int32_t playbackPos)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_PLAYBACK_POS_CHANGED,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_PLAYBACK_POS_CHANGED,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyPlaybackPosChanged done fail, error: %{public}d", error);
@@ -379,7 +379,7 @@ void BluetoothAvrcpTgProxy::NotifyPlayerAppSettingChanged(const std::vector<int3
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_PLAYER_APP_SETTING_CHANGED,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_PLAYER_APP_SETTING_CHANGED,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyPlayerAppSettingChanged done fail, error: %{public}d", error);
@@ -399,7 +399,7 @@ void BluetoothAvrcpTgProxy::NotifyNowPlayingContentChanged()
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_NOWPLAYING_CONTENT_CHANGED,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_NOWPLAYING_CONTENT_CHANGED,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyNowPlayingContentChanged done fail, error: %{public}d", error);
@@ -420,7 +420,7 @@ void BluetoothAvrcpTgProxy::NotifyAvailablePlayersChanged()
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
 
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_AVAILABLE_PLAYERS_CHANGED,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_AVAILABLE_PLAYERS_CHANGED,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyAvailablePlayersChanged done fail, error: %{public}d", error);
@@ -448,7 +448,7 @@ void BluetoothAvrcpTgProxy::NotifyAddressedPlayerChanged(int32_t playerId, int32
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_ADDRESSED_PLAYER_CHANGED,
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_ADDRESSED_PLAYER_CHANGED,
                               option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyAddressedPlayerChanged done fail, error: %{public}d", error);
@@ -472,7 +472,7 @@ void BluetoothAvrcpTgProxy::NotifyUidChanged(int32_t uidCounter)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_UID_CHANGED, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_UID_CHANGED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyUidChanged done fail, error: %{public}d", error);
         return;
@@ -495,7 +495,7 @@ void BluetoothAvrcpTgProxy::NotifyVolumeChanged(int32_t volume)
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    int error = InnerTransact(IBluetoothAvrcpTg::Code::BT_AVRCP_TG_NOTIFY_VOLUME_CHANGED, option, data, reply);
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_NOTIFY_VOLUME_CHANGED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyVolumeChanged done fail, error: %{public}d", error);
         return;

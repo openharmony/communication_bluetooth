@@ -288,9 +288,9 @@ int BluetoothRemoteDevice::CancelPairing()
         return BT_ERR_INTERNAL_ERROR;
     }
     if (hostProxy->CancelPairing(transport_, address_)) {
-      return BT_NO_ERROR;
+        return BT_NO_ERROR;
     }
-    return BT_ERR_INTERNAL_ERROR;
+    return  BT_ERR_INTERNAL_ERROR;
 }
 
 bool BluetoothRemoteDevice::IsBondedFromLocal() const
@@ -358,25 +358,19 @@ int BluetoothRemoteDevice::GetDeviceClass(int &cod) const
     return ret;
 }
 
-std::vector<ParcelUuid> BluetoothRemoteDevice::GetDeviceUuids() const
+int BluetoothRemoteDevice::GetDeviceUuids(std::vector<std::string> &uuids) const
 {
     HILOGI("enter");
-    std::vector<ParcelUuid> parcelUuids;
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
-        return parcelUuids;
+        return BT_ERR_INTERNAL_ERROR;
     }
     sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
     if (hostProxy == nullptr) {
         HILOGE("fails: no proxy");
-        return parcelUuids;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    std::vector<bluetooth::Uuid> uuids = hostProxy->GetDeviceUuids(transport_, address_);
-    for (auto iter : uuids) {
-        ParcelUuid parcelUuid = UUID::ConvertFrom128Bits(iter.ConvertTo128Bits());
-        parcelUuids.push_back(parcelUuid);
-    }
-    return parcelUuids;
+    return hostProxy->GetDeviceUuids(address_, uuids);
 }
 
 int BluetoothRemoteDevice::SetDevicePin(const std::string &pin)

@@ -20,54 +20,34 @@
 #include "../parcel/bluetooth_ble_scan_settings.h"
 #include "../parcel/bluetooth_ble_advertiser_data.h"
 #include "../parcel/bluetooth_ble_advertiser_settings.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_ble_central_manager_callback.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
 namespace Bluetooth {
-struct BluetoothAdvDeviceInfo {
-    std::vector<int8_t> advDeviceId;
+struct BluetoothActiveDeviceInfo {
+    std::vector<int8_t> deviceId;
     int32_t status;
     int32_t timeOut;
 };
-struct BluetoothBleFilterParamSet {
+struct BluetoothLpDeviceParamSet {
     BluetoothBleScanSettings btScanSettings;
     std::vector<BluetoothBleScanFilter> btScanFilters;
     BluetoothBleAdvertiserSettings btAdvSettings;
     BluetoothBleAdvertiserData btAdvData;
     BluetoothBleAdvertiserData btRespData;
     bluetooth::Uuid uuid;
-    std::vector<BluetoothAdvDeviceInfo> advDeviceInfos;
-    int deliveryMode;
-    int advHandle;
-    int duration;
-    int fieldValidFlagBit;
+    std::vector<BluetoothActiveDeviceInfo> activeDeviceInfos;
+    int32_t deliveryMode;
+    int32_t advHandle;
+    int32_t duration;
+    uint32_t fieldValidFlagBit;
 };
 
 class IBluetoothBleCentralManager : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetootBleCentralManager");
-
-    enum Code {
-        BLE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK = 0,
-        BLE_DE_REGISTER_BLE_CENTRAL_MANAGER_CALLBACK,
-        BLE_START_SCAN,
-        BLE_START_SCAN_WITH_SETTINGS,
-        BLE_STOP_SCAN,
-        BLE_CONFIG_SCAN_FILTER,
-        BLE_REMOVE_SCAN_FILTER,
-        BLE_PROXY_UID,
-        BLE_RESET_ALL_PROXY,
-        BLE_SET_BURST_PARAM,
-        BLE_SET_SCAN_REPORT_CHANNEL_TO_SH,
-        BLE_START_SCAN_IN_SH_SYNC,
-        BLE_STOP_SCAN_IN_SH_SYNC,
-        BLE_SEND_PARAMS_TO_SH,
-        BLE_IS_SUPPORT_SENSOR_ADVERTISER_FILTER,
-        BLE_SET_SH_ADV_FILTER_PARAM,
-        BLE_REMOVE_SH_ADV_FILTER,
-    };
-
     virtual void RegisterBleCentralManagerCallback(int32_t &scannerId,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
     virtual void DeregisterBleCentralManagerCallback(int32_t scannerId,
@@ -79,14 +59,14 @@ public:
     virtual void RemoveScanFilter(int32_t scannerId) = 0;
     virtual bool ProxyUid(int32_t uid, bool isProxy) = 0;
     virtual bool ResetAllProxy() = 0;
-    virtual int SetBurstParam(int duration, int maxExtAdvEvents, int burstWindow, int burstInterval, int advHandle) = 0;
-    virtual int SetScanReportChannelToSensorHub(const int clientId, const int isToAp) = 0;
-    virtual int StartScanInShSync() = 0;
-    virtual int StopScanInShSync() = 0;
-    virtual int SendParamsToSensorhub(const std::vector<uint8_t> &dataValue, int32_t type) = 0;
-    virtual bool IsSupportSensorAdvertiseFilter() = 0;
-    virtual int SetAdvFilterParam(const BluetoothBleFilterParamSet &paramSet) = 0;
-    virtual int RemoveAdvFilter(const bluetooth::Uuid &uuid) = 0;
+    virtual int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle) = 0;
+    virtual int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable) = 0;
+    virtual int EnableSyncDataToLpDevice() = 0;
+    virtual int DisableSyncDataToLpDevice() = 0;
+    virtual int SendParamsToLpDevice(const std::vector<uint8_t> &dataValue, int32_t type) = 0;
+    virtual bool IsLpDeviceAvailable() = 0;
+    virtual int SetLpDeviceParam(const BluetoothLpDeviceParamSet &paramSet) = 0;
+    virtual int RemoveLpDeviceParam(const bluetooth::Uuid &uuid) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

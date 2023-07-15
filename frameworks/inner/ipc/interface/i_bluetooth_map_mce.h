@@ -19,6 +19,7 @@
 #include "../parcel/bluetooth_map_mce_parameter.h"
 #include "../parcel/bluetooth_raw_address.h"
 #include "iremote_broker.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_map_mce_observer.h"
 
 namespace OHOS {
@@ -26,31 +27,6 @@ namespace Bluetooth {
 class IBluetoothMapMce : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothMapMce");
-
-    enum Code {
-        MCE_REGISTER_OBSERVER = 0,
-        MCE_DE_REGISTER_OBSERVER,
-        MCE_CONNECT,
-        MCE_DISCONNECT,
-        MCE_ISCONNECTED,
-        MCE_GET_CONNECT_DEVICES,
-        MCE_GET_DEVICES_BY_STATES,
-        MCE_GET_CONNECTION_STATE,
-        MCE_SET_CONNECTION_STRATEGY,
-        MCE_GET_CONNECTION_STRATEGY,
-        MCE_GET_UNREAD_MESSAGES,
-        MCE_GET_SUPPORTED_FEATURES,
-        MCE_SEND_MESSAGE,
-        MCE_SET_NOTIFICATION_FILTER,
-        MCE_GET_MESSAGES_LISTING,
-        MCE_GET_MESSAGE,
-        MCE_UPDATE_INBOX,
-        MCE_GET_CONVERSATION_LISTING,
-        MCE_SET_MESSAGE_STATUS,
-        MCE_SET_OWNER_STATUS,
-        MCE_GET_OWNER_STATUS,
-        MCE_GET_MAS_INSTANCE_INFO,
-    };
 
     virtual void RegisterObserver(const sptr<IBluetoothMapMceObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothMapMceObserver> &observer) = 0;

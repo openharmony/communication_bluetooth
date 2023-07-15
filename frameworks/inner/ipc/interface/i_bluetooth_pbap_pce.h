@@ -17,6 +17,7 @@
 
 #include "../parcel/bluetooth_pbap_pce_parameter.h"
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "pbap_pce_parameter.h"
 #include "i_bluetooth_pbap_pce_observer.h"
@@ -26,24 +27,6 @@ namespace Bluetooth {
 class IBluetoothPbapPce : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothPbapPce");
-
-    enum Code {
-        PBAP_PCE_GET_DEVICE_STATE = 0,
-        PBAP_PCE_CONNECT,
-        PBAP_PCE_PULL_PHONEBOOK,
-        PBAP_PCE_SET_PHONEBOOK,
-        PBAP_PCE_PULL_VCARD_LISTING,
-        PBAP_PCE_PULL_VCARD_ENTRY,
-        PBAP_PCE_PULL_ISDOWNLOAGING,
-        PBAP_PCE_ABORT_DOWNLOADING,
-        PBAP_PCE_SET_DEVICE_PASSWORD,
-        PBAP_PCE_DISCONNECT,
-        PBAP_PCE_SET_CONNECT_STRATEGY,
-        PBAP_PCE_GET_CONNECT_STRATEGY,
-        PBAP_PCE_GET_DEVICES_BY_STATE,
-        PBAP_PCE_REGISTER_OBSERVER,
-        PBAP_PCE_DEREGISTER_OBSERVER,
-    };
 
     virtual int GetDeviceState(const BluetoothRawAddress &device) = 0;
     virtual int Connect(const BluetoothRawAddress &device) = 0;

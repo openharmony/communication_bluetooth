@@ -18,6 +18,7 @@
 #include <string>
 #include "../parcel/bluetooth_raw_address.h"
 #include "../parcel/bluetooth_hfp_hf_call.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -26,19 +27,6 @@ class IBluetoothHfpHfObserver : public OHOS::IRemoteBroker {
 public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothHfpHfObserver");
-
-    enum Code {
-        BT_HFP_HF_OBSERVER_CONNECTION_STATE_CHANGED = 0,
-        BT_HFP_HF_OBSERVER_SCO_STATE_CHANGED,
-        BT_HFP_HF_OBSERVER_CALL_CHANGED,
-        BT_HFP_HF_OBSERVER_SIGNAL_STRENGTH_CHANGED,
-        BT_HFP_HF_OBSERVER_REGISTRATION_STATUS_CHANGED,
-        BT_HFP_HF_OBSERVER_ROAMING_STATUS_CHANGED,
-        BT_HFP_HF_OBSERVER_OPERATOR_SELECTION_CHANGED,
-        BT_HFP_HF_OBSERVER_SUBSCRIBER_NUMBER_CHANGED,
-        BT_HFP_HF_OBSERVER_VOICE_RECOGNITION_STATUS_CHANGED,
-        BT_HFP_HF_OBSERVER_IN_BAND_RING_TONE_CHANGED,
-    };
 
     virtual void OnConnectionStateChanged(const BluetoothRawAddress &device, int state) = 0;
     virtual void OnScoStateChanged(const BluetoothRawAddress &device,  int state) = 0;

@@ -35,65 +35,71 @@ const uint32_t AVRCP_FOLDER_ITEMS_NUM_MAX = 0xFFFF;
 BluetoothAvrcpCtObserverStub::BluetoothAvrcpCtObserverStub()
 {
     HILOGI("start.");
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_CONNECTION_STATE_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_CONNECTION_STATE_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_PRESS_BUTTON)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_PRESS_BUTTON)] =
         &BluetoothAvrcpCtObserverStub::OnPressButtonInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_RELEASE_BUTTON)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_RELEASE_BUTTON)] =
         &BluetoothAvrcpCtObserverStub::OnReleaseButtonInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_SET_BROWSED_PLAYER)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_SET_BROWSED_PLAYER)] =
         &BluetoothAvrcpCtObserverStub::OnSetBrowsedPlayerInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_CAPABILITIES)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_CAPABILITIES)] =
         &BluetoothAvrcpCtObserverStub::OnGetCapabilitiesInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTES)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTES)] =
         &BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingAttributesInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_PLAYER_APP_SETTING_VALUES)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_PLAYER_APP_SETTING_VALUES)] =
         &BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingValuesInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_PLAYER_APP_SETTING_CURRENT_VALUE)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_PLAYER_APP_SETTING_CURRENT_VALUE)] =
         &BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingCurrentValueInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_SET_PLAYER_APP_SETTING_CURRENT_VALUE)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_SET_PLAYER_APP_SETTING_CURRENT_VALUE)] =
         &BluetoothAvrcpCtObserverStub::OnSetPlayerAppSettingCurrentValueInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTE_TEXT)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTE_TEXT)] =
         &BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingAttributeTextInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_PLAYER_APP_SETTING_VALUE_TEXT)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_PLAYER_APP_SETTING_VALUE_TEXT)] =
         &BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingValueTextInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_ELEMENT_ATTRIBUTRES)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_ELEMENT_ATTRIBUTRES)] =
         &BluetoothAvrcpCtObserverStub::OnGetElementAttributesInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_PLAY_STATUS)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_PLAY_STATUS)] =
         &BluetoothAvrcpCtObserverStub::OnGetPlayStatusInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_PLAY_ITEM)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_PLAY_ITEM)] =
         &BluetoothAvrcpCtObserverStub::OnPlayItemInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_TOTAL_NUMBER_OF_ITEMS)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_TOTAL_NUMBER_OF_ITEMS)] =
         &BluetoothAvrcpCtObserverStub::OnGetTotalNumberOfItemsInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_ITEM_ATTRIBUTES)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_ITEM_ATTRIBUTES)] =
         &BluetoothAvrcpCtObserverStub::OnGetItemAttributesInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_SET_ABSOLUTE_VOLUME)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_SET_ABSOLUTE_VOLUME)] =
         &BluetoothAvrcpCtObserverStub::OnSetAbsoluteVolumeInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_PLAYBACK_STATUS_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_PLAYBACK_STATUS_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnPlaybackStatusChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_TRACK_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_TRACK_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnTrackChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_TRACK_REACHED_END)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_TRACK_REACHED_END)] =
         &BluetoothAvrcpCtObserverStub::OnTrackReachedEndInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_TRACK_REACHED_START)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_TRACK_REACHED_START)] =
         &BluetoothAvrcpCtObserverStub::OnTrackReachedStartInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_PLAYBACK_POS_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_PLAYBACK_POS_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnPlaybackPosChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_PLAY_APP_SETTING_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_PLAY_APP_SETTING_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnPlayerAppSettingChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_NOW_PLAYING_CONTENT_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_NOW_PLAYING_CONTENT_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnNowPlayingContentChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_AVAILABLE_PLAYER_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_AVAILABLE_PLAYER_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnAvailablePlayersChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_ADDRESSED_PLAYER_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_ADDRESSED_PLAYER_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnAddressedPlayerChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_UID_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_UID_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnUidChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_VOLUME_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_VOLUME_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnVolumeChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_MEDIA_PLAYERS)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_MEDIA_PLAYERS)] =
         &BluetoothAvrcpCtObserverStub::OnGetMediaPlayersInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothAvrcpCtObserver::Code::AVRCP_CT_GET_FOLDER_ITEMS)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_GET_FOLDER_ITEMS)] =
         &BluetoothAvrcpCtObserverStub::OnGetFolderItemsInner;
 }
 

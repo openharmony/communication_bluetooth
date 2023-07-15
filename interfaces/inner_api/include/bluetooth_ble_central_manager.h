@@ -246,14 +246,14 @@ public:
     virtual void OnStartOrStopScanEvent(int resultCode, bool isStartScan) = 0;
 
     /**
-     * @brief SensorHub msg report event callback.
+     * @brief low power device msg report event callback.
      *
      * @param uuid Service uuid.
      * @param msgType Report msg type.
      * @param value Msg data.
      * @since 6
      */
-    virtual void OnNotifyMsgReportFromSh(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) {};
+    virtual void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) {};
 };
 
 /**
@@ -441,24 +441,24 @@ public:
         std::vector<uint8_t> manufactureDataMask_;
 };
 
-struct BleAdvDeviceInfo {
-    std::vector<int8_t> advDeviceId;
+struct BleActiveDeviceInfo {
+    std::vector<int8_t> deviceId;
     int32_t status;
     int32_t timeOut;
 };
 
-struct BleAdvFilterParamSet {
+struct BleLpDeviceParamSet {
     BleScanSettings scanSettings;
     std::vector<BleScanFilter> scanFilters;
     BleAdvertiserSettings advSettings;
     std::vector<uint8_t> advData;
     std::vector<uint8_t> respData;
     UUID uuid;
-    std::vector<BleAdvDeviceInfo> advDeviceInfos;
-    int deliveryMode;
-    int advHandle;
-    int duration;
-    int fieldValidFlagBit;
+    std::vector<BleActiveDeviceInfo> activeDeviceInfos;
+    int32_t deliveryMode;
+    int32_t advHandle;
+    int32_t duration;
+    uint32_t fieldValidFlagBit;
 };
 
 /**
@@ -520,74 +520,74 @@ public:
     int ConfigScanFilter(const std::vector<BleScanFilter> &filter);
 
     /**
-    * @brief set burst work param.
+    * @brief set low power device adv param.
     *
     * @param duration advertise duration.
     * @param maxExtAdvEvents maximum number of extended advertising events.
-    * @param burstWindow burst work window.
-    * @param burstInterval burst work interval.
+    * @param window work window.
+    * @param interval work interval.
     * @param advHandle Indicates the advertisement handle.
     * @return Result.
     */
-    int SetBurstParam(int duration, int maxExtAdvEvents, int burstWindow, int burstInterval, int advHandle);
+    int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle);
 
     /**
     * @brief set scan result report channel.
     *
-    * @param isToAp the switch of report.(0:report msg to sensorhub; 1:report msg to ap;).
+    * @param enable the switch of report.(true: report msg to low power device; false: not report).
     * @return Result.
     */
-    int SetScanReportChannelToSensorHub(const int isToAp);
+    int SetScanReportChannelToLpDevice(bool enable);
 
     /**
-    * @brief Set scan state start sync to sensorHub.
+    * @brief Enable sync data to low power device.
     *
     * @return Result.
     */
-    int StartScanInShSync();
+    int EnableSyncDataToLpDevice();
 
     /**
-    * @brief Set scan state stop sync to sensorHub.
+    * @brief Disable sync data to low power device.
     *
     * @return Result.
     */
-    int StopScanInShSync();
+    int DisableSyncDataToLpDevice();
 
     /**
-    * @brief Translate ParamData to sensorHub.
+    * @brief Translate ParamData to low power device.
     *
     * @param data Indicates the pointer to the data.
     * @param dataSize Indicates the data size.
     * @param type Indicates the data type.
     * @return Result.
     */
-    int SendParamsToSensorhub(const std::vector<uint8_t> &dataValue, int32_t type);
+    int SendParamsToLpDevice(const std::vector<uint8_t> &dataValue, int32_t type);
 
     /**
-    * @brief Get whether support sensorAdvertiseFilter.
+    * @brief Get whether support low power device.
     *
-    * @return true: support; false: not support.
+    * @return true: available; false: not available.
     * @since 6
     */
-    bool IsSupportSensorAdvertiseFilter();
+    bool IsLpDeviceAvailable();
 
     /**
-    * @brief Set advFilterParam.
+    * @brief Set low power device param data.
     *
-    * @param bleAdvFilterParamSet AdvFilterParam data.
+    * @param lpDeviceParamSet low power device param data.
     * @return Result
     * @since 6
     */
-    int SetAdvFilterParam(const BleAdvFilterParamSet &bleAdvFilterParamSet);
+    int SetLpDeviceParam(const BleLpDeviceParamSet &lpDeviceParamSet);
 
     /**
-    * @brief Remove advFilterParam.
+    * @brief Remove low power device param data.
     *
     * @param uuid Uuid.
     * @return Result
     * @since 6
     */
-    int RemoveAdvFilter(const UUID &uuid);
+    int RemoveLpDeviceParam(const UUID &uuid);
 
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManager);

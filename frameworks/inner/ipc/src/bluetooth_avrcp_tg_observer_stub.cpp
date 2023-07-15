@@ -22,7 +22,7 @@ BluetoothAvrcpTgObserverStub::BluetoothAvrcpTgObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothAvrcpTgObserver::Code::BT_AVRCP_TG_OBSERVER_CONNECTION_STATE_CHANGED)] =
+        BluetoothAvrcpTgObserverInterfaceCode::BT_AVRCP_TG_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner;
 }
 
