@@ -24,33 +24,37 @@ BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE)] =
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE)] =
         &BluetoothGattClientCallbackStub::OnConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_CHANGE)] =
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_CHARACTER_CHANGE)] =
         &BluetoothGattClientCallbackStub::OnCharacteristicChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_READ)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_CHARACTER_READ)] =
         &BluetoothGattClientCallbackStub::OnCharacteristicReadInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CHARACTER_WRITE)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_CHARACTER_WRITE)] =
         &BluetoothGattClientCallbackStub::OnCharacteristicWriteInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_READ)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_READ)] =
         &BluetoothGattClientCallbackStub::OnDescriptorReadInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_WRITE)] =
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_WRITE)] =
         &BluetoothGattClientCallbackStub::OnDescriptorWriteInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_MTU_UPDATE)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_MTU_UPDATE)] =
         &BluetoothGattClientCallbackStub::OnMtuChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_DISCOVER)] =
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_SERVICES_DISCOVER)] =
         &BluetoothGattClientCallbackStub::OnServicesDiscoveredInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_CONNECTION_PARA_CHANGE)] =
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_CONNECTION_PARA_CHANGE)] =
         &BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothGattClientCallback::Code::BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED)] =
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED)] =
         &BluetoothGattClientCallbackStub::OnServicesChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothGattClientCallback::Code::
-        BT_GATT_CLIENT_CALLBACK_READ_REMOTE_RSSI_VALUE)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_READ_REMOTE_RSSI_VALUE)] =
         &BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner;
 }
 

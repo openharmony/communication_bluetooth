@@ -67,7 +67,8 @@ public:
     int32_t GetMeidaPlayerList(const RawAddress &device, int32_t startItem, int32_t endItem) override;
 private:
     static inline BrokerDelegator<BluetoothAvrcpCtProxy> delegator_;
-    ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
+    ErrCode InnerTransact(
+        BluetoothAvrcpCtInterfaceCode interfaceCode, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     /**
      * @brief Write the serializable data
      * @param parcelableVector The communication data of IPC

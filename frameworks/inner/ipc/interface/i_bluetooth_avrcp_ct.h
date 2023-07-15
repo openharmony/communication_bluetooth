@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_avrcp_ct_observer.h"
 #include "raw_address.h"
@@ -29,39 +30,6 @@ using namespace OHOS::bluetooth;
 class IBluetoothAvrcpCt: public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpCt");
-
-    enum Code {
-        AVRCP_CT_REGISTER_OBSERVER = 0,
-        AVRCP_CT_UNREGISTER_OBSERVER,
-        AVRCP_CT_GET_CONNECTED_DEVICES,
-        AVRCP_CT_GET_DEVICES_BY_STATES,
-        AVRCP_CT_GET_DEVICE_STATE,
-        AVRCP_CT_CONNECT,
-        AVRCP_CT_DISCONNECT,
-        AVRCP_CT_PRESS_BUTTON,
-        AVRCP_CT_RELEASE_BUTTON,
-        AVRCP_CT_GET_UNIT_INFO,
-        AVRCP_CT_GET_SUB_UNIT_INFO,
-        AVRCP_CT_GET_SUPPORTED_COMPANIES,
-        AVRCP_CT_GET_SUPPORTED_EVENTS,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTES,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_VALUES,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_CURRENT_VALUE,
-        AVRCP_CT_SET_PLAYER_APP_SETTING_CURRENT_VALUE,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTE_TEXT,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_VALUES_TEXT,
-        AVRCP_CT_GET_ELEMENT_ATTRIBUTES,
-        AVRCP_CT_GET_PLAYER_STATUS,
-        AVRCP_CT_PLAY_ITEM,
-        AVRCP_CT_GET_FOLDER_ITEMS,
-        AVRCP_CT_GET_TOTAL_NUMBER_OF_ITEMS,
-        AVRCP_CT_SET_ABSOLUTE_VOLUME,
-        AVRCP_CT_ENABLE_NOTIFICATION,
-        AVRCP_CT_DISABLE_NOTIFICATION,
-        AVRCP_CT_GET_ITEM_ATTRIBUTES,
-        AVRCP_CT_SET_BROWSERED_PLAYER,
-        AVRCP_CT_MEDIA_PLAYER_LIST
-    };
 
     virtual void RegisterObserver(const sptr<IBluetoothAvrcpCtObserver> &observer) = 0;
     virtual void UnregisterObserver(const sptr<IBluetoothAvrcpCtObserver> &observer) = 0;

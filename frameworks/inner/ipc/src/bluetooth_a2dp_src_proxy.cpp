@@ -37,7 +37,7 @@ int32_t BluetoothA2dpSrcProxy::Connect(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_CONNECT, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_CONNECT, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -63,7 +63,7 @@ int32_t BluetoothA2dpSrcProxy::Disconnect(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_DISCONNECT, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -89,7 +89,8 @@ void BluetoothA2dpSrcProxy::RegisterObserver(const sptr<IBluetoothA2dpSourceObse
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_REGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return;
@@ -113,7 +114,8 @@ void BluetoothA2dpSrcProxy::DeregisterObserver(const sptr<IBluetoothA2dpSourceOb
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_DEREGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_DEREGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return;
@@ -135,7 +137,8 @@ int BluetoothA2dpSrcProxy::GetDevicesByStates(const std::vector<int32_t> &states
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_DEVICE_BY_STATES, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_DEVICE_BY_STATES, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -169,7 +172,7 @@ int BluetoothA2dpSrcProxy::GetDeviceState(const RawAddress &device, int &state)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_DEVICE_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -200,7 +203,8 @@ int32_t BluetoothA2dpSrcProxy::GetPlayingState(const RawAddress &device, int &st
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_PLAYING_STATE, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_PLAYING_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -218,15 +222,15 @@ int BluetoothA2dpSrcProxy::SetConnectStrategy(const RawAddress &device, int32_t 
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("write device error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteInt32(strategy)) {
         HILOGE("write strategy error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     MessageParcel reply;
@@ -234,25 +238,26 @@ int BluetoothA2dpSrcProxy::SetConnectStrategy(const RawAddress &device, int32_t 
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_SET_CONNECT_STRATEGY, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_SET_CONNECT_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     return reply.ReadInt32();
 }
 
-int BluetoothA2dpSrcProxy::GetConnectStrategy(const RawAddress &device)
+int BluetoothA2dpSrcProxy::GetConnectStrategy(const RawAddress &device, int &strategy)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("write device error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     MessageParcel reply;
@@ -260,13 +265,19 @@ int BluetoothA2dpSrcProxy::GetConnectStrategy(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_CONNECT_STRATEGY, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_CONNECT_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
-    return reply.ReadInt32();
+    int32_t res = reply.ReadInt32();
+    if (res == NO_ERROR) {
+        strategy = reply.ReadInt32();
+    }
+
+    return res;
 }
 
 int BluetoothA2dpSrcProxy::SetActiveSinkDevice(const RawAddress &device)
@@ -286,7 +297,8 @@ int BluetoothA2dpSrcProxy::SetActiveSinkDevice(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_SET_ACTIVE_SINK_DEVICE, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_SET_ACTIVE_SINK_DEVICE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return ERROR;
@@ -310,7 +322,8 @@ RawAddress BluetoothA2dpSrcProxy::GetActiveSinkDevice()
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_ACTIVE_SINK_DEVICE, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_ACTIVE_SINK_DEVICE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return rawAddress;
@@ -338,7 +351,7 @@ BluetoothA2dpCodecStatus BluetoothA2dpSrcProxy::GetCodecStatus(const RawAddress 
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_CODEC_STATUS, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_CODEC_STATUS, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return codecStatus;
@@ -373,7 +386,8 @@ int BluetoothA2dpSrcProxy::SetCodecPreference(const RawAddress &device, const Bl
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_SET_CODEC_PREFERENCE, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_SET_CODEC_PREFERENCE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return ERROR;
@@ -403,7 +417,8 @@ void BluetoothA2dpSrcProxy::SwitchOptionalCodecs(const RawAddress &device, bool 
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_SWITCH_OPTIONAL_CODECS, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_SWITCH_OPTIONAL_CODECS, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return;
@@ -428,7 +443,7 @@ int BluetoothA2dpSrcProxy::GetOptionalCodecsSupportState(const RawAddress &devic
     };
 
     int error = Remote()->SendRequest(
-        IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_OPTIONAL_CODECS_SUPPORT_STATE, data, reply, option);
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_OPTIONAL_CODECS_SUPPORT_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return ERROR;
@@ -454,7 +469,7 @@ int BluetoothA2dpSrcProxy::StartPlaying(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_START_PLAYING, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_START_PLAYING, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return ERROR;
@@ -480,7 +495,7 @@ int BluetoothA2dpSrcProxy::SuspendPlaying(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_SUSPEND_PLAYING, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_SUSPEND_PLAYING, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return ERROR;
@@ -506,7 +521,7 @@ int BluetoothA2dpSrcProxy::StopPlaying(const RawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_STOP_PLAYING, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_STOP_PLAYING, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return ERROR;
@@ -531,7 +546,8 @@ int BluetoothA2dpSrcProxy::WriteFrame(const uint8_t *data, uint32_t size)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_WRITE_FRAME, messageData, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_WRITE_FRAME, messageData, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return ERROR;
@@ -551,7 +567,8 @@ void BluetoothA2dpSrcProxy::GetRenderPosition(uint16_t &delayValue, uint16_t &se
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothA2dpSrc::Code::BT_A2DP_SRC_GET_RENDER_POSITION, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_RENDER_POSITION, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("error: %{public}d", error);
         return;

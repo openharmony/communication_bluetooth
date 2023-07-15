@@ -41,9 +41,9 @@ int BluetoothA2dpSinkObserverStub::OnRemoteRequest(
     }
 
     ErrCode errCode = NO_ERROR;
-    BluetoothA2dpSinkObserverStub::Code msgCode = static_cast<BluetoothA2dpSinkObserverStub::Code>(code);
-    switch (msgCode) {
-        case BluetoothA2dpSinkObserverStub::Code::BT_A2DP_SINK_OBSERVER_CONNECTION_STATE_CHANGED:
+    switch (code) {
+        case static_cast<uint32_t>(
+            BluetoothA2dpSinkObserverInterfaceCode::BT_A2DP_SINK_OBSERVER_CONNECTION_STATE_CHANGED):
             errCode = OnConnectionStateChangedInner(data, reply);
             break;
         default:

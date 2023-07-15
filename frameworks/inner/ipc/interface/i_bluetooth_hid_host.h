@@ -18,6 +18,7 @@
 #include <vector>
 #include <string_ex.h>
 #include <iremote_broker.h>
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_hid_host_observer.h"
 
 using OHOS::Bluetooth::IBluetoothHidHostObserver;
@@ -45,18 +46,8 @@ public:
         uint8_t &type, uint16_t &size, uint8_t &report, int& reuslt) = 0;
     virtual ErrCode HidHostGetReport(std::string &device,
         uint8_t &id, uint16_t &size, uint8_t &type, int& result) = 0;
-
-protected:
-    static constexpr int COMMAND_CONNECT = MIN_TRANSACTION_ID + 0;
-    static constexpr int COMMAND_DISCONNECT = MIN_TRANSACTION_ID + 1;
-    static constexpr int COMMAND_GET_DEVICE_STATE = MIN_TRANSACTION_ID + 2;
-    static constexpr int COMMAND_GET_DEVICES_BY_STATES = MIN_TRANSACTION_ID + 3;
-    static constexpr int COMMAND_REGISTER_OBSERVER = MIN_TRANSACTION_ID + 4;
-    static constexpr int COMMAND_DEREGISTER_OBSERVER = MIN_TRANSACTION_ID + 5;
-    static constexpr int COMMAND_VCUN_PLUG = MIN_TRANSACTION_ID + 6;
-    static constexpr int COMMAND_SEND_DATA = MIN_TRANSACTION_ID + 7;
-    static constexpr int COMMAND_SET_REPORT = MIN_TRANSACTION_ID + 8;
-    static constexpr int COMMAND_GET_REPORT = MIN_TRANSACTION_ID + 9;
+    virtual int32_t SetConnectStrategy(const BluetoothRawAddress &device, int strategy) = 0;
+    virtual int32_t GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) = 0;
 };
 } // Bluetooth
 } // OHOS

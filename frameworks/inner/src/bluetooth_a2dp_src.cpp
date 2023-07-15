@@ -437,49 +437,48 @@ const BluetoothRemoteDevice &A2dpSource::GetActiveSinkDevice() const
     return deviceInfo;
 }
 
-bool A2dpSource::SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
+int A2dpSource::SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
 {
-    HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
+    HILOGI("device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return false;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (pimpl == nullptr || !pimpl->InitA2dpSrcProxy()) {
         HILOGE("pimpl or a2dpSrc proxy is nullptr");
-        return false;
+        return BT_ERR_UNAVAILABLE_PROXY;
     }
 
-    if ((!device.IsValidBluetoothRemoteDevice()) ||
-        ((strategy != static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)) &&
+    if ((!device.IsValidBluetoothRemoteDevice()) || (
+        (strategy != static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)) &&
         (strategy != static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN)))) {
-        HILOGE("input parameter error.");
-        return false;
+        HILOGI("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
     }
 
-    int ret = pimpl->proxy_->SetConnectStrategy(RawAddress(device.GetDeviceAddr()), strategy);
-    return (ret == RET_NO_ERROR);
+    return pimpl->proxy_->SetConnectStrategy(RawAddress(device.GetDeviceAddr()), strategy);
 }
 
-int A2dpSource::GetConnectStrategy(const BluetoothRemoteDevice &device) const
+int A2dpSource::GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return RET_BAD_STATUS;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (pimpl == nullptr || !pimpl->InitA2dpSrcProxy()) {
         HILOGE("pimpl or a2dpSrc proxy is nullptr");
-        return RET_BAD_STATUS;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("input parameter error.");
-        return RET_BAD_PARAM;
+        HILOGI("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
     }
 
-    return pimpl->proxy_->GetConnectStrategy(RawAddress(device.GetDeviceAddr()));
+    return pimpl->proxy_->GetConnectStrategy(RawAddress(device.GetDeviceAddr()), strategy);
 }
 
 A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) const

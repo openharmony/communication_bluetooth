@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "bt_uuid.h"
 #include "iremote_broker.h"
 
@@ -40,11 +41,6 @@ struct ConnectSocketParam {
 class IBluetoothSocket : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothSocket");
-
-    enum Code {
-        SOCKET_CONNECT = 0,
-        SOCKET_LISTEN,
-    };
 
     virtual int Connect(ConnectSocketParam &param, int &fd) = 0;
     virtual int Listen(ListenSocketParam &param, int &fd) = 0;

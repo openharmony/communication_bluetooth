@@ -46,7 +46,8 @@ int BluetoothGattClientProxy::RegisterApplication(
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_REGISTER_APP, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_REGISTER_APP, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::RegisterApplication done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -81,7 +82,8 @@ int BluetoothGattClientProxy::RegisterApplication(
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_REGISTER_APP, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_REGISTER_APP, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::RegisterApplication done fail, error: %{public}d", error);
         return ERROR;
@@ -106,7 +108,8 @@ int BluetoothGattClientProxy::DeregisterApplication(int32_t appId)
         MessageOption::TF_SYNC
     };
     HILOGE("mobaiye2 BluetoothGattClientProxy::DeregisterApplication appId : %{public}d", appId);
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_DEREGISTER_APP, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_DEREGISTER_APP, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::DeregisterApplication done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -134,7 +137,7 @@ int BluetoothGattClientProxy::Connect(int32_t appId, bool autoConnect)
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_CONNECT, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_CONNECT, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::Connect done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -158,7 +161,8 @@ int BluetoothGattClientProxy::Disconnect(int32_t appId)
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_DIS_CONNECT, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_DIS_CONNECT, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::Disconnect done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -183,7 +187,7 @@ int BluetoothGattClientProxy::DiscoveryServices(int32_t appId)
         MessageOption::TF_SYNC
     };
     int error =
-        Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_DISCOVERY_SERVICES, data, reply, option);
+        Remote()->SendRequest(BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_DISCOVERY_SERVICES, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::DiscoveryServices done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -212,7 +216,8 @@ int BluetoothGattClientProxy::ReadCharacteristic(int32_t appId, const BluetoothG
         MessageOption::TF_SYNC
     };
     int error =
-        Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_READ_CHARACTERISTIC, data, reply, option);
+        Remote()->SendRequest(
+            BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_READ_CHARACTERISTIC, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::ReadCharacteristic done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -246,7 +251,8 @@ int BluetoothGattClientProxy::WriteCharacteristic(
         MessageOption::TF_SYNC
     };
     int error =
-        Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_WRITE_CHARACTERISTIC, data, reply, option);
+        Remote()->SendRequest(
+            BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_WRITE_CHARACTERISTIC, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::WriteCharacteristic done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -275,7 +281,7 @@ int BluetoothGattClientProxy::SignedWriteCharacteristic(int32_t appId, Bluetooth
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothGattClient::Code::BT_GATT_CLIENT_SIGNED_WRITE_CHARACTERISTIC, data, reply, option);
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_SIGNED_WRITE_CHARACTERISTIC, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::SignedWriteCharacteristic done fail, error: %{public}d", error);
         return ERROR;
@@ -303,7 +309,8 @@ int BluetoothGattClientProxy::ReadDescriptor(int32_t appId, const BluetoothGattD
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_READ_DESCRIPTOR, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_READ_DESCRIPTOR, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::ReadDescriptor done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -331,7 +338,8 @@ int BluetoothGattClientProxy::WriteDescriptor(int32_t appId, BluetoothGattDescri
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_WRITE_DESCRIPTOR, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_WRITE_DESCRIPTOR, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::WriteDescriptor done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -360,7 +368,8 @@ int BluetoothGattClientProxy::RequestExchangeMtu(int32_t appId, int32_t mtu)
         MessageOption::TF_SYNC
     };
     int error =
-        Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_REQUEST_EXCHANGE_MTU, data, reply, option);
+        Remote()->SendRequest(
+            BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_REQUEST_EXCHANGE_MTU, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::RequestExchangeMtu done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -380,7 +389,8 @@ void BluetoothGattClientProxy::GetAllDevice(std::vector<BluetoothGattDevice> &de
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_GET_ALL_DEVICE, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_GET_ALL_DEVICE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::GetAllDevice done fail, error: %{public}d", error);
     }
@@ -419,7 +429,7 @@ int BluetoothGattClientProxy::RequestConnectionPriority(int32_t appId, int32_t c
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothGattClient::Code::BT_GATT_CLIENT_REQUEST_CONNECTION_PRIORITY, data, reply, option);
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_REQUEST_CONNECTION_PRIORITY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::RequestConnectionPriority done fail, error: %{public}d", error);
         return ERROR;
@@ -443,7 +453,8 @@ int BluetoothGattClientProxy::GetServices(int32_t appId, std::vector<BluetoothGa
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothGattClient::Code::BT_GATT_CLIENT_GET_SERVICES, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_GET_SERVICES, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::GetServices done fail, error: %{public}d", error);
     }
@@ -480,7 +491,7 @@ int BluetoothGattClientProxy::RequestFastestConn(const BluetoothRawAddress &addr
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothGattClient::Code::BT_GATT_CLIENT_REQUEST_FASTEST_CONNECTION, data, reply, option);
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_REQUEST_FASTEST_CONNECTION, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::RequestFastestConn done fail, error: %{public}d", error);
         return ERROR;
@@ -505,7 +516,7 @@ int BluetoothGattClientProxy::ReadRemoteRssiValue(int32_t appId)
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothGattClient::Code::BT_GATT_CLIENT_READ_REMOTE_RSSI_VALUE, data, reply, option);
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_READ_REMOTE_RSSI_VALUE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::ReadRemoteRssiValue done fail, error: %{public}d", error);
         return ERROR;
@@ -538,7 +549,7 @@ int BluetoothGattClientProxy::RequestNotification(int32_t appId, uint16_t charac
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothGattClient::Code::BT_GATT_CLIENT_REQUEST_NOTIFICATION, data, reply, option);
+        BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_REQUEST_NOTIFICATION, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothGattClientProxy::ReadRemoteRssiValue done fail, error: %{public}d", error);
         return ERROR;

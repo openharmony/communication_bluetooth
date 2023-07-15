@@ -60,7 +60,7 @@ int BluetoothSocketProxy::Connect(ConnectSocketParam &param, int &fd)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(BluetoothSocketProxy::Code::SOCKET_CONNECT, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::SOCKET_CONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("Connect done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
@@ -108,7 +108,7 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(BluetoothSocketProxy::Code::SOCKET_LISTEN, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::SOCKET_LISTEN, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("Listen done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;

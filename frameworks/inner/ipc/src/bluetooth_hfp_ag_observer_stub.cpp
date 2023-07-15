@@ -23,16 +23,16 @@ BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpAgObserverStub::Code::BT_HFP_AG_OBSERVER_CONNECTION_STATE_CHANGED)] =
+        BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpAgObserverStub::Code::BT_HFP_AG_OBSERVER_SCO_STATE_CHANGED)] =
+        BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_SCO_STATE_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnScoStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpAgObserverStub::Code::BT_HFP_AG_OBSERVER_ACTIVE_DEVICE_CHANGED)] =
+        BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_ACTIVE_DEVICE_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnActiveDeviceChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpAgObserverStub::Code::BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED)] =
+        BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner;
 
     HILOGI("ends.");

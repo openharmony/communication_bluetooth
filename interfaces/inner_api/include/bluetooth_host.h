@@ -627,6 +627,33 @@ public:
 
     void Init();
 
+    void UnInit();
+
+    /**
+     * @brief Get remote devicec profile uuids.
+     *
+     * @param address Bluetooth address.
+     * @return Returns remote devicec uuids.
+     * @since 10
+     */
+    int32_t GetDeviceUuids(const std::string &address, std::vector<std::string> &uuids);
+
+    /**
+     * @brief Get local profile uuids.
+     *
+     * @return Returns local profile uuids.
+     * @since 10
+     */
+    int32_t GetLocalProfileUuids(std::vector<std::string> &uuids);
+
+    /**
+    * @brief Set fast scan enable or disable.
+    * @param isEnable set fast scan status flag.
+    * @return Returns <b>true</b> if the operation is successful;
+    *         returns <b>false</b> if the operation fails.
+    */
+    int SetFastScan(bool isEnable);
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

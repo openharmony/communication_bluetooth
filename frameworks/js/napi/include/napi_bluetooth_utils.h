@@ -130,6 +130,7 @@ void ConvertDescriptorWriteReqToJS(
     napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
+void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
 
 void ConvertOppTransferInformationToJS(napi_env env,
     napi_value result, BluetoothOppTransferInformation& transferInformation);
@@ -575,6 +576,7 @@ int DoInJsMainThread(napi_env env, std::function<void(void)> func);
 bool IsValidAddress(std::string bdaddr);
 bool IsValidUuid(std::string uuid);
 bool IsValidTransport(int transport);
+bool IsValidConnectStrategy(int strategy);
 napi_status NapiIsBoolean(napi_env env, napi_value value);
 napi_status NapiIsNumber(napi_env env, napi_value value);
 napi_status NapiIsString(napi_env env, napi_value value);
@@ -600,7 +602,8 @@ bool CheckSetBluetoothScanModeParam(napi_env env, napi_callback_info info, int32
 napi_status CheckDeregisterObserver(napi_env env, napi_callback_info info);
 napi_status CheckEmptyParam(napi_env env, napi_callback_info info);
 napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const std::vector<std::string> &names);
-
+napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &strategy);
+napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::string &addr);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H

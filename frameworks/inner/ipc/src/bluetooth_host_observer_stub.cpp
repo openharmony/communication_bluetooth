@@ -21,21 +21,21 @@ namespace Bluetooth {
 BluetoothHostObserverStub::BluetoothHostObserverStub()
 {
     HILOGI("start.");
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_STATE_CHANGE)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_STATE_CHANGE)] =
         &BluetoothHostObserverStub::OnStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE)] =
         &BluetoothHostObserverStub::OnDiscoveryStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_DISCOVERY_RESULT)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DISCOVERY_RESULT)] =
         &BluetoothHostObserverStub::OnDiscoveryResultInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_PAIR_REQUESTED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_PAIR_REQUESTED)] =
         &BluetoothHostObserverStub::OnPairRequestedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_PAIR_CONFIRMED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_PAIR_CONFIRMED)] =
         &BluetoothHostObserverStub::OnPairConfirmedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_SCAN_MODE_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_SCAN_MODE_CHANGED)] =
         &BluetoothHostObserverStub::OnScanModeChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_DEVICE_NAME_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DEVICE_NAME_CHANGED)] =
         &BluetoothHostObserverStub::OnDeviceNameChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothHostObserver::Code::BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED)] =
         &BluetoothHostObserverStub::OnDeviceAddrChangedInner;
 }
 

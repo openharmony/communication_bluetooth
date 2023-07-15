@@ -24,7 +24,7 @@ int BluetoothHidHostObserverStub::OnRemoteRequest(
     MessageOption& option)
 {
     switch (code) {
-        case COMMAND_ON_CONNECTION_STATE_CHANGED: {
+        case static_cast<uint32_t>(BluetoothHidHostObserverInterfaceCode::COMMAND_ON_CONNECTION_STATE_CHANGED): {
             if (BluetoothHidHostObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;

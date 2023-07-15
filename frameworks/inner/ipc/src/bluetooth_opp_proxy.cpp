@@ -44,7 +44,8 @@ ErrCode BluetoothOppProxy::SendFile(std::string &device,
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_SEND_FILE, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SEND_FILE), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::SendFile done fail, error: %{public}d", error);
         return error;
@@ -71,7 +72,8 @@ ErrCode BluetoothOppProxy::SetIncomingFileConfirmation(bool &accept, bool &resul
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_SET_INCOMING_FILE_CONFIRMATION, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SET_INCOMING_FILE_CONFIRMATION), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::GetDeviceState done fail, error: %{public}d", error);
         return error;
@@ -91,7 +93,8 @@ ErrCode BluetoothOppProxy::GetCurrentTransferInformation(BluetoothIOppTransferIn
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(COMMAND_GET_CURRENT_TRANSFER_INFORMATION, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(
+        BluetoothOppInterfaceCode::COMMAND_GET_CURRENT_TRANSFER_INFORMATION), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::GetCurrentTransferInformation done fail, error: %{public}d", error);
         return INVALID_DATA;
@@ -117,7 +120,8 @@ ErrCode BluetoothOppProxy::CancelTransfer(bool &result)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_CANCEL_TRANSFER, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_CANCEL_TRANSFER), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::CancelTransfer done fail, error: %{public}d", error);
         return INVALID_DATA;
@@ -144,7 +148,8 @@ ErrCode BluetoothOppProxy::RegisterObserver(const sptr<IBluetoothOppObserver> ob
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_REGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_REGISTER_OBSERVER), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::RegisterObserver done fail, error: %{public}d", error);
         return INVALID_DATA;
@@ -169,7 +174,8 @@ ErrCode BluetoothOppProxy::DeregisterObserver(const sptr<IBluetoothOppObserver> 
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_DEREGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_DEREGISTER_OBSERVER), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::DeregisterObserver done fail, error: %{public}d", error);
         return INVALID_DATA;
@@ -194,7 +200,8 @@ ErrCode BluetoothOppProxy::GetDeviceState(const BluetoothRawAddress &device, int
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICE_STATE), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::GetDeviceState done fail, error: %{public}d", error);
         return error;
@@ -224,7 +231,8 @@ ErrCode BluetoothOppProxy::GetDevicesByStates(
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(COMMAND_GET_DEVICES_BY_STATES, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothOppProxy::GetDevicesByStates done fail, error: %{public}d", error);
         return INVALID_DATA;

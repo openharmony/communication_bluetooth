@@ -60,6 +60,8 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getBluetoothScanMode", GetBluetoothScanMode),
         DECLARE_NAPI_FUNCTION("startBluetoothDiscovery", StartBluetoothDiscovery),
         DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
+        DECLARE_NAPI_FUNCTION("getLocalProfileUuids", GetLocalProfileUuids),
+        DECLARE_NAPI_FUNCTION("getRemoteProfileUuids", GetRemoteProfileUuids),
         DECLARE_NAPI_FUNCTION("on", RegisterObserver),
         DECLARE_NAPI_FUNCTION("off", DeregisterObserver),
     };
@@ -1056,6 +1058,56 @@ int GetDeviceTransport(std::string &device)
     }
 
     return BT_TRANSPORT_BREDR;
+}
+
+
+static napi_status CheckGetProfileUuids(napi_env env, napi_callback_info info, std::string &address)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {0};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], address));
+    return napi_ok;
+}
+
+napi_value GetLocalProfileUuids(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string address;
+    auto status = CheckGetProfileUuids(env, info, address);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto func = []() {
+        std::vector<std::string> uuids{};
+        int32_t err = BluetoothHost::GetDefaultHost().GetLocalProfileUuids(uuids);
+        HILOGI("err: %{public}d", err);
+        auto object = std::make_shared<NapiNativeUuidsArray>(uuids);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string address;
+    auto status = CheckGetProfileUuids(env, info, address);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto func = [address]() {
+        std::vector<std::string> uuids{};
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(address, BT_TRANSPORT_BREDR);
+        int32_t err = remoteDevice.GetDeviceUuids(uuids);
+        HILOGI("err: %{public}d", err);
+        auto object = std::make_shared<NapiNativeUuidsArray>(uuids);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

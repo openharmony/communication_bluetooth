@@ -16,6 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_BLE_ADVERTISE_CALLBACK_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_BLE_ADVERTISE_CALLBACK_INTERFACE_H
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "ble_service_data.h"
 #include "iremote_broker.h"
 
@@ -24,12 +25,6 @@ namespace Bluetooth {
 class IBluetoothBleAdvertiseCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleAdvertiseCallback");
-
-    enum Code {
-        BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT = 0,
-        BT_BLE_ADVERTISE_CALLBACK_RESULT_EVENT,
-        BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
-    };
 
     virtual void OnAutoStopAdvEvent(int32_t advHandle) = 0;
     virtual void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) = 0;

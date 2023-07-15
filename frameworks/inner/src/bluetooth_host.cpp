@@ -309,14 +309,6 @@ public:
     {
         HILOGI("bluetooth_servi died and then re-registered");
         std::lock_guard<std::mutex> lock(impl_.proxyMutex_);
-        if (!impl_.proxy_) {
-            return;
-        }
-        impl_.proxy_->DeregisterObserver(impl_.observerImp_);
-        impl_.proxy_->DeregisterBleAdapterObserver(impl_.bleObserverImp_);
-        impl_.proxy_->DeregisterRemoteDeviceObserver(impl_.remoteObserverImp_);
-        impl_.proxy_->DeregisterBlePeripheralCallback(impl_.bleRemoteObserverImp_);
-        impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
         impl_.isHostProxyInit = false;
 
@@ -385,6 +377,7 @@ bool BluetoothHost::impl::InitBluetoothHostProxy(void)
 
 bool BluetoothHost::impl::InitBluetoothHostObserver(void)
 {
+    HILOGI("enter");
     deathRecipient_ = new BluetoothHostDeathRecipient(*this);
     if (deathRecipient_ == nullptr) {
         HILOGE("deathRecipient_ is null");
@@ -411,6 +404,7 @@ bool BluetoothHost::impl::InitBluetoothHostObserver(void)
         return false;
     }
     if (proxy_ == nullptr) {
+        HILOGE("proxy_ is null");
         return false;
     }
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
@@ -543,6 +537,15 @@ void BluetoothHost::Init()
         pimpl->proxy_ = iface_cast<IBluetoothHost>(object);
     }
     pimpl->InitBluetoothHostObserver();
+}
+
+void BluetoothHost::UnInit()
+{
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    pimpl->proxy_ = nullptr;
 }
 
 int BluetoothHost::EnableBt()
@@ -1084,6 +1087,34 @@ void BluetoothHost::LoadSystemAbilityFail()
         return;
     }
     pimpl->LoadSystemAbilityFail();
+}
+
+int32_t BluetoothHost::GetLocalProfileUuids(std::vector<std::string> &uuids)
+{
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!pimpl || !pimpl->InitBluetoothHostProxy()) {
+        HILOGE("pimpl or bluetooth host is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+    return pimpl->proxy_->GetLocalProfileUuids(uuids);
+}
+
+int BluetoothHost::SetFastScan(bool isEnable)
+{
+    HILOGI("enter, isEnable: %{public}d", isEnable);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (!pimpl || !pimpl->InitBluetoothHostProxy()) {
+        HILOGE("pimpl or bluetooth host is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+    return pimpl->proxy_->SetFastScan(isEnable);
 }
 } // namespace Bluetooth
 } // namespace OHOS

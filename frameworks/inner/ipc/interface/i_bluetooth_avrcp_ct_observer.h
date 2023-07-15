@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_avrcp_meItem.h"
 #include "../parcel/bluetooth_avrcp_mpItem.h"
@@ -30,39 +31,6 @@ using namespace OHOS::bluetooth;
 class IBluetoothAvrcpCtObserver: public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpCtObserver");
-
-    enum Code {
-        AVRCP_CT_CONNECTION_STATE_CHANGED = 0,
-        AVRCP_CT_PRESS_BUTTON,
-        AVRCP_CT_RELEASE_BUTTON,
-        AVRCP_CT_SET_BROWSED_PLAYER,
-        AVRCP_CT_GET_CAPABILITIES,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTES,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_VALUES,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_CURRENT_VALUE,
-        AVRCP_CT_SET_PLAYER_APP_SETTING_CURRENT_VALUE,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_ATTRIBUTE_TEXT,
-        AVRCP_CT_GET_PLAYER_APP_SETTING_VALUE_TEXT,
-        AVRCP_CT_ELEMENT_ATTRIBUTRES,
-        AVRCP_CT_GET_PLAY_STATUS,
-        AVRCP_CT_PLAY_ITEM,
-        AVRCP_CT_GET_TOTAL_NUMBER_OF_ITEMS,
-        AVRCP_CT_GET_ITEM_ATTRIBUTES,
-        AVRCP_CT_SET_ABSOLUTE_VOLUME,
-        AVRCP_CT_PLAYBACK_STATUS_CHANGED,
-        AVRCP_CT_TRACK_CHANGED,
-        AVRCP_CT_TRACK_REACHED_END,
-        AVRCP_CT_TRACK_REACHED_START,
-        AVRCP_CT_PLAYBACK_POS_CHANGED,
-        AVRCP_CT_PLAY_APP_SETTING_CHANGED,
-        AVRCP_CT_NOW_PLAYING_CONTENT_CHANGED,
-        AVRCP_CT_AVAILABLE_PLAYER_CHANGED,
-        AVRCP_CT_ADDRESSED_PLAYER_CHANGED,
-        AVRCP_CT_UID_CHANGED,
-        AVRCP_CT_VOLUME_CHANGED,
-        AVRCP_CT_GET_MEDIA_PLAYERS,
-        AVRCP_CT_GET_FOLDER_ITEMS,
-    };
 
     virtual void OnConnectionStateChanged(const RawAddress &rawAddr, int state) = 0;
     virtual void OnPressButton(const RawAddress &rawAddr, uint8_t button, int result) = 0;

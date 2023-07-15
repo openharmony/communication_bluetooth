@@ -22,19 +22,19 @@ BluetoothMapMceObserverStub::BluetoothMapMceObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothMapMceObserver::Code::MCE_ON_ACTION_COMPLETED)] =
+        BluetoothMapMceObserverInterfaceCode::MCE_ON_ACTION_COMPLETED)] =
         &BluetoothMapMceObserverStub::OnMapActionCompletedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothMapMceObserver::Code::MCE_ON_CONNECTION_STATE_CHANGED)] =
+        BluetoothMapMceObserverInterfaceCode::MCE_ON_CONNECTION_STATE_CHANGED)] =
         &BluetoothMapMceObserverStub::OnConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMceObserver::Code::MCE_ON_EVENT_REPORTED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothMapMceObserverInterfaceCode::MCE_ON_EVENT_REPORTED)] =
         &BluetoothMapMceObserverStub::OnMapEventReportedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMceObserver::Code::MCE_ON_BMESSAGE_COMPLETED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothMapMceObserverInterfaceCode::MCE_ON_BMESSAGE_COMPLETED)] =
         &BluetoothMapMceObserverStub::OnBmessageCompletedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMceObserver::Code::MCE_ON_MESSAGE_LIST_COMPLETED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothMapMceObserverInterfaceCode::MCE_ON_MESSAGE_LIST_COMPLETED)] =
         &BluetoothMapMceObserverStub::OnMessagesListingCompletedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothMapMceObserver::Code::MCE_ON_CONVERSATION_LIST_COMPLETED)] =
+        BluetoothMapMceObserverInterfaceCode::MCE_ON_CONVERSATION_LIST_COMPLETED)] =
         &BluetoothMapMceObserverStub::OnConversationListingCompletedInner;
 }
 

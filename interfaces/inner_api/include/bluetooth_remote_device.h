@@ -238,7 +238,7 @@ public:
      * @return Returns device uuids;
      * @since 6
      */
-    std::vector<ParcelUuid> GetDeviceUuids() const;
+    int GetDeviceUuids(std::vector<std::string> &uuids) const;
 
     /**
      * @brief Set device pair pin.

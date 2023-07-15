@@ -183,22 +183,28 @@ public:
      *
      * @param device The address of the peer bluetooth device.
      * @param strategy The device connect strategy.
-     * @return Returns <b>true</b> if the operation is successful.
-     *         Returns <b>false</b> if the operation fails.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
      * @since 6.0
      */
-    bool SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy);
+    int SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy);
 
     /**
      * @brief Get connection strategy of peer bluetooth device.
      *
      * @param device The address of the peer bluetooth device.
-     * @return Returns <b>CONNECTION_ALLOWED</b> if the peer device is allowed to connect.
-     *         Returns <b>CONNECTION_FORBIDDEN</b> if the peer device is not allowed to connect.
-     *         Returns <b>CONNECTION_UNKNOWN</b> if the connection policy is unknown.
+     * @param strategy The device connect strategy.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
      * @since 6.0
      */
-    int GetConnectStrategy(const BluetoothRemoteDevice &device) const;
+    int GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const;
 
     /**
      * @brief Get codec status information of connected device.

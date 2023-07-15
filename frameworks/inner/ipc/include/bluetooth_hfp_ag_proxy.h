@@ -45,6 +45,8 @@ public:
     std::string GetActiveDevice() override;
     void RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) override;
+    int SetConnectStrategy(const BluetoothRawAddress &device, int strategy) override;
+    int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) override;
 
 private:
     static inline BrokerDelegator<BluetoothHfpAgProxy> delegator_;

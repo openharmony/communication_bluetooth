@@ -20,6 +20,7 @@
 #include "../parcel/bluetooth_ble_advertiser_settings.h"
 #include "bluetooth_ble_advertiser_data.h"
 #include "bluetooth_ble_advertiser_settings.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_ble_advertise_callback.h"
 #include "iremote_broker.h"
 
@@ -28,17 +29,6 @@ namespace Bluetooth {
 class IBluetoothBleAdvertiser : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleAdvertiser");
-
-    enum Code {
-        BLE_REGISTER_BLE_ADVERTISER_CALLBACK = 0,
-        BLE_DE_REGISTER_BLE_ADVERTISER_CALLBACK,
-        BLE_START_ADVERTISING,
-        BLE_START_ADVERTISING_WITH_RAWDATA,
-        BLE_STOP_ADVERTISING,
-        BLE_CLOSE,
-        BLE_GET_ADVERTISER_HANDLE,
-        BLE_SET_ADVERTISING_DATA,
-    };
 
     virtual void RegisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback) = 0;
     virtual void DeregisterBleAdvertiserCallback(const sptr<IBluetoothBleAdvertiseCallback> &callback) = 0;
