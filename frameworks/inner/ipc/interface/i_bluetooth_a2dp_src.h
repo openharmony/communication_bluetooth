@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_a2dp_src_observer.h"
 #include "../parcel/bluetooth_raw_address.h"
@@ -31,30 +32,6 @@ class IBluetoothA2dpSrc : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothA2dpSrc");
 
-    enum Code {
-        BT_A2DP_SRC_CONNECT = 0,
-        BT_A2DP_SRC_DISCONNECT,
-        BT_A2DP_SRC_REGISTER_OBSERVER,
-        BT_A2DP_SRC_DEREGISTER_OBSERVER,
-        BT_A2DP_SRC_GET_DEVICE_BY_STATES,
-        BT_A2DP_SRC_GET_DEVICE_STATE,
-        BT_A2DP_SRC_GET_PLAYING_STATE,
-        BT_A2DP_SRC_SET_CONNECT_STRATEGY,
-        BT_A2DP_SRC_GET_CONNECT_STRATEGY,
-        BT_A2DP_SRC_SET_ACTIVE_SINK_DEVICE,
-        BT_A2DP_SRC_GET_ACTIVE_SINK_DEVICE,
-        BT_A2DP_SRC_GET_CODEC_STATUS,
-        BT_A2DP_SRC_SET_CODEC_PREFERENCE,
-        BT_A2DP_SRC_SWITCH_OPTIONAL_CODECS,
-        BT_A2DP_SRC_GET_OPTIONAL_CODECS_SUPPORT_STATE,
-        BT_A2DP_SRC_START_PLAYING,
-        BT_A2DP_SRC_SUSPEND_PLAYING,
-        BT_A2DP_SRC_STOP_PLAYING,
-        BT_A2DP_SRC_SET_AUDIO_CONFIGURE,
-        BT_A2DP_SRC_WRITE_FRAME,
-        BT_A2DP_SRC_GET_RENDER_POSITION,
-    };
-
     virtual int Connect(const RawAddress &device) = 0;
     virtual int Disconnect(const RawAddress &device) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothA2dpSourceObserver> &observer) = 0;
@@ -63,7 +40,7 @@ public:
     virtual int GetDeviceState(const RawAddress &device, int &state) = 0;
     virtual int GetPlayingState(const RawAddress &device, int &state) = 0;
     virtual int SetConnectStrategy(const RawAddress &device, int32_t strategy) = 0;
-    virtual int GetConnectStrategy(const RawAddress &device) = 0;
+    virtual int GetConnectStrategy(const RawAddress &device, int &strategy) = 0;
     virtual int SetActiveSinkDevice(const RawAddress &device) = 0;
     virtual RawAddress GetActiveSinkDevice() = 0;
     virtual BluetoothA2dpCodecStatus GetCodecStatus(const RawAddress &device) = 0;

@@ -87,11 +87,13 @@ public:
     bool PairRequestReply(int32_t transport, const std::string &address, bool accept) override;
     bool ReadRemoteRssiValue(const std::string &address) override;
     void GetLocalSupportedUuids(std::vector<std::string> &uuids) override;
-    std::vector<bluetooth::Uuid> GetDeviceUuids(int32_t transport, const std::string &address) override;
+    int32_t GetDeviceUuids(const std::string &address, std::vector<std::string> &uuids) override;
+    int32_t GetLocalProfileUuids(std::vector<std::string> &uuids) override;
     void RegisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     void DeregisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     void RegisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer) override;
     void DeregisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer) override;
+    int32_t SetFastScan(bool isEnable) override;
 
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

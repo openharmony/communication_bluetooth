@@ -23,11 +23,13 @@ BluetoothPbapPceObserverStub::BluetoothPbapPceObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothPbapPceObserverStub::Code::PBAP_PCE_ON_SERVICE_CONNECTION_STATE_CHANGED)] =
+        BluetoothPbapPceObserverInterfaceCode::PBAP_PCE_ON_SERVICE_CONNECTION_STATE_CHANGED)] =
         &BluetoothPbapPceObserverStub::OnServiceConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceObserverStub::Code::PBAP_PCE_ON_SERVICE_PASSWORD_REQUIRED)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothPbapPceObserverInterfaceCode::PBAP_PCE_ON_SERVICE_PASSWORD_REQUIRED)] =
         &BluetoothPbapPceObserverStub::OnServicePasswordRequiredInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPceObserverStub::Code::PBAP_PCE_ON_ACTION_COMPLETED)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothPbapPceObserverInterfaceCode::PBAP_PCE_ON_ACTION_COMPLETED)] =
         &BluetoothPbapPceObserverStub::OnActionCompletedInner;
 }
 
@@ -104,7 +106,7 @@ ErrCode BluetoothPbapPceObserverStub::OnActionCompletedInner(MessageParcel &data
     }
 
     OnActionCompleted(*device, respCode, actionType, *result);
-    
+
     return NO_ERROR;
 }
 }  // namespace Bluetooth

@@ -14,6 +14,7 @@
  */
 #include "bluetooth_a2dp_src.h"
 #include "bluetooth_errorcode.h"
+#include "napi_async_work.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_a2dp_src.h"
 #include "napi_bluetooth_event.h"
@@ -39,6 +40,8 @@ void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getPlayingState", GetPlayingState),
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
+        DECLARE_NAPI_FUNCTION("setConnectionStrategy", SetConnectionStrategy),
+        DECLARE_NAPI_FUNCTION("getConnectionStrategy", GetConnectionStrategy),
     };
 
     napi_define_class(env, "A2dpSource", NAPI_AUTO_LENGTH, A2dpSourceConstructor, nullptr,
@@ -197,6 +200,51 @@ napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
 
     return NapiGetBooleanTrue(env);
+}
+
+napi_value NapiA2dpSource::SetConnectionStrategy(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string remoteAddr {};
+    int32_t strategy = 0;
+    auto status = CheckSetConnectStrategyParam(env, info, remoteAddr, strategy);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    int transport = GetDeviceTransport(remoteAddr);
+    auto func = [remoteAddr, transport, strategy]() {
+        BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
+        A2dpSource *profile = A2dpSource::GetProfile();
+        int32_t err = profile->SetConnectStrategy(remoteDevice, strategy);
+        HILOGI("err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiA2dpSource::GetConnectionStrategy(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string remoteAddr {};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    int transport = GetDeviceTransport(remoteAddr);
+    auto func = [remoteAddr, transport]() {
+        int strategy = 0;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
+        A2dpSource *profile = A2dpSource::GetProfile();
+        int32_t err = profile->GetConnectStrategy(remoteDevice, strategy);
+        HILOGI("err: %{public}d, deviceName: %{public}d", err, strategy);
+        auto object = std::make_shared<NapiNativeInt>(strategy);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 } // namespace Bluetooth
 } // namespace OHOS

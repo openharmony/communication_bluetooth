@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_hfp_hf_observer.h"
 
 namespace OHOS {
@@ -25,33 +26,6 @@ class IBluetoothHfpHf : public OHOS::IRemoteBroker {
 public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothHfpHf");
-
-    enum Code {
-        BT_HFP_HF_CONNECT_SCO = 0,
-        BT_HFP_HF_DISCONNECT_SCO,
-        BT_HFP_HF_GET_DEVICES_BY_STATES,
-        BT_HFP_HF_GET_DEVICE_STATE,
-        BT_HFP_HF_GET_SCO_STATE,
-        BT_HFP_HF_SEND_DTMF_TONE,
-        BT_HFP_HF_CONNECT,
-        BT_HFP_HF_DISCONNECT,
-        BT_HFP_HF_OPEN_VOICE_RECOGNITION,
-        BT_HFP_HF_CLOSE_VOICE_RECOGNITION,
-        BT_HFP_HF_GET_CURRENT_CALL_LIST,
-        BT_HFP_HF_ACCEPT_INCOMING_CALL,
-        BT_HFP_HF_HOLD_ACTIVE_CALL,
-        BT_HFP_HF_REJECT_INCOMING_CALL,
-        BT_HFP_HF_SEND_KEY_PRESSED,
-        BT_HFP_HF_HANDLE_INCOMING_CALL,
-        BT_HFP_HF_HANDLE_MULLTI_CALL,
-        BT_HFP_HF_DIAL_LAST_NUMBER,
-        BT_HFP_HF_DIAL_MEMORY,
-        BT_HFP_HF_SEND_VOICE_TAG,
-        BT_HFP_HF_FINISH_ATIVE_CALL,
-        BT_HFP_HF_START_DIAL,
-        BT_HFP_HF_REGISTER_OBSERVER,
-        BT_HFP_HF_DEREGISTER_OBSERVER,
-    };
 
     virtual bool ConnectSco(const BluetoothRawAddress &device) = 0;
     virtual bool DisconnectSco(const BluetoothRawAddress &device) = 0;

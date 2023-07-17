@@ -87,7 +87,6 @@ void BluetootLoadSystemAbility::RegisterNotifyMsg(const uint32_t &profileId)
 {
     std::lock_guard<std::recursive_mutex> lk(mutex_);
     profileIdList_.push_back(profileId);
-    HILOGI("[BLUETOOTH_LOAD_SYSTEM]profileId=0x%{public}x, size=%{public}zu", profileId, profileIdList_.size());
 }
 
 void BluetootLoadSystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
@@ -153,20 +152,27 @@ void BluetootLoadSystemAbility::NotifyProfile(NOTIFY_PROFILE_MSG notifyMsg, cons
             NotifyTransferProfile(notifyMsg, profileId);
             break;
         case PROFILE_ID_HOST:
-            NotifyHostInit();
+            NotifyHostInit(notifyMsg);
             break;
         default:
             break;
     }
 }
 
-void BluetootLoadSystemAbility::NotifyHostInit()
+void BluetootLoadSystemAbility::NotifyHostInit(NOTIFY_PROFILE_MSG notifyMsg)
 {
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     if (host == nullptr) {
         return;
     }
-    host->Init();
+    if (notifyMsg == NOTIFY_MSG_INIT) {
+        host->Init();
+        return;
+    }
+    if (notifyMsg == NOTIFY_MSG_UNINIT) {
+        host->UnInit();
+        return;
+    }
 }
 
 void BluetootLoadSystemAbility::NotifyA2dpSrcProfile(NOTIFY_PROFILE_MSG notifyMsg)

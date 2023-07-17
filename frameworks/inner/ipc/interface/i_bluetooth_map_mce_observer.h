@@ -17,6 +17,7 @@
 
 #include "../parcel/bluetooth_map_mce_parameter.h"
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -24,15 +25,6 @@ namespace Bluetooth {
 class IBluetoothMapMceObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothMapMceObserver");
-
-    enum Code {
-        MCE_ON_ACTION_COMPLETED = 0,
-        MCE_ON_CONNECTION_STATE_CHANGED,
-        MCE_ON_EVENT_REPORTED,
-        MCE_ON_BMESSAGE_COMPLETED,
-        MCE_ON_MESSAGE_LIST_COMPLETED,
-        MCE_ON_CONVERSATION_LIST_COMPLETED,
-    };
 
     virtual void OnMapActionCompleted(const BluetoothRawAddress &device, const BluetoothIProfileMapAction &action,
         int32_t status) = 0;

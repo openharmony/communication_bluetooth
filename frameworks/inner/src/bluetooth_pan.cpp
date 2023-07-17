@@ -53,7 +53,8 @@ private:
     BluetoothObserverList<PanObserver> &observers_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(PanInnerObserver);
 };
-    std::mutex panProxyMutex;
+    std::mutex proxyMutex;
+
 struct Pan::impl {
     impl();
     ~impl();
@@ -202,7 +203,7 @@ Pan::impl::~impl()
 bool Pan::impl::InitPanProxy(void)
 {
     HILOGI("enter");
-    std::lock_guard<std::mutex> lock(panProxyMutex);
+    std::lock_guard<std::mutex> lock(proxyMutex);
     if (proxy_) {
         return true;
     }
@@ -227,7 +228,7 @@ bool Pan::impl::InitPanProxy(void)
 void Pan::impl::UnInitPanProxy(void)
 {
     HILOGI("enter");
-    std::lock_guard<std::mutex> lock(panProxyMutex);
+    std::lock_guard<std::mutex> lock(proxyMutex);
     if (!proxy_) {
         HILOGE("UnInitPanProxy failed");
         return;

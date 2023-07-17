@@ -488,6 +488,21 @@ int GapRegisterCallbacks(BtGapCallBacks *func)
     g_BluetoothHost->RegisterRemoteDeviceObserver(g_remoteDeviceObserver);
     return OHOS_BT_STATUS_SUCCESS;
 }
+
+bool SetFastScan(bool isEnable)
+{
+    HILOGI("isEnable: %{public}d", isEnable);
+    if (g_BluetoothHost == nullptr) {
+        g_BluetoothHost = &BluetoothHost::GetDefaultHost();
+    }
+    bool isSuccess = false;
+    int ret = g_BluetoothHost->SetFastScan(isEnable);
+    if (ret == BT_NO_ERROR) {
+        isSuccess = true;
+    }
+
+    return isSuccess;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
 #ifdef __cplusplus

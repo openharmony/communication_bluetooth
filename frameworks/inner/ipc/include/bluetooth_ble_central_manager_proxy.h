@@ -28,25 +28,25 @@ public:
     ~BluetoothBleCentralManagerProxy() override;
     DISALLOW_COPY_AND_MOVE(BluetoothBleCentralManagerProxy);
 
-    virtual void RegisterBleCentralManagerCallback(int32_t &scannerId,
+    void RegisterBleCentralManagerCallback(int32_t &scannerId,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
-    virtual void DeregisterBleCentralManagerCallback(int32_t scannerId,
+    void DeregisterBleCentralManagerCallback(int32_t scannerId,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
     int StartScan(int32_t scannerId) override;
     int StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings) override;
     int StopScan(int32_t scannerId) override;
-    virtual int ConfigScanFilter(int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters) override;
-    virtual void RemoveScanFilter(int32_t scannerId) override;
-    virtual bool ProxyUid(int32_t uid, bool isProxy) override;
+    int ConfigScanFilter(int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters) override;
+    void RemoveScanFilter(int32_t scannerId) override;
+    bool ProxyUid(int32_t uid, bool isProxy) override;
     bool ResetAllProxy() override;
-    int SetBurstParam(int duration, int maxExtAdvEvents, int burstWindow, int burstInterval, int advHandle) override;
-    int SetScanReportChannelToSensorHub(const int clientId, const int isToAp) override;
-    int StartScanInShSync() override;
-    int StopScanInShSync() override;
-    int SendParamsToSensorhub(const std::vector<uint8_t> &dataValue, int32_t type) override;
-    bool IsSupportSensorAdvertiseFilter() override;
-    int SetAdvFilterParam(const BluetoothBleFilterParamSet &paramSet) override;
-    int RemoveAdvFilter(const bluetooth::Uuid &uuid) override;
+    int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle) override;
+    int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable) override;
+    int EnableSyncDataToLpDevice() override;
+    int DisableSyncDataToLpDevice() override;
+    int SendParamsToLpDevice(const std::vector<uint8_t> &dataValue, int32_t type) override;
+    bool IsLpDeviceAvailable() override;
+    int SetLpDeviceParam(const BluetoothLpDeviceParamSet &paramSet) override;
+    int RemoveLpDeviceParam(const bluetooth::Uuid &uuid) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

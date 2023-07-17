@@ -18,6 +18,7 @@
 #include <vector>
 #include <string_ex.h>
 #include <iremote_broker.h>
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_opp_observer.h"
 
 using OHOS::Bluetooth::IBluetoothOppObserver;
@@ -40,16 +41,6 @@ public:
     virtual ErrCode GetDeviceState(const BluetoothRawAddress &device, int& result) = 0;
     virtual ErrCode GetDevicesByStates(const std::vector<int32_t> &states,
         std::vector<BluetoothRawAddress>& result) = 0;
-
-protected:
-    static constexpr int COMMAND_SEND_FILE = MIN_TRANSACTION_ID + 0;
-    static constexpr int COMMAND_SET_INCOMING_FILE_CONFIRMATION = MIN_TRANSACTION_ID + 1;
-    static constexpr int COMMAND_GET_CURRENT_TRANSFER_INFORMATION = MIN_TRANSACTION_ID + 2;
-    static constexpr int COMMAND_CANCEL_TRANSFER = MIN_TRANSACTION_ID + 3;
-    static constexpr int COMMAND_REGISTER_OBSERVER = MIN_TRANSACTION_ID + 4;
-    static constexpr int COMMAND_DEREGISTER_OBSERVER = MIN_TRANSACTION_ID + 5;
-    static constexpr int COMMAND_GET_DEVICE_STATE = MIN_TRANSACTION_ID + 6;
-    static constexpr int COMMAND_GET_DEVICES_BY_STATES = MIN_TRANSACTION_ID + 7;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

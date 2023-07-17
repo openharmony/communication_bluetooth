@@ -36,7 +36,7 @@ void BluetoothMapMseProxy::RegisterObserver(const sptr<IBluetoothMapMseObserver>
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_REGISTER_OBSERVER, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
@@ -60,7 +60,7 @@ void BluetoothMapMseProxy::DeregisterObserver(const sptr<IBluetoothMapMseObserve
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_DE_REGISTER_OBSERVER, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_DE_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::DeregisterObserver done fail, error: %{public}d", error);
         return;
@@ -80,7 +80,7 @@ void BluetoothMapMseProxy::GetState(int32_t &ret)
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_GET_STATE, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_GET_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::Connect done fail, error: %{public}d", error);
         return;
@@ -105,7 +105,7 @@ void BluetoothMapMseProxy::Disconnect(const BluetoothRawAddress &device, int32_t
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_DISCONNECT, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::Disconnect done fail, error: %{public}d", error);
         return;
@@ -130,7 +130,7 @@ void BluetoothMapMseProxy::IsConnected(const BluetoothRawAddress &device, bool &
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_ISCONNECTED, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_ISCONNECTED, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::IsConnected done fail, error: %{public}d", error);
         return;
@@ -151,7 +151,7 @@ void BluetoothMapMseProxy::GetConnectedDevices(std::vector<BluetoothRawAddress> 
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_GET_CONNECTED_DEVICES, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_GET_CONNECTED_DEVICES, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::GetConnectDevices done fail, error: %{public}d", error);
         return;
@@ -184,7 +184,7 @@ void BluetoothMapMseProxy::GetDevicesByStates(
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_GET_DEVICES_BY_STATES, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_GET_DEVICES_BY_STATES, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::GetDevicesByStates done fail, error: %{public}d", error);
         return;
@@ -216,7 +216,7 @@ void BluetoothMapMseProxy::GetConnectionState(const BluetoothRawAddress &device,
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_GET_CONNECTION_STATE, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_GET_CONNECTION_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::GetConnectionState done fail, error: %{public}d", error);
         return;
@@ -245,7 +245,7 @@ void BluetoothMapMseProxy::SetConnectionStrategy(const BluetoothRawAddress &devi
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_SET_CONNECTION_STRATEGY, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_SET_CONNECTION_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::GetDevicesByStates done fail, error: %{public}d", error);
         return;
@@ -270,7 +270,7 @@ void BluetoothMapMseProxy::GetConnectionStrategy(const BluetoothRawAddress &devi
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_GET_CONNECTION_STRATEGY, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_GET_CONNECTION_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::GetConnectionStrategy done fail, error: %{public}d", error);
         return;
@@ -303,7 +303,7 @@ void BluetoothMapMseProxy::GrantPermission(const BluetoothRawAddress &device, bo
         MessageOption::TF_ASYNC
     };
     int error = Remote()->SendRequest(
-        IBluetoothMapMse::Code::MSE_GRANT_PERMISSION, data, reply, option);
+        BluetoothMapMseInterfaceCode::MSE_GRANT_PERMISSION, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothMapMseProxy::GrantPermission done fail, error: %{public}d", error);
         return;

@@ -21,7 +21,7 @@ int BluetoothPanObserverStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     switch (code) {
-        case COMMAND_ON_CONNECTION_STATE_CHANGED: {
+        case static_cast<uint32_t>(BluetoothPanObserverInterfaceCode::COMMAND_ON_CONNECTION_STATE_CHANGED): {
             if (BluetoothPanObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;

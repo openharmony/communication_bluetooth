@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_hfp_ag_observer.h"
 
 namespace OHOS {
@@ -26,27 +27,6 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothHfpAg");
 
-    enum Code {
-        BT_HFP_AG_GET_CONNECT_DEVICES = 0,
-        BT_HFP_AG_GET_DEVICES_BY_STATES,
-        BT_HFP_AG_GET_DEVICE_STATE,
-        BT_HFP_AG_CONNECT,
-        BT_HFP_AG_DISCONNECT,
-        BT_HFP_AG_GET_SCO_STATE,
-        BT_HFP_AG_CONNECT_SCO,
-        BT_HFP_AG_DISCONNECT_SCO,
-        BT_HFP_AG_PHONE_STATE_CHANGED,
-        BT_HFP_AG_CLCC_RESPONSE,
-        BT_HFP_AG_OPEN_VOICE_RECOGNITION,
-        BT_HFP_AG_CLOSE_VOICE_RECOGNITION,
-        BT_HFP_AG_SET_ACTIVE_DEVICE,
-        BT_HFP_AG_GET_ACTIVE_DEVICE,
-        BT_HFP_AG_INTO_MOCK,
-        BT_HFP_AG_SEND_NO_CARRIER,
-        BT_HFP_AG_REGISTER_OBSERVER,
-        BT_HFP_AG_DEREGISTER_OBSERVER,
-    };
-
     virtual int32_t GetConnectDevices(std::vector<BluetoothRawAddress> &devices) = 0;
     virtual int GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRawAddress> &devices) = 0;
     virtual int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) = 0;
@@ -55,9 +35,9 @@ public:
     virtual int GetScoState(const BluetoothRawAddress &device) = 0;
     virtual bool ConnectSco() = 0;
     virtual bool DisconnectSco() = 0;
-    virtual void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type, 
+    virtual void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type,
         const std::string &name) = 0;
-    virtual void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number, 
+    virtual void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number,
         int type) = 0;
     virtual bool OpenVoiceRecognition(const BluetoothRawAddress &device) = 0;
     virtual bool CloseVoiceRecognition(const BluetoothRawAddress &device) = 0;
@@ -67,6 +47,8 @@ public:
     virtual bool SendNoCarrier(const BluetoothRawAddress &device) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) = 0;
+    virtual int SetConnectStrategy(const BluetoothRawAddress &device, int strategy) = 0;
+    virtual int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) = 0;
 };
 
 }  // namespace Bluetooth

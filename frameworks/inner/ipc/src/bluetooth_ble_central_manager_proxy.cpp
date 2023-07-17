@@ -60,7 +60,7 @@ void BluetoothBleCentralManagerProxy::DeregisterBleCentralManagerCallback(int32_
         return;
     }
     if (!data.WriteInt32(scannerId)) {
-        HILOGE("[DeregisterBleCentralManagerCallback] fail: write scannerId failed.");
+        HILOGE("[DeregisterBleCentralManagerCallback] fail: write scannerId failed");
         return;
     }
 
@@ -86,7 +86,7 @@ int BluetoothBleCentralManagerProxy::StartScan(int32_t scannerId)
     }
 
     if (!data.WriteInt32(scannerId)) {
-        HILOGE("[StartScan] fail: write scannerId failed.");
+        HILOGE("[StartScan] fail: write scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
     MessageParcel reply;
@@ -107,7 +107,7 @@ int BluetoothBleCentralManagerProxy::StartScan(int32_t scannerId, const Bluetoot
     }
 
     if (!data.WriteInt32(scannerId)) {
-        HILOGE("[StartScan] fail: write scannerId failed.");
+        HILOGE("[StartScan] fail: write scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteParcelable(&settings)) {
@@ -132,7 +132,7 @@ int BluetoothBleCentralManagerProxy::StopScan(int32_t scannerId)
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(scannerId)) {
-        HILOGE("[StopScan] fail: write scannerId failed.");
+        HILOGE("[StopScan] fail: write scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -155,7 +155,7 @@ int BluetoothBleCentralManagerProxy::ConfigScanFilter(
     }
 
     if (!data.WriteInt32(scannerId)) {
-        HILOGE("[ConfigScanFilter] fail: write clientId failed");
+        HILOGE("[ConfigScanFilter] fail: write scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -177,9 +177,7 @@ int BluetoothBleCentralManagerProxy::ConfigScanFilter(
         HILOGW("[ConfigScanFilter] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
-    int ret = reply.ReadInt32();
-    scannerId = reply.ReadInt32();
-    return ret;
+    return reply.ReadInt32();
 }
 
 void BluetoothBleCentralManagerProxy::RemoveScanFilter(int32_t scannerId)
@@ -191,7 +189,7 @@ void BluetoothBleCentralManagerProxy::RemoveScanFilter(int32_t scannerId)
     }
 
     if (!data.WriteInt32(scannerId)) {
-        HILOGE("[RemoveScanFilter] fail: write clientId failed");
+        HILOGE("[RemoveScanFilter] fail: write scannerId failed");
         return;
     }
 
@@ -244,166 +242,165 @@ bool BluetoothBleCentralManagerProxy::ResetAllProxy()
     return true;
 }
 
-int BluetoothBleCentralManagerProxy::SetBurstParam(int duration, int maxExtAdvEvents, int burstWindow,
-    int burstInterval, int advHandle)
+int BluetoothBleCentralManagerProxy::SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval,
+    int advHandle)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGE("[SetBurstParam] fail: write interface token failed.");
+        HILOGE("[SetLpDeviceAdvParam] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(duration)) {
-        HILOGE("[SetBurstParam] fail: write duration failed");
+        HILOGE("[SetLpDeviceAdvParam] fail: write duration failed");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(maxExtAdvEvents)) {
-        HILOGE("[SetBurstParam] fail: write maxExtAdvEvents failed");
+        HILOGE("[SetLpDeviceAdvParam] fail: write maxExtAdvEvents failed");
         return BT_ERR_INTERNAL_ERROR;
     }
-    if (!data.WriteInt32(burstWindow)) {
-        HILOGE("[SetBurstParam] fail: write burstWindow failed");
+    if (!data.WriteInt32(window)) {
+        HILOGE("[SetLpDeviceAdvParam] fail: write window failed");
         return BT_ERR_INTERNAL_ERROR;
     }
-    if (!data.WriteInt32(burstInterval)) {
-        HILOGE("[SetBurstParam] fail: write burstInterval failed");
+    if (!data.WriteInt32(interval)) {
+        HILOGE("[SetLpDeviceAdvParam] fail: write interval failed");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(advHandle)) {
-        HILOGE("[SetBurstParam] fail: write advHandle failed");
+        HILOGE("[SetLpDeviceAdvParam] fail: write advHandle failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t result = InnerTransact(BLE_SET_BURST_PARAM, option, data, reply);
+    int32_t result = InnerTransact(BLE_SET_LPDEVICE_ADV_PARAM, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[SetBurstParam] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[SetLpDeviceAdvParam] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     int ret = reply.ReadInt32();
     return ret;
 }
 
-int BluetoothBleCentralManagerProxy::SetScanReportChannelToSensorHub(const int clientId, const int isToAp)
+int BluetoothBleCentralManagerProxy::SetScanReportChannelToLpDevice(int32_t scannerId, bool enable)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGE("[SetScanReportChannelToSensorHub] fail: write interface token failed.");
+        HILOGE("[SetScanReportChannelToLpDevice] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (!data.WriteInt32(clientId)) {
-        HILOGE("[SetScanReportChannelToSensorHub] fail: write clientId failed");
+    if (!data.WriteInt32(scannerId)) {
+        HILOGE("[SetScanReportChannelToLpDevice] fail: write scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (!data.WriteInt32(isToAp)) {
-        HILOGE("[SetScanReportChannelToSensorHub] fail: write isAdd failed");
+    if (!data.WriteBool(enable)) {
+        HILOGE("[SetScanReportChannelToLpDevice] fail: write enable failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t result = InnerTransact(BLE_SET_SCAN_REPORT_CHANNEL_TO_SH, option, data, reply);
+    int32_t result = InnerTransact(BLE_SET_SCAN_REPORT_CHANNEL_TO_LPDEVICE, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[SetScanReportChannelToSensorHub] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[SetScanReportChannelToLpDevice] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     int ret = reply.ReadInt32();
     return ret;
 }
 
-int BluetoothBleCentralManagerProxy::StartScanInShSync()
+int BluetoothBleCentralManagerProxy::EnableSyncDataToLpDevice()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGE("[StartScanInShSync] fail: write interface token failed.");
+        HILOGE("[EnableSyncDataToLpDevice] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_START_SCAN_IN_SH_SYNC, option, data, reply);
+    ErrCode result = InnerTransact(BLE_ENABLE_SYNC_DATA_TO_LPDEVICE, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[StartScanInShSync] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[EnableSyncDataToLpDevice] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     return reply.ReadInt32();
 }
 
-int BluetoothBleCentralManagerProxy::StopScanInShSync()
+int BluetoothBleCentralManagerProxy::DisableSyncDataToLpDevice()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGE("[StopScanInShSync] fail: write interface token failed.");
+        HILOGE("[DisableSyncDataToLpDevice] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_STOP_SCAN_IN_SH_SYNC, option, data, reply);
+    ErrCode result = InnerTransact(BLE_DISABLE_SYNC_DATA_TO_LPDEVICE, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[StopScanInShSync] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[DisableSyncDataToLpDevice] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     return reply.ReadInt32();
 }
 
-int BluetoothBleCentralManagerProxy::SendParamsToSensorhub(const std::vector<uint8_t> &dataValue, int32_t type)
+int BluetoothBleCentralManagerProxy::SendParamsToLpDevice(const std::vector<uint8_t> &dataValue, int32_t type)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGE("[SendParamsToSensorhub] fail: write interface token failed.");
+        HILOGE("[SendParamsToLpDevice] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteUInt8Vector(dataValue)) {
-        HILOGE("[SendParamsToSensorhub] fail: write dataValue failed.");
+        HILOGE("[SendParamsToLpDevice] fail: write dataValue failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(type)) {
-        HILOGE("[SendParamsToSensorhub] fail: write type failed.");
+        HILOGE("[SendParamsToLpDevice] fail: write type failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_SEND_PARAMS_TO_SH, option, data, reply);
+    ErrCode result = InnerTransact(BLE_SEND_PARAMS_TO_LPDEVICE, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[SendParamsToSensorhub] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[SendParamsToLpDevice] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     return reply.ReadInt32();
 }
 
-bool BluetoothBleCentralManagerProxy::IsSupportSensorAdvertiseFilter()
+bool BluetoothBleCentralManagerProxy::IsLpDeviceAvailable()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGE("[IsSupportSensorAdvertiseFilter] fail: write interface token failed.");
+        HILOGE("[IsLpDeviceAvailable] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_IS_SUPPORT_SENSOR_ADVERTISER_FILTER, option, data, reply);
+    ErrCode result = InnerTransact(BLE_IS_LPDEVICE_AVAILABLE, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[IsSupportSensorAdvertiseFilter] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[IsLpDeviceAvailable] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     return reply.ReadBool();
 }
 
-int WriteScanParcelData(const BluetoothBleFilterParamSet &paramSet, MessageParcel &data)
+int WriteScanParcelData(const BluetoothLpDeviceParamSet &paramSet, MessageParcel &data)
 {
-    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_SH_SCAN_SETTING_VALID_BIT) != 0) {
+    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_LPDEVICE_SCAN_SETTING_VALID_BIT) != 0) {
         if (!data.WriteParcelable(&paramSet.btScanSettings)) {
             HILOGE("[WriteScanParcelData] fail:write settings failed");
             return BT_ERR_INTERNAL_ERROR;
         }
     }
 
-    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_SH_SCAN_FILTER_VALID_BIT) != 0) {
-        HILOGD("filtersize: %{public}zu", paramSet.btScanFilters.size());
+    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_LPDEVICE_SCAN_FILTER_VALID_BIT) != 0) {
         if (!data.WriteInt32(paramSet.btScanFilters.size())) {
             HILOGE("[WriteScanParcelData] fail: write filtersize failed");
             return BT_ERR_INTERNAL_ERROR;
@@ -418,23 +415,23 @@ int WriteScanParcelData(const BluetoothBleFilterParamSet &paramSet, MessageParce
     return BT_NO_ERROR;
 }
 
-int WriteAdvertiserParcelData(const BluetoothBleFilterParamSet &paramSet, MessageParcel &data)
+int WriteAdvertiserParcelData(const BluetoothLpDeviceParamSet &paramSet, MessageParcel &data)
 {
-    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_SH_ADV_SETTING_VALID_BIT) != 0) {
+    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_LPDEVICE_ADV_SETTING_VALID_BIT) != 0) {
         if (!data.WriteParcelable(&paramSet.btAdvSettings)) {
             HILOGE("[WriteAdvertiserParcelData] fail:write settings failed");
             return BT_ERR_INTERNAL_ERROR;
         }
     }
 
-    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_SH_ADVDATA_VALID_BIT) != 0) {
+    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_LPDEVICE_ADVDATA_VALID_BIT) != 0) {
         if (!data.WriteParcelable(&paramSet.btAdvData)) {
             HILOGE("[WriteAdvertiserParcelData] fail:write advData failed");
             return BT_ERR_INTERNAL_ERROR;
         }
     }
 
-    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_SH_RESPDATA_VALID_BIT) != 0) {
+    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_LPDEVICE_RESPDATA_VALID_BIT) != 0) {
         if (!data.WriteParcelable(&paramSet.btRespData)) {
             HILOGE("[WriteAdvertiserParcelData] fail:write scanResponse failed");
             return BT_ERR_INTERNAL_ERROR;
@@ -443,24 +440,24 @@ int WriteAdvertiserParcelData(const BluetoothBleFilterParamSet &paramSet, Messag
     return BT_NO_ERROR;
 }
 
-int WriteAdvDeviceInfoParcelData(const BluetoothBleFilterParamSet &paramSet, MessageParcel &data)
+int WriteActiveDeviceInfoParcelData(const BluetoothLpDeviceParamSet &paramSet, MessageParcel &data)
 {
-    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_SH_ADV_DEVICEINFO_VALID_BIT) != 0) {
-        if (!data.WriteInt32(paramSet.advDeviceInfos.size())) {
-            HILOGE("[WriteAdvDeviceInfoParcelData] fail: write advDeviceInfos failed");
+    if ((paramSet.fieldValidFlagBit & bluetooth::BLE_LPDEVICE_ADV_DEVICEINFO_VALID_BIT) != 0) {
+        if (!data.WriteInt32(paramSet.activeDeviceInfos.size())) {
+            HILOGE("[WriteActiveDeviceInfoParcelData] fail: write activeDeviceInfos failed");
             return BT_ERR_INTERNAL_ERROR;
         }
-        for (uint32_t i = 0; i < paramSet.advDeviceInfos.size(); i++) {
-            if (!data.WriteInt8Vector(paramSet.advDeviceInfos[i].advDeviceId)) {
-                HILOGE("[WriteAdvDeviceInfoParcelData] fail: write advDeviceId failed.");
+        for (uint32_t i = 0; i < paramSet.activeDeviceInfos.size(); i++) {
+            if (!data.WriteInt8Vector(paramSet.activeDeviceInfos[i].deviceId)) {
+                HILOGE("[WriteActiveDeviceInfoParcelData] fail: write deviceId failed.");
                 return BT_ERR_INTERNAL_ERROR;
             }
-            if (!data.WriteInt32(paramSet.advDeviceInfos[i].status)) {
-                HILOGE("[WriteAdvDeviceInfoParcelData] fail: write status failed");
+            if (!data.WriteInt32(paramSet.activeDeviceInfos[i].status)) {
+                HILOGE("[WriteActiveDeviceInfoParcelData] fail: write status failed");
                 return BT_ERR_INTERNAL_ERROR;
             }
-            if (!data.WriteInt32(paramSet.advDeviceInfos[i].timeOut)) {
-                HILOGE("[WriteAdvDeviceInfoParcelData] fail: write timeOut failed");
+            if (!data.WriteInt32(paramSet.activeDeviceInfos[i].timeOut)) {
+                HILOGE("[WriteActiveDeviceInfoParcelData] fail: write timeOut failed");
                 return BT_ERR_INTERNAL_ERROR;
             }
         }
@@ -468,15 +465,15 @@ int WriteAdvDeviceInfoParcelData(const BluetoothBleFilterParamSet &paramSet, Mes
     return BT_NO_ERROR;
 }
 
-int BluetoothBleCentralManagerProxy::SetAdvFilterParam(const BluetoothBleFilterParamSet &paramSet)
+int BluetoothBleCentralManagerProxy::SetLpDeviceParam(const BluetoothLpDeviceParamSet &paramSet)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGE("[SetAdvFilterParam] fail: write interface token failed.");
+        HILOGE("[SetLpDeviceParam] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
-    if (!data.WriteInt32(paramSet.fieldValidFlagBit)) {
-        HILOGE("[SetAdvFilterParam] fail: write fieldValidFlagBit failed.");
+    if (!data.WriteUint32(paramSet.fieldValidFlagBit)) {
+        HILOGE("[SetLpDeviceParam] fail: write fieldValidFlagBit failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
     int ret = WriteScanParcelData(paramSet, data);
@@ -487,55 +484,55 @@ int BluetoothBleCentralManagerProxy::SetAdvFilterParam(const BluetoothBleFilterP
     if (ret != BT_NO_ERROR) {
         return ret;
     }
-    ret = WriteAdvDeviceInfoParcelData(paramSet, data);
+    ret = WriteActiveDeviceInfoParcelData(paramSet, data);
     if (ret != BT_NO_ERROR) {
         return ret;
     }
     BluetoothUuid btUuid(paramSet.uuid);
     if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("[SetAdvFilterParam] fail:write uuid failed");
+        HILOGE("[SetLpDeviceParam] fail:write uuid failed");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(paramSet.advHandle)) {
-        HILOGE("[SetAdvFilterParam] fail: write advHandle failed.");
+        HILOGE("[SetLpDeviceParam] fail: write advHandle failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(paramSet.duration)) {
-        HILOGE("[SetAdvFilterParam] fail: write duration failed.");
+        HILOGE("[SetLpDeviceParam] fail: write duration failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteInt32(paramSet.deliveryMode)) {
-        HILOGE("[SetAdvFilterParam] fail: write deliveryMode failed.");
+        HILOGE("[SetLpDeviceParam] fail: write deliveryMode failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_SET_SH_ADV_FILTER_PARAM, option, data, reply);
+    ErrCode result = InnerTransact(BLE_SET_LPDEVICE_PARAM, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[SetAdvFilterParam] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[SetLpDeviceParam] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     return reply.ReadInt32();
 }
 
-int BluetoothBleCentralManagerProxy::RemoveAdvFilter(const bluetooth::Uuid &uuid)
+int BluetoothBleCentralManagerProxy::RemoveLpDeviceParam(const bluetooth::Uuid &uuid)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGW("[RemoveAdvFilter] fail: write interface token failed.");
+        HILOGW("[RemoveLpDeviceParam] fail: write interface token failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
     BluetoothUuid btUuid(uuid);
     if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("[RemoveAdvFilter] fail: write uuid failed");
+        HILOGE("[RemoveLpDeviceParam] fail: write uuid failed");
         return BT_ERR_INTERNAL_ERROR;
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_REMOVE_SH_ADV_FILTER, option, data, reply);
+    ErrCode result = InnerTransact(BLE_REMOVE_LPDEVICE_PARAM, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[RemoveAdvFilter] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[RemoveLpDeviceParam] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_INTERNAL_ERROR;
     }
     return reply.ReadInt32();

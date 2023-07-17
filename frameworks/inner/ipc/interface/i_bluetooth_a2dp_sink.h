@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_a2dp_sink_observer.h"
 #include "raw_address.h"
@@ -30,19 +31,6 @@ using namespace OHOS::bluetooth;
 class IBluetoothA2dpSink : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothA2dpSink");
-
-    enum Code {
-        BT_A2DP_SINK_CONNECT = 0,
-        BT_A2DP_SINK_DISCONNECT,
-        BT_A2DP_SINK_REGISTER_OBSERVER,
-        BT_A2DP_SINK_DEREGISTER_OBSERVER,
-        BT_A2DP_SINK_GET_DEVICE_BY_STATES,
-        BT_A2DP_SINK_GET_DEVICE_STATE,
-        BT_A2DP_SINK_GET_PLAYING_STATE,
-        BT_A2DP_SINK_SET_CONNECT_STRATEGY,
-        BT_A2DP_SINK_GET_CONNECT_STRATEGY,
-        BT_A2DP_SINK_SEND_DELAY,
-    };
 
     virtual int Connect(const RawAddress &device) = 0;
     virtual int Disconnect(const RawAddress &device) = 0;

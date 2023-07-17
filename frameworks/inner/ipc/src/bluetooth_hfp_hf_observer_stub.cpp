@@ -22,34 +22,34 @@ BluetoothHfpHfObserverStub::BluetoothHfpHfObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_CONNECTION_STATE_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_SCO_STATE_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_SCO_STATE_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnScoStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_CALL_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_CALL_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnCallChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_SIGNAL_STRENGTH_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_SIGNAL_STRENGTH_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnSignalStrengthChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_REGISTRATION_STATUS_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_REGISTRATION_STATUS_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnRegistrationStatusChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_ROAMING_STATUS_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_ROAMING_STATUS_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnRoamingStatusChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_OPERATOR_SELECTION_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_OPERATOR_SELECTION_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnOperatorSelectionChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_SUBSCRIBER_NUMBER_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_SUBSCRIBER_NUMBER_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnSubscriberNumberChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_VOICE_RECOGNITION_STATUS_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_VOICE_RECOGNITION_STATUS_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnVoiceRecognitionStatusChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothHfpHfObserverStub::Code::BT_HFP_HF_OBSERVER_IN_BAND_RING_TONE_CHANGED)] =
+        BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_IN_BAND_RING_TONE_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnInBandRingToneChangedInner;
 
     HILOGI("ends.");

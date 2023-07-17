@@ -24,28 +24,29 @@ BluetoothGattServerCallbackStub::BluetoothGattServerCallbackStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CHARACTERISTIC_READREQUEST)] =
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CHARACTERISTIC_READREQUEST)] =
         &BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CONNECTIONSTATE_CHANGED)] =
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CONNECTIONSTATE_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_ADD_SERVICE)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_ADD_SERVICE)] =
         &BluetoothGattServerCallbackStub::OnAddServiceInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE_REQUEST)] =
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE_REQUEST)] =
         &BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_DESCRIPTOR_READ_REQUEST)] =
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_DESCRIPTOR_READ_REQUEST)] =
         &BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE_REQUEST)] =
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE_REQUEST)] =
         &BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_MTU_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_MTU_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnMtuChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_NOTIFY_CONFIRM)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_NOTIFY_CONFIRM)] =
         &BluetoothGattServerCallbackStub::OnNotifyConfirmInner;
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothGattServerCallbackStub::Code::GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED)] =
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner;
     HILOGI("ends.");
 }
@@ -98,7 +99,7 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessagePa
         HILOGE("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner device is null");
         return TRANSACTION_ERR;
     }
-    
+
     int32_t ret = data.ReadInt32();
     int32_t state = data.ReadInt32();
     OnConnectionStateChanged(*device, ret, state);

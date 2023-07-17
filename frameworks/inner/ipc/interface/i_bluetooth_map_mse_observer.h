@@ -16,6 +16,7 @@
 #define OHOS_BLUETOOTH_STANDARD_MAP_MSE_OBSERVER_INTERFACE_H
 
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -23,11 +24,6 @@ namespace Bluetooth {
 class IBluetoothMapMseObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothMapMseObserver");
-
-    enum Code {
-        MSE_ON_CONNECTION_STATE_CHANGED = 0,
-        MSE_ON_PERMISSION,
-    };
 
     virtual void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t status) = 0;
     virtual void OnPermission(const BluetoothRawAddress &device) = 0;

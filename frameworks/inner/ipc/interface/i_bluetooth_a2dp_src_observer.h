@@ -16,6 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_A2DP_SRC_OBSERVER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_A2DP_SRC_OBSERVER_INTERFACE_H
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "raw_address.h"
 #include "../parcel/bluetooth_a2dp_a2dpCodecInfo.h"

@@ -21,10 +21,9 @@ namespace Bluetooth {
 BluetoothMapMseObserverStub::BluetoothMapMseObserverStub()
 {
     HILOGI("start.");
-    memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothMapMseObserver::Code::MSE_ON_CONNECTION_STATE_CHANGED)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothMapMseObserverInterfaceCode::MSE_ON_CONNECTION_STATE_CHANGED)] =
         &BluetoothMapMseObserverStub::OnConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(IBluetoothMapMseObserver::Code::MSE_ON_PERMISSION)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothMapMseObserverInterfaceCode::MSE_ON_PERMISSION)] =
         &BluetoothMapMseObserverStub::OnPermissionInner;
 }
 

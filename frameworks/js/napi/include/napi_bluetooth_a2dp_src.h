@@ -36,6 +36,8 @@ public:
     static napi_value GetPlayingState(napi_env env, napi_callback_info info);
     static napi_value Connect(napi_env env, napi_callback_info info);
     static napi_value Disconnect(napi_env env, napi_callback_info info);
+    static napi_value SetConnectionStrategy(napi_env env, napi_callback_info info);
+    static napi_value GetConnectionStrategy(napi_env env, napi_callback_info info);
 
     static NapiA2dpSourceObserver observer_;
     static bool isRegistered_;

@@ -52,5 +52,13 @@ napi_value NapiNativeBleDescriptor::ToNapiValue(napi_env env) const
     ConvertBLEDescriptorToJS(env, object, const_cast<GattDescriptor &>(descriptor_));
     return object;
 }
+
+napi_value NapiNativeUuidsArray::ToNapiValue(napi_env env) const
+{
+    napi_value array;
+    napi_create_array(env, &array);
+    ConvertUuidsVectorToJS(env, array, uuids_);
+    return array;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

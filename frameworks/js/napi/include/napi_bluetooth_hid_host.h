@@ -35,6 +35,9 @@ public:
     static napi_value Connect(napi_env env, napi_callback_info info);
     static napi_value Disconnect(napi_env env, napi_callback_info info);
 
+    static napi_value SetConnectionStrategy(napi_env env, napi_callback_info info);
+    static napi_value GetConnectionStrategy(napi_env env, napi_callback_info info);
+
     static NapiBluetoothHidHostObserver observer_;
 };
 } // namespace Bluetooth

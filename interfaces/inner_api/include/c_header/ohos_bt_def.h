@@ -49,7 +49,55 @@
 #define OHOS_BLE_UUID_MAX_LEN 16
 
 /**
- * @brief Defines the device id length.
+ * @brief Defines the maximum duration of low power device advertise, *10 = 655350 ms(spec_5.3_7.8.56)
+ *
+ */
+#define LPDEVICE_ADVERTISING_DURATION_MAX 65535
+
+/**
+ * @brief Defines the minmum duration of low power device advertise. no_duration(spec_5.3_7.8.56)
+ *
+ */
+#define LPDEVICE_ADVERTISING_DURATION_MIN 0
+
+/**
+ * @brief Defines the maximum low power device advertise adv event, 1 octet(spec_5.3_7.8.56)
+ *
+ */
+#define LPDEVICE_ADVERTISING_EXTADVEVENT_MAX 255
+
+/**
+ * @brief Defines the minmum low power device advertise adv event. no max number of adv events(spec_5.3_7.8.56)
+ *
+ */
+#define LPDEVICE_ADVERTISING_EXTADVEVENT_MIN 0
+
+/**
+ * @brief Defines the maxmum low power device advertise interval. ms (1105 support)
+ *
+ */
+#define LPDEVICE_ADVERTISING_INTERVAL_MAX 16777215
+
+/**
+ * @brief Defines the minmum low power device advertise interval. ms (1105 support)
+ *
+ */
+#define LPDEVICE_ADVERTISING_INTERVAL_MIN 0
+
+/**
+ * @brief Defines the maxmum low power device advertise window. ms (1105 support)
+ *
+ */
+#define LPDEVICE_ADVERTISING_WINDOW_MAX 16777215
+
+/**
+ * @brief Defines the minmum low power device advertise window. ms (1105 support)
+ *
+ */
+#define LPDEVICE_ADVERTISING_WINDOW_MIN 0
+
+/**
+ * @brief Defines the device id length
  *
  */
 #define OHOS_ACTIVE_DEVICE_ID_LEN 8

@@ -17,7 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_BLE_PERIPHERAL_OBSERVER_INTERFACE_H
 
 #include "bluetooth_raw_address.h"
-
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -25,12 +25,6 @@ namespace Bluetooth {
 class IBluetoothBlePeripheralObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBlePeripheralObserver");
-
-    enum Code {
-        BLE_ON_READ_REMOTE_RSSI_EVENT = 0,
-        BLE_PAIR_STATUS_CHANGED,
-        BLE_ACL_STATE_CHANGED,
-    };
 
     virtual void OnReadRemoteRssiEvent(const BluetoothRawAddress &device, int rssi, int status) = 0;
     virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status) = 0;
