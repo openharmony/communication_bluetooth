@@ -18,6 +18,7 @@
 #include <vector>
 #include <string_ex.h>
 #include <iremote_broker.h>
+#include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_pan_observer.h"
 
 using OHOS::Bluetooth::IBluetoothPanObserver;

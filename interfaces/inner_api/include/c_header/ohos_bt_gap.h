@@ -179,6 +179,14 @@ bool PairRequestReply(const BdAddr *bdAddr, int transport, bool accept);
 bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool accept);
 
 /**
+ * @brief Set fast scan enable or disable.
+ * @param isEnable set fast scan status flag.
+ * @return Returns <b>true</b> if the operation is successful;
+ *         returns <b>false</b> if the operation fails.
+ */
+bool SetFastScan(bool isEnable);
+
+/**
  * @brief Gap state changed callback.
  * 
  * @param transport Transport type when state change, details see {@link BtTransportId}

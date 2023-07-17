@@ -566,6 +566,23 @@ void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::
     napi_set_named_property(env, result, "state", profileState);
 }
 
+void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids)
+{
+    HILOGI("enter");
+    size_t idx = 0;
+
+    if (uuids.empty()) {
+        return;
+    }
+    HILOGI("size: %{public}zu", uuids.size());
+    for (auto& uuid : uuids) {
+        napi_value uuidValue = nullptr;
+        napi_create_string_utf8(env, uuid.c_str(), NAPI_AUTO_LENGTH, &uuidValue);
+        napi_set_element(env, result, idx, uuidValue);
+        idx++;
+    }
+}
+
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName)
 {
     napi_value prop = nullptr;
@@ -966,6 +983,12 @@ bool IsValidTransport(int transport)
     return transport == BT_TRANSPORT_BREDR || transport == BT_TRANSPORT_BLE;
 }
 
+bool IsValidConnectStrategy(int strategy)
+{
+    return strategy == static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)
+        || strategy == static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
+}
+
 napi_status NapiIsBoolean(napi_env env, napi_value value)
 {
     napi_valuetype valuetype = napi_undefined;
@@ -1280,5 +1303,26 @@ napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const
     return napi_ok;
 }
 
+napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &strategy)
+{
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_THREE, "Requires 2 or 3 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
+    NAPI_BT_RETURN_IF(!ParseInt32(env, strategy, argv[PARAM1]), "ParseInt failed", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!IsValidConnectStrategy(strategy), "Invalid strategy", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::string &addr)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
+    return napi_ok;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

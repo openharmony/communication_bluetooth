@@ -527,6 +527,7 @@ typedef void (*ScanParameterSetCompletedCallback)(int clientId, int status);
 typedef void (*LpDeviceInfoCallback)(BtUuid *uuid, int32_t type, uint8_t *data, uint32_t dataSize);
 
 typedef void (*ScanStateChangeCallback)(int32_t resultCode, bool isStartScan);
+
 /**
  * @brief Defines GATT callbacks.
  *
@@ -557,7 +558,7 @@ typedef struct {
     ScanStateChangeCallback scanStateChangeCb;
     /** Called when low power device notify msg. */
     LpDeviceInfoCallback lpDeviceInfoCb;
-}BleScanCallbacks;
+} BleScanCallbacks;
 
 /**
  * @brief Initializes the Bluetooth protocol stack.
@@ -724,7 +725,7 @@ int BleStopScan(int32_t scannerId);
 int BleGattRegisterCallbacks(BtGattCallbacks *func);
 
 /**
- * @brief Registers ble scan callbacks.
+ * @brief Register ble scan callbacks.
  *
  * @param func Indicates the pointer to the callbacks to register. For details, see {@link BleScanCallbacks}.
  * @param scannerId Indicates the pointer to the scannerId, identify one scan.
@@ -742,7 +743,7 @@ int BleRegisterScanCallbacks(BleScanCallbacks *func, int32_t *scannerId);
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
- int BleDeregisterScanCallbacks(int32_t scannerId);
+int BleDeregisterScanCallbacks(int32_t scannerId);
 
 /**
  * @brief Sets advertising data and parameters and starts advertising.
@@ -776,7 +777,6 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
  */
 int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleScanNativeFilter *filter,
     uint32_t filterSize);
-
 /**
  * @brief set low power device adv param.
  *
@@ -812,7 +812,7 @@ int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable);
 int EnableSyncDataToLpDevice(void);
 
 /**
- * @brief Disable synchronizing data to low power device.
+ * @brief Disable synchronizing data to the low power device.
  *
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if disable sync success;
  * returns an error code defined in {@link BtStatus} otherwise.
@@ -849,7 +849,7 @@ int SendParamsToLpDevice(const uint8_t *data, uint32_t dataSize, int32_t type);
  * @return true: available; false: not available.
  * @since 6
  */
-bool IsLpDeviceAvailable();
+bool IsLpDeviceAvailable(void);
 
 /**
  * @brief Set low power device Param.

@@ -18,6 +18,7 @@
 #include <string_ex.h>
 #include <iremote_broker.h>
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "ipc_types.h"
 
 namespace OHOS {
@@ -29,9 +30,6 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothHidHostObserver");
 
     virtual ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int state) = 0;
-
-protected:
-    static constexpr int COMMAND_ON_CONNECTION_STATE_CHANGED = MIN_TRANSACTION_ID + 0;
 };
 } // Bluetooth
 } // OHOS

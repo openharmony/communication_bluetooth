@@ -24,13 +24,13 @@ BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED)] =
+        BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED)] =
+        BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
-        IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
+        BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner;
 }
 

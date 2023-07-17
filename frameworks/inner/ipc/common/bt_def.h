@@ -53,6 +53,10 @@ const std::string BLUETOOTH_UUID_PNP = "00001200-0000-1000-8000-00805F9B34FB";
 const std::string BLUETOOTH_UUID_HID_HOST = "00001124-0000-1000-8000-00805F9B34FB";
 const std::string BLUETOOTH_UUID_PAN = "00001116-0000-1000-8000-00805F9B34FB";
 const std::string BLUETOOTH_UUID_OPP = "00001105-0000-1000-8000-00805F9B34FB";
+const std::string BLUETOOTH_UUID_HSP_AG = "00001112-0000-1000-8000-00805F9B34FB";
+const std::string BLUETOOTH_UUID_HSP_HS = "00001108-0000-1000-8000-00805F9B34FB";
+const std::string BLUETOOTH_UUID_HOGP = "00001812-0000-1000-8000-00805F9B34FB";
+const std::string ADV_AUDIO_DIST = "0000110D-0000-1000-8000-00805F9B34FB";
 
 /*********************************************
  *
@@ -375,35 +379,35 @@ constexpr uint16_t BLE_SCAN_MODE_OP_P50_100_200_INTERVAL_MS = 200;
 constexpr float BLE_SCAN_UNIT_TIME = 0.625;
 void ConvertBleScanMode(int scanMode, uint16_t &outScanWindow, uint16_t &outScanInterval);
 
-// SensorHub
-constexpr int32_t BLE_SH_SCAN_SETTING_VALID_BIT = 0x01;
-constexpr int32_t BLE_SH_SCAN_FILTER_VALID_BIT = 0x02;
-constexpr int32_t BLE_SH_ADV_SETTING_VALID_BIT = 0x04;
-constexpr int32_t BLE_SH_ADVDATA_VALID_BIT = 0x08;
-constexpr int32_t BLE_SH_RESPDATA_VALID_BIT = 0x10;
-constexpr int32_t BLE_SH_ADV_DEVICEINFO_VALID_BIT = 0x20;
+// low power device
+constexpr int32_t BLE_LPDEVICE_SCAN_SETTING_VALID_BIT = 0x01;
+constexpr int32_t BLE_LPDEVICE_SCAN_FILTER_VALID_BIT = 0x02;
+constexpr int32_t BLE_LPDEVICE_ADV_SETTING_VALID_BIT = 0x04;
+constexpr int32_t BLE_LPDEVICE_ADVDATA_VALID_BIT = 0x08;
+constexpr int32_t BLE_LPDEVICE_RESPDATA_VALID_BIT = 0x10;
+constexpr int32_t BLE_LPDEVICE_ADV_DEVICEINFO_VALID_BIT = 0x20;
 
-constexpr int8_t BLE_SENSORHUB_MSG_DEV_INFO = 0x00;
-constexpr int8_t BLE_SENSORHUB_MSG_SOFT_FILTER = 0x01;
-constexpr int8_t BLE_SENSORHUB_MSG_ADV_PARAM = 0x02;
-constexpr int8_t BLE_SENSORHUB_MSG_ADV_DATA = 0x03;
-constexpr int8_t BLE_SENSORHUB_MSG_ADV_RSP_DATA = 0x04;
-constexpr int8_t BLE_SENSORHUB_MSG_UUID_DATA = 0x0a;
-constexpr int8_t BLE_SENSORHUB_MSG_ADV_HANDLE = 0x0b;
-constexpr int8_t BLE_SENSORHUB_MSG_SCAN_STATUS = 0x0c;
-constexpr int8_t BLE_SENSORHUB_MSG_SCAN_PARAM = 0x0d;
+constexpr int8_t BLE_LPDEVICE_MSG_DEV_INFO = 0x00;
+constexpr int8_t BLE_LPDEVICE_MSG_SOFT_FILTER = 0x01;
+constexpr int8_t BLE_LPDEVICE_MSG_ADV_PARAM = 0x02;
+constexpr int8_t BLE_LPDEVICE_MSG_ADV_DATA = 0x03;
+constexpr int8_t BLE_LPDEVICE_MSG_ADV_RSP_DATA = 0x04;
+constexpr int8_t BLE_LPDEVICE_MSG_UUID_DATA = 0x0a;
+constexpr int8_t BLE_LPDEVICE_MSG_ADV_HANDLE = 0x0b;
+constexpr int8_t BLE_LPDEVICE_MSG_SCAN_STATUS = 0x0c;
+constexpr int8_t BLE_LPDEVICE_MSG_SCAN_PARAM = 0x0d;
 
-constexpr uint8_t BLE_SENSORHUB_MSG_TYPE_NOTICE_UP_DATA = 0x02;
+constexpr uint8_t BLE_LPDEVICE_MSG_TYPE_NOTICE_UP_DATA = 0x02;
 
-constexpr int8_t BLE_SENSORHUB_DISABLE_SCAN_IN_SENSORHUB = 0;
-constexpr int8_t BLE_SENSORHUB_ENABLE_SCAN_IN_SENSORHUB = 1;
+constexpr int8_t BLE_LPDEVICE_DISABLE_SCAN_IN_LPDEVICE = 0;
+constexpr int8_t BLE_LPDEVICE_ENABLE_SCAN_IN_LPDEVICE = 1;
 
-constexpr int8_t BLE_SENSORHUB_DEVICE_TYPE_ALL = 2;
+constexpr int8_t BLE_LPDEVICE_DEVICE_TYPE_ALL = 2;
 
-constexpr uint32_t BLE_SENSORHUB_RECOVERY_DOING = 1;
-constexpr uint32_t BLE_SENSORHUB_RECOVERY_DONE = 2;
+constexpr uint32_t BLE_LPDEVICE_RECOVERY_DOING = 1;
+constexpr uint32_t BLE_LPDEVICE_RECOVERY_DONE = 2;
 
-constexpr int32_t BLE_SENSORHUB_HANDLE_RESOURCE_NOT_APPLY = -100;
+constexpr int32_t BLE_LPDEVICE_HANDLE_RESOURCE_NOT_APPLY = -100;
 
 constexpr uint8_t BLE_DATA_LEN_1 = 1;
 constexpr uint8_t BLE_DATA_LEN_2 = 2;
@@ -414,6 +418,8 @@ constexpr uint8_t BLE_DEVICE_ADDR_LEN = 6;
 constexpr uint8_t BLE_ADV_DEVICE_ID_LEN = 8;
 constexpr uint8_t BLE_UUID_LEN = 16;
 constexpr uint8_t BLE_UUID_HALF_LEN = 8;
+
+constexpr int32_t BLE_SCAN_MAX_NUM = 1000;
 
 // Phy type
 using PHY_TYPE = enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 };

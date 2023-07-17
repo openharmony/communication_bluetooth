@@ -16,6 +16,7 @@
 
 #include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
+#include "napi_async_work.h"
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_hfp_ag.h"
 #include "napi_bluetooth_profile.h"
@@ -43,6 +44,8 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("openVoiceRecognition", OpenVoiceRecognition),
         DECLARE_NAPI_FUNCTION("closeVoiceRecognition", CloseVoiceRecognition),
+        DECLARE_NAPI_FUNCTION("setConnectionStrategy", SetConnectionStrategy),
+        DECLARE_NAPI_FUNCTION("getConnectionStrategy", GetConnectionStrategy),
     };
 
     napi_define_class(env, "HandsFreeAudioGateway", NAPI_AUTO_LENGTH, HandsFreeAudioGatewayConstructor, nullptr,
@@ -329,6 +332,49 @@ napi_value NapiHandsFreeAudioGateway::Disconnect(napi_env env, napi_callback_inf
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetBooleanTrue(env);
+}
+
+napi_value NapiHandsFreeAudioGateway::SetConnectionStrategy(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string remoteAddr {};
+    int32_t strategy = 0;
+    auto status = CheckSetConnectStrategyParam(env, info, remoteAddr, strategy);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr, strategy]() {
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+        int32_t err = profile->SetConnectStrategy(remoteDevice, strategy);
+        HILOGI("err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiHandsFreeAudioGateway::GetConnectionStrategy(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string remoteAddr {};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        int strategy = 0;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+        int32_t err = profile->GetConnectStrategy(remoteDevice, strategy);
+        HILOGI("err: %{public}d, deviceName: %{public}d", err, strategy);
+        auto object = std::make_shared<NapiNativeInt>(strategy);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 } // namespace Bluetooth
 } // namespace OHOS

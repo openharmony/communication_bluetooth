@@ -18,6 +18,7 @@
 
 #include "../parcel/bluetooth_pbap_pce_parameter.h"
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "pbap_pce_parameter.h"
 
@@ -27,12 +28,6 @@ class IBluetoothPbapPceObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothPbapPceObserver");
 
-    enum Code {
-        PBAP_PCE_ON_SERVICE_CONNECTION_STATE_CHANGED = 0,
-        PBAP_PCE_ON_SERVICE_PASSWORD_REQUIRED,
-        PBAP_PCE_ON_ACTION_COMPLETED,
-
-    };
     virtual void OnServiceConnectionStateChanged(const BluetoothRawAddress &device, int state) = 0;
     virtual void OnServicePasswordRequired(
         const BluetoothRawAddress &device, const ::std::vector<uint8_t> &description, int8_t charset, bool fullAccess) = 0;

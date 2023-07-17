@@ -32,7 +32,7 @@ void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &ob
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_REGISTER_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
@@ -53,7 +53,7 @@ void BluetoothHostProxy::DeregisterObserver(const sptr<IBluetoothHostObserver> &
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_DEREGISTER_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_DEREGISTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::DeregisterObserver done fail, error: %{public}d", error);
         return;
@@ -71,7 +71,7 @@ int32_t BluetoothHostProxy::EnableBt()
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_ENABLE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_ENABLE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::EnableBt done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -90,7 +90,7 @@ int32_t BluetoothHostProxy::DisableBt()
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_DISABLE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_DISABLE, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::DisableBt done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -111,7 +111,7 @@ sptr<IRemoteObject> BluetoothHostProxy::GetProfile(const std::string &name)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GETPROFILE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GETPROFILE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetProfile done fail, error: %{public}d", error);
         return nullptr;
@@ -132,7 +132,7 @@ sptr<IRemoteObject> BluetoothHostProxy::GetBleRemote(const std::string &name)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_BLE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BLE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetProfile done fail, error: %{public}d", error);
         return nullptr;
@@ -149,7 +149,7 @@ bool BluetoothHostProxy::BluetoothFactoryReset()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_FACTORY_RESET, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_FACTORY_RESET, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::BluetoothFactoryReset done fail, error: %{public}d", error);
         return false;
@@ -167,7 +167,7 @@ int32_t BluetoothHostProxy::GetBtState(int &state)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GETSTATE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GETSTATE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtState done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -189,7 +189,7 @@ std::string BluetoothHostProxy::GetLocalAddress()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_LOCAL_ADDRESS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_LOCAL_ADDRESS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetLocalAddress done fail, error: %{public}d", error);
         return std::string();
@@ -206,7 +206,7 @@ int32_t BluetoothHostProxy::DisableBle()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_DISABLE_BLE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_DISABLE_BLE, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::DisableBle done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -224,7 +224,7 @@ int32_t BluetoothHostProxy::EnableBle()
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
 
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_ENABLE_BLE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_ENABLE_BLE, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::EnableBle done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -241,7 +241,7 @@ bool BluetoothHostProxy::IsBrEnabled()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_IS_BR_ENABLED, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_IS_BR_ENABLED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::IsBrEnabled done fail, error: %{public}d", error);
         return false;
@@ -258,7 +258,7 @@ bool BluetoothHostProxy::IsBleEnabled()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_IS_BLE_ENABLED, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_IS_BLE_ENABLED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::IsBleEnabled done fail, error: %{public}d", error);
         return false;
@@ -276,7 +276,7 @@ std::vector<uint32_t> BluetoothHostProxy::GetProfileList()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_PROFILE_LIST, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_PROFILE_LIST, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetProfileList done fail, error: %{public}d", error);
         return vec;
@@ -297,7 +297,8 @@ int32_t BluetoothHostProxy::GetMaxNumConnectedAudioDevices()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_MAXNUM_CONNECTED_AUDIODEVICES, option, data, reply);
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_GET_MAXNUM_CONNECTED_AUDIODEVICES, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetMaxNumConnectedAudioDevices done fail, error: %{public}d", error);
         return -1;
@@ -320,7 +321,7 @@ int32_t BluetoothHostProxy::GetBtConnectionState(int &state)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_BT_STATE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BT_STATE, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtConnectionState done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -345,7 +346,7 @@ int32_t BluetoothHostProxy::GetBtProfileConnState(uint32_t profileId, int &state
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_BT_PROFILE_CONNSTATE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BT_PROFILE_CONNSTATE, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtProfileConnState done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -367,7 +368,7 @@ int32_t BluetoothHostProxy::GetLocalDeviceClass()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_LOCAL_DEVICE_CLASS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_LOCAL_DEVICE_CLASS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetLocalDeviceClass done fail, error: %{public}d", error);
         return -1;
@@ -394,7 +395,7 @@ bool BluetoothHostProxy::SetLocalDeviceClass(const int32_t &deviceClass)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_SET_LOCAL_DEVICE_CLASS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_SET_LOCAL_DEVICE_CLASS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetLocalDeviceClass done fail, error: %{public}d", error);
         return false;
@@ -411,7 +412,7 @@ int32_t BluetoothHostProxy::GetLocalName(std::string &name)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_LOCAL_NAME, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_LOCAL_NAME, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetLocalName done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -436,7 +437,7 @@ int32_t BluetoothHostProxy::SetLocalName(const std::string &name)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_SET_LOCAL_NAME, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_SET_LOCAL_NAME, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetLocalName done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -453,7 +454,7 @@ int32_t BluetoothHostProxy::GetBtScanMode(int32_t &scanMode)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_BT_SCAN_MODE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BT_SCAN_MODE, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtScanMode done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -482,7 +483,7 @@ int32_t BluetoothHostProxy::SetBtScanMode(int32_t mode, int32_t duration)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_SET_BT_SCAN_MODE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_SET_BT_SCAN_MODE, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetBtScanMode done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -504,7 +505,7 @@ int32_t BluetoothHostProxy::GetBondableMode(const int32_t transport)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_BONDABLE_MODE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BONDABLE_MODE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBondableMode done fail, error: %{public}d", error);
         return -1;
@@ -533,7 +534,7 @@ bool BluetoothHostProxy::SetBondableMode(int32_t transport, int32_t mode)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_SET_BONDABLE_MODE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_SET_BONDABLE_MODE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetBondableMode done fail, error: %{public}d", error);
         return false;
@@ -550,7 +551,7 @@ int32_t BluetoothHostProxy::StartBtDiscovery()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_START_BT_DISCOVERY, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_START_BT_DISCOVERY, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::StartBtDiscovery done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -568,7 +569,7 @@ int32_t BluetoothHostProxy::CancelBtDiscovery()
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
 
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_CANCEL_BT_DISCOVERY, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_CANCEL_BT_DISCOVERY, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::CancelBtDiscovery done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -589,7 +590,7 @@ bool BluetoothHostProxy::IsBtDiscovering(const int32_t transport)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_IS_BT_DISCOVERING, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_IS_BT_DISCOVERING, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::Start done fail, error: %{public}d", error);
         return false;
@@ -607,7 +608,7 @@ long BluetoothHostProxy::GetBtDiscoveryEndMillis()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_BT_DISCOVERY_END_MILLIS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BT_DISCOVERY_END_MILLIS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtDiscoveryEndMillis done fail, error: %{public}d", error);
         return -1;
@@ -629,7 +630,7 @@ int32_t BluetoothHostProxy::GetPairedDevices(int32_t transport, std::vector<Blue
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_PAIRED_DEVICES, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_PAIRED_DEVICES, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetPairedDevices done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -662,7 +663,7 @@ int32_t BluetoothHostProxy::RemovePair(const int32_t transport, const sptr<Bluet
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_REMOVE_PAIR, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REMOVE_PAIR, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::RemovePair done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -680,7 +681,7 @@ bool BluetoothHostProxy::RemoveAllPairs()
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
 
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_REMOVE_ALL_PAIRS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REMOVE_ALL_PAIRS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RemoveAllPairs done fail, error: %{public}d", error);
         return false;
@@ -701,7 +702,7 @@ void BluetoothHostProxy::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemot
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_REGISTER_REMOTE_DEVICE_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_REMOTE_DEVICE_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtConnectionState done fail, error: %{public}d", error);
         return;
@@ -722,7 +723,8 @@ void BluetoothHostProxy::DeregisterRemoteDeviceObserver(const sptr<IBluetoothRem
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_DEREGISTER_REMOTE_DEVICE_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_DEREGISTER_REMOTE_DEVICE_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::DeregisterRemoteDeviceObserver done fail, error: %{public}d", error);
         return;
@@ -739,7 +741,8 @@ int32_t BluetoothHostProxy::GetBleMaxAdvertisingDataLength()
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_GET_BLE_MAX_ADVERTISING_DATALENGTH, option, data, reply);
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_GET_BLE_MAX_ADVERTISING_DATALENGTH, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBleMaxAdvertisingDataLength done fail, error: %{public}d", error);
         return false;
@@ -764,7 +767,7 @@ int32_t BluetoothHostProxy::GetDeviceType(int32_t transport, const std::string &
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_DEVICE_TYPE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_TYPE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetDeviceType done fail, error: %{public}d", error);
         return 0;
@@ -785,7 +788,7 @@ int32_t BluetoothHostProxy::GetPhonebookPermission(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_PHONEBOOK_PERMISSION, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_PHONEBOOK_PERMISSION, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetPhonebookPermission done fail, error: %{public}d", error);
         return 0;
@@ -810,7 +813,7 @@ bool BluetoothHostProxy::SetPhonebookPermission(const std::string &address, int3
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::SET_PHONEBOOK_PERMISSION, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_PHONEBOOK_PERMISSION, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetPhonebookPermission done fail, error: %{public}d", error);
         return false;
@@ -831,7 +834,7 @@ int32_t BluetoothHostProxy::GetMessagePermission(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_MESSAGE_PERMISSION, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_MESSAGE_PERMISSION, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetMessagePermission done fail, error: %{public}d", error);
         return 0;
@@ -856,7 +859,7 @@ bool BluetoothHostProxy::SetMessagePermission(const std::string &address, int32_
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::SET_MESSAGE_PERMISSION, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_MESSAGE_PERMISSION, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetMessagePermission done fail, error: %{public}d", error);
         return false;
@@ -877,7 +880,7 @@ int32_t BluetoothHostProxy::GetPowerMode(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_POWER_MODE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_POWER_MODE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetPowerMode done fail, error: %{public}d", error);
         return 0;
@@ -902,7 +905,7 @@ int32_t BluetoothHostProxy::GetDeviceName(int32_t transport, const std::string &
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_DEVICE_NAME, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_NAME, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetDeviceName done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -928,7 +931,7 @@ std::string BluetoothHostProxy::GetDeviceAlias(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_DEVICE_ALIAS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_ALIAS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetDeviceAlias done fail, error: %{public}d", error);
         return std::string();
@@ -953,7 +956,7 @@ bool BluetoothHostProxy::SetDeviceAlias(const std::string &address, const std::s
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::SET_DEVICE_ALIAS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_DEVICE_ALIAS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetDeviceAlias done fail, error: %{public}d", error);
         return false;
@@ -974,7 +977,7 @@ int32_t BluetoothHostProxy::GetDeviceBatteryLevel(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_DEVICE_BATTERY_LEVEL, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_BATTERY_LEVEL, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetDeviceBatteryLevel done fail, error: %{public}d", error);
         return 0;
@@ -999,7 +1002,7 @@ int32_t BluetoothHostProxy::GetPairState(int32_t transport, const std::string &a
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_PAIR_STATE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_PAIR_STATE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetPairState done fail, error: %{public}d", error);
         return 0;
@@ -1024,7 +1027,7 @@ int32_t BluetoothHostProxy::StartPair(int32_t transport, const std::string &addr
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::START_PAIR, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::START_PAIR, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::StartPair done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -1049,7 +1052,7 @@ bool BluetoothHostProxy::CancelPairing(int32_t transport, const std::string &add
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::CANCEL_PAIRING, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::CANCEL_PAIRING, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::CancelPairing done fail, error: %{public}d", error);
         return false;
@@ -1074,7 +1077,7 @@ bool BluetoothHostProxy::IsBondedFromLocal(int32_t transport, const std::string 
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::IS_BONDED_FROM_LOCAL, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::IS_BONDED_FROM_LOCAL, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::IsBondedFromLocal done fail, error: %{public}d", error);
         return false;
@@ -1099,7 +1102,7 @@ bool BluetoothHostProxy::IsAclConnected(int32_t transport, const std::string &ad
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::IS_ACL_CONNECTED, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::IS_ACL_CONNECTED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::IsAclConnected done fail, error: %{public}d", error);
         return false;
@@ -1124,7 +1127,7 @@ bool BluetoothHostProxy::IsAclEncrypted(int32_t transport, const std::string &ad
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::IS_ACL_ENCRYPTED, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::IS_ACL_ENCRYPTED, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::IsAclEncrypted done fail, error: %{public}d", error);
         return false;
@@ -1145,7 +1148,7 @@ int32_t BluetoothHostProxy::GetDeviceClass(const std::string &address, int &cod)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_DEVICE_CLASS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_CLASS, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetDeviceClass done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -1174,7 +1177,7 @@ int32_t BluetoothHostProxy::SetDevicePin(const std::string &address, const std::
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::SET_DEVICE_PIN, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_DEVICE_PIN, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetDevicePin done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -1203,7 +1206,7 @@ int32_t BluetoothHostProxy::SetDevicePairingConfirmation(int32_t transport, cons
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::SET_DEVICE_PAIRING_CONFIRMATION, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_DEVICE_PAIRING_CONFIRMATION, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetDevicePairingConfirmation done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -1236,7 +1239,7 @@ bool BluetoothHostProxy::SetDevicePasskey(int32_t transport, const std::string &
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::SET_DEVICE_PASSKEY, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_DEVICE_PASSKEY, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetDevicePasskey done fail, error: %{public}d", error);
         return false;
@@ -1265,7 +1268,7 @@ bool BluetoothHostProxy::PairRequestReply(int32_t transport, const std::string &
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::PAIR_REQUEST_PEPLY, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::PAIR_REQUEST_PEPLY, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::PairRequestReply done fail, error: %{public}d", error);
         return false;
@@ -1286,7 +1289,7 @@ bool BluetoothHostProxy::ReadRemoteRssiValue(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::READ_REMOTE_RSSI_VALUE, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::READ_REMOTE_RSSI_VALUE, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::ReadRemoteRssiValue done fail, error: %{public}d", error);
         return false;
@@ -1303,7 +1306,7 @@ void BluetoothHostProxy::GetLocalSupportedUuids(std::vector<std::string> &uuids)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_LOCAL_SUPPORTED_UUIDS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_LOCAL_SUPPORTED_UUIDS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetLocalSupportedUuids done fail, error: %{public}d", error);
         return;
@@ -1316,37 +1319,55 @@ void BluetoothHostProxy::GetLocalSupportedUuids(std::vector<std::string> &uuids)
     }
 }
 
-std::vector<bluetooth::Uuid> BluetoothHostProxy::GetDeviceUuids(int32_t transport, const std::string &address)
+int32_t BluetoothHostProxy::GetDeviceUuids(const std::string &address, std::vector<std::string> &uuids)
 {
-    std::vector<bluetooth::Uuid> uuids;
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::GetDeviceUuids WriteInterfaceToken error");
-        return uuids;
-    }
-    if (!data.WriteInt32(transport)) {
-        HILOGE("BluetoothHostProxy::GetDeviceUuids Write transport error");
-        return uuids;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(address)) {
         HILOGE("BluetoothHostProxy::GetDeviceUuids Write address error");
-        return uuids;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::GET_DEVICE_UUIDS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_UUIDS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetDeviceUuids done fail, error: %{public}d", error);
-        return uuids;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     int32_t size = reply.ReadInt32();
-    bluetooth::Uuid uuid;
+    std::string uuid;
     for (int32_t i = 0; i < size; i++) {
-        uuid = ParcelBtUuid::ReadFromParcel(reply);
+        uuid = reply.ReadString();
         uuids.push_back(uuid);
     }
-    return uuids;
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::GetLocalProfileUuids(std::vector<std::string> &uuids)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetLocalProfileUuids WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_LOCAL_PROFILE_UUIDS, option, data, reply);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetLocalProfileUuids done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    int32_t size = reply.ReadInt32();
+    std::string uuid;
+    for (int32_t i = 0; i < size; i++) {
+        uuid = reply.ReadString();
+        uuids.push_back(uuid);
+    }
+    return reply.ReadInt32();
 }
 
 void BluetoothHostProxy::RegisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer)
@@ -1363,7 +1384,7 @@ void BluetoothHostProxy::RegisterBleAdapterObserver(const sptr<IBluetoothHostObs
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_REGISTER_BLE_ADAPTER_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_BLE_ADAPTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterBleAdapterObserver done fail, error: %{public}d", error);
         return;
@@ -1385,7 +1406,7 @@ void BluetoothHostProxy::DeregisterBleAdapterObserver(const sptr<IBluetoothHostO
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_DEREGISTER_BLE_ADAPTER_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_DEREGISTER_BLE_ADAPTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::DeregisterBleAdapterObserver done fail, error: %{public}d", error);
         return;
@@ -1406,7 +1427,7 @@ void BluetoothHostProxy::RegisterBlePeripheralCallback(const sptr<IBluetoothBleP
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_REGISTER_BLE_PERIPHERAL_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_BLE_PERIPHERAL_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterBlePeripheralCallback done fail, error: %{public}d", error);
         return;
@@ -1428,7 +1449,8 @@ void BluetoothHostProxy::DeregisterBlePeripheralCallback(const sptr<IBluetoothBl
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(IBluetoothHost::Code::BT_DEREGISTER_BLE_PERIPHERAL_OBSERVER, option, data, reply);
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_DEREGISTER_BLE_PERIPHERAL_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::DeregisterBlePeripheralCallback done fail, error: %{public}d", error);
         return;
@@ -1449,6 +1471,27 @@ int32_t BluetoothHostProxy::InnerTransact(
         HILOGW("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
     }
     return err;
+}
+
+int32_t BluetoothHostProxy::SetFastScan(bool isEnable)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::SetBtScanMode WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteBool(isEnable)) {
+        HILOGE("BluetoothHostProxy::SetFastScan WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_SET_FAST_SCAN, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::SetFastScan done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

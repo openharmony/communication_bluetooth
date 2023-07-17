@@ -23,11 +23,13 @@ BluetoothPbapPseObserverStub::BluetoothPbapPseObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
-        BluetoothPbapPseObserverStub::Code::PBAP_PSE_ON_SERVICE_CONNECTION_STATE_CHANGE)] =
+        BluetoothPbapPseObserverInterfaceCode::PBAP_PSE_ON_SERVICE_CONNECTION_STATE_CHANGE)] =
         &BluetoothPbapPseObserverStub::OnServiceConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPseObserverStub::Code::PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothPbapPseObserverInterfaceCode::PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED)] =
         &BluetoothPbapPseObserverStub::OnServicePermissionInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothPbapPseObserverStub::Code::PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothPbapPseObserverInterfaceCode::PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED)] =
         &BluetoothPbapPseObserverStub::OnServicePasswordRequiredInner;
 }
 

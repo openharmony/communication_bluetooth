@@ -39,7 +39,7 @@ int BluetoothPbapPseProxy::GetDeviceState(const BluetoothRawAddress& device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_DEVICE_STATE, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("GetDeviceState done fail, error: %{public}d", error);
         return ERROR;
@@ -64,7 +64,8 @@ void BluetoothPbapPseProxy::GetDevicesByStates(
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_GET_DEVICES_BY_STATES, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_DEVICES_BY_STATES, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("GetServices done fail, error: %{public}d", error);
     }
@@ -97,7 +98,7 @@ int BluetoothPbapPseProxy::Disconnect(const BluetoothRawAddress& device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_DISCONNECT, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothPbapPseInterfaceCode::PBAP_PSE_DISCONNECT, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("Disconnect done fail, error: %{public}d", error);
         return ERROR;
@@ -129,7 +130,8 @@ int BluetoothPbapPseProxy::SetConnectionStrategy(const BluetoothRawAddress& devi
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_SET_CONNECTION_STRATEGY, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_CONNECTION_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("SetConnectionStrategy done fail, error: %{public}d", error);
         return ERROR;
@@ -156,7 +158,8 @@ int BluetoothPbapPseProxy::GetConnectionStrategy(const BluetoothRawAddress& devi
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_GET_CONNECTION_STRATEGY, data, reply, option);
+    int error = Remote()->SendRequest(
+        BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_CONNECTION_STRATEGY, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("GetConnectionStrategy done fail, error: %{public}d", error);
         return ERROR;
@@ -193,7 +196,7 @@ void BluetoothPbapPseProxy::GrantPermission(const BluetoothRawAddress& device, b
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_GRANT_PERMISSION, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothPbapPseInterfaceCode::PBAP_PSE_GRANT_PERMISSION, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("GrantPermission done fail, error: %{public}d", error);
         return;
@@ -230,7 +233,7 @@ int BluetoothPbapPseProxy::SetDevicePassword(
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_SET_DEVICE_PASSWORD, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_DEVICE_PASSWORD, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("SetDevicePassword done fail, error: %{public}d", error);
         return ERROR;
@@ -255,7 +258,7 @@ void BluetoothPbapPseProxy::RegisterObserver(const sptr<IBluetoothPbapPseObserve
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_REGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothPbapPseInterfaceCode::PBAP_PSE_REGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("RegisterObserver done fail, error: %{public}d", error);
         return;
@@ -280,7 +283,7 @@ void BluetoothPbapPseProxy::DeregisterObserver(const sptr<IBluetoothPbapPseObser
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    int error = Remote()->SendRequest(IBluetoothPbapPse::Code::PBAP_PSE_DEREGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(BluetoothPbapPseInterfaceCode::PBAP_PSE_DEREGISTER_OBSERVER, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("RegisterObserver done fail, error: %{public}d", error);
         return;

@@ -22,7 +22,7 @@ int BluetoothOppObserverStub::OnRemoteRequest(
 {
     HILOGI("BluetoothOppObserverStub OnRemoteRequest start");
     switch (code) {
-        case COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED: {
+        case static_cast<uint32_t>(BluetoothOppObserverInterfaceCode::COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED): {
             if (BluetoothOppObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
@@ -33,10 +33,10 @@ int BluetoothOppObserverStub::OnRemoteRequest(
                 return ERR_NULL_OBJECT;
             }
             OnReceiveIncomingFileChanged(*oppInformation);
-            HILOGE("COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED end");
+            HILOGE("BluetoothOppObserverInterfaceCode::COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED end");
             return NO_ERROR;
         }
-        case COMMAND_ON_TRANSFER_STATE_CHANGED: {
+        case static_cast<uint32_t>(BluetoothOppObserverInterfaceCode::COMMAND_ON_TRANSFER_STATE_CHANGED): {
             if (BluetoothOppObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
                 HILOGE("local descriptor is not equal to remote");
                 return IPC_INVOKER_TRANSLATE_ERR;
@@ -47,7 +47,7 @@ int BluetoothOppObserverStub::OnRemoteRequest(
                 return ERR_NULL_OBJECT;
             }
             OnTransferStateChanged(*oppInformation);
-            HILOGE("COMMAND_ON_TRANSFER_STATE_CHANGED end");
+            HILOGE("BluetoothOppObserverInterfaceCode::COMMAND_ON_TRANSFER_STATE_CHANGED end");
             return NO_ERROR;
         }
         default:

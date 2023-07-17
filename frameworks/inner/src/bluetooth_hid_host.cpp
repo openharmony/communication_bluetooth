@@ -183,6 +183,18 @@ struct HidHost::impl {
         }
     }
 
+    int SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
+    {
+        HILOGI("enter");
+        return proxy_->SetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    }
+
+    int GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const
+    {
+        HILOGI("enter");
+        return proxy_->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    }
+
 private:
     BluetoothObserverList<HidHostObserver> observers_;
     sptr<HidHostInnerObserver> innerObserver_;
@@ -366,6 +378,48 @@ int32_t HidHost::Disconnect(const BluetoothRemoteDevice &device)
     }
 
     return pimpl->Disconnect(device);
+}
+
+int HidHost::SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
+{
+    HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+        HILOGE("pimpl or hidHost proxy is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
+    if ((!device.IsValidBluetoothRemoteDevice()) || (
+        (strategy != static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)) &&
+        (strategy != static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN)))) {
+        HILOGI("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
+    }
+    return pimpl->SetConnectStrategy(device, strategy);
+}
+
+int HidHost::GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const
+{
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+        HILOGE("pimpl or hidHost proxy is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
+    if (!device.IsValidBluetoothRemoteDevice()) {
+        HILOGI("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
+    }
+    return pimpl->GetConnectStrategy(device, strategy);
 }
 
 void HidHost::RegisterObserver(HidHostObserver *observer)

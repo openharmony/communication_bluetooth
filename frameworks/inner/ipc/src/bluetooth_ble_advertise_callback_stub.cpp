@@ -25,11 +25,11 @@ namespace OHOS {
 namespace Bluetooth {
 const std::map<uint32_t, std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleAdvertiseCallbackStub::memberFuncMap_ = {
-        {IBluetoothBleAdvertiseCallback::Code::BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT,
+        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT,
             std::bind(&BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner, _1, _2, _3)},
-        {IBluetoothBleAdvertiseCallback::Code::BT_BLE_ADVERTISE_CALLBACK_RESULT_EVENT,
+        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_RESULT_EVENT,
             std::bind(&BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner, _1, _2, _3)},
-        {IBluetoothBleAdvertiseCallback::Code::BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
+        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
             std::bind(&BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner, _1, _2, _3)},
 };
 

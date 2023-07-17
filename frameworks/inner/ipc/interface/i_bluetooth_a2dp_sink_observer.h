@@ -17,6 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_A2DP_SINK_OBSERVER_INTERFACE_H
 
 #include "iremote_broker.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "raw_address.h"
 #include "../parcel/bluetooth_raw_address.h"
 
@@ -26,10 +27,6 @@ using namespace OHOS::bluetooth;
 class IBluetoothA2dpSinkObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothA2dpSinkObserver");
-
-    enum Code {
-        BT_A2DP_SINK_OBSERVER_CONNECTION_STATE_CHANGED = 0,
-    };
 
     virtual void OnConnectionStateChanged(const RawAddress &device, int state) = 0;
 };

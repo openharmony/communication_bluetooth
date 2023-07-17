@@ -108,6 +108,36 @@ public:
      */
     int32_t Disconnect(const BluetoothRemoteDevice &device);
 
+    /**
+     * @brief Set connection strategy for peer bluetooth device.
+     *        If peer device is connected and the policy is set not allowed,then perform disconnect operation.
+     *        If peer device is disconnected and the policy is set allowed,then perform connect operation.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param strategy The device connect strategy.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
+     * @since 10.0
+     */
+    int SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy);
+
+    /**
+     * @brief Get connection strategy of peer bluetooth device.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param strategy The device connect strategy.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
+     * @since 10.0
+     */
+    int GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const;
+
         /**
      * @brief Register Hid Host observer instance.
      *

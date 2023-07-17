@@ -19,6 +19,7 @@
 #include <iremote_broker.h>
 #include "../parcel/bluetooth_opp_transfer_information.h"
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "ipc_types.h"
 
 namespace OHOS {
@@ -31,10 +32,6 @@ public:
 
     virtual ErrCode OnReceiveIncomingFileChanged(const BluetoothIOppTransferInformation &transferInformation) = 0;
     virtual ErrCode OnTransferStateChanged(const BluetoothIOppTransferInformation &transferInformation) = 0;
-
-protected:
-    static constexpr int COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED = MIN_TRANSACTION_ID + 0;
-    static constexpr int COMMAND_ON_TRANSFER_STATE_CHANGED = MIN_TRANSACTION_ID + 1;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

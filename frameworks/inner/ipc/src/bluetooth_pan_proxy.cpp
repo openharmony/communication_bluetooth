@@ -36,7 +36,8 @@ int32_t BluetoothPanProxy::Disconnect(const BluetoothRawAddress &device)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_DISCONNECT, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DISCONNECT), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothPanProxy::Disconnect done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -61,7 +62,8 @@ int32_t BluetoothPanProxy::GetDeviceState(const BluetoothRawAddress &device, int
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_GET_DEVICE_STATE, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICE_STATE), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -92,7 +94,8 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(COMMAND_GET_DEVICES_BY_STATES, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("SendRequest failed, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -132,7 +135,8 @@ ErrCode BluetoothPanProxy::RegisterObserver(const sptr<IBluetoothPanObserver> ob
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_REGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_REGISTER_OBSERVER), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothPanProxy::RegisterObserver done fail, error: %{public}d", error);
         return INVALID_DATA;
@@ -157,7 +161,8 @@ ErrCode BluetoothPanProxy::DeregisterObserver(const sptr<IBluetoothPanObserver> 
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_DEREGISTER_OBSERVER, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DEREGISTER_OBSERVER), data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("BluetoothPanProxy::DeregisterObserver done fail, error: %{public}d", error);
         return INVALID_DATA;
@@ -182,7 +187,8 @@ int32_t BluetoothPanProxy::SetTethering(const bool value)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_SET_TETHERING, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_SET_TETHERING), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothPanProxy::SetTethering done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -203,7 +209,8 @@ int32_t BluetoothPanProxy::IsTetheringOn(bool &result)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(COMMAND_IS_TETHERING_ON, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_IS_TETHERING_ON), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothPanProxy::IsTetheringOn done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;

@@ -24,11 +24,11 @@ BluetoothBlePeripheralObserverStub::BluetoothBlePeripheralObserverStub()
 {
     HILOGI("start.");
     memberFuncMap_ = {
-        {static_cast<uint32_t>(IBluetoothBlePeripheralObserver::Code::BLE_ON_READ_REMOTE_RSSI_EVENT),
+        {static_cast<uint32_t>(BluetoothBlePeripheralObserverInterfaceCode::BLE_ON_READ_REMOTE_RSSI_EVENT),
             &BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner},
-        {static_cast<uint32_t>(IBluetoothBlePeripheralObserver::Code::BLE_PAIR_STATUS_CHANGED),
+        {static_cast<uint32_t>(BluetoothBlePeripheralObserverInterfaceCode::BLE_PAIR_STATUS_CHANGED),
             &BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner},
-        {static_cast<uint32_t>(IBluetoothBlePeripheralObserver::Code::BLE_ACL_STATE_CHANGED),
+        {static_cast<uint32_t>(BluetoothBlePeripheralObserverInterfaceCode::BLE_ACL_STATE_CHANGED),
             &BluetoothBlePeripheralObserverStub::OnAclStateChangedInner},
     };
 }

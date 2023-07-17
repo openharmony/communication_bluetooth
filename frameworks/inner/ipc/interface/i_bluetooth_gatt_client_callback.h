@@ -20,6 +20,7 @@
 #include "../parcel/bluetooth_gatt_characteristic_parcel.h"
 #include "../parcel/bluetooth_gatt_descriptor_parcel.h"
 #include "../parcel/bluetooth_gatt_service_parcel.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "raw_address.h"
 
 namespace OHOS {
@@ -27,20 +28,6 @@ namespace Bluetooth {
 class IBluetoothGattClientCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattClientCallback");
-
-    enum Code {
-        BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE = 0,
-        BT_GATT_CLIENT_CALLBACK_CHARACTER_CHANGE,
-        BT_GATT_CLIENT_CALLBACK_CHARACTER_READ,
-        BT_GATT_CLIENT_CALLBACK_CHARACTER_WRITE,
-        BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_READ,
-        BT_GATT_CLIENT_CALLBACK_DESCRIPTOR_WRITE,
-        BT_GATT_CLIENT_CALLBACK_MTU_UPDATE,
-        BT_GATT_CLIENT_CALLBACK_SERVICES_DISCOVER,
-        BT_GATT_CLIENT_CALLBACK_CONNECTION_PARA_CHANGE,
-        BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED,
-        BT_GATT_CLIENT_CALLBACK_READ_REMOTE_RSSI_VALUE,
-    };
 
     virtual void OnConnectionStateChanged(int32_t state, int32_t newState) = 0;
     virtual void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) = 0;

@@ -16,6 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_AVRCP_TG_OBSERVER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_AVRCP_TG_OBSERVER_INTERFACE_H
 
+#include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_raw_address.h"
 
@@ -25,10 +26,6 @@ using namespace OHOS::bluetooth;
 class IBluetoothAvrcpTgObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpTgObserver");
-
-    enum Code {
-        BT_AVRCP_TG_OBSERVER_CONNECTION_STATE_CHANGED = 0,
-    };
 
     virtual void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) = 0;
 };

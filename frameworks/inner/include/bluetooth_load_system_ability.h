@@ -105,7 +105,7 @@ private:
     void NotifyAudioProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyMessageProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
-    void NotifyHostInit();
+    void NotifyHostInit(NOTIFY_PROFILE_MSG notifyMsg);
 
     /**
      * @brief Construct a new BluetootLoadSystemAbility object.

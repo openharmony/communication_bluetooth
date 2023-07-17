@@ -209,14 +209,14 @@ std::vector<uint8_t> BleScanFilterImpl::GetManufactureDataMask() const
     return manufactureDataMask_;
 }
 
-void BleScanFilterImpl::SetScannerId(int scannerId)
+void BleScanFilterImpl::SetClientId(int clientId)
 {
-    scannerId_ = scannerId;
+    clientId_ = clientId;
 }
 
-int BleScanFilterImpl::GetScannerId() const
+int BleScanFilterImpl::GetClientId() const
 {
-    return scannerId_;
+    return clientId_;
 }
 
 void BleScanFilterImpl::SetFiltIndex(uint8_t filtIndex)

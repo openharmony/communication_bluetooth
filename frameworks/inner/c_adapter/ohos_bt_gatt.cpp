@@ -94,7 +94,7 @@ public:
         }
         strStream >> strs;
         string address = result.GetPeripheralDevice().GetDeviceAddr();
-        HILOGI("device: %{public}s, scan data: %{public}s", GetEncryptAddr(address).c_str(), strs.c_str());
+        HILOGD("device: %{public}s, scan data: %{public}s", GetEncryptAddr(address).c_str(), strs.c_str());
         if (appCallback != nullptr && appCallback->scanResultCb != nullptr) {
             appCallback->scanResultCb(&scanResult);
         } else {
@@ -119,21 +119,24 @@ public:
      */
     void OnStartOrStopScanEvent(int32_t resultCode, bool isStartScan) override
     {
-        return;
+        HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+        if (appCallback != nullptr && appCallback->scanStateChangeCb != nullptr) {
+            appCallback->scanStateChangeCb(resultCode, isStartScan);
+        } else {
+            HILOGE("call back is null.");
+        }
     }
 
     /**
-     * @brief Notify sensorHub msg callback.
+     * @brief Notify low power device msg callback.
      *
      * @param btUuid uuid.
      * @param msgType notify msgType.
      * @param value notify msg value.
      * @since 6
      */
-    void OnNotifyMsgReportFromSh(const UUID &btUuid, int msgType, const std::vector<uint8_t> &value) override
+    void OnNotifyMsgReportFromLpDevice(const UUID &btUuid, int msgType, const std::vector<uint8_t> &value) override
     {
-        HILOGD("btUuid: %{public}s, msgType: %{public}d, len: %{public}zu", btUuid.ToString().c_str(), msgType,
-            value.size());
         if (appCallback != nullptr && appCallback->lpDeviceInfoCb != nullptr) {
             BtUuid retUuid;
             string strUuid = btUuid.ToString();
@@ -418,7 +421,7 @@ int BleStartScan(void)
 
 /**
  * @brief Stops a scan.
- * 
+ *
  * @param scannerId Indicates the scanner id.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is stopped;
  * returns an error code defined in {@link BtStatus} otherwise.
@@ -457,10 +460,10 @@ int BleGattRegisterCallbacks(BtGattCallbacks *func)
 }
 
 /**
- * @brief Registers ble scan callbacks.
+ * @brief Register ble scan callbacks.
  *
  * @param func Indicates the pointer to the callbacks to register. For details, see {@link BleScanCallbacks}.
- * @param scannerId Indicates the pointer to the scannerId, identify a scan.
+ * @param scannerId Indicates the pointer to the scannerId, identify one scan.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the BLE callbacks are registered;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
@@ -469,9 +472,10 @@ int BleRegisterScanCallbacks(BleScanCallbacks *func, int32_t *scannerId)
 {
     HILOGI("BleRegisterScanCallbacks enter");
     if (scannerId == nullptr || func == nullptr) {
-        HILOGE("BleRegisterScanCallbacks scannerId or func is null.");
+        HILOGE("BleRegisterScanCallbacks scannerId or func is null");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
+
     std::shared_ptr<BleCentralManagerCallbackWapper> callback = std::make_shared<BleCentralManagerCallbackWapper>();
     callback->appCallback = func;
     std::shared_ptr<BleCentralManager> bleCentralManager = std::make_shared<BleCentralManager>(callback);
@@ -493,8 +497,8 @@ int BleRegisterScanCallbacks(BleScanCallbacks *func, int32_t *scannerId)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
- int BleDeregisterScanCallbacks(int32_t scannerId)
- {
+int BleDeregisterScanCallbacks(int32_t scannerId)
+{
     HILOGI("BleDeregisterScanCallbacks enter. scannerId: %{public}d", scannerId);
     if (g_bleCentralManagerMap.GetObject(scannerId) == nullptr) {
         HILOGE("BleDeregisterScanCallbacks fail, scannerId is invalid.");
@@ -502,7 +506,7 @@ int BleRegisterScanCallbacks(BleScanCallbacks *func, int32_t *scannerId)
     }
     g_bleCentralManagerMap.RemoveObject(scannerId);
     return OHOS_BT_STATUS_SUCCESS;
- }
+}
 
 /**
  * @brief Sets advertising data and parameters and starts advertising.
@@ -648,7 +652,7 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
 {
     HILOGI("SetConfigScanFilter enter");
     vector<BleScanFilter> scanFilters;
-    for (unsigned int i = 0; i < filterSize; i++) {
+    for (uint32_t i = 0; i < filterSize; i++) {
         BleScanNativeFilter nativeScanFilter = filter[i];
         BleScanFilter scanFilter;
         int result = SetOneScanFilter(scanFilter, &nativeScanFilter);
@@ -660,7 +664,7 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
     }
     std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
     if (bleCentralManager == nullptr) {
-        HILOGE("SetConfigScanFilter fail, scannerId is invalid.");
+        HILOGE("SetConfigScanFilter fail, ble centra manager is null.");
         return OHOS_BT_STATUS_FAIL;
     }
     bleCentralManager->ConfigScanFilter(scanFilters);
@@ -686,7 +690,7 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
 int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleScanNativeFilter *filter,
     uint32_t filterSize)
 {
-    HILOGI("BleStartScanEx enter, scannerId: %{public}d, filterSize: %{public}u", scannerId, filterSize);
+    HILOGI("BleStartScanEx enter, scannerId: %{public}d, filterSize %{public}u", scannerId, filterSize);
     if (configs == nullptr) {
         HILOGE("BleStartScanEx fail, configs is null.");
         return OHOS_BT_STATUS_FAIL;
@@ -713,6 +717,24 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
 }
 
 /**
+ * @brief Get BleCentralManager object.
+ * get one from existing objects, if not exist, create one.
+ * used to operate by BleCentralManager object, but not related to one scan.
+ *
+ * @param bleCentralManager the pointer of BleCentralManager.
+ * @since 6
+*/
+void GetBleCentralManagerObject(std::shared_ptr<BleCentralManager> &bleCentralManager)
+{
+    bleCentralManager = g_bleCentralManagerMap.GetObject();
+    if (bleCentralManager == nullptr) {
+        HILOGI("no exist BleCentralManager");
+        std::shared_ptr<BleCentralManagerCallbackWapper> callback = std::make_shared<BleCentralManagerCallbackWapper>();
+        bleCentralManager = std::make_shared<BleCentralManager>(callback);
+    }
+}
+
+/**
  * @brief set low power device adv param.
  *
  * @param duration advertise duration.
@@ -726,8 +748,44 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
 */
 int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("SetLpDeviceAdvParam enter. duration: %{public}d, maxExtAdvEvents: %{public}d, window: %{public}d \
+        interval: %{public}d, advHandle: %{public}d", duration, maxExtAdvEvents, window, interval, advHandle);
+    if (duration < LPDEVICE_ADVERTISING_DURATION_MIN || duration > LPDEVICE_ADVERTISING_DURATION_MAX) {
+        HILOGE("duration out of range:, duration: %{public}d", duration);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    if (maxExtAdvEvents < LPDEVICE_ADVERTISING_EXTADVEVENT_MIN
+        || maxExtAdvEvents > LPDEVICE_ADVERTISING_EXTADVEVENT_MAX) {
+        HILOGE("maxExtAdvEvents out of range:, maxExtAdvEvents: %{public}d", maxExtAdvEvents);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    if (window < LPDEVICE_ADVERTISING_WINDOW_MIN || window > LPDEVICE_ADVERTISING_WINDOW_MAX) {
+        HILOGE("window out of range:, window: %{public}d", window);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    if (interval < LPDEVICE_ADVERTISING_INTERVAL_MIN || interval > LPDEVICE_ADVERTISING_INTERVAL_MAX) {
+        HILOGE("interval out of range:, interval: %{public}d", interval);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    if (interval < window) {
+        HILOGE("interval must bigger than window, interval: %{public}d, window: %{public}d", interval, window);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
+    GetBleCentralManagerObject(bleCentralManager);
+    if (bleCentralManager == nullptr) {
+        HILOGE("get BleCentralManager fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    if (bleCentralManager->SetLpDeviceAdvParam(duration, maxExtAdvEvents, window, interval, advHandle) !=
+        BT_NO_ERROR) {
+        return OHOS_BT_STATUS_FAIL;
+    }
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -741,8 +799,16 @@ int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int inter
  */
 int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("SetScanReportChannelToLpDevice enter. scannerId: %{public}d, isToAp: %{public}d", scannerId, enable);
+    std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
+    if (bleCentralManager == nullptr) {
+        HILOGE("SetScanReportChannelToLpDevice fail, ble centra manager is null.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    if (bleCentralManager->SetScanReportChannelToLpDevice(enable) != BT_NO_ERROR) {
+        return OHOS_BT_STATUS_FAIL;
+    }
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -754,12 +820,21 @@ int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable)
  */
 int EnableSyncDataToLpDevice(void)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("EnableSyncDataToLpDevice enter");
+    std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
+    GetBleCentralManagerObject(bleCentralManager);
+    if (bleCentralManager == nullptr) {
+        HILOGE("get BleCentralManager fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    if (bleCentralManager->EnableSyncDataToLpDevice() != BT_NO_ERROR) {
+        return OHOS_BT_STATUS_FAIL;
+    }
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
- * @brief Disable synchronizing data to low power device.
+ * @brief Disable synchronizing data to the low power device.
  *
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if disable sync success;
  * returns an error code defined in {@link BtStatus} otherwise.
@@ -767,8 +842,17 @@ int EnableSyncDataToLpDevice(void)
  */
 int DisableSyncDataToLpDevice(void)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("DisableSyncDataToLpDevice enter");
+    std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
+    GetBleCentralManagerObject(bleCentralManager);
+    if (bleCentralManager == nullptr) {
+        HILOGE("get BleCentralManager fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    if (bleCentralManager->DisableSyncDataToLpDevice() != BT_NO_ERROR) {
+        return OHOS_BT_STATUS_FAIL;
+    }
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -782,8 +866,21 @@ int DisableSyncDataToLpDevice(void)
  */
 int GetAdvHandle(int advId, int *advHandle)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("GetAdvHandle enter. advId: %{public}d", advId);
+    if (advHandle == nullptr) {
+        HILOGE("GetAdvHandle fail, advHandle is nullptr.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGE("GetAdvHandle fail, advId is invalid.advId: %{public}d.", advId);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
+        HILOGE("GetAdvHandle fail, the current adv is not started.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    *advHandle = g_BleAdvertiser->GetAdvHandle(*g_bleAdvCallbacks[advId]);
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -798,8 +895,22 @@ int GetAdvHandle(int advId, int *advHandle)
  */
 int SendParamsToLpDevice(const uint8_t *data, uint32_t dataSize, int32_t type)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("SendParamsToLpDevice enter. type: %{public}d, dataSize: %{public}d", type, dataSize);
+    if (data == nullptr || dataSize <= 0) {
+        HILOGE("SendParamsToLpDevice fail, data is nullptr or dataSize is wrong.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
+    GetBleCentralManagerObject(bleCentralManager);
+    if (bleCentralManager == nullptr) {
+        HILOGE("get BleCentralManager fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    std::vector<uint8_t> dataValue(data, data + dataSize);
+    if (bleCentralManager->SendParamsToLpDevice(std::move(dataValue), type) != BT_NO_ERROR) {
+        return OHOS_BT_STATUS_FAIL;
+    }
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -810,8 +921,168 @@ int SendParamsToLpDevice(const uint8_t *data, uint32_t dataSize, int32_t type)
  */
 bool IsLpDeviceAvailable(void)
 {
-    HILOGI("not support");
-    return false;
+    HILOGI("IsLpDeviceAvailable enter.");
+    std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
+    GetBleCentralManagerObject(bleCentralManager);
+    if (bleCentralManager == nullptr) {
+        HILOGE("get BleCentralManager fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    return bleCentralManager->IsLpDeviceAvailable();
+}
+
+void BleScanNativeFilterLog(BleScanNativeFilter &filter)
+{
+    if (filter.address != nullptr) {
+        HILOGI("address: %{public}s", filter.address);
+    }
+    if (filter.deviceName != nullptr) {
+        HILOGI("deviceName: %{public}s", filter.deviceName);
+    }
+    if (filter.serviceUuidLength != 0) {
+        if (filter.serviceUuid != nullptr) {
+            HILOGI("serviceUuid: %{public}s", reinterpret_cast<char *>(filter.serviceUuid));
+        }
+        if (filter.serviceUuidMask != nullptr) {
+            HILOGI("serviceUuidMask: %{public}s", reinterpret_cast<char *>(filter.serviceUuidMask));
+        }
+    }
+    std::string dataStr;
+    if (filter.serviceDataLength != 0) {
+        if (filter.serviceData != nullptr) {
+            dataStr = "";
+            ConvertDataToHex(filter.serviceData, filter.serviceDataLength, dataStr);
+            HILOGI("serviceData: %{public}s", dataStr.c_str());
+        }
+        if (filter.serviceDataMask != nullptr) {
+            dataStr = "";
+            ConvertDataToHex(filter.serviceDataMask, filter.serviceDataLength, dataStr);
+            HILOGI("serviceDataMask: %{public}s", dataStr.c_str());
+        }
+    }
+    if (filter.manufactureDataLength != 0) {
+        if (filter.manufactureData != nullptr) {
+            dataStr = "";
+            ConvertDataToHex(filter.manufactureData, filter.manufactureDataLength, dataStr);
+            HILOGI("manufactureData: %{public}s", dataStr.c_str());
+        }
+        if (filter.manufactureDataMask != nullptr) {
+            dataStr = "";
+            ConvertDataToHex(filter.manufactureDataMask, filter.manufactureDataLength, dataStr);
+            HILOGI("manufactureDataMask: %{public}s", dataStr.c_str());
+        }
+        HILOGI("manufactureId: %{public}d", filter.manufactureId);
+    }
+}
+
+bool ConvertScanFilterParam(const BtLpDeviceParam *param, std::vector<BleScanFilter> &filter)
+{
+    for (unsigned int i = 0; i < param->filterSize; i++) {
+        BleScanNativeFilter nativeScanFilter = param->filter[i];
+        BleScanNativeFilterLog(nativeScanFilter);
+        BleScanFilter scanFilter;
+        int result = SetOneScanFilter(scanFilter, &nativeScanFilter);
+        if (result != OHOS_BT_STATUS_SUCCESS) {
+            HILOGE("SetOneScanFilter faild, result: %{public}d", result);
+            return false;
+        }
+        filter.push_back(scanFilter);
+    }
+    return true;
+}
+
+void ConvertAdvSettingParam(const BtLpDeviceParam *param, BleAdvertiserSettings &advSettings)
+{
+    HILOGI("BleAdvParams: minInterval: %{public}d, advType: %{public}d",
+        param->advParam.minInterval, param->advParam.advType);
+    advSettings.SetInterval(param->advParam.minInterval);
+    if (param->advParam.advType == OHOS_BLE_ADV_SCAN_IND ||
+        param->advParam.advType == OHOS_BLE_ADV_NONCONN_IND) {
+        advSettings.SetConnectable(false);
+    }
+}
+
+bool ConvertAdvDeviceInfo(const BtLpDeviceParam *param, std::vector<BleActiveDeviceInfo> &activeDeviceInfos)
+{
+    if (param->activeDeviceInfo == nullptr || param->activeDeviceSize == 0) {
+        return true;
+    }
+    for (unsigned int i = 0; i < param->activeDeviceSize; i++) {
+        HILOGI("ActiveDeviceInfo: status: %{public}d, timeOut: %{public}d",
+            param->activeDeviceInfo[i].status, param->activeDeviceInfo[i].timeOut);
+        BleActiveDeviceInfo deviceInfo;
+        std::vector<int8_t> value(param->activeDeviceInfo[i].deviceId,
+            param->activeDeviceInfo[i].deviceId + OHOS_ACTIVE_DEVICE_ID_LEN);
+        deviceInfo.deviceId = value;
+        deviceInfo.status = param->activeDeviceInfo[i].status;
+        deviceInfo.timeOut = param->activeDeviceInfo[i].timeOut;
+        activeDeviceInfos.push_back(deviceInfo);
+    }
+    return true;
+}
+
+bool ConvertBtUuid(const BtUuid &inUuid, UUID &outUuid)
+{
+    if (inUuid.uuid == nullptr || inUuid.uuidLen == 0) {
+        HILOGE("uuid is NULL or len is 0.");
+        return false;
+    }
+    string strUuid(inUuid.uuid);
+    HILOGD("UUID: %{public}s", strUuid.c_str());
+    if (!regex_match(strUuid, uuidRegex)) {
+        HILOGE("match the UUID faild.");
+        return false;
+    }
+    outUuid = UUID::FromString(strUuid);
+    return true;
+}
+
+int ConvertLpDeviceParamData(const BtLpDeviceParam *inParam, BleLpDeviceParamSet &outParam)
+{
+    outParam.fieldValidFlagBit = 0;
+    if (!ConvertBtUuid(inParam->uuid, outParam.uuid)) {
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    if (inParam->scanConfig != nullptr) {
+        outParam.scanSettings.SetScanMode(inParam->scanConfig->scanMode);
+        outParam.fieldValidFlagBit |= BLE_LPDEVICE_SCAN_SETTING_VALID_BIT;
+    }
+
+    if (inParam->filter != nullptr && inParam->filterSize > 0) {
+        if (!ConvertScanFilterParam(inParam, outParam.scanFilters)) {
+            return OHOS_BT_STATUS_PARM_INVALID;
+        }
+        outParam.fieldValidFlagBit |= BLE_LPDEVICE_SCAN_FILTER_VALID_BIT;
+    }
+
+    outParam.fieldValidFlagBit |= BLE_LPDEVICE_ADV_SETTING_VALID_BIT;
+    ConvertAdvSettingParam(inParam, outParam.advSettings);
+
+    if (inParam->rawData.advData != nullptr && inParam->rawData.advDataLen > 0) {
+        outParam.advData = ConvertDataToVec(inParam->rawData.advData,
+            inParam->rawData.advDataLen);
+        outParam.fieldValidFlagBit |= BLE_LPDEVICE_ADVDATA_VALID_BIT;
+    }
+
+    if (inParam->rawData.rspData != nullptr && inParam->rawData.rspDataLen > 0) {
+        outParam.respData = ConvertDataToVec(inParam->rawData.rspData,
+            inParam->rawData.rspDataLen);
+        outParam.fieldValidFlagBit |= BLE_LPDEVICE_RESPDATA_VALID_BIT;
+    }
+
+    if (inParam->activeDeviceInfo != nullptr && inParam->activeDeviceSize > 0) {
+        if (!ConvertAdvDeviceInfo(inParam, outParam.activeDeviceInfos)) {
+            return OHOS_BT_STATUS_PARM_INVALID;
+        }
+        outParam.fieldValidFlagBit |= BLE_LPDEVICE_ADV_DEVICEINFO_VALID_BIT;
+    }
+
+    outParam.advHandle = inParam->advHandle;
+    outParam.duration = inParam->duration;
+    outParam.deliveryMode = inParam->deliveryMode;
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -824,8 +1095,28 @@ bool IsLpDeviceAvailable(void)
  */
 int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("SetLpDeviceParam enter.");
+    if (lpDeviceParam == nullptr) {
+        HILOGE("SetLpDeviceParam fail, lpDeviceParam is null.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    BleLpDeviceParamSet paramSet;
+    int ret = ConvertLpDeviceParamData(lpDeviceParam, paramSet);
+    if (ret != OHOS_BT_STATUS_SUCCESS) {
+        return ret;
+    }
+    std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
+    GetBleCentralManagerObject(bleCentralManager);
+    if (bleCentralManager == nullptr) {
+        HILOGE("get BleCentralManager fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    HILOGI("SetLpDeviceParam fieldValidFlagBit: %{public}u", paramSet.fieldValidFlagBit);
+    if (bleCentralManager->SetLpDeviceParam(paramSet) != BT_NO_ERROR) {
+        return OHOS_BT_STATUS_FAIL;
+    }
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -838,10 +1129,22 @@ int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam)
  */
 int RemoveLpDeviceParam(BtUuid uuid)
 {
-    HILOGI("not support");
-    return OHOS_BT_STATUS_UNSUPPORTED;
+    HILOGI("RemoveLpDeviceParam enter.");
+    std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
+    GetBleCentralManagerObject(bleCentralManager);
+    if (bleCentralManager == nullptr) {
+        HILOGE("get BleCentralManager fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    UUID srvUuid;
+    if (!ConvertBtUuid(uuid, srvUuid)) {
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    if (bleCentralManager->RemoveLpDeviceParam(srvUuid) != BT_NO_ERROR) {
+        return OHOS_BT_STATUS_FAIL;
+    }
+    return OHOS_BT_STATUS_SUCCESS;
 }
-
 
 }  // namespace Bluetooth
 }  // namespace OHOS

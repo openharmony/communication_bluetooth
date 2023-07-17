@@ -17,6 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_REMOTE_DEVICE_OBSERVER_INTERFACE_H
 
 #include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_service_ipc_interface_code.h"
 #include "bt_uuid.h"
 #include "iremote_broker.h"
 
@@ -25,16 +26,6 @@ namespace Bluetooth {
 class IBluetoothRemoteDeviceObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothRemoteDeviceObserver");
-
-    enum Code {
-        BT_REMOTE_DEVICE_OBSERVER_ACL_STATE = 0,
-        BT_REMOTE_DEVICE_OBSERVER_PAIR_STATUS,
-        BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID,
-        BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME,
-        BT_REMOTE_DEVICE_OBSERVER_REMOTE_ALIAS,
-        BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD,
-        BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL,
-    };
 
     virtual void OnAclStateChanged(const BluetoothRawAddress &device, int32_t state, uint32_t reason) = 0;
     virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int32_t status) = 0;

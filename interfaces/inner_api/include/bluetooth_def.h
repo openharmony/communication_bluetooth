@@ -1421,18 +1421,17 @@ enum PbapResponseCode : uint8_t {
     PBAP_DATABASE_LOCKED = 0xE1              // Database Locked
 };
 
+constexpr int BLE_LPDEVICE_SCAN_SETTING_VALID_BIT = 0x01;
+constexpr int BLE_LPDEVICE_SCAN_FILTER_VALID_BIT = 0x02;
+constexpr int BLE_LPDEVICE_ADV_SETTING_VALID_BIT = 0x04;
+constexpr int BLE_LPDEVICE_ADVDATA_VALID_BIT = 0x08;
+constexpr int BLE_LPDEVICE_RESPDATA_VALID_BIT = 0x10;
+constexpr int BLE_LPDEVICE_ADV_DEVICEINFO_VALID_BIT = 0x20;
 constexpr int32_t BLE_SCAN_INVALID_ID = 0;
-constexpr int BLE_SH_SCAN_SETTING_VALID_BIT = 0x01;
-constexpr int BLE_SH_SCAN_FILTER_VALID_BIT = 0x02;
-constexpr int BLE_SH_ADV_SETTING_VALID_BIT = 0x04;
-constexpr int BLE_SH_ADVDATA_VALID_BIT = 0x08;
-constexpr int BLE_SH_RESPDATA_VALID_BIT = 0x10;
-constexpr int BLE_SH_ADV_DEVICEINFO_VALID_BIT = 0x20;
 
 #define IS_BT_ENABLED() (BluetoothHost::GetDefaultHost().IsBrEnabled())
 
 #define IS_BLE_ENABLED() (BluetoothHost::GetDefaultHost().IsBleEnabled())
-
 
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))

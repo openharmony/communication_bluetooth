@@ -76,6 +76,15 @@ private:
     GattDescriptor descriptor_;
 };
 
+class NapiNativeUuidsArray : public NapiNativeObject {
+public:
+    NapiNativeUuidsArray(const std::vector<std::string> uuids) : uuids_(uuids) {}
+    ~NapiNativeUuidsArray() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::vector<std::string> uuids_;
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_NATIVE_OBJECT_H
