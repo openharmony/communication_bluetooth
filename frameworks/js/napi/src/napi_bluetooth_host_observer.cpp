@@ -357,7 +357,7 @@ void NapiBluetoothHostObserver::UvQueueWorkOnPairConfirmedCallBack(uv_work_t *wo
     napi_value undefined = 0;
     napi_value callResult = 0;
     napi_get_undefined(callbackData->env, &undefined);
-    HILOGI("Addr is %{public}s", GetEncryptAddr(deviceAddr).c_str());
+    HILOGI("Addr is %{public}s", GetEncryptAddr(callbackData->data->deviceAddr).c_str());
     napi_create_object(callbackData->env, &result);
     napi_value device = 0;
     napi_create_string_utf8(

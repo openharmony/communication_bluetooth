@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,9 +19,10 @@
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_ble.h"
+#include "napi_bluetooth_ble_utils.h"
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
-#include "parser/napi_parser_utils.h"
+#include "../parser/napi_parser_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -44,8 +45,10 @@ napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info inf
 void NapiGattServer::DefineGattServerJSClass(napi_env env)
 {
     napi_property_descriptor gattserverDesc[] = {
+#ifndef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("startAdvertising", StartAdvertising),
         DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
+#endif
         DECLARE_NAPI_FUNCTION("addService", AddService),
         DECLARE_NAPI_FUNCTION("removeService", RemoveGattService),
         DECLARE_NAPI_FUNCTION("close", Close),

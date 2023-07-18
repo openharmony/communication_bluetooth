@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
-#include "napi_bluetooth_utils.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -167,31 +166,16 @@ void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
 }
 } // namespace
 
-void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback(
-    uv_work_t *work, std::shared_ptr<BleScanResult> &result)
+NapiBluetoothBleCentralManagerCallback &NapiBluetoothBleCentralManagerCallback::GetInstance(void)
 {
-    HILOGI("enter");
-    if (work == nullptr) {
-        HILOGE("work is null");
-        return;
-    }
-    auto callbackData = (AfterWorkCallbackData<NapiBluetoothBleCentralManagerCallback,
-        decltype(&NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback),
-	std::shared_ptr<BleScanResult>> *)work->data;
-    if (callbackData == nullptr) {
-        HILOGE("callbackData is null");
-        return;
-    }
-    napi_value napiResult = 0;
-    napi_value callback = 0;
-    napi_value undefined = 0;
-    napi_value callResult = 0;
-    napi_get_undefined(callbackData->env, &undefined);
-    std::vector<BleScanResult> results;
-    results.push_back(*result);
-    ConvertScanResult(results, callbackData->env, napiResult);
-    napi_get_reference_value(callbackData->env, callbackData->callback, &callback);
-    napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &napiResult, &callResult);
+    static NapiBluetoothBleCentralManagerCallback instance;
+    return instance;
+}
+
+void NapiBluetoothBleCentralManagerCallback::SetNapiScanCallback(const std::shared_ptr<NapiCallback> &callback)
+{
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    napiScanCallback_ = callback;
 }
 
 static void OnSysScanCallback(const BleScanResult &result, const std::string type)
@@ -207,52 +191,24 @@ static void OnSysScanCallback(const BleScanResult &result, const std::string typ
 void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
 {
     HILOGD("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
+    // system scan
     OnSysScanCallback(result, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BLE_FIND_DEVICE_TYPE);
-    if (callbackInfo == nullptr) {
-        HILOGD("This callback is not registered by ability.");
+
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    if (napiScanCallback_ == nullptr) {
+        HILOGE("napiScanCallback_ is nullptr");
         return;
     }
 
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    if (loop == nullptr) {
-        HILOGE("loop instance is nullptr");
-        return;
-    }
-
-    auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothBleCentralManagerCallback,
-        decltype(&NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback),
-        std::shared_ptr<BleScanResult>>();
-    if (callbackData == nullptr) {
-        HILOGE("new callbackData failed");
-        return;
-    }
-
-    callbackData->object = this;
-    callbackData->function = &NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnScanCallback;
-    callbackData->env = callbackInfo->env_;
-    callbackData->callback = callbackInfo->callback_;
-    callbackData->data = std::make_shared<BleScanResult>(result);
-
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        HILOGE("new work failed");
-        delete callbackData;
-        callbackData = nullptr;
-        return;
-    }
-
-    work->data = (void *)callbackData;
-
-    int ret = uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
-    if (ret != 0) {
-        delete callbackData;
-        callbackData = nullptr;
-        delete work;
-        work = nullptr;
-    }
+    auto func = [result, callback = napiScanCallback_]() {
+        if (callback == nullptr) {
+            HILOGE("napiScanCallback_ is nullptr");
+            return;
+        }
+        auto napiNative = std::make_shared<NapiNativeBleScanResult>(result);
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiScanCallback_->GetNapiEnv(), func);
 }
 
 void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEvent(
@@ -374,6 +330,14 @@ void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCo
     work->data = static_cast<void *>(data);
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEScan);
+}
+
+napi_value NapiNativeBleScanResult::ToNapiValue(napi_env env) const
+{
+    napi_value object = 0;
+    std::vector<BleScanResult> results {scanResult_};
+    ConvertScanResult(results, env, object);
+    return object;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

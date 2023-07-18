@@ -19,12 +19,14 @@
 #include "bluetooth_gatt_client.h"
 #include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_bluetooth_ble_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
 
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLECharacteristicChange";
 const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
+const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE = "BLEMtuChange";
 class NapiGattClient;
 
 class NapiGattClientCallback : public GattClientCallback {
@@ -32,13 +34,13 @@ public:
     void OnConnectionStateChanged(int connectionState, int ret) override;
     void OnCharacteristicChanged(const GattCharacteristic &characteristic) override;
     void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)  override;
-    void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret) override {}
+    void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret) override;
     void OnDescriptorReadResult(const GattDescriptor &descriptor, int ret) override;
-    void OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret) override {}
-    void OnMtuUpdate(int mtu, int ret) override {}
+    void OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret) override;
+    void OnMtuUpdate(int mtu, int ret) override;
     void OnServicesDiscovered(int status) override;
     void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override {}
-    void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override {}
+    void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override;
     void OnReadRemoteRssiValueResult(int rssi, int status)  override;
     void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo)
     {
