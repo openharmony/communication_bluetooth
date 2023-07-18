@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,6 @@
 #include "napi_bluetooth_event.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_client_callback.h"
-#include "napi_bluetooth_utils.h"
 #include "bluetooth_errorcode.h"
 
 namespace OHOS {
@@ -80,6 +79,59 @@ void NapiGattClientCallback::OnReadRemoteRssiValueResult(int rssi, int ret)
     HILOGI("rssi: %{public}d, ret: %{public}d", rssi, ret);
     auto napiRssi = std::make_shared<NapiNativeInt>(rssi);
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_REMOTE_RSSI_VALUE, napiRssi, ret);
+}
+
+void NapiGattClientCallback::OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret)
+{
+#ifdef BLUETOOTH_API_SINCE_10
+    HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
+    auto napiCharacter = std::make_shared<NapiNativeBleCharacteristic>(characteristic);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_WRITE_CHARACTER, napiCharacter, ret);
+#endif
+}
+
+void NapiGattClientCallback::OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret)
+{
+#ifdef BLUETOOTH_API_SINCE_10
+    HILOGI("UUID: %{public}s, ret: %{public}d", descriptor.GetUuid().ToString().c_str(), ret);
+    auto napiDescriptor = std::make_shared<NapiNativeBleDescriptor>(descriptor);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_WRITE_DESCRIPTOR, napiDescriptor, ret);
+#endif
+}
+
+void NapiGattClientCallback::OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status)
+{
+#ifdef BLUETOOTH_API_SINCE_10
+    HILOGI("UUID: %{public}s, status: %{public}d", characteristic.GetUuid().ToString().c_str(), status);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_ENABLE_CHARACTER_CHANGED, nullptr, status);
+#endif
+}
+
+void NapiGattClientCallback::OnMtuUpdate(int mtu, int ret)
+{
+#ifdef BLUETOOTH_API_SINCE_10
+    HILOGI("ret: %{public}d, mtu: %{public}d", ret, mtu);
+    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
+    auto it = callbackInfos_.find(STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE);
+    if (it == callbackInfos_.end() || it->second == nullptr) {
+        HILOGI("BLEMtuChange callback is not registered.");
+        return;
+    }
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
+
+    auto func = [callbackInfo, mtu]() {
+        napi_value result = nullptr;
+        napi_create_int32(callbackInfo->env_, mtu, &result);
+
+        napi_value callback = nullptr;
+        napi_value undefined = nullptr;
+        napi_value callResult = nullptr;
+        napi_get_undefined(callbackInfo->env_, &undefined);
+        napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+    };
+    DoInJsMainThread(callbackInfo->env_, func);
+#endif
 }
 
 } // namespace Bluetooth

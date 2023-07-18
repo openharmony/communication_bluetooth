@@ -44,11 +44,20 @@ public:
     static napi_value ReadCharacteristicValue(napi_env env, napi_callback_info info);
     static napi_value ReadDescriptorValue(napi_env env, napi_callback_info info);
 
+#ifdef BLUETOOTH_API_SINCE_10
+    static napi_value WriteCharacteristicValueEx(napi_env env, napi_callback_info info);
+    static napi_value WriteDescriptorValueEx(napi_env env, napi_callback_info info);
+    static napi_value setCharacteristicChangeNotification(napi_env env, napi_callback_info info);
+    static napi_value setCharacteristicChangeIndication(napi_env env, napi_callback_info info);
+#else
     static napi_value WriteCharacteristicValue(napi_env env, napi_callback_info info);
     static napi_value WriteDescriptorValue(napi_env env, napi_callback_info info);
-    static napi_value SetBLEMtuSize(napi_env env, napi_callback_info info);
     static napi_value SetNotifyCharacteristicChanged(napi_env env, napi_callback_info info);
+#endif
+
+    static napi_value SetBLEMtuSize(napi_env env, napi_callback_info info);
     static napi_value GetRssiValue(napi_env env, napi_callback_info info);
+    static napi_value GetDeviceName(napi_env env, napi_callback_info info);
 
     std::shared_ptr<GattClient> &GetClient()
     {

@@ -57,10 +57,13 @@
         "ability_runtime",
         "base",
         "bundle_framework",
+        "c_utils",
         "hilog",
         "hisysevent",
         "hitrace",
+        "libuv",
         "ipc",
+        "napi",
         "samgr_proxy",
         "samgr"
       ],

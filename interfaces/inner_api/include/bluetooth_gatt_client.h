@@ -307,6 +307,17 @@ public:
     int SetNotifyCharacteristic(GattCharacteristic &characteristic, bool enable);
 
     /**
+     * @brief The function to SetIndicateCharacteristic.
+     *
+     * @param characteristic characteristic object.
+     * @param enable enable of GattClient.
+     * @return result of #GATT_STATUS.
+     * @since 6
+     *
+     */
+    int SetIndicateCharacteristic(GattCharacteristic &characteristic, bool enable);
+
+    /**
      * @brief The function to write characteristic.
      *
      * @param characteristic characteristic object.
@@ -359,6 +370,9 @@ public:
 
 private:
     BLUETOOTH_DECLARE_IMPL();
+
+    int SetNotifyCharacteristicInner(GattCharacteristic &characteristic, bool enable,
+        const std::vector<uint8_t> &descriptorValue);
 };
 } // namespace Bluetooth
 } // namespace OHOS

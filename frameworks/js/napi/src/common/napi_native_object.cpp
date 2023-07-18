@@ -36,23 +36,6 @@ napi_value NapiNativeString::ToNapiValue(napi_env env) const
     }
     return value;
 }
-
-napi_value NapiNativeBleCharacteristic::ToNapiValue(napi_env env) const
-{
-    napi_value object;
-    napi_create_object(env, &object);
-    ConvertBLECharacteristicToJS(env, object, const_cast<GattCharacteristic &>(character_));
-    return object;
-}
-
-napi_value NapiNativeBleDescriptor::ToNapiValue(napi_env env) const
-{
-    napi_value object;
-    napi_create_object(env, &object);
-    ConvertBLEDescriptorToJS(env, object, const_cast<GattDescriptor &>(descriptor_));
-    return object;
-}
-
 napi_value NapiNativeUuidsArray::ToNapiValue(napi_env env) const
 {
     napi_value array;

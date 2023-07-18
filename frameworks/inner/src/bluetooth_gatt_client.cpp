@@ -785,9 +785,9 @@ int GattClient::RequestBleMtuSize(int mtu)
     return result;
 }
 
-int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool enable)
+int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic, bool enable,
+    const std::vector<uint8_t> &descriptorValue)
 {
-    HILOGD("handle: 0x%{public}04X, enable: %{public}d", characteristic.GetHandle(), enable);
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -798,9 +798,6 @@ int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    static const uint8_t NOTIFICATION[2] = {1, 0};
-    static const uint8_t DEFAULT_VALUE[2] = {0};
-    static const size_t CLIENT_CHARACTERISTIC_CONFIGURATION_VALUE_LENGTH = 0x02;
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Request not supported");
@@ -820,9 +817,8 @@ int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool
         HILOGE("descriptor not exist.");
         return ret;
     }
-    BluetoothGattDescriptor desc(bluetooth::Descriptor(descriptor->GetHandle(),
-        (enable ? NOTIFICATION : DEFAULT_VALUE),
-        CLIENT_CHARACTERISTIC_CONFIGURATION_VALUE_LENGTH));
+    BluetoothGattDescriptor desc(bluetooth::Descriptor(
+        descriptor->GetHandle(), descriptorValue.data(), descriptorValue.size()));
     int result = GattStatus::GATT_FAILURE;
     HILOGD("applicationId: %{public}d", pimpl->applicationId_);
     result = pimpl->proxy_->WriteDescriptor(pimpl->applicationId_, &desc);
@@ -833,6 +829,22 @@ int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool
         pimpl->requestInformation_.doing_ = true;
     }
     return result;
+}
+
+int GattClient::SetNotifyCharacteristic(GattCharacteristic &characteristic, bool enable)
+{
+    HILOGI("handle: 0x%{public}04X, enable: %{public}d", characteristic.GetHandle(), enable);
+    std::vector<uint8_t> enableNotifyValue = {1, 0};
+    std::vector<uint8_t> disableValue = {0, 0};
+    return SetNotifyCharacteristicInner(characteristic, enable, (enable ? enableNotifyValue : disableValue));
+}
+
+int GattClient::SetIndicateCharacteristic(GattCharacteristic &characteristic, bool enable)
+{
+    HILOGI("handle: 0x%{public}04X, enable: %{public}d", characteristic.GetHandle(), enable);
+    std::vector<uint8_t> enableIndicateValue = {2, 0};
+    std::vector<uint8_t> disableValue = {0, 0};
+    return SetNotifyCharacteristicInner(characteristic, enable, (enable ? enableIndicateValue : disableValue));
 }
 
 int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)

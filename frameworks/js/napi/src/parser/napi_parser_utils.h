@@ -16,6 +16,7 @@
 #ifndef NAPI_PARSER_UTILS_H
 #define NAPI_PARSER_UTILS_H
 
+#include "napi_bluetooth_ble_utils.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {
@@ -72,6 +73,7 @@ napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBle
 napi_status NapiParseGattDescriptor(napi_env env, napi_value object, NapiBleDescriptor &outDescriptor);
 napi_status NapiParseNotifyCharacteristic(napi_env env, napi_value object, NapiNotifyCharacteristic &outCharacter);
 napi_status NapiParseGattsServerResponse(napi_env env, napi_value object, NapiGattsServerResponse &rsp);
+napi_status NapiParseGattWriteType(napi_env env, napi_value value, int &outWriteType);
 
 struct NapiAsyncCallback;
 std::shared_ptr<NapiAsyncCallback> NapiParseAsyncCallback(napi_env env, napi_callback_info info);

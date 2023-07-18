@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,12 +20,13 @@
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_bluetooth_ble_utils.h"
 
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
-#include "parser/napi_parser_utils.h"
+#include "../parser/napi_parser_utils.h"
 
 #include <memory>
 namespace OHOS {
@@ -38,11 +39,19 @@ struct SysStopBLEContext {
     napi_ref callbackComplete = nullptr;
 };
 
-NapiBluetoothBleCentralManagerCallback g_bleCentralMangerCallback;
-NapiBluetoothBleAdvertiseCallback g_bleAdvertiseCallback;
-BleAdvertiser g_bleAdvertiser;
-std::unique_ptr<BleCentralManager> g_bleCentralManager =
-    std::make_unique<BleCentralManager>(g_bleCentralMangerCallback);
+namespace {
+BleAdvertiser *BleAdvertiserGetInstance(void)
+{
+    static BleAdvertiser instance;
+    return &instance;
+}
+
+BleCentralManager *BleCentralManagerGetInstance(void)
+{
+    static BleCentralManager instance(NapiBluetoothBleCentralManagerCallback::GetInstance());
+    return &instance;
+}
+}  // namespace {}
 
 napi_value GetPropertyValueByNamed(napi_env env, napi_value object, std::string_view propertyName, napi_valuetype type)
 {
@@ -117,14 +126,14 @@ napi_value SysStartBLEScan(napi_env env, napi_callback_info info)
     settinngs.SetReportDelay(scanOptions.interval);
     settinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
 
-    g_bleCentralManager->StartScan(settinngs);
+    BleCentralManagerGetInstance()->StartScan(settinngs);
     return NapiGetNull(env);
 }
 
 void SysStopBLEScanExec(napi_env env, void *data)
 {
     HILOGI("SysStopBLEScanExec");
-    g_bleCentralManager->StopScan();
+    BleCentralManagerGetInstance()->StopScan();
     UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
 }
 
@@ -250,24 +259,86 @@ void DefineSystemBLEInterface(napi_env env, napi_value exports)
     HILOGI("DefineSystemBLEInterface init");
 }
 
+static napi_value On(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    auto CheckBleOnFunc = [env, info]() -> napi_status {
+        size_t argc = ARGS_SIZE_TWO;
+        napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+        napi_value thisVar = nullptr;
+        NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+        NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments", napi_invalid_arg);
+
+        std::string type {};
+        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
+        if (type != REGISTER_BLE_FIND_DEVICE_TYPE) {
+            HILOGE("Invalid type: %{public}s", type.c_str());
+            return napi_invalid_arg;
+        }
+
+        NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
+        auto napiScanCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
+        NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(napiScanCallback);
+        return napi_ok;
+    };
+
+    auto status = CheckBleOnFunc();
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
+}
+
+static napi_value Off(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    auto CheckBleOffFunc = [env, info]() -> napi_status {
+        size_t argc = ARGS_SIZE_TWO;
+        napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+        napi_value thisVar = nullptr;
+        NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+        NAPI_BT_RETURN_IF(
+            argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments", napi_invalid_arg);
+
+        std::string type {};
+        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
+        if (type != REGISTER_BLE_FIND_DEVICE_TYPE) {
+            HILOGE("Invalid type: %{public}s", type.c_str());
+            return napi_invalid_arg;
+        }
+        NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(nullptr);
+        return napi_ok;
+    };
+
+    auto status = CheckBleOffFunc();
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
+}
+
 void DefineBLEJSObject(napi_env env, napi_value exports)
 {
     HILOGI("enter");
-    napi_value BLEObject = nullptr;
     PropertyInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("createGattServer", NapiGattServer::CreateGattServer),
         DECLARE_NAPI_FUNCTION("createGattClientDevice", NapiGattClient::CreateGattClientDevice),
         DECLARE_NAPI_FUNCTION("startBLEScan", StartBLEScan),
         DECLARE_NAPI_FUNCTION("stopBLEScan", StopBLEScan),
-        DECLARE_NAPI_FUNCTION("on", RegisterObserver),
-        DECLARE_NAPI_FUNCTION("off", DeregisterObserver),
+        DECLARE_NAPI_FUNCTION("on", On),
+        DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectedBLEDevices", GetConnectedBLEDevices),
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("startAdvertising", StartAdvertising),
+        DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
+#endif
     };
 
+#ifdef BLUETOOTH_API_SINCE_10
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+#else
+    napi_value BLEObject = nullptr;
     napi_create_object(env, &BLEObject);
     napi_define_properties(env, BLEObject, sizeof(desc) / sizeof(desc[0]), desc);
     napi_set_named_property(env, exports, "BLE", BLEObject);
+#endif
 }
 
 static void ConvertMatchMode(ScanOptions &params, int32_t matchMode)
@@ -527,12 +598,11 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
     auto status = CheckBleScanParams(env, info, scanfilters, settinngs);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    if (g_bleCentralManager) {
-        int ret = g_bleCentralManager->ConfigScanFilter(scanfilters);
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
-        ret = g_bleCentralManager->StartScan(settinngs);
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
-    }
+    int ret = BleCentralManagerGetInstance()->ConfigScanFilter(scanfilters);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
+    ret = BleCentralManagerGetInstance()->StartScan(settinngs);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
+
     return NapiGetUndefinedRet(env);
 }
 
@@ -542,7 +612,7 @@ napi_value StopBLEScan(napi_env env, napi_callback_info info)
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = g_bleCentralManager->StopScan();
+    int ret = BleCentralManagerGetInstance()->StopScan();
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
@@ -670,7 +740,8 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
     auto status = CheckAdvertisingData(env, info, settings, advData, rspData);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = g_bleAdvertiser.StartAdvertising(settings, advData, rspData, g_bleAdvertiseCallback);
+    int ret = BleAdvertiserGetInstance()->StartAdvertising(
+        settings, advData, rspData, NapiBluetoothBleAdvertiseCallback::GetInstance());
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
@@ -690,7 +761,7 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
     auto status = CheckEmptyArgs(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = g_bleAdvertiser.StopAdvertising(g_bleAdvertiseCallback);
+    int ret = BleAdvertiserGetInstance()->StopAdvertising(NapiBluetoothBleAdvertiseCallback::GetInstance());
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
@@ -724,12 +795,24 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     SetNamedPropertyByInteger(
         env, scanDutyObj, static_cast<int32_t>(ScanDuty::SCAN_MODE_LOW_POWER), "SCAN_MODE_LOW_POWER");
 
+#ifdef BLUETOOTH_API_SINCE_10
+    napi_value gattWriteTypeObj = nullptr;
+    napi_create_object(env, &gattWriteTypeObj);
+    SetNamedPropertyByInteger(env, gattWriteTypeObj, static_cast<int32_t>(NapiGattWriteType::WRITE), "WRITE");
+    SetNamedPropertyByInteger(
+        env, gattWriteTypeObj, static_cast<int32_t>(NapiGattWriteType::WRITE_NO_RESPONSE), "WRITE_NO_RESPONSE");
+#endif
+
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("MatchMode", matchModeObj),
         DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObj),
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
+#endif
     };
 
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+
     return exports;
 }
 }  // namespace Bluetooth

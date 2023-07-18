@@ -17,7 +17,8 @@
 #define NAPI_BLUETOOTH_BLE_CENTRAL_MANAGER_H
 
 #include "bluetooth_ble_central_manager.h"
-#include "napi_bluetooth_utils.h"
+#include "napi_async_callback.h"
+#include "napi_bluetooth_ble_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -26,12 +27,17 @@ public:
     NapiBluetoothBleCentralManagerCallback() = default;
     ~NapiBluetoothBleCentralManagerCallback() override = default;
 
+    static NapiBluetoothBleCentralManagerCallback &GetInstance(void);
+
     void OnScanCallback(const BleScanResult &result) override;
     void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override;
     void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override;
     void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) override {};
 
+    void SetNapiScanCallback(const std::shared_ptr<NapiCallback> &callback);
 private:
+    std::mutex callbackMutex_ {};
+    std::shared_ptr<NapiCallback> napiScanCallback_ {nullptr};
     void UvQueueWorkOnScanCallback(uv_work_t *work, std::shared_ptr<BleScanResult> &result);
     void UvQueueWorkOnBleBatchScanResultsEvent(uv_work_t *work, const std::vector<BleScanResult> &results);
 };

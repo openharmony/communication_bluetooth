@@ -62,6 +62,48 @@ NapiCallback::~NapiCallback()
     }
 }
 
+namespace {
+void NapiCallFunction(napi_env env, napi_ref callbackRef, napi_value *argv, size_t argc)
+{
+    napi_value undefined = nullptr;
+    napi_value callRet = nullptr;
+    napi_value callback = nullptr;
+    auto status = napi_get_reference_value(env, callbackRef, &callback);
+    if (status != napi_ok) {
+        HILOGE("napi_get_reference_value failed, status: %{public}d", status);
+        return;
+    }
+
+    status = napi_call_function(env, undefined, callback, argc, argv, &callRet);
+    if (status != napi_ok) {
+        HILOGE("napi_call_function failed, status: %{public}d", status);
+    }
+
+    // Check whether the JS application triggers an exception in callback. If it is, clear it.
+    bool isExist = false;
+    status = napi_is_exception_pending(env, &isExist);
+    HILOGD("napi_is_exception_pending status: %{public}d, isExist: %{public}d", status, isExist);
+    if (isExist) {
+        HILOGI("Clear JS application's exception");
+        napi_value exception = nullptr;
+        status = napi_get_and_clear_last_exception(env, &exception);
+        HILOGD("napi_get_and_clear_last_exception status: %{public}d, exception: %{public}p", status, exception);
+    }
+}
+}  // namespace {}
+
+void NapiCallback::CallFunction(const std::shared_ptr<NapiNativeObject> &object)
+{
+    if (object == nullptr) {
+        HILOGE("napi native object is nullptr");
+        return;
+    }
+
+    NapiHandleScope scope(env_);
+    napi_value val = object->ToNapiValue(env_);
+    NapiCallFunction(env_, callbackRef_, &val, ARGS_SIZE_ONE);
+}
+
 void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object)
 {
     if (object == nullptr) {
@@ -70,34 +112,15 @@ void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObj
     }
 
     NapiHandleScope scope(env_);
-
-    napi_value undefined = nullptr;
-    napi_value callRet = nullptr;
-    napi_value callback = nullptr;
-    auto status = napi_get_reference_value(env_, callbackRef_, &callback);
-    if (status != napi_ok) {
-        HILOGE("napi_get_reference_value failed, status: %{public}d", status);
-        return;
-    }
-
     napi_value code = GetCallbackErrorValue(env_, errCode);
     napi_value val = object->ToNapiValue(env_);
     napi_value argv[ARGS_SIZE_TWO] = {code, val};
-    status = napi_call_function(env_, undefined, callback, ARGS_SIZE_TWO, argv, &callRet);
-    if (status != napi_ok) {
-        HILOGE("napi_call_function failed, status: %{public}d", status);
-    }
+    NapiCallFunction(env_, callbackRef_, argv, ARGS_SIZE_TWO);
+}
 
-    // Check whether the JS application triggers an exception in callback. If it is, clear it.
-    bool isExist = false;
-    status = napi_is_exception_pending(env_, &isExist);
-    HILOGD("napi_is_exception_pending status: %{public}d, isExist: %{public}d", status, isExist);
-    if (isExist) {
-        HILOGI("Clear JS application's exception");
-        napi_value exception = nullptr;
-        status = napi_get_and_clear_last_exception(env_, &exception);
-        HILOGD("napi_get_and_clear_last_exception status: %{public}d, exception: %{public}p", status, exception);
-    }
+napi_env NapiCallback::GetNapiEnv(void)
+{
+    return env_;
 }
 
 NapiPromise::NapiPromise(napi_env env) : env_(env)
