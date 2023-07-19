@@ -56,26 +56,6 @@ private:
     std::string value_;
 };
 
-class NapiNativeBleCharacteristic : public NapiNativeObject {
-public:
-    NapiNativeBleCharacteristic(const GattCharacteristic &character) : character_(character) {}
-    ~NapiNativeBleCharacteristic() override = default;
-
-    napi_value ToNapiValue(napi_env env) const override;
-private:
-    GattCharacteristic character_;
-};
-
-class NapiNativeBleDescriptor : public NapiNativeObject {
-public:
-    NapiNativeBleDescriptor(const GattDescriptor &descriptor) : descriptor_(descriptor) {}
-    ~NapiNativeBleDescriptor() override = default;
-
-    napi_value ToNapiValue(napi_env env) const override;
-private:
-    GattDescriptor descriptor_;
-};
-
 class NapiNativeUuidsArray : public NapiNativeObject {
 public:
     NapiNativeUuidsArray(const std::vector<std::string> uuids) : uuids_(uuids) {}

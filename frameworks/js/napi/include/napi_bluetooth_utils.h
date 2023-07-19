@@ -92,9 +92,6 @@ const std::string REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const std::string REGISTER_STATE_CHANGE_TYPE = "stateChange";
 const std::string REGISTER_PIN_REQUEST_TYPE = "pinRequired";
 const std::string REGISTER_BOND_STATE_TYPE = "bondStateChange";
-const std::string REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
-const std::string REGISTER_SYS_BLE_SCAN_TYPE = "sysBLEScan";
-const std::string REGISTER_SYS_BLE_FIND_DEVICE_TYPE = "sysBLEDeviceFonud";
 
 const std::string INVALID_DEVICE_ID = "00:00:00:00:00:00";
 const std::string INVALID_PIN_CODE = "000000";
@@ -106,28 +103,6 @@ bool ParseArrayBuffer(napi_env env, uint8_t **data, size_t &size, napi_value arg
 napi_value GetCallbackErrorValue(napi_env env, int errCode);
 
 napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string> &stringVector);
-
-void ConvertGattServiceToJS(napi_env env, napi_value result, GattService &service);
-void ConvertGattServiceVectorToJS(napi_env env, napi_value result, std::vector<GattService> &services);
-
-void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacteristic &characteristic);
-void ConvertBLECharacteristicVectorToJS(
-    napi_env env, napi_value result, std::vector<GattCharacteristic> &characteristics);
-
-void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor &descriptor);
-void ConvertBLEDescriptorVectorToJS(napi_env env, napi_value result, std::vector<GattDescriptor> &descriptors);
-
-void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std::string &device,
-    GattCharacteristic &characteristic, int requestId);
-
-void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const std::string &device,
-    GattCharacteristic &characteristic, int requestId);
-
-void ConvertDescriptorReadReqToJS(
-    napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
-
-void ConvertDescriptorWriteReqToJS(
-    napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
@@ -157,11 +132,6 @@ struct AsyncCallbackInfo {
     napi_deferred deferred_;
     napi_ref callback_ = 0;
     int errorCode_ = 0;
-};
-
-struct GetServiceCallbackInfo : public AsyncCallbackInfo {
-    std::vector<GattService> services_;
-    std::shared_ptr<GattClient> client_ = nullptr;
 };
 
 struct SppListenCallbackInfo : public AsyncCallbackInfo {
@@ -197,22 +167,6 @@ struct SetDevicePinCodeCallbackInfo {
     CallbackPromiseInfo promise;
 };
 
-struct GattGetDeviceNameCallbackInfo {
-    napi_env env = nullptr;
-    napi_async_work asyncWork = nullptr;
-    std::string deviceName = "";
-    CallbackPromiseInfo promise;
-};
-
-struct GattGetRssiValueCallbackInfo {
-    napi_env env = nullptr;
-    napi_async_work asyncWork = nullptr;
-    int32_t rssi = 0;
-    std::mutex mutexRssi {};
-    std::condition_variable cvfull {};
-    CallbackPromiseInfo promise;
-};
-
 struct BluetoothCallbackInfo {
     napi_env env_;
     napi_ref callback_ = 0;
@@ -234,14 +188,6 @@ struct PairConfirmedCallBackInfo {
     }
 };
 
-struct GattCharacteristicCallbackInfo : public BluetoothCallbackInfo {
-    GattCharacteristic characteristic_ = {UUID::FromString("0"), 0, 0};
-};
-
-struct GattDescriptorCallbackInfo : public BluetoothCallbackInfo {
-    GattDescriptor descriptor_ = {UUID::FromString("0"), 0};
-};
-
 struct BufferCallbackInfo : public BluetoothCallbackInfo {
     char buffer_[1024];
 };
@@ -256,17 +202,10 @@ sysBLEMap g_sysBLEObserver;
 std::mutex g_sysBLEObserverMutex;
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> g_Observer;
 std::mutex g_observerMutex;
-std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = nullptr;
-std::string deviceAddr;
 std::atomic<bool> isCurrentAppOperate(false);
 }  // namespace
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
 const sysBLEMap &GetSysBLEObserver();
-void SetGattClientDeviceId(const std::string &deviceId);
-std::string GetGattClientDeviceId();
-
-void SetRssiValueCallbackInfo(std::shared_ptr<GattGetRssiValueCallbackInfo> &callback);
-std::shared_ptr<GattGetRssiValueCallbackInfo> GetRssiValueCallbackInfo();
 
 void SetCurrentAppOperate(const bool &isCurrentApp);
 bool GetCurrentAppOperate();

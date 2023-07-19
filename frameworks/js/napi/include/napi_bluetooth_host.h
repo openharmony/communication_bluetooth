@@ -45,9 +45,6 @@ napi_value SetDevicePinCode(napi_env env, napi_callback_info info);
 napi_value GetLocalProfileUuids(napi_env env, napi_callback_info info);
 napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info);
 
-napi_value GetDeviceName(napi_env env, napi_callback_info info);
-napi_value GetRssiValue(napi_env env, napi_callback_info info);
-
 napi_value PropertyValueInit(napi_env env, napi_value exports);
 napi_value ScanDutyInit(napi_env env);
 napi_value MatchModeInit(napi_env env);

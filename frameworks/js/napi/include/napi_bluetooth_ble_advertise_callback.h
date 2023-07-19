@@ -25,6 +25,8 @@ public:
     NapiBluetoothBleAdvertiseCallback() = default;
     ~NapiBluetoothBleAdvertiseCallback() override = default;
 
+    static NapiBluetoothBleAdvertiseCallback &GetInstance(void);
+
     void OnStartResultEvent(int result) override;
     void OnSetAdvDataEvent(int result) override;
 };

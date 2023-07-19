@@ -340,6 +340,23 @@ napi_status NapiParseArrayBuffer(napi_env env, napi_value value, std::vector<uin
     return napi_ok;
 }
 
+napi_status NapiParseGattWriteType(napi_env env, napi_value value, int &outWriteType)
+{
+    int writeType = -1;
+    NAPI_BT_CALL_RETURN(NapiParseInt32(env, value, writeType));
+    if (writeType == static_cast<int>(NapiGattWriteType::WRITE)) {
+        HILOGI("gattWriteType: WRITE");
+        outWriteType = GattCharacteristic::WriteType::DEFAULT;
+    } else if (writeType == static_cast<int>(NapiGattWriteType::WRITE_NO_RESPONSE)) {
+        HILOGI("gattWriteType: WRITE_NO_RESPONSE");
+        outWriteType = GattCharacteristic::WriteType::NO_RESPONSE;
+    } else {
+        HILOGE("Invalid gattWriteType: %{public}d", writeType);
+        return napi_invalid_arg;
+    }
+    return napi_ok;
+}
+
 std::shared_ptr<NapiAsyncCallback> NapiParseAsyncCallback(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_FOUR;

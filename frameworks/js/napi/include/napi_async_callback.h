@@ -49,7 +49,9 @@ public:
     NapiCallback(napi_env env, napi_value callback);
     ~NapiCallback();
 
+    void CallFunction(const std::shared_ptr<NapiNativeObject> &object);
     void CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object);
+    napi_env GetNapiEnv(void);
 private:
     NapiCallback(const NapiCallback &) = delete;
     NapiCallback &operator=(const NapiCallback &) = delete;
