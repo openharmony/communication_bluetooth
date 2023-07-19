@@ -19,7 +19,7 @@
 #include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_timer.h"
-#include "parser/napi_parser_utils.h"
+#include "../parser/napi_parser_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {

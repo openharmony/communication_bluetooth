@@ -148,18 +148,6 @@ void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
 {
     HILOGI("addr:%{public}s, rssi:%{public}d, status is %{public}d",
         GET_ENCRYPT_ADDR(device), rssi, status);
-    std::shared_ptr<GattGetRssiValueCallbackInfo> callbackInfo = GetRssiValueCallbackInfo();
-    if (callbackInfo == nullptr) {
-        return;
-    }
-    std::unique_lock<std::mutex> lock(callbackInfo->mutexRssi);
-    if (status == 0) {
-        callbackInfo->promise.errorCode = CODE_SUCCESS;
-        callbackInfo->rssi = rssi;
-    } else {
-        callbackInfo->promise.errorCode = CODE_FAILED;
-    }
-    callbackInfo->cvfull.notify_all();
 }
 
 void NapiBluetoothRemoteDeviceObserver::DealPairStatus(const int &status, int &bondStatus)
