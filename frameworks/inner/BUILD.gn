@@ -119,7 +119,10 @@ config("btframework_config") {
 
 config("btframework_public_config") {
   visibility = [ "*" ]
-  include_dirs = [ "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include" ]
+  include_dirs = [
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
+  ]
 }
 
 ohos_shared_library("btframework") {
