@@ -23,7 +23,7 @@ namespace Bluetooth {
 class NapiBluetoothHidHost {
 public:
 
-    static void DefineHidHostJSClass(napi_env env);
+    static void DefineHidHostJSClass(napi_env env, napi_value exports);
     static napi_value HidHostConstructor(napi_env env, napi_callback_info info);
 
     static napi_value On(napi_env env, napi_callback_info info);
@@ -38,7 +38,11 @@ public:
     static napi_value SetConnectionStrategy(napi_env env, napi_callback_info info);
     static napi_value GetConnectionStrategy(napi_env env, napi_callback_info info);
 
+    static napi_value CreateHidHostProfile(napi_env env, napi_callback_info info);
+    static napi_value DefineCreateProfile(napi_env env, napi_value exports);
+
     static NapiBluetoothHidHostObserver observer_;
+    static thread_local napi_ref consRef_;
 };
 } // namespace Bluetooth
 } // namespace OHOS

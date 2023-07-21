@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,21 +24,25 @@ namespace OHOS {
 namespace Bluetooth {
 class NapiA2dpSource {
 public:
-
-    static void DefineA2dpSourceJSClass(napi_env env);
+    static napi_value DefineA2dpSourceJSClass(napi_env env, napi_value exports);
     static napi_value A2dpSourceConstructor(napi_env env, napi_callback_info info);
+    static napi_value A2dpPropertyValueInit(napi_env env, napi_value exports);
 
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
-
-    static napi_value GetConnectionDevices(napi_env env, napi_callback_info info);
-    static napi_value GetDeviceState(napi_env env, napi_callback_info info);
     static napi_value GetPlayingState(napi_env env, napi_callback_info info);
     static napi_value Connect(napi_env env, napi_callback_info info);
     static napi_value Disconnect(napi_env env, napi_callback_info info);
+    static napi_value GetConnectionDevices(napi_env env, napi_callback_info info);
+    static napi_value GetDeviceState(napi_env env, napi_callback_info info);
+#ifdef BLUETOOTH_API_SINCE_10
+    static napi_value DefineCreateProfile(napi_env env, napi_value exports);
+    static napi_value CreateA2dpSrcProfile(napi_env env, napi_callback_info info);
     static napi_value SetConnectionStrategy(napi_env env, napi_callback_info info);
     static napi_value GetConnectionStrategy(napi_env env, napi_callback_info info);
-
+    static napi_value GetConnectionState(napi_env env, napi_callback_info info);
+    static napi_value getConnectedDevices(napi_env env, napi_callback_info info);
+#endif
     static NapiA2dpSourceObserver observer_;
     static bool isRegistered_;
 };

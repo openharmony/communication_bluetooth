@@ -26,7 +26,7 @@ namespace Bluetooth {
 class NapiHandsFreeAudioGateway {
 public:
 
-    static void DefineHandsFreeAudioGatewayJSClass(napi_env env);
+    static void DefineHandsFreeAudioGatewayJSClass(napi_env env, napi_value exports);
     static napi_value HandsFreeAudioGatewayConstructor(napi_env env, napi_callback_info info);
 
     static napi_value On(napi_env env, napi_callback_info info);
@@ -45,8 +45,12 @@ public:
     static napi_value SetConnectionStrategy(napi_env env, napi_callback_info info);
     static napi_value GetConnectionStrategy(napi_env env, napi_callback_info info);
 
+    static napi_value CreateHfpAgProfile(napi_env env, napi_callback_info info);
+    static napi_value DefineCreateProfile(napi_env env, napi_value exports);
+
     static NapiHandsFreeAudioGatewayObserver observer_;
     static bool isRegistered_;
+    static thread_local napi_ref consRef_;
 };
 
 }  // namespace Bluetooth
