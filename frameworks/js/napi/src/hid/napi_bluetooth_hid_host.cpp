@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,15 +29,21 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 NapiBluetoothHidHostObserver NapiBluetoothHidHost::observer_;
+thread_local napi_ref NapiBluetoothHidHost::consRef_ = nullptr;
 
-void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env)
+void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
+        DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
+#else
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+#endif
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
         DECLARE_NAPI_FUNCTION("setConnectionStrategy", SetConnectionStrategy),
@@ -47,13 +53,44 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env)
     napi_define_class(env, "NapiBluetoothHidHost", NAPI_AUTO_LENGTH, HidHostConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
 
+    
+#ifdef BLUETOOTH_API_SINCE_10
+    DefineCreateProfile(env, exports);
+    napi_create_reference(env, constructor, 1, &consRef_);
+#else
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HID_HOST, napiProfile);
     HidHost *profile = HidHost::GetProfile();
     profile->RegisterObserver(&observer_);
+#endif
     HILOGI("finished");
 }
+
+napi_value NapiBluetoothHidHost::DefineCreateProfile(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("createHidHostProfile", CreateHidHostProfile),
+    };
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
+    return exports;
+}
+
+napi_value NapiBluetoothHidHost::CreateHidHostProfile(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    napi_value napiProfile;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, consRef_, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HID_HOST, napiProfile);
+
+    HidHost *profile = HidHost::GetProfile();
+    profile->RegisterObserver(&observer_);
+
+    return napiProfile;
+}
+
 
 napi_value NapiBluetoothHidHost::HidHostConstructor(napi_env env, napi_callback_info info)
 {

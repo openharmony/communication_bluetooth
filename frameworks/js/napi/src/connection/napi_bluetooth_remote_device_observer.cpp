@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_remote_device_observer.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_bluetooth_connection.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -59,11 +60,12 @@ void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
 }
 
 void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
-    const BluetoothRemoteDevice &device, int state, unsigned int reason) {}
+    const BluetoothRemoteDevice &device, int state, unsigned int reason)
+{}
 
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
 {
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BOND_STATE_TYPE);
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallback(REGISTER_BOND_STATE_TYPE);
     if (callbackInfo == nullptr) {
         HILOGI("This callback is not registered by ability.");
         return;
@@ -80,7 +82,8 @@ void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemot
     DealPairStatus(status, bondStatus);
 
     auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothRemoteDeviceObserver,
-        decltype(&NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged), std::pair<std::string, int>>();
+        decltype(&NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged),
+        std::pair<std::string, int>>();
     if (callbackData == nullptr) {
         HILOGE("new callbackData failed");
         return;
@@ -103,8 +106,7 @@ void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemot
 
     work->data = (void *)callbackData;
 
-    int ret = uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
     if (ret != 0) {
         delete callbackData;
         callbackData = nullptr;
@@ -146,8 +148,29 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryLevelChanged(
 void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
     const BluetoothRemoteDevice &device, int rssi, int status)
 {
-    HILOGI("addr:%{public}s, rssi:%{public}d, status is %{public}d",
-        GET_ENCRYPT_ADDR(device), rssi, status);
+    HILOGI("addr:%{public}s, rssi:%{public}d, status is %{public}d", GET_ENCRYPT_ADDR(device), rssi, status);
+}
+
+void NapiBluetoothRemoteDeviceObserver::RegisterCallback(
+    const std::string &callbackName, const std::shared_ptr<BluetoothCallbackInfo> &callback)
+{
+    std::lock_guard<std::mutex> lock(callbacksMapLock_);
+    callbacks_[callbackName] = callback;
+}
+
+void NapiBluetoothRemoteDeviceObserver::DeRegisterCallback(const std::string &callbackName)
+{
+    std::lock_guard<std::mutex> lock(callbacksMapLock_);
+    callbacks_.erase(callbackName);
+}
+
+std::shared_ptr<BluetoothCallbackInfo> NapiBluetoothRemoteDeviceObserver::GetCallback(const std::string &callbackName)
+{
+    std::lock_guard<std::mutex> lock(callbacksMapLock_);
+    if (callbacks_.find(callbackName) != callbacks_.end()) {
+        return callbacks_[callbackName];
+    }
+    return nullptr;
 }
 
 void NapiBluetoothRemoteDeviceObserver::DealPairStatus(const int &status, int &bondStatus)
@@ -155,13 +178,13 @@ void NapiBluetoothRemoteDeviceObserver::DealPairStatus(const int &status, int &b
     HILOGI("status is %{public}d", status);
     switch (status) {
         case PAIR_NONE:
-            bondStatus = BondState::BOND_STATE_INVALID;
+            bondStatus = static_cast<int>(BondState::BOND_STATE_INVALID);
             break;
         case PAIR_PAIRING:
-            bondStatus = BondState::BOND_STATE_BONDING;
+            bondStatus = static_cast<int>(BondState::BOND_STATE_BONDING);
             break;
         case PAIR_PAIRED:
-            bondStatus = BondState::BOND_STATE_BONDED;
+            bondStatus = static_cast<int>(BondState::BOND_STATE_BONDED);
             break;
         default:
             break;
