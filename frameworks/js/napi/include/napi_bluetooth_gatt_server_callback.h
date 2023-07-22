@@ -18,6 +18,7 @@
 #include "bluetooth_gatt_server.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_ble_utils.h"
+#include "napi_async_callback.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -25,7 +26,13 @@ const std::string STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ = "characteris
 const std::string STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE = "characteristicWrite";
 const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ = "descriptorRead";
 const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE = "descriptorWrite";
+
+#ifdef BLUETOOTH_API_SINCE_10
+const std::string STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectionStateChange";
+#else
 const std::string STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectStateChange";
+#endif
+const std::string STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE = "BLEMtuChange";
 
 class NapiGattServerCallback : public GattServerCallback {
 public:
@@ -39,9 +46,9 @@ public:
         GattDescriptor &descriptor, int requestId) override;
     void OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
         GattDescriptor &descriptor, int requestId) override;
-    void OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu) override {}
+    void OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu) override;
     void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device,
-        int result) override {}
+        int result) override;
     void OnConnectionParameterChanged(const BluetoothRemoteDevice &device,
         int interval, int latency, int timeout, int status) override {}
 
@@ -51,6 +58,7 @@ public:
         callbackInfos_[type] = callbackInfo;
     }
 
+    NapiAsyncWorkMap asyncWorkMap_ {};
     NapiGattServerCallback() = default;
     ~NapiGattServerCallback() override = default;
 

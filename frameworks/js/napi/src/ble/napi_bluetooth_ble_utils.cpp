@@ -286,9 +286,9 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     napi_set_named_property(env, result, "offset", offset);
     HILOGI("offset is %{public}d", 0);
 
-    napi_value isPrep;
-    napi_get_boolean(env, false, &isPrep);
-    napi_set_named_property(env, result, "isPrep", isPrep);
+    napi_value isPrepared;
+    napi_get_boolean(env, false, &isPrepared);
+    napi_set_named_property(env, result, "isPrepared", isPrepared);
 
     napi_value needRsp;
     napi_get_boolean(env, true, &needRsp);
@@ -331,9 +331,9 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     napi_set_named_property(env, result, "offset", offset);
     HILOGI("offset is %{public}d", 0);
 
-    napi_value isPrep;
-    napi_get_boolean(env, false, &isPrep);
-    napi_set_named_property(env, result, "isPrep", isPrep);
+    napi_value isPrepared;
+    napi_get_boolean(env, false, &isPrepared);
+    napi_set_named_property(env, result, "isPrepared", isPrepared);
 
     napi_value needRsp;
     napi_get_boolean(env, true, &needRsp);

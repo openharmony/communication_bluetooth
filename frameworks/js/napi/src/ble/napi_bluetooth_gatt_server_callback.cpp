@@ -259,5 +259,54 @@ void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice
         }
     );
 }
+
+void NapiGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu)
+{
+    HILOGI("enter, remote device address: %{public}s, mtu: %{public}d",
+        GET_ENCRYPT_ADDR(device), mtu);
+    if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE]) {
+        HILOGI("This callback is not registered by ability.");
+        return;
+    }
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
+        callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE];
+    callbackInfo->info_ = mtu;
+    callbackInfo->deviceId_ = device.GetDeviceAddr();
+
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(callbackInfo->env_, &loop);
+    uv_work_t *work = new uv_work_t;
+    work->data = (void*)callbackInfo.get();
+
+    uv_queue_work(
+        loop,
+        work,
+        [](uv_work_t *work) {},
+        [](uv_work_t *work, int status) {
+            BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
+            if (callbackInfo == nullptr) {
+                HILOGE("callbackInfo is null!");
+                return;
+            }
+            napi_value result = 0;
+            napi_value callback = 0;
+            napi_value undefined = 0;
+            napi_value callResult = 0;
+            napi_get_undefined(callbackInfo->env_, &undefined);
+            napi_create_int32(callbackInfo->env_, static_cast<int32_t>(callbackInfo->info_), &result);
+            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+            delete work;
+            work = nullptr;
+        }
+    );
+}
+
+void NapiGattServerCallback::OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int ret)
+{
+    HILOGI("ret: %{public}d", ret);
+    auto napiRet = std::make_shared<NapiNativeInt>(ret);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC, napiRet, ret);
+}
 } // namespace Bluetooth
 } // namespace OHOS
