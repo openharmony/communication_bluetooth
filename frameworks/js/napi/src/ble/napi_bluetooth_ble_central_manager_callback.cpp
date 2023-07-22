@@ -70,6 +70,8 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
             HILOGE("ConvertScanResult memcpy_s fail");
             return;
         }
+        napi_get_boolean(env, bleScanResult.IsConnectable(), &value);
+        napi_set_named_property(env, result, "connectable", value);
         napi_create_typedarray(env, napi_uint8_array, bleScanResult.GetPayload().size(), buffer, 0, &value);
         napi_set_named_property(env, result, "data", value);
         napi_create_string_utf8(env, bleScanResult.GetName().c_str(), NAPI_AUTO_LENGTH, &value);
