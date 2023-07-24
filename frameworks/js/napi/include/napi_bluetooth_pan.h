@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Bluetooth {
 class NapiBluetoothPan {
 public:
-    static void DefinePanJSClass(napi_env env);
+    static void DefinePanJSClass(napi_env env, napi_value exports);
     static napi_value PanConstructor(napi_env env, napi_callback_info info);
 
     static napi_value On(napi_env env, napi_callback_info info);
@@ -35,6 +35,13 @@ public:
 
     static napi_value SetTethering(napi_env env, napi_callback_info info);
     static napi_value IsTetheringOn(napi_env env, napi_callback_info info);
+    static napi_value CreatePanProfile(napi_env env, napi_callback_info info);
+    static napi_value GetConnectedDevices(napi_env env, napi_callback_info info);
+    static napi_value GetConnectionState(napi_env env, napi_callback_info info);
+    static napi_value SetConnectionStrategy(napi_env env, napi_callback_info info);
+    static napi_value GetConnectionStrategy(napi_env env, napi_callback_info info);
+    static napi_value DefineCreateProfile(napi_env env, napi_value exports);
+    static thread_local napi_ref consRef_;
 
     static NapiBluetoothPanObserver observer_;
 };
