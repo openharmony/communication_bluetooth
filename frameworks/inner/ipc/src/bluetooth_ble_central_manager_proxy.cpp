@@ -28,7 +28,7 @@ BluetoothBleCentralManagerProxy::BluetoothBleCentralManagerProxy(const sptr<IRem
 BluetoothBleCentralManagerProxy::~BluetoothBleCentralManagerProxy()
 {}
 
-void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(int32_t &scannerId,
+void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(int32_t &scannerId, bool enableRandomAddrMode,
     const sptr<IBluetoothBleCentralManagerCallback> &callback)
 {
     MessageParcel data;
@@ -39,6 +39,10 @@ void BluetoothBleCentralManagerProxy::RegisterBleCentralManagerCallback(int32_t 
 
     if (!data.WriteRemoteObject(callback->AsObject())) {
         HILOGW("[RegisterBleCentralManagerCallback] fail: write callback failed.");
+        return;
+    }
+    if (!data.WriteBool(enableRandomAddrMode)) {
+        HILOGW("[RegisterBleCentralManagerCallback] fail: write enableRandomAddrMode failed.");
         return;
     }
 

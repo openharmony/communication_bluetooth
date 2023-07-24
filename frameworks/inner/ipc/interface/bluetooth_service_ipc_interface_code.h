@@ -439,6 +439,7 @@ enum BluetoothHostInterfaceCode {
     BT_DEREGISTER_BLE_PERIPHERAL_OBSERVER,
     GET_LOCAL_PROFILE_UUIDS,
     BT_SET_FAST_SCAN,
+    GET_RANDOM_ADDRESS,
 };
 
 enum BluetoothMapMceObserverInterfaceCode {
