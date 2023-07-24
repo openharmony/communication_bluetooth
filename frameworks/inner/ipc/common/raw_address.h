@@ -79,6 +79,16 @@ public:
     };
 
     /**
+     * @brief Set RawAddress address string.
+     *
+     * @since 6
+     */
+    void SetAddress(const std::string &address)
+    {
+        address_ = address;
+    };
+
+    /**
      * @brief Convert RawAddress to uint8_t pointer.
      *
      * @param dst Out parameter uint8_t pointer.
