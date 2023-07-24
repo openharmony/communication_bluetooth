@@ -45,14 +45,16 @@ napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info inf
 void NapiGattServer::DefineGattServerJSClass(napi_env env)
 {
     napi_property_descriptor gattserverDesc[] = {
-#ifndef BLUETOOTH_API_SINCE_10
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("notifyCharacteristicChanged", NotifyCharacteristicChangedEx),
+#else
         DECLARE_NAPI_FUNCTION("startAdvertising", StartAdvertising),
         DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
+        DECLARE_NAPI_FUNCTION("notifyCharacteristicChanged", NotifyCharacteristicChanged),
 #endif
         DECLARE_NAPI_FUNCTION("addService", AddService),
         DECLARE_NAPI_FUNCTION("removeService", RemoveGattService),
         DECLARE_NAPI_FUNCTION("close", Close),
-        DECLARE_NAPI_FUNCTION("notifyCharacteristicChanged", NotifyCharacteristicChanged),
         DECLARE_NAPI_FUNCTION("sendResponse", SendResponse),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
@@ -315,6 +317,76 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
     return NapiGetBooleanTrue(env);
 }
 
+static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServer> &server, const UUID &serviceUuid,
+    const UUID &characterUuid)
+{
+    auto service = server->GetService(serviceUuid, true);
+    if (!service.has_value()) {
+        service = server->GetService(serviceUuid, false);
+    }
+    if (!service.has_value()) {
+        HILOGE("not found service uuid: %{public}s", serviceUuid.ToString().c_str());
+        return nullptr;
+    }
+    GattCharacteristic *character = service.value().get().GetCharacteristic(characterUuid);
+    return character;
+}
+
+#ifdef BLUETOOTH_API_SINCE_10
+static napi_status CheckNotifyCharacteristicChangedEx(napi_env env, napi_callback_info info, 
+    NapiGattServer **outServer, std::string &outDeviceId, NapiNotifyCharacteristic &outCharacter)
+{
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {0};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_THREE, "Requires 2 or 3 arguments.", napi_invalid_arg);
+
+    std::string deviceId {};
+    NapiNotifyCharacteristic character;
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], deviceId));
+    NAPI_BT_CALL_RETURN(NapiParseNotifyCharacteristic(env, argv[PARAM1], character));
+
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr || outServer ==nullptr, "gattServer is nullptr.", napi_invalid_arg);
+    *outServer = gattServer;
+    outDeviceId = std::move(deviceId);
+    outCharacter = std::move(character);
+    return napi_ok;
+}
+
+napi_value NapiGattServer::NotifyCharacteristicChangedEx(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    NapiGattServer* napiServer = nullptr;
+    std::string deviceId {};
+    NapiNotifyCharacteristic notifyCharacter;
+    auto status = CheckNotifyCharacteristicChangedEx(env, info, &napiServer, deviceId, notifyCharacter);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && napiServer && napiServer->GetServer()), BT_ERR_INVALID_PARAM);
+
+    auto func = [server = napiServer->GetServer(), notifyCharacter, deviceId]() {
+        int ret = BT_ERR_INTERNAL_ERROR;
+        auto character = GetGattCharacteristic(server, notifyCharacter.serviceUuid, notifyCharacter.characterUuid);
+        if (character == nullptr) {
+            HILOGI("character is null!");
+            return NapiAsyncWorkRet(ret);
+        }
+        character->SetValue(notifyCharacter.characterValue.data(), notifyCharacter.characterValue.size());
+        BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
+        ret = server->NotifyCharacteristicChanged(remoteDevice, *character, notifyCharacter.confirm);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+
+    bool success = napiServer->GetCallback().asyncWorkMap_.TryPush(NapiAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC,
+        asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+#else
 static napi_status CheckGattsNotify(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer,
     std::string &outDeviceId, NapiNotifyCharacteristic &outCharacter)
 {
@@ -337,21 +409,6 @@ static napi_status CheckGattsNotify(napi_env env, napi_callback_info info, std::
     return napi_ok;
 }
 
-static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServer> &server, const UUID &serviceUuid,
-    const UUID &characterUuid)
-{
-    auto service = server->GetService(serviceUuid, true);
-    if (!service.has_value()) {
-        service = server->GetService(serviceUuid, false);
-    }
-    if (!service.has_value()) {
-        HILOGE("not found service uuid: %{public}s", serviceUuid.ToString().c_str());
-        return nullptr;
-    }
-    GattCharacteristic *character = service.value().get().GetCharacteristic(characterUuid);
-    return character;
-}
-
 napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -370,5 +427,6 @@ napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callba
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
+#endif
 } // namespace Bluetooth
 } // namespace OHOS
