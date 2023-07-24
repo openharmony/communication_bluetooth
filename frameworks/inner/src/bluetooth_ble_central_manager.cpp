@@ -161,6 +161,7 @@ struct BleCentralManager::impl {
     sptr<BleCentralManagerDeathRecipient> deathRecipient_ = nullptr;
 
     int32_t scannerId_ = BLE_SCAN_INVALID_ID;
+    bool enableRandomAddrMode_ = true;
 };
 
 class BleCentralManager::impl::BleCentralManagerDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -196,7 +197,7 @@ bool  BleCentralManager::impl::InitBleCentralManagerProxy(void)
         return false;
     }
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
-    proxy_->RegisterBleCentralManagerCallback(scannerId_, callbackImp_);
+    proxy_->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
     HILOGI("RegisterBleCentralManagerCallback, scannerId: %{public}d", scannerId_);
 
     deathRecipient_ = new BleCentralManagerDeathRecipient(*this);
@@ -508,7 +509,8 @@ BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : pimp
         return;
 }
 
-BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> callback) : pimpl(nullptr)
+BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> callback, bool enableRandomAddrMode)
+    : pimpl(nullptr)
 {
     if (pimpl == nullptr) {
         pimpl = std::make_unique<impl>();
@@ -517,6 +519,7 @@ BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> 
         }
     }
     HILOGI("successful");
+    pimpl->enableRandomAddrMode_ = enableRandomAddrMode;
     pimpl->callbacks_.Register(callback);
 }
 

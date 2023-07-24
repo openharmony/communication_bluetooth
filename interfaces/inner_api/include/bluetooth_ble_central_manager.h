@@ -480,9 +480,10 @@ public:
      * @brief A constructor used to create a <b>BleCentralManager</b> instance.
      *
      * @param cllback Central manager callback to create an <b>BleCentralManagerCallback</b> instance.
+     * @param enableRandomAddrMode Indicates whether to use random address for interface interaction.
      * @since 6
      */
-    explicit BleCentralManager(std::shared_ptr<BleCentralManagerCallback> callback);
+    explicit BleCentralManager(std::shared_ptr<BleCentralManagerCallback> callback, bool enableRandomAddrMode = true);
 
     /**
      * @brief A destructor used to delete the <b>BleCentralManager</b> instance.
