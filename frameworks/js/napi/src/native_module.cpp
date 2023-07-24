@@ -36,6 +36,10 @@
 #include "napi_bluetooth_pan.h"
 #include "napi_bluetooth_opp.h"
 
+#include "access/napi_bluetooth_access.h"
+#include "connection/napi_bluetooth_connection.h"
+#include "constant/napi_bluetooth_constant.h"
+
 namespace OHOS {
 namespace Bluetooth {
 EXTERN_C_START
@@ -54,16 +58,21 @@ static napi_value Init(napi_env env, napi_value exports)
     DefineBLEJSObject(env, exports);
     DefineSppFunctions(env, exports);
     NapiProfile::DefineProfileFunctions(env, exports);
-    NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(env);
+    NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(env, exports);
     NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(env);
+
+    NapiAccess::DefineAccessJSFunction(env, exports);
+    DefineConnectionFunctions(env, exports);
+    NapiConstant::DefineJSConstant(env, exports);
+
     BluetoothHostInit(env, exports);
     NapiA2dpSink::DefineA2dpSinkJSClass(env);
-    NapiA2dpSource::DefineA2dpSourceJSClass(env);
+    NapiA2dpSource::DefineA2dpSourceJSClass(env, exports);
     NapiPbapClient::DefinePbapClientJSClass(env);
     NapiPbapServer::DefinePbapServerJSClass(env);
     NapiAvrcpController::DefineAvrcpControllerJSClass(env);
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
-    NapiBluetoothHidHost::DefineHidHostJSClass(env);
+    NapiBluetoothHidHost::DefineHidHostJSClass(env, exports);
     NapiBluetoothPan::DefinePanJSClass(env);
     NapiBluetoothOpp::DefineOppJSClass(env);
     DefineSystemBLEInterface(env, exports);

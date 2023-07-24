@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,29 +28,48 @@ using namespace std;
 
 NapiA2dpSourceObserver NapiA2dpSource::observer_;
 bool NapiA2dpSource::isRegistered_ = false;
+thread_local napi_ref g_napiProfile = nullptr;
 
-void NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env)
+napi_value NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env, napi_value exports)
 {
-    napi_value constructor;
+    A2dpPropertyValueInit(env, exports);
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
-        DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
-        DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
-        DECLARE_NAPI_FUNCTION("getPlayingState", GetPlayingState),
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
+        DECLARE_NAPI_FUNCTION("getPlayingState", GetPlayingState),
+#ifndef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
+        DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+#endif
+#ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("setConnectionStrategy", SetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionStrategy", GetConnectionStrategy),
+        DECLARE_NAPI_FUNCTION("getConnectionState", GetConnectionState),
+        DECLARE_NAPI_FUNCTION("getConnectedDevices", getConnectedDevices),
+#endif
     };
 
-    napi_define_class(env, "A2dpSource", NAPI_AUTO_LENGTH, A2dpSourceConstructor, nullptr,
-        sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-
+    napi_value constructor;
+    napi_define_class(env,
+        "A2dpSource",
+        NAPI_AUTO_LENGTH,
+        A2dpSourceConstructor,
+        nullptr,
+        sizeof(properties) / sizeof(properties[0]),
+        properties,
+        &constructor);
+#ifdef BLUETOOTH_API_SINCE_10
+    DefineCreateProfile(env, exports);
+    napi_create_reference(env, constructor, 1, &g_napiProfile);
+#else
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_A2DP_SOURCE, napiProfile);
+#endif
     HILOGI("finished");
+    return exports;
 }
 
 napi_value NapiA2dpSource::A2dpSourceConstructor(napi_env env, napi_callback_info info)
@@ -87,6 +106,80 @@ napi_value NapiA2dpSource::Off(napi_env env, napi_callback_info info)
     return ret;
 }
 
+napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    int state = PlayingState::STATE_NOT_PLAYING;
+    napi_value ret = nullptr;
+    napi_create_int32(env, state, &ret);
+
+    std::string remoteAddr{};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, ret);
+
+    int transport = BT_TRANSPORT_BREDR;
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+    A2dpSource *profile = A2dpSource::GetProfile();
+    int32_t errorCode = profile->GetPlayingState(remoteDevice, state);
+    HILOGI("errorCode: %{public}d", errorCode);
+    NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
+
+    return NapiGetInt32Ret(env, state);
+}
+
+napi_value NapiA2dpSource::Connect(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string remoteAddr{};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
+
+    int transport = BT_TRANSPORT_BREDR;
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+    A2dpSource *profile = A2dpSource::GetProfile();
+    int32_t ret = profile->Connect(remoteDevice);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+
+    return NapiGetBooleanTrue(env);
+}
+
+napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string remoteAddr{};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
+
+    int transport = BT_TRANSPORT_BREDR;
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+    A2dpSource *profile = A2dpSource::GetProfile();
+    int32_t ret = profile->Disconnect(remoteDevice);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+
+    return NapiGetBooleanTrue(env);
+}
+
+napi_value PlayingStateInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value playingState = nullptr;
+    napi_create_object(env, &playingState);
+    SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_NOT_PLAYING, "STATE_NOT_PLAYING");
+    SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_PLAYING, "STATE_PLAYING");
+    return playingState;
+}
+
+napi_value NapiA2dpSource::A2dpPropertyValueInit(napi_env env, napi_value exports)
+{
+    napi_value playingStateObj = PlayingStateInit(env);
+    napi_property_descriptor exportProps[] = {
+        DECLARE_NAPI_PROPERTY("PlayingState", playingStateObj),
+    };
+    napi_define_properties(env, exports, sizeof(exportProps) / sizeof(*exportProps), exportProps);
+    HILOGI("end");
+    return exports;
+}
+
 napi_value NapiA2dpSource::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -100,7 +193,7 @@ napi_value NapiA2dpSource::GetConnectionDevices(napi_env env, napi_callback_info
     NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
 
     vector<string> deviceVector;
-    for (auto &device: devices) {
+    for (auto &device : devices) {
         deviceVector.push_back(device.GetDeviceAddr());
     }
     ConvertStringVectorToJS(env, ret, deviceVector);
@@ -149,68 +242,34 @@ napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info)
+#ifdef BLUETOOTH_API_SINCE_10
+napi_value NapiA2dpSource::DefineCreateProfile(napi_env env, napi_value exports)
 {
-    HILOGI("start");
-    int state = PlayingState::STATE_NOT_PLAYING;
-    napi_value ret = nullptr;
-    napi_create_int32(env, state, &ret);
-
-    std::string remoteAddr {};
-    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, ret);
-
-    int transport = GetDeviceTransport(remoteAddr);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
-    A2dpSource *profile = A2dpSource::GetProfile();
-    int32_t errorCode = profile->GetPlayingState(remoteDevice, state);
-    HILOGI("errorCode: %{public}d", errorCode);
-    NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
-
-    return NapiGetInt32Ret(env, state);
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("createA2dpSrcProfile", CreateA2dpSrcProfile),
+    };
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
+    return exports;
 }
 
-napi_value NapiA2dpSource::Connect(napi_env env, napi_callback_info info)
+napi_value NapiA2dpSource::CreateA2dpSrcProfile(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
-    std::string remoteAddr {};
-    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
-
-    int transport = GetDeviceTransport(remoteAddr);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
-    A2dpSource *profile = A2dpSource::GetProfile();
-    int32_t ret = profile->Connect(remoteDevice);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-
-    return NapiGetBooleanTrue(env);
-}
-
-napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
-{
-    HILOGI("start");
-    std::string remoteAddr {};
-    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
-
-    int transport = GetDeviceTransport(remoteAddr);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
-    A2dpSource *profile = A2dpSource::GetProfile();
-    int32_t ret = profile->Disconnect(remoteDevice);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-
-    return NapiGetBooleanTrue(env);
+    napi_value profile;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, g_napiProfile, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &profile);
+    return profile;
 }
 
 napi_value NapiA2dpSource::SetConnectionStrategy(napi_env env, napi_callback_info info)
 {
     HILOGI("start");
-    std::string remoteAddr {};
+    std::string remoteAddr{};
     int32_t strategy = 0;
     auto status = CheckSetConnectStrategyParam(env, info, remoteAddr, strategy);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int transport = GetDeviceTransport(remoteAddr);
+    int transport = BT_TRANSPORT_BREDR;
     auto func = [remoteAddr, transport, strategy]() {
         BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
         A2dpSource *profile = A2dpSource::GetProfile();
@@ -227,11 +286,11 @@ napi_value NapiA2dpSource::SetConnectionStrategy(napi_env env, napi_callback_inf
 napi_value NapiA2dpSource::GetConnectionStrategy(napi_env env, napi_callback_info info)
 {
     HILOGI("start");
-    std::string remoteAddr {};
+    std::string remoteAddr{};
     auto status = CheckDeviceAddressParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int transport = GetDeviceTransport(remoteAddr);
+    int transport = BT_TRANSPORT_BREDR;
     auto func = [remoteAddr, transport]() {
         int strategy = 0;
         BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
@@ -246,5 +305,16 @@ napi_value NapiA2dpSource::GetConnectionStrategy(napi_env env, napi_callback_inf
     asyncWork->Run();
     return asyncWork->GetRet();
 }
-} // namespace Bluetooth
-} // namespace OHOS
+
+napi_value NapiA2dpSource::GetConnectionState(napi_env env, napi_callback_info info)
+{
+    return GetDeviceState(env, info);
+}
+napi_value NapiA2dpSource::getConnectedDevices(napi_env env, napi_callback_info info)
+{
+    return GetConnectionDevices(env, info);
+}
+
+#endif
+}  // namespace Bluetooth
+}  // namespace OHOS

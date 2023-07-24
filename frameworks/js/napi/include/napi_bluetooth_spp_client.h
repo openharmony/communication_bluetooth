@@ -22,7 +22,15 @@
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string STR_BT_SPP_READ = "sppRead";
+struct SppConnectCallbackInfo : public AsyncCallbackInfo {
+    std::shared_ptr<ClientSocket> client_ = nullptr;
+    std::string deviceId_ = "";
+    std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
+    std::shared_ptr<SppOption> sppOption_ = nullptr;
+};
+
+const std::string REGISTER_SPP_READ_TYPE = "sppRead";
+std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
 struct NapiSppClient {
     static napi_value SppConnect(napi_env env, napi_callback_info info);
