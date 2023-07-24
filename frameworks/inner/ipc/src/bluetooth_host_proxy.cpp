@@ -1493,5 +1493,27 @@ int32_t BluetoothHostProxy::SetFastScan(bool isEnable)
     }
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::GetRandomAddress(const std::string &realAddr, std::string &randomAddr)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetRandomAddress WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(realAddr)) {
+        HILOGE("BluetoothHostProxy::GetRandomAddress Write realAddr error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_RANDOM_ADDRESS, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetRandomAddress fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    randomAddr = reply.ReadString();
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

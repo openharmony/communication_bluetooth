@@ -654,6 +654,16 @@ public:
     */
     int SetFastScan(bool isEnable);
 
+    /**
+    * @brief Get the random address of a device.
+    * If the address carried in the bluetooth interface is not obtained from the bluetooth,
+    * the interface needs to be used for address translation.
+    * @param realAddr real address.
+    * @param[out] randomAddr random address.
+    * @return Returns result.
+    */
+    int GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const;
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

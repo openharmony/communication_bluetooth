@@ -1116,5 +1116,24 @@ int BluetoothHost::SetFastScan(bool isEnable)
     }
     return pimpl->proxy_->SetFastScan(isEnable);
 }
+
+int BluetoothHost::GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const
+{
+    HILOGI("enter.");
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (!pimpl || !pimpl->InitBluetoothHostProxy()) {
+        HILOGE("pimpl or bluetooth host is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+    if (!IsValidBluetoothAddr(realAddr)) {
+        HILOGE("realAddr is invalid: %{public}s", realAddr.c_str());
+        return BT_ERR_INVALID_PARAM;
+    }
+    return pimpl->proxy_->GetRandomAddress(realAddr, randomAddr);
+}
 } // namespace Bluetooth
 } // namespace OHOS
