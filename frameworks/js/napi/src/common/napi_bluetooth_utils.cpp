@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -251,6 +251,14 @@ void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName,
     }
 }
 
+void SetNamedPropertyByString(napi_env env, napi_value dstObj, std::string strValue, const char *propName)
+{
+    napi_value prop = nullptr;
+    if (napi_create_string_utf8(env, strValue.c_str(), NAPI_AUTO_LENGTH, &prop) == napi_ok) {
+        napi_set_named_property(env, dstObj, propName, prop);
+    }
+}
+
 napi_value NapiGetNull(napi_env env)
 {
     napi_value result = nullptr;
@@ -293,118 +301,6 @@ napi_value NapiGetInt32Ret(napi_env env, int32_t res)
     return ret;
 }
 
-static napi_status CheckObserverParams(napi_env env, size_t argc, napi_value *argv, std::string &outType,
-    std::shared_ptr<BluetoothCallbackInfo> &outpCallbackInfo)
-{
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
-    std::string type;
-    bool ok = ParseString(env, type, argv[PARAM0]);
-    if (!ok) {
-        return napi_invalid_arg;
-    }
-    napi_valuetype valueType = napi_undefined;
-    NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM1], &valueType));
-    NAPI_BT_RETURN_IF(valueType != napi_function, "Requires a function argument", napi_function_expected);
-    NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &outpCallbackInfo->callback_));
-
-    outType = type;
-    outpCallbackInfo->env_ = env;
-    return napi_ok;
-}
-
-napi_value RegisterObserver(napi_env env, napi_callback_info info)
-{
-    HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    HILOGI("argc: %{public}zu", argc);
-    if (argc == expectedArgsCount + 1) {
-        NapiSppClient::On(env, info);
-    } else {
-        std::string type;
-        std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
-        auto status = CheckObserverParams(env, argc, argv, type, pCallbackInfo);
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-        std::lock_guard<std::mutex> lock(g_observerMutex);
-        g_Observer[type] = pCallbackInfo;
-        HILOGI("%{public}s is registered", type.c_str());
-    }
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-    return ret;
-}
-
-static void RemoveObserver(std::string type)
-{
-    std::lock_guard<std::mutex> lock(g_observerMutex);
-    if (g_Observer.find(type) != g_Observer.end()) {
-        g_Observer[type] = nullptr;
-        HILOGI("%{public}s is deregistered", type.c_str());
-    } else {
-        HILOGE("%{public}s has not been registered", type.c_str());
-    }
-}
-
-static std::map<std::string, int32_t> registerTypeMap = {
-    {REGISTER_DEVICE_FIND_TYPE, BLUETOOTH_DEVICE_FIND_TYPE},
-    {REGISTER_STATE_CHANGE_TYPE, STATE_CHANGE_TYPE},
-    {REGISTER_PIN_REQUEST_TYPE, PIN_REQUEST_TYPE},
-    {REGISTER_BOND_STATE_TYPE, BOND_STATE_CHANGE_TYPE},
-};
-
-napi_value CallbackObserver(int32_t typeNum, std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo)
-{
-    napi_value result = 0;
-    napi_value deviceId = nullptr;
-    napi_value state = nullptr;
-    napi_value pinCode = nullptr;
-    napi_value value = 0;
-
-    switch (typeNum) {
-        case BLUETOOTH_DEVICE_FIND_TYPE:
-            napi_create_array(pCallbackInfo->env_, &result);
-            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &value);
-            napi_set_element(pCallbackInfo->env_, result, 0, value);
-            break;
-        case STATE_CHANGE_TYPE:
-            napi_create_int32(pCallbackInfo->env_, static_cast<int32_t>(BluetoothState::STATE_OFF), &result);
-            break;
-        case PIN_REQUEST_TYPE:
-            napi_create_object(pCallbackInfo->env_, &result);
-            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &deviceId);
-            napi_set_named_property(pCallbackInfo->env_, result, "deviceId", deviceId);
-            napi_create_string_utf8(pCallbackInfo->env_, INVALID_PIN_CODE.c_str(), NAPI_AUTO_LENGTH, &pinCode);
-            napi_set_named_property(pCallbackInfo->env_, result, "pinCode", pinCode);
-            break;
-        case BOND_STATE_CHANGE_TYPE:
-            napi_create_object(pCallbackInfo->env_, &result);
-            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &deviceId);
-            napi_set_named_property(pCallbackInfo->env_, result, "deviceId", deviceId);
-            napi_create_int32(pCallbackInfo->env_, static_cast<int32_t>(BondState::BOND_STATE_INVALID), &state);
-            napi_set_named_property(pCallbackInfo->env_, result, "state", state);
-            break;
-        case BLE_DEVICE_FIND_TYPE:
-            napi_create_array(pCallbackInfo->env_, &result);
-            napi_create_string_utf8(pCallbackInfo->env_, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &value);
-            napi_set_element(pCallbackInfo->env_, result, 0, value);
-            break;
-        default:
-            result = NapiGetNull(pCallbackInfo->env_);
-            break;
-    }
-    return result;
-}
-
-napi_value DeregisterObserver(napi_env env, napi_callback_info info)
-{
-    HILOGI("enter");
-    auto status = CheckDeregisterObserver(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    return NapiGetUndefinedRet(env);
-}
-
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver()
 {
     return g_Observer;
@@ -413,36 +309,6 @@ std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver()
 const sysBLEMap &GetSysBLEObserver()
 {
     return g_sysBLEObserver;
-}
-
-std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
-{
-    std::shared_ptr<SppOption> sppOption = std::make_shared<SppOption>();
-    napi_value propertyNameValue = nullptr;
-    napi_value value = nullptr;
-
-    napi_create_string_utf8(env, "uuid", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    bool isSuccess = ParseString(env, sppOption->uuid_, value);
-    if (!isSuccess || (!regex_match(sppOption->uuid_, uuidRegex))) {
-        HILOGE("Parse UUID faild.");
-        return nullptr;
-    }
-    HILOGI("uuid is %{public}s", sppOption->uuid_.c_str());
-
-    napi_create_string_utf8(env, "secure", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    ParseBool(env, sppOption->secure_, value);
-    HILOGI("secure is %{public}d", sppOption->secure_);
-
-    int type = 0;
-    napi_create_string_utf8(env, "type", NAPI_AUTO_LENGTH, &propertyNameValue);
-    napi_get_property(env, object, propertyNameValue, &value);
-    ParseInt32(env, type, value);
-    sppOption->type_ = BtSocketType(type);
-    HILOGI("uuid: %{public}s, secure: %{public}d, type: %{public}d",
-        sppOption->uuid_.c_str(), sppOption->secure_, sppOption->type_);
-    return sppOption;
 }
 
 int GetProfileConnectionState(int state)
@@ -871,47 +737,6 @@ bool CheckSetBluetoothScanModeParam(napi_env env, napi_callback_info info, int32
     NAPI_BT_RETURN_IF(!ParseInt32(env, mode, argv[PARAM0]), "ParseInt32 failed", false);
     NAPI_BT_RETURN_IF(!ParseInt32(env, duration, argv[PARAM1]), "ParseInt32 failed", false);
     return true;
-}
-
-napi_status CheckDeregisterObserver(napi_env env, napi_callback_info info)
-{
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-    if (argc == ARGS_SIZE_ONE) {
-        std::string type;
-        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-        RemoveObserver(type);
-    } else if (argc == expectedArgsCount + 1) {
-        NapiSppClient::Off(env, info);
-    } else {
-        NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
-        std::string type;
-        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-
-        std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
-        NAPI_BT_RETURN_IF(pCallbackInfo == nullptr, "pCallbackInfo is nullptr.", napi_invalid_arg);
-        pCallbackInfo->env_ = env;
-        NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
-        NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_));
-        if (pCallbackInfo != nullptr) {
-            napi_value callback = 0;
-            napi_value undefined = 0;
-            napi_value callResult = 0;
-            napi_get_undefined(pCallbackInfo->env_, &undefined);
-            int32_t typeNum = 0;
-            if (registerTypeMap.find(type) != registerTypeMap.end()) {
-                typeNum = registerTypeMap[type];
-            }
-            napi_value result = CallbackObserver(typeNum, pCallbackInfo);
-            napi_get_reference_value(pCallbackInfo->env_, pCallbackInfo->callback_, &callback);
-            napi_call_function(pCallbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        }
-        RemoveObserver(type);
-    }
-    return napi_ok;
 }
 
 napi_status CheckEmptyParam(napi_env env, napi_callback_info info)

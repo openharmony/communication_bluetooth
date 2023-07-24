@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_BLUETOOTH_HOST_H_
-#define NAPI_BLUETOOTH_HOST_H_
+#ifndef NAPI_BLUETOOTH_CONSTANT_H_
+#define NAPI_BLUETOOTH_CONSTANT_H_
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace Bluetooth {
-napi_value BluetoothHostInit(napi_env env, napi_value exports);
-napi_value RegisterHostObserver(napi_env env, napi_callback_info info);
-napi_value DeregisterHostObserver(napi_env env, napi_callback_info info);
-napi_value PropertyValueInit(napi_env env, napi_value exports);
-napi_value ScanDutyInit(napi_env env);
-napi_value MatchModeInit(napi_env env);
+class NapiConstant {
+public:
+    static napi_value DefineJSConstant(napi_env env, napi_value exports);
+
+private:
+    static napi_value ConstantPropertyValueInit(napi_env env, napi_value exports);
+    static napi_value ProfileIdInit(napi_env env);
+    static napi_value ProfileUuidsInit(napi_env env);
+    static napi_value ProfileStateInit(napi_env env);
+    static napi_value MajorClassOfDeviceInit(napi_env env);
+    static napi_value MajorMinorClassOfDeviceInit(napi_env env);
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
-#endif /* NAPI_BLUETOOTH_H_ */
+#endif /* NAPI_BLUETOOTH_CONSTANT_H_ */

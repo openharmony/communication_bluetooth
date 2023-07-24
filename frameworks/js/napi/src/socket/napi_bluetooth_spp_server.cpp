@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ std::map<int, std::shared_ptr<NapiSppServer>> NapiSppServer::serverMap;
 
 void DefineSppFunctions(napi_env env, napi_value exports)
 {
+    SppPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("sppListen", NapiSppServer::SppListen),
         DECLARE_NAPI_FUNCTION("sppAccept", NapiSppServer::SppAccept),
@@ -33,8 +34,41 @@ void DefineSppFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("sppCloseServerSocket", NapiSppServer::SppCloseServerSocket),
         DECLARE_NAPI_FUNCTION("sppCloseClientSocket", NapiSppClient::SppCloseClientSocket),
         DECLARE_NAPI_FUNCTION("sppWrite", NapiSppClient::SppWrite),
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("on", NapiSppServer::RegisterSocketObserver),
+        DECLARE_NAPI_FUNCTION("off", NapiSppServer::DeRegisterSocketObserver),
+#endif
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
+napi_value NapiSppServer::RegisterSocketObserver(napi_env env, napi_callback_info info)
+{
+    return NapiSppClient::On(env, info);
+}
+
+napi_value NapiSppServer::DeRegisterSocketObserver(napi_env env, napi_callback_info info)
+{
+    return NapiSppClient::Off(env, info);
+}
+
+napi_value SppTypeInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value sppType = nullptr;
+    napi_create_object(env, &sppType);
+    SetNamedPropertyByInteger(env, sppType, SppType::SPP_RFCOMM, "SPP_RFCOMM");
+    return sppType;
+}
+
+void SppPropertyValueInit(napi_env env, napi_value exports)
+{
+    napi_value sppTypeObj = SppTypeInit(env);
+    napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("SppType", sppTypeObj),
+    };
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    HILOGI("end");
 }
 
 static napi_status CheckSppListenParams(

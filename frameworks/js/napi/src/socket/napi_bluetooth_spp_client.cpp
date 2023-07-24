@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,6 +67,36 @@ static napi_status CheckSppConnectParams(
         napi_create_promise(env, &callbackInfo->deferred_, &promise);
     }
     return napi_ok;
+}
+
+std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
+{
+    std::shared_ptr<SppOption> sppOption = std::make_shared<SppOption>();
+    napi_value propertyNameValue = nullptr;
+    napi_value value = nullptr;
+
+    napi_create_string_utf8(env, "uuid", NAPI_AUTO_LENGTH, &propertyNameValue);
+    napi_get_property(env, object, propertyNameValue, &value);
+    bool isSuccess = ParseString(env, sppOption->uuid_, value);
+    if (!isSuccess || (!regex_match(sppOption->uuid_, uuidRegex))) {
+        HILOGE("Parse UUID faild.");
+        return nullptr;
+    }
+    HILOGI("uuid is %{public}s", sppOption->uuid_.c_str());
+
+    napi_create_string_utf8(env, "secure", NAPI_AUTO_LENGTH, &propertyNameValue);
+    napi_get_property(env, object, propertyNameValue, &value);
+    ParseBool(env, sppOption->secure_, value);
+    HILOGI("secure is %{public}d", sppOption->secure_);
+
+    int type = 0;
+    napi_create_string_utf8(env, "type", NAPI_AUTO_LENGTH, &propertyNameValue);
+    napi_get_property(env, object, propertyNameValue, &value);
+    ParseInt32(env, type, value);
+    sppOption->type_ = BtSocketType(type);
+    HILOGI("uuid: %{public}s, secure: %{public}d, type: %{public}d",
+        sppOption->uuid_.c_str(), sppOption->secure_, sppOption->type_);
+    return sppOption;
 }
 
 napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
@@ -237,7 +267,7 @@ napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
         "Wrong argument type. String expected.", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(type.c_str() != STR_BT_SPP_READ, "Invalid type.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
     callbackInfo = std::make_shared<BufferCallbackInfo>();
     callbackInfo->env_ = env;
@@ -284,7 +314,7 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
         "Wrong argument type. String expected.", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(type.c_str() != STR_BT_SPP_READ, "Invalid type.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
     NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
 
@@ -307,7 +337,7 @@ napi_value NapiSppClient::Off(napi_env env, napi_callback_info info)
 void NapiSppClient::SppRead(int id)
 {
     if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
-        clientMap[id]->callbackInfos_[STR_BT_SPP_READ] == nullptr) {
+        clientMap[id]->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
         HILOGE("thread start failed.");
         return;
     }
@@ -327,12 +357,12 @@ void NapiSppClient::SppRead(int id)
         } else {
             HILOGI("callback read data to jshap begin");
             if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
-                clientMap[id]->callbackInfos_[STR_BT_SPP_READ] == nullptr) {
+                clientMap[id]->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
                 HILOGE("failed");
                 return;
             }
             std::shared_ptr<BufferCallbackInfo> callbackInfo =
-                std::static_pointer_cast<BufferCallbackInfo>(clientMap[id]->callbackInfos_[STR_BT_SPP_READ]);
+                std::static_pointer_cast<BufferCallbackInfo>(clientMap[id]->callbackInfos_[REGISTER_SPP_READ_TYPE]);
 
             callbackInfo->info_ = ret;
             if (memcpy_s(callbackInfo->buffer_, sizeof(callbackInfo->buffer_), buf, ret) != EOK) {

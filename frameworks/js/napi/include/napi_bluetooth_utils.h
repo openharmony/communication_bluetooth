@@ -15,7 +15,6 @@
 #ifndef NAPI_BLUETOOTH_UTILS_H
 #define NAPI_BLUETOOTH_UTILS_H
 
-#include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_client.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_gatt_server.h"
@@ -88,13 +87,9 @@ struct SppOption {
     BtSocketType type_;
 };
 
-const std::string REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const std::string REGISTER_STATE_CHANGE_TYPE = "stateChange";
-const std::string REGISTER_PIN_REQUEST_TYPE = "pinRequired";
-const std::string REGISTER_BOND_STATE_TYPE = "bondStateChange";
 
 const std::string INVALID_DEVICE_ID = "00:00:00:00:00:00";
-const std::string INVALID_PIN_CODE = "000000";
 
 bool ParseString(napi_env env, std::string &param, napi_value args);
 bool ParseInt32(napi_env env, int32_t &param, napi_value args);
@@ -113,14 +108,13 @@ void ConvertOppTransferInformationToJS(napi_env env,
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName);
+void SetNamedPropertyByString(napi_env env, napi_value dstObj, std::string strValue, const char *propName);
 napi_value NapiGetNull(napi_env env);
 napi_value NapiGetBooleanFalse(napi_env env);
 napi_value NapiGetBooleanTrue(napi_env env);
 napi_value NapiGetBooleanRet(napi_env env, bool ret);
 napi_value NapiGetUndefinedRet(napi_env env);
 napi_value NapiGetInt32Ret(napi_env env, int32_t res);
-napi_value RegisterObserver(napi_env env, napi_callback_info info);
-napi_value DeregisterObserver(napi_env env, napi_callback_info info);
 
 int GetProfileConnectionState(int state);
 int GetScoConnectionState(int state);
@@ -132,24 +126,6 @@ struct AsyncCallbackInfo {
     napi_deferred deferred_;
     napi_ref callback_ = 0;
     int errorCode_ = 0;
-};
-
-struct SppListenCallbackInfo : public AsyncCallbackInfo {
-    std::shared_ptr<ServerSocket> server_ = nullptr;
-    std::string name_ = "";
-    std::shared_ptr<SppOption> sppOption_;
-};
-
-struct SppAcceptCallbackInfo : public AsyncCallbackInfo {
-    std::shared_ptr<ServerSocket> server_ = nullptr;
-    std::shared_ptr<ClientSocket> client_ = nullptr;
-};
-
-struct SppConnectCallbackInfo : public AsyncCallbackInfo {
-    std::shared_ptr<ClientSocket> client_ = nullptr;
-    std::string deviceId_ = "";
-    std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
-    std::shared_ptr<SppOption> sppOption_ = nullptr;
 };
 
 struct CallbackPromiseInfo {
@@ -307,20 +283,10 @@ enum class BluetoothState {
     /** Indicates the local Bluetooth is turning off LE only mode */
     STATE_BLE_TURNING_OFF = 6
 };
-
-enum BondState {
-    BOND_STATE_INVALID = 0,
-    BOND_STATE_BONDING = 1,
-    BOND_STATE_BONDED = 2
-};
-
-enum class ScanMode {
-    SCAN_MODE_NONE = 0,
-    SCAN_MODE_CONNECTABLE = 1,
-    SCAN_MODE_GENERAL_DISCOVERABLE = 2,
-    SCAN_MODE_LIMITED_DISCOVERABLE = 3,
-    SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE = 4,
-    SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE = 5
+enum ConnectionStrategy {
+    CONNECTION_UNKNOWN = 0,
+    CONNECTION_ALLOWED = 1,
+    CONNECTION_FORBIDDEN =2,
 };
 
 enum MajorClass {
@@ -538,7 +504,6 @@ bool CheckProfileIdParam(napi_env env, napi_callback_info info, int &profileId);
 bool CheckSetDevicePairingConfirmationParam(napi_env env, napi_callback_info info, std::string &addr, bool &accept);
 bool CheckLocalNameParam(napi_env env, napi_callback_info info, std::string &name);
 bool CheckSetBluetoothScanModeParam(napi_env env, napi_callback_info info, int32_t &mode, int32_t &duration);
-napi_status CheckDeregisterObserver(napi_env env, napi_callback_info info);
 napi_status CheckEmptyParam(napi_env env, napi_callback_info info);
 napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const std::vector<std::string> &names);
 napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &strategy);
