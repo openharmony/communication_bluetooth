@@ -48,7 +48,7 @@ struct BluetoothLpDeviceParamSet {
 class IBluetoothBleCentralManager : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetootBleCentralManager");
-    virtual void RegisterBleCentralManagerCallback(int32_t &scannerId,
+    virtual void RegisterBleCentralManagerCallback(int32_t &scannerId, bool enableRandomAddrMode,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
     virtual void DeregisterBleCentralManagerCallback(int32_t scannerId,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
