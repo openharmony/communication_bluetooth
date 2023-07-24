@@ -28,13 +28,19 @@ using namespace std;
 
 NapiHandsFreeAudioGatewayObserver NapiHandsFreeAudioGateway::observer_;
 bool NapiHandsFreeAudioGateway::isRegistered_ = false;
+thread_local napi_ref NapiHandsFreeAudioGateway::consRef_ = nullptr;
 
-void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
+void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env, napi_value exports)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
+        DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
+#else
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+#endif
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
         DECLARE_NAPI_FUNCTION("getScoState", GetScoState),
@@ -50,10 +56,36 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env)
 
     napi_define_class(env, "HandsFreeAudioGateway", NAPI_AUTO_LENGTH, HandsFreeAudioGatewayConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
+
+#ifdef BLUETOOTH_API_SINCE_10
+    DefineCreateProfile(env, exports);
+    napi_create_reference(env, constructor, 1, &consRef_);
+#else
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
+#endif
     HILOGI("finished");
+}
+
+napi_value NapiHandsFreeAudioGateway::DefineCreateProfile(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("createHfpAgProfile", CreateHfpAgProfile),
+    };
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
+    return exports;
+}
+
+napi_value NapiHandsFreeAudioGateway::CreateHfpAgProfile(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    napi_value napiProfile;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, consRef_, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
+    return napiProfile;
 }
 
 napi_value NapiHandsFreeAudioGateway::HandsFreeAudioGatewayConstructor(napi_env env, napi_callback_info info)
