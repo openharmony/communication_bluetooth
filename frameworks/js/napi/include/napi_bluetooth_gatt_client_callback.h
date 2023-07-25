@@ -59,6 +59,7 @@ public:
     static std::shared_mutex g_gattClientCallbackInfosMutex;
 
     NapiAsyncWorkMap asyncWorkMap_ {};
+    napi_threadsafe_function onBleCharacterChangedThreadSafeFunc_ = nullptr;
 
 private:
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};

@@ -26,17 +26,25 @@ std::shared_mutex NapiGattClientCallback::g_gattClientCallbackInfosMutex;
 
 void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
 {
-    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGI("This callback is not registered by ability.");
+    auto status = napi_acquire_threadsafe_function(onBleCharacterChangedThreadSafeFunc_);
+    if (status != napi_ok) {
+        HILOGE("napi_acquire_threadsafe_function failed, status: %{public}d", status);
         return;
     }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-    HILOGI("uuid is %{public}s", characteristic.GetUuid().ToString().c_str());
 
-    NapiEvent::CheckAndNotify(callbackInfo, characteristic);
+    GattCharacteristic *character = new GattCharacteristic(characteristic);
+    status = napi_call_threadsafe_function(
+        onBleCharacterChangedThreadSafeFunc_, static_cast<void *>(character), napi_tsfn_blocking);
+    if (status != napi_ok) {
+        HILOGE("napi_call_threadsafe_function failed, status: %{public}d", status);
+        return;
+    }
+
+    status = napi_release_threadsafe_function(onBleCharacterChangedThreadSafeFunc_, napi_tsfn_release);
+    if (status != napi_ok) {
+        HILOGE("napi_release_threadsafe_function failed, status: %{public}d", status);
+        return;
+    }
 }
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
