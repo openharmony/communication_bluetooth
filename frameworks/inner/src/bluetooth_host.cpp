@@ -1120,6 +1120,7 @@ int BluetoothHost::SetFastScan(bool isEnable)
 int BluetoothHost::GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const
 {
     HILOGI("enter.");
+    randomAddr = "";
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
