@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
-
+std::mutex g_avrcpProxyMutex;
 AvrcpCtResponse::AvrcpCtResponse(uint8_t type, int resp) : type_(type), resp_(resp)
 {
     HILOGI("enter");
@@ -885,7 +885,6 @@ public:
     }
 
     bool InitAvrcpCtProxy(void);
-    void UnInitAvrcpCtProxy(void);
 
     std::mutex observerMutex_;
     BluetoothObserverList<AvrcpController::IObserver> observers_;
@@ -905,11 +904,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        std::lock_guard<std::mutex> lock(g_avrcpProxyMutex);
         if (!avrcpCt_.proxy_) {
             return;
         }
-        avrcpCt_.proxy_->UnregisterObserver(avrcpCt_.observer_);
-        avrcpCt_.proxy_->AsObject()->RemoveDeathRecipient(avrcpCt_.deathRecipient_);
         avrcpCt_.proxy_ = nullptr;
     }
 
@@ -932,9 +930,11 @@ AvrcpController::impl::impl()
 
 bool AvrcpController::impl::InitAvrcpCtProxy(void)
 {
+    std::lock_guard<std::mutex> lock(g_avrcpProxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGI("enter");
     proxy_ = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
     if (!proxy_) {
         HILOGE("get AvrcpController proxy failed");
@@ -951,18 +951,6 @@ bool AvrcpController::impl::InitAvrcpCtProxy(void)
         proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     }
     return true;
-}
-
-void AvrcpController::impl::UnInitAvrcpCtProxy(void)
-{
-    if (!proxy_) {
-        HILOGE("UnInitAvrcpCtProxy failed");
-        return;
-    }
-    proxy_->UnregisterObserver(observer_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitAvrcpCtProxy success");
 }
 
 AvrcpController *AvrcpController::GetProfile(void)
@@ -984,15 +972,6 @@ void AvrcpController::Init()
         HILOGE("get AvrcpController proxy failed");
         return;
     }
-}
-
-void AvrcpController::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitAvrcpCtProxy();
 }
 
 /******************************************************************
@@ -1030,7 +1009,7 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetConnectedDevices(void)
         return std::vector<BluetoothRemoteDevice>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return std::vector<BluetoothRemoteDevice>();
     }
@@ -1053,7 +1032,7 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetDevicesByStates(const std
         return std::vector<BluetoothRemoteDevice>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return std::vector<BluetoothRemoteDevice>();
     }
@@ -1083,7 +1062,7 @@ int AvrcpController::GetDeviceState(const BluetoothRemoteDevice &device)
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
@@ -1101,7 +1080,7 @@ bool AvrcpController::Connect(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1120,7 +1099,7 @@ bool AvrcpController::Disconnect(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1143,7 +1122,7 @@ int AvrcpController::PressButton(const BluetoothRemoteDevice &device, uint8_t bu
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1183,7 +1162,7 @@ int AvrcpController::ReleaseButton(const BluetoothRemoteDevice &device, uint8_t 
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1227,7 +1206,7 @@ int AvrcpController::GetUnitInfo(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1245,7 +1224,7 @@ int AvrcpController::GetSubUnitInfo(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1267,7 +1246,7 @@ int AvrcpController::GetSupportedCompanies(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1285,7 +1264,7 @@ int AvrcpController::GetSupportedEvents(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1307,7 +1286,7 @@ int AvrcpController::GetPlayerAppSettingAttributes(const BluetoothRemoteDevice &
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1325,7 +1304,7 @@ int AvrcpController::GetPlayerAppSettingValues(const BluetoothRemoteDevice &devi
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1357,7 +1336,7 @@ int AvrcpController::GetPlayerAppSettingCurrentValue(
         return RET_NO_ERROR;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1396,7 +1375,7 @@ int AvrcpController::SetPlayerAppSettingCurrentValue(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1444,7 +1423,7 @@ int AvrcpController::GetPlayerApplicationSettingAttributeText(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1478,7 +1457,7 @@ int AvrcpController::GetPlayerApplicationSettingValueText(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1517,7 +1496,7 @@ int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, c
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1543,7 +1522,7 @@ int AvrcpController::GetPlayStatus(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1561,7 +1540,7 @@ int AvrcpController::PlayItem(const BluetoothRemoteDevice &device, uint64_t uid,
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1588,7 +1567,7 @@ int AvrcpController::GetFolderItems(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1629,7 +1608,7 @@ int AvrcpController::GetMeidaPlayerList(const BluetoothRemoteDevice &device, uin
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1647,7 +1626,7 @@ int AvrcpController::GetTotalNumberOfItems(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1670,7 +1649,7 @@ int AvrcpController::SetAbsoluteVolume(const BluetoothRemoteDevice &device, uint
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1693,7 +1672,7 @@ int AvrcpController::EnableNotification(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1716,7 +1695,7 @@ int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, co
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1742,7 +1721,7 @@ int AvrcpController::SetAddressedPlayer(const BluetoothRemoteDevice &device, uin
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1759,7 +1738,7 @@ int AvrcpController::SetBrowsedPlayer(const BluetoothRemoteDevice &device, uint1
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1779,7 +1758,7 @@ int AvrcpController::ChangePath(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1797,7 +1776,7 @@ int AvrcpController::GetItemAttributes(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1820,7 +1799,7 @@ int AvrcpController::RequestContinuingResponse(const BluetoothRemoteDevice &devi
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }
@@ -1846,7 +1825,7 @@ int AvrcpController::AddToNowPlaying(const BluetoothRemoteDevice &device, uint64
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpCtProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
         return RET_BAD_STATUS;
     }

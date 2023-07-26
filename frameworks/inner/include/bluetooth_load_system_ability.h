@@ -31,7 +31,7 @@ enum SUBSCRIBED_SYSTEM_ABILITY_STATE {
     STATE_SUBSCRIBED,
 };
 
-enum NOTIFY_PROFILE_MSG { NOTIFY_MSG_INIT, NOTIFY_MSG_UNINIT };
+enum NOTIFY_PROFILE_MSG { NOTIFY_MSG_INIT };
 
 class BluetootLoadSystemAbility : public SystemAbilityStatusChangeStub {
 public:

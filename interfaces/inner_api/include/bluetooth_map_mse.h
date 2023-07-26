@@ -204,11 +204,6 @@ public:
      */
     void Init();
 
-    /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of MapServer profile.
-     */
-    void UnInit();
-
 private:
     /**
      * @brief A constructor used to create a Map Server instance.
