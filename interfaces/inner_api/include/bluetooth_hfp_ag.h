@@ -319,11 +319,6 @@ public:
      */
     void Init();
 
-    /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of HfpAg profile.
-     */
-    void UnInit();
-
 private:
     HandsFreeAudioGateway();
     ~HandsFreeAudioGateway();

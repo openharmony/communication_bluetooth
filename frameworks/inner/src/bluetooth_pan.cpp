@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+std::mutex g_proxyMutex;
 class PanInnerObserver : public BluetoothPanObserverStub {
 public:
     explicit PanInnerObserver(BluetoothObserverList<PanObserver> &observers) : observers_(observers)
@@ -53,13 +54,11 @@ private:
     BluetoothObserverList<PanObserver> &observers_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(PanInnerObserver);
 };
-    std::mutex proxyMutex;
 
 struct Pan::impl {
     impl();
     ~impl();
     bool InitPanProxy(void);
-    void UnInitPanProxy(void);
 
     int32_t GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice>& result)
     {
@@ -146,12 +145,11 @@ struct Pan::impl {
 
         return proxy_->IsTetheringOn(value);
     }
-
+    sptr<IBluetoothPan> proxy_;
 private:
 
     BluetoothObserverList<PanObserver> observers_;
     sptr<PanInnerObserver> innerObserver_;
-    sptr<IBluetoothPan> proxy_;
     class PanDeathRecipient;
     sptr<PanDeathRecipient> deathRecipient_;
 };
@@ -166,11 +164,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        std::lock_guard<std::mutex> lock(g_proxyMutex);
         if (!impl_.proxy_) {
             return;
         }
-        impl_.proxy_->DeregisterObserver(impl_.innerObserver_);
-        impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
     }
 
@@ -202,11 +199,11 @@ Pan::impl::~impl()
 
 bool Pan::impl::InitPanProxy(void)
 {
-    HILOGI("enter");
-    std::lock_guard<std::mutex> lock(proxyMutex);
+    std::lock_guard<std::mutex> lock(g_proxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGI("enter");
     proxy_ = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
     if (!proxy_) {
         HILOGE("get Pan proxy_ failed");
@@ -223,20 +220,6 @@ bool Pan::impl::InitPanProxy(void)
         proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     }
     return true;
-}
-
-void Pan::impl::UnInitPanProxy(void)
-{
-    HILOGI("enter");
-    std::lock_guard<std::mutex> lock(proxyMutex);
-    if (!proxy_) {
-        HILOGE("UnInitPanProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(innerObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitPanProxy success");
 }
 
 Pan::Pan()
@@ -259,15 +242,6 @@ void Pan::Init()
     }
 }
 
-void Pan::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitPanProxy();
-}
-
 Pan *Pan::GetProfile()
 {
     static Pan instance;
@@ -281,7 +255,7 @@ int32_t Pan::GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRe
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or pan proxy_ is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -296,7 +270,7 @@ int32_t Pan::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or pan proxy_ is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -311,7 +285,7 @@ int32_t Pan::Disconnect(const BluetoothRemoteDevice &device)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or pan proxy_ is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -338,7 +312,7 @@ int32_t Pan::SetTethering(bool value)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or pan proxy_ is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -353,7 +327,7 @@ int32_t Pan::IsTetheringOn(bool &value)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitPanProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or pan proxy_ is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
