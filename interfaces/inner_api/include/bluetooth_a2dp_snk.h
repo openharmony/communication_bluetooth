@@ -190,11 +190,6 @@ public:
      */
     void Init();
 
-    /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of A2dpSink profile.
-     */
-    void UnInit();
-
 private:
     /**
      * @brief A constructor used to create a a2dp sink instance.

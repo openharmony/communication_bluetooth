@@ -640,7 +640,6 @@ struct PbapClient::impl {
     }
 
     bool InitPbapClientProxy(void);
-    void UnInitPbapClientProxy(void);
 
 private:
 
@@ -704,18 +703,6 @@ bool PbapClient::impl::InitPbapClientProxy(void)
     return true;
 }
 
-void PbapClient::impl::UnInitPbapClientProxy(void)
-{
-    if (!proxy_) {
-        HILOGE("UnInitPbapClientProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(serviceObserverImpl_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitPbapClientProxy success");
-}
-
 PbapClient *PbapClient::GetProfile()
 {
     static PbapClient instance;
@@ -740,15 +727,6 @@ void PbapClient::Init()
         HILOGE("PbapClient proxy_ is nullptr");
         return;
     }
-}
-
-void PbapClient::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitPbapClientProxy();
 }
 
 void PbapClient::RegisterObserver(PbapClientObserver *observer)

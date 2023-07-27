@@ -43,7 +43,7 @@ constexpr uint8_t REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS = 0x04;
 constexpr uint8_t REQUEST_TYPE_READ_REMOTE_RSSI_VALUE = 0x05;
 
 constexpr const int WAIT_TIMEOUT = 3; // 3s
-
+std::mutex g_gattClientProxyMutex;
 struct DiscoverInfomation {
     struct Characteristics {
         bool isDiscoverDescCompleted_;
@@ -126,12 +126,12 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("enter");
+        std::lock_guard<std::mutex> lock(g_gattClientProxyMutex);
         std::shared_ptr<GattClient> clientSptr = (client_).lock();
         if (!clientSptr || !clientSptr->pimpl || !clientSptr->pimpl->proxy_) {
             HILOGE("callback client is nullptr");
             return;
         }
-        clientSptr->pimpl->proxy_->AsObject()->RemoveDeathRecipient(clientSptr->pimpl->deathRecipient_);
         clientSptr->pimpl->proxy_ = nullptr;
     }
 
@@ -332,9 +332,11 @@ private:
 
 bool GattClient::impl::Init(std::weak_ptr<GattClient> client)
 {
+    std::lock_guard<std::mutex> lock(g_gattClientProxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGE("enter!");
     proxy_ = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     if (!proxy_) {
         HILOGE("get gattClient proxy failed");

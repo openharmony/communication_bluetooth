@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+std::mutex g_oppProxyMutex;
 BluetoothOppTransferInformation::BluetoothOppTransferInformation()
 {}
 
@@ -211,13 +212,11 @@ private:
     BluetoothObserverList<OppObserver> &observers_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(OppInnerObserver);
 };
-    std::mutex oppProxyMutex;
 
 struct Opp::impl {
     impl();
     ~impl();
     bool InitOppServerProxy(void);
-    void UnInitOppServerProxy(void);
 
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states)
     {
@@ -321,10 +320,10 @@ struct Opp::impl {
         observers_.Deregister(observer);
     }
 
+    sptr<IBluetoothOpp> proxy_;
 private:
     BluetoothObserverList<OppObserver> observers_;
     sptr<OppInnerObserver> innerObserver_;
-    sptr<IBluetoothOpp> proxy_;
     class OppDeathRecipient;
     sptr<OppDeathRecipient> deathRecipient_;
 };
@@ -339,11 +338,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("Opp::impl::OppDeathRecipient::OnRemoteDied starts");
+        std::lock_guard<std::mutex> lock(g_oppProxyMutex);
         if (!impl_.proxy_) {
             return;
         }
-        impl_.proxy_->DeregisterObserver(impl_.innerObserver_);
-        impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
     }
 
@@ -377,11 +375,11 @@ Opp::impl::~impl()
 
 bool Opp::impl::InitOppServerProxy(void)
 {
-    HILOGI("enter");
-    std::lock_guard<std::mutex> lock(oppProxyMutex);
+    std::lock_guard<std::mutex> lock(g_oppProxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGI("enter");
     proxy_ = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
     if (!proxy_) {
         HILOGE("get Opp proxy_ failed");
@@ -398,20 +396,6 @@ bool Opp::impl::InitOppServerProxy(void)
         proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     }
     return true;
-}
-
-void Opp::impl::UnInitOppServerProxy(void)
-{
-    HILOGI("enter");
-    std::lock_guard<std::mutex> lock(oppProxyMutex);
-    if (!proxy_) {
-        HILOGE("UnInitOppServerProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(innerObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitOppServerProxy success");
 }
 
 Opp::Opp()
@@ -434,15 +418,6 @@ void Opp::Init()
     }
 }
 
-void Opp::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitOppServerProxy();
-}
-
 Opp *Opp::GetProfile()
 {
     static Opp instance;
@@ -455,7 +430,7 @@ std::vector<BluetoothRemoteDevice> Opp::GetDevicesByStates(std::vector<int> stat
         return std::vector<BluetoothRemoteDevice>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitOppServerProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or opp proxy_ is nullptr");
         return std::vector<BluetoothRemoteDevice>();
     }
@@ -470,7 +445,7 @@ int Opp::GetDeviceState(const BluetoothRemoteDevice &device)
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
 
-    if (pimpl == nullptr || !pimpl->InitOppServerProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or opp proxy_ is nullptr");
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
@@ -485,7 +460,7 @@ bool Opp::SendFile(std::string device, std::vector<std::string>filePaths, std::v
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitOppServerProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or opp proxy_ is nullptr");
         return false;
     }
@@ -500,7 +475,7 @@ bool Opp::SetIncomingFileConfirmation(bool accept)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitOppServerProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("get Opp proxy_ failed");
         return false;
     }
@@ -516,7 +491,7 @@ BluetoothOppTransferInformation Opp::GetCurrentTransferInformation()
         return transferInformation;
     }
 
-    if (pimpl == nullptr || !pimpl->InitOppServerProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or opp proxy_ is nullptr");
         return transferInformation;
     }
@@ -532,7 +507,7 @@ bool Opp::CancelTransfer()
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitOppServerProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or opp proxy_ is nullptr");
         return false;
     }
