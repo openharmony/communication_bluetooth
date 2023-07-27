@@ -627,8 +627,6 @@ public:
 
     void Init();
 
-    void UnInit();
-
     /**
      * @brief Get remote devicec profile uuids.
      *

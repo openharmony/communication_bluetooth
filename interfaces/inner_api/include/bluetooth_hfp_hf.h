@@ -392,11 +392,6 @@ public:
     void Init();
 
     /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of HfpHf profile.
-     */
-    void UnInit();
-
-    /**
      * @brief Static HandsFree Unit observer instance.
      *
      * @since 6

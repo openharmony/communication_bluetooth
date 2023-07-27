@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+std::mutex g_bleManagerProxyMutex;
 struct BleCentralManager::impl {
     impl();
     ~impl();
@@ -173,12 +174,11 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("enter");
+        std::lock_guard<std::mutex> lock(g_bleManagerProxyMutex);
         if (!owner_.proxy_) {
             return;
         }
-        owner_.proxy_->DeregisterBleCentralManagerCallback(owner_.scannerId_, owner_.callbackImp_);
         owner_.scannerId_ = BLE_SCAN_INVALID_ID;
-        owner_.proxy_->AsObject()->RemoveDeathRecipient(owner_.deathRecipient_);
         owner_.proxy_ = nullptr;
     }
 
@@ -188,9 +188,11 @@ private:
 
 bool  BleCentralManager::impl::InitBleCentralManagerProxy(void)
 {
+    std::lock_guard<std::mutex> lock(g_bleManagerProxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGI("enter");
     proxy_ = GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     if (!proxy_) {
         HILOGE("get bleCentralManager proxy_ failed");
@@ -798,7 +800,7 @@ int BleCentralManager::RemoveLpDeviceParam(const UUID &uuid)
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or ble central manager proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }

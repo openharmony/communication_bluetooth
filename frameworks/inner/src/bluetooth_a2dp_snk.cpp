@@ -44,12 +44,11 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
-
+std::mutex g_a2dpSnkProxyMutex;
 struct A2dpSink::impl {
     impl();
     ~impl();
     bool InitA2dpSinkProxy(void);
-    void UnInitA2dpSinkProxy(void);
 
     BluetoothObserverList<A2dpSinkObserver> observers_;
     sptr<IBluetoothA2dpSink> proxy_ = nullptr;
@@ -101,11 +100,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("enter");
+        std::lock_guard<std::mutex> lock(g_a2dpSnkProxyMutex);
         if (!a2dpSinkDeath_.proxy_) {
             return;
         }
-        a2dpSinkDeath_.proxy_->DeregisterObserver(a2dpSinkDeath_.observerImp_);
-        a2dpSinkDeath_.proxy_->AsObject()->RemoveDeathRecipient(a2dpSinkDeath_.deathRecipient_);
         a2dpSinkDeath_.proxy_ = nullptr;
     }
 
@@ -138,9 +136,11 @@ A2dpSink::impl::~impl()
 
 bool A2dpSink::impl::InitA2dpSinkProxy(void)
 {
+    std::lock_guard<std::mutex> lock(g_a2dpSnkProxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGI("Enter!");
     proxy_ = GetRemoteProxy<IBluetoothA2dpSink>(PROFILE_A2DP_SINK);
     if (!proxy_) {
         HILOGE("get A2dpSink proxy_ failed");
@@ -157,18 +157,6 @@ bool A2dpSink::impl::InitA2dpSinkProxy(void)
         proxy_->RegisterObserver(observerImp_);
     }
     return true;
-}
-
-void A2dpSink::impl::UnInitA2dpSinkProxy(void)
-{
-    if (!proxy_) {
-        HILOGE("UnInitA2dpSinkProxy fail");
-        return;
-    }
-    proxy_->DeregisterObserver(observerImp_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitA2dpSinkProxy success");
 }
 
 A2dpSink::A2dpSink()
@@ -189,15 +177,6 @@ void A2dpSink::Init()
         HILOGE("A2dpSink proxy is nullptr");
         return;
     }
-}
-
-void A2dpSink::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitA2dpSinkProxy();
 }
 
 A2dpSink::~A2dpSink()
@@ -227,7 +206,7 @@ int A2dpSink::GetDeviceState(const BluetoothRemoteDevice &device) const
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return RET_BAD_STATUS;
     }
@@ -249,7 +228,7 @@ std::vector<BluetoothRemoteDevice> A2dpSink::GetDevicesByStates(std::vector<int>
         return std::vector<BluetoothRemoteDevice>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return std::vector<BluetoothRemoteDevice>();
     }
@@ -275,7 +254,7 @@ int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device) const
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return RET_BAD_STATUS;
     }
@@ -298,7 +277,7 @@ int A2dpSink::GetPlayingState(const BluetoothRemoteDevice &device, int &state) c
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return RET_BAD_STATUS;
     }
@@ -319,7 +298,7 @@ bool A2dpSink::Connect(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return false;
     }
@@ -341,7 +320,7 @@ bool A2dpSink::Disconnect(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return false;
     }
@@ -370,7 +349,7 @@ bool A2dpSink::SetConnectStrategy(const BluetoothRemoteDevice &device, int strat
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return false;
     }
@@ -394,7 +373,7 @@ int A2dpSink::GetConnectStrategy(const BluetoothRemoteDevice &device) const
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return RET_BAD_STATUS;
     }
@@ -416,7 +395,7 @@ bool A2dpSink::SendDelay(const BluetoothRemoteDevice &device, uint16_t delayValu
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitA2dpSinkProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or A2dpSink proxy is nullptr");
         return false;
     }
