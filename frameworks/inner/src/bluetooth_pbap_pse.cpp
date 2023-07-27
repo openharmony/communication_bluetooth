@@ -205,7 +205,6 @@ struct PbapServer::impl {
     }
 
     bool InitPbapServerProxy(void);
-    void UnInitPbapServerProxy(void);
 
 private:
     std::mutex mutex_;
@@ -269,18 +268,6 @@ bool PbapServer::impl::InitPbapServerProxy(void)
     return true;
 }
 
-void PbapServer::impl::UnInitPbapServerProxy(void)
-{
-    if (!proxy_) {
-        HILOGE("UnInitPbapServerProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(serviceObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitPbapServerProxy success");
-}
-
 PbapServer *PbapServer::GetProfile()
 {
     static PbapServer instance;
@@ -305,15 +292,6 @@ void PbapServer::Init()
         HILOGE("PbapServer proxy_ is nullptr");
         return;
     }
-}
-
-void PbapServer::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitPbapServerProxy();
 }
 
 void PbapServer::RegisterObserver(PbapObserver *observer)

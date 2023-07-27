@@ -206,11 +206,6 @@ public:
      */
     void Init();
 
-    /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of PbapServer profile.
-     */
-    void UnInit();
-
 private:
     /**
      * @brief constructor
