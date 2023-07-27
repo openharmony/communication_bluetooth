@@ -802,11 +802,6 @@ public:
      */
     void Init();
 
-    /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of MapClient profile.
-     */
-    void UnInit();
-
 private:
     /**
      * @brief Construct a new Map Client object

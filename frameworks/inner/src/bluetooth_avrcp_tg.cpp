@@ -33,6 +33,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+std::mutex g_avrcpTgMutex;
 struct AvrcpTarget::impl {
 public:
     class ObserverImpl : public BluetoothAvrcpTgObserverStub {
@@ -63,11 +64,10 @@ public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) final
         {
             HILOGI("starts");
+            std::lock_guard<std::mutex> lock(g_avrcpTgMutex);
             if (!avrcpTgServer_.proxy_) {
                 return;
             }
-            avrcpTgServer_.proxy_->UnregisterObserver(avrcpTgServer_.observer_);
-            avrcpTgServer_.proxy_->AsObject()->RemoveDeathRecipient(avrcpTgServer_.deathRecipient_);
             avrcpTgServer_.proxy_ = nullptr;
         }
 
@@ -99,6 +99,7 @@ public:
 
     bool InitAvrcpTgProxy(void)
     {
+        std::lock_guard<std::mutex> lock(g_avrcpTgMutex);
         if (proxy_) {
             return true;
         }
@@ -118,18 +119,6 @@ public:
             proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
         }
         return true;
-    }
-
-    void UnInitAvrcpCtProxy(void)
-    {
-        if (!proxy_) {
-            HILOGE("UnInitAvrcpCtProxy failed");
-            return;
-        }
-        proxy_->UnregisterObserver(observer_);
-        proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-        proxy_ = nullptr;
-        HILOGI("UnInitAvrcpCtProxy success");
     }
 
     bool IsEnabled(void)
@@ -176,15 +165,6 @@ void AvrcpTarget::Init()
     }
 }
 
-void AvrcpTarget::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitAvrcpCtProxy();
-}
-
 /******************************************************************
  * REGISTER / UNREGISTER OBSERVER                                 *
  ******************************************************************/
@@ -220,7 +200,7 @@ void AvrcpTarget::SetActiveDevice(const BluetoothRemoteDevice &device)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -236,7 +216,7 @@ std::vector<BluetoothRemoteDevice> AvrcpTarget::GetConnectedDevices(void)
         return std::vector<BluetoothRemoteDevice>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return std::vector<BluetoothRemoteDevice>();
     }
@@ -257,7 +237,7 @@ std::vector<BluetoothRemoteDevice> AvrcpTarget::GetDevicesByStates(std::vector<i
         return std::vector<BluetoothRemoteDevice>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return std::vector<BluetoothRemoteDevice>();
     }
@@ -286,7 +266,7 @@ int AvrcpTarget::GetDeviceState(const BluetoothRemoteDevice &device)
         return static_cast<int32_t>(BTConnectState::DISCONNECTED);
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return static_cast<int32_t>(BTConnectState::DISCONNECTED);
     }
@@ -305,7 +285,7 @@ bool AvrcpTarget::Connect(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return RET_BAD_STATUS;
     }
@@ -324,7 +304,7 @@ bool AvrcpTarget::Disconnect(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return RET_BAD_STATUS;
     }
@@ -346,7 +326,7 @@ void AvrcpTarget::NotifyPlaybackStatusChanged(uint8_t playStatus, uint32_t playb
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -362,7 +342,7 @@ void AvrcpTarget::NotifyTrackChanged(uint64_t uid, uint32_t playbackPos)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -378,7 +358,7 @@ void AvrcpTarget::NotifyTrackReachedEnd(uint32_t playbackPos)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -394,7 +374,7 @@ void AvrcpTarget::NotifyTrackReachedStart(uint32_t playbackPos)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -410,7 +390,7 @@ void AvrcpTarget::NotifyPlaybackPosChanged(uint32_t playbackPos)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -427,7 +407,7 @@ void AvrcpTarget::NotifyPlayerAppSettingChanged(const std::vector<uint8_t> &attr
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -452,7 +432,7 @@ void AvrcpTarget::NotifyNowPlayingContentChanged(void)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -468,7 +448,7 @@ void AvrcpTarget::NotifyAvailablePlayersChanged(void)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -484,7 +464,7 @@ void AvrcpTarget::NotifyAddressedPlayerChanged(uint16_t playerId, uint16_t uidCo
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -500,7 +480,7 @@ void AvrcpTarget::NotifyUidChanged(uint16_t uidCounter)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
@@ -516,7 +496,7 @@ void AvrcpTarget::NotifyVolumeChanged(uint8_t volume)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitAvrcpTgProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpTarget proxy is nullptr");
         return;
     }
