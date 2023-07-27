@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+std::mutex g_hidProxyMutex;
 class HidHostInnerObserver : public BluetoothHidHostObserverStub {
 public:
     explicit HidHostInnerObserver(BluetoothObserverList<HidHostObserver> &observers) : observers_(observers)
@@ -55,13 +56,11 @@ private:
     BluetoothObserverList<HidHostObserver> &observers_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(HidHostInnerObserver);
 };
-    std::mutex hidProxyMutex;
 
 struct HidHost::impl {
     impl();
     ~impl();
     bool InitHidHostProxy(void);
-    void UnInitHidHostProxy(void);
 
     int32_t GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice>& result)
     {
@@ -195,10 +194,10 @@ struct HidHost::impl {
         return proxy_->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
+    sptr<IBluetoothHidHost> proxy_;
 private:
     BluetoothObserverList<HidHostObserver> observers_;
-    sptr<HidHostInnerObserver> innerObserver_;
-    sptr<IBluetoothHidHost> proxy_;
+    sptr<HidHostInnerObserver> innerObserver_;    
     class HidHostDeathRecipient;
     sptr<HidHostDeathRecipient> deathRecipient_;
 };
@@ -213,11 +212,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        std::lock_guard<std::mutex> lock(g_hidProxyMutex);
         if (!impl_.proxy_) {
             return;
         }
-        impl_.proxy_->DeregisterObserver(impl_.innerObserver_);
-        impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
     }
 
@@ -250,7 +248,7 @@ HidHost::impl::~impl()
 bool HidHost::impl::InitHidHostProxy(void)
 {
     HILOGI("enter");
-    std::lock_guard<std::mutex> lock(hidProxyMutex);
+    std::lock_guard<std::mutex> lock(g_hidProxyMutex);
     if (proxy_) {
         return true;
     }
@@ -272,20 +270,6 @@ bool HidHost::impl::InitHidHostProxy(void)
     return true;
 }
 
-void HidHost::impl::UnInitHidHostProxy(void)
-{
-    HILOGI("enter");
-    std::lock_guard<std::mutex> lock(hidProxyMutex);
-    if (!proxy_) {
-        HILOGE("UnInitHidHostProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(innerObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitHidHostProxy success");
-}
-
 HidHost::HidHost()
 {
     pimpl = std::make_unique<impl>();
@@ -305,15 +289,6 @@ void HidHost::Init()
     }
 }
 
-void HidHost::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitHidHostProxy();
-}
-
 HidHost *HidHost::GetProfile()
 {
     static HidHost instance;
@@ -327,7 +302,7 @@ int32_t HidHost::GetDevicesByStates(std::vector<int> states, std::vector<Bluetoo
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -342,7 +317,7 @@ int32_t HidHost::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &st
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -357,7 +332,7 @@ int32_t HidHost::Connect(const BluetoothRemoteDevice &device)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -372,7 +347,7 @@ int32_t HidHost::Disconnect(const BluetoothRemoteDevice &device)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -388,7 +363,7 @@ int HidHost::SetConnectStrategy(const BluetoothRemoteDevice &device, int strateg
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -410,7 +385,7 @@ int HidHost::GetConnectStrategy(const BluetoothRemoteDevice &device, int &strate
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
     }
@@ -441,7 +416,7 @@ void HidHost::HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uin
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return;
     }
@@ -456,7 +431,7 @@ void HidHost::HidHostSendData(std::string device, uint8_t id, uint16_t size, uin
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return;
     }
@@ -471,7 +446,7 @@ void HidHost::HidHostSetReport(std::string device, uint8_t type, uint16_t size, 
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return;
     }
@@ -486,7 +461,7 @@ void HidHost::HidHostGetReport(std::string device, uint8_t id, uint16_t size, ui
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHidHostProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hidHost proxy is nullptr");
         return;
     }

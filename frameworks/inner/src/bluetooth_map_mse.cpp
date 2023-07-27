@@ -69,7 +69,6 @@ struct MapServer::impl {
         }
     }
     bool InitMapServerProxy(void);
-    void UnInitMapServerProxy(void);
 
     std::mutex mutex_;
     sptr<IBluetoothMapMse> proxy_;
@@ -141,18 +140,6 @@ bool MapServer::impl::InitMapServerProxy(void)
     return true;
 }
 
-void MapServer::impl::UnInitMapServerProxy(void)
-{
-    if (!proxy_) {
-        HILOGE("UnInitMapServerProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(serviceObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitMapServerProxy success");
-}
-
 MapServer::~MapServer()
 {}
 
@@ -172,15 +159,6 @@ void MapServer::Init()
         HILOGE("MapServer proxy_ is nullptr");
         return;
     }
-}
-
-void MapServer::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitMapServerProxy();
 }
 
 void MapServer::RegisterObserver(MapServerObserver &observer)

@@ -108,16 +108,6 @@ void BluetootLoadSystemAbility::OnAddSystemAbility(int32_t systemAbilityId, cons
 
 void BluetootLoadSystemAbility::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    std::lock_guard<std::recursive_mutex> lk(mutex_);
-    HILOGI("[BLUETOOTH_LOAD_SYSTEM]OnRemoveSystemAbility systemAbilityId:%{public}d", systemAbilityId);
-    switch (systemAbilityId) {
-        case BLUETOOTH_HOST_SYS_ABILITY_ID:
-            NotifyMsgToProfile(NOTIFY_MSG_UNINIT);
-            break;
-        default:
-            HILOGE("[BLUETOOTH_LOAD_SYSTEM]unhandled sysabilityId:%{public}d", systemAbilityId);
-            break;
-    }
     return;
 }
 
@@ -169,10 +159,6 @@ void BluetootLoadSystemAbility::NotifyHostInit(NOTIFY_PROFILE_MSG notifyMsg)
         host->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        host->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyA2dpSrcProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -183,10 +169,6 @@ void BluetootLoadSystemAbility::NotifyA2dpSrcProfile(NOTIFY_PROFILE_MSG notifyMs
     }
     if (notifyMsg == NOTIFY_MSG_INIT) {
         profile->Init();
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
         return;
     }
 }
@@ -201,10 +183,6 @@ void BluetootLoadSystemAbility::NotifyA2dpSinkProfile(NOTIFY_PROFILE_MSG notifyM
         profile->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyHfpAgProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -215,10 +193,6 @@ void BluetootLoadSystemAbility::NotifyHfpAgProfile(NOTIFY_PROFILE_MSG notifyMsg)
     }
     if (notifyMsg == NOTIFY_MSG_INIT) {
         profile->Init();
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
         return;
     }
 }
@@ -233,10 +207,6 @@ void BluetootLoadSystemAbility::NotifyHfpHfProfile(NOTIFY_PROFILE_MSG notifyMsg)
         profile->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyAvrcpTgProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -249,10 +219,6 @@ void BluetootLoadSystemAbility::NotifyAvrcpTgProfile(NOTIFY_PROFILE_MSG notifyMs
         profile->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyAvrcpCtProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -263,10 +229,6 @@ void BluetootLoadSystemAbility::NotifyAvrcpCtProfile(NOTIFY_PROFILE_MSG notifyMs
     }
     if (notifyMsg == NOTIFY_MSG_INIT) {
         profile->Init();
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
         return;
     }
 }
@@ -307,10 +269,6 @@ void BluetootLoadSystemAbility::NotifyMapClientProfile(NOTIFY_PROFILE_MSG notify
         profile->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyMapServerProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -321,10 +279,6 @@ void BluetootLoadSystemAbility::NotifyMapServerProfile(NOTIFY_PROFILE_MSG notify
     }
     if (notifyMsg == NOTIFY_MSG_INIT) {
         profile->Init();
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
         return;
     }
 }
@@ -339,10 +293,6 @@ void BluetootLoadSystemAbility::NotifyPbapClientProfile(NOTIFY_PROFILE_MSG notif
         profile->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyPbapServerProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -353,10 +303,6 @@ void BluetootLoadSystemAbility::NotifyPbapServerProfile(NOTIFY_PROFILE_MSG notif
     }
     if (notifyMsg == NOTIFY_MSG_INIT) {
         profile->Init();
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
         return;
     }
 }
@@ -391,10 +337,6 @@ void BluetootLoadSystemAbility::NotifyOppProfile(NOTIFY_PROFILE_MSG notifyMsg)
         profile->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyHidHostProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -407,10 +349,6 @@ void BluetootLoadSystemAbility::NotifyHidHostProfile(NOTIFY_PROFILE_MSG notifyMs
         profile->Init();
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
-        return;
-    }
 }
 
 void BluetootLoadSystemAbility::NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg)
@@ -421,10 +359,6 @@ void BluetootLoadSystemAbility::NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg)
     }
     if (notifyMsg == NOTIFY_MSG_INIT) {
         profile->Init();
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_UNINIT) {
-        profile->UnInit();
         return;
     }
 }
