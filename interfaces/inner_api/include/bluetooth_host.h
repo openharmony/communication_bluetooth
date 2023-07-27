@@ -660,7 +660,8 @@ public:
     * the interface needs to be used for address translation.
     * @param realAddr real address.
     * @param[out] randomAddr random address.
-    * @return Returns result.
+    * @return Returns {@link BT_NO_ERROR} if get random address success;
+    * returns an error code defined in {@link BtErrCode} otherwise.
     */
     int GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const;
 
