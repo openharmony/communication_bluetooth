@@ -330,7 +330,6 @@ struct MapClient::impl {
     void ConvertEnvelopeToProfileFormat(
         IProfileSendMessageParameters &iProfileMsg, const MapSendMessageParameters &msg);
     bool InitMapClientProxy(void);
-    void UnInitMapClientProxy(void);
 };
 
 class MapClient::impl::BluetoothMapMceDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -389,18 +388,6 @@ bool MapClient::impl::InitMapClientProxy(void)
     return true;
 }
 
-void MapClient::impl::UnInitMapClientProxy(void)
-{
-    if (!proxy_) {
-        HILOGE("UnInitMapClientProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(observerImp_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitMapClientProxy success");
-}
-
 MapClient *MapClient::GetProfile()
 {
     HILOGI("enter");
@@ -428,15 +415,6 @@ void MapClient::Init()
         HILOGE("MapClient proxy_ is nullptr");
         return;
     }
-}
-
-void MapClient::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitMapClientProxy();
 }
 
 void MapClient::RegisterObserver(MapClientObserver &observer)

@@ -188,11 +188,6 @@ public:
     void Init();
 
     /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of HidHost profile.
-     */
-    void UnInit();
-
-    /**
      * @brief Static Hid Host observer instance.
      *
      */

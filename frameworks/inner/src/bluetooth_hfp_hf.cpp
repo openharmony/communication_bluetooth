@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+std::mutex g_hfpHFProxyMutex;
 class HfServiceObserver : public BluetoothHfpHfObserverStub {
 public:
     explicit HfServiceObserver(BluetoothObserverList<HandsFreeUnitObserver> &observers) : observers_(observers)
@@ -154,7 +155,6 @@ struct HandsFreeUnit::impl {
     impl();
     ~impl();
     bool InitHfpHfProxy(void);
-    void UnInitHfpHfProxy(void);
 
     bool ConnectSco(const BluetoothRemoteDevice &device)
     {
@@ -416,14 +416,13 @@ struct HandsFreeUnit::impl {
         HILOGI("enter");
         observers_.Deregister(observer);
     }
-
+   sptr<IBluetoothHfpHf> proxy_;
 private:
     const static int HFP_HF_SLC_STATE_DISCONNECTED = static_cast<int>(BTConnectState::DISCONNECTED);
     const static int HFP_HF_SCO_STATE_DISCONNECTED = 3;
 
     BluetoothObserverList<HandsFreeUnitObserver> observers_;
     HfServiceObserver serviceObserver_ {HfServiceObserver(observers_)};
-    sptr<IBluetoothHfpHf> proxy_;
     class HandsFreeUnitDeathRecipient;
     sptr<HandsFreeUnitDeathRecipient> deathRecipient_;
 };
@@ -438,11 +437,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("starts");
+        std::lock_guard<std::mutex> lock(g_hfpHFProxyMutex);
         if (!impl_.proxy_) {
             return;
         }
-        impl_.proxy_->DeregisterObserver(&impl_.serviceObserver_);
-        impl_.proxy_->AsObject()->RemoveDeathRecipient(impl_.deathRecipient_);
         impl_.proxy_ = nullptr;
     }
 
@@ -475,9 +473,11 @@ HandsFreeUnit::impl::~impl()
 
 bool HandsFreeUnit::impl::InitHfpHfProxy(void)
 {
+    std::lock_guard<std::mutex> lock(g_hfpHFProxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGI("enter");
     proxy_ = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
     if (!proxy_) {
         HILOGE("get HfpHf proxy fail");
@@ -490,18 +490,6 @@ bool HandsFreeUnit::impl::InitHfpHfProxy(void)
         proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     }
     return true;
-}
-
-void HandsFreeUnit::impl::UnInitHfpHfProxy(void)
-{
-    if (!proxy_) {
-        HILOGE("UnInitHfpHfProxy failed");
-        return;
-    }
-    proxy_->DeregisterObserver(&serviceObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    proxy_ = nullptr;
-    HILOGI("UnInitHfpHfProxy success");
 }
 
 HandsFreeUnit::HandsFreeUnit()
@@ -524,15 +512,6 @@ void HandsFreeUnit::Init()
     }
 }
 
-void HandsFreeUnit::UnInit()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    pimpl->UnInitHfpHfProxy();
-}
-
 HandsFreeUnit *HandsFreeUnit::GetProfile()
 {
     static HandsFreeUnit instance;
@@ -546,7 +525,7 @@ bool HandsFreeUnit::ConnectSco(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -561,7 +540,7 @@ bool HandsFreeUnit::DisconnectSco(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -576,7 +555,7 @@ std::vector<BluetoothRemoteDevice> HandsFreeUnit::GetDevicesByStates(std::vector
         return std::vector<BluetoothRemoteDevice>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return std::vector<BluetoothRemoteDevice>();
     }
@@ -591,7 +570,7 @@ int HandsFreeUnit::GetDeviceState(const BluetoothRemoteDevice &device) const
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
@@ -606,7 +585,7 @@ int HandsFreeUnit::GetScoState(const BluetoothRemoteDevice &device) const
         return static_cast<int>(HfpScoConnectState::SCO_DISCONNECTED);
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return static_cast<int>(HfpScoConnectState::SCO_DISCONNECTED);
     }
@@ -621,7 +600,7 @@ bool HandsFreeUnit::SendDTMFTone(const BluetoothRemoteDevice &device, uint8_t co
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -636,7 +615,7 @@ bool HandsFreeUnit::Connect(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -651,7 +630,7 @@ bool HandsFreeUnit::Disconnect(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -666,7 +645,7 @@ bool HandsFreeUnit::OpenVoiceRecognition(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -681,7 +660,7 @@ bool HandsFreeUnit::CloseVoiceRecognition(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -696,7 +675,7 @@ std::vector<HandsFreeUnitCall> HandsFreeUnit::GetExistingCalls(const BluetoothRe
         return std::vector<HandsFreeUnitCall>();
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return std::vector<HandsFreeUnitCall>();
     }
@@ -711,7 +690,7 @@ bool HandsFreeUnit::AcceptIncomingCall(const BluetoothRemoteDevice &device, int 
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -726,7 +705,7 @@ bool HandsFreeUnit::HoldActiveCall(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -741,7 +720,7 @@ bool HandsFreeUnit::RejectIncomingCall(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -761,7 +740,7 @@ bool HandsFreeUnit::HandleIncomingCall(const BluetoothRemoteDevice &device, int 
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -776,7 +755,7 @@ bool HandsFreeUnit::HandleMultiCall(const BluetoothRemoteDevice &device, int fla
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -791,7 +770,7 @@ bool HandsFreeUnit::DialLastNumber(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -806,7 +785,7 @@ bool HandsFreeUnit::DialMemory(const BluetoothRemoteDevice &device, int index)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -827,7 +806,7 @@ bool HandsFreeUnit::FinishActiveCall(const BluetoothRemoteDevice &device, const 
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return false;
     }
@@ -843,7 +822,7 @@ std::optional<HandsFreeUnitCall> HandsFreeUnit::StartDial(
         return std::nullopt;
     }
 
-    if (pimpl == nullptr || !pimpl->InitHfpHfProxy()) {
+    if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or hfpHf proxy is nullptr");
         return std::nullopt;
     }

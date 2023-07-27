@@ -376,11 +376,6 @@ public:
     void Init();
 
     /**
-     * @brief After closing the Bluetooth process, call this interface for uninitialization of Opp profile.
-     */
-    void UnInit();
-
-    /**
      * @brief Static Opp observer instance.
      *
      */

@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
-
+std::mutex g_bleProxyMutex;
 struct BleAdvertiser::impl {
     impl();
     ~impl();
@@ -102,11 +102,10 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("enter");
+        std::lock_guard<std::mutex> lock(g_bleProxyMutex);
         if (!owner_.proxy_) {
             return;
         }
-        owner_.proxy_->DeregisterBleAdvertiserCallback(owner_.callbackImp_);
-        owner_.proxy_->AsObject()->RemoveDeathRecipient(owner_.deathRecipient_);
         owner_.proxy_ = nullptr;
         owner_.callbacks_.Clear();
     }
@@ -117,9 +116,11 @@ private:
 
 bool BleAdvertiser::impl::InitBleAdvertiserProxy(void)
 {
+    std::lock_guard<std::mutex> lock(g_bleProxyMutex);
     if (proxy_) {
         return true;
     }
+    HILOGI("enter");
     proxy_ = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     if (!proxy_) {
         HILOGE("get bleAdvertiser proxy_ failed");
