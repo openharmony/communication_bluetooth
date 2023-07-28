@@ -14,6 +14,9 @@
  */
 #include "bluetooth_utils.h"
 #include <map>
+#include <chrono>
+#include <random>
+#include "securec.h"
 #include "__config"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_def.h"
@@ -30,6 +33,14 @@ namespace OHOS {
 namespace Bluetooth {
 constexpr int startPos = 6;
 constexpr int endPos = 13;
+constexpr int RANDOM_ADDR_ARRAY_SIZE = 4;
+constexpr int RANDOM_ADDR_MAC_BIT_SIZE = 12;
+constexpr int RANDOM_ADDR_FIRST_BIT = 1;
+constexpr int RANDOM_ADDR_LAST_BIT = 11;
+constexpr int RANDOM_ADDR_SPLIT_SIZE = 2;
+constexpr int HEX_BASE = 16;
+constexpr int OCT_BASE = 8;
+
 std::string GetEncryptAddr(std::string addr)
 {
     if (addr.empty() || addr.length() != ADDRESS_LENGTH) {
@@ -152,6 +163,41 @@ sptr<IRemoteObject> GetRemoteObject(const std::string &objectName)
         return nullptr;
     }
     return remote;
+}
+
+void ToUpper(char* arr)
+{
+    for (size_t i = 0; i < strlen(arr); ++i) {
+        if (arr[i] >= 'a' && arr[i] <= 'z') {
+            arr[i] = toupper(arr[i]);
+        }
+    }
+}
+
+std::string GenerateRandomMacAddress()
+{
+    int ret = 0;
+    std::string randomMac = "";
+    char strMacTmp[RANDOM_ADDR_ARRAY_SIZE] = {0};
+    std::mt19937_64 gen(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    for (int i = 0; i < RANDOM_ADDR_MAC_BIT_SIZE; i++) {
+        if (i != RANDOM_ADDR_FIRST_BIT) {
+            std::uniform_int_distribution<> distribution(0, HEX_BASE - 1);
+            ret = sprintf_s(strMacTmp, RANDOM_ADDR_ARRAY_SIZE, "%x", distribution(gen));
+        } else {
+            std::uniform_int_distribution<> distribution(0, OCT_BASE - 1);
+            ret = sprintf_s(strMacTmp, RANDOM_ADDR_ARRAY_SIZE, "%x", RANDOM_ADDR_SPLIT_SIZE * distribution(gen));
+        }
+        if (ret == -1) {
+            HILOGE("GenerateRandomMacAddress failed, sprintf_s return -1!");
+        }
+        ToUpper(strMacTmp);
+        randomMac += strMacTmp;
+        if ((i % RANDOM_ADDR_SPLIT_SIZE != 0 && (i != RANDOM_ADDR_LAST_BIT))) {
+            randomMac.append(":");
+        }
+    }
+    return randomMac;
 }
 
 }  // namespace Bluetooth
