@@ -70,7 +70,11 @@ struct BluetoothHost::impl {
 
     bool InitBluetoothHostObserver(void);
 
+    void SyncRandomAddrToService(void);
+
     std::mutex proxyMutex_;
+    std::string stagingRealAddr_;
+    std::string stagingRandomAddr_;
 private:
     class BluetoothHostDeathRecipient;
     sptr<BluetoothHostDeathRecipient> deathRecipient_ = nullptr;
@@ -96,6 +100,9 @@ public:
     {
         HILOGD("bluetooth state, transport: %{public}s, status: %{public}s",
             GetBtTransportName(transport).c_str(), GetBtStateName(status).c_str());
+        if (status == BTStateID::STATE_TURN_ON) {
+            host_.SyncRandomAddrToService();
+        }
         host_.observers_.ForEach([transport, status](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnStateChanged(transport, status);
         });
@@ -477,6 +484,26 @@ void BluetoothHost::impl::LoadSystemAbilityFail()
     proxy_ = nullptr;
     isHostProxyInit = false;
     proxyConVar_.notify_one();
+}
+
+void BluetoothHost::impl::SyncRandomAddrToService(void)
+{
+    HILOGI("SyncRandomAddrToService.");
+    if (!IsValidBluetoothAddr(stagingRealAddr_)) {
+        HILOGE("stagingRealAddr_ is invalid.");
+        return;
+    }
+    if (!IsValidBluetoothAddr(stagingRandomAddr_)) {
+        HILOGE("stagingRandomAddr_ is invalid.");
+        return;
+    }
+    if (proxy_ == nullptr) {
+        HILOGE("proxy_ is nullptr.");
+        return;
+    }
+    proxy_->SyncRandomAddress(stagingRealAddr_, stagingRandomAddr_);
+    stagingRealAddr_ = "";
+    stagingRandomAddr_ = "";
 }
 
 BluetoothHost::BluetoothHost()
@@ -1116,7 +1143,16 @@ int BluetoothHost::GetRandomAddress(const std::string &realAddr, std::string &ra
     randomAddr = "";
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
+        if (!pimpl) {
+            HILOGE("pimpl is null.");
+            return BT_ERR_INVALID_STATE;
+        }
+        randomAddr = GenerateRandomMacAddress();
+        pimpl->stagingRealAddr_ = realAddr;
+        pimpl->stagingRandomAddr_ = randomAddr;
+        HILOGI("GetRandomAddress, realAddr: %{public}s, randomAddr: %{public}s",
+            GetEncryptAddr(realAddr).c_str(), GetEncryptAddr(randomAddr).c_str());
+        return BT_NO_ERROR;
     }
 
     if (!pimpl || !pimpl->proxy_) {
