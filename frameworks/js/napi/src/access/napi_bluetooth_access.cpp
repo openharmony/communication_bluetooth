@@ -163,7 +163,7 @@ napi_value NapiAccess::StateChangeInit(napi_env env)
     return state;
 }
 
-static bool IsValidObserverType(std::string &outType)
+static bool IsValidObserverType(const std::string &outType)
 {
     return outType == REGISTER_STATE_CHANGE_TYPE;
 }
@@ -231,16 +231,14 @@ static napi_status CheckAccessDeregisterObserver(napi_env env, napi_callback_inf
         pCallbackInfo->env_ = env;
         NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
         NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_));
-        if (pCallbackInfo != nullptr) {
-            napi_value callback = 0;
-            napi_value undefined = 0;
-            napi_value callResult = 0;
-            napi_get_undefined(pCallbackInfo->env_, &undefined);
-            napi_value result = nullptr;
-            napi_create_int32(pCallbackInfo->env_, static_cast<int32_t>(BluetoothState::STATE_OFF), &result);
-            napi_get_reference_value(pCallbackInfo->env_, pCallbackInfo->callback_, &callback);
-            napi_call_function(pCallbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        }
+        napi_value callback = 0;
+        napi_value undefined = 0;
+        napi_value callResult = 0;
+        napi_get_undefined(pCallbackInfo->env_, &undefined);
+        napi_value result = nullptr;
+        napi_create_int32(pCallbackInfo->env_, static_cast<int32_t>(BluetoothState::STATE_OFF), &result);
+        napi_get_reference_value(pCallbackInfo->env_, pCallbackInfo->callback_, &callback);
+        napi_call_function(pCallbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
         g_bluetoothAccessObserver.stateChangeCallback = nullptr;
     }
     return napi_ok;

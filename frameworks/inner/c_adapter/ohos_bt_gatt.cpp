@@ -142,7 +142,7 @@ public:
             string strUuid = btUuid.ToString();
             retUuid.uuid = (char *)strUuid.c_str();
             retUuid.uuidLen = strUuid.size();
-            appCallback->lpDeviceInfoCb(&retUuid, msgType, (uint8_t*)value.data(), value.size());
+            appCallback->lpDeviceInfoCb(&retUuid, msgType, const_cast<uint8_t*>(value.data()), value.size());
         }
     }
 

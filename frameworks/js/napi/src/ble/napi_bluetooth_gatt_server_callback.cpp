@@ -41,14 +41,14 @@ void NapiGattServerCallback::OnCharacteristicReadRequest(
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     uv_work_t *work = new uv_work_t;
-    work->data = (void*)callbackInfo.get();
+    work->data = static_cast<void *>(callbackInfo.get());
 
     uv_queue_work(
         loop,
         work,
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
-            GattCharacteristicCallbackInfo *callbackInfo = (GattCharacteristicCallbackInfo *)work->data;
+            GattCharacteristicCallbackInfo *callbackInfo = static_cast<GattCharacteristicCallbackInfo *>(work->data);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertCharacteristicReadReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
@@ -86,14 +86,14 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     uv_work_t *work = new uv_work_t;
-    work->data = (void*)callbackInfo.get();
+    work->data = static_cast<void *>(callbackInfo.get());
 
     uv_queue_work(
         loop,
         work,
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
-            GattCharacteristicCallbackInfo *callbackInfo = (GattCharacteristicCallbackInfo *)work->data;
+            GattCharacteristicCallbackInfo *callbackInfo = static_cast<GattCharacteristicCallbackInfo *>(work->data);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertCharacteristicWriteReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
@@ -149,7 +149,7 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     uv_work_t *work = new uv_work_t;
-    work->data = (void*)callbackInfo.get();
+    work->data = static_cast<void *>(callbackInfo.get());
 
     uv_queue_work(
         loop,
