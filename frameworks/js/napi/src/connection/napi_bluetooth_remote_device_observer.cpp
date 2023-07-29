@@ -118,37 +118,37 @@ void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemot
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteUuidChanged(
     const BluetoothRemoteDevice &device, const std::vector<ParcelUuid> &uuids)
 {
-    HILOGI("called");
+    HILOGD("called");
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteNameChanged(
     const BluetoothRemoteDevice &device, const std::string &deviceName)
 {
-    HILOGI("addr:%{public}s, deviceName:%{public}s", GET_ENCRYPT_ADDR(device), deviceName.c_str());
+    HILOGD("addr:%{public}s, deviceName:%{public}s", GET_ENCRYPT_ADDR(device), deviceName.c_str());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteAliasChanged(
     const BluetoothRemoteDevice &device, const std::string &alias)
 {
-    HILOGI("addr:%{public}s, alias:%{public}s", GET_ENCRYPT_ADDR(device), alias.c_str());
+    HILOGD("addr:%{public}s, alias:%{public}s", GET_ENCRYPT_ADDR(device), alias.c_str());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteCodChanged(
     const BluetoothRemoteDevice &device, const BluetoothDeviceClass &cod)
 {
-    HILOGI("addr:%{public}s, cod:%{public}d", GET_ENCRYPT_ADDR(device), cod.GetClassOfDevice());
+    HILOGD("addr:%{public}s, cod:%{public}d", GET_ENCRYPT_ADDR(device), cod.GetClassOfDevice());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryLevelChanged(
     const BluetoothRemoteDevice &device, int batteryLevel)
 {
-    HILOGI("addr:%{public}s, batteryLevel:%{public}d", GET_ENCRYPT_ADDR(device), batteryLevel);
+    HILOGD("addr:%{public}s, batteryLevel:%{public}d", GET_ENCRYPT_ADDR(device), batteryLevel);
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
     const BluetoothRemoteDevice &device, int rssi, int status)
 {
-    HILOGI("addr:%{public}s, rssi:%{public}d, status is %{public}d", GET_ENCRYPT_ADDR(device), rssi, status);
+    HILOGD("addr:%{public}s, rssi:%{public}d, status is %{public}d", GET_ENCRYPT_ADDR(device), rssi, status);
 }
 
 void NapiBluetoothRemoteDeviceObserver::RegisterCallback(
