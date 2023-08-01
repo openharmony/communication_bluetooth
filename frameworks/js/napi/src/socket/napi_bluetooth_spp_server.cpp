@@ -125,7 +125,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
         env, nullptr, resource,
         [](napi_env env, void* data) {
             HILOGI("SppListen execute");
-            SppListenCallbackInfo* callbackInfo = (SppListenCallbackInfo*)data;
+            SppListenCallbackInfo* callbackInfo = static_cast<SppListenCallbackInfo*>(data);
             callbackInfo->server_ = std::make_shared<ServerSocket>(callbackInfo->name_,
                 UUID::FromString(callbackInfo->sppOption_->uuid_), callbackInfo->sppOption_->type_,
                 callbackInfo->sppOption_->secure_);
@@ -141,7 +141,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void* data) {
             HILOGI("SppListen execute back");
-            SppListenCallbackInfo* callbackInfo = (SppListenCallbackInfo*)data;
+            SppListenCallbackInfo* callbackInfo = static_cast<SppListenCallbackInfo*>(data);
             napi_value result[ARGS_SIZE_TWO] = {0};
             napi_value callback = 0;
             napi_value undefined = 0;
@@ -179,7 +179,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
             delete callbackInfo;
             callbackInfo = nullptr;
         },
-        (void*)callbackInfo,
+        static_cast<void*>(callbackInfo),
         &callbackInfo->asyncWork_);
 
     napi_queue_async_work(env, callbackInfo->asyncWork_);
@@ -244,7 +244,7 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
         env, nullptr, resource,
         [](napi_env env, void* data) {
             HILOGI("SppAccept execute");
-            SppAcceptCallbackInfo* callbackInfo = (SppAcceptCallbackInfo*)data;
+            SppAcceptCallbackInfo* callbackInfo = static_cast<SppAcceptCallbackInfo*>(data);
             callbackInfo->client_ = callbackInfo->server_->Accept(num_20);
             if (callbackInfo->client_ != nullptr) {
                 callbackInfo->errorCode_ = CODE_SUCCESS;
@@ -254,7 +254,7 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void* data) {
             HILOGI("SppAccept execute back");
-            SppAcceptCallbackInfo* callbackInfo = (SppAcceptCallbackInfo*)data;
+            SppAcceptCallbackInfo* callbackInfo = static_cast<SppAcceptCallbackInfo*>(data);
             napi_value result[ARGS_SIZE_TWO] = {0};
             napi_value callback = 0;
             napi_value undefined = 0;
@@ -287,7 +287,7 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
             delete callbackInfo;
             callbackInfo = nullptr;
         },
-        (void*)callbackInfo,
+        static_cast<void*>(callbackInfo),
         &callbackInfo->asyncWork_);
 
     napi_queue_async_work(env, callbackInfo->asyncWork_);

@@ -108,7 +108,7 @@ void ConvertOppTransferInformationToJS(napi_env env,
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName);
-void SetNamedPropertyByString(napi_env env, napi_value dstObj, std::string strValue, const char *propName);
+void SetNamedPropertyByString(napi_env env, napi_value dstObj, const std::string &strValue, const char *propName);
 napi_value NapiGetNull(napi_env env);
 napi_value NapiGetBooleanFalse(napi_env env);
 napi_value NapiGetBooleanTrue(napi_env env);
@@ -187,7 +187,7 @@ void SetCurrentAppOperate(const bool &isCurrentApp);
 bool GetCurrentAppOperate();
 void RegisterSysBLEObserver(const std::shared_ptr<BluetoothCallbackInfo> &, int32_t, const std::string &);
 void UnregisterSysBLEObserver(const std::string &);
-std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type);
+std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string &type);
 
 struct ScanFilter {
     std::string deviceId;     // The name of a BLE peripheral device

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include <uv.h>
+#include "napi_async_callback.h"
 #include "napi_bluetooth_opp_observer.h"
 
 namespace OHOS {
@@ -34,14 +35,15 @@ void NapiBluetoothOppObserver::OnReceiveIncomingFileChanged(const BluetoothOppTr
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     uv_work_t *work = new uv_work_t;
-    work->data = (void*)callbackInfo.get();
+    work->data = static_cast<void *>(callbackInfo.get());
 
     uv_queue_work(
         loop,
         work,
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
-            TransforInformationCallbackInfo *callbackInfo = (TransforInformationCallbackInfo *)work->data;
+            TransforInformationCallbackInfo *callbackInfo = static_cast<TransforInformationCallbackInfo *>(work->data);
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertOppTransferInformationToJS(callbackInfo->env_, result, callbackInfo->information_);
