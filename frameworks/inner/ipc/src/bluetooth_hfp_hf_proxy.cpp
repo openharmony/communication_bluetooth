@@ -491,7 +491,8 @@ bool BluetoothHfpHfProxy::DialMemory(const BluetoothRawAddress &device, int inde
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::SendVoiceTag(const BluetoothRawAddress &device, int index) {
+bool BluetoothHfpHfProxy::SendVoiceTag(const BluetoothRawAddress &device, int index)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::SendVoiceTag WriteInterfaceToken error");
@@ -519,7 +520,8 @@ bool BluetoothHfpHfProxy::SendVoiceTag(const BluetoothRawAddress &device, int in
     return reply.ReadBool();
 }
 
-bool BluetoothHfpHfProxy::SendKeyPressed(const BluetoothRawAddress &device) {
+bool BluetoothHfpHfProxy::SendKeyPressed(const BluetoothRawAddress &device)
+{
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor())) {
         HILOGE("BluetoothHfpHfProxy::SendKeyPressed WriteInterfaceToken error");

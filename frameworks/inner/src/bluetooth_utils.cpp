@@ -176,11 +176,11 @@ void ToUpper(char* arr)
 
 std::string GenerateRandomMacAddress()
 {
-    int ret = 0;
     std::string randomMac = "";
     char strMacTmp[RANDOM_ADDR_ARRAY_SIZE] = {0};
     std::mt19937_64 gen(std::chrono::high_resolution_clock::now().time_since_epoch().count());
     for (int i = 0; i < RANDOM_ADDR_MAC_BIT_SIZE; i++) {
+        int ret = -1;
         if (i != RANDOM_ADDR_FIRST_BIT) {
             std::uniform_int_distribution<> distribution(0, HEX_BASE - 1);
             ret = sprintf_s(strMacTmp, RANDOM_ADDR_ARRAY_SIZE, "%x", distribution(gen));

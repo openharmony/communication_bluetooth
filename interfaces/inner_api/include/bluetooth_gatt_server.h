@@ -294,7 +294,7 @@ private:
 
     //The passkey pattern of C++
     struct PassKey {
-      PassKey() {};
+        PassKey() {};
     };
 public:
     explicit GattServer(PassKey, GattServerCallback &callback) : GattServer(callback) {};

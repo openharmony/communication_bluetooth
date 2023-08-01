@@ -114,7 +114,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         env, nullptr, resource,
         [](napi_env env, void* data) {
             HILOGI("SppConnect execute");
-            SppConnectCallbackInfo* callbackInfo = (SppConnectCallbackInfo*)data;
+            SppConnectCallbackInfo* callbackInfo = static_cast<SppConnectCallbackInfo*>(data);
             callbackInfo->device_ = std::make_shared<BluetoothRemoteDevice>(callbackInfo->deviceId_, 0);
             callbackInfo->client_ = std::make_shared<ClientSocket>(*callbackInfo->device_,
                 UUID::FromString(callbackInfo->sppOption_->uuid_),
@@ -130,7 +130,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void* data) {
             HILOGI("SppConnect execute back");
-            SppConnectCallbackInfo* callbackInfo = (SppConnectCallbackInfo*)data;
+            SppConnectCallbackInfo* callbackInfo = static_cast<SppConnectCallbackInfo*>(data);
             napi_value result[ARGS_SIZE_TWO] = {0};
             napi_value callback = 0;
             napi_value undefined = 0;
@@ -172,7 +172,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
             delete callbackInfo;
             callbackInfo = nullptr;
         },
-        (void*)callbackInfo,
+        static_cast<void*>(callbackInfo),
         &callbackInfo->asyncWork_);
     napi_queue_async_work(env, callbackInfo->asyncWork_);
     return NapiGetUndefinedRet(env);
@@ -343,13 +343,12 @@ void NapiSppClient::SppRead(int id)
     }
     InputStream inputStream = clientMap[id]->client_->GetInputStream();
     uint8_t buf[SOCKET_BUFFER_SIZE];
-    int ret = 0;
 
     while (true) {
         HILOGI("thread start.");
         (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
         HILOGI("inputStream.Read start");
-        ret = inputStream.Read(buf, sizeof(buf));
+        int ret = inputStream.Read(buf, sizeof(buf));
         HILOGI("inputStream.Read end");
         if (ret <= 0) {
             HILOGI("inputStream.Read failed, ret = %{public}d", ret);
@@ -373,14 +372,14 @@ void NapiSppClient::SppRead(int id)
             uv_loop_s *loop = nullptr;
             napi_get_uv_event_loop(callbackInfo->env_, &loop);
             uv_work_t *work = new uv_work_t;
-            work->data = (void*)callbackInfo.get();
+            work->data = static_cast<void *>(callbackInfo.get());
 
             uv_queue_work(
                 loop,
                 work,
                 [](uv_work_t *work) {},
                 [](uv_work_t *work, int status) {
-                    BufferCallbackInfo *callbackInfo = (BufferCallbackInfo *)work->data;
+                    BufferCallbackInfo *callbackInfo = static_cast<BufferCallbackInfo *>(work->data);
                     int size = callbackInfo->info_;
                     if (size < 0 || size > SOCKET_BUFFER_SIZE) {
                         HILOGE("malloc size error");
@@ -388,7 +387,7 @@ void NapiSppClient::SppRead(int id)
                         work = nullptr;
                         return;
                     }
-                    uint8_t* totalBuf = (uint8_t*) malloc(size);
+                    uint8_t* totalBuf = static_cast<uint8_t*> (malloc(size));
                     if (totalBuf == nullptr) {
                         HILOGE("malloc failed");
                         delete work;
