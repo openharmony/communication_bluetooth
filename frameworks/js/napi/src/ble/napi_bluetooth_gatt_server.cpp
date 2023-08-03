@@ -75,7 +75,7 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
     napi_wrap(
         env, thisVar, gattServer,
         [](napi_env env, void* data, void* hint) {
-            NapiGattServer* server = (NapiGattServer*)data;
+            NapiGattServer* server = static_cast<NapiGattServer*>(data);
             if (server) {
                 delete server;
                 server = nullptr;

@@ -118,7 +118,7 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
     napi_wrap(
         env, thisVar, gattClient,
         [](napi_env env, void* data, void* hint) {
-            NapiGattClient* client = (NapiGattClient*)data;
+            NapiGattClient* client = static_cast<NapiGattClient*>(data);
             if (client) {
                 delete client;
                 client = nullptr;

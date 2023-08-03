@@ -16,6 +16,7 @@
 
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
+#include "napi_async_callback.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -38,14 +39,15 @@ void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemot
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(callbackInfo->env_, &loop);
     uv_work_t *work = new uv_work_t;
-    work->data = (void*)callbackInfo.get();
+    work->data = static_cast<void *>(callbackInfo.get());
 
     uv_queue_work(
         loop,
         work,
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
-            BluetoothCallbackInfo *callbackInfo = (BluetoothCallbackInfo *)work->data;
+            BluetoothCallbackInfo *callbackInfo = static_cast<BluetoothCallbackInfo *>(work->data);
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_,

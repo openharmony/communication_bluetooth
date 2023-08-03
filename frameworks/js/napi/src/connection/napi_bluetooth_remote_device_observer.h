@@ -40,7 +40,7 @@ public:
     std::shared_ptr<BluetoothCallbackInfo> GetCallback(const std::string &callbackName);
 
 private:
-    void DealPairStatus(const int &status, int &boneStatus);
+    void DealPairStatus(const int &status, int &bondStatus);
     void UvQueueWorkOnPairStatusChanged(uv_work_t *work, std::pair<std::string, int> &data);
 
 private:
