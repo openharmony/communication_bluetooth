@@ -74,40 +74,40 @@ const NapiGattProperties DEFAULT_GATT_PROPERTIES = {
     .writeNoResponse = true,
     .read = true,
 };
-int ConvertGattPermissions(const NapiGattPermission &napiPermissions)
+uint16_t ConvertGattPermissions(const NapiGattPermission &napiPermissions)
 {
-    int permissions = 0;
+    uint16_t permissions = 0;
     if (napiPermissions.readable) {
-        permissions |= static_cast<int>(GattPermission::READABLE);
+        permissions |= static_cast<uint16_t>(GattPermission::READABLE);
     }
     if (napiPermissions.writeable) {
-        permissions |= static_cast<int>(GattPermission::WRITEABLE);
+        permissions |= static_cast<uint16_t>(GattPermission::WRITEABLE);
     }
     if (napiPermissions.readEncrypted) {
-        permissions |= static_cast<int>(GattPermission::READ_ENCRYPTED_MITM);
+        permissions |= static_cast<uint16_t>(GattPermission::READ_ENCRYPTED_MITM);
     }
     if (napiPermissions.writeEncrypted) {
-        permissions |= static_cast<int>(GattPermission::WRITE_ENCRYPTED_MITM);
+        permissions |= static_cast<uint16_t>(GattPermission::WRITE_ENCRYPTED_MITM);
     }
     return permissions;
 }
-int ConvertGattProperties(const NapiGattProperties &napiProperties)
+uint16_t ConvertGattProperties(const NapiGattProperties &napiProperties)
 {
-    int properties = 0;
+    uint16_t properties = 0;
     if (napiProperties.read) {
-        properties |= GattCharacteristic::READ;
+        properties |= static_cast<uint16_t>(GattCharacteristic::READ);
     }
     if (napiProperties.write) {
-        properties |= GattCharacteristic::WRITE;
+        properties |= static_cast<uint16_t>(GattCharacteristic::WRITE);
     }
     if (napiProperties.writeNoResponse) {
-        properties |= GattCharacteristic::WRITE_WITHOUT_RESPONSE;
+        properties |= static_cast<uint16_t>(GattCharacteristic::WRITE_WITHOUT_RESPONSE);
     }
     if (napiProperties.notify) {
-        properties |= GattCharacteristic::NOTIFY;
+        properties |= static_cast<uint16_t>(GattCharacteristic::NOTIFY);
     }
     if (napiProperties.indicate) {
-        properties |= GattCharacteristic::INDICATE;
+        properties |= static_cast<uint16_t>(GattCharacteristic::INDICATE);
     }
     return properties;
 }

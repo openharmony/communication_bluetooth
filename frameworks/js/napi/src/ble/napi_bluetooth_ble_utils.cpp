@@ -93,7 +93,11 @@ void ConvertBLECharacteristicVectorToJS(napi_env env, napi_value result,
 
 bool HasProperty(int properties, int propertyMask)
 {
-    return (properties & propertyMask) != 0;
+    if (properties < 0 || propertyMask < 0) {
+        HILOGE("properties or propertyMask is less than 0");
+        return false;
+    }
+    return (static_cast<unsigned int>(properties) & static_cast<unsigned int>(propertyMask)) != 0;
 }
 napi_value ConvertGattPropertiesToJs(napi_env env, int properties)
 {

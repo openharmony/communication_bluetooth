@@ -339,7 +339,6 @@ enum BluetoothHfpHfInterfaceCode {
     BT_HFP_HF_DEREGISTER_OBSERVER,
     BT_HFP_HF_SEND_VOICE_TAG,
     BT_HFP_HF_SEND_KEY_PRESSED
-
 };
 
 enum class BluetoothHidHostObserverInterfaceCode {

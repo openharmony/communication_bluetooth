@@ -141,6 +141,28 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
     napi_create_object(env, &majorMinorClass);
     // MajorMinorClass
     // Computer Major Class
+    ComputerMajorClassOfDeviceInit(env, majorMinorClass);
+    // Phone Major Class
+    PhoneMajorClassOfDeviceInit(env, majorMinorClass);
+    // LAN/Network Access Point Major Class
+    NetworkMajorClassOfDeviceInit(env, majorMinorClass);
+    // Audio/Video Major Class
+    AudioVideoMajorClassOfDeviceInit(env, majorMinorClass);
+    // Peripheral Major Class
+    PeripheralMajorClassOfDeviceInit(env, majorMinorClass);
+    // Imaging Major Class
+    ImagingMajorClassOfDeviceInit(env, majorMinorClass);
+    // Wearable Major Class
+    WearableMajorClassOfDeviceInit(env, majorMinorClass);
+    // Minor Device Class field - Toy Major Class
+    ToyMajorClassOfDeviceInit(env, majorMinorClass);
+    // Minor Device Class field - Health
+    HealthMajorClassOfDeviceInit(env, majorMinorClass);
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::ComputerMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::COMPUTER_UNCATEGORIZED), "COMPUTER_UNCATEGORIZED");
     SetNamedPropertyByInteger(
@@ -159,7 +181,11 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
         env, majorMinorClass, static_cast<int>(MajorMinorClass::COMPUTER_WEARABLE), "COMPUTER_WEARABLE");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::COMPUTER_TABLET), "COMPUTER_TABLET");
-    // Phone Major Class
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::PhoneMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::PHONE_UNCATEGORIZED), "PHONE_UNCATEGORIZED");
     SetNamedPropertyByInteger(
@@ -170,7 +196,11 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::PHONE_MODEM_OR_GATEWAY), "PHONE_MODEM_OR_GATEWAY");
     SetNamedPropertyByInteger(env, majorMinorClass, static_cast<int>(MajorMinorClass::PHONE_ISDN), "PHONE_ISDN");
-    // LAN/Network Access Point Major Class
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::NetworkMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::NETWORK_FULLY_AVAILABLE), "NETWORK_FULLY_AVAILABLE");
     SetNamedPropertyByInteger(
@@ -197,15 +227,15 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
         "NETWORK_83_TO_99_UTILIZED");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::NETWORK_NO_SERVICE), "NETWORK_NO_SERVICE");
-    // Audio/Video Major Class
-    SetNamedPropertyByInteger(env,
-        majorMinorClass,
-        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_UNCATEGORIZED),
-        "AUDIO_VIDEO_UNCATEGORIZED");
-    SetNamedPropertyByInteger(env,
-        majorMinorClass,
-        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_WEARABLE_HEADSET),
-        "AUDIO_VIDEO_WEARABLE_HEADSET");
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::AudioVideoMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_UNCATEGORIZED), "AUDIO_VIDEO_UNCATEGORIZED");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_WEARABLE_HEADSET), "AUDIO_VIDEO_WEARABLE_HEADSET");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::AUDIO_VIDEO_HANDSFREE), "AUDIO_VIDEO_HANDSFREE");
     SetNamedPropertyByInteger(
@@ -214,10 +244,8 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
         env, majorMinorClass, static_cast<int>(MajorMinorClass::AUDIO_VIDEO_LOUDSPEAKER), "AUDIO_VIDEO_LOUDSPEAKER");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::AUDIO_VIDEO_HEADPHONES), "AUDIO_VIDEO_HEADPHONES");
-    SetNamedPropertyByInteger(env,
-        majorMinorClass,
-        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_PORTABLE_AUDIO),
-        "AUDIO_VIDEO_PORTABLE_AUDIO");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_PORTABLE_AUDIO), "AUDIO_VIDEO_PORTABLE_AUDIO");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::AUDIO_VIDEO_CAR_AUDIO), "AUDIO_VIDEO_CAR_AUDIO");
     SetNamedPropertyByInteger(
@@ -230,23 +258,20 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
         env, majorMinorClass, static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_CAMERA), "AUDIO_VIDEO_VIDEO_CAMERA");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::AUDIO_VIDEO_CAMCORDER), "AUDIO_VIDEO_CAMCORDER");
-    SetNamedPropertyByInteger(env,
-        majorMinorClass,
-        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_MONITOR),
-        "AUDIO_VIDEO_VIDEO_MONITOR");
-    SetNamedPropertyByInteger(env,
-        majorMinorClass,
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_MONITOR), "AUDIO_VIDEO_VIDEO_MONITOR");
+    SetNamedPropertyByInteger(env, majorMinorClass,
         static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER),
         "AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER");
-    SetNamedPropertyByInteger(env,
-        majorMinorClass,
-        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_CONFERENCING),
-        "AUDIO_VIDEO_VIDEO_CONFERENCING");
-    SetNamedPropertyByInteger(env,
-        majorMinorClass,
-        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_GAMING_TOY),
-        "AUDIO_VIDEO_VIDEO_GAMING_TOY");
-    // Peripheral Major Class
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_CONFERENCING), "AUDIO_VIDEO_VIDEO_CONFERENCING");
+    SetNamedPropertyByInteger(env, majorMinorClass,
+        static_cast<int>(MajorMinorClass::AUDIO_VIDEO_VIDEO_GAMING_TOY), "AUDIO_VIDEO_VIDEO_GAMING_TOY");
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::PeripheralMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(env,
         majorMinorClass,
         static_cast<int>(MajorMinorClass::PERIPHERAL_NON_KEYBOARD_NON_POINTING),
@@ -289,7 +314,11 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
         majorMinorClass,
         static_cast<int>(MajorMinorClass::PERIPHERAL_GESTURAL_INPUT),
         "PERIPHERAL_GESTURAL_INPUT");
-    // Imaging Major Class
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::ImagingMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::IMAGING_UNCATEGORIZED), "IMAGING_UNCATEGORIZED");
     SetNamedPropertyByInteger(
@@ -300,7 +329,11 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
         env, majorMinorClass, static_cast<int>(MajorMinorClass::IMAGING_SCANNER), "IMAGING_SCANNER");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::IMAGING_PRINTER), "IMAGING_PRINTER");
-    // Wearable Major Class
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::WearableMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::WEARABLE_UNCATEGORIZED), "WEARABLE_UNCATEGORIZED");
     SetNamedPropertyByInteger(
@@ -313,7 +346,11 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
         env, majorMinorClass, static_cast<int>(MajorMinorClass::WEARABLE_HELMET), "WEARABLE_HELMET");
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::WEARABLE_GLASSES), "WEARABLE_GLASSES");
-    // Minor Device Class field - Toy Major Class
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::ToyMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::TOY_UNCATEGORIZED), "TOY_UNCATEGORIZED");
     SetNamedPropertyByInteger(env, majorMinorClass, static_cast<int>(MajorMinorClass::TOY_ROBOT), "TOY_ROBOT");
@@ -323,7 +360,11 @@ napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::TOY_CONTROLLER), "TOY_CONTROLLER");
     SetNamedPropertyByInteger(env, majorMinorClass, static_cast<int>(MajorMinorClass::TOY_GAME), "TOY_GAME");
-    // Minor Device Class field - Health
+    return majorMinorClass;
+}
+
+napi_value NapiConstant::HealthMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass)
+{
     SetNamedPropertyByInteger(
         env, majorMinorClass, static_cast<int>(MajorMinorClass::HEALTH_UNCATEGORIZED), "HEALTH_UNCATEGORIZED");
     SetNamedPropertyByInteger(

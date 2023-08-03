@@ -50,7 +50,7 @@ napi_value GetCallbackErrorValue(napi_env env, int errCode)
     return result;
 }
 
-std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string type)
+std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string &type)
 {
     std::lock_guard<std::mutex> lock(g_observerMutex);
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> observers = GetObserver();
@@ -124,7 +124,7 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
         return false;
     }
 
-    status = napi_get_arraybuffer_info(env, args, (void**)data, &size);
+    status = napi_get_arraybuffer_info(env, args, reinterpret_cast<void**>(data), &size);
     if (status != napi_ok) {
         HILOGE("can not get arraybuffer, error is %{public}d", status);
         return false;
@@ -251,7 +251,7 @@ void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName,
     }
 }
 
-void SetNamedPropertyByString(napi_env env, napi_value dstObj, std::string strValue, const char *propName)
+void SetNamedPropertyByString(napi_env env, napi_value dstObj, const std::string &strValue, const char *propName)
 {
     napi_value prop = nullptr;
     if (napi_create_string_utf8(env, strValue.c_str(), NAPI_AUTO_LENGTH, &prop) == napi_ok) {
