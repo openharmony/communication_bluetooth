@@ -104,7 +104,7 @@ void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemot
         return;
     }
 
-    work->data = (void *)callbackData;
+    work->data = static_cast<void *>(callbackData);
 
     int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
     if (ret != 0) {
