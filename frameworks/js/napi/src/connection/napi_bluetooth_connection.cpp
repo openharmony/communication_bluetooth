@@ -596,7 +596,7 @@ napi_value SetDevicePinCode(napi_env env, napi_callback_info info)
                 callbackInfo = nullptr;
             }
         },
-        (void *)asyncCallbackInfo,
+        static_cast<void *>(asyncCallbackInfo),
         &asyncCallbackInfo->asyncWork);
     NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
     HILOGI("end");

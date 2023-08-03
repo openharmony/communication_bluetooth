@@ -91,6 +91,7 @@ void AfterWorkCallbackToSysBLEScan(uv_work_t *work, int status)
 
     const napi_env &env = data->env;
 
+    NapiHandleScope scope(env);
     napi_value funcComplete = nullptr;
     napi_value callbackResult = nullptr;
     napi_value undefine = nullptr;
@@ -120,6 +121,7 @@ void AfterWorkCallbackToSysBLEDeviceFound(uv_work_t *work, int status)
     std::unique_ptr<SysBLEDeviceFoundCallbackData> data(static_cast<SysBLEDeviceFoundCallbackData *>(work->data));
     const napi_env &env = data->env;
 
+    NapiHandleScope scope(env);
     napi_value result = nullptr;
     std::vector<BleScanResult> scanResults;
     scanResults.push_back(*(data->result));
@@ -180,7 +182,7 @@ void NapiBluetoothBleCentralManagerCallback::SetNapiScanCallback(const std::shar
     napiScanCallback_ = callback;
 }
 
-static void OnSysScanCallback(const BleScanResult &result, const std::string type)
+static void OnSysScanCallback(const BleScanResult &result, const std::string &type)
 {
     std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
     auto sysObservers = GetSysBLEObserver();
@@ -277,7 +279,7 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
         return;
     }
 
-    work->data = (void *)callbackData;
+    work->data = static_cast<void *>(callbackData);
 
     int ret = uv_queue_work(
         loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);

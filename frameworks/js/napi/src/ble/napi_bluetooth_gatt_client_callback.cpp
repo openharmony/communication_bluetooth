@@ -37,6 +37,7 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
         onBleCharacterChangedThreadSafeFunc_, static_cast<void *>(character), napi_tsfn_blocking);
     if (status != napi_ok) {
         HILOGE("napi_call_threadsafe_function failed, status: %{public}d", status);
+        delete character;
         return;
     }
 

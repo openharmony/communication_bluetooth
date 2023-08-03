@@ -120,7 +120,7 @@ void NapiBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDev
         return;
     }
 
-    work->data = (void *)callbackData;
+    work->data = static_cast<void *>(callbackData);
 
     int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
     if (ret != 0) {
@@ -143,11 +143,11 @@ void NapiBluetoothConnectionObserver::OnPairRequested(const BluetoothRemoteDevic
     remoteDevice.PairRequestReply(true);
 }
 
-void NapiBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice &device, int pinType, int number)
+void NapiBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
 {
     HILOGI("OnPairConfirmed");
     std::shared_ptr<PairConfirmedCallBackInfo> pairConfirmInfo =
-        std::make_shared<PairConfirmedCallBackInfo>(number, pinType, device.GetDeviceAddr());
+        std::make_shared<PairConfirmedCallBackInfo>(number, reqType, device.GetDeviceAddr());
     OnPairConfirmedCallBack(pairConfirmInfo);
 }
 
@@ -277,7 +277,7 @@ void NapiBluetoothConnectionObserver::OnPairConfirmedCallBack(
         return;
     }
 
-    work->data = (void *)callbackData;
+    work->data = static_cast<void *>(callbackData);
 
     int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
     if (ret != 0) {
