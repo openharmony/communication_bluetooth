@@ -1003,7 +1003,6 @@ void AvrcpController::UnregisterObserver(IObserver *observer)
 std::vector<BluetoothRemoteDevice> AvrcpController::GetConnectedDevices(void)
 {
     HILOGI("enter");
-    std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return std::vector<BluetoothRemoteDevice>();
@@ -1014,6 +1013,7 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetConnectedDevices(void)
         return std::vector<BluetoothRemoteDevice>();
     }
 
+    std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
     std::vector<BluetoothRemoteDevice> devices;
     std::vector<RawAddress> rawAddrs = pimpl->proxy_->GetConnectedDevices();
     for (auto rawAddr : rawAddrs) {
