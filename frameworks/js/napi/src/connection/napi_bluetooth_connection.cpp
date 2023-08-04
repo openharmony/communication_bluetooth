@@ -260,7 +260,7 @@ napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
 
 napi_value GetRemoteDeviceName(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     std::string name = INVALID_NAME;
     napi_value result = nullptr;
@@ -272,13 +272,12 @@ napi_value GetRemoteDeviceName(napi_env env, napi_callback_info info)
     int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport).GetDeviceName(name);
     napi_create_string_utf8(env, name.c_str(), name.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
-    HILOGI("end");
     return result;
 }
 
 napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -296,7 +295,7 @@ napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
         tmpMajorClass = MajorClass::MAJOR_UNCATEGORIZED;
         tmpMajorMinorClass = MajorClass::MAJOR_UNCATEGORIZED;
     }
-    HILOGI("cod = %{public}d, majorClass = %{public}d, majorMinorClass = %{public}d",
+    HILOGD("cod = %{public}d, majorClass = %{public}d, majorMinorClass = %{public}d",
         tmpCod,
         tmpMajorClass,
         tmpMajorMinorClass);
@@ -312,7 +311,6 @@ napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
     napi_create_int32(env, tmpCod, &cod);
     napi_set_named_property(env, result, "classOfDevice", cod);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
-    HILOGI("end");
     return result;
 }
 
