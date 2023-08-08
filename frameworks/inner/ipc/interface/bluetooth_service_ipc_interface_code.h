@@ -440,6 +440,7 @@ enum BluetoothHostInterfaceCode {
     BT_SET_FAST_SCAN,
     GET_RANDOM_ADDRESS,
     SYNC_RANDOM_ADDRESS,
+    START_CREDIBLE_PAIR,
 };
 
 enum BluetoothMapMceObserverInterfaceCode {
