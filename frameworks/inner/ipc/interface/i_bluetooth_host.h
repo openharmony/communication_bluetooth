@@ -99,6 +99,7 @@ public:
     virtual int32_t GetDeviceBatteryLevel(const std::string &address) = 0;
     virtual int32_t GetPairState(int32_t transport, const std::string &address) = 0;
     virtual int32_t StartPair(int32_t transport, const std::string &address) = 0;
+    virtual int32_t StartCrediblePair(int32_t transport, const std::string &address) = 0;
     virtual bool CancelPairing(int32_t transport, const std::string &address) = 0;
     virtual bool IsBondedFromLocal(int32_t transport, const std::string &address) = 0;
     virtual bool IsAclConnected(int32_t transport, const std::string &address) = 0;
