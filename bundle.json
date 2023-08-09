@@ -55,7 +55,6 @@
       "components": [
         "ability_base",
         "ability_runtime",
-        "base",
         "bundle_framework",
         "c_utils",
         "hilog",
@@ -64,14 +63,10 @@
         "libuv",
         "ipc",
         "napi",
-        "samgr_proxy",
         "samgr"
       ],
       "third_party": [
-        "googletest",
-        "libuv",
-        "libxml2",
-        "openssl"
+        "libuv"
       ]
     },
     "build": {
