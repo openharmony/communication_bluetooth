@@ -23,6 +23,8 @@ namespace OHOS {
 namespace Bluetooth {
 enum BluetoothA2dpSinkObserverInterfaceCode {
     BT_A2DP_SINK_OBSERVER_CONNECTION_STATE_CHANGED = 0,
+    // The last code, if you want to add a new code, please add it before this
+    BT_A2DP_SINK_OBSERVER_BUTT
 };
 
 enum BluetoothA2dpSinkInterfaceCode {
@@ -36,12 +38,16 @@ enum BluetoothA2dpSinkInterfaceCode {
     BT_A2DP_SINK_SET_CONNECT_STRATEGY,
     BT_A2DP_SINK_GET_CONNECT_STRATEGY,
     BT_A2DP_SINK_SEND_DELAY,
+    // The last code, if you want to add a new code, please add it before this
+    BT_A2DP_SINK_BUTT
 };
 
 enum BluetoothA2dpSourceObserverInterfaceCode {
     BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED = 0,
     BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED,
     BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    BT_A2DP_SRC_OBSERVER_BUTT
 };
 
 enum BluetoothA2dpSrcInterfaceCode {
@@ -66,6 +72,8 @@ enum BluetoothA2dpSrcInterfaceCode {
     BT_A2DP_SRC_SET_AUDIO_CONFIGURE,
     BT_A2DP_SRC_WRITE_FRAME,
     BT_A2DP_SRC_GET_RENDER_POSITION,
+    // The last code, if you want to add a new code, please add it before this
+    BT_A2DP_SRC_BUTT
 };
 
 enum class BluetoothAvrcpCtObserverInterfaceCode {
@@ -99,6 +107,8 @@ enum class BluetoothAvrcpCtObserverInterfaceCode {
     AVRCP_CT_VOLUME_CHANGED,
     AVRCP_CT_GET_MEDIA_PLAYERS,
     AVRCP_CT_GET_FOLDER_ITEMS,
+    // The last code, if you want to add a new code, please add it before this
+    AVRCP_CT_OBSERVER_BUTT
 };
 
 enum class BluetoothAvrcpCtInterfaceCode {
@@ -131,11 +141,15 @@ enum class BluetoothAvrcpCtInterfaceCode {
     AVRCP_CT_DISABLE_NOTIFICATION,
     AVRCP_CT_GET_ITEM_ATTRIBUTES,
     AVRCP_CT_SET_BROWSERED_PLAYER,
-    AVRCP_CT_MEDIA_PLAYER_LIST
+    AVRCP_CT_MEDIA_PLAYER_LIST,
+    // The last code, if you want to add a new code, please add it before this
+    AVRCP_CT_BUTT
 };
 
 enum BluetoothAvrcpTgObserverInterfaceCode {
     BT_AVRCP_TG_OBSERVER_CONNECTION_STATE_CHANGED = 0,
+    // The last code, if you want to add a new code, please add it before this
+    BT_AVRCP_TG_OBSERVER_BUTT
 };
 
 enum BluetoothAvrcpTgInterfaceCode {
@@ -158,12 +172,16 @@ enum BluetoothAvrcpTgInterfaceCode {
     BT_AVRCP_TG_NOTIFY_ADDRESSED_PLAYER_CHANGED,
     BT_AVRCP_TG_NOTIFY_UID_CHANGED,
     BT_AVRCP_TG_NOTIFY_VOLUME_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    BT_AVRCP_TG_BUTT
 };
 
 enum BluetoothBleAdvertiseCallbackInterfaceCode {
     BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT = 0,
     BT_BLE_ADVERTISE_CALLBACK_RESULT_EVENT,
     BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
+    // The last code, if you want to add a new code, please add it before this
+    BT_BLE_ADVERTISE_CALLBACK_BUTT
 };
 
 enum BluetoothBleAdvertiserInterfaceCode {
@@ -175,6 +193,8 @@ enum BluetoothBleAdvertiserInterfaceCode {
     BLE_CLOSE,
     BLE_GET_ADVERTISER_HANDLE,
     BLE_SET_ADVERTISING_DATA,
+    // The last code, if you want to add a new code, please add it before this
+    BLE_ADVERTISER_BUTT
 };
 
 enum BluetoothBleCentralManagerCallbackInterfaceCode {
@@ -182,6 +202,8 @@ enum BluetoothBleCentralManagerCallbackInterfaceCode {
     BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK,
     BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED,
     BT_BLE_LPDEVICE_CALLBACK_NOTIFY_MSG_REPORT,
+    // The last code, if you want to add a new code, please add it before this
+    BT_BLE_CENTRAL_MANAGER_CALLBACK_BUTT
 };
 
 enum BluetoothBleCentralManagerInterfaceCode {
@@ -202,12 +224,16 @@ enum BluetoothBleCentralManagerInterfaceCode {
     BLE_IS_LPDEVICE_AVAILABLE,
     BLE_SET_LPDEVICE_PARAM,
     BLE_REMOVE_LPDEVICE_PARAM,
+    // The last code, if you want to add a new code, please add it before this
+    BLE_CENTRAL_MANAGER_BUTT
 };
 
 enum BluetoothBlePeripheralObserverInterfaceCode {
     BLE_ON_READ_REMOTE_RSSI_EVENT = 0,
     BLE_PAIR_STATUS_CHANGED,
     BLE_ACL_STATE_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    BLE_PERIPHERAL_OBSERVER_BUTT
 };
 
 enum BluetoothGattClientCallbackInterfaceCode {
@@ -222,6 +248,8 @@ enum BluetoothGattClientCallbackInterfaceCode {
     BT_GATT_CLIENT_CALLBACK_CONNECTION_PARA_CHANGE,
     BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED,
     BT_GATT_CLIENT_CALLBACK_READ_REMOTE_RSSI_VALUE,
+    // The last code, if you want to add a new code, please add it before this
+    BT_GATT_CLIENT_CALLBACK_BUTT
 };
 
 enum BluetoothGattClientInterfaceCode {
@@ -242,6 +270,8 @@ enum BluetoothGattClientInterfaceCode {
     BT_GATT_CLIENT_REQUEST_FASTEST_CONNECTION,
     BT_GATT_CLIENT_READ_REMOTE_RSSI_VALUE,
     BT_GATT_CLIENT_REQUEST_NOTIFICATION,
+    // The last code, if you want to add a new code, please add it before this
+    BT_GATT_CLIENT_BUTT
 };
 
 enum BluetoothGattServerCallbackInterfaceCode {
@@ -255,6 +285,8 @@ enum BluetoothGattServerCallbackInterfaceCode {
     GATT_SERVER_CALLBACK_MTU_CHANGED,
     GATT_SERVER_CALLBACK_NOTIFY_CONFIRM,
     GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    GATT_SERVER_CALLBACK_BUTT
 };
 
 enum BluetoothGattServerInterfaceCode {
@@ -269,6 +301,8 @@ enum BluetoothGattServerInterfaceCode {
     GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE,
     GATT_SERVER_RESPOND_DESCRIPTOR_READ,
     GATT_SERVER_RESPOND_DESCRIPTOR_WRITE,
+    // The last code, if you want to add a new code, please add it before this
+    GATT_SERVER_BUTT
 };
 
 enum BluetoothHfpAgObserverInterfaceCode {
@@ -276,6 +310,8 @@ enum BluetoothHfpAgObserverInterfaceCode {
     BT_HFP_AG_OBSERVER_SCO_STATE_CHANGED,
     BT_HFP_AG_OBSERVER_ACTIVE_DEVICE_CHANGED,
     BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    BT_HFP_AG_OBSERVER_BUTT
 };
 
 enum BluetoothHfpAgInterfaceCode {
@@ -299,6 +335,8 @@ enum BluetoothHfpAgInterfaceCode {
     BT_HFP_AG_DEREGISTER_OBSERVER,
     BT_HFP_AG_SET_CONNECT_STRATEGY,
     BT_HFP_AG_GET_CONNECT_STRATEGY,
+    // The last code, if you want to add a new code, please add it before this
+    BT_HFP_AG_BUTT
 };
 
 enum BluetoothHfpHfObserverInterfaceCode {
@@ -312,6 +350,8 @@ enum BluetoothHfpHfObserverInterfaceCode {
     BT_HFP_HF_OBSERVER_SUBSCRIBER_NUMBER_CHANGED,
     BT_HFP_HF_OBSERVER_VOICE_RECOGNITION_STATUS_CHANGED,
     BT_HFP_HF_OBSERVER_IN_BAND_RING_TONE_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    BT_HFP_HF_OBSERVER_BUTT
 };
 
 enum BluetoothHfpHfInterfaceCode {
@@ -338,11 +378,15 @@ enum BluetoothHfpHfInterfaceCode {
     BT_HFP_HF_REGISTER_OBSERVER,
     BT_HFP_HF_DEREGISTER_OBSERVER,
     BT_HFP_HF_SEND_VOICE_TAG,
-    BT_HFP_HF_SEND_KEY_PRESSED
+    BT_HFP_HF_SEND_KEY_PRESSED,
+    // The last code, if you want to add a new code, please add it before this
+    BT_HFP_HF_BUTT
 };
 
 enum class BluetoothHidHostObserverInterfaceCode {
     COMMAND_ON_CONNECTION_STATE_CHANGED = MIN_TRANSACTION_ID + 0,
+    // The last code, if you want to add a new code, please add it before this
+    COMMAND_HID_HOST_OBSERVER_BUTT
 };
 
 enum class BluetoothHidHostInterfaceCode {
@@ -358,6 +402,8 @@ enum class BluetoothHidHostInterfaceCode {
     COMMAND_GET_REPORT,
     COMMAND_SET_CONNECT_STRATEGY,
     COMMAND_GET_CONNECT_STRATEGY,
+    // The last code, if you want to add a new code, please add it before this
+    COMMAND_HID_HOST_BUTT
 };
 
 enum BluetoothHostObserverInterfaceCode {
@@ -370,6 +416,8 @@ enum BluetoothHostObserverInterfaceCode {
     BT_HOST_OBSERVER_SCAN_MODE_CHANGED,
     BT_HOST_OBSERVER_DEVICE_NAME_CHANGED,
     BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    BT_HOST_OBSERVER_BUTT
 };
 
 enum BluetoothHostInterfaceCode {
@@ -440,6 +488,8 @@ enum BluetoothHostInterfaceCode {
     BT_SET_FAST_SCAN,
     GET_RANDOM_ADDRESS,
     SYNC_RANDOM_ADDRESS,
+    // The last code, if you want to add a new code, please add it before this
+    BT_HOST_BUTT
 };
 
 enum BluetoothMapMceObserverInterfaceCode {
@@ -449,6 +499,8 @@ enum BluetoothMapMceObserverInterfaceCode {
     MCE_ON_BMESSAGE_COMPLETED,
     MCE_ON_MESSAGE_LIST_COMPLETED,
     MCE_ON_CONVERSATION_LIST_COMPLETED,
+    // The last code, if you want to add a new code, please add it before this
+    MCE_OBSERVER_BUTT
 };
 
 enum BluetoothMapMceInterfaceCode {
@@ -474,11 +526,15 @@ enum BluetoothMapMceInterfaceCode {
     MCE_SET_OWNER_STATUS,
     MCE_GET_OWNER_STATUS,
     MCE_GET_MAS_INSTANCE_INFO,
+    // The last code, if you want to add a new code, please add it before this
+    MCE_BUTT
 };
 
 enum BluetoothMapMseObserverInterfaceCode {
     MSE_ON_CONNECTION_STATE_CHANGED = 0,
     MSE_ON_PERMISSION,
+    // The last code, if you want to add a new code, please add it before this
+    MSE_OBSERVER_BUTT
 };
 
 enum BluetoothMapMseInterfaceCode {
@@ -493,11 +549,15 @@ enum BluetoothMapMseInterfaceCode {
     MSE_SET_CONNECTION_STRATEGY,
     MSE_GET_CONNECTION_STRATEGY,
     MSE_GRANT_PERMISSION,
+    // The last code, if you want to add a new code, please add it before this
+    MSE_BUTT
 };
 
 enum class BluetoothOppObserverInterfaceCode {
     COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED = MIN_TRANSACTION_ID + 0,
     COMMAND_ON_TRANSFER_STATE_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    COMMAND_OPP_OBSERVER_BUTT
 };
 
 enum class BluetoothOppInterfaceCode {
@@ -509,10 +569,14 @@ enum class BluetoothOppInterfaceCode {
     COMMAND_DEREGISTER_OBSERVER,
     COMMAND_GET_DEVICE_STATE,
     COMMAND_GET_DEVICES_BY_STATES,
+    // The last code, if you want to add a new code, please add it before this
+    COMMAND_OPP_BUTT
 };
 
 enum class BluetoothPanObserverInterfaceCode {
     COMMAND_ON_CONNECTION_STATE_CHANGED = MIN_TRANSACTION_ID + 0,
+    // The last code, if you want to add a new code, please add it before this
+    COMMAND_PAN_OBSERVER_BUTT
 };
 
 enum class BluetoothPanInterfaceCode {
@@ -523,6 +587,8 @@ enum class BluetoothPanInterfaceCode {
     COMMAND_DEREGISTER_OBSERVER,
     COMMAND_SET_TETHERING,
     COMMAND_IS_TETHERING_ON,
+    // The last code, if you want to add a new code, please add it before this
+    COMMAND_PAN_BUTT
 };
 
 
@@ -530,6 +596,8 @@ enum BluetoothPbapPceObserverInterfaceCode {
     PBAP_PCE_ON_SERVICE_CONNECTION_STATE_CHANGED = 0,
     PBAP_PCE_ON_SERVICE_PASSWORD_REQUIRED,
     PBAP_PCE_ON_ACTION_COMPLETED,
+    // The last code, if you want to add a new code, please add it before this
+    PBAP_PCE_OBSERVER_BUTT
 };
 
 enum BluetoothPbapPceInterfaceCode {
@@ -548,12 +616,16 @@ enum BluetoothPbapPceInterfaceCode {
     PBAP_PCE_GET_DEVICES_BY_STATE,
     PBAP_PCE_REGISTER_OBSERVER,
     PBAP_PCE_DEREGISTER_OBSERVER,
+    // The last code, if you want to add a new code, please add it before this
+    PBAP_PCE_BUTT
 };
 
 enum BluetoothPbapPseObserverInterfaceCode {
     PBAP_PSE_ON_SERVICE_CONNECTION_STATE_CHANGE = 0,
     PBAP_PSE_ON_SERVICE_PERMISSION,
     PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED,
+    // The last code, if you want to add a new code, please add it before this
+    PBAP_PSE_OBSERVER_BUTT
 };
 
 enum BluetoothPbapPseInterfaceCode {
@@ -566,6 +638,8 @@ enum BluetoothPbapPseInterfaceCode {
     PBAP_PSE_SET_DEVICE_PASSWORD,
     PBAP_PSE_REGISTER_OBSERVER,
     PBAP_PSE_DEREGISTER_OBSERVER,
+    // The last code, if you want to add a new code, please add it before this
+    PBAP_PSE_BUTT
 };
 
 enum BluetoothRemoteDeviceObserverInterfaceCode {
@@ -576,11 +650,15 @@ enum BluetoothRemoteDeviceObserverInterfaceCode {
     BT_REMOTE_DEVICE_OBSERVER_REMOTE_ALIAS,
     BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD,
     BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL,
+    // The last code, if you want to add a new code, please add it before this
+    BT_REMOTE_DEVICE_OBSERVER_BUTT
 };
 
 enum BluetoothSocketInterfaceCode {
     SOCKET_CONNECT = 0,
     SOCKET_LISTEN,
+    // The last code, if you want to add a new code, please add it before this
+    SOCKET_BUTT
 };
 
 }  // namespace Bluetooth
