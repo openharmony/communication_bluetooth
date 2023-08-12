@@ -253,6 +253,50 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     return NapiGetBooleanRet(env, isOK);
 }
 
+static void NapiThreadSafeFuncCallJs(napi_env, napi_value jsCallback, void *context, void *data)
+{
+    BufferCallbackInfo *callbackInfo = static_cast<BufferCallbackInfo *>(data);
+    std::shared_ptr<SppCallbackBuffer> buffer = callbackInfo->PopData();
+    if (buffer == nullptr) {
+        HILOGE("callbackInfo->PopData return nullptr");
+        return;
+    }
+    if (buffer->len_ < 0 || buffer->len_ > SOCKET_BUFFER_SIZE) {
+        HILOGE("buffer->len_ invalid");
+        return;
+    }
+
+    napi_value result = nullptr;
+    uint8_t *bufferData = nullptr;
+    napi_create_arraybuffer(callbackInfo->env_, buffer->len_, (void **)&bufferData, &result);
+    if (memcpy_s(bufferData, buffer->len_, bufferData, buffer->len_) != EOK) {
+        HILOGE("memcpy_s failed!");
+        return;
+    }
+
+    napi_value undefined = nullptr;
+    napi_value callResult = nullptr;
+    napi_get_undefined(callbackInfo->env_, &undefined);
+    napi_call_function(callbackInfo->env_, undefined, jsCallback, ARGS_SIZE_ONE, &result, &callResult);
+}
+
+static napi_status NapiSppCreateThreadSafeFunc(std::shared_ptr<NapiSppClient> &client)
+{
+    napi_value name;
+    napi_threadsafe_function tsfn;
+    const size_t maxQueueSize = 0;  // 0 means no limited
+    const size_t initialThreadCount = 1;
+    napi_value callback = nullptr;
+    auto callbackInfo = client->callbackInfos_[REGISTER_SPP_READ_TYPE];
+    NAPI_BT_CALL_RETURN(napi_create_string_utf8(callbackInfo->env_, "SppRead", NAPI_AUTO_LENGTH, &name));
+    NAPI_BT_CALL_RETURN(napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback));
+    NAPI_BT_CALL_RETURN(napi_create_threadsafe_function(callbackInfo->env_, callback, nullptr, name, maxQueueSize,
+        initialThreadCount, nullptr, nullptr, nullptr, NapiThreadSafeFuncCallJs, &tsfn));
+
+    client->sppReadThreadSafeFunc_ = tsfn;
+    return napi_ok;
+}
+
 napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -261,7 +305,6 @@ napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     int id = -1;
     std::string type;
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo;
 
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
@@ -269,7 +312,7 @@ napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
         "Wrong argument type. String expected.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
-    callbackInfo = std::make_shared<BufferCallbackInfo>();
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BufferCallbackInfo>();
     callbackInfo->env_ = env;
 
     napi_valuetype valueType1 = napi_undefined;
@@ -287,6 +330,7 @@ napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF(!client, "client is nullptr.", napi_invalid_arg);
     client->sppReadFlag = true;
     client->callbackInfos_[type] = callbackInfo;
+    NAPI_BT_RETURN_IF(NapiSppCreateThreadSafeFunc(client) != napi_ok, "inner error", napi_invalid_arg);
     HILOGI("sppRead begin");
     client->thread_ = std::make_shared<std::thread>(NapiSppClient::SppRead, id);
     client->thread_->detach();
@@ -313,13 +357,17 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
-        "Wrong argument type. String expected.", napi_invalid_arg);
+                      "Wrong argument type. String expected.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
     NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
 
     std::shared_ptr<NapiSppClient> client = NapiSppClient::clientMap[id];
     NAPI_BT_RETURN_IF(!client, "client is nullptr.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_abort),
+        "innner error",
+        napi_invalid_arg);
+    client->sppReadThreadSafeFunc_ = nullptr;
     client->callbackInfos_[type] = nullptr;
     client->sppReadFlag = false;
     sleep(sleepTime);
@@ -336,12 +384,12 @@ napi_value NapiSppClient::Off(napi_env env, napi_callback_info info)
 
 void NapiSppClient::SppRead(int id)
 {
-    if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
-        clientMap[id]->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
+    auto client = clientMap[id];
+    if (client == nullptr || !client->sppReadFlag || client->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
         HILOGE("thread start failed.");
         return;
     }
-    InputStream inputStream = clientMap[id]->client_->GetInputStream();
+    InputStream inputStream = client->client_->GetInputStream();
     uint8_t buf[SOCKET_BUFFER_SIZE];
 
     while (true) {
@@ -355,66 +403,43 @@ void NapiSppClient::SppRead(int id)
             return;
         } else {
             HILOGI("callback read data to jshap begin");
-            if (clientMap[id] == nullptr || !clientMap[id]->sppReadFlag ||
-                clientMap[id]->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
+            if (client == nullptr || !client->sppReadFlag || client->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
                 HILOGE("failed");
                 return;
             }
             std::shared_ptr<BufferCallbackInfo> callbackInfo =
-                std::static_pointer_cast<BufferCallbackInfo>(clientMap[id]->callbackInfos_[REGISTER_SPP_READ_TYPE]);
-
-            callbackInfo->info_ = ret;
-            if (memcpy_s(callbackInfo->buffer_, sizeof(callbackInfo->buffer_), buf, ret) != EOK) {
-                HILOGE("memcpy_s failed!");
+                std::static_pointer_cast<BufferCallbackInfo>(client->callbackInfos_[REGISTER_SPP_READ_TYPE]);
+            if (callbackInfo == nullptr) {
+                HILOGE("callbackInfo nullptr");
                 return;
             }
 
-            uv_loop_s *loop = nullptr;
-            napi_get_uv_event_loop(callbackInfo->env_, &loop);
-            uv_work_t *work = new uv_work_t;
-            work->data = static_cast<void *>(callbackInfo.get());
+            std::shared_ptr<SppCallbackBuffer> buffer = std::make_shared<SppCallbackBuffer>();
+            buffer->len_ = ret;
+            if (memcpy_s(buffer->data_, sizeof(buffer->data_), buf, ret) != EOK) {
+                HILOGE("memcpy_s failed!");
+                return;
+            }
+            callbackInfo->PushData(buffer);
 
-            uv_queue_work(
-                loop,
-                work,
-                [](uv_work_t *work) {},
-                [](uv_work_t *work, int status) {
-                    BufferCallbackInfo *callbackInfo = static_cast<BufferCallbackInfo *>(work->data);
-                    int size = callbackInfo->info_;
-                    if (size < 0 || size > SOCKET_BUFFER_SIZE) {
-                        HILOGE("malloc size error");
-                        delete work;
-                        work = nullptr;
-                        return;
-                    }
-                    uint8_t* totalBuf = static_cast<uint8_t*> (malloc(size));
-                    if (totalBuf == nullptr) {
-                        HILOGE("malloc failed");
-                        delete work;
-                        work = nullptr;
-                        return;
-                    }
-                    if (memcpy_s(totalBuf, size, callbackInfo->buffer_, size) != EOK) {
-                        HILOGE("memcpy_s failed!");
-                    }
-                    napi_value result = nullptr;
-                    uint8_t* bufferData = nullptr;
-                    napi_create_arraybuffer(callbackInfo->env_, size, (void**)&bufferData, &result);
-                    if (memcpy_s(bufferData, size, totalBuf, size) != EOK) {
-                        HILOGE("memcpy_s failed!");
-                    }
-                    free(totalBuf);
+            auto status = napi_acquire_threadsafe_function(client->sppReadThreadSafeFunc_);
+            if (status != napi_ok) {
+                HILOGE("napi_acquire_threadsafe_function failed, status: %{public}d", status);
+                return;
+            }
 
-                    napi_value callback = nullptr;
-                    napi_value undefined = nullptr;
-                    napi_value callResult = nullptr;
-                    napi_get_undefined(callbackInfo->env_, &undefined);
-                    napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-                    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-                    delete work;
-                    work = nullptr;
-                }
-            );
+            status = napi_call_threadsafe_function(
+                client->sppReadThreadSafeFunc_, static_cast<void *>(callbackInfo.get()), napi_tsfn_blocking);
+            if (status != napi_ok) {
+                HILOGE("napi_call_threadsafe_function failed, status: %{public}d", status);
+                return;
+            }
+
+            status = napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_release);
+            if (status != napi_ok) {
+                HILOGE("napi_release_threadsafe_function failed, status: %{public}d", status);
+                return;
+            }
         }
     }
     return;
