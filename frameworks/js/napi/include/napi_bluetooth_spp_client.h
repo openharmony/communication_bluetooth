@@ -17,6 +17,7 @@
 
 #include <thread>
 #include <map>
+#include <queue>
 #include "bluetooth_socket.h"
 #include "napi_bluetooth_utils.h"
 
@@ -27,6 +28,35 @@ struct SppConnectCallbackInfo : public AsyncCallbackInfo {
     std::string deviceId_ = "";
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
     std::shared_ptr<SppOption> sppOption_ = nullptr;
+};
+
+struct SppCallbackBuffer {
+    ssize_t len_;
+    char data_[1024];
+};
+
+struct BufferCallbackInfo : public BluetoothCallbackInfo {
+    void PushData(const std::shared_ptr<SppCallbackBuffer> &data)
+    {
+        std::lock_guard<std::mutex> lock(bufferLock_);
+        buffer_.push(data);
+        HILOGD("BufferCallbackInfo::PushData after %{public}u.", buffer_.size());
+    }
+
+    std::shared_ptr<SppCallbackBuffer> PopData()
+    {
+        std::lock_guard<std::mutex> lock(bufferLock_);
+        if (buffer_.empty()) {
+            return nullptr;
+        }
+        std::shared_ptr<SppCallbackBuffer> ret = buffer_.front();
+        buffer_.pop();
+        HILOGD("BufferCallbackInfo::PopData after %{public}u.", buffer_.size());
+        return ret;
+    }
+private:
+    std::mutex bufferLock_;
+    std::queue<std::shared_ptr<SppCallbackBuffer>> buffer_;
 };
 
 const std::string REGISTER_SPP_READ_TYPE = "sppRead";
@@ -40,16 +70,17 @@ struct NapiSppClient {
     static napi_value Off(napi_env env, napi_callback_info info);
     static void SppRead(int id);
 
-    static std::map<int, std::shared_ptr<NapiSppClient>> clientMap;
     static int count;
+    static std::map<int, std::shared_ptr<NapiSppClient>> clientMap;
 
+    int id_ = -1;
     bool sppReadFlag = false;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 
     std::shared_ptr<ClientSocket> client_ = nullptr;
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
     std::shared_ptr<std::thread> thread_;
-    int id_ = -1;
+    napi_threadsafe_function sppReadThreadSafeFunc_ = nullptr;
 };
 } // namespace Bluetooth
 } // namespace OHOS
