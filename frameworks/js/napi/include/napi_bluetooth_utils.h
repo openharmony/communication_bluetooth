@@ -164,10 +164,6 @@ struct PairConfirmedCallBackInfo {
     }
 };
 
-struct BufferCallbackInfo : public BluetoothCallbackInfo {
-    char buffer_[1024];
-};
-
 struct TransforInformationCallbackInfo : public BluetoothCallbackInfo {
     BluetoothOppTransferInformation information_;
 };

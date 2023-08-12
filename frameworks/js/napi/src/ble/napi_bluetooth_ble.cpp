@@ -693,7 +693,7 @@ static napi_status ParseAdvertisDataParameters(const napi_env &env, const napi_c
     const napi_value &object, BleAdvertiserData &outData)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
-        env, object, {"serviceUuids", "manufactureData", "serviceData", "includeDeviceName"}));
+        env, object, {"serviceUuids", "manufactureData", "serviceData", "includeDeviceName", "includeTxPower"}));
 
     NAPI_BT_CALL_RETURN(ParseServiceUuidParameters(env, object, outData));
     NAPI_BT_CALL_RETURN(ParseManufactureDataParameters(env, object, outData));
@@ -703,6 +703,11 @@ static napi_status ParseAdvertisDataParameters(const napi_env &env, const napi_c
     NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, object, "includeDeviceName", includeDeviceName, exist));
     HILOGI("includeDeviceName: %{public}d", includeDeviceName);
     outData.SetIncludeDeviceName(includeDeviceName);
+
+    bool includeTxPower = false;
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, object, "includeTxPower", includeTxPower, exist));
+    HILOGI("includeTxPower: %{public}d", includeTxPower);
+    outData.SetIncludeTxPower(includeTxPower);
 
     return napi_ok;
 }
