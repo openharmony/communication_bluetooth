@@ -215,6 +215,7 @@ public:
     uint8_t advFlag_ {};
     std::string payload_ = "";
     bool includeDeviceName_ = false;
+    bool includeTxPower_ = false;
 };
 
 /**
