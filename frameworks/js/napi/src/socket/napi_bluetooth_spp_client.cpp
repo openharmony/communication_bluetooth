@@ -269,7 +269,7 @@ static void NapiThreadSafeFuncCallJs(napi_env, napi_value jsCallback, void *cont
     napi_value result = nullptr;
     uint8_t *bufferData = nullptr;
     napi_create_arraybuffer(callbackInfo->env_, buffer->len_, (void **)&bufferData, &result);
-    if (memcpy_s(bufferData, buffer->len_, bufferData, buffer->len_) != EOK) {
+    if (memcpy_s(bufferData, buffer->len_, buffer->data_, buffer->len_) != EOK) {
         HILOGE("memcpy_s failed!");
         return;
     }
@@ -290,8 +290,8 @@ static napi_status NapiSppCreateThreadSafeFunc(std::shared_ptr<NapiSppClient> &c
     auto callbackInfo = client->callbackInfos_[REGISTER_SPP_READ_TYPE];
     NAPI_BT_CALL_RETURN(napi_create_string_utf8(callbackInfo->env_, "SppRead", NAPI_AUTO_LENGTH, &name));
     NAPI_BT_CALL_RETURN(napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback));
-    NAPI_BT_CALL_RETURN(napi_create_threadsafe_function(callbackInfo->env_, callback, nullptr, name, maxQueueSize,
-        initialThreadCount, nullptr, nullptr, nullptr, NapiThreadSafeFuncCallJs, &tsfn));
+    NAPI_BT_CALL_RETURN(napi_create_threadsafe_function(callbackInfo->env_, callback, nullptr,
+        name, maxQueueSize, initialThreadCount, nullptr, nullptr, nullptr, NapiThreadSafeFuncCallJs, &tsfn));
 
     client->sppReadThreadSafeFunc_ = tsfn;
     return napi_ok;
@@ -403,7 +403,7 @@ void NapiSppClient::SppRead(int id)
             return;
         } else {
             HILOGI("callback read data to jshap begin");
-            if (client == nullptr || !client->sppReadFlag || client->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
+            if (client == nullptr || !client->sppReadFlag || !client->callbackInfos_[REGISTER_SPP_READ_TYPE]) {
                 HILOGE("failed");
                 return;
             }
