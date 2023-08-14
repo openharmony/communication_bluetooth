@@ -40,7 +40,6 @@ struct BufferCallbackInfo : public BluetoothCallbackInfo {
     {
         std::lock_guard<std::mutex> lock(bufferLock_);
         buffer_.push(data);
-        HILOGD("BufferCallbackInfo::PushData after %{public}u.", buffer_.size());
     }
 
     std::shared_ptr<SppCallbackBuffer> PopData()
@@ -51,7 +50,6 @@ struct BufferCallbackInfo : public BluetoothCallbackInfo {
         }
         std::shared_ptr<SppCallbackBuffer> ret = buffer_.front();
         buffer_.pop();
-        HILOGD("BufferCallbackInfo::PopData after %{public}u.", buffer_.size());
         return ret;
     }
 private:
