@@ -40,10 +40,7 @@ ohos_shared_library("baseprofile") {
     "native_module_base_profile.cpp",
   ]
 
-  deps = [
-    "$BT_PART_DIR/frameworks/inner:btframework",
-    "//third_party/libuv:uv",
-  ]
+  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
 
   external_deps = [
     "ability_base:want",
@@ -53,6 +50,7 @@ ohos_shared_library("baseprofile") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libuv:uv",
     "napi:ace_napi",
   ]
 
