@@ -186,6 +186,28 @@ public:
         includeDeviceName_ = flag;
     }
 
+    /**
+     * @brief Get whether the txpower will be included in the advertisement packet.
+     *
+     * @return Returns includeTxPower flag.
+     * @since 10
+     */
+    bool GetIncludeTxPower() const
+    {
+        return includeTxPower_;
+    }
+
+    /**
+     * @brief Set whether the txpower will be included in the advertisement packet.
+     *
+     * @param flag includeTxPower flag.
+     * @since 10
+     */
+    void SetIncludeTxPower(bool flag)
+    {
+        includeTxPower_ = flag;
+    }
+
 public:
     std::vector<Uuid> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
@@ -193,6 +215,7 @@ public:
     uint8_t advFlag_ {};
     std::string payload_ = "";
     bool includeDeviceName_ = false;
+    bool includeTxPower_ = false;
 };
 
 /**
