@@ -142,12 +142,29 @@ public:
      */
     void SetIncludeDeviceName(bool flag);
 
+    /**
+     * @brief Get whether the txpower will be included in the advertisement packet.
+     *
+     * @return Returns includeTxPower flag.
+     * @since 10
+     */
+    bool GetIncludeTxPower() const;
+
+    /**
+     * @brief Set whether the txpower will be included in the advertisement packet.
+     *
+     * @param flag includeTxPower flag.
+     * @since 10
+     */
+    void SetIncludeTxPower(bool flag);
+
 private:
     std::vector<ParcelUuid> serviceUuids_{};
     std::map<uint16_t, std::string> manufacturerSpecificData_{};
     std::map<ParcelUuid, std::string> serviceData_{};
     uint8_t advFlag_ = BLE_ADV_FLAG_GEN_DISC;
     bool includeDeviceName_ = false;
+    bool includeTxPower_ = false;
 };
 
 /**
