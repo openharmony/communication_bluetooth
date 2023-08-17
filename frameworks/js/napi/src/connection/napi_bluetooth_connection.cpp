@@ -698,7 +698,7 @@ napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 
     auto func = [remoteAddr, transport]() {
         BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
-        int32_t err = remoteDevice.StartPair();
+        int32_t err = remoteDevice.StartCrediblePair();
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };

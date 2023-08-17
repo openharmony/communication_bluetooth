@@ -189,6 +189,15 @@ public:
     int StartPair();
 
     /**
+     * @brief Credible Device start pair.
+     *
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 10
+     */
+    int StartCrediblePair();
+
+    /**
      * @brief Cancel pair operation.
      *
      * @return Returns <b>true</b> if the operation is successful;
