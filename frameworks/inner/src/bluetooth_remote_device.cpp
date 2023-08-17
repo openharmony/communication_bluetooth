@@ -271,6 +271,25 @@ int BluetoothRemoteDevice::StartPair()
     return hostProxy->StartPair(transport_, address_);
 }
 
+int BluetoothRemoteDevice::StartCrediblePair()
+{
+    HILOGI("enter");
+    if (!IsValidBluetoothRemoteDevice()) {
+        HILOGW("Invalid remote device");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
+    if (hostProxy == nullptr) {
+        HILOGE("fails: no proxy");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return hostProxy->StartCrediblePair(transport_, address_);
+}
+
 int BluetoothRemoteDevice::CancelPairing()
 {
     HILOGI("enter");

@@ -488,6 +488,7 @@ enum BluetoothHostInterfaceCode {
     BT_SET_FAST_SCAN,
     GET_RANDOM_ADDRESS,
     SYNC_RANDOM_ADDRESS,
+    START_CREDIBLE_PAIR,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

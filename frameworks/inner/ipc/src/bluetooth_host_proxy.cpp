@@ -1035,6 +1035,31 @@ int32_t BluetoothHostProxy::StartPair(int32_t transport, const std::string &addr
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHostProxy::StartCrediblePair(int32_t transport, const std::string &address)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::StartCrediblePair WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteInt32(transport)) {
+        HILOGE("BluetoothHostProxy::StartCrediblePair transport error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("BluetoothHostProxy::StartCrediblePair address error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::START_CREDIBLE_PAIR, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::StartCrediblePair done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
 bool BluetoothHostProxy::CancelPairing(int32_t transport, const std::string &address)
 {
     MessageParcel data;
