@@ -60,14 +60,12 @@
         "hilog",
         "hisysevent",
         "hitrace",
-        "libuv",
         "ipc",
+        "libuv",
         "napi",
         "samgr"
       ],
-      "third_party": [
-        "libuv"
-      ]
+      "third_party": []
     },
     "build": {
       "group_type": {
