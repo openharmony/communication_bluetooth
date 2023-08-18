@@ -628,15 +628,6 @@ public:
     void Init();
 
     /**
-     * @brief Get remote devicec profile uuids.
-     *
-     * @param address Bluetooth address.
-     * @return Returns remote devicec uuids.
-     * @since 10
-     */
-    int32_t GetDeviceUuids(const std::string &address, std::vector<std::string> &uuids);
-
-    /**
      * @brief Get local profile uuids.
      *
      * @return Returns local profile uuids.
