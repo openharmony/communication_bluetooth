@@ -48,8 +48,6 @@ void UpdateCallbackInfo(std::map<std::string, std::shared_ptr<BluetoothCallbackI
 class NapiEvent {
 public:
     static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb, int value);
-    static napi_value CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb,
-        BluetoothOppTransferInformation &information);
     static napi_value OnEvent(napi_env env, napi_callback_info cbinfo,
         std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> &callbackInfos);
     static napi_value OffEvent(napi_env env, napi_callback_info cbinfo,

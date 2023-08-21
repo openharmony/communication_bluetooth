@@ -93,17 +93,10 @@ private:
     void NotifyAvrcpTgProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyAvrcpCtProfile(NOTIFY_PROFILE_MSG notifyMsg);
 
-    void NotifyMapClientProfile(NOTIFY_PROFILE_MSG notifyMsg);
-    void NotifyMapServerProfile(NOTIFY_PROFILE_MSG notifyMsg);
-    void NotifyPbapClientProfile(NOTIFY_PROFILE_MSG notifyMsg);
-    void NotifyPbapServerProfile(NOTIFY_PROFILE_MSG notifyMsg);
-
-    void NotifyOppProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyHidHostProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg);
 
     void NotifyAudioProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
-    void NotifyMessageProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyHostInit(NOTIFY_PROFILE_MSG notifyMsg);
 

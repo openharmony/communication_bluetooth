@@ -74,15 +74,6 @@ napi_value NapiEvent::CreateResult(const std::shared_ptr<BluetoothCallbackInfo> 
     return result;
 }
 
-napi_value NapiEvent::CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb,
-    BluetoothOppTransferInformation &information)
-{
-    napi_value result = nullptr;
-    napi_create_object(cb->env_, &result);
-    ConvertOppTransferInformationToJS(cb->env_, result, information);
-    return result;
-}
-
 // if callbackInfos contains specific type, new callbackInfo will cover the old.
 // If exist, covered event happen, this function will clear rest reference of old callbackInfo in napi framework.
 void UpdateCallbackInfo(std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos,
