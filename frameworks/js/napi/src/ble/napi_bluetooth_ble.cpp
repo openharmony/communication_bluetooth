@@ -627,6 +627,12 @@ static napi_status ParseAdvertisingSettingsParameters(
     uint32_t interval = 0;
     NAPI_BT_CALL_RETURN(NapiParseObjectUint32Optional(env, object, "interval", interval, exist));
     if (exist) {
+        const uint32_t minInterval = 32;
+        const uint32_t maxInterval = 16384;
+        if (interval < minInterval || interval > maxInterval) {
+            HILOGE("Invalid interval: %{public}d", interval);
+            return napi_invalid_arg;
+        }
         HILOGI("interval: %{public}u", interval);
         outSettings.SetInterval(interval);
     }
