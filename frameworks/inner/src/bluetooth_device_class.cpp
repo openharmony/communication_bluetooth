@@ -53,8 +53,6 @@ bool BluetoothDeviceClass::IsProfileSupported(int profileId) const
         return IsA2dpSinkSupported();
     } else if (profileId == BluetoothDevice::PROFILE_HEADSET) {
         return IsHeadSetSupported();
-    } else if (profileId == BluetoothDevice::PROFILE_OPP) {
-        return IsOppSupported();
     } else if (profileId == BluetoothDevice::PROFILE_HID) {
         return (GetMajorMinorClass() & BluetoothDevice::MAJOR_PERIPHERAL) ==
                BluetoothDevice::MAJOR_PERIPHERAL;

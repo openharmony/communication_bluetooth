@@ -28,13 +28,10 @@
 #include "napi_bluetooth_spp_server.h"
 #include "napi_bluetooth_a2dp_snk.h"
 #include "napi_bluetooth_a2dp_src.h"
-#include "napi_bluetooth_pbap_pce.h"
-#include "napi_bluetooth_pbap_pse.h"
 #include "napi_bluetooth_avrcp_ct.h"
 #include "napi_bluetooth_avrcp_tg.h"
 #include "napi_bluetooth_hid_host.h"
 #include "napi_bluetooth_pan.h"
-#include "napi_bluetooth_opp.h"
 
 #include "access/napi_bluetooth_access.h"
 #include "connection/napi_bluetooth_connection.h"
@@ -68,13 +65,10 @@ static napi_value Init(napi_env env, napi_value exports)
     BluetoothHostInit(env, exports);
     NapiA2dpSink::DefineA2dpSinkJSClass(env);
     NapiA2dpSource::DefineA2dpSourceJSClass(env, exports);
-    NapiPbapClient::DefinePbapClientJSClass(env);
-    NapiPbapServer::DefinePbapServerJSClass(env);
     NapiAvrcpController::DefineAvrcpControllerJSClass(env);
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
     NapiBluetoothHidHost::DefineHidHostJSClass(env, exports);
     NapiBluetoothPan::DefinePanJSClass(env, exports);
-    NapiBluetoothOpp::DefineOppJSClass(env);
     DefineSystemBLEInterface(env, exports);
 
     HILOGI("-----Init end------");
