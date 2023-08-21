@@ -180,6 +180,8 @@ int SocketConnect(const BluetoothCreateSocketPara *socketPara, const BdAddr *bdA
     int result = client->Connect(psm);
     if (result != OHOS_BT_STATUS_SUCCESS) {
         HILOGE("SocketConnect fail, result: %{public}d", result);
+        client->Close();
+        HILOGE("SocketConnect closed.");
         return BT_SOCKET_INVALID_ID;
     }
     int clientId = g_clientMap.AddObject(client);
