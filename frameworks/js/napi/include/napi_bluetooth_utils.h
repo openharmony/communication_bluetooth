@@ -20,7 +20,6 @@
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_log.h"
-#include "bluetooth_opp.h"
 #include "bluetooth_remote_device.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -102,9 +101,6 @@ void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::str
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
 
-void ConvertOppTransferInformationToJS(napi_env env,
-    napi_value result, BluetoothOppTransferInformation& transferInformation);
-
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName);
@@ -162,10 +158,6 @@ struct PairConfirmedCallBackInfo {
         this->pinType = pinType;
         this->deviceAddr = deviceAddr;
     }
-};
-
-struct TransforInformationCallbackInfo : public BluetoothCallbackInfo {
-    BluetoothOppTransferInformation information_;
 };
 
 namespace {

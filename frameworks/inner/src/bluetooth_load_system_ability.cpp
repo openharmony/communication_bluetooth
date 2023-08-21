@@ -27,12 +27,7 @@
 #include "bluetooth_hfp_ag.h"
 #include "bluetooth_hfp_hf.h"
 #include "bluetooth_hid_host.h"
-#include "bluetooth_map_mce.h"
-#include "bluetooth_map_mse.h"
-#include "bluetooth_opp.h"
 #include "bluetooth_pan.h"
-#include "bluetooth_pbap_client.h"
-#include "bluetooth_pbap_server.h"
 #include "log.h"
 #include "system_ability_definition.h"
 
@@ -132,10 +127,6 @@ void BluetootLoadSystemAbility::NotifyProfile(NOTIFY_PROFILE_MSG notifyMsg, cons
             break;
         case PROFILE_ID_MAP_MCE:
         case PROFILE_ID_MAP_MSE:
-        case PROFILE_ID_PBAP_PCE:
-        case PROFILE_ID_PBAP_PSE:
-            NotifyMessageProfile(notifyMsg, profileId);
-            break;
         case PROFILE_ID_HID_HOST_SERVER:
         case PROFILE_ID_OPP_SERVER:
         case PROFILE_ID_PAN_SERVER:
@@ -259,86 +250,6 @@ void BluetootLoadSystemAbility::NotifyAudioProfile(NOTIFY_PROFILE_MSG notifyMsg,
     }
 }
 
-void BluetootLoadSystemAbility::NotifyMapClientProfile(NOTIFY_PROFILE_MSG notifyMsg)
-{
-    MapClient *profile = MapClient::GetProfile();
-    if (profile == nullptr) {
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_INIT) {
-        profile->Init();
-        return;
-    }
-}
-
-void BluetootLoadSystemAbility::NotifyMapServerProfile(NOTIFY_PROFILE_MSG notifyMsg)
-{
-    MapServer *profile = MapServer::GetProfile();
-    if (profile == nullptr) {
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_INIT) {
-        profile->Init();
-        return;
-    }
-}
-
-void BluetootLoadSystemAbility::NotifyPbapClientProfile(NOTIFY_PROFILE_MSG notifyMsg)
-{
-    PbapClient *profile = PbapClient::GetProfile();
-    if (profile == nullptr) {
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_INIT) {
-        profile->Init();
-        return;
-    }
-}
-
-void BluetootLoadSystemAbility::NotifyPbapServerProfile(NOTIFY_PROFILE_MSG notifyMsg)
-{
-    PbapServer *profile = PbapServer::GetProfile();
-    if (profile == nullptr) {
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_INIT) {
-        profile->Init();
-        return;
-    }
-}
-
-void BluetootLoadSystemAbility::NotifyMessageProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId)
-{
-    switch (profileId) {
-        case PROFILE_ID_MAP_MCE:
-            NotifyMapClientProfile(notifyMsg);
-            break;
-        case PROFILE_ID_MAP_MSE:
-            NotifyMapServerProfile(notifyMsg);
-            break;
-        case PROFILE_ID_PBAP_PCE:
-            NotifyPbapClientProfile(notifyMsg);
-            break;
-        case PROFILE_ID_PBAP_PSE:
-            NotifyPbapServerProfile(notifyMsg);
-            break;
-        default:
-            break;
-    }
-}
-
-void BluetootLoadSystemAbility::NotifyOppProfile(NOTIFY_PROFILE_MSG notifyMsg)
-{
-    Opp *profile = Opp::GetProfile();
-    if (profile == nullptr) {
-        return;
-    }
-    if (notifyMsg == NOTIFY_MSG_INIT) {
-        profile->Init();
-        return;
-    }
-}
-
 void BluetootLoadSystemAbility::NotifyHidHostProfile(NOTIFY_PROFILE_MSG notifyMsg)
 {
     HidHost *profile = HidHost::GetProfile();
@@ -366,9 +277,6 @@ void BluetootLoadSystemAbility::NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg)
 void BluetootLoadSystemAbility::NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId)
 {
     switch (profileId) {
-        case PROFILE_ID_OPP_SERVER:
-            NotifyOppProfile(notifyMsg);
-            break;
         case PROFILE_ID_HID_HOST_SERVER:
             NotifyHidHostProfile(notifyMsg);
             break;
