@@ -280,7 +280,7 @@ static void NapiThreadSafeFuncCallJs(napi_env, napi_value jsCallback, void *cont
     napi_call_function(callbackInfo->env_, undefined, jsCallback, ARGS_SIZE_ONE, &result, &callResult);
 }
 
-static napi_status NapiSppCreateThreadSafeFunc(std::shared_ptr<NapiSppClient> &client)
+static napi_status NapiSppCreateThreadSafeFunc(const std::shared_ptr<NapiSppClient> &client)
 {
     napi_value name;
     napi_threadsafe_function tsfn;
