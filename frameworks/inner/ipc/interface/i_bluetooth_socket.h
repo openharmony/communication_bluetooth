@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "bluetooth_service_ipc_interface_code.h"
 #include "bt_uuid.h"
 #include "iremote_broker.h"
+#include "i_bluetooth_socket_observer.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -29,6 +30,7 @@ struct ListenSocketParam {
     bluetooth::Uuid uuid;
     int32_t securityFlag;
     int32_t type;
+    sptr<IBluetoothSocketObserver> observer;
 };
 
 struct ConnectSocketParam {
@@ -37,6 +39,7 @@ struct ConnectSocketParam {
     int32_t securityFlag;
     int32_t type;
     int32_t psm;
+    sptr<IBluetoothSocketObserver> observer;
 };
 class IBluetoothSocket : public OHOS::IRemoteBroker {
 public:
@@ -44,6 +47,7 @@ public:
 
     virtual int Connect(ConnectSocketParam &param, int &fd) = 0;
     virtual int Listen(ListenSocketParam &param, int &fd) = 0;
+    virtual void RemoveObserver(const sptr<IBluetoothSocketObserver> &observer) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
