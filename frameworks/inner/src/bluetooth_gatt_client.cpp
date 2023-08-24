@@ -90,7 +90,7 @@ struct GattClient::impl {
 
     bool isGetServiceYet_;
     bool isRegisterSucceeded_;
-    GattClientCallback *callback_;
+    std::shared_ptr<GattClientCallback> callback_;
     int applicationId_;
     int connectionState_;
     BluetoothRemoteDevice device_;
@@ -170,6 +170,10 @@ public:
             clientSptr->pimpl->connectionState_ = newState;
         }
 
+        if (clientSptr->pimpl->callback_ == nullptr) {
+            HILOGE("callback_ is nullptr");
+            return;
+        }
         clientSptr->pimpl->callback_->OnConnectionStateChanged(newState, state);
     }
 
@@ -527,7 +531,7 @@ GattClient::~GattClient()
     }
 }
 
-int GattClient::Connect(GattClientCallback &callback, bool isAutoConnect, int transport)
+int GattClient::Connect(std::shared_ptr<GattClientCallback> callback, bool isAutoConnect, int transport)
 {
     HILOGI("enter, isAutoConnect: %{public}d, transport: %{public}d", isAutoConnect, transport);
     if (!IS_BLE_ENABLED()) {
@@ -549,7 +553,7 @@ int GattClient::Connect(GattClientCallback &callback, bool isAutoConnect, int tr
     if (pimpl->isRegisterSucceeded_) {
         return pimpl->proxy_->Connect(pimpl->applicationId_, isAutoConnect);
     }
-    pimpl->callback_ = &callback;
+    pimpl->callback_ = callback;
     if ((transport == GATT_TRANSPORT_TYPE_LE && !IS_BLE_ENABLED()) ||
         (transport == GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED())) {
         HILOGE("Unsupported mode");

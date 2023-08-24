@@ -219,8 +219,10 @@ static napi_status NapiGattClientCreateThreadSafeFunction(
     NAPI_BT_CALL_RETURN(napi_create_string_utf8(env, "GattClient", NAPI_AUTO_LENGTH, &name));
     NAPI_BT_CALL_RETURN(napi_create_threadsafe_function(env, jsCallback, nullptr, name, maxQueueSize,
         initialThreadCount, nullptr, nullptr, nullptr, NapiThreadSafeFunctionCallJs, &tsfn));
-
-    gattClient->GetCallback().onBleCharacterChangedThreadSafeFunc_ = tsfn;
+    if (gattClient->GetCallback() == nullptr) {
+        HILOGE("gattClient->GetCallback is nullptr");
+    }
+    gattClient->GetCallback()->onBleCharacterChangedThreadSafeFunc_ = tsfn;
     return napi_ok;
 }
 
@@ -249,7 +251,10 @@ napi_status CheckGattClientOn(napi_env env, napi_callback_info info)
     NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
     std::unique_lock<std::shared_mutex> guard(NapiGattClientCallback::g_gattClientCallbackInfosMutex);
     NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_));
-    gattClient->GetCallback().SetCallbackInfo(type, callbackInfo);
+    if (gattClient->GetCallback() == nullptr) {
+        HILOGE("gattClient->GetCallback is nullptr");
+    }
+    gattClient->GetCallback()->SetCallbackInfo(type, callbackInfo);
     HILOGI("%{public}s is registered", type.c_str());
     return napi_ok;
 }
@@ -277,26 +282,29 @@ napi_status CheckGattClientOff(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", napi_invalid_arg);
 
     // Clear 'BLECharacteristicChange' callback, different with others callback.
+    if (gattClient->GetCallback() == nullptr) {
+        HILOGE("gattClient->GetCallback is nullptr");
+    }
     if (type == STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE) {
         NAPI_BT_CALL_RETURN(napi_release_threadsafe_function(
-            gattClient->GetCallback().onBleCharacterChangedThreadSafeFunc_, napi_tsfn_abort));
-        gattClient->GetCallback().onBleCharacterChangedThreadSafeFunc_ = nullptr;
+            gattClient->GetCallback()->onBleCharacterChangedThreadSafeFunc_, napi_tsfn_abort));
+        gattClient->GetCallback()->onBleCharacterChangedThreadSafeFunc_ = nullptr;
         return napi_ok;
     }
 
     // callback_ need unref before, see napi_bluetooth_gatt_client
     std::unique_lock<std::shared_mutex> guard(NapiGattClientCallback::g_gattClientCallbackInfosMutex);
-    auto &gattClientCallback = gattClient->GetCallback();
+    auto gattClientCallback = gattClient->GetCallback();
     uint32_t refCount = INVALID_REF_COUNT;
-    if (gattClientCallback.GetCallbackInfo(type) == nullptr) {
+    if (gattClientCallback->GetCallbackInfo(type) == nullptr) {
         return napi_invalid_arg;
     }
-    NAPI_BT_CALL_RETURN(napi_reference_unref(env, gattClientCallback.GetCallbackInfo(type)->callback_, &refCount));
+    NAPI_BT_CALL_RETURN(napi_reference_unref(env, gattClientCallback->GetCallbackInfo(type)->callback_, &refCount));
     HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
     if (refCount == 0) {
-        NAPI_BT_CALL_RETURN(napi_delete_reference(env, gattClientCallback.GetCallbackInfo(type)->callback_));
+        NAPI_BT_CALL_RETURN(napi_delete_reference(env, gattClientCallback->GetCallbackInfo(type)->callback_));
     }
-    gattClientCallback.SetCallbackInfo(type, nullptr);
+    gattClientCallback->SetCallbackInfo(type, nullptr);
     HILOGI("%{public}s is removed", type.c_str());
     return napi_ok;
 }
@@ -332,6 +340,9 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
     std::shared_ptr<GattClient> client = gattClient->GetClient();
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
 
+    if (gattClient->GetCallback() == nullptr) {
+        HILOGE("gattClient->GetCallback is nullptr");
+    }
     int ret = client->Connect(gattClient->GetCallback(), true, GATT_TRANSPORT_TYPE_LE);
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
@@ -398,8 +409,10 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-
-    bool success = client->GetCallback().asyncWorkMap_.TryPush(NapiAsyncType::GATT_CLIENT_READ_CHARACTER, asyncWork);
+    if (client->GetCallback() == nullptr) {
+        HILOGE("client->GetCallback is nullptr");
+    }
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::GATT_CLIENT_READ_CHARACTER, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
@@ -451,8 +464,10 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-
-    bool success = client->GetCallback().asyncWorkMap_.TryPush(NapiAsyncType::GATT_CLIENT_READ_DESCRIPTOR, asyncWork);
+    if (client->GetCallback() == nullptr) {
+        HILOGE("client->GetCallback is nullptr");
+    }
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::GATT_CLIENT_READ_DESCRIPTOR, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
@@ -584,8 +599,10 @@ napi_value NapiGattClient::GetRssiValue(napi_env env, napi_callback_info info)
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-
-    bool success = napiGattClient->GetCallback().asyncWorkMap_.TryPush(GATT_CLIENT_READ_REMOTE_RSSI_VALUE, asyncWork);
+    if (napiGattClient->GetCallback() == nullptr) {
+        HILOGE("napiGattClient->GetCallback is nullptr");
+    }
+    bool success = napiGattClient->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_READ_REMOTE_RSSI_VALUE, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
@@ -676,8 +693,10 @@ napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callbac
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-
-    bool success = client->GetCallback().asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_CHARACTER, asyncWork);
+    if (client->GetCallback() == nullptr) {
+        HILOGE("client->GetCallback is nullptr");
+    }
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_CHARACTER, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
@@ -726,8 +745,10 @@ napi_value NapiGattClient::WriteDescriptorValueEx(napi_env env, napi_callback_in
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-
-    bool success = client->GetCallback().asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_DESCRIPTOR, asyncWork);
+    if (client->GetCallback() == nullptr) {
+        HILOGE("client->GetCallback is nullptr");
+    }
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_DESCRIPTOR, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
@@ -782,8 +803,10 @@ static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info 
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-
-    bool success = client->GetCallback().asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
+    if (client->GetCallback() == nullptr) {
+        HILOGE("client->GetCallback is nullptr");
+    }
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
