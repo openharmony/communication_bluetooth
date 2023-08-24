@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,11 @@ int BluetoothSocketProxy::Connect(ConnectSocketParam &param, int &fd)
         return BT_ERR_INTERNAL_ERROR;
     }
 
+    if (!data.WriteRemoteObject(param.observer->AsObject())) {
+        HILOGE("write remote object error");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
@@ -103,6 +108,11 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
         return BT_ERR_INTERNAL_ERROR;
     }
 
+    if (!data.WriteRemoteObject(param.observer->AsObject())) {
+        HILOGE("write remote object error");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
@@ -120,6 +130,28 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
     }
 
     return errorCode;
+}
+
+void BluetoothSocketProxy::RemoveObserver(const sptr<IBluetoothSocketObserver> &observer)
+{
+    HILOGD("BluetoothSocketProxy::RemoveObserver start");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
+        HILOGE("BluetoothSocketProxy::RemoveObserver WriteInterfaceToken error");
+        return;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("BluetoothSocketProxy::RemoveObserver error");
+        return;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::REMOVE_OBSERVER, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothSocketProxy::RemoveObserver done fail, error: %{public}d", error);
+        return;
+    }
+    HILOGD("BluetoothSocketProxy::RemoveObserver success");
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

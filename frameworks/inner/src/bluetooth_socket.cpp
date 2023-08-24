@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,7 @@
 #include "system_ability_definition.h"
 #include "raw_address.h"
 #include "bluetooth_socket.h"
+#include "bluetooth_socket_observer_stub.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -75,6 +76,7 @@ struct ClientSocket::impl {
                 HILOGI("fd closed, fd_: %{pubilc}d", fd_);
                 close(fd_);
                 fd_ = -1;
+                proxy_->RemoveObserver(observer_);
             } else {
                 HILOGE("socket not created");
                 return;
@@ -203,6 +205,7 @@ struct ClientSocket::impl {
 
     class BluetoothClientSocketDeathRecipient;
     sptr<BluetoothClientSocketDeathRecipient> deathRecipient_;
+    sptr<BluetoothSocketObserverStub> observer_;
 
     sptr<IBluetoothSocket> proxy_;
     std::unique_ptr<InputStream> inputStream_ {
@@ -275,6 +278,7 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
     }
 
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    observer_ = new BluetoothSocketObserverStub();
 }
 
 ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
@@ -315,6 +319,7 @@ ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
     }
 
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    observer_ = new BluetoothSocketObserverStub();
 }
 
 ClientSocket::ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth)
@@ -357,7 +362,8 @@ int ClientSocket::Connect(int psm)
         .uuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits()),
         .securityFlag = (int32_t)pimpl->getSecurityFlags(),
         .type = (int32_t)pimpl->type_,
-        .psm = psm
+        .psm = psm,
+        .observer = pimpl->observer_
     };
     int ret = pimpl->proxy_->Connect(param, pimpl->fd_);
     if (ret != BT_NO_ERROR) {
@@ -461,10 +467,11 @@ struct ServerSocket::impl {
         }
 
         ListenSocketParam param {
-            name_,
-            bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits()),
-            (int32_t)getSecurityFlags(),
-            (int32_t)type_
+            .name = name_,
+            .uuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits()),
+            .securityFlag = (int32_t)getSecurityFlags(),
+            .type = (int32_t)type_,
+            .observer = observer_
         };
         int ret = proxy_->Listen(param, fd_);
         if (ret != BT_NO_ERROR) {
@@ -621,6 +628,7 @@ struct ServerSocket::impl {
                 close(fd_);
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 fd_ = -1;
+                proxy_->RemoveObserver(observer_);
                 return;
             } else {
                 HILOGE("socket not created");
@@ -660,6 +668,7 @@ struct ServerSocket::impl {
 
     class BluetoothServerSocketDeathRecipient;
     sptr<BluetoothServerSocketDeathRecipient> deathRecipient_;
+    sptr<BluetoothSocketObserverStub> observer_;
 
     sptr<IBluetoothSocket> proxy_;
     UUID uuid_;
@@ -724,6 +733,7 @@ ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, 
     }
     deathRecipient_ = new BluetoothServerSocketDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+    observer_ = new BluetoothSocketObserverStub();
 }
 
 ServerSocket::ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
