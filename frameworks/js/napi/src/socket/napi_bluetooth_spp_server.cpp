@@ -95,12 +95,7 @@ static napi_status CheckSppListenParams(
         HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
         NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM2], &valueType));
-        if (valueType != napi_function) {
-            HILOGE("Wrong argument type. Function expected.");
-            delete callbackInfo;
-            callbackInfo = nullptr;
-            return napi_invalid_arg;
-        }
+        NAPI_BT_RETURN_IF(valueType != napi_function, "Wrong argument type. Function expected.", napi_invalid_arg);
         napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
     } else {
@@ -114,8 +109,13 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     string name;
-    SppListenCallbackInfo *callbackInfo = new SppListenCallbackInfo();
+    SppListenCallbackInfo *callbackInfo = new (std::nothrow) SppListenCallbackInfo();
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, callbackInfo != nullptr, BT_ERR_INVALID_PARAM);
     auto status = CheckSppListenParams(env, info, name, callbackInfo);
+    if (status != napi_ok) {
+        delete callbackInfo;
+        callbackInfo = nullptr;
+    }
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     napi_value resource = nullptr;
@@ -214,12 +214,7 @@ static napi_status CheckSppAcceptParams(
         HILOGI("callback mode");
         napi_valuetype valueType = napi_undefined;
         NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM1], &valueType));
-        if (valueType != napi_function) {
-            HILOGE("Wrong argument type. Function expected.");
-            delete callbackInfo;
-            callbackInfo = nullptr;
-            return napi_invalid_arg;
-        }
+        NAPI_BT_RETURN_IF(valueType != napi_function, "Wrong argument type. Function expected.", napi_invalid_arg);
         napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
         napi_get_undefined(env, &promise);
     } else {
@@ -233,8 +228,13 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     int32_t serverSocketNum = -1;
-    SppAcceptCallbackInfo *callbackInfo = new SppAcceptCallbackInfo();
+    SppAcceptCallbackInfo *callbackInfo = new (std::nothrow) SppAcceptCallbackInfo();
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, callbackInfo != nullptr, BT_ERR_INVALID_PARAM);
     auto status = CheckSppAcceptParams(env, info, serverSocketNum, callbackInfo);
+    if (status != napi_ok) {
+        delete callbackInfo;
+        callbackInfo = nullptr;
+    }
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     napi_value resource = nullptr;
