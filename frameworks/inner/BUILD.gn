@@ -137,6 +137,7 @@ config("btcommon_public_config") {
   include_dirs = [
     "common",
     "ipc/common",
+    "ipc/include",
     "ipc/interface",
     "ipc/parcel",
   ]
