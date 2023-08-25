@@ -413,10 +413,7 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    if (client->GetCallback() == nullptr) {
-        HILOGE("client->GetCallback is nullptr");
-        return NapiGetBooleanFalse(env);
-    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::GATT_CLIENT_READ_CHARACTER, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
@@ -469,10 +466,7 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    if (client->GetCallback() == nullptr) {
-        HILOGE("client->GetCallback is nullptr");
-        return NapiGetBooleanFalse(env);
-    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::GATT_CLIENT_READ_DESCRIPTOR, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
@@ -605,10 +599,7 @@ napi_value NapiGattClient::GetRssiValue(napi_env env, napi_callback_info info)
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    if (napiGattClient->GetCallback() == nullptr) {
-        HILOGE("napiGattClient->GetCallback is nullptr");
-        return NapiGetBooleanFalse(env);
-    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, napiGattClient->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
     bool success = napiGattClient->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_READ_REMOTE_RSSI_VALUE, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
@@ -700,10 +691,7 @@ napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callbac
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    if (client->GetCallback() == nullptr) {
-        HILOGE("client->GetCallback is nullptr");
-        return NapiGetBooleanFalse(env);
-    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_CHARACTER, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
@@ -809,10 +797,7 @@ static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info 
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    if (client->GetCallback() == nullptr) {
-        HILOGE("client->GetCallback is nullptr");
-        return NapiGetBooleanFalse(env);
-    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 

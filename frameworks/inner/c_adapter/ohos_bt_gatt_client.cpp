@@ -447,6 +447,7 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
     HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
     if (result != OHOS_BT_STATUS_SUCCESS) {
         client = nullptr;
+        clientWrapper = nullptr;
         iter->second.gattClient = nullptr;
         iter->second.gattClientCallback = nullptr;
         iter->second.remoteAddr = "";

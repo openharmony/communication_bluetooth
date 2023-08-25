@@ -200,7 +200,7 @@ public:
      * @since 6
      *
      */
-    int Connect(std::shared_ptr<GattClientCallback> callback, bool isAutoConnect, int transport);
+    int Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoConnect, int transport);
 
     /**
      * @brief The function to request connection priority.
