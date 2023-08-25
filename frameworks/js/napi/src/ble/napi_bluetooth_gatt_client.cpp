@@ -753,10 +753,7 @@ napi_value NapiGattClient::WriteDescriptorValueEx(napi_env env, napi_callback_in
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    if (client->GetCallback() == nullptr) {
-        HILOGE("client->GetCallback is nullptr");
-        return NapiGetBooleanFalse(env);
-    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_DESCRIPTOR, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
