@@ -343,10 +343,7 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
     std::shared_ptr<GattClient> client = gattClient->GetClient();
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
 
-    if (gattClient->GetCallback() == nullptr) {
-        HILOGE("gattClient->GetCallback is nullptr");
-        return NapiGetBooleanFalse(env);
-    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, gattClient->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
     int ret = client->Connect(gattClient->GetCallback(), true, GATT_TRANSPORT_TYPE_LE);
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
