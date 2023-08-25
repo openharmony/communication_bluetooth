@@ -90,7 +90,7 @@ struct GattClient::impl {
 
     bool isGetServiceYet_;
     bool isRegisterSucceeded_;
-    std::shared_ptr<GattClientCallback> callback_;
+    std::weak_ptr<GattClientCallback> callback_;
     int applicationId_;
     int connectionState_;
     BluetoothRemoteDevice device_;
@@ -170,11 +170,8 @@ public:
             clientSptr->pimpl->connectionState_ = newState;
         }
 
-        if (clientSptr->pimpl->callback_ == nullptr) {
-            HILOGE("callback_ is nullptr");
-            return;
-        }
-        clientSptr->pimpl->callback_->OnConnectionStateChanged(newState, state);
+        auto callback = (clientSptr->pimpl->callback_).lock();
+        callback->OnConnectionStateChanged(newState, state);
     }
 
     void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) override
@@ -189,7 +186,8 @@ public:
             for (auto &character : svc.GetCharacteristics()) {
                 if (character.GetHandle() == characteristic.handle_) {
                     character.SetValue(characteristic.value_.get(), characteristic.length_);
-                    clientSptr->pimpl->callback_->OnCharacteristicChanged(character);
+                    auto callback = (clientSptr->pimpl->callback_).lock();
+                    callback->OnCharacteristicChanged(character);
                     return;
                 }
             }
@@ -214,7 +212,8 @@ public:
         if (ret == GattStatus::GATT_SUCCESS) {
             ptr->SetValue(characteristic.value_.get(), characteristic.length_);
         }
-        clientSptr->pimpl->callback_->OnCharacteristicReadResult(*ptr, ret);
+        auto callback = (clientSptr->pimpl->callback_).lock();
+        callback->OnCharacteristicReadResult(*ptr, ret);
     }
 
     void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic) override
@@ -231,7 +230,8 @@ public:
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_WRITE) {
             HILOGE("Unexpected call!");
         }
-        clientSptr->pimpl->callback_->OnCharacteristicWriteResult(*ptr, ret);
+        auto callback = (clientSptr->pimpl->callback_).lock();
+        callback->OnCharacteristicWriteResult(*ptr, ret);
     }
 
     void OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor &descriptor) override
@@ -251,7 +251,8 @@ public:
         if (ret == GattStatus::GATT_SUCCESS) {
             ptr->SetValue(descriptor.value_.get(), descriptor.length_);
         }
-        clientSptr->pimpl->callback_->OnDescriptorReadResult(*ptr, ret);
+        auto callback = (clientSptr->pimpl->callback_).lock();
+        callback->OnDescriptorReadResult(*ptr, ret);
     }
 
     void OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor &descriptor) override
@@ -265,11 +266,12 @@ public:
         std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
         clientSptr->pimpl->requestInformation_.doing_ = false;
         auto ptr = clientSptr->pimpl->requestInformation_.context_.descriptor_;
+        auto callback = (clientSptr->pimpl->callback_).lock();
         if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_DESCRIPTOR_WRITE) {
-            clientSptr->pimpl->callback_->OnDescriptorWriteResult(*ptr, ret);
+            callback->OnDescriptorWriteResult(*ptr, ret);
         } else if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS) {
             auto characterPtr = clientSptr->pimpl->requestInformation_.context_.characteristic_;
-            clientSptr->pimpl->callback_->OnSetNotifyCharacteristic(*characterPtr, ret);
+           callback->OnSetNotifyCharacteristic(*characterPtr, ret);
         } else {
             HILOGE("Unexpected call!");
         }
@@ -283,7 +285,8 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        clientSptr->pimpl->callback_->OnMtuUpdate(mtu, state);
+        auto callback = (clientSptr->pimpl->callback_).lock();
+        callback->OnMtuUpdate(mtu, state);
     }
 
     void OnServicesDiscovered(int32_t status) override
@@ -306,7 +309,8 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        clientSptr->pimpl->callback_->OnConnectionParameterChanged(interval, latency, timeout, status);
+        auto callback = (clientSptr->pimpl->callback_).lock();
+        callback->OnConnectionParameterChanged(interval, latency, timeout, status);
     }
 
     void OnReadRemoteRssiValue(const bluetooth::RawAddress &addr, int32_t rssi, int32_t status) override
@@ -322,7 +326,8 @@ public:
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_READ_REMOTE_RSSI_VALUE) {
             HILOGE("Unexpected call!");
         }
-        clientSptr->pimpl->callback_->OnReadRemoteRssiValueResult(rssi, status);
+        auto callback = (clientSptr->pimpl->callback_).lock();
+        callback->OnReadRemoteRssiValueResult(rssi, status);
     }
 
     explicit BluetoothGattClientCallbackStubImpl(std::weak_ptr<GattClient> client) : client_(client)
@@ -355,7 +360,6 @@ bool GattClient::impl::Init(std::weak_ptr<GattClient> client)
 GattClient::impl::impl(const BluetoothRemoteDevice &device)
     : isGetServiceYet_(false),
       isRegisterSucceeded_(false),
-      callback_(nullptr),
       applicationId_(0),
       connectionState_(static_cast<int>(BTConnectState::DISCONNECTED)),
       device_(device)
@@ -419,7 +423,8 @@ void GattClient::impl::DiscoverComplete(int state)
         }
     }
     if (ret) {
-        callback_->OnServicesDiscovered(state);
+        std::shared_ptr<GattClientCallback> clientSptr = (callback_).lock();
+        clientSptr->OnServicesDiscovered(state);
     }
 }
 
@@ -531,7 +536,7 @@ GattClient::~GattClient()
     }
 }
 
-int GattClient::Connect(std::shared_ptr<GattClientCallback> callback, bool isAutoConnect, int transport)
+int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoConnect, int transport)
 {
     HILOGI("enter, isAutoConnect: %{public}d, transport: %{public}d", isAutoConnect, transport);
     if (!IS_BLE_ENABLED()) {
