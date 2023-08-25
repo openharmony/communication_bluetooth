@@ -658,6 +658,7 @@ enum BluetoothRemoteDeviceObserverInterfaceCode {
 enum BluetoothSocketInterfaceCode {
     SOCKET_CONNECT = 0,
     SOCKET_LISTEN,
+    REMOVE_OBSERVER,
     // The last code, if you want to add a new code, please add it before this
     SOCKET_BUTT
 };
