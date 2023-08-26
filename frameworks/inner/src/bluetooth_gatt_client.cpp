@@ -171,6 +171,10 @@ public:
         }
 
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         callback->OnConnectionStateChanged(newState, state);
     }
 
@@ -187,6 +191,10 @@ public:
                 if (character.GetHandle() == characteristic.handle_) {
                     character.SetValue(characteristic.value_.get(), characteristic.length_);
                     auto callback = (clientSptr->pimpl->callback_).lock();
+                    if (!callback) {
+                        HILOGE("callback client is nullptr");
+                        return;
+                    }
                     callback->OnCharacteristicChanged(character);
                     return;
                 }
@@ -213,6 +221,10 @@ public:
             ptr->SetValue(characteristic.value_.get(), characteristic.length_);
         }
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         callback->OnCharacteristicReadResult(*ptr, ret);
     }
 
@@ -231,6 +243,10 @@ public:
             HILOGE("Unexpected call!");
         }
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         callback->OnCharacteristicWriteResult(*ptr, ret);
     }
 
@@ -252,6 +268,10 @@ public:
             ptr->SetValue(descriptor.value_.get(), descriptor.length_);
         }
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         callback->OnDescriptorReadResult(*ptr, ret);
     }
 
@@ -267,6 +287,10 @@ public:
         clientSptr->pimpl->requestInformation_.doing_ = false;
         auto ptr = clientSptr->pimpl->requestInformation_.context_.descriptor_;
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_DESCRIPTOR_WRITE) {
             callback->OnDescriptorWriteResult(*ptr, ret);
         } else if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS) {
@@ -286,6 +310,10 @@ public:
             return;
         }
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         callback->OnMtuUpdate(mtu, state);
     }
 
@@ -310,6 +338,10 @@ public:
             return;
         }
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         callback->OnConnectionParameterChanged(interval, latency, timeout, status);
     }
 
@@ -327,6 +359,10 @@ public:
             HILOGE("Unexpected call!");
         }
         auto callback = (clientSptr->pimpl->callback_).lock();
+        if (!callback) {
+            HILOGE("callback client is nullptr");
+            return;
+        }
         callback->OnReadRemoteRssiValueResult(rssi, status);
     }
 
