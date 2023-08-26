@@ -42,7 +42,7 @@ constexpr uint8_t REQUEST_TYPE_DESCRIPTOR_WRITE = 0x03;
 constexpr uint8_t REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS = 0x04;
 constexpr uint8_t REQUEST_TYPE_READ_REMOTE_RSSI_VALUE = 0x05;
 
-constexpr const int WAIT_TIMEOUT = 3; // 3s
+constexpr const int WAIT_TIMEOUT = 10; // 10s
 std::mutex g_gattClientProxyMutex;
 struct DiscoverInfomation {
     struct Characteristics {
