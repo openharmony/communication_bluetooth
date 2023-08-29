@@ -50,7 +50,7 @@ class GattClientCallbackWrapper;
 
 struct GattClientWrapper {
     std::shared_ptr<GattClient> gattClient;
-    GattClientCallbackWrapper *gattClientCallback;
+    std::shared_ptr<GattClientCallbackWrapper> gattClientCallback;
     string remoteAddr;
     bool fastestConnFlag;
 };
@@ -364,7 +364,6 @@ int BleGattcUnRegister(int clientId)
             clientWrapper.gattClient = nullptr;
         }
         if (clientWrapper.gattClientCallback != nullptr) {
-            delete clientWrapper.gattClientCallback;
             clientWrapper.gattClientCallback = nullptr;
         }
         GATTCLIENT.erase(it);
@@ -424,7 +423,6 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
     if (iter->second.gattClient != nullptr && iter->second.remoteAddr == strAddress) {
         HILOGI("connect to the same remote device again.");
         client = iter->second.gattClient;
-        delete iter->second.gattClientCallback;
         iter->second.gattClientCallback = nullptr;
     } else {
         BluetoothRemoteDevice device(strAddress, transport);
@@ -440,15 +438,16 @@ int BleGattcConnect(int clientId, BtGattClientCallbacks *func, const BdAddr *bdA
         iter->second.fastestConnFlag = false;
     }
 
-    GattClientCallbackWrapper *clientWrapper = new GattClientCallbackWrapper(func, clientId);
+    std::shared_ptr<GattClientCallbackWrapper> clientWrapper = std::make_shared<GattClientCallbackWrapper>(
+        func, clientId);
     iter->second.gattClient = client;
     iter->second.gattClientCallback = clientWrapper;
     iter->second.remoteAddr = strAddress;
-    int result = client->Connect(*(clientWrapper), isAutoConnect, transport);
+    int result = client->Connect(clientWrapper, isAutoConnect, transport);
     HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
     if (result != OHOS_BT_STATUS_SUCCESS) {
         client = nullptr;
-        delete clientWrapper;
+        clientWrapper = nullptr;
         iter->second.gattClient = nullptr;
         iter->second.gattClientCallback = nullptr;
         iter->second.remoteAddr = "";

@@ -35,6 +35,16 @@
 
 namespace OHOS {
 namespace Bluetooth {
+#define WPTR_GATT_CBACK(cbWptr, func, ...)      \
+do {                                            \
+   auto cbSptr = (cbWptr).lock();               \
+   if (cbSptr) {                                \
+       cbSptr->func(__VA_ARGS__);               \
+   } else {                                     \
+       HILOGE(#cbWptr ": callback is nullptr"); \
+   }                                            \
+} while (0)
+
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_READ = 0x00;
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_WRITE = 0x01;
 constexpr uint8_t REQUEST_TYPE_DESCRIPTOR_READ = 0x02;
@@ -90,7 +100,7 @@ struct GattClient::impl {
 
     bool isGetServiceYet_;
     bool isRegisterSucceeded_;
-    GattClientCallback *callback_;
+    std::weak_ptr<GattClientCallback> callback_;
     int applicationId_;
     int connectionState_;
     BluetoothRemoteDevice device_;
@@ -169,8 +179,7 @@ public:
             std::lock_guard<std::mutex> lck(clientSptr->pimpl->connStateMutex_);
             clientSptr->pimpl->connectionState_ = newState;
         }
-
-        clientSptr->pimpl->callback_->OnConnectionStateChanged(newState, state);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnConnectionStateChanged, newState, state);
     }
 
     void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) override
@@ -185,7 +194,7 @@ public:
             for (auto &character : svc.GetCharacteristics()) {
                 if (character.GetHandle() == characteristic.handle_) {
                     character.SetValue(characteristic.value_.get(), characteristic.length_);
-                    clientSptr->pimpl->callback_->OnCharacteristicChanged(character);
+                    WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicChanged, character);
                     return;
                 }
             }
@@ -210,7 +219,7 @@ public:
         if (ret == GattStatus::GATT_SUCCESS) {
             ptr->SetValue(characteristic.value_.get(), characteristic.length_);
         }
-        clientSptr->pimpl->callback_->OnCharacteristicReadResult(*ptr, ret);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicReadResult, *ptr, ret);
     }
 
     void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic) override
@@ -227,7 +236,7 @@ public:
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_WRITE) {
             HILOGE("Unexpected call!");
         }
-        clientSptr->pimpl->callback_->OnCharacteristicWriteResult(*ptr, ret);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicWriteResult, *ptr, ret);
     }
 
     void OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor &descriptor) override
@@ -247,7 +256,7 @@ public:
         if (ret == GattStatus::GATT_SUCCESS) {
             ptr->SetValue(descriptor.value_.get(), descriptor.length_);
         }
-        clientSptr->pimpl->callback_->OnDescriptorReadResult(*ptr, ret);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnDescriptorReadResult, *ptr, ret);
     }
 
     void OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor &descriptor) override
@@ -262,10 +271,10 @@ public:
         clientSptr->pimpl->requestInformation_.doing_ = false;
         auto ptr = clientSptr->pimpl->requestInformation_.context_.descriptor_;
         if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_DESCRIPTOR_WRITE) {
-            clientSptr->pimpl->callback_->OnDescriptorWriteResult(*ptr, ret);
+            WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnDescriptorWriteResult, *ptr, ret);
         } else if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS) {
             auto characterPtr = clientSptr->pimpl->requestInformation_.context_.characteristic_;
-            clientSptr->pimpl->callback_->OnSetNotifyCharacteristic(*characterPtr, ret);
+            WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnSetNotifyCharacteristic, *characterPtr, ret);
         } else {
             HILOGE("Unexpected call!");
         }
@@ -279,7 +288,7 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        clientSptr->pimpl->callback_->OnMtuUpdate(mtu, state);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnMtuUpdate, mtu, state);
     }
 
     void OnServicesDiscovered(int32_t status) override
@@ -302,7 +311,8 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        clientSptr->pimpl->callback_->OnConnectionParameterChanged(interval, latency, timeout, status);
+
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnConnectionParameterChanged, interval, latency, timeout, status);
     }
 
     void OnReadRemoteRssiValue(const bluetooth::RawAddress &addr, int32_t rssi, int32_t status) override
@@ -318,7 +328,7 @@ public:
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_READ_REMOTE_RSSI_VALUE) {
             HILOGE("Unexpected call!");
         }
-        clientSptr->pimpl->callback_->OnReadRemoteRssiValueResult(rssi, status);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnReadRemoteRssiValueResult, rssi, status);
     }
 
     explicit BluetoothGattClientCallbackStubImpl(std::weak_ptr<GattClient> client) : client_(client)
@@ -351,7 +361,6 @@ bool GattClient::impl::Init(std::weak_ptr<GattClient> client)
 GattClient::impl::impl(const BluetoothRemoteDevice &device)
     : isGetServiceYet_(false),
       isRegisterSucceeded_(false),
-      callback_(nullptr),
       applicationId_(0),
       connectionState_(static_cast<int>(BTConnectState::DISCONNECTED)),
       device_(device)
@@ -415,7 +424,8 @@ void GattClient::impl::DiscoverComplete(int state)
         }
     }
     if (ret) {
-        callback_->OnServicesDiscovered(state);
+        std::shared_ptr<GattClientCallback> clientSptr = (callback_).lock();
+        clientSptr->OnServicesDiscovered(state);
     }
 }
 
@@ -527,7 +537,7 @@ GattClient::~GattClient()
     }
 }
 
-int GattClient::Connect(GattClientCallback &callback, bool isAutoConnect, int transport)
+int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoConnect, int transport)
 {
     HILOGI("enter, isAutoConnect: %{public}d, transport: %{public}d", isAutoConnect, transport);
     if (!IS_BLE_ENABLED()) {
@@ -549,7 +559,7 @@ int GattClient::Connect(GattClientCallback &callback, bool isAutoConnect, int tr
     if (pimpl->isRegisterSucceeded_) {
         return pimpl->proxy_->Connect(pimpl->applicationId_, isAutoConnect);
     }
-    pimpl->callback_ = &callback;
+    pimpl->callback_ = callback;
     if ((transport == GATT_TRANSPORT_TYPE_LE && !IS_BLE_ENABLED()) ||
         (transport == GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED())) {
         HILOGE("Unsupported mode");
