@@ -64,7 +64,7 @@ public:
         return client_;
     }
 
-    NapiGattClientCallback &GetCallback()
+    std::shared_ptr<NapiGattClientCallback> GetCallback()
     {
         return callback_;
     }
@@ -80,7 +80,8 @@ public:
         device_ = std::make_shared<BluetoothRemoteDevice>(deviceId, 1);
         client_ = std::make_shared<GattClient>(*device_);
         client_->Init();
-        callback_.SetClient(this);
+        callback_ = std::make_shared<NapiGattClientCallback>();
+        callback_->SetClient(this);
     }
     ~NapiGattClient() = default;
 
@@ -88,7 +89,7 @@ public:
 
 private:
     std::shared_ptr<GattClient> client_ = nullptr;
-    NapiGattClientCallback callback_;
+    std::shared_ptr<NapiGattClientCallback> callback_;
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
 };
 } // namespace Bluetooth
