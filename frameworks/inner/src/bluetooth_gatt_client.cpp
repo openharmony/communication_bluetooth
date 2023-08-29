@@ -35,14 +35,14 @@
 
 namespace OHOS {
 namespace Bluetooth {
-#define WPTR_GATT_CBACK(cbWptr, func, ...)
-do {
-   auto cbSptr = (cbWptr).lock();
-   if (cbSptr) {
-       cbSptr->func(__VA_ARGS__);
-   } else {
-       HILOGE(#cbWptr ": callback is nullptr");
-   }
+#define WPTR_GATT_CBACK(cbWptr, func, ...)      \
+do {                                            \
+   auto cbSptr = (cbWptr).lock();               \
+   if (cbSptr) {                                \
+       cbSptr->func(__VA_ARGS__);               \
+   } else {                                     \
+       HILOGE(#cbWptr ": callback is nullptr"); \
+   }                                            \
 } while (0)
 
 constexpr uint8_t REQUEST_TYPE_CHARACTERISTICS_READ = 0x00;
