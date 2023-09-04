@@ -40,8 +40,8 @@ private:
     void UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state);
     void EnableBt();
     void DisableBle();
-    void GetBrStateByStauts(const int status, BluetoothState &state, bool &isCallback);
-    void GetBleStateByStauts(const int status, BluetoothState &state);
+    void GetBrStateByStatus(const int status, BluetoothState &state, bool &isCallback);
+    void GetBleStateByStatus(const int status, BluetoothState &state);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
