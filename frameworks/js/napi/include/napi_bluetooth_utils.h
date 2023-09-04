@@ -166,13 +166,10 @@ sysBLEMap g_sysBLEObserver;
 std::mutex g_sysBLEObserverMutex;
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> g_Observer;
 std::mutex g_observerMutex;
-std::atomic<bool> isCurrentAppOperate(false);
 }  // namespace
 std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
 const sysBLEMap &GetSysBLEObserver();
 
-void SetCurrentAppOperate(const bool &isCurrentApp);
-bool GetCurrentAppOperate();
 void RegisterSysBLEObserver(const std::shared_ptr<BluetoothCallbackInfo> &, int32_t, const std::string &);
 void UnregisterSysBLEObserver(const std::string &);
 std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string &type);
