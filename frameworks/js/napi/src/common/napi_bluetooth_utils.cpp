@@ -352,16 +352,6 @@ int GetScoConnectionState(int state)
     return scoState;
 }
 
-void SetCurrentAppOperate(const bool &isCurrentApp)
-{
-    isCurrentAppOperate.store(isCurrentApp);
-}
-
-bool GetCurrentAppOperate()
-{
-    return isCurrentAppOperate.load();
-}
-
 void RegisterSysBLEObserver(
     const std::shared_ptr<BluetoothCallbackInfo> &info, int32_t callbackIndex, const std::string &type)
 {
