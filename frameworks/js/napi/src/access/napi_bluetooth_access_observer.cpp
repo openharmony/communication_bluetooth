@@ -109,18 +109,16 @@ void NapiBluetoothAccessObserver::EnableBt()
     if (ret != BT_NO_ERROR) {
         HILOGE("failed");
     }
-    SetCurrentAppOperate(false);
 }
 
 void NapiBluetoothAccessObserver::DisableBle()
 {
     HILOGI("start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    bool enabled = host->DisableBle();
-    if (!enabled) {
+    int ret = host->DisableBle();
+    if (ret != BT_NO_ERROR) {
         HILOGE("failed");
     }
-    SetCurrentAppOperate(false);
 }
 
 bool NapiBluetoothAccessObserver::DealStateChange(const int transport, const int status, BluetoothState &state)
@@ -128,14 +126,14 @@ bool NapiBluetoothAccessObserver::DealStateChange(const int transport, const int
     HILOGD("transport is %{public}d, status is %{public}d", transport, status);
     bool isCallback = true;
     if (transport == BT_TRANSPORT_BREDR) {
-        GetBrStateByStauts(status, state, isCallback);
+        GetBrStateByStatus(status, state, isCallback);
     } else if (transport == BT_TRANSPORT_BLE) {
-        GetBleStateByStauts(status, state);
+        GetBleStateByStatus(status, state);
     }
     return isCallback;
 }
 
-void NapiBluetoothAccessObserver::GetBrStateByStauts(const int status, BluetoothState &state, bool &isCallback)
+void NapiBluetoothAccessObserver::GetBrStateByStatus(const int status, BluetoothState &state, bool &isCallback)
 {
     switch (status) {
         case BTStateID::STATE_TURNING_ON:
@@ -153,10 +151,6 @@ void NapiBluetoothAccessObserver::GetBrStateByStauts(const int status, Bluetooth
         case BTStateID::STATE_TURN_OFF: {
             HILOGD("STATE_OFF(0)");
             isCallback = false;
-            BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-            if (host->IsBleEnabled() && GetCurrentAppOperate()) {
-                DisableBle();
-            }
             break;
         }
         default:
@@ -164,7 +158,7 @@ void NapiBluetoothAccessObserver::GetBrStateByStauts(const int status, Bluetooth
     }
 }
 
-void NapiBluetoothAccessObserver::GetBleStateByStauts(const int status, BluetoothState &state)
+void NapiBluetoothAccessObserver::GetBleStateByStatus(const int status, BluetoothState &state)
 {
     switch (status) {
         case BTStateID::STATE_TURNING_ON:
@@ -174,9 +168,6 @@ void NapiBluetoothAccessObserver::GetBleStateByStauts(const int status, Bluetoot
         case BTStateID::STATE_TURN_ON:
             HILOGD("STATE_BLE_ON(5)");
             state = BluetoothState::STATE_BLE_ON;
-            if (GetCurrentAppOperate()) {
-                EnableBt();
-            }
             break;
         case BTStateID::STATE_TURNING_OFF:
             HILOGD("STATE_BLE_TURNING_OFF(6)");

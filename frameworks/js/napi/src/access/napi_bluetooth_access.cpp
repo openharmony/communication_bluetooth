@@ -63,9 +63,6 @@ napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-    if (ret == BT_NO_ERROR) {
-        SetCurrentAppOperate(true);
-    }
     return NapiGetBooleanTrue(env);
 }
 
@@ -83,10 +80,6 @@ napi_value NapiAccess::DisableBluetooth(napi_env env, napi_callback_info info)
     } else {
         ret = host->DisableBt();
         NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-    }
-
-    if (ret == BT_NO_ERROR) {
-        SetCurrentAppOperate(true);
     }
     return NapiGetBooleanTrue(env);
 }
