@@ -125,7 +125,7 @@ napi_status CheckGattsOn(napi_env env, napi_callback_info info)
 
     NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
     NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_));
-    gattServer->GetCallback().SetCallbackInfo(type, callbackInfo);
+    gattServer->GetCallback()->SetCallbackInfo(type, callbackInfo);
     HILOGI("%{public}s is registered", type.c_str());
     return napi_ok;
 }
@@ -153,7 +153,7 @@ napi_status CheckGattsOff(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
     // callback_ need unref before, see napi_bluetooth_gatt_client
     auto &gattServerCallback = gattServer->GetCallback();
-    gattServerCallback.SetCallbackInfo(type, nullptr);
+    gattServerCallback->SetCallbackInfo(type, nullptr);
     HILOGI("%{public}s is removed", type.c_str());
     return napi_ok;
 }
@@ -379,7 +379,7 @@ napi_value NapiGattServer::NotifyCharacteristicChangedEx(napi_env env, napi_call
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
 
-    bool success = napiServer->GetCallback().asyncWorkMap_.TryPush(NapiAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC,
+    bool success = napiServer->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC,
         asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 

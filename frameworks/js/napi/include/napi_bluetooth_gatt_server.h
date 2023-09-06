@@ -48,7 +48,7 @@ public:
     {
         return server_;
     }
-    NapiGattServerCallback &GetCallback()
+    std::shared_ptr<NapiGattServerCallback> &GetCallback()
     {
         return callback_;
     }
@@ -57,7 +57,9 @@ public:
     NapiGattServer()
     {
         HILOGI("enter");
-        server_ = GattServer::CreateInstance(callback_);
+        callback_ = std::make_shared<NapiGattServerCallback>();
+        std::shared_ptr<GattServerCallback> tmp = std::static_pointer_cast<GattServerCallback>(callback_);
+        server_ = GattServer::CreateInstance(tmp);
     }
     ~NapiGattServer() = default;
 
@@ -65,7 +67,7 @@ public:
 
 private:
     std::shared_ptr<GattServer> server_ = nullptr;
-    NapiGattServerCallback callback_;
+    std::shared_ptr<NapiGattServerCallback> callback_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
