@@ -66,6 +66,8 @@ struct BluetoothHost::impl {
 
     sptr<IBluetoothHost> proxy_ = nullptr;
 
+    bool isHostProxyInit = false;
+
     bool InitBluetoothHostObserver(void);
 
     void SyncRandomAddrToService(void);
@@ -315,7 +317,7 @@ public:
         HILOGI("bluetooth_servi died and then re-registered");
         std::lock_guard<std::mutex> lock(impl_.proxyMutex_);
         impl_.proxy_ = nullptr;
-
+        impl_.isHostProxyInit = false;
         // Notify the upper layer that bluetooth is disabled.
         if (impl_.observerImp_ != nullptr && impl_.bleObserverImp_ != nullptr) {
             HILOGI("bluetooth_servi died and send state off to app");
@@ -430,7 +432,10 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
     }
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (object != nullptr) {
-        proxy_ = iface_cast<IBluetoothHost>(object);
+        if (isHostProxyInit == false && proxy_ == nullptr) {
+            proxy_ = iface_cast<IBluetoothHost>(object);
+            isHostProxyInit = true;
+        }
         if (!InitBluetoothHostObserver()) {
             HILOGE("InitBluetoothHostObserver fail");
             return false;
@@ -463,10 +468,14 @@ void BluetoothHost::impl::LoadSystemAbilitySuccess(const sptr<IRemoteObject> &re
     HILOGI("LoadSystemAbilitySuccess FinishStart SA");
     std::lock_guard<std::mutex> lock(proxyMutex_);
     if (remoteObject != nullptr) {
-        proxy_ = iface_cast<IBluetoothHost>(remoteObject);
+        if (isHostProxyInit == false && proxy_ == nullptr) {
+            proxy_ = iface_cast<IBluetoothHost>(remoteObject);
+            isHostProxyInit = true;
+        }
     } else {
         HILOGE("LoadSystemAbilitySuccess remoteObject is NULL.");
     }
+    isHostProxyInit = false;
     proxyConVar_.notify_one();
 }
 
@@ -554,7 +563,10 @@ void BluetoothHost::Init()
         return;
     }
     std::lock_guard<std::mutex> lock(pimpl->proxyMutex_);
-    pimpl->proxy_ = iface_cast<IBluetoothHost>(object);
+    if (pimpl->isHostProxyInit == false && pimpl->proxy_ == nullptr) {
+        pimpl->proxy_ = iface_cast<IBluetoothHost>(object);
+        isHostProxyInit = true;
+    }
     pimpl->InitBluetoothHostObserver();
 }
 
