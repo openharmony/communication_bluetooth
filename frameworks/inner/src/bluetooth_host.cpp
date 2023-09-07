@@ -565,7 +565,6 @@ void BluetoothHost::Init()
     std::lock_guard<std::mutex> lock(pimpl->proxyMutex_);
     if (pimpl->isHostProxyInit == false && pimpl->proxy_ == nullptr) {
         pimpl->proxy_ = iface_cast<IBluetoothHost>(object);
-        isHostProxyInit = true;
     }
     pimpl->InitBluetoothHostObserver();
 }
