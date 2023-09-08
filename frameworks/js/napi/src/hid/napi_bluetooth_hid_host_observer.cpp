@@ -41,25 +41,20 @@ void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemot
     uv_work_t *work = new uv_work_t;
     work->data = static_cast<void *>(callbackInfo.get());
 
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            BluetoothCallbackInfo *callbackInfo = static_cast<BluetoothCallbackInfo *>(work->data);
-            NapiHandleScope scope(callbackInfo->env_);
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
-                callbackInfo->state_);
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-        }
-    );
+    auto func = [callbackInfo]() {
+        NapiHandleScope scope(callbackInfo->env_);
+        napi_value result = nullptr;
+        napi_create_object(callbackInfo->env_, &result);
+        ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
+            callbackInfo->state_);
+        napi_value callback = nullptr;
+        napi_value undefined = nullptr;
+        napi_value callResult = nullptr;
+        napi_get_undefined(callbackInfo->env_, &undefined);
+        napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
+        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
+    };
+    DoInJsMainThread(callbackInfo->env_, func);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
