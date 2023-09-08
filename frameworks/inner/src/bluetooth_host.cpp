@@ -315,7 +315,6 @@ public:
         HILOGI("bluetooth_servi died and then re-registered");
         std::lock_guard<std::mutex> lock(impl_.proxyMutex_);
         impl_.proxy_ = nullptr;
-
         // Notify the upper layer that bluetooth is disabled.
         if (impl_.observerImp_ != nullptr && impl_.bleObserverImp_ != nullptr) {
             HILOGI("bluetooth_servi died and send state off to app");
@@ -430,7 +429,9 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
     }
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (object != nullptr) {
-        proxy_ = iface_cast<IBluetoothHost>(object);
+        if (proxy_ == nullptr) {
+            proxy_ = iface_cast<IBluetoothHost>(object);
+        }
         if (!InitBluetoothHostObserver()) {
             HILOGE("InitBluetoothHostObserver fail");
             return false;
@@ -463,7 +464,9 @@ void BluetoothHost::impl::LoadSystemAbilitySuccess(const sptr<IRemoteObject> &re
     HILOGI("LoadSystemAbilitySuccess FinishStart SA");
     std::lock_guard<std::mutex> lock(proxyMutex_);
     if (remoteObject != nullptr) {
-        proxy_ = iface_cast<IBluetoothHost>(remoteObject);
+        if (proxy_ == nullptr) {
+            proxy_ = iface_cast<IBluetoothHost>(remoteObject);
+        }
     } else {
         HILOGE("LoadSystemAbilitySuccess remoteObject is NULL.");
     }
@@ -554,7 +557,9 @@ void BluetoothHost::Init()
         return;
     }
     std::lock_guard<std::mutex> lock(pimpl->proxyMutex_);
-    pimpl->proxy_ = iface_cast<IBluetoothHost>(object);
+    if (pimpl->proxy_ == nullptr) {
+        pimpl->proxy_ = iface_cast<IBluetoothHost>(object);
+    }
     pimpl->InitBluetoothHostObserver();
 }
 
