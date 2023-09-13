@@ -33,7 +33,7 @@ NapiBluetoothAccessObserver g_bluetoothAccessObserver;
 
 napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("enter");
     RegisterAccessObserverToHost();
     AccessPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
@@ -52,14 +52,14 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
 
 void NapiAccess::RegisterAccessObserverToHost()
 {
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     host->RegisterObserver(g_bluetoothAccessObserver);
 }
 
 napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
@@ -68,7 +68,7 @@ napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
 
 napi_value NapiAccess::DisableBluetooth(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     // only ble
     int state = BTStateID::STATE_TURN_OFF;
@@ -86,7 +86,7 @@ napi_value NapiAccess::DisableBluetooth(napi_env env, napi_callback_info info)
 
 napi_value NapiAccess::GetState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t state = BTStateID::STATE_TURN_OFF;
     int32_t err = host->GetBtState(state);
@@ -129,7 +129,7 @@ napi_value NapiAccess::GetState(napi_env env, napi_callback_info info)
 
 napi_value NapiAccess::AccessPropertyValueInit(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("enter");
     napi_value stateObj = StateChangeInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("BluetoothState", stateObj),
@@ -141,7 +141,7 @@ napi_value NapiAccess::AccessPropertyValueInit(napi_env env, napi_value exports)
 
 napi_value NapiAccess::StateChangeInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value state = nullptr;
     napi_create_object(env, &state);
     SetNamedPropertyByInteger(env, state, static_cast<int>(BluetoothState::STATE_OFF), "STATE_OFF");
@@ -189,7 +189,7 @@ static napi_status CheckAccessObserverParams(napi_env env, size_t argc, napi_val
 napi_value NapiAccess::RegisterAccessObserver(napi_env env, napi_callback_info info)
 {
     // fsafasfasf
-    HILOGI("enter");
+    HILOGD("enter");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -231,7 +231,7 @@ static napi_status CheckAccessDeregisterObserver(napi_env env, napi_callback_inf
 
 napi_value NapiAccess::DeregisterAccessObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     auto status = CheckAccessDeregisterObserver(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     return NapiGetUndefinedRet(env);

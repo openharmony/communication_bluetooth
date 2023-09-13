@@ -112,7 +112,7 @@ public:
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
-        HILOGI("enter");
+        HILOGD("enter");
         auto sptr = gattServer_.lock();
         if (sptr && sptr->pimpl && sptr->pimpl->proxy_) {
             HILOGI("Clear gattServer proxy");
@@ -393,11 +393,11 @@ public:
 
     explicit BluetoothGattServerCallbackStubImpl(std::weak_ptr<GattServer> server) : server_(server)
     {
-        HILOGI("enter");
+        HILOGD("enter");
     }
     ~BluetoothGattServerCallbackStubImpl() override
     {
-        HILOGI("enter");
+        HILOGD("enter");
     }
 
 private:
@@ -459,12 +459,12 @@ GattService *GattServer::impl::GetIncludeService(uint16_t handle)
 GattServer::impl::impl(GattServerCallback &callback)
     : isRegisterSucceeded_(false), callback_(callback), applicationId_(0)
 {
-    HILOGI("enter");
+    HILOGD("enter");
 };
 
 GattServer::GattServer(GattServerCallback &callback) : pimpl(new GattServer::impl(callback))
 {
-    HILOGI("enter");
+    HILOGD("enter");
 }
 
 bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
@@ -605,7 +605,7 @@ int GattServer::impl::RespondDescriptorWrite(const bluetooth::GattDevice &device
 
 int GattServer::AddService(GattService &service)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -655,7 +655,7 @@ int GattServer::AddService(GattService &service)
 
 void GattServer::ClearServices()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return;
@@ -673,7 +673,7 @@ void GattServer::ClearServices()
 
 int GattServer::Close()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -720,7 +720,7 @@ void GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 }
 std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const UUID &uuid, bool isPrimary)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return std::nullopt;
@@ -745,7 +745,7 @@ std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const 
 
 std::list<GattService> &GattServer::GetServices()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return pimpl->gattServices_;
@@ -797,7 +797,7 @@ int GattServer::NotifyCharacteristicChanged(
 
 int GattServer::RemoveGattService(const GattService &service)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -880,7 +880,7 @@ int GattServer::SendResponse(
 
 GattServer::~GattServer()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (pimpl->proxy_ == nullptr) {
         HILOGE("proxy is null.");
         return;

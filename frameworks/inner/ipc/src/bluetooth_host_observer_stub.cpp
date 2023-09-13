@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothHostObserverStub::BluetoothHostObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("enter");
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_STATE_CHANGE)] =
         &BluetoothHostObserverStub::OnStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE)] =
@@ -41,7 +41,7 @@ BluetoothHostObserverStub::BluetoothHostObserverStub()
 
 BluetoothHostObserverStub::~BluetoothHostObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("enter");
     memberFuncMap_.clear();
 }
 
@@ -82,7 +82,7 @@ ErrCode BluetoothHostObserverStub::OnDiscoveryStateChangedInner(MessageParcel &d
 {
     int32_t status = data.ReadInt32();
 
-    HILOGI("BluetoothHostObserverStub::OnDiscoveryStateChangedInner starts");
+    HILOGD("BluetoothHostObserverStub::OnDiscoveryStateChangedInner starts");
     OnDiscoveryStateChanged(status);
 
     return NO_ERROR;
