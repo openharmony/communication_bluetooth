@@ -133,6 +133,59 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
     return true;
 }
 
+void ConvertOppTransferInformationToJS(napi_env env, napi_value result,
+    BluetoothOppTransferInformation& transferInformation)
+{
+    HILOGI("ConvertOppTransferInformationToJS called");
+    napi_value id;
+    napi_create_int32(env, transferInformation.GetId(), &id);
+    napi_set_named_property(env, result, "id", id);
+
+    napi_value fileName;
+    napi_create_string_utf8(env, transferInformation.GetFileName().c_str(), NAPI_AUTO_LENGTH, &fileName);
+    napi_set_named_property(env, result, "fileName", fileName);
+
+    napi_value filePath;
+    napi_create_string_utf8(env, transferInformation.GetFilePath().c_str(), NAPI_AUTO_LENGTH, &filePath);
+    napi_set_named_property(env, result, "filePath", filePath);
+
+    napi_value mimeType;
+    napi_create_string_utf8(env, transferInformation.GetMimeType().c_str(), NAPI_AUTO_LENGTH, &mimeType);
+    napi_set_named_property(env, result, "mimeType", mimeType);
+
+    napi_value deviceName;
+    napi_create_string_utf8(env, transferInformation.GetDeviceName().c_str(), NAPI_AUTO_LENGTH, &deviceName);
+    napi_set_named_property(env, result, "deviceName", deviceName);
+
+    napi_value deviceAddress;
+    napi_create_string_utf8(env, transferInformation.GetDeviceAddress().c_str(), NAPI_AUTO_LENGTH, &deviceAddress);
+    napi_set_named_property(env, result, "deviceAddress", deviceAddress);
+
+    napi_value direction;
+    napi_create_int32(env, transferInformation.GetDirection(), &direction);
+    napi_set_named_property(env, result, "direction", direction);
+
+    napi_value status;
+    napi_create_int32(env, transferInformation.GetStatus(), &status);
+    napi_set_named_property(env, result, "status", status);
+
+    napi_value failedReason;
+    napi_create_int32(env, transferInformation.GetFailedReason(), &failedReason);
+    napi_set_named_property(env, result, "failedReason", failedReason);
+
+    napi_value timeStamp;
+    napi_create_int64(env, transferInformation.GetTimeStamp(), &timeStamp);
+    napi_set_named_property(env, result, "timeStamp", timeStamp);
+
+    napi_value currentBytes;
+    napi_create_int64(env, transferInformation.GetCurrentBytes(), &currentBytes);
+    napi_set_named_property(env, result, "currentBytes", currentBytes);
+
+    napi_value totalBytes;
+    napi_create_int64(env, transferInformation.GetTotalBytes(), &totalBytes);
+    napi_set_named_property(env, result, "totalBytes", totalBytes);
+}
+
 napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string>& stringVector)
 {
     HILOGI("vector size: %{public}zu", stringVector.size());
