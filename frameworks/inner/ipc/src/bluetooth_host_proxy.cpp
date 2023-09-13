@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Bluetooth {
 void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &observer)
 {
-    HILOGI("BluetoothHostProxy::RegisterObserver start");
+    HILOGD("BluetoothHostProxy::RegisterObserver start");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::RegisterObserver WriteInterfaceToken error");
@@ -37,7 +37,7 @@ void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &ob
         HILOGE("BluetoothHostProxy::RegisterObserver done fail, error: %{public}d", error);
         return;
     }
-    HILOGI("BluetoothHostProxy::RegisterObserver success");
+    HILOGD("BluetoothHostProxy::RegisterObserver success");
 }
 
 void BluetoothHostProxy::DeregisterObserver(const sptr<IBluetoothHostObserver> &observer)
@@ -1397,7 +1397,7 @@ int32_t BluetoothHostProxy::GetLocalProfileUuids(std::vector<std::string> &uuids
 
 void BluetoothHostProxy::RegisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer)
 {
-    HILOGI("BluetoothHostProxy::RegisterBleAdapterObserver start");
+    HILOGD("BluetoothHostProxy::RegisterBleAdapterObserver start");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::RegisterBleAdapterObserver WriteInterfaceToken error");
@@ -1414,7 +1414,7 @@ void BluetoothHostProxy::RegisterBleAdapterObserver(const sptr<IBluetoothHostObs
         HILOGE("BluetoothHostProxy::RegisterBleAdapterObserver done fail, error: %{public}d", error);
         return;
     }
-    HILOGI("BluetoothHostProxy::RegisterBleAdapterObserver success");
+    HILOGD("BluetoothHostProxy::RegisterBleAdapterObserver success");
 }
 
 void BluetoothHostProxy::DeregisterBleAdapterObserver(const sptr<IBluetoothHostObserver> &observer)
@@ -1440,7 +1440,7 @@ void BluetoothHostProxy::DeregisterBleAdapterObserver(const sptr<IBluetoothHostO
 
 void BluetoothHostProxy::RegisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer)
 {
-    HILOGI("BluetoothHostProxy::RegisterBlePeripheralCallback start");
+    HILOGD("BluetoothHostProxy::RegisterBlePeripheralCallback start");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::RegisterBlePeripheralCallback WriteInterfaceToken error");
