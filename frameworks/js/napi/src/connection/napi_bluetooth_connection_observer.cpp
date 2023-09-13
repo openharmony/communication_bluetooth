@@ -145,7 +145,7 @@ void NapiBluetoothConnectionObserver::OnPairRequested(const BluetoothRemoteDevic
 
 void NapiBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
 {
-    HILOGI("OnPairConfirmed");
+    HILOGD("OnPairConfirmed");
     std::shared_ptr<PairConfirmedCallBackInfo> pairConfirmInfo =
         std::make_shared<PairConfirmedCallBackInfo>(number, reqType, device.GetDeviceAddr());
     OnPairConfirmedCallBack(pairConfirmInfo);
@@ -242,10 +242,10 @@ void NapiBluetoothConnectionObserver::UvQueueWorkOnPairConfirmedCallBack(
 void NapiBluetoothConnectionObserver::OnPairConfirmedCallBack(
     const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallback(REGISTER_PIN_REQUEST_TYPE);
     if (callbackInfo == nullptr) {
-        HILOGI("This callback is not registered by ability.");
+        HILOGD("This callback is not registered by ability.");
         return;
     }
     uv_loop_s *loop = nullptr;

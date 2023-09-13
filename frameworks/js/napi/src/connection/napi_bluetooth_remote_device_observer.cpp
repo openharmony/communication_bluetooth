@@ -67,7 +67,7 @@ void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemot
 {
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallback(REGISTER_BOND_STATE_TYPE);
     if (callbackInfo == nullptr) {
-        HILOGI("This callback is not registered by ability.");
+        HILOGD("This callback is not registered by ability.");
         return;
     }
     HILOGI("addr:%{public}s, status:%{public}d", GET_ENCRYPT_ADDR(device), status);

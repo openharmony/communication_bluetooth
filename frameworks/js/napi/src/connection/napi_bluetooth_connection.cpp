@@ -71,7 +71,7 @@ std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefault
 
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("enter");
     RegisterObserverToHost();
     ConnectionPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
@@ -181,7 +181,7 @@ napi_status CheckDeRegisterObserver(napi_env env, napi_callback_info info)
 
 napi_value RegisterConnectionObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     auto status = CheckRegisterObserver(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -192,7 +192,7 @@ napi_value RegisterConnectionObserver(napi_env env, napi_callback_info info)
 
 napi_value DeRegisterConnectionObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     auto status = CheckDeRegisterObserver(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -203,7 +203,7 @@ napi_value DeRegisterConnectionObserver(napi_env env, napi_callback_info info)
 
 napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int state = static_cast<int>(BTConnectState::DISCONNECTED);
     int32_t err = host->GetBtConnectionState(state);
@@ -217,7 +217,7 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
 
 napi_value PairDevice(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -238,7 +238,7 @@ napi_value PairDevice(napi_env env, napi_callback_info info)
 
 napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string remoteAddr{};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -311,7 +311,7 @@ napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
 napi_value GetLocalName(napi_env env, napi_callback_info info)
 {
     napi_value result = nullptr;
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     std::string localName = INVALID_NAME;
     int32_t err = host->GetLocalName(localName);
@@ -323,7 +323,7 @@ napi_value GetLocalName(napi_env env, napi_callback_info info)
 
 napi_value GetPairedDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     std::vector<BluetoothRemoteDevice> remoteDeviceLists;
     int32_t ret = host->GetPairedDevices(BT_TRANSPORT_BREDR, remoteDeviceLists);
@@ -352,7 +352,7 @@ napi_value GetPairedDevices(napi_env env, napi_callback_info info)
 
 napi_value GetProfileConnectionState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     int profileId = 0;
     bool checkRet = CheckProfileIdParam(env, info, profileId);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -370,7 +370,7 @@ napi_value GetProfileConnectionState(napi_env env, napi_callback_info info)
 
 napi_value SetDevicePairingConfirmation(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string remoteAddr{};
     bool accept = false;
     bool checkRet = CheckSetDevicePairingConfirmationParam(env, info, remoteAddr, accept);
@@ -391,7 +391,7 @@ napi_value SetDevicePairingConfirmation(napi_env env, napi_callback_info info)
 
 napi_value SetLocalName(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string localName = INVALID_NAME;
     bool checkRet = CheckLocalNameParam(env, info, localName);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -404,7 +404,7 @@ napi_value SetLocalName(napi_env env, napi_callback_info info)
 
 napi_value SetBluetoothScanMode(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     int32_t mode = 0;
     int32_t duration = 0;
     bool checkRet = CheckSetBluetoothScanModeParam(env, info, mode, duration);
@@ -420,7 +420,7 @@ napi_value SetBluetoothScanMode(napi_env env, napi_callback_info info)
 
 napi_value GetBluetoothScanMode(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t scanMode = 0;
     int32_t err = host->GetBtScanMode(scanMode);
@@ -450,7 +450,7 @@ void ClearDiscoveryDevice()
 
 napi_value StartBluetoothDiscovery(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     ClearDiscoveryDevice();
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->StartBtDiscovery();
@@ -460,7 +460,7 @@ napi_value StartBluetoothDiscovery(napi_env env, napi_callback_info info)
 
 napi_value StopBluetoothDiscovery(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->CancelBtDiscovery();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
@@ -497,7 +497,7 @@ void SetPromise(const napi_env &env, const napi_deferred &deferred, const int32_
 static void PaddingCallbackPromiseInfo(
     const napi_env &env, const napi_ref &callback, CallbackPromiseInfo &info, napi_value &promise)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (callback) {
         info.callback = callback;
         info.isCallback = true;
@@ -512,7 +512,7 @@ static void PaddingCallbackPromiseInfo(
 
 static void ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInfo &info, const napi_value &result)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (info.isCallback) {
         SetCallback(env, info.callback, info.errorCode, result);
     } else {
@@ -523,7 +523,7 @@ static void ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInfo
 
 napi_status ParseSetDevicePinCodeParameters(napi_env env, napi_callback_info info, SetDevicePinCodeCallbackInfo *params)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
     std::string remoteAddr{};
@@ -548,7 +548,7 @@ napi_status ParseSetDevicePinCodeParameters(napi_env env, napi_callback_info inf
 
 napi_value SetDevicePinCode(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     SetDevicePinCodeCallbackInfo *asyncCallbackInfo =
         new (std::nothrow) SetDevicePinCodeCallbackInfo{.env = env, .asyncWork = nullptr};
     napi_status status = ParseSetDevicePinCodeParameters(env, info, asyncCallbackInfo);
@@ -611,7 +611,7 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
 
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -631,7 +631,7 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 
 napi_value CancelPairedDeviceAsync(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string remoteAddr {};
     bool checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -652,7 +652,7 @@ napi_value CancelPairedDeviceAsync(napi_env env, napi_callback_info info)
 
 napi_value CancelPairingDevice(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string remoteAddr{};
     bool checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -684,7 +684,7 @@ napi_status CheckPairCredibleDeviceParam(napi_env env, napi_callback_info info, 
 
 napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     int transport = INVALID_TYPE;
     auto status = CheckPairCredibleDeviceParam(env, info, remoteAddr, transport);
@@ -714,7 +714,7 @@ napi_status CheckGetProfileUuids(napi_env env, napi_callback_info info, std::str
 
 napi_value GetLocalProfileUuids(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     auto func = []() {
         std::vector<std::string> uuids{};
         int32_t err = BluetoothHost::GetDefaultHost().GetLocalProfileUuids(uuids);
@@ -730,7 +730,7 @@ napi_value GetLocalProfileUuids(napi_env env, napi_callback_info info)
 
 napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("enter");
     std::string address;
     auto status = CheckGetProfileUuids(env, info, address);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
@@ -751,7 +751,7 @@ napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info)
 
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("enter");
     napi_value scanModeObj = ScanModeInit(env);
     napi_value bondStateObj = BondStateInit(env);
 #ifdef BLUETOOTH_API_SINCE_10
@@ -773,7 +773,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
 
 napi_value ScanModeInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value scanMode = nullptr;
     napi_create_object(env, &scanMode);
     SetNamedPropertyByInteger(env, scanMode, static_cast<int>(ScanMode::SCAN_MODE_NONE), "SCAN_MODE_NONE");
@@ -796,7 +796,7 @@ napi_value ScanModeInit(napi_env env)
 
 napi_value BondStateInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value bondState = nullptr;
     napi_create_object(env, &bondState);
     SetNamedPropertyByInteger(env, bondState, static_cast<int>(BondState::BOND_STATE_INVALID), "BOND_STATE_INVALID");
@@ -808,7 +808,7 @@ napi_value BondStateInit(napi_env env)
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value BluetoothTransportInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value bluetoothTransport = nullptr;
     napi_create_object(env, &bluetoothTransport);
     SetNamedPropertyByInteger(
@@ -820,7 +820,7 @@ napi_value BluetoothTransportInit(napi_env env)
 
 napi_value PinTypeInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value pinType = nullptr;
     napi_create_object(env, &pinType);
     SetNamedPropertyByInteger(
@@ -844,7 +844,7 @@ napi_value PinTypeInit(napi_env env)
 
 void RegisterObserverToHost()
 {
-    HILOGI("start");
+    HILOGD("enter");
     g_remoteDeviceObserver = std::make_shared<NapiBluetoothRemoteDeviceObserver>();
     BluetoothHost &host = BluetoothHost::GetDefaultHost();
     host.RegisterObserver(g_connectionObserver);

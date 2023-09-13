@@ -54,7 +54,7 @@ napi_value NapiSppServer::DeRegisterSocketObserver(napi_env env, napi_callback_i
 
 napi_value SppTypeInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value sppType = nullptr;
     napi_create_object(env, &sppType);
     SetNamedPropertyByInteger(env, sppType, SppType::SPP_RFCOMM, "SPP_RFCOMM");
@@ -74,7 +74,7 @@ void SppPropertyValueInit(napi_env env, napi_value exports)
 static napi_status CheckSppListenParams(
     napi_env env, napi_callback_info info, string &name, SppListenCallbackInfo *callbackInfo)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {0};
 
@@ -107,7 +107,7 @@ static napi_status CheckSppListenParams(
 
 napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     string name;
     SppListenCallbackInfo *callbackInfo = new (std::nothrow) SppListenCallbackInfo();
     NAPI_BT_ASSERT_RETURN_UNDEF(env, callbackInfo != nullptr, BT_ERR_INVALID_PARAM);
@@ -190,7 +190,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 static napi_status CheckSppAcceptParams(
     napi_env env, napi_callback_info info, int32_t &serverSocketNum, SppAcceptCallbackInfo *callbackInfo)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
 
@@ -226,7 +226,7 @@ static napi_status CheckSppAcceptParams(
 
 napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     int32_t serverSocketNum = -1;
     SppAcceptCallbackInfo *callbackInfo = new (std::nothrow) SppAcceptCallbackInfo();
     NAPI_BT_ASSERT_RETURN_UNDEF(env, callbackInfo != nullptr, BT_ERR_INVALID_PARAM);
@@ -297,7 +297,7 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
 
 static napi_status CheckSppCloseServerSockeParams(napi_env env, napi_callback_info info, int &id)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = {0};
     napi_value thisVar = nullptr;
@@ -310,7 +310,7 @@ static napi_status CheckSppCloseServerSockeParams(napi_env env, napi_callback_in
 
 napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     int id =  -1;
     auto status = CheckSppCloseServerSockeParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);

@@ -556,7 +556,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
 static bool SetServiceUuidParameter(BleScanFilter &scanFilter, BleScanNativeFilter *nativeScanFilter)
 {
-    HILOGI("SetServiceUuidParameter enter");
+    HILOGD("SetServiceUuidParameter enter");
     if (nativeScanFilter->serviceUuidLength != 0 && nativeScanFilter->serviceUuid != nullptr) {
         if (!regex_match(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuid)), uuidRegex)) {
             HILOGE("match the UUID faild.");
@@ -587,7 +587,7 @@ static bool SetServiceUuidParameter(BleScanFilter &scanFilter, BleScanNativeFilt
  */
 static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nativeScanFilter)
 {
-    HILOGI("SetOneScanFilter enter");
+    HILOGD("SetOneScanFilter enter");
     if (nativeScanFilter->address != nullptr) {
         scanFilter.SetDeviceId(nativeScanFilter->address);
     }
@@ -650,7 +650,7 @@ static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nati
  */
 static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *filter, uint32_t filterSize)
 {
-    HILOGI("SetConfigScanFilter enter");
+    HILOGD("SetConfigScanFilter enter");
     vector<BleScanFilter> scanFilters;
     for (uint32_t i = 0; i < filterSize; i++) {
         BleScanNativeFilter nativeScanFilter = filter[i];
@@ -690,7 +690,7 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
 int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleScanNativeFilter *filter,
     uint32_t filterSize)
 {
-    HILOGI("BleStartScanEx enter, scannerId: %{public}d, filterSize %{public}u", scannerId, filterSize);
+    HILOGD("BleStartScanEx enter, scannerId: %{public}d, filterSize %{public}u", scannerId, filterSize);
     if (configs == nullptr) {
         HILOGE("BleStartScanEx fail, configs is null.");
         return OHOS_BT_STATUS_FAIL;
