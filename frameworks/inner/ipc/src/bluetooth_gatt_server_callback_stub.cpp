@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothGattServerCallbackStub::BluetoothGattServerCallbackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CHARACTERISTIC_READREQUEST)] =
         &BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner;
@@ -48,12 +48,12 @@ BluetoothGattServerCallbackStub::BluetoothGattServerCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED)] =
         &BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner;
-    HILOGI("ends.");
+    HILOGD("ends.");
 }
 
 BluetoothGattServerCallbackStub::~BluetoothGattServerCallbackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 int BluetoothGattServerCallbackStub::OnRemoteRequest(
@@ -108,7 +108,7 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessagePa
 }
 ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothGattServerCallbackStub::OnAddServiceInner Triggered!");
+    HILOGD("BluetoothGattServerCallbackStub::OnAddServiceInner Triggered!");
     int32_t ret = data.ReadInt32();
     std::shared_ptr<BluetoothGattService> service(data.ReadParcelable<BluetoothGattService>());
     if (!service) {

@@ -261,7 +261,7 @@ void DefineSystemBLEInterface(napi_env env, napi_value exports)
 
 static napi_value On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     auto CheckBleOnFunc = [env, info]() -> napi_status {
         size_t argc = ARGS_SIZE_TWO;
         napi_value argv[ARGS_SIZE_TWO] = {nullptr};
@@ -289,7 +289,7 @@ static napi_value On(napi_env env, napi_callback_info info)
 
 static napi_value Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     auto CheckBleOffFunc = [env, info]() -> napi_status {
         size_t argc = ARGS_SIZE_TWO;
         napi_value argv[ARGS_SIZE_TWO] = {nullptr};
@@ -315,7 +315,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
 
 void DefineBLEJSObject(napi_env env, napi_value exports)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     PropertyInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("createGattServer", NapiGattServer::CreateGattServer),
@@ -525,7 +525,7 @@ static napi_status ParseScanFilterManufactureDataParameters(
 
 static napi_status ParseScanFilter(const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::vector<std::string> expectedNames {"deviceId", "name", "serviceUuid", "serviceUuidMask",
         "serviceSolicitationUuid", "serviceSolicitationUuidMask", "serviceData", "serviceDataMask", "manufactureId",
         "manufactureData", "manufactureDataMask"};
@@ -542,7 +542,7 @@ static napi_status ParseScanFilter(const napi_env &env, napi_value &scanFilter, 
 
 static napi_status ParseScanFilterParameters(const napi_env &env, napi_value &args, std::vector<BleScanFilter> &params)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     NAPI_BT_CALL_RETURN(NapiIsArray(env, args));
 
     uint32_t length = 0;
@@ -592,7 +592,7 @@ static napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std
 
 napi_value StartBLEScan(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settinngs;
     auto status = CheckBleScanParams(env, info, scanfilters, settinngs);
@@ -608,7 +608,7 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
 
 napi_value StopBLEScan(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -620,7 +620,7 @@ napi_value StopBLEScan(napi_env env, napi_callback_info info)
 static napi_status ParseAdvertisingSettingsParameters(
     const napi_env &env, const napi_callback_info &info, const napi_value &object, BleAdvertiserSettings &outSettings)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"interval", "txPower", "connectable"}));
 
     bool exist = false;
@@ -661,7 +661,7 @@ static napi_status ParseAdvertisingSettingsParameters(
 
 static napi_status ParseServiceUuidParameters(napi_env env, napi_value object, BleAdvertiserData &outData)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::vector<UUID> vec {};
     NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "serviceUuids", vec));
     for (size_t i = 0; i < vec.size(); ++i) {
@@ -673,7 +673,7 @@ static napi_status ParseServiceUuidParameters(napi_env env, napi_value object, B
 
 static napi_status ParseManufactureDataParameters(napi_env env, napi_value object, BleAdvertiserData &outData)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::vector<NapiAdvManufactureData> vec {};
     NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "manufactureData", vec));
     for (size_t i = 0; i < vec.size(); ++i) {
@@ -684,7 +684,7 @@ static napi_status ParseManufactureDataParameters(napi_env env, napi_value objec
 
 static napi_status ParseServiceDataParameters(napi_env env, napi_value object, BleAdvertiserData &outData)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::vector<NapiAdvServiceData> vec {};
     NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "serviceData", vec));
     for (size_t i = 0; i < vec.size(); ++i) {
@@ -744,7 +744,7 @@ napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdver
 
 napi_value StartAdvertising(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     BleAdvertiserSettings settings;
     BleAdvertiserData advData;
     BleAdvertiserData rspData;
@@ -768,7 +768,7 @@ static napi_status CheckEmptyArgs(napi_env env, napi_callback_info info)
 
 napi_value StopAdvertising(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     auto status = CheckEmptyArgs(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -779,7 +779,7 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
 
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value result = nullptr;
     napi_create_array(env, &result);
 
@@ -790,7 +790,7 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
 
 napi_value PropertyInit(napi_env env, napi_value exports)
 {
-    HILOGI("enter");
+    HILOGD("enter");
 
     napi_value matchModeObj = nullptr;
     napi_value scanDutyObj = nullptr;

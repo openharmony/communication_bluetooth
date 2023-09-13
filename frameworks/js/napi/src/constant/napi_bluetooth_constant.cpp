@@ -36,7 +36,7 @@ namespace OHOS {
 namespace Bluetooth {
 napi_value NapiConstant::DefineJSConstant(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("enter");
     ConstantPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -46,7 +46,7 @@ napi_value NapiConstant::DefineJSConstant(napi_env env, napi_value exports)
 
 napi_value NapiConstant::ConstantPropertyValueInit(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("enter");
     napi_value profileIdObj = ProfileIdInit(env);
     napi_value profileUuidsObj = ProfileUuidsInit(env);
     napi_value profileStateObj = ProfileStateInit(env);
@@ -66,7 +66,7 @@ napi_value NapiConstant::ConstantPropertyValueInit(napi_env env, napi_value expo
 
 napi_value NapiConstant::ProfileIdInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value profileId = nullptr;
     napi_create_object(env, &profileId);
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_A2DP_SINK, "PROFILE_A2DP_SINK");
@@ -86,7 +86,7 @@ napi_value NapiConstant::ProfileIdInit(napi_env env)
 
 napi_value NapiConstant::ProfileUuidsInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value profileUuidsObj = nullptr;
     napi_create_object(env, &profileUuidsObj);
     SetNamedPropertyByString(env, profileUuidsObj, PROFILE_UUID_HFP_AG, "PROFILE_UUID_HFP_AG");
@@ -104,7 +104,7 @@ napi_value NapiConstant::ProfileUuidsInit(napi_env env)
 
 napi_value NapiConstant::ProfileStateInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value profileState = nullptr;
     napi_create_object(env, &profileState);
     SetNamedPropertyByInteger(env, profileState, ProfileConnectionState::STATE_DISCONNECTED, "STATE_DISCONNECTED");
@@ -116,7 +116,7 @@ napi_value NapiConstant::ProfileStateInit(napi_env env)
 
 napi_value NapiConstant::MajorClassOfDeviceInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value majorClass = nullptr;
     napi_create_object(env, &majorClass);
     // MajorClass
@@ -136,7 +136,7 @@ napi_value NapiConstant::MajorClassOfDeviceInit(napi_env env)
 
 napi_value NapiConstant::MajorMinorClassOfDeviceInit(napi_env env)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value majorMinorClass = nullptr;
     napi_create_object(env, &majorMinorClass);
     // MajorMinorClass

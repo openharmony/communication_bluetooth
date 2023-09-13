@@ -61,7 +61,7 @@ struct ClientSocket::impl {
 
     void Close()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
@@ -130,7 +130,7 @@ struct ClientSocket::impl {
 
     InputStream &GetInputStream()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (inputStream_ == nullptr) {
             HILOGE("inputStream is NULL, failed. please Connect");
         }
@@ -139,7 +139,7 @@ struct ClientSocket::impl {
 
     OutputStream &GetOutputStream()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (outputStream_ == nullptr) {
             HILOGE("outputStream is NULL, failed. please Connect");
         }
@@ -148,13 +148,13 @@ struct ClientSocket::impl {
 
     BluetoothRemoteDevice &GetRemoteDevice()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         return remoteDevice_;
     }
 
     bool IsConnected()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         return socketStatus_ == SOCKET_CONNECTED;
     }
 
@@ -231,7 +231,7 @@ public:
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
-        HILOGI("starts");
+        HILOGD("enter");
         host_.proxy_->AsObject()->RemoveDeathRecipient(host_.deathRecipient_);
         host_.proxy_ = nullptr;
     }
@@ -250,7 +250,7 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
       auth_(auth),
       socketStatus_(SOCKET_INIT)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
@@ -291,7 +291,7 @@ ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
       auth_(false),
       socketStatus_(SOCKET_CONNECTED)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
@@ -335,7 +335,7 @@ ClientSocket::~ClientSocket()
 
 int ClientSocket::Connect(int psm)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGI("BR is not TURN_ON");
         return BT_ERR_INVALID_STATE;
@@ -395,37 +395,37 @@ int ClientSocket::Connect(int psm)
 
 void ClientSocket::Close()
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->Close();
 }
 
 InputStream &ClientSocket::GetInputStream()
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->GetInputStream();
 }
 
 OutputStream &ClientSocket::GetOutputStream()
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->GetOutputStream();
 }
 
 BluetoothRemoteDevice &ClientSocket::GetRemoteDevice()
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->GetRemoteDevice();
 }
 
 bool ClientSocket::IsConnected() const
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->IsConnected();
 }
 
 int ClientSocket::SetBufferSize(int bufferSize)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->SetBufferSize(bufferSize);
 }
 
@@ -451,7 +451,7 @@ struct ServerSocket::impl {
 
     int Listen()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (!IS_BT_ENABLED()) {
             HILOGE("BR is not TURN_ON");
             return BT_ERR_INVALID_STATE;
@@ -515,7 +515,7 @@ struct ServerSocket::impl {
 
     std::shared_ptr<ClientSocket> Accept(int timeout)
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (socketStatus_ != SOCKET_LISTENING) {
             HILOGE("socket is not in listen state");
             return nullptr;
@@ -546,7 +546,7 @@ struct ServerSocket::impl {
 
     int RecvSocketFd()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         int rv = 0;
         int cfd = -1;
         int clientFd = -1;
@@ -616,7 +616,7 @@ struct ServerSocket::impl {
 
     void Close()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
@@ -639,7 +639,7 @@ struct ServerSocket::impl {
 
     const std::string &GetStringTag()
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGE("socketStatus_ is SOCKET_CLOSED");
             socketServiceType_ = "";
@@ -695,7 +695,7 @@ public:
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
-        HILOGI("starts");
+        HILOGD("enter");
         if (!host_.proxy_) {
             return;
         }
@@ -747,25 +747,25 @@ ServerSocket::~ServerSocket()
 
 int ServerSocket::Listen()
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->Listen();
 }
 
 std::shared_ptr<ClientSocket> ServerSocket::Accept(int timeout)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->Accept(timeout);
 }
 
 void ServerSocket::Close()
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->Close();
 }
 
 const std::string &ServerSocket::GetStringTag()
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return pimpl->GetStringTag();
 }
 
@@ -777,7 +777,7 @@ int ServerSocket::GetPsm()
 std::shared_ptr<ClientSocket> SocketFactory::BuildInsecureRfcommDataSocketByServiceRecord(
     const BluetoothRemoteDevice &device, const UUID &uuid)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     if (device.IsValidBluetoothRemoteDevice()) {
         return std::make_shared<ClientSocket>(device, uuid, TYPE_RFCOMM, false);
     } else {
@@ -789,7 +789,7 @@ std::shared_ptr<ClientSocket> SocketFactory::BuildInsecureRfcommDataSocketByServ
 std::shared_ptr<ClientSocket> SocketFactory::BuildRfcommDataSocketByServiceRecord(
     const BluetoothRemoteDevice &device, const UUID &uuid)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     if (device.IsValidBluetoothRemoteDevice()) {
         return std::make_shared<ClientSocket>(device, uuid, TYPE_RFCOMM, true);
     } else {
@@ -801,13 +801,13 @@ std::shared_ptr<ClientSocket> SocketFactory::BuildRfcommDataSocketByServiceRecor
 std::shared_ptr<ServerSocket> SocketFactory::DataListenInsecureRfcommByServiceRecord(
     const std::string &name, const UUID &uuid)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return std::make_shared<ServerSocket>(name, uuid, TYPE_RFCOMM, false);
 }
 
 std::shared_ptr<ServerSocket> SocketFactory::DataListenRfcommByServiceRecord(const std::string &name, const UUID &uuid)
 {
-    HILOGI("starts");
+    HILOGD("enter");
     return std::make_shared<ServerSocket>(name, uuid, TYPE_RFCOMM, true);
 }
 }  // namespace Bluetooth

@@ -159,7 +159,7 @@ public:
 
     void OnDeviceAddrChanged(const std::string &address) override
     {
-        HILOGI("enter");
+        HILOGD("enter");
         host_.observers_.ForEach(
             [address](std::shared_ptr<BluetoothHostObserver> observer) { observer->OnDeviceAddrChanged(address); });
     }
@@ -198,7 +198,7 @@ public:
 
     void OnRemoteUuidChanged(const BluetoothRawAddress &device, const std::vector<bluetooth::Uuid> uuids) override
     {
-        HILOGI("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
+        HILOGD("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
             [remoteDevice, uuids](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -213,7 +213,7 @@ public:
 
     void OnRemoteNameChanged(const BluetoothRawAddress &device, const std::string deviceName) override
     {
-        HILOGI("enter, device: %{public}s, deviceName: %{public}s",
+        HILOGD("enter, device: %{public}s, deviceName: %{public}s",
             GetEncryptAddr((device).GetAddress()).c_str(), deviceName.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
@@ -235,7 +235,7 @@ public:
 
     void OnRemoteCodChanged(const BluetoothRawAddress &device, int32_t cod) override
     {
-        HILOGI("enter, device: %{public}s, cod: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), cod);
+        HILOGD("enter, device: %{public}s, cod: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), cod);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         BluetoothDeviceClass deviceClass(cod);
         host_.remoteObservers_.ForEach(
@@ -381,7 +381,7 @@ bool BluetoothHost::impl::InitBluetoothHostProxy(void)
 
 bool BluetoothHost::impl::InitBluetoothHostObserver(void)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     deathRecipient_ = new BluetoothHostDeathRecipient(*this);
     if (deathRecipient_ == nullptr) {
         HILOGE("deathRecipient_ is null");
@@ -483,7 +483,7 @@ void BluetoothHost::impl::LoadSystemAbilityFail()
 
 void BluetoothHost::impl::SyncRandomAddrToService(void)
 {
-    HILOGI("SyncRandomAddrToService.");
+    HILOGD("SyncRandomAddrToService.");
     if (!IsValidBluetoothAddr(stagingRealAddr_)) {
         HILOGE("stagingRealAddr_ is invalid.");
         return;
@@ -565,7 +565,7 @@ void BluetoothHost::Init()
 
 int BluetoothHost::EnableBt()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return BT_ERR_INTERNAL_ERROR;
@@ -576,7 +576,7 @@ int BluetoothHost::EnableBt()
 
 int BluetoothHost::DisableBt()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return BT_ERR_INTERNAL_ERROR;
@@ -587,7 +587,7 @@ int BluetoothHost::DisableBt()
 
 int BluetoothHost::GetBtState() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BTStateID::STATE_TURN_OFF;
@@ -606,7 +606,7 @@ int BluetoothHost::GetBtState() const
 
 int BluetoothHost::GetBtState(int &state) const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     state = BTStateID::STATE_TURN_OFF;
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -625,7 +625,7 @@ int BluetoothHost::GetBtState(int &state) const
 
 bool BluetoothHost::BluetoothFactoryReset()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return false;
@@ -672,7 +672,7 @@ BluetoothRemoteDevice BluetoothHost::GetRemoteDevice(const std::string &addr, in
 
 int BluetoothHost::EnableBle()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->LoadBluetoothHostService()) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return BT_ERR_INTERNAL_ERROR;
@@ -682,7 +682,7 @@ int BluetoothHost::EnableBle()
 
 int BluetoothHost::DisableBle()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return BT_ERR_INTERNAL_ERROR;
@@ -712,7 +712,7 @@ bool BluetoothHost::IsBleEnabled() const
 
 std::string BluetoothHost::GetLocalAddress() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return std::string();
@@ -723,7 +723,7 @@ std::string BluetoothHost::GetLocalAddress() const
 
 std::vector<uint32_t> BluetoothHost::GetProfileList() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::vector<uint32_t> profileList;
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
@@ -736,7 +736,7 @@ std::vector<uint32_t> BluetoothHost::GetProfileList() const
 
 int BluetoothHost::GetMaxNumConnectedAudioDevices() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return INVALID_VALUE;
@@ -747,7 +747,7 @@ int BluetoothHost::GetMaxNumConnectedAudioDevices() const
 
 int BluetoothHost::GetBtConnectionState() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     int state = static_cast<int>(BTConnectState::DISCONNECTED);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -766,7 +766,7 @@ int BluetoothHost::GetBtConnectionState() const
 
 int BluetoothHost::GetBtConnectionState(int &state) const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     state = static_cast<int>(BTConnectState::DISCONNECTED);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -802,7 +802,7 @@ int BluetoothHost::GetBtProfileConnState(uint32_t profileId, int &state) const
 
 void BluetoothHost::GetLocalSupportedUuids(std::vector<ParcelUuid> &uuids)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return;
@@ -828,7 +828,7 @@ void BluetoothHost::Stop()
 
 BluetoothDeviceClass BluetoothHost::GetLocalDeviceClass() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return BluetoothDeviceClass(0);
@@ -840,7 +840,7 @@ BluetoothDeviceClass BluetoothHost::GetLocalDeviceClass() const
 
 bool BluetoothHost::SetLocalDeviceClass(const BluetoothDeviceClass &deviceClass)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return false;
@@ -852,7 +852,7 @@ bool BluetoothHost::SetLocalDeviceClass(const BluetoothDeviceClass &deviceClass)
 
 std::string BluetoothHost::GetLocalName() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return std::string();
@@ -865,7 +865,7 @@ std::string BluetoothHost::GetLocalName() const
 
 int BluetoothHost::GetLocalName(std::string &name) const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return BT_ERR_UNAVAILABLE_PROXY;
@@ -876,7 +876,7 @@ int BluetoothHost::GetLocalName(std::string &name) const
 
 int BluetoothHost::SetLocalName(const std::string &name)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -891,7 +891,7 @@ int BluetoothHost::SetLocalName(const std::string &name)
 
 int BluetoothHost::GetBtScanMode(int32_t &scanMode) const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -945,7 +945,7 @@ bool BluetoothHost::SetBondableMode(int transport, int mode)
 
 int BluetoothHost::StartBtDiscovery()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -961,7 +961,7 @@ int BluetoothHost::StartBtDiscovery()
 
 int BluetoothHost::CancelBtDiscovery()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -993,7 +993,7 @@ bool BluetoothHost::IsBtDiscovering(int transport) const
 
 long BluetoothHost::GetBtDiscoveryEndMillis() const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return 0;
@@ -1048,7 +1048,7 @@ int32_t BluetoothHost::RemovePair(const BluetoothRemoteDevice &device)
 
 bool BluetoothHost::RemoveAllPairs()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
         return false;
