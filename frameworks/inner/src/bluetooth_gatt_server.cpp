@@ -364,8 +364,9 @@ public:
                 ptr = &(*it);
             }
         }
-
-        serverSptr->pimpl->callback_->OnServiceAdded(ptr, ret);
+        if (serverSptr->pimpl && serverSptr->pimpl->callback_) {
+            serverSptr->pimpl->callback_->OnServiceAdded(ptr, ret);
+        }
         return;
     }
 
