@@ -36,11 +36,6 @@ void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemot
 
     callbackInfo->state_ = state;
     callbackInfo->deviceId_ = device.GetDeviceAddr();
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = static_cast<void *>(callbackInfo.get());
-
     auto func = [callbackInfo]() {
         NapiHandleScope scope(callbackInfo->env_);
         napi_value result = nullptr;
