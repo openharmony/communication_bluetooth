@@ -498,7 +498,6 @@ int BleGattsUnRegister(int serverId)
     HILOGI("serverId: %{public}d", serverId);
     if (serverId >= 0 && serverId < MAXIMUM_NUMBER_APPLICATION) {
         if (GATTSERVER(serverId) != nullptr) {
-            GATTSERVER(serverId).reset();
             GATTSERVER(serverId) = nullptr;
             return OHOS_BT_STATUS_SUCCESS;
         }
