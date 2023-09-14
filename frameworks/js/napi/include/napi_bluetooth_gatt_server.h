@@ -48,7 +48,7 @@ public:
     {
         return server_;
     }
-    std::shared_ptr<NapiGattServerCallback> &GetCallback()
+    std::shared_ptr<NapiGattServerCallback> GetCallback()
     {
         return callback_;
     }

@@ -152,7 +152,7 @@ napi_status CheckGattsOff(napi_env env, napi_callback_info info)
     auto gattServer = NapiGetGattServer(env, thisVar);
     NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
     // callback_ need unref before, see napi_bluetooth_gatt_client
-    auto &gattServerCallback = gattServer->GetCallback();
+    auto gattServerCallback = gattServer->GetCallback();
     gattServerCallback->SetCallbackInfo(type, nullptr);
     HILOGI("%{public}s is removed", type.c_str());
     return napi_ok;

@@ -82,7 +82,7 @@ struct GattServer::impl {
     std::optional<std::reference_wrapper<GattDescriptor>> FindDescriptor(uint16_t handle);
     std::set<RequestInformation> requests_;
     std::list<bluetooth::GattDevice> devices_;
-    std::shared_ptr<GattServerCallback> &callback_;
+    std::shared_ptr<GattServerCallback> callback_;
     int BuildRequestId(uint8_t type, uint8_t transport);
     int RespondCharacteristicRead(
         const bluetooth::GattDevice &device, uint16_t handle, const uint8_t *value, size_t length, int ret);
@@ -96,7 +96,7 @@ struct GattServer::impl {
     bluetooth::GattDevice *FindConnectedDevice(const BluetoothRemoteDevice &device);
     GattService BuildService(const BluetoothGattService &service);
     void BuildIncludeService(GattService &svc, const std::vector<bluetooth::Service> &iSvcs);
-    impl(std::shared_ptr<GattServerCallback> &callback);
+    impl(std::shared_ptr<GattServerCallback> callback);
     bool Init(std::weak_ptr<GattServer>);
 
     class BluetoothGattServerDeathRecipient;
@@ -457,13 +457,13 @@ GattService *GattServer::impl::GetIncludeService(uint16_t handle)
     return nullptr;
 }
 
-GattServer::impl::impl(std::shared_ptr<GattServerCallback> &callback)
+GattServer::impl::impl(std::shared_ptr<GattServerCallback> callback)
     : isRegisterSucceeded_(false), callback_(callback), applicationId_(0)
 {
     HILOGI("enter");
 };
 
-GattServer::GattServer(std::shared_ptr<GattServerCallback> &callback) : pimpl(new GattServer::impl(callback))
+GattServer::GattServer(std::shared_ptr<GattServerCallback> callback) : pimpl(new GattServer::impl(callback))
 {
     HILOGI("enter");
 }
@@ -492,7 +492,7 @@ bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
     return true;
 }
 
-std::shared_ptr<GattServer> GattServer::CreateInstance(std::shared_ptr<GattServerCallback> &callback)
+std::shared_ptr<GattServer> GattServer::CreateInstance(std::shared_ptr<GattServerCallback> callback)
 {
     // The passkey pattern used here.
     auto instance = std::make_shared<GattServer>(PassKey(), callback);
