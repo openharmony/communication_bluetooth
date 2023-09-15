@@ -892,6 +892,7 @@ GattServer::~GattServer()
     }
     HILOGE("pimpl->serviceCallback_ use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
     pimpl->serviceCallback_.clear();
+    HILOGE("pimpl->serviceCallback_ clear use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     HILOGI("end");
 }
