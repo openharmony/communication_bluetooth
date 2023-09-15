@@ -27,6 +27,7 @@
 #include "bluetooth_hfp_ag.h"
 #include "bluetooth_hfp_hf.h"
 #include "bluetooth_hid_host.h"
+#include "bluetooth_opp.h"
 #include "bluetooth_pan.h"
 #include "log.h"
 #include "system_ability_definition.h"
@@ -250,6 +251,18 @@ void BluetootLoadSystemAbility::NotifyAudioProfile(NOTIFY_PROFILE_MSG notifyMsg,
     }
 }
 
+void BluetootLoadSystemAbility::NotifyOppProfile(NOTIFY_PROFILE_MSG notifyMsg)
+{
+    Opp *profile = Opp::GetProfile();
+    if (profile == nullptr) {
+        return;
+    }
+    if (notifyMsg == NOTIFY_MSG_INIT) {
+        profile->Init();
+        return;
+    }
+}
+
 void BluetootLoadSystemAbility::NotifyHidHostProfile(NOTIFY_PROFILE_MSG notifyMsg)
 {
     HidHost *profile = HidHost::GetProfile();
@@ -277,6 +290,10 @@ void BluetootLoadSystemAbility::NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg)
 void BluetootLoadSystemAbility::NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId)
 {
     switch (profileId) {
+        case PROFILE_ID_OPP_SERVER:
+            NotifyOppProfile(notifyMsg);
+        break;
+
         case PROFILE_ID_HID_HOST_SERVER:
             NotifyHidHostProfile(notifyMsg);
             break;
