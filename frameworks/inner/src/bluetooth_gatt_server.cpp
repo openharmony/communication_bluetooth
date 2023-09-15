@@ -483,6 +483,7 @@ bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
     HILOGE("serviceCallback_ use cnt = %{public}d", serviceCallback_->GetSptrRefCount());
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     int result = proxy_->RegisterApplication(serviceCallback_);
+    HILOGE("pimpl->serviceCallback_ regist use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
     if (result > 0) {
         applicationId_ = result;
         isRegisterSucceeded_ = true;
@@ -892,7 +893,6 @@ GattServer::~GattServer()
     }
     HILOGE("pimpl->serviceCallback_ use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
     pimpl->serviceCallback_.clear();
-    HILOGE("pimpl->serviceCallback_ clear use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     HILOGI("end");
 }
