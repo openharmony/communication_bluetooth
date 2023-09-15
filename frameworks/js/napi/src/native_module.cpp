@@ -32,6 +32,7 @@
 #include "napi_bluetooth_avrcp_tg.h"
 #include "napi_bluetooth_hid_host.h"
 #include "napi_bluetooth_pan.h"
+#include "napi_bluetooth_opp.h"
 
 #include "access/napi_bluetooth_access.h"
 #include "connection/napi_bluetooth_connection.h"
@@ -69,6 +70,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
     NapiBluetoothHidHost::DefineHidHostJSClass(env, exports);
     NapiBluetoothPan::DefinePanJSClass(env, exports);
+    NapiBluetoothOpp::DefineOppJSClass(env);
     DefineSystemBLEInterface(env, exports);
 
     HILOGI("-----Init end------");

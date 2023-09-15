@@ -93,6 +93,7 @@ private:
     void NotifyAvrcpTgProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyAvrcpCtProfile(NOTIFY_PROFILE_MSG notifyMsg);
 
+    void NotifyOppProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyHidHostProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg);
 
