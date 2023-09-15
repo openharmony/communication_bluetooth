@@ -890,7 +890,7 @@ GattServer::~GattServer()
     if (pimpl->isRegisterSucceeded_) {
         pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
     }
-    HILOGE("pimpl->serviceCallback_ use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount();
+    HILOGE("pimpl->serviceCallback_ use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
     pimpl->serviceCallback_.clear();
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     HILOGI("end");
