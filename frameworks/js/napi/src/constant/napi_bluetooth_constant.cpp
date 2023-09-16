@@ -73,8 +73,13 @@ napi_value NapiConstant::ProfileIdInit(napi_env env)
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_A2DP_SOURCE, "PROFILE_A2DP_SOURCE");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_AVRCP_CT, "PROFILE_AVRCP_CT");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_AVRCP_TG, "PROFILE_AVRCP_TG");
+#ifdef BLUETOOTH_API_SINCE_10
+    SetNamedPropertyByInteger(
+        env, profileId, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, "PROFILE_HANDSFREE_AUDIO_GATEWAY");
+#else
     SetNamedPropertyByInteger(
         env, profileId, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, "PROFILE_HANDS_FREE_AUDIO_GATEWAY");
+#endif
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HANDS_FREE_UNIT, "PROFILE_HANDS_FREE_UNIT");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HID_HOST, "PROFILE_HID_HOST");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PAN_NETWORK, "PROFILE_PAN_NETWORK");

@@ -128,9 +128,9 @@ void BluetootLoadSystemAbility::NotifyProfile(NOTIFY_PROFILE_MSG notifyMsg, cons
             break;
         case PROFILE_ID_MAP_MCE:
         case PROFILE_ID_MAP_MSE:
-        case PROFILE_ID_HID_HOST_SERVER:
-        case PROFILE_ID_OPP_SERVER:
-        case PROFILE_ID_PAN_SERVER:
+        case PROFILE_ID_HID_HOST:
+        case PROFILE_ID_OPP:
+        case PROFILE_ID_PAN:
             NotifyTransferProfile(notifyMsg, profileId);
             break;
         case PROFILE_ID_HOST:
@@ -290,14 +290,14 @@ void BluetootLoadSystemAbility::NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg)
 void BluetootLoadSystemAbility::NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId)
 {
     switch (profileId) {
-        case PROFILE_ID_OPP_SERVER:
+        case PROFILE_ID_OPP:
             NotifyOppProfile(notifyMsg);
         break;
 
-        case PROFILE_ID_HID_HOST_SERVER:
+        case PROFILE_ID_HID_HOST:
             NotifyHidHostProfile(notifyMsg);
             break;
-        case PROFILE_ID_PAN_SERVER:
+        case PROFILE_ID_PAN:
             NotifyPanProfile(notifyMsg);
             break;
         default:
