@@ -373,6 +373,10 @@ uint32_t GetProfileId(int profile)
             HILOGD("PROFILE_ID_PBAP_PSE");
             profileId = PROFILE_ID_PBAP_PSE;
             break;
+        case static_cast<int32_t>(ProfileId::PROFILE_HID_HOST):
+            HILOGD("PROFILE_HID_HOST");
+            profileId = PROFILE_ID_HID_HOST;
+            break;
         default:
             break;
     }
@@ -691,6 +695,18 @@ bool CheckProfileIdParam(napi_env env, napi_callback_info info, int &profileId)
     NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr) != napi_ok, "call failed.", false);
     NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Wrong argument type", false);
     NAPI_BT_RETURN_IF(!ParseInt32(env, profileId, argv[PARAM0]), "ParseInt32 failed", false);
+    return true;
+}
+
+bool CheckProfileIdParamEx(napi_env env, napi_callback_info info, int &profileId, size_t &argc)
+{
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc > ARGS_SIZE_ONE, "Wrong argument type", false);
+    if (argc == ARGS_SIZE_ONE) {
+        NAPI_BT_RETURN_IF(!ParseInt32(env, profileId, argv[PARAM0]), "ParseInt32 failed", false);
+    }
     return true;
 }
 

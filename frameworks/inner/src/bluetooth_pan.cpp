@@ -180,7 +180,7 @@ Pan::impl::impl()
     if (proxy_) {
         return;
     }
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_PAN_SERVER);
+    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_PAN);
     if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
         BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
         return;
