@@ -30,12 +30,10 @@ int BluetoothGattClientProxy::RegisterApplication(
         HILOGE("BluetoothGattClientProxy::RegisterApplication WriteInterfaceToken error");
         return BT_ERR_INTERNAL_ERROR;
     }
-    HILOGE("pimpl->serviceCallback_ before use cnt = %{public}d", callback->GetSptrRefCount());
     if (!data.WriteRemoteObject(callback->AsObject())) {
         HILOGE("BluetoothGattClientProxy::RegisterApplication transport error");
         return BT_ERR_INTERNAL_ERROR;
     }
-    HILOGE("pimpl->serviceCallback_ after use cnt = %{public}d", callback->GetSptrRefCount());
     if (!data.WriteParcelable(&addr)) {
         HILOGE("BluetoothGattClientProxy::RegisterApplication transport error");
         return BT_ERR_INTERNAL_ERROR;
