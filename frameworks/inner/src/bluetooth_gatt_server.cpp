@@ -892,7 +892,7 @@ GattServer::~GattServer()
         pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
     }
     HILOGE("pimpl->serviceCallback_ use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
-    BluetoothGattServerCallbackStubImpl* ptr = pimpl->serviceCallback_.GetRefPtr();
+    BluetoothGattServerCallbackStub* ptr = pimpl->serviceCallback_.GetRefPtr();
     ptr->DecStrongRef(nullptr);
     HILOGE("pimpl->serviceCallback_ dec use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
     pimpl->serviceCallback_.clear();
