@@ -480,10 +480,8 @@ bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
     }
     serviceCallback_ = new BluetoothGattServerCallbackStubImpl(server);
     deathRecipient_ = new BluetoothGattServerDeathRecipient(server);
-    HILOGE("serviceCallback_ use cnt = %{public}d", serviceCallback_->GetSptrRefCount());
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     int result = proxy_->RegisterApplication(serviceCallback_);
-    HILOGE("pimpl->serviceCallback_ regist use cnt = %{public}d", serviceCallback_->GetSptrRefCount());
     if (result > 0) {
         applicationId_ = result;
         isRegisterSucceeded_ = true;
@@ -891,11 +889,7 @@ GattServer::~GattServer()
     if (pimpl->isRegisterSucceeded_) {
         pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
     }
-    HILOGE("pimpl->serviceCallback_ use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
-    BluetoothGattServerCallbackStub* ptr = pimpl->serviceCallback_.GetRefPtr();
-    ptr->DecStrongRef(nullptr);
-    HILOGE("pimpl->serviceCallback_ dec use cnt = %{public}d", pimpl->serviceCallback_->GetSptrRefCount());
-    pimpl->serviceCallback_.clear();
+
     pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     HILOGI("end");
 }
