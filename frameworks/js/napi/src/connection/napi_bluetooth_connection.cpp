@@ -79,16 +79,17 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("pairDevice", PairDeviceAsync),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDeviceAsync),
+        DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionStateEx),
 #else
         DECLARE_NAPI_FUNCTION("pairDevice", PairDevice),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDevice),
+        DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionState),
 #endif
         DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
         DECLARE_NAPI_FUNCTION("getLocalName", GetLocalName),
         DECLARE_NAPI_FUNCTION("getPairedDevices", GetPairedDevices),
         DECLARE_NAPI_FUNCTION("getProfileConnState", GetProfileConnectionState),
-        DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionState),
         DECLARE_NAPI_FUNCTION("setDevicePairingConfirmation", SetDevicePairingConfirmation),
         DECLARE_NAPI_FUNCTION("setLocalName", SetLocalName),
         DECLARE_NAPI_FUNCTION("setBluetoothScanMode", SetBluetoothScanMode),
@@ -365,6 +366,24 @@ napi_value GetProfileConnectionState(napi_env env, napi_callback_info info)
     napi_create_int32(env, status, &ret);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, ret);
     HILOGI("status: %{public}d", status);
+    return ret;
+}
+
+napi_value GetProfileConnectionStateEx(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    int profileId = 0;
+    size_t argSize = 0;
+    bool checkRet = CheckProfileIdParamEx(env, info, profileId, argSize);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+    HILOGD("argSize = %{public}zu", argSize);
+
+    napi_value ret = nullptr;
+    if (argSize == 0) {
+        ret = GetBtConnectionState(env, info);
+    } else {
+        ret = GetProfileConnectionState(env, info);
+    }
     return ret;
 }
 
