@@ -228,7 +228,7 @@ HidHost::impl::impl()
     if (proxy_) {
         return;
     }
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_HID_HOST_SERVER);
+    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_HID_HOST);
     if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
         BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
         return;

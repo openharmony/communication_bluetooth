@@ -493,6 +493,7 @@ napi_status ParseUuidParams(napi_env env, napi_value object, const char *name, b
 
 bool CheckDeivceIdParam(napi_env env, napi_callback_info info, std::string &addr);
 bool CheckProfileIdParam(napi_env env, napi_callback_info info, int &profileId);
+bool CheckProfileIdParamEx(napi_env env, napi_callback_info info, int &profileId, size_t &argc);
 bool CheckSetDevicePairingConfirmationParam(napi_env env, napi_callback_info info, std::string &addr, bool &accept);
 bool CheckLocalNameParam(napi_env env, napi_callback_info info, std::string &name);
 bool CheckSetBluetoothScanModeParam(napi_env env, napi_callback_info info, int32_t &mode, int32_t &duration);
