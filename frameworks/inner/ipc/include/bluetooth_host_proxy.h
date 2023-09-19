@@ -97,6 +97,7 @@ public:
     int32_t SetFastScan(bool isEnable) override;
     int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr) override;
     int32_t SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr) override;
+    int32_t CountEnableTimes(bool enable) override;
 
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

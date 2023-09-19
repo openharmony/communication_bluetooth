@@ -489,6 +489,7 @@ enum BluetoothHostInterfaceCode {
     GET_RANDOM_ADDRESS,
     SYNC_RANDOM_ADDRESS,
     START_CREDIBLE_PAIR,
+    BT_COUNT_ENABLE_TIMES,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

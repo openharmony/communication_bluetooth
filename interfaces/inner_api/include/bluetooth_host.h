@@ -669,6 +669,8 @@ private:
      */
     ~BluetoothHost();
 
+    int CountEnableTimes(bool enable);
+
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHost);
     BLUETOOTH_DECLARE_IMPL();
 };
