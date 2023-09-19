@@ -108,7 +108,7 @@ public:
 
     void OnDiscoveryStateChanged(int32_t status) override
     {
-        HILOGI("enter, status: %{public}d", status);
+        HILOGD("enter, status: %{public}d", status);
         host_.observers_.ForEach(
             [status](std::shared_ptr<BluetoothHostObserver> observer) { observer->OnDiscoveryStateChanged(status); });
     }

@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothBlePeripheralObserverStub::BluetoothBlePeripheralObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_ = {
         {static_cast<uint32_t>(BluetoothBlePeripheralObserverInterfaceCode::BLE_ON_READ_REMOTE_RSSI_EVENT),
             &BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner},
@@ -35,7 +35,7 @@ BluetoothBlePeripheralObserverStub::BluetoothBlePeripheralObserverStub()
 
 BluetoothBlePeripheralObserverStub::~BluetoothBlePeripheralObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 

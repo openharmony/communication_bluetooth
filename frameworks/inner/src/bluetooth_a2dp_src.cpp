@@ -140,7 +140,7 @@ A2dpSource::impl::impl()
 
 A2dpSource::impl::~impl()
 {
-    HILOGI("start");
+    HILOGD("start");
     if (proxy_ != nullptr) {
         proxy_->DeregisterObserver(observerImp_);
         proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
@@ -182,7 +182,7 @@ A2dpSource::A2dpSource()
 
 A2dpSource::~A2dpSource()
 {
-    HILOGI("start");
+    HILOGD("start");
 }
 
 void A2dpSource::Init()
@@ -244,7 +244,7 @@ int A2dpSource::GetDevicesByStates(const std::vector<int> &states, std::vector<B
 
 int A2dpSource::GetDeviceState(const BluetoothRemoteDevice &device, int &state) const
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGD("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -366,7 +366,7 @@ int32_t A2dpSource::Disconnect(const BluetoothRemoteDevice &device)
 
 A2dpSource *A2dpSource::GetProfile()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     static A2dpSource service;
     return &service;
 }

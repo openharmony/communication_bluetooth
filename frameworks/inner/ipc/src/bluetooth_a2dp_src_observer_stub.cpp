@@ -22,7 +22,7 @@ namespace Bluetooth {
 using namespace OHOS::bluetooth;
 BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner;
@@ -36,7 +36,7 @@ BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
 
 BluetoothA2dpSrcObserverStub::~BluetoothA2dpSrcObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 

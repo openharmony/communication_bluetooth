@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnConnectionStateChangedInner;
@@ -35,12 +35,12 @@ BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub()
         BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner;
 
-    HILOGI("ends.");
+    HILOGD("ends.");
 }
 
 BluetoothHfpAgObserverStub::~BluetoothHfpAgObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 

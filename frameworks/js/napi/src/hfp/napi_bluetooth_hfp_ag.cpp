@@ -149,7 +149,7 @@ napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_ca
 
 napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     napi_value result = nullptr;
     int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
@@ -368,7 +368,7 @@ napi_value NapiHandsFreeAudioGateway::Disconnect(napi_env env, napi_callback_inf
 
 napi_value NapiHandsFreeAudioGateway::SetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr {};
     int32_t strategy = 0;
     auto status = CheckSetConnectStrategyParam(env, info, remoteAddr, strategy);
@@ -389,7 +389,7 @@ napi_value NapiHandsFreeAudioGateway::SetConnectionStrategy(napi_env env, napi_c
 
 napi_value NapiHandsFreeAudioGateway::GetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr {};
     auto status = CheckDeviceAddressParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);

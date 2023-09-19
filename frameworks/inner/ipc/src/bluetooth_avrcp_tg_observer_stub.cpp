@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothAvrcpTgObserverStub::BluetoothAvrcpTgObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothAvrcpTgObserverInterfaceCode::BT_AVRCP_TG_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner;
@@ -28,7 +28,7 @@ BluetoothAvrcpTgObserverStub::BluetoothAvrcpTgObserverStub()
 
 BluetoothAvrcpTgObserverStub::~BluetoothAvrcpTgObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 

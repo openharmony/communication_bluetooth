@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Bluetooth {
 napi_value NapiBaseProfile::DefineBaseProfileJSFunction(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("start");
     BaseProfilePropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -31,7 +31,7 @@ napi_value NapiBaseProfile::DefineBaseProfileJSFunction(napi_env env, napi_value
 
 napi_value NapiBaseProfile::BaseProfilePropertyValueInit(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("start");
     napi_value strategyObj = ConnectionStrategyInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("ConnectionStrategy", strategyObj),
