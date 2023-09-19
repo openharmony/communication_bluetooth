@@ -30,7 +30,7 @@ namespace Bluetooth {
 
 napi_value BluetoothHostInit(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("start");
     PropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", RegisterHostObserver),
@@ -86,7 +86,7 @@ napi_value DeregisterHostObserver(napi_env env, napi_callback_info info)
 
 napi_value PropertyValueInit(napi_env env, napi_value exports)
 {
-    HILOGI("start");
+    HILOGD("start");
     napi_value scanDutyObject = ScanDutyInit(env);
     napi_value matchModeObject = MatchModeInit(env);
 

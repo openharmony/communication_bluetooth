@@ -22,7 +22,7 @@ namespace Bluetooth {
 const int32_t GATT_CLIENT_CALLBACK_READ_DATA_SIZE_MAX_LEN = 0x100;
 BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_CONNECT_STATE_CHANGE)] =
         &BluetoothGattClientCallbackStub::OnConnectionStateChangedInner;
@@ -60,7 +60,7 @@ BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub()
 
 BluetoothGattClientCallbackStub::~BluetoothGattClientCallbackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 

@@ -133,7 +133,7 @@ void NapiBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDev
 
 void NapiBluetoothConnectionObserver::OnPairRequested(const BluetoothRemoteDevice &device)
 {
-    HILOGI("start");
+    HILOGD("start");
     BluetoothRemoteDevice remoteDevice;
     if (device.GetTransportType() == BT_TRANSPORT_BREDR) {
         remoteDevice = BluetoothHost::GetDefaultHost().GetRemoteDevice(device.GetDeviceAddr(), BT_TRANSPORT_BREDR);
@@ -203,7 +203,7 @@ static std::string GetFormatPinCode(const uint32_t pinType, const uint32_t pinCo
 void NapiBluetoothConnectionObserver::UvQueueWorkOnPairConfirmedCallBack(
     uv_work_t *work, const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo)
 {
-    HILOGI("start");
+    HILOGD("start");
     if (work == nullptr) {
         HILOGE("work is null");
         return;

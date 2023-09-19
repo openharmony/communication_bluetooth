@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Bluetooth {
 BluetoothHfpHfObserverStub::BluetoothHfpHfObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpHfObserverInterfaceCode::BT_HFP_HF_OBSERVER_CONNECTION_STATE_CHANGED)] =
         &BluetoothHfpHfObserverStub::OnConnectionStateChangedInner;
@@ -57,7 +57,7 @@ BluetoothHfpHfObserverStub::BluetoothHfpHfObserverStub()
 
 BluetoothHfpHfObserverStub::~BluetoothHfpHfObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 

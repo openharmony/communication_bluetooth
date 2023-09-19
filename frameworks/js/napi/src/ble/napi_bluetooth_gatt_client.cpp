@@ -615,7 +615,7 @@ static napi_status CheckGattClientGetDeviceName(napi_env env, napi_callback_info
 
 napi_value NapiGattClient::GetDeviceName(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
 
     auto status = CheckGattClientGetDeviceName(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);

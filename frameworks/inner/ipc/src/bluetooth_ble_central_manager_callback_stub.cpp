@@ -41,12 +41,12 @@ const std::map<uint32_t,
 
 BluetoothBleCentralManagerCallBackStub::BluetoothBleCentralManagerCallBackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 BluetoothBleCentralManagerCallBackStub::~BluetoothBleCentralManagerCallBackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 int BluetoothBleCentralManagerCallBackStub::OnRemoteRequest(

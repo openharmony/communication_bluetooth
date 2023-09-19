@@ -47,12 +47,12 @@ const std::map<uint32_t, std::function<ErrCode(BluetoothRemoteDeviceObserverstub
 
 BluetoothRemoteDeviceObserverstub::BluetoothRemoteDeviceObserverstub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 BluetoothRemoteDeviceObserverstub::~BluetoothRemoteDeviceObserverstub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 int BluetoothRemoteDeviceObserverstub::OnRemoteRequest(

@@ -36,7 +36,7 @@ int BluetoothDeviceClass::GetMajorClass() const
 int BluetoothDeviceClass::GetMajorMinorClass() const
 {
     int res = (class_ & BluetoothDevice::DEVICE_BITMASK);
-    HILOGI("MajorMinorClass: 0x%{public}X", res);
+    HILOGD("MajorMinorClass: 0x%{public}X", res);
     return res;
 }
 

@@ -34,7 +34,7 @@ const uint32_t AVRCP_FOLDER_ITEMS_NUM_MAX = 0xFFFF;
 
 BluetoothAvrcpCtObserverStub::BluetoothAvrcpCtObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_CONNECTION_STATE_CHANGED)] =
         &BluetoothAvrcpCtObserverStub::OnConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothAvrcpCtObserverInterfaceCode::AVRCP_CT_PRESS_BUTTON)] =
@@ -105,7 +105,7 @@ BluetoothAvrcpCtObserverStub::BluetoothAvrcpCtObserverStub()
 
 BluetoothAvrcpCtObserverStub::~BluetoothAvrcpCtObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
     memberFuncMap_.clear();
 }
 

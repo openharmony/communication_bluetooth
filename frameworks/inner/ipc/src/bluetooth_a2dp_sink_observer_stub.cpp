@@ -22,12 +22,12 @@ namespace Bluetooth {
 using namespace OHOS::bluetooth;
 BluetoothA2dpSinkObserverStub::BluetoothA2dpSinkObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 BluetoothA2dpSinkObserverStub::~BluetoothA2dpSinkObserverStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 int BluetoothA2dpSinkObserverStub::OnRemoteRequest(
