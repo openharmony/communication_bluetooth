@@ -182,7 +182,7 @@ public:
      * @since 6
      *
      */
-    static std::shared_ptr<GattServer> CreateInstance(GattServerCallback &callback);
+    static std::shared_ptr<GattServer> CreateInstance(std::shared_ptr<GattServerCallback> callback);
     /**
      * @brief The function to add service.
      *
@@ -289,7 +289,7 @@ public:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(GattServer);
 
 private:
-    explicit GattServer(GattServerCallback &callback);
+    explicit GattServer(std::shared_ptr<GattServerCallback> callback);
     BLUETOOTH_DECLARE_IMPL();
 
     //The passkey pattern of C++
@@ -297,7 +297,7 @@ private:
         PassKey() {};
     };
 public:
-    explicit GattServer(PassKey, GattServerCallback &callback) : GattServer(callback) {};
+    explicit GattServer(PassKey, std::shared_ptr<GattServerCallback> callback) : GattServer(callback) {};
     
 };
 } // namespace Bluetooth
