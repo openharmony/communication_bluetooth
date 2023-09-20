@@ -469,9 +469,9 @@ int BleGattsRegister(BtUuid appUuid)
     }
     for (int i = 0; i < MAXIMUM_NUMBER_APPLICATION; i++) {
         if (GATTSERVER(i) == nullptr) {
-            GattServerCallbackWapper *callbackWapper = new GattServerCallbackWapper(g_GattsCallback, i);
-            GATTSERVER(i) = GattServer::CreateInstance(*callbackWapper);
-            HILOGD("register gattServer: %{public}d", i);
+            std::shared_ptr<GattServerCallback> callbackWapper = std::make_shared<GattServerCallbackWapper>(g_GattsCallback, i);
+            GATTSERVER(i) = GattServer::CreateInstance(callbackWapper);
+            HILOGI("register gattServer: %{public}d", i);
             if (g_GattsCallback->registerServerCb != nullptr) {
                 g_GattsCallback->registerServerCb(0, i, &appUuid);
             }
