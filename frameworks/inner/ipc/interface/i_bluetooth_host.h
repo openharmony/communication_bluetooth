@@ -120,6 +120,7 @@ public:
     virtual int32_t SetFastScan(bool isEnable) = 0;
     virtual int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr) = 0;
     virtual int32_t SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr) = 0;
+    virtual int32_t CountEnableTimes(bool enable) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
