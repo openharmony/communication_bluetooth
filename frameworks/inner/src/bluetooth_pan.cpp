@@ -33,11 +33,11 @@ class PanInnerObserver : public BluetoothPanObserverStub {
 public:
     explicit PanInnerObserver(BluetoothObserverList<PanObserver> &observers) : observers_(observers)
     {
-        HILOGI("enter");
+        HILOGD("enter");
     }
     ~PanInnerObserver() override
     {
-        HILOGI("enter");
+        HILOGD("enter");
     }
 
     ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override

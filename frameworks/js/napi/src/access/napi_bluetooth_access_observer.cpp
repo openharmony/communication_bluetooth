@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Bluetooth {
 void NapiBluetoothAccessObserver::UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state)
 {
-    HILOGI("start");
+    HILOGD("start");
 
     if (work == nullptr) {
         HILOGE("work is null");
@@ -59,7 +59,7 @@ void NapiBluetoothAccessObserver::OnStateChanged(const int transport, const int 
         return;
     }
     if (stateChangeCallback == nullptr) {
-        HILOGI("This callback is not registered by ability.");
+        HILOGD("This callback is not registered by ability.");
         return;
     }
     uv_loop_s *loop = nullptr;
@@ -103,7 +103,7 @@ void NapiBluetoothAccessObserver::OnStateChanged(const int transport, const int 
 
 void NapiBluetoothAccessObserver::EnableBt()
 {
-    HILOGI("start");
+    HILOGD("start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->EnableBt();
     if (ret != BT_NO_ERROR) {
@@ -113,7 +113,7 @@ void NapiBluetoothAccessObserver::EnableBt()
 
 void NapiBluetoothAccessObserver::DisableBle()
 {
-    HILOGI("start");
+    HILOGD("start");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->DisableBle();
     if (ret != BT_NO_ERROR) {

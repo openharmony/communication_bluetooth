@@ -34,11 +34,11 @@ class HidHostInnerObserver : public BluetoothHidHostObserverStub {
 public:
     explicit HidHostInnerObserver(BluetoothObserverList<HidHostObserver> &observers) : observers_(observers)
     {
-        HILOGI("Enter!");
+        HILOGD("Enter!");
     }
     ~HidHostInnerObserver() override
     {
-        HILOGI("Enter!");
+        HILOGD("Enter!");
     }
 
     ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override

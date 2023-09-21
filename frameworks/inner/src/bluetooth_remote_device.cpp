@@ -359,7 +359,7 @@ bool BluetoothRemoteDevice::IsAclEncrypted() const
 
 int BluetoothRemoteDevice::GetDeviceClass(int &cod) const
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
         return BT_ERR_INTERNAL_ERROR;

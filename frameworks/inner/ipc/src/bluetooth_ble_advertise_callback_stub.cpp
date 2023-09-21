@@ -35,12 +35,12 @@ const std::map<uint32_t, std::function<ErrCode(BluetoothBleAdvertiseCallbackStub
 
 BluetoothBleAdvertiseCallbackStub::BluetoothBleAdvertiseCallbackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 BluetoothBleAdvertiseCallbackStub::~BluetoothBleAdvertiseCallbackStub()
 {
-    HILOGI("start.");
+    HILOGD("start.");
 }
 
 int BluetoothBleAdvertiseCallbackStub::OnRemoteRequest(

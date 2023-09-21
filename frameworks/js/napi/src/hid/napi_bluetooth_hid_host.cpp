@@ -252,7 +252,7 @@ napi_value NapiBluetoothHidHost::Disconnect(napi_env env, napi_callback_info inf
 
 napi_value NapiBluetoothHidHost::SetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr {};
     int32_t strategy = 0;
     auto status = CheckSetConnectStrategyParam(env, info, remoteAddr, strategy);
@@ -273,7 +273,7 @@ napi_value NapiBluetoothHidHost::SetConnectionStrategy(napi_env env, napi_callba
 
 napi_value NapiBluetoothHidHost::GetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr {};
     auto status = CheckDeviceAddressParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
