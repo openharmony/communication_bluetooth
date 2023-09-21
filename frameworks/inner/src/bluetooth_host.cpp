@@ -563,6 +563,16 @@ void BluetoothHost::Init()
     pimpl->InitBluetoothHostObserver();
 }
 
+int BluetoothHost::CountEnableTimes(bool enable)
+{
+    HILOGD("enter");
+    if (!pimpl || !pimpl->proxy_) {
+        HILOGE("pimpl or bluetooth host is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    return pimpl->proxy_->CountEnableTimes(enable);
+}
 int BluetoothHost::EnableBt()
 {
     HILOGD("enter");
@@ -581,7 +591,7 @@ int BluetoothHost::DisableBt()
         HILOGE("pimpl or bluetooth host is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
-
+    CountEnableTimes(false);
     return pimpl->proxy_->DisableBt();
 }
 
@@ -677,6 +687,7 @@ int BluetoothHost::EnableBle()
         HILOGE("pimpl or bluetooth host is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    CountEnableTimes(true);
     return pimpl->proxy_->EnableBle();
 }
 
