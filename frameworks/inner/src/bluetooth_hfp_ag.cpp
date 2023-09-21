@@ -134,7 +134,7 @@ struct HandsFreeAudioGateway::impl {
 
     int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+        HILOGD("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
@@ -463,7 +463,7 @@ std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetDevicesByStates(std
 
 int32_t HandsFreeAudioGateway::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOGD("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;

@@ -108,7 +108,7 @@ napi_value NapiA2dpSource::Off(napi_env env, napi_callback_info info)
 
 napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     int state = PlayingState::STATE_NOT_PLAYING;
     napi_value ret = nullptr;
     napi_create_int32(env, state, &ret);
@@ -129,7 +129,7 @@ napi_value NapiA2dpSource::GetPlayingState(napi_env env, napi_callback_info info
 
 napi_value NapiA2dpSource::Connect(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr{};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -145,7 +145,7 @@ napi_value NapiA2dpSource::Connect(napi_env env, napi_callback_info info)
 
 napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr{};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -202,7 +202,7 @@ napi_value NapiA2dpSource::GetConnectionDevices(napi_env env, napi_callback_info
 
 napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
 
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
@@ -263,7 +263,7 @@ napi_value NapiA2dpSource::CreateA2dpSrcProfile(napi_env env, napi_callback_info
 
 napi_value NapiA2dpSource::SetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr{};
     int32_t strategy = 0;
     auto status = CheckSetConnectStrategyParam(env, info, remoteAddr, strategy);
@@ -285,7 +285,7 @@ napi_value NapiA2dpSource::SetConnectionStrategy(napi_env env, napi_callback_inf
 
 napi_value NapiA2dpSource::GetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
+    HILOGD("start");
     std::string remoteAddr{};
     auto status = CheckDeviceAddressParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);

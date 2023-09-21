@@ -113,7 +113,7 @@ private:
 
 A2dpSink::impl::impl()
 {
-    HILOGI("start");
+    HILOGD("start");
     if (proxy_) {
         return;
     }
@@ -127,7 +127,7 @@ A2dpSink::impl::impl()
 
 A2dpSink::impl::~impl()
 {
-    HILOGI("start");
+    HILOGD("start");
     if (proxy_ != nullptr) {
         proxy_->DeregisterObserver(observerImp_);
         proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
@@ -181,7 +181,7 @@ void A2dpSink::Init()
 
 A2dpSink::~A2dpSink()
 {
-    HILOGI("start");
+    HILOGD("start");
 }
 
 void A2dpSink::RegisterObserver(A2dpSinkObserver *observer)
