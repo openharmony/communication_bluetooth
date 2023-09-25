@@ -1579,7 +1579,7 @@ int32_t BluetoothHostProxy::CountEnableTimes(bool isEnable)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SYNC_RANDOM_ADDRESS, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_COUNT_ENABLE_TIMES, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::CountEnableTimes done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
