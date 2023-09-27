@@ -82,6 +82,7 @@ struct ClientSocket::impl {
                 fd_ = -1;
                 if (proxy_ == nullptr) {
                     HILOGE("proxy_ is nullptr");
+                    return;
                 }
                 proxy_->RemoveObserver(observer_);
             } else {
@@ -641,6 +642,7 @@ struct ServerSocket::impl {
                 fd_ = -1;
                 if (proxy_ == nullptr) {
                     HILOGE("proxy_ is nullptr");
+                    return;
                 }
                 proxy_->RemoveObserver(observer_);
                 return;
