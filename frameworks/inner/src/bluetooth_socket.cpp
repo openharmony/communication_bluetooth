@@ -64,7 +64,7 @@ struct ClientSocket::impl {
         HILOGD("enter");
         if (!IS_BLE_ENABLED()) {
             HILOGE("bluetooth is off.");
-            return BT_ERR_INTERNAL_ERROR;
+            return;
         }
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
@@ -626,7 +626,7 @@ struct ServerSocket::impl {
         HILOGD("enter");
         if (!IS_BLE_ENABLED()) {
             HILOGE("bluetooth is off.");
-            return BT_ERR_INTERNAL_ERROR;
+            return;
         }
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
