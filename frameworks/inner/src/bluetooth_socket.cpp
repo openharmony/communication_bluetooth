@@ -62,6 +62,10 @@ struct ClientSocket::impl {
     void Close()
     {
         HILOGD("enter");
+        if (!IS_BLE_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INTERNAL_ERROR;
+        }
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
@@ -76,6 +80,9 @@ struct ClientSocket::impl {
                 HILOGI("fd closed, fd_: %{pubilc}d", fd_);
                 close(fd_);
                 fd_ = -1;
+                if (proxy_ == nullptr) {
+                    HILOGE("proxy_ is nullptr");
+                }
                 proxy_->RemoveObserver(observer_);
             } else {
                 HILOGE("socket not created");
@@ -617,6 +624,10 @@ struct ServerSocket::impl {
     void Close()
     {
         HILOGD("enter");
+        if (!IS_BLE_ENABLED()) {
+            HILOGE("bluetooth is off.");
+            return BT_ERR_INTERNAL_ERROR;
+        }
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
@@ -628,6 +639,9 @@ struct ServerSocket::impl {
                 close(fd_);
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 fd_ = -1;
+                if (proxy_ == nullptr) {
+                    HILOGE("proxy_ is nullptr");
+                }
                 proxy_->RemoveObserver(observer_);
                 return;
             } else {
