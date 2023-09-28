@@ -1077,12 +1077,12 @@ bool AvrcpController::Connect(const BluetoothRemoteDevice &device)
 
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return RET_BAD_STATUS;
+        return false;
     }
 
     if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
+        return false;
     }
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
@@ -1096,12 +1096,12 @@ bool AvrcpController::Disconnect(const BluetoothRemoteDevice &device)
 
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return RET_BAD_STATUS;
+        return false;
     }
 
     if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
+        return false;
     }
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
