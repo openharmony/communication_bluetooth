@@ -373,7 +373,7 @@ napi_value GetProfileConnectionStateEx(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
     int profileId = 0;
-    size_t argSize = 0;
+    size_t argSize = ARGS_SIZE_ONE;
     bool checkRet = CheckProfileIdParamEx(env, info, profileId, argSize);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
     HILOGD("argSize = %{public}zu", argSize);
