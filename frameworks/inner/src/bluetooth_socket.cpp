@@ -76,6 +76,10 @@ struct ClientSocket::impl {
                 HILOGI("fd closed, fd_: %{pubilc}d", fd_);
                 close(fd_);
                 fd_ = -1;
+                if (proxy_ == nullptr) {
+                    HILOGE("proxy_ is nullptr");
+                    return;
+                }
                 proxy_->RemoveObserver(observer_);
             } else {
                 HILOGE("socket not created");
@@ -628,6 +632,10 @@ struct ServerSocket::impl {
                 close(fd_);
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 fd_ = -1;
+                if (proxy_ == nullptr) {
+                    HILOGE("proxy_ is nullptr");
+                    return;
+                }
                 proxy_->RemoveObserver(observer_);
                 return;
             } else {
