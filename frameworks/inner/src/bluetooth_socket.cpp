@@ -62,10 +62,6 @@ struct ClientSocket::impl {
     void Close()
     {
         HILOGD("enter");
-        if (!IS_BLE_ENABLED()) {
-            HILOGE("bluetooth is off.");
-            return;
-        }
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
@@ -625,10 +621,6 @@ struct ServerSocket::impl {
     void Close()
     {
         HILOGD("enter");
-        if (!IS_BLE_ENABLED()) {
-            HILOGE("bluetooth is off.");
-            return;
-        }
         if (socketStatus_ == SOCKET_CLOSED) {
             HILOGW("The socketStatus_ is already SOCKET_CLOSED");
             return;
