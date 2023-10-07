@@ -150,6 +150,7 @@ config("btcommon_public_config") {
 ohos_shared_library("btcommon") {
   stack_protector_ret = true
   public_configs = [ ":btcommon_public_config" ]
+  innerapi_tags = [ "chipsetsdk" ]
   sources = [
     "ipc/common/avrcp_media.cpp",
     "ipc/common/ble_parcel_data.cpp",
