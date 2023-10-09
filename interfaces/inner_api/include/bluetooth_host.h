@@ -627,6 +627,8 @@ public:
 
     void Init();
 
+    void Uinit();
+
     /**
      * @brief Get local profile uuids.
      *

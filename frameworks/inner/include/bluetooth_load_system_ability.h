@@ -31,7 +31,10 @@ enum SUBSCRIBED_SYSTEM_ABILITY_STATE {
     STATE_SUBSCRIBED,
 };
 
-enum NOTIFY_PROFILE_MSG { NOTIFY_MSG_INIT };
+enum NOTIFY_PROFILE_MSG { 
+    NOTIFY_MSG_INIT,
+    NOTIFY_MSG_UINIT,
+};
 
 class BluetootLoadSystemAbility : public SystemAbilityStatusChangeStub {
 public:
@@ -99,7 +102,7 @@ private:
 
     void NotifyAudioProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
-    void NotifyHostInit(NOTIFY_PROFILE_MSG notifyMsg);
+    void NotifyHostMsg(NOTIFY_PROFILE_MSG notifyMsg);
 
     /**
      * @brief Construct a new BluetootLoadSystemAbility object.
