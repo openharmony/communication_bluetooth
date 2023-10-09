@@ -104,11 +104,25 @@ void BluetootLoadSystemAbility::OnAddSystemAbility(int32_t systemAbilityId, cons
 
 void BluetootLoadSystemAbility::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
+    std::lock_guard<std::recursive_mutex> lk(mutex_);
+    HILOGI("[BLUETOOTH_LOAD_SYSTEM]OnRemoveSystemAbility systemAbilityId:%{public}d", systemAbilityId);
+    switch (systemAbilityId) {
+        case BLUETOOTH_HOST_SYS_ABILITY_ID: {
+            NotifyMsgToProfile(NOTIFY_MSG_UINIT);
+            break;
+        }
+        default:
+            HILOGE("[BLUETOOTH_LOAD_SYSTEM]unhandled sysabilityId:%{public}d", systemAbilityId);
+            break;
+    }
     return;
 }
 
 void BluetootLoadSystemAbility::NotifyMsgToProfile(NOTIFY_PROFILE_MSG notifyMsg)
 {
+    if (notifyMsg == NOTIFY_MSG_UINIT) {
+        NotifyHostMsg(notifyMsg);
+    }
     for (auto it = profileIdList_.begin(); it != profileIdList_.end(); ++it) {
         NotifyProfile(notifyMsg, *it);
     }
@@ -134,22 +148,28 @@ void BluetootLoadSystemAbility::NotifyProfile(NOTIFY_PROFILE_MSG notifyMsg, cons
             NotifyTransferProfile(notifyMsg, profileId);
             break;
         case PROFILE_ID_HOST:
-            NotifyHostInit(notifyMsg);
+            NotifyHostMsg(notifyMsg);
             break;
         default:
             break;
     }
 }
 
-void BluetootLoadSystemAbility::NotifyHostInit(NOTIFY_PROFILE_MSG notifyMsg)
+void BluetootLoadSystemAbility::NotifyHostMsg(NOTIFY_PROFILE_MSG notifyMsg)
 {
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     if (host == nullptr) {
         return;
     }
-    if (notifyMsg == NOTIFY_MSG_INIT) {
-        host->Init();
-        return;
+    switch (notifyMsg) {
+        case NOTIFY_MSG_INIT:
+            host->Init();
+            break;
+        case NOTIFY_MSG_UINIT:
+            host->Uinit();
+            break;
+        default:
+            break;
     }
 }
 
