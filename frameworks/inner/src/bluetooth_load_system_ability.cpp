@@ -122,6 +122,7 @@ void BluetootLoadSystemAbility::NotifyMsgToProfile(NOTIFY_PROFILE_MSG notifyMsg)
 {
     if (notifyMsg == NOTIFY_MSG_UINIT) {
         NotifyHostMsg(notifyMsg);
+        return;
     }
     for (auto it = profileIdList_.begin(); it != profileIdList_.end(); ++it) {
         NotifyProfile(notifyMsg, *it);
