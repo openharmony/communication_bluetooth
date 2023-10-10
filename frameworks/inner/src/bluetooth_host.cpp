@@ -74,8 +74,6 @@ struct BluetoothHost::impl {
     std::string stagingRealAddr_;
     std::string stagingRandomAddr_;
 private:
-    class BluetoothHostDeathRecipient;
-    sptr<BluetoothHostDeathRecipient> deathRecipient_ = nullptr;
     std::condition_variable proxyConVar_;
 };
 
@@ -303,35 +301,6 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBlePeripheralCallbackImp);
 };
 
-class BluetoothHost::impl::BluetoothHostDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit BluetoothHostDeathRecipient(BluetoothHost::impl &impl) : impl_(impl)
-    {};
-    ~BluetoothHostDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHostDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("bluetooth_servi died and then re-registered");
-        std::lock_guard<std::mutex> lock(impl_.proxyMutex_);
-        impl_.proxy_ = nullptr;
-        // Notify the upper layer that bluetooth is disabled.
-        if (impl_.observerImp_ != nullptr && impl_.bleObserverImp_ != nullptr) {
-            HILOGI("bluetooth_servi died and send state off to app");
-            impl_.observerImp_->OnStateChanged(BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
-            impl_.bleObserverImp_->OnStateChanged(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
-        }
-    }
-
-private:
-    bool ResetHostProxy()
-    {
-        HILOGI("proxy is null, try to get proxy.");
-        return true;
-    }
-    BluetoothHost::impl &impl_;
-};
-
 BluetoothHost::impl::impl()
 {
     BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_HOST);
@@ -352,7 +321,6 @@ BluetoothHost::impl::~impl()
     proxy_->DeregisterBleAdapterObserver(bleObserverImp_);
     proxy_->DeregisterRemoteDeviceObserver(remoteObserverImp_);
     proxy_->DeregisterBlePeripheralCallback(bleRemoteObserverImp_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }
 
 bool BluetoothHost::impl::InitBluetoothHostProxy(void)
@@ -382,11 +350,6 @@ bool BluetoothHost::impl::InitBluetoothHostProxy(void)
 bool BluetoothHost::impl::InitBluetoothHostObserver(void)
 {
     HILOGD("enter");
-    deathRecipient_ = new BluetoothHostDeathRecipient(*this);
-    if (deathRecipient_ == nullptr) {
-        HILOGE("deathRecipient_ is null");
-        return false;
-    }
     observerImp_ = new (std::nothrow) BluetoothHostObserverImp(*this);
     if (observerImp_ == nullptr) {
         HILOGE("observerImp_ is null");
@@ -411,7 +374,6 @@ bool BluetoothHost::impl::InitBluetoothHostObserver(void)
         HILOGE("proxy_ is null");
         return false;
     }
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     proxy_->RegisterObserver(observerImp_);
     proxy_->RegisterBleAdapterObserver(bleObserverImp_);
     proxy_->RegisterRemoteDeviceObserver(remoteObserverImp_);
@@ -561,6 +523,23 @@ void BluetoothHost::Init()
         pimpl->proxy_ = iface_cast<IBluetoothHost>(object);
     }
     pimpl->InitBluetoothHostObserver();
+}
+
+void BluetoothHost::Uinit()
+{
+    HILOGE("enter BluetoothHost Uinit");
+    if (!pimpl) {
+        HILOGE("fails: no pimpl");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(pimpl->proxyMutex_);
+    pimpl->proxy_ = nullptr;
+    // Notify the upper layer that bluetooth is disabled.
+    if (pimpl->observerImp_ != nullptr && pimpl->bleObserverImp_ != nullptr) {
+        HILOGI("bluetooth_servi died and send state off to app");
+        pimpl->observerImp_->OnStateChanged(BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
+        pimpl->bleObserverImp_->OnStateChanged(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
+    }
 }
 
 int BluetoothHost::CountEnableTimes(bool enable)
