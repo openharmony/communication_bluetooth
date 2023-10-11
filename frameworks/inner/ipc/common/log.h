@@ -118,4 +118,20 @@
 #define LOG_EVENT_INT(tag, subTag) LOG_ERROR("ERROR tag num: 0x%x, opcode: %ld", tag, subTag)
 #endif
 
+#define CHECK_AND_RETURN_LOG(cond, fmt, ...)        \
+    do {                                            \
+        if (!(cond)) {                              \
+            HILOGE(fmt, ##__VA_ARGS__);             \
+            return;                                 \
+        }                                           \
+    } while (0)
+
+#define CHECK_AND_RETURN_LOG_RET(cond, ret, fmt, ...)               \
+    do {                                                            \
+        if (!(cond)) {                                              \
+            HILOGE(fmt " ret(%{public}s)", ##__VA_ARGS__, #ret);    \
+            return ret;                                             \
+        }                                                           \
+    } while (0)
+
 #endif  // LOG_H
