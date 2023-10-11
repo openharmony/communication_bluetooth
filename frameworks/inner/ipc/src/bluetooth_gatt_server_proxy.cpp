@@ -72,28 +72,42 @@ void BluetoothGattServerProxy::ClearServices(int appId)
     }
     return;
 }
-void BluetoothGattServerProxy::CancelConnection(const BluetoothGattDevice &device)
+
+int BluetoothGattServerProxy::Connect(int appId, const BluetoothGattDevice &device, bool isDirect)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::CancelConnection WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothGattServerProxy::CancelConnection error");
-        return;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_INTERNAL_ERROR, "WriteInt32 failed");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "WriteParcelable failed");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(isDirect), BT_ERR_INTERNAL_ERROR, "WriteBool failed");
+
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(BluetoothGattServerInterfaceCode::GATT_SERVER_CONNECT, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, BT_ERR_INTERNAL_ERROR, "Connect done failed, error: %{public}d", error);
+    return reply.ReadInt32();
+}
+
+int BluetoothGattServerProxy::CancelConnection(int appId, const BluetoothGattDevice &device)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_INTERNAL_ERROR, "WriteInt32 failed");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "WriteParcelable failed");
+
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
         BluetoothGattServerInterfaceCode::GATT_SERVER_CANCEL_CONNECTION, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::CancelConnection done fail, error: %{public}d", error);
-        return;
-    }
-    return;
+    CHECK_AND_RETURN_LOG_RET(
+        error == NO_ERROR, BT_ERR_INTERNAL_ERROR, "CancelConnection done failed, error: %{public}d", error);
+    return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback)
 {

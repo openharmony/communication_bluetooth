@@ -692,31 +692,40 @@ int GattServer::Close()
     return ret;
 }
 
-void GattServer::CancelConnection(const BluetoothRemoteDevice &device)
+int GattServer::Connect(const BluetoothRemoteDevice &device, bool isDirect)
 {
-    HILOGI("remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-    if (!IS_BLE_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return;
-    }
-
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
     if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
         HILOGE("pimpl or gatt server proxy is nullptr");
-        return;
+        return BT_ERR_INTERNAL_ERROR;
     }
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
 
-    if (!device.IsValidBluetoothRemoteDevice()) {
-        HILOGE("Request not supported");
-        return;
+    int appId = pimpl->applicationId_;
+    HILOGI("appId: %{public}d, device: %{public}s, isDirect: %{public}d", appId, GET_ENCRYPT_ADDR(device), isDirect);
+    
+    bluetooth::GattDevice gattDevice(bluetooth::RawAddress(device.GetDeviceAddr()), GATT_TRANSPORT_TYPE_LE);
+    return pimpl->proxy_->Connect(appId, gattDevice, isDirect);
+}
+
+int GattServer::CancelConnection(const BluetoothRemoteDevice &device)
+{
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
 
     auto gattDevice = pimpl->FindConnectedDevice(device);
     if (gattDevice == nullptr) {
         HILOGE("gattDevice is nullptr");
-        return;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
-    pimpl->proxy_->CancelConnection(*gattDevice);
+    int appId = pimpl->applicationId_;
+    HILOGI("appId: %{public}d, device: %{public}s", appId, GET_ENCRYPT_ADDR(device));
+    return pimpl->proxy_->CancelConnection(appId, *gattDevice);
 }
 std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const UUID &uuid, bool isPrimary)
 {

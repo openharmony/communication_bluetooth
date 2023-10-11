@@ -301,6 +301,7 @@ enum BluetoothGattServerInterfaceCode {
     GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE,
     GATT_SERVER_RESPOND_DESCRIPTOR_READ,
     GATT_SERVER_RESPOND_DESCRIPTOR_WRITE,
+    GATT_SERVER_CONNECT,
     // The last code, if you want to add a new code, please add it before this
     GATT_SERVER_BUTT
 };
