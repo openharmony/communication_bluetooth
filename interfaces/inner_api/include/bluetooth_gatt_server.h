@@ -263,13 +263,26 @@ public:
         const BluetoothRemoteDevice &device, int requestId, int status, int offset, const uint8_t *value, int length);
 
     /**
-     * @brief The function to cancel connection.
+     * @brief The function to connect client device.
      *
      * @param device Remote device object.
+     * @param isDirect Whether to directly connect to the remote device (true)
+     *                 or to automatically connect as soon as the remote device becomes available (false)
+     * @return int   api accept status.
      * @since 6
      *
      */
-    void CancelConnection(const BluetoothRemoteDevice &device);
+    int Connect(const BluetoothRemoteDevice &device, bool isDirect);
+
+    /**
+     * @brief The function to cancel connection.
+     *
+     * @param device Remote device object.
+     * @return int   api accept status.
+     * @since 6
+     *
+     */
+    int CancelConnection(const BluetoothRemoteDevice &device);
 
     /**
      * @brief A destructor of GattServer.

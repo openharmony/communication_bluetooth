@@ -34,7 +34,8 @@ public:
     virtual void ClearServices(int appId) = 0;
     virtual int RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback) = 0;
     virtual int DeregisterApplication(int appId) = 0;
-    virtual void CancelConnection(const BluetoothGattDevice &device) = 0;
+    virtual int Connect(int appId, const BluetoothGattDevice &device, bool isDirect) = 0;
+    virtual int CancelConnection(int appId, const BluetoothGattDevice &device) = 0;
     virtual int NotifyClient(
         const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, bool needConfirm) = 0;
     virtual int RemoveService(int32_t appId, const BluetoothGattService &services) = 0;

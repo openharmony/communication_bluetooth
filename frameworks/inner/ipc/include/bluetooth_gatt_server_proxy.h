@@ -28,7 +28,8 @@ public:
 
     int AddService(int32_t appId, BluetoothGattService *services) override;
     void ClearServices(int appId) override;
-    void CancelConnection(const BluetoothGattDevice &device) override;
+    int Connect(int appId, const BluetoothGattDevice &device, bool isDirect) override;
+    int CancelConnection(int appId, const BluetoothGattDevice &device) override;
     int RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback) override;
     int DeregisterApplication(int appId) override;
     int NotifyClient(

@@ -422,6 +422,17 @@ int BleGattsRegister(BtUuid appUuid);
 int BleGattsUnRegister(int serverId);
 
 /**
+ * @brief GATT server connect the client.
+ *
+ * @param serverId Indicates the ID of the GATT server.
+ * @param bdAddr Indicates the address of the client.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the GATT server is disconnected from the client;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleGattsConnect(int serverId, BdAddr bdAddr);
+
+/**
  * @brief Disconnects the GATT server from the client.
  *
  * @param serverId Indicates the ID of the GATT server.

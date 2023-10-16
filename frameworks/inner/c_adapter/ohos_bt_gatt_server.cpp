@@ -507,6 +507,28 @@ int BleGattsUnRegister(int serverId)
 }
 
 /**
+ * @brief GATT server connect the client.
+ *
+ * @param serverId Indicates the ID of the GATT server.
+ * @param bdAddr Indicates the address of the client.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the GATT server is disconnected from the client;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleGattsConnect(int serverId, BdAddr bdAddr)
+{
+    HILOGI("serverId: %{public}d", serverId);
+    CHECK_AND_RETURN_LOG_RET(
+        0 <= serverId && serverId < MAXIMUM_NUMBER_APPLICATION, OHOS_BT_STATUS_PARM_INVALID, "serverId is invalid!");
+    CHECK_AND_RETURN_LOG_RET(GATTSERVER(serverId), OHOS_BT_STATUS_UNHANDLED, "GATTSERVER(serverId) is null!");
+
+    string strAddress;
+    GetAddrFromByte(bdAddr.addr, strAddress);
+    BluetoothRemoteDevice device(strAddress, BT_TRANSPORT_BLE);
+    return GATTSERVER(serverId)->Connect(device, true);
+}
+
+/**
  * @brief Disconnects the GATT server from the client.
  *
  * @param serverId Indicates the ID of the GATT server.
@@ -519,22 +541,14 @@ int BleGattsUnRegister(int serverId)
 int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
 {
     HILOGI("serverId: %{public}d, connId: %{public}d", serverId, connId);
-    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
-        HILOGE("serverId is invalid!");
-        return OHOS_BT_STATUS_PARM_INVALID;
-    }
-
-    if (GATTSERVER(serverId) == nullptr) {
-        HILOGE("GATTSERVER(serverId) is null!");
-        return OHOS_BT_STATUS_UNHANDLED;
-    }
+    CHECK_AND_RETURN_LOG_RET(
+        0 <= serverId && serverId < MAXIMUM_NUMBER_APPLICATION, OHOS_BT_STATUS_PARM_INVALID, "serverId is invalid!");
+    CHECK_AND_RETURN_LOG_RET(GATTSERVER(serverId), OHOS_BT_STATUS_UNHANDLED, "GATTSERVER(serverId) is null!");
 
     string strAddress;
     GetAddrFromByte(bdAddr.addr, strAddress);
     BluetoothRemoteDevice device(strAddress, BT_TRANSPORT_BLE);
-
-    GATTSERVER(serverId)->CancelConnection(device);
-    return OHOS_BT_STATUS_SUCCESS;
+    return GATTSERVER(serverId)->CancelConnection(device);
 }
 
 /**
