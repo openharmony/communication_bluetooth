@@ -46,6 +46,9 @@ public:
     virtual void NotifyAddressedPlayerChanged(int32_t playerId, int32_t uidCounter) = 0;
     virtual void NotifyUidChanged(int32_t uidCounter) = 0;
     virtual void NotifyVolumeChanged(int32_t volume) = 0;
+    virtual int32_t SetDeviceAbsoluteVolume(const BluetoothRawAddress &addr, int32_t volumeLevel) = 0;
+    virtual int32_t SetDeviceAbsVolumeAbility(const BluetoothRawAddress &addr, int32_t ability) = 0;
+    virtual int32_t GetDeviceAbsVolumeAbility(const BluetoothRawAddress &addr, int32_t &ability) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

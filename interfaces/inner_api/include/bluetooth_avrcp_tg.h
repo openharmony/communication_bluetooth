@@ -272,6 +272,36 @@ public:
      */
     void Init();
 
+    /**
+     * @brief audio set device absolute volume.
+     *
+     * @param[in] device The remote device.
+     * @param[in] volumeLevel device absolute volume.
+     * @return error code
+     * @since 6
+     */
+    int32_t SetDeviceAbsoluteVolume(const BluetoothRemoteDevice &device, int32_t volumeLevel);
+
+    /**
+     * @brief set device absolute ability.
+     *
+     * @param[in] device The remote device.
+     * @param[in] ability device absolute ability see {DeviceAbsVolumeAbility}.
+     * @return error code
+     * @since 6
+     */
+    int32_t SetDeviceAbsVolumeAbility(const BluetoothRemoteDevice &device, int32_t ability);
+
+    /**
+     * @brief get device absolute volume ability.
+     *
+     * @param[in] device The remote device.
+     * @param[out] ability device absolute ability see {DeviceAbsVolumeAbility}.
+     * @return error code
+     * @since 6
+     */
+    int32_t GetDeviceAbsVolumeAbility(const BluetoothRemoteDevice &device, int32_t &ability);
+
 private:
     /**
      * @brief A constructor used to create an <b>AvrcpTarget</b> instance.

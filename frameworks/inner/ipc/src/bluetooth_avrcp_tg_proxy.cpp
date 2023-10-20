@@ -15,6 +15,7 @@
 
 #include "bluetooth_avrcp_tg_proxy.h"
 #include "bluetooth_log.h"
+#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -501,6 +502,91 @@ void BluetoothAvrcpTgProxy::NotifyVolumeChanged(int32_t volume)
         return;
     }
     return;
+}
+
+int32_t BluetoothAvrcpTgProxy::SetDeviceAbsoluteVolume(const BluetoothRawAddress &addr, int32_t volumeLevel)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothAvrcpTgProxy::GetDescriptor())) {
+        HILOGE("[SetDeviceAbsoluteVolume] WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteParcelable(&addr)) {
+        HILOGE("[SetDeviceAbsoluteVolume] WriteParcelable error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteInt32(volumeLevel)) {
+        HILOGE("[SetDeviceAbsoluteVolume] WriteInt32 error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_SET_DEVICE_ABSOLUTE_VOLUME, option, data, reply);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothAvrcpTgProxy::SetDeviceAbsoluteVolume done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    return reply.ReadInt32();
+}
+int32_t BluetoothAvrcpTgProxy::SetDeviceAbsVolumeAbility(const BluetoothRawAddress &addr, int32_t ability)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothAvrcpTgProxy::GetDescriptor())) {
+        HILOGE("[SetDeviceAbsVolumeAbility] WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteParcelable(&addr)) {
+        HILOGE("[SetDeviceAbsVolumeAbility] WriteParcelable error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteInt32(ability)) {
+        HILOGE("[SetDeviceAbsVolumeAbility] WriteInt32 error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_SET_DEVICE_ABS_VOLUME_ABILITY, option, data, reply);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothAvrcpTgProxy::SetDeviceAbsVolumeAbility done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    return reply.ReadInt32();
+}
+int32_t BluetoothAvrcpTgProxy::GetDeviceAbsVolumeAbility(const BluetoothRawAddress &addr, int32_t &ability)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothAvrcpTgProxy::GetDescriptor())) {
+        HILOGE("[GetDeviceAbsVolumeAbility] WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteParcelable(&addr)) {
+        HILOGE("[GetDeviceAbsVolumeAbility] WriteParcelable error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_GET_DEVICE_ABS_VOLUME_ABILITY, option, data, reply);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothAvrcpTgProxy::GetDeviceAbsVolumeAbility done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    int32_t ret = reply.ReadInt32();
+    if (ret == BT_NO_ERROR) {
+        ability = reply.ReadInt32();
+    }
+
+    return ret;
 }
 
 ErrCode BluetoothAvrcpTgProxy::InnerTransact(
