@@ -46,6 +46,9 @@ public:
     void NotifyAddressedPlayerChanged(int32_t playerId, int32_t uidCounter) override;
     void NotifyUidChanged(int32_t uidCounter) override;
     void NotifyVolumeChanged(int32_t volume) override;
+    int32_t SetDeviceAbsoluteVolume(const BluetoothRawAddress &addr, int32_t volumeLevel) override;
+    int32_t SetDeviceAbsVolumeAbility(const BluetoothRawAddress &addr, int32_t ability) override;
+    int32_t GetDeviceAbsVolumeAbility(const BluetoothRawAddress &addr, int32_t &ability) override;
 
 private:
     static inline BrokerDelegator<BluetoothAvrcpTgProxy> delegator_;

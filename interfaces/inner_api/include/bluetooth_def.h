@@ -1012,6 +1012,13 @@ enum AvrcAbsoluteVolume : uint8_t {
     AVRC_ABSOLUTE_VOLUME_INVALID = 0x80,
 };
 
+enum DeviceAbsVolumeAbility {
+    DEVICE_ABSVOL_CLOSE = 0,
+    DEVICE_ABSVOL_OPEN = 1,
+    DEVICE_ABSVOL_UNSUPPORT = 2,
+    DEVICE_ABSVOL_BUTT
+};
+
 /**
  * @brief This enumeration declares the values of the "EVENT ID".
  * @see Audio/Video Remote Control 1.6.2 Section 28 Appendix H: list of defined notification events.
