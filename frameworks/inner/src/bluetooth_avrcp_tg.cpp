@@ -165,6 +165,51 @@ void AvrcpTarget::Init()
     }
 }
 
+int32_t AvrcpTarget::SetDeviceAbsoluteVolume(const BluetoothRemoteDevice &device, int32_t volumeLevel)
+{
+    HILOGI("enter");
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;;
+    }
+
+    if (pimpl == nullptr || !pimpl->proxy_) {
+        HILOGE("pimpl or avrcpTarget proxy is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+    return pimpl->proxy_->SetDeviceAbsoluteVolume(BluetoothRawAddress(device.GetDeviceAddr()), volumeLevel);
+}
+
+int32_t AvrcpTarget::SetDeviceAbsVolumeAbility(const BluetoothRemoteDevice &device, int32_t ability)
+{
+    HILOGI("enter");
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;;
+    }
+
+    if (pimpl == nullptr || !pimpl->proxy_) {
+        HILOGE("pimpl or avrcpTarget proxy is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+    return pimpl->proxy_->SetDeviceAbsVolumeAbility(BluetoothRawAddress(device.GetDeviceAddr()), ability);
+}
+
+int32_t AvrcpTarget::GetDeviceAbsVolumeAbility(const BluetoothRemoteDevice &device, int32_t &ability)
+{
+    HILOGI("enter");
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;;
+    }
+
+    if (pimpl == nullptr || !pimpl->proxy_) {
+        HILOGE("pimpl or avrcpTarget proxy is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+    return pimpl->proxy_->GetDeviceAbsVolumeAbility(BluetoothRawAddress(device.GetDeviceAddr()), ability);
+}
+
 /******************************************************************
  * REGISTER / UNREGISTER OBSERVER                                 *
  ******************************************************************/
