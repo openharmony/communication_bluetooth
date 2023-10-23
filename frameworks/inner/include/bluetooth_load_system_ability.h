@@ -43,7 +43,7 @@ public:
      *
      * @return Returns the Instance of the BluetootLoadSystemAbility.
      */
-    static BluetootLoadSystemAbility &GetInstance();
+    static sptr<BluetootLoadSystemAbility> GetInstance();
     /**
      * @brief When an external process accesses bluetooth profile, the profile has not yet obtained the proxy. At this
      * time, it is necessary to subscribe to the status of the start and stop of the Bluetooth process, and then

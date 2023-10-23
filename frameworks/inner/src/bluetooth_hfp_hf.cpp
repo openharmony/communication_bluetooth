@@ -453,9 +453,9 @@ HandsFreeUnit::impl::impl()
     if (proxy_) {
         return;
     }
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_HFP_HF);
-    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_HFP_HF);
+    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
         return;
     }
     InitHfpHfProxy();

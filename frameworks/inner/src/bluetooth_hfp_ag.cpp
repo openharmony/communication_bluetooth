@@ -341,9 +341,9 @@ HandsFreeAudioGateway::impl::impl()
     if (proxy_) {
         return;
     }
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_HFP_AG);
-    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_HFP_AG);
+    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
         return;
     }
     InitHfpAgProxy();
