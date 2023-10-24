@@ -37,6 +37,8 @@ class IRemoteObject;
 }
 namespace OHOS {
 namespace Bluetooth {
+static sptr<BluetootLoadSystemAbility> instance = nullptr;
+static std::mutex instanceLock;
 
 BluetootLoadSystemAbility::BluetootLoadSystemAbility()
 {}
@@ -55,7 +57,7 @@ void BluetootLoadSystemAbility::SubScribeBluetoothSystemAbility()
         HILOGE("[BLUETOOTH_LOAD_SYSTEM] failed to get samgrProxy");
         return;
     }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, this);
+    int32_t ret = samgrProxy->SubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, instance);
     if (ret != ERR_OK) {
         HILOGE("[BLUETOOTH_LOAD_SYSTEM] subscribe systemAbilityId: bluetooth service failed!");
         return;
@@ -63,10 +65,17 @@ void BluetootLoadSystemAbility::SubScribeBluetoothSystemAbility()
     subscribeBluetoothSystemAbilityState = STATE_SUBSCRIBING;
 }
 
-BluetootLoadSystemAbility &BluetootLoadSystemAbility::GetInstance()
+sptr<BluetootLoadSystemAbility> BluetootLoadSystemAbility::GetInstance()
 {
-    static BluetootLoadSystemAbility bluetoothLoadSystemAbility;
-    return bluetoothLoadSystemAbility;
+    // 双检锁
+    if (instance == nullptr) {
+        std::lock_guard<std::mutex> lk(instanceLock);
+        if (instance == nullptr) {
+            sptr<BluetootLoadSystemAbility> temp = new BluetootLoadSystemAbility();
+            instance = temp;
+        }
+    }
+    return instance;
 }
 
 bool BluetootLoadSystemAbility::HasSubscribedBluetoothSystemAbility()

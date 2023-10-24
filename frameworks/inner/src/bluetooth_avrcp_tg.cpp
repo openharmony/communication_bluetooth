@@ -80,9 +80,9 @@ public:
         if (proxy_) {
             return;
         }
-        BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_AVRCP_TG);
-        if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
-            BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+        BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_AVRCP_TG);
+        if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
+            BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
             return;
         }
         InitAvrcpTgProxy();

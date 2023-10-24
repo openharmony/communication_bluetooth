@@ -354,9 +354,9 @@ Opp::impl::impl()
     if (proxy_) {
         return;
     }
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_OPP);
-    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_OPP);
+    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
         return;
     }
     InitOppServerProxy();
