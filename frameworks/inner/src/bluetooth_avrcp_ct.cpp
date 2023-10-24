@@ -920,9 +920,9 @@ AvrcpController::impl::impl()
     if (proxy_) {
         return;
     }
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_AVRCP_CT);
-    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_AVRCP_CT);
+    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
         return;
     }
     InitAvrcpCtProxy();

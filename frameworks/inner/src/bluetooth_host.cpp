@@ -303,9 +303,9 @@ private:
 
 BluetoothHost::impl::impl()
 {
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_HOST);
-    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_HOST);
+    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
     }
     InitBluetoothHostProxy();
 }

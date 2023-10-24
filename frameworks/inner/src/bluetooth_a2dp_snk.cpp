@@ -117,9 +117,9 @@ A2dpSink::impl::impl()
     if (proxy_) {
         return;
     }
-    BluetootLoadSystemAbility::GetInstance().RegisterNotifyMsg(PROFILE_ID_A2DP_SINK);
-    if (!BluetootLoadSystemAbility::GetInstance().HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance().SubScribeBluetoothSystemAbility();
+    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_A2DP_SINK);
+    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
+        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
         return;
     }
     InitA2dpSinkProxy();
