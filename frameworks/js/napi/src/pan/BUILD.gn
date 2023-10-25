@@ -43,6 +43,7 @@ ohos_shared_library("pan") {
   ]
 
   sources = [
+    "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
     "$BT_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
     "$BT_NAPI_DIR/src/common/napi_bluetooth_profile.cpp",
     "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",

@@ -676,7 +676,7 @@ struct ServerSocket::impl {
 
     class BluetoothServerSocketDeathRecipient;
     sptr<BluetoothServerSocketDeathRecipient> deathRecipient_;
-    sptr<BluetoothSocketObserverStub> observer_;
+    sptr<BluetoothSocketObserverStub> observer_ = nullptr;
 
     sptr<IBluetoothSocket> proxy_;
     UUID uuid_;

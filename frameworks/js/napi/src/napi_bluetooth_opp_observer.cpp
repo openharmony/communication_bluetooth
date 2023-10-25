@@ -43,6 +43,7 @@ void NapiBluetoothOppObserver::OnReceiveIncomingFileChanged(const BluetoothOppTr
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             TransforInformationCallbackInfo *callbackInfo = static_cast<TransforInformationCallbackInfo *>(work->data);
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
             NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
@@ -85,6 +86,8 @@ void NapiBluetoothOppObserver::OnTransferStateChanged(const BluetoothOppTransfer
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             TransforInformationCallbackInfo *callbackInfo = (TransforInformationCallbackInfo *)work->data;
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertOppTransferInformationToJS(callbackInfo->env_, result, callbackInfo->information_);

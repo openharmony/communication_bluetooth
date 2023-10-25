@@ -17,6 +17,7 @@
 #include "bluetooth_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_async_callback.h"
 #include "napi_bluetooth_pan_observer.h"
 
 namespace OHOS {
@@ -45,6 +46,8 @@ void NapiBluetoothPanObserver::OnConnectionStateChanged(const BluetoothRemoteDev
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             BluetoothCallbackInfo *callbackInfo = static_cast<BluetoothCallbackInfo *>(work->data);
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
