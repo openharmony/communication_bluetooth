@@ -32,6 +32,9 @@ BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED)] =
+        &BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner;
 }
 
 BluetoothA2dpSrcObserverStub::~BluetoothA2dpSrcObserverStub()
@@ -90,6 +93,14 @@ ErrCode BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel 
     int error = data.ReadInt32();
 
     OnConfigurationChanged(RawAddress(addr), *info, error);
+    return NO_ERROR;
+}
+
+ErrCode BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::string addr = data.ReadString();
+    int action = data.ReadInt32();
+    OnMediaStackChanged(RawAddress(addr), action);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
