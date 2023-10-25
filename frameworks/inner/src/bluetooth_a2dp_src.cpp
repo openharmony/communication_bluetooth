@@ -99,6 +99,14 @@ public:
         });
     };
 
+    void OnMediaStackChanged(const RawAddress &device, int action) override
+    {
+        HILOGI("device: %{public}s, action: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), action);
+        a2dpSource_.observers_.ForEach([device, action](std::shared_ptr<A2dpSourceObserver> observer) {
+            observer->OnMediaStackChanged(BluetoothRemoteDevice(device.GetAddress(), 0), action);
+        });
+    }
+
 private:
     A2dpSource::impl &a2dpSource_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothA2dpSourceObserverImp);
