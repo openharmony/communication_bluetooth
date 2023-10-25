@@ -134,14 +134,6 @@ struct CallbackPromiseInfo {
     int errorCode = CODE_FAILED;
 };
 
-struct SetDevicePinCodeCallbackInfo {
-    napi_env env = nullptr;
-    napi_async_work asyncWork = nullptr;
-    std::string deviceId = "";
-    std::string pinCode = "";
-    CallbackPromiseInfo promise;
-};
-
 struct BluetoothCallbackInfo {
     napi_env env_;
     napi_ref callback_ = 0;
@@ -209,7 +201,7 @@ enum class ScanDuty {
 };
 
 struct ScanOptions {
-    int32_t interval;                                        // Time of delay for reporting the scan result
+    int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
     MatchMode MatchMode = MatchMode::MATCH_MODE_AGGRESSIVE;  // Match mode for Bluetooth LE scan filters hardware match
 };
