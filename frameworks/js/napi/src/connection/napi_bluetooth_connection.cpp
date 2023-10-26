@@ -218,7 +218,7 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
 
 napi_value PairDevice(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
+    HILOGI("enter");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -239,7 +239,7 @@ napi_value PairDevice(napi_env env, napi_callback_info info)
 
 napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
+    HILOGI("enter");
     std::string remoteAddr{};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -487,135 +487,42 @@ napi_value StopBluetoothDiscovery(napi_env env, napi_callback_info info)
 }
 
 #ifdef BLUETOOTH_API_SINCE_10
-static void SetCallback(const napi_env &env, const napi_ref &callbackIn, const int &errorCode, const napi_value &result)
-{
-    HILOGI("errorCode:%{public}d", errorCode);
-    napi_value undefined = nullptr;
-    napi_get_undefined(env, &undefined);
-
-    napi_value callback = nullptr;
-    napi_value resultout = nullptr;
-    napi_get_reference_value(env, callbackIn, &callback);
-    napi_value results[ARGS_SIZE_TWO] = {nullptr};
-    results[PARAM0] = GetCallbackErrorValue(env, errorCode);
-    results[PARAM1] = result;
-    NAPI_CALL_RETURN_VOID(
-        env, napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, &results[PARAM0], &resultout));
-    HILOGI("end");
-}
-
-void SetPromise(const napi_env &env, const napi_deferred &deferred, const int32_t &errorCode, const napi_value &result)
-{
-    if (errorCode == BT_NO_ERROR) {
-        napi_resolve_deferred(env, deferred, result);
-    } else {
-        napi_reject_deferred(env, deferred, GetCallbackErrorValue(env, errorCode));
-    }
-}
-
-static void PaddingCallbackPromiseInfo(
-    const napi_env &env, const napi_ref &callback, CallbackPromiseInfo &info, napi_value &promise)
+napi_status ParseSetDevicePinCodeParameters(napi_env env, napi_callback_info info,
+    std::string &outRemoteAddr, std::string &outPinCode)
 {
     HILOGD("enter");
-    if (callback) {
-        info.callback = callback;
-        info.isCallback = true;
-    } else {
-        napi_deferred deferred = nullptr;
-        NAPI_CALL_RETURN_VOID(env, napi_create_promise(env, &deferred, &promise));
-        info.deferred = deferred;
-        info.isCallback = false;
-    }
-    HILOGI("end");
-}
-
-static void ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInfo &info, const napi_value &result)
-{
-    HILOGD("enter");
-    if (info.isCallback) {
-        SetCallback(env, info.callback, info.errorCode, result);
-    } else {
-        SetPromise(env, info.deferred, info.errorCode, result);
-    }
-    HILOGI("end");
-}
-
-napi_status ParseSetDevicePinCodeParameters(napi_env env, napi_callback_info info, SetDevicePinCodeCallbackInfo *params)
-{
-    HILOGD("enter");
-    size_t expectedArgsCount = ARGS_SIZE_THREE;
-    size_t argc = expectedArgsCount;
     std::string remoteAddr{};
     std::string pinCode{};
+    size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {nullptr};
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, NULL));
-    NAPI_BT_RETURN_IF(argc != expectedArgsCount && argc != expectedArgsCount - CALLBACK_SIZE,
-        "Requires 2 or 3 arguments.",
-        napi_invalid_arg);
-    NAPI_BT_RETURN_IF(!ParseString(env, remoteAddr, argv[PARAM0]), "remoteAddr ParseString failed", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(!IsValidAddress(remoteAddr), "Invalid addr", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_THREE,
+        "Requires 2 or 3 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], remoteAddr));
     NAPI_BT_RETURN_IF(!ParseString(env, pinCode, argv[PARAM1]), "pinCode ParseString failed", napi_invalid_arg);
-    params->deviceId = remoteAddr;
-    params->pinCode = pinCode;
-    if (argc == expectedArgsCount) {
-        NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM2]));
-        napi_create_reference(env, argv[PARAM2], 1, &params->promise.callback);
-    }
-    HILOGI("end");
+    outRemoteAddr = remoteAddr;
+    outPinCode = pinCode;
     return napi_ok;
 }
 
 napi_value SetDevicePinCode(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    SetDevicePinCodeCallbackInfo *asyncCallbackInfo =
-        new (std::nothrow) SetDevicePinCodeCallbackInfo{.env = env, .asyncWork = nullptr};
-    napi_status status = ParseSetDevicePinCodeParameters(env, info, asyncCallbackInfo);
-    if (status != napi_ok) {
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-    }
+    std::string remoteAddr = "";
+    std::string pinCode = "";
+    auto status = ParseSetDevicePinCodeParameters(env, info, remoteAddr, pinCode);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    napi_value promise = nullptr;
-    PaddingCallbackPromiseInfo(env, asyncCallbackInfo->promise.callback, asyncCallbackInfo->promise, promise);
-
-    napi_value resourceName = nullptr;
-    napi_create_string_latin1(env, "setDevicePinCode", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(env,
-        nullptr,
-        resourceName,
-        [](napi_env env, void *data) {
-            HILOGI("napi_create_async_work start");
-            SetDevicePinCodeCallbackInfo *callbackInfo = static_cast<SetDevicePinCodeCallbackInfo *>(data);
-            if (callbackInfo) {
-                int transport = GetDeviceTransport(callbackInfo->deviceId);
-                callbackInfo->promise.errorCode = BluetoothHost::GetDefaultHost()
-                                                      .GetRemoteDevice(callbackInfo->deviceId, transport)
-                                                      .SetDevicePin(callbackInfo->pinCode);
-            }
-        },
-        [](napi_env env, napi_status status, void *data) {
-            SetDevicePinCodeCallbackInfo *callbackInfo = static_cast<SetDevicePinCodeCallbackInfo *>(data);
-            if (callbackInfo) {
-                ReturnCallbackPromise(env, callbackInfo->promise, NapiGetNull(env));
-                if (callbackInfo->promise.callback != nullptr) {
-                    napi_delete_reference(env, callbackInfo->promise.callback);
-                }
-                napi_delete_async_work(env, callbackInfo->asyncWork);
-                delete callbackInfo;
-                callbackInfo = nullptr;
-            }
-        },
-        static_cast<void *>(asyncCallbackInfo),
-        &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
-    HILOGI("end");
-    if (asyncCallbackInfo->promise.isCallback) {
-        return NapiGetUndefinedRet(env);
-    } else {
-        return promise;
-    }
+    auto func = [remoteAddr, pinCode]() {
+        int transport = GetDeviceTransport(remoteAddr);
+        int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport).SetDevicePin(pinCode);
+        HILOGI("SetDevicePinCode err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::string &addr)

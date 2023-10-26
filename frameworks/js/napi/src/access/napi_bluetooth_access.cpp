@@ -52,14 +52,14 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
 
 void NapiAccess::RegisterAccessObserverToHost()
 {
-    HILOGD("enter");
+    HILOGI("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     host->RegisterObserver(g_bluetoothAccessObserver);
 }
 
 napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
+    HILOGI("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
@@ -68,7 +68,7 @@ napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
 
 napi_value NapiAccess::DisableBluetooth(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
+    HILOGI("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     // only ble
     int state = BTStateID::STATE_TURN_OFF;
@@ -165,6 +165,7 @@ static napi_status NapiParseObserverType(napi_env env, napi_value value, std::st
 {
     std::string type{};
     NAPI_BT_CALL_RETURN(NapiParseString(env, value, type));
+    HILOGI("type: %{public}s", type.c_str());
     NAPI_BT_RETURN_IF(!IsValidObserverType(type), "Invalid type", napi_invalid_arg);
     outType = std::move(type);
     return napi_ok;
@@ -188,8 +189,7 @@ static napi_status CheckAccessObserverParams(napi_env env, size_t argc, napi_val
 
 napi_value NapiAccess::RegisterAccessObserver(napi_env env, napi_callback_info info)
 {
-    // fsafasfasf
-    HILOGD("enter");
+    HILOGI("enter");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -231,7 +231,7 @@ static napi_status CheckAccessDeregisterObserver(napi_env env, napi_callback_inf
 
 napi_value NapiAccess::DeregisterAccessObserver(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
+    HILOGI("enter");
     auto status = CheckAccessDeregisterObserver(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     return NapiGetUndefinedRet(env);
