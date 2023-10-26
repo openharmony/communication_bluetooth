@@ -49,6 +49,8 @@ void NapiGattServerCallback::OnCharacteristicReadRequest(
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             GattCharacteristicCallbackInfo *callbackInfo = static_cast<GattCharacteristicCallbackInfo *>(work->data);
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertCharacteristicReadReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
@@ -94,6 +96,8 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             GattCharacteristicCallbackInfo *callbackInfo = static_cast<GattCharacteristicCallbackInfo *>(work->data);
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertCharacteristicWriteReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
@@ -157,6 +161,8 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             BluetoothCallbackInfo *callbackInfo = static_cast<BluetoothCallbackInfo *>(work->data);
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);
@@ -199,6 +205,8 @@ void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevic
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             GattDescriptorCallbackInfo *callbackInfo = static_cast<GattDescriptorCallbackInfo *>(work->data);
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertDescriptorWriteReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
@@ -243,6 +251,8 @@ void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice
         [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             GattDescriptorCallbackInfo *callbackInfo = static_cast<GattDescriptorCallbackInfo *>(work->data);
+            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
+            NapiHandleScope scope(callbackInfo->env_);
             napi_value result = nullptr;
             napi_create_object(callbackInfo->env_, &result);
             ConvertDescriptorReadReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,

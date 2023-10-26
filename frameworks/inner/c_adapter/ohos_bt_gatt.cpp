@@ -978,6 +978,11 @@ void BleScanNativeFilterLog(BleScanNativeFilter &filter)
 
 bool ConvertScanFilterParam(const BtLpDeviceParam *param, std::vector<BleScanFilter> &filter)
 {
+    unsigned int maxFilterSize = 10;  // max filter size
+    if (param->filterSize > maxFilterSize) {
+        HILOGE("filterSize(%{public}u) is larger than %{public}u", param->filterSize, maxFilterSize);
+        return false;
+    }
     for (unsigned int i = 0; i < param->filterSize; i++) {
         BleScanNativeFilter nativeScanFilter = param->filter[i];
         BleScanNativeFilterLog(nativeScanFilter);
@@ -1007,6 +1012,11 @@ bool ConvertAdvDeviceInfo(const BtLpDeviceParam *param, std::vector<BleActiveDev
 {
     if (param->activeDeviceInfo == nullptr || param->activeDeviceSize == 0) {
         return true;
+    }
+    unsigned int maxActiveDevice = 10;  // max active device
+    if (param->activeDeviceSize > maxActiveDevice) {
+        HILOGE("activeDeviceSize(%{public}u) is larger than %{public}u", param->activeDeviceSize, maxActiveDevice);
+        return false;
     }
     for (unsigned int i = 0; i < param->activeDeviceSize; i++) {
         HILOGI("ActiveDeviceInfo: status: %{public}d, timeOut: %{public}d",
