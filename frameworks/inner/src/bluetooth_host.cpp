@@ -307,6 +307,12 @@ BluetoothHost::impl::impl()
     if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
         BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
     }
+
+    observerImp_ = new BluetoothHostObserverImp(*this);
+    remoteObserverImp_ = new BluetoothRemoteDeviceObserverImp(*this);
+    bleRemoteObserverImp_ = new BluetoothBlePeripheralCallbackImp(*this);
+    bleObserverImp_ = new BluetoothHostObserverImp(*this);
+
     InitBluetoothHostProxy();
 }
 
@@ -350,30 +356,12 @@ bool BluetoothHost::impl::InitBluetoothHostProxy(void)
 bool BluetoothHost::impl::InitBluetoothHostObserver(void)
 {
     HILOGD("enter");
-    observerImp_ = new (std::nothrow) BluetoothHostObserverImp(*this);
-    if (observerImp_ == nullptr) {
-        HILOGE("observerImp_ is null");
-        return false;
-    }
-    remoteObserverImp_ = new (std::nothrow) BluetoothRemoteDeviceObserverImp(*this);
-    if (remoteObserverImp_ == nullptr) {
-        HILOGE("remoteObserverImp_ is null");
-        return false;
-    }
-    bleRemoteObserverImp_ = new (std::nothrow) BluetoothBlePeripheralCallbackImp(*this);
-    if (bleRemoteObserverImp_ == nullptr) {
-        HILOGE("bleRemoteObserverImp_ is null");
-        return false;
-    }
-    bleObserverImp_ = new (std::nothrow) BluetoothHostObserverImp(*this);
-    if (bleObserverImp_ == nullptr) {
-        HILOGE("bleObserverImp_ is null");
-        return false;
-    }
+
     if (proxy_ == nullptr) {
         HILOGE("proxy_ is null");
         return false;
     }
+    // The bluetooth service will be de-weight, repeated register without side effects.
     proxy_->RegisterObserver(observerImp_);
     proxy_->RegisterBleAdapterObserver(bleObserverImp_);
     proxy_->RegisterRemoteDeviceObserver(remoteObserverImp_);
