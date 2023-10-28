@@ -46,6 +46,16 @@ private:
     int value_;
 };
 
+class NapiNativeBool : public NapiNativeObject {
+public:
+    explicit NapiNativeBool(bool value) : value_(value) {}
+    ~NapiNativeBool() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    bool value_;
+};
+
 class NapiNativeString : public NapiNativeObject {
 public:
     explicit NapiNativeString(std::string value) : value_(std::move(value)) {}

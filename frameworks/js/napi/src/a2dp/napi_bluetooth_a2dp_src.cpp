@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "bluetooth_a2dp_src.h"
+#include "bluetooth_avrcp_tg.h"
 #include "bluetooth_errorcode.h"
 #include "napi_async_work.h"
 #include "napi_bluetooth_profile.h"
@@ -47,7 +48,11 @@ napi_value NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env, napi_value expo
         DECLARE_NAPI_FUNCTION("setConnectionStrategy", SetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionStrategy", GetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionState", GetConnectionState),
-        DECLARE_NAPI_FUNCTION("getConnectedDevices", getConnectedDevices),
+        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectedDevices),
+        DECLARE_NAPI_FUNCTION("isAbsoluteVolumeSupport", IsAbsoluteVolumeSupport),
+        DECLARE_NAPI_FUNCTION("isAbsoluteVolumeEnabled", IsAbsoluteVolumeEnabled),
+        DECLARE_NAPI_FUNCTION("enableAbsoluteVolume", EnableAbsoluteVolume),
+        DECLARE_NAPI_FUNCTION("disableAbsoluteVolume", DisableAbsoluteVolume),
 #endif
     };
 
@@ -310,9 +315,91 @@ napi_value NapiA2dpSource::GetConnectionState(napi_env env, napi_callback_info i
 {
     return GetDeviceState(env, info);
 }
-napi_value NapiA2dpSource::getConnectedDevices(napi_env env, napi_callback_info info)
+napi_value NapiA2dpSource::GetConnectedDevices(napi_env env, napi_callback_info info)
 {
     return GetConnectionDevices(env, info);
+}
+
+napi_value NapiA2dpSource::IsAbsoluteVolumeSupport(napi_env env, napi_callback_info info)
+{
+    HILOGD("start");
+    std::string remoteAddr{};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->GetDeviceAbsVolumeAbility(remoteDevice, ability);
+        if (ability == DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT) {
+            return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(false));
+        }
+        return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(true));
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiA2dpSource::IsAbsoluteVolumeEnabled(napi_env env, napi_callback_info info)
+{
+    HILOGD("start");
+    std::string remoteAddr{};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->GetDeviceAbsVolumeAbility(remoteDevice, ability);
+        if (ability == DeviceAbsVolumeAbility::DEVICE_ABSVOL_OPEN) {
+            return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(true));
+        }
+        return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(false));
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiA2dpSource::EnableAbsoluteVolume(napi_env env, napi_callback_info info)
+{
+    HILOGD("start");
+    std::string remoteAddr{};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_OPEN;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->SetDeviceAbsVolumeAbility(remoteDevice, ability);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiA2dpSource::DisableAbsoluteVolume(napi_env env, napi_callback_info info)
+{
+    HILOGD("start");
+    std::string remoteAddr{};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_CLOSE;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->SetDeviceAbsVolumeAbility(remoteDevice, ability);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 #endif

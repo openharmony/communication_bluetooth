@@ -41,7 +41,11 @@ public:
     static napi_value SetConnectionStrategy(napi_env env, napi_callback_info info);
     static napi_value GetConnectionStrategy(napi_env env, napi_callback_info info);
     static napi_value GetConnectionState(napi_env env, napi_callback_info info);
-    static napi_value getConnectedDevices(napi_env env, napi_callback_info info);
+    static napi_value GetConnectedDevices(napi_env env, napi_callback_info info);
+    static napi_value IsAbsoluteVolumeSupport(napi_env env, napi_callback_info info);
+    static napi_value IsAbsoluteVolumeEnabled(napi_env env, napi_callback_info info);
+    static napi_value EnableAbsoluteVolume(napi_env env, napi_callback_info info);
+    static napi_value DisableAbsoluteVolume(napi_env env, napi_callback_info info);
 #endif
     static NapiA2dpSourceObserver observer_;
     static bool isRegistered_;

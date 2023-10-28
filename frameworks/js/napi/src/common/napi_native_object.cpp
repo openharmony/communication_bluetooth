@@ -27,6 +27,16 @@ napi_value NapiNativeInt::ToNapiValue(napi_env env) const
     return value;
 }
 
+napi_value NapiNativeBool::ToNapiValue(napi_env env) const
+{
+    napi_value value = nullptr;
+    napi_status status = napi_get_boolean(env, value_, &value);
+    if (status != napi_ok) {
+        HILOGE("napi_create_int32 failed");
+    }
+    return value;
+}
+
 napi_value NapiNativeString::ToNapiValue(napi_env env) const
 {
     napi_value value = nullptr;
