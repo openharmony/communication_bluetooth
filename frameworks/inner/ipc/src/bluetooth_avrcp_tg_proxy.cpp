@@ -524,7 +524,8 @@ int32_t BluetoothAvrcpTgProxy::SetDeviceAbsoluteVolume(const BluetoothRawAddress
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_SET_DEVICE_ABSOLUTE_VOLUME, option, data, reply);
+    int error =
+        InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_SET_DEVICE_ABSOLUTE_VOLUME, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::SetDeviceAbsoluteVolume done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -552,7 +553,8 @@ int32_t BluetoothAvrcpTgProxy::SetDeviceAbsVolumeAbility(const BluetoothRawAddre
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_SET_DEVICE_ABS_VOLUME_ABILITY, option, data, reply);
+    int error =
+        InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_SET_DEVICE_ABS_VOLUME_ABILITY, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::SetDeviceAbsVolumeAbility done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -575,7 +577,8 @@ int32_t BluetoothAvrcpTgProxy::GetDeviceAbsVolumeAbility(const BluetoothRawAddre
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_GET_DEVICE_ABS_VOLUME_ABILITY, option, data, reply);
+    int error =
+        InnerTransact(BluetoothAvrcpTgInterfaceCode::BT_AVRCP_TG_GET_DEVICE_ABS_VOLUME_ABILITY, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothAvrcpTgProxy::GetDeviceAbsVolumeAbility done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
