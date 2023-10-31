@@ -170,7 +170,7 @@ int32_t AvrcpTarget::SetDeviceAbsoluteVolume(const BluetoothRemoteDevice &device
     HILOGI("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (pimpl == nullptr || !pimpl->proxy_) {
@@ -185,7 +185,7 @@ int32_t AvrcpTarget::SetDeviceAbsVolumeAbility(const BluetoothRemoteDevice &devi
     HILOGI("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (pimpl == nullptr || !pimpl->proxy_) {
@@ -200,7 +200,7 @@ int32_t AvrcpTarget::GetDeviceAbsVolumeAbility(const BluetoothRemoteDevice &devi
     HILOGI("enter");
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (pimpl == nullptr || !pimpl->proxy_) {
