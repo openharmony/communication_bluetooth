@@ -147,7 +147,7 @@ private:
     long reportDelayMillis_ = 0;
     int scanMode_ = SCAN_MODE_LOW_POWER;
     bool legacy_ = true;
-    int phy_ = PHY_LE_ALL_SUPPORTED;
+    int phy_ = PHY_LE_1M;
 };
 
 /**
