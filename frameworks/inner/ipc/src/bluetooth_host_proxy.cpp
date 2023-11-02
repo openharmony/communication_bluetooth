@@ -1586,5 +1586,60 @@ int32_t BluetoothHostProxy::CountEnableTimes(bool isEnable)
     }
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::SendDeviceSelection WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("BluetoothHostProxy::SendDeviceSelection Write address error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteInt32(useA2dp)) {
+        HILOGE("BluetoothHostProxy::SendDeviceSelection Write useA2dp error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteInt32(useHfp)) {
+        HILOGE("BluetoothHostProxy::SendDeviceSelection Write useHfp error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteInt32(userSelection)) {
+        HILOGE("BluetoothHostProxy::SendDeviceSelection Write userSelection error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_SEND_DEVICE_SELECTION, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::SendDeviceSelection fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::GetFeatures(const std::string &address)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetFeatures WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("BluetoothHostProxy::GetFeatures Write address error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_FEATURES, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetFeatures fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

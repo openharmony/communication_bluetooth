@@ -46,6 +46,7 @@ enum BluetoothA2dpSourceObserverInterfaceCode {
     BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED = 0,
     BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED,
     BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
+    BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_OBSERVER_BUTT
 };
@@ -314,6 +315,7 @@ enum BluetoothHfpAgObserverInterfaceCode {
     BT_HFP_AG_OBSERVER_SCO_STATE_CHANGED,
     BT_HFP_AG_OBSERVER_ACTIVE_DEVICE_CHANGED,
     BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED,
+    BT_HFP_AG_OBSERVER_HFP_STACK_CHANGED,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_OBSERVER_BUTT
 };
@@ -339,6 +341,7 @@ enum BluetoothHfpAgInterfaceCode {
     BT_HFP_AG_DEREGISTER_OBSERVER,
     BT_HFP_AG_SET_CONNECT_STRATEGY,
     BT_HFP_AG_GET_CONNECT_STRATEGY,
+    BT_HFP_AG_IS_IN_BAND_RINGING_ENABLE,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_BUTT
 };
@@ -494,6 +497,8 @@ enum BluetoothHostInterfaceCode {
     SYNC_RANDOM_ADDRESS,
     START_CREDIBLE_PAIR,
     BT_COUNT_ENABLE_TIMES,
+    BT_SEND_DEVICE_SELECTION,
+    BT_GET_FEATURES,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

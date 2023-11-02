@@ -656,6 +656,25 @@ public:
     */
     int GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const;
 
+    /**
+    * @brief Send Hiecho8,9 to device selected by user.
+    * @param address object device report address.
+    * @param useA2dp whether use A2dp of this device.
+    * @param useHfp whether use Hfp of this device.
+    * @param userSelection whether this echo command send by user selection.
+    * @return Returns {@link BT_NO_ERROR} if send echo 8,9 command success;
+    * returns an error code defined in {@link BtErrCode} otherwise.
+    */
+    int SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) const;
+
+    /**
+    * @brief Get the device features, sucn as wear detection.
+    * @param address object device report address.
+    * @return Returns {@link BT_NO_ERROR} if get the device features success;
+    * returns an error code defined in {@link BtErrCode} otherwise.
+    */
+    int GetFeatures(const std::string &address) const;
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
