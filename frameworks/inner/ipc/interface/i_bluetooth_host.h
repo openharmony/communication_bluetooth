@@ -121,6 +121,8 @@ public:
     virtual int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr) = 0;
     virtual int32_t SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr) = 0;
     virtual int32_t CountEnableTimes(bool enable) = 0;
+    virtual int32_t SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) = 0;
+    virtual int32_t GetFeatures(const std::string &address) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
