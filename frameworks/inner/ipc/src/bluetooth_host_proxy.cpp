@@ -1620,25 +1620,25 @@ int32_t BluetoothHostProxy::SendDeviceSelection(const std::string &address, int 
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::GetFeatures(const std::string &address)
+bool BluetoothHostProxy::IsSupportWearDetection(const std::string &address)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::GetFeatures WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        HILOGE("BluetoothHostProxy::IsSupportWearDetection WriteInterfaceToken error");
+        return false;
     }
     if (!data.WriteString(address)) {
-        HILOGE("BluetoothHostProxy::GetFeatures Write address error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        HILOGE("BluetoothHostProxy::IsSupportWearDetection Write address error");
+        return false;
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_FEATURES, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_IS_SUPPORT_WEAR_DETECTION, option, data, reply);
     if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::GetFeatures fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
+        HILOGE("BluetoothHostProxy::IsSupportWearDetection fail, error: %{public}d", error);
+        return false;
     }
-    return reply.ReadInt32();
+    return reply.ReadBool();
 }
 
 }  // namespace Bluetooth

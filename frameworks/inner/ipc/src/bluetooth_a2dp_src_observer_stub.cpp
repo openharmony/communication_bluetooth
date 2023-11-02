@@ -101,7 +101,7 @@ ErrCode BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(MessageParcel &da
     std::string addr = data.ReadString();
     int action = data.ReadInt32();
     OnMediaStackChanged(RawAddress(addr), action);
-    return NO_ERROR;
+    return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
