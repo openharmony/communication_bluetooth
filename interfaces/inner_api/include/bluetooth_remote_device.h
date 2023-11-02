@@ -330,13 +330,13 @@ public:
     int GetDeviceProductType(int &cod, int &majorClass, int &majorMinorClass) const;
 
     /**
-     * @brief Get the wear detection capability of the device.
+     * @brief Whether wear detection is supported
      *
-     * @return Returns <b>SUPPORT_ON</b> if the device supports wear detection;
-     *         returns <b>SUPPORT_OFF</b> if the device not supports wear detection.
+     * @return Returns <b>true</b> if the device supports wear detection;
+     *         returns <b>false</b> if the device not supports wear detection.
      * @since 10
      */
-    int GetFeatures() const;
+    bool IsSupportWearDetection() const;
 
 private:
     std::string address_ = "00:00:00:00:00:00";

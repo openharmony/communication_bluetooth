@@ -478,7 +478,7 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
     
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_INVALID_PARAM;
     }
 
     if (!IS_BT_ENABLED()) {
@@ -493,28 +493,29 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
     majorClass = deviceClass.GetMajorClass();
     majorMinorClass = deviceClass.GetMajorMinorClass();
     if (cod == 0) {
-        HILOGI("cod = %{public}d", cod);
+        HILOGW("cod = %{public}d", cod);
         cod = BluetoothDevice::MAJOR_UNCATEGORIZED;
         majorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
         majorMinorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
     }
-    HILOGD("cod = %{public}d, majorClass = %{public}d, majorMinorClass = %{public}d", cod, majorClass, majorMinorClass);
+    HILOGD("cod = %{public}#X, majorClass = %{public}#X, majorMinorClass = %{public}#X",
+        cod, majorClass, majorMinorClass);
 
     return ret;
 }
 
-int BluetoothRemoteDevice::GetFeatures() const
+bool BluetoothRemoteDevice::IsSupportWearDetection() const
 {
     HILOGI("enter");
 
     if (!IsValidBluetoothRemoteDevice()) {
         HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
+        return false;
     }
 
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
+        return false;
     }
 
     sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
@@ -523,12 +524,7 @@ int BluetoothRemoteDevice::GetFeatures() const
         return false;
     }
 
-    int32_t wearDetectionSupport = hostProxy->GetFeatures(address_);
-    if (wearDetectionSupport == 1) {
-        return static_cast<int>(BtTwsWearDetection::SUPPORT_ON);
-    } else {
-        return static_cast<int>(BtTwsWearDetection::SUPPORT_OFF);
-    }
+    return hostProxy->IsSupportWearDetection(address_);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

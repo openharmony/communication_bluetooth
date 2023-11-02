@@ -1428,11 +1428,6 @@ enum PbapResponseCode : uint8_t {
     PBAP_DATABASE_LOCKED = 0xE1              // Database Locked
 };
 
-enum BtTwsWearDetection {
-    SUPPORT_ON,
-    SUPPORT_OFF,
-};
-
 constexpr int BLE_LPDEVICE_SCAN_SETTING_VALID_BIT = 0x01;
 constexpr int BLE_LPDEVICE_SCAN_FILTER_VALID_BIT = 0x02;
 constexpr int BLE_LPDEVICE_ADV_SETTING_VALID_BIT = 0x04;
