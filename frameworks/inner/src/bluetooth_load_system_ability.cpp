@@ -48,7 +48,6 @@ BluetootLoadSystemAbility::~BluetootLoadSystemAbility()
 
 void BluetootLoadSystemAbility::SubScribeBluetoothSystemAbility()
 {
-    std::lock_guard<std::recursive_mutex> lk(mutex_);
     if (subscribeBluetoothSystemAbilityState != STATE_NONE) {
         return;
     }
