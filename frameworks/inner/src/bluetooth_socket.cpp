@@ -256,6 +256,10 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
 {
     HILOGD("enter");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!samgr) {
+        HILOGE("samgr is nullptr.");
+        return;
+    }
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
     if (!hostRemote) {
@@ -297,6 +301,10 @@ ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
 {
     HILOGD("enter");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!samgr) {
+        HILOGE("samgr is nullptr.");
+        return;
+    }
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
     if (!hostRemote) {
@@ -720,6 +728,10 @@ ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, 
 {
     HILOGI("(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!samgr) {
+        HILOGE("samgr is nullptr.");
+        return;
+    }
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
     if (!hostRemote) {
