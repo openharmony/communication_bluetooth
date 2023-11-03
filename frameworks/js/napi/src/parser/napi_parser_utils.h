@@ -61,6 +61,7 @@ struct NapiGattProperties {
     bool indicate = false;
 };
 
+bool NapiIsObjectPropertyExist(napi_env env, napi_value object, const char *name);
 napi_status NapiParseBoolean(napi_env env, napi_value value, bool &outBoolean);
 napi_status NapiParseInt32(napi_env env, napi_value value, int32_t &outNum);
 napi_status NapiParseUint32(napi_env env, napi_value value, uint32_t &outNum);

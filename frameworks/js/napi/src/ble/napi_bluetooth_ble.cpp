@@ -271,14 +271,20 @@ static napi_value On(napi_env env, napi_callback_info info)
 
         std::string type {};
         NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-        if (type != REGISTER_BLE_FIND_DEVICE_TYPE) {
+        if (type == REGISTER_BLE_FIND_DEVICE_TYPE) {
+            NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
+            auto napiScanCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
+            NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(napiScanCallback);
+        } else if (type == REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE) {
+            NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
+            auto napiAdvertisingStateCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
+            NapiBluetoothBleAdvertiseCallback::GetInstance().SetNapiAdvertisingStateCallback(
+                napiAdvertisingStateCallback);
+        } else {
             HILOGE("Invalid type: %{public}s", type.c_str());
             return napi_invalid_arg;
         }
 
-        NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
-        auto napiScanCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
-        NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(napiScanCallback);
         return napi_ok;
     };
 
@@ -300,11 +306,14 @@ static napi_value Off(napi_env env, napi_callback_info info)
 
         std::string type {};
         NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-        if (type != REGISTER_BLE_FIND_DEVICE_TYPE) {
+        if (type == REGISTER_BLE_FIND_DEVICE_TYPE) {
+            NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(nullptr);
+        } else if (type == REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE) {
+            NapiBluetoothBleAdvertiseCallback::GetInstance().SetNapiAdvertisingStateCallback(nullptr);
+        } else {
             HILOGE("Invalid type: %{public}s", type.c_str());
             return napi_invalid_arg;
         }
-        NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(nullptr);
         return napi_ok;
     };
 
@@ -328,6 +337,8 @@ void DefineBLEJSObject(napi_env env, napi_value exports)
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("startAdvertising", StartAdvertising),
         DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
+        DECLARE_NAPI_FUNCTION("enableAdvertising", EnableAdvertising),
+        DECLARE_NAPI_FUNCTION("disableAdvertising", DisableAdvertising),
 #endif
     };
 
@@ -618,7 +629,7 @@ napi_value StopBLEScan(napi_env env, napi_callback_info info)
 }
 
 static napi_status ParseAdvertisingSettingsParameters(
-    const napi_env &env, const napi_callback_info &info, const napi_value &object, BleAdvertiserSettings &outSettings)
+    const napi_env &env, const napi_value &object, BleAdvertiserSettings &outSettings)
 {
     HILOGD("enter");
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"interval", "txPower", "connectable"}));
@@ -695,7 +706,7 @@ static napi_status ParseServiceDataParameters(napi_env env, napi_value object, B
     return napi_ok;
 }
 
-static napi_status ParseAdvertisDataParameters(const napi_env &env, const napi_callback_info &info,
+static napi_status ParseAdvertisDataParameters(const napi_env &env,
     const napi_value &object, BleAdvertiserData &outData)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
@@ -718,6 +729,49 @@ static napi_status ParseAdvertisDataParameters(const napi_env &env, const napi_c
     return napi_ok;
 }
 
+napi_status CheckAdvertisingDataWithDuration(napi_env env, napi_value object, BleAdvertiserSettings &outSettings,
+    BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData, uint16_t &outDuration)
+{
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"advertisingSettings", "advertisingData",
+        "advertisingResponse", "duration"}));
+
+    napi_value advSettingsObject;
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, "advertisingSettings", advSettingsObject));
+    BleAdvertiserSettings settings;
+    NAPI_BT_CALL_RETURN(ParseAdvertisingSettingsParameters(env, advSettingsObject, settings));
+
+    napi_value advDataObject;
+    NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, "advertisingData", advDataObject));
+    BleAdvertiserData advData;
+    NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, advDataObject, advData));
+
+    BleAdvertiserData advRsp;
+    if (NapiIsObjectPropertyExist(env, object, "advertisingResponse")) {
+        napi_value advRspObject;
+        NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, "advertisingResponse", advRspObject));
+        NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, advRspObject, advRsp));
+    }
+
+    bool exist = false;
+    uint32_t duration = 0;
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32Optional(env, object, "duration", duration, exist));
+    if (exist) {
+        const uint32_t minDuration = 0;
+        const uint32_t maxDuration = 65535;
+        if (duration < minDuration || duration > maxDuration) {
+            HILOGE("Invalid duration: %{public}d", duration);
+            return napi_invalid_arg;
+        }
+        HILOGI("duration: %{public}u", duration);
+    }
+    outDuration = duration;
+    outSettings = std::move(settings);
+    outAdvData = std::move(advData);
+    outRspData = std::move(advRsp);
+    return napi_ok;
+}
+
 napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdvertiserSettings &outSettings,
     BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData)
 {
@@ -728,12 +782,12 @@ napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdver
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_THREE), "need 2 or 3 arguments.", napi_invalid_arg);
 
     BleAdvertiserSettings settings;
-    NAPI_BT_CALL_RETURN(ParseAdvertisingSettingsParameters(env, info, argv[PARAM0], settings));
+    NAPI_BT_CALL_RETURN(ParseAdvertisingSettingsParameters(env, argv[PARAM0], settings));
     BleAdvertiserData advData;
-    NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, info, argv[PARAM1], advData));
+    NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, argv[PARAM1], advData));
     BleAdvertiserData rspData;
     if (argc == ARGS_SIZE_THREE) {
-        NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, info, argv[PARAM2], rspData));
+        NAPI_BT_CALL_RETURN(ParseAdvertisDataParameters(env, argv[PARAM2], rspData));
     }
 
     outSettings = std::move(settings);
@@ -744,17 +798,159 @@ napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdver
 
 napi_value StartAdvertising(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
+    HILOGI("enter");
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
+    napi_value thisVar = nullptr;
+    auto status = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
     BleAdvertiserSettings settings;
     BleAdvertiserData advData;
     BleAdvertiserData rspData;
-    auto status = CheckAdvertisingData(env, info, settings, advData, rspData);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    if (argc != 0 && NapiIsObjectPropertyExist(env, argv[PARAM0], "advertisingSettings")) {
+        uint16_t duration = 0;
+        auto status = CheckAdvertisingDataWithDuration(env, argv[PARAM0], settings, advData, rspData, duration);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+        auto func = [settings, advData, rspData, duration]() {
+            BleAdvertiser *bleAdvertiser = BleAdvertiserGetInstance();
+            if (bleAdvertiser == nullptr) {
+                HILOGE("bleAdvertiser is nullptr");
+                return NapiAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = bleAdvertiser->StartAdvertising(
+                settings, advData, rspData, duration, NapiBluetoothBleAdvertiseCallback::GetInstance());
+            return NapiAsyncWorkRet(ret);
+        };
 
-    int ret = BleAdvertiserGetInstance()->StartAdvertising(
-        settings, advData, rspData, NapiBluetoothBleAdvertiseCallback::GetInstance());
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
-    return NapiGetUndefinedRet(env);
+        auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+        bool success = NapiBluetoothBleAdvertiseCallback::GetInstance().asyncWorkMap_.TryPush(
+            NapiAsyncType::GET_ADVERTISING_HANDLE, asyncWork);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+
+        asyncWork->Run();
+        return asyncWork->GetRet();
+    } else {
+        auto status = CheckAdvertisingData(env, info, settings, advData, rspData);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+        int ret = BleAdvertiserGetInstance()->StartAdvertising(
+            settings, advData, rspData, 0, NapiBluetoothBleAdvertiseCallback::GetInstance());
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+        return NapiGetUndefinedRet(env);
+    }
+}
+
+#ifdef BLUETOOTH_API_SINCE_10
+napi_status CheckAdvertisingEnableParams(napi_env env, napi_callback_info info,
+    uint32_t &outAdvHandle, uint16_t &outDuration)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO), "need 1 or 2 arguments.", napi_invalid_arg);
+
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, argv[PARAM0], {"advertisingId", "duration"}));
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32(env, argv[PARAM0], "advertisingId", outAdvHandle));
+    if (outAdvHandle != BleAdvertiserGetInstance()->GetAdvHandle(NapiBluetoothBleAdvertiseCallback::GetInstance())) {
+        HILOGE("Invalid outAdvHandle: %{public}d", outAdvHandle);
+        return napi_invalid_arg;
+    }
+
+    bool exist = false;
+    uint32_t duration = 0;
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32Optional(env, argv[PARAM0], "duration", duration, exist));
+    if (exist) {
+        const uint32_t minDuration = 0;
+        const uint32_t maxDuration = 65535;
+        if (duration < minDuration || duration > maxDuration) {
+            HILOGE("Invalid duration: %{public}d", duration);
+            return napi_invalid_arg;
+        }
+        HILOGI("duration: %{public}u", duration);
+    }
+    outDuration = duration;
+
+    return napi_ok;
+}
+
+napi_value EnableAdvertising(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    uint32_t advHandle = 0xFF;
+    uint16_t duration = 0;
+    auto status = CheckAdvertisingEnableParams(env, info, advHandle, duration);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto func = [advHandle, duration]() {
+        BleAdvertiser *bleAdvertiser = BleAdvertiserGetInstance();
+        if (bleAdvertiser == nullptr) {
+            HILOGE("bleAdvertiser is nullptr");
+            return NapiAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+        }
+        int ret = bleAdvertiser->EnableAdvertising(
+            advHandle, duration, NapiBluetoothBleAdvertiseCallback::GetInstance());
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_status CheckAdvertisingDisableParams(napi_env env, napi_callback_info info, uint32_t &outAdvHandle)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO), "need 1 or 2 arguments.", napi_invalid_arg);
+
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, argv[PARAM0], {"advertisingId"}));
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32(env, argv[PARAM0], "advertisingId", outAdvHandle));
+    if (outAdvHandle != BleAdvertiserGetInstance()->GetAdvHandle(NapiBluetoothBleAdvertiseCallback::GetInstance())) {
+        HILOGE("Invalid outAdvHandle: %{public}d", outAdvHandle);
+        return napi_invalid_arg;
+    }
+
+    return napi_ok;
+}
+
+napi_value DisableAdvertising(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    uint32_t advHandle = 0xFF;
+    auto status = CheckAdvertisingDisableParams(env, info, advHandle);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto func = [advHandle]() {
+        BleAdvertiser *bleAdvertiser = BleAdvertiserGetInstance();
+        if (bleAdvertiser == nullptr) {
+            HILOGE("bleAdvertiser is nullptr");
+            return NapiAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+        }
+        int ret = bleAdvertiser->DisableAdvertising(
+            advHandle, NapiBluetoothBleAdvertiseCallback::GetInstance());
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+#endif
+
+napi_status CheckStopAdvWithAdvId(napi_env env, napi_value object, uint32_t &outAdvHandle)
+{
+    NAPI_BT_CALL_RETURN(NapiParseUint32(env, object, outAdvHandle));
+    if (outAdvHandle != BleAdvertiserGetInstance()->GetAdvHandle(NapiBluetoothBleAdvertiseCallback::GetInstance())) {
+        HILOGE("Invalid outAdvHandle: %{public}d", outAdvHandle);
+        return napi_invalid_arg;
+    }
+    return napi_ok;
 }
 
 static napi_status CheckEmptyArgs(napi_env env, napi_callback_info info)
@@ -769,12 +965,45 @@ static napi_status CheckEmptyArgs(napi_env env, napi_callback_info info)
 napi_value StopAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    auto status = CheckEmptyArgs(env, info);
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    auto status = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = BleAdvertiserGetInstance()->StopAdvertising(NapiBluetoothBleAdvertiseCallback::GetInstance());
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
-    return NapiGetUndefinedRet(env);
+    if (argc != ARGS_SIZE_ZERO) {
+        auto status = napi_ok;
+        if (argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO) {
+            status = napi_invalid_arg;
+        }
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+        uint32_t advHandle = 0xFF;
+        status = CheckStopAdvWithAdvId(env, argv[PARAM0], advHandle);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+        auto func = []() {
+            BleAdvertiser *bleAdvertiser = BleAdvertiserGetInstance();
+            if (bleAdvertiser == nullptr) {
+                HILOGE("bleAdvertiser is nullptr");
+                return NapiAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = bleAdvertiser->StopAdvertising(
+                NapiBluetoothBleAdvertiseCallback::GetInstance());
+            return NapiAsyncWorkRet(ret);
+        };
+
+        auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+
+        asyncWork->Run();
+        return asyncWork->GetRet();
+    } else {
+        auto status = CheckEmptyArgs(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+        int ret = BleAdvertiserGetInstance()->StopAdvertising(NapiBluetoothBleAdvertiseCallback::GetInstance());
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+        return NapiGetUndefinedRet(env);
+    }
 }
 
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
