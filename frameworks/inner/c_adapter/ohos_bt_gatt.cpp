@@ -94,7 +94,8 @@ public:
         }
         strStream >> strs;
         string address = result.GetPeripheralDevice().GetDeviceAddr();
-        HILOGD("device: %{public}s, scan data: %{public}s", GetEncryptAddr(address).c_str(), strs.c_str());
+        HILOGD("device: %{public}s, len: %{public}d, scan data: %{public}s",
+            GetEncryptAddr(address).c_str(), scanResult.advLen, strs.c_str());
         if (appCallback != nullptr && appCallback->scanResultCb != nullptr) {
             appCallback->scanResultCb(&scanResult);
         } else {
