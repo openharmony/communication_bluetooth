@@ -181,7 +181,10 @@ enum BluetoothAvrcpTgInterfaceCode {
 
 enum BluetoothBleAdvertiseCallbackInterfaceCode {
     BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT = 0,
-    BT_BLE_ADVERTISE_CALLBACK_RESULT_EVENT,
+    BT_BLE_ADVERTISE_CALLBACK_START_RESULT_EVENT,
+    BT_BLE_ADVERTISE_CALLBACK_ENABLE_RESULT_EVENT,
+    BT_BLE_ADVERTISE_CALLBACK_DISABLE_RESULT_EVENT,
+    BT_BLE_ADVERTISE_CALLBACK_STOP_RESULT_EVENT,
     BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
     // The last code, if you want to add a new code, please add it before this
     BT_BLE_ADVERTISE_CALLBACK_BUTT
@@ -196,6 +199,8 @@ enum BluetoothBleAdvertiserInterfaceCode {
     BLE_CLOSE,
     BLE_GET_ADVERTISER_HANDLE,
     BLE_SET_ADVERTISING_DATA,
+    BLE_ENABLE_ADVERTISING,
+    BLE_DISABLE_ADVERTISING,
     // The last code, if you want to add a new code, please add it before this
     BLE_ADVERTISER_BUTT
 };

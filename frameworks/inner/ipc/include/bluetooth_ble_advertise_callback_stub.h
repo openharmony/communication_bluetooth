@@ -34,6 +34,9 @@ public:
 private:
     ErrCode OnAutoStopAdvEventInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnStartResultEventInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnEnableResultEventInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnDisableResultEventInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnStopResultEventInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnSetAdvDataEventInner(MessageParcel &data, MessageParcel &reply);
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>

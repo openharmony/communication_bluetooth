@@ -25,7 +25,7 @@ namespace Bluetooth {
 
 // shall check object type is napi_object before, if it's other type, return false
 // If the 'name' field is not exist, or napi function call error, return false
-static bool NapiIsObjectPropertyExist(napi_env env, napi_value object, const char *name)
+bool NapiIsObjectPropertyExist(napi_env env, napi_value object, const char *name)
 {
     auto status = NapiIsObject(env, object);
     if (status != napi_ok) {
