@@ -30,6 +30,10 @@ namespace Bluetooth {
 sptr<BluetoothHostProxy> GetHostProxy()
 {
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!samgr) {
+        HILOGE("samgr is nullptr.");
+        return nullptr;
+    }
     sptr<IRemoteObject> remote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
 
     sptr<BluetoothHostProxy> hostProxy = new BluetoothHostProxy(remote);
