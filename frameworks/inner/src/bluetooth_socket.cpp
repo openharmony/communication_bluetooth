@@ -53,7 +53,7 @@ struct ClientSocket::impl {
             HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
                 HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_, "ADDRESS", "empty",
                 "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
-            HILOGI("fd closed, fd_: %{pubilc}d", fd_);
+            HILOGI("fd closed, fd_: %{public}d", fd_);
             close(fd_);
             fd_ = -1;
         }
@@ -73,7 +73,7 @@ struct ClientSocket::impl {
                 HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
                     HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_, "ADDRESS", "empty",
                     "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
-                HILOGI("fd closed, fd_: %{pubilc}d", fd_);
+                HILOGI("fd closed, fd_: %{public}d", fd_);
                 close(fd_);
                 fd_ = -1;
                 if (proxy_ == nullptr) {
@@ -441,6 +441,12 @@ int ClientSocket::SetBufferSize(int bufferSize)
     return pimpl->SetBufferSize(bufferSize);
 }
 
+int ClientSocket::GetSocketFd()
+{
+    HILOGD("enter");
+    return pimpl->fd_;
+}
+
 struct ServerSocket::impl {
     impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
     ~impl()
@@ -792,6 +798,11 @@ const std::string &ServerSocket::GetStringTag()
 int ServerSocket::GetPsm()
 {
     return pimpl->psm_;
+}
+
+int ServerSocket::GetSocketFd() 
+{
+    return pimpl->fd_;
 }
 
 std::shared_ptr<ClientSocket> SocketFactory::BuildInsecureRfcommDataSocketByServiceRecord(

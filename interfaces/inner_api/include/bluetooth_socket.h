@@ -156,6 +156,14 @@ public:
      */
     int SetBufferSize(int bufferSize);
 
+    /**
+     * @brief Get client socket fd
+     *
+     * @return int fd
+     * @since 6
+     */
+    int GetSocketFd();
+
 private:
     ClientSocket() = delete;
     BLUETOOTH_DECLARE_IMPL();
@@ -225,6 +233,15 @@ public:
      * @since 6
      */
     int GetPsm();
+
+    /**
+     * @brief Get server socket fd
+     *
+     * @return int fd.
+     * @since 6
+     */
+    int GetSocketFd();
+
 private:
     BLUETOOTH_DECLARE_IMPL();
 };
