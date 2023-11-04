@@ -56,7 +56,7 @@ public:
     bool SetBondableMode(int32_t transport, int32_t mode) override;
     int32_t StartBtDiscovery() override;
     int32_t CancelBtDiscovery() override;
-    bool IsBtDiscovering(const int32_t transport) override;
+    int32_t IsBtDiscovering(bool &isDisCovering, const int32_t transport) override;
     long GetBtDiscoveryEndMillis() override;
     int32_t GetPairedDevices(int32_t transport, std::vector<BluetoothRawAddress> &pairedAddr) override;
     int32_t RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) override;
@@ -74,7 +74,7 @@ public:
     std::string GetDeviceAlias(const std::string &address) override;
     bool SetDeviceAlias(const std::string &address, const std::string &aliasName) override;
     int32_t GetDeviceBatteryLevel(const std::string &address) override;
-    int32_t GetPairState(int32_t transport, const std::string &address) override;
+    int32_t GetPairState(int32_t transport, const std::string &address, int32_t &pairState) override;
     int32_t StartPair(int32_t transport, const std::string &address) override;
     int32_t StartCrediblePair(int32_t transport, const std::string &address) override;
     bool CancelPairing(int32_t transport, const std::string &address) override;

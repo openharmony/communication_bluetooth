@@ -953,20 +953,20 @@ int BluetoothHost::CancelBtDiscovery()
     return pimpl->proxy_->CancelBtDiscovery();
 }
 
-bool BluetoothHost::IsBtDiscovering(int transport) const
+int32_t BluetoothHost::IsBtDiscovering(bool &isDiscovering, int transport) const
 {
     HILOGI("enter, transport: %{public}d", transport);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return false;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (!pimpl || !pimpl->proxy_) {
         HILOGE("pimpl or bluetooth host is nullptr");
-        return false;
+        return BT_ERR_INVALID_STATE;
     }
 
-    return pimpl->proxy_->IsBtDiscovering(transport);
+    return pimpl->proxy_->IsBtDiscovering(isDiscovering, transport);
 }
 
 long BluetoothHost::GetBtDiscoveryEndMillis() const

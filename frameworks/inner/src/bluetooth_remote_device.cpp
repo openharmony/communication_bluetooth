@@ -241,7 +241,7 @@ int BluetoothRemoteDevice::GetDeviceBatteryLevel() const
     return hostProxy->GetDeviceBatteryLevel(address_);
 }
 
-int BluetoothRemoteDevice::GetPairState() const
+int BluetoothRemoteDevice::GetPairState(int &pairState) const
 {
     HILOGI("enter");
     if (!IsValidBluetoothRemoteDevice()) {
@@ -253,7 +253,7 @@ int BluetoothRemoteDevice::GetPairState() const
         HILOGE("fails: no proxy");
         return INVALID_VALUE;
     }
-    return hostProxy->GetPairState(transport_, address_);
+    return hostProxy->GetPairState(transport_, address_, pairState);
 }
 
 int BluetoothRemoteDevice::StartPair()
