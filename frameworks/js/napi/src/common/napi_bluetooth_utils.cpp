@@ -858,16 +858,16 @@ void ConvertCodecSampleRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecSampleRat
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_44100:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_44100_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_48000:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_48000_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_88200:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_96000:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_96000_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_176400:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
@@ -943,13 +943,13 @@ void ConvertCodecSampleRateToCodecInfo(CodecInfo &codecInfo, int32_t codecSample
         case A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER:
             codecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_NONE;
             break;
-        case A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_44100_USER:
+        case A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER:
             codecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_44100;
             break;
-        case A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_48000_USER:
+        case A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER:
             codecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_48000;
             break;
-        case A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_96000_USER:
+        case A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER:
             a2dpCodecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_96000;
             break;
         default:
@@ -985,7 +985,7 @@ napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info info, 
     NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
-        env, argv[PARAM1], { "codecType","codecBitsPerSample", "codecChannelMode","codecSampleRate"}));
+        env, argv[PARAM1], {"codecType", "codecBitsPerSample", "codecChannelMode", "codecSampleRate"}));
     bool exist = false;
     int32_t codecType = 0;
     NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM1], "codecType", exist, codecType));
