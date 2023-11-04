@@ -313,9 +313,37 @@ public:
      * @brief Start advertising result event callback.
      *
      * @param result Start advertising result.
+     * @param advHandle advertising handle.
      * @since 6
      */
-    virtual void OnStartResultEvent(int result) = 0;
+    virtual void OnStartResultEvent(int result, int advHandle) = 0;
+
+    /**
+     * @brief Enable advertising result event callback.
+     *
+     * @param result Enable advertising result.
+     * @param advHandle advertising handle.
+     * @since 11
+     */
+    virtual void OnEnableResultEvent(int result, int advHandle) = 0;
+
+    /**
+     * @brief Disable advertising result event callback.
+     *
+     * @param result Disable advertising result.
+     * @param advHandle advertising handle.
+     * @since 11
+     */
+    virtual void OnDisableResultEvent(int result, int advHandle) = 0;
+
+    /**
+     * @brief Stop advertising result event callback.
+     *
+     * @param result Stop advertising result.
+     * @param advHandle advertising handle.
+     * @since 11
+     */
+    virtual void OnStopResultEvent(int result, int advHandle) = 0;
 
     /**
      * @brief Set advertising data result event callback.
@@ -324,6 +352,15 @@ public:
      * @since 6
      */
     virtual void OnSetAdvDataEvent(int result) = 0;
+
+    /**
+     * @brief Get advertising handle callback.
+     *
+     * @param result get advertising handle result.
+     * @param advHandle advertising handle.
+     * @since 11
+     */
+    virtual void OnGetAdvHandleEvent(int result, int advHandle) = 0;
 };
 
 /**
@@ -353,11 +390,12 @@ public:
      * @param settings Advertise settings.
      * @param advData Advertise data.
      * @param scanResponse Scan response.
+     * @param duration advertise duration.
      * @param callback Advertise callback.
      * @since 6
      */
     int StartAdvertising(const BleAdvertiserSettings &settings, const BleAdvertiserData &advData,
-        const BleAdvertiserData &scanResponse, BleAdvertiseCallback &callback);
+        const BleAdvertiserData &scanResponse, uint16_t duration, BleAdvertiseCallback &callback);
 
     /**
      * @brief Start advertising.
@@ -365,11 +403,31 @@ public:
      * @param settings Advertise settings.
      * @param advData Advertise data.
      * @param scanResponse Scan response.
+     * @param duration advertise duration.
      * @param callback Advertise callback.
      * @since 6
      */
     int StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
-        const std::vector<uint8_t> &scanResponse, BleAdvertiseCallback &callback);
+        const std::vector<uint8_t> &scanResponse, uint16_t duration, BleAdvertiseCallback &callback);
+
+    /**
+     * @brief Enable advertising.
+     *
+     * @param advHandle Advertise handle.
+     * @param duration Advertise duration.
+     * @param callback Advertise callback.
+     * @since 11
+     */
+    int EnableAdvertising(uint8_t advHandle, uint16_t duration, BleAdvertiseCallback &callback);
+
+    /**
+     * @brief Disable advertising.
+     *
+     * @param advHandle Advertise handle.
+     * @param callback Advertise callback.
+     * @since 11
+     */
+    int DisableAdvertising(uint8_t advHandle, BleAdvertiseCallback &callback);
 
     void SetAdvertisingData(const std::vector<uint8_t> &advData, const std::vector<uint8_t> &scanResponse,
         BleAdvertiseCallback &callback);

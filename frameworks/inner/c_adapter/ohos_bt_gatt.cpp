@@ -158,16 +158,26 @@ public:
         advId_ = advId;
     }
 
-    void OnStartResultEvent(int result) override
+    void OnStartResultEvent(int result, int advHandle) override
     {
         HILOGI("advId: %{public}d, ret: %{public}d", advId_, result);
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
+        advHandle_ = advHandle;
         if (g_AppCallback != nullptr && g_AppCallback->advEnableCb != nullptr) {
             g_AppCallback->advEnableCb(advId_, ret);
         } else {
             HILOGW("call back is null.");
         }
     }
+
+    void OnEnableResultEvent(int result, int advHandle) override
+    {}
+
+    void OnDisableResultEvent(int result, int advHandle) override
+    {}
+
+    void OnStopResultEvent(int result, int advHandle) override
+    {}
 
     void OnSetAdvDataEvent(int result) override
     {
@@ -178,6 +188,14 @@ public:
         }
     }
 
+    void OnGetAdvHandleEvent(int result, int advHandle) override
+    {}
+
+    int GetAdvHandle()
+    {
+        return advHandle_;
+    }
+
 protected:
     BleAdvertiserData *advData = nullptr;
     BleAdvertiserData *advResponseData = nullptr;
@@ -185,6 +203,7 @@ protected:
 
 private:
     int advId_;
+    int advHandle_ = 0xFF;
 };
 
 /**
@@ -551,7 +570,61 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
     auto advData = ConvertDataToVec(rawData.advData, rawData.advDataLen);
     auto scanResponse = ConvertDataToVec(rawData.rspData, rawData.rspDataLen);
-    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, *g_bleAdvCallbacks[i]);
+    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, *g_bleAdvCallbacks[i]);
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Enable advertising.
+ *
+ * This function is available for system applications only. \n
+ *
+ * @param advId Indicates the pointer to the advertisement ID.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 11
+ */
+int BleEnableAdvEx(int advId)
+{
+    HILOGI("BleEnableAdv, advId: %{public}d.", advId);
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGE("BleEnableAdv fail, advId is invalid.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
+        HILOGE("BleEnableAdv fail, the current adv is not started.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    g_BleAdvertiser->EnableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), 0, *g_bleAdvCallbacks[advId]);
+
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Disable advertising.
+ *
+ * This function is available for system applications only. \n
+ *
+ * @param advId Indicates the pointer to the advertisement ID.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 11
+ */
+int BleDisableAdvEx(int advId)
+{
+    HILOGI("BleDisableAdv, advId: %{public}d.", advId);
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGE("BleDisableAdv fail, advId is invalid.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
+        HILOGE("BleDisableAdv fail, the current adv is not started.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    g_BleAdvertiser->DisableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), *g_bleAdvCallbacks[advId]);
+
     return OHOS_BT_STATUS_SUCCESS;
 }
 

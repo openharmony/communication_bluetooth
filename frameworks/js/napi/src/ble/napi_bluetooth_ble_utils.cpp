@@ -404,5 +404,20 @@ napi_value NapiNativeGattServiceArray::ToNapiValue(napi_env env) const
     ConvertGattServiceVectorToJS(env, object, const_cast<vector<GattService> &>(gattServices_));
     return object;
 }
+
+napi_value NapiNativeAdvertisingStateInfo::ToNapiValue(napi_env env) const
+{
+    napi_value object;
+    napi_create_object(env, &object);
+
+    napi_value value;
+    napi_create_int32(env, advHandle_, &value);
+    napi_set_named_property(env, object, "advertisingId", value);
+
+    napi_create_int32(env, advState_, &value);
+    napi_set_named_property(env, object, "state", value);
+    return object;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

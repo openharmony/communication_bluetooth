@@ -760,6 +760,30 @@ int BleDeregisterScanCallbacks(int32_t scannerId);
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam);
 
 /**
+ * @brief Enable advertising.
+ *
+ * This function is available for system applications only. \n
+ *
+ * @param advId Indicates the pointer to the advertisement ID.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 11
+ */
+int BleEnableAdvEx(int advId);
+
+/**
+ * @brief Disable advertising.
+ *
+ * This function is available for system applications only. \n
+ *
+ * @param advId Indicates the pointer to the advertisement ID.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 11
+ */
+int BleDisableAdvEx(int advId);
+
+/**
  * @brief Starts a scan with BleScanConfigs.
  * If don't need ble scan filter, set BleScanNativeFilter to NULL or filterSize to zero.
  * If one of the ble scan filtering rules is not required, set it to NULL.
