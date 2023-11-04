@@ -365,7 +365,7 @@ BluetoothA2dpCodecStatus BluetoothA2dpSrcProxy::GetCodecStatus(const RawAddress 
     return *statusPtr;
 }
 
-int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress& device, BluetoothA2dpCodecInfo& info)
+int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, BluetoothA2dpCodecInfo &info)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
