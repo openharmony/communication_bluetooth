@@ -818,16 +818,16 @@ void ConvertCodecBitsPerSample(A2dpCodecInfo &a2dpCodecInfo, int32_t codecBitsPe
 {
     switch (codecBitsPerSample) {
         case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_NONE:
-            a2dpCodecInfo.codecBitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_NONE_USER;
+            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_NONE_USER;
             break;
         case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_16:
-            a2dpCodecInfo.codecBitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER;
+            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER;
             break;
         case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_24:
-            a2dpCodecInfo.codecBitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_24_USER;
+            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_24_USER;
             break;
         case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_32:
-            a2dpCodecInfo.codecBitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER;
+            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER;
             break;
         default:
             break;
@@ -838,13 +838,13 @@ void ConvertCodecChannelMode(A2dpCodecInfo &a2dpCodecInfo, int32_t codecChannelM
 {
     switch (codecChannelMode) {
         case CodecChannelMode::CODEC_CHANNEL_MODE_NONE:
-            a2dpCodecInfo.codecChannelMode = A2dpUserCodecChannelMode::A2DP_CHANNEL_MODE_NONE_USER;
+            a2dpCodecInfo.channelMode = A2dpUserCodecChannelMode::A2DP_CHANNEL_MODE_NONE_USER;
             break;
         case CodecChannelMode::CODEC_CHANNEL_MODE_MONO:
-            a2dpCodecInfo.codecChannelMode = A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER;
+            a2dpCodecInfo.channelMode = A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER;
             break;
         case CodecChannelMode::CODEC_CHANNEL_MODE_STEREO:
-            a2dpCodecInfo.codecChannelMode = A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_STEREO_USER;
+            a2dpCodecInfo.channelMode = A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_STEREO_USER;
             break;
         default:
             break;
@@ -855,25 +855,25 @@ void ConvertCodecSampleRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecSampleRat
 {
     switch (codecSampleRate) {
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_NONE:
-            a2dpCodecInfo.codecSampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_44100:
-            a2dpCodecInfo.codecSampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_44100_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_44100_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_48000:
-            a2dpCodecInfo.codecSampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_48000_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_48000_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_88200:
-            a2dpCodecInfo.codecSampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_96000:
-            a2dpCodecInfo.codecSampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_96000_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_96000_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_176400:
-            a2dpCodecInfo.codecSampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
         case CodecSampleRate::CODEC_BITS_PER_SAMPLE_192000:
-            a2dpCodecInfo.codecSampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
+            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
         default:
             break;
