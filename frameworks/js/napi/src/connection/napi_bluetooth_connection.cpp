@@ -104,6 +104,8 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getRemoteProfileUuids", GetRemoteProfileUuids),
         DECLARE_NAPI_FUNCTION("on", RegisterConnectionObserver),
         DECLARE_NAPI_FUNCTION("off", DeRegisterConnectionObserver),
+        DECLARE_NAPI_FUNCTION("isBluetoothDisCovering", IsBluetoothDiscovering),
+        DECLARE_NAPI_FUNCTION("getPairState", GetPairState),
 #endif
     };
 
@@ -218,7 +220,7 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
 
 napi_value PairDevice(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -239,7 +241,7 @@ napi_value PairDevice(napi_env env, napi_callback_info info)
 
 napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::string remoteAddr{};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -672,6 +674,33 @@ napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+napi_value IsBluetoothDiscovering(napi_env env, napi_callback_info info)
+{
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    bool isDiscovering = false;
+    int32_t err = host->IsBtDiscovering(isDiscovering);
+    napi_value result = nullptr;
+    NAPI_BT_RETURN_IF(napi_get_boolean(env, isDiscovering, &result) != napi_ok, "napi_get_boolean failed", result);
+    NAPI_BT_ASSERT_RETURN(env, err = BT_NO_ERROR, err, result);
+    HILOGE("isBluetoothDiscovering :%{public}d", isDiscovering);
+    return result;
+}
+
+napi_value GetPairState(napi_env env, napi_callback_info info)
+{
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+    int pairState = PAIR_NONE;
+    int32_t err = remoteDevice.GetPairState(pairState);
+    napi_value result = nullptr;
+    NAPI_BT_RETURN_IF(napi_create_int32(env, pairState, &result) != napi_ok, "napi_create_int32 failed", result);
+    NAPI_BT_ASSERT_RETURN(env, err = BT_NO_ERROR, err, result);
+    HILOGE("getPairState :%{public}d", pairState);
+    return result;
 }
 #endif
 

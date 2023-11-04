@@ -21,6 +21,7 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
+
 NapiAvrcpControllerObserver NapiAvrcpController::observer_;
 bool NapiAvrcpController::isRegistered_ = false;
 

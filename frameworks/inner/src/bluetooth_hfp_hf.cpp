@@ -224,8 +224,9 @@ struct HandsFreeUnit::impl {
     bool Connect(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && !BluetoothHost::GetDefaultHost().IsBtDiscovering() &&
-            device.IsValidBluetoothRemoteDevice()) {
+        bool isDiscovering = false;
+        BluetoothHost::GetDefaultHost().IsBtDiscovering(isDiscovering);
+        if (proxy_ != nullptr && !isDiscovering && device.IsValidBluetoothRemoteDevice()) {
             return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         HILOGE("fw return false!");
