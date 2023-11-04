@@ -215,6 +215,17 @@ public:
      */
     A2dpCodecStatus GetCodecStatus(const BluetoothRemoteDevice &device) const;
 
+
+    /**
+    * @brief Get the codec encoding preferences of the specified device.
+    *
+    * @param device The address of the bluetooth device.
+    * @param info The codec encoding information.
+    * @return Return the result getted.
+    * @since 6.0
+    */
+    int GetCodecPreference(const BluetoothRemoteDevice& device, const A2dpCodecInfo& info);
+
     /**
      * @brief Set the codec encoding preferences of the specified device.
      *
