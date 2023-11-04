@@ -25,6 +25,8 @@ void DefineSystemBLEInterface(napi_env env, napi_value exports);
 napi_value StartBLEScan(napi_env env, napi_callback_info info);
 napi_value StopBLEScan(napi_env env, napi_callback_info info);
 napi_value StartAdvertising(napi_env env, napi_callback_info info);
+napi_value EnableAdvertising(napi_env env, napi_callback_info info);
+napi_value DisableAdvertising(napi_env env, napi_callback_info info);
 napi_value StopAdvertising(napi_env env, napi_callback_info info);
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info);
 napi_value PropertyInit(napi_env env, napi_value exports);

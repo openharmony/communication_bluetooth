@@ -49,6 +49,7 @@ enum class NapiGattWriteType {
 const std::string REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
 const std::string REGISTER_SYS_BLE_SCAN_TYPE = "sysBLEScan";
 const std::string REGISTER_SYS_BLE_FIND_DEVICE_TYPE = "sysBLEDeviceFonud";
+const std::string REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE = "advertisingStateChange";
 
 void ConvertGattServiceToJS(napi_env env, napi_value result, GattService &service);
 void ConvertGattServiceVectorToJS(napi_env env, napi_value result, std::vector<GattService> &services);
@@ -115,6 +116,17 @@ public:
     napi_value ToNapiValue(napi_env env) const override;
 private:
     std::vector<GattService> gattServices_ {};
+};
+
+class NapiNativeAdvertisingStateInfo : public NapiNativeObject {
+public:
+    NapiNativeAdvertisingStateInfo(int advHandle, int advState) : advHandle_(advHandle), advState_(advState) {}
+    ~NapiNativeAdvertisingStateInfo() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int advHandle_;
+    int advState_;
 };
 
 }  // namespace Bluetooth

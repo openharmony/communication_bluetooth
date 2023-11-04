@@ -16,6 +16,9 @@
 #include "napi_bluetooth_ble_advertise_callback.h"
 
 #include "bluetooth_log.h"
+#include "napi_async_work.h"
+#include "napi_native_object.h"
+#include "napi_bluetooth_ble_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -25,11 +28,87 @@ NapiBluetoothBleAdvertiseCallback &NapiBluetoothBleAdvertiseCallback::GetInstanc
     return instance;
 }
 
-void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result)
+void NapiBluetoothBleAdvertiseCallback::SetNapiAdvertisingStateCallback(const std::shared_ptr<NapiCallback> &callback)
 {
-    HILOGI("enter, result: %{public}d", result);
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    napiAdvertisingStateCallback_ = callback;
 }
+
+void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHandle)
+{
+    HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
+
+    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
+        if (callback == nullptr) {
+            HILOGE("napiAdvertisingStateCallback_ is nullptr");
+            return;
+        }
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 1); // 1 mean start adv
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+}
+
+void NapiBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHandle)
+{
+    HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
+
+    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
+        if (callback == nullptr) {
+            HILOGE("napiAdvertisingStateCallback_ is nullptr");
+            return;
+        }
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 2); // 2 mean enable adv
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+}
+
+void NapiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advHandle)
+{
+    HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
+
+    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
+        if (callback == nullptr) {
+            HILOGE("napiAdvertisingStateCallback_ is nullptr");
+            return;
+        }
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 3); // 3 mean disable adv
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+}
+
+void NapiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHandle)
+{
+    HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
+
+    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
+        if (callback == nullptr) {
+            HILOGE("napiAdvertisingStateCallback_ is nullptr");
+            return;
+        }
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 4); // 4 mean stop adv
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+}
+
 void NapiBluetoothBleAdvertiseCallback::OnSetAdvDataEvent(int result)
 {}
+
+void NapiBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advHandle)
+{
+    auto napiAdvHandle = std::make_shared<NapiNativeInt>(advHandle);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GET_ADVERTISING_HANDLE, napiAdvHandle, result);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

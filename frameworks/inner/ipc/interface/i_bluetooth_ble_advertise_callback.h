@@ -28,6 +28,9 @@ public:
 
     virtual void OnAutoStopAdvEvent(int32_t advHandle) = 0;
     virtual void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) = 0;
+    virtual void OnEnableResultEvent(int32_t result, int32_t advHandle) = 0;
+    virtual void OnDisableResultEvent(int32_t result, int32_t advHandle) = 0;
+    virtual void OnStopResultEvent(int32_t result, int32_t advHandle) = 0;
     virtual void OnSetAdvDataEvent(int32_t result, int32_t advHandle) = 0;
 };
 }  // namespace Bluetooth
