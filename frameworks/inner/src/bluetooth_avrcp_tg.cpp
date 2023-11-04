@@ -124,8 +124,9 @@ public:
     bool IsEnabled(void)
     {
         HILOGI("enter");
-
-        return (proxy_ != nullptr && !BluetoothHost::GetDefaultHost().IsBtDiscovering());
+        bool isDiscovering = false;
+        BluetoothHost::GetDefaultHost().IsBtDiscovering(isDiscovering);
+        return (proxy_ != nullptr && !isDiscovering);
     }
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)

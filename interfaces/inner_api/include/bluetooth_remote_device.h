@@ -39,7 +39,7 @@ public:
      *
      * @since 6
      */
-    BluetoothRemoteDevice(const std::string &addr, const int transport);
+    BluetoothRemoteDevice(const std::string &addr, const int transport = BT_TRANSPORT_BREDR);
     /**
      * @brief A destructor used to delete the <b>BluetoothRemoteDevice</b> instance.
      *
@@ -177,7 +177,7 @@ public:
      * @return Returns device pair state.
      * @since 6
      */
-    int GetPairState() const;
+    int GetPairState(int &pairState) const;
 
     /**
      * @brief Device start pair.

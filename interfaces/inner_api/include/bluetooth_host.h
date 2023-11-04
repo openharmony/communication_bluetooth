@@ -541,11 +541,11 @@ public:
     /**
      * @brief Check if device is discovering.
      *
-     * @return Returns <b>true</b> if device is discovering;
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
      *         returns <b>false</b> if device is not discovering.
      * @since 6
      */
-    bool IsBtDiscovering(int transport = BT_TRANSPORT_BREDR) const;
+    int IsBtDiscovering(bool &isDisCovering, int transport = BT_TRANSPORT_BREDR) const;
 
     /**
      * @brief Get device discovery end time.

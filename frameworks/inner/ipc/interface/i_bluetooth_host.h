@@ -79,7 +79,7 @@ public:
     virtual bool SetBondableMode(int32_t transport, int32_t mode) = 0;
     virtual int32_t StartBtDiscovery() = 0;
     virtual int32_t CancelBtDiscovery() = 0;
-    virtual bool IsBtDiscovering(const int32_t transport) = 0;
+    virtual int32_t IsBtDiscovering(bool &isDisCovering, const int32_t transport) = 0;
     virtual long GetBtDiscoveryEndMillis() = 0;
     virtual int32_t GetPairedDevices(const int32_t transport, std::vector<BluetoothRawAddress> &pairedAddr) = 0;
     virtual int32_t RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) = 0;
@@ -97,7 +97,7 @@ public:
     virtual std::string GetDeviceAlias(const std::string &address) = 0;
     virtual bool SetDeviceAlias(const std::string &address, const std::string &aliasName) = 0;
     virtual int32_t GetDeviceBatteryLevel(const std::string &address) = 0;
-    virtual int32_t GetPairState(int32_t transport, const std::string &address) = 0;
+    virtual int32_t GetPairState(int32_t transport, const std::string &address, int32_t &pairState) = 0;
     virtual int32_t StartPair(int32_t transport, const std::string &address) = 0;
     virtual int32_t StartCrediblePair(int32_t transport, const std::string &address) = 0;
     virtual bool CancelPairing(int32_t transport, const std::string &address) = 0;
