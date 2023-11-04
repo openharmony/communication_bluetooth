@@ -224,7 +224,7 @@ public:
     * @return Return the result getted.
     * @since 6.0
     */
-    int GetCodecPreference(const BluetoothRemoteDevice& device, const A2dpCodecInfo& info);
+    int GetCodecPreference(const BluetoothRemoteDevice &device, const A2dpCodecInfo &info);
 
     /**
      * @brief Set the codec encoding preferences of the specified device.
