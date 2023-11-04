@@ -486,7 +486,7 @@ napi_value NapiA2dpSource::SetCurrentCodecInfo(napi_env env, napi_callback_info 
     int transport = BT_TRANSPORT_BREDR;
     auto func = [remoteAddr, transport, a2dpCodecInfo]() {
         BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
-        A2dpSource* profile = A2dpSource::GetProfile();
+        A2dpSource *profile = A2dpSource::GetProfile();
         int32_t err = profile->SetCodecPreference(remoteDevice, a2dpCodecInfo);
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
@@ -504,12 +504,12 @@ napi_value NapiA2dpSource::GetCurrentCodecInfo(napi_env env, napi_callback_info 
     napi_create_object(env, &ret);
 
     std::string remoteAddr{};
-    bool checkRet = CheckDeviceIdParam(env, info, remoteAddr);
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, ret);
     A2dpCodecInfo a2dpCodecInfo;
     int transport = BT_TRANSPORT_BREDR;
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
-    A2dpSource* profile = A2dpSource::GetProfile();
+    A2dpSource *profile = A2dpSource::GetProfile();
     int errorCode = profile->GetCodecPreference(remoteDevice, a2dpCodecInfo);
     NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
     CodecInfo codecInfo;
