@@ -19,6 +19,7 @@
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_gatt_service.h"
+#include "bluetooth_a2dp_src.h"
 #include "bluetooth_log.h"
 #include "bluetooth_opp.h"
 #include "bluetooth_remote_device.h"
@@ -404,6 +405,43 @@ enum PlayingState {
     STATE_PLAYING = 1
 };
 
+enum CodecType {
+    CODEC_TYPE_SBC = 0,
+    CODEC_TYPE_AAC = 1,
+    CODEC_TYPE_L2HC = 2,
+    CODEC_TYPE_INVALID = -1,
+};
+
+enum CodecBitsPerSample {
+    CODEC_BITS_PER_SAMPLE_NONE = 0,
+    CODEC_BITS_PER_SAMPLE_16 = 1,
+    CODEC_BITS_PER_SAMPLE_24 = 2,
+    CODEC_BITS_PER_SAMPLE_32 = 3,
+};
+
+enum CodecChannelMode {
+    CODEC_CHANNEL_MODE_NONE = 0,
+    CODEC_CHANNEL_MODE_MONO = 1,
+    CODEC_CHANNEL_MODE_STEREO = 2,
+};
+
+enum CodecSampleRate {
+    CODEC_SAMPLE_RATE_NONE = 0,
+    CODEC_SAMPLE_RATE_44100 = 1,
+    CODEC_SAMPLE_RATE_48000 = 2,
+    CODEC_SAMPLE_RATE_88200 = 3,
+    CODEC_SAMPLE_RATE_96000 = 4,
+    CODEC_SAMPLE_RATE_176400 = 5,
+    CODEC_SAMPLE_RATE_192000 = 6,
+};
+
+struct CodecInfo {
+    CodecType codecType;
+    CodecBitsPerSample codecBitsPerSample;
+    CodecChannelMode codecChannelMode;
+    CodecSampleRate codecSampleRate;
+};
+
 enum ProfileId {
     PROFILE_A2DP_SINK = 0,
     PROFILE_A2DP_SOURCE = 1,
@@ -493,6 +531,9 @@ napi_status CheckEmptyParam(napi_env env, napi_callback_info info);
 napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const std::vector<std::string> &names);
 napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &strategy);
 napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::string &addr);
+napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info info, std::string &addr, A2dpCodecInfo &a2dpCodecInfo);
+void ConvertA2dpCodecInfoToCodecInfo(CodecInfo &codecInfo, A2dpCodecInfo &a2dpCodecInfo);
+void ConvertCodecInfoToJs(napi_env env, napi_value &object, CodecInfo &codecInfo);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H

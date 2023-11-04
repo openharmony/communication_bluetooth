@@ -53,6 +53,8 @@ napi_value NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env, napi_value expo
         DECLARE_NAPI_FUNCTION("isAbsoluteVolumeEnabled", IsAbsoluteVolumeEnabled),
         DECLARE_NAPI_FUNCTION("enableAbsoluteVolume", EnableAbsoluteVolume),
         DECLARE_NAPI_FUNCTION("disableAbsoluteVolume", DisableAbsoluteVolume),
+        DECLARE_NAPI_FUNCTION("setCurrentCodecInfo", SetCurrentCodecInfo),
+        DECLARE_NAPI_FUNCTION("getCurrentCodecInfo", GetCurrentCodecInfo),
 #endif
     };
 
@@ -174,11 +176,83 @@ napi_value PlayingStateInit(napi_env env)
     return playingState;
 }
 
+napi_value CodecTypeInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value codecType = nullptr;
+    napi_create_object(env, &codecType);
+    SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_SBC, "CODEC_TYPE_SBC");
+    SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_AAC, "CODEC_TYPE_AAC");
+    SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_L2HC, "CODEC_TYPE_L2HC");
+    SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_INVALID, "CODEC_TYPE_INVALID");
+    return codecType;
+}
+
+napi_value CodecBitsPerSampleInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value codecBitsPerSample = nullptr;
+    napi_create_object(env, &codecBitsPerSample);
+    SetNamedPropertyByInteger(env, codecBitsPerSample,
+        CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_NONE, "CODEC_BITS_PER_SAMPLE_NONE");
+    SetNamedPropertyByInteger(env, codecBitsPerSample,
+        CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_16, "CODEC_BITS_PER_SAMPLE_16");
+    SetNamedPropertyByInteger(env, codecBitsPerSample,
+        CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_24, "CODEC_BITS_PER_SAMPLE_24");
+    SetNamedPropertyByInteger(env, codecBitsPerSample,
+        CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_32, "CODEC_BITS_PER_SAMPLE_32");
+    return codecBitsPerSample;
+}
+
+napi_value CodecChannelModeInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value codecChannelMode = nullptr;
+    napi_create_object(env, &codecChannelMode);
+    SetNamedPropertyByInteger(env, codecChannelMode,
+        CodecChannelMode::CODEC_CHANNEL_MODE_NONE, "CODEC_CHANNEL_MODE_NONE");
+    SetNamedPropertyByInteger(env, codecChannelMode,
+        CodecChannelMode::CODEC_CHANNEL_MODE_MONO, "CODEC_CHANNEL_MODE_MONO");
+    SetNamedPropertyByInteger(env, codecChannelMode,
+        CodecChannelMode::CODEC_CHANNEL_MODE_STEREO, "CODEC_CHANNEL_MODE_STEREO");
+    return codecChannelMode;
+}
+
+napi_value CodecSampleRateInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value codecSampleRate = nullptr;
+    napi_create_object(env, &codecSampleRate);
+    SetNamedPropertyByInteger(env, codecSampleRate,
+        CodecSampleRate::CODEC_SAMPLE_RATE_NONE, "CODEC_SAMPLE_RATE_NONE");
+    SetNamedPropertyByInteger(env, codecSampleRate,
+        CodecSampleRate::CODEC_SAMPLE_RATE_44100, "CODEC_SAMPLE_RATE_44100");
+    SetNamedPropertyByInteger(env, codecSampleRate,
+        CodecSampleRate::CODEC_SAMPLE_RATE_48000, "CODEC_SAMPLE_RATE_48000");
+    SetNamedPropertyByInteger(env, codecSampleRate,
+        CodecSampleRate::CODEC_SAMPLE_RATE_88200, "CODEC_SAMPLE_RATE_88200");
+    SetNamedPropertyByInteger(env, codecSampleRate,
+        CodecSampleRate::CODEC_SAMPLE_RATE_96000, "CODEC_SAMPLE_RATE_96000");
+    SetNamedPropertyByInteger(env, codecSampleRate,
+        CodecSampleRate::CODEC_SAMPLE_RATE_176400, "CODEC_SAMPLE_RATE_176400");
+    SetNamedPropertyByInteger(env, codecSampleRate,
+        CodecSampleRate::CODEC_SAMPLE_RATE_192000, "CODEC_SAMPLE_RATE_192000");
+    return codecSampleRate;
+}
+
 napi_value NapiA2dpSource::A2dpPropertyValueInit(napi_env env, napi_value exports)
 {
     napi_value playingStateObj = PlayingStateInit(env);
+    napi_value codecTypeObj = CodecTypeInit(env);
+    napi_value codecBitsPerSampleObj = CodecBitsPerSampleInit(env);
+    napi_value codecChannelModeObj = CodecChannelModeInit(env);
+    napi_value codecSampleRateObj = CodecSampleRateInit(env);
     napi_property_descriptor exportProps[] = {
         DECLARE_NAPI_PROPERTY("PlayingState", playingStateObj),
+        DECLARE_NAPI_PROPERTY("CodecType", codecTypeObj),
+        DECLARE_NAPI_PROPERTY("CodecBitsPerSample", codecBitsPerSampleObj),
+        DECLARE_NAPI_PROPERTY("CodecChannelMode", codecChannelModeObj),
+        DECLARE_NAPI_PROPERTY("CodecSampleRate", codecSampleRateObj),
     };
     napi_define_properties(env, exports, sizeof(exportProps) / sizeof(*exportProps), exportProps);
     HILOGI("end");
@@ -400,6 +474,48 @@ napi_value NapiA2dpSource::DisableAbsoluteVolume(napi_env env, napi_callback_inf
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+napi_value NapiA2dpSource::SetCurrentCodecInfo(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    std::string remoteAddr{};
+    A2dpCodecInfo a2dpCodecInfo;
+    auto status = CheckSetCodecPreferenceParam(env, info, remoteAddr, a2dpCodecInfo);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    int transport = BT_TRANSPORT_BREDR;
+    auto func = [remoteAddr, transport, a2dpCodecInfo]() {
+        BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
+        A2dpSource* profile = A2dpSource::GetProfile();
+        int32_t err = profile->SetCodecPreference(remoteDevice, a2dpCodecInfo);
+        HILOGI("err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiA2dpSource::GetCurrentCodecInfo(napi_env env, napi_callback_info info)
+{
+    HILOGI("start");
+    napi_value ret = nullptr;
+    napi_create_object(env, &ret);
+
+    std::string remoteAddr{};
+    bool checkRet = CheckDeviceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, ret);
+    A2dpCodecInfo a2dpCodecInfo;
+    int transport = BT_TRANSPORT_BREDR;
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+    A2dpSource* profile = A2dpSource::GetProfile();
+    int errorCode = profile->GetCodecPreference(remoteDevice, a2dpCodecInfo);
+    NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
+    CodecInfo codecInfo;
+    ConvertA2dpCodecInfoToCodecInfo(codecInfo, a2dpCodecInfo);
+    ConvertCodecInfoToJs(env, ret, codecInfo);
+    return ret;
 }
 
 #endif
