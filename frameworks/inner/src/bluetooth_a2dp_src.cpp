@@ -502,7 +502,7 @@ A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) 
     return ret;
 }
 
-int A2dpSource::SetCodecPreference(const BluetoothRemoteDevice &device, A2dpCodecInfo &info)
+int A2dpSource::GetCodecPreference(const BluetoothRemoteDevice &device, A2dpCodecInfo &info)
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
