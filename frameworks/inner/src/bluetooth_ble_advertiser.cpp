@@ -26,6 +26,7 @@
 #include "system_ability_definition.h"
 
 #include <memory>
+#include "securec.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -280,6 +281,10 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     setting.SetInterval(settings.GetInterval());
     setting.SetLegacyMode(settings.IsLegacyMode());
     setting.SetTxPower(settings.GetTxPower());
+    uint8_t addr[OHOS_BD_ADDR_LEN] = {};
+    settings.GetOwnAddr(addr);
+    setting.SetOwnAddr(addr);
+    setting.SetOwnAddrType(settings.GetOwnAddrType());
 
     BluetoothBleAdvertiserData bleAdvertiserData;
     BluetoothBleAdvertiserData bleScanResponse;
@@ -327,6 +332,10 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     setting.SetInterval(settings.GetInterval());
     setting.SetLegacyMode(settings.IsLegacyMode());
     setting.SetTxPower(settings.GetTxPower());
+    uint8_t addr[OHOS_BD_ADDR_LEN] = {};
+    settings.GetOwnAddr(addr);
+    setting.SetOwnAddr(addr);
+    setting.SetOwnAddrType(settings.GetOwnAddrType());
 
     BluetoothBleAdvertiserData bleAdvertiserData;
     bleAdvertiserData.SetPayload(std::string(advData.begin(), advData.end()));
@@ -633,6 +642,26 @@ int BleAdvertiserSettings::GetSecondaryPhy() const
 void BleAdvertiserSettings::SetSecondaryPhy(int secondaryPhy)
 {
     secondaryPhy_ = secondaryPhy;
+}
+
+void BleAdvertiserSettings::GetOwnAddr(uint8_t addr[OHOS_BD_ADDR_LEN]) const
+{
+    memcpy_s(addr, OHOS_BD_ADDR_LEN, ownAddr_, OHOS_BD_ADDR_LEN);
+}
+
+void BleAdvertiserSettings::SetOwnAddr(const uint8_t addr[OHOS_BD_ADDR_LEN])
+{
+    memcpy_s(ownAddr_, OHOS_BD_ADDR_LEN, addr, OHOS_BD_ADDR_LEN);
+}
+
+int8_t BleAdvertiserSettings::GetOwnAddrType() const
+{
+    return ownAddrType_;
+}
+
+void BleAdvertiserSettings::SetOwnAddrType(int8_t addrType)
+{
+    ownAddrType_ = addrType;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
