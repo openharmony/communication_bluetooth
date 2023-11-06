@@ -37,6 +37,8 @@
 #include "string"
 #include "uuid.h"
 #include "bluetooth_object_map.h"
+#include <queue>
+#include <set>
 
 
 #ifdef __cplusplus
@@ -48,6 +50,11 @@ using namespace std;
 namespace OHOS {
 namespace Bluetooth {
 #define MAX_BLE_ADV_NUM 7
+#define MAX_ADV_ADDR_MAP_SIZE 128
+#define ADV_ADDR_TIMEOUT (60 * 60 * 1000) // 1 hour
+#define ADV_ADDR_TIME_THRESHOLD (15 * 60 * 1000) // 15 mins
+#define MS_PER_SECOND 1000
+#define NS_PER_MS 1000000
 
 class BleCentralManagerCallbackWapper;
 class BleAdvCallback;
@@ -59,6 +66,10 @@ static std::shared_ptr<BleAdvertiser> g_BleAdvertiser = nullptr;
 
 constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
+
+static mutex g_advMutex;
+static set<string> g_advAddrs;
+static queue<pair<string, uint64_t>> g_advTimeQueue; // pair<addr, time>
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -276,6 +287,7 @@ int BleSetAdvData(int advId, const StartAdvRawData data)
         HILOGE("Invalid advId (%{public}d)", advId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
+    lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("Adv is not started, need call 'BleStartAdvEx' first.");
         return OHOS_BT_STATUS_FAIL;
@@ -328,6 +340,7 @@ int BleStopAdv(int advId)
         HILOGE("BleStopAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
+    lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleStopAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
@@ -528,6 +541,114 @@ int BleDeregisterScanCallbacks(int32_t scannerId)
     return OHOS_BT_STATUS_SUCCESS;
 }
 
+static uint64_t GetBootMillis()
+{
+    struct timespec ts = {};
+    clock_gettime(CLOCK_BOOTTIME, &ts);
+    return ts.tv_sec * MS_PER_SECOND + ts.tv_nsec / NS_PER_MS;
+}
+
+static void RemoveTimeoutAdvAddr()
+{
+    uint64_t now = GetBootMillis();
+    while (!g_advTimeQueue.empty() && now >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
+        g_advAddrs.erase(g_advTimeQueue.front().first);
+        g_advTimeQueue.pop();
+    }
+}
+
+static bool IsAdvAddrSetFull()
+{
+    if (g_advTimeQueue.size() >= MAX_ADV_ADDR_MAP_SIZE) {
+        if (GetBootMillis() >= g_advTimeQueue.front().second + ADV_ADDR_TIME_THRESHOLD) {
+            g_advAddrs.erase(g_advTimeQueue.front().first);
+            g_advTimeQueue.pop();
+            HILOGI("remove oldest adv addr");
+        } else {
+            HILOGI("reached the max num of advs in 15 minutes");
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool IsAddrValid(const AdvOwnAddrParams *ownAddrParams)
+{
+    if (ownAddrParams != nullptr && ((ownAddrParams->addr[0] & 0xC0) ^ 0x40) == 0) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief Sets own address, own address type, advertising data and parameters, and then starts advertising.
+ *
+ * This function is available for softbus only.
+ *
+ * @param advId Indicates the pointer to the advertisement ID.
+ * @param rawData Indicates the advertising data. For details, see {@link StartAdvRawData}.
+ * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
+ * @param ownAddrParams Indicates the own address and own address type. For details, see {@link AdvOwnAddrParams}.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdvParams *advParam,
+    const AdvOwnAddrParams *ownAddrParams)
+{
+    HILOGI("BleStartAdvWithAddr enter");
+    if(rawData == nullptr || advParam == nullptr || !IsAddrValid(ownAddrParams)){
+        HILOGW("params are invalid");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    lock_guard<mutex> lock(g_advMutex);
+    int i = 0;
+    for (; i < MAX_BLE_ADV_NUM; i++) {
+        if (g_bleAdvCallbacks[i] == nullptr) {
+            g_bleAdvCallbacks[i] = make_shared<BleAdvCallback>(i);
+            break;
+        }
+    }
+
+    if (i == MAX_BLE_ADV_NUM) {
+        HILOGW("reach the max num of adv");
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
+
+    RemoveTimeoutAdvAddr();
+    string addrStr(reinterpret_cast<const char*>(ownAddrParams->addr), sizeof(ownAddrParams->addr));
+    if (g_advAddrs.find(addrStr) == g_advAddrs.end() && !IsAdvAddrSetFull()) {
+        g_advTimeQueue.push(pair<string, uint64_t>(addrStr, GetBootMillis()));
+        g_advAddrs.insert(addrStr);
+    } else {
+        HILOGW("already has the same adv addr");
+        g_bleAdvCallbacks[i] = nullptr;
+        return OHOS_BT_STATUS_UNHANDLED;
+    }
+
+    *advId = i;
+    HILOGI("ret advId: %{public}d.", *advId);
+
+    BleAdvertiserSettings settings;
+    settings.SetInterval(advParam->minInterval);
+    if (advParam->advType == OHOS_BLE_ADV_SCAN_IND ||
+        advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
+        settings.SetConnectable(false);
+    }
+    if (ownAddrParams != nullptr) {
+        settings.SetOwnAddr(ownAddrParams->addr);
+        settings.SetOwnAddrType(ownAddrParams->addrType);
+    }
+
+    auto advData = ConvertDataToVec(rawData->advData, rawData->advDataLen);
+    auto scanResponse = ConvertDataToVec(rawData->rspData, rawData->rspDataLen);
+    if (g_BleAdvertiser == nullptr) {
+        g_BleAdvertiser = make_shared<BleAdvertiser>();
+    }
+    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, *g_bleAdvCallbacks[i]);
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
 /**
  * @brief Sets advertising data and parameters and starts advertising.
  *
@@ -543,6 +664,7 @@ int BleDeregisterScanCallbacks(int32_t scannerId)
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam)
 {
     HILOGI("BleStartAdvEx enter");
+    lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = std::make_shared<BleAdvertiser>();
     }
@@ -591,6 +713,7 @@ int BleEnableAdvEx(int advId)
         HILOGE("BleEnableAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
+    lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleEnableAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
@@ -618,6 +741,7 @@ int BleDisableAdvEx(int advId)
         HILOGE("BleDisableAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
+    lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleDisableAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
@@ -949,6 +1073,7 @@ int GetAdvHandle(int advId, int *advHandle)
         HILOGE("GetAdvHandle fail, advId is invalid.advId: %{public}d.", advId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
+    lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("GetAdvHandle fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
