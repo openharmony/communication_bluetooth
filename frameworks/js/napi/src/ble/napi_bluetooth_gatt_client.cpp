@@ -687,10 +687,16 @@ napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callbac
         }
         return NapiAsyncWorkRet(ret);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+
+    bool isNeedCallback = character->GetWriteType() == GattCharacteristic::WriteType::DEFAULT;
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(
+        env, info, func, isNeedCallback ? ASYNC_WORK_NEED_CALLBACK : ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_CHARACTER, asyncWork);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+    // GattCharacteristic write need callback, write no response is not needed.
+    if (isNeedCallback) {
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_CHARACTER, asyncWork);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+    }
 
     asyncWork->Run();
     return asyncWork->GetRet();
