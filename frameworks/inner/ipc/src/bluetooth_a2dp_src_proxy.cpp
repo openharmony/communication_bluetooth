@@ -378,7 +378,7 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
     }
 
     MessageParcel reply;
-    MessageOption option{
+    MessageOption option {
         MessageOption::TF_SYNC
     };
 
