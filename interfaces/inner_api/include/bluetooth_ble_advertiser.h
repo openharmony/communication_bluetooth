@@ -35,6 +35,7 @@
 
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
+#include "ohos_bt_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -286,6 +287,38 @@ public:
      */
     void SetSecondaryPhy(int secondaryPhy);
 
+    /**
+     * @brief Get own address.
+     *
+     * @param addr Own address.
+     * @since 6
+     */
+    void GetOwnAddr(uint8_t addr[OHOS_BD_ADDR_LEN]) const;
+
+    /**
+     * @brief Set own address.
+     *
+     * @param addr Own address.
+     * @since 6
+     */
+    void SetOwnAddr(const uint8_t addr[OHOS_BD_ADDR_LEN]);
+
+    /**
+     * @brief Get own address type.
+     *
+     * @return Returns own address type.
+     * @since 6
+     */
+    int8_t GetOwnAddrType() const;
+
+    /**
+     * @brief Set own address type.
+     *
+     * @param addrType Own address type.
+     * @since 6
+     */
+    void SetOwnAddrType(int8_t addrType);
+
 private:
     bool connectable_ = true;
     bool legacyMode_ = true;
@@ -293,6 +326,8 @@ private:
     uint8_t txPower_ = BLE_ADV_TX_POWER_LOW;
     int primaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     int secondaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
+    uint8_t ownAddr_[OHOS_BD_ADDR_LEN] = {};
+    int8_t ownAddrType_ = -1;
 };
 
 /**
