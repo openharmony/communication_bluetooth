@@ -20,6 +20,7 @@
 #include "array"
 #include "map"
 #include "vector"
+#include "securec.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -392,6 +393,50 @@ int BleAdvertiserSettingsImpl::GetSecondaryPhy() const
 void BleAdvertiserSettingsImpl::SetSecondaryPhy(int secondaryPhy)
 {
     secondaryPhy_ = secondaryPhy;
+}
+
+/**
+ * @brief Get own address.
+ *
+ * @param addr Own address.
+ * @since 6
+ */
+void BleAdvertiserSettingsImpl::GetOwnAddr(uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN]) const
+{
+    memcpy_s(addr, RawAddress::BT_ADDRESS_BYTE_LEN, ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN);
+}
+
+/**
+ * @brief Set own address.
+ *
+ * @param addr Own address.
+ * @since 6
+ */
+void BleAdvertiserSettingsImpl::SetOwnAddr(const uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN])
+{
+    memcpy_s(ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN, addr, RawAddress::BT_ADDRESS_BYTE_LEN);
+}
+
+/**
+ * @brief Get own address type.
+ *
+ * @return Returns own address type.
+ * @since 6
+ */
+int8_t BleAdvertiserSettingsImpl::GetOwnAddrType() const
+{
+    return ownAddrType_;
+}
+
+/**
+ * @brief Set own address type.
+ *
+ * @param addrType Own address type.
+ * @since 6
+ */
+void BleAdvertiserSettingsImpl::SetOwnAddrType(int8_t addrType)
+{
+    ownAddrType_ = addrType;
 }
 
 /**
