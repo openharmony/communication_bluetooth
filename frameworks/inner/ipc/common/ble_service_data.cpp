@@ -403,7 +403,7 @@ void BleAdvertiserSettingsImpl::SetSecondaryPhy(int secondaryPhy)
  */
 void BleAdvertiserSettingsImpl::GetOwnAddr(uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN]) const
 {
-    memcpy_s(addr, RawAddress::BT_ADDRESS_BYTE_LEN, ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN);
+    (void)memcpy_s(addr, RawAddress::BT_ADDRESS_BYTE_LEN, ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN);
 }
 
 /**
@@ -414,7 +414,7 @@ void BleAdvertiserSettingsImpl::GetOwnAddr(uint8_t addr[RawAddress::BT_ADDRESS_B
  */
 void BleAdvertiserSettingsImpl::SetOwnAddr(const uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN])
 {
-    memcpy_s(ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN, addr, RawAddress::BT_ADDRESS_BYTE_LEN);
+    (void)memcpy_s(ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN, addr, RawAddress::BT_ADDRESS_BYTE_LEN);
 }
 
 /**
