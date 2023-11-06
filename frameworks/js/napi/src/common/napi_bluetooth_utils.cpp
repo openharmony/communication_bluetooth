@@ -854,25 +854,25 @@ void ConvertCodecChannelMode(A2dpCodecInfo &a2dpCodecInfo, int32_t codecChannelM
 void ConvertCodecSampleRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecSampleRate)
 {
     switch (codecSampleRate) {
-        case CodecSampleRate::CODEC_BITS_PER_SAMPLE_NONE:
+        case CodecSampleRate::CODEC_SAMPLE_RATE_NONE:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
-        case CodecSampleRate::CODEC_BITS_PER_SAMPLE_44100:
+        case CodecSampleRate::CODEC_SAMPLE_RATE_44100:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER;
             break;
-        case CodecSampleRate::CODEC_BITS_PER_SAMPLE_48000:
+        case CodecSampleRate::CODEC_SAMPLE_RATE_48000:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER;
             break;
-        case CodecSampleRate::CODEC_BITS_PER_SAMPLE_88200:
+        case CodecSampleRate::CODEC_SAMPLE_RATE_88200:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
-        case CodecSampleRate::CODEC_BITS_PER_SAMPLE_96000:
+        case CodecSampleRate::CODEC_SAMPLE_RATE_96000:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER;
             break;
-        case CodecSampleRate::CODEC_BITS_PER_SAMPLE_176400:
+        case CodecSampleRate::CODEC_SAMPLE_RATE_176400:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
-        case CodecSampleRate::CODEC_BITS_PER_SAMPLE_192000:
+        case CodecSampleRate::CODEC_SAMPLE_RATE_192000:
             a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
             break;
         default:
@@ -941,16 +941,16 @@ void ConvertCodecSampleRateToCodecInfo(CodecInfo &codecInfo, int32_t codecSample
 {
     switch (codecSampleRate) {
         case A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER:
-            codecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_NONE;
+            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_NONE;
             break;
         case A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER:
-            codecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_44100;
+            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_44100;
             break;
         case A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER:
-            codecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_48000;
+            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_48000;
             break;
         case A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER:
-            a2dpCodecInfo.codecSampleRate = CodecSampleRate::CODEC_BITS_PER_SAMPLE_96000;
+            a2dpCodecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_96000;
             break;
         default:
             break;
