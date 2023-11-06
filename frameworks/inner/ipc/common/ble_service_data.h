@@ -268,6 +268,38 @@ public:
      */
     void SetSecondaryPhy(int secondaryPhy);
 
+    /**
+     * @brief Get own address.
+     *
+     * @return Returns own address.
+     * @since 6
+     */
+    void GetOwnAddr(uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN]) const;
+
+    /**
+     * @brief Set own address.
+     *
+     * @param addr Own address.
+     * @since 6
+     */
+    void SetOwnAddr(const uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN]);
+
+    /**
+     * @brief Get own address type.
+     *
+     * @return Returns own address type.
+     * @since 6
+     */
+    int8_t GetOwnAddrType() const;
+
+    /**
+     * @brief Set own address type.
+     *
+     * @param addrType Own address type.
+     * @since 6
+     */
+    void SetOwnAddrType(int8_t addrType);
+
 private:
     /// Advertising interval.
     int interval_ = BLE_ADV_DEFAULT_INTERVAL;
@@ -281,6 +313,10 @@ private:
     int primaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     /// Advertising secondaryPhy.
     int secondaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
+    /// Own address.
+    uint8_t ownAddr_[RawAddress::BT_ADDRESS_BYTE_LEN] = {};
+    /// Own address type.
+    int8_t ownAddrType_ = -1;
 };
 
 /**
