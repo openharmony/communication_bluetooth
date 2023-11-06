@@ -45,6 +45,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief Enumerates ble address type
+ *
+ * @since 6
+ */
+typedef enum {
+    BLE_ADDR_RANDOM = 0x01,
+} BleAddrType;
+
+/**
  * @brief Enumerates advertising filtering parameters.
  *
  * The parameters specify whether the advertiser uses a whitelist to filter scan or connection requests from scanners.
@@ -272,6 +281,16 @@ typedef enum {
     /** Coded PHY */
     OHOS_BLE_SCAN_PHY_CODED = 0x03
 } BleScanResultPhyType;
+
+/**
+ * @brief Defines BLE advertising own address parameters.
+ *
+ * @since 6
+ */
+typedef struct {
+    uint8_t addr[OHOS_BD_ADDR_LEN];
+    BleAddrType addrType;
+} AdvOwnAddrParams;
 
 /**
  * @brief Defines BLE advertising parameters.
@@ -744,6 +763,22 @@ int BleRegisterScanCallbacks(BleScanCallbacks *func, int32_t *scannerId);
  * @since 6
  */
 int BleDeregisterScanCallbacks(int32_t scannerId);
+
+/**
+ * @brief Sets own address, own address type, advertising data and parameters and starts advertising.
+ *
+ * This function is available for softbus only.
+ *
+ * @param advId Indicates the pointer to the advertisement ID.
+ * @param rawData Indicates the advertising data. For details, see {@link StartAdvRawData}.
+ * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
+ * @param ownAddrParams Indicates the own address and own address type. For details, see {@link AdvOwnAddrParams}.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 6
+ */
+int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdvParams *advParam,
+    const AdvOwnAddrParams *ownAddrParams);
 
 /**
  * @brief Sets advertising data and parameters and starts advertising.
