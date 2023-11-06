@@ -153,5 +153,30 @@ void BluetoothSocketProxy::RemoveObserver(const sptr<IBluetoothSocketObserver> &
     }
     HILOGD("BluetoothSocketProxy::RemoveObserver success");
 }
+
+int BluetoothSocketProxy::UpdateCocConnectionParams(const BluetoothSocketCocInfo &info)
+{
+    HILOGI("UpdateCocConnectionParams starts");
+    MessageParcel data;
+
+    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
+        HILOGE("WriteInterfaceToken error");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&info)) {
+        HILOGE("WriteParcelable error");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::SOCKET_UPDATE_COC_PARAMS, data, reply, option);
+    if (error != BT_NO_ERROR) {
+        HILOGE("UpdateCocConnectionParams done fail, error: %{public}d", error);
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

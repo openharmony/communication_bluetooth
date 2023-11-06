@@ -841,5 +841,21 @@ std::shared_ptr<ServerSocket> SocketFactory::DataListenRfcommByServiceRecord(con
     HILOGD("enter");
     return std::make_shared<ServerSocket>(name, uuid, TYPE_RFCOMM, true);
 }
+
+int ClientSocket::UpdateCocConnectionParams(CocUpdateSocketParam &param)
+{
+    HILOGI("UpdateCocConnectionParams enter");
+    BluetoothSocketCocInfo info;
+
+    info.addr = param.addr;
+    info.minInterval = param.minInterval;
+    info.maxInterval = param.maxInterval;
+    info.peripheralLatency = param.peripheralLatency;
+    info.supervisionTimeout = param.supervisionTimeout;
+    info.minConnEventLen = param.minConnEventLen;
+    info.maxConnEventLen = param.maxConnEventLen;
+    CHECK_AND_RETURN_LOG_RET(pimpl->proxy_, BT_ERR_INVALID_STATE, "proxy is null");
+    return pimpl->proxy_->UpdateCocConnectionParams(info);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
