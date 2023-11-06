@@ -20,6 +20,7 @@
 
 #include "bluetooth_service_ipc_interface_code.h"
 #include "bt_uuid.h"
+#include "bluetooth_socket_coc.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_socket_observer.h"
 
@@ -41,6 +42,7 @@ struct ConnectSocketParam {
     int32_t psm;
     sptr<IBluetoothSocketObserver> observer;
 };
+
 class IBluetoothSocket : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothSocket");
@@ -48,6 +50,7 @@ public:
     virtual int Connect(ConnectSocketParam &param, int &fd) = 0;
     virtual int Listen(ListenSocketParam &param, int &fd) = 0;
     virtual void RemoveObserver(const sptr<IBluetoothSocketObserver> &observer) = 0;
+    virtual int UpdateCocConnectionParams(const BluetoothSocketCocInfo &info) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

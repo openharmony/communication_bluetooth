@@ -1487,6 +1487,16 @@ enum PbapResponseCode : uint8_t {
     PBAP_DATABASE_LOCKED = 0xE1              // Database Locked
 };
 
+struct CocUpdateSocketParam {
+    std::string addr;
+    int32_t minInterval;
+    int32_t maxInterval;
+    int32_t peripheralLatency;
+    int32_t supervisionTimeout;
+    int32_t minConnEventLen;
+    int32_t maxConnEventLen;
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
