@@ -37,6 +37,13 @@ bool BluetoothBleAdvertiserSettings::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(secondaryPhy_)) {
         return false;
     }
+    std::string addr(reinterpret_cast<const char*>(ownAddr_), bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN);
+    if (!parcel.WriteString(addr)) {
+        return false;
+    }
+    if (!parcel.WriteInt8(ownAddrType_)) {
+        return false;
+    }
     return true;
 }
 
@@ -73,6 +80,16 @@ bool BluetoothBleAdvertiserSettings::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadInt32(secondaryPhy_)) {
+        return false;
+    }
+    std::string address = "";
+    if (parcel.ReadString(address) && address.size() == bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN) {
+        (void)memcpy_s(ownAddr_, bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN,
+            reinterpret_cast<const uint8_t *>(address.c_str()), bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN);
+    } else {
+        return false;
+    }
+    if (!parcel.ReadInt8(ownAddrType_)) {
         return false;
     }
     return true;
