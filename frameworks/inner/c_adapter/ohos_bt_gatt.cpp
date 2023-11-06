@@ -597,7 +597,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     const AdvOwnAddrParams *ownAddrParams)
 {
     HILOGI("BleStartAdvWithAddr enter");
-    if(rawData == nullptr || advParam == nullptr || !IsAddrValid(ownAddrParams)){
+    if (rawData == nullptr || advParam == nullptr || !IsAddrValid(ownAddrParams)) {
         HILOGW("params are invalid");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
