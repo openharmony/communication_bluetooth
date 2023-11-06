@@ -797,20 +797,20 @@ napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::
 void ConvertCodecType(A2dpCodecInfo &a2dpCodecInfo, int32_t codecType)
 {
     switch (codecType) {
-    case CodecType::CODEC_TYPE_SBC:
-        a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_SBC_USER;
-        break;
-    case CodecType::CODEC_TYPE_AAC:
-        a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_AAC_USER;
-        break;
-    case CodecType::CODEC_TYPE_L2HC:
-        a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_L2HCV2_USER;
-        break;
-    case CodecType::CODEC_TYPE_INVALID:
-        a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_NONA2DP_USER;
-        break;
-    default:
-        break;
+        case CodecType::CODEC_TYPE_SBC:
+            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_SBC_USER;
+            break;
+        case CodecType::CODEC_TYPE_AAC:
+            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_AAC_USER;
+            break;
+        case CodecType::CODEC_TYPE_L2HC:
+            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_L2HCV2_USER;
+            break;
+        case CodecType::CODEC_TYPE_INVALID:
+            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_NONA2DP_USER;
+            break;
+        default:
+            break;
     }
 }
 
@@ -923,17 +923,17 @@ void ConvertCodecBitsPerSampleToCodecInfo(CodecInfo &codecInfo, int32_t codecBit
 void ConvertCodecChannelModeToCodecInfo(CodecInfo &codecInfo, int32_t codecChannelMode)
 {
     switch (codecChannelMode) {
-    case A2dpUserCodecChannelMode::A2DP_CHANNEL_MODE_NONE_USER:
-        codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_NONE;
-        break;
-    case A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER:
-        codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_MONO;
-        break;
-    case A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_STEREO_USER:
-        codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_STEREO;
-        break;
-    default:
-        break;
+        case A2dpUserCodecChannelMode::A2DP_CHANNEL_MODE_NONE_USER:
+            codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_NONE;
+            break;
+        case A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER:
+            codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_MONO;
+            break;
+        case A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_STEREO_USER:
+            codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_STEREO;
+            break;
+        default:
+            break;
     }
 }
 
@@ -950,7 +950,7 @@ void ConvertCodecSampleRateToCodecInfo(CodecInfo &codecInfo, int32_t codecSample
             codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_48000;
             break;
         case A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER:
-            a2dpCodecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_96000;
+            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_96000;
             break;
         default:
             break;
@@ -966,7 +966,7 @@ void ConvertA2dpCodecInfoToCodecInfo(CodecInfo &codecInfo, A2dpCodecInfo &a2dpCo
 
 void ConvertCodecInfoToJs(napi_env env, napi_value &object, CodecInfo &codecInfo)
 {
-    napi_value value;
+    napi_value value = nullptr;
     napi_create_int32(env, codecInfo.codecType, &value);
     napi_set_named_property(env, object, "codecType", value);
     napi_create_int32(env, codecInfo.codecBitsPerSample, &value);
