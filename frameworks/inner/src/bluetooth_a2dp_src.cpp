@@ -327,19 +327,6 @@ int32_t A2dpSource::Connect(const BluetoothRemoteDevice &device)
         HILOGE("input parameter error.");
         return BT_ERR_INVALID_PARAM;
     }
-
-    int cod = 0;
-    int32_t err = device.GetDeviceClass(cod);
-    if (err != BT_NO_ERROR) {
-        HILOGE("GetDeviceClass Failed.");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    BluetoothDeviceClass devClass = BluetoothDeviceClass(cod);
-    if (!devClass.IsProfileSupported(BluetoothDevice::PROFILE_A2DP)) {
-        HILOGE("a2dp connect failed. The remote device does not support A2DP service.");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
     return pimpl->proxy_->Connect(RawAddress(device.GetDeviceAddr()));
 }
 
