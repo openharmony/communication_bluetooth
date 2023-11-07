@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_a2dp_src_observer_stub.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "raw_address.h"
 
@@ -101,7 +102,7 @@ ErrCode BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(MessageParcel &da
     std::string addr = data.ReadString();
     int action = data.ReadInt32();
     OnMediaStackChanged(RawAddress(addr), action);
-    return NO_ERROR;
+    return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
