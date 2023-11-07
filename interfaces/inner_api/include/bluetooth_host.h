@@ -661,8 +661,8 @@ public:
     * @param address object device report address.
     * @param useA2dp whether use A2dp of this device.
     * @param useHfp whether use Hfp of this device.
-    * @param userSelection whether this echo command send by user selection.
-    * @return Returns {@link BT_NO_ERROR} if send echo 8,9 command success;
+    * @param userSelection whether this send command by user selection.
+    * @return Returns {@link BT_NO_ERROR} if send selection success;
     * returns an error code defined in {@link BtErrCode} otherwise.
     */
     int SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) const;
