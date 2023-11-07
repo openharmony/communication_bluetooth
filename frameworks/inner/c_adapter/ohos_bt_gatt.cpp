@@ -548,6 +548,14 @@ static uint64_t GetBootMillis()
     return ts.tv_sec * MS_PER_SECOND + ts.tv_nsec / NS_PER_MS;
 }
 
+static void RemoveTimeoutAdvAddr(uint64_t currentMillis)
+{
+    while (!g_advTimeQueue.empty() && now >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
+        g_advAddrMap.erase(g_advTimeQueue.front().first);
+        g_advTimeQueue.pop();
+    }
+}
+
 static bool CanStartAdv(const string& addrStr, uint64_t currentMillis)
 {
     auto addrTime = g_advAddrMap.find(addrStr);
@@ -567,14 +575,6 @@ static bool CanStartAdv(const string& addrStr, uint64_t currentMillis)
     g_advTimeQueue.push(pair<string, uint64_t>(addrStr, currentMillis));
     g_advAddrMap.insert(make_pair(addrStr, currentMillis));
     return true;
-}
-
-static void RemoveTimeoutAdvAddr(uint64_t currentMillis)
-{
-    while (!g_advTimeQueue.empty() && now >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
-        g_advAddrMap.erase(g_advTimeQueue.front().first);
-        g_advTimeQueue.pop();
-    }
 }
 
 static bool IsAddrValid(const AdvOwnAddrParams *ownAddrParams)
