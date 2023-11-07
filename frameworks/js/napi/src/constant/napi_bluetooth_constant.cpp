@@ -388,7 +388,7 @@ napi_value NapiConstant::HealthMajorClassOfDeviceInit(napi_env env, napi_value m
         static_cast<int>(MajorMinorClass::HEALTH_BODY_COMPOSITION_ANALYZER),
         "HEALTH_BODY_COMPOSITION_ANALYZER");
     SetNamedPropertyByInteger(
-        env, majorMinorClass, static_cast<int>(MajorMinorClass::HEALTH_PEAK_FLOW_MOITOR), "HEALTH_PEAK_FLOW_MOITOR");
+        env, majorMinorClass, static_cast<int>(MajorMinorClass::HEALTH_PEAK_FLOW_MONITOR), "HEALTH_PEAK_FLOW_MONITOR");
     SetNamedPropertyByInteger(env,
         majorMinorClass,
         static_cast<int>(MajorMinorClass::HEALTH_MEDICATION_MONITOR),
