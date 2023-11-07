@@ -370,7 +370,7 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("write device error");
