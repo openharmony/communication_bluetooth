@@ -550,7 +550,7 @@ static uint64_t GetBootMillis()
 
 static void RemoveTimeoutAdvAddr(uint64_t currentMillis)
 {
-    while (!g_advTimeQueue.empty() && now >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
+    while (!g_advTimeQueue.empty() && currentMillis >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
         g_advAddrMap.erase(g_advTimeQueue.front().first);
         g_advTimeQueue.pop();
     }
