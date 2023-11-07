@@ -63,7 +63,7 @@ struct GattServiceWapper {
     GattService *gattService;
     int index;
     int maxNum;
-    int handleOffset;
+    int handleOffset;  // Gatt service handle in stack
     bool isAdding;
 };
 
@@ -437,15 +437,23 @@ static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool
             continue;
         }
 
+        // The characteristic handle is the offset of the gatt service handle now.
+        // 'isOffset' indicates whether attrHandle is the actual feature value handle.
+        // if it's true, attrHandle is not an offset; if it's false, attrHandle is also an offset.
         std::vector<GattCharacteristic> &gattCharacteristics = gattService->GetCharacteristics();
-
         for (auto &character : gattCharacteristics) {
-            if (character.GetHandle() == attrHandle) {
+            int characterHandle = character.GetHandle();
+            if (isOffset) {
+                characterHandle += GATTSERVICES(serverId, i).handleOffset;
+            }
+            if (characterHandle == attrHandle) {
                 *srvcHandle = i;
                 return &character;
             }
         }
     }
+    HILOGE("not find Character, serverId: %{public}d, attrHandle: %{public}d, isOffset: %{public}d",
+        serverId, attrHandle, isOffset);
     return nullptr;
 }
 
