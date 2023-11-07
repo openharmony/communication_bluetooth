@@ -389,7 +389,7 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
         return ERROR;
     }
     int32_t exception = reply.ReadInt32();
-    std::unique_ptr<BluetoothA2dpCodecInfo> bluetoothA2dpCodecInfo(reply.ReadParcelable<BluetoothA2dpCodecInfo>());
+    std::shared_ptr<BluetoothA2dpCodecInfo> bluetoothA2dpCodecInfo(reply.ReadParcelable<BluetoothA2dpCodecInfo>());
     if (bluetoothA2dpCodecInfo == nullptr) {
         HILOGE("transport error");
         return ERROR;
