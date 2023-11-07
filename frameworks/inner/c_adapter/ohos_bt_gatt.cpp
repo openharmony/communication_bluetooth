@@ -68,7 +68,7 @@ constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
 static mutex g_advMutex;
-static set<string> g_advAddrs;
+static map<string, uint64_t> g_advAddrMap; // map<addr, time>
 static queue<pair<string, uint64_t>> g_advTimeQueue; // pair<addr, time>
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
@@ -548,28 +548,33 @@ static uint64_t GetBootMillis()
     return ts.tv_sec * MS_PER_SECOND + ts.tv_nsec / NS_PER_MS;
 }
 
-static void RemoveTimeoutAdvAddr()
+static bool CanStartAdv(const string& addrStr, uint64_t currentMillis)
 {
-    uint64_t now = GetBootMillis();
-    while (!g_advTimeQueue.empty() && now >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
-        g_advAddrs.erase(g_advTimeQueue.front().first);
-        g_advTimeQueue.pop();
-    }
-}
-
-static bool IsAdvAddrSetFull()
-{
-    if (g_advTimeQueue.size() >= MAX_ADV_ADDR_MAP_SIZE) {
-        if (GetBootMillis() >= g_advTimeQueue.front().second + ADV_ADDR_TIME_THRESHOLD) {
-            g_advAddrs.erase(g_advTimeQueue.front().first);
-            g_advTimeQueue.pop();
-            HILOGI("remove oldest adv addr");
+    auto addrTime = g_advAddrMap.find(addrStr);
+    if (addrTime != g_advAddrMap.end()) {
+        if (currentMillis >= addrTime->second + ADV_ADDR_TIME_THRESHOLD) {
+            HILOGW("has the same adv addr in [15mins, 60mins]");
+            return false;
         } else {
-            HILOGI("reached the max num of advs in 15 minutes");
             return true;
         }
     }
-    return false;
+    if (g_advTimeQueue.size() >= MAX_ADV_ADDR_MAP_SIZE) {
+        g_advAddrMap.erase(g_advTimeQueue.front().first);
+        g_advTimeQueue.pop();
+        HILOGI("remove oldest adv addr");
+    }
+    g_advTimeQueue.push(pair<string, uint64_t>(addrStr, currentMillis));
+    g_advAddrMap.insert(make_pair(addrStr, currentMillis));
+    return true;
+}
+
+static void RemoveTimeoutAdvAddr(uint64_t currentMillis)
+{
+    while (!g_advTimeQueue.empty() && now >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
+        g_advAddrMap.erase(g_advTimeQueue.front().first);
+        g_advTimeQueue.pop();
+    }
 }
 
 static bool IsAddrValid(const AdvOwnAddrParams *ownAddrParams)
@@ -615,13 +620,10 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         return OHOS_BT_STATUS_UNHANDLED;
     }
 
-    RemoveTimeoutAdvAddr();
+    uint64_t currentMillis = GetBootMillis();
+    RemoveTimeoutAdvAddr(currentMillis);
     string addrStr(reinterpret_cast<const char*>(ownAddrParams->addr), sizeof(ownAddrParams->addr));
-    if (g_advAddrs.find(addrStr) == g_advAddrs.end() && !IsAdvAddrSetFull()) {
-        g_advTimeQueue.push(pair<string, uint64_t>(addrStr, GetBootMillis()));
-        g_advAddrs.insert(addrStr);
-    } else {
-        HILOGW("already has the same adv addr");
+    if (!CanStartAdv(addrStr, currentMillis)) {
         g_bleAdvCallbacks[i] = nullptr;
         return OHOS_BT_STATUS_UNHANDLED;
     }
