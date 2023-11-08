@@ -374,7 +374,7 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
     }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("write device error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     MessageParcel reply;
@@ -384,15 +384,19 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
 
     int error = Remote()->SendRequest(
         BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_CODEC_PREFERENCE, data, reply, option);
-    if (error != NO_ERROR) {
+    if (error != BT_NO_ERROR) {
         HILOGE("error: %{public}d", error);
-        return ERROR;
+        return error;
     }
     int32_t exception = reply.ReadInt32();
+    if (exception != BT_NO_ERROR) {
+        HILOGE("error: %{public}d", exception);
+        return exception;
+    }
     std::shared_ptr<BluetoothA2dpCodecInfo> bluetoothA2dpCodecInfo(reply.ReadParcelable<BluetoothA2dpCodecInfo>());
     if (bluetoothA2dpCodecInfo == nullptr) {
-        HILOGE("transport error");
-        return ERROR;
+         HILOGE("error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     info = *bluetoothA2dpCodecInfo;
     return exception;
@@ -403,15 +407,15 @@ int BluetoothA2dpSrcProxy::SetCodecPreference(const RawAddress &device, const Bl
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("write device error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteParcelable(&info)) {
         HILOGE("transport error");
-        return ERROR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     MessageParcel reply;
@@ -421,9 +425,9 @@ int BluetoothA2dpSrcProxy::SetCodecPreference(const RawAddress &device, const Bl
 
     int error = Remote()->SendRequest(
         BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_SET_CODEC_PREFERENCE, data, reply, option);
-    if (error != NO_ERROR) {
+    if (error != BT_NO_ERROR) {
         HILOGE("error: %{public}d", error);
-        return ERROR;
+        return error;
     }
 
     return reply.ReadInt32();
