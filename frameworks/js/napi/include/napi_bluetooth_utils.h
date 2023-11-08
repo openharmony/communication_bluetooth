@@ -456,27 +456,27 @@ enum ProfileId {
     PROFILE_OPP = 10
 };
 
-const std::map<int32_t, int32_t> g_codecTypeMap = {
+const static std::map<int32_t, int32_t> g_codecTypeMap = {
     {CODEC_TYPE_SBC, A2DP_CODEC_TYPE_SBC_USER},
     {CODEC_TYPE_AAC, A2DP_CODEC_TYPE_AAC_USER},
     {CODEC_TYPE_L2HC, A2DP_CODEC_TYPE_L2HCV2_USER},
     {CODEC_TYPE_INVALID, A2DP_CODEC_TYPE_NONA2DP_USER},
 };
 
-const std::map<int32_t, int32_t> g_codecBitsPerSampleMap = {
+const static std::map<int32_t, int32_t> g_codecBitsPerSampleMap = {
     {CODEC_BITS_PER_SAMPLE_NONE, A2DP_SAMPLE_BITS_NONE_USER},
     {CODEC_BITS_PER_SAMPLE_16, A2DP_SAMPLE_BITS_16_USER},
     {CODEC_BITS_PER_SAMPLE_24, A2DP_SAMPLE_BITS_24_USER},
     {CODEC_BITS_PER_SAMPLE_32, A2DP_SAMPLE_BITS_32_USER},
 };
 
-const std::map<int32_t, int32_t> g_codecChannelModeMap = {
+const static std::map<int32_t, int32_t> g_codecChannelModeMap = {
     {CODEC_CHANNEL_MODE_NONE, A2DP_CHANNEL_MODE_NONE_USER},
     {CODEC_CHANNEL_MODE_MONO, A2DP_SBC_CHANNEL_MODE_MONO_USER},
     {CODEC_CHANNEL_MODE_STEREO, A2DP_SBC_CHANNEL_MODE_STEREO_USER},
 };
 
-const std::map<int32_t, int32_t> g_codecSampleRateMap = {
+const static std::map<int32_t, int32_t> g_codecSampleRateMap = {
     {CODEC_SAMPLE_RATE_NONE, A2DP_SAMPLE_RATE_NONE_USER},
     {CODEC_SAMPLE_RATE_44100, A2DP_SBC_SAMPLE_RATE_44100_USER},
     {CODEC_SAMPLE_RATE_48000, A2DP_L2HCV2_SAMPLE_RATE_48000_USER},
@@ -486,27 +486,27 @@ const std::map<int32_t, int32_t> g_codecSampleRateMap = {
     {CODEC_SAMPLE_RATE_192000, A2DP_SAMPLE_RATE_NONE_USER},
 };
 
-const std::map<int32_t, CodecType> g_a2dpCodecTypeMap = {
+const static std::map<int32_t, CodecType> g_a2dpCodecTypeMap = {
     {A2DP_CODEC_TYPE_SBC_USER, CODEC_TYPE_SBC},
     {A2DP_CODEC_TYPE_AAC_USER, CODEC_TYPE_AAC},
     {A2DP_CODEC_TYPE_L2HCV2_USER, CODEC_TYPE_L2HC},
     {A2DP_CODEC_TYPE_NONA2DP_USER, CODEC_TYPE_INVALID},
 };
 
-const std::map<int32_t, CodecBitsPerSample> g_a2dpCodecBitsPerSampleMap = {
+const static std::map<int32_t, CodecBitsPerSample> g_a2dpCodecBitsPerSampleMap = {
     {A2DP_SAMPLE_BITS_NONE_USER, CODEC_BITS_PER_SAMPLE_NONE},
     {A2DP_SAMPLE_BITS_16_USER, CODEC_BITS_PER_SAMPLE_16},
     {A2DP_SAMPLE_BITS_24_USER, CODEC_BITS_PER_SAMPLE_24},
     {A2DP_SAMPLE_BITS_32_USER, CODEC_BITS_PER_SAMPLE_32},
 };
 
-const std::map<int32_t, CodecChannelMode> g_a2dpCodecChannelModeMap = {
+const static std::map<int32_t, CodecChannelMode> g_a2dpCodecChannelModeMap = {
     {A2DP_CHANNEL_MODE_NONE_USER, CODEC_CHANNEL_MODE_NONE},
     {A2DP_SBC_CHANNEL_MODE_MONO_USER, CODEC_CHANNEL_MODE_MONO},
     {A2DP_SBC_CHANNEL_MODE_STEREO_USER, CODEC_CHANNEL_MODE_STEREO},
 };
 
-const std::map<int32_t, CodecSampleRate> g_a2dpCodecSampleRateMap = {
+const static std::map<int32_t, CodecSampleRate> g_a2dpCodecSampleRateMap = {
     {A2DP_SAMPLE_RATE_NONE_USER, CODEC_SAMPLE_RATE_NONE},
     {A2DP_SBC_SAMPLE_RATE_44100_USER, CODEC_SAMPLE_RATE_44100},
     {A2DP_L2HCV2_SAMPLE_RATE_48000_USER, CODEC_SAMPLE_RATE_48000},
