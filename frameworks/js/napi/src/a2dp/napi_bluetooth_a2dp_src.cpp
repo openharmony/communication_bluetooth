@@ -478,23 +478,16 @@ napi_value NapiA2dpSource::DisableAbsoluteVolume(napi_env env, napi_callback_inf
 
 napi_value NapiA2dpSource::SetCurrentCodecInfo(napi_env env, napi_callback_info info)
 {
-    HILOGI("start");
     std::string remoteAddr{};
     A2dpCodecInfo a2dpCodecInfo;
     auto status = CheckSetCodecPreferenceParam(env, info, remoteAddr, a2dpCodecInfo);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    int transport = BT_TRANSPORT_BREDR;
-    auto func = [remoteAddr, transport, a2dpCodecInfo]() {
-        BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
-        A2dpSource *profile = A2dpSource::GetProfile();
-        int32_t err = profile->SetCodecPreference(remoteDevice, a2dpCodecInfo);
-        HILOGI("err: %{public}d", err);
-        return NapiAsyncWorkRet(err);
-    };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-    asyncWork->Run();
-    return asyncWork->GetRet();
+    BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+    A2dpSource *profile = A2dpSource::GetProfile();
+    int32_t errorCode = profile->SetCodecPreference(remoteDevice, a2dpCodecInfo);
+    HILOGI("err: %{public}d", errorCode);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
+    return NapiGetBooleanTrue(env);
 }
 
 napi_value NapiA2dpSource::GetCurrentCodecInfo(napi_env env, napi_callback_info info)
@@ -512,9 +505,7 @@ napi_value NapiA2dpSource::GetCurrentCodecInfo(napi_env env, napi_callback_info 
     A2dpSource *profile = A2dpSource::GetProfile();
     int errorCode = profile->GetCodecPreference(remoteDevice, a2dpCodecInfo);
     NAPI_BT_ASSERT_RETURN(env, (errorCode == BT_NO_ERROR), errorCode, ret);
-    CodecInfo codecInfo;
-    ConvertA2dpCodecInfoToCodecInfo(codecInfo, a2dpCodecInfo);
-    ConvertCodecInfoToJs(env, ret, codecInfo);
+    ConvertCodecInfoToJs(env, ret, a2dpCodecInfo);
     return ret;
 }
 
