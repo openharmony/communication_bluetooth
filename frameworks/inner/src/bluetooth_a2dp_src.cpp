@@ -507,28 +507,30 @@ int A2dpSource::GetCodecPreference(const BluetoothRemoteDevice &device, A2dpCode
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return RET_BAD_STATUS;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or a2dpSrc proxy is nullptr");
-        return RET_BAD_STATUS;
+        return BT_ERR_UNAVAILABLE_PROXY;
     }
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("input parameter error.");
-        return RET_BAD_PARAM;
+        return BT_ERR_INVALID_PARAM;
     }
 
     BluetoothA2dpCodecInfo serviceInfo;
-    if (pimpl->proxy_->GetCodecPreference(RawAddress(device.GetDeviceAddr()), serviceInfo) == RET_NO_ERROR) {
-        info.codecType = serviceInfo.codecType;
-        info.sampleRate = serviceInfo.sampleRate;
-        info.channelMode = serviceInfo.channelMode;
-        info.bitsPerSample = serviceInfo.bitsPerSample;
-        return RET_NO_ERROR;
+    int ret = pimpl->proxy_->GetCodecPreference(RawAddress(device.GetDeviceAddr()), serviceInfo);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("GetCodecPreference error.");
+        return ret;
     }
-    return RET_BAD_PARAM;
+    info.codecType = serviceInfo.codecType;
+    info.sampleRate = serviceInfo.sampleRate;
+    info.channelMode = serviceInfo.channelMode;
+    info.bitsPerSample = serviceInfo.bitsPerSample;
+    return ret;
 }
 
 int A2dpSource::SetCodecPreference(const BluetoothRemoteDevice &device, const A2dpCodecInfo &info)
@@ -536,17 +538,17 @@ int A2dpSource::SetCodecPreference(const BluetoothRemoteDevice &device, const A2
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return RET_BAD_STATUS;
+        return BT_ERR_INVALID_STATE;
     }
 
     if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or a2dpSrc proxy is nullptr");
-        return RET_BAD_STATUS;
+        return BT_ERR_UNAVAILABLE_PROXY;
     }
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("input parameter error.");
-        return RET_BAD_PARAM;
+        return BT_ERR_INVALID_PARAM;
     }
 
     BluetoothA2dpCodecInfo serviceInfo;
