@@ -169,6 +169,8 @@ typedef enum {
     OHOS_BLE_SCAN_MODE_OP_P100_1000_1000 = 0x06,
     /** Duty cycle 50 */
     OHOS_BLE_SCAN_MODE_OP_P50_100_200 = 0x07,
+    /** Duty cycle 10 30/300 */
+    OHOS_BLE_SCAN_MODE_OP_P10_30_300 = 0x08, 
 } BleScanMode;
 
 /**
