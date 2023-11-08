@@ -861,11 +861,13 @@ void ConvertCodecSampleRateToCodecInfo(CodecInfo &codecInfo, int32_t codecSample
 
 void ConvertCodecInfoToJs(napi_env env, napi_value &object, A2dpCodecInfo &a2dpCodecInfo)
 {
+    // convert A2dpCodecInfo to CodecInfo
     CodecInfo codecInfo;
     ConvertCodecSampleRateToCodecInfo(codecInfo, a2dpCodecInfo.sampleRate);
     ConvertCodecChannelModeToCodecInfo(codecInfo, a2dpCodecInfo.channelMode);
     ConvertCodecBitsPerSampleToCodecInfo(codecInfo, a2dpCodecInfo.bitsPerSample);
     ConvertCodecTypeToCodecInfo(codecInfo, a2dpCodecInfo.codecType);
+    // convert CodecInfo to JS
     napi_value value = nullptr;
     napi_create_int32(env, codecInfo.codecType, &value);
     napi_set_named_property(env, object, "codecType", value);
@@ -886,6 +888,7 @@ napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info info, 
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
         env, argv[PARAM1], {"codecType", "codecBitsPerSample", "codecChannelMode", "codecSampleRate"}));
+    // parse codecInfo
     int32_t codecType = 0;
     NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, argv[PARAM1], "codecType", codecType));
     ConvertCodecType(a2dpCodecInfo, codecType);
