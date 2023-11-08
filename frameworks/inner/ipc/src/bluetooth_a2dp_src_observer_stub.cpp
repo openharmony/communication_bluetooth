@@ -97,7 +97,7 @@ ErrCode BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel 
     return NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int action = data.ReadInt32();
