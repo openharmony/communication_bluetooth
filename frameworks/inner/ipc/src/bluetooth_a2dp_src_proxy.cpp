@@ -370,11 +370,11 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
@@ -396,7 +396,7 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
     std::shared_ptr<BluetoothA2dpCodecInfo> bluetoothA2dpCodecInfo(reply.ReadParcelable<BluetoothA2dpCodecInfo>());
     if (bluetoothA2dpCodecInfo == nullptr) {
          HILOGE("error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_INTERNAL_ERROR;
     }
     info = *bluetoothA2dpCodecInfo;
     return exception;
@@ -407,15 +407,15 @@ int BluetoothA2dpSrcProxy::SetCodecPreference(const RawAddress &device, const Bl
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteString(device.GetAddress())) {
         HILOGE("write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (!data.WriteParcelable(&info)) {
         HILOGE("transport error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
