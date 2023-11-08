@@ -512,7 +512,7 @@ int A2dpSource::GetCodecPreference(const BluetoothRemoteDevice &device, A2dpCode
 
     if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or a2dpSrc proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     if (!device.IsValidBluetoothRemoteDevice()) {
@@ -543,7 +543,7 @@ int A2dpSource::SetCodecPreference(const BluetoothRemoteDevice &device, const A2
 
     if (pimpl == nullptr || !pimpl->proxy_) {
         HILOGE("pimpl or a2dpSrc proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     if (!device.IsValidBluetoothRemoteDevice()) {
