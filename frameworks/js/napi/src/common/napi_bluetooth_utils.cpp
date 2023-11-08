@@ -794,178 +794,78 @@ napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     return napi_ok;
 }
+
 void ConvertCodecType(A2dpCodecInfo &a2dpCodecInfo, int32_t codecType)
 {
-    switch (codecType) {
-        case CodecType::CODEC_TYPE_SBC:
-            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_SBC_USER;
-            break;
-        case CodecType::CODEC_TYPE_AAC:
-            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_AAC_USER;
-            break;
-        case CodecType::CODEC_TYPE_L2HC:
-            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_L2HCV2_USER;
-            break;
-        case CodecType::CODEC_TYPE_INVALID:
-            a2dpCodecInfo.codecType = A2dpUserCodecType::A2DP_CODEC_TYPE_NONA2DP_USER;
-            break;
-        default:
-            break;
+    auto iter = g_codecTypeMap.find(codecType);
+    if (iter != g_codecTypeMap.end()) {
+        a2dpCodecInfo.codecType = iter->second;
     }
 }
 
 void ConvertCodecBitsPerSample(A2dpCodecInfo &a2dpCodecInfo, int32_t codecBitsPerSample)
 {
-    switch (codecBitsPerSample) {
-        case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_NONE:
-            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_NONE_USER;
-            break;
-        case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_16:
-            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER;
-            break;
-        case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_24:
-            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_24_USER;
-            break;
-        case CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_32:
-            a2dpCodecInfo.bitsPerSample = A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER;
-            break;
-        default:
-            break;
+    auto iter = g_codecBitsPerSampleMap.find(codecBitsPerSample);
+    if (iter != g_codecBitsPerSampleMap.end()) {
+        a2dpCodecInfo.bitsPerSample = iter->second;
     }
 }
 
 void ConvertCodecChannelMode(A2dpCodecInfo &a2dpCodecInfo, int32_t codecChannelMode)
 {
-    switch (codecChannelMode) {
-        case CodecChannelMode::CODEC_CHANNEL_MODE_NONE:
-            a2dpCodecInfo.channelMode = A2dpUserCodecChannelMode::A2DP_CHANNEL_MODE_NONE_USER;
-            break;
-        case CodecChannelMode::CODEC_CHANNEL_MODE_MONO:
-            a2dpCodecInfo.channelMode = A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER;
-            break;
-        case CodecChannelMode::CODEC_CHANNEL_MODE_STEREO:
-            a2dpCodecInfo.channelMode = A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_STEREO_USER;
-            break;
-        default:
-            break;
+    auto iter = g_codecChannelModeMap.find(codecChannelMode);
+    if (iter != g_codecChannelModeMap.end()) {
+        a2dpCodecInfo.channelMode = iter->second;
     }
 }
 
 void ConvertCodecSampleRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecSampleRate)
 {
-    switch (codecSampleRate) {
-        case CodecSampleRate::CODEC_SAMPLE_RATE_NONE:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
-            break;
-        case CodecSampleRate::CODEC_SAMPLE_RATE_44100:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER;
-            break;
-        case CodecSampleRate::CODEC_SAMPLE_RATE_48000:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER;
-            break;
-        case CodecSampleRate::CODEC_SAMPLE_RATE_88200:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
-            break;
-        case CodecSampleRate::CODEC_SAMPLE_RATE_96000:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER;
-            break;
-        case CodecSampleRate::CODEC_SAMPLE_RATE_176400:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
-            break;
-        case CodecSampleRate::CODEC_SAMPLE_RATE_192000:
-            a2dpCodecInfo.sampleRate = A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER;
-            break;
-        default:
-            break;
+    auto iter = g_codecSampleRateMap.find(codecSampleRate);
+    if (iter != g_codecSampleRateMap.end()) {
+        a2dpCodecInfo.sampleRate = iter->second;
     }
 }
 
 void ConvertCodecTypeToCodecInfo(CodecInfo &codecInfo, int32_t codecType)
 {
-    switch (codecType) {
-        case A2dpUserCodecType::A2DP_CODEC_TYPE_SBC_USER:
-            codecInfo.codecType = CodecType::CODEC_TYPE_SBC;
-            break;
-        case A2dpUserCodecType::A2DP_CODEC_TYPE_AAC_USER:
-            codecInfo.codecType = CodecType::CODEC_TYPE_AAC;
-            break;
-        case A2dpUserCodecType::A2DP_CODEC_TYPE_L2HCV2_USER:
-            codecInfo.codecType = CodecType::CODEC_TYPE_L2HC;
-            break;
-        case A2dpUserCodecType::A2DP_CODEC_TYPE_NONA2DP_USER:
-            codecInfo.codecType = CodecType::CODEC_TYPE_INVALID;
-            break;
-        default:
-            break;
+    auto iter = g_a2dpCodecTypeMap.find(codecType);
+    if (iter != g_a2dpCodecTypeMap.end()) {
+        codecInfo.codecType = iter->second;
     }
 }
 
 void ConvertCodecBitsPerSampleToCodecInfo(CodecInfo &codecInfo, int32_t codecBitsPerSample)
 {
-    switch (codecBitsPerSample) {
-        case A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_NONE_USER:
-            codecInfo.codecBitsPerSample = CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_NONE;
-            break;
-        case A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER:
-            codecInfo.codecBitsPerSample = CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_16;
-            break;
-        case A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_24_USER:
-            codecInfo.codecBitsPerSample = CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_24;
-            break;
-        case A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER:
-            codecInfo.codecBitsPerSample = CodecBitsPerSample::CODEC_BITS_PER_SAMPLE_32;
-            break;
-        default:
-            break;
+    auto iter = g_a2dpCodecBitsPerSampleMap.find(codecBitsPerSample);
+    if (iter != g_a2dpCodecBitsPerSampleMap.end()) {
+        codecInfo.codecBitsPerSample = iter->second;
     }
 }
 
 void ConvertCodecChannelModeToCodecInfo(CodecInfo &codecInfo, int32_t codecChannelMode)
 {
-    switch (codecChannelMode) {
-        case A2dpUserCodecChannelMode::A2DP_CHANNEL_MODE_NONE_USER:
-            codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_NONE;
-            break;
-        case A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER:
-            codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_MONO;
-            break;
-        case A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_STEREO_USER:
-            codecInfo.codecChannelMode = CodecChannelMode::CODEC_CHANNEL_MODE_STEREO;
-            break;
-        default:
-            break;
+    auto iter = g_a2dpCodecChannelModeMap.find(codecChannelMode);
+    if (iter != g_a2dpCodecChannelModeMap.end()) {
+        codecInfo.codecChannelMode = iter->second;
     }
 }
 
 void ConvertCodecSampleRateToCodecInfo(CodecInfo &codecInfo, int32_t codecSampleRate)
 {
-    switch (codecSampleRate) {
-        case A2dpUserCodecSampleRate::A2DP_SAMPLE_RATE_NONE_USER:
-            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_NONE;
-            break;
-        case A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER:
-            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_44100;
-            break;
-        case A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER:
-            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_48000;
-            break;
-        case A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER:
-            codecInfo.codecSampleRate = CodecSampleRate::CODEC_SAMPLE_RATE_96000;
-            break;
-        default:
-            break;
+    auto iter = g_a2dpCodecSampleRateMap.find(codecSampleRate);
+    if (iter != g_a2dpCodecSampleRateMap.end()) {
+        codecInfo.codecSampleRate = iter->second;
     }
 }
 
-void ConvertA2dpCodecInfoToCodecInfo(CodecInfo &codecInfo, A2dpCodecInfo &a2dpCodecInfo) {
+void ConvertCodecInfoToJs(napi_env env, napi_value &object, A2dpCodecInfo &a2dpCodecInfo)
+{
+    CodecInfo codecInfo;
     ConvertCodecSampleRateToCodecInfo(codecInfo, a2dpCodecInfo.sampleRate);
     ConvertCodecChannelModeToCodecInfo(codecInfo, a2dpCodecInfo.channelMode);
     ConvertCodecBitsPerSampleToCodecInfo(codecInfo, a2dpCodecInfo.bitsPerSample);
     ConvertCodecTypeToCodecInfo(codecInfo, a2dpCodecInfo.codecType);
-}
-
-void ConvertCodecInfoToJs(napi_env env, napi_value &object, CodecInfo &codecInfo)
-{
     napi_value value = nullptr;
     napi_create_int32(env, codecInfo.codecType, &value);
     napi_set_named_property(env, object, "codecType", value);
@@ -986,27 +886,18 @@ napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info info, 
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
         env, argv[PARAM1], {"codecType", "codecBitsPerSample", "codecChannelMode", "codecSampleRate"}));
-    bool exist = false;
     int32_t codecType = 0;
-    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM1], "codecType", exist, codecType));
-    if (exist) {
-        ConvertCodecType(a2dpCodecInfo, codecType);
-    }
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, argv[PARAM1], "codecType", codecType));
+    ConvertCodecType(a2dpCodecInfo, codecType);
     int32_t codecBitsPerSample = 0;
-    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM1], "codecBitsPerSample", exist, codecBitsPerSample));
-    if (exist) {
-        ConvertCodecBitsPerSample(a2dpCodecInfo, codecBitsPerSample);
-    }
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, argv[PARAM1], "codecBitsPerSample", codecBitsPerSample));
+    ConvertCodecBitsPerSample(a2dpCodecInfo, codecBitsPerSample);
     int32_t codecChannelMode = 0;
-    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM1], "codecChannelMode", exist, codecChannelMode));
-    if (exist) {
-        ConvertCodecChannelMode(a2dpCodecInfo, codecChannelMode);
-    }
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, argv[PARAM1], "codecChannelMode", codecChannelMode));
+    ConvertCodecChannelMode(a2dpCodecInfo, codecChannelMode);
     int32_t codecSampleRate = 0;
-    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM1], "codecSampleRate", exist, codecSampleRate));
-    if (exist) {
-        ConvertCodecSampleRate(a2dpCodecInfo, codecSampleRate);
-    }
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, argv[PARAM1], "codecSampleRate", codecSampleRate));
+    ConvertCodecSampleRate(a2dpCodecInfo, codecSampleRate);
     return napi_ok;
 }
 }  // namespace Bluetooth
