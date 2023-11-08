@@ -67,8 +67,14 @@ static std::shared_ptr<BleAdvertiser> g_BleAdvertiser = nullptr;
 constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
+struct CaseInsensitiveCompare {
+    bool operator()(const string& s1, const string& s2) const {
+        return lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(),
+            [](char c1, char c2) { return tolower(c1) < tolower(c2); });
+    }
+};
 static mutex g_advMutex;
-static map<string, uint64_t> g_advAddrMap; // map<addr, time>
+static map<string, uint64_t, CaseInsensitiveCompare> g_advAddrMap; // map<addr, time>
 static queue<pair<string, uint64_t>> g_advTimeQueue; // pair<addr, time>
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
