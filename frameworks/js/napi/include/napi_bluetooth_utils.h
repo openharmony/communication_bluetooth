@@ -589,8 +589,7 @@ napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const
 napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &strategy);
 napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::string &addr);
 napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info info, std::string &addr, A2dpCodecInfo &a2dpCodecInfo);
-void ConvertA2dpCodecInfoToCodecInfo(CodecInfo &codecInfo, A2dpCodecInfo &a2dpCodecInfo);
-void ConvertCodecInfoToJs(napi_env env, napi_value &object, CodecInfo &codecInfo);
+void ConvertCodecInfoToJs(napi_env env, napi_value &object, A2dpCodecInfo &a2dpCodecInfo);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H
