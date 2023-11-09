@@ -63,7 +63,7 @@ int BluetoothA2dpSrcObserverStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int state = data.ReadInt32();
@@ -73,7 +73,7 @@ ErrCode BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParce
     return NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int playingState = data.ReadInt32();
@@ -84,7 +84,7 @@ ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel 
     return NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
