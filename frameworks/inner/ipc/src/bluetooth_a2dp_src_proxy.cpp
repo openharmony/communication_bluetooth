@@ -386,7 +386,7 @@ int BluetoothA2dpSrcProxy::GetCodecPreference(const RawAddress &device, Bluetoot
         BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_CODEC_PREFERENCE, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("error: %{public}d", error);
-        return error;
+        return BT_ERR_INTERNAL_ERROR;
     }
     int32_t exception = reply.ReadInt32();
     if (exception != BT_NO_ERROR) {
