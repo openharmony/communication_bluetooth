@@ -89,7 +89,7 @@ int32_t BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel 
     std::string addr = data.ReadString();
     std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
     if (!info) {
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     int error = data.ReadInt32();
 
