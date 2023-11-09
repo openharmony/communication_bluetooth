@@ -81,7 +81,7 @@ public:
     virtual int32_t CancelBtDiscovery() = 0;
     virtual int32_t IsBtDiscovering(bool &isDisCovering, const int32_t transport) = 0;
     virtual long GetBtDiscoveryEndMillis() = 0;
-    virtual int32_t GetPairedDevices(const int32_t transport, std::vector<BluetoothRawAddress> &pairedAddr) = 0;
+    virtual int32_t GetPairedDevices(std::vector<BluetoothRawAddress> &pairedAddr) = 0;
     virtual int32_t RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device) = 0;
     virtual bool RemoveAllPairs() = 0;
     virtual void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) = 0;

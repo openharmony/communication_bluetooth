@@ -340,15 +340,6 @@ napi_value GetPairedDevices(napi_env env, napi_callback_info info)
         count++;
     }
     NAPI_BT_ASSERT_RETURN(env, ret == BT_NO_ERROR, ret, result);
-    std::vector<BluetoothRemoteDevice> bleDeviceLists;
-    ret = host->GetPairedDevices(BT_TRANSPORT_BLE, bleDeviceLists);
-    for (auto vec : bleDeviceLists) {
-        napi_value remoteDeviceResult;
-        napi_create_string_utf8(env, vec.GetDeviceAddr().c_str(), vec.GetDeviceAddr().size(), &remoteDeviceResult);
-        napi_set_element(env, result, count, remoteDeviceResult);
-        count++;
-    }
-    NAPI_BT_ASSERT_RETURN(env, ret == BT_NO_ERROR, ret, result);
     HILOGI("end");
     return result;
 }

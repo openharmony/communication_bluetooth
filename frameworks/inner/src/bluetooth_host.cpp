@@ -998,7 +998,7 @@ int32_t BluetoothHost::GetPairedDevices(int transport, std::vector<BluetoothRemo
     }
 
     std::vector<BluetoothRawAddress> pairedAddr;
-    int32_t ret = pimpl->proxy_->GetPairedDevices(transport, pairedAddr);
+    int32_t ret = pimpl->proxy_->GetPairedDevices(pairedAddr);
 
     for (auto it = pairedAddr.begin(); it != pairedAddr.end(); it++) {
         BluetoothRemoteDevice device((*it).GetAddress(), transport);
