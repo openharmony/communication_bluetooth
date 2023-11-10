@@ -115,7 +115,7 @@ config("btframework_public_config") {
 }
 
 ohos_shared_library("btframework") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
   configs = [ ":btframework_config" ]
   public_configs = [ ":btframework_public_config" ]
   innerapi_tags = [ "platformsdk" ]
@@ -148,7 +148,7 @@ config("btcommon_public_config") {
 }
 
 ohos_shared_library("btcommon") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
   public_configs = [ ":btcommon_public_config" ]
   innerapi_tags = [ "chipsetsdk" ]
   sources = [
