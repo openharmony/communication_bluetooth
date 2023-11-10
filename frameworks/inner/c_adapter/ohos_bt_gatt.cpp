@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -560,7 +560,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
 {
     HILOGI("BleStartAdvWithAddr enter");
     if (advId == nullptr || rawData == nullptr || advParam == nullptr || ownAddrParams == nullptr ||
-        !IsAddrValid(ownAddrParams->addr)) {
+        !IsRpa(ownAddrParams->addr)) {
         HILOGW("params are invalid");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -584,6 +584,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         g_bleAdvCallbacks[i] = nullptr;
         return OHOS_BT_STATUS_UNHANDLED;
     }
+    // adv must stop after {@link ADV_ADDR_TIME_THRESHOLD}
     g_advAddrTimer[i] = AlarmCreate("advAddr", false);
     AlarmSet(g_advAddrTimer[i], ADV_ADDR_TIME_THRESHOLD, OnAdvAddrAlarm, (void *)&i);
 
