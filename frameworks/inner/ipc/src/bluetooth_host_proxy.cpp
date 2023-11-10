@@ -622,14 +622,10 @@ long BluetoothHostProxy::GetBtDiscoveryEndMillis()
     return millis;
 }
 
-int32_t BluetoothHostProxy::GetPairedDevices(int32_t transport, std::vector<BluetoothRawAddress> &pairedAddr)
+int32_t BluetoothHostProxy::GetPairedDevices(std::vector<BluetoothRawAddress> &pairedAddr)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::GetPairedDevices WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(transport)) {
         HILOGE("BluetoothHostProxy::GetPairedDevices WriteInterfaceToken error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
