@@ -296,7 +296,7 @@ int BleSetAdvData(int advId, const StartAdvRawData data)
 
     auto advData = ConvertDataToVec(data.advData, data.advDataLen);
     auto rspData = ConvertDataToVec(data.rspData, data.rspDataLen);
-    g_BleAdvertiser->SetAdvertisingData(advData, rspData, *g_bleAdvCallbacks[advId]);
+    g_BleAdvertiser->SetAdvertisingData(advData, rspData, g_bleAdvCallbacks[advId]);
 
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -346,7 +346,7 @@ int BleStopAdv(int advId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleAdvertiser->StopAdvertising(*g_bleAdvCallbacks[advId]);
+    g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
 
     usleep(100);
     if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
@@ -645,7 +645,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = make_shared<BleAdvertiser>();
     }
-    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, *g_bleAdvCallbacks[i]);
+    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -692,7 +692,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
     auto advData = ConvertDataToVec(rawData.advData, rawData.advDataLen);
     auto scanResponse = ConvertDataToVec(rawData.rspData, rawData.rspDataLen);
-    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, *g_bleAdvCallbacks[i]);
+    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -719,7 +719,7 @@ int BleEnableAdvEx(int advId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleAdvertiser->EnableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), 0, *g_bleAdvCallbacks[advId]);
+    g_BleAdvertiser->EnableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), 0, g_bleAdvCallbacks[advId]);
 
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -747,7 +747,7 @@ int BleDisableAdvEx(int advId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleAdvertiser->DisableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), *g_bleAdvCallbacks[advId]);
+    g_BleAdvertiser->DisableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), g_bleAdvCallbacks[advId]);
 
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -1078,7 +1078,7 @@ int GetAdvHandle(int advId, int *advHandle)
         HILOGE("GetAdvHandle fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
     }
-    *advHandle = g_BleAdvertiser->GetAdvHandle(*g_bleAdvCallbacks[advId]);
+    *advHandle = g_BleAdvertiser->GetAdvHandle(g_bleAdvCallbacks[advId]);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
