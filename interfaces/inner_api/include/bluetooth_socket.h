@@ -157,6 +157,16 @@ public:
     int SetBufferSize(int bufferSize);
 
     /**
+     * @brief update coc connection params
+     *
+     * @param CocUpdateSocketParam coc socket params.
+     * @return Returns <b>0</b> if the operation is successful.
+     *         Returns <b>-1</b> if the operation fails.
+     * @since 6
+     */
+    int UpdateCocConnectionParams(CocUpdateSocketParam &param);
+
+    /**
      * @brief Get client socket fd
      *
      * @return int fd

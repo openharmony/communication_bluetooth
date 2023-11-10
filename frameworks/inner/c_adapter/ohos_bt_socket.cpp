@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "ohos_bt_adapter_utils.h"
+#include "bluetooth_def.h"
 #include "bluetooth_socket.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
@@ -349,6 +350,35 @@ int SetSocketBufferSize(int clientId, uint32_t bufferSize)
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
+}
+/**
+ * @brief Update the coc connection params
+ *
+ * @param param CocUpdateSocketParam instance for carry params.
+ * @param bdAddr The remote device address to connect.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int SocketUpdateCocConnectionParams(BluetoothCocUpdateSocketParam* param, const BdAddr *bdAddr)
+{
+    CocUpdateSocketParam params;
+
+    HILOGI("Socket update coc params start");
+    CHECK_AND_RETURN_LOG_RET(param, OHOS_BT_STATUS_FAIL, "param is null");
+    CHECK_AND_RETURN_LOG_RET(bdAddr, OHOS_BT_STATUS_FAIL, "bdAddr is null");
+    ConvertAddr(bdAddr->addr, params.addr);
+    params.minInterval = param->minInterval;
+    params.maxInterval = param->maxInterval;
+    params.peripheralLatency = param->peripheralLatency;
+    params.supervisionTimeout = param->supervisionTimeout;
+    params.minConnEventLen = param->minConnEventLen;
+    params.maxConnEventLen = param->maxConnEventLen;
+
+    std::shared_ptr<BluetoothRemoteDevice> device = std::make_shared<BluetoothRemoteDevice>(params.addr,
+        OHOS_SOCKET_SPP_RFCOMM);
+    std::shared_ptr<ClientSocket> client = std::make_shared<ClientSocket>(*device, UUID::RandomUUID(),
+        TYPE_L2CAP_LE, false);
+    CHECK_AND_RETURN_LOG_RET(client, OHOS_BT_STATUS_FAIL, "client is null");
+    return client->UpdateCocConnectionParams(params);
 }
 
 }  // namespace Bluetooth

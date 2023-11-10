@@ -44,6 +44,15 @@ typedef struct {
     bool isEncrypt;
 } BluetoothCreateSocketPara;
 
+typedef struct {
+    int minInterval;
+    int maxInterval;
+    int peripheralLatency;
+    int supervisionTimeout;
+    int minConnEventLen;
+    int maxConnEventLen;
+} BluetoothCocUpdateSocketParam;
+
 /**
  * @brief Creates an server listening socket based on the service record.
  *
@@ -154,6 +163,14 @@ int SocketGetPsm(int serverId);
  * @return  Returns the operation result status {@link BtStatus}.
  */
 int SetSocketBufferSize(int clientId, uint32_t bufferSize);
+
+/**
+ * @brief Update the coc connection params.
+ *
+ * @param param CocUpdateSocketParam instance for carry params.
+ * @return Returns the operation result status {@link BtStatus}. 
+ */
+int SocketUpdateCocConnectionParams(BluetoothCocUpdateSocketParam* param, const BdAddr *bdAddr);
 
 #ifdef __cplusplus
 }

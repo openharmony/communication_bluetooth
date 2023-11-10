@@ -32,6 +32,7 @@ public:
     int Connect(ConnectSocketParam &param, int &fd) override;
     int Listen(ListenSocketParam &param, int &fd) override;
     void RemoveObserver(const sptr<IBluetoothSocketObserver> &observer) override;
+    int UpdateCocConnectionParams(const BluetoothSocketCocInfo &info) override;
 private:
     static inline BrokerDelegator<BluetoothSocketProxy> delegator_;
 };

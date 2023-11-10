@@ -1428,6 +1428,16 @@ enum PbapResponseCode : uint8_t {
     PBAP_DATABASE_LOCKED = 0xE1              // Database Locked
 };
 
+struct CocUpdateSocketParam {
+    std::string addr;
+    int32_t minInterval;
+    int32_t maxInterval;
+    int32_t peripheralLatency;
+    int32_t supervisionTimeout;
+    int32_t minConnEventLen;
+    int32_t maxConnEventLen;
+};
+
 constexpr int BLE_LPDEVICE_SCAN_SETTING_VALID_BIT = 0x01;
 constexpr int BLE_LPDEVICE_SCAN_FILTER_VALID_BIT = 0x02;
 constexpr int BLE_LPDEVICE_ADV_SETTING_VALID_BIT = 0x04;
