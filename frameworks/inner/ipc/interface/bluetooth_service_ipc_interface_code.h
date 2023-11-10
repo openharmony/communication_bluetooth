@@ -46,6 +46,7 @@ enum BluetoothA2dpSourceObserverInterfaceCode {
     BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED = 0,
     BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED,
     BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
+    BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_OBSERVER_BUTT
 };
@@ -499,6 +500,8 @@ enum BluetoothHostInterfaceCode {
     SYNC_RANDOM_ADDRESS,
     START_CREDIBLE_PAIR,
     BT_COUNT_ENABLE_TIMES,
+    BT_SEND_DEVICE_SELECTION,
+    BT_IS_SUPPORT_WEAR_DETECTION,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

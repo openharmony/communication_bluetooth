@@ -18,6 +18,7 @@
 #include "bluetooth_raw_address.h"
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"
+#include "bluetooth_device.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
@@ -473,6 +474,61 @@ bool BluetoothRemoteDevice::ReadRemoteRssiValue()
         return false;
     }
     return hostProxy->ReadRemoteRssiValue(address_);
+}
+
+int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &majorMinorClass) const
+{
+    HILOGI("enter");
+    
+    if (!IsValidBluetoothRemoteDevice()) {
+        HILOGW("Invalid remote device");
+        return BT_ERR_INVALID_PARAM;
+    }
+
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    int deviceCod = 0;
+    int ret = GetDeviceClass(deviceCod);
+    BluetoothDeviceClass deviceClass = BluetoothDeviceClass(deviceCod);
+    cod = deviceClass.GetClassOfDevice();
+    majorClass = deviceClass.GetMajorClass();
+    majorMinorClass = deviceClass.GetMajorMinorClass();
+    if (cod == 0) {
+        HILOGW("cod = %{public}d", cod);
+        cod = BluetoothDevice::MAJOR_UNCATEGORIZED;
+        majorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
+        majorMinorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
+    }
+    HILOGD("cod = %{public}#X, majorClass = %{public}#X, majorMinorClass = %{public}#X",
+        cod, majorClass, majorMinorClass);
+
+    return ret;
+}
+
+bool BluetoothRemoteDevice::IsSupportWearDetection() const
+{
+    HILOGI("enter");
+
+    if (!IsValidBluetoothRemoteDevice()) {
+        HILOGW("Invalid remote device");
+        return false;
+    }
+
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return false;
+    }
+
+    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
+    if (hostProxy == nullptr) {
+        HILOGE("fails: no proxy");
+        return false;
+    }
+
+    return hostProxy->IsSupportWearDetection(address_);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
