@@ -17,7 +17,7 @@ BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
 
 ohos_shared_library("access") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
 
   #install_enable = true
   include_dirs = [
