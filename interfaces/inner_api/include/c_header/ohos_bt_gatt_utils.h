@@ -39,7 +39,7 @@ void RemoveTimeoutAdvAddr();
  * and duplicate addresses after 15 minutes are not allowed to be broadcast.
  * There is no limit on non-duplicate addresses.
  */
-bool CanStartAdv(const string& addrStr);
+bool CanStartAdv(const std::string& addrStr);
 
 /*
  * RPA: The two highest bits of the broadcast address are 01
