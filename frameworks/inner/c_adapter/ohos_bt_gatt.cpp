@@ -37,8 +37,7 @@
 #include "string"
 #include "uuid.h"
 #include "bluetooth_object_map.h"
-#include <queue>
-#include <set>
+#include "ohos_bt_gatt_utils.h"
 
 
 #ifdef __cplusplus
@@ -50,11 +49,6 @@ using namespace std;
 namespace OHOS {
 namespace Bluetooth {
 #define MAX_BLE_ADV_NUM 7
-#define MAX_ADV_ADDR_MAP_SIZE 128
-#define ADV_ADDR_TIMEOUT (60 * 60 * 1000) // 1 hour
-#define ADV_ADDR_TIME_THRESHOLD (15 * 60 * 1000) // 15 mins
-#define MS_PER_SECOND 1000
-#define NS_PER_MS 1000000
 
 class BleCentralManagerCallbackWapper;
 class BleAdvCallback;
@@ -67,15 +61,8 @@ static std::shared_ptr<BleAdvertiser> g_BleAdvertiser = nullptr;
 constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
-struct CaseInsensitiveCompare {
-    bool operator()(const string& s1, const string& s2) const {
-        return lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(),
-            [](char c1, char c2) { return tolower(c1) < tolower(c2); });
-    }
-};
 static mutex g_advMutex;
-static map<string, uint64_t, CaseInsensitiveCompare> g_advAddrMap; // map<addr, time>
-static queue<pair<string, uint64_t>> g_advTimeQueue; // pair<addr, time>
+static Alarm *g_advAddrTimer[MAX_BLE_ADV_NUM] = { nullptr };
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -360,6 +347,8 @@ int BleStopAdv(int advId)
         g_AppCallback->advDisableCb(advId, 0);
     }
     g_bleAdvCallbacks[advId] = nullptr;
+    AlarmDelete(g_advAddrTimer[advId]);
+    g_advAddrTimer[advId] = nullptr;
 
     if (IsAllAdvStopped()) {
         HILOGI("All adv have been stopped.");
@@ -547,48 +536,10 @@ int BleDeregisterScanCallbacks(int32_t scannerId)
     return OHOS_BT_STATUS_SUCCESS;
 }
 
-static uint64_t GetBootMillis()
+static void OnAdvAddrAlarm(void *param)
 {
-    struct timespec ts = {};
-    clock_gettime(CLOCK_BOOTTIME, &ts);
-    return ts.tv_sec * MS_PER_SECOND + ts.tv_nsec / NS_PER_MS;
-}
-
-static void RemoveTimeoutAdvAddr(uint64_t currentMillis)
-{
-    while (!g_advTimeQueue.empty() && currentMillis >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
-        g_advAddrMap.erase(g_advTimeQueue.front().first);
-        g_advTimeQueue.pop();
-    }
-}
-
-static bool CanStartAdv(const string& addrStr, uint64_t currentMillis)
-{
-    auto addrTime = g_advAddrMap.find(addrStr);
-    if (addrTime != g_advAddrMap.end()) {
-        if (currentMillis >= addrTime->second + ADV_ADDR_TIME_THRESHOLD) {
-            HILOGW("has the same adv addr in [15mins, 60mins]");
-            return false;
-        } else {
-            return true;
-        }
-    }
-    if (g_advTimeQueue.size() >= MAX_ADV_ADDR_MAP_SIZE) {
-        g_advAddrMap.erase(g_advTimeQueue.front().first);
-        g_advTimeQueue.pop();
-        HILOGI("remove oldest adv addr");
-    }
-    g_advTimeQueue.push(pair<string, uint64_t>(addrStr, currentMillis));
-    g_advAddrMap.insert(make_pair(addrStr, currentMillis));
-    return true;
-}
-
-static bool IsAddrValid(const AdvOwnAddrParams *ownAddrParams)
-{
-    if (ownAddrParams != nullptr && ((ownAddrParams->addr[0] & 0xC0) ^ 0x40) == 0) {
-        return true;
-    }
-    return false;
+    int advId = (int)*param;
+    BleStopAdv(advId);
 }
 
 /**
@@ -608,7 +559,8 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     const AdvOwnAddrParams *ownAddrParams)
 {
     HILOGI("BleStartAdvWithAddr enter");
-    if (rawData == nullptr || advParam == nullptr || !IsAddrValid(ownAddrParams)) {
+    if (advId == nullptr || rawData == nullptr || advParam == nullptr || ownAddrParams == nullptr ||
+        !IsAddrValid(ownAddrParams->addr)) {
         HILOGW("params are invalid");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -626,13 +578,14 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         return OHOS_BT_STATUS_UNHANDLED;
     }
 
-    uint64_t currentMillis = GetBootMillis();
-    RemoveTimeoutAdvAddr(currentMillis);
+    RemoveTimeoutAdvAddr();
     string addrStr(reinterpret_cast<const char*>(ownAddrParams->addr), sizeof(ownAddrParams->addr));
-    if (!CanStartAdv(addrStr, currentMillis)) {
+    if (!CanStartAdv(addrStr)) {
         g_bleAdvCallbacks[i] = nullptr;
         return OHOS_BT_STATUS_UNHANDLED;
     }
+    g_advAddrTimer[i] = AlarmCreate("advAddr", false);
+    AlarmSet(g_advAddrTimer[i], ADV_ADDR_TIME_THRESHOLD, OnAdvAddrAlarm, (void *)&i);
 
     *advId = i;
     HILOGI("ret advId: %{public}d.", *advId);
@@ -643,10 +596,8 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
         settings.SetConnectable(false);
     }
-    if (ownAddrParams != nullptr) {
-        settings.SetOwnAddr(ownAddrParams->addr);
-        settings.SetOwnAddrType(ownAddrParams->addrType);
-    }
+    settings.SetOwnAddr(ownAddrParams->addr);
+    settings.SetOwnAddrType(ownAddrParams->addrType);
 
     auto advData = ConvertDataToVec(rawData->advData, rawData->advDataLen);
     auto scanResponse = ConvertDataToVec(rawData->rspData, rawData->rspDataLen);
