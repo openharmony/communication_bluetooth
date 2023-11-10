@@ -26,7 +26,7 @@ public:
     NapiBluetoothBleAdvertiseCallback() = default;
     ~NapiBluetoothBleAdvertiseCallback() override = default;
 
-    static NapiBluetoothBleAdvertiseCallback &GetInstance(void);
+    static std::shared_ptr<NapiBluetoothBleAdvertiseCallback> GetInstance(void);
 
     void OnStartResultEvent(int result, int advHandle) override;
     void OnEnableResultEvent(int result, int advHandle) override;

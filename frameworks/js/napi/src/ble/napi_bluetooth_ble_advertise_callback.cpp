@@ -22,9 +22,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
-NapiBluetoothBleAdvertiseCallback &NapiBluetoothBleAdvertiseCallback::GetInstance(void)
+std::shared_ptr<NapiBluetoothBleAdvertiseCallback> NapiBluetoothBleAdvertiseCallback::GetInstance(void)
 {
-    static NapiBluetoothBleAdvertiseCallback instance;
+    static std::shared_ptr<NapiBluetoothBleAdvertiseCallback> instance;
     return instance;
 }
 

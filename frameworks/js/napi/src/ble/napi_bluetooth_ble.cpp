@@ -278,7 +278,7 @@ static napi_value On(napi_env env, napi_callback_info info)
         } else if (type == REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE) {
             NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
             auto napiAdvertisingStateCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
-            NapiBluetoothBleAdvertiseCallback::GetInstance().SetNapiAdvertisingStateCallback(
+            NapiBluetoothBleAdvertiseCallback::GetInstance()->SetNapiAdvertisingStateCallback(
                 napiAdvertisingStateCallback);
         } else {
             HILOGE("Invalid type: %{public}s", type.c_str());
@@ -309,7 +309,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
         if (type == REGISTER_BLE_FIND_DEVICE_TYPE) {
             NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(nullptr);
         } else if (type == REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE) {
-            NapiBluetoothBleAdvertiseCallback::GetInstance().SetNapiAdvertisingStateCallback(nullptr);
+            NapiBluetoothBleAdvertiseCallback::GetInstance()->SetNapiAdvertisingStateCallback(nullptr);
         } else {
             HILOGE("Invalid type: %{public}s", type.c_str());
             return napi_invalid_arg;
@@ -825,7 +825,7 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
 
         auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-        bool success = NapiBluetoothBleAdvertiseCallback::GetInstance().asyncWorkMap_.TryPush(
+        bool success = NapiBluetoothBleAdvertiseCallback::GetInstance()->asyncWorkMap_.TryPush(
             NapiAsyncType::GET_ADVERTISING_HANDLE, asyncWork);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
