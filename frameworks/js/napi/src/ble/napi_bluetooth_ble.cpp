@@ -802,8 +802,8 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
     size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {nullptr};
     napi_value thisVar = nullptr;
-    auto status = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto checkRes = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
 
     BleAdvertiserSettings settings;
     BleAdvertiserData advData;
@@ -968,8 +968,8 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {nullptr};
     napi_value thisVar = nullptr;
-    auto status = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto checkRes = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
 
     if (argc != ARGS_SIZE_ZERO) {
         auto status = napi_ok;
