@@ -317,6 +317,27 @@ public:
      */
     bool IsValidBluetoothRemoteDevice() const;
 
+    /**
+     * @brief Get the product type of the device, such as headsets, watchs and car.
+     *
+     * @param cod Class of device.
+     * @param majorClass The major class.
+     * @param majorMinorClass The minor class.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 10
+     */
+    int GetDeviceProductType(int &cod, int &majorClass, int &majorMinorClass) const;
+
+    /**
+     * @brief Whether wear detection is supported
+     *
+     * @return Returns <b>true</b> if the device supports wear detection;
+     *         returns <b>false</b> if the device not supports wear detection.
+     * @since 10
+     */
+    bool IsSupportWearDetection() const;
+
 private:
     std::string address_ = "00:00:00:00:00:00";
     int transport_ = 0;

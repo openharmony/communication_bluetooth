@@ -32,11 +32,13 @@ public:
         BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED = 0,
         BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED,
         BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
+        BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED,
     };
 
     virtual void OnConnectionStateChanged(const RawAddress &device, int state) = 0;
     virtual void OnPlayingStatusChanged(const RawAddress &device, int playingState, int error) = 0;
     virtual void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) = 0;
+    virtual void OnMediaStackChanged(const RawAddress &device, int action) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

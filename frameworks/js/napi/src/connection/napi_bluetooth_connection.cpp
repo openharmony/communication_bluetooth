@@ -280,22 +280,12 @@ napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
 
     int transport = GetDeviceTransport(remoteAddr);
-    int deviceCod = 0;
-    int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport).GetDeviceClass(deviceCod);
-    BluetoothDeviceClass deviceClass = BluetoothDeviceClass(deviceCod);
-    int tmpCod = deviceClass.GetClassOfDevice();
-    int tmpMajorClass = deviceClass.GetMajorClass();
-    int tmpMajorMinorClass = deviceClass.GetMajorMinorClass();
-    if (tmpCod == 0) {
-        HILOGI("cod = %{public}d", tmpCod);
-        tmpCod = MajorClass::MAJOR_UNCATEGORIZED;
-        tmpMajorClass = MajorClass::MAJOR_UNCATEGORIZED;
-        tmpMajorMinorClass = MajorClass::MAJOR_UNCATEGORIZED;
-    }
-    HILOGD("cod = %{public}d, majorClass = %{public}d, majorMinorClass = %{public}d",
-        tmpCod,
-        tmpMajorClass,
-        tmpMajorMinorClass);
+    BluetoothRemoteDevice remoteDevice = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport);
+    int tmpCod = MajorClass::MAJOR_UNCATEGORIZED;
+    int tmpMajorClass = MajorClass::MAJOR_UNCATEGORIZED;
+    int tmpMajorMinorClass = MajorClass::MAJOR_UNCATEGORIZED;
+    int32_t err = remoteDevice.GetDeviceProductType(tmpCod, tmpMajorClass, tmpMajorMinorClass);
+
     napi_value result = nullptr;
     napi_create_object(env, &result);
     napi_value majorClass = 0;

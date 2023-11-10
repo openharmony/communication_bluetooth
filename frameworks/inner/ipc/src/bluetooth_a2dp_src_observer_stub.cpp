@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_a2dp_src_observer_stub.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "raw_address.h"
 
@@ -32,6 +33,9 @@ BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
         &BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED)] =
+        &BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner;
 }
 
 BluetoothA2dpSrcObserverStub::~BluetoothA2dpSrcObserverStub()
@@ -59,7 +63,7 @@ int BluetoothA2dpSrcObserverStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int state = data.ReadInt32();
@@ -69,7 +73,7 @@ ErrCode BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParce
     return NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int playingState = data.ReadInt32();
@@ -80,17 +84,25 @@ ErrCode BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel 
     return NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
     if (!info) {
-        return TRANSACTION_ERR;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     int error = data.ReadInt32();
 
     OnConfigurationChanged(RawAddress(addr), *info, error);
     return NO_ERROR;
+}
+
+int32_t BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::string addr = data.ReadString();
+    int action = data.ReadInt32();
+    OnMediaStackChanged(RawAddress(addr), action);
+    return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
