@@ -20,6 +20,7 @@ FwkCAdapterSrc = [
   "c_adapter/ohos_bt_adapter_utils.cpp",
   "c_adapter/ohos_bt_gap.cpp",
   "c_adapter/ohos_bt_gatt.cpp",
+  "c_adapter/ohos_bt_gatt_utils.cpp",
   "c_adapter/ohos_bt_gatt_client.cpp",
   "c_adapter/ohos_bt_gatt_server.cpp",
   "c_adapter/ohos_bt_spp.cpp",
