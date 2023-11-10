@@ -669,6 +669,7 @@ enum BluetoothSocketInterfaceCode {
     SOCKET_CONNECT = 0,
     SOCKET_LISTEN,
     REMOVE_OBSERVER,
+    SOCKET_UPDATE_COC_PARAMS,
     // The last code, if you want to add a new code, please add it before this
     SOCKET_BUTT
 };
