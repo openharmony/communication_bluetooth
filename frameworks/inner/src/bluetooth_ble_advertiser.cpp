@@ -264,7 +264,7 @@ int32_t BleAdvertiser::impl::CheckAdvertiserData(const BluetoothBleAdvertiserSet
 }
 
 int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const BleAdvertiserData &advData,
-    const BleAdvertiserData &scanResponse, uint16_t duration, shared_ptr<BleAdvertiseCallback> callback)
+    const BleAdvertiserData &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback)
 {
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -315,7 +315,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
 }
 
 int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
-    const std::vector<uint8_t> &scanResponse, uint16_t duration, shared_ptr<BleAdvertiseCallback> callback)
+    const std::vector<uint8_t> &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback)
 {
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -326,6 +326,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     BluetoothBleAdvertiserSettings setting;
     setting.SetConnectable(settings.IsConnectable());
@@ -361,7 +362,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
 }
 
 void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, const std::vector<uint8_t> &scanResponse,
-    shared_ptr<BleAdvertiseCallback> callback)
+    std::shared_ptr<BleAdvertiseCallback> callback)
 {
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -372,6 +373,7 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return;
     }
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     int advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (!pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
@@ -386,7 +388,7 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
     pimpl->proxy_->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
 }
 
-int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, shared_ptr<BleAdvertiseCallback> callback)
+int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback)
 {
     HILOGI("enter");
     if (!IS_BLE_ENABLED()) {
@@ -399,6 +401,7 @@ int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, share
         return BT_ERR_INTERNAL_ERROR;
     }
 
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
     uint8_t tmpAdvHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
     if (tmpAdvHandle == BLE_INVALID_ADVERTISING_HANDLE) {
         HILOGE("Invalid advertising callback");
@@ -415,7 +418,7 @@ int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, share
     return ret;
 }
 
-int BleAdvertiser::DisableAdvertising(uint8_t advHandle, shared_ptr<BleAdvertiseCallback> callback)
+int BleAdvertiser::DisableAdvertising(uint8_t advHandle, std::shared_ptr<BleAdvertiseCallback> callback)
 {
     HILOGI("enter");
     if (!IS_BLE_ENABLED()) {
@@ -427,7 +430,7 @@ int BleAdvertiser::DisableAdvertising(uint8_t advHandle, shared_ptr<BleAdvertise
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
-
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
     uint8_t tmpAdvHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
     if (tmpAdvHandle == BLE_INVALID_ADVERTISING_HANDLE) {
         HILOGE("Invalid advertising callback");
@@ -444,7 +447,7 @@ int BleAdvertiser::DisableAdvertising(uint8_t advHandle, shared_ptr<BleAdvertise
     return ret;
 }
 
-int BleAdvertiser::StopAdvertising(shared_ptr<BleAdvertiseCallback> callback)
+int BleAdvertiser::StopAdvertising(std::shared_ptr<BleAdvertiseCallback> callback)
 {
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -455,6 +458,7 @@ int BleAdvertiser::StopAdvertising(shared_ptr<BleAdvertiseCallback> callback)
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     HILOGI("enter");
     uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
@@ -467,7 +471,7 @@ int BleAdvertiser::StopAdvertising(shared_ptr<BleAdvertiseCallback> callback)
     return ret;
 }
 
-void BleAdvertiser::Close(shared_ptr<BleAdvertiseCallback> callback)
+void BleAdvertiser::Close(std::shared_ptr<BleAdvertiseCallback> callback)
 {
     if (!IS_BLE_ENABLED()) {
         HILOGE("BLE is not enabled");
@@ -478,6 +482,7 @@ void BleAdvertiser::Close(shared_ptr<BleAdvertiseCallback> callback)
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return;
     }
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
@@ -493,12 +498,13 @@ void BleAdvertiser::Close(shared_ptr<BleAdvertiseCallback> callback)
     }
 }
 
-uint8_t BleAdvertiser::GetAdvHandle(shared_ptr<BleAdvertiseCallback> callback)
+uint8_t BleAdvertiser::GetAdvHandle(std::shared_ptr<BleAdvertiseCallback> callback)
 {
     if (!BluetoothHost::GetDefaultHost().IsBleEnabled()) {
         HILOGE("BLE is not enabled");
         return BLE_INVALID_ADVERTISING_HANDLE;
     }
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
     return pimpl->callbacks_.GetAdvertiserHandle(callback);
 }
 
