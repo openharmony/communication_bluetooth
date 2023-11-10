@@ -430,7 +430,7 @@ public:
      * @since 6
      */
     int StartAdvertising(const BleAdvertiserSettings &settings, const BleAdvertiserData &advData,
-        const BleAdvertiserData &scanResponse, uint16_t duration, BleAdvertiseCallback &callback);
+        const BleAdvertiserData &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback>);
 
     /**
      * @brief Start advertising.
@@ -443,7 +443,7 @@ public:
      * @since 6
      */
     int StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
-        const std::vector<uint8_t> &scanResponse, uint16_t duration, BleAdvertiseCallback &callback);
+        const std::vector<uint8_t> &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback>);
 
     /**
      * @brief Enable advertising.
@@ -453,7 +453,7 @@ public:
      * @param callback Advertise callback.
      * @since 11
      */
-    int EnableAdvertising(uint8_t advHandle, uint16_t duration, BleAdvertiseCallback &callback);
+    int EnableAdvertising(uint8_t advHandle, uint16_t duration, std::shared_ptr<BleAdvertiseCallback>);
 
     /**
      * @brief Disable advertising.
@@ -462,11 +462,11 @@ public:
      * @param callback Advertise callback.
      * @since 11
      */
-    int DisableAdvertising(uint8_t advHandle, BleAdvertiseCallback &callback);
+    int DisableAdvertising(uint8_t advHandle, std::shared_ptr<BleAdvertiseCallback>);
 
     void SetAdvertisingData(const std::vector<uint8_t> &advData, const std::vector<uint8_t> &scanResponse,
-        BleAdvertiseCallback &callback);
-    int StopAdvertising(BleAdvertiseCallback &callback);
+        std::shared_ptr<BleAdvertiseCallback>);
+    int StopAdvertising(std::shared_ptr<BleAdvertiseCallback>);
 
     /**
      * @brief Cleans up advertisers.
@@ -474,7 +474,7 @@ public:
      * @param callback Advertise callback.
      * @since 6
      */
-    void Close(BleAdvertiseCallback &callback);
+    void Close(std::shared_ptr<BleAdvertiseCallback>);
 
     /**
      * @brief Get Advertise handle.
@@ -482,7 +482,7 @@ public:
      * @param callback Advertise callback.
      * @since 6
      */
-    uint8_t GetAdvHandle(BleAdvertiseCallback &callback);
+    uint8_t GetAdvHandle(std::shared_ptr<BleAdvertiseCallback>);
 
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiser);
