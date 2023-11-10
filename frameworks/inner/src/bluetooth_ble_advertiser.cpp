@@ -482,7 +482,7 @@ void BleAdvertiser::Close(std::shared_ptr<BleAdvertiseCallback> callback)
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return;
     }
-    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
+    CHECK_AND_RETURN_LOG(callback != nullptr, "callback is nullptr");
 
     HILOGI("enter");
     if (pimpl->proxy_ != nullptr) {
@@ -504,7 +504,7 @@ uint8_t BleAdvertiser::GetAdvHandle(std::shared_ptr<BleAdvertiseCallback> callba
         HILOGE("BLE is not enabled");
         return BLE_INVALID_ADVERTISING_HANDLE;
     }
-    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BLE_INVALID_ADVERTISING_HANDLE, "callback is nullptr");
     return pimpl->callbacks_.GetAdvertiserHandle(callback);
 }
 
