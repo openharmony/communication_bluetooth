@@ -44,6 +44,7 @@ public:
     virtual int SetActiveSinkDevice(const RawAddress &device) = 0;
     virtual RawAddress GetActiveSinkDevice() = 0;
     virtual BluetoothA2dpCodecStatus GetCodecStatus(const RawAddress &device) = 0;
+    virtual int GetCodecPreference(const RawAddress &device, BluetoothA2dpCodecInfo &info) = 0;
     virtual int SetCodecPreference(const RawAddress &device, const BluetoothA2dpCodecInfo &info) = 0;
     virtual void SwitchOptionalCodecs(const RawAddress &device, bool isEnable) = 0;
     virtual int GetOptionalCodecsSupportState(const RawAddress &device) = 0;

@@ -22,6 +22,43 @@
 
 namespace OHOS {
 namespace Bluetooth {
+enum CodecType {
+    CODEC_TYPE_SBC = 0,
+    CODEC_TYPE_AAC = 1,
+    CODEC_TYPE_L2HC = 2,
+    CODEC_TYPE_INVALID = -1,
+};
+
+enum CodecBitsPerSample {
+    CODEC_BITS_PER_SAMPLE_NONE = 0,
+    CODEC_BITS_PER_SAMPLE_16 = 1,
+    CODEC_BITS_PER_SAMPLE_24 = 2,
+    CODEC_BITS_PER_SAMPLE_32 = 3,
+};
+
+enum CodecChannelMode {
+    CODEC_CHANNEL_MODE_NONE = 0,
+    CODEC_CHANNEL_MODE_MONO = 1,
+    CODEC_CHANNEL_MODE_STEREO = 2,
+};
+
+enum CodecSampleRate {
+    CODEC_SAMPLE_RATE_NONE = 0,
+    CODEC_SAMPLE_RATE_44100 = 1,
+    CODEC_SAMPLE_RATE_48000 = 2,
+    CODEC_SAMPLE_RATE_88200 = 3,
+    CODEC_SAMPLE_RATE_96000 = 4,
+    CODEC_SAMPLE_RATE_176400 = 5,
+    CODEC_SAMPLE_RATE_192000 = 6,
+};
+
+struct CodecInfo {
+    CodecType codecType;
+    CodecBitsPerSample codecBitsPerSample;
+    CodecChannelMode codecChannelMode;
+    CodecSampleRate codecSampleRate;
+};
+
 class NapiA2dpSource {
 public:
     static napi_value DefineA2dpSourceJSClass(napi_env env, napi_value exports);
@@ -46,6 +83,8 @@ public:
     static napi_value IsAbsoluteVolumeEnabled(napi_env env, napi_callback_info info);
     static napi_value EnableAbsoluteVolume(napi_env env, napi_callback_info info);
     static napi_value DisableAbsoluteVolume(napi_env env, napi_callback_info info);
+    static napi_value SetCurrentCodecInfo(napi_env env, napi_callback_info info);
+    static napi_value GetCurrentCodecInfo(napi_env env, napi_callback_info info);
 #endif
     static NapiA2dpSourceObserver observer_;
     static bool isRegistered_;
