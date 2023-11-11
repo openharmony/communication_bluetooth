@@ -73,6 +73,7 @@ enum BluetoothA2dpSrcInterfaceCode {
     BT_A2DP_SRC_SET_AUDIO_CONFIGURE,
     BT_A2DP_SRC_WRITE_FRAME,
     BT_A2DP_SRC_GET_RENDER_POSITION,
+    BT_A2DP_SRC_GET_CODEC_PREFERENCE,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_BUTT
 };
