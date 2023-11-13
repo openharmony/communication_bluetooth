@@ -106,20 +106,7 @@ struct HidHost::impl {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
         }
-
-        int cod = 0;
-        int32_t err = device.GetDeviceClass(cod);
-        if (err != BT_NO_ERROR) {
-            HILOGE("GetDeviceClass Failed.");
-            return false;
-        }
-        BluetoothDeviceClass devClass = BluetoothDeviceClass(cod);
-        if (!devClass.IsProfileSupported(BluetoothDevice::PROFILE_HID)) {
-            HILOGE("hid connect failed. The remote device does not support HID service.");
-            return BT_ERR_PROFILE_DISABLED;
-        }
-        cod = devClass.GetClassOfDevice();
-        HILOGI("hid connect remote device: %{public}s, cod: %{public}d", GET_ENCRYPT_ADDR(device), cod);
+        HILOGI("hid connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
         return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 

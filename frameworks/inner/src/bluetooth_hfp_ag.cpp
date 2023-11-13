@@ -150,18 +150,6 @@ struct HandsFreeAudioGateway::impl {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
         }
-
-        int cod = 0;
-        int32_t err = device.GetDeviceClass(cod);
-        if (err != BT_NO_ERROR) {
-            HILOGE("GetDeviceClass Failed.");
-            return BT_ERR_INVALID_PARAM;
-        }
-        BluetoothDeviceClass devClass = BluetoothDeviceClass(cod);
-        if (!devClass.IsProfileSupported(BluetoothDevice::PROFILE_HEADSET)) {
-            HILOGE("hfp connect failed. The remote device does not support HFP service.");
-            return BT_ERR_PROFILE_DISABLED;
-        }
         return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
