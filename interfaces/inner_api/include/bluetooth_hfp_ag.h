@@ -171,6 +171,24 @@ public:
     /**
      * @brief Initiate the establishment of an audio connection to remote active HF device.
      *
+     * @param callType the type of the call, Refer to enum BtCallType
+     * @return Returns <b>0</b> if the operation is successful; returns <b>Other</b> if the operation fails.
+     * @since 10
+     */
+    int32_t ConnectSco(const uint8_t callType);
+
+    /**
+     * @brief Release the audio connection from remote active HF device.
+     *
+     * @param callType the type of the call, Refer to enum BtCallType
+     * @return Returns <b>0</b> if the operation is successful; returns <b>Other</b> if the operation fails.
+     * @since 10
+     */
+    int32_t DisconnectSco(const uint8_t callType);
+
+    /**
+     * @brief Initiate the establishment of an audio connection to remote active HF device.
+     *
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      * @since 6
      */

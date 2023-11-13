@@ -31,6 +31,8 @@ public:
     int32_t Connect(const BluetoothRawAddress &device) override;
     int32_t Disconnect(const BluetoothRawAddress &device) override;
     int GetScoState(const BluetoothRawAddress &device) override;
+    int32_t ConnectSco(const uint8_t callType) override;
+    int32_t DisconnectSco(const uint8_t callType) override;
     bool ConnectSco() override;
     bool DisconnectSco() override;
     void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type,

@@ -33,6 +33,8 @@ public:
     virtual int32_t Connect(const BluetoothRawAddress &device) = 0;
     virtual int32_t Disconnect(const BluetoothRawAddress &device) = 0;
     virtual int GetScoState(const BluetoothRawAddress &device) = 0;
+    virtual int32_t ConnectSco(const uint8_t callType) = 0;
+    virtual int32_t DisconnectSco(const uint8_t callType) = 0;
     virtual bool ConnectSco() = 0;
     virtual bool DisconnectSco() = 0;
     virtual void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type,
