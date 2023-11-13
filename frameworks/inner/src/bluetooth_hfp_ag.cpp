@@ -172,6 +172,16 @@ struct HandsFreeAudioGateway::impl {
         return HFP_AG_SCO_STATE_DISCONNECTED;
     }
 
+    int32_t ConnectSco(const uint8_t callType)
+    {
+        return proxy_->ConnectSco(callType);
+    }
+
+    int32_t DisconnectSco(const uint8_t callType)
+    {
+        return proxy_->DisconnectSco(callType);
+    }
+
     bool ConnectSco()
     {
         HILOGD("enter");
@@ -187,6 +197,17 @@ struct HandsFreeAudioGateway::impl {
         if (proxy_ != nullptr) {
             return proxy_->DisconnectSco();
         }
+        return false;
+    }
+
+    bool IsValidCallType(const uint8_t callType)
+    {
+        if (callType == static_cast<uint8_t>(BTCallType::CALL_TYPE_CELLULAR) ||
+            callType == static_cast<uint8_t>(BTCallType::CALL_TYPE_VIRTUAL) ||
+            callType == static_cast<uint8_t>(BTCallType::CALL_TYPE_RECOGNITION)) {
+            return true;
+        }
+        HILOGE("invalid call type");
         return false;
     }
 
@@ -511,6 +532,42 @@ int HandsFreeAudioGateway::GetScoState(const BluetoothRemoteDevice &device) cons
     }
 
     return pimpl->GetScoState(device);
+}
+
+int32_t HandsFreeAudioGateway::ConnectSco(const uint8_t callType)
+{
+    HILOGI("enter, callType: %{public}d", callType);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    if (pimpl == nullptr || !pimpl->proxy_) {
+        HILOGE("pimpl or hfpAG proxy is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
+    if (!pimpl->IsValidCallType(callType)) {
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->ConnectSco(callType);
+}
+
+int32_t HandsFreeAudioGateway::DisConnectSco(const uint8_t callType)
+{
+    HILOGI("enter, callType: %{public}d", callType);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    if (pimpl == nullptr || !pimpl->proxy_) {
+        HILOGE("pimpl or hfpAG proxy is nullptr");
+        return BT_ERR_UNAVAILABLE_PROXY;
+    }
+
+    if (!pimpl->IsValidCallType(callType)) {
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->DisconnectSco(callType);
 }
 
 bool HandsFreeAudioGateway::ConnectSco()
