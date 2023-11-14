@@ -52,6 +52,7 @@ FwkSrc = [
   "src/bluetooth_socket.cpp",
   "src/bluetooth_socket_inputstream.cpp",
   "src/bluetooth_socket_outputstream.cpp",
+  "src/bluetooth_timer.cpp",
   "src/bluetooth_utils.cpp",
   "src/bluetooth_host_load_callback.cpp",
   "src/bluetooth_load_system_ability.cpp",
