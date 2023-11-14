@@ -27,6 +27,7 @@
 #include "bluetooth_hfp_ag.h"
 #include "bluetooth_hfp_hf.h"
 #include "bluetooth_hid_host.h"
+#include "bluetooth_map_mse.h"
 #include "bluetooth_opp.h"
 #include "bluetooth_pan.h"
 #include "log.h"
@@ -130,6 +131,7 @@ void BluetootLoadSystemAbility::NotifyMsgToProfile(NOTIFY_PROFILE_MSG notifyMsg)
 {
     if (notifyMsg == NOTIFY_MSG_UINIT) {
         NotifyHostMsg(notifyMsg);
+        NotifyMapMseProfile(notifyMsg);
         return;
     }
     for (auto it = profileIdList_.begin(); it != profileIdList_.end(); ++it) {
@@ -328,6 +330,27 @@ void BluetootLoadSystemAbility::NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyM
             break;
         case PROFILE_ID_PAN:
             NotifyPanProfile(notifyMsg);
+            break;
+        case PROFILE_ID_MAP_MSE:
+            NotifyMapMseProfile(notifyMsg);
+            break;
+        default:
+            break;
+    }
+}
+
+void BluetootLoadSystemAbility::NotifyMapMseProfile(NOTIFY_PROFILE_MSG notifyMsg)
+{
+    MapMse *profile = MapMse::GetProfile();
+    if (profile == nullptr) {
+        return;
+    }
+    switch (notifyMsg) {
+        case NOTIFY_MSG_INIT:
+            profile->Init();
+            break;
+        case NOTIFY_MSG_UINIT:
+            profile->Uinit();
             break;
         default:
             break;
