@@ -14,8 +14,10 @@
  */
 
 #include "ohos_bt_gatt_utils.h"
+#include "bluetooth_log.h"
 #include <map>
 #include <queue>
+#include <mutex>
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +62,7 @@ void RemoveTimeoutAdvAddr()
     while (!g_advTimeQueue.empty() && currentMillis >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
         g_advAddrMap.erase(g_advTimeQueue.front().first);
         g_advTimeQueue.pop();
+        HILOGI("remove timeout adv addr.");
     }
 }
 
@@ -79,6 +82,7 @@ bool CanStartAdv(const string& addrStr)
             HILOGW("has the same adv addr in [15mins, 60mins]");
             return false;
         } else {
+            HILOGI("has the same adv addr in 15mins");
             return true;
         }
     }
@@ -89,15 +93,8 @@ bool CanStartAdv(const string& addrStr)
     }
     g_advTimeQueue.push(pair<string, uint64_t>(addrStr, currentMillis));
     g_advAddrMap.insert(make_pair(addrStr, currentMillis));
+    HILOGI("insert new adv addr");
     return true;
-}
-
-/*
- * RPA: The two highest bits of the broadcast address are 01
- */
-bool IsRpa(uint8_t addr[BD_ADDR_LEN])
-{
-    return ((addr[0] & 0xC0) ^ 0x40) == 0;
 }
 
 }  // namespace Bluetooth
