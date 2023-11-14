@@ -552,7 +552,7 @@ int32_t HandsFreeAudioGateway::ConnectSco(const uint8_t callType)
     return pimpl->ConnectSco(callType);
 }
 
-int32_t HandsFreeAudioGateway::DisConnectSco(const uint8_t callType)
+int32_t HandsFreeAudioGateway::DisconnectSco(const uint8_t callType)
 {
     HILOGI("enter, callType: %{public}d", callType);
     if (!IS_BT_ENABLED()) {
