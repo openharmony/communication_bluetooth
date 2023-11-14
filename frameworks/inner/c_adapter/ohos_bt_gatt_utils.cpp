@@ -62,7 +62,6 @@ void RemoveTimeoutAdvAddr()
     while (!g_advTimeQueue.empty() && currentMillis >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
         g_advAddrMap.erase(g_advTimeQueue.front().first);
         g_advTimeQueue.pop();
-        HILOGI("remove timeout adv addr.");
     }
 }
 
@@ -82,18 +81,15 @@ bool CanStartAdv(const string& addrStr)
             HILOGW("has the same adv addr in [15mins, 60mins]");
             return false;
         } else {
-            HILOGI("has the same adv addr in 15mins");
             return true;
         }
     }
     if (g_advTimeQueue.size() >= MAX_ADV_ADDR_MAP_SIZE) {
         g_advAddrMap.erase(g_advTimeQueue.front().first);
         g_advTimeQueue.pop();
-        HILOGI("remove oldest adv addr");
     }
     g_advTimeQueue.push(pair<string, uint64_t>(addrStr, currentMillis));
     g_advAddrMap.insert(make_pair(addrStr, currentMillis));
-    HILOGI("insert new adv addr");
     return true;
 }
 
