@@ -169,6 +169,8 @@ typedef enum {
     OHOS_BLE_SCAN_MODE_OP_P100_1000_1000 = 0x06,
     /** Duty cycle 50 */
     OHOS_BLE_SCAN_MODE_OP_P50_100_200 = 0x07,
+    /** Duty cycle 10 30/300 */
+    OHOS_BLE_SCAN_MODE_OP_P10_30_300 = 0x08, 
 } BleScanMode;
 
 /**
@@ -288,7 +290,7 @@ typedef enum {
  * @since 6
  */
 typedef struct {
-    uint8_t addr[OHOS_BD_ADDR_LEN];
+    uint8_t addr[OHOS_BD_ADDR_LEN]; // little endian
     BleAddrType addrType;
 } AdvOwnAddrParams;
 
@@ -772,7 +774,7 @@ int BleDeregisterScanCallbacks(int32_t scannerId);
  * @param advId Indicates the pointer to the advertisement ID.
  * @param rawData Indicates the advertising data. For details, see {@link StartAdvRawData}.
  * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
- * @param ownAddrParams Indicates the own address and own address type. For details, see {@link AdvOwnAddrParams}.
+ * @param ownAddrParams Indicates the own address(little endian) and own address type. For details, see {@link AdvOwnAddrParams}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
