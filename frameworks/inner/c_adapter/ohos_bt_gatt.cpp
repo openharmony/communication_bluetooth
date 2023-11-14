@@ -38,6 +38,7 @@
 #include "uuid.h"
 #include "bluetooth_object_map.h"
 #include "ohos_bt_gatt_utils.h"
+#include "bluetooth_timer.h"
 
 
 #ifdef __cplusplus
@@ -62,7 +63,7 @@ constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
 static mutex g_advMutex;
-static Alarm *g_advAddrTimer[MAX_BLE_ADV_NUM] = { nullptr };
+static uint32_t g_advAddrTimerIds[MAX_BLE_ADV_NUM];
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -347,8 +348,10 @@ int BleStopAdv(int advId)
         g_AppCallback->advDisableCb(advId, 0);
     }
     g_bleAdvCallbacks[advId] = nullptr;
-    AlarmDelete(g_advAddrTimer[advId]);
-    g_advAddrTimer[advId] = nullptr;
+    if (g_advAddrTimerIds[advId] != 0) {
+        BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId]);
+        g_advAddrTimerIds[advId] = 0;
+    }
 
     if (IsAllAdvStopped()) {
         HILOGI("All adv have been stopped.");
@@ -536,10 +539,16 @@ int BleDeregisterScanCallbacks(int32_t scannerId)
     return OHOS_BT_STATUS_SUCCESS;
 }
 
-static void OnAdvAddrAlarm(void *param)
+/*
+ * RPA: The two highest bits of the broadcast address are 01, and address type is random.
+ */
+static bool IsRpa(const AdvOwnAddrParams *ownAddrParams)
 {
-    int advId = (int)*param;
-    BleStopAdv(advId);
+    if (ownAddrParams != nullptr && ((ownAddrParams->addr[0] & 0xC0) ^ 0x40) == 0 &&
+        ownAddrParams->addrType == BLE_ADDR_RANDOM) {
+            return true;
+        }
+    return false;
 }
 
 /**
@@ -550,7 +559,7 @@ static void OnAdvAddrAlarm(void *param)
  * @param advId Indicates the pointer to the advertisement ID.
  * @param rawData Indicates the advertising data. For details, see {@link StartAdvRawData}.
  * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
- * @param ownAddrParams Indicates the own address and own address type. For details, see {@link AdvOwnAddrParams}.
+ * @param ownAddrParams Indicates the own address(big endian) and own address type. For details, see {@link AdvOwnAddrParams}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
@@ -559,8 +568,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     const AdvOwnAddrParams *ownAddrParams)
 {
     HILOGI("BleStartAdvWithAddr enter");
-    if (advId == nullptr || rawData == nullptr || advParam == nullptr || ownAddrParams == nullptr ||
-        !IsRpa(ownAddrParams->addr)) {
+    if (advId == nullptr || rawData == nullptr || advParam == nullptr || !IsRpa(ownAddrParams->addr)) {
         HILOGW("params are invalid");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -585,8 +593,13 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         return OHOS_BT_STATUS_UNHANDLED;
     }
     // adv must stop after {@link ADV_ADDR_TIME_THRESHOLD}
-    g_advAddrTimer[i] = AlarmCreate("advAddr", false);
-    AlarmSet(g_advAddrTimer[i], ADV_ADDR_TIME_THRESHOLD, OnAdvAddrAlarm, (void *)&i);
+    auto timerCallback = [i]() {
+        HILOGI("Stop adv : %{public}d.", i);
+        BleStopAdv(i);
+    };
+    uint32_t timerId = 0;
+    BluetoothTimer::GetInstance()->Register(timerCallback, timerId, ADV_ADDR_TIME_THRESHOLD);
+    g_advAddrTimerIds[i] = timerId;
 
     *advId = i;
     HILOGI("ret advId: %{public}d.", *advId);
