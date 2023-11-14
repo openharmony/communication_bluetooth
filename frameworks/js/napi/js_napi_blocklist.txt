@@ -53,8 +53,8 @@ type:*OHOS::Bluetooth::PanObserver
 type:*OHOS::Bluetooth::Pan
 type:*OHOS::Bluetooth::PbapPullPhoneBookParam
 type:*OHOS::Bluetooth::PbapPullvCardListingParam
-type:*OHOS::Bluetooth::PbapObserver
-type:*OHOS::Bluetooth::PbapServer
+type:*OHOS::Bluetooth::MapMseObserver
+type:*OHOS::Bluetooth::MapMse
 type:*OHOS::Bluetooth::IBluetoothBleCentralManager
 type:*OHOS::Bluetooth::InputStream
 type:*OHOS::Bluetooth::OutputStream
