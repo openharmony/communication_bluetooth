@@ -206,7 +206,7 @@ int32_t BluetoothHfpAgProxy::ConnectSco(const uint8_t callType)
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHfpAgProxy::DisConnectSco(const uint8_t callType)
+int32_t BluetoothHfpAgProxy::DisconnectSco(const uint8_t callType)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
@@ -224,7 +224,7 @@ int32_t BluetoothHfpAgProxy::DisConnectSco(const uint8_t callType)
     int error = Remote()->SendRequest(
         BluetoothHfpAgInterfaceCode::BT_HFP_AG_DISCONNECT_SCO_EX, data, reply, option);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothHfpAgProxy::DisConnectSco done fail, error: %{public}d", error);
+        HILOGE("BluetoothHfpAgProxy::ConnectSco done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
