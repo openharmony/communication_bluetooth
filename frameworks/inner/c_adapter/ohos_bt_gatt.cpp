@@ -559,7 +559,7 @@ static bool IsRpa(const AdvOwnAddrParams *ownAddrParams)
  * @param advId Indicates the pointer to the advertisement ID.
  * @param rawData Indicates the advertising data. For details, see {@link StartAdvRawData}.
  * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
- * @param ownAddrParams Indicates the own address(big endian) and own address type. For details, see {@link AdvOwnAddrParams}.
+ * @param ownAddrParams Indicates the own address(little endian) and own address type. For details, see {@link AdvOwnAddrParams}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
