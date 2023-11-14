@@ -96,6 +96,7 @@ config("btframework_config") {
   cflags_cc = [
     "-fPIC",
     "-Wno-unused-parameter",
+    "-Wno-return-type-c-linkage",
     "-Wunused-private-field",
   ]
   include_dirs = [
