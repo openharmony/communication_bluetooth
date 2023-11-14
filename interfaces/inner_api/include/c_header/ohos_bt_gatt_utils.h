@@ -16,6 +16,8 @@
 #ifndef OHOS_BT_GATT_UTILS_H
 #define OHOS_BT_GATT_UTILS_H
 
+#include "string"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,7 +25,6 @@ extern "C" {
 namespace OHOS {
 namespace Bluetooth {
 
-#define BD_ADDR_LEN 6
 #define ADV_ADDR_TIME_THRESHOLD (15 * 60 * 1000) // 15 mins
 
 /*
@@ -40,11 +41,6 @@ void RemoveTimeoutAdvAddr();
  * There is no limit on non-duplicate addresses.
  */
 bool CanStartAdv(const std::string& addrStr);
-
-/*
- * RPA: The two highest bits of the broadcast address are 01
- */
-bool IsRpa(uint8_t addr[BD_ADDR_LEN]);
 
 }  // namespace Bluetooth
 }  // namespace OHOS
