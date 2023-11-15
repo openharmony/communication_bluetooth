@@ -32,6 +32,7 @@ constexpr int RET_NO_SUPPORT = -1;
 constexpr int RET_BAD_PARAM = -2;
 constexpr int RET_BAD_STATUS = -3;
 constexpr int RET_NO_SPACE = -4;
+constexpr int RET_REACH_MAX = -5;
 
 /*********************************************
  *
@@ -206,6 +207,16 @@ const int DEVICE_TYPE_UNKNOWN = -1;
 const int DEVICE_TYPE_BREDR = 0;
 const int DEVICE_TYPE_LE = 1;
 const int DEVICE_TYPE_DUAL_MONO = 2;
+
+/**
+ * @brief ACL LINK TYPE.
+ * use to
+ * acl connectCallback()
+ */
+const int LINK_TYPE_UNKNOWN = -1;
+const int LINK_TYPE_BREDR = 0;
+const int LINK_TYPE_LE = 1;
+
 /*********************************************
  *
  * GATT Macro Define
