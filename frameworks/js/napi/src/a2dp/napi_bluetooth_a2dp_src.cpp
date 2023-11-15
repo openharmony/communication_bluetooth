@@ -107,7 +107,7 @@ napi_value NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env, napi_value expo
         DECLARE_NAPI_FUNCTION("getConnectionStrategy", GetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionState", GetConnectionState),
         DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectedDevices),
-        DECLARE_NAPI_FUNCTION("isAbsoluteVolumeSupport", IsAbsoluteVolumeSupport),
+        DECLARE_NAPI_FUNCTION("isAbsoluteVolumeSupported", IsAbsoluteVolumeSupported),
         DECLARE_NAPI_FUNCTION("isAbsoluteVolumeEnabled", IsAbsoluteVolumeEnabled),
         DECLARE_NAPI_FUNCTION("enableAbsoluteVolume", EnableAbsoluteVolume),
         DECLARE_NAPI_FUNCTION("disableAbsoluteVolume", DisableAbsoluteVolume),
@@ -452,7 +452,7 @@ napi_value NapiA2dpSource::GetConnectedDevices(napi_env env, napi_callback_info 
     return GetConnectionDevices(env, info);
 }
 
-napi_value NapiA2dpSource::IsAbsoluteVolumeSupport(napi_env env, napi_callback_info info)
+napi_value NapiA2dpSource::IsAbsoluteVolumeSupported(napi_env env, napi_callback_info info)
 {
     HILOGD("start");
     std::string remoteAddr{};
