@@ -663,7 +663,7 @@ napi_value IsBluetoothDiscovering(napi_env env, napi_callback_info info)
     bool isDiscovering = false;
     int32_t err = host->IsBtDiscovering(isDiscovering);
     napi_value result = nullptr;
-    NAPI_BT_RETURN_IF(napi_get_boolean(env, isDiscovering, &result) != napi_ok, "napi_get_boolean failed", result);
+    NAPI_BT_ASSERT_RETURN(env, napi_get_boolean(env, isDiscovering, &result) == napi_ok, err, result);
     NAPI_BT_ASSERT_RETURN(env, err = BT_NO_ERROR, err, result);
     HILOGE("isBluetoothDiscovering :%{public}d", isDiscovering);
     return result;
@@ -678,7 +678,7 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
     int pairState = PAIR_NONE;
     int32_t err = remoteDevice.GetPairState(pairState);
     napi_value result = nullptr;
-    NAPI_BT_RETURN_IF(napi_create_int32(env, pairState, &result) != napi_ok, "napi_create_int32 failed", result);
+    NAPI_BT_ASSERT_RETURN(env, napi_create_int32(env, pairState, &result) == napi_ok, err, result);
     NAPI_BT_ASSERT_RETURN(env, err = BT_NO_ERROR, err, result);
     HILOGE("getPairState :%{public}d", pairState);
     return result;
