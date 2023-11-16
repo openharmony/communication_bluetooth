@@ -610,7 +610,9 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
         settings.SetConnectable(false);
     }
-    settings.SetOwnAddr(ownAddrParams->addr);
+    std::array<uint8_t, OHOS_BD_ADDR_LEN> addr;
+    std::copy(std::begin(ownAddrParams->addr), std::end(ownAddrParams->addr), std::begin(addr));
+    settings.SetOwnAddr(addr);
     settings.SetOwnAddrType(ownAddrParams->addrType);
 
     auto advData = ConvertDataToVec(rawData->advData, rawData->advDataLen);
