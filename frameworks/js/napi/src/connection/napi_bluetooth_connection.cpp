@@ -28,8 +28,10 @@
 
 namespace OHOS {
 namespace Bluetooth {
-NapiBluetoothConnectionObserver g_connectionObserver;
-std::shared_ptr<NapiBluetoothRemoteDeviceObserver> g_remoteDeviceObserver;
+std::shared_ptr<NapiBluetoothConnectionObserver> g_connectionObserver =
+    std::make_shared<NapiBluetoothConnectionObserver>();
+std::shared_ptr<NapiBluetoothRemoteDeviceObserver> g_remoteDeviceObserver =
+    std::make_shared<NapiBluetoothRemoteDeviceObserver>();
 std::mutex deviceMutex;
 std::vector<std::shared_ptr<BluetoothRemoteDevice>> g_DiscoveryDevices;
 std::set<std::string> g_supportRegisterFunc = {
@@ -117,7 +119,7 @@ static bool IsValidObserverType(const std::string &callbackName)
 {
     if (callbackName == REGISTER_DEVICE_FIND_TYPE || callbackName == REGISTER_PIN_REQUEST_TYPE ||
         callbackName == REGISTER_BOND_STATE_TYPE) {
-        return true;    
+        return true;
     } else {
         HILOGE("not support %{public}s.", callbackName.c_str());
         return false;
@@ -149,7 +151,7 @@ napi_status CheckRegisterObserver(napi_env env, napi_callback_info info)
     if (callbackName == REGISTER_BOND_STATE_TYPE) {
         g_remoteDeviceObserver->RegisterCallback(callbackName, callbackInfo);
     } else {
-        g_connectionObserver.RegisterCallback(callbackName, callbackInfo);
+        g_connectionObserver->RegisterCallback(callbackName, callbackInfo);
     }
     return napi_ok;
 }
@@ -177,7 +179,7 @@ napi_status CheckDeRegisterObserver(napi_env env, napi_callback_info info)
     if (callbackName == REGISTER_BOND_STATE_TYPE) {
         g_remoteDeviceObserver->DeRegisterCallback(callbackName);
     } else {
-        g_connectionObserver.DeRegisterCallback(callbackName);
+        g_connectionObserver->DeRegisterCallback(callbackName);
     }
     return napi_ok;
 }
@@ -781,7 +783,6 @@ napi_value PinTypeInit(napi_env env)
 void RegisterObserverToHost()
 {
     HILOGD("enter");
-    g_remoteDeviceObserver = std::make_shared<NapiBluetoothRemoteDeviceObserver>();
     BluetoothHost &host = BluetoothHost::GetDefaultHost();
     host.RegisterObserver(g_connectionObserver);
     host.RegisterRemoteDeviceObserver(g_remoteDeviceObserver);

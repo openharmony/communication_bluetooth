@@ -287,7 +287,7 @@ public:
      * @param observer HandsFree AudioGateway observer instance.
      * @since 6
      */
-    void RegisterObserver(HandsFreeAudioGatewayObserver *observer);
+    void RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer);
 
     /**
      * @brief Deregister HandsFree AudioGateway observer instance.
@@ -295,7 +295,7 @@ public:
      * @param observer HandsFree AudioGateway observer instance.
      * @since 6
      */
-    void DeregisterObserver(HandsFreeAudioGatewayObserver *observer);
+    void DeregisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer);
 
     /**
      * @brief Get remote HF device list which are in the connected state.

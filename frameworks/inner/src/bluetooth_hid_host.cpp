@@ -384,16 +384,18 @@ int HidHost::GetConnectStrategy(const BluetoothRemoteDevice &device, int &strate
     return pimpl->GetConnectStrategy(device, strategy);
 }
 
-void HidHost::RegisterObserver(HidHostObserver *observer)
+void HidHost::RegisterObserver(std::shared_ptr<HidHostObserver> observer)
 {
-    std::shared_ptr<HidHostObserver> observerPtr(observer, [](HidHostObserver *) {});
-    return pimpl->RegisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->RegisterObserver(observer);
 }
 
-void HidHost::DeregisterObserver(HidHostObserver *observer)
+void HidHost::DeregisterObserver(std::shared_ptr<HidHostObserver> observer)
 {
-    std::shared_ptr<HidHostObserver> observerPtr(observer, [](HidHostObserver *) {});
-    return pimpl->DeregisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->DeregisterObserver(observer);
 }
 
 void HidHost::HidHostVCUnplug(std::string device, uint8_t id, uint16_t size, uint8_t type)

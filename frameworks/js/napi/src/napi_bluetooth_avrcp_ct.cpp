@@ -21,8 +21,8 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-
-NapiAvrcpControllerObserver NapiAvrcpController::observer_;
+std::shared_ptr<NapiAvrcpControllerObserver> NapiAvrcpController::observer_ =
+    std::make_shared<NapiAvrcpControllerObserver>();
 bool NapiAvrcpController::isRegistered_ = false;
 
 void NapiAvrcpController::DefineAvrcpControllerJSClass(napi_env env)
@@ -54,14 +54,14 @@ napi_value NapiAvrcpController::AvrcpControllerConstructor(napi_env env, napi_ca
 
 napi_value NapiAvrcpController::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::unique_lock<std::shared_mutex> guard(NapiAvrcpControllerObserver::g_avrcpCtCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
     if (!isRegistered_) {
         AvrcpController *profile = AvrcpController::GetProfile();
-        profile->RegisterObserver(&observer_);
+        profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
 
@@ -71,11 +71,11 @@ napi_value NapiAvrcpController::On(napi_env env, napi_callback_info info)
 
 napi_value NapiAvrcpController::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::unique_lock<std::shared_mutex> guard(NapiAvrcpControllerObserver::g_avrcpCtCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
     HILOGI("Napi Avrcp is unregistered");
     return ret;
 }

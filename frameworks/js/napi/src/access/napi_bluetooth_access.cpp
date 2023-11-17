@@ -28,7 +28,8 @@
 namespace OHOS {
 namespace Bluetooth {
 namespace {
-NapiBluetoothAccessObserver g_bluetoothAccessObserver;
+std::shared_ptr<NapiBluetoothAccessObserver> g_bluetoothAccessObserver =
+    std::make_shared<NapiBluetoothAccessObserver>();
 }  // namespace
 
 napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
@@ -198,7 +199,7 @@ napi_value NapiAccess::RegisterAccessObserver(napi_env env, napi_callback_info i
     std::shared_ptr<BluetoothCallbackInfo> pCallbackInfo = std::make_shared<BluetoothCallbackInfo>();
     auto status = CheckAccessObserverParams(env, argc, argv, type, pCallbackInfo);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    g_bluetoothAccessObserver.stateChangeCallback = pCallbackInfo;
+    g_bluetoothAccessObserver->stateChangeCallback = pCallbackInfo;
     HILOGI("%{public}s is registered", type.c_str());
     napi_value ret = nullptr;
     napi_get_undefined(env, &ret);
@@ -214,7 +215,7 @@ static napi_status CheckAccessDeregisterObserver(napi_env env, napi_callback_inf
     if (argc == ARGS_SIZE_ONE) {
         std::string type;
         NAPI_BT_CALL_RETURN(NapiParseObserverType(env, argv[PARAM0], type));
-        g_bluetoothAccessObserver.stateChangeCallback = nullptr;
+        g_bluetoothAccessObserver->stateChangeCallback = nullptr;
     } else {
         NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
         std::string type;
@@ -224,7 +225,7 @@ static napi_status CheckAccessDeregisterObserver(napi_env env, napi_callback_inf
         pCallbackInfo->env_ = env;
         NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
         NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &pCallbackInfo->callback_));
-        g_bluetoothAccessObserver.stateChangeCallback = nullptr;
+        g_bluetoothAccessObserver->stateChangeCallback = nullptr;
     }
     return napi_ok;
 }
