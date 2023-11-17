@@ -143,14 +143,14 @@ public:
      *
      * @param observer Hid Host observer instance.
      */
-    void RegisterObserver(HidHostObserver *observer);
+    void RegisterObserver(std::shared_ptr<HidHostObserver> observer);
 
     /**
      * @brief Deregister Hid Host observer instance.
      *
      * @param observer Hid Host observer instance.
      */
-    void DeregisterObserver(HidHostObserver *observer);
+    void DeregisterObserver(std::shared_ptr<HidHostObserver> observer);
 
     /**
      * @brief Hid Host VCUnplug.

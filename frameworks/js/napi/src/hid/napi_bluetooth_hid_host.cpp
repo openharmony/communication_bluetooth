@@ -28,7 +28,8 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
-NapiBluetoothHidHostObserver NapiBluetoothHidHost::observer_;
+std::shared_ptr<NapiBluetoothHidHostObserver> NapiBluetoothHidHost::observer_ =
+    std::make_shared<NapiBluetoothHidHostObserver>();
 thread_local napi_ref NapiBluetoothHidHost::consRef_ = nullptr;
 
 void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports)
@@ -62,7 +63,7 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HID_HOST, napiProfile);
     HidHost *profile = HidHost::GetProfile();
-    profile->RegisterObserver(&observer_);
+    profile->RegisterObserver(observer_);
 #endif
     HILOGI("finished");
 }
@@ -86,7 +87,7 @@ napi_value NapiBluetoothHidHost::CreateHidHostProfile(napi_env env, napi_callbac
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HID_HOST, napiProfile);
 
     HidHost *profile = HidHost::GetProfile();
-    profile->RegisterObserver(&observer_);
+    profile->RegisterObserver(observer_);
 
     return napiProfile;
 }
@@ -130,7 +131,7 @@ napi_value NapiBluetoothHidHost::On(napi_env env, napi_callback_info info)
         return ret;
     }
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    observer_.callbackInfos_[type] = callbackInfo;
+    observer_->callbackInfos_[type] = callbackInfo;
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
 }
@@ -157,11 +158,11 @@ napi_value NapiBluetoothHidHost::Off(napi_env env, napi_callback_info info)
         return ret;
     }
 
-    if (observer_.callbackInfos_[type] != nullptr) {
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_.callbackInfos_[type];
+    if (observer_->callbackInfos_[type] != nullptr) {
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_->callbackInfos_[type];
     napi_delete_reference(env, callbackInfo->callback_);
     }
-    observer_.callbackInfos_[type] = nullptr;
+    observer_->callbackInfos_[type] = nullptr;
     HILOGI("%{public}s is unregistered", type.c_str());
     return ret;
 }

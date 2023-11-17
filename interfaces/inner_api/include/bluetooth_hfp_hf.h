@@ -374,7 +374,7 @@ public:
      * @param observer HandsFreeUnitObserver instance.
      * @since 6
      */
-    void RegisterObserver(HandsFreeUnitObserver *observer);
+    void RegisterObserver(std::shared_ptr<HandsFreeUnitObserver> observer);
 
     /**
      * @brief Deregister HandsFree Unit observer instance.
@@ -382,7 +382,7 @@ public:
      * @param observer HandsFreeUnitObserver instance.
      * @since 6
      */
-    void DeregisterObserver(HandsFreeUnitObserver *observer);
+    void DeregisterObserver(std::shared_ptr<HandsFreeUnitObserver> observer);
 
     /**
      * @brief The external process calls the HfpHf profile interface before the Bluetooth process starts. At this

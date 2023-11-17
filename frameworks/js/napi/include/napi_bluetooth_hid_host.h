@@ -41,7 +41,7 @@ public:
     static napi_value CreateHidHostProfile(napi_env env, napi_callback_info info);
     static napi_value DefineCreateProfile(napi_env env, napi_value exports);
 
-    static NapiBluetoothHidHostObserver observer_;
+    static std::shared_ptr<NapiBluetoothHidHostObserver> observer_;
     static thread_local napi_ref consRef_;
 };
 } // namespace Bluetooth

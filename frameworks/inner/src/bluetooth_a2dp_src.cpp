@@ -205,18 +205,18 @@ void A2dpSource::Init()
     }
 }
 
-void A2dpSource::RegisterObserver(A2dpSourceObserver *observer)
+void A2dpSource::RegisterObserver(std::shared_ptr<A2dpSourceObserver> observer)
 {
-    HILOGI("enter");
-    std::shared_ptr<A2dpSourceObserver> pointer(observer, [](A2dpSourceObserver *) {});
-    pimpl->observers_.Register(pointer);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Register(observer);
 }
 
-void A2dpSource::DeregisterObserver(A2dpSourceObserver *observer)
+void A2dpSource::DeregisterObserver(std::shared_ptr<A2dpSourceObserver> observer)
 {
-    HILOGI("enter");
-    std::shared_ptr<A2dpSourceObserver> pointer(observer, [](A2dpSourceObserver *) {});
-    pimpl->observers_.Deregister(pointer);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Deregister(observer);
 }
 
 int A2dpSource::GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRemoteDevice> &devices) const
