@@ -678,6 +678,12 @@ enum BluetoothSocketInterfaceCode {
     SOCKET_BUTT
 };
 
+enum BluetoothAudioManagerInterfaceCode {
+    AUDIO_MANAGER_ENABLE = 0,
+    AUDIO_MANAGER_DISABLE,
+    IS_AUDIO_MANAGER_ENABLED
+};
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_SERVICE_IPC_INTERFACE_CODE_H
