@@ -131,28 +131,21 @@ napi_value NapiMapMse::GetConnectedDevices(napi_env env, napi_callback_info info
 
 napi_value NapiMapMse::GetConnectionState(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
-    napi_value result = nullptr;
-    int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
-    if (napi_create_int32(env, profileState, &result) != napi_ok) {
-        HILOGE("napi_create_int32 failed.");
-    }
-
+    HILOGI("enter");
     std::string remoteAddr {};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_RETURN(env, checkRet, BT_ERR_INVALID_PARAM, result);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
 
     MapMse *profile = MapMse::GetProfile();
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
     int32_t errorCode = profile->GetDeviceState(device, state);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, result);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_NO_ERROR, errorCode);
 
-    profileState = GetProfileConnectionState(state);
-    if (napi_create_int32(env, profileState, &result) != napi_ok) {
-        HILOGE("napi_create_int32 failed.");
-    }
+    napi_value result = nullptr;
+    int32_t profileState = GetProfileConnectionState(state);
+    napi_create_int32(env, profileState, &result);
     return result;
 }
 
@@ -161,13 +154,13 @@ napi_value NapiMapMse::Disconnect(napi_env env, napi_callback_info info)
     HILOGD("enter");
     std::string remoteAddr{};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
 
     MapMse *profile = MapMse::GetProfile();
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t errorCode = profile->Disconnect(device);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetBooleanTrue(env);
 }
 
