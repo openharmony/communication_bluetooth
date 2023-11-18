@@ -154,13 +154,13 @@ napi_value NapiMapMse::Disconnect(napi_env env, napi_callback_info info)
     HILOGD("enter");
     std::string remoteAddr{};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     MapMse *profile = MapMse::GetProfile();
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t errorCode = profile->Disconnect(device);
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_NO_ERROR, errorCode);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetBooleanTrue(env);
 }
 
