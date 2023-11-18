@@ -4,7 +4,10 @@
 =======
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
+<<<<<<< HEAD
 >>>>>>> 399c6857 (update time)
+=======
+>>>>>>> cf103f81 (update time)
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,10 +21,14 @@
  * limitations under the License.
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 
 >>>>>>> 399c6857 (update time)
+=======
+
+>>>>>>> cf103f81 (update time)
 #include <uv.h>
 #include "napi_bluetooth_bt_weardetection.h"
 #include "bluetooth_audio_manager.h"
