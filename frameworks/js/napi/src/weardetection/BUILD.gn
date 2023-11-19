@@ -10,12 +10,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("//build/ohos.gni")
- 
+
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
- 
+
 ohos_shared_library("weardetection") {
   stack_protector_ret = true
 
@@ -32,14 +32,14 @@ ohos_shared_library("weardetection") {
     "$BT_NAPI_DIR/include",
     "$BT_NAPI_DIR/src",
   ]
- 
+
   defines = [
-   "BT_LOG_TAG = \"bluetooth_napi\"",
-   "BT_LOG_DOMAIN = 0xD000100",
-   "ENABLE_NAPI_BLUETOOTH_MANAGER",
-   "BLUETOOTH_API_SINCE_10",
- ]
- 
+    "BT_LOG_TAG = \"bluetooth_napi\"",
+    "BT_LOG_DOMAIN = 0xD000100",
+    "ENABLE_NAPI_BLUETOOTH_MANAGER",
+    "BLUETOOTH_API_SINCE_10",
+  ]
+
   sources = [
     "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
     "$BT_NAPI_DIR/src/common/napi_async_work.cpp",
@@ -52,9 +52,9 @@ ohos_shared_library("weardetection") {
     "$BT_NAPI_DIR/src/weardetection/napi_bluetooth_bt_weardetection.cpp",
     "$BT_NAPI_DIR/src/weardetection/native_module_weardetection.cpp",
   ]
- 
+
   deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
- 
+
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
@@ -66,7 +66,7 @@ ohos_shared_library("weardetection") {
     "libuv:uv",
     "napi:ace_napi",
   ]
- 
+
   relative_install_dir = "module/bluetooth"
   part_name = "bluetooth"
   subsystem_name = "communication"
