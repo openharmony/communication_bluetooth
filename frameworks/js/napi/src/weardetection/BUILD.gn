@@ -18,7 +18,14 @@ BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
  
 ohos_shared_library("weardetection") {
   stack_protector_ret = true
- 
+
+  sanitize = {
+    cfi = true
+    boundary_sanitize = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "$BT_PART_DIR/frameworks/inner/common",
     "$BT_PART_DIR/interfaces/inner_api/include",
@@ -41,9 +48,9 @@ ohos_shared_library("weardetection") {
     "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
     "$BT_NAPI_DIR/src/common/napi_native_object.cpp",
     "$BT_NAPI_DIR/src/common/napi_timer.cpp",
+    "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
     "$BT_NAPI_DIR/src/weardetection/napi_bluetooth_bt_weardetection.cpp",
     "$BT_NAPI_DIR/src/weardetection/native_module_weardetection.cpp",
-    "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
   ]
  
   deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
