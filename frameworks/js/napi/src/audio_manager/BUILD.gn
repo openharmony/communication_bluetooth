@@ -41,6 +41,8 @@ ohos_shared_library("weardetection") {
   ]
 
   sources = [
+    "$BT_NAPI_DIR/src/audio_manager/napi_bluetooth_audio_manager.cpp",
+    "$BT_NAPI_DIR/src/audio_manager/native_module_audio_manager.cpp",
     "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
     "$BT_NAPI_DIR/src/common/napi_async_work.cpp",
     "$BT_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
@@ -49,8 +51,6 @@ ohos_shared_library("weardetection") {
     "$BT_NAPI_DIR/src/common/napi_native_object.cpp",
     "$BT_NAPI_DIR/src/common/napi_timer.cpp",
     "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
-    "$BT_NAPI_DIR/src/weardetection/napi_bluetooth_bt_weardetection.cpp",
-    "$BT_NAPI_DIR/src/weardetection/native_module_weardetection.cpp",
   ]
 
   deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
