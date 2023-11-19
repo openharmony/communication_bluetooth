@@ -17,11 +17,11 @@
 #include "bluetooth_audio_manager_proxy.h"
 #include "bluetooth_log.h"
 #include "refbase.h"
- 
+
 namespace OHOS {
 namespace Bluetooth {
- 
-int BluetoothAudioManagerProxy::EnableBtAudioManager(const std::string &deviceId, int32_t supportVal)
+
+int BluetoothAudioManagerProxy::EnableWearDetection(const std::string &deviceId, int32_t supportVal)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor())) {
@@ -32,26 +32,25 @@ int BluetoothAudioManagerProxy::EnableBtAudioManager(const std::string &deviceId
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
- 
+
     if (!data.WriteInt32(supportVal)) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
- 
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothAudioManagerInterfaceCode::AUDIO_MANAGER_ENABLE), data, reply, option);
+        static_cast<uint32_t>(BluetoothAudioManagerInterfaceCode::WEAR_DETECTION_ENABLE), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetections done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
-    return 0;
+    return reply.ReadInt32();
 }
- 
-int BluetoothAudioManagerProxy::DisableBtAudioManager(const std::string &deviceId, int32_t supportVal)
+
+int BluetoothAudioManagerProxy::DisableWearDetection(const std::string &deviceId, int32_t supportVal)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor())) {
@@ -62,26 +61,26 @@ int BluetoothAudioManagerProxy::DisableBtAudioManager(const std::string &deviceI
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
- 
+
     if (!data.WriteInt32(supportVal)) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
- 
+
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothAudioManagerInterfaceCode::AUDIO_MANAGER_DISABLE), data, reply, option);
+        static_cast<uint32_t>(BluetoothAudioManagerInterfaceCode::WEAR_DETECTION_DISABLE), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetections done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
-    return 0;
+    return reply.ReadInt32();
 }
- 
-int BluetoothAudioManagerProxy::IsBtAudioManagerEnabled(const std::string &deviceId)
+
+int BluetoothAudioManagerProxy::IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor())) {
@@ -92,18 +91,22 @@ int BluetoothAudioManagerProxy::IsBtAudioManagerEnabled(const std::string &devic
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
- 
+
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
     };
     int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothAudioManagerInterfaceCode::IS_AUDIO_MANAGER_ENABLED), data, reply, option);
+        static_cast<uint32_t>(BluetoothAudioManagerInterfaceCode::IS_WEAR_DETECTION_ENABLED), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetections done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
-    return 0;
+    int32_t exception = reply.ReadInt32();
+    if (exception == 1 || exception == 0) {
+        ability = reply.ReadInt32();
+    }
+    return exception;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

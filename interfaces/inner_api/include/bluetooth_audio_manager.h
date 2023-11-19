@@ -15,27 +15,27 @@
 
 #ifndef BLUETOOTH_AUDIO_MANAGER_H
 #define BLUETOOTH_AUDIO_MANAGER_H
- 
+
 #include <cstdint>
 #include <string>
- 
+
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "iremote_broker.h"
 #include "refbase.h"
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
- 
+
 namespace OHOS {
 namespace Bluetooth {
- 
+
 class BtAudioManagerCallback {
     virtual ~BtAudioManagerCallback() = default;
- 
+
     virtual void OnAudioManagerEnabled(int ret);
 };
- 
-class BLUETOOTH_API BtAudioManager {
+
+class BLUETOOTH_API BluetoothAudioManager {
 public:
     // common
     /**
@@ -44,27 +44,26 @@ public:
      * @return Returns the singleton instance.
      * @since 6
      */
-    static BtAudioManager &GetInstance();
- 
+    static BluetoothAudioManager &GetInstance();
+
     void RegisterCallback(BtAudioManagerCallback &btAudioManagerCallback);
- 
-    int EnableBtAudioManager(const std::string &deviceId, int32_t supportVal);
-    int DisableBtAudioManager(const std::string &deviceId, int32_t supportVal);
-    int IsBtAudioManagerEnabled(const std::string &deviceId);
- 
+
+    int EnableWearDetection(const std::string &deviceId, int32_t supportVal);
+    int DisableWearDetection(const std::string &deviceId, int32_t supportVal);
+    int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability);
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
      *
      * @since 6
      */
-    BtAudioManager();
- 
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BtAudioManager);
+    BluetoothAudioManager();
+
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothAudioManager);
     BLUETOOTH_DECLARE_IMPL();
- 
+
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
- 
 #endif

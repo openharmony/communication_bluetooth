@@ -14,8 +14,8 @@
  */
  
 #include "bluetooth_log.h"
-#include "napi_bluetooth_bt_weardetection.h"
- 
+#include "napi_bluetooth_audio_manager.h"
+
 namespace OHOS {
 namespace Bluetooth {
 EXTERN_C_START
@@ -26,11 +26,11 @@ static napi_value Init(napi_env env, napi_value exports)
 {
     HILOGI("-----connection Init start------");
     napi_property_descriptor desc[] = {};
- 
+
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
- 
-    NapiBtWearDetection::DefineSystemWearDetectionInterface(env, exports);
- 
+
+    NapiBluetoothAudioManager::DefineSystemWearDetectionInterface(env, exports);
+
     HILOGI("-----connection Init end------");
     return exports;
 }

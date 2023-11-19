@@ -679,9 +679,9 @@ enum BluetoothSocketInterfaceCode {
 };
 
 enum BluetoothAudioManagerInterfaceCode {
-    AUDIO_MANAGER_ENABLE = 0,
-    AUDIO_MANAGER_DISABLE,
-    IS_AUDIO_MANAGER_ENABLED
+    WEAR_DETECTION_ENABLE = 0,
+    WEAR_DETECTION_DISABLE,
+    IS_WEAR_DETECTION_ENABLED
 };
 
 }  // namespace Bluetooth
