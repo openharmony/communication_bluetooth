@@ -49,6 +49,7 @@ ohos_shared_library("bluetooth") {
     "src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",
     "src/access/napi_bluetooth_access.cpp",
     "src/access/napi_bluetooth_access_observer.cpp",
+    "src/audio_manager/napi_bluetooth_audio_manager.cpp",
     "src/base_profile/napi_bluetooth_base_profile.cpp",
     "src/ble/napi_bluetooth_ble.cpp",
     "src/ble/napi_bluetooth_ble_advertise_callback.cpp",
@@ -91,7 +92,6 @@ ohos_shared_library("bluetooth") {
     "src/parser/napi_parser_utils.cpp",
     "src/socket/napi_bluetooth_spp_client.cpp",
     "src/socket/napi_bluetooth_spp_server.cpp",
-    "src/audio_manager/napi_bluetooth_audio_manager.cpp",
   ]
 
   deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework" ]
@@ -138,6 +138,7 @@ ohos_shared_library("bluetoothmanager") {
     "src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",
     "src/access/napi_bluetooth_access.cpp",
     "src/access/napi_bluetooth_access_observer.cpp",
+    "src/audio_manager/napi_bluetooth_audio_manager.cpp",
     "src/base_profile/napi_bluetooth_base_profile.cpp",
     "src/ble/napi_bluetooth_ble.cpp",
     "src/ble/napi_bluetooth_ble_advertise_callback.cpp",
@@ -180,7 +181,6 @@ ohos_shared_library("bluetoothmanager") {
     "src/parser/napi_parser_utils.cpp",
     "src/socket/napi_bluetooth_spp_client.cpp",
     "src/socket/napi_bluetooth_spp_server.cpp",
-    "src/audio_manager/napi_bluetooth_audio_manager.cpp",
   ]
 
   deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework" ]
@@ -205,6 +205,7 @@ ohos_shared_library("bluetoothmanager") {
 
 group("bluetooth_napi") {
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/audio_manager:weardetection",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi:bluetooth",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi:bluetoothmanager",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/a2dp:a2dp",
@@ -217,6 +218,5 @@ group("bluetooth_napi") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/hid:hid",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/pan:pan",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/socket:socket",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/audio_manager:weardetection",
   ]
 }
