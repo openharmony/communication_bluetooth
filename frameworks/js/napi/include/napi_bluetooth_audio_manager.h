@@ -13,8 +13,8 @@
  * limitations under the License.
  */
  
-#ifndef NAPI_BLUETOOTH_BT_WEARDETECTION_H
-#define NAPI_BLUETOOTH_BT_WEARDETECTION_H
+#ifndef NAPI_BLUETOOTH_AUDIO_MANAGER_H
+#define NAPI_BLUETOOTH_AUDIO_MANAGER_H
  
 #include <vector>
 #include "bluetooth_a2dp_snk.h"
@@ -36,4 +36,4 @@ public:
  
 }  // namespace Bluetooth
 }  // namespace OHOS
-#endif /* NAPI_BLUETOOTH_BT_WEARDETECTION_H */
+#endif /* NAPI_BLUETOOTH_AUDIO_MANAGER_H */
