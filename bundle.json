@@ -73,8 +73,7 @@
         "fwk_group": [
           "//foundation/communication/bluetooth/frameworks/inner:btframework",
           "//foundation/communication/bluetooth/frameworks/inner:btcommon",
-          "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi",
-          "//foundation/communication/bluetooth/frameworks/js/napi/src/weardetection:weardetection"
+          "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi"
         ],
         "service_group": [
         ]
