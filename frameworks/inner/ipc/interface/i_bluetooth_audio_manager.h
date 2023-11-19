@@ -15,7 +15,7 @@
 
 #ifndef OHOS_BLUETOOTH_AUDIO_MANAGER_INTERFACE_H
 #define OHOS_BLUETOOTH_AUDIO_MANAGER_INTERFACE_H
- 
+
 #include "bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "parcel_bt_uuid.h"
@@ -23,18 +23,17 @@
 #include "i_bluetooth_host_observer.h"
 #include "i_bluetooth_remote_device_observer.h"
 #include "iremote_broker.h"
- 
+
 namespace OHOS {
 namespace Bluetooth {
- 
+
 class IBluetoothAudioManager : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAudioManager");
- 
-    virtual int EnableBtAudioManager(const std::string &deviceId, int32_t supportVal) = 0;
-    virtual int DisableBtAudioManager(const std::string &deviceId, int32_t supportVal) = 0;
-    virtual int IsBtAudioManagerEnabled(const std::string &deviceId) = 0;
- 
+
+    virtual int EnableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
+    virtual int DisableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
+    virtual int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

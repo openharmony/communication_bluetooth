@@ -17,77 +17,86 @@
 #include "i_bluetooth_audio_manager.h"
 #include "i_bluetooth_host.h"
 #include "bluetooth_utils.h"
- 
- 
+
 namespace OHOS {
 namespace Bluetooth {
-struct BtAudioManager::impl {
+struct BluetoothAudioManager::impl {
     impl();
     ~impl()
     {}
-    int EnableBtAudioManager(const std::string &deviceId, int32_t supportVal);
-    int DisableBtAudioManager(const std::string &deviceId, int32_t supportVal);
-    int IsBtAudioManagerEnabled(const std::string &deviceId);
+    int EnableWearDetection(const std::string &deviceId, int32_t supportVal);
+    int DisableWearDetection(const std::string &deviceId, int32_t supportVal);
+    int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability);
     sptr<IBluetoothAudioManager> proxy_;
 };
- 
-BtAudioManager::impl::impl()
+
+BluetoothAudioManager::impl::impl()
 {
     proxy_ = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
 }
- 
-BtAudioManager::BtAudioManager():pimpl(std::make_unique<impl>())
+
+BluetoothAudioManager::BluetoothAudioManager():pimpl(std::make_unique<impl>())
 {}
- 
-int BtAudioManager::impl::EnableBtAudioManager(const std :: string & deviceId, int32_t supportVal)
+
+int BluetoothAudioManager::impl::EnableWearDetection(const std::string & deviceId, int32_t supportVal)
 {
     if (proxy_ == nullptr) {
-    } else {
-        proxy_->EnableBtAudioManager(deviceId, supportVal);
+        HILOGE("proxy_ is null");
+        return BT_ERR_INVALID_STATE;
     }
-    return 0;
+    return proxy_->EnableWearDetection(deviceId, supportVal);
 }
- 
-int BtAudioManager::impl::DisableBtAudioManager(const std :: string & deviceId, int32_t supportVal)
+
+int BluetoothAudioManager::impl::DisableWearDetection(const std::string & deviceId, int32_t supportVal)
 {
     if (proxy_ == nullptr) {
-    } else {
-        proxy_->DisableBtAudioManager(deviceId, supportVal);
+        HILOGE("proxy_ is null");
+        return BT_ERR_INVALID_STATE;
     }
-    return 0;
+    return proxy_->DisableWearDetection(deviceId, supportVal);
 }
- 
-int BtAudioManager::impl::IsBtAudioManagerEnabled(const std :: string & deviceId)
+
+int BluetoothAudioManager::impl::IsWearDetectionEnabled(const std::string & deviceId, int32_t &ability)
 {
     if (proxy_ == nullptr) {
-        return -1;
-    } else {
-        return proxy_->IsBtAudioManagerEnabled(deviceId);
+        HILOGE("proxy_ is null");
+        return BT_ERR_INVALID_STATE;
     }
+    return proxy_->IsWearDetectionEnabled(deviceId, ability);
 }
- 
-int BtAudioManager::EnableBtAudioManager(const std::string &deviceId, int32_t supportVal)
+
+int BluetoothAudioManager::EnableWearDetection(const std::string &deviceId, int32_t supportVal)
 {
-    pimpl->EnableBtAudioManager(deviceId, supportVal);
-    return 0;
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->EnableWearDetection(deviceId, supportVal);
 }
- 
-int BtAudioManager::DisableBtAudioManager(const std::string &deviceId, int32_t supportVal)
+
+int BluetoothAudioManager::DisableWearDetection(const std::string &deviceId, int32_t supportVal)
 {
-    pimpl->DisableBtAudioManager(deviceId, supportVal);
-    return 0;
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->DisableWearDetection(deviceId, supportVal);
 }
- 
-int BtAudioManager::IsBtAudioManagerEnabled(const std::string &deviceId)
+
+int BluetoothAudioManager::IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability)
 {
-    return pimpl->IsBtAudioManagerEnabled(deviceId);
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->IsWearDetectionEnabled(deviceId, ability);
 }
- 
-BtAudioManager &BtAudioManager::GetInstance()
+
+BluetoothAudioManager &BluetoothAudioManager::GetInstance()
 {
-    static BtAudioManager instance;
+    static BluetoothAudioManager instance;
     return instance;
 }
- 
+
 }  // namespace Bluetooth
 }  // namespace OHOS

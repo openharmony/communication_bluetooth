@@ -29,10 +29,10 @@ public:
     virtual ~BluetoothAudioManagerProxy()
     {}
  
-    int EnableBtAudioManager(const std::string &deviceId, int32_t supportVal) override;
-    int DisableBtAudioManager(const std::string &deviceId, int32_t supportVal) override;
-    int IsBtAudioManagerEnabled(const std::string &deviceId) override;
-
+    int EnableWearDetection(const std::string &deviceId, int32_t supportVal) override;
+    int DisableWearDetection(const std::string &deviceId, int32_t supportVal) override;
+    int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability) override;
+ 
 private:
     static inline BrokerDelegator<BluetoothAudioManagerProxy> delegator_;
 };
