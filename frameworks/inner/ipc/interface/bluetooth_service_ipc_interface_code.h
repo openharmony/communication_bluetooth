@@ -678,6 +678,14 @@ enum BluetoothSocketInterfaceCode {
     SOCKET_BUTT
 };
 
+enum BluetoothAudioManagerInterfaceCode {
+    WEAR_DETECTION_ENABLE = 0,
+    WEAR_DETECTION_DISABLE,
+    IS_WEAR_DETECTION_ENABLED,
+    // The last code, if you want to add a new code, please add it before this
+    WEAR_DETECTION_BUTT
+};
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_SERVICE_IPC_INTERFACE_CODE_H
