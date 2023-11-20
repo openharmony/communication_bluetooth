@@ -37,6 +37,7 @@ std::string GetBtTransportName(int transport);
 std::string GetProfileConnStateName(int state);
 std::string GetErrorCode(int32_t errCode);
 std::string GenerateRandomMacAddress();
+std::string GetUpdateOutputStackActionName(int action);
 
 sptr<IRemoteObject> GetRemoteObject(const std::string &objectName);
 template <typename T>

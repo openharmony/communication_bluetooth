@@ -34,6 +34,8 @@ public:
     virtual int EnableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
     virtual int DisableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
     virtual int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability) = 0;
+    virtual int32_t IsWearDetectionSupported(const std::string &address, bool &isSupported) = 0;
+    virtual int32_t SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

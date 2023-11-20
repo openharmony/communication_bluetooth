@@ -110,5 +110,45 @@ int BluetoothAudioManagerProxy::IsWearDetectionEnabled(const std::string &device
  
     return ret;
 }
+
+int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const std::string &address, bool &isSupported)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::IsWearDetectionSupported Write address error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothAudioManagerInterfaceCode::BT_IS_WEAR_DETECTION_SUPPORTED, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::IsWearDetectionSupported fail, error: %{public}d", error);
+    isSupported = reply.ReadBool();
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::SendDeviceSelection Write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(useA2dp), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::SendDeviceSelection Write useA2dp error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(useHfp), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::SendDeviceSelection Write useHfp error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(userSelection), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::SendDeviceSelection Write userSelection error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothAudioManagerInterfaceCode::BT_SEND_DEVICE_SELECTION, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::SendDeviceSelection fail, error: %{public}d", error);
+
+    return reply.ReadInt32();
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -65,6 +65,24 @@ int BluetoothAudioManager::impl::IsWearDetectionEnabled(const std::string & devi
     return proxy_->IsWearDetectionEnabled(deviceId, ability);
 }
 
+int BluetoothAudioManager::impl::IsWearDetectionSupported(const std::string & address, bool &isSupported)
+{
+    if (proxy_ == nullptr) {
+        HILOGE("proxy_ is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return proxy_->IsWearDetectionSupported(address, isSupported);
+}
+
+int BluetoothAudioManager::impl::SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection)
+{
+    if (proxy_ == nullptr) {
+        HILOGE("proxy_ is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return proxy_->SendDeviceSelection(address, useA2dp, useHfp, userSelection);
+}
+
 int BluetoothAudioManager::EnableWearDetection(const std::string &deviceId, int32_t supportVal)
 {
     if (pimpl == nullptr) {
@@ -90,6 +108,34 @@ int BluetoothAudioManager::IsWearDetectionEnabled(const std::string &deviceId, i
         return BT_ERR_INVALID_STATE;
     }
     return pimpl->IsWearDetectionEnabled(deviceId, ability);
+}
+
+int BluetoothAudioManager::IsWearDetectionSupported(const std::string &address, bool &isSupported)
+{
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->IsWearDetectionSupported(address, isSupported);
+}
+
+int BluetoothAudioManager::SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) const
+{
+    HILOGI("enter, address: %{public}s, useA2dp: %{public}d, useHfp: %{public}d, userSelection:%{public}d",
+        GetEncryptAddr(address).c_str(), useA2dp, useHfp, userSelection);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->SendDeviceSelection(address, useA2dp, useHfp, userSelection);
 }
 
 BluetoothAudioManager &BluetoothAudioManager::GetInstance()

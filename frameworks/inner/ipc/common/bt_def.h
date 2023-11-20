@@ -1519,6 +1519,15 @@ struct CocUpdateSocketParam {
     int32_t maxConnEventLen;
 };
 
+enum UpdateOutputStackAction {
+    WEAR = 0,
+    UNWEAR = 1,
+    ENABLE_FROM_REMOTE = 2,
+    DISABLE_FROM_REMOTE = 3,
+    ENABLE_WEAR_DETECTION = 4,
+    DISABLE_WEAR_DETECTION = 5,
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else

@@ -501,8 +501,6 @@ enum BluetoothHostInterfaceCode {
     SYNC_RANDOM_ADDRESS,
     START_CREDIBLE_PAIR,
     BT_COUNT_ENABLE_TIMES,
-    BT_SEND_DEVICE_SELECTION,
-    BT_IS_SUPPORT_WEAR_DETECTION,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
@@ -682,6 +680,8 @@ enum BluetoothAudioManagerInterfaceCode {
     WEAR_DETECTION_ENABLE = 0,
     WEAR_DETECTION_DISABLE,
     IS_WEAR_DETECTION_ENABLED,
+    BT_IS_WEAR_DETECTION_SUPPORTED,
+    BT_SEND_DEVICE_SELECTION,
     // The last code, if you want to add a new code, please add it before this
     WEAR_DETECTION_BUTT
 };
