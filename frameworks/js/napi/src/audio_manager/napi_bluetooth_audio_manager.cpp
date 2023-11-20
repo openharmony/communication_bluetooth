@@ -110,7 +110,7 @@ napi_value NapiBluetoothAudioManager::IsWearDetectionEnabled(napi_env env, napi_
     return asyncWork->GetRet();
 }
 
-napi_value NapiBluetoothAudioManager::IsWearDetectionEnabled(napi_env env, napi_callback_info info)
+napi_value NapiBluetoothAudioManager::IsWearDetectionSupported(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     std::string remoteAddr{};
