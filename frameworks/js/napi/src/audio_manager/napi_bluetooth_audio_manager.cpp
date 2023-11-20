@@ -27,6 +27,8 @@
 #include "parser/napi_parser_utils.h"
 #include "napi_bluetooth_utils.h"
 
+#include "bluetooth_remote_device.h"
+
 
 namespace OHOS {
 namespace Bluetooth {
@@ -42,6 +44,7 @@ void NapiBluetoothAudioManager::DefineSystemWearDetectionInterface(napi_env env,
         DECLARE_NAPI_FUNCTION("enableWearDetection", EnableWearDetection),
         DECLARE_NAPI_FUNCTION("disableWearDetection", DisableWearDetection),
         DECLARE_NAPI_FUNCTION("isWearDetectionEnabled", IsWearDetectionEnabled),
+        DECLARE_NAPI_FUNCTION("isWearDetectionSupported", IsWearDetectionSupported),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     HILOGI("DefineSystemWearDetectionInterface init");
@@ -100,6 +103,28 @@ napi_value NapiBluetoothAudioManager::IsWearDetectionEnabled(napi_env env, napi_
             return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(true));
         }
         return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(false));
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiBluetoothAudioManager::IsWearDetectionEnabled(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string remoteAddr{};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        bool isSupported = remoteDevice.IsSupportWearDetection();
+        HILOGI("isSupported: %{public}d", isSupported);
+        if (isSupported) {
+            return NapiAsyncWorkRet(0, std::make_shared<NapiNativeBool>(true));
+        }
+        return NapiAsyncWorkRet(0, std::make_shared<NapiNativeBool>(false));
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
