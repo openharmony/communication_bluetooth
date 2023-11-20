@@ -30,6 +30,7 @@ const std::string PROFILE_UUID_AVRCP_CT = "0000110E-0000-1000-8000-00805F9B34FB"
 const std::string PROFILE_UUID_AVRCP_TG = "0000110C-0000-1000-8000-00805F9B34FB";
 const std::string PROFILE_UUID_HID = "00001124-0000-1000-8000-00805F9B34FB";
 const std::string PROFILE_UUID_HOGP = "00001812-0000-1000-8000-00805F9B34FB";
+const std::string PROFILE_UUID_PBAP_PSE = "0000112f-0000-1000-8000-00805F9B34FB";
 }  // namespace
 
 namespace OHOS {
@@ -52,12 +53,14 @@ napi_value NapiConstant::ConstantPropertyValueInit(napi_env env, napi_value expo
     napi_value profileStateObj = ProfileStateInit(env);
     napi_value majorClassObj = MajorClassOfDeviceInit(env);
     napi_value majorMinorClassObj = MajorMinorClassOfDeviceInit(env);
+    napi_value accessAuthorizationObj = AccessAuthorizationInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("ProfileId", profileIdObj),
         DECLARE_NAPI_PROPERTY("ProfileUuids", profileUuidsObj),
         DECLARE_NAPI_PROPERTY("ProfileConnectionState", profileStateObj),
         DECLARE_NAPI_PROPERTY("MajorClass", majorClassObj),
         DECLARE_NAPI_PROPERTY("MajorMinorClass", majorMinorClassObj),
+        DECLARE_NAPI_PROPERTY("AccessAuthorization", accessAuthorizationObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     HILOGI("end");
@@ -83,8 +86,8 @@ napi_value NapiConstant::ProfileIdInit(napi_env env)
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HANDS_FREE_UNIT, "PROFILE_HANDS_FREE_UNIT");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HID_HOST, "PROFILE_HID_HOST");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PAN_NETWORK, "PROFILE_PAN_NETWORK");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_CLIENT, "PROFILE_PBAP_CLIENT");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_SERVER, "PROFILE_PBAP_SERVER");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_CLIENT, "PROFILE_PBAP_PCE");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_SERVER, "PROFILE_PBAP_PSE");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_OPP, "PROFILE_OPP");
     return profileId;
 }
@@ -104,6 +107,7 @@ napi_value NapiConstant::ProfileUuidsInit(napi_env env)
     SetNamedPropertyByString(env, profileUuidsObj, PROFILE_UUID_AVRCP_TG, "PROFILE_UUID_AVRCP_TG");
     SetNamedPropertyByString(env, profileUuidsObj, PROFILE_UUID_HID, "PROFILE_UUID_HID");
     SetNamedPropertyByString(env, profileUuidsObj, PROFILE_UUID_HOGP, "PROFILE_UUID_HOGP");
+    SetNamedPropertyByString(env, profileUuidsObj, PROFILE_UUID_PBAP_PSE, "PROFILE_UUID_PBAP_PSE");
     return profileUuidsObj;
 }
 
@@ -411,6 +415,17 @@ napi_value NapiConstant::HealthMajorClassOfDeviceInit(napi_env env, napi_value m
         static_cast<int>(MajorMinorClass::HEALTH_PERSONAL_MOBILITY_DEVICE),
         "HEALTH_PERSONAL_MOBILITY_DEVICE");
     return majorMinorClass;
+}
+
+napi_value NapiConstant::AccessAuthorizationInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value accessAuthorization = nullptr;
+    napi_create_object(env, &accessAuthorization);
+    SetNamedPropertyByInteger(env, accessAuthorization, AccessAuthorization::UNKNOWN, "UNKNOWN");
+    SetNamedPropertyByInteger(env, accessAuthorization, AccessAuthorization::ALLOWED, "ALLOWED");
+    SetNamedPropertyByInteger(env, accessAuthorization, AccessAuthorization::REJECTED, "REJECTED");
+    return accessAuthorization;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
