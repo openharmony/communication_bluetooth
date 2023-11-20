@@ -44,6 +44,9 @@ sptr<T> GetRemoteProxy(const std::string &objectName)
 {
     return iface_cast<T>(GetRemoteObject(objectName));
 }
+
+bool CheckConnectionStrategyInvalid(int32_t strategy);
+bool CheckAccessAuthorizationInvalid(int32_t accessAuthorization);
 }  // namespace Bluetooth
 }  // namespace OHOS
 
