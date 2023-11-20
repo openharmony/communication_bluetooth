@@ -17,10 +17,10 @@
 #include "bluetooth_audio_manager_proxy.h"
 #include "bluetooth_log.h"
 #include "refbase.h"
-
+ 
 namespace OHOS {
 namespace Bluetooth {
-
+ 
 int BluetoothAudioManagerProxy::EnableWearDetection(const std::string &deviceId, int32_t supportVal)
 {
     MessageParcel data;
@@ -32,7 +32,7 @@ int BluetoothAudioManagerProxy::EnableWearDetection(const std::string &deviceId,
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
-
+ 
     if (!data.WriteInt32(supportVal)) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
@@ -49,7 +49,7 @@ int BluetoothAudioManagerProxy::EnableWearDetection(const std::string &deviceId,
     }
     return reply.ReadInt32();
 }
-
+ 
 int BluetoothAudioManagerProxy::DisableWearDetection(const std::string &deviceId, int32_t supportVal)
 {
     MessageParcel data;
@@ -61,12 +61,12 @@ int BluetoothAudioManagerProxy::DisableWearDetection(const std::string &deviceId
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
-
+ 
     if (!data.WriteInt32(supportVal)) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
-
+ 
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
@@ -79,7 +79,7 @@ int BluetoothAudioManagerProxy::DisableWearDetection(const std::string &deviceId
     }
     return reply.ReadInt32();
 }
-
+ 
 int BluetoothAudioManagerProxy::IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability)
 {
     MessageParcel data;
@@ -91,7 +91,7 @@ int BluetoothAudioManagerProxy::IsWearDetectionEnabled(const std::string &device
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetection write device error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
-
+ 
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
@@ -102,11 +102,13 @@ int BluetoothAudioManagerProxy::IsWearDetectionEnabled(const std::string &device
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetections done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
-    int32_t exception = reply.ReadInt32();
-    if (exception == 1 || exception == 0) {
+ 
+    int32_t ret = reply.ReadInt32();
+    if (ret == BT_NO_ERROR) {
         ability = reply.ReadInt32();
     }
-    return exception;
+ 
+    return ret;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

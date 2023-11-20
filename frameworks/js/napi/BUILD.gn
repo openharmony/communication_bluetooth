@@ -205,11 +205,11 @@ ohos_shared_library("bluetoothmanager") {
 
 group("bluetooth_napi") {
   deps = [
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/audio_manager:weardetection",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi:bluetooth",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi:bluetoothmanager",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/a2dp:a2dp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/access:access",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/audio_manager:weardetection",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/base_profile:baseprofile",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/ble:ble",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/connection:connection",

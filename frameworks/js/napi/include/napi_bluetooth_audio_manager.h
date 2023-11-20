@@ -28,9 +28,6 @@ public:
     static napi_value EnableWearDetection(napi_env env, napi_callback_info info);
     static napi_value DisableWearDetection(napi_env env, napi_callback_info info);
     static napi_value IsWearDetectionEnabled(napi_env env, napi_callback_info info);
-
-    static NapiA2dpSinkObserver observer_;
-    static bool isRegistered_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

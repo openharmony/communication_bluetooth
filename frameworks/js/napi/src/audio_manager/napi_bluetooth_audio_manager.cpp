@@ -96,7 +96,7 @@ napi_value NapiBluetoothAudioManager::IsWearDetectionEnabled(napi_env env, napi_
         int32_t ability = ENABLE_WEARDETECTION_UNSUPPORT;
         BluetoothAudioManager &wd = BluetoothAudioManager::GetInstance();
         int32_t err = wd.IsWearDetectionEnabled(remoteAddr, ability);
-        if (err == WEARDETECTION_ENABLED) {
+        if (ability == WEARDETECTION_ENABLED) {
             return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(true));
         }
         return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(false));
