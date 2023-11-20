@@ -681,7 +681,9 @@ enum BluetoothSocketInterfaceCode {
 enum BluetoothAudioManagerInterfaceCode {
     WEAR_DETECTION_ENABLE = 0,
     WEAR_DETECTION_DISABLE,
-    IS_WEAR_DETECTION_ENABLED
+    IS_WEAR_DETECTION_ENABLED,
+    // The last code, if you want to add a new code, please add it before this
+    WEAR_DETECTION_BUTT
 };
 
 }  // namespace Bluetooth
