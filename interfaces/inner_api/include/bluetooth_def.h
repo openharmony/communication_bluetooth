@@ -1447,6 +1447,15 @@ struct CocUpdateSocketParam {
     int32_t maxConnEventLen;
 };
 
+enum UpdateOutputStackAction {
+    WEAR = 0,
+    UNWEAR = 1,
+    ENABLE_FROM_REMOTE = 2,
+    DISABLE_FROM_REMOTE = 3,
+    ENABLE_WEAR_DETECTION = 4,
+    DISABLE_WEAR_DETECTION = 5,
+};
+
 constexpr int BLE_LPDEVICE_SCAN_SETTING_VALID_BIT = 0x01;
 constexpr int BLE_LPDEVICE_SCAN_FILTER_VALID_BIT = 0x02;
 constexpr int BLE_LPDEVICE_ADV_SETTING_VALID_BIT = 0x04;

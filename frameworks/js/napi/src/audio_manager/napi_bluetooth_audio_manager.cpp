@@ -27,8 +27,6 @@
 #include "parser/napi_parser_utils.h"
 #include "napi_bluetooth_utils.h"
 
-#include "bluetooth_remote_device.h"
-
 
 namespace OHOS {
 namespace Bluetooth {
