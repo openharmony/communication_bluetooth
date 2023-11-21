@@ -120,7 +120,8 @@ int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const std::string &
         "BluetoothAudioManagerProxy::IsWearDetectionSupported Write address error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothAudioManagerInterfaceCode::BT_IS_WEAR_DETECTION_SUPPORTED, option, data, reply);
+    int error = Remote()->SendRequest(
+        BluetoothAudioManagerInterfaceCode::BT_IS_WEAR_DETECTION_SUPPORTED, data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::IsWearDetectionSupported fail, error: %{public}d", error);
     isSupported = reply.ReadBool();
@@ -143,7 +144,8 @@ int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const std::string &addre
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothAudioManagerInterfaceCode::BT_SEND_DEVICE_SELECTION, option, data, reply);
+    int error = Remote()->SendRequest(
+        BluetoothAudioManagerInterfaceCode::BT_SEND_DEVICE_SELECTION, data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::SendDeviceSelection fail, error: %{public}d", error);
 
