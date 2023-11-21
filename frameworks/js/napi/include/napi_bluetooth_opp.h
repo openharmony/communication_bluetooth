@@ -35,7 +35,7 @@ public:
     static napi_value GetConnectionDevices(napi_env env, napi_callback_info info);
     static napi_value GetDeviceState(napi_env env, napi_callback_info info);
 
-    static NapiBluetoothOppObserver observer_;
+    static std::shared_ptr<NapiBluetoothOppObserver> observer_;
     static bool isRegistered_;
 };
 } // namespace Bluetooth

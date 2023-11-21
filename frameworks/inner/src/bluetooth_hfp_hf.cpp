@@ -831,16 +831,18 @@ std::optional<HandsFreeUnitCall> HandsFreeUnit::StartDial(
     return pimpl->StartDial(device, number);
 }
 
-void HandsFreeUnit::RegisterObserver(HandsFreeUnitObserver *observer)
+void HandsFreeUnit::RegisterObserver(std::shared_ptr<HandsFreeUnitObserver> observer)
 {
-    std::shared_ptr<HandsFreeUnitObserver> observerPtr(observer, [](HandsFreeUnitObserver *) {});
-    return pimpl->RegisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->RegisterObserver(observer);
 }
 
-void HandsFreeUnit::DeregisterObserver(HandsFreeUnitObserver *observer)
+void HandsFreeUnit::DeregisterObserver(std::shared_ptr<HandsFreeUnitObserver> observer)
 {
-    std::shared_ptr<HandsFreeUnitObserver> observerPtr(observer, [](HandsFreeUnitObserver *) {});
-    return pimpl->DeregisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->DeregisterObserver(observer);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -293,16 +293,18 @@ int32_t Pan::Disconnect(const BluetoothRemoteDevice &device)
     return pimpl->Disconnect(device);
 }
 
-void Pan::RegisterObserver(PanObserver *observer)
+void Pan::RegisterObserver(std::shared_ptr<PanObserver> observer)
 {
-    std::shared_ptr<PanObserver> observerPtr(observer, [](PanObserver *) {});
-    return pimpl->RegisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->RegisterObserver(observer);
 }
 
-void Pan::DeregisterObserver(PanObserver *observer)
+void Pan::DeregisterObserver(std::shared_ptr<PanObserver> observer)
 {
-    std::shared_ptr<PanObserver> observerPtr(observer, [](PanObserver *) {});
-    return pimpl->DeregisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->DeregisterObserver(observer);
 }
 
 int32_t Pan::SetTethering(bool value)

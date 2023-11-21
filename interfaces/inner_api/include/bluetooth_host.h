@@ -255,7 +255,7 @@ public:
      * @param observer Class BluetoothHostObserver pointer to register observer.
      * @since 6
      */
-    void RegisterObserver(BluetoothHostObserver &observer);
+    void RegisterObserver(std::shared_ptr<BluetoothHostObserver> observer);
 
     /**
      * @brief Deregister observer.
@@ -263,7 +263,7 @@ public:
      * @param observer Class BluetoothHostObserver pointer to deregister observer.
      * @since 6
      */
-    void DeregisterObserver(BluetoothHostObserver &observer);
+    void DeregisterObserver(std::shared_ptr<BluetoothHostObserver> observer);
 
     /**
      * @brief Enable classic.
@@ -611,7 +611,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    void DeregisterRemoteDeviceObserver(BluetoothRemoteDeviceObserver &observer);
+    void DeregisterRemoteDeviceObserver(std::shared_ptr<BluetoothRemoteDeviceObserver> observer);
 
     /**
      * @brief Get max advertising data length.

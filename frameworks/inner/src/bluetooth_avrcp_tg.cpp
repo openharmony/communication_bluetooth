@@ -215,23 +215,20 @@ int32_t AvrcpTarget::GetDeviceAbsVolumeAbility(const BluetoothRemoteDevice &devi
  * REGISTER / UNREGISTER OBSERVER                                 *
  ******************************************************************/
 
-void AvrcpTarget::RegisterObserver(AvrcpTarget::IObserver *observer)
+void AvrcpTarget::RegisterObserver(std::shared_ptr<AvrcpTarget::IObserver> observer)
 {
-    HILOGI("enter");
-
+    HILOGD("enter");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-    std::shared_ptr<IObserver> observerPtr(observer, [](IObserver *) {});
-    pimpl->observers_.Register(observerPtr);
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Register(observer);
 }
 
-void AvrcpTarget::UnregisterObserver(AvrcpTarget::IObserver *observer)
+void AvrcpTarget::UnregisterObserver(std::shared_ptr<AvrcpTarget::IObserver> observer)
 {
-    HILOGI("enter");
-
+    HILOGD("enter");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-
-    std::shared_ptr<IObserver> observerPtr(observer, [](IObserver *) {});
-    pimpl->observers_.Deregister(observerPtr);
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Deregister(observer);
 }
 
 /******************************************************************
