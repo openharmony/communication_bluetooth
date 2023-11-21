@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_audio_manager.h"
+#include "bluetooth_host.h"
 #include "i_bluetooth_audio_manager.h"
 #include "i_bluetooth_host.h"
 #include "bluetooth_utils.h"
@@ -27,6 +28,8 @@ struct BluetoothAudioManager::impl {
     int EnableWearDetection(const std::string &deviceId, int32_t supportVal);
     int DisableWearDetection(const std::string &deviceId, int32_t supportVal);
     int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability);
+    int IsWearDetectionSupported(const std::string &address, bool &isSupported);
+    int SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection);
     sptr<IBluetoothAudioManager> proxy_;
 };
 
@@ -65,7 +68,7 @@ int BluetoothAudioManager::impl::IsWearDetectionEnabled(const std::string & devi
     return proxy_->IsWearDetectionEnabled(deviceId, ability);
 }
 
-int BluetoothAudioManager::impl::IsWearDetectionSupported(const std::string & address, bool &isSupported)
+int BluetoothAudioManager::impl::IsWearDetectionSupported(const std::string &address, bool &isSupported)
 {
     if (proxy_ == nullptr) {
         HILOGE("proxy_ is null");
