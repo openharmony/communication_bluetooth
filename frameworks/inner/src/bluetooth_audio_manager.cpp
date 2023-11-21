@@ -14,6 +14,8 @@
  */
 
 #include "bluetooth_audio_manager.h"
+#include "bluetooth_errorcode.h"
+#include "bluetooth_log.h"
 #include "bluetooth_host.h"
 #include "i_bluetooth_audio_manager.h"
 #include "i_bluetooth_host.h"

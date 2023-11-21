@@ -19,8 +19,6 @@
 #include <cstdint>
 #include <string>
 
-#include "bluetooth_errorcode.h"
-#include "bluetooth_log.h"
 #include "iremote_broker.h"
 #include "refbase.h"
 #include "bluetooth_def.h"
