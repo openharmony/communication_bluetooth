@@ -103,17 +103,17 @@ std::string GetProfileConnStateName(int state)
 std::string GetUpdateOutputStackActionName(int action)
 {
     switch (action) {
-        case static_cast<int>(UpdateOutputStackAction::WEAR):
+        case static_cast<int>(UpdateOutputStackAction::ACTION_WEAR):
             return "WEAR(0)";
-        case static_cast<int>(UpdateOutputStackAction::UNWEAR):
+        case static_cast<int>(UpdateOutputStackAction::ACTION_UNWEAR):
             return "UNWEAR(1)";
-        case static_cast<int>(UpdateOutputStackAction::ENABLE_FROM_REMOTE):
+        case static_cast<int>(UpdateOutputStackAction::ACTION_ENABLE_FROM_REMOTE):
             return "ENABLE_FROM_REMOTE(2)";
-        case static_cast<int>(UpdateOutputStackAction::DISABLE_FROM_REMOTE):
+        case static_cast<int>(UpdateOutputStackAction::ACTION_DISABLE_FROM_REMOTE):
             return "DISABLE_FROM_REMOTE(3)";
-        case static_cast<int>(UpdateOutputStackAction::ENABLE_WEAR_DETECTION):
+        case static_cast<int>(UpdateOutputStackAction::ACTION_ENABLE_WEAR_DETECTION):
             return "ENABLE_WEAR_DETECTION(4)";
-        case static_cast<int>(UpdateOutputStackAction::DISABLE_WEAR_DETECTION):
+        case static_cast<int>(UpdateOutputStackAction::ACTION_DISABLE_WEAR_DETECTION):
             return "DISABLE_WEAR_DETECTION(5)";
         default:
             return "Unknown";
