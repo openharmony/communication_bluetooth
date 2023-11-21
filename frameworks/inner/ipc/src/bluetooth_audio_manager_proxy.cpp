@@ -111,13 +111,13 @@ int BluetoothAudioManagerProxy::IsWearDetectionEnabled(const std::string &device
     return ret;
 }
 
-int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const std::string &address, bool &isSupported)
+int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_INTERNAL_ERROR,
-        "BluetoothAudioManagerProxy::IsWearDetectionSupported Write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::IsWearDetectionSupported Write device error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int error = Remote()->SendRequest(
@@ -128,13 +128,13 @@ int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const std::string &
     return reply.ReadInt32();
 }
 
-int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection)
+int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const BluetoothRawAddress &device, int useA2dp, int useHfp, int userSelection)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_INTERNAL_ERROR,
-        "BluetoothAudioManagerProxy::SendDeviceSelection Write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::SendDeviceSelection Write device error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(useA2dp), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::SendDeviceSelection Write useA2dp error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(useHfp), BT_ERR_INTERNAL_ERROR,

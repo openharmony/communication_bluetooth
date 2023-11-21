@@ -23,6 +23,7 @@
 #include "refbase.h"
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
+#include "bluetooth_remote_device.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -53,24 +54,24 @@ public:
     /**
      * @brief Whether wear detection is supported
      *
-     * @param address Remote device address.
+     * @param device Remote device.
      * @param isSupported Headset wearing detection capability.
      * @return Returns {@link BT_NO_ERROR} if the operation fails.
      *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 11
      */
-    int IsWearDetectionSupported(const std::string &address, bool &isSupported);
+    int IsWearDetectionSupported(const BluetoothRemoteDevice &device, bool &isSupported);
 
     /**
     * @brief Report to the remote device that the user has selected the device.
-    * @param address object device report address.
+    * @param device Remote device.
     * @param useA2dp whether use A2dp of this device.
     * @param useHfp whether use Hfp of this device.
     * @param userSelection whether this send command by user selection.
     * @return Returns {@link BT_NO_ERROR} if send selection success;
     * returns an error code defined in {@link BtErrCode} otherwise.
     */
-    int SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) const;
+    int SendDeviceSelection(const BluetoothRemoteDevice &device, int useA2dp, int useHfp, int userSelection) const;
 
 private:
     /**
