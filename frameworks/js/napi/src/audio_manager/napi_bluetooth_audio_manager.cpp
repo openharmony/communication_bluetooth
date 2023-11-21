@@ -116,8 +116,9 @@ napi_value NapiBluetoothAudioManager::IsWearDetectionSupported(napi_env env, nap
 
     auto func = [remoteAddr]() {
         BluetoothAudioManager &audioManager = BluetoothAudioManager::GetInstance();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         bool isSupported = false;
-        int32_t err = audioManager.IsWearDetectionSupported(remoteAddr, isSupported);
+        int32_t err = audioManager.IsWearDetectionSupported(device, isSupported);
         HILOGI("isSupported: %{public}d", isSupported);
         return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(isSupported));
     };
