@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-NapiAvrcpTargetObserver NapiAvrcpTarget::observer_;
+std::shared_ptr<NapiAvrcpTargetObserver> NapiAvrcpTarget::observer_ = std::make_shared<NapiAvrcpTargetObserver>();
 bool NapiAvrcpTarget::isRegistered_ = false;
 
 void NapiAvrcpTarget::DefineAvrcpTargetJSClass(napi_env env)
@@ -57,10 +57,10 @@ napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiAvrcpTargetObserver::g_avrcpTgCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
     if (!isRegistered_) {
         AvrcpTarget *profile = AvrcpTarget::GetProfile();
-        profile->RegisterObserver(&observer_);
+        profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
     HILOGI("Napi Avrcp Target is registered");
@@ -73,7 +73,7 @@ napi_value NapiAvrcpTarget::Off(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiAvrcpTargetObserver::g_avrcpTgCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
     HILOGI("Napi Avrcp Target is unregistered");
     return ret;
 }

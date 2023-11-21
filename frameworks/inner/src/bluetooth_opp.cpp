@@ -515,16 +515,18 @@ bool Opp::CancelTransfer()
     return pimpl->CancelTransfer();
 }
 
-void Opp::RegisterObserver(OppObserver *observer)
+void Opp::RegisterObserver(std::shared_ptr<OppObserver> observer)
 {
-    std::shared_ptr<OppObserver> observerPtr(observer, [](OppObserver *) {});
-    return pimpl->RegisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->RegisterObserver(observer);
 }
 
-void Opp::DeregisterObserver(OppObserver *observer)
+void Opp::DeregisterObserver(std::shared_ptr<OppObserver> observer)
 {
-    std::shared_ptr<OppObserver> observerPtr(observer, [](OppObserver *) {});
-    return pimpl->DeregisterObserver(observerPtr);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->DeregisterObserver(observer);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

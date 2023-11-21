@@ -979,22 +979,20 @@ void AvrcpController::Init()
  * REGISTER / UNREGISTER OBSERVER                                 *
  ******************************************************************/
 
-void AvrcpController::RegisterObserver(IObserver *observer)
+void AvrcpController::RegisterObserver(std::shared_ptr<IObserver> observer)
 {
-    HILOGI("enter");
-
+    HILOGD("enter");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-    std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
-    pimpl->observers_.Register(pointer);
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Register(observer);
 }
 
-void AvrcpController::UnregisterObserver(IObserver *observer)
+void AvrcpController::UnregisterObserver(std::shared_ptr<IObserver> observer)
 {
-    HILOGI("enter");
-
+    HILOGD("enter");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-    std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
-    pimpl->observers_.Deregister(pointer);
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Deregister(observer);
 }
 
 /******************************************************************
