@@ -27,7 +27,6 @@
 #include "parser/napi_parser_utils.h"
 #include "napi_bluetooth_utils.h"
 
-
 namespace OHOS {
 namespace Bluetooth {
 
@@ -116,10 +115,11 @@ napi_value NapiBluetoothAudioManager::IsWearDetectionSupported(napi_env env, nap
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr]() {
-        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
-        bool isSupported = remoteDevice.IsSupportWearDetection();
+        BluetoothAudioManager &audioManager = BluetoothAudioManager::GetInstance();
+        bool isSupported = false;
+        int32_t err = audioManager.IsWearDetectionSupported(remoteAddr, isSupported);
         HILOGI("isSupported: %{public}d", isSupported);
-        return NapiAsyncWorkRet(0, std::make_shared<NapiNativeBool>(isSupported));
+        return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(isSupported));
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
