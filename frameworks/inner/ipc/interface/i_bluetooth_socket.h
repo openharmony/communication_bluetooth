@@ -31,7 +31,7 @@ struct ListenSocketParam {
     bluetooth::Uuid uuid;
     int32_t securityFlag;
     int32_t type;
-    sptr<IBluetoothSocketObserver> observer;
+    sptr<IBluetoothServerSocketObserver> observer;
 };
 
 struct ConnectSocketParam {
@@ -40,7 +40,6 @@ struct ConnectSocketParam {
     int32_t securityFlag;
     int32_t type;
     int32_t psm;
-    sptr<IBluetoothSocketObserver> observer;
 };
 
 class IBluetoothSocket : public OHOS::IRemoteBroker {
@@ -49,7 +48,11 @@ public:
 
     virtual int Connect(ConnectSocketParam &param, int &fd) = 0;
     virtual int Listen(ListenSocketParam &param, int &fd) = 0;
-    virtual void RemoveObserver(const sptr<IBluetoothSocketObserver> &observer) = 0;
+    virtual int DeregisterServerObserver(const sptr<IBluetoothServerSocketObserver> &observer) = 0;
+    virtual int RegisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
+        const sptr<IBluetoothClientSocketObserver> &observer) = 0;
+    virtual int DeregisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
+        const sptr<IBluetoothClientSocketObserver> &observer) = 0;
     virtual int UpdateCocConnectionParams(const BluetoothSocketCocInfo &info) = 0;
 };
 }  // namespace Bluetooth

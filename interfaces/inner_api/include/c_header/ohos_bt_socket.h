@@ -29,6 +29,7 @@ extern "C" {
 #define BT_SOCKET_WRITE_FAILED (-1)
 #define BT_SOCKET_INVALID_ID (-1)
 #define BT_SOCKET_INVALID_PSM (-1)
+#define BT_SOCKET_INVALID_TYPE (-2)
 
 typedef enum {
     OHOS_SOCKET_SPP_RFCOMM = 0x0,
@@ -52,6 +53,18 @@ typedef struct {
     int minConnEventLen;
     int maxConnEventLen;
 } BluetoothCocUpdateSocketParam;
+
+/**
+ * @brief callback invoked when the socket connection state changed.
+ * @param bdAddr Indicates the ID of the GATT client.
+ * @param uuid This parameter is required when type is {@link OHOS_SOCKET_SPP_RFCOMM}.
+ * @param status Indicates the connection status {@link ConnStatus}.
+ * @param result Indicates the operation result.
+ */
+typedef void (*ConnectionStateChangedCallback)(const BdAddr *bdAddr, BtUuid uuid, int status, int result);
+typedef struct {
+    ConnectionStateChangedCallback connStateCb;
+} BtSocketConnectionCallback;
 
 /**
  * @brief Creates an server listening socket based on the service record.
@@ -95,6 +108,20 @@ int SocketServerClose(int serverId);
  * @return Returns a client ID, if connect fail return {@link BT_SOCKET_INVALID_ID}.
  */
 int SocketConnect(const BluetoothCreateSocketPara *socketPara, const BdAddr *bdAddr, int psm);
+
+/**
+ * @brief Connects to a remote device over the socket.
+ * This method will block until a connection is made or the connection fails.
+ *
+ * @param socketPara The param to create a client socket and connect to a remote device.
+ * @param bdAddr The remote device address to connect.
+ * @param psm BluetoothSocketType is {@link OHOS_SOCKET_L2CAP_LE} use dynamic PSM value from remote device.
+ * BluetoothSocketType is {@link OHOS_SOCKET_SPP_RFCOMM} use -1.
+ * @param callback Reference to the socket state observer.
+ * @return Returns a client ID, if connect fail return {@link BT_SOCKET_INVALID_ID}.
+ */
+int SocketConnectEx(const BluetoothCreateSocketPara *socketPara, const BdAddr *bdAddr, int psm,
+    BtSocketConnectionCallback *callback);
 
 /**
  * @brief Disables a connection and releases related resources.

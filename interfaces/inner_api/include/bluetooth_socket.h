@@ -63,6 +63,22 @@ const int FLAG_AUTH = 1 << 1;
 const int SPP_SOCKET_PSM_VALUE = -1;
 
 /**
+ * @brief Represents bluetooth connection callbcak.
+ */
+class BluetoothConnectionObserver {
+public:
+    /**
+     * @brief delete the BluetoothConnectionObserver instance.
+     */
+    virtual ~BluetoothConnectionObserver() = default;
+
+    /**
+     * @brief notify connection status and result.
+     */
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result) = 0;
+};
+
+/**
  * @brief Class for client socket functions.
  *
  * @since 6
@@ -90,6 +106,19 @@ public:
      * @since 6
      */
     ClientSocket(int fd, std::string address, BtSocketType type);
+
+    /**
+     * @brief A constructor used to create an ClientSocket instance.
+     *
+     * @param bda Remote device object.
+     * @param uuid Uuid.
+     * @param type Socket type.
+     * @param auth Connection state.
+     * @param observer Connection callback.
+     * @since 6
+     */
+    ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth,
+        std::shared_ptr<BluetoothConnectionObserver> observer);
 
     /**
      * @brief Destroy the ClientSocket object.
