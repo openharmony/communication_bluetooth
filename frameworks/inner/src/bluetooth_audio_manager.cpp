@@ -117,6 +117,7 @@ int BluetoothAudioManager::IsWearDetectionEnabled(const std::string &deviceId, i
 
 int BluetoothAudioManager::IsWearDetectionSupported(const BluetoothRemoteDevice &device, bool &isSupported)
 {
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -136,8 +137,8 @@ int BluetoothAudioManager::IsWearDetectionSupported(const BluetoothRemoteDevice 
 
 int BluetoothAudioManager::SendDeviceSelection(const BluetoothRemoteDevice &device, int useA2dp, int useHfp, int userSelection) const
 {
-    HILOGI("enter, address: %{public}s, useA2dp: %{public}d, useHfp: %{public}d, userSelection:%{public}d",
-        GetEncryptAddr(address).c_str(), useA2dp, useHfp, userSelection);
+    HILOGI("enter, device: %{public}s, useA2dp: %{public}d, useHfp: %{public}d, userSelection:%{public}d",
+        GET_ENCRYPT_ADDR(device), useA2dp, useHfp, userSelection);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
