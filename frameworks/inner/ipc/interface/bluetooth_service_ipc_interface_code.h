@@ -683,7 +683,7 @@ enum BluetoothSocketInterfaceCode {
 enum BluetoothSocketObserverInterfaceCode {
     BT_SOCKET_OBSERVER_CONNECTION_STATE_CHANGED = 0,
     // The last code, if you want to add a new code, please add it before this
-    BT_SOCKET_OBSERVER_BUTT    
+    BT_SOCKET_OBSERVER_BUTT
 };
 
 enum BluetoothAudioManagerInterfaceCode {
