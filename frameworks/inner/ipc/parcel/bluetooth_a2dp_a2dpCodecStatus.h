@@ -40,6 +40,26 @@ public:
     bool ReadFromParcel(Parcel &parcel);
 };
 
+class BluetoothA2dpOffloadCodecStatus : public Parcelable,
+                                        public bluetooth::OffloadCodecStatus {
+public:
+    BluetoothA2dpOffloadCodecStatus() = default;
+    explicit BluetoothA2dpOffloadCodecStatus(const bluetooth::OffloadCodecStatus &other)
+        : bluetooth::OffloadCodecStatus(other) {}
+    BluetoothA2dpOffloadCodecStatus(const BluetoothA2dpOffloadCodecStatus &other)
+        : bluetooth::OffloadCodecStatus(other) {}
+    ~BluetoothA2dpOffloadCodecStatus() override = default;
+    BluetoothA2dpOffloadCodecStatus &operator = (const bluetooth::OffloadCodecStatus &other);
+    BluetoothA2dpOffloadCodecStatus &operator = (const BluetoothA2dpOffloadCodecStatus &other);
+
+    bool Marshalling(Parcel &parcel) const override;
+
+    static BluetoothA2dpOffloadCodecStatus *Unmarshalling(Parcel &parcel);
+
+    bool WriteToParcel(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel);
+};
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 

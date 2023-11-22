@@ -80,6 +80,41 @@ struct A2dpCodecStatus {
     // Local device and peer confirmed codec information
     std::vector<A2dpCodecInfo> codecInfoConfirmedCap;
 };
+
+/**
+ * @brief A2dp Offload Codec configuration information of a2dp source
+ *
+ * @since 6.0
+ */
+struct A2dpOffloadCodecInfo {
+    uint16_t mediaPacketHeader;
+    uint8_t mPt;
+    uint32_t ssrc;
+    uint8_t boundaryFlag;
+    uint8_t broadcastFlag;
+    uint32_t codecType;
+    uint16_t maxLatency;
+    uint16_t scmsTEnable;
+    uint32_t sampleRate;
+    uint32_t encodedAudioBitrate;
+    uint8_t bitsPerSample;
+    uint8_t chMode;
+    uint16_t aclHdl;
+    uint16_t l2cRcid;
+    uint16_t mtu;
+    uint8_t codecSpecific0;
+    uint8_t codecSpecific1;
+    uint8_t codecSpecific2;
+    uint8_t codecSpecific3;
+    uint8_t codecSpecific4;
+    uint8_t codecSpecific5;
+    uint8_t codecSpecific6;
+    uint8_t codecSpecific7;
+};
+
+struct A2dpOffloadCodecStatus {
+    A2dpOffloadCodecInfo offloadInfo;
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_A2DP_CODEC_H

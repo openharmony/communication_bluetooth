@@ -615,6 +615,58 @@ void BluetoothA2dpSrcProxy::GetRenderPosition(uint16_t &delayValue, uint16_t &se
     timeStamp = reply.ReadUint32();
 }
 
+int BluetoothA2dpSrcProxy::OffloadStartPlaying(const RawAddress &device, const std::vector<int32_t> &sessionsId)
+{
+    return OffloadPlayingControl(device, sessionsId, BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_OFFLOAD_START_PLAYING);
+}
+
+int BluetoothA2dpSrcProxy::OffloadStopPlaying(const RawAddress &device, const std::vector<int32_t> &sessionsId)
+{
+    return OffloadPlayingControl(device, sessionsId, BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_OFFLOAD_STOP_PLAYING);
+}
+
+int BluetoothA2dpSrcProxy::A2dpOffloadSessionPathRequest(const RawAddress &device,
+    const std::vector<BluetoothA2dpStreamInfo> &info)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), BT_ERR_INTERNAL_ERROR, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(info.size()), BT_ERR_INTERNAL_ERROR, "write info size failed.");
+    for (auto streamInfo : info) {
+        CHECK_AND_RETURN_LOG_RET(data.WriteInt32(streamInfo.sessionId), BT_ERR_INTERNAL_ERROR, "write sessionId");
+        CHECK_AND_RETURN_LOG_RET(data.WriteInt32(streamInfo.streamType), BT_ERR_INTERNAL_ERROR, "write streamType");
+        CHECK_AND_RETURN_LOG_RET(data.WriteInt32(streamInfo.sampleRate), BT_ERR_INTERNAL_ERROR, "write sampleRate");
+        CHECK_AND_RETURN_LOG_RET(data.WriteInt32(streamInfo.isSpatialAudio), BT_ERR_INTERNAL_ERROR,
+            "write isSpatialAudio failed.");
+    }
+
+    MessageParcel reply;
+    MessageOption option{ MessageOption::TF_SYNC };
+    int error =
+        Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_OFFLOAD_SESSION_REQUEST, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, BT_ERR_IPC_TRANS_FAILED, "error:%{public}d", error);
+    return reply.ReadInt32();
+}
+
+BluetoothA2dpOffloadCodecStatus BluetoothA2dpSrcProxy::GetOffloadCodecStatus(const RawAddress &device)
+{
+    MessageParcel data;
+    BluetoothA2dpOffloadCodecStatus offloadStatus;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()), offloadStatus,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), offloadStatus, "write device error");
+
+    MessageParcel reply;
+    MessageOption option{ MessageOption::TF_SYNC };
+    int error =
+        Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_OFFLOAD_GET_CODEC_STATUS, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, offloadStatus, "error:%{public}d", error);
+    std::shared_ptr<BluetoothA2dpOffloadCodecStatus> statusPtr(reply.ReadParcelable<BluetoothA2dpOffloadCodecStatus>());
+    CHECK_AND_RETURN_LOG_RET(statusPtr, offloadStatus, "error:%{public}d", error);
+    return *statusPtr;
+}
+
 bool BluetoothA2dpSrcProxy::WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply)
 {
     if (!reply.WriteInt32(parcelableVector.size())) {
@@ -631,5 +683,22 @@ bool BluetoothA2dpSrcProxy::WriteParcelableInt32Vector(const std::vector<int32_t
     return true;
 }
 
+int BluetoothA2dpSrcProxy::OffloadPlayingControl(const RawAddress &device, const std::vector<int32_t> &sessionsId,
+    int control)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
+        "WriteInterfaceToken error control:%{public}d", control);
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), BT_ERR_INTERNAL_ERROR,
+        "write device error control:%{public}d", control);
+    CHECK_AND_RETURN_LOG_RET(WriteParcelableInt32Vector(sessionsId, data), BT_ERR_INTERNAL_ERROR,
+        "write sessionId error control:%{public}d, sessions size:%{public}d", control, (int)sessionsId.size());
+
+    MessageParcel reply;
+    MessageOption option{ MessageOption::TF_SYNC };
+    int error = Remote()->SendRequest(control, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, BT_ERR_IPC_TRANS_FAILED, "error:%{public}d", error);
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
