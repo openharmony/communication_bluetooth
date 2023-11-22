@@ -398,18 +398,18 @@ ClientSocket::~ClientSocket()
 int ClientSocket::Connect(int psm)
 {
     HILOGD("enter");
-    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED() , BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
 
     pimpl->address_ = pimpl->remoteDevice_.GetDeviceAddr();
     std::string tempAddress = pimpl->address_;
-    CHECK_AND_RETURN_LOG_RET(tempAddress.size() , BtStatus::BT_FAILURE, "address size error");
-    CHECK_AND_RETURN_LOG_RET(pimpl->socketStatus_ != SOCKET_CLOSED , BT_ERR_INVALID_STATE, "socket closed");
-    CHECK_AND_RETURN_LOG_RET(pimpl->proxy_ , BT_ERR_SERVICE_DISCONNECTED, "proxy_ is nullptr");
+    CHECK_AND_RETURN_LOG_RET(tempAddress.size(), BtStatus::BT_FAILURE, "address size error");
+    CHECK_AND_RETURN_LOG_RET(pimpl->socketStatus_ != SOCKET_CLOSED, BT_ERR_INVALID_STATE, "socket closed");
+    CHECK_AND_RETURN_LOG_RET(pimpl->proxy_, BT_ERR_SERVICE_DISCONNECTED, "proxy_ is nullptr");
 
     bluetooth::Uuid tempUuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits());
     int ret = pimpl->proxy_->RegisterClientObserver(BluetoothRawAddress(pimpl->address_), tempUuid,
         pimpl->observerImp_);
-    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR , ret, "regitser observer fail, ret = %d", ret);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "regitser observer fail, ret = %d", ret);
 
     ConnectSocketParam param {
         .addr = tempAddress,
@@ -419,16 +419,16 @@ int ClientSocket::Connect(int psm)
         .psm = psm
     };
     ret = pimpl->proxy_->Connect(param, pimpl->fd_);
-    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR , ret, "Connect error %{public}d", ret);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Connect error %{public}d", ret);
 
     HILOGI("fd_: %{public}d", pimpl->fd_);
-    CHECK_AND_RETURN_LOG_RET(pimpl->fd_ != -1 , BtStatus::BT_FAILURE, "connect failed!");
+    CHECK_AND_RETURN_LOG_RET(pimpl->fd_ != -1, BtStatus::BT_FAILURE, "connect failed!");
 
     bool recvret = pimpl->RecvSocketSignal();
     HILOGI("recvret: %{public}d", recvret);
     pimpl->inputStream_ = std::make_unique<InputStream>(pimpl->fd_);
     pimpl->outputStream_ = std::make_unique<OutputStream>(pimpl->fd_);
-    CHECK_AND_RETURN_LOG_RET(recvret , BtStatus::BT_FAILURE, "recvSocketSignal connect failed!");
+    CHECK_AND_RETURN_LOG_RET(recvret, BtStatus::BT_FAILURE, "recvSocketSignal connect failed!");
     pimpl->socketStatus_ = SOCKET_CONNECTED;
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", pimpl->fd_, "ADDRESS",
