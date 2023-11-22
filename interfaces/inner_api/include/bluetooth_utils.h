@@ -30,7 +30,7 @@ namespace Bluetooth {
 static constexpr int GET_PROXY_SLEEP_SEC = 1; // 1s
 std::string GetEncryptAddr(std::string addr);
 #define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetDeviceAddr()).c_str())
-#define GET_ENCRYPT_AVRCP_ADDR(rawAddr) (GetEncryptAddr((rawAddr).GetAddress()).c_str())
+#define GET_ENCRYPT_RAW_ADDR(rawAddr) (GetEncryptAddr((rawAddr).GetAddress()).c_str())
 #define GET_ENCRYPT_GATT_ADDR(device) (GetEncryptAddr((device).addr_.GetAddress()).c_str())
 std::string GetBtStateName(int state);
 std::string GetBtTransportName(int transport);
