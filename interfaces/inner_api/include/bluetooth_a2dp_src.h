@@ -90,6 +90,18 @@ public:
 };
 
 /**
+ * @brief audio stream details.
+ *
+ * @since 6.0
+ */
+struct A2dpStreamInfo {
+    int32_t sessionId;
+    int32_t streamType;
+    int32_t sampleRate;
+    bool isSpatialAudio;
+};
+
+/**
  * @brief A2dp source API.
  *
  * @since 6.0
@@ -224,7 +236,6 @@ public:
      */
     A2dpCodecStatus GetCodecStatus(const BluetoothRemoteDevice &device) const;
 
-
     /**
     * @brief Get the codec encoding preferences of the specified device.
     *
@@ -336,6 +347,45 @@ public:
      * @since 6.0
      */
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp);
+
+    /**
+     * @brief Audio start offload streaming for hardware encoding datapath.
+     *
+     * @param device remote bluetooth sink device.
+     * @return Returns general <b>enum BtErrCode</b> for the operation.
+     * @since 6.0
+     */
+    int OffloadStartPlaying(const BluetoothRemoteDevice &device, const std::vector<int32_t> &sessionsId);
+
+    /**
+     * @brief Audio stop offload streaming for hardware encoding datapath.
+     *
+     * @param device remote bluetooth sink device.
+     * @return Returns general <b>enum BtErrCode</b> for the operation.
+     * @since 6.0
+     */
+    int OffloadStopPlaying(const BluetoothRemoteDevice &device, const std::vector<int32_t> &sessionsId);
+
+    /**
+     * brief Get a2dp encoding data path information of connected sink device.
+     *
+     * @param device remote bluetooth sink device.
+     * @info streams detail information
+     * @return Returns <b>UNKNOWN_ENCODING_PATH: 0</b>, bt unable to judge encoding data path
+     *         Returns <b>SOFTWARE_ENCODING_PATH: 1</b>, a2dp audio encoding path should select a2dp hdi.
+     *         Returns <b>HARDWARE_ENCODING_PATH: 2</b>, a2dp audio encoding path should select a2dp offload hdi.
+     *         Returns general <b>enum BtErrCode</b> for the operation.
+     */
+    int A2dpOffloadSessionRequest(const BluetoothRemoteDevice &device, const std::vector<A2dpStreamInfo> &info);
+
+    /**
+     * @brief Get A2dp Offload codec status information of connected device.
+     *
+     * @param device remote bluetooth sink device.
+     * @return a2dp offload configration information of connected device.
+     * @since 6.0
+     */
+    A2dpOffloadCodecStatus GetOffloadCodecStatus(const BluetoothRemoteDevice &device) const;
 
     /**
      * @brief The external process calls the A2dpSrc profile interface before the Bluetooth process starts. At this
