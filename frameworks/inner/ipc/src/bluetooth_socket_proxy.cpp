@@ -191,7 +191,7 @@ int BluetoothSocketProxy::RegisterClientObserver(const BluetoothRawAddress &dev,
 }
 
 int BluetoothSocketProxy::DeregisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
-        const sptr<IBluetoothClientSocketObserver> &observer)
+    const sptr<IBluetoothClientSocketObserver> &observer)
 {
     HILOGD("BluetoothSocketProxy::DeregisterClientObserver start");
     MessageParcel data;
