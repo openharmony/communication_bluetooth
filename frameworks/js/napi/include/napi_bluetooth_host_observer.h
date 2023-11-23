@@ -40,11 +40,6 @@ private:
     void DealBlePairComfirmed(const std::string &addr, const int reqType, const int number);
     void OnPairConfirmedCallBack(const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo);
 
-    void UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state);
-    void UvQueueWorkOnDiscoveryResult(uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device);
-    void UvQueueWorkOnPairConfirmedCallBack(uv_work_t *work,
-        const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo);
-
     void EnableBt();
     void DisableBle();
 };
