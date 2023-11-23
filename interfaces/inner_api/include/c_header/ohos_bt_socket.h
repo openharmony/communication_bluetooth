@@ -29,6 +29,7 @@ extern "C" {
 #define BT_SOCKET_WRITE_FAILED (-1)
 #define BT_SOCKET_INVALID_ID (-1)
 #define BT_SOCKET_INVALID_PSM (-1)
+#define BT_SOCKET_INVALID_SCN (-1)
 #define BT_SOCKET_INVALID_TYPE (-2)
 
 typedef enum {
@@ -173,7 +174,7 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen);
 int SocketWrite(int clientId, const uint8_t *data, uint32_t len);
 
 /**
- * @brief Get dynamic PSM value.
+ * @brief Get dynamic PSM value for OHOS_SOCKET_L2CAP_LE.
  *
  * @param serverId The relative ID used to identify the current server socket, obtain the value by calling
  * {@link SocketServerCreate}.
@@ -181,6 +182,16 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len);
  * Returns {@link BT_SOCKET_INVALID_PSM} if the operation failed.
  */
 int SocketGetPsm(int serverId);
+
+/**
+ * @brief Get server scm number for OHOS_SOCKET_RFCOMM.
+ *
+ * @param serverId The relative ID used to identify the current server socket, obtain the value by calling
+ * {@link SocketServerCreate}.
+ * @return Returns the scn number.
+ * Returns {@link BT_SOCKET_INVALID_SCN} if the operation failed.
+ */
+int SocketGetScn(int serverId);
 
 /**
  * @brief Adjust the socket send and recv buffer size, limit range is 4KB to 50KB

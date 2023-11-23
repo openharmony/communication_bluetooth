@@ -35,7 +35,8 @@ namespace Bluetooth {
 const int LENGTH = 18;
 const int MIN_BUFFER_SIZE_TO_SET = 4 * 1024; // 4KB
 const int MAX_BUFFER_SIZE_TO_SET = 50 * 1024; // 50KB
-const int PSM_BUFFER_SIZE = 4;
+const int TX_OFFSETRS = 7; // bool + addr
+const int RX_OFFSETRS = 9; // bool + addr + short
 std::mutex g_socketProxyMutex;
 
 struct ClientSocket::impl {
@@ -103,10 +104,7 @@ struct ClientSocket::impl {
 #else
         int recvBufSize = recv(fd_, recvStateBuf, sizeof(recvStateBuf), MSG_WAITALL);
 #endif
-        if (recvBufSize <= 0) {
-            HILOGE("service closed");
-            return false;
-        }
+        CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false, "recv status error, service closed");
         bool state = recvStateBuf[0];
 
         uint8_t buf[6] = {0}; // addr buffer len
@@ -115,17 +113,31 @@ struct ClientSocket::impl {
 #else
         int recvAddrSize = recv(fd_, buf, sizeof(buf), MSG_WAITALL);
 #endif
-        if (recvAddrSize <= 0) {
-            HILOGE("service closed");
-            return false;
-        }
+        CHECK_AND_RETURN_LOG_RET(recvAddrSize > 0, false, "recv status addr, service closed");
         char token[LENGTH] = {0};
         (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
             buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
-        BluetoothRawAddress rawAddr {
-            token
-        };
+        BluetoothRawAddress rawAddr { token };
         std::string address = rawAddr.GetAddress().c_str();
+
+        uint16_t txSize;
+#ifdef DARWIN_PLATFORM
+        int recvTxSize = recv(fd_, &txSize, sizeof(txSize), 0);
+#else
+        int recvTxSize = recv(fd_, &txSize, sizeof(txSize), MSG_WAITALL);
+#endif
+        CHECK_AND_RETURN_LOG_RET(recvTxSize > 0, false, "recv tx addr, service closed");
+        maxTxPacketSize_ = txSize;
+
+        uint16_t rxSize;
+#ifdef DARWIN_PLATFORM
+        int recvRxSize = recv(fd_, &rxSize, sizeof(rxSize), 0);
+#else
+        int recvRxSize = recv(fd_, &rxSize, sizeof(rxSize), MSG_WAITALL);
+#endif
+        CHECK_AND_RETURN_LOG_RET(recvRxSize > 0, false, "recv Rx addr, service closed");
+        maxRxPacketSize_ = rxSize;
+
         return state;
     }
 
@@ -214,6 +226,22 @@ struct ClientSocket::impl {
         return RET_NO_ERROR;
     }
 
+    bool RecvSocketPsmOrScn();
+    {
+        int channel = 0;
+#ifdef DARWIN_PLATFORM
+        int recvBufSize = recv(fd_, &channel, sizeof(channel), 0);
+#else
+        int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
+#endif
+        CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false,
+                                 "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
+        CHECK_AND_RETURN_LOG_RET(channel > 0, false, "recv channel error, invalid channel:%{public}d", channel);
+        HILOGI("psm or scn = %{public}d, type = %{public}d", channel, type_);
+        socketChannel_ = channel;
+        return true;
+    }
+
     class BluetoothClientSocketDeathRecipient;
     sptr<BluetoothClientSocketDeathRecipient> deathRecipient_;
     // user register observer
@@ -237,6 +265,9 @@ struct ClientSocket::impl {
     int fd_;
     bool auth_;
     int socketStatus_;
+    int socketChannel_ = -1;
+    uint32_t maxTxPacketSize_ = -1;
+    uint32_t maxRxPacketSize_ = -1;
 };
 
 class ClientSocket::impl::BluetoothSocketObserverImp : public BluetoothClientSocketObserverStub {
@@ -288,44 +319,28 @@ bool ClientSocket::impl::InitClientSocketProxy(void)
 {
     std::lock_guard<std::mutex> lock(g_socketProxyMutex);
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!samgr) {
-        HILOGE("samgr is nullptr.");
-        return false;
-    }
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    CHECK_AND_RETURN_LOG_RET(samgr, false, "samgr is nullptr.");
 
-    if (!hostRemote) {
-        HILOGE("failed: no hostRemote");
-        return false;
-    }
+    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    CHECK_AND_RETURN_LOG_RET(hostRemote, false, "failed: no hostRemote");
 
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG_RET(remote, false, "failed: no remote");
 
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return false;
-    }
     HILOGI("remote obtained");
 
     proxy_ = iface_cast<IBluetoothSocket>(remote);
 
     deathRecipient_ = new (std::nothrow) BluetoothClientSocketDeathRecipient(*this);
-    if (!deathRecipient_) {
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(deathRecipient_, false, "deathRecipient_ is nullptr");
 
-    if (!proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(proxy_, false, "proxy_ is nullptr");
 
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
-    if (!observerImp_) {
-        HILOGE("observerImp is failed");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(observerImp_, false, "observerImp is failed");
+
     return true;
 }
 
@@ -423,6 +438,7 @@ int ClientSocket::Connect(int psm)
 
     HILOGI("fd_: %{public}d", pimpl->fd_);
     CHECK_AND_RETURN_LOG_RET(pimpl->fd_ != -1, BtStatus::BT_FAILURE, "connect failed!");
+    CHECK_AND_RETURN_LOG_RET(pimpl->RecvSocketPsmOrScn(), BT_ERR_INVALID_STATE, "recv psm or scn failed");
 
     bool recvret = pimpl->RecvSocketSignal();
     HILOGI("recvret: %{public}d", recvret);
@@ -478,6 +494,30 @@ int ClientSocket::GetSocketFd()
     return pimpl->fd_;
 }
 
+int ClientSocket::GetPsm()
+{
+    HILOGI("psm:%{public}d", pimpl->socketChannel_);
+    return pimpl->socketChannel_;
+}
+
+int ClientSocket::GetScn()
+{
+    HILOGI("scn:%{public}d", pimpl->socketChannel_);
+    return pimpl->socketChannel_;
+}
+
+uint32_t ClientSocket::GetMaxTransmitPacketSize()
+{
+    HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_);
+    return pimpl->maxTxPacketSize_;
+}
+
+uint32_t ClientSocket::GetMaxReceivePacketSize()
+{
+    HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_);
+    return pimpl->maxRxPacketSize_;
+}
+
 struct ServerSocket::impl {
     impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
     ~impl()
@@ -501,19 +541,16 @@ struct ServerSocket::impl {
     int Listen()
     {
         HILOGD("enter");
-        if (!IS_BT_ENABLED()) {
-            HILOGE("BR is not TURN_ON");
-            return BT_ERR_INVALID_STATE;
-        }
+        
+        CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+
         if (!proxy_) {
             HILOGE("failed, proxy_ is nullptr");
             socketStatus_ = SOCKET_CLOSED;
             return BT_ERR_SERVICE_DISCONNECTED;
         }
-        if (socketStatus_ == SOCKET_CLOSED) {
-            HILOGE("failed, socketStatus_ is SOCKET_CLOSED");
-            return BT_ERR_INVALID_STATE;
-        }
+        CHECK_AND_RETURN_LOG_RET(socketStatus_ != SOCKET_CLOSED, BT_ERR_INVALID_STATE,
+                                 "failed, socketStatus_ is SOCKET_CLOSED");
 
         ListenSocketParam param {
             .name = name_,
@@ -523,22 +560,15 @@ struct ServerSocket::impl {
             .observer = observer_
         };
         int ret = proxy_->Listen(param, fd_);
-        if (ret != BT_NO_ERROR) {
-            HILOGE("Listen error %{public}d.", ret);
-            return ret;
-        }
+        CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Listen error %{public}d.", ret);
+
         if (fd_ == BT_INVALID_SOCKET_FD) {
-            HILOGE("listen socket failed, fd_ is -1");
+            HILOGE("listen socket failed");
             socketStatus_ = SOCKET_CLOSED;
             return BT_ERR_INVALID_STATE;
         }
 
-        if (type_ == TYPE_L2CAP_LE) {
-            psm_ = RecvSocketPsm();
-            if (psm_ <= 0) {
-                return BT_ERR_INVALID_STATE;
-            }
-        }
+        CHECK_AND_RETURN_LOG_RET(RecvSocketPsmOrScn(), BT_ERR_INVALID_STATE, "recv psm or scn failed");
 
         if (socketStatus_ == SOCKET_INIT) {
             socketStatus_ = SOCKET_LISTENING;
@@ -574,7 +604,7 @@ struct ServerSocket::impl {
         setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time, sizeof(time));
 
         acceptFd_ = RecvSocketFd();
-        HILOGE("RecvSocketFd acceptFd: %{public}d", acceptFd_);
+        HILOGI("RecvSocketFd acceptFd: %{public}d", acceptFd_);
         if (acceptFd_ <= 0) {
             return nullptr;
         }
@@ -596,11 +626,8 @@ struct ServerSocket::impl {
     int RecvSocketFd()
     {
         HILOGD("enter");
-        int rv = 0;
-        int cfd = -1;
-        int clientFd = -1;
-        char ccmsg[CMSG_SPACE(sizeof(cfd))];
-        char buffer[10];
+        char ccmsg[CMSG_SPACE(sizeof(int))];
+        char buffer[14];
         struct iovec io = {.iov_base = buffer, .iov_len = sizeof(buffer)};
         struct msghdr msg;
         (void)memset_s(&msg, sizeof(msg), 0, sizeof(msg));
@@ -610,57 +637,64 @@ struct ServerSocket::impl {
         msg.msg_iovlen = 1;
 
 #ifdef DARWIN_PLATFORM
-        rv = recvmsg(fd_, &msg, 0);
+        int rv = recvmsg(fd_, &msg, 0);
 #else
-        rv = recvmsg(fd_, &msg, MSG_NOSIGNAL);
+        int rv = recvmsg(fd_, &msg, MSG_NOSIGNAL);
 #endif
         if (rv == -1) {
             HILOGE("[sock] recvmsg error  %{public}d, fd: %{public}d", errno, fd_);
             return BtStatus::BT_FAILURE;
         }
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
-        if ((cmptr != nullptr) && (cmptr->cmsg_len == CMSG_LEN(sizeof(int)))) {
-            if (cmptr->cmsg_level != SOL_SOCKET || cmptr->cmsg_type != SCM_RIGHTS) {
-                HILOGE("[sock] control level: %{public}d", cmptr->cmsg_level);
-                HILOGE("[sock] control type: %{public}d", cmptr->cmsg_type);
-                return BtStatus::BT_FAILURE;
-            }
-            clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
-        } else {
-            return BtStatus::BT_FAILURE;
-        }
+        CHECK_AND_RETURN_LOG_RET(cmptr != nullptr && cmptr->cmsg_len == CMSG_LEN(sizeof(int))
+            && cmptr->cmsg_level == SOL_SOCKET && cmptr->cmsg_type == SCM_RIGHTS,
+            BtStatus::BT_FAILURE, "recvmsg error")
+        int clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
+
         uint8_t recvBuf[rv];
         (void)memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
-        if (memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv) != EOK) {
-            HILOGE("[sock] RecvSocketFd, recvBuf memcpy_s fail");
-            return BtStatus::BT_FAILURE;
-        }
+        CHECK_AND_RETURN_LOG_RET(memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv) == EOK,
+                                 BtStatus::BT_FAILURE, "RecvSocketFd, recvBuf memcpy_s fail");
 
         uint8_t buf[6] = {0};
-        if (memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf)) != EOK) {
-            HILOGE("[sock] RecvSocketFd, buf memcpy_s fail");
-            return BtStatus::BT_FAILURE;
-        }
+        CHECK_AND_RETURN_LOG_RET(memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf)) == EOK,
+                                 BtStatus::BT_FAILURE, "RecvSocketFd, buf memcpy_s fail");
 
         char token[LENGTH] = {0};
         (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
             buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
         BluetoothRawAddress rawAddr {token};
         acceptAddress_ = rawAddr.GetAddress().c_str();
+
+        maxTxPacketSize_ = GetShortFromBuf(recvBuf + TX_OFFSETRS, rv - TX_OFFSETRS);
+        maxRxPacketSize_ = GetShortFromBuf(recvBuf + RX_OFFSETRS, rv - RX_OFFSETRS);
         return clientFd;
     }
 
-    int RecvSocketPsm()
+    uint16_t GetShortFromBuf(uint8_t recvBuf[], int len)
     {
-        uint8_t recvBuf[PSM_BUFFER_SIZE];
-        int recvBufSize = recv(fd_, recvBuf, sizeof(recvBuf), MSG_WAITALL);
-        if (recvBufSize <= 0) {
-            HILOGE("[sock] recv error  %{public}d, fd: %{public}d", errno, fd_);
-            return BtStatus::BT_FAILURE;
-        }
-        int psm = recvBuf[0];
-        HILOGI("[sock] RecvSocketPsm psm: %{public}d", psm);
-        return psm;
+        uint16_t shortBuf;
+        CHECK_AND_RETURN_LOG_RET(len >= static_cast<int>(sizeof(shortBuf)), 0, "getshort fail, invalid len");
+        CHECK_AND_RETURN_LOG_RET(memcpy_s(shortBuf, sizeof(shortBuf), &recvBuf[0], sizeof(shortBuf)) == EOK, 0,
+                                 "getshort failed, memcpy_s fail");
+        return shortBuf;
+    }
+
+    bool RecvSocketPsmOrScn();
+    {
+        int channel = 0;
+#ifdef DARWIN_PLATFORM
+        int recvBufSize = recv(fd_, &channel, sizeof(channel), 0);
+#else
+        int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
+#endif
+        CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false,
+                                 "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
+        CHECK_AND_RETURN_LOG_RET(channel > 0, false,
+                                 "recv channel error, errno:%{public}d, fd_:%{public}d", errno, fd_);
+        HILOGI("psm or scn = %{public}d, type = %{public}d", channel, type_);
+        socketChannel_ = channel;
+        return true;
     }
 
     void Close()
@@ -737,7 +771,9 @@ struct ServerSocket::impl {
     std::string socketServiceType_ {
         ""
     };
-    int psm_;
+    int socketChannel_ = -1;
+    uint32_t maxTxPacketSize_ = 0;
+    uint32_t maxRxPacketSize_ = 0;
 };
 
 class ServerSocket::impl::BluetoothServerSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
@@ -761,33 +797,24 @@ private:
 };
 
 ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
-    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name), psm_(-1)
+    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name),
 {
     HILOGI("(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!samgr) {
-        HILOGE("samgr is nullptr.");
-        return;
-    }
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    CHECK_AND_RETURN_LOG(samgr, "samgr is nullptr.");
 
-    if (!hostRemote) {
-        HILOGI("failed: no hostRemote");
-        return;
-    }
+    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    CHECK_AND_RETURN_LOG(hostRemote, "failed: no hostRemote");
+
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG(remote, "failed: no remote");
 
-    if (!remote) {
-        HILOGE("failed: no remote");
-        return;
-    }
     HILOGI("remote obtained");
 
     proxy_ = iface_cast<IBluetoothSocket>(remote);
-    if (proxy_ == nullptr) {
-        return;
-    }
+    CHECK_AND_RETURN_LOG(proxy_, "failed: no proxy_");
+
     deathRecipient_ = new BluetoothServerSocketDeathRecipient(*this);
     proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
     observer_ = new BluetoothServerSocketObserverStub();
@@ -796,7 +823,7 @@ ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, 
 ServerSocket::ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
     : pimpl(new ServerSocket::impl(name, uuid, type, encrypt))
 {
-    HILOGI("(4 parameters) starts");
+    HILOGI("type:%{public}d encrypt:%{public}d", type, encrypt);
 }
 
 ServerSocket::~ServerSocket()
@@ -828,7 +855,26 @@ const std::string &ServerSocket::GetStringTag()
 
 int ServerSocket::GetPsm()
 {
-    return pimpl->psm_;
+    HILOGI("psm:%{public}d", pimpl->socketChannel_);
+    return pimpl->socketChannel_;
+}
+
+int ServerSocket::GetScn()
+{
+    HILOGI("scn:%{public}d", pimpl->socketChannel_);
+    return pimpl->socketChannel_;
+}
+
+uint32_t ServerSocket::GetMaxTransmitPacketSize()
+{
+    HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_);
+    return pimpl->maxTxPacketSize_;
+}
+
+uint32_t ServerSocket::GetMaxReceivePacketSize()
+{
+    HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_);
+    return pimpl->maxRxPacketSize_;
 }
 
 int ServerSocket::GetSocketFd() 

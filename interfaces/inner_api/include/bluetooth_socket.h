@@ -203,6 +203,39 @@ public:
      */
     int GetSocketFd();
 
+    /**
+     * @brief Get dynamic PSM value for TYPE_L2CAP_LE.
+     *
+     * @return int psm.
+     * @since 6
+     */
+    int GetPsm();
+
+    /**
+     * @brief Get client channel number for TYPE_RFCOMM.
+     *
+     * @return int scn.
+     * @since 6
+     */
+
+    int GetScn();
+
+    /**
+     * @brief Get the maximum supported transmit packet size for the underlying transport
+     *
+     * @return int the maximum supported transmit packet size
+     * @since 6
+     */
+    int GetMaxTransmitPacketSize();
+
+    /**
+     * @brief Get the maximum supported receive packet size for the underlying transport
+     *
+     * @return int the maximum supported receive packet size
+     * @since 6
+     */
+    int GetMaxReceivePacketSize();
+
 private:
     ClientSocket() = delete;
     BLUETOOTH_DECLARE_IMPL();
@@ -266,12 +299,37 @@ public:
     const std::string &GetStringTag();
 
     /**
-     * @brief Get dynamic PSM value.
+     * @brief Get dynamic PSM value for TYPE_L2CAP_LE.
      *
      * @return int psm.
      * @since 6
      */
     int GetPsm();
+
+    /**
+     * @brief Get server channel number for TYPE_RFCOMM.
+     *
+     * @return int scn.
+     * @since 6
+     */
+
+    int GetScn();
+
+    /**
+     * @brief Get the maximum supported transmit packet size for the underlying transport
+     *
+     * @return int the maximum supported transmit packet size
+     * @since 6
+     */
+    int GetMaxTransmitPacketSize();
+
+    /**
+     * @brief Get the maximum supported receive packet size for the underlying transport
+     *
+     * @return int the maximum supported receive packet size
+     * @since 6
+     */
+    int GetMaxReceivePacketSize();
 
     /**
      * @brief Get server socket fd
