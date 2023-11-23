@@ -226,7 +226,7 @@ struct ClientSocket::impl {
         return RET_NO_ERROR;
     }
 
-    bool RecvSocketPsmOrScn();
+    bool RecvSocketPsmOrScn()
     {
         int channel = 0;
 #ifdef DARWIN_PLATFORM
@@ -235,7 +235,7 @@ struct ClientSocket::impl {
         int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
 #endif
         CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false,
-                                 "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
+            "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
         CHECK_AND_RETURN_LOG_RET(channel > 0, false, "recv channel error, invalid channel:%{public}d", channel);
         HILOGI("psm or scn = %{public}d, type = %{public}d", channel, type_);
         socketChannel_ = channel;
@@ -550,7 +550,7 @@ struct ServerSocket::impl {
             return BT_ERR_SERVICE_DISCONNECTED;
         }
         CHECK_AND_RETURN_LOG_RET(socketStatus_ != SOCKET_CLOSED, BT_ERR_INVALID_STATE,
-                                 "failed, socketStatus_ is SOCKET_CLOSED");
+            "failed, socketStatus_ is SOCKET_CLOSED");
 
         ListenSocketParam param {
             .name = name_,
@@ -648,17 +648,17 @@ struct ServerSocket::impl {
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
         CHECK_AND_RETURN_LOG_RET(cmptr != nullptr && cmptr->cmsg_len == CMSG_LEN(sizeof(int))
             && cmptr->cmsg_level == SOL_SOCKET && cmptr->cmsg_type == SCM_RIGHTS,
-            BtStatus::BT_FAILURE, "recvmsg error")
+            BtStatus::BT_FAILURE, "recvmsg error");
         int clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
 
         uint8_t recvBuf[rv];
         (void)memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
         CHECK_AND_RETURN_LOG_RET(memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv) == EOK,
-                                 BtStatus::BT_FAILURE, "RecvSocketFd, recvBuf memcpy_s fail");
+            BtStatus::BT_FAILURE, "RecvSocketFd, recvBuf memcpy_s fail");
 
         uint8_t buf[6] = {0};
         CHECK_AND_RETURN_LOG_RET(memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf)) == EOK,
-                                 BtStatus::BT_FAILURE, "RecvSocketFd, buf memcpy_s fail");
+            BtStatus::BT_FAILURE, "RecvSocketFd, buf memcpy_s fail");
 
         char token[LENGTH] = {0};
         (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
@@ -676,7 +676,7 @@ struct ServerSocket::impl {
         uint16_t shortBuf;
         CHECK_AND_RETURN_LOG_RET(len >= static_cast<int>(sizeof(shortBuf)), 0, "getshort fail, invalid len");
         CHECK_AND_RETURN_LOG_RET(memcpy_s(shortBuf, sizeof(shortBuf), &recvBuf[0], sizeof(shortBuf)) == EOK, 0,
-                                 "getshort failed, memcpy_s fail");
+            "getshort failed, memcpy_s fail");
         return shortBuf;
     }
 
@@ -689,9 +689,9 @@ struct ServerSocket::impl {
         int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
 #endif
         CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false,
-                                 "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
+            "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
         CHECK_AND_RETURN_LOG_RET(channel > 0, false,
-                                 "recv channel error, errno:%{public}d, fd_:%{public}d", errno, fd_);
+            "recv channel error, errno:%{public}d, fd_:%{public}d", errno, fd_);
         HILOGI("psm or scn = %{public}d, type = %{public}d", channel, type_);
         socketChannel_ = channel;
         return true;
