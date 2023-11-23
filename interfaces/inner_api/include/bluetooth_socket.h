@@ -226,7 +226,7 @@ public:
      * @return int the maximum supported transmit packet size
      * @since 6
      */
-    int GetMaxTransmitPacketSize();
+    uint32_t GetMaxTransmitPacketSize();
 
     /**
      * @brief Get the maximum supported receive packet size for the underlying transport
@@ -234,7 +234,7 @@ public:
      * @return int the maximum supported receive packet size
      * @since 6
      */
-    int GetMaxReceivePacketSize();
+    uint32_t GetMaxReceivePacketSize();
 
 private:
     ClientSocket() = delete;
@@ -321,7 +321,7 @@ public:
      * @return int the maximum supported transmit packet size
      * @since 6
      */
-    int GetMaxTransmitPacketSize();
+    uint32_t GetMaxTransmitPacketSize();
 
     /**
      * @brief Get the maximum supported receive packet size for the underlying transport
@@ -329,7 +329,7 @@ public:
      * @return int the maximum supported receive packet size
      * @since 6
      */
-    int GetMaxReceivePacketSize();
+    uint32_t GetMaxReceivePacketSize();
 
     /**
      * @brief Get server socket fd

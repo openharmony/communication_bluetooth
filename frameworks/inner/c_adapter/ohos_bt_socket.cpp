@@ -392,7 +392,7 @@ int SocketGetPsm(int serverId)
     HILOGI("serverId: %{public}d", serverId);
     std::shared_ptr<ServerSocket> server = g_serverMap.GetObject(serverId);
     CHECK_AND_RETURN_LOG_RET(server, BT_SOCKET_INVALID_PSM, "server is null!");
-    return server->GetPsm(;
+    return server->GetPsm();
 }
 
 /**
