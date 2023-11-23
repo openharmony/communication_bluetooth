@@ -126,7 +126,7 @@ struct ClientSocket::impl {
 #else
         int recvTxSize = recv(fd_, &txSize, sizeof(txSize), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvTxSize > 0, false, "recv tx addr, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvTxSize > 0, false, "recv tx error, service closed");
         maxTxPacketSize_ = txSize;
 
         uint16_t rxSize;
@@ -135,7 +135,7 @@ struct ClientSocket::impl {
 #else
         int recvRxSize = recv(fd_, &rxSize, sizeof(rxSize), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvRxSize > 0, false, "recv Rx addr, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvRxSize > 0, false, "recv Rx error, service closed");
         maxRxPacketSize_ = rxSize;
 
         return state;
@@ -266,8 +266,8 @@ struct ClientSocket::impl {
     bool auth_;
     int socketStatus_;
     int socketChannel_ = -1;
-    uint32_t maxTxPacketSize_ = -1;
-    uint32_t maxRxPacketSize_ = -1;
+    uint32_t maxTxPacketSize_ = 0;
+    uint32_t maxRxPacketSize_ = 0;
 };
 
 class ClientSocket::impl::BluetoothSocketObserverImp : public BluetoothClientSocketObserverStub {
