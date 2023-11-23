@@ -47,11 +47,11 @@ napi_value NapiBaseProfile::ConnectionStrategyInit(napi_env env)
     napi_value strategyObj = nullptr;
     napi_create_object(env, &strategyObj);
     SetNamedPropertyByInteger(env, strategyObj, ConnectionStrategy::CONNECTION_UNKNOWN,
-        "CONNECT_STRATEGY_UNSUPPORTED");
+        "CONNECTION_STRATEGY_UNSUPPORTED");
     SetNamedPropertyByInteger(env, strategyObj, ConnectionStrategy::CONNECTION_ALLOWED,
-        "CONNECT_STRATEGY_ALLOWED");
+        "CONNECTION_STRATEGY_ALLOWED");
     SetNamedPropertyByInteger(env, strategyObj, ConnectionStrategy::CONNECTION_FORBIDDEN,
-        "CONNECT_STRATEGY_FORBIDDEN");
+        "CONNECTION_STRATEGY_FORBIDDEN");
     return strategyObj;
 }
 }  // namespace Bluetooth
