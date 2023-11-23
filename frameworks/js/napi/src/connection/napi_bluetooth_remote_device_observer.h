@@ -17,6 +17,7 @@
 #define NAPI_BLUETOOTH_REMOTE_DEVICE_OBSERVER_H
 
 #include "bluetooth_host.h"
+#include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {
@@ -35,9 +36,9 @@ public:
     void OnRemoteBatteryLevelChanged(const BluetoothRemoteDevice &device, int batteryLevel) override;
     void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override;
 
-    void RegisterCallback(const std::string &callbackName, const std::shared_ptr<BluetoothCallbackInfo> &callback);
+    void RegisterCallback(const std::string &callbackName, const std::shared_ptr<NapiCallback> &callback);
     void DeRegisterCallback(const std::string &callbackName);
-    std::shared_ptr<BluetoothCallbackInfo> GetCallback(const std::string &callbackName);
+    std::shared_ptr<NapiCallback> GetCallback(const std::string &callbackName);
 
 private:
     void DealPairStatus(const int &status, int &bondStatus);
@@ -45,7 +46,7 @@ private:
 
 private:
     std::mutex callbacksMapLock_;
-    std::unordered_map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbacks_;
+    std::unordered_map<std::string, std::shared_ptr<NapiCallback>> callbacks_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
