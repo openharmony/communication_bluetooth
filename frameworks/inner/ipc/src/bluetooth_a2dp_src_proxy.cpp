@@ -645,7 +645,7 @@ int BluetoothA2dpSrcProxy::A2dpOffloadSessionPathRequest(const RawAddress &devic
     MessageOption option{ MessageOption::TF_SYNC };
     int error =
         Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_OFFLOAD_SESSION_REQUEST, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, BT_ERR_IPC_TRANS_FAILED, "error:%{public}d", error);
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_IPC_TRANS_FAILED, "error:%{public}d", error);
     return reply.ReadInt32();
 }
 
@@ -661,7 +661,7 @@ BluetoothA2dpOffloadCodecStatus BluetoothA2dpSrcProxy::GetOffloadCodecStatus(con
     MessageOption option{ MessageOption::TF_SYNC };
     int error =
         Remote()->SendRequest(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_OFFLOAD_GET_CODEC_STATUS, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, offloadStatus, "error:%{public}d", error);
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, offloadStatus, "error:%{public}d", error);
     std::shared_ptr<BluetoothA2dpOffloadCodecStatus> statusPtr(reply.ReadParcelable<BluetoothA2dpOffloadCodecStatus>());
     CHECK_AND_RETURN_LOG_RET(statusPtr, offloadStatus, "error:%{public}d", error);
     return *statusPtr;
