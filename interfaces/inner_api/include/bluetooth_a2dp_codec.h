@@ -112,8 +112,11 @@ struct A2dpOffloadCodecInfo {
     uint8_t codecSpecific7;
 };
 
+class BluetoothA2dpOffloadCodecStatus;
 struct A2dpOffloadCodecStatus {
     A2dpOffloadCodecInfo offloadInfo;
+    A2dpOffloadCodecStatus() {}
+    A2dpOffloadCodecStatus(const BluetoothA2dpOffloadCodecStatus &status);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

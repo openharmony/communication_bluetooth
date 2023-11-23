@@ -692,12 +692,12 @@ int BluetoothA2dpSrcProxy::OffloadPlayingControl(const RawAddress &device, const
     CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), BT_ERR_INTERNAL_ERROR,
         "write device error control:%{public}d", control);
     CHECK_AND_RETURN_LOG_RET(WriteParcelableInt32Vector(sessionsId, data), BT_ERR_INTERNAL_ERROR,
-        "write sessionId error control:%{public}d, sessions size:%{public}d", control, (int)sessionsId.size());
+        "write sessionId error control:%{public}d, sessions size:%{public}d", control, (int32_t)sessionsId.size());
 
     MessageParcel reply;
     MessageOption option{ MessageOption::TF_SYNC };
     int error = Remote()->SendRequest(control, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, BT_ERR_IPC_TRANS_FAILED, "error:%{public}d", error);
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_IPC_TRANS_FAILED, "error:%{public}d", error);
     return reply.ReadInt32();
 }
 }  // namespace Bluetooth
