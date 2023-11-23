@@ -675,12 +675,12 @@ struct ServerSocket::impl {
     {
         uint16_t shortBuf;
         CHECK_AND_RETURN_LOG_RET(len >= static_cast<int>(sizeof(shortBuf)), 0, "getshort fail, invalid len");
-        CHECK_AND_RETURN_LOG_RET(memcpy_s(shortBuf, sizeof(shortBuf), &recvBuf[0], sizeof(shortBuf)) == EOK, 0,
+        CHECK_AND_RETURN_LOG_RET(memcpy_s(&shortBuf, sizeof(shortBuf), &recvBuf[0], sizeof(shortBuf)) == EOK, 0,
             "getshort failed, memcpy_s fail");
         return shortBuf;
     }
 
-    bool RecvSocketPsmOrScn();
+    bool RecvSocketPsmOrScn()
     {
         int channel = 0;
 #ifdef DARWIN_PLATFORM
@@ -797,7 +797,7 @@ private:
 };
 
 ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
-    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name),
+    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
 {
     HILOGI("(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
