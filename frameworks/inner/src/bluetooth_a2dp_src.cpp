@@ -701,7 +701,7 @@ int A2dpSource::OffloadStartPlaying(const BluetoothRemoteDevice &device, const s
 {
     HILOGI("enter");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    CHECK_AND_RETURN_LOG_RET(!(pimpl == nullptr || !pimpl->proxy_), BT_ERR_UNAVAILABLE_PROXY,
+    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), BT_ERR_UNAVAILABLE_PROXY,
         "pimpl or a2dpSrc proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
     CHECK_AND_RETURN_LOG_RET(sessionsId.size() != 0, BT_ERR_INVALID_PARAM, "session size zero.");
@@ -712,7 +712,7 @@ int A2dpSource::OffloadStopPlaying(const BluetoothRemoteDevice &device, const st
 {
     HILOGI("enter");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    CHECK_AND_RETURN_LOG_RET(!(pimpl == nullptr || !pimpl->proxy_), BT_ERR_UNAVAILABLE_PROXY,
+    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), BT_ERR_UNAVAILABLE_PROXY,
         "pimpl or a2dpSrc proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
     CHECK_AND_RETURN_LOG_RET(sessionsId.size() != 0, BT_ERR_INVALID_PARAM, "session size zero.");
@@ -723,7 +723,7 @@ int A2dpSource::A2dpOffloadSessionRequest(const BluetoothRemoteDevice &device, c
 {
     HILOGI("enter, session request device:%{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    CHECK_AND_RETURN_LOG_RET(!(pimpl == nullptr || !pimpl->proxy_), BT_ERR_UNAVAILABLE_PROXY,
+    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), BT_ERR_UNAVAILABLE_PROXY,
         "pimpl or a2dpSrc proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
 
@@ -739,43 +739,46 @@ int A2dpSource::A2dpOffloadSessionRequest(const BluetoothRemoteDevice &device, c
     return pimpl->proxy_->A2dpOffloadSessionPathRequest(RawAddress(device.GetDeviceAddr()), streamsInfo);
 }
 
+A2dpOffloadCodecStatus::A2dpOffloadCodecStatus(const BluetoothA2dpOffloadCodecStatus &status)
+{
+    offloadInfo.mediaPacketHeader = status.offloadInfo.mediaPacketHeader;
+    offloadInfo.mPt = status.offloadInfo.mPt;
+    offloadInfo.ssrc = status.offloadInfo.ssrc;
+    offloadInfo.boundaryFlag = status.offloadInfo.boundaryFlag;
+    offloadInfo.broadcastFlag = status.offloadInfo.broadcastFlag;
+    offloadInfo.codecType = status.offloadInfo.codecType;
+    offloadInfo.maxLatency = status.offloadInfo.maxLatency;
+    offloadInfo.scmsTEnable = status.offloadInfo.scmsTEnable;
+    offloadInfo.sampleRate = status.offloadInfo.sampleRate;
+    offloadInfo.encodedAudioBitrate = status.offloadInfo.encodedAudioBitrate;
+    offloadInfo.bitsPerSample = status.offloadInfo.bitsPerSample;
+    offloadInfo.chMode = status.offloadInfo.chMode;
+    offloadInfo.aclHdl = status.offloadInfo.aclHdl;
+    offloadInfo.l2cRcid = status.offloadInfo.l2cRcid;
+    offloadInfo.mtu = status.offloadInfo.mtu;
+    offloadInfo.codecSpecific0 = status.offloadInfo.codecSpecific0;
+    offloadInfo.codecSpecific1 = status.offloadInfo.codecSpecific1;
+    offloadInfo.codecSpecific2 = status.offloadInfo.codecSpecific2;
+    offloadInfo.codecSpecific3 = status.offloadInfo.codecSpecific3;
+    offloadInfo.codecSpecific4 = status.offloadInfo.codecSpecific4;
+    offloadInfo.codecSpecific5 = status.offloadInfo.codecSpecific5;
+    offloadInfo.codecSpecific6 = status.offloadInfo.codecSpecific6;
+    offloadInfo.codecSpecific7 = status.offloadInfo.codecSpecific7;
+}
+
 A2dpOffloadCodecStatus A2dpSource::GetOffloadCodecStatus(const BluetoothRemoteDevice &device) const
 {
     HILOGI("enter");
     A2dpOffloadCodecStatus ret;
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), ret, "bluetooth is off.");
-    CHECK_AND_RETURN_LOG_RET(!(pimpl == nullptr || !pimpl->proxy_), ret, "pimpl or a2dpSrc proxy is nullptr");
+    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), ret, "pimpl or a2dpSrc proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), ret, "input device err");
 
     BluetoothA2dpOffloadCodecStatus offloadStatus =
         pimpl->proxy_->GetOffloadCodecStatus(RawAddress(device.GetDeviceAddr()));
-    ret.offloadInfo.mediaPacketHeader = offloadStatus.offloadInfo.mediaPacketHeader;
-    ret.offloadInfo.mPt = offloadStatus.offloadInfo.mPt;
-    ret.offloadInfo.ssrc = offloadStatus.offloadInfo.ssrc;
-    ret.offloadInfo.boundaryFlag = offloadStatus.offloadInfo.boundaryFlag;
-    ret.offloadInfo.broadcastFlag = offloadStatus.offloadInfo.broadcastFlag;
-    ret.offloadInfo.codecType = offloadStatus.offloadInfo.codecType;
-    ret.offloadInfo.maxLatency = offloadStatus.offloadInfo.maxLatency;
-    ret.offloadInfo.scmsTEnable = offloadStatus.offloadInfo.scmsTEnable;
-    ret.offloadInfo.sampleRate = offloadStatus.offloadInfo.sampleRate;
-    ret.offloadInfo.encodedAudioBitrate = offloadStatus.offloadInfo.encodedAudioBitrate;
-    ret.offloadInfo.bitsPerSample = offloadStatus.offloadInfo.bitsPerSample;
-    ret.offloadInfo.chMode = offloadStatus.offloadInfo.chMode;
-    ret.offloadInfo.aclHdl = offloadStatus.offloadInfo.aclHdl;
-    ret.offloadInfo.l2cRcid = offloadStatus.offloadInfo.l2cRcid;
-    ret.offloadInfo.mtu = offloadStatus.offloadInfo.mtu;
-    ret.offloadInfo.codecSpecific0 = offloadStatus.offloadInfo.codecSpecific0;
-    ret.offloadInfo.codecSpecific1 = offloadStatus.offloadInfo.codecSpecific1;
-    ret.offloadInfo.codecSpecific2 = offloadStatus.offloadInfo.codecSpecific2;
-    ret.offloadInfo.codecSpecific3 = offloadStatus.offloadInfo.codecSpecific3;
-    ret.offloadInfo.codecSpecific4 = offloadStatus.offloadInfo.codecSpecific4;
-    ret.offloadInfo.codecSpecific5 = offloadStatus.offloadInfo.codecSpecific5;
-    ret.offloadInfo.codecSpecific6 = offloadStatus.offloadInfo.codecSpecific6;
-    ret.offloadInfo.codecSpecific7 = offloadStatus.offloadInfo.codecSpecific7;
-    HILOGI("aclHdl:%{public}x,l2cRcid:%{public}x,mtu:%{public}d,sampleRate:%{public}x,bitRate:%{public}x",
-        ret.offloadInfo.aclHdl, ret.offloadInfo.l2cRcid, ret.offloadInfo.mtu, ret.offloadInfo.sampleRate,
-        ret.offloadInfo.encodedAudioBitrate);
-    return ret;
+    A2dpOffloadCodecStatus status(offloadStatus);
+    HILOGI("codecType:%{public}x,mtu:%{public}d", status.offloadInfo.codecType, status.offloadInfo.mtu);
+    return status;
 }
 } // namespace Bluetooth
 } // namespace OHOS

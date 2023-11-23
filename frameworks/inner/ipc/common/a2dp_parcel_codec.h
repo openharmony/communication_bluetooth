@@ -184,7 +184,7 @@ struct OffloadCodecStatus {
 };
 
 /**
- * @brief The details of a2dp audio strem info.
+ * @brief The details of a2dp audio stream info.
  *
  * @since 6.0
  */
