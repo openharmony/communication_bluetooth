@@ -380,7 +380,7 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
 }
 
 /**
- * @brief Get dynamic PSM value for OHOS_SOCKET_L2CAP_LE.
+ * @brief Get dynamic PSM value for OHOS_SOCKET_L2CAP.
  *
  * @param serverId The relative ID used to identify the current server socket, obtain the value by calling
  * {@link SocketServerCreate}.
@@ -392,7 +392,7 @@ int SocketGetPsm(int serverId)
     HILOGI("serverId: %{public}d", serverId);
     std::shared_ptr<ServerSocket> server = g_serverMap.GetObject(serverId);
     CHECK_AND_RETURN_LOG_RET(server, BT_SOCKET_INVALID_PSM, "server is null!");
-    return server->GetPsm();
+    return server->GetL2capPsm();
 }
 
 /**
@@ -408,7 +408,7 @@ int SocketGetScn(int serverId)
     HILOGI("serverId: %{public}d", serverId);
     std::shared_ptr<ServerSocket> server = g_serverMap.GetObject(serverId);
     CHECK_AND_RETURN_LOG_RET(server, BT_SOCKET_INVALID_SCN, "server is null!");
-    return server->GetScn();
+    return server->GetRfcommScn();
 }
 
 /**

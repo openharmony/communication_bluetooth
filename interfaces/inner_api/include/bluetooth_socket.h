@@ -209,7 +209,7 @@ public:
      * @return int psm.
      * @since 6
      */
-    int GetPsm();
+    int GetL2capPsm();
 
     /**
      * @brief Get client channel number for TYPE_RFCOMM.
@@ -218,7 +218,7 @@ public:
      * @since 6
      */
 
-    int GetScn();
+    int GetRfcommScn();
 
     /**
      * @brief Get the maximum supported transmit packet size for the underlying transport
@@ -299,12 +299,12 @@ public:
     const std::string &GetStringTag();
 
     /**
-     * @brief Get dynamic PSM value for TYPE_L2CAP_LE.
+     * @brief Get dynamic PSM value for TYPE_L2CAP.
      *
      * @return int psm.
      * @since 6
      */
-    int GetPsm();
+    int GetL2capPsm();
 
     /**
      * @brief Get server channel number for TYPE_RFCOMM.
@@ -313,7 +313,7 @@ public:
      * @since 6
      */
 
-    int GetScn();
+    int GetRfcommScn();
 
     /**
      * @brief Get the maximum supported transmit packet size for the underlying transport

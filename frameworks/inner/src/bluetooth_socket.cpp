@@ -104,7 +104,7 @@ struct ClientSocket::impl {
 #else
         int recvBufSize = recv(fd_, recvStateBuf, sizeof(recvStateBuf), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false, "recv status error, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvBufSize == sizeof(recvStateBuf), false, "recv status error, service closed");
         bool state = recvStateBuf[0];
 
         uint8_t buf[6] = {0}; // addr buffer len
@@ -113,7 +113,7 @@ struct ClientSocket::impl {
 #else
         int recvAddrSize = recv(fd_, buf, sizeof(buf), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvAddrSize > 0, false, "recv status addr, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvAddrSize == sizeof(buf), false, "recv status addr, service closed");
         char token[LENGTH] = {0};
         (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
             buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
@@ -122,20 +122,20 @@ struct ClientSocket::impl {
 
         uint16_t txSize;
 #ifdef DARWIN_PLATFORM
-        int recvTxSize = recv(fd_, &txSize, sizeof(txSize), 0);
+        int recvTxLen = recv(fd_, &txSize, sizeof(txSize), 0);
 #else
-        int recvTxSize = recv(fd_, &txSize, sizeof(txSize), MSG_WAITALL);
+        int recvTxLen = recv(fd_, &txSize, sizeof(txSize), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvTxSize > 0, false, "recv tx error, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvTxLen == sizeof(txSize), false, "recv tx error, service closed");
         maxTxPacketSize_ = txSize;
 
         uint16_t rxSize;
 #ifdef DARWIN_PLATFORM
-        int recvRxSize = recv(fd_, &rxSize, sizeof(rxSize), 0);
+        int recvRxlen = recv(fd_, &rxSize, sizeof(rxSize), 0);
 #else
-        int recvRxSize = recv(fd_, &rxSize, sizeof(rxSize), MSG_WAITALL);
+        int recvRxlen = recv(fd_, &rxSize, sizeof(rxSize), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvRxSize > 0, false, "recv Rx error, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvRxlen == sizeof(rxSize), false, "recv rx error, service closed");
         maxRxPacketSize_ = rxSize;
 
         return state;
@@ -234,7 +234,7 @@ struct ClientSocket::impl {
 #else
         int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false,
+        CHECK_AND_RETURN_LOG_RET(recvBufSize == sizeof(channel), false,
             "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
         CHECK_AND_RETURN_LOG_RET(channel > 0, false, "recv channel error, invalid channel:%{public}d", channel);
         HILOGI("psm or scn = %{public}d, type = %{public}d", channel, type_);
@@ -494,13 +494,13 @@ int ClientSocket::GetSocketFd()
     return pimpl->fd_;
 }
 
-int ClientSocket::GetPsm()
+int ClientSocket::GetL2capPsm()
 {
     HILOGI("psm:%{public}d", pimpl->socketChannel_);
     return pimpl->socketChannel_;
 }
 
-int ClientSocket::GetScn()
+int ClientSocket::GetRfcommScn()
 {
     HILOGI("scn:%{public}d", pimpl->socketChannel_);
     return pimpl->socketChannel_;
@@ -674,6 +674,7 @@ struct ServerSocket::impl {
     uint16_t GetShortFromBuf(uint8_t recvBuf[], int len)
     {
         uint16_t shortBuf;
+        CHECK_AND_RETURN_LOG_RET(recvBuf, 0, "getshort fail, invalid recvBuf");
         CHECK_AND_RETURN_LOG_RET(len >= static_cast<int>(sizeof(shortBuf)), 0, "getshort fail, invalid len");
         CHECK_AND_RETURN_LOG_RET(memcpy_s(&shortBuf, sizeof(shortBuf), &recvBuf[0], sizeof(shortBuf)) == EOK, 0,
             "getshort failed, memcpy_s fail");
@@ -688,7 +689,7 @@ struct ServerSocket::impl {
 #else
         int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvBufSize > 0, false,
+        CHECK_AND_RETURN_LOG_RET(recvBufSize == sizeof(channel), false,
             "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
         CHECK_AND_RETURN_LOG_RET(channel > 0, false,
             "recv channel error, errno:%{public}d, fd_:%{public}d", errno, fd_);
@@ -853,13 +854,13 @@ const std::string &ServerSocket::GetStringTag()
     return pimpl->GetStringTag();
 }
 
-int ServerSocket::GetPsm()
+int ServerSocket::GetL2capPsm()
 {
     HILOGI("psm:%{public}d", pimpl->socketChannel_);
     return pimpl->socketChannel_;
 }
 
-int ServerSocket::GetScn()
+int ServerSocket::GetRfcommScn()
 {
     HILOGI("scn:%{public}d", pimpl->socketChannel_);
     return pimpl->socketChannel_;

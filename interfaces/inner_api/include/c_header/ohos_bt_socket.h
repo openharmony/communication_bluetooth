@@ -174,7 +174,7 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen);
 int SocketWrite(int clientId, const uint8_t *data, uint32_t len);
 
 /**
- * @brief Get dynamic PSM value for OHOS_SOCKET_L2CAP_LE.
+ * @brief Get dynamic PSM value for OHOS_SOCKET_L2CAP.
  *
  * @param serverId The relative ID used to identify the current server socket, obtain the value by calling
  * {@link SocketServerCreate}.
