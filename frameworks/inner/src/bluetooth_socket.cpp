@@ -541,7 +541,7 @@ struct ServerSocket::impl {
     int Listen()
     {
         HILOGD("enter");
-        
+
         CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
 
         if (!proxy_) {
@@ -877,7 +877,7 @@ uint32_t ServerSocket::GetMaxReceivePacketSize()
     return pimpl->maxRxPacketSize_;
 }
 
-int ServerSocket::GetSocketFd() 
+int ServerSocket::GetSocketFd()
 {
     return pimpl->fd_;
 }
