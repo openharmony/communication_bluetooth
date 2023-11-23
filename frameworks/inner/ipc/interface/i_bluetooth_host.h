@@ -124,6 +124,8 @@ public:
     virtual int32_t CountEnableTimes(bool enable) = 0;
     virtual int32_t SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) = 0;
     virtual bool IsSupportWearDetection(const std::string &address) = 0;
+    virtual int32_t ConnectAllowedProfiles(const std::string &remoteAddr) = 0;
+    virtual int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

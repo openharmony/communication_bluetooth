@@ -108,6 +108,8 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", DeRegisterConnectionObserver),
         DECLARE_NAPI_FUNCTION("isBluetoothDisCovering", IsBluetoothDiscovering),
         DECLARE_NAPI_FUNCTION("getPairState", GetPairState),
+        DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
+        DECLARE_NAPI_FUNCTION("disconnectAllowedProfiles", DisconnectAllowedProfiles),
 #endif
     };
 
@@ -684,6 +686,44 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN(env, err = BT_NO_ERROR, err, result);
     HILOGE("getPairState :%{public}d", pairState);
     return result;
+}
+
+napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+        int32_t ret = host->ConnectAllowedProfiles(remoteAddr);
+        HILOGI("ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+        int32_t ret = host->DisconnectAllowedProfiles(remoteAddr);
+        HILOGI("ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 #endif
 

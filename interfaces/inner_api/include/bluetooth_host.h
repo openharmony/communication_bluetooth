@@ -675,6 +675,26 @@ public:
     */
     bool IsSupportWearDetection(const std::string &address) const;
 
+    /**
+    * @brief Connects all allowed bluetooth profiles between the local and remote device.
+    *
+    * @param remoteAddr remote device addr.
+    * @return Returns <b>true</b> if the operation is successful;
+    *         returns <b>false</b> if the operation fails.
+    * @since 11
+    */
+    int ConnectAllowedProfiles(const std::string &remoteAddr) const;
+
+    /**
+    * @brief Disconnects all allowed bluetooth profiles between the local and remote device.
+    *
+    * @param remoteAddr remote device addr.
+    * @return Returns <b>true</b> if the operation is successful;
+    *         returns <b>false</b> if the operation fails.
+    * @since 11
+    */
+    int DisconnectAllowedProfiles(const std::string &remoteAddr) const;
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
