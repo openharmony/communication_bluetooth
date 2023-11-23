@@ -189,10 +189,10 @@ struct OffloadCodecStatus {
  * @since 6.0
  */
 struct BluetoothA2dpStreamInfo {
-    int sessionId;
-    int streamType;
-    int sampleRate;
-    int isSpatialAudio;
+    int32_t sessionId;
+    int32_t streamType;
+    int32_t sampleRate;
+    int32_t isSpatialAudio;
 };
 }  // namespace bluetooth
 }  // namespace OHOS
