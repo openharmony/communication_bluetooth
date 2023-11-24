@@ -17,12 +17,13 @@
 #define NAPI_BLUETOOTH_ACCESS_OBSERVER_H
 
 #include "bluetooth_host.h"
+#include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
 namespace OHOS {
 namespace Bluetooth {
 class NapiBluetoothAccessObserver : public BluetoothHostObserver {
 public:
-    std::shared_ptr<BluetoothCallbackInfo> stateChangeCallback;
+    std::shared_ptr<NapiCallback> napiStateChangeCallback_ {nullptr};
     NapiBluetoothAccessObserver() = default;
     ~NapiBluetoothAccessObserver() override = default;
 
@@ -37,7 +38,6 @@ public:
 
 private:
     bool DealStateChange(const int transport, const int status, BluetoothState &state);
-    void UvQueueWorkOnStateChanged(uv_work_t *work, BluetoothState &state);
     void EnableBt();
     void DisableBle();
     void GetBrStateByStatus(const int status, BluetoothState &state, bool &isCallback);
