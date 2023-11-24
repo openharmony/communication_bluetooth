@@ -35,8 +35,15 @@ namespace Bluetooth {
 const int LENGTH = 18;
 const int MIN_BUFFER_SIZE_TO_SET = 4 * 1024; // 4KB
 const int MAX_BUFFER_SIZE_TO_SET = 50 * 1024; // 50KB
-const int TX_OFFSETRS = 7; // bool + addr
-const int RX_OFFSETRS = 9; // bool + addr + short
+const int ADDR_OFFSET = 1; // bool
+const int TX_OFFSET = 7; // bool + addr
+const int RX_OFFSET = 9; // bool + addr + short
+const int SOCKET_RECV_STATE_SIZE = 1;
+const int SOCKET_RECV_ADDR_SIZE = 6;
+const int SOCKET_RECV_TXRX_SIZE = 2;
+const int SOCKET_RECV_CHANNEL_SIZE = 4;
+const int SOCKET_RECV_FD_SIZE = 14;
+
 std::mutex g_socketProxyMutex;
 
 struct ClientSocket::impl {
@@ -98,22 +105,22 @@ struct ClientSocket::impl {
 
     bool RecvSocketSignal()
     {
-        uint8_t recvStateBuf[1];
+        uint8_t recvStateBuf[SOCKET_RECV_STATE_SIZE];
 #ifdef DARWIN_PLATFORM
         int recvBufSize = recv(fd_, recvStateBuf, sizeof(recvStateBuf), 0);
 #else
         int recvBufSize = recv(fd_, recvStateBuf, sizeof(recvStateBuf), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvBufSize == sizeof(recvStateBuf), false, "recv status error, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvBufSize == SOCKET_RECV_STATE_SIZE, false, "recv status error, service closed");
         bool state = recvStateBuf[0];
 
-        uint8_t buf[6] = {0}; // addr buffer len
+        uint8_t buf[SOCKET_RECV_ADDR_SIZE] = {0}; // addr buffer len
 #ifdef DARWIN_PLATFORM
         int recvAddrSize = recv(fd_, buf, sizeof(buf), 0);
 #else
         int recvAddrSize = recv(fd_, buf, sizeof(buf), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvAddrSize == sizeof(buf), false, "recv status addr, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvAddrSize == SOCKET_RECV_ADDR_SIZE, false, "recv status addr, service closed");
         char token[LENGTH] = {0};
         (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
             buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
@@ -126,7 +133,7 @@ struct ClientSocket::impl {
 #else
         int recvTxLen = recv(fd_, &txSize, sizeof(txSize), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvTxLen == sizeof(txSize), false, "recv tx error, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvTxLen == SOCKET_RECV_TXRX_SIZE, false, "recv tx error, service closed");
         maxTxPacketSize_ = txSize;
 
         uint16_t rxSize;
@@ -135,7 +142,7 @@ struct ClientSocket::impl {
 #else
         int recvRxlen = recv(fd_, &rxSize, sizeof(rxSize), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvRxlen == sizeof(rxSize), false, "recv rx error, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvRxlen == SOCKET_RECV_TXRX_SIZE, false, "recv rx error, service closed");
         maxRxPacketSize_ = rxSize;
 
         return state;
@@ -234,7 +241,7 @@ struct ClientSocket::impl {
 #else
         int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvBufSize == sizeof(channel), false,
+        CHECK_AND_RETURN_LOG_RET(recvBufSize == SOCKET_RECV_CHANNEL_SIZE, false,
             "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
         CHECK_AND_RETURN_LOG_RET(channel > 0, false, "recv channel error, invalid channel:%{public}d", channel);
         HILOGI("psm or scn = %{public}d, type = %{public}d", channel, type_);
@@ -627,7 +634,7 @@ struct ServerSocket::impl {
     {
         HILOGD("enter");
         char ccmsg[CMSG_SPACE(sizeof(int))];
-        char buffer[14];
+        char buffer[SOCKET_RECV_FD_SIZE];
         struct iovec io = {.iov_base = buffer, .iov_len = sizeof(buffer)};
         struct msghdr msg;
         (void)memset_s(&msg, sizeof(msg), 0, sizeof(msg));
@@ -646,9 +653,11 @@ struct ServerSocket::impl {
             return BtStatus::BT_FAILURE;
         }
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
-        CHECK_AND_RETURN_LOG_RET(cmptr != nullptr && cmptr->cmsg_len == CMSG_LEN(sizeof(int))
-            && cmptr->cmsg_level == SOL_SOCKET && cmptr->cmsg_type == SCM_RIGHTS,
-            BtStatus::BT_FAILURE, "recvmsg error");
+        CHECK_AND_RETURN_LOG_RET(cmptr != nullptr, BtStatus::BT_FAILURE, "cmptr error");
+        CHECK_AND_RETURN_LOG_RET(cmptr->cmsg_len == CMSG_LEN(sizeof(int)) && cmptr->cmsg_level == SOL_SOCKET
+            && cmptr->cmsg_type == SCM_RIGHTS, BtStatus::BT_FAILURE,
+            "recvmsg error, len:%{public}d level:%{public}d type:%{public}d",
+            cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
         int clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
 
         uint8_t recvBuf[rv];
@@ -656,8 +665,8 @@ struct ServerSocket::impl {
         CHECK_AND_RETURN_LOG_RET(memcpy_s(recvBuf, sizeof(recvBuf), (uint8_t *)msg.msg_iov[0].iov_base, rv) == EOK,
             BtStatus::BT_FAILURE, "RecvSocketFd, recvBuf memcpy_s fail");
 
-        uint8_t buf[6] = {0};
-        CHECK_AND_RETURN_LOG_RET(memcpy_s(buf, sizeof(buf), &recvBuf[1], sizeof(buf)) == EOK,
+        uint8_t buf[SOCKET_RECV_ADDR_SIZE] = {0};
+        CHECK_AND_RETURN_LOG_RET(memcpy_s(buf, sizeof(buf), &recvBuf[ADDR_OFFSET], sizeof(buf)) == EOK,
             BtStatus::BT_FAILURE, "RecvSocketFd, buf memcpy_s fail");
 
         char token[LENGTH] = {0};
@@ -666,16 +675,16 @@ struct ServerSocket::impl {
         BluetoothRawAddress rawAddr {token};
         acceptAddress_ = rawAddr.GetAddress().c_str();
 
-        maxTxPacketSize_ = GetShortFromBuf(recvBuf + TX_OFFSETRS, rv - TX_OFFSETRS);
-        maxRxPacketSize_ = GetShortFromBuf(recvBuf + RX_OFFSETRS, rv - RX_OFFSETRS);
+        maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, rv - TX_OFFSET);
+        maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, rv - RX_OFFSET);
         return clientFd;
     }
 
-    uint16_t GetShortFromBuf(uint8_t recvBuf[], int len)
+    uint16_t GetPacketSizeFromBuf(uint8_t recvBuf[], int recvBufLen)
     {
         uint16_t shortBuf;
         CHECK_AND_RETURN_LOG_RET(recvBuf, 0, "getshort fail, invalid recvBuf");
-        CHECK_AND_RETURN_LOG_RET(len >= static_cast<int>(sizeof(shortBuf)), 0, "getshort fail, invalid len");
+        CHECK_AND_RETURN_LOG_RET(recvBufLen >= SOCKET_RECV_TXRX_SIZE, 0, "getshort fail, invalid len");
         CHECK_AND_RETURN_LOG_RET(memcpy_s(&shortBuf, sizeof(shortBuf), &recvBuf[0], sizeof(shortBuf)) == EOK, 0,
             "getshort failed, memcpy_s fail");
         return shortBuf;
@@ -689,7 +698,7 @@ struct ServerSocket::impl {
 #else
         int recvBufSize = recv(fd_, &channel, sizeof(channel), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvBufSize == sizeof(channel), false,
+        CHECK_AND_RETURN_LOG_RET(recvBufSize == SOCKET_RECV_CHANNEL_SIZE, false,
             "recv psm or scn error, errno:%{public}d, fd_:%{public}d", errno, fd_);
         CHECK_AND_RETURN_LOG_RET(channel > 0, false,
             "recv channel error, errno:%{public}d, fd_:%{public}d", errno, fd_);
