@@ -138,11 +138,11 @@ struct ClientSocket::impl {
 
         uint16_t rxSize;
 #ifdef DARWIN_PLATFORM
-        int recvRxlen = recv(fd_, &rxSize, sizeof(rxSize), 0);
+        int recvRxLen = recv(fd_, &rxSize, sizeof(rxSize), 0);
 #else
-        int recvRxlen = recv(fd_, &rxSize, sizeof(rxSize), MSG_WAITALL);
+        int recvRxLen = recv(fd_, &rxSize, sizeof(rxSize), MSG_WAITALL);
 #endif
-        CHECK_AND_RETURN_LOG_RET(recvRxlen == SOCKET_RECV_TXRX_SIZE, false, "recv rx error, service closed");
+        CHECK_AND_RETURN_LOG_RET(recvRxLen == SOCKET_RECV_TXRX_SIZE, false, "recv rx error, service closed");
         maxRxPacketSize_ = rxSize;
 
         return state;
@@ -683,10 +683,10 @@ struct ServerSocket::impl {
     uint16_t GetPacketSizeFromBuf(uint8_t recvBuf[], int recvBufLen)
     {
         uint16_t shortBuf;
-        CHECK_AND_RETURN_LOG_RET(recvBuf, 0, "getshort fail, invalid recvBuf");
-        CHECK_AND_RETURN_LOG_RET(recvBufLen >= SOCKET_RECV_TXRX_SIZE, 0, "getshort fail, invalid len");
+        CHECK_AND_RETURN_LOG_RET(recvBuf, 0, "getpacketsize fail, invalid recvBuf");
+        CHECK_AND_RETURN_LOG_RET(recvBufLen >= SOCKET_RECV_TXRX_SIZE, 0, "getpacketsize fail, invalid recvBufLen");
         CHECK_AND_RETURN_LOG_RET(memcpy_s(&shortBuf, sizeof(shortBuf), &recvBuf[0], sizeof(shortBuf)) == EOK, 0,
-            "getshort failed, memcpy_s fail");
+            "getpacketsize failed, memcpy_s fail");
         return shortBuf;
     }
 
