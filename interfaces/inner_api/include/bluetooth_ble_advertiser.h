@@ -293,7 +293,7 @@ public:
      * @param addr Own address.
      * @since 6
      */
-    void GetOwnAddr(uint8_t addr[OHOS_BD_ADDR_LEN]) const;
+    std::array<uint8_t, OHOS_BD_ADDR_LEN> GetOwnAddr() const;
 
     /**
      * @brief Set own address.
@@ -301,7 +301,7 @@ public:
      * @param addr Own address.
      * @since 6
      */
-    void SetOwnAddr(const uint8_t addr[OHOS_BD_ADDR_LEN]);
+    void SetOwnAddr(const std::array<uint8_t, OHOS_BD_ADDR_LEN>& addr);
 
     /**
      * @brief Get own address type.
@@ -326,7 +326,7 @@ private:
     uint8_t txPower_ = BLE_ADV_TX_POWER_LOW;
     int primaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     int secondaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
-    uint8_t ownAddr_[OHOS_BD_ADDR_LEN] = {};
+    std::array<uint8_t, OHOS_BD_ADDR_LEN> ownAddr_ = {};
     int8_t ownAddrType_ = -1;
 };
 
