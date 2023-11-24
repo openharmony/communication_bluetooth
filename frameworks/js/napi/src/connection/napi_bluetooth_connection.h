@@ -71,6 +71,8 @@ napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info);
 napi_value GetProfileConnectionStateEx(napi_env env, napi_callback_info info);
 napi_value IsBluetoothDiscovering(napi_env env, napi_callback_info info);
 napi_value GetPairState(napi_env env, napi_callback_info info);
+napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info);
+napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info);
 #endif
 
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports);
