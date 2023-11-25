@@ -16,7 +16,6 @@
 #ifndef OHOS_BLUETOOTH_AUDIO_MANAGER_INTERFACE_H
 #define OHOS_BLUETOOTH_AUDIO_MANAGER_INTERFACE_H
 
-#include "bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "parcel_bt_uuid.h"
 #include "i_bluetooth_ble_peripheral_observer.h"
@@ -34,6 +33,9 @@ public:
     virtual int EnableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
     virtual int DisableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
     virtual int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability) = 0;
+    virtual int32_t IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported) = 0;
+    virtual int32_t SendDeviceSelection(const BluetoothRawAddress &device,
+        int useA2dp, int useHfp, int userSelection) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

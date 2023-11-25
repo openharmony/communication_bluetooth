@@ -98,11 +98,8 @@ public:
     int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr) override;
     int32_t SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr) override;
     int32_t CountEnableTimes(bool enable) override;
-    int32_t SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) override;
-    bool IsSupportWearDetection(const std::string &address) override;
     int32_t ConnectAllowedProfiles(const std::string &remoteAddr) override;
     int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) override;
-
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
