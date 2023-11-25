@@ -636,9 +636,7 @@ enum BluetoothPbapPceInterfaceCode {
 };
 
 enum BluetoothPbapPseObserverInterfaceCode {
-    PBAP_PSE_ON_SERVICE_CONNECTION_STATE_CHANGE = 0,
-    PBAP_PSE_ON_SERVICE_PERMISSION,
-    PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED,
+    PBAP_PSE_ON_CONNECTION_STATE_CHANGE = 0,
     // The last code, if you want to add a new code, please add it before this
     PBAP_PSE_OBSERVER_BUTT
 };
@@ -649,10 +647,12 @@ enum BluetoothPbapPseInterfaceCode {
     PBAP_PSE_DISCONNECT,
     PBAP_PSE_SET_CONNECTION_STRATEGY,
     PBAP_PSE_GET_CONNECTION_STRATEGY,
-    PBAP_PSE_GRANT_PERMISSION,
-    PBAP_PSE_SET_DEVICE_PASSWORD,
     PBAP_PSE_REGISTER_OBSERVER,
     PBAP_PSE_DEREGISTER_OBSERVER,
+    PBAP_PSE_SET_SHARE_TYPE,
+    PBAP_PSE_GET_SHARE_TYPE,
+    PBAP_PSE_SET_ACCESS_AUTHORIZATION,
+    PBAP_PSE_GET_ACCESS_AUTHORIZATION,
     // The last code, if you want to add a new code, please add it before this
     PBAP_PSE_BUTT
 };

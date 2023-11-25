@@ -263,7 +263,7 @@ enum class BluetoothState {
 enum ConnectionStrategy {
     CONNECTION_UNKNOWN = 0,
     CONNECTION_ALLOWED = 1,
-    CONNECTION_FORBIDDEN =2,
+    CONNECTION_FORBIDDEN = 2,
 };
 
 enum MajorClass {
@@ -412,6 +412,12 @@ enum ProfileId {
     PROFILE_OPP = 10
 };
 
+enum AccessAuthorization {
+    UNKNOWN = 0,
+    ALLOWED = 1,
+    REJECTED = 2,
+};
+
 template<typename T1, typename T2, typename T3>
 struct AfterWorkCallbackData {
     T1* object;
@@ -487,6 +493,9 @@ napi_status CheckEmptyParam(napi_env env, napi_callback_info info);
 napi_status NapiCheckObjectPropertiesName(napi_env env, napi_value object, const std::vector<std::string> &names);
 napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &strategy);
 napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::string &addr);
+napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,
+    int32_t &accessAuthorization);
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H
