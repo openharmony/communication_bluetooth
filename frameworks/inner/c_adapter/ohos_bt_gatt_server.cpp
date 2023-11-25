@@ -172,7 +172,8 @@ static std::shared_ptr<GattAttribute> GetAttribute(int serverId, int serviceInde
 static std::shared_ptr<GattAttribute> GetAttributeWithHandle(int serverId, int handle)
 {
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-        auto attribute = GetAttribute(serverId, i, [handle](GattAttribute &attr) { return attr.handle == handle; });
+        auto attribute =
+            GetAttribute(serverId, i, [handle](const GattAttribute &attr) { return attr.handle == handle; });
         if (attribute) {
             return attribute;
         }
@@ -220,7 +221,7 @@ static std::shared_ptr<GattAttribute> GetDescriptorAttribute(
 static std::shared_ptr<GattAttribute> GetAttributeWithActualHandle(int serverId, uint16_t actualHandle)
 {
     for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-        auto attribute = GetAttribute(serverId, i, [actualHandle](GattAttribute &attr) {
+        auto attribute = GetAttribute(serverId, i, [actualHandle](const GattAttribute &attr) {
             return attr.actualHandle == actualHandle;
         });
         if (attribute) {

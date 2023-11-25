@@ -17,6 +17,7 @@
 #define NAPI_BLUETOOTH_CONNECTION_OBSERVER_H
 
 #include "bluetooth_host.h"
+#include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
 
 namespace OHOS {
@@ -35,22 +36,18 @@ public:
     void OnDeviceNameChanged(const std::string &deviceName) override;
     void OnDeviceAddrChanged(const std::string &address) override;
 
-    void RegisterCallback(const std::string &callbackName, const std::shared_ptr<BluetoothCallbackInfo> &callback);
+    void RegisterCallback(const std::string &callbackName, const std::shared_ptr<NapiCallback> &callback);
     void DeRegisterCallback(const std::string &callbackName);
-    std::shared_ptr<BluetoothCallbackInfo> GetCallback(const std::string &callbackName);
+    std::shared_ptr<NapiCallback> GetCallback(const std::string &callbackName);
 
 private:
     void DealBredrPairComfirmed(const std::string &addr, const int reqType, const int number);
     void DealBlePairComfirmed(const std::string &addr, const int reqType, const int number);
     void OnPairConfirmedCallBack(const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo);
 
-    void UvQueueWorkOnDiscoveryResult(uv_work_t *work, std::shared_ptr<BluetoothRemoteDevice> &device);
-    void UvQueueWorkOnPairConfirmedCallBack(
-        uv_work_t *work, const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo);
-
 private:
     std::mutex callbacksMapLock_;
-    std::unordered_map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbacks_;
+    std::unordered_map<std::string, std::shared_ptr<NapiCallback>> callbacks_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

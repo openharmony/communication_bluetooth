@@ -37,7 +37,7 @@ public:
     static napi_value Connect(napi_env env, napi_callback_info info);
     static napi_value Disconnect(napi_env env, napi_callback_info info);
 
-    static NapiA2dpSinkObserver observer_;
+    static std::shared_ptr<NapiA2dpSinkObserver> observer_;
     static bool isRegistered_;
 };
 

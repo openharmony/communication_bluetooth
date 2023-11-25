@@ -501,6 +501,8 @@ enum BluetoothHostInterfaceCode {
     SYNC_RANDOM_ADDRESS,
     START_CREDIBLE_PAIR,
     BT_COUNT_ENABLE_TIMES,
+    CONNECT_ALLOWED_PROFILES,
+    DISCONNECT_ALLOWED_PROFILES,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
@@ -670,10 +672,18 @@ enum BluetoothRemoteDeviceObserverInterfaceCode {
 enum BluetoothSocketInterfaceCode {
     SOCKET_CONNECT = 0,
     SOCKET_LISTEN,
-    REMOVE_OBSERVER,
+    DEREGISTER_SERVER_OBSERVER,
     SOCKET_UPDATE_COC_PARAMS,
+    REGISTER_CLIENT_OBSERVER,
+    DEREGISTER_CLIENT_OBSERVER,
     // The last code, if you want to add a new code, please add it before this
     SOCKET_BUTT
+};
+
+enum BluetoothSocketObserverInterfaceCode {
+    BT_SOCKET_OBSERVER_CONNECTION_STATE_CHANGED = 0,
+    // The last code, if you want to add a new code, please add it before this
+    BT_SOCKET_OBSERVER_BUTT
 };
 
 enum BluetoothAudioManagerInterfaceCode {

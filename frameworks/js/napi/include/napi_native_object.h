@@ -68,12 +68,45 @@ private:
 
 class NapiNativeUuidsArray : public NapiNativeObject {
 public:
-    NapiNativeUuidsArray(const std::vector<std::string> uuids) : uuids_(uuids) {}
+    explicit NapiNativeUuidsArray(const std::vector<std::string> uuids) : uuids_(uuids) {}
     ~NapiNativeUuidsArray() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:
     std::vector<std::string> uuids_;
+};
+
+class NapiNativeDiscoveryResultArray : public NapiNativeObject {
+public:
+    explicit NapiNativeDiscoveryResultArray(const std::shared_ptr<BluetoothRemoteDevice> &device) : remoteDevice_(device) {}
+    ~NapiNativeDiscoveryResultArray() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::shared_ptr<BluetoothRemoteDevice> remoteDevice_ {nullptr};
+};
+
+class NapiNativePinRequiredParam : public NapiNativeObject {
+public:
+    explicit NapiNativePinRequiredParam(const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo)
+        : pairConfirmInfo_(pairConfirmInfo) {}
+    ~NapiNativePinRequiredParam() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::shared_ptr<PairConfirmedCallBackInfo> pairConfirmInfo_ {nullptr};
+};
+
+class NapiNativeBondStateParam : public NapiNativeObject {
+public:
+    NapiNativeBondStateParam(std::string deviceAddr, int bondStatus)
+        : deviceAddr_(deviceAddr), bondStatus_(bondStatus) {}
+    ~NapiNativeBondStateParam() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::string deviceAddr_ = "";
+    int bondStatus_ = -1;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

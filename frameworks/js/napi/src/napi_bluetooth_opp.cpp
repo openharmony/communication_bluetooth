@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
-NapiBluetoothOppObserver NapiBluetoothOpp::observer_;
+std::shared_ptr<NapiBluetoothOppObserver> NapiBluetoothOpp::observer_ = std::make_shared<NapiBluetoothOppObserver>();
 bool NapiBluetoothOpp::isRegistered_ = false;
 
 void NapiBluetoothOpp::DefineOppJSClass(napi_env env)
@@ -48,7 +48,7 @@ void NapiBluetoothOpp::DefineOppJSClass(napi_env env)
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_OPP, napiProfile);
     Opp *profile = Opp::GetProfile();
-    profile->RegisterObserver(&observer_);
+    profile->RegisterObserver(observer_);
     HILOGI("DefineOppJSClass finished");
 }
 
@@ -90,7 +90,7 @@ napi_value NapiBluetoothOpp::On(napi_env env, napi_callback_info info)
         return ret;
     }
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    observer_.callbackInfos_[type] = callbackInfo;
+    observer_->callbackInfos_[type] = callbackInfo;
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
 }
@@ -117,11 +117,11 @@ napi_value NapiBluetoothOpp::Off(napi_env env, napi_callback_info info)
         return ret;
     }
 
-    if (observer_.callbackInfos_[type] != nullptr) {
-        std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_.callbackInfos_[type];
+    if (observer_->callbackInfos_[type] != nullptr) {
+        std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_->callbackInfos_[type];
         napi_delete_reference(env, callbackInfo->callback_);
     }
-    observer_.callbackInfos_[type] = nullptr;
+    observer_->callbackInfos_[type] = nullptr;
     HILOGI("%{public}s is unregistered", type.c_str());
     return ret;
 }

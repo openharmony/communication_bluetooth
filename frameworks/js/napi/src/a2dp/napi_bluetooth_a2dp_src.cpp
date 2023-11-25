@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-NapiA2dpSourceObserver NapiA2dpSource::observer_;
+std::shared_ptr<NapiA2dpSourceObserver> NapiA2dpSource::observer_ = std::make_shared<NapiA2dpSourceObserver>();
 bool NapiA2dpSource::isRegistered_ = false;
 thread_local napi_ref g_napiProfile = nullptr;
 
@@ -150,10 +150,10 @@ napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiA2dpSourceObserver::g_a2dpSrcCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
     if (!isRegistered_) {
         A2dpSource *profile = A2dpSource::GetProfile();
-        profile->RegisterObserver(&observer_);
+        profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
     HILOGI("napi A2dpSource is registered");
@@ -166,7 +166,7 @@ napi_value NapiA2dpSource::Off(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiA2dpSourceObserver::g_a2dpSrcCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
     HILOGI("Napi A2dpSource is unregistered");
     return ret;
 }
@@ -598,7 +598,7 @@ static void ConvertCodecSampleRateToCodecInfo(CodecInfo &codecInfo, int32_t code
     }
 }
 
-static void ConvertCodecInfoToJs(napi_env env, napi_value &object, A2dpCodecInfo &a2dpCodecInfo)
+static void ConvertCodecInfoToJs(napi_env env, napi_value &object, const A2dpCodecInfo &a2dpCodecInfo)
 {
     // convert A2dpCodecInfo to CodecInfo
     CodecInfo codecInfo;

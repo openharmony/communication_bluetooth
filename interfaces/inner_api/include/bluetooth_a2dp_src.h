@@ -305,7 +305,7 @@ public:
      * @param observer Reference to the a2dp source observer.
      * @since 6.0
      */
-    void RegisterObserver(A2dpSourceObserver *observer);
+    void RegisterObserver(std::shared_ptr<A2dpSourceObserver> observer);
 
     /**
      * @brief Deregister callback function of framework.
@@ -313,7 +313,7 @@ public:
      * @param observer Reference to the a2dp source observer.
      * @since 6.0
      */
-    void DeregisterObserver(A2dpSourceObserver *observer);
+    void DeregisterObserver(std::shared_ptr<A2dpSourceObserver> observer);
 
     /**
      * @brief Write the pcm data to a2dp source profile.
