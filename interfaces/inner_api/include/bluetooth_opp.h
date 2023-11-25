@@ -343,14 +343,14 @@ public:
      *
      * @param observer Opp observer instance.
      */
-    void RegisterObserver(OppObserver *observer);
+    void RegisterObserver(std::shared_ptr<OppObserver> observer);
 
     /**
      * @brief Deregister Opp observer instance.
      *
      * @param observer Opp observer instance.
      */
-    void DeregisterObserver(OppObserver *observer);
+    void DeregisterObserver(std::shared_ptr<OppObserver> observer);
 
     /**
      * @brief Get remote Opp device list which are in the specified states.

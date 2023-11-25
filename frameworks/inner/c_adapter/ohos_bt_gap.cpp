@@ -263,8 +263,8 @@ public:
     }
 };
 
-static BluetoothHostObserverWapper g_hostObserver;
-static std::shared_ptr<BluetoothRemoteDeviceObserverWapper> g_remoteDeviceObserver;
+static std::shared_ptr<BluetoothHostObserverWapper> g_hostObserver = nullptr;
+static std::shared_ptr<BluetoothRemoteDeviceObserverWapper> g_remoteDeviceObserver = nullptr;
 
 bool EnableBle(void)
 {
@@ -483,6 +483,7 @@ int GapRegisterCallbacks(BtGapCallBacks *func)
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
     g_GapCallback = func;
+    g_hostObserver = std::make_shared<BluetoothHostObserverWapper>();
     g_remoteDeviceObserver = std::make_shared<BluetoothRemoteDeviceObserverWapper>();
     g_BluetoothHost->RegisterObserver(g_hostObserver);
     g_BluetoothHost->RegisterRemoteDeviceObserver(g_remoteDeviceObserver);

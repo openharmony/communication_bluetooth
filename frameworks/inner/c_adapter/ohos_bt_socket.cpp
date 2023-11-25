@@ -41,6 +41,26 @@ const int MAX_OBJECT_NUM = 10000;
 static BluetoothObjectMap<std::shared_ptr<ServerSocket>, MAX_OBJECT_NUM> g_serverMap;
 static BluetoothObjectMap<std::shared_ptr<ClientSocket>, MAX_OBJECT_NUM> g_clientMap;
 
+class BluetoothConnectionObserverWapper : public BluetoothConnectionObserver {
+public:
+    explicit BluetoothConnectionObserverWapper(BtSocketConnectionCallback *callback)
+    {
+        callback_ = callback;
+    }
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result) override
+    {
+        BdAddr addr;
+        GetAddrFromString(dev.GetDeviceAddr(), addr.addr);
+        BtUuid btUuid;
+        string strUuid = uuid.ToString();
+        btUuid.uuid = (char *)strUuid.c_str();
+        btUuid.uuidLen = strUuid.size();
+        callback_->connStateCb(&addr, btUuid, status, result);
+    }
+private:
+    BtSocketConnectionCallback *callback_;
+};
+
 static bool GetSocketUuidPara(const BluetoothCreateSocketPara *socketPara, UUID &serverUuid)
 {
     if (socketPara->socketType == OHOS_SOCKET_SPP_RFCOMM) {
@@ -177,6 +197,57 @@ int SocketConnect(const BluetoothCreateSocketPara *socketPara, const BdAddr *bdA
 
     std::shared_ptr<ClientSocket> client = std::make_shared<ClientSocket>(*device, serverUuid,
         BtSocketType(socketPara->socketType), socketPara->isEncrypt);
+    HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
+    int result = client->Connect(psm);
+    if (result != OHOS_BT_STATUS_SUCCESS) {
+        HILOGE("SocketConnect fail, result: %{public}d", result);
+        client->Close();
+        HILOGE("SocketConnect closed.");
+        return BT_SOCKET_INVALID_ID;
+    }
+    int clientId = g_clientMap.AddObject(client);
+    HILOGI("SocketConnect success, clientId: %{public}d", clientId);
+    return clientId;
+}
+
+/**
+ * @brief Connects to a remote device over the socket.
+ * This method will block until a connection is made or the connection fails.
+ * @param socketPara The param to create a client socket and connect to a remote device.
+ * @param bdAddr The remote device address to connect.
+ * @param psm BluetoothSocketType is {@link OHOS_SOCKET_L2CAP_LE} use dynamic PSM value from remote device.
+ * BluetoothSocketType is {@link OHOS_SOCKET_SPP_RFCOMM} use -1.
+ * @param callback Reference to the socket state observer
+ * @return Returns a client ID, if connect fail return {@link BT_SOCKET_INVALID_ID}.
+ */
+int SocketConnectEx(const BluetoothCreateSocketPara *socketPara, const BdAddr *bdAddr, int psm,
+    BtSocketConnectionCallback *callback)
+{
+    HILOGI("SocketConnect start.");
+    if (socketPara == nullptr || bdAddr == nullptr || callback == nullptr) {
+        HILOGE("socketPara is nullptr, or bdAddr is nullptr, or callback is nullptr");
+        return BT_SOCKET_INVALID_ID;
+    }
+
+    string strAddress;
+    ConvertAddr(bdAddr->addr, strAddress);
+    std::shared_ptr<BluetoothRemoteDevice> device = std::make_shared<BluetoothRemoteDevice>(strAddress, 0);
+
+    UUID serverUuid;
+    if (!GetSocketUuidPara(socketPara, serverUuid)) {
+        return BT_SOCKET_INVALID_ID;
+    }
+
+    /** Only support registering connection callbacks for sockets of Type TYPE_RFCOMM. */
+    if (socketPara->socketType != OHOS_SOCKET_SPP_RFCOMM) {
+        HILOGE("SocketType is not support");
+        return BT_SOCKET_INVALID_TYPE;
+    }
+
+    std::shared_ptr<BluetoothConnectionObserverWapper> connWrapper =
+        std::make_shared<BluetoothConnectionObserverWapper>(callback);
+    std::shared_ptr<ClientSocket> client = std::make_shared<ClientSocket>(*device, serverUuid,
+        BtSocketType(socketPara->socketType), socketPara->isEncrypt, connWrapper);
     HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
     int result = client->Connect(psm);
     if (result != OHOS_BT_STATUS_SUCCESS) {

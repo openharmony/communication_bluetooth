@@ -293,7 +293,7 @@ public:
      * @param addr Own address.
      * @since 6
      */
-    void GetOwnAddr(uint8_t addr[OHOS_BD_ADDR_LEN]) const;
+    std::array<uint8_t, OHOS_BD_ADDR_LEN> GetOwnAddr() const;
 
     /**
      * @brief Set own address.
@@ -301,7 +301,7 @@ public:
      * @param addr Own address.
      * @since 6
      */
-    void SetOwnAddr(const uint8_t addr[OHOS_BD_ADDR_LEN]);
+    void SetOwnAddr(const std::array<uint8_t, OHOS_BD_ADDR_LEN>& addr);
 
     /**
      * @brief Get own address type.
@@ -326,7 +326,7 @@ private:
     uint8_t txPower_ = BLE_ADV_TX_POWER_LOW;
     int primaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     int secondaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
-    uint8_t ownAddr_[OHOS_BD_ADDR_LEN] = {};
+    std::array<uint8_t, OHOS_BD_ADDR_LEN> ownAddr_ = {};
     int8_t ownAddrType_ = -1;
 };
 
@@ -430,7 +430,7 @@ public:
      * @since 6
      */
     int StartAdvertising(const BleAdvertiserSettings &settings, const BleAdvertiserData &advData,
-        const BleAdvertiserData &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback>);
+        const BleAdvertiserData &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback);
 
     /**
      * @brief Start advertising.
@@ -443,7 +443,7 @@ public:
      * @since 6
      */
     int StartAdvertising(const BleAdvertiserSettings &settings, const std::vector<uint8_t> &advData,
-        const std::vector<uint8_t> &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback>);
+        const std::vector<uint8_t> &scanResponse, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback);
 
     /**
      * @brief Enable advertising.
@@ -453,7 +453,7 @@ public:
      * @param callback Advertise callback.
      * @since 11
      */
-    int EnableAdvertising(uint8_t advHandle, uint16_t duration, std::shared_ptr<BleAdvertiseCallback>);
+    int EnableAdvertising(uint8_t advHandle, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback);
 
     /**
      * @brief Disable advertising.
@@ -462,11 +462,11 @@ public:
      * @param callback Advertise callback.
      * @since 11
      */
-    int DisableAdvertising(uint8_t advHandle, std::shared_ptr<BleAdvertiseCallback>);
+    int DisableAdvertising(uint8_t advHandle, std::shared_ptr<BleAdvertiseCallback> callback);
 
     void SetAdvertisingData(const std::vector<uint8_t> &advData, const std::vector<uint8_t> &scanResponse,
-        std::shared_ptr<BleAdvertiseCallback>);
-    int StopAdvertising(std::shared_ptr<BleAdvertiseCallback>);
+        std::shared_ptr<BleAdvertiseCallback> callback);
+    int StopAdvertising(std::shared_ptr<BleAdvertiseCallback> callback);
 
     /**
      * @brief Cleans up advertisers.
@@ -474,7 +474,7 @@ public:
      * @param callback Advertise callback.
      * @since 6
      */
-    void Close(std::shared_ptr<BleAdvertiseCallback>);
+    void Close(std::shared_ptr<BleAdvertiseCallback> callback);
 
     /**
      * @brief Get Advertise handle.
@@ -482,7 +482,7 @@ public:
      * @param callback Advertise callback.
      * @since 6
      */
-    uint8_t GetAdvHandle(std::shared_ptr<BleAdvertiseCallback>);
+    uint8_t GetAdvHandle(std::shared_ptr<BleAdvertiseCallback> callback);
 
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiser);

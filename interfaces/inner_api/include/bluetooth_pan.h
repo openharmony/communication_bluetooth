@@ -105,14 +105,14 @@ public:
      *
      * @param observer Pan observer instance.
      */
-    void RegisterObserver(PanObserver *observer);
+    void RegisterObserver(std::shared_ptr<PanObserver> observer);
 
     /**
      * @brief Deregister Pan observer instance.
      *
      * @param observer Pan observer instance.
      */
-    void DeregisterObserver(PanObserver *observer);
+    void DeregisterObserver(std::shared_ptr<PanObserver> observer);
 
     /**
      * @brief Set Tethering

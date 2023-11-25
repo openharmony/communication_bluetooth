@@ -17,12 +17,23 @@
 #define OHOS_BLUETOOTH_STANDARD_SOCKET_OBSERVER_INTERFACE_H
 
 #include "iremote_broker.h"
+#include "bluetooth_raw_address.h"
+#include "bluetooth_bt_uuid.h"
+#include "bluetooth_service_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Bluetooth {
-class IBluetoothSocketObserver : public OHOS::IRemoteBroker {
+class IBluetoothClientSocketObserver : public OHOS::IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothSocketObserver");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothClientSocketObserver");
+
+    virtual void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid,
+        int status, int result) = 0;
+};
+
+class IBluetoothServerSocketObserver : public OHOS::IRemoteBroker {
+public:
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothServerSocketObserver");
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

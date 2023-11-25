@@ -127,13 +127,6 @@ struct AsyncCallbackInfo {
     int errorCode_ = 0;
 };
 
-struct CallbackPromiseInfo {
-    napi_ref callback = nullptr;
-    napi_deferred deferred = nullptr;
-    bool isCallback = false;
-    int errorCode = CODE_FAILED;
-};
-
 struct BluetoothCallbackInfo {
     napi_env env_;
     napi_ref callback_ = 0;
