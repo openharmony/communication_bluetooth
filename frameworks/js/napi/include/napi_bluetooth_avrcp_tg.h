@@ -36,7 +36,7 @@ public:
     static napi_value Connect(napi_env env, napi_callback_info info);
     static napi_value Disconnect(napi_env env, napi_callback_info info);
 
-    static NapiAvrcpTargetObserver observer_;
+    static std::shared_ptr<NapiAvrcpTargetObserver> observer_;
     static bool isRegistered_;
 };
 

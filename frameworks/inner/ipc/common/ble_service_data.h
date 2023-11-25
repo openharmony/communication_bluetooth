@@ -274,7 +274,7 @@ public:
      * @return Returns own address.
      * @since 6
      */
-    void GetOwnAddr(uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN]) const;
+    std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN> GetOwnAddr() const;
 
     /**
      * @brief Set own address.
@@ -282,7 +282,7 @@ public:
      * @param addr Own address.
      * @since 6
      */
-    void SetOwnAddr(const uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN]);
+    void SetOwnAddr(const std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN>& addr);
 
     /**
      * @brief Get own address type.
@@ -314,7 +314,7 @@ private:
     /// Advertising secondaryPhy.
     int secondaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     /// Own address.
-    uint8_t ownAddr_[RawAddress::BT_ADDRESS_BYTE_LEN] = {};
+    std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN> ownAddr_ = {};
     /// Own address type.
     int8_t ownAddrType_ = -1;
 };

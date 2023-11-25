@@ -21,7 +21,8 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-NapiHandsFreeUnitObserver NapiHandsFreeUnit::observer_;
+std::shared_ptr<NapiHandsFreeUnitObserver> NapiHandsFreeUnit::observer_ =
+    std::make_shared<NapiHandsFreeUnitObserver>();
 bool NapiHandsFreeUnit::isRegistered_ = false;
 
 void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
@@ -63,10 +64,10 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
     if (!isRegistered_) {
         HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
-        profile->RegisterObserver(&observer_);
+        profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
 
@@ -80,7 +81,7 @@ napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
     HILOGI("Hands Free Unit is unregistered");
     return ret;
 }

@@ -682,23 +682,18 @@ int HandsFreeAudioGateway::GetConnectStrategy(const BluetoothRemoteDevice &devic
     return pimpl->GetConnectStrategy(device, strategy);
 }
 
-void HandsFreeAudioGateway::RegisterObserver(HandsFreeAudioGatewayObserver *observer)
+void HandsFreeAudioGateway::RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
 {
     HILOGD("enter");
-    std::shared_ptr<HandsFreeAudioGatewayObserver> observerPtr(observer, [](HandsFreeAudioGatewayObserver *) {});
-    pimpl->RegisterObserver(observerPtr);
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->RegisterObserver(observer);
 }
 
-void HandsFreeAudioGateway::DeregisterObserver(HandsFreeAudioGatewayObserver *observer)
+void HandsFreeAudioGateway::DeregisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
 {
     HILOGD("enter");
-    std::shared_ptr<HandsFreeAudioGatewayObserver> observerPtr(observer, [](HandsFreeAudioGatewayObserver *) {});
-    if (pimpl == nullptr) {
-        HILOGI("pimpl is nullptr!");
-        return;
-    }
-    pimpl->DeregisterObserver(observerPtr);
-    HILOGI("end");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->DeregisterObserver(observer);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -21,16 +21,29 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothSocketObserverStub : public IRemoteStub<IBluetoothSocketObserver> {
+class BluetoothClientSocketObserverStub : public IRemoteStub<IBluetoothClientSocketObserver> {
 public:
-    BluetoothSocketObserverStub() = default;
-    ~BluetoothSocketObserverStub() = default;
+    BluetoothClientSocketObserverStub() = default;
+    ~BluetoothClientSocketObserverStub() = default;
 
     int32_t OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    DISALLOW_COPY_AND_MOVE(BluetoothSocketObserverStub);
+    int32_t OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    DISALLOW_COPY_AND_MOVE(BluetoothClientSocketObserverStub);
+};
+
+class BluetoothServerSocketObserverStub : public IRemoteStub<IBluetoothServerSocketObserver> {
+public:
+    BluetoothServerSocketObserverStub() = default;
+    ~BluetoothServerSocketObserverStub() = default;
+
+    int32_t OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
+private:
+    DISALLOW_COPY_AND_MOVE(BluetoothServerSocketObserverStub);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

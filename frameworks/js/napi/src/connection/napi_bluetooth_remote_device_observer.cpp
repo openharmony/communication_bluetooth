@@ -24,95 +24,25 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged(
-    uv_work_t *work, std::pair<std::string, int> &data)
-{
-    HILOGI("uv_work_t start");
-    if (work == nullptr) {
-        HILOGE("work is null");
-        return;
-    }
-    auto callbackData = (AfterWorkCallbackData<NapiBluetoothRemoteDeviceObserver,
-        decltype(&NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged),
-        std::pair<std::string, int>> *)work->data;
-    if (callbackData == nullptr) {
-        HILOGE("callbackData is null");
-        return;
-    }
-
-    napi_value result = 0;
-    napi_value callback = 0;
-    napi_value undefined = 0;
-    napi_value callResult = 0;
-
-    napi_get_undefined(callbackData->env, &undefined);
-    HILOGI("Status is %{public}d", callbackData->data.second);
-    napi_create_object(callbackData->env, &result);
-    napi_value device = 0;
-    napi_create_string_utf8(
-        callbackData->env, callbackData->data.first.data(), callbackData->data.first.size(), &device);
-    napi_set_named_property(callbackData->env, result, "deviceId", device);
-    napi_value bondState = 0;
-    napi_create_int32(callbackData->env, callbackData->data.second, &bondState);
-    napi_set_named_property(callbackData->env, result, "state", bondState);
-    napi_get_reference_value(callbackData->env, callbackData->callback, &callback);
-    napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-}
-
 void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
     const BluetoothRemoteDevice &device, int state, unsigned int reason)
 {}
 
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
 {
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallback(REGISTER_BOND_STATE_TYPE);
-    if (callbackInfo == nullptr) {
-        HILOGD("This callback is not registered by ability.");
-        return;
-    }
-    HILOGI("addr:%{public}s, status:%{public}d", GET_ENCRYPT_ADDR(device), status);
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    if (loop == nullptr) {
-        HILOGE("loop instance is nullptr");
-        return;
-    }
+    std::shared_ptr<NapiCallback> napiPairStatusChangeCallback = GetCallback(REGISTER_BOND_STATE_TYPE);
+    CHECK_AND_RETURN_LOG(napiPairStatusChangeCallback, "PairStatusChangeCallback is not registered");
 
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
+    HILOGI("addr:%{public}s, bondStatus:%{public}d", GET_ENCRYPT_ADDR(device), bondStatus);
 
-    auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothRemoteDeviceObserver,
-        decltype(&NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged),
-        std::pair<std::string, int>>();
-    if (callbackData == nullptr) {
-        HILOGE("new callbackData failed");
-        return;
-    }
-
-    std::string deviceAddr = device.GetDeviceAddr();
-    callbackData->object = this;
-    callbackData->function = &NapiBluetoothRemoteDeviceObserver::UvQueueWorkOnPairStatusChanged;
-    callbackData->env = callbackInfo->env_;
-    callbackData->callback = callbackInfo->callback_;
-    callbackData->data = std::pair<std::string, int>(deviceAddr, bondStatus);
-
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        HILOGE("new work failed");
-        delete callbackData;
-        callbackData = nullptr;
-        return;
-    }
-
-    work->data = static_cast<void *>(callbackData);
-
-    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
-    if (ret != 0) {
-        delete callbackData;
-        callbackData = nullptr;
-        delete work;
-        work = nullptr;
-    }
+    auto func = [bondStatus, addr = device.GetDeviceAddr(), callback = napiPairStatusChangeCallback]() {
+        CHECK_AND_RETURN_LOG(callback, "PairStatusChangeCallback is not registered");
+        auto napiNative = std::make_shared<NapiNativeBondStateParam>(addr, bondStatus);
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiPairStatusChangeCallback->GetNapiEnv(), func);
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteUuidChanged(
@@ -152,7 +82,7 @@ void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
 }
 
 void NapiBluetoothRemoteDeviceObserver::RegisterCallback(
-    const std::string &callbackName, const std::shared_ptr<BluetoothCallbackInfo> &callback)
+    const std::string &callbackName, const std::shared_ptr<NapiCallback> &callback)
 {
     std::lock_guard<std::mutex> lock(callbacksMapLock_);
     callbacks_[callbackName] = callback;
@@ -164,7 +94,7 @@ void NapiBluetoothRemoteDeviceObserver::DeRegisterCallback(const std::string &ca
     callbacks_.erase(callbackName);
 }
 
-std::shared_ptr<BluetoothCallbackInfo> NapiBluetoothRemoteDeviceObserver::GetCallback(const std::string &callbackName)
+std::shared_ptr<NapiCallback> NapiBluetoothRemoteDeviceObserver::GetCallback(const std::string &callbackName)
 {
     std::lock_guard<std::mutex> lock(callbacksMapLock_);
     if (callbacks_.find(callbackName) != callbacks_.end()) {

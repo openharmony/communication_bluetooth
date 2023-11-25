@@ -1592,5 +1592,37 @@ int32_t BluetoothHostProxy::CountEnableTimes(bool isEnable)
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHostProxy::ConnectAllowedProfiles(const std::string &remoteAddr)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(remoteAddr), BT_ERR_IPC_TRANS_FAILED,
+        "Write remoteAddr error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::CONNECT_ALLOWED_PROFILES, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::DisconnectAllowedProfiles(const std::string &remoteAddr)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(remoteAddr), BT_ERR_IPC_TRANS_FAILED,
+        "Write remoteAddr error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::DISCONNECT_ALLOWED_PROFILES, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+
+    return reply.ReadInt32();
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS
