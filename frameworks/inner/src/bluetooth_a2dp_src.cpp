@@ -101,7 +101,8 @@ public:
 
     void OnMediaStackChanged(const RawAddress &device, int action) override
     {
-        HILOGI("device: %{public}s, action: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), action);
+        HILOGI("device: %{public}s, action: %{public}s",
+            GET_ENCRYPT_RAW_ADDR(device), GetUpdateOutputStackActionName(action).c_str());
         a2dpSource_.observers_.ForEach([device, action](std::shared_ptr<A2dpSourceObserver> observer) {
             observer->OnMediaStackChanged(BluetoothRemoteDevice(device.GetAddress(), 0), action);
         });

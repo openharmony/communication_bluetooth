@@ -32,6 +32,8 @@ public:
     int EnableWearDetection(const std::string &deviceId, int32_t supportVal) override;
     int DisableWearDetection(const std::string &deviceId, int32_t supportVal) override;
     int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability) override;
+    int32_t IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported) override;
+    int32_t SendDeviceSelection(const BluetoothRawAddress &device, int useA2dp, int useHfp, int userSelection) override;
  
 private:
     static inline BrokerDelegator<BluetoothAudioManagerProxy> delegator_;

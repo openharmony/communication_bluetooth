@@ -83,7 +83,7 @@ public:
      * @brief Media Stack Changed observer.
      * @param device bluetooth device address.
      * @param Action on the device.
-     * @since 10.0
+     * @since 11.0
      */
     virtual void OnMediaStackChanged(const BluetoothRemoteDevice &device, int action)
     {}
