@@ -38,7 +38,7 @@ public:
     static napi_value DisconnectSco(napi_env env, napi_callback_info info);
     static napi_value SendDTMF(napi_env env, napi_callback_info info);
 
-    static NapiHandsFreeUnitObserver observer_;
+    static std::shared_ptr<NapiHandsFreeUnitObserver> observer_;
     static bool isRegistered_;
 };
 

@@ -184,18 +184,18 @@ A2dpSink::~A2dpSink()
     HILOGD("start");
 }
 
-void A2dpSink::RegisterObserver(A2dpSinkObserver *observer)
+void A2dpSink::RegisterObserver(std::shared_ptr<A2dpSinkObserver> observer)
 {
-    HILOGI("enter");
-    std::shared_ptr<A2dpSinkObserver> pointer(observer, [](A2dpSinkObserver *) {});
-    pimpl->observers_.Register(pointer);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Register(observer);
 }
 
-void A2dpSink::DeregisterObserver(A2dpSinkObserver *observer)
+void A2dpSink::DeregisterObserver(std::shared_ptr<A2dpSinkObserver> observer)
 {
-    HILOGI("enter");
-    std::shared_ptr<A2dpSinkObserver> pointer(observer, [](A2dpSinkObserver *) {});
-    pimpl->observers_.Deregister(pointer);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Deregister(observer);
 }
 
 int A2dpSink::GetDeviceState(const BluetoothRemoteDevice &device) const

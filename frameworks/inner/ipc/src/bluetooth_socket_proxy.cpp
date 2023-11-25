@@ -55,11 +55,6 @@ int BluetoothSocketProxy::Connect(ConnectSocketParam &param, int &fd)
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    if (!data.WriteRemoteObject(param.observer->AsObject())) {
-        HILOGE("write remote object error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
@@ -132,26 +127,105 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
     return errorCode;
 }
 
-void BluetoothSocketProxy::RemoveObserver(const sptr<IBluetoothSocketObserver> &observer)
+int BluetoothSocketProxy::DeregisterServerObserver(const sptr<IBluetoothServerSocketObserver> &observer)
 {
-    HILOGD("BluetoothSocketProxy::RemoveObserver start");
+    HILOGD("BluetoothSocketProxy::DeregisterServerObserver start");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("BluetoothSocketProxy::RemoveObserver WriteInterfaceToken error");
-        return;
+        HILOGE("BluetoothSocketProxy::DeregisterServerObserver WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothSocketProxy::RemoveObserver error");
-        return;
+        HILOGE("BluetoothSocketProxy::DeregisterServerObserver error");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::REMOVE_OBSERVER, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothSocketProxy::RemoveObserver done fail, error: %{public}d", error);
-        return;
+    MessageOption option = {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::DEREGISTER_SERVER_OBSERVER, data, reply, option);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothSocketProxy::DeregisterServerObserver done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    HILOGD("BluetoothSocketProxy::RemoveObserver success");
+    HILOGD("BluetoothSocketProxy::DeregisterServerObserver success");
+    return reply.ReadInt32();
+}
+
+int BluetoothSocketProxy::RegisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
+    const sptr<IBluetoothClientSocketObserver> &observer)
+{
+    HILOGD("BluetoothSocketProxy::RegisterClientObserver start");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
+        HILOGE("BluetoothSocketProxy::RegisterClientObserver WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteParcelable(&dev)) {
+        HILOGE("write dev error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    BluetoothUuid btUuid(uuid);
+    if (!data.WriteParcelable(&btUuid)) {
+        HILOGE("write uuid error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("write observer error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::REGISTER_CLIENT_OBSERVER, data, reply, option);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothSocketProxy::RegisterClientObserver done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    HILOGD("BluetoothSocketProxy::RegisterClientObserver success");
+    return reply.ReadInt32();
+}
+
+int BluetoothSocketProxy::DeregisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
+    const sptr<IBluetoothClientSocketObserver> &observer)
+{
+    HILOGD("BluetoothSocketProxy::DeregisterClientObserver start");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
+        HILOGE("BluetoothSocketProxy::DeregisterClientObserver WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteParcelable(&dev)) {
+        HILOGE("write dev error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    BluetoothUuid btUuid(uuid);
+    if (!data.WriteParcelable(&btUuid)) {
+        HILOGE("write uuid error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("write observer error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {
+        MessageOption::TF_SYNC
+    };
+    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::DEREGISTER_CLIENT_OBSERVER, data, reply, option);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothSocketProxy::DeregisterClientObserver done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    HILOGD("BluetoothSocketProxy::DeregisterClientObserver success");
+    return reply.ReadInt32();
 }
 
 int BluetoothSocketProxy::UpdateCocConnectionParams(const BluetoothSocketCocInfo &info)

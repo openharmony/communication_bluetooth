@@ -468,26 +468,18 @@ BluetoothHost &BluetoothHost::GetDefaultHost()
     return hostAdapter;
 }
 
-void BluetoothHost::RegisterObserver(BluetoothHostObserver &observer)
+void BluetoothHost::RegisterObserver(std::shared_ptr<BluetoothHostObserver> observer)
 {
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-
-    std::shared_ptr<BluetoothHostObserver> pointer(&observer, [](BluetoothHostObserver *) {});
-    pimpl->observers_.Register(pointer);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Register(observer);
 }
 
-void BluetoothHost::DeregisterObserver(BluetoothHostObserver &observer)
+void BluetoothHost::DeregisterObserver(std::shared_ptr<BluetoothHostObserver> observer)
 {
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-
-    std::shared_ptr<BluetoothHostObserver> pointer(&observer, [](BluetoothHostObserver *) {});
-    pimpl->observers_.Deregister(pointer);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Deregister(observer);
 }
 
 void BluetoothHost::Init()
@@ -1037,21 +1029,16 @@ bool BluetoothHost::RemoveAllPairs()
 
 void BluetoothHost::RegisterRemoteDeviceObserver(std::shared_ptr<BluetoothRemoteDeviceObserver> observer)
 {
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->remoteObservers_.Register(observer);
 }
 
-void BluetoothHost::DeregisterRemoteDeviceObserver(BluetoothRemoteDeviceObserver &observer)
+void BluetoothHost::DeregisterRemoteDeviceObserver(std::shared_ptr<BluetoothRemoteDeviceObserver> observer)
 {
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    std::shared_ptr<BluetoothRemoteDeviceObserver> pointer(&observer, [](BluetoothRemoteDeviceObserver *) {});
-    pimpl->remoteObservers_.Deregister(pointer);
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->remoteObservers_.Deregister(observer);
 }
 
 int BluetoothHost::GetBleMaxAdvertisingDataLength() const
@@ -1115,6 +1102,22 @@ int BluetoothHost::GetRandomAddress(const std::string &realAddr, std::string &ra
     HILOGI("enter.");
     randomAddr = realAddr;
     return BT_NO_ERROR;
+}
+
+int BluetoothHost::ConnectAllowedProfiles(const std::string &remoteAddr) const
+{
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET((pimpl && pimpl->proxy_), BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    return pimpl->proxy_->ConnectAllowedProfiles(remoteAddr);
+}
+
+int BluetoothHost::DisconnectAllowedProfiles(const std::string &remoteAddr) const
+{
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET((pimpl && pimpl->proxy_), BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    return pimpl->proxy_->DisconnectAllowedProfiles(remoteAddr);
 }
 } // namespace Bluetooth
 } // namespace OHOS

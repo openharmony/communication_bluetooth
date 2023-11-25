@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
-NapiBluetoothPanObserver NapiBluetoothPan::observer_;
+std::shared_ptr<NapiBluetoothPanObserver> NapiBluetoothPan::observer_ = std::make_shared<NapiBluetoothPanObserver>();
 thread_local napi_ref NapiBluetoothPan::consRef_ = nullptr;
 
 napi_value NapiBluetoothPan::CreatePanProfile(napi_env env, napi_callback_info info)
@@ -38,7 +38,7 @@ napi_value NapiBluetoothPan::CreatePanProfile(napi_env env, napi_callback_info i
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_PAN_NETWORK, napiProfile);
     Pan *profile = Pan::GetProfile();
-    profile->RegisterObserver(&NapiBluetoothPan::observer_);
+    profile->RegisterObserver(NapiBluetoothPan::observer_);
     HILOGI("finished");
 
     return napiProfile;
@@ -77,7 +77,7 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env, napi_value exports)
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_PAN_NETWORK, napiProfile);
     Pan *profile = Pan::GetProfile();
-    profile->RegisterObserver(&NapiBluetoothPan::observer_);
+    profile->RegisterObserver(NapiBluetoothPan::observer_);
 #endif    
 }
 
@@ -142,7 +142,7 @@ napi_value NapiBluetoothPan::On(napi_env env, napi_callback_info info)
         return ret;
     }
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    observer_.callbackInfos_[type] = callbackInfo;
+    observer_->callbackInfos_[type] = callbackInfo;
 
     HILOGI("%{public}s is registered", type.c_str());
     return ret;
@@ -169,11 +169,11 @@ napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
         HILOGE("string expected.");
         return ret;
     }
-    if (observer_.callbackInfos_[type] != nullptr) {
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_.callbackInfos_[type];
+    if (observer_->callbackInfos_[type] != nullptr) {
+    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_->callbackInfos_[type];
     napi_delete_reference(env, callbackInfo->callback_);
     }
-    observer_.callbackInfos_[type] = nullptr;
+    observer_->callbackInfos_[type] = nullptr;
 
     HILOGI("%{public}s is unregistered", type.c_str());
 

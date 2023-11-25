@@ -43,7 +43,7 @@ public:
     static napi_value DefineCreateProfile(napi_env env, napi_value exports);
     static thread_local napi_ref consRef_;
 
-    static NapiBluetoothPanObserver observer_;
+    static std::shared_ptr<NapiBluetoothPanObserver> observer_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

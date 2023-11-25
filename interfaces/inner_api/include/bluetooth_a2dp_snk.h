@@ -173,7 +173,7 @@ public:
      * @param observer Reference to the a2dp sink observer.
      * @since 6.0
      */
-    void RegisterObserver(A2dpSinkObserver *observer);
+    void RegisterObserver(std::shared_ptr<A2dpSinkObserver> observer);
 
     /**
      * @brief Deregister callback function of framework.
@@ -181,7 +181,7 @@ public:
      * @param observer Reference to the a2dp sink observer.
      * @since 6.0
      */
-    void DeregisterObserver(A2dpSinkObserver *observer);
+    void DeregisterObserver(std::shared_ptr<A2dpSinkObserver> observer);
 
     /**
      * @brief The external process calls the A2dpSink profile interface before the Bluetooth process starts. At this

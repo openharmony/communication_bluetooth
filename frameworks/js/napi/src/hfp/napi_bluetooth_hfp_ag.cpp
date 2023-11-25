@@ -26,7 +26,8 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-NapiHandsFreeAudioGatewayObserver NapiHandsFreeAudioGateway::observer_;
+std::shared_ptr<NapiHandsFreeAudioGatewayObserver> NapiHandsFreeAudioGateway::observer_ =
+    std::make_shared<NapiHandsFreeAudioGatewayObserver>();
 bool NapiHandsFreeAudioGateway::isRegistered_ = false;
 thread_local napi_ref NapiHandsFreeAudioGateway::consRef_ = nullptr;
 
@@ -101,10 +102,10 @@ napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
     if (!isRegistered_) {
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-        profile->RegisterObserver(&observer_);
+        profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
 
@@ -118,7 +119,7 @@ napi_value NapiHandsFreeAudioGateway::Off(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
     HILOGI("Hands Free Audio Gateway is unregistered");
     return ret;
 }
