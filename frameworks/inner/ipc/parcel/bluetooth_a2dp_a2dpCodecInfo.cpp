@@ -14,6 +14,7 @@
  */
 
 #include "bluetooth_a2dp_a2dpCodecInfo.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -96,5 +97,75 @@ bool BluetoothA2dpCodecInfo::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
+bool BluetoothA2dpOffloadCodecInfo::Marshalling(Parcel &parcel) const
+{
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint16(mediaPacketHeader), false, "write mediaPacketHeader failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(mPt), false, "write mPt failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint32(ssrc), false, "write ssrc failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(boundaryFlag), false, "write boundaryFlag failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(broadcastFlag), false, "write broadcastFlag failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint32(codecType), false, "write codecType failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint16(maxLatency), false, "write maxLatency failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint16(scmsTEnable), false, "write scmsTEnable failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint32(sampleRate), false, "write sampleRate failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint32(encodedAudioBitrate), false, "write encodedAudioBitrate failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(bitsPerSample), false, "write bitsPerSample failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(chMode), false, "write chMode failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint16(aclHdl), false, "write aclHdl failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint16(l2cRcid), false, "write l2cRcid failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint16(mtu), false, "write mtu failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific0), false, "write codecSpecific0 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific1), false, "write codecSpecific1 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific2), false, "write codecSpecific2 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific3), false, "write codecSpecific3 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific4), false, "write codecSpecific4 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific5), false, "write codecSpecific5 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific6), false, "write codecSpecific6 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteUint8(codecSpecific7), false, "write codecSpecific7 failed.");
+    return true;
+}
+
+bool BluetoothA2dpOffloadCodecInfo::WriteToParcel(Parcel &parcel)
+{
+    return Marshalling(parcel);
+}
+
+BluetoothA2dpOffloadCodecInfo *BluetoothA2dpOffloadCodecInfo::Unmarshalling(Parcel &parcel)
+{
+    BluetoothA2dpOffloadCodecInfo *offloadCodecData = new BluetoothA2dpOffloadCodecInfo();
+    if (offloadCodecData != nullptr && !offloadCodecData->ReadFromParcel(parcel)) {
+        delete offloadCodecData;
+        offloadCodecData = nullptr;
+    }
+    return offloadCodecData;
+}
+
+bool BluetoothA2dpOffloadCodecInfo::ReadFromParcel(Parcel &parcel)
+{
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint16(mediaPacketHeader), false, "read mediaPacketHeader failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(mPt), false, "read mPt failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint32(ssrc), false, "read ssrc failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(boundaryFlag), false, "read boundaryFlag failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(broadcastFlag), false, "read broadcastFlag failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint32(codecType), false, "read codecType failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint16(maxLatency), false, "read maxLatency failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint16(scmsTEnable), false, "read scmsTEnable failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint32(sampleRate), false, "read sampleRate failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint32(encodedAudioBitrate), false, "read encodedAudioBitrate failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(bitsPerSample), false, "read bitsPerSample failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(chMode), false, "read chMode failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint16(aclHdl), false, "read aclHdl failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint16(l2cRcid), false, "read l2cRcid failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint16(mtu), false, "read mtu failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific0), false, "read codecSpecific0 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific1), false, "read codecSpecific1 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific2), false, "read codecSpecific2 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific3), false, "read codecSpecific3 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific4), false, "read codecSpecific4 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific5), false, "read codecSpecific5 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific6), false, "read codecSpecific6 failed.");
+    CHECK_AND_RETURN_LOG_RET(parcel.ReadUint8(codecSpecific7), false, "read codecSpecific7 failed.");
+    return true;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

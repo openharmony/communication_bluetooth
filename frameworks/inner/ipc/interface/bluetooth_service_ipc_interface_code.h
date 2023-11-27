@@ -74,6 +74,10 @@ enum BluetoothA2dpSrcInterfaceCode {
     BT_A2DP_SRC_WRITE_FRAME,
     BT_A2DP_SRC_GET_RENDER_POSITION,
     BT_A2DP_SRC_GET_CODEC_PREFERENCE,
+    BT_A2DP_SRC_OFFLOAD_START_PLAYING,
+    BT_A2DP_SRC_OFFLOAD_STOP_PLAYING,
+    BT_A2DP_SRC_OFFLOAD_SESSION_REQUEST,
+    BT_A2DP_SRC_OFFLOAD_GET_CODEC_STATUS,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_BUTT
 };
