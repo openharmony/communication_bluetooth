@@ -34,8 +34,6 @@ std::shared_ptr<NapiBluetoothRemoteDeviceObserver> g_remoteDeviceObserver =
     std::make_shared<NapiBluetoothRemoteDeviceObserver>();
 std::mutex deviceMutex;
 std::vector<std::shared_ptr<BluetoothRemoteDevice>> g_DiscoveryDevices;
-std::set<std::string> g_supportRegisterFunc = {
-    REGISTER_DEVICE_FIND_TYPE, REGISTER_PIN_REQUEST_TYPE, REGISTER_BOND_STATE_TYPE};
 
 std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefaultValue = {
     {REGISTER_DEVICE_FIND_TYPE,
@@ -108,6 +106,8 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", DeRegisterConnectionObserver),
         DECLARE_NAPI_FUNCTION("isBluetoothDisCovering", IsBluetoothDiscovering),
         DECLARE_NAPI_FUNCTION("getPairState", GetPairState),
+        DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
+        DECLARE_NAPI_FUNCTION("disconnectAllowedProfiles", DisconnectAllowedProfiles),
 #endif
     };
 
@@ -131,28 +131,19 @@ napi_status CheckRegisterObserver(napi_env env, napi_callback_info info)
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    HILOGI("argc: %{public}zu", argc);
     NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
 
     std::string callbackName;
-    bool ok = ParseString(env, callbackName, argv[PARAM0]);
-    if (!ok) {
-        return napi_invalid_arg;
-    }
-    if (!g_supportRegisterFunc.count(callbackName)) {
-        HILOGE("not support %{public}s.", callbackName.c_str());
-        return napi_invalid_arg;
-    }
-    NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], callbackName));
+    NAPI_BT_RETURN_IF(!IsValidObserverType(callbackName), "Invalid type", napi_invalid_arg);
 
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
-    NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_));
-    callbackInfo->env_ = env;
+    auto napiCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
     if (callbackName == REGISTER_BOND_STATE_TYPE) {
-        g_remoteDeviceObserver->RegisterCallback(callbackName, callbackInfo);
+        g_remoteDeviceObserver->RegisterCallback(callbackName, napiCallback);
     } else {
-        g_connectionObserver->RegisterCallback(callbackName, callbackInfo);
+        g_connectionObserver->RegisterCallback(callbackName, napiCallback);
     }
+    HILOGI("%{public}s registered", callbackName.c_str());
     return napi_ok;
 }
 
@@ -161,26 +152,19 @@ napi_status CheckDeRegisterObserver(napi_env env, napi_callback_info info)
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_value thisVar = nullptr;
-    std::string callbackName;
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-    NAPI_BT_RETURN_IF(argc < ARGS_SIZE_ONE, "Requires 1 arguments at least.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
 
-    if (argc == ARGS_SIZE_TWO) {
-        NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
-        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], callbackName));
-        NAPI_BT_RETURN_IF(!IsValidObserverType(callbackName), "Invalid type", napi_invalid_arg);
-
-        std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
-        callbackInfo->env_ = env;
-        NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
-        NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_));
-    }
+    std::string callbackName;
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], callbackName));
+    NAPI_BT_RETURN_IF(!IsValidObserverType(callbackName), "Invalid type", napi_invalid_arg);
 
     if (callbackName == REGISTER_BOND_STATE_TYPE) {
         g_remoteDeviceObserver->DeRegisterCallback(callbackName);
     } else {
         g_connectionObserver->DeRegisterCallback(callbackName);
     }
+    HILOGI("%{public}s unregistered", callbackName.c_str());
     return napi_ok;
 }
 
@@ -684,6 +668,44 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN(env, err = BT_NO_ERROR, err, result);
     HILOGE("getPairState :%{public}d", pairState);
     return result;
+}
+
+napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+        int32_t ret = host->ConnectAllowedProfiles(remoteAddr);
+        HILOGI("ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+        int32_t ret = host->DisconnectAllowedProfiles(remoteAddr);
+        HILOGI("ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 #endif
 

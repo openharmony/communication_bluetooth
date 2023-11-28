@@ -32,6 +32,7 @@ private:
     static napi_value ProfileStateInit(napi_env env);
     static napi_value MajorClassOfDeviceInit(napi_env env);
     static napi_value MajorMinorClassOfDeviceInit(napi_env env);
+    static napi_value AccessAuthorizationInit(napi_env env);
     static napi_value ComputerMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass);
     static napi_value PhoneMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass);
     static napi_value NetworkMajorClassOfDeviceInit(napi_env env, napi_value majorMinorClass);

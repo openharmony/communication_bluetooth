@@ -206,7 +206,7 @@ int SetSocketBufferSize(int clientId, uint32_t bufferSize);
  * @brief Update the coc connection params.
  *
  * @param param CocUpdateSocketParam instance for carry params.
- * @return Returns the operation result status {@link BtStatus}. 
+ * @return Returns the operation result status {@link BtStatus}.
  */
 int SocketUpdateCocConnectionParams(BluetoothCocUpdateSocketParam* param, const BdAddr *bdAddr);
 

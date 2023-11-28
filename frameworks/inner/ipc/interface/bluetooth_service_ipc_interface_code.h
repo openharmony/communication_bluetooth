@@ -74,6 +74,10 @@ enum BluetoothA2dpSrcInterfaceCode {
     BT_A2DP_SRC_WRITE_FRAME,
     BT_A2DP_SRC_GET_RENDER_POSITION,
     BT_A2DP_SRC_GET_CODEC_PREFERENCE,
+    BT_A2DP_SRC_OFFLOAD_START_PLAYING,
+    BT_A2DP_SRC_OFFLOAD_STOP_PLAYING,
+    BT_A2DP_SRC_OFFLOAD_SESSION_REQUEST,
+    BT_A2DP_SRC_OFFLOAD_GET_CODEC_STATUS,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_BUTT
 };
@@ -501,8 +505,8 @@ enum BluetoothHostInterfaceCode {
     SYNC_RANDOM_ADDRESS,
     START_CREDIBLE_PAIR,
     BT_COUNT_ENABLE_TIMES,
-    BT_SEND_DEVICE_SELECTION,
-    BT_IS_SUPPORT_WEAR_DETECTION,
+    CONNECT_ALLOWED_PROFILES,
+    DISCONNECT_ALLOWED_PROFILES,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
@@ -636,9 +640,7 @@ enum BluetoothPbapPceInterfaceCode {
 };
 
 enum BluetoothPbapPseObserverInterfaceCode {
-    PBAP_PSE_ON_SERVICE_CONNECTION_STATE_CHANGE = 0,
-    PBAP_PSE_ON_SERVICE_PERMISSION,
-    PBAP_PSE_ON_SERVICE_PASSWORD_REQUIRED,
+    PBAP_PSE_ON_CONNECTION_STATE_CHANGE = 0,
     // The last code, if you want to add a new code, please add it before this
     PBAP_PSE_OBSERVER_BUTT
 };
@@ -649,10 +651,12 @@ enum BluetoothPbapPseInterfaceCode {
     PBAP_PSE_DISCONNECT,
     PBAP_PSE_SET_CONNECTION_STRATEGY,
     PBAP_PSE_GET_CONNECTION_STRATEGY,
-    PBAP_PSE_GRANT_PERMISSION,
-    PBAP_PSE_SET_DEVICE_PASSWORD,
     PBAP_PSE_REGISTER_OBSERVER,
     PBAP_PSE_DEREGISTER_OBSERVER,
+    PBAP_PSE_SET_SHARE_TYPE,
+    PBAP_PSE_GET_SHARE_TYPE,
+    PBAP_PSE_SET_ACCESS_AUTHORIZATION,
+    PBAP_PSE_GET_ACCESS_AUTHORIZATION,
     // The last code, if you want to add a new code, please add it before this
     PBAP_PSE_BUTT
 };
@@ -690,6 +694,8 @@ enum BluetoothAudioManagerInterfaceCode {
     WEAR_DETECTION_ENABLE = 0,
     WEAR_DETECTION_DISABLE,
     IS_WEAR_DETECTION_ENABLED,
+    BT_IS_WEAR_DETECTION_SUPPORTED,
+    BT_SEND_DEVICE_SELECTION,
     // The last code, if you want to add a new code, please add it before this
     WEAR_DETECTION_BUTT
 };

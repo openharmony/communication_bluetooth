@@ -44,6 +44,7 @@ const int SOCKET_RECV_TXRX_SIZE = 2;
 const int SOCKET_RECV_CHANNEL_SIZE = 4;
 const int SOCKET_RECV_FD_SIZE = 14;
 
+constexpr char BLUETOOTH_UE_DOMAIN[] = "BLUETOOTH_UE";
 std::mutex g_socketProxyMutex;
 
 struct ClientSocket::impl {
@@ -66,6 +67,9 @@ struct ClientSocket::impl {
             HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
                 HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_, "ADDRESS", "empty",
                 "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
+            HiSysEventWrite(BLUETOOTH_UE_DOMAIN, "SOCKET_DISCONN", HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                "PNAMEID", "Bluetooth", "PVERSIONID", "1.0", "DEV_ADDRESS", GetEncryptAddr(address_),
+                "SCENE_CODE", fd_);
             HILOGI("fd closed, fd_: %{public}d", fd_);
             close(fd_);
             fd_ = -1;
@@ -86,6 +90,9 @@ struct ClientSocket::impl {
                 HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
                     HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "close", "ID", fd_, "ADDRESS", "empty",
                     "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
+                HiSysEventWrite(BLUETOOTH_UE_DOMAIN, "SOCKET_DISCONN", HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                    "PNAMEID", "Bluetooth", "PVERSIONID", "1.0", "DEV_ADDRESS", GetEncryptAddr(address_),
+                    "SCENE_CODE", fd_);
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 close(fd_);
                 fd_ = -1;

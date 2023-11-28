@@ -51,6 +51,11 @@ public:
     int StopPlaying(const RawAddress &device) override;
     int WriteFrame(const uint8_t *data, uint32_t size) override;
     void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) override;
+    int OffloadStartPlaying(const RawAddress &device, const std::vector<int32_t> &sessionId) override;
+    int OffloadStopPlaying(const RawAddress &device, const std::vector<int32_t> &sessionId) override;
+    int A2dpOffloadSessionPathRequest(const RawAddress &device,
+        const std::vector<BluetoothA2dpStreamInfo> &info) override;
+    BluetoothA2dpOffloadCodecStatus GetOffloadCodecStatus(const RawAddress &device) override;
 
 private:
     static inline BrokerDelegator<BluetoothA2dpSrcProxy> delegator_;
@@ -61,6 +66,15 @@ private:
      * @return true: Write the serializable data successfully; otherwise is not.
      */
     bool WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply);
+
+    /**
+     * @brief control offload play or stop action
+     * @param device the remote connected sink device
+     * @param sessionsId audio control streams sessions id
+     * @param control audio control action request playing or stop playing.
+     * @return true: control remote sink device successfully; otherwise is not.
+     */
+    int OffloadPlayingControl(const RawAddress &device, const std::vector<int32_t> &sessionsId, int control);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

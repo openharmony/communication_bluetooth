@@ -93,7 +93,7 @@ int BluetoothGattClientProxy::RegisterApplication(
 
 int BluetoothGattClientProxy::DeregisterApplication(int32_t appId)
 {
-    HILOGI("BluetoothGattClientProxy::DeregisterApplication start");
+    HILOGI("BluetoothGattClientProxy::DeregisterApplication start appId : %{public}d", appId);
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothGattClientProxy::GetDescriptor())) {
         HILOGE("BluetoothGattClientProxy::DeregisterApplication WriteInterfaceToken error");
@@ -107,7 +107,7 @@ int BluetoothGattClientProxy::DeregisterApplication(int32_t appId)
     MessageOption option {
         MessageOption::TF_SYNC
     };
-    HILOGE("mobaiye2 BluetoothGattClientProxy::DeregisterApplication appId : %{public}d", appId);
+
     int error = Remote()->SendRequest(
         BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_DEREGISTER_APP, data, reply, option);
     if (error != BT_NO_ERROR) {

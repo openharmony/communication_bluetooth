@@ -20,8 +20,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothSocketCocInfo : public Parcelable
-{
+class BluetoothSocketCocInfo : public Parcelable {
 public:
     BluetoothSocketCocInfo() = default;
     ~BluetoothSocketCocInfo() override = default;
@@ -34,12 +33,12 @@ public:
     bool ReadFromParcel(Parcel &parcel);
 
     std::string addr;
-    int32_t minInterval;
-    int32_t maxInterval;
-    int32_t peripheralLatency;
-    int32_t supervisionTimeout;
-    int32_t minConnEventLen;
-    int32_t maxConnEventLen;
+    int32_t minInterval = 0;
+    int32_t maxInterval = 0;
+    int32_t peripheralLatency = 0;
+    int32_t supervisionTimeout = 0;
+    int32_t minConnEventLen = 0;
+    int32_t maxConnEventLen = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
