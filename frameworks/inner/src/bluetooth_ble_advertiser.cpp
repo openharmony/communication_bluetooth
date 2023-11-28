@@ -274,6 +274,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     BluetoothBleAdvertiserSettings setting;
     setting.SetConnectable(settings.IsConnectable());
@@ -294,6 +295,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         return ret;
     }
 
+    HILOGI("duration=%{public}d", duration);
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
@@ -339,6 +341,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     BluetoothBleAdvertiserData bleScanResponse;
     bleScanResponse.SetPayload(std::string(scanResponse.begin(), scanResponse.end()));
 
+    HILOGI("duration=%{public}d", duration);
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     int ret = BT_ERR_INTERNAL_ERROR;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {

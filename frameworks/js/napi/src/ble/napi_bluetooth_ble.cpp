@@ -729,6 +729,16 @@ static napi_status ParseAdvertisDataParameters(const napi_env &env,
     return napi_ok;
 }
 
+static bool IsValidAdvertiserDuration(uint32_t duration)
+{
+    const uint32_t MIN_DURATION = 0;
+    const uint32_t MAX_DURATION = 65535;
+    if (duration < MIN_DURATION || duration > MAX_DURATION) {
+        return false;
+    }
+    return true;
+}
+
 napi_status CheckAdvertisingDataWithDuration(napi_env env, napi_value object, BleAdvertiserSettings &outSettings,
     BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData, uint16_t &outDuration)
 {
@@ -757,9 +767,7 @@ napi_status CheckAdvertisingDataWithDuration(napi_env env, napi_value object, Bl
     uint32_t duration = 0;
     NAPI_BT_CALL_RETURN(NapiParseObjectUint32Optional(env, object, "duration", duration, exist));
     if (exist) {
-        const uint32_t minDuration = 0;
-        const uint32_t maxDuration = 65535;
-        if (duration < minDuration || duration > maxDuration) {
+        if (!IsValidAdvertiserDuration(duration)) {
             HILOGE("Invalid duration: %{public}d", duration);
             return napi_invalid_arg;
         }
@@ -862,9 +870,7 @@ napi_status CheckAdvertisingEnableParams(napi_env env, napi_callback_info info,
     uint32_t duration = 0;
     NAPI_BT_CALL_RETURN(NapiParseObjectUint32Optional(env, argv[PARAM0], "duration", duration, exist));
     if (exist) {
-        const uint32_t minDuration = 0;
-        const uint32_t maxDuration = 65535;
-        if (duration < minDuration || duration > maxDuration) {
+        if (!IsValidAdvertiserDuration(duration)) {
             HILOGE("Invalid duration: %{public}d", duration);
             return napi_invalid_arg;
         }
