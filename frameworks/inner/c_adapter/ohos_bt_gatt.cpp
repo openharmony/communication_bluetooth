@@ -606,8 +606,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
 
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam->minInterval);
-    if (advParam->advType == OHOS_BLE_ADV_SCAN_IND ||
-        advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
+    if (advParam->advType == OHOS_BLE_ADV_SCAN_IND || advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
         settings.SetConnectable(false);
     }
     std::array<uint8_t, OHOS_BD_ADDR_LEN> addr;
