@@ -598,7 +598,7 @@ static void ConvertCodecSampleRateToCodecInfo(CodecInfo &codecInfo, int32_t code
     }
 }
 
-static void ConvertCodecInfoToJs(napi_env env, napi_value &object, A2dpCodecInfo &a2dpCodecInfo)
+static void ConvertCodecInfoToJs(napi_env env, napi_value &object, const A2dpCodecInfo &a2dpCodecInfo)
 {
     // convert A2dpCodecInfo to CodecInfo
     CodecInfo codecInfo;

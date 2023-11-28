@@ -46,12 +46,78 @@ napi_value NapiNativeString::ToNapiValue(napi_env env) const
     }
     return value;
 }
+
 napi_value NapiNativeUuidsArray::ToNapiValue(napi_env env) const
 {
     napi_value array;
     napi_create_array(env, &array);
     ConvertUuidsVectorToJS(env, array, uuids_);
     return array;
+}
+
+napi_value NapiNativeDiscoveryResultArray::ToNapiValue(napi_env env) const
+{
+    CHECK_AND_RETURN_LOG_RET(remoteDevice_, nullptr, "remoteDevice is nullptr");
+
+    napi_value array;
+    napi_value value;
+    std::string addr = remoteDevice_->GetDeviceAddr();
+    napi_create_array(env, &array);
+    napi_create_string_utf8(env, addr.c_str(), addr.size(), &value);
+    napi_set_element(env, array, 0, value);
+    return array;
+}
+
+static std::string GetFormatPinCode(uint32_t pinType, uint32_t pinCode)
+{
+    std::string pinCodeStr = std::to_string(pinCode);
+    if (pinType != PIN_TYPE_CONFIRM_PASSKEY && pinType != PIN_TYPE_NOTIFY_PASSKEY) {
+        return pinCodeStr;
+    }
+
+    const uint32_t FORMAT_PINCODE_LENGTH = 6;
+    while (pinCodeStr.length() < FORMAT_PINCODE_LENGTH) {
+        pinCodeStr = "0" + pinCodeStr;
+    }
+    return pinCodeStr;
+}
+
+napi_value NapiNativePinRequiredParam::ToNapiValue(napi_env env) const
+{
+    CHECK_AND_RETURN_LOG_RET(pairConfirmInfo_, nullptr, "pairConfirmInfo is nullptr");
+
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value device = nullptr;
+    std::string addr = pairConfirmInfo_->deviceAddr;
+    napi_create_string_utf8(env, addr.c_str(), addr.size(), &device);
+    napi_set_named_property(env, result, "deviceId", device);
+
+    napi_value pinCode = nullptr;
+    std::string pinCodeStr = GetFormatPinCode(pairConfirmInfo_->pinType, pairConfirmInfo_->number);
+    napi_create_string_utf8(env, pinCodeStr.c_str(), pinCodeStr.size(), &pinCode);
+    napi_set_named_property(env, result, "pinCode", pinCode);
+
+    napi_value pinType = nullptr;
+    napi_create_int32(env, pairConfirmInfo_->pinType, &pinType);
+    napi_set_named_property(env, result, "pinType", pinType);
+    return result;
+}
+
+napi_value NapiNativeBondStateParam::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value device = nullptr;
+    napi_create_string_utf8(env, deviceAddr_.c_str(), deviceAddr_.size(), &device);
+    napi_set_named_property(env, result, "deviceId", device);
+
+    napi_value bondState = nullptr;
+    napi_create_int32(env, bondStatus_, &bondState);
+    napi_set_named_property(env, result, "state", bondState);
+    return result;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

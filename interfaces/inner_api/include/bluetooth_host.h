@@ -657,23 +657,24 @@ public:
     int GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const;
 
     /**
-    * @brief Report to the remote device that the user has selected the device.
-    * @param address object device report address.
-    * @param useA2dp whether use A2dp of this device.
-    * @param useHfp whether use Hfp of this device.
-    * @param userSelection whether this send command by user selection.
-    * @return Returns {@link BT_NO_ERROR} if send selection success;
-    * returns an error code defined in {@link BtErrCode} otherwise.
+    * @brief Connects all allowed bluetooth profiles between the local and remote device.
+    *
+    * @param remoteAddr remote device addr.
+    * @return Returns <b>true</b> if the operation is successful;
+    *         returns <b>false</b> if the operation fails.
+    * @since 11
     */
-    int SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) const;
+    int ConnectAllowedProfiles(const std::string &remoteAddr) const;
 
     /**
-    * @brief Whether wear detection is supported
-    * @param address object device report address.
-    * @return Returns <b>true</b> if the device support wear detection;
-    *         returns <b>false</b> if the device not support wear detection.
+    * @brief Disconnects all allowed bluetooth profiles between the local and remote device.
+    *
+    * @param remoteAddr remote device addr.
+    * @return Returns <b>true</b> if the operation is successful;
+    *         returns <b>false</b> if the operation fails.
+    * @since 11
     */
-    bool IsSupportWearDetection(const std::string &address) const;
+    int DisconnectAllowedProfiles(const std::string &remoteAddr) const;
 
 private:
     /**

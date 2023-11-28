@@ -1104,19 +1104,20 @@ int BluetoothHost::GetRandomAddress(const std::string &realAddr, std::string &ra
     return BT_NO_ERROR;
 }
 
-int BluetoothHost::SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) const
+int BluetoothHost::ConnectAllowedProfiles(const std::string &remoteAddr) const
 {
-    HILOGI("enter, address: %{public}s, useA2dp: %{public}d, useHfp: %{public}d, userSelection:%{public}d",
-        GetEncryptAddr(address).c_str(), useA2dp, useHfp, userSelection);
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    if (!pimpl || !pimpl->proxy_) {
-        HILOGE("pimpl or bluetooth host is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
-    return pimpl->proxy_->SendDeviceSelection(address, useA2dp, useHfp, userSelection);
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET((pimpl && pimpl->proxy_), BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    return pimpl->proxy_->ConnectAllowedProfiles(remoteAddr);
+}
+
+int BluetoothHost::DisconnectAllowedProfiles(const std::string &remoteAddr) const
+{
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET((pimpl && pimpl->proxy_), BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    return pimpl->proxy_->DisconnectAllowedProfiles(remoteAddr);
 }
 } // namespace Bluetooth
 } // namespace OHOS

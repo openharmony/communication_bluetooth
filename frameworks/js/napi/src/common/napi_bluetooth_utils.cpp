@@ -794,5 +794,26 @@ napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     return napi_ok;
 }
+
+bool IsAccessAuthorizationValid(int32_t accessAuthorization)
+{
+    return accessAuthorization == static_cast<int32_t>(AccessAuthorization::UNKNOWN) ||
+        accessAuthorization == static_cast<int32_t>(AccessAuthorization::ALLOWED) ||
+        accessAuthorization == static_cast<int32_t>(AccessAuthorization::REJECTED);
+}
+
+napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,
+    int32_t &accessAuthorization)
+{
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_THREE, "Requires 2 or 3 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
+    NAPI_BT_RETURN_IF(!ParseInt32(env, accessAuthorization, argv[PARAM1]), "ParseInt failed", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!IsAccessAuthorizationValid(accessAuthorization),
+        "Invalid accessAuthorization", napi_invalid_arg);
+    return napi_ok;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
