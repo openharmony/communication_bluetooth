@@ -98,6 +98,14 @@ int SocketServerAccept(int serverId);
 int SocketServerClose(int serverId);
 
 /**
+ * @brief Set fast connection flag
+ *
+ * @param bdAddr The remote device address to connect.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int SocketSetFastConnection(const BdAddr *bdAddr);
+
+/**
  * @brief Connects to a remote device over the socket.
  * This method will block until a connection is made or the connection fails.
  *
