@@ -93,15 +93,11 @@ MapMse::impl::~impl()
 bool MapMse::impl::InitMapMseProxy(void)
 {
     HILOGD("enter");
-    std::lock_guard<std::mutex> lock(mapMseProxyMutex);
-    if (proxy_) {
-        return true;
-    }
+    std::lock_guard<std::mutex> lock(mapMseProxyMutex);\
+    CHECK_AND_RETURN_LOG_RET((proxy_ == nullptr), true, "proxy exist");
+
     proxy_ = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
-    if (!proxy_) {
-        HILOGE("get MapMse proxy_ failed");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET((proxy_ != nullptr), false, "get proxy failed");
 
     serviceObserverImp_ = new (std::nothrow) BluetoothMapMseObserverImp(observers_);
     if (serviceObserverImp_ != nullptr) {
@@ -145,23 +141,14 @@ MapMse::~MapMse()
 void MapMse::Init()
 {
     HILOGI("MapMse init enter");
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    if (!pimpl->InitMapMseProxy()) {
-        HILOGE("MapMse proxy is nullptr");
-        return;
-    }
+    CHECK_AND_RETURN_LOG((pimpl != nullptr), "pimpl is null");
+    CHECK_AND_RETURN_LOG(pimpl->InitMapMseProxy(), "init fail");
 }
 
 void MapMse::Uinit()
 {
     HILOGI("MapMse Uinit enter");
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
+    CHECK_AND_RETURN_LOG((pimpl != nullptr), "pimpl is null");
     std::lock_guard<std::mutex> lock(pimpl->mapMseProxyMutex);
     pimpl->proxy_ = nullptr;
 }

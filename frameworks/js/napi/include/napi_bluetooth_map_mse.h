@@ -41,7 +41,6 @@ public:
     static napi_value GetMessageAccessAuthorization(napi_env env, napi_callback_info info);
 
     static std::shared_ptr<NapiMapMseObserver> observer_;
-    static bool isRegistered_;
 };
 
 }  // namespace Bluetooth

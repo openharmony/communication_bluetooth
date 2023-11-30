@@ -28,7 +28,6 @@ namespace Bluetooth {
 using namespace std;
 
 std::shared_ptr<NapiMapMseObserver> NapiMapMse::observer_ = std::make_shared<>(NapiMapMseObserver);
-bool NapiMapMse::isRegistered_ = false;
 thread_local napi_ref g_consRef_ = nullptr;
 
 void NapiMapMse::DefineMapMseJSClass(napi_env env, napi_value exports)
@@ -64,11 +63,14 @@ napi_value NapiMapMse::DefineCreateProfile(napi_env env, napi_value exports)
 
 napi_value NapiMapMse::CreateMapMseProfile(napi_env env, napi_callback_info info)
 {
-    napi_value profile;
+    napi_value napiProfile;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, g_consRef_, &constructor);
-    napi_new_instance(env, constructor, 0, nullptr, &profile);
-    return profile;
+    napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
+
+    MapMse *profile = MapMse::GetProfile();
+    profile->RegisterObserver(observer_);
+    return napiProfile;
 }
 
 napi_value NapiMapMse::MapMseConstructor(napi_env env, napi_callback_info info)
@@ -85,11 +87,6 @@ napi_value NapiMapMse::On(napi_env env, napi_callback_info info)
 
     napi_value ret = nullptr;
     ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
-    if (!isRegistered_) {
-        MapMse *profile = MapMse::GetProfile();
-        profile->RegisterObserver(observer_);
-        isRegistered_ = true;
-    }
     HILOGI("napi NapiMapMse is registered");
     return ret;
 }
