@@ -104,6 +104,7 @@ private:
     void NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyHostMsg(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyMapMseMsg(NOTIFY_PROFILE_MSG notifyMsg);
+    void NotifyPbapPseMsg(NOTIFY_PROFILE_MSG notifyMsg);
 
     /**
      * @brief Construct a new BluetootLoadSystemAbility object.

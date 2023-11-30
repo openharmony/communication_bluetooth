@@ -474,7 +474,7 @@ public:
      * @param[in] observer The pointer to the <b>AvrcpController::IObserver</b>.
      * @since 6
      */
-    void RegisterObserver(AvrcpController::IObserver *observer);
+    void RegisterObserver(std::shared_ptr<AvrcpController::IObserver> observer);
 
     /**
      * @brief Unregisters the observer.
@@ -482,7 +482,7 @@ public:
      * @param[in] observer The pointer to the <b>AvrcpController::IObserver</b>.
      * @since 6
      */
-    void UnregisterObserver(AvrcpController::IObserver *observer);
+    void UnregisterObserver(std::shared_ptr<AvrcpController::IObserver> observer);
 
     /******************************************************************
      * CONNECTION                                                     *

@@ -118,6 +118,10 @@
 #define LOG_EVENT_INT(tag, subTag) LOG_ERROR("ERROR tag num: 0x%x, opcode: %ld", tag, subTag)
 #endif
 
+#ifdef CHECK_AND_RETURN_LOG
+#undef CHECK_AND_RETURN_LOG
+#endif
+
 #define CHECK_AND_RETURN_LOG(cond, fmt, ...)        \
     do {                                            \
         if (!(cond)) {                              \
@@ -125,6 +129,10 @@
             return;                                 \
         }                                           \
     } while (0)
+
+#ifdef CHECK_AND_RETURN_LOG_RET
+#undef CHECK_AND_RETURN_LOG_RET
+#endif
 
 #define CHECK_AND_RETURN_LOG_RET(cond, ret, fmt, ...)               \
     do {                                                            \

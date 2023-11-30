@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-NapiA2dpSinkObserver NapiA2dpSink::observer_;
+std::shared_ptr<NapiA2dpSinkObserver> NapiA2dpSink::observer_ = std::make_shared<NapiA2dpSinkObserver>();
 bool NapiA2dpSink::isRegistered_ = false;
 
 void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env)
@@ -58,10 +58,10 @@ napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiA2dpSinkObserver::g_a2dpSinkCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
     if (!isRegistered_) {
         A2dpSink *profile = A2dpSink::GetProfile();
-        profile->RegisterObserver(&observer_);
+        profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
     HILOGI("Napi A2dpSink is registered");
@@ -74,7 +74,7 @@ napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
     std::unique_lock<std::shared_mutex> guard(NapiA2dpSinkObserver::g_a2dpSinkCallbackInfosMutex);
 
     napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_.callbackInfos_);
+    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
     HILOGI("napi A2dpSink is unregistered");
     return ret;
 }

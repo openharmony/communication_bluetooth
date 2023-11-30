@@ -169,6 +169,7 @@ public:
     static const int HEALTH_DATA_DISPLAY = 0x091C;
     static const int HEALTH_STEP_COUNTER = 0x0920;
     static const int HEALTH_BODY_COMPOSITION_ANALYZER = 0x0924;
+    static const int HEALTH_PEAK_FLOW_MOITOR = 0x0928; // HEALTH_PEAK_FLOW_MOITOR is compatible with api8.
     static const int HEALTH_PEAK_FLOW_MONITOR = 0x0928;
     static const int HEALTH_MEDICATION_MONITOR = 0x092C;
     static const int HEALTH_KNEE_PROSTHESIS = 0x0930;

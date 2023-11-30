@@ -26,7 +26,6 @@
 #include "system_ability_definition.h"
 
 #include <memory>
-#include "securec.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -275,15 +274,14 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         HILOGE("pimpl or bleAdvertiser proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     BluetoothBleAdvertiserSettings setting;
     setting.SetConnectable(settings.IsConnectable());
     setting.SetInterval(settings.GetInterval());
     setting.SetLegacyMode(settings.IsLegacyMode());
     setting.SetTxPower(settings.GetTxPower());
-    uint8_t addr[OHOS_BD_ADDR_LEN] = {};
-    settings.GetOwnAddr(addr);
-    setting.SetOwnAddr(addr);
+    setting.SetOwnAddr(settings.GetOwnAddr());
     setting.SetOwnAddrType(settings.GetOwnAddrType());
 
     BluetoothBleAdvertiserData bleAdvertiserData;
@@ -297,6 +295,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         return ret;
     }
 
+    HILOGI("duration=%{public}d", duration);
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
@@ -333,9 +332,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     setting.SetInterval(settings.GetInterval());
     setting.SetLegacyMode(settings.IsLegacyMode());
     setting.SetTxPower(settings.GetTxPower());
-    uint8_t addr[OHOS_BD_ADDR_LEN] = {};
-    settings.GetOwnAddr(addr);
-    setting.SetOwnAddr(addr);
+    setting.SetOwnAddr(settings.GetOwnAddr());
     setting.SetOwnAddrType(settings.GetOwnAddrType());
 
     BluetoothBleAdvertiserData bleAdvertiserData;
@@ -344,6 +341,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     BluetoothBleAdvertiserData bleScanResponse;
     bleScanResponse.SetPayload(std::string(scanResponse.begin(), scanResponse.end()));
 
+    HILOGI("duration=%{public}d", duration);
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     int ret = BT_ERR_INTERNAL_ERROR;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
@@ -650,14 +648,14 @@ void BleAdvertiserSettings::SetSecondaryPhy(int secondaryPhy)
     secondaryPhy_ = secondaryPhy;
 }
 
-void BleAdvertiserSettings::GetOwnAddr(uint8_t addr[OHOS_BD_ADDR_LEN]) const
+std::array<uint8_t, OHOS_BD_ADDR_LEN> BleAdvertiserSettings::GetOwnAddr() const
 {
-    memcpy_s(addr, OHOS_BD_ADDR_LEN, ownAddr_, OHOS_BD_ADDR_LEN);
+    return ownAddr_;
 }
 
-void BleAdvertiserSettings::SetOwnAddr(const uint8_t addr[OHOS_BD_ADDR_LEN])
+void BleAdvertiserSettings::SetOwnAddr(const std::array<uint8_t, OHOS_BD_ADDR_LEN>& addr)
 {
-    memcpy_s(ownAddr_, OHOS_BD_ADDR_LEN, addr, OHOS_BD_ADDR_LEN);
+    ownAddr_ = addr;
 }
 
 int8_t BleAdvertiserSettings::GetOwnAddrType() const

@@ -46,6 +46,7 @@ const std::string BLE_CENTRAL_MANAGER_SERVER = "BleCentralMangerServer";
 const std::string PROFILE_HID_HOST_SERVER = "BluetoothHidHostServer";
 const std::string PROFILE_PAN_SERVER = "BluetoothPanServer";
 const std::string PROFILE_OPP_SERVER = "BluetoothOppServer";
+const std::string PROFILE_AUDIO_MANAGER = "BluetoothAudioManagerServer";
 }  // namespace
 
 class IBluetoothHost : public OHOS::IRemoteBroker {
@@ -121,8 +122,8 @@ public:
     virtual int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr) = 0;
     virtual int32_t SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr) = 0;
     virtual int32_t CountEnableTimes(bool enable) = 0;
-    virtual int32_t SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection) = 0;
-    virtual bool IsSupportWearDetection(const std::string &address) = 0;
+    virtual int32_t ConnectAllowedProfiles(const std::string &remoteAddr) = 0;
+    virtual int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

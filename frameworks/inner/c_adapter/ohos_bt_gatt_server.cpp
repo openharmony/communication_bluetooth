@@ -19,7 +19,9 @@
 #include <string.h>
 #include <vector>
 #include <map>
+#include <memory>
 #include <mutex>
+#include <sstream>
 #include <algorithm>
 
 #include "ohos_bt_adapter_utils.h"
@@ -57,32 +59,179 @@ static int g_connId = 0;
 static std::map<int, struct ConnectedDevice> g_MapConnectedDevice;
 static std::mutex g_mapConnDeviceMutex;
 
-#define MAXIMUM_NUMBER_APPLICATION 64
-#define MAXIMUM_NUMBER_GATTSERVICE 64
-struct GattServiceWapper {
+#define MAXIMUM_NUMBER_APPLICATION 10
+#define MAXIMUM_NUMBER_GATTSERVICE 10
+
+static const char *GetAttributeTypeString(int attributeType);
+
+struct GattAttribute {
+    enum AttributeType {
+        GATT_SERVICE = 0,
+        GATT_CHARACTERISTIC,
+        GATT_DESCRIPTOR,
+    };
+
+    GattAttribute(uint16_t handle, UUID uuid, int attrType)
+        : handle(handle), actualHandle(0), uuid(uuid), attrType(attrType) {}
+
+    std::string ToLogString(void)
+    {
+        std::stringstream ss;
+        ss << "uuid: " << uuid.ToString();
+        ss << ", attrType: " << GetAttributeTypeString(attrType);
+        ss << ", handle: " << handle;
+        ss << ", actualHandle: " << actualHandle;
+        return ss.str();
+    }
+
+    uint16_t handle;  // Attribute handle showed in application (fake attribute handle, used as index)
+    uint16_t actualHandle;  // Attribute handle in bluetooth stack (actual attribute handle)
+    UUID uuid;
+    int attrType;
+};
+
+static const char *GetAttributeTypeString(int attributeType)
+{
+    switch (attributeType) {
+        case GattAttribute::GATT_SERVICE:
+            return "GATT_SERVICE";
+        case GattAttribute::GATT_CHARACTERISTIC:
+            return "GATT_CHARACTERISTIC";
+        case GattAttribute::GATT_DESCRIPTOR:
+            return "GATT_DESCRIPTOR";
+        default:
+            break;
+    }
+    return "Unknown";
+}
+
+struct GattServiceWrapper {
     GattService *gattService;
-    int index;
-    int maxNum;
-    int handleOffset;  // Gatt service handle in stack
     bool isAdding;
+    std::vector<std::shared_ptr<GattAttribute>> attributes;
 };
 
-struct GattServerWapper {
+struct GattServerWrapper {
     std::shared_ptr<GattServer> gattServer = nullptr;
-    struct GattServiceWapper gattServices[MAXIMUM_NUMBER_GATTSERVICE];
+    struct GattServiceWrapper gattServices[MAXIMUM_NUMBER_GATTSERVICE];
 };
 
-GattServerWapper g_gattServers[MAXIMUM_NUMBER_APPLICATION];
+static uint16_t GetNextAttributeHandle(void)
+{
+    static std::atomic_uint16_t nextAttributeHandle = 1;  // The next attribute handle showed in application.
+    if (nextAttributeHandle.load() == UINT16_MAX) {
+        nextAttributeHandle = 1;
+    }
+    return nextAttributeHandle++;
+}
+
+GattServerWrapper g_gattServers[MAXIMUM_NUMBER_APPLICATION];
 
 #define GATTSERVER(x) g_gattServers[x].gattServer
 #define GATTSERVICES(x, y) g_gattServers[x].gattServices[y]
 #define GATTSERVICE(x, y) GATTSERVICES(x, y).gattService
 
-static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle);
 static int AddDeviceRecord(struct ConnectedDevice &device);
 static void RemoveDeviceRecord(int connId);
 static std::optional<ConnectedDevice> GetDeviceInfoByConnId(int connId);
 static std::optional<int> GetConnIdByDeviceInfo(struct ConnectedDevice &device);
+
+static void AddAttribute(int serverId, int serviceIndex, int attrType, UUID uuid, uint16_t handle)
+{
+    CHECK_AND_RETURN_LOG(
+        0 <= serverId && serverId < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId);
+    CHECK_AND_RETURN_LOG(0 <= serviceIndex && serviceIndex < MAXIMUM_NUMBER_GATTSERVICE,
+        "serviceIndex(%{public}d) is invalid", serviceIndex);
+    
+    GattServiceWrapper &gattServiceWrapper = GATTSERVICES(serverId, serviceIndex);
+    auto attribute = std::make_shared<GattAttribute>(handle, uuid, attrType);
+    gattServiceWrapper.attributes.push_back(attribute);
+    HILOGD("serverId(%{public}d), serviceIndex(%{public}d), attribute(%{public}s)",
+        serverId, serviceIndex, attribute->ToLogString().c_str());
+}
+
+static std::shared_ptr<GattAttribute> GetAttribute(int serverId, int serviceIndex,
+    std::function<bool(GattAttribute &)> predicate)
+{
+    CHECK_AND_RETURN_LOG_RET(
+        0 <= serverId && serverId < MAXIMUM_NUMBER_APPLICATION, nullptr, "serverId(%{public}d) is invalid", serverId);
+    CHECK_AND_RETURN_LOG_RET(0 <= serviceIndex && serviceIndex < MAXIMUM_NUMBER_GATTSERVICE, nullptr,
+        "serviceIndex(%{public}d) is invalid", serviceIndex);
+
+    GattServiceWrapper &gattServiceWrapper = GATTSERVICES(serverId, serviceIndex);
+    for (auto &attribute : gattServiceWrapper.attributes) {
+        if (attribute != nullptr && predicate(*attribute)) {
+            HILOGD("serverId(%{public}d), serviceIndex(%{public}d), attribute(%{public}s)",
+                serverId, serviceIndex, attribute->ToLogString().c_str());
+            return attribute;
+        }
+    }
+    return nullptr;
+}
+
+static std::shared_ptr<GattAttribute> GetAttributeWithHandle(int serverId, int handle)
+{
+    for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
+        auto attribute =
+            GetAttribute(serverId, i, [handle](const GattAttribute &attr) { return attr.handle == handle; });
+        if (attribute) {
+            return attribute;
+        }
+    }
+
+    HILOGE("Not found attribute handle(%{public}d) in serverId(%{public}d)", handle, serverId);
+    return nullptr;
+}
+
+static std::shared_ptr<GattAttribute> GetAttributeWithUuid(int serverId, int serviceIndex, int attributeType, UUID uuid)
+{
+    auto attribute = GetAttribute(serverId, serviceIndex, [attributeType, uuid](GattAttribute &attr) {
+        return attr.attrType == attributeType && attr.uuid.Equals(uuid);
+    });
+
+    if (!attribute) {
+        HILOGE("Not found attribute(attributeType: %{public}s, uuid: %{public}s)"
+            "in serverId(%{public}d) serviceIndex(%{public}d)",
+            GetAttributeTypeString(attributeType), uuid.ToString().c_str(), serverId, serviceIndex);
+    }
+    return attribute;
+}
+
+static std::shared_ptr<GattAttribute> GetDescriptorAttribute(
+    int serverId, int serviceIndex, UUID characterUuid, UUID descriptorUuid)
+{
+    auto characterAttribute =
+        GetAttributeWithUuid(serverId, serviceIndex, GattAttribute::GATT_CHARACTERISTIC, characterUuid);
+    CHECK_AND_RETURN_LOG_RET(
+        characterAttribute, nullptr, "not found character uuid:%{public}s", characterUuid.ToString().c_str());
+
+    // Descriptor attribute handle is after the characteristic attribute handle.
+    auto descriptorAttribute = GetAttribute(serverId, serviceIndex,
+        [characterHandle = characterAttribute->handle, descriptorUuid](GattAttribute &attr) {
+            return attr.handle > characterHandle && attr.uuid.Equals(descriptorUuid);
+    });
+
+    if (!descriptorAttribute) {
+        HILOGE("Not found descriptorAttribute(uuid: %{public}s) in serverId(%{public}d) serviceIndex(%{public}d)",
+            descriptorUuid.ToString().c_str(), serverId, serviceIndex);
+    }
+    return descriptorAttribute;
+}
+
+static std::shared_ptr<GattAttribute> GetAttributeWithActualHandle(int serverId, uint16_t actualHandle)
+{
+    for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
+        auto attribute = GetAttribute(serverId, i, [actualHandle](const GattAttribute &attr) {
+            return attr.actualHandle == actualHandle;
+        });
+        if (attribute) {
+            return attribute;
+        }
+    }
+
+    HILOGE("Not found attribute actualHandle(%{public}u) in serverId(%{public}d)", actualHandle, serverId);
+    return nullptr;
+}
 
 class GattServerCallbackWapper : public GattServerCallback {
 public:
@@ -126,60 +275,57 @@ public:
     void OnServiceAdded(GattService *Service, int ret) override
     {
         int i;
-        int err = OHOS_BT_STATUS_SUCCESS;
-        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
-            HILOGE("serverId_ is invalid!");
-            return;
-        }
+        CHECK_AND_RETURN_LOG(
+            0 <= serverId_ && serverId_ < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId_);
+        CHECK_AND_RETURN_LOG(g_GattsCallback && g_GattsCallback->serviceStartCb, "callback is nullptr");
+
         for (i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-            if (GATTSERVICE(serverId_, i) != nullptr) {
-                HILOGI("isAdding: %{public}d, srvcUuid: %{public}s, ind: %{public}s",
-                    GATTSERVICES(serverId_, i).isAdding,
-                    GATTSERVICE(serverId_, i)->GetUuid().ToString().c_str(),
-                    Service->GetUuid().ToString().c_str());
-            } else {
-                HILOGE("services is empty!");
+            if (GATTSERVICE(serverId_, i) == nullptr) {
+                continue;
             }
-            if (GATTSERVICE(serverId_, i) != nullptr &&
-                GATTSERVICES(serverId_, i).isAdding &&
-                GATTSERVICE(serverId_, i)->GetUuid().CompareTo(Service->GetUuid()) == 0) {
-                GATTSERVICES(serverId_, i).isAdding = false;
-                GATTSERVICES(serverId_, i).handleOffset = Service->GetHandle() - i;
-                HILOGI("serverId: %{public}d, service handle is: %{public}d, offset: %{public}d",
-                    serverId_, GATTSERVICE(serverId_, i)->GetHandle(), GATTSERVICES(serverId_, i).handleOffset);
+            auto &gattServiceWrapper = GATTSERVICES(serverId_, i);
+            if (gattServiceWrapper.isAdding && GATTSERVICE(serverId_, i)->GetUuid().Equals(Service->GetUuid())) {
+                gattServiceWrapper.isAdding = false;
+                HILOGI("find service, serverId: %{public}d, serviceIndex: %{public}d", serverId_, i);
                 break;
             }
         }
-
         if (i == MAXIMUM_NUMBER_GATTSERVICE) {
             HILOGE("add service failed, invalid srvcHandle: %{public}u", Service->GetHandle());
-            err = OHOS_BT_STATUS_FAIL;
+            g_GattsCallback->serviceStartCb(OHOS_BT_STATUS_FAIL, serverId_, i);
+            return;
         }
 
         vector<GattCharacteristic> &characteristics = Service->GetCharacteristics();
         for (auto item = characteristics.begin(); item != characteristics.end(); item++) {
-            HILOGI("charHandle: %{public}d, uuid: %{public}s",
-                item->GetHandle(), item->GetUuid().ToString().c_str());
+            auto characterAttribute =
+                GetAttributeWithUuid(serverId_, i, GattAttribute::GATT_CHARACTERISTIC, item->GetUuid());
+            if (characterAttribute == nullptr) {
+                HILOGE("not found characterAttribute");
+                continue;
+            }
+            characterAttribute->actualHandle = item->GetHandle();
+            HILOGI("characterAttribute(%{public}s)", characterAttribute->ToLogString().c_str());
             vector<GattDescriptor> &descriptors = item->GetDescriptors();
             for (auto des = descriptors.begin(); des != descriptors.end(); des++) {
-                HILOGI("desHandle: %{public}d, uuid: %{public}s", des->GetHandle(), des->GetUuid().ToString().c_str());
+                auto descAttribute = GetDescriptorAttribute(serverId_, i, item->GetUuid(), des->GetUuid());
+                if (descAttribute == nullptr) {
+                    HILOGE("not found descriptorAttribute");
+                    continue;
+                }
+                descAttribute->actualHandle = des->GetHandle();
+                HILOGI("descAttribute(%{public}s)", descAttribute->ToLogString().c_str());
             }
         }
 
-        if (g_GattsCallback != nullptr && g_GattsCallback->serviceStartCb != nullptr) {
-            g_GattsCallback->serviceStartCb(err, serverId_, i);
-        } else {
-            HILOGW("call back is null.");
-        }
+        g_GattsCallback->serviceStartCb(OHOS_BT_STATUS_SUCCESS, serverId_, i);
     }
 
     void OnCharacteristicReadRequest(
         const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId) override
     {
-        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
-            HILOGE("serverId_ is invalid!");
-            return;
-        }
+        CHECK_AND_RETURN_LOG(
+            0 <= serverId_ && serverId_ < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId_);
 
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
@@ -191,18 +337,19 @@ public:
             return;
         }
 
-        int srvcHandle = 0;
-        FindCharacteristic(serverId_, characteristic.GetHandle(), true, &srvcHandle);
+        std::shared_ptr<GattAttribute> attribute = GetAttributeWithActualHandle(serverId_, characteristic.GetHandle());
+        CHECK_AND_RETURN_LOG(attribute, "not found attribute in serverId(%{public}d) with actualHandle(%{public}u)",
+            serverId_, characteristic.GetHandle());
 
         BtReqReadCbPara readInfo;
         readInfo.connId = connId.value();
         readInfo.transId = requestId;
         readInfo.bdAddr = &dev.remoteAddr;
-        readInfo.attrHandle = characteristic.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
+        readInfo.attrHandle = attribute->handle;
         readInfo.offset = 0;
         readInfo.isLong = false;
-        HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d",
-            connId.value(), requestId, readInfo.attrHandle);
+        HILOGD("connId: %{public}d, requestId: %{public}d, %{public}s",
+            connId.value(), requestId, attribute->ToLogString().c_str());
         if (g_GattsCallback != nullptr && g_GattsCallback->requestReadCb != nullptr) {
             g_GattsCallback->requestReadCb(readInfo);
         } else {
@@ -213,10 +360,9 @@ public:
     void OnCharacteristicWriteRequest(
         const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId) override
     {
-        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
-            HILOGE("serverId_ is invalid!");
-            return;
-        }
+        CHECK_AND_RETURN_LOG(
+            0 <= serverId_ && serverId_ < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId_);
+
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
@@ -227,22 +373,23 @@ public:
             return;
         }
 
-        int srvcHandle = 0;
-        FindCharacteristic(serverId_, characteristic.GetHandle(), true, &srvcHandle);
+        std::shared_ptr<GattAttribute> attribute = GetAttributeWithActualHandle(serverId_, characteristic.GetHandle());
+        CHECK_AND_RETURN_LOG(attribute, "not found attribute in serverId(%{public}d) with actualHandle(%{public}u)",
+            serverId_, characteristic.GetHandle());
 
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
         writeInfo.connId = connId.value();
         writeInfo.transId = requestId;
         writeInfo.bdAddr = &dev.remoteAddr;
-        writeInfo.attrHandle = characteristic.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
+        writeInfo.attrHandle = attribute->handle;
         writeInfo.offset = 0;
         writeInfo.value = characteristic.GetValue(&length).get();
         writeInfo.length = length;
         writeInfo.needRsp = (characteristic.GetWriteType() == GattCharacteristic::WriteType::DEFAULT);
         writeInfo.isPrep = false;
-        HILOGI("connId: %{public}d, requestId: %{public}d, attrHandle: %{public}d, valueLen: %{public}d",
-            connId.value(), requestId, writeInfo.attrHandle, writeInfo.length);
+        HILOGD("connId: %{public}d, requestId: %{public}d, valueLen: %{public}d, %{public}s",
+            connId.value(), requestId, writeInfo.length, attribute->ToLogString().c_str());
         if (g_GattsCallback != nullptr && g_GattsCallback->requestWriteCb != nullptr) {
             g_GattsCallback->requestWriteCb(writeInfo);
         } else {
@@ -253,10 +400,9 @@ public:
     void OnDescriptorReadRequest(
         const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId) override
     {
-        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
-            HILOGE("serverId_ is invalid!");
-            return;
-        }
+        CHECK_AND_RETURN_LOG(
+            0 <= serverId_ && serverId_ < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId_);
+
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
@@ -267,17 +413,19 @@ public:
             return;
         }
 
-        const GattCharacteristic *characteristic = descriptor.GetCharacteristic();
-        int srvcHandle = 0;
-        FindCharacteristic(serverId_, characteristic->GetHandle(), true, &srvcHandle);
+        std::shared_ptr<GattAttribute> attribute = GetAttributeWithActualHandle(serverId_, descriptor.GetHandle());
+        CHECK_AND_RETURN_LOG(attribute, "not found attribute in serverId(%{public}d) with actualHandle(%{public}u)",
+            serverId_, descriptor.GetHandle());
 
         BtReqReadCbPara readInfo;
         readInfo.connId = connId.value();
         readInfo.transId = requestId;
         readInfo.bdAddr = &dev.remoteAddr;
-        readInfo.attrHandle = descriptor.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
+        readInfo.attrHandle = attribute->handle;
         readInfo.offset = 0;
         readInfo.isLong = false;
+        HILOGD("connId: %{public}d, requestId: %{public}d, %{public}s",
+            connId.value(), requestId, attribute->ToLogString().c_str());
         if (g_GattsCallback != nullptr && g_GattsCallback->requestReadCb != nullptr) {
             g_GattsCallback->requestReadCb(readInfo);
         } else {
@@ -288,10 +436,9 @@ public:
     void OnDescriptorWriteRequest(
         const BluetoothRemoteDevice &device, GattDescriptor &descriptor, int requestId) override
     {
-        if (serverId_ >= MAXIMUM_NUMBER_APPLICATION || serverId_ < 0) {
-            HILOGE("serverId_ is invalid!");
-            return;
-        }
+        CHECK_AND_RETURN_LOG(
+            0 <= serverId_ && serverId_ < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId_);
+
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
@@ -302,21 +449,24 @@ public:
             return;
         }
 
-        const GattCharacteristic *characteristic = descriptor.GetCharacteristic();
-        int srvcHandle = 0;
-        FindCharacteristic(serverId_, characteristic->GetHandle(), true, &srvcHandle);
+        std::shared_ptr<GattAttribute> attribute = GetAttributeWithActualHandle(serverId_, descriptor.GetHandle());
+        CHECK_AND_RETURN_LOG(attribute, "not found attribute in serverId(%{public}d) with actualHandle(%{public}u)",
+            serverId_, descriptor.GetHandle());
 
         BtReqWriteCbPara writeInfo;
         size_t length = 0;
         writeInfo.connId = connId.value();
         writeInfo.transId = requestId;
         writeInfo.bdAddr = &dev.remoteAddr;
-        writeInfo.attrHandle = descriptor.GetHandle() - GATTSERVICES(serverId_, srvcHandle).handleOffset;
+        writeInfo.attrHandle = attribute->handle;
         writeInfo.offset = 0;
         writeInfo.value = descriptor.GetValue(&length).get();
         writeInfo.length = length;
         writeInfo.needRsp = true;
         writeInfo.isPrep = false;
+
+        HILOGD("connId: %{public}d, requestId: %{public}d, valueLen: %{public}d, %{public}s",
+            connId.value(), requestId, writeInfo.length, attribute->ToLogString().c_str());
         if (g_GattsCallback != nullptr && g_GattsCallback->requestWriteCb != nullptr) {
             g_GattsCallback->requestWriteCb(writeInfo);
         } else {
@@ -345,7 +495,7 @@ public:
 
     void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int result) override
     {
-        HILOGI("result: %{public}d", result);
+        HILOGD("result: %{public}d", result);
         struct ConnectedDevice dev;
         dev.serverId = serverId_;
         GetAddrFromString(device.GetDeviceAddr(), dev.remoteAddr.addr);
@@ -420,43 +570,6 @@ static std::optional<int> GetConnIdByDeviceInfo(struct ConnectedDevice &device)
     return iter->first;
 }
 
-static GattCharacteristic *FindCharacteristic(int serverId, int attrHandle, bool isOffset, int *srvcHandle)
-{
-    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
-        HILOGE("serverId is invalid!");
-        return nullptr;
-    }
-
-    if (srvcHandle == nullptr) {
-        HILOGE("srvcHandle is null!");
-        return nullptr;
-    }
-    for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-        GattService *gattService = GATTSERVICE(serverId, i);
-        if (gattService == nullptr) {
-            continue;
-        }
-
-        // The characteristic handle is the offset of the gatt service handle now.
-        // 'isOffset' indicates whether attrHandle is the actual feature value handle.
-        // if it's true, attrHandle is not an offset; if it's false, attrHandle is also an offset.
-        std::vector<GattCharacteristic> &gattCharacteristics = gattService->GetCharacteristics();
-        for (auto &character : gattCharacteristics) {
-            int characterHandle = character.GetHandle();
-            if (isOffset) {
-                characterHandle += GATTSERVICES(serverId, i).handleOffset;
-            }
-            if (characterHandle == attrHandle) {
-                *srvcHandle = i;
-                return &character;
-            }
-        }
-    }
-    HILOGE("not find Character, serverId: %{public}d, attrHandle: %{public}d, isOffset: %{public}d",
-        serverId, attrHandle, isOffset);
-    return nullptr;
-}
-
 /**
  * @brief Registers a GATT server with a specified application UUID.
  *
@@ -477,7 +590,8 @@ int BleGattsRegister(BtUuid appUuid)
     }
     for (int i = 0; i < MAXIMUM_NUMBER_APPLICATION; i++) {
         if (GATTSERVER(i) == nullptr) {
-            std::shared_ptr<GattServerCallback> callbackWapper = std::make_shared<GattServerCallbackWapper>(g_GattsCallback, i);
+            std::shared_ptr<GattServerCallback> callbackWapper =
+                std::make_shared<GattServerCallbackWapper>(g_GattsCallback, i);
             GATTSERVER(i) = GattServer::CreateInstance(callbackWapper);
             HILOGI("register gattServer: %{public}d", i);
             if (g_GattsCallback->registerServerCb != nullptr) {
@@ -595,8 +709,6 @@ int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number
             HILOGD("add srvcHandle: %{public}d", i);
             GATTSERVICE(serverId, i) = new GattService(
                 uuid, i, number, isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
-            GATTSERVICES(serverId, i).maxNum = number;
-            GATTSERVICES(serverId, i).index = i + 1;
             GATTSERVICES(serverId, i).isAdding = false;
             if (g_GattsCallback != nullptr && g_GattsCallback->serviceAddCb != nullptr) {
                 g_GattsCallback->serviceAddCb(0, serverId, &srvcUuid, i);
@@ -659,22 +771,23 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
     }
     UUID uuid(UUID::FromString(strUuid));
 
-    int chHandle = GATTSERVICES(serverId, srvcHandle).index;
-    GATTSERVICES(serverId, srvcHandle).index += 2;
-    GattCharacteristic characteristic(uuid, chHandle, permissions, properties);
-
-    unsigned char stubValue[1] = {0x31};
-    characteristic.SetValue(stubValue, sizeof(stubValue));
-
     if (GATTSERVICE(serverId, srvcHandle) == nullptr) {
-        HILOGE("GATTSERVICE(serverId, srvcHandle) is null!");
+        HILOGE("GATTSERVICE(serverId:%{public}d, srvcHandle:%{public}u) is null!", serverId, srvcHandle);
         return OHOS_BT_STATUS_UNHANDLED;
     }
-    GATTSERVICE(serverId, srvcHandle)->AddCharacteristic(characteristic);
 
-    HILOGD("serverId: %{public}d, srvcHandle: %{public}d, charHandle: %{public}d", serverId, srvcHandle, chHandle);
+    unsigned char stubValue[1] = {0x31};
+    GattCharacteristic characteristic(uuid, permissions, properties);
+    characteristic.SetValue(stubValue, sizeof(stubValue));
+
+    uint16_t characterHandle = GetNextAttributeHandle();
+    GATTSERVICE(serverId, srvcHandle)->AddCharacteristic(characteristic);
+    AddAttribute(serverId, srvcHandle, GattAttribute::GATT_CHARACTERISTIC, uuid, characterHandle);
+
+    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, charHandle: %{public}d",
+        serverId, srvcHandle, characterHandle);
     if (g_GattsCallback != nullptr && g_GattsCallback->characteristicAddCb != nullptr) {
-        g_GattsCallback->characteristicAddCb(0, serverId, &characUuid, srvcHandle, chHandle);
+        g_GattsCallback->characteristicAddCb(0, serverId, &characUuid, srvcHandle, characterHandle);
     } else {
         HILOGW("callback is null.");
     }
@@ -715,14 +828,15 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
         return OHOS_BT_STATUS_UNHANDLED;
     }
     GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
-    int desHandle = GATTSERVICES(serverId, srvcHandle).index++;
+    uint16_t desHandle = GetNextAttributeHandle();
     GattDescriptor descriptor(uuid, desHandle, permissions);
 
     unsigned char stubValue[2] = {0x01, 0x00};
     descriptor.SetValue(stubValue, sizeof(stubValue));
 
     characteristic.AddDescriptor(descriptor);
-    HILOGD("serverId: %{public}d, srvcHandle: %{public}d, desHandle: %{public}d", serverId, srvcHandle, desHandle);
+    AddAttribute(serverId, srvcHandle, GattAttribute::GATT_DESCRIPTOR, uuid, desHandle);
+    HILOGI("serverId: %{public}d, srvcHandle: %{public}d, desHandle: %{public}d", serverId, srvcHandle, desHandle);
     if (g_GattsCallback != nullptr && g_GattsCallback->descriptorAddCb != nullptr) {
         g_GattsCallback->descriptorAddCb(0, serverId, &descUuid, srvcHandle, desHandle);
     } else {
@@ -817,6 +931,7 @@ int BleGattsDeleteService(int serverId, int srvcHandle)
     GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
     delete GATTSERVICE(serverId, srvcHandle);
     GATTSERVICE(serverId, srvcHandle) = nullptr;
+    GATTSERVICES(serverId, srvcHandle).attributes.clear();
     if (g_GattsCallback != nullptr && g_GattsCallback->serviceDeleteCb != nullptr) {
         g_GattsCallback->serviceDeleteCb(OHOS_BT_STATUS_SUCCESS, serverId, srvcHandle);
     } else {
@@ -864,7 +979,7 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
         return OHOS_BT_STATUS_UNHANDLED;
     }
 
-    HILOGI("serverId:%{public}d, requestId:%{public}d, valueLen:%{public}d",
+    HILOGD("serverId:%{public}d, requestId:%{public}d, valueLen:%{public}d",
         serverId, param->attrHandle, param->valueLen);
     std::optional<ConnectedDevice> deviceInfo = GetDeviceInfoByConnId(param->connectId);
     if (!deviceInfo.has_value()) {
@@ -912,8 +1027,6 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
         HILOGE("param is null!");
         return OHOS_BT_STATUS_UNHANDLED;
     }
-    HILOGI("serverId: %{public}d, attrHandle:%{public}d, confirm:%{public}d, valueLen:%{public}d",
-        serverId, param->attrHandle, param->confirm, param->valueLen);
     std::optional<ConnectedDevice> deviceInfo = GetDeviceInfoByConnId(param->connectId);
     if (!deviceInfo.has_value()) {
         HILOGE("connectId is invalid!");
@@ -923,24 +1036,16 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 
     string strAddress;
     GetAddrFromByte(value.remoteAddr.addr, strAddress);
-    HILOGI("device: %{public}s", GetEncryptAddr(strAddress).c_str());
     BluetoothRemoteDevice device(strAddress, 1);
 
-    int srvcHandle = 0;
-    GattCharacteristic *appCharacteristic = FindCharacteristic(serverId, param->attrHandle, false, &srvcHandle);
-    if (appCharacteristic == nullptr) {
-        HILOGE("not find characteristic");
-        return OHOS_BT_STATUS_FAIL;
-    }
-
-    HILOGI("srvcHandle:%{public}d", srvcHandle);
-    GattCharacteristic characteristic(appCharacteristic->GetUuid(),
-        appCharacteristic->GetHandle() + GATTSERVICES(serverId, srvcHandle).handleOffset,
-        appCharacteristic->GetPermissions(),
-        appCharacteristic->GetProperties());
+    std::shared_ptr<GattAttribute> attribute = GetAttributeWithHandle(serverId, param->attrHandle);
+    CHECK_AND_RETURN_LOG_RET(attribute, OHOS_BT_STATUS_FAIL, "not found attribute");
+    HILOGD("serverId: %{public}d, handle:%{public}u, actualHandle:%{public}u confirm:%{public}d, valueLen:%{public}d",
+        serverId, attribute->handle, attribute->actualHandle, param->confirm, param->valueLen);
+    // permission, properties is not used.
+    GattCharacteristic characteristic(attribute->uuid, attribute->actualHandle, 0, 0);
 
     characteristic.SetValue(reinterpret_cast<unsigned char*>(param->value), param->valueLen);
-
     GATTSERVER(serverId)->NotifyCharacteristicChanged(device, characteristic,
         (param->confirm == 1) ? true : false);
     return OHOS_BT_STATUS_SUCCESS;

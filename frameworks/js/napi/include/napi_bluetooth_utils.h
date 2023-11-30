@@ -127,13 +127,6 @@ struct AsyncCallbackInfo {
     int errorCode_ = 0;
 };
 
-struct CallbackPromiseInfo {
-    napi_ref callback = nullptr;
-    napi_deferred deferred = nullptr;
-    bool isCallback = false;
-    int errorCode = CODE_FAILED;
-};
-
 struct BluetoothCallbackInfo {
     napi_env env_;
     napi_ref callback_ = 0;
@@ -270,7 +263,7 @@ enum class BluetoothState {
 enum ConnectionStrategy {
     CONNECTION_UNKNOWN = 0,
     CONNECTION_ALLOWED = 1,
-    CONNECTION_FORBIDDEN =2,
+    CONNECTION_FORBIDDEN = 2,
 };
 
 enum MajorClass {
@@ -386,6 +379,7 @@ enum MajorMinorClass {
     HEALTH_DATA_DISPLAY = 0x091C,
     HEALTH_STEP_COUNTER = 0x0920,
     HEALTH_BODY_COMPOSITION_ANALYZER = 0x0924,
+    HEALTH_PEAK_FLOW_MOITOR = 0x0928, // HEALTH_PEAK_FLOW_MOITOR is compatible with api8.
     HEALTH_PEAK_FLOW_MONITOR = 0x0928,
     HEALTH_MEDICATION_MONITOR = 0x092C,
     HEALTH_KNEE_PROSTHESIS = 0x0930,

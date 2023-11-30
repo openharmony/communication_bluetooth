@@ -53,7 +53,7 @@ public:
 
         void OnConnectionStateChanged(const RawAddress &rawAddr, int state) override
         {
-            HILOGD("enter, address: %{public}s, state: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), state);
+            HILOGD("enter, address: %{public}s, state: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), state);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnConnectionStateChanged(device, static_cast<int>(state));
@@ -64,7 +64,7 @@ public:
         void OnPressButton(const RawAddress &rawAddr, uint8_t button, int result) override
         {
             HILOGI("enter, address: %{public}s, button: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), button, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPressButton(device, static_cast<uint8_t>(button), static_cast<int>(result));
@@ -75,7 +75,7 @@ public:
         void OnReleaseButton(const RawAddress &rawAddr, uint8_t button,  int result) override
         {
             HILOGI("enter, address: %{public}s, button: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), button, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), button, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnReleaseButton(device, static_cast<uint8_t>(button), static_cast<int>(result));
@@ -87,7 +87,7 @@ public:
             uint32_t numberOfItems, const std::vector<std::string> &folderNames, int result, int detail) override
         {
             HILOGI("enter, address: %{public}s, res: %{public}d, detail: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -103,7 +103,7 @@ public:
         void OnGetCapabilities(const RawAddress &rawAddr, const std::vector<uint32_t> &companies,
             const std::vector<uint8_t> &events, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnGetCapabilities(device, companies, events, result);
@@ -114,7 +114,7 @@ public:
         void OnGetPlayerAppSettingAttributes(
             const RawAddress &rawAddr, std::vector<uint8_t> attributes, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -127,7 +127,7 @@ public:
             int attribute, const std::vector<uint8_t> &values, int result) override
         {
             HILOGI("enter, address: %{public}s, attribute: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), attribute, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), attribute, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -140,7 +140,7 @@ public:
         void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> attributes,
             const std::vector<uint8_t> &values, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -151,7 +151,7 @@ public:
 
         void OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -163,7 +163,7 @@ public:
         void OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr,
             const std::vector<uint8_t> attribtues, const std::vector<std::string> &attributeName, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -175,7 +175,7 @@ public:
         void OnGetPlayerAppSettingValueText(const RawAddress &rawAddr,
             const std::vector<uint8_t> &values, const std::vector<std::string> &valueName, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -187,7 +187,7 @@ public:
         void OnGetElementAttributes(const RawAddress &rawAddr,
         const std::vector<uint32_t> &attribtues, const std::vector<std::string> &valueName, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -200,7 +200,7 @@ public:
             uint32_t songLength, uint32_t songPosition, uint8_t playStatus, int result) override
         {
             HILOGI("enter, address: %{public}s, status: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playStatus, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), playStatus, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnGetPlayStatus(device,
@@ -215,7 +215,7 @@ public:
         void OnPlayItem(const RawAddress &rawAddr, int status, int result) override
         {
             HILOGI("enter, address: %{public}s, status: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), status, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), status, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlayItem(device, static_cast<int>(status), static_cast<int>(result));
@@ -227,7 +227,7 @@ public:
             std::vector<BluetoothAvrcpMpItem> &items, int result, int detail) override
         {
             HILOGI("enter, address: %{public}s, uidCounter: %{public}d, res: %{public}d, detail: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result, detail);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), uidCounter, result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             std::vector<AvrcMpItem> myItems;
@@ -275,7 +275,7 @@ public:
             const std::vector<std::string> &values, int result, int detail) override
         {
             HILOGI("enter, address: %{public}s, res: %{public}d, detail: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), result, detail);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
 
@@ -288,7 +288,7 @@ public:
             int result, int detail) override
         {
             HILOGI("address: %{public}s, uidCounter: %{public}d, numOfItems: %{public}d, res: %{public}d, "
-                "detail: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, numOfItems, result, detail);
+                "detail: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), uidCounter, numOfItems, result, detail);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnGetTotalNumberOfItems(device,
@@ -303,7 +303,7 @@ public:
         void OnSetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume, int result) override
         {
             HILOGI("enter, address: %{public}s, volume: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), volume, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnSetAbsoluteVolume(device, static_cast<uint8_t>(volume), result);
@@ -314,7 +314,7 @@ public:
         void OnPlaybackStatusChanged(const RawAddress &rawAddr, uint8_t playStatus, int result) override
         {
             HILOGI("enter, address: %{public}s, status: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playStatus, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), playStatus, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlaybackStatusChanged(device, static_cast<uint8_t>(playStatus), static_cast<int>(result));
@@ -324,7 +324,7 @@ public:
 
         void OnTrackChanged(const RawAddress &rawAddr, uint64_t uid, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnTrackChanged(device, static_cast<uint64_t>(uid), static_cast<int>(result));
@@ -334,7 +334,7 @@ public:
 
         void OnTrackReachedEnd(const RawAddress &rawAddr, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnTrackReachedEnd(device, static_cast<int>(result));
@@ -344,7 +344,7 @@ public:
 
         void OnTrackReachedStart(const RawAddress &rawAddr, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnTrackReachedStart(device, static_cast<int>(result));
@@ -355,7 +355,7 @@ public:
         void OnPlaybackPosChanged(const RawAddress &rawAddr, uint32_t playbackPos, int result) override
         {
             HILOGI("enter, address: %{public}s, playbackPos: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playbackPos, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), playbackPos, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlaybackPosChanged(device, static_cast<uint32_t>(playbackPos), static_cast<int>(result));
@@ -366,7 +366,7 @@ public:
         void OnPlayerAppSettingChanged(const RawAddress &rawAddr, const std::vector<uint8_t> &attributes,
             const std::vector<uint8_t> &values, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnPlayerAppSettingChanged(device, attributes, values, static_cast<int>(result));
@@ -376,7 +376,7 @@ public:
 
         void OnNowPlayingContentChanged(const RawAddress &rawAddr, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnNowPlayingContentChanged(device, static_cast<int>(result));
@@ -386,7 +386,7 @@ public:
 
         void OnAvailablePlayersChanged(const RawAddress &rawAddr, int result) override
         {
-            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_AVRCP_ADDR(rawAddr), result);
+            HILOGI("enter, address: %{public}s, res: %{public}d", GET_ENCRYPT_RAW_ADDR(rawAddr), result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnAvailablePlayersChanged(device, static_cast<int>(result));
@@ -398,7 +398,7 @@ public:
             const RawAddress &rawAddr, uint16_t playerId, uint16_t uidCounter, int result) override
         {
             HILOGI("enter, address: %{public}s, playerId: %{public}d, uidCounter: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), playerId, uidCounter, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), playerId, uidCounter, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnAddressedPlayerChanged(
@@ -410,7 +410,7 @@ public:
         void OnUidChanged(const RawAddress &rawAddr, uint16_t uidCounter, int result) override
         {
             HILOGI("enter, address: %{public}s, uidCounter: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), uidCounter, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), uidCounter, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnUidChanged(device, static_cast<uint16_t>(uidCounter), static_cast<int>(result));
@@ -421,7 +421,7 @@ public:
         void OnVolumeChanged(const RawAddress &rawAddr, uint8_t volume, int result) override
         {
             HILOGI("enter, address: %{public}s, volume: %{public}d, res: %{public}d",
-                GET_ENCRYPT_AVRCP_ADDR(rawAddr), volume, result);
+                GET_ENCRYPT_RAW_ADDR(rawAddr), volume, result);
 
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             impl_->OnVolumeChanged(device, static_cast<uint8_t>(volume), static_cast<int>(result));
@@ -979,22 +979,20 @@ void AvrcpController::Init()
  * REGISTER / UNREGISTER OBSERVER                                 *
  ******************************************************************/
 
-void AvrcpController::RegisterObserver(IObserver *observer)
+void AvrcpController::RegisterObserver(std::shared_ptr<IObserver> observer)
 {
-    HILOGI("enter");
-
+    HILOGD("enter");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-    std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
-    pimpl->observers_.Register(pointer);
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Register(observer);
 }
 
-void AvrcpController::UnregisterObserver(IObserver *observer)
+void AvrcpController::UnregisterObserver(std::shared_ptr<IObserver> observer)
 {
-    HILOGI("enter");
-
+    HILOGD("enter");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
-    std::shared_ptr<IObserver> pointer(observer, [](IObserver *) {});
-    pimpl->observers_.Deregister(pointer);
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    pimpl->observers_.Deregister(observer);
 }
 
 /******************************************************************

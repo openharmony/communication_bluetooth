@@ -32,6 +32,7 @@ constexpr int RET_NO_SUPPORT = -1;
 constexpr int RET_BAD_PARAM = -2;
 constexpr int RET_BAD_STATUS = -3;
 constexpr int RET_NO_SPACE = -4;
+constexpr int RET_REACH_MAX = -5;
 
 /*********************************************
  *
@@ -206,6 +207,16 @@ const int DEVICE_TYPE_UNKNOWN = -1;
 const int DEVICE_TYPE_BREDR = 0;
 const int DEVICE_TYPE_LE = 1;
 const int DEVICE_TYPE_DUAL_MONO = 2;
+
+/**
+ * @brief ACL LINK TYPE.
+ * use to
+ * acl connectCallback()
+ */
+const int LINK_TYPE_UNKNOWN = -1;
+const int LINK_TYPE_BREDR = 0;
+const int LINK_TYPE_LE = 1;
+
 /*********************************************
  *
  * GATT Macro Define
@@ -362,6 +373,7 @@ typedef enum {
     SCAN_MODE_OP_P25_60_240 = 0x05,
     SCAN_MODE_OP_P100_1000_1000 = 0x06,
     SCAN_MODE_OP_P50_100_200 = 0x07,
+    SCAN_MODE_OP_P10_30_300 = 0x08,
 } SCAN_MODE;
 /// Regular scan params
 constexpr uint16_t BLE_SCAN_MODE_LOW_POWER_WINDOW_MS = 512;
@@ -380,6 +392,8 @@ constexpr uint16_t BLE_SCAN_MODE_OP_P100_1000_1000_WINDOW_MS = 1000;
 constexpr uint16_t BLE_SCAN_MODE_OP_P100_1000_1000_INTERVAL_MS = 1000;
 constexpr uint16_t BLE_SCAN_MODE_OP_P50_100_200_WINDOW_MS = 100;
 constexpr uint16_t BLE_SCAN_MODE_OP_P50_100_200_INTERVAL_MS = 200;
+constexpr uint16_t BLE_SCAN_MODE_OP_P10_30_300_WINDOW_MS = 30;
+constexpr uint16_t BLE_SCAN_MODE_OP_P10_30_300_INTERVAL_MS = 300;
 constexpr float BLE_SCAN_UNIT_TIME = 0.625;
 void ConvertBleScanMode(int scanMode, uint16_t &outScanWindow, uint16_t &outScanInterval);
 
@@ -1503,6 +1517,15 @@ struct CocUpdateSocketParam {
     int32_t supervisionTimeout;
     int32_t minConnEventLen;
     int32_t maxConnEventLen;
+};
+
+enum UpdateOutputStackAction {
+    ACTION_WEAR = 0,
+    ACTION_UNWEAR = 1,
+    ACTION_ENABLE_FROM_REMOTE = 2,
+    ACTION_DISABLE_FROM_REMOTE = 3,
+    ACTION_ENABLE_WEAR_DETECTION = 4,
+    ACTION_DISABLE_WEAR_DETECTION = 5,
 };
 
 #ifdef BLUETOOTH_EXPORT

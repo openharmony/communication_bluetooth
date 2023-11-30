@@ -94,5 +94,34 @@ bool BluetoothA2dpCodecStatus::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
+bool BluetoothA2dpOffloadCodecStatus::Marshalling(Parcel &parcel) const
+{
+    BluetoothA2dpOffloadCodecInfo info = bluetooth::OffloadCodecInfo(offloadInfo);
+    CHECK_AND_RETURN_LOG_RET(parcel.WriteParcelable(&info), false, "write parcel err.");
+    return true;
+}
+
+bool BluetoothA2dpOffloadCodecStatus::WriteToParcel(Parcel &parcel)
+{
+    return Marshalling(parcel);
+}
+
+BluetoothA2dpOffloadCodecStatus *BluetoothA2dpOffloadCodecStatus::Unmarshalling(Parcel &parcel)
+{
+    BluetoothA2dpOffloadCodecStatus *offloadCodecData = new BluetoothA2dpOffloadCodecStatus();
+    if (offloadCodecData != nullptr && !offloadCodecData->ReadFromParcel(parcel)) {
+        delete offloadCodecData;
+        offloadCodecData = nullptr;
+    }
+    return offloadCodecData;
+}
+
+bool BluetoothA2dpOffloadCodecStatus::ReadFromParcel(Parcel &parcel)
+{
+    std::shared_ptr<BluetoothA2dpOffloadCodecInfo> info(parcel.ReadParcelable<BluetoothA2dpOffloadCodecInfo>());
+    CHECK_AND_RETURN_LOG_RET(info, false, "Read Parcel err.");
+    offloadInfo = bluetooth::OffloadCodecInfo(*info);
+    return true;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
