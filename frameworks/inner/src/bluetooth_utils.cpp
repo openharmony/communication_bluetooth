@@ -229,7 +229,6 @@ bool CheckConnectionStrategyInvalid(int32_t strategy)
     return false;
 }
 
-
 bool CheckAccessAuthorizationInvalid(int32_t accessAuthorization)
 {
     if (accessAuthorization == static_cast<int32_t>(BTPermissionType::ACCESS_UNKNOWN) ||
