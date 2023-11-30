@@ -495,6 +495,7 @@ napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, 
 napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::string &addr);
 napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,
     int32_t &accessAuthorization);
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H
