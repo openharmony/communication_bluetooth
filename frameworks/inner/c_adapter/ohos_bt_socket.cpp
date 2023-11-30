@@ -21,6 +21,7 @@
 
 #include "ohos_bt_adapter_utils.h"
 #include "bluetooth_def.h"
+#include "bluetooth_gatt_client.h"
 #include "bluetooth_socket.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
@@ -165,6 +166,34 @@ int SocketServerClose(int serverId)
     }
     server->Close();
     g_serverMap.RemoveObject(serverId);
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Set fast connection flag
+ *
+ * @param bdAddr The remote device address to connect.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int SocketSetFastConnection(const BdAddr *bdAddr)
+{
+    string strAddress;
+    int leType = 1;
+    if (bdAddr == nullptr) {
+        HILOGE("bdAddr is nullptr.");
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    ConvertAddr(bdAddr->addr, strAddress);
+    // create a client to reuse requestfastestconn.
+    std::shared_ptr<GattClient> client = nullptr;
+    BluetoothRemoteDevice device(strAddress, leType);
+    client = std::make_shared<GattClient>(device);
+    client->Init();
+    int result = client->RequestFastestConn();
+    if (result != OHOS_BT_STATUS_SUCCESS) {
+        HILOGE("request fastest connect fail.");
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
