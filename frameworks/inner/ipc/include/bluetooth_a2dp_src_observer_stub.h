@@ -36,7 +36,8 @@ private:
     int32_t OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply);
     int32_t OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply);
     int32_t OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply);
-    using BluetoothA2dpSrcObserverFunc = int32_t (BluetoothA2dpSrcObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+    using BluetoothA2dpSrcObserverFunc =
+        int32_t (BluetoothA2dpSrcObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothA2dpSrcObserverFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothA2dpSrcObserverStub);

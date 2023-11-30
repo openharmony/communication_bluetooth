@@ -363,6 +363,7 @@ typedef enum {
     SCAN_MODE_OP_P25_60_240 = 0x05,
     SCAN_MODE_OP_P100_1000_1000 = 0x06,
     SCAN_MODE_OP_P50_100_200 = 0x07,
+    SCAN_MODE_OP_P10_30_300 = 0x08,
     SCAN_MODE_INVALID
 } SCAN_MODE;
 
@@ -1444,6 +1445,15 @@ struct CocUpdateSocketParam {
     int32_t supervisionTimeout;
     int32_t minConnEventLen;
     int32_t maxConnEventLen;
+};
+
+enum UpdateOutputStackAction {
+    ACTION_WEAR = 0,
+    ACTION_UNWEAR = 1,
+    ACTION_ENABLE_FROM_REMOTE = 2,
+    ACTION_DISABLE_FROM_REMOTE = 3,
+    ACTION_ENABLE_WEAR_DETECTION = 4,
+    ACTION_DISABLE_WEAR_DETECTION = 5,
 };
 
 constexpr int BLE_LPDEVICE_SCAN_SETTING_VALID_BIT = 0x01;

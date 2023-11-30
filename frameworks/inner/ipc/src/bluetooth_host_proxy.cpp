@@ -1592,58 +1592,36 @@ int32_t BluetoothHostProxy::CountEnableTimes(bool isEnable)
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::SendDeviceSelection(const std::string &address, int useA2dp, int useHfp, int userSelection)
+int32_t BluetoothHostProxy::ConnectAllowedProfiles(const std::string &remoteAddr)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::SendDeviceSelection WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteString(address)) {
-        HILOGE("BluetoothHostProxy::SendDeviceSelection Write address error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(useA2dp)) {
-        HILOGE("BluetoothHostProxy::SendDeviceSelection Write useA2dp error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(useHfp)) {
-        HILOGE("BluetoothHostProxy::SendDeviceSelection Write useHfp error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(userSelection)) {
-        HILOGE("BluetoothHostProxy::SendDeviceSelection Write userSelection error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(remoteAddr), BT_ERR_IPC_TRANS_FAILED,
+        "Write remoteAddr error");
+
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_SEND_DEVICE_SELECTION, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::SendDeviceSelection fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::CONNECT_ALLOWED_PROFILES, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+
     return reply.ReadInt32();
 }
 
-bool BluetoothHostProxy::IsSupportWearDetection(const std::string &address)
+int32_t BluetoothHostProxy::DisconnectAllowedProfiles(const std::string &remoteAddr)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::IsSupportWearDetection WriteInterfaceToken error");
-        return false;
-    }
-    if (!data.WriteString(address)) {
-        HILOGE("BluetoothHostProxy::IsSupportWearDetection Write address error");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(remoteAddr), BT_ERR_IPC_TRANS_FAILED,
+        "Write remoteAddr error");
+
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_IS_SUPPORT_WEAR_DETECTION, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::IsSupportWearDetection fail, error: %{public}d", error);
-        return false;
-    }
-    return reply.ReadBool();
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::DISCONNECT_ALLOWED_PROFILES, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+
+    return reply.ReadInt32();
 }
 
 }  // namespace Bluetooth

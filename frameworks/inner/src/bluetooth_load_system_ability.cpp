@@ -30,6 +30,7 @@
 #include "bluetooth_map_mse.h"
 #include "bluetooth_opp.h"
 #include "bluetooth_pan.h"
+#include "bluetooth_pbap_pse.h"
 #include "log.h"
 #include "system_ability_definition.h"
 
@@ -132,6 +133,7 @@ void BluetootLoadSystemAbility::NotifyMsgToProfile(NOTIFY_PROFILE_MSG notifyMsg)
     if (notifyMsg == NOTIFY_MSG_UINIT) {
         NotifyHostMsg(notifyMsg);
         NotifyMapMseProfile(notifyMsg);
+        NotifyPbapPseMsg(notifyMsg);
         return;
     }
     for (auto it = profileIdList_.begin(); it != profileIdList_.end(); ++it) {
@@ -160,6 +162,9 @@ void BluetootLoadSystemAbility::NotifyProfile(NOTIFY_PROFILE_MSG notifyMsg, cons
             break;
         case PROFILE_ID_HOST:
             NotifyHostMsg(notifyMsg);
+            break;
+        case PROFILE_ID_PBAP_PSE:
+            NotifyPbapPseMsg(notifyMsg);
             break;
         default:
             break;
@@ -342,6 +347,24 @@ void BluetootLoadSystemAbility::NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyM
 void BluetootLoadSystemAbility::NotifyMapMseProfile(NOTIFY_PROFILE_MSG notifyMsg)
 {
     MapMse *profile = MapMse::GetProfile();
+    if (profile == nullptr) {
+        return;
+    }
+    switch (notifyMsg) {
+        case NOTIFY_MSG_INIT:
+            profile->Init();
+            break;
+        case NOTIFY_MSG_UINIT:
+            profile->Uinit();
+            break;
+        default:
+            break;
+    }
+}
+
+void BluetootLoadSystemAbility::NotifyPbapPseMsg(NOTIFY_PROFILE_MSG notifyMsg)
+{
+    PbapPse *profile = PbapPse::GetProfile();
     if (profile == nullptr) {
         return;
     }

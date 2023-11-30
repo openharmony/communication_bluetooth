@@ -508,27 +508,5 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
     return ret;
 }
 
-bool BluetoothRemoteDevice::IsSupportWearDetection() const
-{
-    HILOGI("enter");
-
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return false;
-    }
-
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
-
-    return hostProxy->IsSupportWearDetection(address_);
-}
 }  // namespace Bluetooth
 }  // namespace OHOS

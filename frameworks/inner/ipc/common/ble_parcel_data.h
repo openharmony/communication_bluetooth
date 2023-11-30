@@ -380,9 +380,9 @@ public:
      * @param addr Own address.
      * @since 6
      */
-    void GetOwnAddr(uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN]) const
+    std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN> GetOwnAddr() const
     {
-        (void)memcpy_s(addr, RawAddress::BT_ADDRESS_BYTE_LEN, ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN);
+        return ownAddr_;
     }
 
     /**
@@ -391,9 +391,9 @@ public:
      * @param addr Own address.
      * @since 6
      */
-    void SetOwnAddr(const uint8_t addr[RawAddress::BT_ADDRESS_BYTE_LEN])
+    void SetOwnAddr(const std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN>& addr)
     {
-        (void)memcpy_s(ownAddr_, RawAddress::BT_ADDRESS_BYTE_LEN, addr, RawAddress::BT_ADDRESS_BYTE_LEN);
+        ownAddr_ = addr;
     }
 
     /**
@@ -425,7 +425,7 @@ public:
     uint8_t txPower_ {};
     int primaryPhy_ {};
     int secondaryPhy_ {};
-    uint8_t ownAddr_[RawAddress::BT_ADDRESS_BYTE_LEN] = {};
+    std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN> ownAddr_ = {};
     int8_t ownAddrType_ = -1;
 };
 

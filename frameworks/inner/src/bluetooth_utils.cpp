@@ -100,6 +100,26 @@ std::string GetProfileConnStateName(int state)
     }
 }
 
+std::string GetUpdateOutputStackActionName(int action)
+{
+    switch (action) {
+        case static_cast<int>(UpdateOutputStackAction::ACTION_WEAR):
+            return "WEAR(0)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_UNWEAR):
+            return "UNWEAR(1)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_ENABLE_FROM_REMOTE):
+            return "ENABLE_FROM_REMOTE(2)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_DISABLE_FROM_REMOTE):
+            return "DISABLE_FROM_REMOTE(3)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_ENABLE_WEAR_DETECTION):
+            return "ENABLE_WEAR_DETECTION(4)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_DISABLE_WEAR_DETECTION):
+            return "DISABLE_WEAR_DETECTION(5)";
+        default:
+            return "Unknown";
+    }
+}
+
 static std::map<int32_t, std::string> BtErrCodeMap {
     { BtErrCode::BT_NO_ERROR, "BT_NO_ERROR" },
     { BtErrCode::BT_ERR_PERMISSION_FAILED, "BT_ERR_PERMISSION_FAILED" },
@@ -209,15 +229,6 @@ bool CheckConnectionStrategyInvalid(int32_t strategy)
     return false;
 }
 
-bool CheckShareTypeInvalid(int32_t shareType)
-{
-    if (shareType == static_cast<int32_t>(BTShareType::SHARE_NAME_AND_PHONE_NUMVER)
-        || shareType == static_cast<int32_t>(BTShareType::SHARE_ALL)
-        || shareType == static_cast<int32_t>(BTShareType::SHARE_NOTHING)) {
-        return true;
-    }
-    return false;
-}
 
 bool CheckAccessAuthorizationInvalid(int32_t accessAuthorization)
 {

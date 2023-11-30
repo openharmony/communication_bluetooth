@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,8 +37,8 @@
 #include "string"
 #include "uuid.h"
 #include "bluetooth_object_map.h"
-#include <queue>
-#include <set>
+#include "ohos_bt_gatt_utils.h"
+#include "bluetooth_timer.h"
 
 
 #ifdef __cplusplus
@@ -50,11 +50,6 @@ using namespace std;
 namespace OHOS {
 namespace Bluetooth {
 #define MAX_BLE_ADV_NUM 7
-#define MAX_ADV_ADDR_MAP_SIZE 128
-#define ADV_ADDR_TIMEOUT (60 * 60 * 1000) // 1 hour
-#define ADV_ADDR_TIME_THRESHOLD (15 * 60 * 1000) // 15 mins
-#define MS_PER_SECOND 1000
-#define NS_PER_MS 1000000
 
 class BleCentralManagerCallbackWapper;
 class BleAdvCallback;
@@ -68,8 +63,7 @@ constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
 static mutex g_advMutex;
-static set<string> g_advAddrs;
-static queue<pair<string, uint64_t>> g_advTimeQueue; // pair<addr, time>
+static uint32_t g_advAddrTimerIds[MAX_BLE_ADV_NUM];
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -354,6 +348,10 @@ int BleStopAdv(int advId)
         g_AppCallback->advDisableCb(advId, 0);
     }
     g_bleAdvCallbacks[advId] = nullptr;
+    if (g_advAddrTimerIds[advId] != 0) {
+        BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId]);
+        g_advAddrTimerIds[advId] = 0;
+    }
 
     if (IsAllAdvStopped()) {
         HILOGI("All adv have been stopped.");
@@ -541,42 +539,15 @@ int BleDeregisterScanCallbacks(int32_t scannerId)
     return OHOS_BT_STATUS_SUCCESS;
 }
 
-static uint64_t GetBootMillis()
+/*
+ * RPA: The two highest bits of the broadcast address are 01, and address type is random.
+ */
+static bool IsRpa(const AdvOwnAddrParams *ownAddrParams)
 {
-    struct timespec ts = {};
-    clock_gettime(CLOCK_BOOTTIME, &ts);
-    return ts.tv_sec * MS_PER_SECOND + ts.tv_nsec / NS_PER_MS;
-}
-
-static void RemoveTimeoutAdvAddr()
-{
-    uint64_t now = GetBootMillis();
-    while (!g_advTimeQueue.empty() && now >= g_advTimeQueue.front().second + ADV_ADDR_TIMEOUT) {
-        g_advAddrs.erase(g_advTimeQueue.front().first);
-        g_advTimeQueue.pop();
-    }
-}
-
-static bool IsAdvAddrSetFull()
-{
-    if (g_advTimeQueue.size() >= MAX_ADV_ADDR_MAP_SIZE) {
-        if (GetBootMillis() >= g_advTimeQueue.front().second + ADV_ADDR_TIME_THRESHOLD) {
-            g_advAddrs.erase(g_advTimeQueue.front().first);
-            g_advTimeQueue.pop();
-            HILOGI("remove oldest adv addr");
-        } else {
-            HILOGI("reached the max num of advs in 15 minutes");
+    if (ownAddrParams != nullptr && ((ownAddrParams->addr[0] & 0xC0) ^ 0x40) == 0 &&
+        ownAddrParams->addrType == BLE_ADDR_RANDOM) {
             return true;
         }
-    }
-    return false;
-}
-
-static bool IsAddrValid(const AdvOwnAddrParams *ownAddrParams)
-{
-    if (ownAddrParams != nullptr && ((ownAddrParams->addr[0] & 0xC0) ^ 0x40) == 0) {
-        return true;
-    }
     return false;
 }
 
@@ -588,7 +559,7 @@ static bool IsAddrValid(const AdvOwnAddrParams *ownAddrParams)
  * @param advId Indicates the pointer to the advertisement ID.
  * @param rawData Indicates the advertising data. For details, see {@link StartAdvRawData}.
  * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
- * @param ownAddrParams Indicates the own address and own address type. For details, see {@link AdvOwnAddrParams}.
+ * @param ownAddrParams Indicates the own address(little endian) and own address type. For details, see {@link AdvOwnAddrParams}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
@@ -597,7 +568,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     const AdvOwnAddrParams *ownAddrParams)
 {
     HILOGI("BleStartAdvWithAddr enter");
-    if (rawData == nullptr || advParam == nullptr || !IsAddrValid(ownAddrParams)) {
+    if (advId == nullptr || rawData == nullptr || advParam == nullptr || !IsRpa(ownAddrParams)) {
         HILOGW("params are invalid");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -617,28 +588,31 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
 
     RemoveTimeoutAdvAddr();
     string addrStr(reinterpret_cast<const char*>(ownAddrParams->addr), sizeof(ownAddrParams->addr));
-    if (g_advAddrs.find(addrStr) == g_advAddrs.end() && !IsAdvAddrSetFull()) {
-        g_advTimeQueue.push(pair<string, uint64_t>(addrStr, GetBootMillis()));
-        g_advAddrs.insert(addrStr);
-    } else {
-        HILOGW("already has the same adv addr");
+    if (!CanStartAdv(addrStr)) {
         g_bleAdvCallbacks[i] = nullptr;
         return OHOS_BT_STATUS_UNHANDLED;
     }
+    // adv must stop after {@link ADV_ADDR_TIME_THRESHOLD}
+    auto timerCallback = [i]() {
+        HILOGI("Stop adv : %{public}d.", i);
+        BleStopAdv(i);
+    };
+    uint32_t timerId = 0;
+    BluetoothTimer::GetInstance()->Register(timerCallback, timerId, ADV_ADDR_TIME_THRESHOLD);
+    g_advAddrTimerIds[i] = timerId;
 
     *advId = i;
     HILOGI("ret advId: %{public}d.", *advId);
 
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam->minInterval);
-    if (advParam->advType == OHOS_BLE_ADV_SCAN_IND ||
-        advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
+    if (advParam->advType == OHOS_BLE_ADV_SCAN_IND || advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
         settings.SetConnectable(false);
     }
-    if (ownAddrParams != nullptr) {
-        settings.SetOwnAddr(ownAddrParams->addr);
-        settings.SetOwnAddrType(ownAddrParams->addrType);
-    }
+    std::array<uint8_t, OHOS_BD_ADDR_LEN> addr;
+    std::copy(std::begin(ownAddrParams->addr), std::end(ownAddrParams->addr), std::begin(addr));
+    settings.SetOwnAddr(addr);
+    settings.SetOwnAddrType(ownAddrParams->addrType);
 
     auto advData = ConvertDataToVec(rawData->advData, rawData->advDataLen);
     auto scanResponse = ConvertDataToVec(rawData->rspData, rawData->rspDataLen);

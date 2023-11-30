@@ -48,7 +48,7 @@ public:
     static napi_value CreateHfpAgProfile(napi_env env, napi_callback_info info);
     static napi_value DefineCreateProfile(napi_env env, napi_value exports);
 
-    static NapiHandsFreeAudioGatewayObserver observer_;
+    static std::shared_ptr<NapiHandsFreeAudioGatewayObserver> observer_;
     static bool isRegistered_;
     static thread_local napi_ref consRef_;
 };
