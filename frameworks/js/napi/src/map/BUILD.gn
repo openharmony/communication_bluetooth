@@ -1,4 +1,4 @@
-# Copyright (C) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
+# Copyright (C) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,12 +17,19 @@ BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
 
 ohos_shared_library("map") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
 
-  #install_enable = true
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
+
   include_dirs = [
     "$BT_NAPI_DIR/include",
-    "$BT_NAPI_DIR/src",
     "$BT_PART_DIR/frameworks/inner/common",
   ]
 
@@ -42,9 +49,9 @@ ohos_shared_library("map") {
     "$BT_NAPI_DIR/src/common/napi_native_object.cpp",
     "$BT_NAPI_DIR/src/common/napi_timer.cpp",
     "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
-    "$napi_bluetooth_map_mse.cpp",
-    "$napi_bluetooth_map_mse_observer.cpp",
-    "$native_module_map.cpp",
+    "napi_bluetooth_map_mse.cpp",
+    "napi_bluetooth_map_mse_observer.cpp",
+    "native_module_map.cpp",
   ]
 
   deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]

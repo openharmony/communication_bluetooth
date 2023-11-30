@@ -99,11 +99,11 @@ private:
     void NotifyOppProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyHidHostProfile(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyPanProfile(NOTIFY_PROFILE_MSG notifyMsg);
+    void NotifyMapMseProfile(NOTIFY_PROFILE_MSG notifyMsg);
 
     void NotifyAudioProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyTransferProfile(NOTIFY_PROFILE_MSG notifyMsg, const uint32_t &profileId);
     void NotifyHostMsg(NOTIFY_PROFILE_MSG notifyMsg);
-    void NotifyMapMseMsg(NOTIFY_PROFILE_MSG notifyMsg);
     void NotifyPbapPseMsg(NOTIFY_PROFILE_MSG notifyMsg);
 
     /**

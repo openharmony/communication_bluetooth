@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-std::shared_ptr<NapiMapMseObserver> NapiMapMse::observer_ = std::make_shared<>(NapiMapMseObserver);
+std::shared_ptr<NapiMapMseObserver> NapiMapMse::observer_ = std::make_shared<NapiMapMseObserver>();
 thread_local napi_ref g_consRef_ = nullptr;
 
 void NapiMapMse::DefineMapMseJSClass(napi_env env, napi_value exports)
@@ -111,7 +111,7 @@ napi_value NapiMapMse::GetConnectedDevices(napi_env env, napi_callback_info info
     NAPI_BT_ASSERT_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
 
     MapMse *profile = MapMse::GetProfile();
-    vector<int32_t> states = { static_cast<int32_t>(BTCpnnectState::CONNECTED) };
+    vector<int32_t> states = { static_cast<int32_t>(BTConnectState::CONNECTED) };
     vector<BluetoothRemoteDevice> devices {};
     int32_t errorCode = profile->GetDevicesByStates(states, devices);
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, ret);
