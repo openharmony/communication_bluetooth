@@ -222,8 +222,8 @@ std::string GenerateRandomMacAddress()
 
 bool CheckConnectionStrategyInvalid(int32_t strategy)
 {
-    if (strategy == static_cast<int32_t>(BTStrategyType::CONNECTION_ALLOWED)
-        || strategy == static_cast<int32_t>(BTStrategyType::CONNECTION_FORBIDDEN)) {
+    if (strategy == static_cast<int32_t>(BTStrategyType::CONNECTION_ALLOWED) ||
+        strategy == static_cast<int32_t>(BTStrategyType::CONNECTION_FORBIDDEN)) {
         return true;
     }
     return false;
@@ -232,9 +232,9 @@ bool CheckConnectionStrategyInvalid(int32_t strategy)
 
 bool CheckAccessAuthorizationInvalid(int32_t accessAuthorization)
 {
-     if (accessAuthorization == static_cast<int32_t>(BTPermissionType::ACCESS_UNKNOWN)
-        || accessAuthorization == static_cast<int32_t>(BTPermissionType::ACCESS_ALLOWED)
-        || accessAuthorization == static_cast<int32_t>(BTPermissionType::ACCESS_FORBIDDEN)) {
+     if (accessAuthorization == static_cast<int32_t>(BTPermissionType::ACCESS_UNKNOWN) ||
+        accessAuthorization == static_cast<int32_t>(BTPermissionType::ACCESS_ALLOWED) ||
+        accessAuthorization == static_cast<int32_t>(BTPermissionType::ACCESS_FORBIDDEN)) {
         return true
     }
     return false;
