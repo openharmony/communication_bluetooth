@@ -418,7 +418,6 @@ enum AccessAuthorization {
     REJECTED = 2,
 };
 
-
 template<typename T1, typename T2, typename T3>
 struct AfterWorkCallbackData {
     T1* object;
