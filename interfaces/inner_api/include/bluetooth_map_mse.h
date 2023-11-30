@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -142,8 +142,6 @@ public:
 private:
     MapMse();
     ~MapMse();
-    bool CheckConnectionStrategyInvalid(int32_t strategy) const;
-    bool CheckConnectionStrategyInvalid(int32_t strategy) const;
 
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(MapMse);
     BLUETOOTH_DECLARE_IMPL();

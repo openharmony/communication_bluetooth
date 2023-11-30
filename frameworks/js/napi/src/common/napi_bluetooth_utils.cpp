@@ -797,9 +797,9 @@ napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::
 
 bool IsAccessAuthorizationValid(int32_t accessAuthorization)
 {
-    return accessAuthorization == static_cast<int>(AccessAuthorization::UNKNOWN)
-        || accessAuthorization == static_cast<int>(AccessAuthorization::ALLOWED)
-        || accessAuthorization == static_cast<int>(AccessAuthorization::REJECTED);
+    return accessAuthorization == static_cast<int32_t>(AccessAuthorization::UNKNOWN) ||
+        accessAuthorization == static_cast<int32_t>(AccessAuthorization::ALLOWED) ||
+        accessAuthorization == static_cast<int32_t>(AccessAuthorization::REJECTED);
 }
 
 napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,

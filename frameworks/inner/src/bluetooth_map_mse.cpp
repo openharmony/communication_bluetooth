@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,9 +71,7 @@ private:
 
 MapMse::impl::impl()
 {
-    if (proxy_) {
-        return;
-    }
+    CHECK_AND_RETURN_LOG((proxy_ == nullptr), "proxy exist");
     BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_MAP_MSE);
     if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
         BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
@@ -93,7 +91,7 @@ MapMse::impl::~impl()
 bool MapMse::impl::InitMapMseProxy(void)
 {
     HILOGD("enter");
-    std::lock_guard<std::mutex> lock(mapMseProxyMutex);\
+    std::lock_guard<std::mutex> lock(mapMseProxyMutex);
     CHECK_AND_RETURN_LOG_RET((proxy_ == nullptr), true, "proxy exist");
 
     proxy_ = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
@@ -176,7 +174,7 @@ int32_t MapMse::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &sta
     return pimpl->proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
 }
 
-int32_t MapMse::GetDevicesByStates(const std::vector<int> &states, std::vector<BluetoothRemoteDevice> &result) const
+int32_t MapMse::GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRemoteDevice> &result) const
 {
     HILOGI("enter");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
@@ -230,8 +228,7 @@ int32_t MapMse::GetConnectionStrategy(const BluetoothRemoteDevice &device, int32
 
 int32_t MapMse::SetMessageAccessAuthorization(const BluetoothRemoteDevice &device, int32_t accessAuthorization)
 {
-    HILOGI("device: %{public}s, accessAuthorization: %{public}d",
-        GET_ENCRYPT_ADDR(device), accessAuthorization);
+    HILOGI("device: %{public}s, accessAuthorization: %{public}d", GET_ENCRYPT_ADDR(device), accessAuthorization);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
     CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
         BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
@@ -239,18 +236,20 @@ int32_t MapMse::SetMessageAccessAuthorization(const BluetoothRemoteDevice &devic
     CHECK_AND_RETURN_LOG_RET(CheckAccessAuthorizationInvalid(accessAuthorization),
         BT_ERR_INVALID_PARAM, "metaData param error");
 
-    return pimpl->proxy_->SetMessageAccessAuthorization(BluetoothRawAddress(device.GetDeviceAddr()), accessAuthorization);
+    return pimpl->proxy_->SetMessageAccessAuthorization(
+        BluetoothRawAddress(device.GetDeviceAddr()), accessAuthorization);
 }
 
 int32_t MapMse::GetMessageAccessAuthorization(const BluetoothRemoteDevice &device, int32_t &accessAuthorization) const
 {
-    HILOGI("device: %{public}s, metaDataType: %{public}d", GET_ENCRYPT_ADDR(device), dataValue);
+    HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
     CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
         BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetMessageAccessAuthorization(BluetoothRawAddress(device.GetDeviceAddr()), accessAuthorization);
+    return pimpl->proxy_->GetMessageAccessAuthorization(
+        BluetoothRawAddress(device.GetDeviceAddr()), accessAuthorization);
 }
 
 } // namespace Bluetooth

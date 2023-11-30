@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ public:
 
     int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) override;
     int32_t GetDevicesByStates(const std::vector<int32_t> &states,
-        std::vector<BluetoothRawAddress> &devices) override;
+        std::vector<BluetoothRawAddress> &rawDevices) override;
     int32_t Disconnect(const BluetoothRawAddress &device) override;
     int32_t SetConnectionStrategy(const BluetoothRawAddress &device, int32_t strategy) override;
     int32_t GetConnectionStrategy(const BluetoothRawAddress &device, int32_t &strategy) override;
