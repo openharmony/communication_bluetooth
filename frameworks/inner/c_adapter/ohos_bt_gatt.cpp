@@ -165,7 +165,7 @@ public:
 
     void OnStartResultEvent(int result, int advHandle) override
     {
-        HILOGI("advId: %{public}d, ret: %{public}d", advId_, result);
+        HILOGI("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
         advHandle_ = advHandle;
         if (g_AppCallback != nullptr && g_AppCallback->advEnableCb != nullptr) {
@@ -182,7 +182,23 @@ public:
     {}
 
     void OnStopResultEvent(int result, int advHandle) override
-    {}
+    {
+        HILOGI("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
+        int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
+        advHandle_ = 0xFF; // restore invalid advHandle
+        if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
+            g_AppCallback->advDisableCb(advId_, ret);
+        } else {
+            HILOGW("call back is null.");
+        }
+        if (g_advAddrTimerIds[advId_] != 0) {
+            BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId_]);
+            g_advAddrTimerIds[advId_] = 0;
+        } else {
+            HILOGW("TimerId no registered, is 0.");
+        }
+        g_bleAdvCallbacks[advId_] = nullptr;
+    }
 
     void OnSetAdvDataEvent(int result) override
     {
@@ -309,16 +325,6 @@ int BleStartAdv(int advId, const BleAdvParams *param)
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
-static bool IsAllAdvStopped()
-{
-    for (int i = 0; i < MAX_BLE_ADV_NUM; i++) {
-        if (g_bleAdvCallbacks[i] != nullptr) {
-            return false;
-        }
-    }
-    return true;
-}
-
 /**
  * @brief Stops advertising.
  *
@@ -341,21 +347,6 @@ int BleStopAdv(int advId)
     }
 
     g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
-
-    usleep(100);
-    if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
-        HILOGI("adv stopped advId: %{public}d.", advId);
-        g_AppCallback->advDisableCb(advId, 0);
-    }
-    g_bleAdvCallbacks[advId] = nullptr;
-    if (g_advAddrTimerIds[advId] != 0) {
-        BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId]);
-        g_advAddrTimerIds[advId] = 0;
-    }
-
-    if (IsAllAdvStopped()) {
-        HILOGI("All adv have been stopped.");
-    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 

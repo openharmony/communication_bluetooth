@@ -193,6 +193,13 @@ enum class ScanDuty {
     SCAN_MODE_LOW_LATENCY = 2  // Scan using highest duty cycle
 };
 
+enum class AdvertisingState {
+    STARTED = 1,  // advertiser started
+    ENABLED = 2,  // advertiser temporarily enabled
+    DISABLED = 3, // advertiser temporarily disabled
+    STOPPED = 4  // advertiser stopped
+};
+
 struct ScanOptions {
     int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
