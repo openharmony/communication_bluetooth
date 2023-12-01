@@ -18,6 +18,7 @@
 #include "bluetooth_log.h"
 #include "napi_async_work.h"
 #include "napi_native_object.h"
+#include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_ble_utils.h"
 
 namespace OHOS {
@@ -46,7 +47,8 @@ void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHa
             HILOGE("napiAdvertisingStateCallback_ is nullptr");
             return;
         }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 1); // 1 mean start adv
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
+            static_cast<int>(AdvertisingState::STARTED));
         callback->CallFunction(napiNative);
     };
     DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
@@ -63,7 +65,8 @@ void NapiBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advH
             HILOGE("napiAdvertisingStateCallback_ is nullptr");
             return;
         }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 2); // 2 mean enable adv
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
+            static_cast<int>(AdvertisingState::ENABLED));
         callback->CallFunction(napiNative);
     };
     DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
@@ -80,7 +83,8 @@ void NapiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int adv
             HILOGE("napiAdvertisingStateCallback_ is nullptr");
             return;
         }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 3); // 3 mean disable adv
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
+            static_cast<int>(AdvertisingState::DISABLED));
         callback->CallFunction(napiNative);
     };
     DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
@@ -97,7 +101,8 @@ void NapiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHan
             HILOGE("napiAdvertisingStateCallback_ is nullptr");
             return;
         }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, 4); // 4 mean stop adv
+        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
+            static_cast<int>(AdvertisingState::STOPPED));
         callback->CallFunction(napiNative);
     };
     DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
