@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "bluetooth_pan.h"
 #include "bluetooth_utils.h"
