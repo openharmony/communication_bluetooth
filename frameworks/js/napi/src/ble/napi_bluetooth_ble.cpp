@@ -1047,6 +1047,13 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     SetNamedPropertyByInteger(env, gattWriteTypeObj, static_cast<int32_t>(NapiGattWriteType::WRITE), "WRITE");
     SetNamedPropertyByInteger(
         env, gattWriteTypeObj, static_cast<int32_t>(NapiGattWriteType::WRITE_NO_RESPONSE), "WRITE_NO_RESPONSE");
+
+    napi_value advertisingStateObj = nullptr;
+    napi_create_object(env, &advertisingStateObj);
+    SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::STARTED), "STARTED");
+    SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::ENABLED), "ENABLED");
+    SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::DISABLED), "DISABLED");
+    SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::STOPPED), "STOPPED");
 #endif
 
     napi_property_descriptor exportFuncs[] = {
@@ -1054,6 +1061,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObj),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
+        DECLARE_NAPI_PROPERTY("AdvertisingState", advertisingStateObj),
 #endif
     };
 
