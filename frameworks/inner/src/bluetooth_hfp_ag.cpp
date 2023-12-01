@@ -16,7 +16,6 @@
 #include "bluetooth_hfp_ag.h"
 #include <unistd.h>
 #include "bluetooth_device.h"
-#include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
 #include "bluetooth_load_system_ability.h"
 #include "bluetooth_log.h"

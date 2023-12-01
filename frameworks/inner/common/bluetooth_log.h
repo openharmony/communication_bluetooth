@@ -91,7 +91,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, BT_LOG_DOMAI
 #define CHECK_AND_RETURN_LOG_RET(cond, ret, fmt, ...)               \
     do {                                                            \
         if (!(cond)) {                                              \
-            HILOGE(fmt " ret(%{public}s)", ##__VA_ARGS__, #ret);    \
+            HILOGE(fmt, ##__VA_ARGS__);    \
             return ret;                                             \
         }                                                           \
     } while (0)

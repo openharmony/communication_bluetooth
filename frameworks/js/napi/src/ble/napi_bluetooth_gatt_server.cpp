@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "napi_bluetooth_gatt_server.h"
-#include "bluetooth_errorcode.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
