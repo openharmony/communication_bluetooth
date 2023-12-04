@@ -22,6 +22,7 @@
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
+#include "bluetooth_phone_state.h"
 #include "i_bluetooth_hfp_ag.h"
 #include "bluetooth_hfp_ag_observer_stub.h"
 #include "i_bluetooth_host.h"
@@ -172,12 +173,12 @@ struct HandsFreeAudioGateway::impl {
         return HFP_AG_SCO_STATE_DISCONNECTED;
     }
 
-    int32_t ConnectSco(const uint8_t callType)
+    int32_t ConnectSco(uint8_t callType)
     {
         return proxy_->ConnectSco(callType);
     }
 
-    int32_t DisconnectSco(const uint8_t callType)
+    int32_t DisconnectSco(uint8_t callType)
     {
         return proxy_->DisconnectSco(callType);
     }
@@ -200,24 +201,22 @@ struct HandsFreeAudioGateway::impl {
         return false;
     }
 
-    bool IsValidCallType(const uint8_t callType)
+    bool IsValidCallType(uint8_t callType)
     {
         if (callType == static_cast<uint8_t>(BTCallType::CALL_TYPE_CELLULAR) ||
             callType == static_cast<uint8_t>(BTCallType::CALL_TYPE_VIRTUAL) ||
             callType == static_cast<uint8_t>(BTCallType::CALL_TYPE_RECOGNITION)) {
             return true;
         }
-        HILOGE("invalid call type");
         return false;
     }
 
-    void PhoneStateChanged(
-        int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
+    void PhoneStateChanged(BluetoothPhoneState &phoneState)
     {
         HILOGI("numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, type: %{public}d",
-            numActive, numHeld, callState, type);
+            phoneState.GetActiveNum(), phoneState.GetHeldNum(), phoneState.GetCallState(), phoneState.GetCallType());
         if (proxy_ != nullptr) {
-            proxy_->PhoneStateChanged(numActive, numHeld, callState, number, type, name);
+            proxy_->PhoneStateChanged(phoneState);
         }
     }
 
@@ -534,39 +533,25 @@ int HandsFreeAudioGateway::GetScoState(const BluetoothRemoteDevice &device) cons
     return pimpl->GetScoState(device);
 }
 
-int32_t HandsFreeAudioGateway::ConnectSco(const uint8_t callType)
+int32_t HandsFreeAudioGateway::ConnectSco(uint8_t callType)
 {
     HILOGI("enter, callType: %{public}d", callType);
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
-
-    if (!pimpl->IsValidCallType(callType)) {
-        return BT_ERR_INVALID_STATE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), BT_ERR_UNAVAILABLE_PROXY,
+        "pimpl or hfpAG proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET((pimpl->IsValidCallType(callType)), BT_ERR_INVALID_PARAM,
+        "connect sco call type error.");
     return pimpl->ConnectSco(callType);
 }
 
-int32_t HandsFreeAudioGateway::DisconnectSco(const uint8_t callType)
+int32_t HandsFreeAudioGateway::DisconnectSco(uint8_t callType)
 {
     HILOGI("enter, callType: %{public}d", callType);
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
-
-    if (!pimpl->IsValidCallType(callType)) {
-        return BT_ERR_INVALID_STATE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), BT_ERR_UNAVAILABLE_PROXY,
+        "pimpl or hfpAG proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET((pimpl->IsValidCallType(callType)), BT_ERR_INVALID_PARAM,
+        "disconnect sco call type error.");
     return pimpl->DisconnectSco(callType);
 }
 
@@ -603,17 +588,17 @@ bool HandsFreeAudioGateway::DisconnectSco()
 void HandsFreeAudioGateway::PhoneStateChanged(
     int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
 {
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
+    CHECK_AND_RETURN_LOG((pimpl != nullptr && pimpl->proxy_ != nullptr), "pimpl or hfpAG proxy is nullptr.");
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return;
-    }
-
-    pimpl->PhoneStateChanged(numActive, numHeld, callState, number, type, name);
+    BluetoothPhoneState phoneState;
+    phoneState.SetActiveNum(numActive);
+    phoneState.SetHeldNum(numHeld);
+    phoneState.SetCallState(callState);
+    phoneState.SetNumber(number);
+    phoneState.SetCallType(type);
+    phoneState.SetName(name);
+    pimpl->PhoneStateChanged(phoneState);
 }
 
 void HandsFreeAudioGateway::ClccResponse(
