@@ -81,6 +81,15 @@ public:
         });
     }
 
+    void OnHfpStackChanged(const BluetoothRawAddress &device, int32_t action) override
+    {
+        HILOGI("enter, device: %{public}s, action: %{public}u",
+            GET_ENCRYPT_RAW_ADDR(device), GetUpdateOutputStackActionName(action).c_str());
+        BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
+        observers_.ForEach([remoteDevice](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
+            observer->OnHfpStackChanged(remoteDevice);
+    }
+
 private:
     BluetoothObserverList<HandsFreeAudioGatewayObserver> &observers_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AgServiceObserver);
@@ -276,6 +285,12 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGD("enter");
         return proxy_->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    }
+
+    bool IsInbandRingingEnabled() const
+    {
+        HILOGD("enter");
+        return proxy_->IsInbandRingingEnabled();
     }
 
     void RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
@@ -680,6 +695,15 @@ int HandsFreeAudioGateway::GetConnectStrategy(const BluetoothRemoteDevice &devic
         return BT_ERR_INVALID_PARAM;
     }
     return pimpl->GetConnectStrategy(device, strategy);
+}
+
+bool HandsFreeAudioGateway::IsInbandRingingEnabled() const
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_),
+        BT_ERR_INTERNAL_ERROR, "pimpl or hfpAG proxy is nullptr");
+    return pimpl->IsInbandRingingEnabled();
 }
 
 void HandsFreeAudioGateway::RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
