@@ -104,7 +104,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getRemoteProfileUuids", GetRemoteProfileUuids),
         DECLARE_NAPI_FUNCTION("on", RegisterConnectionObserver),
         DECLARE_NAPI_FUNCTION("off", DeRegisterConnectionObserver),
-        DECLARE_NAPI_FUNCTION("isBluetoothDisCovering", IsBluetoothDiscovering),
+        DECLARE_NAPI_FUNCTION("isBluetoothDiscovering", IsBluetoothDiscovering),
         DECLARE_NAPI_FUNCTION("getPairState", GetPairState),
         DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
         DECLARE_NAPI_FUNCTION("disconnectAllowedProfiles", DisconnectAllowedProfiles),
