@@ -289,7 +289,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool IsInbandRingingEnabled() const
     {
-        HILOGD("enter");
+        HILOGI("enter");
         return proxy_->IsInbandRingingEnabled();
     }
 
@@ -699,7 +699,7 @@ int HandsFreeAudioGateway::GetConnectStrategy(const BluetoothRemoteDevice &devic
 
 bool HandsFreeAudioGateway::IsInbandRingingEnabled() const
 {
-    HILOGD("enter");
+    HILOGI("enter");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_),
         BT_ERR_INTERNAL_ERROR, "pimpl or hfpAG proxy is nullptr");
