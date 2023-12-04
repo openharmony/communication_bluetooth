@@ -92,6 +92,15 @@ public:
     {}
 
     /**
+     * @brief The observer function to notify audio framework the hfp stack changed.
+     *
+     * @param device Remote device object.
+     * @param action Action on the device.
+     * @since 11
+     */
+    virtual void OnHfpStackChanged(const BluetoothRemoteDevice &device, int32_t action)
+
+    /**
      * @brief Destroy the HandsFreeAudioGateway Observer object.
      *
      * @since 6
@@ -304,6 +313,14 @@ public:
      * @since 6
      */
     std::vector<BluetoothRemoteDevice> GetConnectedDevices() const;
+
+    /**
+     * @brief Check whether in-band-ringing is enabled
+     *
+     * @return Returns <b>true</b> if the in-band-ringing is enbale; returns <b>false</b> if the in-band-ringing is disable.
+     * @since 11
+     */
+    bool IsInbandRingingEnabled() const;
 
     /**
      * @brief Static HandsFree AudioGateway observer instance.
