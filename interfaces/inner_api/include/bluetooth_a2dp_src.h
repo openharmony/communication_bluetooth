@@ -92,13 +92,24 @@ public:
 /**
  * @brief audio stream details.
  *
- * @since 6.0
+ * @since 11.0
  */
 struct A2dpStreamInfo {
     int32_t sessionId;
     int32_t streamType;
     int32_t sampleRate;
     bool isSpatialAudio;
+};
+
+/**
+ * @brief a2dp audio stream encode type.
+ *
+ * @since 11.0
+ */
+enum A2dpStreamEncodeType : uint8_t {
+    A2DP_STREAM_ENCODE_UNKNOWN = 0,
+    A2DP_STREAM_ENCODE_SOFTWARE,
+    A2DP_STREAM_ENCODE_HARDWARE,
 };
 
 /**
