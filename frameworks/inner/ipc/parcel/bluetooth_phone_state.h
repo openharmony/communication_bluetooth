@@ -32,8 +32,8 @@ public:
     bool WriteToParcel(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel);
 
-    int GetAcitveNum();
-    void SetAcitveNum(int activeNum);
+    int GetActiveNum();
+    void SetActiveNum(int activeNum);
     int GetHeldNum();
     void SetHeldNum(int heldNum);
     int GetCallState();
