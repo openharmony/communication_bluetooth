@@ -40,7 +40,7 @@ enum class BTShareType : int32_t {
 
 class BluetoothPbapPseObserverImp : public BluetoothPbapPseObserverStub {
 public:
-    explicit BluetoothPbapPseObserverImp(BluetoothObserverList<PbapPseObserver> &observers) 
+    explicit BluetoothPbapPseObserverImp(BluetoothObserverList<PbapPseObserver> &observers)
         : observers_(observers)
     {}
     ~BluetoothPbapPseObserverImp() override
