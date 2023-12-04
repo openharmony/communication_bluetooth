@@ -78,12 +78,12 @@ bool BluetoothPhoneState::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
-int BluetoothPhoneState::GetAcitveNum()
+int BluetoothPhoneState::GetActiveNum()
 {
     return activeNum_;
 }
 
-void BluetoothPhoneState::SetAcitveNum(int activeNum)
+void BluetoothPhoneState::SetActiveNum(int activeNum)
 {
     activeNum_ = activeNum;
 }
