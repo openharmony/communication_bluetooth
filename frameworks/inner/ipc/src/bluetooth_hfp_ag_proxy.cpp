@@ -521,6 +521,21 @@ int BluetoothHfpAgProxy::GetConnectStrategy(const BluetoothRawAddress &device, i
     return res;
 }
 
+bool BluetoothHfpAgProxy::IsInbandRingingEnabled()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option {
+        MessageOption::TF_SYNC
+    };
+
+    int error = Remote()->SendRequest(
+        BluetoothHfpAgInterfaceCode::BT_HFP_AG_IS_IN_BAND_RINGING_ENABLE, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR,
+        "BluetoothHfpAgProxy::IsInbandRingingEnabled done fail, error: %{public}d", error);
+    return reply.ReadBool();
+}
+
 void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer)
 {
     MessageParcel data;
