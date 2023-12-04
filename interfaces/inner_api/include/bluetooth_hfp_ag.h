@@ -99,6 +99,7 @@ public:
      * @since 11
      */
     virtual void OnHfpStackChanged(const BluetoothRemoteDevice &device, int32_t action)
+    {}
 
     /**
      * @brief Destroy the HandsFreeAudioGateway Observer object.

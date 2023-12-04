@@ -87,7 +87,7 @@ public:
             GET_ENCRYPT_RAW_ADDR(device), GetUpdateOutputStackActionName(action).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
-            observer->OnHfpStackChanged(remoteDevice);
+            observer->OnHfpStackChanged(remoteDevice, action);
     }
 
 private:
