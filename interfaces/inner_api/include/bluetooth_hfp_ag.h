@@ -175,7 +175,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns <b>Other</b> if the operation fails.
      * @since 10
      */
-    int32_t ConnectSco(const uint8_t callType);
+    int32_t ConnectSco(uint8_t callType);
 
     /**
      * @brief Release the audio connection from remote active HF device.
@@ -184,7 +184,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns <b>Other</b> if the operation fails.
      * @since 10
      */
-    int32_t DisconnectSco(const uint8_t callType);
+    int32_t DisconnectSco(uint8_t callType);
 
     /**
      * @brief Initiate the establishment of an audio connection to remote active HF device.
