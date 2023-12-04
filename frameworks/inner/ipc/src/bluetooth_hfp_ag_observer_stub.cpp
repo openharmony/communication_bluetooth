@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hfp_ag_observer_stub.h"
 #include "bluetooth_log.h"
 
@@ -34,6 +34,9 @@ BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_HFP_STACK_CHANGED)] =
+        &BluetoothHfpAgObserverStub::OnHfpStackChangedInner;
 
     HILOGD("ends.");
 }
@@ -72,7 +75,7 @@ ErrCode BluetoothHfpAgObserverStub::OnConnectionStateChangedInner(MessageParcel 
     }
     int state = data.ReadInt32();
     OnConnectionStateChanged(*device, state);
-    return NO_ERROR;
+    return BT_NO_ERROR;
 }
 
 ErrCode BluetoothHfpAgObserverStub::OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply)
@@ -83,7 +86,7 @@ ErrCode BluetoothHfpAgObserverStub::OnScoStateChangedInner(MessageParcel &data, 
     }
     int state = data.ReadInt32();
     OnScoStateChanged(*device, state);
-    return NO_ERROR;
+    return BT_NO_ERROR;
 }
 
 ErrCode BluetoothHfpAgObserverStub::OnActiveDeviceChangedInner(MessageParcel &data, MessageParcel &reply)
@@ -93,7 +96,7 @@ ErrCode BluetoothHfpAgObserverStub::OnActiveDeviceChangedInner(MessageParcel &da
         return TRANSACTION_ERR;
     }
     OnActiveDeviceChanged(*device);
-    return NO_ERROR;
+    return BT_NO_ERROR;
 }
 
 ErrCode BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner(MessageParcel &data, MessageParcel &reply)
@@ -104,7 +107,17 @@ ErrCode BluetoothHfpAgObserverStub::OnHfEnhancedDriverSafetyChangedInner(Message
     }
     int indValue = data.ReadInt32();
     OnScoStateChanged(*device, indValue);
-    return NO_ERROR;
+    return BT_NO_ERROR;
+}
+
+int32_t BluetoothHfpAgObserverStub::OnHfpStackChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    CHECK_AND_RETURN_LOG_RET(device, BT_ERR_INTERNAL_ERROR,
+        "BluetoothHfpAgObserverStub::OnHfpStackChangedInnerInner error, service is null");
+    int action = data.ReadInt32();
+    OnHfpStackChanged(*device, action);
+    return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
