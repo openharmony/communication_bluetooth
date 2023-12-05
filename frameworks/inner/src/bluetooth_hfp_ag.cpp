@@ -88,6 +88,7 @@ public:
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, action](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnHfpStackChanged(remoteDevice, action);
+        });
     }
 
 private:
