@@ -48,6 +48,7 @@ FwkSrc = [
   "src/bluetooth_map_mse.cpp",
   "src/bluetooth_opp.cpp",
   "src/bluetooth_pan.cpp",
+  "src/bluetooth_profile_manager.cpp",
   "src/bluetooth_pbap_pse.cpp",
   "src/bluetooth_proxy_manager.cpp",
   "src/bluetooth_remote_device.cpp",
@@ -57,7 +58,6 @@ FwkSrc = [
   "src/bluetooth_timer.cpp",
   "src/bluetooth_utils.cpp",
   "src/bluetooth_host_load_callback.cpp",
-  "src/bluetooth_load_system_ability.cpp",
   "src/bluetooth_audio_manager.cpp",
 ]
 

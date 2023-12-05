@@ -18,7 +18,7 @@
 #include "bluetooth_device.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
-#include "bluetooth_load_system_ability.h"
+#include "bluetooth_profile_manager.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
@@ -102,17 +102,14 @@ std::string HfpAgServiceName = "bluetooth-hfp-ag-server";
 struct HandsFreeAudioGateway::impl {
     impl();
     ~impl();
-    bool InitHfpAgProxy(void);
 
     int32_t GetConnectedDevices(std::vector<BluetoothRemoteDevice>& devices)
     {
         HILOGD("enter");
-        if (!proxy_) {
-            HILOGE("proxy_ is nullptr.");
-            return BT_ERR_SERVICE_DISCONNECTED;
-        }
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
         std::vector<BluetoothRawAddress> ori;
-        int32_t ret = proxy_->GetConnectDevices(ori);
+        int32_t ret = proxy->GetConnectDevices(ori);
         if (ret != BT_NO_ERROR) {
             HILOGE("inner error.");
             return ret;
@@ -127,14 +124,15 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGD("enter");
         std::vector<BluetoothRemoteDevice> remoteDevices;
-        if (proxy_ != nullptr) {
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr) {
             std::vector<BluetoothRawAddress> rawDevices;
             std::vector<int32_t> tmpstates;
             for (int state : states) {
                 int32_t value = (int32_t)state;
                 tmpstates.push_back(value);
             }
-            proxy_->GetDevicesByStates(tmpstates, rawDevices);
+            proxy->GetDevicesByStates(tmpstates, rawDevices);
             for (BluetoothRawAddress rawDevice : rawDevices) {
                 BluetoothRemoteDevice remoteDevice(rawDevice.GetAddress(), 0);
                 remoteDevices.push_back(remoteDevice);
@@ -146,68 +144,72 @@ struct HandsFreeAudioGateway::impl {
     int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
     {
         HILOGD("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy == nullptr || !device.IsValidBluetoothRemoteDevice()) {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
         }
 
-        return proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
+        return proxy->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
     }
 
     int32_t Connect(const BluetoothRemoteDevice &device)
     {
         HILOGI("hfp connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy == nullptr || !device.IsValidBluetoothRemoteDevice()) {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
         }
-        return proxy_->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
+        return proxy->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
     int32_t Disconnect(const BluetoothRemoteDevice &device)
     {
         HILOGI("hfp disconnect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ == nullptr || !device.IsValidBluetoothRemoteDevice()) {
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy == nullptr || !device.IsValidBluetoothRemoteDevice()) {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
         }
-        return proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
+        return proxy->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
     int GetScoState(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->GetScoState(BluetoothRawAddress(device.GetDeviceAddr()));
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy->GetScoState(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return HFP_AG_SCO_STATE_DISCONNECTED;
     }
 
     int32_t ConnectSco(uint8_t callType)
     {
-        return proxy_->ConnectSco(callType);
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        return proxy->ConnectSco(callType);
     }
 
     int32_t DisconnectSco(uint8_t callType)
     {
-        return proxy_->DisconnectSco(callType);
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        return proxy->DisconnectSco(callType);
     }
 
     bool ConnectSco()
     {
         HILOGD("enter");
-        if (proxy_ != nullptr) {
-            return proxy_->ConnectSco();
-        }
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, proxy->ConnectSco(), "failed: no proxy");
         return false;
     }
 
     bool DisconnectSco()
     {
         HILOGD("enter");
-        if (proxy_ != nullptr) {
-            return proxy_->DisconnectSco();
-        }
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, proxy->DisconnectSco(), "failed: no proxy");
         return false;
     }
 
@@ -225,8 +227,9 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGI("numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, type: %{public}d",
             phoneState.GetActiveNum(), phoneState.GetHeldNum(), phoneState.GetCallState(), phoneState.GetCallType());
-        if (proxy_ != nullptr) {
-            proxy_->PhoneStateChanged(phoneState);
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr) {
+            proxy->PhoneStateChanged(phoneState);
         }
     }
 
@@ -234,16 +237,18 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGI("enter, index: %{public}d, direction: %{public}d, status: %{public}d, mode: %{public}d, mpty: "
             "%{public}d, type: %{public}d", index, direction, status, mode, mpty, type);
-        if (proxy_ != nullptr) {
-            proxy_->ClccResponse(index, direction, status, mode, mpty, number, type);
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr) {
+            proxy->ClccResponse(index, direction, status, mode, mpty, number, type);
         }
     }
 
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->OpenVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
+            return proxy->OpenVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
     }
@@ -251,8 +256,9 @@ struct HandsFreeAudioGateway::impl {
     bool CloseVoiceRecognition(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->CloseVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
+            return proxy->CloseVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
     }
@@ -260,8 +266,9 @@ struct HandsFreeAudioGateway::impl {
     bool SetActiveDevice(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        if (proxy_ != nullptr && device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->SetActiveDevice(BluetoothRawAddress(device.GetDeviceAddr()));
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
+            return proxy->SetActiveDevice(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
     }
@@ -269,8 +276,9 @@ struct HandsFreeAudioGateway::impl {
     bool IntoMock(const BluetoothRemoteDevice &device, int state)
     {
         HILOGD("enter");
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            return proxy_->IntoMock(BluetoothRawAddress(device.GetDeviceAddr()), state);
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr && IS_BT_ENABLED()) {
+            return proxy->IntoMock(BluetoothRawAddress(device.GetDeviceAddr()), state);
         }
         return false;
     }
@@ -278,8 +286,9 @@ struct HandsFreeAudioGateway::impl {
     bool SendNoCarrier(const BluetoothRemoteDevice &device)
     {
         HILOGD("enter");
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
-            return proxy_->SendNoCarrier(BluetoothRawAddress(device.GetDeviceAddr()));
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+            return proxy->SendNoCarrier(BluetoothRawAddress(device.GetDeviceAddr()));
         }
         return false;
     }
@@ -288,8 +297,9 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGD("enter");
         BluetoothRemoteDevice device;
-        if (proxy_ != nullptr) {
-            std::string address = proxy_->GetActiveDevice();
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        if (proxy != nullptr) {
+            std::string address = proxy->GetActiveDevice();
             BluetoothRemoteDevice remoteDevice(address, 0);
             device = remoteDevice;
         }
@@ -299,19 +309,22 @@ struct HandsFreeAudioGateway::impl {
     int SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
     {
         HILOGD("enter");
-        return proxy_->SetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        return proxy->SetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
     int GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const
     {
         HILOGD("enter");
-        return proxy_->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        return proxy->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
     bool IsInbandRingingEnabled() const
     {
         HILOGI("enter");
-        return proxy_->IsInbandRingingEnabled();
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        return proxy->IsInbandRingingEnabled();
     }
 
     void RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
@@ -327,85 +340,33 @@ struct HandsFreeAudioGateway::impl {
         HILOGI("end");
     }
 
-    sptr<IBluetoothHfpAg> proxy_;
+    int32_t profileRegisterId;
 private:
     const static int HFP_AG_SLC_STATE_DISCONNECTED = static_cast<int>(BTConnectState::DISCONNECTED);
     const static int HFP_AG_SCO_STATE_DISCONNECTED = 3;
 
     BluetoothObserverList<HandsFreeAudioGatewayObserver> observers_;
     sptr<AgServiceObserver> serviceObserver_;
-    class HandsFreeAudioGatewayDeathRecipient;
-    sptr<HandsFreeAudioGatewayDeathRecipient> deathRecipient_;
-};
-
-class HandsFreeAudioGateway::impl::HandsFreeAudioGatewayDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit HandsFreeAudioGatewayDeathRecipient(HandsFreeAudioGateway::impl &impl) : impl_(impl)
-    {};
-    ~HandsFreeAudioGatewayDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(HandsFreeAudioGatewayDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("starts");
-        std::lock_guard<std::mutex> lock(g_hfpProxyMutex);
-        if (!impl_.proxy_) {
-            return;
-        }
-        impl_.proxy_ = nullptr;
-    }
-
-private:
-    HandsFreeAudioGateway::impl &impl_;
 };
 
 HandsFreeAudioGateway::impl::impl()
 {
-    HILOGD("enter");
-    if (proxy_) {
-        return;
-    }
-    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_HFP_AG);
-    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
-        return;
-    }
-    InitHfpAgProxy();
+    serviceObserver_ = new AgServiceObserver(observers_);
+    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_HFP_AG,
+        [this](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothHfpAg> proxy = iface_cast<IBluetoothHfpAg>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->RegisterObserver(serviceObserver_);
+    });
 }
 
 HandsFreeAudioGateway::impl::~impl()
 {
     HILOGD("enter");
-    if (proxy_ == nullptr) {
-        return;
-    }
-    proxy_->DeregisterObserver(serviceObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-}
-
-bool HandsFreeAudioGateway::impl::InitHfpAgProxy(void)
-{
-    std::lock_guard<std::mutex> lock(g_hfpProxyMutex);
-    if (proxy_) {
-        return true;
-    }
-    HILOGD("enter");
-    proxy_ = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
-    if (!proxy_) {
-        HILOGE("get HfpAg proxy failed");
-        return false;
-    }
-
-    serviceObserver_ = new AgServiceObserver(observers_);
-    if (serviceObserver_ != nullptr) {
-        proxy_->RegisterObserver(serviceObserver_);
-    }
-
-    deathRecipient_ = new HandsFreeAudioGatewayDeathRecipient(*this);
-    if (deathRecipient_ != nullptr) {
-        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    }
-    return true;
+    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    proxy->DeregisterObserver(serviceObserver_);
 }
 
 HandsFreeAudioGateway *HandsFreeAudioGateway::GetProfile()
@@ -426,18 +387,6 @@ HandsFreeAudioGateway::~HandsFreeAudioGateway()
     HILOGD("enter");
 }
 
-void HandsFreeAudioGateway::Init()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    if (!pimpl->InitHfpAgProxy()) {
-        HILOGE("HfpAG proxy is nullptr");
-        return;
-    }
-}
-
 std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetConnectedDevices() const
 {
     std::vector<BluetoothRemoteDevice> devices;
@@ -445,11 +394,8 @@ std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetConnectedDevices() 
         HILOGE("bluetooth is off.");
         return devices;
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return devices;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, devices, "failed: no proxy");
 
     pimpl->GetConnectedDevices(devices);
     return devices;
@@ -462,10 +408,8 @@ int32_t HandsFreeAudioGateway::GetConnectedDevices(std::vector<BluetoothRemoteDe
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->GetConnectedDevices(devices);
 }
@@ -476,11 +420,8 @@ std::vector<BluetoothRemoteDevice> HandsFreeAudioGateway::GetDevicesByStates(std
         HILOGE("bluetooth is off.");
         return std::vector<BluetoothRemoteDevice>();
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return std::vector<BluetoothRemoteDevice>();
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::vector<BluetoothRemoteDevice>(), "failed: no proxy");
 
     return pimpl->GetDevicesByStates(states);
 }
@@ -493,10 +434,8 @@ int32_t HandsFreeAudioGateway::GetDeviceState(const BluetoothRemoteDevice &devic
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->GetDeviceState(device, state);
 }
@@ -509,10 +448,8 @@ int32_t HandsFreeAudioGateway::Connect(const BluetoothRemoteDevice &device)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->Connect(device);
 }
@@ -524,11 +461,8 @@ int32_t HandsFreeAudioGateway::Disconnect(const BluetoothRemoteDevice &device)
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->Disconnect(device);
 }
@@ -540,11 +474,9 @@ int HandsFreeAudioGateway::GetScoState(const BluetoothRemoteDevice &device) cons
         HILOGE("bluetooth is off.");
         return static_cast<int>(HfpScoConnectState::SCO_DISCONNECTED);
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return static_cast<int>(HfpScoConnectState::SCO_DISCONNECTED);
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr,
+        static_cast<int>(HfpScoConnectState::SCO_DISCONNECTED), "failed: no proxy");
 
     return pimpl->GetScoState(device);
 }
@@ -553,8 +485,9 @@ int32_t HandsFreeAudioGateway::ConnectSco(uint8_t callType)
 {
     HILOGI("enter, callType: %{public}d", callType);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), BT_ERR_UNAVAILABLE_PROXY,
-        "pimpl or hfpAG proxy is nullptr.");
+	sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY,
+        "hfpAG proxy is nullptr.");
     CHECK_AND_RETURN_LOG_RET((pimpl->IsValidCallType(callType)), BT_ERR_INVALID_PARAM,
         "connect sco call type error.");
     return pimpl->ConnectSco(callType);
@@ -564,8 +497,9 @@ int32_t HandsFreeAudioGateway::DisconnectSco(uint8_t callType)
 {
     HILOGI("enter, callType: %{public}d", callType);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr), BT_ERR_UNAVAILABLE_PROXY,
-        "pimpl or hfpAG proxy is nullptr.");
+	sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY,
+        "hfpAG proxy is nullptr.");
     CHECK_AND_RETURN_LOG_RET((pimpl->IsValidCallType(callType)), BT_ERR_INVALID_PARAM,
         "disconnect sco call type error.");
     return pimpl->DisconnectSco(callType);
@@ -585,7 +519,8 @@ void HandsFreeAudioGateway::PhoneStateChanged(
     int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
 {
     CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
-    CHECK_AND_RETURN_LOG((pimpl != nullptr && pimpl->proxy_ != nullptr), "pimpl or hfpAG proxy is nullptr.");
+	sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "hfpAG proxy is nullptr.");
 
     BluetoothPhoneState phoneState;
     phoneState.SetActiveNum(numActive);
@@ -605,10 +540,8 @@ void HandsFreeAudioGateway::ClccResponse(
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
 
     pimpl->ClccResponse(index, direction, status, mode, mpty, number, type);
 }
@@ -621,10 +554,8 @@ bool HandsFreeAudioGateway::OpenVoiceRecognition(const BluetoothRemoteDevice &de
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return false;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->OpenVoiceRecognition(device);
 }
@@ -637,10 +568,8 @@ bool HandsFreeAudioGateway::CloseVoiceRecognition(const BluetoothRemoteDevice &d
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return false;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->CloseVoiceRecognition(device);
 }
@@ -653,10 +582,8 @@ bool HandsFreeAudioGateway::SetActiveDevice(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return false;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->SetActiveDevice(device);
 }
@@ -669,10 +596,8 @@ BluetoothRemoteDevice HandsFreeAudioGateway::GetActiveDevice() const
         return device;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return device;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, device, "failed: no proxy");
 
     device = pimpl->GetActiveDevice();
     return device;
@@ -686,10 +611,8 @@ int HandsFreeAudioGateway::SetConnectStrategy(const BluetoothRemoteDevice &devic
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     if ((!device.IsValidBluetoothRemoteDevice()) || (
         (strategy != static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)) &&
@@ -708,24 +631,20 @@ int HandsFreeAudioGateway::GetConnectStrategy(const BluetoothRemoteDevice &devic
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return BT_ERR_UNAVAILABLE_PROXY;
-    }
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("input parameter error.");
         return BT_ERR_INVALID_PARAM;
     }
     return pimpl->GetConnectStrategy(device, strategy);
-}
-
 bool HandsFreeAudioGateway::IsInbandRingingEnabled() const
 {
     HILOGI("enter");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_),
-        BT_ERR_INTERNAL_ERROR, "pimpl or hfpAG proxy is nullptr");
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "hfpAG proxy is nullptr");
     return pimpl->IsInbandRingingEnabled();
 }
 
@@ -742,6 +661,5 @@ void HandsFreeAudioGateway::DeregisterObserver(std::shared_ptr<HandsFreeAudioGat
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->DeregisterObserver(observer);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS

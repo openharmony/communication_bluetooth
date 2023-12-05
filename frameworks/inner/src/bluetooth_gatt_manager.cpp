@@ -37,6 +37,7 @@
 #include "raw_address.h"
 #include "refbase.h"
 #include "system_ability_definition.h"
+#include "bluetooth_profile_manager.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -44,10 +45,9 @@ struct GattManager::impl {
 public:
     impl()
     {
-        if (!clientProxy_) {
-            HILOGE("GattManager proxy_ failed");
-            return;
-        }
+        sptr<BluetoothGattClientProxy> proxy = 
+            GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     };
     ~impl() {};
     bool InitGattManagerProxy(void);
@@ -56,23 +56,14 @@ public:
 };
 
 GattManager::GattManager() : pimpl(new GattManager::impl())
-{}
+{
+    sptr<BluetoothGattClientProxy> proxy = 
+        GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+}
 
 GattManager::~GattManager()
 {}
-
-bool GattManager::impl::InitGattManagerProxy(void)
-{
-    if (clientProxy_) {
-        return true;
-    }
-    clientProxy_ = GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
-    if (!clientProxy_) {
-        HILOGE("get gatt manager proxy failed");
-        return false;
-    }
-    return true;
-}
 
 std::vector<BluetoothRemoteDevice> GattManager::GetDevicesByStates(
     const std::array<int, GATT_CONNECTION_STATE_NUM> &states)
@@ -83,11 +74,9 @@ std::vector<BluetoothRemoteDevice> GattManager::GetDevicesByStates(
         HILOGE("bluetooth is off.");
         return result;
     }
-
-    if (pimpl == nullptr || !pimpl->InitGattManagerProxy()) {
-        HILOGE("pimpl or gattManager proxy is nullptr");
-        return result;
-    }
+    sptr<BluetoothGattClientProxy> proxy = 
+        GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, result, "failed: no proxy");
 
     for (auto &state : states) {
         stateSet.emplace(state);
@@ -113,10 +102,9 @@ std::vector<BluetoothRemoteDevice> GattManager::GetConnectedDevices()
         return result;
     }
 
-    if (pimpl == nullptr || !pimpl->InitGattManagerProxy()) {
-        HILOGE("pimpl or gattManager proxy is nullptr");
-        return result;
-    }
+    sptr<BluetoothGattClientProxy> proxy = 
+        GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, result, "failed: no proxy");
 
     if (pimpl->clientProxy_ != nullptr) {
         std::vector<BluetoothGattDevice> device;
