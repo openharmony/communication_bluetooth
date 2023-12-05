@@ -32,6 +32,7 @@ public:
 
     void OnActiveDeviceChanged(const BluetoothRemoteDevice &device) override{}
     void OnHfEnhancedDriverSafetyChanged(const BluetoothRemoteDevice &device, int indValue) override{}
+    void OnHfpStackChanged(const BluetoothRemoteDevice &device, int action) override{}
 
     NapiHandsFreeAudioGatewayObserver() = default;
     ~NapiHandsFreeAudioGatewayObserver() override = default;
