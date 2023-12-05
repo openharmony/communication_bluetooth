@@ -187,6 +187,7 @@ ohos_shared_library("btcommon") {
     "ipc/parcel/bluetooth_raw_address.cpp",
     "ipc/parcel/bluetooth_socket_coc.cpp",
     "ipc/parcel/parcel_bt_uuid.cpp",
+    "ipc/parcel/bluetooth_phone_state.cpp",
   ]
 
   deps = []
