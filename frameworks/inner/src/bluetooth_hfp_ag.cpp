@@ -83,10 +83,10 @@ public:
 
     void OnHfpStackChanged(const BluetoothRawAddress &device, int32_t action) override
     {
-        HILOGI("enter, device: %{public}s, action: %{public}u",
+        HILOGI("enter, device: %{public}s, action: %{public}s",
             GET_ENCRYPT_RAW_ADDR(device), GetUpdateOutputStackActionName(action).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        observers_.ForEach([remoteDevice](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
+        observers_.ForEach([remoteDevice, action](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnHfpStackChanged(remoteDevice, action);
     }
 
@@ -719,5 +719,6 @@ void HandsFreeAudioGateway::DeregisterObserver(std::shared_ptr<HandsFreeAudioGat
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->DeregisterObserver(observer);
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS
