@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include "bluetooth_service_ipc_interface_code.h"
+#include "bluetooth_phone_state.h"
 #include "i_bluetooth_hfp_ag_observer.h"
 
 namespace OHOS {
@@ -33,10 +34,11 @@ public:
     virtual int32_t Connect(const BluetoothRawAddress &device) = 0;
     virtual int32_t Disconnect(const BluetoothRawAddress &device) = 0;
     virtual int GetScoState(const BluetoothRawAddress &device) = 0;
-    virtual bool ConnectSco() = 0;
+    virtual int32_t ConnectSco(uint8_t callType) = 0;
+    virtual int32_t DisconnectSco(uint8_t callType) = 0;
+    virtual bool ConnectSco() = 0; 
     virtual bool DisconnectSco() = 0;
-    virtual void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type,
-        const std::string &name) = 0;
+    virtual void PhoneStateChanged(BluetoothPhoneState &phoneState) = 0;
     virtual void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number,
         int type) = 0;
     virtual bool OpenVoiceRecognition(const BluetoothRawAddress &device) = 0;
