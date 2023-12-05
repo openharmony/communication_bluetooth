@@ -531,32 +531,12 @@ int HandsFreeAudioGateway::GetScoState(const BluetoothRemoteDevice &device) cons
 
 bool HandsFreeAudioGateway::ConnectSco()
 {
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return false;
-    }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return false;
-    }
-
-    return pimpl->ConnectSco();
+    return true;
 }
 
 bool HandsFreeAudioGateway::DisconnectSco()
 {
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return false;
-    }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or hfpAG proxy is nullptr");
-        return false;
-    }
-
-    return pimpl->DisconnectSco();
+    return true;
 }
 
 void HandsFreeAudioGateway::PhoneStateChanged(
