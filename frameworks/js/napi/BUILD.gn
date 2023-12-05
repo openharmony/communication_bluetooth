@@ -216,6 +216,7 @@ group("bluetooth_napi") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/constant:constant",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/hfp:hfp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/hid:hid",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/map:map",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/pan:pan",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/pbap:pbap",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/socket:socket",
