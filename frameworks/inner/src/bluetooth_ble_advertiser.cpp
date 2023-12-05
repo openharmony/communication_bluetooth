@@ -26,6 +26,7 @@
 #include "system_ability_definition.h"
 
 #include <memory>
+#include "bluetooth_profile_manager.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -38,7 +39,6 @@ struct BleAdvertiser::impl {
     uint32_t GetAdvertiserTotalBytes(const BluetoothBleAdvertiserData &data, bool isFlagsIncluded);
     int32_t CheckAdvertiserData(const BluetoothBleAdvertiserSettings &setting,
         const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse);
-    bool InitBleAdvertiserProxy(void);
 
     class BluetoothBleAdvertiserCallbackImp : public BluetoothBleAdvertiseCallbackStub {
     public:
@@ -114,66 +114,27 @@ struct BleAdvertiser::impl {
     sptr<BluetoothBleAdvertiserCallbackImp> callbackImp_ = nullptr;
 
     BluetoothObserverMap<std::shared_ptr<BleAdvertiseCallback>> callbacks_;
-    sptr<IBluetoothBleAdvertiser> proxy_ = nullptr;
-
-    class BleAdvertiserDeathRecipient;
-    sptr<BleAdvertiserDeathRecipient> deathRecipient_ = nullptr;
+    int32_t profileRegisterId;
 };
-
-class BleAdvertiser::impl::BleAdvertiserDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit BleAdvertiserDeathRecipient(BleAdvertiser::impl &impl) : owner_(impl) {};
-    ~BleAdvertiserDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiserDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("enter");
-        std::lock_guard<std::mutex> lock(g_bleProxyMutex);
-        if (!owner_.proxy_) {
-            return;
-        }
-        owner_.proxy_ = nullptr;
-        owner_.callbacks_.Clear();
-    }
-
-private:
-    BleAdvertiser::impl &owner_;
-};
-
-bool BleAdvertiser::impl::InitBleAdvertiserProxy(void)
-{
-    std::lock_guard<std::mutex> lock(g_bleProxyMutex);
-    if (proxy_) {
-        return true;
-    }
-    HILOGI("enter");
-    proxy_ = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
-    if (!proxy_) {
-        HILOGE("get bleAdvertiser proxy_ failed");
-        return false;
-    }
-    callbackImp_ = new BluetoothBleAdvertiserCallbackImp(*this);
-    if (callbackImp_ != nullptr) {
-        proxy_->RegisterBleAdvertiserCallback(callbackImp_);
-    }
-
-    deathRecipient_ = new BleAdvertiserDeathRecipient(*this);
-    if (deathRecipient_ != nullptr) {
-        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    }
-    return true;
-}
 
 BleAdvertiser::impl::impl()
-{}
+{
+    callbackImp_ = new BluetoothBleAdvertiserCallbackImp(*this);
+    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(BLE_ADVERTISER_SERVER,
+        [this](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothBleAdvertiser> proxy = iface_cast<IBluetoothBleAdvertiser>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->RegisterBleAdvertiserCallback(callbackImp_);
+    });
+}
 
 BleAdvertiser::impl::~impl()
 {
-    if (proxy_ != nullptr) {
-        proxy_->DeregisterBleAdvertiserCallback(callbackImp_);
-        proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-    }
+    HILOGD("start");
+    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    proxy->DeregisterBleAdvertiserCallback(callbackImp_);
 }
 
 BleAdvertiser::BleAdvertiser() : pimpl(nullptr)
@@ -269,11 +230,8 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-
-    if (pimpl == nullptr || !pimpl->InitBleAdvertiserProxy()) {
-        HILOGE("pimpl or bleAdvertiser proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     BluetoothBleAdvertiserSettings setting;
@@ -298,9 +256,9 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     HILOGI("duration=%{public}d", duration);
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
-        ret = pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
+        ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
     } else {
-        ret = pimpl->proxy_->GetAdvertiserHandle(advHandle);
+        ret = proxy->GetAdvertiserHandle(advHandle);
         if (ret != BT_NO_ERROR || advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
             HILOGE("Invalid advertising handle");
             callback->OnStartResultEvent(BT_ERR_INTERNAL_ERROR, BLE_INVALID_ADVERTISING_HANDLE);
@@ -308,7 +266,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         }
         callback->OnGetAdvHandleEvent(0, advHandle);
         pimpl->callbacks_.Register(advHandle, callback);
-        ret = pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
+        ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
     }
     return ret;
 }
@@ -321,10 +279,8 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitBleAdvertiserProxy()) {
-        HILOGE("pimpl or bleAdvertiser proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     BluetoothBleAdvertiserSettings setting;
@@ -345,16 +301,16 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     int ret = BT_ERR_INTERNAL_ERROR;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
-        ret = pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, true);
+        ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, true);
     } else {
-        ret = pimpl->proxy_->GetAdvertiserHandle(advHandle);
+        ret = proxy->GetAdvertiserHandle(advHandle);
         if (ret != BT_NO_ERROR || advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
             HILOGE("Invalid advertising handle");
             callback->OnStartResultEvent(BT_ERR_INTERNAL_ERROR, BLE_INVALID_ADVERTISING_HANDLE);
             return ret;
         }
         pimpl->callbacks_.Register(advHandle, callback);
-        ret = pimpl->proxy_->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, true);
+        ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, true);
     }
     return ret;
 }
@@ -366,11 +322,9 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
         HILOGE("bluetooth is off.");
         return;
     }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
 
-    if (pimpl == nullptr || !pimpl->InitBleAdvertiserProxy()) {
-        HILOGE("pimpl or bleAdvertiser proxy is nullptr");
-        return;
-    }
     CHECK_AND_RETURN_LOG(callback != nullptr, "callback is nullptr");
 
     int advHandle = BLE_INVALID_ADVERTISING_HANDLE;
@@ -383,7 +337,7 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
     bleAdvertiserData.SetPayload(std::string(advData.begin(), advData.end()));
     BluetoothBleAdvertiserData bleScanResponse;
     bleScanResponse.SetPayload(std::string(scanResponse.begin(), scanResponse.end()));
-    pimpl->proxy_->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
+    proxy->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
 }
 
 int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback)
@@ -393,11 +347,8 @@ int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, std::
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-
-    if (pimpl == nullptr || !pimpl->InitBleAdvertiserProxy()) {
-        HILOGE("pimpl or bleAdvertiser proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
     uint8_t tmpAdvHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
@@ -412,7 +363,7 @@ int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, std::
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    int ret = pimpl->proxy_->EnableAdvertising(advHandle, duration);
+    int ret = proxy->EnableAdvertising(advHandle, duration);
     return ret;
 }
 
@@ -424,10 +375,8 @@ int BleAdvertiser::DisableAdvertising(uint8_t advHandle, std::shared_ptr<BleAdve
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitBleAdvertiserProxy()) {
-        HILOGE("pimpl or bleAdvertiser proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
     uint8_t tmpAdvHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
     if (tmpAdvHandle == BLE_INVALID_ADVERTISING_HANDLE) {
@@ -441,7 +390,7 @@ int BleAdvertiser::DisableAdvertising(uint8_t advHandle, std::shared_ptr<BleAdve
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    int ret = pimpl->proxy_->DisableAdvertising(advHandle);
+    int ret = proxy->DisableAdvertising(advHandle);
     return ret;
 }
 
@@ -452,10 +401,8 @@ int BleAdvertiser::StopAdvertising(std::shared_ptr<BleAdvertiseCallback> callbac
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->InitBleAdvertiserProxy()) {
-        HILOGE("pimpl or bleAdvertiser proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
     HILOGI("enter");
@@ -465,7 +412,7 @@ int BleAdvertiser::StopAdvertising(std::shared_ptr<BleAdvertiseCallback> callbac
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    int ret = pimpl->proxy_->StopAdvertising(advHandle);
+    int ret = proxy->StopAdvertising(advHandle);
     return ret;
 }
 
@@ -476,17 +423,15 @@ void BleAdvertiser::Close(std::shared_ptr<BleAdvertiseCallback> callback)
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->InitBleAdvertiserProxy()) {
-        HILOGE("pimpl or bleAdvertiser proxy is nullptr");
-        return;
-    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
     CHECK_AND_RETURN_LOG(callback != nullptr, "callback is nullptr");
 
     HILOGI("enter");
-    if (pimpl->proxy_ != nullptr) {
+    if (proxy != nullptr) {
         uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
         if (advHandle != BLE_INVALID_ADVERTISING_HANDLE) {
-            pimpl->proxy_->Close(advHandle);
+            proxy->Close(advHandle);
         }
 
         std::shared_ptr<BleAdvertiseCallback> observer = pimpl->callbacks_.GetAdvertiserObserver(advHandle);

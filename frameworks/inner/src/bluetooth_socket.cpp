@@ -29,6 +29,7 @@
 #include "raw_address.h"
 #include "bluetooth_socket.h"
 #include "bluetooth_socket_observer_stub.h"
+#include "bluetooth_profile_manager.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -52,15 +53,8 @@ struct ClientSocket::impl {
     impl(int fd, std::string address, BtSocketType type);
     impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth,
         std::shared_ptr<BluetoothConnectionObserver> observer);
-    bool InitClientSocketProxy(void);
     ~impl()
     {
-        if (proxy_ != nullptr && proxy_->AsObject() != nullptr) {
-            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-        } else {
-            HILOGI("failed: no proxy_");
-        }
-
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
@@ -96,12 +90,10 @@ struct ClientSocket::impl {
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 close(fd_);
                 fd_ = -1;
-                if (proxy_ == nullptr) {
-                    HILOGE("proxy_ is nullptr");
-                    return;
-                }
+                sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+                CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
                 bluetooth::Uuid tempUuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits());
-                proxy_->DeregisterClientObserver(BluetoothRawAddress(remoteDevice_.GetDeviceAddr()), tempUuid,
+                proxy->DeregisterClientObserver(BluetoothRawAddress(remoteDevice_.GetDeviceAddr()), tempUuid,
                     observerImp_);
             } else {
                 HILOGE("socket not created");
@@ -256,16 +248,12 @@ struct ClientSocket::impl {
         return true;
     }
 
-    class BluetoothClientSocketDeathRecipient;
-    sptr<BluetoothClientSocketDeathRecipient> deathRecipient_;
     // user register observer
     std::shared_ptr<BluetoothConnectionObserver> observer_ = nullptr;
     class BluetoothSocketObserverImp;
 
     // socket observer
     sptr<BluetoothSocketObserverImp> observerImp_ = nullptr;
-
-    sptr<IBluetoothSocket> proxy_;
     std::unique_ptr<InputStream> inputStream_ {
         nullptr
     };
@@ -312,52 +300,6 @@ private:
     ClientSocket::impl &clientSocket_;
 };
 
-class ClientSocket::impl::BluetoothClientSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit BluetoothClientSocketDeathRecipient(ClientSocket::impl &host) : host_(host) {};
-    ~BluetoothClientSocketDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothClientSocketDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGD("enter");
-        host_.proxy_->AsObject()->RemoveDeathRecipient(host_.deathRecipient_);
-        host_.proxy_ = nullptr;
-    }
-
-private:
-    ClientSocket::impl &host_;
-};
-
-bool ClientSocket::impl::InitClientSocketProxy(void)
-{
-    std::lock_guard<std::mutex> lock(g_socketProxyMutex);
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    CHECK_AND_RETURN_LOG_RET(samgr, false, "samgr is nullptr.");
-
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-    CHECK_AND_RETURN_LOG_RET(hostRemote, false, "failed: no hostRemote");
-
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
-    CHECK_AND_RETURN_LOG_RET(remote, false, "failed: no remote");
-
-    HILOGI("remote obtained");
-
-    proxy_ = iface_cast<IBluetoothSocket>(remote);
-
-    deathRecipient_ = new (std::nothrow) BluetoothClientSocketDeathRecipient(*this);
-    CHECK_AND_RETURN_LOG_RET(deathRecipient_, false, "deathRecipient_ is nullptr");
-
-    CHECK_AND_RETURN_LOG_RET(proxy_, false, "proxy_ is nullptr");
-
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
-    CHECK_AND_RETURN_LOG_RET(observerImp_, false, "observerImp is failed");
-
-    return true;
-}
-
 ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth)
     : inputStream_(nullptr),
       outputStream_(nullptr),
@@ -369,9 +311,10 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
       socketStatus_(SOCKET_INIT)
 {
     HILOGD("enter 4 parameters");
-    if (!InitClientSocketProxy()) {
-        HILOGE("init fail");
-    }
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
+    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "failed: no proxy");
 }
 
 ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
@@ -385,9 +328,10 @@ ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
       socketStatus_(SOCKET_CONNECTED)
 {
     HILOGD("enter 3 parameters");
-    if (!InitClientSocketProxy()) {
-        HILOGE("init fail");
-    }
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
+    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "failed: no proxy");
 }
 
 ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth,
@@ -402,10 +346,10 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
       auth_(auth),
       socketStatus_(SOCKET_INIT)
 {
-    HILOGD("enter 5 parameters");
-    if (!InitClientSocketProxy()) {
-        HILOGE("init fail");
-    }
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
+    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "failed: no proxy");
 }
 
 ClientSocket::ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth)
@@ -433,10 +377,11 @@ int ClientSocket::Connect(int psm)
     std::string tempAddress = pimpl->address_;
     CHECK_AND_RETURN_LOG_RET(tempAddress.size(), BtStatus::BT_FAILURE, "address size error");
     CHECK_AND_RETURN_LOG_RET(pimpl->socketStatus_ != SOCKET_CLOSED, BT_ERR_INVALID_STATE, "socket closed");
-    CHECK_AND_RETURN_LOG_RET(pimpl->proxy_, BT_ERR_SERVICE_DISCONNECTED, "proxy_ is nullptr");
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "proxy is nullptr");
 
     bluetooth::Uuid tempUuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits());
-    int ret = pimpl->proxy_->RegisterClientObserver(BluetoothRawAddress(pimpl->address_), tempUuid,
+    int ret = proxy->RegisterClientObserver(BluetoothRawAddress(pimpl->address_), tempUuid,
         pimpl->observerImp_);
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "regitser observer fail, ret = %d", ret);
 
@@ -447,7 +392,7 @@ int ClientSocket::Connect(int psm)
         .type = (int32_t)pimpl->type_,
         .psm = psm
     };
-    ret = pimpl->proxy_->Connect(param, pimpl->fd_);
+    ret = proxy->Connect(param, pimpl->fd_);
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Connect error %{public}d", ret);
 
     HILOGI("fd_: %{public}d", pimpl->fd_);
@@ -537,12 +482,6 @@ struct ServerSocket::impl {
     ~impl()
     {
         HILOGI("enter");
-        if (proxy_ != nullptr && proxy_->AsObject() != nullptr) {
-            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-        } else {
-            HILOGE("proxy_ is nullptr");
-        }
-
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
@@ -558,8 +497,9 @@ struct ServerSocket::impl {
 
         CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
 
-        if (!proxy_) {
-            HILOGE("failed, proxy_ is nullptr");
+        sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+        if (!proxy) {
+            HILOGE("failed, proxy is nullptr");
             socketStatus_ = SOCKET_CLOSED;
             return BT_ERR_SERVICE_DISCONNECTED;
         }
@@ -573,7 +513,7 @@ struct ServerSocket::impl {
             .type = (int32_t)type_,
             .observer = observer_
         };
-        int ret = proxy_->Listen(param, fd_);
+        int ret = proxy->Listen(param, fd_);
         CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Listen error %{public}d.", ret);
 
         if (fd_ == BT_INVALID_SOCKET_FD) {
@@ -728,11 +668,9 @@ struct ServerSocket::impl {
                 close(fd_);
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 fd_ = -1;
-                if (proxy_ == nullptr) {
-                    HILOGE("proxy_ is nullptr");
-                    return;
-                }
-                proxy_->DeregisterServerObserver(observer_);
+                sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+                CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
+                proxy->DeregisterServerObserver(observer_);
                 return;
             } else {
                 HILOGE("socket not created");
@@ -770,11 +708,9 @@ struct ServerSocket::impl {
         return retStr;
     }
 
-    class BluetoothServerSocketDeathRecipient;
-    sptr<BluetoothServerSocketDeathRecipient> deathRecipient_;
     sptr<BluetoothServerSocketObserverStub> observer_ = nullptr;
 
-    sptr<IBluetoothSocket> proxy_;
+    sptr<IBluetoothSocket> proxy;
     UUID uuid_;
     BtSocketType type_;
     bool encrypt_;
@@ -793,26 +729,6 @@ struct ServerSocket::impl {
     uint32_t maxRxPacketSize_ = 0;
 };
 
-class ServerSocket::impl::BluetoothServerSocketDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit BluetoothServerSocketDeathRecipient(ServerSocket::impl &host) : host_(host) {};
-    ~BluetoothServerSocketDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothServerSocketDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGD("enter");
-        if (!host_.proxy_) {
-            return;
-        }
-        host_.proxy_->AsObject()->RemoveDeathRecipient(host_.deathRecipient_);
-        host_.proxy_ = nullptr;
-    }
-
-private:
-    ServerSocket::impl &host_;
-};
-
 ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
     : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
 {
@@ -829,11 +745,8 @@ ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, 
 
     HILOGI("remote obtained");
 
-    proxy_ = iface_cast<IBluetoothSocket>(remote);
-    CHECK_AND_RETURN_LOG(proxy_, "failed: no proxy_");
-
-    deathRecipient_ = new BluetoothServerSocketDeathRecipient(*this);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+   sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG(proxy, "failed: no proxy");
     observer_ = new BluetoothServerSocketObserverStub();
 }
 
@@ -948,8 +861,9 @@ int ClientSocket::UpdateCocConnectionParams(CocUpdateSocketParam &param)
     info.supervisionTimeout = param.supervisionTimeout;
     info.minConnEventLen = param.minConnEventLen;
     info.maxConnEventLen = param.maxConnEventLen;
-    CHECK_AND_RETURN_LOG_RET(pimpl->proxy_, BT_ERR_INVALID_STATE, "proxy is null");
-    return pimpl->proxy_->UpdateCocConnectionParams(info);
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "proxy is null");
+    return proxy->UpdateCocConnectionParams(info);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
