@@ -216,6 +216,8 @@ enum BluetoothHfpAgInterfaceCode {
     BT_HFP_AG_DEREGISTER_OBSERVER,
     BT_HFP_AG_SET_CONNECT_STRATEGY,
     BT_HFP_AG_GET_CONNECT_STRATEGY,
+    BT_HFP_AG_CONNECT_SCO_EX,
+    BT_HFP_AG_DISCONNECT_SCO_EX,
     BT_HFP_AG_IS_IN_BAND_RINGING_ENABLE,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_BUTT
