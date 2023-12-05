@@ -184,6 +184,7 @@ ohos_shared_library("btcommon") {
     "ipc/parcel/bluetooth_gatt_service_parcel.cpp",
     "ipc/parcel/bluetooth_hfp_hf_call.cpp",
     "ipc/parcel/bluetooth_opp_transfer_information.cpp",
+    "ipc/parcel/bluetooth_phone_state.cpp",
     "ipc/parcel/bluetooth_raw_address.cpp",
     "ipc/parcel/bluetooth_socket_coc.cpp",
     "ipc/parcel/parcel_bt_uuid.cpp",
