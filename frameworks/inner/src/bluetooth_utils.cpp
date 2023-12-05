@@ -115,6 +115,8 @@ std::string GetUpdateOutputStackActionName(int action)
             return "ENABLE_WEAR_DETECTION(4)";
         case static_cast<int>(UpdateOutputStackAction::ACTION_DISABLE_WEAR_DETECTION):
             return "DISABLE_WEAR_DETECTION(5)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_USER_SELECTION):
+            return "USER_SELECTION(6)";
         default:
             return "Unknown";
     }
