@@ -29,10 +29,10 @@ class NapiHandsFreeAudioGatewayObserver : public HandsFreeAudioGatewayObserver{
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
     void OnScoStateChanged(const BluetoothRemoteDevice &device, int state) override;
-    void OnHfpStackChanged(const BluetoothRemoteDevice &device, int action) override;
 
     void OnActiveDeviceChanged(const BluetoothRemoteDevice &device) override{}
     void OnHfEnhancedDriverSafetyChanged(const BluetoothRemoteDevice &device, int indValue) override{}
+    void OnHfpStackChanged(const BluetoothRemoteDevice &device, int action) override{}
 
     NapiHandsFreeAudioGatewayObserver() = default;
     ~NapiHandsFreeAudioGatewayObserver() override = default;
