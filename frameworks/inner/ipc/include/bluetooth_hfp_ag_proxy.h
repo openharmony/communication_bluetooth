@@ -31,10 +31,11 @@ public:
     int32_t Connect(const BluetoothRawAddress &device) override;
     int32_t Disconnect(const BluetoothRawAddress &device) override;
     int GetScoState(const BluetoothRawAddress &device) override;
+    int32_t ConnectSco(uint8_t callType) override;
+    int32_t DisconnectSco(uint8_t callType) override;
     bool ConnectSco() override;
     bool DisconnectSco() override;
-    void PhoneStateChanged(int numActive, int numHeld, int callState, const std::string &number, int type,
-        const std::string &name) override;
+    void PhoneStateChanged(BluetoothPhoneState &phoneState) override;
     void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number,
         int type) override;
     bool OpenVoiceRecognition(const BluetoothRawAddress &device) override;
