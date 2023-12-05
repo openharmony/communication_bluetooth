@@ -182,6 +182,38 @@ int BluetoothHfpAgProxy::GetScoState(const BluetoothRawAddress &device)
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHfpAgProxy::ConnectSco(uint8_t callType)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "BluetoothHfpAgProxy::ConnectSco WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(callType), BT_ERR_IPC_TRANS_FAILED,
+        "BluetoothHfpAgProxy::ConnectSco callType error");
+    MessageParcel reply;
+    MessageOption option {MessageOption::TF_SYNC};
+    int error = Remote()->SendRequest(
+        BluetoothHfpAgInterfaceCode::BT_HFP_AG_CONNECT_SCO_EX, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_IPC_TRANS_FAILED,
+        "BluetoothHfpAgProxy::ConnectSco done fail, error: %{public}d", error);
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHfpAgProxy::DisconnectSco(uint8_t callType)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "BluetoothHfpAgProxy::DisConnectSco WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(callType), BT_ERR_IPC_TRANS_FAILED,
+        "BluetoothHfpAgProxy::DisConnectSco callType error");
+    MessageParcel reply;
+    MessageOption option {MessageOption::TF_SYNC};
+    int error = Remote()->SendRequest(
+        BluetoothHfpAgInterfaceCode::BT_HFP_AG_DISCONNECT_SCO_EX, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_IPC_TRANS_FAILED,
+        "BluetoothHfpAgProxy::DisConnectSco done fail, error: %{public}d", error);
+    return reply.ReadInt32();
+}
+
 bool BluetoothHfpAgProxy::ConnectSco()
 {
     MessageParcel data;
@@ -222,48 +254,19 @@ bool BluetoothHfpAgProxy::DisconnectSco()
     return reply.ReadBool();
 }
 
-void BluetoothHfpAgProxy::PhoneStateChanged(
-    int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
+void BluetoothHfpAgProxy::PhoneStateChanged(BluetoothPhoneState &phoneState)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor())) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteInt32(numActive)) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteInt32 error");
-        return;
-    }
-    if (!data.WriteInt32(numHeld)) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteInt32 error");
-        return;
-    }
-    if (!data.WriteInt32(callState)) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteInt32 error");
-        return;
-    }
-    if (!data.WriteString(number)) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteString error");
-        return;
-    }
-    if (!data.WriteInt32(type)) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteInt32 error");
-        return;
-    }
-    if (!data.WriteString(name)) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged WriteString error");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()),
+        "BluetoothHfpAgProxy::PhoneStateChanged WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteParcelable(&phoneState),
+        "BluetoothHfpAgProxy::PhoneStateChanged WritePhoneState error");
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_ASYNC
-    };
+    MessageOption option {MessageOption::TF_ASYNC};
     int error = Remote()->SendRequest(
         BluetoothHfpAgInterfaceCode::BT_HFP_AG_PHONE_STATE_CHANGED, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHfpAgProxy::PhoneStateChanged done fail, error: %{public}d", error);
-        return;
-    }
+    CHECK_AND_RETURN_LOG(error == BT_NO_ERROR,
+        "BluetoothHfpAgProxy::PhoneStateChanged done fail, error: %{public}d", error);
 }
 
 void BluetoothHfpAgProxy::ClccResponse(

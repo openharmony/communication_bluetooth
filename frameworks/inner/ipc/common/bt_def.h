@@ -113,6 +113,16 @@ enum class BTStrategyType : int {
     CONNECTION_FORBIDDEN,
 };
 /**
+ * @brief the type of the call
+ * use to
+ * ConnectSco(),DisconnectSco()
+ */
+enum class BTCallType : uint8_t {
+    CALL_TYPE_CELLULAR = 0,
+    CALL_TYPE_VIRTUAL = 1,
+    CALL_TYPE_RECOGNITION = 2,
+};
+/**
  * @brief profile id define
  * use to
  * GetBtProfileConnState(),GetProfileList()
