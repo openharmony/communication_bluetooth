@@ -14,7 +14,6 @@
  */
 #include "bluetooth_hfp_ag.h"
 
-#include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
 #include "napi_async_work.h"
 #include "napi_bluetooth_error.h"

@@ -15,7 +15,6 @@
 
 #include "bluetooth_hid_host.h"
 
-#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "napi_async_work.h"

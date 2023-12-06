@@ -18,7 +18,6 @@
 #include <random>
 #include "securec.h"
 #include "__config"
-#include "bluetooth_errorcode.h"
 #include "bluetooth_def.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
