@@ -311,10 +311,6 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
       socketStatus_(SOCKET_INIT)
 {
     HILOGD("enter 4 parameters");
-    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
-    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
-    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "failed: no proxy");
 }
 
 ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
@@ -328,10 +324,6 @@ ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
       socketStatus_(SOCKET_CONNECTED)
 {
     HILOGD("enter 3 parameters");
-    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
-    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
-    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "failed: no proxy");
 }
 
 ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth,
@@ -346,10 +338,7 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
       auth_(auth),
       socketStatus_(SOCKET_INIT)
 {
-    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
-    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
-    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "failed: no proxy");
+    HILOGD("enter 5 parameters");
 }
 
 ClientSocket::ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth)

@@ -45,7 +45,7 @@ struct GattManager::impl {
 public:
     impl()
     {
-        sptr<BluetoothGattClientProxy> proxy = 
+        sptr<BluetoothGattClientProxy> proxy =
             GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     };
@@ -57,7 +57,7 @@ public:
 
 GattManager::GattManager() : pimpl(new GattManager::impl())
 {
-    sptr<BluetoothGattClientProxy> proxy = 
+    sptr<BluetoothGattClientProxy> proxy =
         GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
 }
@@ -74,7 +74,7 @@ std::vector<BluetoothRemoteDevice> GattManager::GetDevicesByStates(
         HILOGE("bluetooth is off.");
         return result;
     }
-    sptr<BluetoothGattClientProxy> proxy = 
+    sptr<BluetoothGattClientProxy> proxy =
         GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, result, "failed: no proxy");
 
@@ -102,7 +102,7 @@ std::vector<BluetoothRemoteDevice> GattManager::GetConnectedDevices()
         return result;
     }
 
-    sptr<BluetoothGattClientProxy> proxy = 
+    sptr<BluetoothGattClientProxy> proxy =
         GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, result, "failed: no proxy");
 

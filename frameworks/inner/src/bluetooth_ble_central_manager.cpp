@@ -31,6 +31,8 @@ std::mutex g_bleManagerProxyMutex;
 struct BleCentralManager::impl {
     impl();
     ~impl();
+
+    bool InitBleCentralManagerProxy(void);
     void ConvertBleScanSetting(const BleScanSettings &inSettings, BluetoothBleScanSettings &outSetting);
     void ConvertBleScanFilter(const std::vector<BleScanFilter> &filters,
         std::vector<BluetoothBleScanFilter> &bluetoothBleScanFilters);
@@ -139,7 +141,7 @@ struct BleCentralManager::impl {
     int32_t profileRegisterId;
 };
 
-BleCentralManager::impl::impl()
+bool  BleCentralManager::impl::InitBleCentralManagerProxy(void)
 {
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
     profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(BLE_CENTRAL_MANAGER_SERVER,
@@ -148,7 +150,11 @@ BleCentralManager::impl::impl()
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
     });
+    return true;
 }
+
+BleCentralManager::impl::impl()
+{}
 
 void BleCentralManager::impl::ConvertBleScanSetting(const BleScanSettings &inSettings,
     BluetoothBleScanSettings &outSetting)
@@ -216,7 +222,8 @@ BleCentralManager::impl::~impl()
 {
     HILOGD("start");
     Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
-    sptr<IBluetoothBleCentralManager> proxy = 
+    scannerId_ = BLE_SCAN_INVALID_ID;
+    sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterBleCentralManagerCallback(scannerId_, callbackImp_);
@@ -264,14 +271,18 @@ int BleCentralManager::StartScan()
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
         HILOGE("scannerId is invalid");
         return BT_ERR_INTERNAL_ERROR;
     }
 
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     HILOGI("StartScan without param, scannerId: %{public}d", pimpl->scannerId_);
     return proxy->StartScan(pimpl->scannerId_);
 }
@@ -283,9 +294,10 @@ int BleCentralManager::StartScan(const BleScanSettings &settings)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
         HILOGE("scannerId is invalid");
         return BT_ERR_INTERNAL_ERROR;
@@ -298,6 +310,9 @@ int BleCentralManager::StartScan(const BleScanSettings &settings)
     setting.SetScanMode(settings.GetScanMode());
     setting.SetLegacy(settings.GetLegacy());
     setting.SetPhy(settings.GetPhy());
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     return proxy->StartScan(pimpl->scannerId_, setting);
 }
 
@@ -308,14 +323,18 @@ int BleCentralManager::StopScan()
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
         HILOGE("scannerId is invalid");
         return BT_ERR_INTERNAL_ERROR;
     }
 
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     HILOGI("scannerId_: %{public}d", pimpl->scannerId_);
 
     int ret = proxy->StopScan(pimpl->scannerId_);
@@ -330,10 +349,7 @@ int BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter> &filter
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
-    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy() || pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
         HILOGE("pimpl or ble central manager proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
@@ -366,6 +382,9 @@ int BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter> &filter
         scanFilter.SetManufactureDataMask(filter.GetManufactureDataMask());
         bluetoothBleScanFilters.push_back(scanFilter);
     }
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int ret = proxy->ConfigScanFilter(pimpl->scannerId_, bluetoothBleScanFilters);
     if (ret != BT_NO_ERROR) {
         HILOGE("failed.");
@@ -380,9 +399,10 @@ int BleCentralManager::SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, in
         HILOGE("bluetooth is off.");
         return BT_ERR_INTERNAL_ERROR;
     }
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     return proxy->SetLpDeviceAdvParam(duration, maxExtAdvEvents, window, interval, advHandle);
 }
 
@@ -393,15 +413,19 @@ int BleCentralManager::SetScanReportChannelToLpDevice(bool enable)
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     // need start scan first
     if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
         HILOGE("failed, scannerId invalid.");
         return BT_ERR_INTERNAL_ERROR;
     }
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     return proxy->SetScanReportChannelToLpDevice(pimpl->scannerId_, enable);
 }
 
@@ -412,9 +436,10 @@ int BleCentralManager::EnableSyncDataToLpDevice()
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     return proxy->EnableSyncDataToLpDevice();
 }
 
@@ -425,9 +450,10 @@ int BleCentralManager::DisableSyncDataToLpDevice()
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     return proxy->DisableSyncDataToLpDevice();
 }
 
@@ -438,9 +464,10 @@ int BleCentralManager::SendParamsToLpDevice(const std::vector<uint8_t> &dataValu
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     return proxy->SendParamsToLpDevice(dataValue, type);
 }
 
@@ -451,9 +478,10 @@ bool BleCentralManager::IsLpDeviceAvailable()
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     return proxy->IsLpDeviceAvailable();
 }
 
@@ -464,9 +492,10 @@ int BleCentralManager::SetLpDeviceParam(const BleLpDeviceParamSet &lpDeviceParam
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    sptr<IBluetoothBleCentralManager> proxy =
-        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->InitBleCentralManagerProxy()) {
+        HILOGE("pimpl or ble central manager proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     BluetoothLpDeviceParamSet paramSet;
     if ((lpDeviceParamSet.fieldValidFlagBit & BLE_LPDEVICE_SCAN_SETTING_VALID_BIT) != 0) {
@@ -499,7 +528,9 @@ int BleCentralManager::SetLpDeviceParam(const BleLpDeviceParamSet &lpDeviceParam
     paramSet.advHandle = lpDeviceParamSet.advHandle;
     paramSet.deliveryMode = lpDeviceParamSet.deliveryMode;
     paramSet.duration = lpDeviceParamSet.duration;
-
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     return proxy->SetLpDeviceParam(paramSet);
 }
 

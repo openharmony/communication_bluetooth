@@ -132,6 +132,7 @@ BleAdvertiser::impl::~impl()
 {
     HILOGD("start");
     Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    callbacks_.Clear();
     sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterBleAdvertiserCallback(callbackImp_);
