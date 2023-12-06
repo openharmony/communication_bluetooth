@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <functional>
 #include <optional>
-#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "napi/native_api.h"
