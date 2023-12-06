@@ -112,7 +112,8 @@ private:
 A2dpSource::impl::impl()
 {
     observerImp_ = new (std::nothrow) BluetoothA2dpSourceObserverImp(*this);
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_A2DP_SRC,
+    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "observerImp_ is nullptr");
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_A2DP_SRC,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothA2dpSrc> proxy = iface_cast<IBluetoothA2dpSrc>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -123,7 +124,7 @@ A2dpSource::impl::impl()
 A2dpSource::impl::~impl()
 {
     HILOGD("start");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(observerImp_);
@@ -611,7 +612,7 @@ int A2dpSource::A2dpOffloadSessionRequest(const BluetoothRemoteDevice &device, c
     CHECK_AND_RETURN_LOG_RET(device.GetDeviceAddr() != INVALID_MAC_ADDRESS, A2DP_STREAM_ENCODE_UNKNOWN, "invaild mac");
     CHECK_AND_RETURN_LOG_RET(info.size() != 0, A2DP_STREAM_ENCODE_SOFTWARE, "empty stream");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), A2DP_STREAM_ENCODE_UNKNOWN, "bluetooth is off.");
-	sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
+    sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, A2DP_STREAM_ENCODE_UNKNOWN, "a2dpSrc proxy is nullptr");
 
     std::vector<BluetoothA2dpStreamInfo> streamsInfo = {};

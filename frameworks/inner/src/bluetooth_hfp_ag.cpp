@@ -188,12 +188,14 @@ struct HandsFreeAudioGateway::impl {
     int32_t ConnectSco(uint8_t callType)
     {
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_PARAM, "failed: no proxy");
         return proxy->ConnectSco(callType);
     }
 
     int32_t DisconnectSco(uint8_t callType)
     {
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_PARAM, "failed: no proxy");
         return proxy->DisconnectSco(callType);
     }
 
@@ -228,9 +230,8 @@ struct HandsFreeAudioGateway::impl {
         HILOGI("numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, type: %{public}d",
             phoneState.GetActiveNum(), phoneState.GetHeldNum(), phoneState.GetCallState(), phoneState.GetCallType());
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
-        if (proxy != nullptr) {
-            proxy->PhoneStateChanged(phoneState);
-        }
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is null");
+        proxy->PhoneStateChanged(phoneState);
     }
 
     void ClccResponse(int index, int direction, int status, int mode, bool mpty, std::string number, int type)
@@ -238,9 +239,8 @@ struct HandsFreeAudioGateway::impl {
         HILOGI("enter, index: %{public}d, direction: %{public}d, status: %{public}d, mode: %{public}d, mpty: "
             "%{public}d, type: %{public}d", index, direction, status, mode, mpty, type);
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
-        if (proxy != nullptr) {
-            proxy->ClccResponse(index, direction, status, mode, mpty, number, type);
-        }
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is null");
+        proxy->ClccResponse(index, direction, status, mode, mpty, number, type);
     }
 
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
@@ -310,6 +310,7 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGD("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
         return proxy->SetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
@@ -317,6 +318,7 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGD("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
         return proxy->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
@@ -324,6 +326,7 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGI("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
         return proxy->IsInbandRingingEnabled();
     }
 
@@ -352,7 +355,7 @@ private:
 HandsFreeAudioGateway::impl::impl()
 {
     serviceObserver_ = new AgServiceObserver(observers_);
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_HFP_AG,
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_HFP_AG,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothHfpAg> proxy = iface_cast<IBluetoothHfpAg>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -363,7 +366,7 @@ HandsFreeAudioGateway::impl::impl()
 HandsFreeAudioGateway::impl::~impl()
 {
     HILOGD("enter");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
     sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(serviceObserver_);

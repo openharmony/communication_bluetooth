@@ -120,7 +120,7 @@ struct BleAdvertiser::impl {
 BleAdvertiser::impl::impl()
 {
     callbackImp_ = new BluetoothBleAdvertiserCallbackImp(*this);
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(BLE_ADVERTISER_SERVER,
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(BLE_ADVERTISER_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothBleAdvertiser> proxy = iface_cast<IBluetoothBleAdvertiser>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -131,7 +131,7 @@ BleAdvertiser::impl::impl()
 BleAdvertiser::impl::~impl()
 {
     HILOGD("start");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
     callbacks_.Clear();
     sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");

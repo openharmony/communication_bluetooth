@@ -446,7 +446,7 @@ GattServer::GattServer(std::shared_ptr<GattServerCallback> callback) : pimpl(new
 bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
 {
     serviceCallback_ = new BluetoothGattServerCallbackStubImpl(server);
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_GATT_SERVER,
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_GATT_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothGattServer> proxy = iface_cast<IBluetoothGattServer>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -573,8 +573,6 @@ int GattServer::AddService(GattService &service)
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
     BluetoothGattService svc;
     svc.isPrimary_ = service.IsPrimary();
@@ -608,6 +606,8 @@ int GattServer::AddService(GattService &service)
         svc.characteristics_.push_back(std::move(c));
     }
     int appId = pimpl->applicationId_;
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int ret = proxy->AddService(appId, &svc);
     HILOGI("appId = %{public}d, ret = %{public}d.", appId, ret);
     return ret;
@@ -831,7 +831,7 @@ int GattServer::SendResponse(
 GattServer::~GattServer()
 {
     HILOGD("enter");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(pimpl->profileRegisterId);
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(pimpl->profileRegisterId);
     sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     if (pimpl->isRegisterSucceeded_) {

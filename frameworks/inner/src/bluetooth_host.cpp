@@ -305,7 +305,7 @@ BluetoothHost::impl::impl()
     bleRemoteObserverImp_ = new BluetoothBlePeripheralCallbackImp(*this);
     bleObserverImp_ = new BluetoothHostObserverImp(*this);
 
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(BLUETOOTH_HOST,
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(BLUETOOTH_HOST,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothHost> proxy = iface_cast<IBluetoothHost>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -319,7 +319,7 @@ BluetoothHost::impl::impl()
 BluetoothHost::impl::~impl()
 {
     HILOGI("starts");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(observerImp_);
@@ -336,7 +336,8 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
         HILOGE("samgrProxy is nullptr.");
         return false;
     }
-   sptr<IRemoteObject> hostRemote = Singleton<BluetoothProfileManager>::GetInstance().GetProfileRemote(BLUETOOTH_HOST);
+   sptr<IRemoteObject> hostRemote = DelayedSingleton<BluetoothProfileManager>::GetInstance()->GetProfileRemote(BLUETOOTH_HOST);
+    //当蓝牙服务已经起来的时候。这时的hostRemote不为空， 不需要进行后续的从sa拉起蓝牙服务的动作
     if (hostRemote != nullptr) {
         return true;
     }
@@ -355,6 +356,7 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
     auto waitStatus = proxyConVar_.wait_for(
         lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), []() {
             sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+            HILOGI("bluetooth_service has found");
             return proxy != nullptr;
         });
     if (!waitStatus) {

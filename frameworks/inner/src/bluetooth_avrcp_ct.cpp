@@ -442,15 +442,6 @@ public:
         proxy->UnregisterObserver(observer_);
     }
 
-    bool IsEnabled(void)
-    {
-        HILOGI("enter");
-        bool isDiscovering = false;
-        BluetoothHost::GetDefaultHost().IsBtDiscovering(isDiscovering);
-        sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
-        return (proxy != nullptr && !isDiscovering);
-    }
-
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
     {
         HILOGI("enter, device: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
@@ -894,7 +885,8 @@ public:
 AvrcpController::impl::impl()
 {
     observer_ = new (std::nothrow) ObserverImpl(this);
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_AVRCP_CT,
+    CHECK_AND_RETURN_LOG(observer_ != nullptr, "observer_ is nullptr");
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_AVRCP_CT,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothAvrcpCt> proxy = iface_cast<IBluetoothAvrcpCt>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
