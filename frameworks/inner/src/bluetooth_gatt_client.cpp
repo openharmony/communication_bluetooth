@@ -517,6 +517,8 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
         return BT_ERR_INTERNAL_ERROR;
     }
     HILOGI("isRegisterSucceeded: %{public}d", pimpl->isRegisterSucceeded_);
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     if (pimpl->isRegisterSucceeded_) {
         return proxy->Connect(pimpl->applicationId_, isAutoConnect);
     }
@@ -536,8 +538,6 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
     }
 
     int appId = 0;
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int32_t result = proxy->RegisterApplication(
         pimpl->clientCallback_, bluetooth::RawAddress(pimpl->device_.GetDeviceAddr()), transport, appId);
     HILOGI("Proxy register application : %{public}d", appId);
