@@ -89,7 +89,8 @@ private:
 A2dpSink::impl::impl()
 {
     observerImp_ = new (std::nothrow) BluetoothA2dpSinkObserverImp(*this);
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_A2DP_SINK,
+    CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "observerImp_ is nullptr");
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_A2DP_SINK,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothA2dpSink> proxy = iface_cast<IBluetoothA2dpSink>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -100,7 +101,7 @@ A2dpSink::impl::impl()
 A2dpSink::impl::~impl()
 {
     HILOGD("start");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
     sptr<IBluetoothA2dpSink> proxy = GetRemoteProxy<IBluetoothA2dpSink>(PROFILE_A2DP_SINK);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(observerImp_);

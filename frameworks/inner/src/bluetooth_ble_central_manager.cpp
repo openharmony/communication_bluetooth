@@ -144,7 +144,7 @@ struct BleCentralManager::impl {
 bool  BleCentralManager::impl::InitBleCentralManagerProxy(void)
 {
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(BLE_CENTRAL_MANAGER_SERVER,
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(BLE_CENTRAL_MANAGER_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothBleCentralManager> proxy = iface_cast<IBluetoothBleCentralManager>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -221,7 +221,7 @@ void BleCentralManager::impl::ConvertActiveDeviceInfo(const std::vector<BleActiv
 BleCentralManager::impl::~impl()
 {
     HILOGD("start");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
     scannerId_ = BLE_SCAN_INVALID_ID;
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);

@@ -506,8 +506,10 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ == static_cast<int>(BTConnectState::CONNECTED)) {
@@ -534,6 +536,8 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
     }
 
     int appId = 0;
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int32_t result = proxy->RegisterApplication(
         pimpl->clientCallback_, bluetooth::RawAddress(pimpl->device_.GetDeviceAddr()), transport, appId);
     HILOGI("Proxy register application : %{public}d", appId);
@@ -557,8 +561,10 @@ int GattClient::Disconnect()
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
@@ -566,6 +572,8 @@ int GattClient::Disconnect()
         return BT_ERR_INTERNAL_ERROR;
     }
     int result = BT_ERR_INTERNAL_ERROR;
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     result = proxy->Disconnect(pimpl->applicationId_);
     return result;
 }
@@ -578,9 +586,12 @@ int GattClient::Close()
         return BT_ERR_INVALID_STATE;
     }
 
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
-
     if (pimpl->isRegisterSucceeded_) {
         int32_t result = proxy->DeregisterApplication(pimpl->applicationId_);
         HILOGI("result: %{public}d", result);
@@ -601,8 +612,10 @@ int GattClient::DiscoverServices()
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
@@ -620,8 +633,10 @@ std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const 
         return std::nullopt;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::nullopt, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return std::nullopt;
+    }
 
     pimpl->GetServices();
     for (auto &svc : pimpl->gattServices_) {
@@ -642,8 +657,10 @@ std::vector<GattService> &GattClient::GetService()
         return pimpl->gattServices_;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, pimpl->gattServices_, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return pimpl->gattServices_;
+    }
 
     pimpl->GetServices();
     return pimpl->gattServices_;
@@ -657,8 +674,10 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
@@ -672,6 +691,8 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
     }
     int result = GattStatus::GATT_FAILURE;
     HILOGI("applicationId: %{public}d, handle: 0x%{public}04X", pimpl->applicationId_, characteristic.GetHandle());
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     result = proxy->ReadCharacteristic(
         pimpl->applicationId_, (BluetoothGattCharacteristic)bluetooth::Characteristic(characteristic.GetHandle()));
     HILOGI("result: %{public}d", result);
@@ -691,8 +712,10 @@ int GattClient::ReadDescriptor(GattDescriptor &descriptor)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
@@ -706,6 +729,8 @@ int GattClient::ReadDescriptor(GattDescriptor &descriptor)
     }
     int result = BT_ERR_INTERNAL_ERROR;
     HILOGI("applicationId: %{public}d, handle: 0x%{public}04X", pimpl->applicationId_, descriptor.GetHandle());
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     result = proxy->ReadDescriptor(
         pimpl->applicationId_, (BluetoothGattDescriptor)bluetooth::Descriptor(descriptor.GetHandle()));
     HILOGI("result: %{public}d", result);
@@ -725,8 +750,10 @@ int GattClient::RequestBleMtuSize(int mtu)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
@@ -735,6 +762,8 @@ int GattClient::RequestBleMtuSize(int mtu)
     }
     int result = BT_ERR_INTERNAL_ERROR;
     HILOGI("applicationId: %{public}d, mtu: %{public}d", pimpl->applicationId_, mtu);
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     result = proxy->RequestExchangeMtu(pimpl->applicationId_, mtu);
     HILOGI("result: %{public}d", result);
     return result;
@@ -748,8 +777,10 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
@@ -761,6 +792,8 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
         HILOGI("Remote device busy");
         return BT_ERR_INTERNAL_ERROR;
     }
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int ret = proxy->RequestNotification(pimpl->applicationId_, characteristic.GetHandle(), enable);
     if (ret != BT_NO_ERROR) {
         return ret;
@@ -816,8 +849,10 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
@@ -839,6 +874,8 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
         bluetooth::Characteristic(characteristic.GetHandle(), value.data(), length));
     int result = BT_ERR_INTERNAL_ERROR;
     bool withoutRespond = true;
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     if (characteristic.GetWriteType() == static_cast<int>(GattCharacteristic::WriteType::SIGNED)) {
         HILOGI("Signed write");
         result = proxy->SignedWriteCharacteristic(pimpl->applicationId_, &character);
@@ -867,8 +904,10 @@ int GattClient::WriteDescriptor(GattDescriptor &descriptor)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
@@ -887,6 +926,8 @@ int GattClient::WriteDescriptor(GattDescriptor &descriptor)
         return BT_ERR_INTERNAL_ERROR;
     }
     int result = BT_ERR_INTERNAL_ERROR;
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     BluetoothGattDescriptor desc(bluetooth::Descriptor(descriptor.GetHandle(), characterValue.get(), length));
     result = proxy->WriteDescriptor(pimpl->applicationId_, &desc);
     HILOGI("result: %{public}d", result);
@@ -905,8 +946,10 @@ int GattClient::RequestConnectionPriority(int connPriority)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
@@ -920,6 +963,8 @@ int GattClient::RequestConnectionPriority(int connPriority)
         return GattStatus::INVALID_PARAMETER;
     }
     int result = GattStatus::GATT_FAILURE;
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     result = proxy->RequestConnectionPriority(pimpl->applicationId_, connPriority);
     HILOGI("result: %{public}d", result);
     return result;
@@ -933,9 +978,13 @@ int GattClient::RequestFastestConn()
         return BT_ERR_INVALID_STATE;
     }
 
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
-
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     return proxy->RequestFastestConn(bluetooth::RawAddress(pimpl->device_.GetDeviceAddr()));
 }
@@ -946,8 +995,11 @@ int GattClient::ReadRemoteRssiValue()
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
@@ -961,6 +1013,8 @@ int GattClient::ReadRemoteRssiValue()
     }
     int result = GattStatus::GATT_FAILURE;
     HILOGI("applicationId: %{public}d", pimpl->applicationId_);
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     result = proxy->ReadRemoteRssiValue(pimpl->applicationId_);
     HILOGI("result: %{public}d", result);
     if (result == BT_NO_ERROR) {

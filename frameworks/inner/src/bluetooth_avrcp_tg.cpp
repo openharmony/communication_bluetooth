@@ -58,7 +58,8 @@ public:
     impl()
     {
         observer_ = new (std::nothrow) ObserverImpl(this);
-        profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_AVRCP_TG,
+        CHECK_AND_RETURN_LOG(observer_ != nullptr, "observer_ is nullptr");
+        profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_AVRCP_TG,
             [this](sptr<IRemoteObject> remote) {
             sptr<IBluetoothAvrcpTg> proxy = iface_cast<IBluetoothAvrcpTg>(remote);
             CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -72,15 +73,6 @@ public:
         sptr<IBluetoothAvrcpTg> proxy = GetRemoteProxy<IBluetoothAvrcpTg>(PROFILE_AVRCP_TG);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->UnregisterObserver(observer_);
-    }
-
-    bool IsEnabled(void)
-    {
-        HILOGI("enter");
-        bool isDiscovering = false;
-        BluetoothHost::GetDefaultHost().IsBtDiscovering(isDiscovering);
-        sptr<IBluetoothAvrcpTg> proxy = GetRemoteProxy<IBluetoothAvrcpTg>(PROFILE_AVRCP_TG);
-        return (proxy != nullptr && !isDiscovering);
     }
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)

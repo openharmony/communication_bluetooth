@@ -106,8 +106,8 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t
     HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
-            Singleton<BluetoothProfileManager>::GetInstance().isBluetoothServiceOn_ = true;
-            Singleton<BluetoothProfileManager>::GetInstance().RunFuncWhenBluetoothServiceStarted();
+            DelayedSingleton<BluetoothProfileManager>::GetInstance()->isBluetoothServiceOn_ = true;
+            DelayedSingleton<BluetoothProfileManager>::GetInstance()->RunFuncWhenBluetoothServiceStarted();
             break;
         }
         default:
@@ -123,8 +123,8 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int3
     HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
-            Singleton<BluetoothProfileManager>::GetInstance().profileRemoteMap_.Clear();
-            Singleton<BluetoothProfileManager>::GetInstance().isBluetoothServiceOn_ = false;
+            DelayedSingleton<BluetoothProfileManager>::GetInstance()->profileRemoteMap_.Clear();
+            DelayedSingleton<BluetoothProfileManager>::GetInstance()->isBluetoothServiceOn_ = false;
             break;
         }
         default:

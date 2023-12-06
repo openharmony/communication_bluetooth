@@ -36,7 +36,7 @@ struct ProfileIdProperty {
     std::string objectName;
 };
 class BluetoothProfileManager {
-DECLARE_SINGLETON(BluetoothProfileManager);
+DECLARE_DELAYED_SINGLETON(BluetoothProfileManager);
 
 public:
     /**
@@ -83,7 +83,7 @@ private:
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
 {
-    return iface_cast<T>(Singleton<BluetoothProfileManager>::GetInstance().GetProfileRemote(objectName));
+    return iface_cast<T>(DelayedSingleton<BluetoothProfileManager>::GetInstance()->GetProfileRemote(objectName));
 };
 } // namespace bluetooth
 } // namespace OHOS
