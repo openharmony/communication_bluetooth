@@ -639,6 +639,8 @@ int HandsFreeAudioGateway::GetConnectStrategy(const BluetoothRemoteDevice &devic
         return BT_ERR_INVALID_PARAM;
     }
     return pimpl->GetConnectStrategy(device, strategy);
+}
+
 bool HandsFreeAudioGateway::IsInbandRingingEnabled() const
 {
     HILOGI("enter");

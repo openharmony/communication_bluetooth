@@ -21,7 +21,7 @@
 #include "bluetooth_map_mse.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_host.h"
-#include "bluetooth_load_system_ability.h"
+#include "bluetooth_profile_manager.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
 #include "iservice_registry.h"
@@ -60,10 +60,7 @@ struct MapMse::impl {
     ~impl();
     void RegisterObserver(std::shared_ptr<MapMseObserver> &observer);
     void DeregisterObserver(std::shared_ptr<MapMseObserver> &observer);
-    bool InitMapMseProxy();
-
-    sptr<IBluetoothMapMse> proxy_ = nullptr;
-    std::mutex mapMseProxyMutex;
+    int32_t profileRegisterId;
 private:
     BluetoothObserverList<MapMseObserver> observers_;
     sptr<BluetoothMapMseObserverImp> serviceObserverImp_ = nullptr;
@@ -71,37 +68,22 @@ private:
 
 MapMse::impl::impl()
 {
-    CHECK_AND_RETURN_LOG((proxy_ == nullptr), "proxy exist");
-    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_MAP_MSE);
-    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
-        return;
-    }
-    InitMapMseProxy();
+    serviceObserverImp_ = new (std::nothrow) BluetoothMapMseObserverImp(observers_);
+    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_MAP_MSE,
+        [this](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothMapMse> proxy = iface_cast<IBluetoothMapMse>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->RegisterObserver(serviceObserverImp_);
+    });
 };
 
 MapMse::impl::~impl()
 {
     HILOGD("enter");
-    if (proxy_ != nullptr) {
-        proxy_->DeregisterObserver(serviceObserverImp_);
-    }
-}
-
-bool MapMse::impl::InitMapMseProxy(void)
-{
-    HILOGD("enter");
-    std::lock_guard<std::mutex> lock(mapMseProxyMutex);
-    CHECK_AND_RETURN_LOG_RET((proxy_ == nullptr), true, "proxy exist");
-
-    proxy_ = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
-    CHECK_AND_RETURN_LOG_RET((proxy_ != nullptr), false, "get proxy failed");
-
-    serviceObserverImp_ = new (std::nothrow) BluetoothMapMseObserverImp(observers_);
-    if (serviceObserverImp_ != nullptr) {
-        proxy_->RegisterObserver(serviceObserverImp_);
-    }
-    return true;
+    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    proxy->DeregisterObserver(serviceObserverImp_);
 }
 
 void MapMse::impl::RegisterObserver(std::shared_ptr<MapMseObserver> &observer)
@@ -136,21 +118,6 @@ MapMse::~MapMse()
     HILOGI("enter");
 }
 
-void MapMse::Init()
-{
-    HILOGI("MapMse init enter");
-    CHECK_AND_RETURN_LOG((pimpl != nullptr), "pimpl is null");
-    CHECK_AND_RETURN_LOG(pimpl->InitMapMseProxy(), "init fail");
-}
-
-void MapMse::Uinit()
-{
-    HILOGI("MapMse Uinit enter");
-    CHECK_AND_RETURN_LOG((pimpl != nullptr), "pimpl is null");
-    std::lock_guard<std::mutex> lock(pimpl->mapMseProxyMutex);
-    pimpl->proxy_ = nullptr;
-}
-
 void MapMse::RegisterObserver(std::shared_ptr<MapMseObserver> observer)
 {
     HILOGI("enter");
@@ -167,22 +134,22 @@ int32_t MapMse::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &sta
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
+    return proxy->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
 }
 
 int32_t MapMse::GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRemoteDevice> &result) const
 {
     HILOGI("enter");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     std::vector<BluetoothRawAddress> rawAddress {};
-    int32_t ret = pimpl->proxy_->GetDevicesByStates(states, rawAddress);
+    int32_t ret = proxy->GetDevicesByStates(states, rawAddress);
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "inner error");
 
     for (BluetoothRawAddress rawAddr : rawAddress) {
@@ -196,47 +163,47 @@ int32_t MapMse::Disconnect(const BluetoothRemoteDevice &device)
 {
     HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
+    return proxy->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
 }
 
 int32_t MapMse::SetConnectionStrategy(const BluetoothRemoteDevice &device, int32_t strategy)
 {
     HILOGI("device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
     CHECK_AND_RETURN_LOG_RET(CheckConnectionStrategyInvalid(strategy), BT_ERR_INVALID_PARAM, "strategy param error");
 
-    return pimpl->proxy_->SetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    return proxy->SetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
 }
 
 int32_t MapMse::GetConnectionStrategy(const BluetoothRemoteDevice &device, int32_t &strategy) const
 {
     HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    return proxy->GetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
 }
 
 int32_t MapMse::SetMessageAccessAuthorization(const BluetoothRemoteDevice &device, int32_t accessAuthorization)
 {
     HILOGI("device: %{public}s, accessAuthorization: %{public}d", GET_ENCRYPT_ADDR(device), accessAuthorization);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
     CHECK_AND_RETURN_LOG_RET(CheckAccessAuthorizationInvalid(accessAuthorization),
         BT_ERR_INVALID_PARAM, "metaData param error");
 
-    return pimpl->proxy_->SetMessageAccessAuthorization(
+    return proxy->SetMessageAccessAuthorization(
         BluetoothRawAddress(device.GetDeviceAddr()), accessAuthorization);
 }
 
@@ -244,11 +211,11 @@ int32_t MapMse::GetMessageAccessAuthorization(const BluetoothRemoteDevice &devic
 {
     HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetMessageAccessAuthorization(
+    return proxy->GetMessageAccessAuthorization(
         BluetoothRawAddress(device.GetDeviceAddr()), accessAuthorization);
 }
 
