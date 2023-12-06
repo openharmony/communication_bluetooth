@@ -403,6 +403,9 @@ int BleCentralManager::SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, in
         HILOGE("pimpl or ble central manager proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     return proxy->SetLpDeviceAdvParam(duration, maxExtAdvEvents, window, interval, advHandle);
 }
 

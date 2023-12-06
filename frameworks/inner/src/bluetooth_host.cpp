@@ -356,7 +356,7 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
     auto waitStatus = proxyConVar_.wait_for(
         lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), []() {
             sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-            HILOGI("bluetooth_service has found");
+            HILOGI("bluetooth_service has found, proxy not null");
             return proxy != nullptr;
         });
     if (!waitStatus) {
