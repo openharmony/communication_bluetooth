@@ -121,7 +121,7 @@ struct ClientSocket::impl {
         CHECK_AND_RETURN_LOG_RET(recvBufSize == SOCKET_RECV_STATE_SIZE, false, "recv status error, service closed");
         bool state = recvStateBuf[0];
 
-        if (type_ == TYPE_L2CAP || type_ ==TYPE_L2CAP_LE) {
+        if (type_ == TYPE_L2CAP || type_ == TYPE_L2CAP_LE) {
             return true;
         }
 
