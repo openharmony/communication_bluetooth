@@ -113,6 +113,8 @@ struct BleAdvertiser::impl {
     sptr<BluetoothBleAdvertiserCallbackImp> callbackImp_ = nullptr;
 
     BluetoothObserverMap<std::shared_ptr<BleAdvertiseCallback>> callbacks_;
+    class BleAdvertiserDeathRecipient;
+    sptr<BleAdvertiserDeathRecipient> deathRecipient_ = nullptr;
     int32_t profileRegisterId;
 };
 
@@ -125,10 +127,6 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("enter");
-        if (!owner_.proxy_) {
-            return;
-        }
-        owner_.proxy_ = nullptr;
         owner_.callbacks_.Clear();
     }
 
@@ -146,7 +144,7 @@ BleAdvertiser::impl::impl()
         proxy->RegisterBleAdvertiserCallback(callbackImp_);
         deathRecipient_ = new BleAdvertiserDeathRecipient(*this);
         if (deathRecipient_ != nullptr) {
-            proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+            proxy->AsObject()->AddDeathRecipient(deathRecipient_);
         }
     });
 }
@@ -159,7 +157,7 @@ BleAdvertiser::impl::~impl()
     sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterBleAdvertiserCallback(callbackImp_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
+    proxy->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }
 
 BleAdvertiser::BleAdvertiser() : pimpl(nullptr)
