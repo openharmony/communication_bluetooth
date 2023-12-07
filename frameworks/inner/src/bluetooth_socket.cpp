@@ -113,6 +113,10 @@ struct ClientSocket::impl {
         CHECK_AND_RETURN_LOG_RET(recvBufSize == SOCKET_RECV_STATE_SIZE, false, "recv status error, service closed");
         bool state = recvStateBuf[0];
 
+        if (type_ == TYPE_L2CAP || type_ == TYPE_L2CAP_LE) {
+            return true;
+        }
+
         uint8_t buf[SOCKET_RECV_ADDR_SIZE] = {0}; // addr buffer len
 #ifdef DARWIN_PLATFORM
         int recvAddrSize = recv(fd_, buf, sizeof(buf), 0);
