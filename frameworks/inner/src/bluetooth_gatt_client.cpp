@@ -318,6 +318,9 @@ private:
 
 bool GattClient::impl::Init(std::weak_ptr<GattClient> client)
 {
+    if (clientCallback_ != nullptr) {
+        return true;
+    }
     clientCallback_ = new BluetoothGattClientCallbackStubImpl(client);
     return true;
 }
@@ -587,13 +590,11 @@ int GattClient::Close()
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
+
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     if (pimpl->isRegisterSucceeded_) {
@@ -616,11 +617,9 @@ int GattClient::DiscoverServices()
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
@@ -639,11 +638,9 @@ std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const 
         return std::nullopt;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return std::nullopt;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return std::nullopt;
     }
 
     pimpl->GetServices();
@@ -665,11 +662,9 @@ std::vector<GattService> &GattClient::GetService()
         return pimpl->gattServices_;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return pimpl->gattServices_;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return pimpl->gattServices_;
     }
 
     pimpl->GetServices();
@@ -684,11 +679,9 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
@@ -724,11 +717,9 @@ int GattClient::ReadDescriptor(GattDescriptor &descriptor)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
@@ -764,11 +755,9 @@ int GattClient::RequestBleMtuSize(int mtu)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
@@ -793,11 +782,9 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
@@ -867,11 +854,9 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
@@ -924,11 +909,9 @@ int GattClient::WriteDescriptor(GattDescriptor &descriptor)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
@@ -968,11 +951,9 @@ int GattClient::RequestConnectionPriority(int connPriority)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
@@ -1002,11 +983,9 @@ int GattClient::RequestFastestConn()
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
@@ -1022,11 +1001,9 @@ int GattClient::ReadRemoteRssiValue()
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
