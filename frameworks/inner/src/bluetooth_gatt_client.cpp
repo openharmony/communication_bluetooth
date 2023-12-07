@@ -507,11 +507,9 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
@@ -564,11 +562,9 @@ int GattClient::Disconnect()
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->clientCallback_ == nullptr) {    
-        if (!pimpl->Init(weak_from_this())) {
-            HILOGE("pimpl or gatt client proxy is nullptr");
-            return BT_ERR_INTERNAL_ERROR;
-        }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
