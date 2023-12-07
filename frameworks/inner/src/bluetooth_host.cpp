@@ -308,7 +308,7 @@ BluetoothHost::impl::impl()
     profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(BLUETOOTH_HOST,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothHost> proxy = iface_cast<IBluetoothHost>(remote);
-        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
         proxy->RegisterObserver(observerImp_);
         proxy->RegisterBleAdapterObserver(bleObserverImp_);
         proxy->RegisterRemoteDeviceObserver(remoteObserverImp_);
@@ -321,7 +321,7 @@ BluetoothHost::impl::~impl()
     HILOGI("starts");
     DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
     proxy->DeregisterObserver(observerImp_);
     proxy->DeregisterBleAdapterObserver(bleObserverImp_);
     proxy->DeregisterRemoteDeviceObserver(remoteObserverImp_);
@@ -390,7 +390,7 @@ void BluetoothHost::impl::SyncRandomAddrToService(void)
         return;
     }
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
     proxy->SyncRandomAddress(stagingRealAddr_, stagingRandomAddr_);
     stagingRealAddr_ = "";
     stagingRandomAddr_ = "";
@@ -431,7 +431,7 @@ int BluetoothHost::CountEnableTimes(bool enable)
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     return proxy->CountEnableTimes(enable);
 }
@@ -441,7 +441,7 @@ int BluetoothHost::EnableBt()
     HILOGD("enter");
     CHECK_AND_RETURN_LOG_RET(!IsBtProhibitedByEdm(), BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     return proxy->EnableBt();
 }
@@ -450,7 +450,7 @@ int BluetoothHost::DisableBt()
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     CountEnableTimes(false);
     return proxy->DisableBt();
@@ -462,7 +462,7 @@ int BluetoothHost::GetBtState() const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BTStateID::STATE_TURN_OFF, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BTStateID::STATE_TURN_OFF, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BTStateID::STATE_TURN_OFF, "proxy is nullptr");
 
     int state = BTStateID::STATE_TURN_OFF;
     proxy->GetBtState(state);
@@ -477,7 +477,7 @@ int BluetoothHost::GetBtState(int &state) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_NO_ERROR, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr");
 
     int ret = proxy->GetBtState(state);
     HILOGI("state: %{public}d", state);
@@ -490,7 +490,7 @@ bool BluetoothHost::BluetoothFactoryReset()
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), false, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
 
     return proxy->BluetoothFactoryReset();
 }
@@ -533,7 +533,7 @@ int BluetoothHost::EnableBle()
         "pimpl is null or load bluetooth service failed.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     CountEnableTimes(true);
     return proxy->EnableBle();
@@ -543,7 +543,7 @@ int BluetoothHost::DisableBle()
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     return proxy->DisableBle();
 }
@@ -551,7 +551,7 @@ int BluetoothHost::DisableBle()
 bool BluetoothHost::IsBrEnabled() const
 {
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
 
     return proxy->IsBrEnabled();
 }
@@ -559,7 +559,7 @@ bool BluetoothHost::IsBrEnabled() const
 bool BluetoothHost::IsBleEnabled() const
 {
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
 
     return proxy->IsBleEnabled();
 }
@@ -568,7 +568,7 @@ std::string BluetoothHost::GetLocalAddress() const
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::string(), "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::string(), "proxy is nullptr");
 
     return proxy->GetLocalAddress();
 }
@@ -578,7 +578,7 @@ std::vector<uint32_t> BluetoothHost::GetProfileList() const
     HILOGD("enter");
     std::vector<uint32_t> profileList;
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, profileList, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, profileList, "proxy is nullptr");
 
     profileList = proxy->GetProfileList();
     return profileList;
@@ -588,7 +588,7 @@ int BluetoothHost::GetMaxNumConnectedAudioDevices() const
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, INVALID_VALUE, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, INVALID_VALUE, "proxy is nullptr");
 
     return proxy->GetMaxNumConnectedAudioDevices();
 }
@@ -600,7 +600,7 @@ int BluetoothHost::GetBtConnectionState() const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), state, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, state, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, state, "proxy is nullptr");
 
     proxy->GetBtConnectionState(state);
     HILOGI("state: %{public}d", state);
@@ -614,7 +614,7 @@ int BluetoothHost::GetBtConnectionState(int &state) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     int ret = proxy->GetBtConnectionState(state);
     HILOGI("state: %{public}d", state);
@@ -628,7 +628,7 @@ int BluetoothHost::GetBtProfileConnState(uint32_t profileId, int &state) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->GetBtProfileConnState(profileId, state);
 }
@@ -637,7 +637,7 @@ void BluetoothHost::GetLocalSupportedUuids(std::vector<ParcelUuid> &uuids)
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
 
     std::vector<std::string> stringUuids;
     proxy->GetLocalSupportedUuids(stringUuids);
@@ -662,7 +662,7 @@ BluetoothDeviceClass BluetoothHost::GetLocalDeviceClass() const
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BluetoothDeviceClass(0), "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BluetoothDeviceClass(0), "proxy is nullptr");
 
     int LocalDeviceClass = proxy->GetLocalDeviceClass();
     return BluetoothDeviceClass(LocalDeviceClass);
@@ -672,7 +672,7 @@ bool BluetoothHost::SetLocalDeviceClass(const BluetoothDeviceClass &deviceClass)
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
 
     int cod = deviceClass.GetClassOfDevice();
     return proxy->SetLocalDeviceClass(cod);
@@ -682,7 +682,7 @@ std::string BluetoothHost::GetLocalName() const
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::string(), "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::string(), "proxy is nullptr");
 
     std::string name = INVALID_NAME;
     proxy->GetLocalName(name);
@@ -693,7 +693,7 @@ int BluetoothHost::GetLocalName(std::string &name) const
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->GetLocalName(name);
 }
@@ -704,7 +704,7 @@ int BluetoothHost::SetLocalName(const std::string &name)
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->SetLocalName(name);
 }
@@ -715,7 +715,7 @@ int BluetoothHost::GetBtScanMode(int32_t &scanMode) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->GetBtScanMode(scanMode);
 }
@@ -726,7 +726,7 @@ int BluetoothHost::SetBtScanMode(int mode, int duration)
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->SetBtScanMode(mode, duration);
 }
@@ -735,7 +735,7 @@ int BluetoothHost::GetBondableMode(int transport) const
 {
     HILOGI("transport: %{public}d", transport);
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, INVALID_VALUE, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, INVALID_VALUE, "proxy is nullptr");
 
     return proxy->GetBondableMode(transport);
 }
@@ -744,7 +744,7 @@ bool BluetoothHost::SetBondableMode(int transport, int mode)
 {
     HILOGI("transport: %{public}d, mode: %{public}d", transport, mode);
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
 
     return proxy->SetBondableMode(transport, mode);
 }
@@ -755,7 +755,7 @@ int BluetoothHost::StartBtDiscovery()
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->StartBtDiscovery();
 }
@@ -766,7 +766,7 @@ int BluetoothHost::CancelBtDiscovery()
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->CancelBtDiscovery();
 }
@@ -777,7 +777,7 @@ int32_t BluetoothHost::IsBtDiscovering(bool &isDiscovering, int transport) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr");
 
     return proxy->IsBtDiscovering(isDiscovering, transport);
 }
@@ -788,7 +788,7 @@ long BluetoothHost::GetBtDiscoveryEndMillis() const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), 0, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, 0, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, 0, "proxy is nullptr");
 
     return proxy->GetBtDiscoveryEndMillis();
 }
@@ -799,7 +799,7 @@ int32_t BluetoothHost::GetPairedDevices(int transport, std::vector<BluetoothRemo
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     std::vector<BluetoothRawAddress> pairedAddr;
     int32_t ret = proxy->GetPairedDevices(pairedAddr);
@@ -817,7 +817,7 @@ int32_t BluetoothHost::RemovePair(const BluetoothRemoteDevice &device)
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     sptr<BluetoothRawAddress> rawAddrSptr = new BluetoothRawAddress(device.GetDeviceAddr());
     return proxy->RemovePair(device.GetTransportType(), rawAddrSptr);
@@ -827,7 +827,7 @@ bool BluetoothHost::RemoveAllPairs()
 {
     HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
 
     return proxy->RemoveAllPairs();
 }
@@ -851,7 +851,7 @@ void BluetoothHost::DeregisterRemoteDeviceObserver(std::shared_ptr<BluetoothRemo
 int BluetoothHost::GetBleMaxAdvertisingDataLength() const
 {
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, INVALID_VALUE, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, INVALID_VALUE, "proxy is nullptr");
 
     return proxy->GetBleMaxAdvertisingDataLength();
 }
@@ -875,7 +875,7 @@ int32_t BluetoothHost::GetLocalProfileUuids(std::vector<std::string> &uuids)
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INTERNAL_ERROR, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->GetLocalProfileUuids(uuids);
 }
@@ -886,7 +886,7 @@ int BluetoothHost::SetFastScan(bool isEnable)
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
 
     return proxy->SetFastScan(isEnable);
 }
@@ -932,9 +932,8 @@ bool BluetoothHost::IsBtProhibitedByEdm(void)
     int len = GetParameter(BLUETOOTH_EDM_KEY, PARAM_FALSE, result, PARAM_FALSE_LEN + 1);
     CHECK_AND_RETURN_LOG_RET(len == PARAM_FALSE_LEN || len == PARAM_TRUE_LEN, false, "GetParameter len is invalid.");
 
-    HILOGI("prohibit_bluetooth = %{public}s", result);
     if (strncmp(result, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
-        HILOGW("Bluetooth is prohibited by EDM. You won't be able to turn on bluetooth !");
+        HILOGW("bluetooth is prohibited by EDM. You won't be able to turn on bluetooth !");
         return true;
     }
     return false;
