@@ -14,7 +14,6 @@
  */
 
 #include "bluetooth_pan.h"
-#include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
 #include "bluetooth_profile_manager.h"
 #include "bluetooth_log.h"
