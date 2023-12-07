@@ -21,7 +21,7 @@
 #include "bluetooth_avrcp_ct_observer_stub.h"
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"
-#include "bluetooth_load_system_ability.h"
+#include "bluetooth_profile_manager.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
@@ -437,18 +437,9 @@ public:
     ~impl()
     {
         HILOGI("enter");
-        if (proxy_ != nullptr) {
-            proxy_->UnregisterObserver(observer_);
-            proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-        }
-    }
-
-    bool IsEnabled(void)
-    {
-        HILOGI("enter");
-        bool isDiscovering = false;
-        BluetoothHost::GetDefaultHost().IsBtDiscovering(isDiscovering);
-        return (proxy_ != nullptr && !isDiscovering);
+        sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->UnregisterObserver(observer_);
     }
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
@@ -884,74 +875,23 @@ public:
             observer->OnActionCompleted(device, resp);
         });
     }
-
-    bool InitAvrcpCtProxy(void);
-
     std::mutex observerMutex_;
     BluetoothObserverList<AvrcpController::IObserver> observers_;
 
     sptr<ObserverImpl> observer_;
-    sptr<IBluetoothAvrcpCt> proxy_ = nullptr;
-    class BluetoothAvrcpCtDeathRecipient;
-    sptr<BluetoothAvrcpCtDeathRecipient> deathRecipient_;
-};
-
-class AvrcpController::impl::BluetoothAvrcpCtDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit BluetoothAvrcpCtDeathRecipient(AvrcpController::impl &AvrcpController) : avrcpCt_(AvrcpController) {};
-    ~BluetoothAvrcpCtDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothAvrcpCtDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("starts");
-        std::lock_guard<std::mutex> lock(g_avrcpProxyMutex);
-        if (!avrcpCt_.proxy_) {
-            return;
-        }
-        avrcpCt_.proxy_ = nullptr;
-    }
-
-private:
-    AvrcpController::impl &avrcpCt_;
+    int32_t profileRegisterId;
 };
 
 AvrcpController::impl::impl()
 {
-    if (proxy_) {
-        return;
-    }
-    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_AVRCP_CT);
-    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
-        return;
-    }
-    InitAvrcpCtProxy();
-}
-
-bool AvrcpController::impl::InitAvrcpCtProxy(void)
-{
-    std::lock_guard<std::mutex> lock(g_avrcpProxyMutex);
-    if (proxy_) {
-        return true;
-    }
-    HILOGI("enter");
-    proxy_ = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
-    if (!proxy_) {
-        HILOGE("get AvrcpController proxy failed");
-        return false;
-    }
-
     observer_ = new (std::nothrow) ObserverImpl(this);
-    if (observer_ != nullptr) {
-        proxy_->RegisterObserver(observer_);
-    }
-
-    deathRecipient_ = new BluetoothAvrcpCtDeathRecipient(*this);
-    if (deathRecipient_ != nullptr) {
-        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    }
-    return true;
+    CHECK_AND_RETURN_LOG(observer_ != nullptr, "observer_ is nullptr");
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_AVRCP_CT,
+        [this](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothAvrcpCt> proxy = iface_cast<IBluetoothAvrcpCt>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->RegisterObserver(observer_);
+    });
 }
 
 AvrcpController *AvrcpController::GetProfile(void)
@@ -961,18 +901,6 @@ AvrcpController *AvrcpController::GetProfile(void)
     static AvrcpController instance;
 
     return &instance;
-}
-
-void AvrcpController::Init()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    if (!pimpl->InitAvrcpCtProxy()) {
-        HILOGE("get AvrcpController proxy failed");
-        return;
-    }
 }
 
 /******************************************************************
@@ -1006,15 +934,13 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetConnectedDevices(void)
         HILOGE("bluetooth is off.");
         return std::vector<BluetoothRemoteDevice>();
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return std::vector<BluetoothRemoteDevice>();
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr,
+        std::vector<BluetoothRemoteDevice>(), "failed: no proxy");
 
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
     std::vector<BluetoothRemoteDevice> devices;
-    std::vector<RawAddress> rawAddrs = pimpl->proxy_->GetConnectedDevices();
+    std::vector<RawAddress> rawAddrs = proxy->GetConnectedDevices();
     for (auto rawAddr : rawAddrs) {
         BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
         devices.push_back(device);
@@ -1030,19 +956,17 @@ std::vector<BluetoothRemoteDevice> AvrcpController::GetDevicesByStates(const std
         HILOGE("bluetooth is off.");
         return std::vector<BluetoothRemoteDevice>();
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return std::vector<BluetoothRemoteDevice>();
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr,
+        std::vector<BluetoothRemoteDevice>(), "failed: no proxy");
 
     std::vector<BluetoothRemoteDevice> devices;
-    if (pimpl->proxy_ != nullptr) {
+    if (proxy != nullptr) {
         std::vector<int32_t> convertStates;
         for (auto state : states) {
             convertStates.push_back(static_cast<int32_t>(state));
         }
-        std::vector<RawAddress> rawAddrs = pimpl->proxy_->GetDevicesByStates(convertStates);
+        std::vector<RawAddress> rawAddrs = proxy->GetDevicesByStates(convertStates);
         for (auto rawAddr : rawAddrs) {
             BluetoothRemoteDevice device(rawAddr.GetAddress(), BTTransport::ADAPTER_BREDR);
             devices.push_back(device);
@@ -1061,13 +985,12 @@ int AvrcpController::GetDeviceState(const BluetoothRemoteDevice &device)
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return static_cast<int>(BTConnectState::DISCONNECTED);
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr,
+        static_cast<int>(BTConnectState::DISCONNECTED), "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetDeviceState(rawAddr);
+    return proxy->GetDeviceState(rawAddr);
 }
 
 bool AvrcpController::Connect(const BluetoothRemoteDevice &device)
@@ -1079,13 +1002,11 @@ bool AvrcpController::Connect(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return false;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    int result = pimpl->proxy_->Connect(rawAddr);
+    int result = proxy->Connect(rawAddr);
     return result == RET_NO_ERROR;
 }
 
@@ -1098,13 +1019,11 @@ bool AvrcpController::Disconnect(const BluetoothRemoteDevice &device)
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return false;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    int result = pimpl->proxy_->Disconnect(rawAddr);
+    int result = proxy->Disconnect(rawAddr);
     return result == RET_NO_ERROR;
 }
 
@@ -1121,10 +1040,8 @@ int AvrcpController::PressButton(const BluetoothRemoteDevice &device, uint8_t bu
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_BAD_STATUS;
     switch (button) {
@@ -1139,7 +1056,7 @@ int AvrcpController::PressButton(const BluetoothRemoteDevice &device, uint8_t bu
         case AVRC_KEY_OPERATION_FORWARD:
         case AVRC_KEY_OPERATION_BACKWARD: {
             BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-            result = pimpl->proxy_->PressButton(rawAddr, static_cast<int32_t>(button));
+            result = proxy->PressButton(rawAddr, static_cast<int32_t>(button));
             break;
         }
         default:
@@ -1161,10 +1078,8 @@ int AvrcpController::ReleaseButton(const BluetoothRemoteDevice &device, uint8_t 
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_BAD_STATUS;
     switch (button) {
@@ -1179,7 +1094,7 @@ int AvrcpController::ReleaseButton(const BluetoothRemoteDevice &device, uint8_t 
         case AVRC_KEY_OPERATION_FORWARD:
         case AVRC_KEY_OPERATION_BACKWARD: {
             BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-            result = pimpl->proxy_->ReleaseButton(rawAddr, static_cast<int32_t>(button));
+            result = proxy->ReleaseButton(rawAddr, static_cast<int32_t>(button));
             break;
         }
         default:
@@ -1205,13 +1120,11 @@ int AvrcpController::GetUnitInfo(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetUnitInfo(rawAddr);
+    return proxy->GetUnitInfo(rawAddr);
 }
 
 int AvrcpController::GetSubUnitInfo(const BluetoothRemoteDevice &device)
@@ -1223,13 +1136,11 @@ int AvrcpController::GetSubUnitInfo(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetSubUnitInfo(rawAddr);
+    return proxy->GetSubUnitInfo(rawAddr);
 }
 
 /******************************************************************
@@ -1245,13 +1156,11 @@ int AvrcpController::GetSupportedCompanies(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetSupportedCompanies(rawAddr);
+    return proxy->GetSupportedCompanies(rawAddr);
 }
 
 int AvrcpController::GetSupportedEvents(const BluetoothRemoteDevice &device)
@@ -1263,13 +1172,11 @@ int AvrcpController::GetSupportedEvents(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetSupportedEvents(rawAddr);
+    return proxy->GetSupportedEvents(rawAddr);
 }
 
 /******************************************************************
@@ -1285,13 +1192,11 @@ int AvrcpController::GetPlayerAppSettingAttributes(const BluetoothRemoteDevice &
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetPlayerAppSettingAttributes(rawAddr);
+    return proxy->GetPlayerAppSettingAttributes(rawAddr);
 }
 
 int AvrcpController::GetPlayerAppSettingValues(const BluetoothRemoteDevice &device, uint8_t attribute)
@@ -1303,10 +1208,8 @@ int AvrcpController::GetPlayerAppSettingValues(const BluetoothRemoteDevice &devi
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_BAD_STATUS;
     do {
@@ -1319,7 +1222,7 @@ int AvrcpController::GetPlayerAppSettingValues(const BluetoothRemoteDevice &devi
             break;
         }
         BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetPlayerAppSettingValues(rawAddr, static_cast<int32_t>(attribute));
+        result = proxy->GetPlayerAppSettingValues(rawAddr, static_cast<int32_t>(attribute));
     } while (false);
 
     return result;
@@ -1335,10 +1238,8 @@ int AvrcpController::GetPlayerAppSettingCurrentValue(
         return RET_NO_ERROR;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_NO_ERROR;
     do {
@@ -1358,7 +1259,7 @@ int AvrcpController::GetPlayerAppSettingCurrentValue(
             break;
         }
         BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetPlayerAppSettingCurrentValue(rawAddr, attrs);
+        result = proxy->GetPlayerAppSettingCurrentValue(rawAddr, attrs);
     } while (false);
 
     return result;
@@ -1374,10 +1275,8 @@ int AvrcpController::SetPlayerAppSettingCurrentValue(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_NO_ERROR;
     std::vector<int32_t> myAttributes;
@@ -1406,7 +1305,7 @@ int AvrcpController::SetPlayerAppSettingCurrentValue(
         if (result != RET_NO_ERROR) {
             break;
         }
-        result = pimpl->proxy_->SetPlayerAppSettingCurrentValue(rawAddr, myAttributes, myValues);
+        result = proxy->SetPlayerAppSettingCurrentValue(rawAddr, myAttributes, myValues);
     } while (false);
 
     return result;
@@ -1422,10 +1321,8 @@ int AvrcpController::GetPlayerApplicationSettingAttributeText(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_BAD_STATUS;
     do {
@@ -1440,7 +1337,7 @@ int AvrcpController::GetPlayerApplicationSettingAttributeText(
             attrs.push_back(static_cast<int32_t>(attribute));
         }
         BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetPlayerAppSettingAttributeText(rawAddr, attrs);
+        result = proxy->GetPlayerAppSettingAttributeText(rawAddr, attrs);
     } while (false);
 
     return result;
@@ -1456,10 +1353,8 @@ int AvrcpController::GetPlayerApplicationSettingValueText(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_BAD_STATUS;
     do {
@@ -1476,7 +1371,7 @@ int AvrcpController::GetPlayerApplicationSettingValueText(
             myValues.push_back(static_cast<int32_t>(value));
         }
         BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-        result = pimpl->proxy_->GetPlayerAppSettingValueText(rawAddr, static_cast<int32_t>(attributeId), myValues);
+        result = proxy->GetPlayerAppSettingValueText(rawAddr, static_cast<int32_t>(attributeId), myValues);
     } while (false);
 
     return result;
@@ -1495,17 +1390,15 @@ int AvrcpController::GetElementAttributes(const BluetoothRemoteDevice &device, c
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     std::vector<int32_t> attrs;
     for (auto attribute : attributes) {
         attrs.push_back(static_cast<int32_t>(attribute));
     }
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetElementAttributes(rawAddr, attrs);
+    return proxy->GetElementAttributes(rawAddr, attrs);
 }
 
 /******************************************************************
@@ -1521,13 +1414,11 @@ int AvrcpController::GetPlayStatus(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetPlayStatus(rawAddr);
+    return proxy->GetPlayStatus(rawAddr);
 }
 
 int AvrcpController::PlayItem(const BluetoothRemoteDevice &device, uint64_t uid, uint16_t uidCounter)
@@ -1538,14 +1429,11 @@ int AvrcpController::PlayItem(const BluetoothRemoteDevice &device, uint64_t uid,
         HILOGE("bluetooth is off.");
         return RET_BAD_STATUS;
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->PlayItem(rawAddr,
+    return proxy->PlayItem(rawAddr,
         static_cast<int32_t>(AVRC_MEDIA_SCOPE_NOW_PLAYING),
         static_cast<int64_t>(uid),
         static_cast<int32_t>(uidCounter));
@@ -1566,10 +1454,8 @@ int AvrcpController::GetFolderItems(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     int result = RET_NO_ERROR;
     do {
@@ -1591,7 +1477,7 @@ int AvrcpController::GetFolderItems(
         for (auto attribute : attributes) {
             attrs.push_back(static_cast<int32_t>(attribute));
         }
-        result = pimpl->proxy_->GetFolderItems(
+        result = proxy->GetFolderItems(
             rawAddr, static_cast<int32_t>(startItem), static_cast<int32_t>(endItem), attrs);
     } while (false);
 
@@ -1607,13 +1493,11 @@ int AvrcpController::GetMeidaPlayerList(const BluetoothRemoteDevice &device, uin
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetMeidaPlayerList(rawAddr, static_cast<int32_t>(startItem), static_cast<int32_t>(endItem));
+    return proxy->GetMeidaPlayerList(rawAddr, static_cast<int32_t>(startItem), static_cast<int32_t>(endItem));
 }
 
 int AvrcpController::GetTotalNumberOfItems(const BluetoothRemoteDevice &device)
@@ -1625,14 +1509,12 @@ int AvrcpController::GetTotalNumberOfItems(const BluetoothRemoteDevice &device)
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     uint8_t scope = AVRC_MEDIA_SCOPE_NOW_PLAYING;
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetTotalNumberOfItems(rawAddr, static_cast<int32_t>(scope));
+    return proxy->GetTotalNumberOfItems(rawAddr, static_cast<int32_t>(scope));
 }
 
 /******************************************************************
@@ -1648,13 +1530,11 @@ int AvrcpController::SetAbsoluteVolume(const BluetoothRemoteDevice &device, uint
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->SetAbsoluteVolume(rawAddr, static_cast<int32_t>(volume));
+    return proxy->SetAbsoluteVolume(rawAddr, static_cast<int32_t>(volume));
 }
 
 /******************************************************************
@@ -1671,10 +1551,8 @@ int AvrcpController::EnableNotification(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     std::vector<int32_t> myEvents;
     for (auto event : events) {
@@ -1682,7 +1560,7 @@ int AvrcpController::EnableNotification(
     }
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->EnableNotification(rawAddr, myEvents, static_cast<int32_t>(interval));
+    return proxy->EnableNotification(rawAddr, myEvents, static_cast<int32_t>(interval));
 }
 
 int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &events)
@@ -1694,10 +1572,8 @@ int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, co
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     std::vector<int32_t> myEvents;
     for (auto event : events) {
@@ -1705,7 +1581,7 @@ int AvrcpController::DisableNotification(const BluetoothRemoteDevice &device, co
     }
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->DisableNotification(rawAddr, myEvents);
+    return proxy->DisableNotification(rawAddr, myEvents);
 }
 
 /******************************************************************
@@ -1720,10 +1596,8 @@ int AvrcpController::SetAddressedPlayer(const BluetoothRemoteDevice &device, uin
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     return RET_BAD_STATUS;
 }
@@ -1737,13 +1611,11 @@ int AvrcpController::SetBrowsedPlayer(const BluetoothRemoteDevice &device, uint1
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->SetBrowsedPlayer(rawAddr, (int32_t)playerId);
+    return proxy->SetBrowsedPlayer(rawAddr, (int32_t)playerId);
 }
 
 int AvrcpController::ChangePath(
@@ -1757,10 +1629,8 @@ int AvrcpController::ChangePath(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     return RET_BAD_STATUS;
 }
@@ -1775,10 +1645,8 @@ int AvrcpController::GetItemAttributes(
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     std::vector<int32_t> attrs;
     for (auto attribute : attributes) {
@@ -1786,7 +1654,7 @@ int AvrcpController::GetItemAttributes(
     }
 
     BluetoothRawAddress rawAddr(device.GetDeviceAddr());
-    return pimpl->proxy_->GetItemAttributes(rawAddr, (int64_t)uid, (int32_t)uidCounter, attrs);
+    return proxy->GetItemAttributes(rawAddr, (int64_t)uid, (int32_t)uidCounter, attrs);
 }
 
 int AvrcpController::RequestContinuingResponse(const BluetoothRemoteDevice &device, uint8_t pduId)
@@ -1798,10 +1666,8 @@ int AvrcpController::RequestContinuingResponse(const BluetoothRemoteDevice &devi
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     return RET_BAD_STATUS;
 }
@@ -1824,10 +1690,8 @@ int AvrcpController::AddToNowPlaying(const BluetoothRemoteDevice &device, uint64
         return RET_BAD_STATUS;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or avrcpCt proxy_ is nullptr");
-        return RET_BAD_STATUS;
-    }
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     return RET_BAD_STATUS;
 }
@@ -1842,10 +1706,8 @@ AvrcpController::AvrcpController(void)
 AvrcpController::~AvrcpController(void)
 {
     HILOGI("enter");
-    if (!pimpl || !pimpl->proxy_) {
-        return;
-    }
-    pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
+    sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     pimpl = nullptr;
 }
 

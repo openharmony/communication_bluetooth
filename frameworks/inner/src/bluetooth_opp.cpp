@@ -15,7 +15,7 @@
 
 #include "bluetooth_opp.h"
 #include "bluetooth_host.h"
-#include "bluetooth_load_system_ability.h"
+#include "bluetooth_profile_manager.h"
 #include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"
 #include "bluetooth_opp_observer_stub.h"
@@ -216,20 +216,20 @@ private:
 struct Opp::impl {
     impl();
     ~impl();
-    bool InitOppServerProxy(void);
 
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states)
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         std::vector<BluetoothRemoteDevice> remoteDevices;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+        sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+        if (proxy != nullptr && IS_BT_ENABLED()) {
             std::vector<BluetoothRawAddress> rawDevices;
             std::vector<int32_t> tmpStates;
             for (int state : states) {
                 tmpStates.push_back((int32_t)state);
             }
 
-            proxy_->GetDevicesByStates(tmpStates, rawDevices);
+            proxy->GetDevicesByStates(tmpStates, rawDevices);
             for (BluetoothRawAddress rawDevice : rawDevices) {
                 BluetoothRemoteDevice remoteDevice(rawDevice.GetAddress(), 0);
                 remoteDevices.push_back(remoteDevice);
@@ -241,9 +241,10 @@ struct Opp::impl {
     int GetDeviceState(const BluetoothRemoteDevice &device)
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
+        sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+        if (proxy != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             int state;
-            proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
+            proxy->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
             return state;
         }
         return static_cast<int>(BTConnectState::DISCONNECTED);
@@ -252,9 +253,10 @@ struct Opp::impl {
     bool SendFile(std::string device, std::vector<std::string>filePaths, std::vector<std::string>mimeTypes)
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+        sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+        if (proxy != nullptr && IS_BT_ENABLED()) {
             bool isOk;
-            proxy_->SendFile(device, filePaths, mimeTypes, isOk);
+            proxy->SendFile(device, filePaths, mimeTypes, isOk);
             return isOk;
         }
         HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
@@ -264,9 +266,10 @@ struct Opp::impl {
     bool SetIncomingFileConfirmation(bool accept)
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+        sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+        if (proxy != nullptr && IS_BT_ENABLED()) {
             bool isOk;
-            proxy_->SetIncomingFileConfirmation(accept, isOk);
+            proxy->SetIncomingFileConfirmation(accept, isOk);
             return isOk;
         }
         HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
@@ -278,8 +281,9 @@ struct Opp::impl {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
         BluetoothIOppTransferInformation oppInformation;
         BluetoothOppTransferInformation transferInformation;
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
-            proxy_->GetCurrentTransferInformation(oppInformation);
+        sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+        if (proxy != nullptr && IS_BT_ENABLED()) {
+            proxy->GetCurrentTransferInformation(oppInformation);
             transferInformation.SetId(oppInformation.GetId());
             transferInformation.SetFileName(oppInformation.GetFileName());
             transferInformation.SetFilePath(oppInformation.GetFilePath());
@@ -299,9 +303,10 @@ struct Opp::impl {
     bool CancelTransfer()
     {
         HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-        if (proxy_ != nullptr && IS_BT_ENABLED()) {
+        sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+        if (proxy != nullptr && IS_BT_ENABLED()) {
             bool isOk;
-            proxy_->CancelTransfer(isOk);
+            proxy->CancelTransfer(isOk);
             return isOk;
         }
         HILOGE("[%{public}s]: %{public}s(): fw return false!", __FILE__, __FUNCTION__);
@@ -320,82 +325,30 @@ struct Opp::impl {
         observers_.Deregister(observer);
     }
 
-    sptr<IBluetoothOpp> proxy_;
+    int32_t profileRegisterId;
 private:
     BluetoothObserverList<OppObserver> observers_;
     sptr<OppInnerObserver> innerObserver_;
-    class OppDeathRecipient;
-    sptr<OppDeathRecipient> deathRecipient_;
-};
-
-class Opp::impl::OppDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit OppDeathRecipient(Opp::impl &impl) : impl_(impl)
-    {};
-    ~OppDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(OppDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("Opp::impl::OppDeathRecipient::OnRemoteDied starts");
-        std::lock_guard<std::mutex> lock(g_oppProxyMutex);
-        if (!impl_.proxy_) {
-            return;
-        }
-        impl_.proxy_ = nullptr;
-    }
-
-private:
-    Opp::impl &impl_;
 };
 
 Opp::impl::impl()
 {
-    if (proxy_) {
-        return;
-    }
-    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_OPP);
-    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
-        return;
-    }
-    InitOppServerProxy();
+    innerObserver_ = new OppInnerObserver(observers_);
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_OPP_SERVER,
+        [this](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothOpp> proxy = iface_cast<IBluetoothOpp>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->RegisterObserver(innerObserver_);
+    });
 }
 
 Opp::impl::~impl()
 {
-    HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
-    if (proxy_ == nullptr) {
-        HILOGE("Opp::impl:~impl() failed: no proxy_");
-        return;
-    }
-    proxy_->DeregisterObserver(innerObserver_);
-    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
-}
-
-bool Opp::impl::InitOppServerProxy(void)
-{
-    std::lock_guard<std::mutex> lock(g_oppProxyMutex);
-    if (proxy_) {
-        return true;
-    }
-    HILOGI("enter");
-    proxy_ = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
-    if (!proxy_) {
-        HILOGE("get Opp proxy_ failed");
-        return false;
-    }
-
-    innerObserver_ = new OppInnerObserver(observers_);
-    if (innerObserver_ != nullptr) {
-        proxy_->RegisterObserver(innerObserver_);
-    }
-
-    deathRecipient_ = new OppDeathRecipient(*this);
-    if (deathRecipient_ != nullptr) {
-        proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    }
-    return true;
+    HILOGD("start");
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    proxy->DeregisterObserver(innerObserver_);
 }
 
 Opp::Opp()
@@ -405,18 +358,6 @@ Opp::Opp()
 
 Opp::~Opp()
 {}
-
-void Opp::Init()
-{
-    if (!pimpl) {
-        HILOGE("fails: no pimpl");
-        return;
-    }
-    if (!pimpl->InitOppServerProxy()) {
-        HILOGE("Opp proxy_ is nullptr");
-        return;
-    }
-}
 
 Opp *Opp::GetProfile()
 {
@@ -429,11 +370,9 @@ std::vector<BluetoothRemoteDevice> Opp::GetDevicesByStates(std::vector<int> stat
         HILOGE("bluetooth is off.");
         return std::vector<BluetoothRemoteDevice>();
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or opp proxy_ is nullptr");
-        return std::vector<BluetoothRemoteDevice>();
-    }
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr,
+        std::vector<BluetoothRemoteDevice>(), "failed: no proxy");
 
     return pimpl->GetDevicesByStates(states);
 }
@@ -444,11 +383,9 @@ int Opp::GetDeviceState(const BluetoothRemoteDevice &device)
         HILOGE("bluetooth is off.");
         return static_cast<int>(BTConnectState::DISCONNECTED);
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or opp proxy_ is nullptr");
-        return static_cast<int>(BTConnectState::DISCONNECTED);
-    }
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr,
+        static_cast<int>(BTConnectState::DISCONNECTED), "failed: no proxy");
 
     return pimpl->GetDeviceState(device);
 }
@@ -459,11 +396,8 @@ bool Opp::SendFile(std::string device, std::vector<std::string>filePaths, std::v
         HILOGE("bluetooth is off.");
         return false;
     }
-
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or opp proxy_ is nullptr");
-        return false;
-    }
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->SendFile(device, filePaths, mimeTypes);
 }
@@ -471,14 +405,12 @@ bool Opp::SendFile(std::string device, std::vector<std::string>filePaths, std::v
 bool Opp::SetIncomingFileConfirmation(bool accept)
 {
     if (!IS_BT_ENABLED()) {
-        HILOGE("pimpl or opp proxy_ is nullptr");
+        HILOGE("pimpl or opp proxy is nullptr");
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("get Opp proxy_ failed");
-        return false;
-    }
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->SetIncomingFileConfirmation(accept);
 }
@@ -491,10 +423,8 @@ BluetoothOppTransferInformation Opp::GetCurrentTransferInformation()
         return transferInformation;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or opp proxy_ is nullptr");
-        return transferInformation;
-    }
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, transferInformation, "failed: no proxy");
 
     transferInformation = pimpl->GetCurrentTransferInformation();
     return transferInformation;
@@ -507,10 +437,8 @@ bool Opp::CancelTransfer()
         return false;
     }
 
-    if (pimpl == nullptr || !pimpl->proxy_) {
-        HILOGE("pimpl or opp proxy_ is nullptr");
-        return false;
-    }
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->CancelTransfer();
 }

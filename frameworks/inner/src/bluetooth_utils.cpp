@@ -164,37 +164,6 @@ std::string GetErrorCode(int32_t errCode)
     return errlog;
 }
 
-sptr<IRemoteObject> GetRemoteObject(const std::string &objectName)
-{
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!samgr) {
-        HILOGE("samgr is null");
-        return nullptr;
-    }
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-    if (!hostRemote) {
-        HILOGE("hostRemote is null");
-        return nullptr;
-    }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    if (!hostProxy) {
-        HILOGE("hostProxy is null");
-        return nullptr;
-    }
-
-    sptr<IRemoteObject> remote = nullptr;
-    if (objectName == BLE_ADVERTISER_SERVER || objectName == BLE_CENTRAL_MANAGER_SERVER) {
-        remote = hostProxy->GetBleRemote(objectName);
-    } else {
-        remote = hostProxy->GetProfile(objectName);
-    }
-    if (!remote) {
-        HILOGE("%{public}s remote is null", objectName.c_str());
-        return nullptr;
-    }
-    return remote;
-}
-
 void ToUpper(char* arr)
 {
     for (size_t i = 0; i < strlen(arr); ++i) {

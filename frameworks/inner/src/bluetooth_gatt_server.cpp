@@ -18,7 +18,6 @@
 #include <set>
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_host.h"
-#include "bluetooth_load_system_ability.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_host_proxy.h"
@@ -28,6 +27,7 @@
 #include "iservice_registry.h"
 #include "raw_address.h"
 #include "system_ability_definition.h"
+#include "bluetooth_profile_manager.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -98,32 +98,7 @@ struct GattServer::impl {
     void BuildIncludeService(GattService &svc, const std::vector<bluetooth::Service> &iSvcs);
     impl(std::shared_ptr<GattServerCallback> callback);
     bool Init(std::weak_ptr<GattServer>);
-
-    class BluetoothGattServerDeathRecipient;
-    sptr<BluetoothGattServerDeathRecipient> deathRecipient_;
-    sptr<IBluetoothGattServer> proxy_;
-};
-
-class GattServer::impl::BluetoothGattServerDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit BluetoothGattServerDeathRecipient(std::weak_ptr<GattServer> gattserver) : gattServer_(gattserver){};
-    ~BluetoothGattServerDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothGattServerDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGD("enter");
-        auto sptr = gattServer_.lock();
-        if (sptr && sptr->pimpl && sptr->pimpl->proxy_) {
-            HILOGI("Clear gattServer proxy");
-            sptr->pimpl->proxy_->DeregisterApplication(sptr->pimpl->applicationId_);
-            sptr->pimpl->proxy_->AsObject()->RemoveDeathRecipient(sptr->pimpl->deathRecipient_);
-            sptr->pimpl->proxy_ = nullptr;
-        }
-    }
-
-private:
-    std::weak_ptr<GattServer> gattServer_;
+    int32_t profileRegisterId;
 };
 
 class GattServer::impl::BluetoothGattServerCallbackStubImpl : public BluetoothGattServerCallbackStub {
@@ -470,24 +445,22 @@ GattServer::GattServer(std::shared_ptr<GattServerCallback> callback) : pimpl(new
 
 bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
 {
-    if (proxy_) {
+    if (profileRegisterId != 0) { //ProxyManager has register callback
         return true;
     }
-    proxy_ = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
-    if (!proxy_) {
-        HILOGE("get gattServer proxy_ failed");
-        return false;
-    }
     serviceCallback_ = new BluetoothGattServerCallbackStubImpl(server);
-    deathRecipient_ = new BluetoothGattServerDeathRecipient(server);
-    proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
-    int result = proxy_->RegisterApplication(serviceCallback_);
-    if (result > 0) {
-        applicationId_ = result;
-        isRegisterSucceeded_ = true;
-    } else {
-        HILOGE("Can not Register to gatt server service! result = %{public}d", result);
-    }
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_GATT_SERVER,
+        [this](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothGattServer> proxy = iface_cast<IBluetoothGattServer>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        int result = proxy->RegisterApplication(serviceCallback_);
+        if (result > 0) {
+            applicationId_ = result;
+            isRegisterSucceeded_ = true;
+        } else {
+            HILOGE("Can not Register to gatt server service! result = %{public}d", result);
+        }
+    });
     return true;
 }
 
@@ -554,53 +527,46 @@ int GattServer::impl::BuildRequestId(uint8_t type, uint8_t transport)
 int GattServer::impl::RespondCharacteristicRead(
     const bluetooth::GattDevice &device, uint16_t handle, const uint8_t *value, size_t length, int ret)
 {
-    if (!proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, GattStatus::REQUEST_NOT_SUPPORT, "failed: no proxy");
+
     if (ret == GattStatus::GATT_SUCCESS) {
         BluetoothGattCharacteristic character(bluetooth::Characteristic(handle, value, length));
 
-        return proxy_->RespondCharacteristicRead(device, &character, ret);
+        return proxy->RespondCharacteristicRead(device, &character, ret);
     }
     BluetoothGattCharacteristic character;
     character.handle_ = handle;
-    return proxy_->RespondCharacteristicRead(device, &character, ret);
+    return proxy->RespondCharacteristicRead(device, &character, ret);
 }
 
 int GattServer::impl::RespondCharacteristicWrite(const bluetooth::GattDevice &device, uint16_t handle, int ret)
 {
-    if (!proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
-    }
-    return proxy_->RespondCharacteristicWrite(
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, GattStatus::REQUEST_NOT_SUPPORT, "failed: no proxy");
+    return proxy->RespondCharacteristicWrite(
         device, (BluetoothGattCharacteristic)bluetooth::Characteristic(handle), ret);
 }
 
 int GattServer::impl::RespondDescriptorRead(
     const bluetooth::GattDevice &device, uint16_t handle, const uint8_t *value, size_t length, int ret)
 {
-    if (!proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, GattStatus::REQUEST_NOT_SUPPORT, "failed: no proxy");
     if (ret == GattStatus::GATT_SUCCESS) {
         BluetoothGattDescriptor desc(bluetooth::Descriptor(handle, value, length));
-        return proxy_->RespondDescriptorRead(device, &desc, ret);
+        return proxy->RespondDescriptorRead(device, &desc, ret);
     }
     BluetoothGattDescriptor desc;
     desc.handle_ = handle;
-    return proxy_->RespondDescriptorRead(device, &desc, ret);
+    return proxy->RespondDescriptorRead(device, &desc, ret);
 }
 
 int GattServer::impl::RespondDescriptorWrite(const bluetooth::GattDevice &device, uint16_t handle, int ret)
 {
-    if (!proxy_) {
-        HILOGE("proxy_ is nullptr");
-        return GattStatus::REQUEST_NOT_SUPPORT;
-    }
-    return proxy_->RespondDescriptorWrite(device, (BluetoothGattDescriptor)bluetooth::Descriptor(handle), ret);
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, GattStatus::REQUEST_NOT_SUPPORT, "failed: no proxy");
+    return proxy->RespondDescriptorWrite(device, (BluetoothGattDescriptor)bluetooth::Descriptor(handle), ret);
 }
 
 int GattServer::AddService(GattService &service)
@@ -609,11 +575,6 @@ int GattServer::AddService(GattService &service)
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
-    }
-
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
     }
 
     BluetoothGattService svc;
@@ -648,7 +609,9 @@ int GattServer::AddService(GattService &service)
         svc.characteristics_.push_back(std::move(c));
     }
     int appId = pimpl->applicationId_;
-    int ret = pimpl->proxy_->AddService(appId, &svc);
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    int ret = proxy->AddService(appId, &svc);
     HILOGI("appId = %{public}d, ret = %{public}d.", appId, ret);
     return ret;
 }
@@ -661,13 +624,11 @@ void GattServer::ClearServices()
         return;
     }
 
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
 
     int appId = pimpl->applicationId_;
-    pimpl->proxy_->ClearServices(int(appId));
+    proxy->ClearServices(int(appId));
     pimpl->gattServices_.clear();
 }
 
@@ -678,13 +639,10 @@ int GattServer::Close()
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    int ret = pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
+    int ret = proxy->DeregisterApplication(pimpl->applicationId_);
     HILOGI("ret: %{public}d", ret);
     if (ret == BT_NO_ERROR) {
         pimpl->isRegisterSucceeded_ = false;
@@ -695,26 +653,22 @@ int GattServer::Close()
 int GattServer::Connect(const BluetoothRemoteDevice &device, bool isDirect)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
 
     int appId = pimpl->applicationId_;
     HILOGI("appId: %{public}d, device: %{public}s, isDirect: %{public}d", appId, GET_ENCRYPT_ADDR(device), isDirect);
     
     bluetooth::GattDevice gattDevice(bluetooth::RawAddress(device.GetDeviceAddr()), GATT_TRANSPORT_TYPE_LE);
-    return pimpl->proxy_->Connect(appId, gattDevice, isDirect);
+    return proxy->Connect(appId, gattDevice, isDirect);
 }
 
 int GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
 
     auto gattDevice = pimpl->FindConnectedDevice(device);
@@ -725,7 +679,7 @@ int GattServer::CancelConnection(const BluetoothRemoteDevice &device)
 
     int appId = pimpl->applicationId_;
     HILOGI("appId: %{public}d, device: %{public}s", appId, GET_ENCRYPT_ADDR(device));
-    return pimpl->proxy_->CancelConnection(appId, *gattDevice);
+    return proxy->CancelConnection(appId, *gattDevice);
 }
 std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const UUID &uuid, bool isPrimary)
 {
@@ -734,11 +688,8 @@ std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const 
         HILOGE("bluetooth is off.");
         return std::nullopt;
     }
-
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return std::nullopt;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::nullopt, "failed: no proxy");
 
     std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
 
@@ -759,11 +710,8 @@ std::list<GattService> &GattServer::GetServices()
         HILOGE("bluetooth is off.");
         return pimpl->gattServices_;
     }
-
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return pimpl->gattServices_;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, pimpl->gattServices_, "failed: no proxy");
 
     std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
     return pimpl->gattServices_;
@@ -778,10 +726,8 @@ int GattServer::NotifyCharacteristicChanged(
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGE("Invalid remote device");
@@ -798,7 +744,7 @@ int GattServer::NotifyCharacteristicChanged(
     BluetoothGattCharacteristic character(
         bluetooth::Characteristic(characteristic.GetHandle(), characterValue.get(), length));
     std::string address = device.GetDeviceAddr();
-    int ret = pimpl->proxy_->NotifyClient(
+    int ret = proxy->NotifyClient(
         bluetooth::GattDevice(bluetooth::RawAddress(address), 0), &character, confirm);
     HILOGI("ret = %{public}d.", ret);
     return ret;
@@ -812,15 +758,13 @@ int GattServer::RemoveGattService(const GattService &service)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
     int ret = BT_ERR_INVALID_PARAM;
     for (auto sIt = pimpl->gattServices_.begin(); sIt != pimpl->gattServices_.end(); sIt++) {
         if (sIt->GetHandle() == service.GetHandle()) {
-            ret = pimpl->proxy_->RemoveService(
+            ret = proxy->RemoveService(
                 pimpl->applicationId_, (BluetoothGattService)bluetooth::Service(service.GetHandle()));
             pimpl->gattServices_.erase(sIt);
             break;
@@ -890,16 +834,12 @@ int GattServer::SendResponse(
 GattServer::~GattServer()
 {
     HILOGD("enter");
-    if (pimpl->proxy_ == nullptr) {
-        HILOGE("proxy is null.");
-        return;
-    }
-
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(pimpl->profileRegisterId);
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     if (pimpl->isRegisterSucceeded_) {
-        pimpl->proxy_->DeregisterApplication(pimpl->applicationId_);
+        proxy->DeregisterApplication(pimpl->applicationId_);
     }
-
-    pimpl->proxy_->AsObject()->RemoveDeathRecipient(pimpl->deathRecipient_);
     HILOGI("end");
 }
 }  // namespace Bluetooth

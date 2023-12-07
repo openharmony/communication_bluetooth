@@ -38,14 +38,6 @@ std::string GetProfileConnStateName(int state);
 std::string GetErrorCode(int32_t errCode);
 std::string GenerateRandomMacAddress();
 std::string GetUpdateOutputStackActionName(int action);
-
-sptr<IRemoteObject> GetRemoteObject(const std::string &objectName);
-template <typename T>
-sptr<T> GetRemoteProxy(const std::string &objectName)
-{
-    return iface_cast<T>(GetRemoteObject(objectName));
-}
-
 bool CheckConnectionStrategyInvalid(int32_t strategy);
 bool CheckAccessAuthorizationInvalid(int32_t accessAuthorization);
 }  // namespace Bluetooth
