@@ -16,7 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_PARCEL_BT_UUID_H
 #define OHOS_BLUETOOTH_STANDARD_PARCEL_BT_UUID_H
 
-#include "bt_uuid.h"
+#include "../common/bt_uuid.h"
 #include "message_parcel.h"
 
 namespace OHOS {

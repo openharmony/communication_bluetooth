@@ -26,7 +26,6 @@
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "gatt_data.h"
-#include "hilog/log.h"
 #include "i_bluetooth_gatt_client.h"
 #include "iservice_registry.h"
 #include "raw_address.h"

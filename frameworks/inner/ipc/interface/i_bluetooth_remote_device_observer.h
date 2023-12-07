@@ -18,7 +18,7 @@
 
 #include "../parcel/bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
-#include "bt_uuid.h"
+#include "../common/bt_uuid.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
