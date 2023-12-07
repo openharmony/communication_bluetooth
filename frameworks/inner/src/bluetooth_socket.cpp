@@ -36,14 +36,14 @@ namespace Bluetooth {
 const int LENGTH = 18;
 const int MIN_BUFFER_SIZE_TO_SET = 4 * 1024; // 4KB
 const int MAX_BUFFER_SIZE_TO_SET = 50 * 1024; // 50KB
-const int ADDR_OFFSET = 1; // bool
-const int TX_OFFSET = 7; // bool + addr
-const int RX_OFFSET = 9; // bool + addr + short
+const int ADDR_OFFSET = 1; // state(1)
+const int TX_OFFSET = 7; // state(1)+addr(6)
+const int RX_OFFSET = 9; // state(1)+addr(6)+tx(2)
 const int SOCKET_RECV_ADDR_SIZE = 6;
 const int SOCKET_RECV_TXRX_SIZE = 2;
 const int SOCKET_RECV_CHANNEL_SIZE = 4;
 const int SOCKET_RECV_FD_SIZE = 14;
-const int SOCKET_RECV_FD_SIGNAL = 11; // bool + addr + short + short signal from stack
+const int SOCKET_RECV_FD_SIGNAL = 11; // state(1)+addr(6)+tx(2)+rx(2)
 
 constexpr char BLUETOOTH_UE_DOMAIN[] = "BLUETOOTH_UE";
 std::mutex g_socketProxyMutex;
@@ -102,7 +102,7 @@ struct ClientSocket::impl {
         }
     }
 
-    uint16_t GetPacketSizeFromBuf(uint8_t recvBuf[], int recvBufLen)
+    uint16_t GetPacketSizeFromBuf(const uint8_t recvBuf[], int recvBufLen) const
     {
         uint16_t shortBuf;
         CHECK_AND_RETURN_LOG_RET(recvBuf, 0, "getpacketsize fail, invalid recvBuf");
@@ -114,17 +114,17 @@ struct ClientSocket::impl {
 
     bool RecvSocketSignal()
     {
-        uint8_t recvStateBuf[SOCKET_RECV_FD_SIGNAL] = {0};
+        uint8_t signalBuf[SOCKET_RECV_FD_SIGNAL] = {0};
 #ifdef DARWIN_PLATFORM
-        int recvBufSize = recv(fd_, recvStateBuf, sizeof(recvStateBuf), 0);
+        int recvBufSize = recv(fd_, signalBuf, sizeof(signalBuf), 0);
 #else
-        int recvBufSize = recv(fd_, recvStateBuf, sizeof(recvStateBuf), MSG_WAITALL);
+        int recvBufSize = recv(fd_, signalBuf, sizeof(signalBuf), MSG_WAITALL);
 #endif
         CHECK_AND_RETURN_LOG_RET(recvBufSize == SOCKET_RECV_FD_SIGNAL, false, "recv signal error, service closed");
-        bool state = recvStateBuf[0];
+        bool state = signalBuf[0];
         // remote addr has been obtained, no need obtain again
-        maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, SOCKET_RECV_FD_SIGNAL - TX_OFFSET);
-        maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, SOCKET_RECV_FD_SIGNAL - RX_OFFSET);
+        maxTxPacketSize_ = GetPacketSizeFromBuf(signalBuf + TX_OFFSET, SOCKET_RECV_FD_SIGNAL - TX_OFFSET);
+        maxRxPacketSize_ = GetPacketSizeFromBuf(signalBuf + RX_OFFSET, SOCKET_RECV_FD_SIGNAL - RX_OFFSET);
 
         return state;
     }
