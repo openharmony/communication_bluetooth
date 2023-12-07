@@ -17,7 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_BLE_ADVERTISE_CALLBACK_INTERFACE_H
 
 #include "bluetooth_service_ipc_interface_code.h"
-#include "ble_service_data.h"
+#include "../common/ble_service_data.h"
 #include "iremote_broker.h"
 
 namespace OHOS {

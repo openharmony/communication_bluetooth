@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_PARCEL_A2DP_A2DPCODECSTATUS_H
 #define BLUETOOTH_PARCEL_A2DP_A2DPCODECSTATUS_H
 
-#include "a2dp_parcel_codec.h"
+#include "../common/a2dp_parcel_codec.h"
 #include "bluetooth_a2dp_a2dpCodecInfo.h"
 #include "parcel.h"
 

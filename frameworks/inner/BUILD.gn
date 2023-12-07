@@ -112,7 +112,6 @@ config("btframework_config") {
   include_dirs = [
     "include",
     "ipc/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/common",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
   ]
 }
@@ -149,11 +148,13 @@ ohos_shared_library("btframework") {
   part_name = "bluetooth"
 }
 
+config("btcommon_config") {
+  include_dirs = [ "include" ]
+}
+
 config("btcommon_public_config") {
   include_dirs = [
-    "common",
     "ipc/common",
-    "ipc/include",
     "ipc/interface",
     "ipc/parcel",
   ]
@@ -161,6 +162,7 @@ config("btcommon_public_config") {
 
 ohos_shared_library("btcommon") {
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  configs = [ ":btcommon_config" ]
   public_configs = [ ":btcommon_public_config" ]
   innerapi_tags = [ "chipsetsdk" ]
   sources = [
