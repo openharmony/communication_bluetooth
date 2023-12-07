@@ -407,7 +407,7 @@ struct HandsFreeUnit::impl {
 
     std::optional<HandsFreeUnitCall> StartDial(const BluetoothRemoteDevice &device, const std::string &number)
     {
-        HILOGI("enter, device: %{public}s, number: %{public}s", GET_ENCRYPT_ADDR(device), number.c_str());
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
         if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
             BluetoothHfpHfCall calls;
