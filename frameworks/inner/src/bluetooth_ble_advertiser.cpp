@@ -31,7 +31,6 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
-std::mutex g_bleProxyMutex;
 struct BleAdvertiser::impl {
     impl();
     ~impl();
@@ -117,6 +116,26 @@ struct BleAdvertiser::impl {
     int32_t profileRegisterId;
 };
 
+class BleAdvertiser::impl::BleAdvertiserDeathRecipient final : public IRemoteObject::DeathRecipient {
+public:
+    explicit BleAdvertiserDeathRecipient(BleAdvertiser::impl &impl) : owner_(impl) {};
+    ~BleAdvertiserDeathRecipient() final = default;
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiserDeathRecipient);
+
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
+    {
+        HILOGI("enter");
+        if (!owner_.proxy_) {
+            return;
+        }
+        owner_.proxy_ = nullptr;
+        owner_.callbacks_.Clear();
+    }
+
+private:
+    BleAdvertiser::impl &owner_;
+};
+
 BleAdvertiser::impl::impl()
 {
     callbackImp_ = new BluetoothBleAdvertiserCallbackImp(*this);
@@ -125,6 +144,10 @@ BleAdvertiser::impl::impl()
         sptr<IBluetoothBleAdvertiser> proxy = iface_cast<IBluetoothBleAdvertiser>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterBleAdvertiserCallback(callbackImp_);
+        deathRecipient_ = new BleAdvertiserDeathRecipient(*this);
+        if (deathRecipient_ != nullptr) {
+            proxy_->AsObject()->AddDeathRecipient(deathRecipient_);
+        }
     });
 }
 
@@ -136,6 +159,7 @@ BleAdvertiser::impl::~impl()
     sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterBleAdvertiserCallback(callbackImp_);
+    proxy_->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }
 
 BleAdvertiser::BleAdvertiser() : pimpl(nullptr)

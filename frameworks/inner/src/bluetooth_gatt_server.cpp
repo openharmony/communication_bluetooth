@@ -445,6 +445,9 @@ GattServer::GattServer(std::shared_ptr<GattServerCallback> callback) : pimpl(new
 
 bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
 {
+    if (profileRegisterId != 0) { //ProxyManager has register callback
+        return true;
+    }
     serviceCallback_ = new BluetoothGattServerCallbackStubImpl(server);
     profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_GATT_SERVER,
         [this](sptr<IRemoteObject> remote) {
