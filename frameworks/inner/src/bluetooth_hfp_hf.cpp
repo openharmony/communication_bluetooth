@@ -117,8 +117,7 @@ public:
     void OnSubscriberNumberChanged(
         const BluetoothRawAddress &device, const std::string &number) override
     {
-        HILOGI("enter, device: %{public}s, number: %{public}s",
-            GetEncryptAddr((device).GetAddress()).c_str(), number.c_str());
+        HILOGI("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, number](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnSubscriberNumberChanged(remoteDevice, number);
