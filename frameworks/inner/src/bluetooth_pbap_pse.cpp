@@ -21,7 +21,6 @@
 #include "bluetooth_pbap_pse.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_host.h"
-#include "bluetooth_load_system_ability.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
 #include "iservice_registry.h"
@@ -29,6 +28,7 @@
 #include "system_ability_definition.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
+#include "bluetooth_profile_manager.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -65,9 +65,8 @@ struct PbapPse::impl {
     void RegisterObserver(std::shared_ptr<PbapPseObserver> &observer);
     void DeregisterObserver(std::shared_ptr<PbapPseObserver> &observer);
     bool InitPbapPseProxy();
-
-    sptr<IBluetoothPbapPse> proxy_ = nullptr;
     std::mutex pbapPseProxyMutex_;
+    int32_t profileRegisterId;
 private:
     BluetoothObserverList<PbapPseObserver> observers_;
     sptr<BluetoothPbapPseObserverImp> serviceObserverImp_ = nullptr;
@@ -75,37 +74,22 @@ private:
 
 PbapPse::impl::impl()
 {
-    CHECK_AND_RETURN_LOG((proxy_ == nullptr), "proxy exist");
-    BluetootLoadSystemAbility::GetInstance()->RegisterNotifyMsg(PROFILE_ID_PBAP_PSE);
-    if (!BluetootLoadSystemAbility::GetInstance()->HasSubscribedBluetoothSystemAbility()) {
-        BluetootLoadSystemAbility::GetInstance()->SubScribeBluetoothSystemAbility();
-        return;
-    }
-    InitPbapPseProxy();
+    serviceObserverImp_ = new BluetoothPbapPseObserverImp(observers_);
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_PBAP_PSE,
+        [this](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothPbapPse> proxy = iface_cast<IBluetoothPbapPse>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->RegisterObserver(serviceObserverImp_);
+    });
 }
 
 PbapPse::impl::~impl()
 {
     HILOGI("enter");
-    if (proxy_ != nullptr) {
-        proxy_->DeregisterObserver(serviceObserverImp_);
-    }
-}
-
-bool PbapPse::impl::InitPbapPseProxy(void)
-{
-    HILOGI("enter");
-    std::lock_guard<std::mutex> lock(pbapPseProxyMutex_);
-    CHECK_AND_RETURN_LOG_RET((proxy_ == nullptr), true, "proxy exist");
-
-    proxy_ = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
-    CHECK_AND_RETURN_LOG_RET((proxy_ != nullptr), false, "get proxy failed");
-
-    serviceObserverImp_ = new BluetoothPbapPseObserverImp(observers_);
-    if (serviceObserverImp_ != nullptr) {
-        proxy_->RegisterObserver(serviceObserverImp_);
-    }
-    return true;
+    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    proxy->DeregisterObserver(serviceObserverImp_);
 }
 
 void PbapPse::impl::RegisterObserver(std::shared_ptr<PbapPseObserver> &observer)
@@ -140,21 +124,6 @@ PbapPse::~PbapPse()
     HILOGI("enter");
 }
 
-void PbapPse::Init()
-{
-    HILOGI("Init enter");
-    CHECK_AND_RETURN_LOG((pimpl != nullptr), "pimpl is null");
-    CHECK_AND_RETURN_LOG(pimpl->InitPbapPseProxy(), "init fail");
-}
-
-void PbapPse::Uinit()
-{
-    HILOGI("Uinit enter");
-    CHECK_AND_RETURN_LOG((pimpl != nullptr), "pimpl is null");
-    std::lock_guard<std::mutex> lock(pimpl->pbapPseProxyMutex_);
-    pimpl->proxy_ = nullptr;
-}
-
 void PbapPse::RegisterObserver(std::shared_ptr<PbapPseObserver> observer)
 {
     HILOGI("enter");
@@ -171,11 +140,11 @@ int32_t PbapPse::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &st
 {
     HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
+    return proxy->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
 }
 
 int32_t PbapPse::GetDevicesByStates(const std::vector<int32_t> &states,
@@ -183,11 +152,11 @@ int32_t PbapPse::GetDevicesByStates(const std::vector<int32_t> &states,
 {
     HILOGI("enter");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     std::vector<BluetoothRawAddress> rawAddress {};
-    int32_t ret = pimpl->proxy_->GetDevicesByStates(states, rawAddress);
+    int32_t ret = proxy->GetDevicesByStates(states, rawAddress);
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "inner error");
 
     for (BluetoothRawAddress rawAddr : rawAddress) {
@@ -201,34 +170,34 @@ int32_t PbapPse::Disconnect(const BluetoothRemoteDevice &device)
 {
     HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
+    return proxy->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
 }
 
 int32_t PbapPse::SetConnectionStrategy(const BluetoothRemoteDevice &device, int32_t strategy)
 {
     HILOGI("device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
     CHECK_AND_RETURN_LOG_RET(CheckConnectionStrategyInvalid(strategy), BT_ERR_INVALID_PARAM, "strategy param error");
 
-    return pimpl->proxy_->SetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    return proxy->SetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
 }
 
 int32_t PbapPse::GetConnectionStrategy(const BluetoothRemoteDevice &device, int32_t &strategy) const
 {
     HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    return proxy->GetConnectionStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
 }
 
 bool CheckShareTypeInvalid(int32_t shareType)
@@ -245,23 +214,23 @@ int32_t PbapPse::SetShareType(const BluetoothRemoteDevice &device, int32_t share
 {
     HILOGI("device: %{public}s, shareType: %{public}d", GET_ENCRYPT_ADDR(device), shareType);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
     CHECK_AND_RETURN_LOG_RET(CheckShareTypeInvalid(shareType), BT_ERR_INVALID_PARAM, "shareType param error");
 
-    return pimpl->proxy_->SetShareType(BluetoothRawAddress(device.GetDeviceAddr()), shareType);
+    return proxy->SetShareType(BluetoothRawAddress(device.GetDeviceAddr()), shareType);
 }
 
 int32_t PbapPse::GetShareType(const BluetoothRemoteDevice &device, int32_t &shareType) const
 {
     HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetShareType(BluetoothRawAddress(device.GetDeviceAddr()), shareType);
+    return proxy->GetShareType(BluetoothRawAddress(device.GetDeviceAddr()), shareType);
 }
 
 int32_t PbapPse::SetPhoneBookAccessAuthorization(const BluetoothRemoteDevice &device, int32_t accessAuthorization)
@@ -269,13 +238,13 @@ int32_t PbapPse::SetPhoneBookAccessAuthorization(const BluetoothRemoteDevice &de
     HILOGI("device: %{public}s, accessAuthorization: %{public}d",
         GET_ENCRYPT_ADDR(device), accessAuthorization);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
     CHECK_AND_RETURN_LOG_RET(CheckAccessAuthorizationInvalid(accessAuthorization),
         BT_ERR_INVALID_PARAM, "accessAuthorization param error");
 
-    return pimpl->proxy_->SetPhoneBookAccessAuthorization(BluetoothRawAddress(device.GetDeviceAddr()),
+    return proxy->SetPhoneBookAccessAuthorization(BluetoothRawAddress(device.GetDeviceAddr()),
         accessAuthorization);
 }
 
@@ -284,11 +253,11 @@ int32_t PbapPse::GetPhoneBookAccessAuthorization(const BluetoothRemoteDevice &de
 {
     HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
-    CHECK_AND_RETURN_LOG_RET((pimpl != nullptr && pimpl->proxy_ != nullptr),
-        BT_ERR_INTERNAL_ERROR, "pimpl or proxy is nullptr");
+    sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device param error");
 
-    return pimpl->proxy_->GetPhoneBookAccessAuthorization(BluetoothRawAddress(device.GetDeviceAddr()),
+    return proxy->GetPhoneBookAccessAuthorization(BluetoothRawAddress(device.GetDeviceAddr()),
         accessAuthorization);
 }
 
