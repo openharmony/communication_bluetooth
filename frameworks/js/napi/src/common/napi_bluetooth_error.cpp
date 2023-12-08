@@ -32,6 +32,7 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { BtErrCode::BT_ERR_IPC_TRANS_FAILED, "trans exception." },
     { BtErrCode::BT_ERR_PERMISSION_FAILED, "Permission denied." },
     { BtErrCode::BT_ERR_SYSTEM_PERMISSION_FAILED, "Non-system applications are not allowed to use system APIs."},
+    { BtErrCode::BT_ERR_PROHIBITED_BY_EDM, "Bluetooth is prohibited by EDM."},
     { BtErrCode::BT_ERR_INVALID_PARAM, "Invalid parameter." },
     { BtErrCode::BT_ERR_API_NOT_SUPPORT, "Capability is not supported." },
     { BtErrCode::BT_ERR_GATT_READ_NOT_PERMITTED, "Gatt read forbiden." },

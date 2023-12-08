@@ -693,6 +693,14 @@ private:
 
     int CountEnableTimes(bool enable);
 
+    /**
+    * @brief Check whether bluetooth is prohibited by EDM.
+    *
+    * @return Returns <b>true</b> if bluetooth is prohibited, returns <b>false</b> otherwise.
+    * @since 11
+    */
+    bool IsBtProhibitedByEdm(void);
+
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHost);
     BLUETOOTH_DECLARE_IMPL();
 };

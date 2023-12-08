@@ -60,6 +60,7 @@
         "hilog",
         "hisysevent",
         "hitrace",
+        "init",
         "ipc",
         "libuv",
         "napi",
