@@ -93,8 +93,8 @@ public:
         std::string strs;
         std::stringstream strStream;
         for (int i = 0; i < scanResult.advLen; i++) {
-            char token[3] = {0};
-            (void)sprintf_s(token, 3, "%02X", scanResult.advData[i]);
+            char token[3] = {0}; // The length of token is 3.
+            (void)sprintf_s(token, sizeof(token), "%02X", scanResult.advData[i]);
             strStream << token;
         }
         strStream >> strs;
