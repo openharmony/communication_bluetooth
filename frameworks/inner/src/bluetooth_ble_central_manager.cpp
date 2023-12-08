@@ -15,7 +15,6 @@
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_ble_central_manager_callback_stub.h"
 #include "bluetooth_def.h"
-#include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_observer_list.h"

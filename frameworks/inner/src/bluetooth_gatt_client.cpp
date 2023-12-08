@@ -17,7 +17,6 @@
 #include <memory>
 #include <set>
 
-#include "bluetooth_errorcode.h"
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_client.h"
 #include "bluetooth_gatt_client_proxy.h"
