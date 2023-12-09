@@ -35,7 +35,7 @@ public:
     int32_t DisableBt() override;
     sptr<IRemoteObject> GetProfile(const std::string &name) override;
     sptr<IRemoteObject> GetBleRemote(const std::string &name) override;
-    bool BluetoothFactoryReset() override;
+    int32_t BluetoothFactoryReset() override;
     int32_t GetBtState(int &state) override;
     std::string GetLocalAddress() override;
     int32_t DisableBle() override;
