@@ -350,7 +350,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool BluetoothFactoryReset();
+    int BluetoothFactoryReset();
 
     /**
      * @brief Get profile service ID list.
