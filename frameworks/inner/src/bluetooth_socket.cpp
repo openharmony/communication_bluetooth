@@ -315,6 +315,7 @@ ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketT
       socketStatus_(SOCKET_INIT)
 {
     HILOGD("enter 4 parameters");
+    observerImp_ = new (std::nothrow) BluetoothSocketObserverImp(*this);
 }
 
 ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
