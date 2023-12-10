@@ -77,6 +77,7 @@ sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string 
         return remote;
     } // SafeMap
     auto hostRemote = GetHostRemote();
+    CHECK_AND_RETURN_LOG_RET(hostRemote != nullptr, nullptr, "hostRemote is nullptr");
     if (objectName == BLUETOOTH_HOST) {
         remote = hostRemote;
     } else {
