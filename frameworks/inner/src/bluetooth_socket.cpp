@@ -715,7 +715,7 @@ struct ServerSocket::impl {
     std::string name_ {
         ""
         };
-    int acceptFd_;
+    int acceptFd_ = 0;
     std::string acceptAddress_;
     std::string socketServiceType_ {
         ""

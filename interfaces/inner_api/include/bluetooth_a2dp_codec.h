@@ -87,29 +87,29 @@ struct A2dpCodecStatus {
  * @since 6.0
  */
 struct A2dpOffloadCodecInfo {
-    uint16_t mediaPacketHeader;
-    uint8_t mPt;
-    uint32_t ssrc;
-    uint8_t boundaryFlag;
-    uint8_t broadcastFlag;
-    uint32_t codecType;
-    uint16_t maxLatency;
-    uint16_t scmsTEnable;
-    uint32_t sampleRate;
-    uint32_t encodedAudioBitrate;
-    uint8_t bitsPerSample;
-    uint8_t chMode;
-    uint16_t aclHdl;
-    uint16_t l2cRcid;
-    uint16_t mtu;
-    uint8_t codecSpecific0;
-    uint8_t codecSpecific1;
-    uint8_t codecSpecific2;
-    uint8_t codecSpecific3;
-    uint8_t codecSpecific4;
-    uint8_t codecSpecific5;
-    uint8_t codecSpecific6;
-    uint8_t codecSpecific7;
+    uint16_t mediaPacketHeader = 0;
+    uint8_t mPt = 0;
+    uint32_t ssrc = 0;
+    uint8_t boundaryFlag = 0;
+    uint8_t broadcastFlag = 0;
+    uint32_t codecType = 0;
+    uint16_t maxLatency = 0;
+    uint16_t scmsTEnable = 0;
+    uint32_t sampleRate = 0;
+    uint32_t encodedAudioBitrate = 0;
+    uint8_t bitsPerSample = 0;
+    uint8_t chMode = 0;
+    uint16_t aclHdl = 0;
+    uint16_t l2cRcid = 0;
+    uint16_t mtu = 0;
+    uint8_t codecSpecific0 = 0;
+    uint8_t codecSpecific1 = 0;
+    uint8_t codecSpecific2 = 0;
+    uint8_t codecSpecific3 = 0;
+    uint8_t codecSpecific4 = 0;
+    uint8_t codecSpecific5 = 0;
+    uint8_t codecSpecific6 = 0;
+    uint8_t codecSpecific7 = 0;
 };
 
 class BluetoothA2dpOffloadCodecStatus;
