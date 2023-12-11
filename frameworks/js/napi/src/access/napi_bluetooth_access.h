@@ -29,6 +29,10 @@ public:
     static napi_value GetState(napi_env env, napi_callback_info info);
     static napi_value RegisterAccessObserver(napi_env env, napi_callback_info info);
     static napi_value DeregisterAccessObserver(napi_env env, napi_callback_info info);
+
+#ifdef BLUETOOTH_API_SINCE_10
+    static napi_value FactoryReset(napi_env env, napi_callback_info info);
+#endif
 private:
     static napi_value AccessPropertyValueInit(napi_env env, napi_value exports);
     static napi_value StateChangeInit(napi_env env);
