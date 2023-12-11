@@ -42,6 +42,7 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("enableBluetooth", EnableBluetooth),
         DECLARE_NAPI_FUNCTION("disableBluetooth", DisableBluetooth),
 #ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
         DECLARE_NAPI_FUNCTION("on", RegisterAccessObserver),
         DECLARE_NAPI_FUNCTION("off", DeregisterAccessObserver),
 #endif
@@ -216,5 +217,21 @@ napi_value NapiAccess::DeregisterAccessObserver(napi_env env, napi_callback_info
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     return NapiGetUndefinedRet(env);
 }
+
+#ifdef BLUETOOTH_API_SINCE_10
+napi_value NapiAccess::FactoryReset(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    auto func = []() {
+        int32_t ret = BluetoothHost::GetDefaultHost().BluetoothFactoryReset();
+        HILOGI("factoryReset ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+#endif
 }  // namespace Bluetooth
 }  // namespace OHOS

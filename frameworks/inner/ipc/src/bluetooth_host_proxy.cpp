@@ -141,21 +141,18 @@ sptr<IRemoteObject> BluetoothHostProxy::GetBleRemote(const std::string &name)
     return reply.ReadRemoteObject();
 }
 
-bool BluetoothHostProxy::BluetoothFactoryReset()
+int32_t BluetoothHostProxy::BluetoothFactoryReset()
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::BluetoothFactoryReset WriteInterfaceToken error");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_FACTORY_RESET, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::BluetoothFactoryReset done fail, error: %{public}d", error);
-        return false;
-    }
-    return reply.ReadBool();
+    int32_t ret = InnerTransact(BluetoothHostInterfaceCode::BT_FACTORY_RESET, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, BT_ERR_IPC_TRANS_FAILED, "error: %{public}d", ret);
+
+    return reply.ReadInt32();
 }
 
 int32_t BluetoothHostProxy::GetBtState(int &state)

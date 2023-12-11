@@ -484,10 +484,14 @@ int BluetoothHost::GetBtState(int &state) const
     return ret;
 }
 
-bool BluetoothHost::BluetoothFactoryReset()
+int BluetoothHost::BluetoothFactoryReset()
 {
     HILOGD("enter");
-    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), false, "bluetooth is off.");
+    constexpr const char* BLUETOOTH_FACTORY_RESET_KEY = "persist.bluetooth.factoryreset";
+    int ret = SetParameter(BLUETOOTH_FACTORY_RESET_KEY, "true");
+    CHECK_AND_RETURN_LOG_RET(ret == 0, BT_ERR_INTERNAL_ERROR, "SetParameter failed");
+
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_NO_ERROR, "bluetooth is off.");
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
