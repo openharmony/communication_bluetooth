@@ -23,7 +23,7 @@
 #include "../parcel/bluetooth_gatt_descriptor_parcel.h"
 #include "../parcel/bluetooth_gatt_device.h"
 #include "../parcel/bluetooth_gatt_service_parcel.h"
-#include "gatt_data.h"
+#include "../common/gatt_data.h"
 namespace OHOS {
 namespace Bluetooth {
 class IBluetoothGattServer : public OHOS::IRemoteBroker {
