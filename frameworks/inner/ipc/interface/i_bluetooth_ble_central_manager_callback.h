@@ -17,7 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_BLE_CENTRAL_MANAGER_CALLBACK_INTERFACE_H
 
 #include "../parcel/bluetooth_ble_scan_result.h"
-#include "ble_service_data.h"
+#include "../common/ble_service_data.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 

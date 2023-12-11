@@ -32,7 +32,7 @@ ohos_shared_library("pan") {
   #install_enable = true
   include_dirs = [
     "$BT_NAPI_DIR/include",
-    "$BT_PART_DIR/frameworks/inner/common",
+    "$BT_PART_DIR/frameworks/inner/include",
   ]
 
   defines = [

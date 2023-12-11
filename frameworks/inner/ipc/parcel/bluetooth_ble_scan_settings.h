@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_PARCEL_BLE_SCAN_SETTINGS_H
 #define BLUETOOTH_PARCEL_BLE_SCAN_SETTINGS_H
 
-#include "ble_parcel_data.h"
+#include "../common/ble_parcel_data.h"
 #include "parcel.h"
 
 namespace OHOS {
