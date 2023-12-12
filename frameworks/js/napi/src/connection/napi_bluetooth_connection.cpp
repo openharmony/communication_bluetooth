@@ -108,6 +108,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getPairState", GetPairState),
         DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
         DECLARE_NAPI_FUNCTION("disconnectAllowedProfiles", DisconnectAllowedProfiles),
+        DECLARE_NAPI_FUNCTION("getRemoteProductId", GetRemoteProductId),
 #endif
     };
 
@@ -707,6 +708,30 @@ napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info)
     asyncWork->Run();
     return asyncWork->GetRet();
 }
+
+napi_value GetRemoteProductId(napi_env env, napi_callback_info info)
+{
+    HILOGD("start");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+
+    int transport = GetDeviceTransport(remoteAddr);
+    BluetoothRemoteDevice remoteDevice = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport);
+    std::string productId;
+    int32_t err = remoteDevice.GetDeviceProductId(productId);
+
+    int32_t id = 0;
+    if (productId.size() == 4) {
+        id = (productId[0] << 24) | (productId[1] << 16) | (productId[2] << 8) | productId[3];
+    }
+    napi_value result = nullptr;
+    napi_create_int32(env, id, &result);
+    NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
+    HILOGI("GetRemoteProductId :%{public}s", productId.c_str());
+    return result;
+}
+
 #endif
 
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)

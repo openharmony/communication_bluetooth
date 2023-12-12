@@ -100,6 +100,7 @@ public:
     int32_t CountEnableTimes(bool enable) override;
     int32_t ConnectAllowedProfiles(const std::string &remoteAddr) override;
     int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) override;
+    int32_t GetDeviceProductId(const std::string &address, std::string &prodcutId) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
