@@ -96,7 +96,7 @@ bool BluetoothA2dpCodecStatus::ReadFromParcel(Parcel &parcel)
 
 bool BluetoothA2dpOffloadCodecStatus::Marshalling(Parcel &parcel) const
 {
-    BluetoothA2dpOffloadCodecInfo info = bluetooth::OffloadCodecInfo(offloadInfo);
+    BluetoothA2dpOffloadCodecInfo info = BluetoothA2dpOffloadCodecInfo(bluetooth::OffloadCodecInfo(offloadInfo));
     CHECK_AND_RETURN_LOG_RET(parcel.WriteParcelable(&info), false, "write parcel err.");
     return true;
 }
