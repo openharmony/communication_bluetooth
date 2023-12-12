@@ -451,10 +451,12 @@ public:
     /**
      * @brief Get local device address.
      *
-     * @return Returns local device address.
+     * @param addr local address.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 6
      */
-    std::string GetLocalAddress() const;
+    int GetLocalAddress(std::string &addr) const;
 
     /**
      * @brief Get local device name.
@@ -660,8 +662,8 @@ public:
     * @brief Connects all allowed bluetooth profiles between the local and remote device.
     *
     * @param remoteAddr remote device addr.
-    * @return Returns <b>true</b> if the operation is successful;
-    *         returns <b>false</b> if the operation fails.
+    * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+    *         returns an error code defined in {@link BtErrCode} otherwise.
     * @since 11
     */
     int ConnectAllowedProfiles(const std::string &remoteAddr) const;
@@ -670,8 +672,8 @@ public:
     * @brief Disconnects all allowed bluetooth profiles between the local and remote device.
     *
     * @param remoteAddr remote device addr.
-    * @return Returns <b>true</b> if the operation is successful;
-    *         returns <b>false</b> if the operation fails.
+    * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+    *         returns an error code defined in {@link BtErrCode} otherwise.
     * @since 11
     */
     int DisconnectAllowedProfiles(const std::string &remoteAddr) const;

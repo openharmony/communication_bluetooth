@@ -43,6 +43,7 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("disableBluetooth", DisableBluetooth),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
+        DECLARE_NAPI_FUNCTION("getLocalAddress", GetLocalAddress),
         DECLARE_NAPI_FUNCTION("on", RegisterAccessObserver),
         DECLARE_NAPI_FUNCTION("off", DeregisterAccessObserver),
 #endif
@@ -231,6 +232,18 @@ napi_value NapiAccess::FactoryReset(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+napi_value NapiAccess::GetLocalAddress(napi_env env, napi_callback_info info)
+{
+    napi_value result = nullptr;
+    HILOGI("enter");
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    std::string localAddr = INVALID_MAC_ADDRESS;
+    int32_t err = host->GetLocalAddress(localAddr);
+    napi_create_string_utf8(env, localAddr.c_str(), localAddr.size(), &result);
+    NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
+    return result;
 }
 #endif
 }  // namespace Bluetooth

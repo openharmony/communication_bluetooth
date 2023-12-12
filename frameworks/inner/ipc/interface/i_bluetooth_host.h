@@ -61,7 +61,7 @@ public:
     virtual sptr<IRemoteObject> GetBleRemote(const std::string &name) = 0;
     virtual int32_t BluetoothFactoryReset() = 0;
     virtual int32_t GetBtState(int &state) = 0;
-    virtual std::string GetLocalAddress() = 0;
+    virtual int32_t GetLocalAddress(std::string &addr) = 0;
     virtual int32_t DisableBle() = 0;
     virtual int32_t EnableBle() = 0;
     virtual bool IsBrEnabled() = 0;
