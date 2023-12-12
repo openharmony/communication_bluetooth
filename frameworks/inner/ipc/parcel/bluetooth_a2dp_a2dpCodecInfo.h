@@ -42,7 +42,7 @@ class BluetoothA2dpCodecInfo : public Parcelable,
 class BluetoothA2dpOffloadCodecInfo : public Parcelable, public bluetooth::OffloadCodecInfo {
 public:
     BluetoothA2dpOffloadCodecInfo() = default;
-    BluetoothA2dpOffloadCodecInfo(const bluetooth::OffloadCodecInfo &other)
+    explicit BluetoothA2dpOffloadCodecInfo(const bluetooth::OffloadCodecInfo &other)
         : bluetooth::OffloadCodecInfo(other) {}
     BluetoothA2dpOffloadCodecInfo(const BluetoothA2dpOffloadCodecInfo &other)
         : bluetooth::OffloadCodecInfo(other) {}
