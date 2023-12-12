@@ -568,13 +568,12 @@ bool BluetoothHost::IsBleEnabled() const
     return proxy->IsBleEnabled();
 }
 
-std::string BluetoothHost::GetLocalAddress() const
+int BluetoothHost::GetLocalAddress(std::string &addr) const
 {
-    HILOGD("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, std::string(), "proxy is nullptr");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
-    return proxy->GetLocalAddress();
+    return proxy->GetLocalAddress(addr);
 }
 
 std::vector<uint32_t> BluetoothHost::GetProfileList() const

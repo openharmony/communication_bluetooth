@@ -32,6 +32,7 @@ public:
 
 #ifdef BLUETOOTH_API_SINCE_10
     static napi_value FactoryReset(napi_env env, napi_callback_info info);
+    static napi_value GetLocalAddress(napi_env env, napi_callback_info info);
 #endif
 private:
     static napi_value AccessPropertyValueInit(napi_env env, napi_value exports);

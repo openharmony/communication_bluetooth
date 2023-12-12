@@ -178,21 +178,22 @@ int32_t BluetoothHostProxy::GetBtState(int &state)
     return exception;
 }
 
-std::string BluetoothHostProxy::GetLocalAddress()
+int32_t BluetoothHostProxy::GetLocalAddress(std::string &addr)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::GetLocalAddress WriteInterfaceToken error");
-        return std::string();
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "GetLocalAddress WriteInterfaceToken error");
+
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_LOCAL_ADDRESS, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::GetLocalAddress done fail, error: %{public}d", error);
-        return std::string();
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_IPC_TRANS_FAILED, "error: %{public}d", error);
+
+    int32_t exception = reply.ReadInt32();
+    if (exception == BT_NO_ERROR) {
+        addr = reply.ReadString();
     }
-    return reply.ReadString();
+    return exception;
 }
 
 int32_t BluetoothHostProxy::DisableBle()
