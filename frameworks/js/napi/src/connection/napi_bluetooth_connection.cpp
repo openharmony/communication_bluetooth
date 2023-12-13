@@ -721,12 +721,8 @@ napi_value GetRemoteProductId(napi_env env, napi_callback_info info)
     std::string productId;
     int32_t err = remoteDevice.GetDeviceProductId(productId);
 
-    int32_t id = 0;
-    if (productId.size() == 4) {
-        id = (productId[0] << 24) | (productId[1] << 16) | (productId[2] << 8) | productId[3];
-    }
     napi_value result = nullptr;
-    napi_create_int32(env, id, &result);
+    napi_create_string_utf8(env, productId.c_str(), productId.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
     HILOGI("GetRemoteProductId :%{public}s", productId.c_str());
     return result;
