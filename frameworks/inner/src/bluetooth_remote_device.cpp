@@ -22,25 +22,13 @@
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
+#include "bluetooth_profile_manager.h"
 #include "bluetooth_remote_device.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
 namespace Bluetooth {
-sptr<BluetoothHostProxy> GetHostProxy()
-{
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!samgr) {
-        HILOGE("samgr is nullptr.");
-        return nullptr;
-    }
-    sptr<IRemoteObject> remote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-
-    sptr<BluetoothHostProxy> hostProxy = new BluetoothHostProxy(remote);
-    return hostProxy;
-}
-
 BluetoothRemoteDevice::BluetoothRemoteDevice(const std::string &addr, const int transport)
 {
     address_ = addr;
@@ -51,31 +39,22 @@ int BluetoothRemoteDevice::GetDeviceType() const
 {
     HILOGI("enter");
     int type = 0;
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGI("Invalid remote device.");
-        return type;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), type, "Invalid remote device.");
 
-    sptr<BluetoothHostProxy> proxy = GetHostProxy();
-    if (proxy == nullptr) {
-        HILOGI("BT host server not created.");
-        return type;
-    }
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, type, "proxy is nullptr.");
 
-    return proxy->GetDeviceType(transport_, address_);
+    return hostProxy->GetDeviceType(transport_, address_);
 }
 
 bool BluetoothRemoteDevice::IsValidBluetoothRemoteDevice() const
 {
-    if (!BluetoothHost::IsValidBluetoothAddr(address_)) {
-        HILOGI("invalid bluetooth addr, address_: %{public}s", GetEncryptAddr(address_).c_str());
-        return false;
-    }
 
-    if ((transport_ != BT_TRANSPORT_BREDR) && (transport_ != BT_TRANSPORT_BLE)) {
-        HILOGI("invalid transport type.");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(BluetoothHost::IsValidBluetoothAddr(address_), false,
+        "invalid bluetooth addr, address_: %{public}s", GetEncryptAddr(address_).c_str());
+
+    CHECK_AND_RETURN_LOG_RET(transport_ == BT_TRANSPORT_BREDR || transport_ == BT_TRANSPORT_BLE, false,
+        "invalid transport type.");
     return true;
 }
 int BluetoothRemoteDevice::GetTransportType() const
@@ -86,15 +65,9 @@ int BluetoothRemoteDevice::GetTransportType() const
 int BluetoothRemoteDevice::GetPhonebookPermission() const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device.");
-        return INVALID_VALUE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return INVALID_VALUE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_VALUE, "Invalid remote device.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_VALUE, "proxy is nullptr.");
 
     return hostProxy->GetPhonebookPermission(address_);
 }
@@ -102,78 +75,45 @@ int BluetoothRemoteDevice::GetPhonebookPermission() const
 bool BluetoothRemoteDevice::SetPhonebookPermission(int permission)
 {
     HILOGI("enter, permission: %{public}d", permission);
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device.");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->SetPhonebookPermission(address_, permission);
 }
 
 int BluetoothRemoteDevice::GetMessagePermission() const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return INVALID_VALUE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return INVALID_VALUE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_VALUE, "Invalid remote device.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_VALUE, "proxy is nullptr.");
     return hostProxy->GetMessagePermission(address_);
 }
 
 bool BluetoothRemoteDevice::SetMessagePermission(int permission)
 {
     HILOGI("enter, permission: %{public}d", permission);
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->SetMessagePermission(address_, permission);
 }
 
 int BluetoothRemoteDevice::GetPowerMode(void) const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return INVALID_VALUE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return INVALID_VALUE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_VALUE, "Invalid remote device.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_VALUE, "proxy is nullptr.");
     return hostProxy->GetPowerMode(address_);
 }
 
 std::string BluetoothRemoteDevice::GetDeviceName() const
 {
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return INVALID_NAME;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return INVALID_NAME;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return INVALID_NAME;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_NAME, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), INVALID_NAME, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_NAME, "proxy is nullptr.");
     std::string name = INVALID_NAME;
     hostProxy->GetDeviceName(transport_, address_, name);
     return name;
@@ -181,136 +121,77 @@ std::string BluetoothRemoteDevice::GetDeviceName() const
 
 int BluetoothRemoteDevice::GetDeviceName(std::string &name) const
 {
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     return hostProxy->GetDeviceName(transport_, address_, name);
 }
 
 std::string BluetoothRemoteDevice::GetDeviceAlias() const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return INVALID_NAME;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return INVALID_NAME;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_NAME, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_NAME, "proxy is nullptr.");
     return hostProxy->GetDeviceAlias(address_);
 }
 
 bool BluetoothRemoteDevice::SetDeviceAlias(const std::string &aliasName)
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->SetDeviceAlias(address_, aliasName);
 }
 
 int BluetoothRemoteDevice::GetDeviceBatteryLevel() const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return INVALID_VALUE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return INVALID_VALUE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_VALUE, "Invalid remote device.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_VALUE, "proxy is nullptr.");
     return hostProxy->GetDeviceBatteryLevel(address_);
 }
 
 int BluetoothRemoteDevice::GetPairState(int &pairState) const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return INVALID_VALUE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return INVALID_VALUE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_VALUE, "Invalid remote device.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_VALUE, "proxy is nullptr.");
     return hostProxy->GetPairState(transport_, address_, pairState);
 }
 
 int BluetoothRemoteDevice::StartPair()
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     return hostProxy->StartPair(transport_, address_);
 }
 
 int BluetoothRemoteDevice::StartCrediblePair()
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     return hostProxy->StartCrediblePair(transport_, address_);
 }
 
 int BluetoothRemoteDevice::CancelPairing()
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     if (hostProxy->CancelPairing(transport_, address_)) {
         return BT_NO_ERROR;
     }
@@ -320,64 +201,37 @@ int BluetoothRemoteDevice::CancelPairing()
 bool BluetoothRemoteDevice::IsBondedFromLocal() const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->IsBondedFromLocal(transport_, address_);
 }
 
 bool BluetoothRemoteDevice::IsAclConnected() const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->IsAclConnected(transport_, address_);
 }
 
 bool BluetoothRemoteDevice::IsAclEncrypted() const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->IsAclEncrypted(transport_, address_);
 }
 
 int BluetoothRemoteDevice::GetDeviceClass(int &cod) const
 {
     HILOGD("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     int ret = hostProxy->GetDeviceClass(address_, cod);
     return ret;
 }
@@ -388,8 +242,8 @@ int BluetoothRemoteDevice::GetDeviceProductId(std::string &prodcutId) const
     CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "fails: no proxy");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
 
     return hostProxy->GetDeviceProductId(address_, prodcutId);
 }
@@ -397,110 +251,65 @@ int BluetoothRemoteDevice::GetDeviceProductId(std::string &prodcutId) const
 int BluetoothRemoteDevice::GetDeviceUuids(std::vector<std::string> &uuids) const
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     return hostProxy->GetDeviceUuids(address_, uuids);
 }
 
 int BluetoothRemoteDevice::SetDevicePin(const std::string &pin)
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     return hostProxy->SetDevicePin(address_, pin);
 }
 
 int BluetoothRemoteDevice::SetDevicePairingConfirmation(bool accept)
 {
     HILOGI("enter, accept: %{public}d", accept);
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     return hostProxy->SetDevicePairingConfirmation(transport_, address_, accept);
 }
 
 bool BluetoothRemoteDevice::SetDevicePasskey(int passkey, bool accept)
 {
     HILOGI("enter, accept: %{public}d", accept);
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->SetDevicePasskey(transport_, address_, passkey, accept);
 }
 
 bool BluetoothRemoteDevice::PairRequestReply(bool accept)
 {
     HILOGI("enter, accept: %{public}d", accept);
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->PairRequestReply(transport_, address_, accept);
 }
 
 bool BluetoothRemoteDevice::ReadRemoteRssiValue()
 {
     HILOGI("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return false;
-    }
-    sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return false;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
     return hostProxy->ReadRemoteRssiValue(address_);
 }
 
 int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &majorMinorClass) const
 {
     HILOGI("enter");
-    
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INVALID_PARAM;
-    }
 
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "Invalid remote device");
+
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     int deviceCod = 0;
     int ret = GetDeviceClass(deviceCod);
