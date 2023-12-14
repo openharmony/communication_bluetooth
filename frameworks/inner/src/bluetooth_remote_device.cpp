@@ -385,21 +385,13 @@ int BluetoothRemoteDevice::GetDeviceClass(int &cod) const
 int BluetoothRemoteDevice::GetDeviceProductId(std::string &prodcutId) const
 {
     HILOGD("enter");
-    if (!IsValidBluetoothRemoteDevice()) {
-        HILOGW("Invalid remote device");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!IS_BT_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+
     sptr<BluetoothHostProxy> hostProxy = GetHostProxy();
-    if (hostProxy == nullptr) {
-        HILOGE("fails: no proxy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    int ret = hostProxy->GetDeviceProductId(address_, prodcutId);
-    return ret;
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "fails: no proxy");
+
+    return hostProxy->GetDeviceProductId(address_, prodcutId);
 }
 
 int BluetoothRemoteDevice::GetDeviceUuids(std::vector<std::string> &uuids) const
