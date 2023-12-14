@@ -1624,21 +1624,15 @@ int32_t BluetoothHostProxy::DisconnectAllowedProfiles(const std::string &remoteA
 int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, std::string &prodcutId)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::GetDeviceProductId WriteInterfaceToken error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!data.WriteString(address)) {
-        HILOGE("BluetoothHostProxy::GetDeviceProductId address error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
+
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_PRODUCT_ID, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::GetDeviceProductId done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+
     int32_t exception = reply.ReadInt32();
     if (exception == BT_NO_ERROR) {
         prodcutId = reply.ReadString();
