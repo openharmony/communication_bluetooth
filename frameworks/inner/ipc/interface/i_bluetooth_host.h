@@ -124,6 +124,7 @@ public:
     virtual int32_t CountEnableTimes(bool enable) = 0;
     virtual int32_t ConnectAllowedProfiles(const std::string &remoteAddr) = 0;
     virtual int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) = 0;
+    virtual int32_t GetDeviceProductId(const std::string &address, std::string &prodcutId) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

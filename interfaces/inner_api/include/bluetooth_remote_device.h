@@ -242,6 +242,14 @@ public:
     int GetDeviceClass(int &cod) const;
 
     /**
+     * @brief Get the product id of a remote device.
+     *
+     * @return Returns device product id;
+     * @since 11
+     */
+    int GetDeviceProductId(std::string &prodcutId) const;
+
+    /**
      * @brief Get device uuids.
      *
      * @return Returns device uuids;
