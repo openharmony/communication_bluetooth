@@ -387,7 +387,12 @@ bool GetLocalAddr(unsigned char *mac, unsigned int len)
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
-    string localAddress = g_BluetoothHost->GetLocalAddress();
+    std::string localAddress = INVALID_MAC_ADDRESS;
+    int32_t err = g_BluetoothHost->GetLocalAddress(localAddress);
+    if (err != BT_NO_ERROR) {
+        HILOGE("error %{public}d", err);
+        return false;
+    }
     GetAddrFromString(localAddress, mac);
     HILOGI("device: %{public}s", GetEncryptAddr(localAddress).c_str());
     return true;
