@@ -524,9 +524,11 @@ int BluetoothHfpAgProxy::GetConnectStrategy(const BluetoothRawAddress &device, i
     return res;
 }
 
-bool BluetoothHfpAgProxy::IsInbandRingingEnabled()
+int BluetoothHfpAgProxy::IsInbandRingingEnabled(bool &isEnabled)
 {
     MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
+        "WriteInterfaceToken fail.");
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
@@ -534,9 +536,9 @@ bool BluetoothHfpAgProxy::IsInbandRingingEnabled()
 
     int error = Remote()->SendRequest(
         BluetoothHfpAgInterfaceCode::BT_HFP_AG_IS_IN_BAND_RINGING_ENABLE, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR,
-        "BluetoothHfpAgProxy::IsInbandRingingEnabled done fail, error: %{public}d", error);
-    return reply.ReadBool();
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR, "done fail, error: %{public}d", error);
+    isEnabled = reply.ReadBool();
+    return reply.ReadInt32();
 }
 
 void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer)
