@@ -68,7 +68,7 @@ struct BluetoothHost::impl {
     std::mutex proxyMutex_;
     std::string stagingRealAddr_;
     std::string stagingRandomAddr_;
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 
 private:
     std::condition_variable proxyConVar_;

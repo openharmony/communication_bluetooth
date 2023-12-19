@@ -137,7 +137,7 @@ struct BleCentralManager::impl {
     sptr<BleCentralManagerDeathRecipient> deathRecipient_ = nullptr;
     int32_t scannerId_ = BLE_SCAN_INVALID_ID;
     bool enableRandomAddrMode_ = true;
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 };
 
 class BleCentralManager::impl::BleCentralManagerDeathRecipient final : public IRemoteObject::DeathRecipient {

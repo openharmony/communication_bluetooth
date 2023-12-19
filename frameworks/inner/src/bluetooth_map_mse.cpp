@@ -60,7 +60,7 @@ struct MapMse::impl {
     ~impl();
     void RegisterObserver(std::shared_ptr<MapMseObserver> &observer);
     void DeregisterObserver(std::shared_ptr<MapMseObserver> &observer);
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 private:
     BluetoothObserverList<MapMseObserver> observers_;
     sptr<BluetoothMapMseObserverImp> serviceObserverImp_ = nullptr;
