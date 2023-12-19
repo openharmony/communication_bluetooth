@@ -48,7 +48,7 @@ public:
     void DeregisterObserver(const sptr<IBluetoothHfpAgObserver> &observer) override;
     int SetConnectStrategy(const BluetoothRawAddress &device, int strategy) override;
     int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) override;
-    bool IsInbandRingingEnabled() override;
+    int IsInbandRingingEnabled(bool &isEnabled) override;
 
 private:
     static inline BrokerDelegator<BluetoothHfpAgProxy> delegator_;

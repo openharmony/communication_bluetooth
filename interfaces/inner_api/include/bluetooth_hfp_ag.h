@@ -339,7 +339,7 @@ public:
      * @return Returns <b>true</b> if the in-band-ringing is enbale; returns <b>false</b> if the in-band-ringing is disable.
      * @since 11
      */
-    bool IsInbandRingingEnabled() const;
+    int IsInbandRingingEnabled(bool &isEnabled) const;
 
     /**
      * @brief Static HandsFree AudioGateway observer instance.
