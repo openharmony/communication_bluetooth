@@ -139,7 +139,7 @@ struct Pan::impl {
 
         return proxy->IsTetheringOn(value);
     }
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 private:
 
     BluetoothObserverList<PanObserver> observers_;

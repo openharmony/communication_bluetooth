@@ -41,7 +41,7 @@ struct A2dpSource::impl {
     BluetoothObserverList<A2dpSourceObserver> observers_;
     class BluetoothA2dpSourceObserverImp;
     sptr<BluetoothA2dpSourceObserverImp> observerImp_ = nullptr;
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 };
 
 class A2dpSource::impl::BluetoothA2dpSourceObserverImp : public BluetoothA2dpSrcObserverStub {

@@ -186,7 +186,7 @@ struct HidHost::impl {
         return proxy->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 private:
     BluetoothObserverList<HidHostObserver> observers_;
     sptr<HidHostInnerObserver> innerObserver_;

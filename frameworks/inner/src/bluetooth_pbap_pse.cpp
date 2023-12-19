@@ -64,9 +64,8 @@ struct PbapPse::impl {
     ~impl();
     void RegisterObserver(std::shared_ptr<PbapPseObserver> &observer);
     void DeregisterObserver(std::shared_ptr<PbapPseObserver> &observer);
-    bool InitPbapPseProxy();
     std::mutex pbapPseProxyMutex_;
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 private:
     BluetoothObserverList<PbapPseObserver> observers_;
     sptr<BluetoothPbapPseObserverImp> serviceObserverImp_ = nullptr;
