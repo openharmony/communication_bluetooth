@@ -325,7 +325,7 @@ struct Opp::impl {
         observers_.Deregister(observer);
     }
 
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 private:
     BluetoothObserverList<OppObserver> observers_;
     sptr<OppInnerObserver> innerObserver_;

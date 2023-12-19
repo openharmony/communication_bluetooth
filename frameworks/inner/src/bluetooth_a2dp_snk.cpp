@@ -51,7 +51,7 @@ struct A2dpSink::impl {
     BluetoothObserverList<A2dpSinkObserver> observers_;
     class BluetoothA2dpSinkObserverImp;
     sptr<BluetoothA2dpSinkObserverImp> observerImp_ = nullptr;
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 };
 
 class A2dpSink::impl::BluetoothA2dpSinkObserverImp : public BluetoothA2dpSinkObserverStub {

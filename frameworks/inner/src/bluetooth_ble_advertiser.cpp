@@ -114,7 +114,7 @@ struct BleAdvertiser::impl {
     BluetoothObserverMap<std::shared_ptr<BleAdvertiseCallback>> callbacks_;
     class BleAdvertiserDeathRecipient;
     sptr<BleAdvertiserDeathRecipient> deathRecipient_ = nullptr;
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 };
 
 class BleAdvertiser::impl::BleAdvertiserDeathRecipient final : public IRemoteObject::DeathRecipient {
