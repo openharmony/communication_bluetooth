@@ -73,7 +73,7 @@ struct RequestInformation {
 
 struct GattServer::impl {
     class BluetoothGattServerCallbackStubImpl;
-    bool isRegisterSucceeded_;
+    bool isRegisterSucceeded_ = false;
     std::mutex serviceListMutex_;
     std::mutex requestListMutex_;
     std::list<GattService> gattServices_;
@@ -90,7 +90,7 @@ struct GattServer::impl {
     int RespondDescriptorRead(
         const bluetooth::GattDevice &device, uint16_t handle, const uint8_t *value, size_t length, int ret);
     int RespondDescriptorWrite(const bluetooth::GattDevice &device, uint16_t handle, int ret);
-    int applicationId_;
+    int applicationId_ = 0;
     std::mutex deviceListMutex_;
     GattService *GetIncludeService(uint16_t handle);
     bluetooth::GattDevice *FindConnectedDevice(const BluetoothRemoteDevice &device);
@@ -98,7 +98,7 @@ struct GattServer::impl {
     void BuildIncludeService(GattService &svc, const std::vector<bluetooth::Service> &iSvcs);
     impl(std::shared_ptr<GattServerCallback> callback);
     bool Init(std::weak_ptr<GattServer>);
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 };
 
 class GattServer::impl::BluetoothGattServerCallbackStubImpl : public BluetoothGattServerCallbackStub {

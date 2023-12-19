@@ -342,7 +342,7 @@ struct HandsFreeAudioGateway::impl {
         HILOGI("end");
     }
 
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 private:
     const static int HFP_AG_SLC_STATE_DISCONNECTED = static_cast<int>(BTConnectState::DISCONNECTED);
     const static int HFP_AG_SCO_STATE_DISCONNECTED = 3;

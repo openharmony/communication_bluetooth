@@ -437,6 +437,7 @@ public:
     ~impl()
     {
         HILOGI("enter");
+        DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
         sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->UnregisterObserver(observer_);
@@ -879,7 +880,7 @@ public:
     BluetoothObserverList<AvrcpController::IObserver> observers_;
 
     sptr<ObserverImpl> observer_;
-    int32_t profileRegisterId;
+    int32_t profileRegisterId = 0;
 };
 
 AvrcpController::impl::impl()
