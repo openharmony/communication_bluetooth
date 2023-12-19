@@ -96,6 +96,7 @@ public:
         if (status == BTStateID::STATE_TURN_ON) {
             host_.SyncRandomAddrToService();
         }
+        DelayedSingleton<BluetoothProfileManager>::GetInstance()->NotifyBluetoothStateChange(transport, status);
         host_.observers_.ForEach([transport, status](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnStateChanged(transport, status);
         });

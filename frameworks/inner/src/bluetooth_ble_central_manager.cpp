@@ -36,6 +36,7 @@ struct BleCentralManager::impl {
     void ConvertAdvertiserSetting(const BleAdvertiserSettings &inSettings, BluetoothBleAdvertiserSettings &outSettings);
     void ConvertActiveDeviceInfo(const std::vector<BleActiveDeviceInfo> &inDeviceInfos,
         std::vector<BluetoothActiveDeviceInfo> &outDeviceInfos);
+    bool InitScannerId(void);
 
     class BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
     public:
@@ -159,14 +160,30 @@ private:
 BleCentralManager::impl::impl()
 {
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(BLE_CENTRAL_MANAGER_SERVER,
-        [this](sptr<IRemoteObject> remote) {
+    auto func = [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothBleCentralManager> proxy = iface_cast<IBluetoothBleCentralManager>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
         deathRecipient_ = new BleCentralManagerDeathRecipient(*this);
         proxy->AsObject()->AddDeathRecipient(deathRecipient_);
-    });
+    };
+    auto bluetoothTurnOffFunc = [this]() {
+        scannerId_ = BLE_SCAN_INVALID_ID;
+    };
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(
+        BLE_CENTRAL_MANAGER_SERVER, func, bluetoothTurnOffFunc);
+}
+
+bool BleCentralManager::impl::InitScannerId(void)
+{
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+    if (scannerId_ == BLE_SCAN_INVALID_ID) {
+        proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
+    }
+    CHECK_AND_RETURN_LOG_RET(scannerId_ != BLE_SCAN_INVALID_ID, false, "scannerId is invalid");
+    return true;
 }
 
 void BleCentralManager::impl::ConvertBleScanSetting(const BleScanSettings &inSettings,
@@ -284,8 +301,8 @@ int BleCentralManager::StartScan()
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
-        HILOGE("scannerId is invalid");
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID && !pimpl->InitScannerId()) {
+        HILOGE("init scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -303,8 +320,8 @@ int BleCentralManager::StartScan(const BleScanSettings &settings)
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
-        HILOGE("scannerId is invalid");
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID && !pimpl->InitScannerId()) {
+        HILOGE("init scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -328,8 +345,8 @@ int BleCentralManager::StopScan()
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
-        HILOGE("scannerId is invalid");
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID && !pimpl->InitScannerId()) {
+        HILOGE("init scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -350,8 +367,8 @@ int BleCentralManager::ConfigScanFilter(const std::vector<BleScanFilter> &filter
         return BT_ERR_INVALID_STATE;
     }
 
-    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
-        HILOGE("pimpl or ble central manager proxy is nullptr");
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID && !pimpl->InitScannerId()) {
+        HILOGE("init scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
 
@@ -415,8 +432,8 @@ int BleCentralManager::SetScanReportChannelToLpDevice(bool enable)
     }
 
     // need start scan first
-    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID) {
-        HILOGE("failed, scannerId invalid.");
+    if (pimpl->scannerId_ == BLE_SCAN_INVALID_ID && !pimpl->InitScannerId()) {
+        HILOGE("init scannerId failed");
         return BT_ERR_INTERNAL_ERROR;
     }
     sptr<IBluetoothBleCentralManager> proxy =
