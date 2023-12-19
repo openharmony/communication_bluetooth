@@ -32,8 +32,9 @@ namespace OHOS {
 namespace Bluetooth {
 const std::string BLUETOOTH_HOST = "BluetoothHost";
 struct ProfileIdProperty {
-    std::function<void (sptr<IRemoteObject>)> func;
-    std::string objectName;
+    std::function<void (sptr<IRemoteObject>)> func {};
+    std::function<void(void)> bluetoothTurnOffFunc {};
+    std::string objectName = "";
 };
 class BluetoothProfileManager {
 DECLARE_DELAYED_SINGLETON(BluetoothProfileManager);
@@ -57,11 +58,26 @@ public:
      */
     int32_t RegisterFunc(const std::string &objectName, std::function<void (sptr<IRemoteObject>)> func);
     /**
+     * @brief register function for profile to get proxy when profile is init
+     *
+     * @param objectName the objectName of profile
+     * @param func the function for profile to register
+     * @param bluetoothTurnOffFunc the function for profile to register
+     *
+     * @return Returns the id of the Profile.
+     */
+    int32_t RegisterFunc(const std::string &objectName, std::function<void (sptr<IRemoteObject>)> func,
+        std::function<void(void)> bluetoothTurnOffFunc);
+    /**
      * @brief Deregister function for profile, ensure that there is a deregister after register
      *
      * @param id the id of profile
      */
     void DeregisterFunc(int32_t id);
+    /**
+     * @brief Notify Bluetooth State Change
+     */
+    void NotifyBluetoothStateChange(int32_t transport, int32_t status);
 
 private:
     class BluetoothSystemAbility : public SystemAbilityStatusChangeStub {
