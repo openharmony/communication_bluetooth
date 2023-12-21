@@ -73,17 +73,8 @@ napi_value NapiAccess::DisableBluetooth(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    // only ble
-    int state = BTStateID::STATE_TURN_OFF;
-    int ret = host->GetBtState(state);
+    int ret = host->DisableBt();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-    if (state == BTStateID::STATE_TURN_OFF) {
-        ret = host->DisableBle();
-        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-    } else {
-        ret = host->DisableBt();
-        NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-    }
     return NapiGetBooleanTrue(env);
 }
 
