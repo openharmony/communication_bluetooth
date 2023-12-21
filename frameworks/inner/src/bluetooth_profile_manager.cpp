@@ -20,6 +20,7 @@
 
 #include "i_bluetooth_host.h"
 #include "bluetooth_def.h"
+#include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -31,7 +32,7 @@ std::atomic_int32_t id = BEGIN_ID;
 
 BluetoothProfileManager::BluetoothProfileManager()
 {
-    bluetoothSystemAbility_ = new BluetoothSystemAbility ();
+    bluetoothSystemAbility_ = new BluetoothSystemAbility();
     SubScribeBluetoothSystemAbility();
 }
 
@@ -91,6 +92,16 @@ sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string 
     CHECK_AND_RETURN_LOG_RET(remote != nullptr, nullptr, "remote is nullptr");
     profileRemoteMap_.Insert(objectName, remote);
     return remote;
+}
+
+void BluetoothProfileManager::NotifyBluetoothStateChange(int32_t transport, int32_t status)
+{
+    if (transport == ADAPTER_BLE && status == STATE_TURN_OFF) {
+        profileIdFuncMap_.Iterate([this](const int32_t id, ProfileIdProperty property) {
+            property.bluetoothTurnOffFunc();
+        });
+    }
+    return;
 }
 
 void BluetoothProfileManager::RunFuncWhenBluetoothServiceStarted()
@@ -154,6 +165,26 @@ int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName,
     ProfileIdProperty idProperties;
     idProperties.objectName = objectName;
     idProperties.func = func;
+    int32_t idForPrint = id;
+    HILOGI("objectname: %{public}s, id: %{public}d", objectName.c_str(), idForPrint);
+    profileIdFuncMap_.Insert(id, idProperties);
+    if (isBluetoothServiceOn_) {
+        sptr<IRemoteObject> remote = GetProfileRemote(objectName);
+        CHECK_AND_RETURN_LOG_RET(remote != nullptr, id, "remote is nullptr"); // 蓝牙已开启，但getremote失败。
+        func(remote);
+    }
+    return id;
+}
+
+int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName,
+    std::function<void (sptr<IRemoteObject>)> func, std::function<void(void)> bluetoothTurnOffFunc)
+{
+    GetValidId();
+    ProfileIdProperty value;
+    ProfileIdProperty idProperties;
+    idProperties.objectName = objectName;
+    idProperties.func = func;
+    idProperties.bluetoothTurnOffFunc = bluetoothTurnOffFunc;
     int32_t idForPrint = id;
     HILOGI("objectname: %{public}s, id: %{public}d", objectName.c_str(), idForPrint);
     profileIdFuncMap_.Insert(id, idProperties);
