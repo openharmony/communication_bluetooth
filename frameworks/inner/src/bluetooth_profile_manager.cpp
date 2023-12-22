@@ -98,7 +98,10 @@ void BluetoothProfileManager::NotifyBluetoothStateChange(int32_t transport, int3
 {
     if (transport == ADAPTER_BLE && status == STATE_TURN_OFF) {
         profileIdFuncMap_.Iterate([this](const int32_t id, ProfileIdProperty property) {
-            property.bluetoothTurnOffFunc();
+            // true if *this stores a callcack function target.flase otherwise
+            if (property.bluetoothTurnOffFunc) {
+                property.bluetoothTurnOffFunc();
+            }
         });
     }
     return;

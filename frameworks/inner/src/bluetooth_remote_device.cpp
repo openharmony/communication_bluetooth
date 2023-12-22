@@ -49,7 +49,6 @@ int BluetoothRemoteDevice::GetDeviceType() const
 
 bool BluetoothRemoteDevice::IsValidBluetoothRemoteDevice() const
 {
-
     CHECK_AND_RETURN_LOG_RET(BluetoothHost::IsValidBluetoothAddr(address_), false,
         "invalid bluetooth addr, address_: %{public}s", GetEncryptAddr(address_).c_str());
 
@@ -57,6 +56,7 @@ bool BluetoothRemoteDevice::IsValidBluetoothRemoteDevice() const
         "invalid transport type.");
     return true;
 }
+
 int BluetoothRemoteDevice::GetTransportType() const
 {
     return transport_;
