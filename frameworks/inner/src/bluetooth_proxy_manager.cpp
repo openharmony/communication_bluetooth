@@ -32,9 +32,9 @@ BluetoothProxyManager& BluetoothProxyManager::GetInstance()
     return instance;
 }
 
-bool BluetoothProxyManager::ProxyUid(int32_t uid, bool isProxy)
+bool BluetoothProxyManager::OnSuspend(int32_t uid, bool isProxy)
 {
-    HILOGD("ProxyUid start. uid:%{public}d , isProxy:%{public}d", uid, isProxy);
+    HILOGD("OnSuspend start. uid:%{public}d , isProxy:%{public}d", uid, isProxy);
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return false;
@@ -43,7 +43,7 @@ bool BluetoothProxyManager::ProxyUid(int32_t uid, bool isProxy)
         HILOGE("GetBleCentralManagerProxy failed.");
         return false;
     }
-    return proxy_->ProxyUid(uid, isProxy);
+    return proxy_->OnSuspend(uid, isProxy);
 }
 
 bool BluetoothProxyManager::ResetAllProxy()
