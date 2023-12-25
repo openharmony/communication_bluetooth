@@ -26,7 +26,7 @@ namespace Bluetooth {
 class IBluetoothBleCentralManager;
 class BluetoothProxyManager {
 public:
-    bool OnSuspend(int32_t uid, bool isProxy);
+    bool FreezeByRss(int32_t uid, bool isProxy);
     bool ResetAllProxy();
 
     static BluetoothProxyManager& GetInstance();
