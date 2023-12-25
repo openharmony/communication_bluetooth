@@ -205,24 +205,24 @@ void BluetoothBleCentralManagerProxy::RemoveScanFilter(int32_t scannerId)
     }
 }
 
-bool BluetoothBleCentralManagerProxy::ProxyUid(int32_t uid, bool isProxy)
+bool BluetoothBleCentralManagerProxy::FreezeByRss(int32_t uid, bool isProxy)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
-        HILOGW("[ProxyUid] fail: write interface token failed.");
+        HILOGW("[FreezeByRss] fail: write interface token failed.");
         return false;
     }
 
     if (!data.WriteInt32(uid) || !data.WriteBool(isProxy)) {
-        HILOGE("[ProxyUid] fail: write data failed");
+        HILOGE("[FreezeByRss] fail: write data failed");
         return false;
     }
 
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_ASYNC};
-    int32_t result = InnerTransact(BLE_PROXY_UID, option, data, reply);
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t result = InnerTransact(BLE_FREEZE_BY_RSS, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGW("[ProxyUid] fail: transact ErrCode=%{public}d", result);
+        HILOGW("[FreezeByRss] fail: transact ErrCode=%{public}d", result);
         return false;
     }
     return true;
@@ -237,7 +237,7 @@ bool BluetoothBleCentralManagerProxy::ResetAllProxy()
     }
 
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_ASYNC};
+    MessageOption option = {MessageOption::TF_SYNC};
     int32_t result = InnerTransact(BLE_RESET_ALL_PROXY, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[ResetAllProxy] fail: transact ErrCode=%{public}d", result);
