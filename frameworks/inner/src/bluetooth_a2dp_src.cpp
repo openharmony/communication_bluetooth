@@ -583,25 +583,27 @@ void A2dpSource::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize,
 
 int A2dpSource::OffloadStartPlaying(const BluetoothRemoteDevice &device, const std::vector<int32_t> &sessionsId)
 {
-    HILOGI("enter");
+    HILOGI("enter, start playing device:%{public}s", GET_ENCRYPT_ADDR(device));
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
+    CHECK_AND_RETURN_LOG_RET(device.GetDeviceAddr() != INVALID_MAC_ADDRESS, BT_ERR_INVALID_PARAM, "invaild mac");
+    CHECK_AND_RETURN_LOG_RET(sessionsId.size() != 0, BT_ERR_INVALID_PARAM, "session size zero.");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY,
         "a2dpSrc proxy is nullptr");
-    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
-    CHECK_AND_RETURN_LOG_RET(sessionsId.size() != 0, BT_ERR_INVALID_PARAM, "session size zero.");
     return proxy->OffloadStartPlaying(RawAddress(device.GetDeviceAddr()), sessionsId);
 }
 
 int A2dpSource::OffloadStopPlaying(const BluetoothRemoteDevice &device, const std::vector<int32_t> &sessionsId)
 {
-    HILOGI("enter");
+    HILOGI("enter, stop playing device:%{public}s", GET_ENCRYPT_ADDR(device));
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
+    CHECK_AND_RETURN_LOG_RET(device.GetDeviceAddr() != INVALID_MAC_ADDRESS, BT_ERR_INVALID_PARAM, "invaild mac");
+    CHECK_AND_RETURN_LOG_RET(sessionsId.size() != 0, BT_ERR_INVALID_PARAM, "session size zero.");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY,
         "a2dpSrc proxy is nullptr");
-    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
-    CHECK_AND_RETURN_LOG_RET(sessionsId.size() != 0, BT_ERR_INVALID_PARAM, "session size zero.");
     return proxy->OffloadStopPlaying(RawAddress(device.GetDeviceAddr()), sessionsId);
 }
 
@@ -658,11 +660,11 @@ A2dpOffloadCodecStatus A2dpSource::GetOffloadCodecStatus(const BluetoothRemoteDe
 {
     HILOGI("enter");
     A2dpOffloadCodecStatus ret;
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), ret, "input device err");
+    CHECK_AND_RETURN_LOG_RET(device.GetDeviceAddr() != INVALID_MAC_ADDRESS, ret, "invaild mac");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), ret, "bluetooth is off.");
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, ret, "a2dpSrc proxy is nullptr");
-    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), ret, "input device err");
-
     BluetoothA2dpOffloadCodecStatus offloadStatus =
         proxy->GetOffloadCodecStatus(RawAddress(device.GetDeviceAddr()));
     A2dpOffloadCodecStatus status(offloadStatus);
