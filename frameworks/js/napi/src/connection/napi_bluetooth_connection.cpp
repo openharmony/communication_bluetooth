@@ -512,6 +512,7 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
 
+
     auto func = [remoteAddr]() {
         int transport = GetDeviceTransport(remoteAddr);
         BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
