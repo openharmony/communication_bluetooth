@@ -514,6 +514,17 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 
 
     auto func = [remoteAddr]() {
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int deviceType = remoteDevice.GetDeviceType();
+        if (deviceType == INVALID_TYPE) {
+            HILOGE("device is not discovery or scan, just quick BLE pair");
+            remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BLE);
+        }
+        if (deviceType == DEVICE_TYPE_LE) {
+            remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BLE);
+        }
+        deviceType = remoteDevice.GetDeviceType();
+        HILOGI("LQ deviceType is %{public}d", deviceType);
         int transport = GetDeviceTransport(remoteAddr);
         BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
         int32_t err = remoteDevice.StartPair();
