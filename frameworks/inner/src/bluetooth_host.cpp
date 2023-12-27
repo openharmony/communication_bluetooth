@@ -91,8 +91,6 @@ public:
 
     void OnStateChanged(int32_t transport, int32_t status) override
     {
-        HILOGD("bluetooth state, transport: %{public}s, status: %{public}s",
-            GetBtTransportName(transport).c_str(), GetBtStateName(status).c_str());
         if (status == BTStateID::STATE_TURN_ON) {
             host_.SyncRandomAddrToService();
         }
@@ -111,7 +109,6 @@ public:
 
     void OnDiscoveryResult(const BluetoothRawAddress &device) override
     {
-        HILOGD("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.observers_.ForEach([remoteDevice](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnDiscoveryResult(remoteDevice);
@@ -381,7 +378,6 @@ void BluetoothHost::impl::LoadSystemAbilityFail()
 
 void BluetoothHost::impl::SyncRandomAddrToService(void)
 {
-    HILOGD("SyncRandomAddrToService.");
     if (!IsValidBluetoothAddr(stagingRealAddr_)) {
         HILOGE("stagingRealAddr_ is invalid.");
         return;
