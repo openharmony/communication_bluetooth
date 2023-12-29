@@ -513,10 +513,17 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr]() {
-        int transport = GetDeviceTransport(remoteAddr);
-        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int deviceType = remoteDevice.GetDeviceType();
+        if (deviceType == INVALID_TYPE) {
+            HILOGE("device is not discovery or scan, deviceType is invalid_type.");
+            return NapiAsyncWorkRet(BT_ERR_INVALID_PARAM);
+        }
+        if (deviceType == DEVICE_TYPE_LE) {
+            remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BLE);
+        }
         int32_t err = remoteDevice.StartPair();
-        HILOGI("err: %{public}d", err);
+        HILOGI("err: %{public}d deviceType is %{public}d", err, deviceType);
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);

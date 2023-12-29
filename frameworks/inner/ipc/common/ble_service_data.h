@@ -226,7 +226,7 @@ public:
      * @return Returns advertiser Tx power.
      * @since 6
      */
-    int GetTxPower() const;
+    int8_t GetTxPower() const;
 
     /**
      * @brief Set advertiser Tx power.
@@ -234,7 +234,7 @@ public:
      * @param txPower Advertiser Tx power.
      * @since 6
      */
-    int SetTxPower(int txPower);
+    void SetTxPower(int8_t txPower);
 
     /**
      * @brief Get primary phy.
@@ -306,7 +306,7 @@ private:
     /// Advertising connectable.
     bool connectable_ = true;
     /// Advertising txPower.
-    int txPower_ = BLE_ADV_TX_POWER_HIGH_VALUE;
+    int8_t txPower_ = BLE_ADV_TX_POWER_MEDIUM_VALUE;
     /// Advertising legacyMode.
     bool legacyMode_ = true;
     /// Advertising primaryPhy.
