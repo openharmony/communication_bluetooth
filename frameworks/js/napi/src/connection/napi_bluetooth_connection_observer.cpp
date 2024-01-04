@@ -47,7 +47,6 @@ void NapiBluetoothConnectionObserver::OnDiscoveryStateChanged(int status)
 void NapiBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDevice &device)
 {
     std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
-    AddDiscoveryDevice(remoteDevice);
     auto napiDiscoveryResultCallback = GetCallback(REGISTER_DEVICE_FIND_TYPE);
     CHECK_AND_RETURN_LOG(napiDiscoveryResultCallback, "DiscoveryResult callback is not registered");
 
