@@ -33,7 +33,6 @@ std::shared_ptr<NapiBluetoothConnectionObserver> g_connectionObserver =
 std::shared_ptr<NapiBluetoothRemoteDeviceObserver> g_remoteDeviceObserver =
     std::make_shared<NapiBluetoothRemoteDeviceObserver>();
 std::mutex deviceMutex;
-std::vector<std::shared_ptr<BluetoothRemoteDevice>> g_DiscoveryDevices;
 
 std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefaultValue = {
     {REGISTER_DEVICE_FIND_TYPE,
@@ -212,15 +211,7 @@ napi_value PairDevice(napi_env env, napi_callback_info info)
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
-    int deviceType = remoteDevice.GetDeviceType();
-    if (deviceType == INVALID_TYPE) {
-        HILOGE("device is not discovery or scan, just quick BLE pair");
-        remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BLE);
-    }
-    if (deviceType == DEVICE_TYPE_LE) {
-        remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BLE);
-    }
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t ret = remoteDevice.StartPair();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
@@ -233,8 +224,7 @@ napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
-    int transport = GetDeviceTransport(remoteAddr);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->RemovePair(remoteDevice);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
@@ -252,8 +242,8 @@ napi_value GetRemoteDeviceName(napi_env env, napi_callback_info info)
     napi_create_string_utf8(env, name.c_str(), name.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, checkRet == true, BT_ERR_INVALID_PARAM, result);
 
-    int transport = GetDeviceTransport(remoteAddr);
-    int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport).GetDeviceName(name);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+    int32_t err = remoteDevice.GetDeviceName(name);
     napi_create_string_utf8(env, name.c_str(), name.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
     return result;
@@ -266,8 +256,7 @@ napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
 
-    int transport = GetDeviceTransport(remoteAddr);
-    BluetoothRemoteDevice remoteDevice = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int tmpCod = MajorClass::MAJOR_UNCATEGORIZED;
     int tmpMajorClass = MajorClass::MAJOR_UNCATEGORIZED;
     int tmpMajorMinorClass = MajorClass::MAJOR_UNCATEGORIZED;
@@ -366,13 +355,12 @@ napi_value SetDevicePairingConfirmation(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     HILOGI("SetDevicePairingConfirmation::accept = %{public}d", accept);
-    int transport = GetDeviceTransport(remoteAddr);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t ret = BT_NO_ERROR;
     if (accept) {
-        ret =
-            BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport).SetDevicePairingConfirmation(accept);
+        ret = remoteDevice.SetDevicePairingConfirmation(accept);
     } else {
-        ret = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport).CancelPairing();
+        ret = remoteDevice.CancelPairing();
     }
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
@@ -420,27 +408,9 @@ napi_value GetBluetoothScanMode(napi_env env, napi_callback_info info)
     return result;
 }
 
-void AddDiscoveryDevice(std::shared_ptr<BluetoothRemoteDevice> &device)
-{
-    std::lock_guard<std::mutex> lock(deviceMutex);
-    for (auto dev : g_DiscoveryDevices) {
-        if (device->GetDeviceAddr().compare(dev->GetDeviceAddr()) == 0) {
-            return;
-        }
-    }
-    g_DiscoveryDevices.push_back(device);
-}
-
-void ClearDiscoveryDevice()
-{
-    std::lock_guard<std::mutex> lock(deviceMutex);
-    g_DiscoveryDevices.clear();
-}
-
 napi_value StartBluetoothDiscovery(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    ClearDiscoveryDevice();
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->StartBtDiscovery();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
@@ -484,8 +454,8 @@ napi_value SetDevicePinCode(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr, pinCode]() {
-        int transport = GetDeviceTransport(remoteAddr);
-        int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport).SetDevicePin(pinCode);
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+        int32_t err = remoteDevice.SetDevicePin(pinCode);
         HILOGI("SetDevicePinCode err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };
@@ -513,17 +483,9 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr]() {
-        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
-        int deviceType = remoteDevice.GetDeviceType();
-        if (deviceType == INVALID_TYPE) {
-            HILOGE("device is not discovery or scan, deviceType is invalid_type.");
-            return NapiAsyncWorkRet(BT_ERR_INVALID_PARAM);
-        }
-        if (deviceType == DEVICE_TYPE_LE) {
-            remoteDevice = BluetoothRemoteDevice(remoteAddr, BT_TRANSPORT_BLE);
-        }
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
         int32_t err = remoteDevice.StartPair();
-        HILOGI("err: %{public}d deviceType is %{public}d", err, deviceType);
+        HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
@@ -540,8 +502,7 @@ napi_value CancelPairedDeviceAsync(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr]() {
-        int transport = GetDeviceTransport(remoteAddr);
-        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
         BluetoothHost *host = &BluetoothHost::GetDefaultHost();
         int32_t err = host->RemovePair(remoteDevice);
         HILOGI("err: %{public}d", err);
@@ -561,8 +522,7 @@ napi_value CancelPairingDevice(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr]() {
-        int transport = GetDeviceTransport(remoteAddr);
-        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport);
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
         int32_t err = remoteDevice.CancelPairing();
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
@@ -589,7 +549,7 @@ napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
-    int transport = INVALID_TYPE;
+    int transport = BT_TRANSPORT_NONE;
     auto status = CheckPairCredibleDeviceParam(env, info, remoteAddr, transport);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -639,7 +599,7 @@ napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     auto func = [address]() {
         std::vector<std::string> uuids{};
-        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(address, BT_TRANSPORT_BREDR);
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(address);
         int32_t err = remoteDevice.GetDeviceUuids(uuids);
         HILOGI("err: %{public}d", err);
         auto object = std::make_shared<NapiNativeUuidsArray>(uuids);
@@ -723,8 +683,7 @@ napi_value GetRemoteProductId(napi_env env, napi_callback_info info)
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
 
-    int transport = GetDeviceTransport(remoteAddr);
-    BluetoothRemoteDevice remoteDevice = BluetoothHost::GetDefaultHost().GetRemoteDevice(remoteAddr, transport);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     std::string productId;
     int32_t err = remoteDevice.GetDeviceProductId(productId);
 
@@ -836,17 +795,6 @@ void RegisterObserverToHost()
     BluetoothHost &host = BluetoothHost::GetDefaultHost();
     host.RegisterObserver(g_connectionObserver);
     host.RegisterRemoteDeviceObserver(g_remoteDeviceObserver);
-}
-
-int GetDeviceTransport(const std::string &device)
-{
-    std::lock_guard<std::mutex> lock(deviceMutex);
-    for (auto dev : g_DiscoveryDevices) {
-        if (device.compare(dev->GetDeviceAddr()) == 0) {
-            return dev->GetTransportType();
-        }
-    }
-    return BT_TRANSPORT_BREDR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
