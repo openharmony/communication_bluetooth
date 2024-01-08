@@ -30,8 +30,6 @@
 namespace OHOS {
 namespace Bluetooth {
 
-const int WEARDETECTION_SUPPORT_ON = 1;
-const int WEARDETECTION_SUPPORT_OFF = 0;
 const int WEARDETECTION_ENABLED = 1;
 const int ENABLE_WEARDETECTION_UNSUPPORT = -1;
 
@@ -55,9 +53,8 @@ napi_value NapiBluetoothAudioManager::EnableWearDetection(napi_env env, napi_cal
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr]() {
-        int32_t ability = WEARDETECTION_SUPPORT_ON;
         BluetoothAudioManager &wd = BluetoothAudioManager::GetInstance();
-        int32_t err = wd.EnableWearDetection(remoteAddr, ability);
+        int32_t err = wd.EnableWearDetection(remoteAddr);
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
@@ -74,9 +71,8 @@ napi_value NapiBluetoothAudioManager::DisableWearDetection(napi_env env, napi_ca
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [remoteAddr]() {
-        int32_t ability = WEARDETECTION_SUPPORT_OFF;
         BluetoothAudioManager &wd = BluetoothAudioManager::GetInstance();
-        int32_t err = wd.DisableWearDetection(remoteAddr, ability);
+        int32_t err = wd.DisableWearDetection(remoteAddr);
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
@@ -95,7 +91,7 @@ napi_value NapiBluetoothAudioManager::IsWearDetectionEnabled(napi_env env, napi_
     auto func = [remoteAddr]() {
         int32_t ability = ENABLE_WEARDETECTION_UNSUPPORT;
         BluetoothAudioManager &wd = BluetoothAudioManager::GetInstance();
-        int32_t err = wd.IsWearDetectionEnabled(remoteAddr, ability);
+        int32_t err = wd.GetWearDetectionState(remoteAddr, ability);
         if (ability == WEARDETECTION_ENABLED) {
             return NapiAsyncWorkRet(err, std::make_shared<NapiNativeBool>(true));
         }
