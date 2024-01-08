@@ -33,7 +33,6 @@ public:
     virtual int32_t IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported) = 0;
     virtual int32_t SendDeviceSelection(const BluetoothRawAddress &device,
         int useA2dp, int useHfp, int userSelection) = 0;
-
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
