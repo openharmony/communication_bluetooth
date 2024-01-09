@@ -83,8 +83,17 @@ public:
  *
  * @since 6
  */
-class BLUETOOTH_API ClientSocket {
+class BLUETOOTH_API ClientSocket : public std::enable_shared_from_this<ClientSocket> {
 public:
+    /**
+     * @brief init socketClient.
+     *
+     * @return init   api init result.
+     * @since 6
+     *
+     */
+    bool Init();
+
     /**
      * @brief A constructor used to create an ClientSocket instance.
      *
@@ -118,7 +127,7 @@ public:
      * @since 6
      */
     ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth,
-        std::shared_ptr<BluetoothConnectionObserver> observer);
+        std::weak_ptr<BluetoothConnectionObserver> observer);
 
     /**
      * @brief Destroy the ClientSocket object.

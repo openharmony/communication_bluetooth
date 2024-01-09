@@ -62,9 +62,9 @@ typedef struct {
  * @param status Indicates the connection status {@link ConnStatus}.
  * @param result Indicates the operation result.
  */
-typedef void (*ConnectionStateChangedCallback)(const BdAddr *bdAddr, BtUuid uuid, int status, int result);
+typedef void (*SocketConnectionStateChangedCallback)(const BdAddr *bdAddr, BtUuid uuid, int status, int result);
 typedef struct {
-    ConnectionStateChangedCallback connStateCb;
+    SocketConnectionStateChangedCallback connStateCb;
 } BtSocketConnectionCallback;
 
 /**
