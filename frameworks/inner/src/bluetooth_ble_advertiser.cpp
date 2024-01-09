@@ -33,6 +33,7 @@ using namespace OHOS::bluetooth;
 struct BleAdvertiser::impl {
     impl();
     ~impl();
+    void Init(std::weak_ptr<BleAdvertiser> advertiser);
     void ConvertBleAdvertiserData(const BleAdvertiserData &data, BluetoothBleAdvertiserData &outData);
     uint32_t GetAdvertiserTotalBytes(const BluetoothBleAdvertiserData &data, bool isFlagsIncluded);
     int32_t CheckAdvertiserSettings(const BleAdvertiserSettings &settings);
@@ -41,19 +42,22 @@ struct BleAdvertiser::impl {
 
     class BluetoothBleAdvertiserCallbackImp : public BluetoothBleAdvertiseCallbackStub {
     public:
-        explicit BluetoothBleAdvertiserCallbackImp(BleAdvertiser::impl &bleAdvertiser)
-            : bleAdvertiser_(bleAdvertiser){};
+        explicit BluetoothBleAdvertiserCallbackImp(std::weak_ptr<BleAdvertiser> advertiser)
+            : advertiser_(advertiser){};
         ~BluetoothBleAdvertiserCallbackImp()
         {}
 
         void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) override
         {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
             HILOGI("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
             std::shared_ptr<BleAdvertiseCallback> observer = nullptr;
             if (opcode == bluetooth::BLE_ADV_START_FAILED_OP_CODE) {
-                observer = bleAdvertiser_.callbacks_.PopAdvertiserObserver(advHandle);
+                observer = advertiserSptr->pimpl->callbacks_.PopAdvertiserObserver(advHandle);
             } else {
-                observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
+                observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             }
 
             if (observer != nullptr) {
@@ -63,8 +67,11 @@ struct BleAdvertiser::impl {
 
         void OnEnableResultEvent(int32_t result, int32_t advHandle) override
         {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
             HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
-            std::shared_ptr<BleAdvertiseCallback> observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
+            auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer != nullptr) {
                 observer->OnEnableResultEvent(result, advHandle);
             }
@@ -72,8 +79,11 @@ struct BleAdvertiser::impl {
 
         void OnDisableResultEvent(int32_t result, int32_t advHandle) override
         {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
             HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
-            std::shared_ptr<BleAdvertiseCallback> observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
+            auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer != nullptr) {
                 observer->OnDisableResultEvent(result, advHandle);
             }
@@ -81,8 +91,11 @@ struct BleAdvertiser::impl {
 
         void OnStopResultEvent(int32_t result, int32_t advHandle) override
         {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
             HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
-            std::shared_ptr<BleAdvertiseCallback> observer = bleAdvertiser_.callbacks_.PopAdvertiserObserver(advHandle);
+            auto observer = advertiserSptr->pimpl->callbacks_.PopAdvertiserObserver(advHandle);
             if (observer != nullptr) {
                 observer->OnStopResultEvent(result, advHandle);
             }
@@ -90,24 +103,30 @@ struct BleAdvertiser::impl {
 
         void OnAutoStopAdvEvent(int32_t advHandle) override
         {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
             HILOGI("advHandle: %{public}d", advHandle);
-            std::shared_ptr<BleAdvertiseCallback> observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
+            auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer != nullptr) {
-                bleAdvertiser_.callbacks_.Deregister(observer);
+                advertiserSptr->pimpl->callbacks_.Deregister(observer);
             }
         }
 
         void OnSetAdvDataEvent(int32_t result, int32_t advHandle) override
         {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
             HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
-            std::shared_ptr<BleAdvertiseCallback> observer = bleAdvertiser_.callbacks_.GetAdvertiserObserver(advHandle);
+            auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer) {
                 observer->OnSetAdvDataEvent(result);
             }
         }
 
     private:
-        BleAdvertiser::impl &bleAdvertiser_;
+        std::weak_ptr<BleAdvertiser> advertiser_;
         BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleAdvertiserCallbackImp);
     };
     sptr<BluetoothBleAdvertiserCallbackImp> callbackImp_ = nullptr;
@@ -120,34 +139,25 @@ struct BleAdvertiser::impl {
 
 class BleAdvertiser::impl::BleAdvertiserDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
-    explicit BleAdvertiserDeathRecipient(BleAdvertiser::impl &impl) : owner_(impl) {};
+    explicit BleAdvertiserDeathRecipient(std::weak_ptr<BleAdvertiser> advertiser) : advertiser_(advertiser) {}
     ~BleAdvertiserDeathRecipient() final = default;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiserDeathRecipient);
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) final
     {
         HILOGI("enter");
-        owner_.callbacks_.Clear();
+
+        std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+        CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+        advertiserSptr->pimpl->callbacks_.Clear();
     }
 
 private:
-    BleAdvertiser::impl &owner_;
+    std::weak_ptr<BleAdvertiser> advertiser_;
 };
 
 BleAdvertiser::impl::impl()
-{
-    callbackImp_ = new BluetoothBleAdvertiserCallbackImp(*this);
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(BLE_ADVERTISER_SERVER,
-        [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothBleAdvertiser> proxy = iface_cast<IBluetoothBleAdvertiser>(remote);
-        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
-        proxy->RegisterBleAdvertiserCallback(callbackImp_);
-        deathRecipient_ = new BleAdvertiserDeathRecipient(*this);
-        if (deathRecipient_ != nullptr) {
-            proxy->AsObject()->AddDeathRecipient(deathRecipient_);
-        }
-    });
-}
+{}
 
 BleAdvertiser::impl::~impl()
 {
@@ -174,6 +184,30 @@ BleAdvertiser::BleAdvertiser() : pimpl(nullptr)
 
 BleAdvertiser::~BleAdvertiser()
 {}
+
+void BleAdvertiser::impl::Init(std::weak_ptr<BleAdvertiser> advertiser)
+{
+    callbackImp_ = new BluetoothBleAdvertiserCallbackImp(advertiser);
+    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(BLE_ADVERTISER_SERVER,
+        [this, advertiser](sptr<IRemoteObject> remote) {
+        sptr<IBluetoothBleAdvertiser> proxy = iface_cast<IBluetoothBleAdvertiser>(remote);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        proxy->RegisterBleAdvertiserCallback(callbackImp_);
+        deathRecipient_ = new BleAdvertiserDeathRecipient(advertiser);
+        if (deathRecipient_ != nullptr) {
+            proxy->AsObject()->AddDeathRecipient(deathRecipient_);
+        }
+    });
+}
+
+std::shared_ptr<BleAdvertiser> BleAdvertiser::CreateInstance(void)
+{
+    auto instance = std::make_shared<BleAdvertiser>(PassKey());
+    CHECK_AND_RETURN_LOG_RET(instance, nullptr, "Create BleAdvertiser failed");
+
+    instance->pimpl->Init(instance);
+    return instance;
+}
 
 void BleAdvertiser::impl::ConvertBleAdvertiserData(const BleAdvertiserData &data, BluetoothBleAdvertiserData &outData)
 {
