@@ -485,7 +485,7 @@ bool BleCentralManager::IsLpDeviceAvailable()
 {
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return BT_ERR_INTERNAL_ERROR;
+        return false;
     }
 
     sptr<IBluetoothBleCentralManager> proxy =
