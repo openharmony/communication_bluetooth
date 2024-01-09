@@ -1090,7 +1090,7 @@ bool IsLpDeviceAvailable(void)
     GetBleCentralManagerObject(bleCentralManager);
     if (bleCentralManager == nullptr) {
         HILOGE("get BleCentralManager fail.");
-        return OHOS_BT_STATUS_FAIL;
+        return false;
     }
 
     return bleCentralManager->IsLpDeviceAvailable();
