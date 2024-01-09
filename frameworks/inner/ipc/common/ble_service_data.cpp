@@ -314,7 +314,7 @@ void BleAdvertiserSettingsImpl::SetInterval(int interval)
  * @return Returns advertiser Tx power.
  * @since 6
  */
-int BleAdvertiserSettingsImpl::GetTxPower() const
+int8_t BleAdvertiserSettingsImpl::GetTxPower() const
 {
     return txPower_;
 }
@@ -322,33 +322,12 @@ int BleAdvertiserSettingsImpl::GetTxPower() const
 /**
  * @brief Set the advertiser Tx power.
  *
- * @param txPowerthe advertiser Tx power.
+ * @param txPower the advertiser Tx power.
  * @since 6
  */
-int BleAdvertiserSettingsImpl::SetTxPower(int txPower)
+void BleAdvertiserSettingsImpl::SetTxPower(int8_t txPower)
 {
-    if (txPower > BLE_ADV_TX_POWER_HIGH || txPower < BLE_ADV_TX_POWER_ULTRA_LOW) {
-        return RET_BAD_PARAM;
-    }
-    switch (txPower) {
-        case BLE_ADV_TX_POWER_ULTRA_LOW:
-            txPower_ = BLE_ADV_TX_POWER_ULTRA_LOW_VALUE;
-            break;
-        case BLE_ADV_TX_POWER_LOW:
-            txPower_ = BLE_ADV_TX_POWER_LOW_VALUE;
-            break;
-        case BLE_ADV_TX_POWER_MEDIUM:
-            txPower_ = BLE_ADV_TX_POWER_MEDIUM_VALUE;
-            break;
-        case BLE_ADV_TX_POWER_HIGH:
-            txPower_ = BLE_ADV_TX_POWER_HIGH_VALUE;
-            break;
-        default:
-            txPower_ = BLE_ADV_TX_POWER_LOW_VALUE;
-            break;
-    }
-
-    return RET_NO_ERROR;
+    txPower_ = txPower;
 }
 
 /**

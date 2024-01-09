@@ -648,7 +648,7 @@ static napi_status ParseAdvertisingSettingsParameters(
         outSettings.SetInterval(interval);
     }
 
-    int32_t txPower = 0;
+    int32_t txPower = -7; // default txPower value
     NAPI_BT_CALL_RETURN(NapiParseObjectInt32Optional(env, object, "txPower", txPower, exist));
     if (exist) {
         const int32_t minTxPower = -127;
