@@ -490,7 +490,7 @@ bool BleCentralManager::IsLpDeviceAvailable()
 
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
     return proxy->IsLpDeviceAvailable();
 }
 
