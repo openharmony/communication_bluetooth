@@ -35,6 +35,7 @@ struct BleAdvertiser::impl {
     ~impl();
     void ConvertBleAdvertiserData(const BleAdvertiserData &data, BluetoothBleAdvertiserData &outData);
     uint32_t GetAdvertiserTotalBytes(const BluetoothBleAdvertiserData &data, bool isFlagsIncluded);
+    int32_t CheckAdvertiserSettings(const BleAdvertiserSettings &settings);
     int32_t CheckAdvertiserData(const BluetoothBleAdvertiserSettings &setting,
         const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse);
 
@@ -224,6 +225,17 @@ uint32_t BleAdvertiser::impl::GetAdvertiserTotalBytes(const BluetoothBleAdvertis
     return size;
 }
 
+int32_t BleAdvertiser::impl::CheckAdvertiserSettings(const BleAdvertiserSettings &settings)
+{
+    int8_t txPower = settings.GetTxPower();
+    if (txPower < BLE_ADV_TX_POWER_MIN_VALUE || txPower > BLE_ADV_TX_POWER_MAX_VALUE) {
+        HILOGE("Illegal txPower argument %{public}d", txPower);
+        return BT_ERR_INVALID_PARAM;
+    }
+
+    return BT_NO_ERROR;
+}
+
 int32_t BleAdvertiser::impl::CheckAdvertiserData(const BluetoothBleAdvertiserSettings &setting,
     const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse)
 {
@@ -256,6 +268,10 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
+    int ret = pimpl->CheckAdvertiserSettings(settings);
+    if (ret != BT_NO_ERROR) {
+        return ret;
+    }
     BluetoothBleAdvertiserSettings setting;
     setting.SetConnectable(settings.IsConnectable());
     setting.SetInterval(settings.GetInterval());
@@ -270,7 +286,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     pimpl->ConvertBleAdvertiserData(advData, bleAdvertiserData);
     pimpl->ConvertBleAdvertiserData(scanResponse, bleScanResponse);
 
-    int ret = pimpl->CheckAdvertiserData(setting, bleAdvertiserData, bleScanResponse);
+    ret = pimpl->CheckAdvertiserData(setting, bleAdvertiserData, bleScanResponse);
     if (ret != BT_NO_ERROR) {
         return ret;
     }
@@ -305,6 +321,10 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
+    int ret = pimpl->CheckAdvertiserSettings(settings);
+    if (ret != BT_NO_ERROR) {
+        return ret;
+    }
     BluetoothBleAdvertiserSettings setting;
     setting.SetConnectable(settings.IsConnectable());
     setting.SetInterval(settings.GetInterval());
@@ -321,7 +341,6 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
 
     HILOGI("duration=%{public}d", duration);
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
-    int ret = BT_ERR_INTERNAL_ERROR;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, true);
     } else {
@@ -585,12 +604,12 @@ uint16_t BleAdvertiserSettings::GetInterval() const
     return interval_;
 }
 
-void BleAdvertiserSettings::SetTxPower(uint8_t txPower)
+void BleAdvertiserSettings::SetTxPower(int8_t txPower)
 {
     txPower_ = txPower;
 }
 
-uint8_t BleAdvertiserSettings::GetTxPower() const
+int8_t BleAdvertiserSettings::GetTxPower() const
 {
     return txPower_;
 }

@@ -281,7 +281,7 @@ public:
      * @return Returns Tx power.
      * @since 6
      */
-    int GetTxPower() const
+    int8_t GetTxPower() const
     {
         return txPower_;
     }
@@ -325,7 +325,7 @@ public:
      * @param txPower Tx power.
      * @since 6
      */
-    void SetTxPower(uint8_t txPower)
+    void SetTxPower(int8_t txPower)
     {
         txPower_ = txPower;
     }
@@ -422,7 +422,7 @@ public:
     bool connectable_ {};
     bool legacyMode_ {};
     uint16_t interval_ {};
-    uint8_t txPower_ {};
+    int8_t txPower_ {};
     int primaryPhy_ {};
     int secondaryPhy_ {};
     std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN> ownAddr_ = {};

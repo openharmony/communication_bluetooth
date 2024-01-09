@@ -28,7 +28,7 @@ bool BluetoothBleAdvertiserSettings::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUint16(interval_)) {
         return false;
     }
-    if (!parcel.WriteUint8(txPower_)) {
+    if (!parcel.WriteInt8(txPower_)) {
         return false;
     }
     if (!parcel.WriteInt32(primaryPhy_)) {
@@ -73,7 +73,7 @@ bool BluetoothBleAdvertiserSettings::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadUint16(interval_)) {
         return false;
     }
-    if (!parcel.ReadUint8(txPower_)) {
+    if (!parcel.ReadInt8(txPower_)) {
         return false;
     }
     if (!parcel.ReadInt32(primaryPhy_)) {

@@ -237,7 +237,7 @@ public:
      * @return Returns Tx power.
      * @since 6
      */
-    uint8_t GetTxPower() const;
+    int8_t GetTxPower() const;
 
     /**
      * @brief Set advertise interval.
@@ -253,7 +253,7 @@ public:
      * @param txPower Tx power.
      * @since 6
      */
-    void SetTxPower(uint8_t txPower);
+    void SetTxPower(int8_t txPower);
 
     /**
      * @brief Get primary phy.
@@ -323,7 +323,7 @@ private:
     bool connectable_ = true;
     bool legacyMode_ = true;
     uint16_t interval_ = BLE_ADV_DEFAULT_INTERVAL;
-    uint8_t txPower_ = BLE_ADV_TX_POWER_LOW;
+    int8_t txPower_ = BLE_ADV_TX_POWER_MEDIUM_VALUE;
     int primaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     int secondaryPhy_ = BLE_ADVERTISEMENT_PHY_1M;
     std::array<uint8_t, OHOS_BD_ADDR_LEN> ownAddr_ = {};
