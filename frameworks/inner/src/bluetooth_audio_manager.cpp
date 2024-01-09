@@ -43,14 +43,14 @@ int BluetoothAudioManager::impl::EnableWearDetection(const std::string &deviceId
 {
     sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
-    return proxy_->EnableWearDetection(deviceId);
+    return proxy->EnableWearDetection(deviceId);
 }
 
 int BluetoothAudioManager::impl::DisableWearDetection(const std::string &deviceId)
 {
     sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
-    return proxy_->DisableWearDetection(deviceId);
+    return proxy->DisableWearDetection(deviceId);
 }
 
 int BluetoothAudioManager::impl::GetWearDetectionState(const std::string &deviceId, int32_t &ability)
