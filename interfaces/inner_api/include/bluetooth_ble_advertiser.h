@@ -406,11 +406,12 @@ public:
 class BLUETOOTH_API BleAdvertiser {
 public:
     /**
-     * @brief A constructor used to create a <b>BleAdvertiser</b> instance.
+     * @brief A constructor of BleAdvertiser.
      *
-     * @since 6
+     * @since 11
+     *
      */
-    explicit BleAdvertiser();
+    static std::shared_ptr<BleAdvertiser> CreateInstance(void);
 
     /**
      * @brief A destructor used to delete the <b>BleAdvertiser</b> instance.
@@ -485,8 +486,16 @@ public:
     uint8_t GetAdvHandle(std::shared_ptr<BleAdvertiseCallback> callback);
 
 private:
+    BleAdvertiser();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiser);
     BLUETOOTH_DECLARE_IMPL();
+
+    //The passkey pattern of C++
+    struct PassKey {
+        PassKey() {};
+    };
+public:
+    explicit BleAdvertiser(PassKey) : BleAdvertiser() {};
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

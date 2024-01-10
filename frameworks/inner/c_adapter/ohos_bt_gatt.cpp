@@ -608,7 +608,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     auto advData = ConvertDataToVec(rawData->advData, rawData->advDataLen);
     auto scanResponse = ConvertDataToVec(rawData->rspData, rawData->rspDataLen);
     if (g_BleAdvertiser == nullptr) {
-        g_BleAdvertiser = make_shared<BleAdvertiser>();
+        g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
     g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
     return OHOS_BT_STATUS_SUCCESS;
@@ -631,7 +631,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     HILOGI("BleStartAdvEx enter");
     lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr) {
-        g_BleAdvertiser = std::make_shared<BleAdvertiser>();
+        g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
     int i = 0;
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
