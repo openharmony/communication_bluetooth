@@ -112,8 +112,9 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
     MessageOption option {
         MessageOption::TF_SYNC
     };
-
-    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::SOCKET_LISTEN, data, reply, option);
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET(remote != nullptr, OBJECT_NULL, "get remote is nullptr!");
+    int error = remote->SendRequest(BluetoothSocketInterfaceCode::SOCKET_LISTEN, data, reply, option);
     if (error != NO_ERROR) {
         HILOGE("Listen done fail, error: %{public}d", error);
         return BT_ERR_INTERNAL_ERROR;
