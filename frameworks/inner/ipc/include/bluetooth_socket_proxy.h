@@ -18,6 +18,7 @@
 
 #include "iremote_proxy.h"
 #include "i_bluetooth_socket.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -39,6 +40,7 @@ public:
     int UpdateCocConnectionParams(const BluetoothSocketCocInfo &info) override;
 private:
     static inline BrokerDelegator<BluetoothSocketProxy> delegator_;
+    std::mutex mutex_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
