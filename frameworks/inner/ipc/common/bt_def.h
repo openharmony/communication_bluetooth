@@ -205,6 +205,7 @@ const int BONDABLE_MODE_ON = 0x01;
  * use to
  * GetTransportType()
  */
+const int BT_TRANSPORT_NONE = -1;
 const int BT_TRANSPORT_BREDR = 0;
 const int BT_TRANSPORT_BLE = 1;
 
@@ -217,6 +218,20 @@ const int DEVICE_TYPE_UNKNOWN = -1;
 const int DEVICE_TYPE_BREDR = 0;
 const int DEVICE_TYPE_LE = 1;
 const int DEVICE_TYPE_DUAL_MONO = 2;
+
+inline int DeviceTypeToTransport(int type)
+{
+    switch (type) {
+        case DEVICE_TYPE_LE:
+            return BT_TRANSPORT_BLE;
+        case DEVICE_TYPE_BREDR:
+            return BT_TRANSPORT_BREDR;
+        case DEVICE_TYPE_DUAL_MONO:
+            return BT_TRANSPORT_BREDR;
+        default:
+            return BT_TRANSPORT_NONE;
+    }
+}
 
 /**
  * @brief ACL LINK TYPE.

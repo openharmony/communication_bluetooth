@@ -198,6 +198,7 @@ const int BONDABLE_MODE_ON = 0x01;
  * use to
  * GetTransportType()
  */
+const int BT_TRANSPORT_NONE = -1;
 const int BT_TRANSPORT_BREDR = 0;
 const int BT_TRANSPORT_BLE = 1;
 

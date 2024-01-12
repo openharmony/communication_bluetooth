@@ -84,9 +84,7 @@ napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);
 #endif
 
-void AddDiscoveryDevice(std::shared_ptr<BluetoothRemoteDevice> &device);
 void RegisterObserverToHost();
-int GetDeviceTransport(const std::string &device);
 }  // namespace Bluetooth
 }  // namespace OHOS
 
