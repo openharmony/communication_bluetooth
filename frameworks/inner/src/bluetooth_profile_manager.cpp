@@ -62,7 +62,7 @@ void BluetoothProfileManager::UnSubScribeBluetoothSystemAbility()
 sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
 {
     sptr<IRemoteObject> value = nullptr;
-    if (profileRemoteMap_.Find(BLUETOOTH_HOST, value) {
+    if (profileRemoteMap_.Find(BLUETOOTH_HOST, value)) {
         HILOGI("Remote is in the map");
     }
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
