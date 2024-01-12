@@ -39,7 +39,7 @@ public:
      *
      * @since 6
      */
-    BluetoothRemoteDevice(const std::string &addr, const int transport = BT_TRANSPORT_BREDR);
+    BluetoothRemoteDevice(const std::string &addr, const int transport = BT_TRANSPORT_NONE);
     /**
      * @brief A destructor used to delete the <b>BluetoothRemoteDevice</b> instance.
      *
@@ -339,7 +339,7 @@ public:
 
 private:
     std::string address_ = "00:00:00:00:00:00";
-    int transport_ = 0;
+    int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth
 } // namespace OHOS
