@@ -27,6 +27,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -95,6 +96,7 @@ private:
     SafeMap<int32_t, ProfileIdProperty> profileIdFuncMap_;
     std::atomic_bool isBluetoothServiceOn_ = false;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
+    std::mutex getProfileRemoteMutex_;
 };
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
