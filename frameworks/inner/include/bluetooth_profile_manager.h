@@ -96,7 +96,6 @@ private:
     SafeMap<int32_t, ProfileIdProperty> profileIdFuncMap_;
     std::atomic_bool isBluetoothServiceOn_ = false;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
-    sptr<IRemoteObject> GetProfileRemoteInner(const std::string &objectName);
     std::mutex getProfileRemoteMutex_;
 };
 template <typename T>
