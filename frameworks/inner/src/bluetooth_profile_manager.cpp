@@ -62,7 +62,9 @@ void BluetoothProfileManager::UnSubScribeBluetoothSystemAbility()
 sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
 {
     sptr<IRemoteObject> value = nullptr;
-    CHECK_AND_RETURN_LOG_RET(!profileRemoteMap_.Find(BLUETOOTH_HOST, value), value, "Remote is in the map");
+    if (profileRemoteMap_.Find(BLUETOOTH_HOST, value)) {
+        return value;
+    }
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, nullptr, "samgrProxy is nullptr");
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
@@ -72,7 +74,7 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
 
 sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string &objectName)
 {
-    HILOGI("enter");
+    std::lock_guard<std::mutex> lock(getProfileRemoteMutex_);
     sptr<IRemoteObject> remote = nullptr;
     if (profileRemoteMap_.Find(objectName, remote)) {
         return remote;
@@ -201,6 +203,7 @@ int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName,
 
 void BluetoothProfileManager::DeregisterFunc(int32_t id)
 {
+    HILOGI("id: %{public}d", id);
     ProfileIdProperty value;
     CHECK_AND_RETURN_LOG(profileIdFuncMap_.Find(id, value), "id is not exist");
     profileIdFuncMap_.Erase(id);
