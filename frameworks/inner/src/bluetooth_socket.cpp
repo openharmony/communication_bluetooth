@@ -107,6 +107,10 @@ struct ClientSocket::impl {
             sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
             CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
             bluetooth::Uuid tempUuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits());
+            if (!observerImp_) {
+                HILOGD("observerImp_ is nullptr");
+                return;
+            }
             proxy->DeregisterClientObserver(BluetoothRawAddress(remoteDevice_.GetDeviceAddr()), tempUuid,
                 observerImp_);
         }
