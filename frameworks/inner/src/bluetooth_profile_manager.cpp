@@ -71,16 +71,8 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
     CHECK_AND_RETURN_LOG_RET(object != nullptr, nullptr, "object is nullptr");
     return object;
 }
-sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string &objectName)
-{
-    sptr<IRemoteObject> remote = nullptr;
-    if (profileRemoteMap_.Find(objectName, remote)) {
-        return remote;
-    }
-    return GetProfileRemoteInner(objectName);
-}
 
-sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemoteInner(const std::string &objectName)
+sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string &objectName)
 {
     std::lock_guard<std::mutex> lock(getProfileRemoteMutex_);
     sptr<IRemoteObject> remote = nullptr;
