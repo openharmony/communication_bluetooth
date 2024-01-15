@@ -306,11 +306,7 @@ int BleSetAdvData(int advId, const StartAdvRawData data)
 
     auto advData = ConvertDataToVec(data.advData, data.advDataLen);
     auto rspData = ConvertDataToVec(data.rspData, data.rspDataLen);
-    int ret = g_BleAdvertiser->SetAdvertisingData(advData, rspData, g_bleAdvCallbacks[advId]);
-    if (ret != BT_NO_ERROR) {
-        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
-        return OHOS_BT_STATUS_FAIL;
-    }
+    g_BleAdvertiser->SetAdvertisingData(advData, rspData, g_bleAdvCallbacks[advId]);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -699,10 +695,10 @@ int BleEnableAdvEx(int advId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    int ret = g_BleAdvertiser->EnableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), 0, 
+    int ret = g_BleAdvertiser->EnableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), 0,
         g_bleAdvCallbacks[advId]);
     if (ret != BT_NO_ERROR) {
-        HILOGE("fail, advId: %{public}d, ret: %{public}d", *advId, ret);
+        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -1332,7 +1328,7 @@ int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam)
     HILOGI("SetLpDeviceParam fieldValidFlagBit: %{public}u", paramSet.fieldValidFlagBit);
     int ret = bleCentralManager->SetLpDeviceParam(paramSet);
     if (ret != BT_NO_ERROR) {
-        HILOGE("fail, uuid: %{public}s, ret: %{public}d", paramSet.uuid.ToString(), ret);
+        HILOGE("fail, advHandle: %{public}d, ret: %{public}d", paramSet.advHandle, ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -1361,7 +1357,7 @@ int RemoveLpDeviceParam(BtUuid uuid)
     }
     int ret = bleCentralManager->RemoveLpDeviceParam(srvUuid);
     if (ret != BT_NO_ERROR) {
-        HILOGE("fail, uuid: %{public}s, ret: %{public}d", srvUuid.ToString(), ret);
+        HILOGE("fail, ret: %{public}d", ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
