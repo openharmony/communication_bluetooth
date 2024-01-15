@@ -97,7 +97,7 @@ private:
     std::atomic_bool isBluetoothServiceOn_ = false;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
     sptr<IRemoteObject> GetProfileRemoteInner(const std::string &objectName);
-    std::mutex mutex_;
+    std::mutex getProfileRemoteMutex_;
 };
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)

@@ -63,7 +63,7 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
 {
     sptr<IRemoteObject> value = nullptr;
     if (profileRemoteMap_.Find(BLUETOOTH_HOST, value)) {
-        HILOGI("Remote is in the map");
+        return value;
     }
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, nullptr, "samgrProxy is nullptr");
@@ -73,7 +73,6 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
 }
 sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string &objectName)
 {
-    HILOGI("enter");
     sptr<IRemoteObject> remote = nullptr;
     if (profileRemoteMap_.Find(objectName, remote)) {
         return remote;
@@ -83,7 +82,7 @@ sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string 
 
 sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemoteInner(const std::string &objectName)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(getProfileRemoteMutex_);
     sptr<IRemoteObject> remote = nullptr;
     if (profileRemoteMap_.Find(objectName, remote)) {
         return remote;
