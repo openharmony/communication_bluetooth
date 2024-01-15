@@ -211,6 +211,7 @@ int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName,
 
 void BluetoothProfileManager::DeregisterFunc(int32_t id)
 {
+    HILOGI("id: %{public}d", id);
     ProfileIdProperty value;
     CHECK_AND_RETURN_LOG(profileIdFuncMap_.Find(id, value), "id is not exist");
     profileIdFuncMap_.Erase(id);
