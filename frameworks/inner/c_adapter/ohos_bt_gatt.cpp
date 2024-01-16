@@ -307,7 +307,6 @@ int BleSetAdvData(int advId, const StartAdvRawData data)
     auto advData = ConvertDataToVec(data.advData, data.advDataLen);
     auto rspData = ConvertDataToVec(data.rspData, data.rspDataLen);
     g_BleAdvertiser->SetAdvertisingData(advData, rspData, g_bleAdvCallbacks[advId]);
-
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -346,7 +345,11 @@ int BleStopAdv(int advId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
+    int ret = g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -458,7 +461,11 @@ int BleStopScan(int32_t scannerId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    bleCentralManager->StopScan();
+    int ret = bleCentralManager->StopScan();
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, scannerId: %{public}d, ret: %{public}d", scannerId, ret);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -610,8 +617,8 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
-    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
-    return OHOS_BT_STATUS_SUCCESS;
+    int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
+    return ret == BT_NO_ERROR ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
 }
 
 /**
@@ -657,7 +664,11 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
     auto advData = ConvertDataToVec(rawData.advData, rawData.advDataLen);
     auto scanResponse = ConvertDataToVec(rawData.rspData, rawData.rspDataLen);
-    g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
+    int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, advId: %{public}d, ret: %{public}d", *advId, ret);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -684,8 +695,12 @@ int BleEnableAdvEx(int advId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleAdvertiser->EnableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), 0, g_bleAdvCallbacks[advId]);
-
+    int ret = g_BleAdvertiser->EnableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), 0,
+        g_bleAdvCallbacks[advId]);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -712,8 +727,11 @@ int BleDisableAdvEx(int advId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    g_BleAdvertiser->DisableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), g_bleAdvCallbacks[advId]);
-
+    int ret = g_BleAdvertiser->DisableAdvertising(g_bleAdvCallbacks[advId]->GetAdvHandle(), g_bleAdvCallbacks[advId]);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -830,7 +848,11 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
         HILOGE("SetConfigScanFilter fail, ble centra manager is null.");
         return OHOS_BT_STATUS_FAIL;
     }
-    bleCentralManager->ConfigScanFilter(scanFilters);
+    int ret = bleCentralManager->ConfigScanFilter(scanFilters);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, scannerId: %{public}d, ret: %{public}d", scannerId, ret);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -875,7 +897,11 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
     HILOGI("scanMode: %{public}d", configs->scanMode);
     BleScanSettings settings;
     settings.SetScanMode(configs->scanMode);
-    bleCentralManager->StartScan(settings);
+    int ret = bleCentralManager->StartScan(settings);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, scannerId: %{public}d, ret: %{public}d", scannerId, ret);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -944,8 +970,9 @@ int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int inter
         HILOGE("get BleCentralManager fail.");
         return OHOS_BT_STATUS_FAIL;
     }
-    if (bleCentralManager->SetLpDeviceAdvParam(duration, maxExtAdvEvents, window, interval, advHandle) !=
-        BT_NO_ERROR) {
+    int ret = bleCentralManager->SetLpDeviceAdvParam(duration, maxExtAdvEvents, window, interval, advHandle);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, advHandle: %{public}d,ret: %{public}d", advHandle, ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -968,7 +995,9 @@ int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable)
         HILOGE("SetScanReportChannelToLpDevice fail, ble centra manager is null.");
         return OHOS_BT_STATUS_FAIL;
     }
-    if (bleCentralManager->SetScanReportChannelToLpDevice(enable) != BT_NO_ERROR) {
+    int ret = bleCentralManager->SetScanReportChannelToLpDevice(enable);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, scannerId: %{public}d, ret: %{public}d", scannerId, ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -990,7 +1019,9 @@ int EnableSyncDataToLpDevice(void)
         HILOGE("get BleCentralManager fail.");
         return OHOS_BT_STATUS_FAIL;
     }
-    if (bleCentralManager->EnableSyncDataToLpDevice() != BT_NO_ERROR) {
+    int ret = bleCentralManager->EnableSyncDataToLpDevice();
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, ret: %{public}d", ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -1012,7 +1043,9 @@ int DisableSyncDataToLpDevice(void)
         HILOGE("get BleCentralManager fail.");
         return OHOS_BT_STATUS_FAIL;
     }
-    if (bleCentralManager->DisableSyncDataToLpDevice() != BT_NO_ERROR) {
+    int ret = bleCentralManager->DisableSyncDataToLpDevice();
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, ret: %{public}d", ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -1044,6 +1077,10 @@ int GetAdvHandle(int advId, int *advHandle)
         return OHOS_BT_STATUS_FAIL;
     }
     *advHandle = g_BleAdvertiser->GetAdvHandle(g_bleAdvCallbacks[advId]);
+    if (*advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
+        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, *advHandle);
+        return OHOS_BT_STATUS_FAIL;
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -1071,7 +1108,9 @@ int SendParamsToLpDevice(const uint8_t *data, uint32_t dataSize, int32_t type)
         return OHOS_BT_STATUS_FAIL;
     }
     std::vector<uint8_t> dataValue(data, data + dataSize);
-    if (bleCentralManager->SendParamsToLpDevice(std::move(dataValue), type) != BT_NO_ERROR) {
+    int ret = bleCentralManager->SendParamsToLpDevice(std::move(dataValue), type);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, ret: %{public}d", ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -1287,7 +1326,9 @@ int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam)
     }
 
     HILOGI("SetLpDeviceParam fieldValidFlagBit: %{public}u", paramSet.fieldValidFlagBit);
-    if (bleCentralManager->SetLpDeviceParam(paramSet) != BT_NO_ERROR) {
+    ret = bleCentralManager->SetLpDeviceParam(paramSet);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, advHandle: %{public}d, ret: %{public}d", paramSet.advHandle, ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
@@ -1314,7 +1355,9 @@ int RemoveLpDeviceParam(BtUuid uuid)
     if (!ConvertBtUuid(uuid, srvUuid)) {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
-    if (bleCentralManager->RemoveLpDeviceParam(srvUuid) != BT_NO_ERROR) {
+    int ret = bleCentralManager->RemoveLpDeviceParam(srvUuid);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, ret: %{public}d", ret);
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
