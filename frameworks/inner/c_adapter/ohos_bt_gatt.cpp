@@ -1326,7 +1326,7 @@ int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam)
     }
 
     HILOGI("SetLpDeviceParam fieldValidFlagBit: %{public}u", paramSet.fieldValidFlagBit);
-    int ret = bleCentralManager->SetLpDeviceParam(paramSet);
+    ret = bleCentralManager->SetLpDeviceParam(paramSet);
     if (ret != BT_NO_ERROR) {
         HILOGE("fail, advHandle: %{public}d, ret: %{public}d", paramSet.advHandle, ret);
         return OHOS_BT_STATUS_FAIL;
