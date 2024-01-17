@@ -28,28 +28,19 @@
 namespace OHOS {
 namespace Bluetooth {
 
-class BtAudioManagerCallback {
-    virtual ~BtAudioManagerCallback() = default;
-
-    virtual void OnAudioManagerEnabled(int ret);
-};
-
 class BLUETOOTH_API BluetoothAudioManager {
 public:
-    // common
     /**
-     * @brief Get default host device.
+     * @brief Get audio manager.
      *
      * @return Returns the singleton instance.
      * @since 6
      */
     static BluetoothAudioManager &GetInstance();
 
-    void RegisterCallback(BtAudioManagerCallback &btAudioManagerCallback);
-
-    int EnableWearDetection(const std::string &deviceId, int32_t supportVal);
-    int DisableWearDetection(const std::string &deviceId, int32_t supportVal);
-    int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability);
+    int EnableWearDetection(const std::string &deviceId);
+    int DisableWearDetection(const std::string &deviceId);
+    int GetWearDetectionState(const std::string &deviceId, int32_t &ability);
 
     /**
      * @brief Whether wear detection is supported

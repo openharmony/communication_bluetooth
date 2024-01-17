@@ -15,10 +15,10 @@
 
 #ifndef OHOS_BLUETOOTH_AUDIOMANAGER_PROXY_H
 #define OHOS_BLUETOOTH_AUDIOMANAGER_PROXY_H
- 
+
 #include <iremote_proxy.h>
 #include "i_bluetooth_audio_manager.h"
- 
+
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothAudioManagerProxy : public IRemoteProxy<IBluetoothAudioManager> {
@@ -26,19 +26,20 @@ public:
     explicit BluetoothAudioManagerProxy(const sptr<IRemoteObject>& remote)
         : IRemoteProxy<IBluetoothAudioManager>(remote)
     {}
-    virtual ~BluetoothAudioManagerProxy()
-    {}
- 
-    int EnableWearDetection(const std::string &deviceId, int32_t supportVal) override;
-    int DisableWearDetection(const std::string &deviceId, int32_t supportVal) override;
-    int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability) override;
+
+    ~BluetoothAudioManagerProxy() override = default;
+
+    int EnableWearDetection(const std::string &deviceId) override;
+    int DisableWearDetection(const std::string &deviceId) override;
+    int GetWearDetectionState(const std::string &deviceId, int32_t &ability) override;
     int32_t IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported) override;
     int32_t SendDeviceSelection(const BluetoothRawAddress &device, int useA2dp, int useHfp, int userSelection) override;
- 
+
 private:
+    int SetWearDetection(const std::string &deviceId, bool enable);
     static inline BrokerDelegator<BluetoothAudioManagerProxy> delegator_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
- 
+
 #endif  // OHOS_BLUETOOTH_AUDIOMANAGER_PROXY_H

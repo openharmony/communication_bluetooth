@@ -16,9 +16,8 @@
 #ifndef NAPI_BLUETOOTH_AUDIO_MANAGER_H
 #define NAPI_BLUETOOTH_AUDIO_MANAGER_H
 
-#include <vector>
-#include "bluetooth_a2dp_snk.h"
-#include "napi_bluetooth_a2dp_snk_observer.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -32,4 +31,4 @@ public:
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
-#endif /* NAPI_BLUETOOTH_AUDIO_MANAGER_H */
+#endif // NAPI_BLUETOOTH_AUDIO_MANAGER_H
