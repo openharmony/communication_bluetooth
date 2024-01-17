@@ -16,11 +16,8 @@
 #ifndef OHOS_BLUETOOTH_AUDIO_MANAGER_INTERFACE_H
 #define OHOS_BLUETOOTH_AUDIO_MANAGER_INTERFACE_H
 
-#include "bluetooth_service_ipc_interface_code.h"
-#include "parcel_bt_uuid.h"
-#include "i_bluetooth_ble_peripheral_observer.h"
-#include "i_bluetooth_host_observer.h"
-#include "i_bluetooth_remote_device_observer.h"
+#include <string>
+#include "../parcel/bluetooth_raw_address.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -30,9 +27,9 @@ class IBluetoothAudioManager : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAudioManager");
 
-    virtual int EnableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
-    virtual int DisableWearDetection(const std::string &deviceId, int32_t supportVal) = 0;
-    virtual int IsWearDetectionEnabled(const std::string &deviceId, int32_t &ability) = 0;
+    virtual int EnableWearDetection(const std::string &deviceId) = 0;
+    virtual int DisableWearDetection(const std::string &deviceId) = 0;
+    virtual int GetWearDetectionState(const std::string &deviceId, int32_t &ability) = 0;
     virtual int32_t IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported) = 0;
     virtual int32_t SendDeviceSelection(const BluetoothRawAddress &device,
         int useA2dp, int useHfp, int userSelection) = 0;
