@@ -461,11 +461,7 @@ int BleStopScan(int32_t scannerId)
         return OHOS_BT_STATUS_FAIL;
     }
 
-    int ret = bleCentralManager->StopScan();
-    if (ret != BT_NO_ERROR) {
-        HILOGE("fail, scannerId: %{public}d, ret: %{public}d", scannerId, ret);
-        return OHOS_BT_STATUS_FAIL;
-    }
+    bleCentralManager->StopScan();
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -848,11 +844,7 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
         HILOGE("SetConfigScanFilter fail, ble centra manager is null.");
         return OHOS_BT_STATUS_FAIL;
     }
-    int ret = bleCentralManager->ConfigScanFilter(scanFilters);
-    if (ret != BT_NO_ERROR) {
-        HILOGE("fail, scannerId: %{public}d, ret: %{public}d", scannerId, ret);
-        return OHOS_BT_STATUS_FAIL;
-    }
+    bleCentralManager->ConfigScanFilter(scanFilters);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -897,11 +889,7 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
     HILOGI("scanMode: %{public}d", configs->scanMode);
     BleScanSettings settings;
     settings.SetScanMode(configs->scanMode);
-    int ret = bleCentralManager->StartScan(settings);
-    if (ret != BT_NO_ERROR) {
-        HILOGE("fail, scannerId: %{public}d, ret: %{public}d", scannerId, ret);
-        return OHOS_BT_STATUS_FAIL;
-    }
+    bleCentralManager->StartScan(settings);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -1077,10 +1065,6 @@ int GetAdvHandle(int advId, int *advHandle)
         return OHOS_BT_STATUS_FAIL;
     }
     *advHandle = g_BleAdvertiser->GetAdvHandle(g_bleAdvCallbacks[advId]);
-    if (*advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
-        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, *advHandle);
-        return OHOS_BT_STATUS_FAIL;
-    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
