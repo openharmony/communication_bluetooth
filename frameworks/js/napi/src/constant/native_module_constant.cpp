@@ -28,11 +28,11 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOGI("-----Constant Init start------");
+    HILOGD("-----Constant Init start------");
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     NapiConstant::DefineJSConstant(env, exports);
-    HILOGI("-----Constant Init end------");
+    HILOGD("-----Constant Init end------");
     return exports;
 }
 EXTERN_C_END

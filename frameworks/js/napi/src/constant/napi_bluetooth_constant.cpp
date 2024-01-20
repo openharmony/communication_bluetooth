@@ -41,7 +41,6 @@ napi_value NapiConstant::DefineJSConstant(napi_env env, napi_value exports)
     ConstantPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
-    HILOGI("end");
     return exports;
 }
 
@@ -63,7 +62,6 @@ napi_value NapiConstant::ConstantPropertyValueInit(napi_env env, napi_value expo
         DECLARE_NAPI_PROPERTY("AccessAuthorization", accessAuthorizationObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    HILOGI("end");
     return exports;
 }
 

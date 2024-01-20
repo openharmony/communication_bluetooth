@@ -256,7 +256,6 @@ void DefineSystemBLEInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("unsubscribeBLEFound", SysUnsubscribeBLEFound),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
-    HILOGI("DefineSystemBLEInterface init");
 }
 
 static napi_value On(napi_env env, napi_callback_info info)

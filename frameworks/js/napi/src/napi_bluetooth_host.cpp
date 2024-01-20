@@ -37,7 +37,6 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", DeregisterHostObserver),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
-    HILOGI("end");
     return exports;
 }
 
@@ -96,13 +95,11 @@ napi_value PropertyValueInit(napi_env env, napi_value exports)
 
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    HILOGI("end");
     return exports;
 }
 
 napi_value ScanDutyInit(napi_env env)
 {
-    HILOGI("enter");
     napi_value scanDuty = nullptr;
     napi_create_object(env, &scanDuty);
     SetNamedPropertyByInteger(env, scanDuty, static_cast<int>(ScanDuty::SCAN_MODE_LOW_POWER), "SCAN_MODE_LOW_POWER");
@@ -114,7 +111,6 @@ napi_value ScanDutyInit(napi_env env)
 
 napi_value MatchModeInit(napi_env env)
 {
-    HILOGI("enter");
     napi_value matchMode = nullptr;
     napi_create_object(env, &matchMode);
     SetNamedPropertyByInteger(

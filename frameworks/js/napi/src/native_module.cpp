@@ -46,7 +46,7 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOGI("-----Init start------");
+    HILOGD("-----Init start------");
     napi_property_descriptor desc[] = {};
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -73,7 +73,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NapiBluetoothOpp::DefineOppJSClass(env);
     DefineSystemBLEInterface(env, exports);
 
-    HILOGI("-----Init end------");
+    HILOGD("-----Init end------");
     return exports;
 }
 EXTERN_C_END

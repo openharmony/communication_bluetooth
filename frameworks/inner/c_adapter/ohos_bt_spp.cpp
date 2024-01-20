@@ -45,7 +45,7 @@ namespace Bluetooth {
  */
 int SppServerCreate(BtCreateSocketPara *socketPara, const char *name, unsigned int len)
 {
-    HILOGI("start!");
+    HILOGD("start!");
     if (socketPara == nullptr) {
         HILOGI("socketPara is invalid!");
         return BT_SPP_INVALID_ID;

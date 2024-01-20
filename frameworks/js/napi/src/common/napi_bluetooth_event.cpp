@@ -21,7 +21,6 @@ namespace OHOS {
 namespace Bluetooth {
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
-    HILOGI("Enter bluetooth event notify");
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(asyncEvent->env_, &loop);
 
@@ -49,7 +48,6 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 if (napi_get_undefined(callbackInfo->env_, &undefined) == napi_ok) {
                     result = callbackInfo->packResult();
                     if (result != nullptr) {
-                        HILOGI("napi_call_function called");
                         napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE,
                             &result, &callResult);
                     }
@@ -151,7 +149,7 @@ napi_value NapiEvent::OnEvent(napi_env env, napi_callback_info info,
     UpdateCallbackInfo(callbackInfos, type);
     napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
     callbackInfos[type] = callbackInfo;
-    HILOGI("%{public}s is registered", type.c_str());
+    HILOGD("%{public}s is registered", type.c_str());
     return ret;
 }
 

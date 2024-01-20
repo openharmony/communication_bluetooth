@@ -133,7 +133,6 @@ napi_value NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env, napi_value expo
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_A2DP_SOURCE, napiProfile);
 #endif
-    HILOGI("finished");
     return exports;
 }
 
@@ -226,7 +225,6 @@ napi_value NapiA2dpSource::Disconnect(napi_env env, napi_callback_info info)
 
 napi_value PlayingStateInit(napi_env env)
 {
-    HILOGI("enter");
     napi_value playingState = nullptr;
     napi_create_object(env, &playingState);
     SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_NOT_PLAYING, "STATE_NOT_PLAYING");
@@ -236,7 +234,6 @@ napi_value PlayingStateInit(napi_env env)
 
 napi_value CodecTypeInit(napi_env env)
 {
-    HILOGI("enter");
     napi_value codecType = nullptr;
     napi_create_object(env, &codecType);
     SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_SBC, "CODEC_TYPE_SBC");
@@ -248,7 +245,6 @@ napi_value CodecTypeInit(napi_env env)
 
 napi_value CodecBitsPerSampleInit(napi_env env)
 {
-    HILOGI("enter");
     napi_value codecBitsPerSample = nullptr;
     napi_create_object(env, &codecBitsPerSample);
     SetNamedPropertyByInteger(env, codecBitsPerSample,
@@ -264,7 +260,6 @@ napi_value CodecBitsPerSampleInit(napi_env env)
 
 napi_value CodecChannelModeInit(napi_env env)
 {
-    HILOGI("enter");
     napi_value codecChannelMode = nullptr;
     napi_create_object(env, &codecChannelMode);
     SetNamedPropertyByInteger(env, codecChannelMode,
@@ -278,7 +273,6 @@ napi_value CodecChannelModeInit(napi_env env)
 
 napi_value CodecSampleRateInit(napi_env env)
 {
-    HILOGI("enter");
     napi_value codecSampleRate = nullptr;
     napi_create_object(env, &codecSampleRate);
     SetNamedPropertyByInteger(env, codecSampleRate,
@@ -313,7 +307,6 @@ napi_value NapiA2dpSource::A2dpPropertyValueInit(napi_env env, napi_value export
         DECLARE_NAPI_PROPERTY("CodecSampleRate", codecSampleRateObj),
     };
     napi_define_properties(env, exports, sizeof(exportProps) / sizeof(*exportProps), exportProps);
-    HILOGI("end");
     return exports;
 }
 

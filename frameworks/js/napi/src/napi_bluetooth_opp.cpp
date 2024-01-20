@@ -28,7 +28,6 @@ bool NapiBluetoothOpp::isRegistered_ = false;
 
 void NapiBluetoothOpp::DefineOppJSClass(napi_env env)
 {
-    HILOGI("NapiBluetoothOpp::DefineOppJSClass called");
     napi_value constructor;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", NapiBluetoothOpp::On),
@@ -49,7 +48,6 @@ void NapiBluetoothOpp::DefineOppJSClass(napi_env env)
     NapiProfile::SetProfile(env, ProfileId::PROFILE_OPP, napiProfile);
     Opp *profile = Opp::GetProfile();
     profile->RegisterObserver(observer_);
-    HILOGI("DefineOppJSClass finished");
 }
 
 napi_value NapiBluetoothOpp::OppConstructor(napi_env env, napi_callback_info info)

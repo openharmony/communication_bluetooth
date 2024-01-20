@@ -78,7 +78,6 @@ void NapiProfile::ProfileEnumInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ProfileId", profileIdObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    HILOGI("end");
 }
 
 napi_value NapiProfile::SppTypeInit(napi_env env)

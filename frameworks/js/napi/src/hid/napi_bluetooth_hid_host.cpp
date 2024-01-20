@@ -64,7 +64,6 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports
     HidHost *profile = HidHost::GetProfile();
     profile->RegisterObserver(observer_);
 #endif
-    HILOGI("finished");
 }
 
 napi_value NapiBluetoothHidHost::DefineCreateProfile(napi_env env, napi_value exports)

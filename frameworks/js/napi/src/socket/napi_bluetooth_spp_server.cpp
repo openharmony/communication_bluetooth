@@ -68,7 +68,6 @@ void SppPropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("SppType", sppTypeObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    HILOGI("end");
 }
 
 static napi_status CheckSppListenParams(
