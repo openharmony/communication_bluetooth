@@ -58,19 +58,19 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, BT_LOG_DOMAI
 
 #define HILOGD(fmt, ...)                 \
     HILOG_DEBUG(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGI(fmt, ...)                \
     HILOG_INFO(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGW(fmt, ...)                \
     HILOG_WARN(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGE(fmt, ...)                 \
     HILOG_ERROR(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGF(fmt, ...)                 \
     HILOG_FATAL(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #else
 
 #define HILOGF(...)
