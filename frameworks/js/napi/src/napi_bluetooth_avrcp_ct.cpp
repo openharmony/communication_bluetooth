@@ -42,7 +42,6 @@ void NapiAvrcpController::DefineAvrcpControllerJSClass(napi_env env)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_AVRCP_CT, napiProfile);
-    HILOGI("finished");
 }
 
 napi_value NapiAvrcpController::AvrcpControllerConstructor(napi_env env, napi_callback_info info)

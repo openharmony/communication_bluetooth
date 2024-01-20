@@ -56,21 +56,21 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, BT_LOG_DOMAI
 
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
-#define HILOGF(fmt, ...)                 \
-    (void)OHOS::HiviewDFX::HiLog::Fatal( \
-        LOG_LABEL, "[%{public}s(%{public}s:%{public}d)]" fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
-#define HILOGE(fmt, ...)                 \
-    (void)OHOS::HiviewDFX::HiLog::Error( \
-        LOG_LABEL, "[%{public}s(%{public}s:%{public}d)]" fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
-#define HILOGW(fmt, ...)                \
-    (void)OHOS::HiviewDFX::HiLog::Warn( \
-        LOG_LABEL, "[%{public}s(%{public}s:%{public}d)]" fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
-#define HILOGI(fmt, ...)                \
-    (void)OHOS::HiviewDFX::HiLog::Info( \
-        LOG_LABEL, "[%{public}s(%{public}s:%{public}d)]" fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGD(fmt, ...)                 \
-    (void)OHOS::HiviewDFX::HiLog::Debug( \
-        LOG_LABEL, "[%{public}s(%{public}s:%{public}d)]" fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+    HILOG_DEBUG(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define HILOGI(fmt, ...)                \
+    HILOG_INFO(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define HILOGW(fmt, ...)                \
+    HILOG_WARN(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define HILOGE(fmt, ...)                 \
+    HILOG_ERROR(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define HILOGF(fmt, ...)                 \
+    HILOG_FATAL(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #else
 
 #define HILOGF(...)

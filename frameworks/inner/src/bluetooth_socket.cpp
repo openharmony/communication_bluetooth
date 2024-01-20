@@ -85,7 +85,7 @@ struct ClientSocket::impl {
     {
         HILOGD("enter");
         if (socketStatus_ == SOCKET_CLOSED) {
-            HILOGW("The socketStatus_ is already SOCKET_CLOSED");
+            HILOGD("The socketStatus_ is already SOCKET_CLOSED");
             return;
         } else {
             socketStatus_ = SOCKET_CLOSED;
@@ -504,7 +504,6 @@ struct ServerSocket::impl {
     impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
     ~impl()
     {
-        HILOGI("enter");
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
@@ -681,7 +680,7 @@ struct ServerSocket::impl {
     {
         HILOGD("enter");
         if (socketStatus_ == SOCKET_CLOSED) {
-            HILOGW("The socketStatus_ is already SOCKET_CLOSED");
+            HILOGD("The socketStatus_ is already SOCKET_CLOSED");
             return;
         } else {
             socketStatus_ = SOCKET_CLOSED;
@@ -755,7 +754,7 @@ struct ServerSocket::impl {
 ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
     : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
 {
-    HILOGI("(4 parameters) starts");
+    HILOGD("(4 parameters) starts");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG(samgr, "samgr is nullptr.");
 
@@ -766,9 +765,7 @@ ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, 
     sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
     CHECK_AND_RETURN_LOG(remote, "failed: no remote");
 
-    HILOGI("remote obtained");
-
-   sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
     CHECK_AND_RETURN_LOG(proxy, "failed: no proxy");
     observer_ = new BluetoothServerSocketObserverStub();
 }
@@ -776,7 +773,7 @@ ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, 
 ServerSocket::ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
     : pimpl(new ServerSocket::impl(name, uuid, type, encrypt))
 {
-    HILOGI("type:%{public}d encrypt:%{public}d", type, encrypt);
+    HILOGD("type:%{public}d encrypt:%{public}d", type, encrypt);
 }
 
 ServerSocket::~ServerSocket()

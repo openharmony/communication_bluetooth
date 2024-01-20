@@ -714,7 +714,6 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
 #endif
     };
     napi_define_properties(env, exports, sizeof(exportProperties) / sizeof(*exportProperties), exportProperties);
-    HILOGI("end");
     return exports;
 }
 

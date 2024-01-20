@@ -372,7 +372,7 @@ bool IsBleEnabled()
     }
 
     bool ret = g_BluetoothHost->IsBleEnabled();
-    HILOGI("ble enable: %{public}d", ret);
+    HILOGD("ble enable: %{public}d", ret);
     return ret;
 }
 

@@ -47,7 +47,6 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
-    HILOGI("finished");
 }
 
 napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callback_info info)

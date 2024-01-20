@@ -36,7 +36,7 @@ bool BluetoothProxyManager::FreezeByRss(int32_t uid, bool isProxy)
 {
     HILOGD("FreezeByRss start. uid:%{public}d , isProxy:%{public}d", uid, isProxy);
     if (!IS_BLE_ENABLED()) {
-        HILOGE("bluetooth is off.");
+        HILOGD("bluetooth is off.");
         return false;
     }
     if (!GetBleCentralManagerProxy()) {
@@ -50,7 +50,7 @@ bool BluetoothProxyManager::ResetAllProxy()
 {
     HILOGI("ResetAllProxy start.");
     if (!IS_BLE_ENABLED()) {
-        HILOGE("bluetooth is off.");
+        HILOGD("bluetooth is off.");
         return false;
     }
     if (!GetBleCentralManagerProxy()) {

@@ -29,7 +29,6 @@ InputStream::~InputStream()
 
 ssize_t InputStream::Read(uint8_t *buf, size_t length)
 {
-    HILOGI("(2 parameters) starts");
     if (socketFd_ == -1) {
         HILOGE("socket closed");
         return -1;
@@ -37,7 +36,7 @@ ssize_t InputStream::Read(uint8_t *buf, size_t length)
 
     auto ret = recv(socketFd_, buf, length, MSG_NOSIGNAL);
 
-    HILOGE("ret:%{public}zd", ret);
+    HILOGD("ret:%{public}zd", ret);
 
     if (ret < 0) {
         HILOGE("socket exception! errno:%{public}d", errno);
