@@ -101,7 +101,7 @@ static bool GetSocketUuidPara(const BluetoothCreateSocketPara *socketPara, UUID 
  */
 int SocketServerCreate(const BluetoothCreateSocketPara *socketPara, const char *name)
 {
-    HILOGI("SocketServerCreate start!");
+    HILOGD("SocketServerCreate start!");
     if (!IS_BT_ENABLED()) {
         HILOGE("fail,BR is not TURN_ON");
         return BT_SOCKET_INVALID_ID;

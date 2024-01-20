@@ -596,7 +596,6 @@ int A2dpSource::OffloadStartPlaying(const BluetoothRemoteDevice &device, const s
 
 int A2dpSource::OffloadStopPlaying(const BluetoothRemoteDevice &device, const std::vector<int32_t> &sessionsId)
 {
-    HILOGI("enter, stop playing device:%{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
     CHECK_AND_RETURN_LOG_RET(device.GetDeviceAddr() != INVALID_MAC_ADDRESS, BT_ERR_INVALID_PARAM, "invaild mac");
     CHECK_AND_RETURN_LOG_RET(sessionsId.size() != 0, BT_ERR_INVALID_PARAM, "session size zero.");
@@ -609,7 +608,6 @@ int A2dpSource::OffloadStopPlaying(const BluetoothRemoteDevice &device, const st
 
 int A2dpSource::A2dpOffloadSessionRequest(const BluetoothRemoteDevice &device, const std::vector<A2dpStreamInfo> &info)
 {
-    HILOGI("enter, session request device:%{public}s", GET_ENCRYPT_ADDR(device));
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), A2DP_STREAM_ENCODE_UNKNOWN, "device err");
     CHECK_AND_RETURN_LOG_RET(device.GetDeviceAddr() != INVALID_MAC_ADDRESS, A2DP_STREAM_ENCODE_UNKNOWN, "invaild mac");
     CHECK_AND_RETURN_LOG_RET(info.size() != 0, A2DP_STREAM_ENCODE_SOFTWARE, "empty stream");

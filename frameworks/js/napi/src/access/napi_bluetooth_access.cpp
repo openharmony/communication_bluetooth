@@ -49,13 +49,11 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
 #endif
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
-    HILOGI("end");
     return exports;
 }
 
 void NapiAccess::RegisterAccessObserverToHost()
 {
-    HILOGI("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     host->RegisterObserver(g_bluetoothAccessObserver);
 }
@@ -92,7 +90,7 @@ napi_value NapiAccess::GetState(napi_env env, napi_callback_info info)
             status = static_cast<int32_t>(BluetoothState::STATE_TURNING_ON);
             break;
         case BTStateID::STATE_TURN_ON:
-            HILOGI("STATE_ON(2)");
+            HILOGD("STATE_ON(2)");
             status = static_cast<int32_t>(BluetoothState::STATE_ON);
             break;
         case BTStateID::STATE_TURNING_OFF:
@@ -129,7 +127,6 @@ napi_value NapiAccess::AccessPropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("BluetoothState", stateObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    HILOGI("end");
     return exports;
 }
 
