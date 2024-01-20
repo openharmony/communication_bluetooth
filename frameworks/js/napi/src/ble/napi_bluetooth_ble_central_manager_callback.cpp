@@ -39,7 +39,6 @@ struct SysBLEDeviceFoundCallbackData {
 void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env &env, napi_value &scanResultArray,
     bool isSysInterface = false)
 {
-    HILOGI("enter");
     napi_create_array(env, &scanResultArray);
     size_t count = 0;
     for (auto bleScanResult : results) {

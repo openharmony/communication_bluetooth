@@ -75,7 +75,6 @@ int BluetoothSocketProxy::Connect(ConnectSocketParam &param, int &fd)
 
 int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
 {
-    HILOGI("starts");
     fd = BT_INVALID_SOCKET_FD;
     MessageParcel data;
 

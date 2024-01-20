@@ -309,7 +309,7 @@ int BleCentralManager::StartScan()
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
-    HILOGI("StartScan without param, scannerId: %{public}d", pimpl->scannerId_);
+    HILOGD("StartScan without param, scannerId: %{public}d", pimpl->scannerId_);
     return proxy->StartScan(pimpl->scannerId_);
 }
 
