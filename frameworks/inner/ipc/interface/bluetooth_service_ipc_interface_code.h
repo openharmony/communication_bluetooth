@@ -330,14 +330,14 @@ enum BluetoothMapMseInterfaceCode {
     MSE_BUTT
 };
 
-enum class BluetoothOppObserverInterfaceCode {
-    COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED = MIN_TRANSACTION_ID + 0,
-    COMMAND_ON_TRANSFER_STATE_CHANGED,
+enum BluetoothOppObserverInterfaceCode {
+    OPP_ON_RECEIVE_INCOMING_FILE_CHANGED = MIN_TRANSACTION_ID + 0,
+    OPP_ON_TRANSFER_STATE_CHANGED,
     // The last code, if you want to add a new code, please add it before this
-    COMMAND_OPP_OBSERVER_BUTT
+    OPP_OBSERVER_BUTT
 };
 
-enum class BluetoothOppInterfaceCode {
+enum BluetoothOppInterfaceCode {
     COMMAND_SEND_FILE = MIN_TRANSACTION_ID + 0,
     COMMAND_SET_INCOMING_FILE_CONFIRMATION,
     COMMAND_GET_CURRENT_TRANSFER_INFORMATION,

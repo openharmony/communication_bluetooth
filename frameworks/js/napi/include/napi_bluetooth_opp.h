@@ -22,8 +22,10 @@ namespace OHOS {
 namespace Bluetooth {
 class NapiBluetoothOpp {
 public:
-    static void DefineOppJSClass(napi_env env);
+    static void DefineOppJSClass(napi_env env, napi_value exports);
     static napi_value OppConstructor(napi_env env, napi_callback_info info);
+    static napi_value DefineCreateProfile(napi_env env, napi_value exports);
+    static napi_value CreateOppServerProfile(napi_env env, napi_callback_info info);
 
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);

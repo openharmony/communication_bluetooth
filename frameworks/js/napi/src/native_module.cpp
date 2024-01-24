@@ -70,7 +70,6 @@ static napi_value Init(napi_env env, napi_value exports)
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
     NapiBluetoothHidHost::DefineHidHostJSClass(env, exports);
     NapiBluetoothPan::DefinePanJSClass(env, exports);
-    NapiBluetoothOpp::DefineOppJSClass(env);
     DefineSystemBLEInterface(env, exports);
 
     HILOGD("-----Init end------");

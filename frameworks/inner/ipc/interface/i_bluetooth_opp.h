@@ -31,15 +31,15 @@ class IBluetoothOpp : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothOpp");
 
-    virtual ErrCode SendFile(std::string &device, std::vector<std::string> &filePaths,
+    virtual int32_t SendFile(std::string &device, std::vector<std::string> &filePaths,
         std::vector<std::string> &mimeTypes, bool& result) = 0;
-    virtual ErrCode SetIncomingFileConfirmation(bool &accept, bool &result) = 0;
-    virtual ErrCode GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) = 0;
-    virtual ErrCode CancelTransfer(bool &result) = 0;
-    virtual ErrCode RegisterObserver(const sptr<IBluetoothOppObserver> observer) = 0;
-    virtual ErrCode DeregisterObserver(const sptr<IBluetoothOppObserver> observer) = 0;
-    virtual ErrCode GetDeviceState(const BluetoothRawAddress &device, int& result) = 0;
-    virtual ErrCode GetDevicesByStates(const std::vector<int32_t> &states,
+    virtual int32_t SetIncomingFileConfirmation(bool accept) = 0;
+    virtual int32_t GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) = 0;
+    virtual int32_t CancelTransfer(bool &result) = 0;
+    virtual void RegisterObserver(const sptr<IBluetoothOppObserver> &observer) = 0;
+    virtual void DeregisterObserver(const sptr<IBluetoothOppObserver> &observer) = 0;
+    virtual int32_t GetDeviceState(const BluetoothRawAddress &device, int& result) = 0;
+    virtual int32_t GetDevicesByStates(const std::vector<int32_t> &states,
         std::vector<BluetoothRawAddress>& result) = 0;
 };
 }  // namespace Bluetooth
