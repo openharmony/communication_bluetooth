@@ -16,6 +16,7 @@
 #ifndef NAPI_BLUETOOTH_OPP_OBSERVER_H
 #define NAPI_BLUETOOTH_OPP_OBSERVER_H
 
+#include <shared_mutex>
 #include "bluetooth_opp.h"
 #include "napi_bluetooth_utils.h"
 
@@ -32,6 +33,7 @@ public:
     void OnReceiveIncomingFileChanged(const BluetoothOppTransferInformation &transferInformation) override;
     void OnTransferStateChanged(const BluetoothOppTransferInformation &transferInformation) override;
 
+    static std::shared_mutex g_oppCallbackInfosMutex;
     std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };
 }  // namespace Bluetooth

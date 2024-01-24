@@ -15,6 +15,8 @@
 #ifndef OHOS_BLUETOOTH_BLUETOOTHOPPOBSERVERSTUB_H
 #define OHOS_BLUETOOTH_BLUETOOTHOPPOBSERVERSTUB_H
 
+#include <map>
+
 #include <iremote_stub.h>
 #include "i_bluetooth_opp_observer.h"
 
@@ -22,11 +24,21 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothOppObserverStub : public IRemoteStub<IBluetoothOppObserver> {
 public:
-    int OnRemoteRequest(
-        uint32_t code,
-        MessageParcel& data,
-        MessageParcel& reply,
-        MessageOption& option) override;
+    BluetoothOppObserverStub();
+    virtual ~BluetoothOppObserverStub();
+
+    int32_t OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
+private:
+    int32_t OnReceiveIncomingFileChangedInner(MessageParcel &data, MessageParcel &reply);
+    int32_t OnTransferStateChangedInner(MessageParcel &data, MessageParcel &reply);
+
+    using BluetoothOppObserverFunc = int32_t (BluetoothOppObserverStub::*)(
+        MessageParcel &data, MessageParcel &reply);
+    std::map<uint32_t, BluetoothOppObserverFunc> memberFuncMap_;
+
+    DISALLOW_COPY_AND_MOVE(BluetoothOppObserverStub);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

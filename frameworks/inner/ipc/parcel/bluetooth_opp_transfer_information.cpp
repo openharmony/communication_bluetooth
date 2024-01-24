@@ -126,6 +126,7 @@ bool BluetoothIOppTransferInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     SetTotalBytes(val64);
+
     return true;
 }
 

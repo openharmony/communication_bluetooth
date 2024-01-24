@@ -27,15 +27,15 @@ public:
     virtual ~BluetoothOppProxy()
     {}
 
-    ErrCode SendFile(std::string &device,
+    int32_t SendFile(std::string &device,
         std::vector<std::string> &filePaths, std::vector<std::string> &mimeTypes, bool& result) override;
-    ErrCode SetIncomingFileConfirmation(bool &accept, bool &result) override;
-    ErrCode GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) override;
-    ErrCode CancelTransfer(bool &result) override;
-    ErrCode RegisterObserver(const sptr<IBluetoothOppObserver> observer) override;
-    ErrCode DeregisterObserver(const sptr<IBluetoothOppObserver> observer) override;
-    ErrCode GetDeviceState(const BluetoothRawAddress &device, int& result) override;
-    ErrCode GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result) override;
+    int32_t SetIncomingFileConfirmation(bool accept) override;
+    int32_t GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) override;
+    int32_t CancelTransfer(bool &result) override;
+    void RegisterObserver(const sptr<IBluetoothOppObserver> &observer) override;
+    void DeregisterObserver(const sptr<IBluetoothOppObserver> &observer) override;
+    int32_t GetDeviceState(const BluetoothRawAddress &device, int& result) override;
+    int32_t GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result) override;
 
 private:
     static inline BrokerDelegator<BluetoothOppProxy> delegator_;

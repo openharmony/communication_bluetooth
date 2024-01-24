@@ -14,29 +14,25 @@
  */
 #include "bluetooth_opp_proxy.h"
 #include "bluetooth_log.h"
-#include "refbase.h"
+#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
-ErrCode BluetoothOppProxy::SendFile(std::string &device,
+int32_t BluetoothOppProxy::SendFile(std::string &device,
     std::vector<std::string> &filePaths, std::vector<std::string> &mimeTypes, bool& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::SendFile WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteString(device)) {
-        HILOGE("BluetoothOppProxy::SendFile write device error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device), BT_ERR_INTERNAL_ERROR, "Write device error");
+
     if (!WriteParcelableStringVector(filePaths, data)) {
         HILOGE("[SendFile] fail: write result failed");
-        return INVALID_DATA;
+        return BT_ERR_INTERNAL_ERROR;
     }
     if (!WriteParcelableStringVector(mimeTypes, data)) {
         HILOGE("[SendFile] fail: write result failed");
-        return INVALID_DATA;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
@@ -46,26 +42,20 @@ ErrCode BluetoothOppProxy::SendFile(std::string &device,
 
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SEND_FILE), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::SendFile done fail, error: %{public}d", error);
-        return error;
-    }
-
-    result = reply.ReadInt32() == NO_ERROR ? true : false;
-    return result;
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    int32_t ret = reply.ReadInt32();
+    CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
+    result = ret;
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothOppProxy::SetIncomingFileConfirmation(bool &accept, bool &result)
+int32_t BluetoothOppProxy::SetIncomingFileConfirmation(bool accept)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::SetIncomingFileConfirmation WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteBool(accept)) {
-        HILOGE("BluetoothOppProxy::SetIncomingFileConfirmation write bool error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(accept), BT_ERR_INTERNAL_ERROR,
+        "setIncomingFileConfirmation write bool error");
 
     MessageParcel reply;
     MessageOption option {
@@ -74,47 +64,33 @@ ErrCode BluetoothOppProxy::SetIncomingFileConfirmation(bool &accept, bool &resul
 
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SET_INCOMING_FILE_CONFIRMATION), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::GetDeviceState done fail, error: %{public}d", error);
-        return error;
-    }
-
-    result = reply.ReadInt32() == NO_ERROR ? true : false;
-    return result;
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return reply.ReadInt32();
 }
 
-ErrCode BluetoothOppProxy::GetCurrentTransferInformation(BluetoothIOppTransferInformation &oppInformation)
+int32_t BluetoothOppProxy::GetCurrentTransferInformation(BluetoothIOppTransferInformation &oppInformation)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::GetCurrentTransferInformation WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int error = Remote()->SendRequest(static_cast<uint32_t>(
         BluetoothOppInterfaceCode::COMMAND_GET_CURRENT_TRANSFER_INFORMATION), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::GetCurrentTransferInformation done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     std::unique_ptr<BluetoothIOppTransferInformation>
         oppInformation_(reply.ReadParcelable<BluetoothIOppTransferInformation>());
-    if (oppInformation_ == nullptr) {
-        return OBJECT_NULL;
-    }
+    CHECK_AND_RETURN_LOG_RET((oppInformation_ != nullptr), BT_ERR_DEVICE_DISCONNECTED, "oppInformation is nullptr");
     oppInformation = *oppInformation_;
-    return ERR_OK;
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothOppProxy::CancelTransfer(bool &result)
+int32_t BluetoothOppProxy::CancelTransfer(bool &result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::CancelTransfer WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
     MessageParcel reply;
     MessageOption option {
         MessageOption::TF_SYNC
@@ -122,26 +98,17 @@ ErrCode BluetoothOppProxy::CancelTransfer(bool &result)
 
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_CANCEL_TRANSFER), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::CancelTransfer done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
 
-    result = reply.ReadInt32() == NO_ERROR ? true : false;
-    return error;
+    result = reply.ReadInt32() == BT_NO_ERROR ? true : false;
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothOppProxy::RegisterObserver(const sptr<IBluetoothOppObserver> observer)
+void BluetoothOppProxy::RegisterObserver(const sptr<IBluetoothOppObserver> &observer)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::RegisterObserver WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothOppProxy::RegisterObserver error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteRemoteObject(observer->AsObject()), "Write object error");
 
     MessageParcel reply;
     MessageOption option {
@@ -150,24 +117,14 @@ ErrCode BluetoothOppProxy::RegisterObserver(const sptr<IBluetoothOppObserver> ob
 
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_REGISTER_OBSERVER), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::RegisterObserver done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
-    return error;
+    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
 }
 
-ErrCode BluetoothOppProxy::DeregisterObserver(const sptr<IBluetoothOppObserver> observer)
+void BluetoothOppProxy::DeregisterObserver(const sptr<IBluetoothOppObserver> &observer)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::DeregisterObserver WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothOppProxy::DeregisterObserver error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteRemoteObject(observer->AsObject()), "Write object error");
 
     MessageParcel reply;
     MessageOption option {
@@ -176,23 +133,17 @@ ErrCode BluetoothOppProxy::DeregisterObserver(const sptr<IBluetoothOppObserver> 
 
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_DEREGISTER_OBSERVER), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::DeregisterObserver done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
-    return error;
+    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
 }
 
-ErrCode BluetoothOppProxy::GetDeviceState(const BluetoothRawAddress &device, int& result)
+int32_t BluetoothOppProxy::GetDeviceState(const BluetoothRawAddress &device, int& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::GetDeviceState WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
     if (!data.WriteParcelable(&device)) {
         HILOGE("BluetoothOppProxy::GetDeviceState write device error");
-        return INVALID_DATA;
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
@@ -202,28 +153,23 @@ ErrCode BluetoothOppProxy::GetDeviceState(const BluetoothRawAddress &device, int
 
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICE_STATE), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::GetDeviceState done fail, error: %{public}d", error);
-        return error;
-    }
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
 
-    ErrCode ec = reply.ReadInt32();
+    int32_t ec = reply.ReadInt32();
     if (FAILED(ec)) {
         return ec;
     }
 
     result = reply.ReadInt32();
-    return ERR_OK;
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothOppProxy::GetDevicesByStates(
+int32_t BluetoothOppProxy::GetDevicesByStates(
     const std::vector<int32_t> &states, std::vector<BluetoothRawAddress>& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor())) {
-        HILOGE("BluetoothOppProxy::GetDevicesByStates WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
     if (!WriteParcelableInt32Vector(states, data)) {
         HILOGE("[GetDevicesByStates] fail: write result failed");
         return INVALID_DATA;
@@ -233,16 +179,13 @@ ErrCode BluetoothOppProxy::GetDevicesByStates(
     MessageOption option = {MessageOption::TF_SYNC};
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothOppProxy::GetDevicesByStates done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     int32_t rawAddsSize = reply.ReadInt32();
     for (int i = 0; i < rawAddsSize; i++) {
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
         result.push_back(*address);
     }
-    return ERR_OK;
+    return BT_NO_ERROR;
 }
 
 bool BluetoothOppProxy::WriteParcelableStringVector(const std::vector<std::string> &parcelableVector, Parcel &reply)
