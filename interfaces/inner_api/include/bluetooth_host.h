@@ -627,9 +627,7 @@ public:
 
     void LoadSystemAbilityFail();
 
-    void Init();
-
-    void Uinit();
+    void OnRemoveBluetoothSystemAbility();
 
     /**
      * @brief Get local profile uuids.
