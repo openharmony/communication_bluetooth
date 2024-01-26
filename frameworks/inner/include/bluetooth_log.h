@@ -16,9 +16,13 @@
 #ifndef BLUETOOTH_LOG_H
 #define BLUETOOTH_LOG_H
 
-#define CONFIG_HILOG
-#ifdef CONFIG_HILOG
 #include "hilog/log.h"
+
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD000101
+#ifndef LOG_TAG
+#define LOG_TAG "Bluetooth"
+#endif
 
 #ifdef HILOGF
 #undef HILOGF
@@ -40,20 +44,6 @@
 #undef HILOGD
 #endif
 
-#ifndef BT_LOG_DOMAIN
-#define BT_LOG_DOMAIN 0xD000101
-#endif
-
-#ifndef BT_LOG_TAG
-#define BT_LOG_TAG "Bluetooth"
-#endif
-
-#ifdef LOG_LABEL
-#undef LOG_LABEL
-#endif
-
-static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, BT_LOG_DOMAIN, BT_LOG_TAG};
-
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define HILOGD(fmt, ...)                 \
@@ -71,14 +61,6 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, BT_LOG_DOMAI
 #define HILOGF(fmt, ...)                 \
     HILOG_FATAL(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
         __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
-#else
-
-#define HILOGF(...)
-#define HILOGE(...)
-#define HILOGW(...)
-#define HILOGI(...)
-#define HILOGD(...)
-#endif  // CONFIG_HILOG
 
 #define CHECK_AND_RETURN_LOG(cond, fmt, ...)        \
     do {                                            \
