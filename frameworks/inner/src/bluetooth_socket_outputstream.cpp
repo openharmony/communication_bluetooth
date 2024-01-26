@@ -27,7 +27,7 @@ OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 OutputStream::~OutputStream()
 {}
 
-size_t OutputStream::Write(const uint8_t *buf, size_t length)
+int OutputStream::Write(const uint8_t *buf, size_t length)
 {
     if (socketFd_ == -1) {
         HILOGE("socket closed.");
@@ -39,6 +39,7 @@ size_t OutputStream::Write(const uint8_t *buf, size_t length)
 
     if (ret == -1) {
         HILOGE("Error.");
+        return -1;
     }
     return ret;
 }

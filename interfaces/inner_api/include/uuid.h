@@ -140,23 +140,24 @@ public:
         rand_r(&randNum);
         gettimeofday(&tv, &tz);
         localtime_r(&tv.tv_sec, &randomTime);
-
-        random.uuid_[15] = (uint8_t)(tv.tv_usec & 0x00000000000000FF);
-        random.uuid_[14] = (uint8_t)((tv.tv_usec & 0x000000000000FF00) >> 8);
-        random.uuid_[13] = (uint8_t)((tv.tv_usec & 0x0000000000FF0000) >> 16);
-        random.uuid_[12] = (uint8_t)((tv.tv_usec & 0x00000000FF000000) >> 24);
-        random.uuid_[10] = (uint8_t)((tv.tv_usec & 0x000000FF00000000) >> 32);
-        random.uuid_[9] = (uint8_t)((tv.tv_usec & 0x0000FF0000000000) >> 40);
-        random.uuid_[8] = (uint8_t)((tv.tv_usec & 0x00FF000000000000) >> 48);
-        random.uuid_[7] = (uint8_t)((tv.tv_usec & 0xFF00000000000000) >> 56);
-        random.uuid_[6] = (uint8_t)((randomTime.tm_sec + randNum) & 0xFF);
-        random.uuid_[5] = (uint8_t)((randomTime.tm_min + (randNum >> 8)) & 0xFF);
-        random.uuid_[4] = (uint8_t)((randomTime.tm_hour + (randNum >> 16)) & 0xFF);
-        random.uuid_[3] = (uint8_t)((randomTime.tm_mday + (randNum >> 24)) & 0xFF);
-        random.uuid_[2] = (uint8_t)(randomTime.tm_mon & 0xFF);
-        random.uuid_[1] = (uint8_t)(randomTime.tm_year & 0xFF);
-        random.uuid_[0] = (uint8_t)((randomTime.tm_year & 0xFF00) >> 8);
-
+        random.uuid_[15] = static_cast<uint8_t>(tv.tv_usec & 0x00000000000000FF); // 15是uuid的数组下标
+        random.uuid_[14] = static_cast<uint8_t>((tv.tv_usec & 0x000000000000FF00) >> 8); // 14是uuid的数组下标，右移8位
+        random.uuid_[13] = static_cast<uint8_t>((tv.tv_usec & 0x0000000000FF0000) >> 16); // 13是uuid的数组下标，右移16位
+        random.uuid_[12] = static_cast<uint8_t>((tv.tv_usec & 0x00000000FF000000) >> 24); // 12是uuid的数组下标，右移24位
+        random.uuid_[10] = static_cast<uint8_t>((tv.tv_usec & 0x000000FF00000000) >> 32); // 10是uuid的数组下标，右移32位
+        random.uuid_[9] = static_cast<uint8_t>((tv.tv_usec & 0x0000FF0000000000) >> 40); // 9是uuid的数组下标，右移40位
+        random.uuid_[8] = static_cast<uint8_t>((tv.tv_usec & 0x00FF000000000000) >> 48); // 8是uuid的数组下标，右移48位
+        random.uuid_[7] = static_cast<uint8_t>((tv.tv_usec & 0xFF00000000000000) >> 56); // 7是uuid的数组下标，右移56位
+        random.uuid_[6] = static_cast<uint8_t>((randomTime.tm_sec + randNum) & 0xFF); // 6是uuid的数组下标
+        // 5是uuid的数组下标，右移8位
+        random.uuid_[5] = static_cast<uint8_t>((randomTime.tm_min + (randNum >> 8)) & 0xFF);
+        // 4是uuid的数组下标，右移16位
+        random.uuid_[4] = static_cast<uint8_t>((randomTime.tm_hour + (randNum >> 16)) & 0xFF);
+        // 3是uuid的数组下标，右移24位
+        random.uuid_[3] = static_cast<uint8_t>((randomTime.tm_mday + (randNum >> 24)) & 0xFF);
+        random.uuid_[2] = static_cast<uint8_t>(randomTime.tm_mon & 0xFF); // 2是uuid的数组下标
+        random.uuid_[1] = static_cast<uint8_t>(randomTime.tm_year & 0xFF); // 1是uuid的数组下标
+        random.uuid_[0] = static_cast<uint8_t>((randomTime.tm_year & 0xFF00) >> 8); // 0是uuid的数组下标，右移8位
         return random;
     }
 
