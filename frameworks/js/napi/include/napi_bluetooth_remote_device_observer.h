@@ -36,7 +36,6 @@ public:
     void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override;
 
 private:
-    void DealPairStatus(const int &status, int &boneStatus);
     void UvQueueWorkOnPairStatusChanged(uv_work_t *work, std::pair<std::string, int> &data);
 };
 }  // namespace Bluetooth

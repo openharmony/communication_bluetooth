@@ -632,11 +632,11 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
     int pairState = PAIR_NONE;
     int32_t err = remoteDevice.GetPairState(pairState);
     int bondState = 0;
-    DealPairStates(pairState, bondState);
+    DealPairStatus(pairState, bondState);
     napi_value result = nullptr;
     NAPI_BT_ASSERT_RETURN(env, napi_create_int32(env, bondState, &result) == napi_ok, err, result);
     NAPI_BT_ASSERT_RETURN(env, err = BT_NO_ERROR, err, result);
-    HILOGE("getPairState :%{public}d", bondState);
+    HILOGI("getPairState :%{public}d", bondState);
     return result;
 }
 
@@ -796,6 +796,24 @@ void RegisterObserverToHost()
     BluetoothHost &host = BluetoothHost::GetDefaultHost();
     host.RegisterObserver(g_connectionObserver);
     host.RegisterRemoteDeviceObserver(g_remoteDeviceObserver);
+}
+
+void DealPairStatus(const int &status, int &bondStatus)
+{
+    HILOGI("status is %{public}d", status);
+    switch (status) {
+        case PAIR_NONE:
+            bondStatus = static_cast<int>(BondState::BOND_STATE_INVALID);
+            break;
+        case PAIR_PAIRING:
+            bondStatus = static_cast<int>(BondState::BOND_STATE_BONDING);
+            break;
+        case PAIR_PAIRED:
+            bondStatus = static_cast<int>(BondState::BOND_STATE_BONDED);
+            break;
+        default:
+            break;
+    }
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
