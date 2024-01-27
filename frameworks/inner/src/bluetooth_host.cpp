@@ -94,6 +94,19 @@ public:
         if (status == BTStateID::STATE_TURN_ON) {
             host_.SyncRandomAddrToService();
         }
+        if (status == BTStateID::STATE_TURN_OFF) {
+            if (transport == BTTransport::ADAPTER_BLE && preBleState_ == BTStateID::STATE_TURN_OFF) {
+                return;
+            }
+            if (transport == BTTransport::ADAPTER_BREDR && preBrState_ == BTStateID::STATE_TURN_OFF) {
+                return;
+            }
+        }
+        if (transport == BTTransport::ADAPTER_BREDR) {
+            preBrState_ = status;
+        } else {
+            preBleState_ = status;
+        }
         DelayedSingleton<BluetoothProfileManager>::GetInstance()->NotifyBluetoothStateChange(transport, status);
         host_.observers_.ForEach([transport, status](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnStateChanged(transport, status);
@@ -159,6 +172,9 @@ public:
 
 private:
     BluetoothHost::impl &host_;
+    const int32_t INVALID_STATE = -1;
+    int32_t preBrState_ = INVALID_STATE;
+    int32_t preBleState_ = INVALID_STATE;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHostObserverImp);
 };
 
@@ -937,6 +953,16 @@ bool BluetoothHost::IsBtProhibitedByEdm(void)
         return true;
     }
     return false;
+}
+
+void BluetoothHost::OnRemoveBluetoothSystemAbility()
+{
+    // Notify the upper layer that bluetooth is disabled.
+    if (pimpl->observerImp_ != nullptr && pimpl->bleObserverImp_ != nullptr) {
+        HILOGD("bluetooth_servi died and send state off to app");
+        pimpl->observerImp_->OnStateChanged(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
+        pimpl->bleObserverImp_->OnStateChanged(BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
+    }
 }
 } // namespace Bluetooth
 } // namespace OHOS
