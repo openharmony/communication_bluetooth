@@ -102,23 +102,5 @@ std::shared_ptr<NapiCallback> NapiBluetoothRemoteDeviceObserver::GetCallback(con
     }
     return nullptr;
 }
-
-void NapiBluetoothRemoteDeviceObserver::DealPairStatus(const int &status, int &bondStatus)
-{
-    HILOGI("status is %{public}d", status);
-    switch (status) {
-        case PAIR_NONE:
-            bondStatus = static_cast<int>(BondState::BOND_STATE_INVALID);
-            break;
-        case PAIR_PAIRING:
-            bondStatus = static_cast<int>(BondState::BOND_STATE_BONDING);
-            break;
-        case PAIR_PAIRED:
-            bondStatus = static_cast<int>(BondState::BOND_STATE_BONDED);
-            break;
-        default:
-            break;
-    }
-}
 }  // namespace Bluetooth
 }  // namespace OHOS
