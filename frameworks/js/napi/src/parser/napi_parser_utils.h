@@ -85,6 +85,7 @@ napi_status NapiParseObjectBoolean(napi_env env, napi_value object, const char *
 napi_status NapiParseObjectUuid(napi_env env, napi_value object, const char *name, std::string &outUuid);
 napi_status NapiParseObjectArrayBuffer(napi_env env, napi_value object, const char *name, std::vector<uint8_t> &outVec);
 napi_status NapiParseObjectBdAddr(napi_env env, napi_value object, const char *name, std::string &outAddr);
+napi_status NapiParseStringArray(napi_env env, napi_value value, std::vector<std::string> &outStrVec);
 napi_status NapiParseObjectInt32(napi_env env, napi_value object, const char *name, int32_t &outNum);
 napi_status NapiParseObjectUint32(napi_env env, napi_value object, const char *name, uint32_t &outNum);
 napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, const char *name,

@@ -307,6 +307,23 @@ napi_status NapiParseString(napi_env env, napi_value value, std::string &outStr)
     return napi_ok;
 }
 
+napi_status NapiParseStringArray(napi_env env, napi_value value, std::vector<std::string> &outStrVec)
+{
+    NAPI_BT_CALL_RETURN(NapiIsArray(env, value));
+    uint32_t length = 0;
+    std::string param {};
+    std::vector<std::string> strVec {};
+    napi_get_array_length(env, value, &length);
+    for (size_t i = 0; i < length; i++) {
+        napi_value result;
+        napi_get_element(env, value, i, &result);
+        NAPI_BT_CALL_RETURN(NapiParseString(env, result, param));
+        strVec.push_back(param);
+    }
+    outStrVec = std::move(strVec);
+    return napi_ok;
+}
+
 napi_status NapiParseBdAddr(napi_env env, napi_value value, std::string &outAddr)
 {
     std::string bdaddr {};
