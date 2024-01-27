@@ -313,30 +313,49 @@ public:
     /**
      * @brief Send File.
      *
-     * @return Return a bool value to confirm whether the file is successfully sent.
+     * @return Return operate result to confirm whether the file is successfully sent.
      */
-    bool SendFile(std::string device, std::vector<std::string>filePaths, std::vector<std::string>mimeTypes);
+    int32_t SendFile(std::string device, std::vector<std::string> filePaths,
+        std::vector<std::string> mimeTypes, bool& result);
 
     /**
      * @brief Set Incoming File Confirmation.
      *
-     * @return Return a bool value to confirm whether the setting is successful.
+     * @return Return operate result to confirm whether the setting is successful.
      */
-    bool SetIncomingFileConfirmation(bool accept);
+    int32_t SetIncomingFileConfirmation(bool accept);
 
     /**
      * @brief Get Current Transfer Information.
      *
-     * @return Return OppTransferInformation Object.
+     * @return Return operate result to getCurrentTransferInformation.
      */
-    BluetoothOppTransferInformation GetCurrentTransferInformation();
+    int32_t GetCurrentTransferInformation(BluetoothOppTransferInformation &transferInformation);
 
      /**
      * @brief Cancel Transfer.
      *
-     * @return Return a bool value to confirm whether the cancellation is set successfully.
+     * @return Return operate result to confirm whether the cancellation is set successfully.
      */
-    bool CancelTransfer();
+    int32_t CancelTransfer(bool& result);
+
+    /**
+     * @brief Get remote opp device list which are in the specified states.
+     *
+     * @param states List of remote device states.
+     * @param result the list of devices
+     * @return Returns operate result.
+     */
+    int32_t GetDevicesByStates(const std::vector<int32_t> &states, std::vector<BluetoothRemoteDevice> &result) const;
+
+    /**
+     * @brief Get the connection state of the specified remote opp device.
+     *
+     * @param device Remote device object.
+     * @param result the connection state of the remote device
+     * @return Returns operate result.
+     */
+    int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &result) const;
 
     /**
      * @brief Register Opp observer instance.
@@ -351,22 +370,6 @@ public:
      * @param observer Opp observer instance.
      */
     void DeregisterObserver(std::shared_ptr<OppObserver> observer);
-
-    /**
-     * @brief Get remote Opp device list which are in the specified states.
-     *
-     * @param states List of remote device states.
-     * @return Returns the list of devices.
-     */
-    std::vector<BluetoothRemoteDevice> GetDevicesByStates(std::vector<int> states);
-
-    /**
-     * @brief Get the connection state of the specified remote Opp device.
-     *
-     * @param device Remote device object.
-     * @return Returns the connection state of the remote device.
-     */
-    int GetDeviceState(const BluetoothRemoteDevice &device);
 
     /**
      * @brief The external process calls the Opp profile interface before the Bluetooth process starts. At this

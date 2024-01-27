@@ -101,7 +101,7 @@ napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
-void ConvertOppTransferInformationToJS(napi_env env,
+napi_status ConvertOppTransferInformationToJS(napi_env env,
     napi_value result, BluetoothOppTransferInformation& transferInformation);
 
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
@@ -149,7 +149,7 @@ struct PairConfirmedCallBackInfo {
 };
 
 struct TransforInformationCallbackInfo : public BluetoothCallbackInfo {
-    BluetoothOppTransferInformation information_;
+    std::shared_ptr<BluetoothOppTransferInformation> information_;
 };
 
 namespace {

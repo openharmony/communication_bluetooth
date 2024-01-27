@@ -30,8 +30,8 @@ class IBluetoothOppObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothOppObserver");
 
-    virtual ErrCode OnReceiveIncomingFileChanged(const BluetoothIOppTransferInformation &transferInformation) = 0;
-    virtual ErrCode OnTransferStateChanged(const BluetoothIOppTransferInformation &transferInformation) = 0;
+    virtual void OnReceiveIncomingFileChanged(const BluetoothIOppTransferInformation &transferInformation) = 0;
+    virtual void OnTransferStateChanged(const BluetoothIOppTransferInformation &transferInformation) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

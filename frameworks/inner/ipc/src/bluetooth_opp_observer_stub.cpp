@@ -12,49 +12,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "bluetooth_errorcode.h"
 #include "bluetooth_opp_observer_stub.h"
 #include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
-int BluetoothOppObserverStub::OnRemoteRequest(
-    uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
+
+BluetoothOppObserverStub::BluetoothOppObserverStub()
 {
-    HILOGI("BluetoothOppObserverStub OnRemoteRequest start");
-    switch (code) {
-        case static_cast<uint32_t>(BluetoothOppObserverInterfaceCode::COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED): {
-            if (BluetoothOppObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
-                HILOGE("local descriptor is not equal to remote");
-                return IPC_INVOKER_TRANSLATE_ERR;
-            }
-            std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
-                data.ReadParcelable<BluetoothIOppTransferInformation>());
-            if (oppInformation == nullptr) {
-                return ERR_NULL_OBJECT;
-            }
-            OnReceiveIncomingFileChanged(*oppInformation);
-            HILOGE("BluetoothOppObserverInterfaceCode::COMMAND_ON_RECEIVE_INCOMING_FILE_CHANGED end");
-            return NO_ERROR;
-        }
-        case static_cast<uint32_t>(BluetoothOppObserverInterfaceCode::COMMAND_ON_TRANSFER_STATE_CHANGED): {
-            if (BluetoothOppObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
-                HILOGE("local descriptor is not equal to remote");
-                return IPC_INVOKER_TRANSLATE_ERR;
-            }
-            std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
-                data.ReadParcelable<BluetoothIOppTransferInformation>());
-            if (oppInformation == nullptr) {
-                return ERR_NULL_OBJECT;
-            }
-            OnTransferStateChanged(*oppInformation);
-            HILOGE("BluetoothOppObserverInterfaceCode::COMMAND_ON_TRANSFER_STATE_CHANGED end");
-            return NO_ERROR;
-        }
-        default:
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    HILOGI("start.");
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothOppObserverInterfaceCode::OPP_ON_RECEIVE_INCOMING_FILE_CHANGED)] =
+        &BluetoothOppObserverStub::OnReceiveIncomingFileChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothOppObserverInterfaceCode::OPP_ON_TRANSFER_STATE_CHANGED)] =
+        &BluetoothOppObserverStub::OnTransferStateChangedInner;
+}
+
+BluetoothOppObserverStub::~BluetoothOppObserverStub()
+{
+    HILOGI("start.");
+    memberFuncMap_.clear();
+}
+
+int32_t BluetoothOppObserverStub::OnRemoteRequest(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    HILOGD("cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    if (BluetoothOppObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
+        HILOGI("local descriptor is not equal to remote");
+        return ERR_INVALID_STATE;
     }
 
-    return ERR_TRANSACTION_FAILED;
+    auto itFunc = memberFuncMap_.find(code);
+    if (itFunc != memberFuncMap_.end()) {
+        auto memberFunc = itFunc->second;
+        if (memberFunc != nullptr) {
+            return (this->*memberFunc)(data, reply);
+        }
+    }
+    HILOGW("OnRemoteRequest, default case, need check.");
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+}
+
+int32_t BluetoothOppObserverStub::OnReceiveIncomingFileChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    HILOGD("Enter.");
+    std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
+        data.ReadParcelable<BluetoothIOppTransferInformation>());
+    CHECK_AND_RETURN_LOG_RET((oppInformation != nullptr), BT_ERR_INTERNAL_ERROR, "Read oppInformation error");
+    OnReceiveIncomingFileChanged(*oppInformation);
+    return BT_NO_ERROR;
+}
+
+int32_t BluetoothOppObserverStub::OnTransferStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    HILOGD("Enter.");
+    std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
+        data.ReadParcelable<BluetoothIOppTransferInformation>());
+    CHECK_AND_RETURN_LOG_RET((oppInformation != nullptr), BT_ERR_INTERNAL_ERROR, "Read oppInformation error");
+    OnTransferStateChanged(*oppInformation);
+    return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

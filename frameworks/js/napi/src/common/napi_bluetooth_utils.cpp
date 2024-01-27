@@ -132,7 +132,7 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
     return true;
 }
 
-void ConvertOppTransferInformationToJS(napi_env env, napi_value result,
+napi_status ConvertOppTransferInformationToJS(napi_env env, napi_value result,
     BluetoothOppTransferInformation& transferInformation)
 {
     HILOGI("ConvertOppTransferInformationToJS called");
@@ -183,6 +183,8 @@ void ConvertOppTransferInformationToJS(napi_env env, napi_value result,
     napi_value totalBytes;
     napi_create_int64(env, transferInformation.GetTotalBytes(), &totalBytes);
     napi_set_named_property(env, result, "totalBytes", totalBytes);
+
+    return napi_ok;
 }
 
 napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string>& stringVector)
