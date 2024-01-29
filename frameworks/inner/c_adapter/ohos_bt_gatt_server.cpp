@@ -385,7 +385,7 @@ public:
         writeInfo.attrHandle = attribute->handle;
         writeInfo.offset = 0;
         writeInfo.value = characteristic.GetValue(&length).get();
-        writeInfo.length = length;
+        writeInfo.length = static_cast<int>(length);
         writeInfo.needRsp = (characteristic.GetWriteType() == GattCharacteristic::WriteType::DEFAULT);
         writeInfo.isPrep = false;
         HILOGD("connId: %{public}d, requestId: %{public}d, valueLen: %{public}d, %{public}s",
@@ -461,7 +461,7 @@ public:
         writeInfo.attrHandle = attribute->handle;
         writeInfo.offset = 0;
         writeInfo.value = descriptor.GetValue(&length).get();
-        writeInfo.length = length;
+        writeInfo.length = static_cast<int>(length);
         writeInfo.needRsp = true;
         writeInfo.isPrep = false;
 

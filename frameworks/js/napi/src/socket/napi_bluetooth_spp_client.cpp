@@ -244,7 +244,7 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_FALSE(env, clientMap[id] > 0, BT_ERR_INTERNAL_ERROR);
     OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
     while (totalSize) {
-        int result = outputStream.Write(totalBuf, totalSize);
+        unsigned int result = outputStream.Write(totalBuf, totalSize);
         NAPI_BT_ASSERT_RETURN_FALSE(env, result > 0, BT_ERR_SPP_IO);
         totalSize = totalSize - result;
         totalBuf += result;
