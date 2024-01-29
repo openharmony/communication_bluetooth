@@ -76,7 +76,7 @@ struct ServerResponse {
             value = nullptr;
         }
 
-        length = len;
+        length = static_cast<int>(len);
         value = values;
     }
 };
