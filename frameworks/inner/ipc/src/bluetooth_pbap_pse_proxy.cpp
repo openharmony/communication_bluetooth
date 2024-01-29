@@ -22,20 +22,16 @@ namespace Bluetooth {
 const int32_t PBAP_PSE_READ_DEVICE_MAX_SIZE = 0x100;
 int32_t BluetoothPbapPseProxy::GetDeviceState(const BluetoothRawAddress &device, int32_t &state)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_DEVICE_STATE, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_DEVICE_STATE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t ret = reply.ReadInt32();
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
@@ -46,29 +42,26 @@ int32_t BluetoothPbapPseProxy::GetDeviceState(const BluetoothRawAddress &device,
 int32_t BluetoothPbapPseProxy::GetDevicesByStates(
     const std::vector<int32_t> &states, std::vector<BluetoothRawAddress> &rawDevices)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteInt32Vector(states), BT_ERR_INTERNAL_ERROR, "WriteInt32Vector error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32Vector(states), BT_ERR_IPC_TRANS_FAILED, "WriteInt32Vector error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_DEVICES_BY_STATES, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_DEVICES_BY_STATES,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t ret = reply.ReadInt32();
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
     int32_t devNum = reply.ReadInt32();
     CHECK_AND_RETURN_LOG_RET((devNum >= 0 && devNum < PBAP_PSE_READ_DEVICE_MAX_SIZE),
-        BT_ERR_INTERNAL_ERROR, "Invalid devNum: %{public}d", devNum);
+        BT_ERR_IPC_TRANS_FAILED, "Invalid devNum: %{public}d", devNum);
 
     for (int32_t i = 0; i < devNum; i++) {
         std::shared_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
-        CHECK_AND_RETURN_LOG_RET((address != nullptr), BT_ERR_INTERNAL_ERROR, "address is nullptr");
+        CHECK_AND_RETURN_LOG_RET((address != nullptr), BT_ERR_IPC_TRANS_FAILED, "address is nullptr");
         rawDevices.push_back(*address);
     }
     return BT_NO_ERROR;
@@ -76,59 +69,49 @@ int32_t BluetoothPbapPseProxy::GetDevicesByStates(
 
 int32_t BluetoothPbapPseProxy::Disconnect(const BluetoothRawAddress &device)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_DISCONNECT, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_DISCONNECT,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int32_t BluetoothPbapPseProxy::SetConnectionStrategy(const BluetoothRawAddress &device, int32_t strategy)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(strategy), BT_ERR_INTERNAL_ERROR, "Write strategy error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "Write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(strategy), BT_ERR_IPC_TRANS_FAILED, "Write strategy error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_CONNECTION_STRATEGY, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_CONNECTION_STRATEGY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int32_t BluetoothPbapPseProxy::GetConnectionStrategy(const BluetoothRawAddress &device, int32_t &strategy)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "Write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_CONNECTION_STRATEGY, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_CONNECTION_STRATEGY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t ret = reply.ReadInt32();
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
@@ -138,40 +121,33 @@ int32_t BluetoothPbapPseProxy::GetConnectionStrategy(const BluetoothRawAddress &
 
 int32_t BluetoothPbapPseProxy::SetShareType(const BluetoothRawAddress &device, int32_t shareType)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(shareType), BT_ERR_INTERNAL_ERROR, "Write shareType error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "Write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(shareType), BT_ERR_IPC_TRANS_FAILED, "Write shareType error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_SHARE_TYPE, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_SHARE_TYPE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int32_t BluetoothPbapPseProxy::GetShareType(const BluetoothRawAddress &device, int32_t &shareType)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "Write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_SHARE_TYPE, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_SHARE_TYPE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t ret = reply.ReadInt32();
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
@@ -182,42 +158,35 @@ int32_t BluetoothPbapPseProxy::GetShareType(const BluetoothRawAddress &device, i
 int32_t BluetoothPbapPseProxy::SetPhoneBookAccessAuthorization(const BluetoothRawAddress &device,
     int32_t accessAuthorization)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "Write device error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(accessAuthorization),
-        BT_ERR_INTERNAL_ERROR, "Write accessAuthorization error");
+        BT_ERR_IPC_TRANS_FAILED, "Write accessAuthorization error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_ACCESS_AUTHORIZATION, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_SET_ACCESS_AUTHORIZATION,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int32_t BluetoothPbapPseProxy::GetPhoneBookAccessAuthorization(const BluetoothRawAddress &device,
     int32_t &accessAuthorization)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "Write device error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "Write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_ACCESS_AUTHORIZATION, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothPbapPseInterfaceCode::PBAP_PSE_GET_ACCESS_AUTHORIZATION,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t ret = reply.ReadInt32();
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
@@ -227,34 +196,26 @@ int32_t BluetoothPbapPseProxy::GetPhoneBookAccessAuthorization(const BluetoothRa
 
 void BluetoothPbapPseProxy::RegisterObserver(const sptr<IBluetoothPbapPseObserver> &observer)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()), "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG(data.WriteRemoteObject(observer->AsObject()), "Write object error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_REGISTER_OBSERVER, data, reply, option);
-    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN(BluetoothPbapPseInterfaceCode::PBAP_PSE_REGISTER_OBSERVER, data, reply, option);
 }
 
 void BluetoothPbapPseProxy::DeregisterObserver(const sptr<IBluetoothPbapPseObserver> &observer)
 {
-    HILOGD("Enter!");
     MessageParcel data;
     CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothPbapPseProxy::GetDescriptor()), "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG(data.WriteRemoteObject(observer->AsObject()), "Write object error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int32_t error = Remote()->SendRequest(
-        BluetoothPbapPseInterfaceCode::PBAP_PSE_DEREGISTER_OBSERVER, data, reply, option);
-    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN(BluetoothPbapPseInterfaceCode::PBAP_PSE_DEREGISTER_OBSERVER, data, reply, option);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
