@@ -200,7 +200,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetCapabilitiesInner(MessageParcel &data
         return BT_ERR_INVALID_PARAM;
     }
     for (int i = 0; i < eventsSize; i++) {
-        uint8_t event = data.ReadInt32();
+        uint8_t event = static_cast<uint8_t>(data.ReadInt32());
         events.push_back(event);
     }
 
@@ -220,7 +220,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingAttributesInner(Messa
         return BT_ERR_INVALID_PARAM;
     }
     for (int i = 0; i < attributesSize; i++) {
-        uint8_t attrbute = data.ReadInt32();
+        uint8_t attrbute = static_cast<uint8_t>(data.ReadInt32());
         attributes.push_back(attrbute);
     }
 
@@ -241,7 +241,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingValuesInner(MessagePa
         return BT_ERR_INVALID_PARAM;
     }
     for (int i = 0; i < valuesSize; i++) {
-        uint8_t value = data.ReadInt32();
+        uint8_t value = static_cast<uint8_t>(data.ReadInt32());
         values.push_back(value);
     }
     int result = data.ReadInt32();
@@ -259,7 +259,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingCurrentValueInner(Mes
         return BT_ERR_INVALID_PARAM;
     }
     for (int i = 0; i < attrbutesSize; i++) {
-        uint8_t attrbute = data.ReadInt32();
+        uint8_t attrbute = static_cast<uint8_t>(data.ReadInt32());
         attrbutes.push_back(attrbute);
     }
 
@@ -269,7 +269,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingCurrentValueInner(Mes
         return BT_ERR_INVALID_PARAM;
     }
     for (int i = 0; i < valuesSize; i++) {
-        uint8_t value = data.ReadInt32();
+        uint8_t value = static_cast<uint8_t>(data.ReadInt32());
         values.push_back(value);
     }
     int result = data.ReadInt32();
@@ -296,7 +296,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingAttributeTextInner(Me
         return BT_ERR_INVALID_PARAM;
     }
     for (int i = 0; i < attrbutesSize; i++) {
-        uint8_t attrbute = data.ReadInt32();
+        uint8_t attrbute = static_cast<uint8_t>(data.ReadInt32());
         attrbutes.push_back(attrbute);
     }
 
@@ -325,7 +325,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayerAppSettingValueTextInner(Messag
         return BT_ERR_INVALID_PARAM;
     }
     for (int i = 0; i < valuesSize; i++) {
-        uint8_t attrbute = data.ReadInt32();
+        uint8_t attrbute = static_cast<uint8_t>(data.ReadInt32());
         values.push_back(attrbute);
     }
 
@@ -379,7 +379,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetPlayStatusInner(MessageParcel &data, 
     std::string addr = data.ReadString();
     uint32_t songLength = data.ReadUint32();
     uint32_t songPosition = data.ReadUint32();
-    uint8_t playStatus = data.ReadInt32();
+    uint8_t playStatus = static_cast<uint8_t>(data.ReadInt32());
 
     int result = data.ReadInt32();
 
@@ -400,7 +400,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnPlayItemInner(MessageParcel &data, Messa
 ErrCode BluetoothAvrcpCtObserverStub::OnGetTotalNumberOfItemsInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint16_t uidCounter = data.ReadInt32();
+    uint16_t uidCounter = static_cast<uint16_t>(data.ReadInt32());
     uint32_t numOfItems = data.ReadUint32();
     int result = data.ReadInt32();
     int detail = data.ReadInt32();
@@ -442,7 +442,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetItemAttributesInner(MessageParcel &da
 ErrCode BluetoothAvrcpCtObserverStub::OnSetAbsoluteVolumeInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint8_t volume = data.ReadInt32();
+    uint8_t volume = static_cast<uint8_t>(data.ReadInt32());
     int result = data.ReadInt32();
 
     OnSetAbsoluteVolume(RawAddress(addr), volume, result);
@@ -452,7 +452,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnSetAbsoluteVolumeInner(MessageParcel &da
 ErrCode BluetoothAvrcpCtObserverStub::OnPlaybackStatusChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint8_t playStatus = data.ReadInt32();
+    uint8_t playStatus = static_cast<uint8_t>(data.ReadInt32());
     int result = data.ReadInt32();
 
     OnPlaybackStatusChanged(RawAddress(addr), playStatus, result);
@@ -547,8 +547,8 @@ ErrCode BluetoothAvrcpCtObserverStub::OnAvailablePlayersChangedInner(MessageParc
 ErrCode BluetoothAvrcpCtObserverStub::OnAddressedPlayerChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint16_t playerId = data.ReadInt32();
-    uint16_t uidCounter = data.ReadInt32();
+    uint16_t playerId = static_cast<uint16_t>(data.ReadInt32());
+    uint16_t uidCounter = static_cast<uint16_t>(data.ReadInt32());
     int result = data.ReadInt32();
     OnAddressedPlayerChanged(RawAddress(addr), playerId, uidCounter, result);
     return NO_ERROR;
@@ -557,7 +557,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnAddressedPlayerChangedInner(MessageParce
 ErrCode BluetoothAvrcpCtObserverStub::OnUidChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint16_t uidCounter = data.ReadInt32();
+    uint16_t uidCounter = static_cast<uint16_t>(data.ReadInt32());
     int result = data.ReadInt32();
     OnUidChanged(RawAddress(addr), uidCounter, result);
     return NO_ERROR;
@@ -566,7 +566,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnUidChangedInner(MessageParcel &data, Mes
 ErrCode BluetoothAvrcpCtObserverStub::OnVolumeChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint8_t volume = data.ReadInt32();
+    uint8_t volume = static_cast<uint8_t>(data.ReadInt32());
     int result = data.ReadInt32();
     OnVolumeChanged(RawAddress(addr), volume, result);
     return NO_ERROR;
@@ -575,7 +575,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnVolumeChangedInner(MessageParcel &data, 
 ErrCode BluetoothAvrcpCtObserverStub::OnGetMediaPlayersInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint16_t uidCounter = data.ReadInt32();
+    uint16_t uidCounter = static_cast<uint16_t>(data.ReadInt32());
 
     std::vector<BluetoothAvrcpMpItem> items {};
     int32_t itemsSize = data.ReadInt32();
@@ -598,7 +598,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnGetMediaPlayersInner(MessageParcel &data
 ErrCode BluetoothAvrcpCtObserverStub::OnGetFolderItemsInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    uint8_t uidCounter = data.ReadInt32();
+    uint8_t uidCounter = static_cast<uint8_t>(data.ReadInt32());
 
     std::vector<BluetoothAvrcpMeItem> items {};
     int32_t itemsSize = data.ReadInt32();

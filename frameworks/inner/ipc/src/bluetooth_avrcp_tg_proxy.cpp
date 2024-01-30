@@ -169,7 +169,7 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgProxy::GetDevicesByStates(const
         HILOGE("BluetoothAvrcpTgProxy::GetConnectedDevices WriteInterfaceToken error");
         return vec;
     }
-    int num = states.size();
+    int num = static_cast<int>(states.size());
     if (!data.WriteInt32(num)) {
         HILOGE("BluetoothAvrcpTgProxy::GetDevicesByStates num error");
         return vec;
@@ -354,7 +354,7 @@ void BluetoothAvrcpTgProxy::NotifyPlayerAppSettingChanged(const std::vector<int3
         HILOGE("BluetoothAvrcpTgProxy::NotifyPlayerAppSettingChanged WriteInterfaceToken error");
         return;
     }
-    int attributesNum = attributes.size();
+    int attributesNum = static_cast<int>(attributes.size());
     if (!data.WriteInt32(attributesNum)) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyPlayerAppSettingChanged attributesNum error");
         return;
@@ -366,7 +366,7 @@ void BluetoothAvrcpTgProxy::NotifyPlayerAppSettingChanged(const std::vector<int3
         }
     }
 
-    int valuesNum = values.size();
+    int valuesNum = static_cast<int>(values.size());
     if (!data.WriteInt32(valuesNum)) {
         HILOGE("BluetoothAvrcpTgProxy::NotifyPlayerAppSettingChanged valuesNum error");
         return;
