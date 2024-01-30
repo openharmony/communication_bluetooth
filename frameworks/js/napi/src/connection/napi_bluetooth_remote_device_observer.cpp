@@ -31,7 +31,10 @@ void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
 {
     std::shared_ptr<NapiCallback> napiPairStatusChangeCallback = GetCallback(REGISTER_BOND_STATE_TYPE);
-    CHECK_AND_RETURN_LOG(napiPairStatusChangeCallback, "PairStatusChangeCallback is not registered");
+    if (!napiPairStatusChangeCallback) {
+        HILOGD("PairStatusChangeCallback is not registered");
+        return;
+    }
 
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
