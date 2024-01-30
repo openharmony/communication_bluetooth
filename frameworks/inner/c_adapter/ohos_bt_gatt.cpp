@@ -1347,6 +1347,18 @@ int RemoveLpDeviceParam(BtUuid uuid)
     return OHOS_BT_STATUS_SUCCESS;
 }
 
+void ClearGlobalResource(void)
+{
+    int i = 0;
+    lock_guard<mutex> lock(g_advMutex);
+    for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
+        if (g_bleAdvCallbacks[i] != nullptr) {
+            g_bleAdvCallbacks[i] = nullptr;
+        }
+    }
+    HILOGD("clear all g_bleAdvCallbacks when ble turn on or bluetooth_serivce unload");
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #ifdef __cplusplus
