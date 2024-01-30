@@ -84,7 +84,7 @@ struct DiscoverInfomation {
 
 struct RequestInformation {
     bool doing_;
-    uint8_t type_;
+    uint8_t type_ = 0;
     union {
         GattCharacteristic *characteristic_;
         GattDescriptor *descriptor_;

@@ -71,7 +71,7 @@ public:
      *         Returns <b> -1 </b> operation failed.
      * @since 6
      */
-    size_t Write(const uint8_t *buf, size_t length);
+    int Write(const uint8_t *buf, size_t length);
 
 private:
     int socketFd_;
