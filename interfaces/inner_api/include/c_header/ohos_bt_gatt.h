@@ -932,6 +932,12 @@ int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam);
  */
 int RemoveLpDeviceParam(BtUuid uuid);
 
+/**
+ * @brief Clear global resource when ble turn on or bluetooth_serivce unload.
+ * @since 11
+ */
+void ClearGlobalResource(void);
+
 #ifdef __cplusplus
 }
 #endif
