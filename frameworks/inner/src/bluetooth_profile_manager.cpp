@@ -24,6 +24,7 @@
 #include "bluetooth_log.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "ohos_bt_gatt.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -106,6 +107,10 @@ void BluetoothProfileManager::NotifyBluetoothStateChange(int32_t transport, int3
             }
         });
     }
+    if (transport == ADAPTER_BLE && status == STATE_TURN_ON) {
+        HILOGD("Clear global variables, return to initial state");
+        ClearGlobalResource();
+    }
     return;
 }
 
@@ -140,6 +145,8 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int3
     HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
+            HILOGD("Clear global variables first");
+            ClearGlobalResource();
             DelayedSingleton<BluetoothProfileManager>::GetInstance()->profileRemoteMap_.Clear();
             DelayedSingleton<BluetoothProfileManager>::GetInstance()->isBluetoothServiceOn_ = false;
             break;
