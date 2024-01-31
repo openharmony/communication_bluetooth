@@ -69,6 +69,10 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, nullptr, "samgrProxy is nullptr");
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    if (object == nullptr) {
+        HILOGD("object is nullptr");
+        return nullptr;
+    }
     CHECK_AND_RETURN_LOG_RET(object != nullptr, nullptr, "object is nullptr");
     return object;
 }

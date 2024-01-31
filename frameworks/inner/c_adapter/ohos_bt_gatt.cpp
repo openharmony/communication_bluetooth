@@ -867,11 +867,12 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
 int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleScanNativeFilter *filter,
     uint32_t filterSize)
 {
-    HILOGD("BleStartScanEx enter, scannerId: %{public}d, filterSize %{public}u", scannerId, filterSize);
     if (configs == nullptr) {
         HILOGE("BleStartScanEx fail, configs is null.");
         return OHOS_BT_STATUS_FAIL;
     }
+    HILOGD("BleStartScanEx enter, scannerId: %{public}d, filterSize %{public}u, scanMode: %{public}d",
+        scannerId, filterSize, configs->scanMode);
     std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
     if (bleCentralManager == nullptr) {
         HILOGE("BleStartScanEx fail, scannerId is invalid.");
@@ -886,7 +887,6 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
         }
     }
 
-    HILOGI("scanMode: %{public}d", configs->scanMode);
     BleScanSettings settings;
     settings.SetScanMode(configs->scanMode);
     bleCentralManager->StartScan(settings);
@@ -977,7 +977,7 @@ int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int inter
  */
 int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable)
 {
-    HILOGI("SetScanReportChannelToLpDevice enter. scannerId: %{public}d, isToAp: %{public}d", scannerId, enable);
+    HILOGD("SetScanReportChannelToLpDevice enter. scannerId: %{public}d, isToAp: %{public}d", scannerId, enable);
     std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
     if (bleCentralManager == nullptr) {
         HILOGE("SetScanReportChannelToLpDevice fail, ble centra manager is null.");
@@ -1024,7 +1024,7 @@ int EnableSyncDataToLpDevice(void)
  */
 int DisableSyncDataToLpDevice(void)
 {
-    HILOGI("DisableSyncDataToLpDevice enter");
+    HILOGD("DisableSyncDataToLpDevice enter");
     std::shared_ptr<BleCentralManager> bleCentralManager = nullptr;
     GetBleCentralManagerObject(bleCentralManager);
     if (bleCentralManager == nullptr) {
