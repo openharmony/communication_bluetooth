@@ -145,7 +145,7 @@ napi_value NapiA2dpSource::A2dpSourceConstructor(napi_env env, napi_callback_inf
 
 napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     std::unique_lock<std::shared_mutex> guard(NapiA2dpSourceObserver::g_a2dpSrcCallbackInfosMutex);
 
     napi_value ret = nullptr;
@@ -155,7 +155,7 @@ napi_value NapiA2dpSource::On(napi_env env, napi_callback_info info)
         profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
-    HILOGI("napi A2dpSource is registered");
+    HILOGD("napi A2dpSource is registered");
     return ret;
 }
 
@@ -368,7 +368,7 @@ napi_value NapiA2dpSource::GetDeviceState(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     int status = GetProfileConnectionState(btConnectState);
     napi_create_int32(env, status, &result);
-    HILOGI("status: %{public}d", status);
+    HILOGD("status: %{public}d", status);
     return result;
 }
 
@@ -426,7 +426,7 @@ napi_value NapiA2dpSource::GetConnectionStrategy(napi_env env, napi_callback_inf
         BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
         A2dpSource *profile = A2dpSource::GetProfile();
         int32_t err = profile->GetConnectStrategy(remoteDevice, strategy);
-        HILOGI("err: %{public}d, deviceName: %{public}d", err, strategy);
+        HILOGD("err: %{public}d, deviceName: %{public}d", err, strategy);
         auto object = std::make_shared<NapiNativeInt>(strategy);
         return NapiAsyncWorkRet(err, object);
     };

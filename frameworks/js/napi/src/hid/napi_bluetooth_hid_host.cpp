@@ -193,7 +193,6 @@ napi_value NapiBluetoothHidHost::GetConnectionDevices(napi_env env, napi_callbac
 
 napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     napi_value result = nullptr;
     int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
@@ -208,14 +207,12 @@ napi_value NapiBluetoothHidHost::GetDeviceState(napi_env env, napi_callback_info
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
     int32_t errorCode = profile->GetDeviceState(device, state);
-    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, result);
 
     profileState = GetProfileConnectionState(state);
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
         HILOGE("napi_create_int32 failed.");
     }
-    HILOGI("profileState: %{public}d", profileState);
     return result;
 }
 
