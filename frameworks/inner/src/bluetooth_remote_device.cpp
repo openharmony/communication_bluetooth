@@ -304,8 +304,6 @@ bool BluetoothRemoteDevice::ReadRemoteRssiValue()
 
 int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &majorMinorClass) const
 {
-    HILOGI("enter");
-
     CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "Invalid remote device");
 
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");

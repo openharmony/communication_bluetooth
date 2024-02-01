@@ -98,7 +98,7 @@ napi_value NapiAccess::GetState(napi_env env, napi_callback_info info)
             status = static_cast<int32_t>(BluetoothState::STATE_TURNING_OFF);
             break;
         case BTStateID::STATE_TURN_OFF:
-            HILOGI("STATE_OFF(0)");
+            HILOGD("STATE_OFF(0)");
             status = static_cast<int32_t>(BluetoothState::STATE_OFF);
             break;
         default:
@@ -108,7 +108,7 @@ napi_value NapiAccess::GetState(napi_env env, napi_callback_info info)
 
     bool enableBle = host->IsBleEnabled();
     if (enableBle && (state == BTStateID::STATE_TURN_OFF)) {
-        HILOGI("BR off and BLE on, STATE_BLE_ON(5)");
+        HILOGD("BR off and BLE on, STATE_BLE_ON(5)");
         status = static_cast<int32_t>(BluetoothState::STATE_BLE_ON);
     } else if (!enableBle && (state == BTStateID::STATE_TURN_OFF)) {
         status = static_cast<int32_t>(BluetoothState::STATE_OFF);

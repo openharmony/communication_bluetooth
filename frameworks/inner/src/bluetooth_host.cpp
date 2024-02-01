@@ -576,7 +576,10 @@ bool BluetoothHost::IsBrEnabled() const
 bool BluetoothHost::IsBleEnabled() const
 {
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
+    if (proxy == nullptr) {
+        HILOGD("proxy is nullptr");
+        return false;
+    }
 
     return proxy->IsBleEnabled();
 }
