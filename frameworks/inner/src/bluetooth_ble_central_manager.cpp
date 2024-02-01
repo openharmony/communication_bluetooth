@@ -325,7 +325,7 @@ int BleCentralManager::StartScan(const BleScanSettings &settings)
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    HILOGI("StartScan with params, scannerId: %{public}d", pimpl->scannerId_);
+    HILOGD("StartScan with params, scannerId: %{public}d", pimpl->scannerId_);
     BluetoothBleScanSettings setting;
     // not use report delay scan. settings.GetReportDelayMillisValue()
     setting.SetReportDelay(0);

@@ -24,14 +24,14 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOGI("-----a2dp Init start------");
+    HILOGD("-----a2dp Init start------");
     napi_property_descriptor desc[] = {};
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
     NapiA2dpSource::DefineA2dpSourceJSClass(env, exports);
 
-    HILOGI("-----a2dp Init end------");
+    HILOGD("-----a2dp Init end------");
     return exports;
 }
 EXTERN_C_END

@@ -42,7 +42,7 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports)
 
 napi_value RegisterHostObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -63,7 +63,7 @@ napi_value RegisterHostObserver(napi_env env, napi_callback_info info)
 
 napi_value DeregisterHostObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {0};
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);

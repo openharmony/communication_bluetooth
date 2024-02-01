@@ -107,7 +107,6 @@ napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info)
         isRegistered_ = true;
     }
 
-    HILOGI("Hands Free Audio Gateway is registered");
     return ret;
 }
 
@@ -163,7 +162,6 @@ napi_value NapiHandsFreeAudioGateway::GetDeviceState(napi_env env, napi_callback
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
     int32_t errorCode = profile->GetDeviceState(device, state);
-    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, result);
 
     profileState = GetProfileConnectionState(state);

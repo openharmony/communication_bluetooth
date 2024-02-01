@@ -200,7 +200,6 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_int32(env, GetProfileConnectionState(state), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
-    HILOGI("end");
     return result;
 }
 
@@ -335,7 +334,6 @@ napi_value GetProfileConnectionStateEx(napi_env env, napi_callback_info info)
     size_t argSize = ARGS_SIZE_ONE;
     bool checkRet = CheckProfileIdParamEx(env, info, profileId, argSize);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
-    HILOGD("argSize = %{public}zu", argSize);
 
     napi_value ret = nullptr;
     if (argSize == 0) {

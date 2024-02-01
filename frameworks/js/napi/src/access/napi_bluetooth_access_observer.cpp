@@ -32,7 +32,10 @@ void NapiBluetoothAccessObserver::OnStateChanged(const int transport, const int 
     }
 
     HILOGD("state is %{public}d", state);
-    CHECK_AND_RETURN_LOG(napiStateChangeCallback_, "stateChangeCallback is not registered");
+    if (!napiStateChangeCallback_) {
+        HILOGD("stateChangeCallback is not registered");
+        return;
+    }
 
     auto func = [state, callback = napiStateChangeCallback_]() {
         CHECK_AND_RETURN_LOG(callback, "stateChangeCallback is not registered");

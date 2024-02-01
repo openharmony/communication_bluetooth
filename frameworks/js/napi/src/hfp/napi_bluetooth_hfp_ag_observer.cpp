@@ -31,7 +31,7 @@ void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const Bluetooth
         HILOGW("This callback is not registered by ability.");
         return;
     }
-    HILOGI("%{public}s is registered by ability",
+    HILOGD("%{public}s is registered by ability",
         STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
     callbackInfo->state_ = state;
