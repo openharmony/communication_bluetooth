@@ -16,13 +16,13 @@
 #ifndef BLUETOOTH_LOG_H
 #define BLUETOOTH_LOG_H
 
-#include "hilog/log.h"
-
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD000101
 #ifndef LOG_TAG
 #define LOG_TAG "Bluetooth"
 #endif
+
+#include "hilog/log.h"
 
 #ifdef HILOGF
 #undef HILOGF
