@@ -193,6 +193,13 @@ enum class ScanDuty {
     SCAN_MODE_LOW_LATENCY = 2  // Scan using highest duty cycle
 };
 
+enum class PhyType {
+    PHY_LE_1M = 1,              // phy 1M
+    PHY_LE_2M = 2,              // phy 2M
+    PHY_LE_CODED = 3,           // phy coded
+    PHY_LE_ALL_SUPPORTED = 255  // phy coded
+};
+
 enum class AdvertisingState {
     STARTED = 1,  // advertiser started
     ENABLED = 2,  // advertiser temporarily enabled
@@ -204,6 +211,7 @@ struct ScanOptions {
     int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
     MatchMode MatchMode = MatchMode::MATCH_MODE_AGGRESSIVE;  // Match mode for Bluetooth LE scan filters hardware match
+    PhyType phyType = PhyType::PHY_LE_1M;                    // Phy for Bluetooth LE scan
 };
 
 struct ScanResult {
