@@ -386,7 +386,6 @@ static void ConvertPhyType(ScanOptions &params, int32_t phyType)
     }
 }
 
-
 static void ConvertDutyMode(ScanOptions &params, int32_t dutyMode)
 {
     switch (dutyMode) {
@@ -623,6 +622,7 @@ static napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std
         NAPI_BT_CALL_RETURN(ParseScanParameters(env, info, argv[PARAM1], scanOptions));
         outSettinngs.SetReportDelay(scanOptions.interval);
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
+        outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phy));
     }
 
     outScanfilters = std::move(scanfilters);
