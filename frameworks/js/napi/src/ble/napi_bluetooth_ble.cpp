@@ -435,7 +435,7 @@ static napi_status ParseScanParameters(
     NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "phyType", exist, phyType));
     if (exist) {
         HILOGI("Scan phyType is %{public}d", phyType);
-        ConvertMatchMode(params, phyType);
+        ConvertPhyType(params, phyType);
     }
     return napi_ok;
 }
