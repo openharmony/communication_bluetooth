@@ -85,7 +85,7 @@ napi_value PinTypeInit(napi_env env);
 #endif
 
 void RegisterObserverToHost();
-void DealPairStatus(const int &status, int &boneStatus);
+void DealPairStatus(const int &status, int &bondStatus);
 }  // namespace Bluetooth
 }  // namespace OHOS
 
