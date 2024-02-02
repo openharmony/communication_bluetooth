@@ -125,6 +125,7 @@ napi_value SysStartBLEScan(napi_env env, napi_callback_info info)
     BleScanSettings settinngs;
     settinngs.SetReportDelay(scanOptions.interval);
     settinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
+    settinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
 
     BleCentralManagerGetInstance()->StartScan(settinngs);
     return NapiGetNull(env);
@@ -365,6 +366,26 @@ static void ConvertMatchMode(ScanOptions &params, int32_t matchMode)
     }
 }
 
+static void ConvertPhyType(ScanOptions &params, int32_t phyType)
+{
+    switch (phyType) {
+        case static_cast<int32_t>(PhyType::PHY_LE_1M):
+            params.phyType = PhyType::PHY_LE_1M;
+            break;
+        case static_cast<int32_t>(PhyType::PHY_LE_2M):
+            params.phyType = PhyType::PHY_LE_2M;
+            break;
+        case static_cast<int32_t>(PhyType::PHY_LE_CODED):
+            params.phyType = PhyType::PHY_LE_CODED;
+            break;
+        case static_cast<int32_t>(PhyType::PHY_LE_ALL_SUPPORTED):
+            params.phyType = PhyType::PHY_LE_ALL_SUPPORTED;
+            break;
+        default:
+            break;
+    }
+}
+
 static void ConvertDutyMode(ScanOptions &params, int32_t dutyMode)
 {
     switch (dutyMode) {
@@ -408,6 +429,13 @@ static napi_status ParseScanParameters(
     if (exist) {
         HILOGI("Scan matchMode is %{public}d", matchMode);
         ConvertMatchMode(params, matchMode);
+    }
+
+    int32_t phyType = 0;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "phyType", exist, phyType));
+    if (exist) {
+        HILOGI("Scan phyType is %{public}d", phyType);
+        ConvertPhyType(params, phyType);
     }
     return napi_ok;
 }
@@ -594,6 +622,7 @@ static napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std
         NAPI_BT_CALL_RETURN(ParseScanParameters(env, info, argv[PARAM1], scanOptions));
         outSettinngs.SetReportDelay(scanOptions.interval);
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
+        outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
     }
 
     outScanfilters = std::move(scanfilters);
