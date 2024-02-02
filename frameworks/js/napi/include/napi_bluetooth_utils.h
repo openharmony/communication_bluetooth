@@ -211,6 +211,7 @@ struct ScanOptions {
     int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
     MatchMode MatchMode = MatchMode::MATCH_MODE_AGGRESSIVE;  // Match mode for Bluetooth LE scan filters hardware match
+    PhyType phyType = PhyType::PHY_LE_1M;                    // Phy for Bluetooth LE scan
 };
 
 struct ScanResult {
