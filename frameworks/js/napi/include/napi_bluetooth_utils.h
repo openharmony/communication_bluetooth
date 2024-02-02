@@ -193,6 +193,13 @@ enum class ScanDuty {
     SCAN_MODE_LOW_LATENCY = 2  // Scan using highest duty cycle
 };
 
+enum class PhyType {
+    PHY_LE_1M = 1,              // phy 1M
+    PHY_LE_2M = 2,              // phy 2M
+    PHY_LE_CODED = 3,           // phy coded
+    PHY_LE_ALL_SUPPORTED = 255  // phy coded
+};
+
 enum class AdvertisingState {
     STARTED = 1,  // advertiser started
     ENABLED = 2,  // advertiser temporarily enabled
