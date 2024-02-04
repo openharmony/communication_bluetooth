@@ -76,7 +76,11 @@ public:
     void OnScanCallback(const BleScanResult &result) override
     {
         BtScanResultData scanResult;
-        scanResult.eventType = OHOS_BLE_EVT_LEGACY_CONNECTABLE; // result.IsConnectable();
+        if (result.IsConnectable()) {
+            scanResult.eventType = OHOS_BLE_EVT_LEGACY_CONNECTABLE;
+        } else {
+            scanResult.eventType = OHOS_BLE_EVT_LEGACY_NON_CONNECTABLE;
+        }
         scanResult.dataStatus = OHOS_BLE_DATA_COMPLETE;
         scanResult.addrType = OHOS_BLE_RANDOM_DEVICE_ADDRESS;
         scanResult.primaryPhy = OHOS_BLE_SCAN_PHY_1M;
