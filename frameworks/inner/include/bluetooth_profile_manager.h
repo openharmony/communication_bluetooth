@@ -32,9 +32,14 @@
 namespace OHOS {
 namespace Bluetooth {
 const std::string BLUETOOTH_HOST = "BluetoothHost";
-struct ProfileIdProperty {
-    std::function<void (sptr<IRemoteObject>)> func {};
+// It is recommended to ues one of the between bluetoothLoadedfunc and bleTurnOnFunc
+struct ProfileFunctions {
+    std::function<void(sptr<IRemoteObject>)> bluetoothLoadedfunc {};
+    std::function<void(sptr<IRemoteObject>)> bleTurnOnFunc {};
     std::function<void(void)> bluetoothTurnOffFunc {};
+};
+struct ProfileIdProperty {
+    ProfileFunctions functions;
     std::string objectName = "";
 };
 class BluetoothProfileManager {
@@ -62,13 +67,11 @@ public:
      * @brief register function for profile to get proxy when profile is init
      *
      * @param objectName the objectName of profile
-     * @param func the function for profile to register
-     * @param bluetoothTurnOffFunc the function for profile to register
+     * @param ProfileFunctions the function for profile to register
      *
      * @return Returns the id of the Profile.
      */
-    int32_t RegisterFunc(const std::string &objectName, std::function<void (sptr<IRemoteObject>)> func,
-        std::function<void(void)> bluetoothTurnOffFunc);
+    int32_t RegisterFunc(const std::string &objectName, ProfileFunctions profileFunctions);
     /**
      * @brief Deregister function for profile, ensure that there is a deregister after register
      *
