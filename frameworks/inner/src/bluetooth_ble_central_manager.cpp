@@ -134,44 +134,31 @@ struct BleCentralManager::impl {
     sptr<BluetoothBleCentralManagerCallbackImp> callbackImp_ = nullptr;
     BluetoothObserverList<BleCentralManagerCallback> callbacks_;
 
-    class BleCentralManagerDeathRecipient;
-    sptr<BleCentralManagerDeathRecipient> deathRecipient_ = nullptr;
-    int32_t scannerId_ = BLE_SCAN_INVALID_ID;
+    int32_t scannerId_ = BLE_SCAN_INVALID_ID;  // lock by scannerIdMutex_
+    std::mutex scannerIdMutex_ {};
     bool enableRandomAddrMode_ = true;
     int32_t profileRegisterId = 0;
-};
-
-class BleCentralManager::impl::BleCentralManagerDeathRecipient final : public IRemoteObject::DeathRecipient {
-public:
-    explicit BleCentralManagerDeathRecipient(BleCentralManager::impl &impl) : owner_(impl) {};
-    ~BleCentralManagerDeathRecipient() final = default;
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManagerDeathRecipient);
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) final
-    {
-        HILOGI("enter");
-        owner_.scannerId_ = BLE_SCAN_INVALID_ID;
-    }
-
-private:
-    BleCentralManager::impl &owner_;
 };
 
 BleCentralManager::impl::impl()
 {
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
-    auto func = [this](sptr<IRemoteObject> remote) {
+    auto bleTurnOnFunc = [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothBleCentralManager> proxy = iface_cast<IBluetoothBleCentralManager>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        std::lock_guard<std::mutex> lock(scannerIdMutex_);
         proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
-        deathRecipient_ = new BleCentralManagerDeathRecipient(*this);
-        proxy->AsObject()->AddDeathRecipient(deathRecipient_);
     };
     auto bluetoothTurnOffFunc = [this]() {
         scannerId_ = BLE_SCAN_INVALID_ID;
     };
+    ProfileFunctions profileFunctions = {
+        .bluetoothLoadedfunc = nullptr,
+        .bleTurnOnFunc = bleTurnOnFunc,
+        .bluetoothTurnOffFunc = bluetoothTurnOffFunc,
+    };
     profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(
-        BLE_CENTRAL_MANAGER_SERVER, func, bluetoothTurnOffFunc);
+        BLE_CENTRAL_MANAGER_SERVER, profileFunctions);
 }
 
 bool BleCentralManager::impl::InitScannerId(void)
@@ -179,11 +166,15 @@ bool BleCentralManager::impl::InitScannerId(void)
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
-    if (scannerId_ == BLE_SCAN_INVALID_ID) {
-        proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
+
+    std::lock_guard<std::mutex> lock(scannerIdMutex_);
+    if (scannerId_ != BLE_SCAN_INVALID_ID) {
+        HILOGI("scannerId(%{public}d) is already registered", scannerId_);
+        return true;
     }
-    CHECK_AND_RETURN_LOG_RET(scannerId_ != BLE_SCAN_INVALID_ID, false, "scannerId is invalid");
-    return true;
+
+    proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
+    return scannerId_ != BLE_SCAN_INVALID_ID;
 }
 
 void BleCentralManager::impl::ConvertBleScanSetting(const BleScanSettings &inSettings,
@@ -256,7 +247,6 @@ BleCentralManager::impl::~impl()
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterBleCentralManagerCallback(scannerId_, callbackImp_);
-    proxy->AsObject()->RemoveDeathRecipient(deathRecipient_);
 }
 
 
