@@ -22,54 +22,31 @@ namespace Bluetooth {
 int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService *services)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::AddService WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(appId)) {
-        HILOGE("BluetoothGattServerProxy::AddService error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-
-    if (!data.WriteParcelable(services)) {
-        HILOGE("BluetoothGattServerProxy::AddService error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(services), BT_ERR_IPC_TRANS_FAILED, "write services error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(BluetoothGattServerInterfaceCode::GATT_SERVER_ADD_SERVICE, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::AddService done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_ADD_SERVICE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 void BluetoothGattServerProxy::ClearServices(int appId)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::ClearServices WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteInt32(appId)) {
-        HILOGE("BluetoothGattServerProxy::ClearServices error");
-        return;
-    }
-    MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    CHECK_AND_RETURN_LOG(
+        data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(appId), "WriteInterfaceToken error");
 
-    int error = Remote()->SendRequest(
-        BluetoothGattServerInterfaceCode::GATT_SERVER_CLEAR_SERVICES, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::ClearServices done fail, error: %{public}d", error);
-        return;
-    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN(BluetoothGattServerInterfaceCode::GATT_SERVER_CLEAR_SERVICES, data, reply, option);
+
     return;
 }
 
@@ -77,17 +54,17 @@ int BluetoothGattServerProxy::Connect(int appId, const BluetoothGattDevice &devi
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_INTERNAL_ERROR, "WriteInt32 failed");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "WriteParcelable failed");
-    CHECK_AND_RETURN_LOG_RET(data.WriteBool(isDirect), BT_ERR_INTERNAL_ERROR, "WriteBool failed");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(isDirect), BT_ERR_IPC_TRANS_FAILED, "write isDirect error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int error = Remote()->SendRequest(BluetoothGattServerInterfaceCode::GATT_SERVER_CONNECT, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, BT_ERR_INTERNAL_ERROR, "Connect done failed, error: %{public}d", error);
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_CONNECT,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
@@ -95,255 +72,156 @@ int BluetoothGattServerProxy::CancelConnection(int appId, const BluetoothGattDev
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
-        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_INTERNAL_ERROR, "WriteInt32 failed");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "WriteParcelable failed");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int error = Remote()->SendRequest(
-        BluetoothGattServerInterfaceCode::GATT_SERVER_CANCEL_CONNECTION, data, reply, option);
-    CHECK_AND_RETURN_LOG_RET(
-        error == NO_ERROR, BT_ERR_INTERNAL_ERROR, "CancelConnection done failed, error: %{public}d", error);
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_CANCEL_CONNECTION,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::RegisterApplication WriteInterfaceToken error");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject())) {
-        HILOGE("BluetoothGattServerProxy::RegisterApplication error");
-        return ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteRemoteObject(callback->AsObject()), BT_ERR_IPC_TRANS_FAILED, "write object error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int error = Remote()->SendRequest(BluetoothGattServerInterfaceCode::GATT_SERVER_REGISTER, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RegisterApplication done fail, error: %{public}d", error);
-        return ERROR;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_REGISTER,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::DeregisterApplication(int appId)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::WriteInterfaceToken WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(appId)) {
-        HILOGE("BluetoothGattServerProxy::DeregisterApplication error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
 
-    int error = Remote()->SendRequest(BluetoothGattServerInterfaceCode::GATT_SERVER_DEREGISTER, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::DeregisterApplication done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_DEREGISTER,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::NotifyClient(
     const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, bool needConfirm)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::WriteInterfaceToken WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothGattServerProxy::NotifyClient error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(characteristic)) {
-        HILOGE("BluetoothGattServerProxy::NotifyClient error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteBool(needConfirm)) {
-        HILOGE("BluetoothGattServerProxy::NotifyClient error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(characteristic),
+        BT_ERR_IPC_TRANS_FAILED, "write characteristic error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(needConfirm), BT_ERR_IPC_TRANS_FAILED, "write needConfirm error");
 
-    int error = Remote()->SendRequest(BluetoothGattServerInterfaceCode::GATT_SERVER_NOTIFY_CLIENT, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::NotifyClient done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_NOTIFY_CLIENT,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RemoveService(int32_t appId, const BluetoothGattService &services)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::RemoveService WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(appId)) {
-        HILOGE("BluetoothGattServerProxy::RemoveService error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&services)) {
-        HILOGE("BluetoothGattServerProxy::RemoveService error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&services), BT_ERR_IPC_TRANS_FAILED, "write services error");
 
-    int error = Remote()->SendRequest(
-        BluetoothGattServerInterfaceCode::GATT_SERVER_REMOVE_SERVICE, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RemoveService done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_REMOVE_SERVICE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RespondCharacteristicRead(
     const BluetoothGattDevice &device, BluetoothGattCharacteristic *characteristic, int32_t ret)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(characteristic)) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(ret)) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(characteristic),
+        BT_ERR_IPC_TRANS_FAILED, "write characteristic error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(ret), BT_ERR_IPC_TRANS_FAILED, "write ret error");
+
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int error =
-        Remote()->SendRequest(
-            BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_CHARACTERISTIC_READ, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicRead done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_CHARACTERISTIC_READ,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RespondCharacteristicWrite(
     const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int32_t ret)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&characteristic)) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(ret)) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&characteristic),
+        BT_ERR_IPC_TRANS_FAILED, "write characteristic error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(ret), BT_ERR_IPC_TRANS_FAILED, "write ret error");
+
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int error = Remote()->SendRequest(
-        BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RespondCharacteristicWrite done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_CHARACTERISTIC_WRITE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RespondDescriptorRead(
     const BluetoothGattDevice &device, BluetoothGattDescriptor *descriptor, int32_t ret)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorRead WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorRead error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(descriptor)) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorRead error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(ret)) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorRead error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(descriptor), BT_ERR_IPC_TRANS_FAILED, "write descriptor error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(ret), BT_ERR_IPC_TRANS_FAILED, "write ret error");
+
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int error =
-        Remote()->SendRequest(
-            BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_DESCRIPTOR_READ, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorRead done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_DESCRIPTOR_READ,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 int BluetoothGattServerProxy::RespondDescriptorWrite(
     const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor, int32_t ret)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor())) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&descriptor)) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(ret)) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&descriptor), BT_ERR_IPC_TRANS_FAILED, "write descriptor error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(ret), BT_ERR_IPC_TRANS_FAILED, "write ret error");
+
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    int error =
-        Remote()->SendRequest(
-            BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_DESCRIPTOR_WRITE, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothGattServerProxy::RespondDescriptorWrite done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_RESPOND_DESCRIPTOR_WRITE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 }  // namespace Bluetooth
