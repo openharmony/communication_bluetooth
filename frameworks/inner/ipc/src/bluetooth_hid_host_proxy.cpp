@@ -23,26 +23,15 @@ namespace Bluetooth {
 int32_t BluetoothHidHostProxy::Connect(const BluetoothRawAddress &device)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::Connect WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothHidHostProxy::Connect write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_CONNECT), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::Connect done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_CONNECT),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     return reply.ReadInt32();
 }
@@ -50,26 +39,15 @@ int32_t BluetoothHidHostProxy::Connect(const BluetoothRawAddress &device)
 int32_t BluetoothHidHostProxy::Disconnect(const BluetoothRawAddress &device)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::Disconnect WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothHidHostProxy::Disconnect write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_DISCONNECT), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::Disconnect done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_DISCONNECT),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     return reply.ReadInt32();
 }
@@ -77,26 +55,15 @@ int32_t BluetoothHidHostProxy::Disconnect(const BluetoothRawAddress &device)
 int32_t BluetoothHidHostProxy::GetDeviceState(const BluetoothRawAddress &device, int32_t &state)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::GetDeviceState WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothHidHostProxy::GetDeviceState write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_DEVICE_STATE), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::GetDeviceState done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_DEVICE_STATE),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     // read error code
     int32_t errCode = reply.ReadInt32();
@@ -114,23 +81,16 @@ int32_t BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &st
     std::vector<BluetoothRawAddress>& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::GetDevicesByStates WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!WriteParcelableInt32Vector(states, data)) {
-        HILOGE("[GetDevicesByStates] fail: write result failed");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(WriteParcelableInt32Vector(states, data), BT_ERR_IPC_TRANS_FAILED, "write states error");
 
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::GetDevicesByStates done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_DEVICES_BY_STATES),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     // read error code
     int32_t errCode = reply.ReadInt32();
     if (errCode != BT_NO_ERROR) {
@@ -149,234 +109,123 @@ int32_t BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &st
     return BT_NO_ERROR;
 }
 
-ErrCode BluetoothHidHostProxy::RegisterObserver(
+int32_t BluetoothHidHostProxy::RegisterObserver(
     const sptr<IBluetoothHidHostObserver> observer)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::RegisterObserver WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothHidHostProxy::RegisterObserver error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteRemoteObject(observer->AsObject()), BT_ERR_IPC_TRANS_FAILED, "write object error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_ASYNC
-    };
+    MessageOption option(MessageOption::TF_ASYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_REGISTER_OBSERVER), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::RegisterObserver done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
-    return error;
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_REGISTER_OBSERVER),
+        data, reply, option, INVALID_DATA);
+
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothHidHostProxy::DeregisterObserver(
+int32_t BluetoothHidHostProxy::DeregisterObserver(
     const sptr<IBluetoothHidHostObserver> observer)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::DeregisterObserver WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothHidHostProxy::DeregisterObserver error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteRemoteObject(observer->AsObject()), BT_ERR_IPC_TRANS_FAILED, "write object error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_ASYNC
-    };
+    MessageOption option(MessageOption::TF_ASYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_DEREGISTER_OBSERVER), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::DeregisterObserver done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
-    return error;
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_DEREGISTER_OBSERVER),
+        data, reply, option, INVALID_DATA);
+
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothHidHostProxy::HidHostVCUnplug(std::string &device,
+int32_t BluetoothHidHostProxy::HidHostVCUnplug(std::string &device,
     uint8_t &id, uint16_t &size, uint8_t &type, int& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-
-    if (!data.WriteString(device)) {
-        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(id)) {
-        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint16(size)) {
-        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(type)) {
-        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device), BT_ERR_IPC_TRANS_FAILED, "Write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(id), BT_ERR_IPC_TRANS_FAILED, "Write id error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint16(size), BT_ERR_IPC_TRANS_FAILED, "Write size error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(type), BT_ERR_IPC_TRANS_FAILED, "Write type error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_VCUN_PLUG), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::HidHostVCUnplug done fail, error: %{public}d", error);
-        return error;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_VCUN_PLUG),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     result = reply.ReadInt32();
-    return ERR_OK;
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothHidHostProxy::HidHostSendData(std::string &device,
+int32_t BluetoothHidHostProxy::HidHostSendData(std::string &device,
     uint8_t &id, uint16_t &size, uint8_t &type, int& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::HidHostSendData WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-
-    if (!data.WriteString(device)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(id)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint16(size)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(type)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSendData error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device), BT_ERR_IPC_TRANS_FAILED, "write device errorr");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(id), BT_ERR_IPC_TRANS_FAILED, "write id error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint16(size), BT_ERR_IPC_TRANS_FAILED, "write size error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(type), BT_ERR_IPC_TRANS_FAILED, "write type error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_SEND_DATA), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::HidHostSendData done fail, error: %{public}d", error);
-        return error;
-    }
-    result = reply.ReadInt32();
-    return ERR_OK;
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_SEND_DATA),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothHidHostProxy::HidHostSetReport(std::string &device,
+int32_t BluetoothHidHostProxy::HidHostSetReport(std::string &device,
     uint8_t &type, uint16_t &size, uint8_t &report, int& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::HidHostSetReport WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-
-    if (!data.WriteString(device)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(type)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint16(size)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(report)) {
-        HILOGE("BluetoothHidHostProxy::HidHostSetReport error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(type), BT_ERR_IPC_TRANS_FAILED, "write type error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint16(size), BT_ERR_IPC_TRANS_FAILED, "write size error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(report), BT_ERR_IPC_TRANS_FAILED, "write report error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_SET_REPORT), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::HidHostSetReport done fail, error: %{public}d", error);
-        return error;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_SET_REPORT),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     result = reply.ReadInt32();
-    return ERR_OK;
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothHidHostProxy::HidHostGetReport(std::string &device,
+int32_t BluetoothHidHostProxy::HidHostGetReport(std::string &device,
     uint8_t &id, uint16_t &size, uint8_t &type, int& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHidHostProxy::HidHostGetReport WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-
-    if (!data.WriteString(device)) {
-        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(id)) {
-        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint16(size)) {
-        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
-        return INVALID_DATA;
-    }
-
-    if (!data.WriteUint8(type)) {
-        HILOGE("BluetoothHidHostProxy::HidHostGetReport error");
-        return INVALID_DATA;
-    }
-
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(id), BT_ERR_IPC_TRANS_FAILED, "write id error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint16(size), BT_ERR_IPC_TRANS_FAILED, "write size error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(type), BT_ERR_IPC_TRANS_FAILED, "write type error");
+    
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_REPORT), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHidHostProxy::HidHostGetReport done fail, error: %{public}d", error);
-        return error;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_REPORT),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     result = reply.ReadInt32();
-    return ERR_OK;
+    return BT_NO_ERROR;
 }
 
 bool BluetoothHidHostProxy::WriteParcelableInt32Vector(
@@ -399,30 +248,16 @@ bool BluetoothHidHostProxy::WriteParcelableInt32Vector(
 int32_t BluetoothHidHostProxy::SetConnectStrategy(const BluetoothRawAddress &device, int strategy)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteInt32(strategy)) {
-        HILOGE("write strategy error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(strategy), BT_ERR_IPC_TRANS_FAILED, "write strategy error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_SET_CONNECT_STRATEGY), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHfpAgProxy::SetConnectStrategy done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_SET_CONNECT_STRATEGY),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     return reply.ReadInt32();
 }
@@ -430,32 +265,20 @@ int32_t BluetoothHidHostProxy::SetConnectStrategy(const BluetoothRawAddress &dev
 int32_t BluetoothHidHostProxy::GetConnectStrategy(const BluetoothRawAddress &device, int &strategy)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor())) {
-        HILOGE("WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_CONNECT_STRATEGY), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHfpAgProxy::GetConnectStrategy done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothHidHostInterfaceCode::COMMAND_GET_CONNECT_STRATEGY),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t res = reply.ReadInt32();
     if (res == NO_ERROR) {
         strategy = reply.ReadInt32();
     }
-
     return res;
 }
 } // Bluetooth

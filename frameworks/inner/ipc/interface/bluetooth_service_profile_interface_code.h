@@ -266,6 +266,35 @@ enum BluetoothHfpHfInterfaceCode {
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_HF_BUTT
 };
+
+#define SEND_IPC_REQUEST_RETURN_RESULT(code, data, reply, option, result)                   \
+    do {                                                                                    \
+        sptr<IRemoteObject> remote = Remote();                                              \
+        if (remote == nullptr) {                                                            \
+            HILOGE("remote is nullptr.");                                                   \
+            return (result);                                                                \
+        }                                                                                   \
+        int ret = remote->SendRequest((code), (data), (reply), (option));                   \
+        if (ret != BT_NO_ERROR) {                                                           \
+            HILOGE("IPC send failed, ret(%{public}d), code(%{public}d)", ret, (code));      \
+            return (result);                                                                \
+        }                                                                                   \
+    } while (0)
+
+#define SEND_IPC_REQUEST_RETURN(code, data, reply, option)                                  \
+    do {                                                                                    \
+        sptr<IRemoteObject> remote = Remote();                                              \
+        if (remote == nullptr) {                                                            \
+            HILOGE("remote is nullptr.");                                                   \
+            return;                                                                         \
+        }                                                                                   \
+        int ret = remote->SendRequest((code), (data), (reply), (option));                   \
+        if (ret != BT_NO_ERROR) {                                                           \
+            HILOGE("IPC send failed, ret(%{public}d), code(%{public}d)", ret, (code));      \
+            return;                                                                         \
+        }                                                                                   \
+    } while (0)
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // BLUETOOTH_SERVICE_PROFILE_INTERFACE_CODE_H
