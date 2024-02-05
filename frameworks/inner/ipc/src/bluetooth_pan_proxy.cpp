@@ -22,52 +22,32 @@ namespace Bluetooth {
 int32_t BluetoothPanProxy::Disconnect(const BluetoothRawAddress &device)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
-        HILOGE("BluetoothPanProxy::Disconnect WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("BluetoothPanProxy::Disconnect write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DISCONNECT), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothPanProxy::Disconnect done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DISCONNECT),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int32_t BluetoothPanProxy::GetDeviceState(const BluetoothRawAddress &device, int32_t &state)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
-        HILOGE("WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteParcelable(&device)) {
-        HILOGE("write device error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICE_STATE), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICE_STATE),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     // read error code
     int32_t errCode = reply.ReadInt32();
     if (errCode != BT_NO_ERROR) {
@@ -83,23 +63,16 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
     std::vector<BluetoothRawAddress>& result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
-        HILOGE("WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!WriteParcelableInt32Vector(states, data)) {
-        HILOGE("write result failed");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(WriteParcelableInt32Vector(states, data), BT_ERR_IPC_TRANS_FAILED, "write device error");
 
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("SendRequest failed, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICES_BY_STATES),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     // read error code
     int32_t errCode = reply.ReadInt32();
     if (errCode != BT_NO_ERROR) {
@@ -118,103 +91,67 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
     return BT_NO_ERROR;
 }
 
-ErrCode BluetoothPanProxy::RegisterObserver(const sptr<IBluetoothPanObserver> observer)
+int32_t BluetoothPanProxy::RegisterObserver(const sptr<IBluetoothPanObserver> observer)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
-        HILOGE("BluetoothPanProxy::RegisterObserver WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothPanProxy::RegisterObserver error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteRemoteObject(observer->AsObject()),
+        BT_ERR_IPC_TRANS_FAILED, "Write object error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_ASYNC
-    };
+    MessageOption option(MessageOption::TF_ASYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_REGISTER_OBSERVER), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothPanProxy::RegisterObserver done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
-    return error;
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_REGISTER_OBSERVER),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    return BT_NO_ERROR;
 }
 
-ErrCode BluetoothPanProxy::DeregisterObserver(const sptr<IBluetoothPanObserver> observer)
+int32_t BluetoothPanProxy::DeregisterObserver(const sptr<IBluetoothPanObserver> observer)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
-        HILOGE("BluetoothPanProxy::DeregisterObserver WriteInterfaceToken error");
-        return IPC_PROXY_TRANSACTION_ERR;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothPanProxy::DeregisterObserver error");
-        return INVALID_DATA;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteRemoteObject(observer->AsObject()),
+        BT_ERR_IPC_TRANS_FAILED, "Write object error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_ASYNC
-    };
+    MessageOption option(MessageOption::TF_ASYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DEREGISTER_OBSERVER), data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothPanProxy::DeregisterObserver done fail, error: %{public}d", error);
-        return INVALID_DATA;
-    }
-    return error;
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DEREGISTER_OBSERVER),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    return BT_NO_ERROR;
 }
 
 int32_t BluetoothPanProxy::SetTethering(const bool value)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
-        HILOGE("BluetoothPanProxy::SetTethering WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteBool(value)) {
-        HILOGE("BluetoothPanProxy::SetTethering error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(value), BT_ERR_IPC_TRANS_FAILED, "write value error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_SET_TETHERING), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothPanProxy::SetTethering done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_SET_TETHERING),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int32_t BluetoothPanProxy::IsTetheringOn(bool &result)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor())) {
-        HILOGE("BluetoothPanProxy::IsTetheringOn WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_IS_TETHERING_ON), data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothPanProxy::IsTetheringOn done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_IS_TETHERING_ON),
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t ret = reply.ReadInt32();
     if (ret != BT_NO_ERROR) {
