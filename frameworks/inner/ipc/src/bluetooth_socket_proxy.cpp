@@ -22,49 +22,22 @@ namespace OHOS {
 namespace Bluetooth {
 int BluetoothSocketProxy::Connect(ConnectSocketParam &param, int &fd)
 {
-    HILOGI("Connect starts");
     MessageParcel data;
-
-    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("Connect WriteInterfaceToken error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!data.WriteString(param.addr)) {
-        HILOGE("Connect write addr error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(param.addr), BT_ERR_IPC_TRANS_FAILED, "write param.addr error");
     BluetoothUuid btUuid(param.uuid);
-    if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("Connect write uuid error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    if (!data.WriteInt32(param.securityFlag)) {
-        HILOGE("Connect write securityFlag error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    if (!data.WriteInt32(param.type)) {
-        HILOGE("Connect write type error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    if (!data.WriteInt32(param.psm)) {
-        HILOGE("Connect write psm error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&btUuid), BT_ERR_IPC_TRANS_FAILED, "write btUuid error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteInt32(param.securityFlag), BT_ERR_IPC_TRANS_FAILED, "write param.securityFlag error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(param.type), BT_ERR_IPC_TRANS_FAILED, "write param.type error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(param.psm), BT_ERR_IPC_TRANS_FAILED, "write param.psm error");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
+    MessageOption option(MessageOption::TF_SYNC);
 
-    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::SOCKET_CONNECT, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("Connect done fail, error: %{public}d", error);
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::SOCKET_CONNECT,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int errorCode = reply.ReadInt32();
     if (errorCode == NO_ERROR) {
@@ -77,47 +50,22 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
 {
     fd = BT_INVALID_SOCKET_FD;
     MessageParcel data;
-
-    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("WriteInterfaceToken error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-    if (!data.WriteString(param.name)) {
-        HILOGE("write name error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(param.name), BT_ERR_IPC_TRANS_FAILED, "write param.name error");
     BluetoothUuid btUuid(param.uuid);
-    if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("write uuid error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    if (!data.WriteInt32(param.securityFlag)) {
-        HILOGE("write securityFlag error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    if (!data.WriteInt32(param.type)) {
-        HILOGE("write type error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    if (!data.WriteRemoteObject(param.observer->AsObject())) {
-        HILOGE("write remote object error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&btUuid), BT_ERR_IPC_TRANS_FAILED, "write btUuid error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteInt32(param.securityFlag), BT_ERR_IPC_TRANS_FAILED, "write param.securityFlag error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(param.type), BT_ERR_IPC_TRANS_FAILED, "write param.type error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteRemoteObject(param.observer->AsObject()), BT_ERR_IPC_TRANS_FAILED, "write object errorr");
 
     MessageParcel reply;
-    MessageOption option {
-        MessageOption::TF_SYNC
-    };
-    auto remote = Remote();
-    CHECK_AND_RETURN_LOG_RET(remote != nullptr, BT_ERR_INTERNAL_ERROR, "get remote is nullptr!");
-    int error = remote->SendRequest(BluetoothSocketInterfaceCode::SOCKET_LISTEN, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("Listen done fail, error: %{public}d", error);
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::SOCKET_LISTEN,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int errorCode = reply.ReadInt32();
     if (errorCode == NO_ERROR) {
@@ -129,126 +77,76 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
 
 int BluetoothSocketProxy::DeregisterServerObserver(const sptr<IBluetoothServerSocketObserver> &observer)
 {
-    HILOGD("BluetoothSocketProxy::DeregisterServerObserver start");
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("BluetoothSocketProxy::DeregisterServerObserver WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothSocketProxy::DeregisterServerObserver error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteRemoteObject(observer->AsObject()),
+        BT_ERR_IPC_TRANS_FAILED, "write object errorr");
+
     MessageParcel reply;
-    MessageOption option = {
-        MessageOption::TF_SYNC
-    };
-    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::DEREGISTER_SERVER_OBSERVER, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothSocketProxy::DeregisterServerObserver done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    HILOGD("BluetoothSocketProxy::DeregisterServerObserver success");
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::DEREGISTER_SERVER_OBSERVER,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int BluetoothSocketProxy::RegisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
     const sptr<IBluetoothClientSocketObserver> &observer)
 {
-    HILOGD("BluetoothSocketProxy::RegisterClientObserver start");
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("BluetoothSocketProxy::RegisterClientObserver WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-
-    if (!data.WriteParcelable(&dev)) {
-        HILOGE("write dev error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&dev), BT_ERR_IPC_TRANS_FAILED, "write dev error");
     BluetoothUuid btUuid(uuid);
-    if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("write uuid error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&btUuid), BT_ERR_IPC_TRANS_FAILED, "write btUuid error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteRemoteObject(observer->AsObject()), BT_ERR_IPC_TRANS_FAILED, "write object errorr");
 
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("write observer error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
     MessageParcel reply;
-    MessageOption option = {
-        MessageOption::TF_SYNC
-    };
-    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::REGISTER_CLIENT_OBSERVER, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothSocketProxy::RegisterClientObserver done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    HILOGD("BluetoothSocketProxy::RegisterClientObserver success");
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::REGISTER_CLIENT_OBSERVER,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int BluetoothSocketProxy::DeregisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
     const sptr<IBluetoothClientSocketObserver> &observer)
 {
-    HILOGD("BluetoothSocketProxy::DeregisterClientObserver start");
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("BluetoothSocketProxy::DeregisterClientObserver WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-
-    if (!data.WriteParcelable(&dev)) {
-        HILOGE("write dev error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&dev), BT_ERR_IPC_TRANS_FAILED, "write dev error");
 
     BluetoothUuid btUuid(uuid);
-    if (!data.WriteParcelable(&btUuid)) {
-        HILOGE("write uuid error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&btUuid), BT_ERR_IPC_TRANS_FAILED, "write btUuid error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteRemoteObject(observer->AsObject()), BT_ERR_IPC_TRANS_FAILED, "write object error");
 
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("write observer error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
     MessageParcel reply;
-    MessageOption option = {
-        MessageOption::TF_SYNC
-    };
-    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::DEREGISTER_CLIENT_OBSERVER, data, reply, option);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothSocketProxy::DeregisterClientObserver done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    HILOGD("BluetoothSocketProxy::DeregisterClientObserver success");
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::DEREGISTER_CLIENT_OBSERVER,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
     return reply.ReadInt32();
 }
 
 int BluetoothSocketProxy::UpdateCocConnectionParams(const BluetoothSocketCocInfo &info)
 {
-    HILOGI("UpdateCocConnectionParams starts");
     MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&info), BT_ERR_IPC_TRANS_FAILED, "write info error");
 
-    if (!data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor())) {
-        HILOGE("WriteInterfaceToken error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
-
-    if (!data.WriteParcelable(&info)) {
-        HILOGE("WriteParcelable error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(BluetoothSocketInterfaceCode::SOCKET_UPDATE_COC_PARAMS, data, reply, option);
-    if (error != BT_NO_ERROR) {
-        HILOGE("UpdateCocConnectionParams done fail, error: %{public}d", error);
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::SOCKET_UPDATE_COC_PARAMS,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     return reply.ReadInt32();
 }
