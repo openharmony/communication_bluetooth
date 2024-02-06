@@ -157,6 +157,7 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int3
             ClearGlobalResource();
             DelayedSingleton<BluetoothProfileManager>::GetInstance()->profileRemoteMap_.Clear();
             DelayedSingleton<BluetoothProfileManager>::GetInstance()->isBluetoothServiceOn_ = false;
+            BluetoothHost::GetDefaultHost().OnRemoveBluetoothSystemAbility();
             break;
         }
         default:
