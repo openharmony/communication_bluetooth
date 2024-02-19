@@ -134,12 +134,63 @@ public:
      */
     int GetPhy() const;
 
+    /**
+     * @brief Set callback type.
+     *
+     * @param callbackType callback type.
+     * @since 12
+     */
+    void SetCallbackType(uint8_t callbackType);
+
+    /**
+     * @brief Get callback type.
+     *
+     * @return callback type value.
+     * @since 12
+     */
+    uint8_t GetCallbackType() const;
+
+    /**
+     * @brief Set match track adv type for total number of advertisers to track per filter.
+     *
+     * @param matchTrackAdvType match track adv type value.
+     * @since 12
+     */
+    void SetMatchTrackAdvType(uint8_t matchTrackAdvType);
+
+    /**
+     * @brief Get match track adv type.
+     *
+     * @return match track adv type value.
+     * @since 12
+     */
+    uint8_t GetMatchTrackAdvType() const;
+
+    /**
+     * @brief Set match mode for Bluetooth LE scan filters hardware match.
+     *
+     * @param matchMode match mode value.
+     * @since 12
+     */
+    void SetMatchMode(uint8_t matchMode);
+
+    /**
+     * @brief Get match mode.
+     *
+     * @return match mode value.
+     * @since 12
+     */
+    uint8_t GetMatchMode() const;
+
     bool operator == (const BleScanSettingsImpl &rhs) const
     {
         return (legacy_ == rhs.GetLegacy()) &&
                (phy_ == rhs.GetPhy()) &&
                (reportDelayMillis_ == rhs.GetReportDelayMillisValue()) &&
-               (scanMode_ == rhs.GetScanMode());
+               (scanMode_ == rhs.GetScanMode()) &&
+               (callbackType_ == rhs.GetCallbackType()) &&
+               (matchTrackAdvType_ == rhs.GetMatchTrackAdvType()) &&
+               (matchMode_ == rhs.GetMatchMode());
     }
 
 private:
@@ -148,6 +199,9 @@ private:
     int scanMode_ = SCAN_MODE_LOW_POWER;
     bool legacy_ = true;
     int phy_ = PHY_LE_1M;
+    uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+    uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
+    uint8_t matchMode_ = MATCH_MODE_AGGRESSIVE;
 };
 
 /**

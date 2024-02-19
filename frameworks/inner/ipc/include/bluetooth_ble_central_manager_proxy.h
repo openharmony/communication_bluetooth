@@ -32,10 +32,9 @@ public:
         const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
     void DeregisterBleCentralManagerCallback(int32_t scannerId,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) override;
-    int StartScan(int32_t scannerId) override;
-    int StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings) override;
+    int StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings,
+        const std::vector<BluetoothBleScanFilter> &filters) override;
     int StopScan(int32_t scannerId) override;
-    int ConfigScanFilter(int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters) override;
     void RemoveScanFilter(int32_t scannerId) override;
     bool FreezeByRss(int32_t uid, bool isProxy) override;
     bool ResetAllProxy() override;
