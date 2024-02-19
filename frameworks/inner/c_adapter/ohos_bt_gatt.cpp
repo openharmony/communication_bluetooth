@@ -113,6 +113,15 @@ public:
     }
 
     /**
+     * @brief Scan result for found or lost callback type.
+     *
+     * @param result Scan result.
+     * @param callbackType callback Type.
+     * @since 12
+     */
+    void OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType) override {};
+
+    /**
      * @brief Batch scan results event callback.
      *
      * @param results Scan results.
@@ -825,14 +834,15 @@ static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nati
  * @param scannerId Indicates the scanner id.
  * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
  * @param filterSize Indicates the number of the scan filter.
+ * @param outScanFilters expected scan filters.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if set scan filter configs success;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *filter, uint32_t filterSize)
+static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *filter, uint32_t filterSize,
+    vector<BleScanFilter> &outScanFilters)
 {
     HILOGD("SetConfigScanFilter enter");
-    vector<BleScanFilter> scanFilters;
     for (uint32_t i = 0; i < filterSize; i++) {
         BleScanNativeFilter nativeScanFilter = filter[i];
         BleScanFilter scanFilter;
@@ -841,14 +851,8 @@ static int SetConfigScanFilter(int32_t scannerId, const BleScanNativeFilter *fil
             HILOGE("SetOneScanFilter faild, result: %{public}d", result);
             return OHOS_BT_STATUS_PARM_INVALID;
         }
-        scanFilters.push_back(scanFilter);
+        outScanFilters.push_back(scanFilter);
     }
-    std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
-    if (bleCentralManager == nullptr) {
-        HILOGE("SetConfigScanFilter fail, ble centra manager is null.");
-        return OHOS_BT_STATUS_FAIL;
-    }
-    bleCentralManager->ConfigScanFilter(scanFilters);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -883,8 +887,9 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
         return OHOS_BT_STATUS_FAIL;
     }
 
+    vector<BleScanFilter> scanFilters;
     if (filter != nullptr && filterSize != 0) {
-        int result = SetConfigScanFilter(scannerId, filter, filterSize);
+        int result = SetConfigScanFilter(scannerId, filter, filterSize, scanFilters);
         if (result != OHOS_BT_STATUS_SUCCESS) {
             HILOGE("SetConfigScanFilter faild, result: %{public}d", result);
             return OHOS_BT_STATUS_PARM_INVALID;
@@ -893,7 +898,7 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
 
     BleScanSettings settings;
     settings.SetScanMode(configs->scanMode);
-    bleCentralManager->StartScan(settings);
+    bleCentralManager->StartScan(settings, scanFilters);
     return OHOS_BT_STATUS_SUCCESS;
 }
 

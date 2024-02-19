@@ -75,7 +75,8 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner(MessageParce
     if (!result) {
         return TRANSACTION_ERR;
     }
-    OnScanCallback(*result);
+    uint8_t callbackType = data.ReadUint8();
+    OnScanCallback(*result, callbackType);
     return NO_ERROR;
 }
 
