@@ -78,12 +78,28 @@ private:
 
 class NapiNativeDiscoveryResultArray : public NapiNativeObject {
 public:
-    explicit NapiNativeDiscoveryResultArray(const std::shared_ptr<BluetoothRemoteDevice> &device) : remoteDevice_(device) {}
+    explicit NapiNativeDiscoveryResultArray(const std::shared_ptr<BluetoothRemoteDevice> &device)
+        : remoteDevice_(device) {}
     ~NapiNativeDiscoveryResultArray() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:
     std::shared_ptr<BluetoothRemoteDevice> remoteDevice_ {nullptr};
+};
+
+class NapiNativeDiscoveryInfoResultArray : public NapiNativeObject {
+public:
+    explicit NapiNativeDiscoveryInfoResultArray(
+        const std::shared_ptr<BluetoothRemoteDevice> &device, int rssi, const std::string deviceName, int deviceClass)
+        : remoteDevice_(device), rssi_(rssi), deviceName_(deviceName), deviceClass_(deviceClass) {}
+    ~NapiNativeDiscoveryInfoResultArray() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::shared_ptr<BluetoothRemoteDevice> remoteDevice_ {nullptr};
+    int rssi_ = 0;
+    std::string deviceName_ = "";
+    int deviceClass_ = MajorClass::MAJOR_UNCATEGORIZED;
 };
 
 class NapiNativePinRequiredParam : public NapiNativeObject {

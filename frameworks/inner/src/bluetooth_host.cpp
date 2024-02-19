@@ -120,11 +120,13 @@ public:
             [status](std::shared_ptr<BluetoothHostObserver> observer) { observer->OnDiscoveryStateChanged(status); });
     }
 
-    void OnDiscoveryResult(const BluetoothRawAddress &device) override
+    void OnDiscoveryResult(
+        const BluetoothRawAddress &device, int rssi, const std::string deviceName, int deviceClass) override
     {
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
-        host_.observers_.ForEach([remoteDevice](std::shared_ptr<BluetoothHostObserver> observer) {
-            observer->OnDiscoveryResult(remoteDevice);
+        host_.observers_.ForEach([remoteDevice, rssi, deviceName, deviceClass](
+            std::shared_ptr<BluetoothHostObserver> observer) {
+            observer->OnDiscoveryResult(remoteDevice, rssi, deviceName, deviceClass);
         });
     }
 
