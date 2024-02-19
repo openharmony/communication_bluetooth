@@ -148,7 +148,8 @@ public:
         random.uuid_[9] = static_cast<uint8_t>((tv.tv_usec & 0x0000FF0000000000) >> 40); // 9是uuid的数组下标，右移40位
         random.uuid_[8] = static_cast<uint8_t>((tv.tv_usec & 0x00FF000000000000) >> 48); // 8是uuid的数组下标，右移48位
         random.uuid_[7] = static_cast<uint8_t>((tv.tv_usec & 0xFF00000000000000) >> 56); // 7是uuid的数组下标，右移56位
-        random.uuid_[6] = static_cast<uint8_t>((randomTime.tm_sec + randNum) & 0xFF); // 6是uuid的数组下标
+        // 6是uuid的数组下标
+        random.uuid_[6] = static_cast<uint8_t>((randomTime.tm_sec + static_cast<int>(randNum)) & 0xFF);
         // 5是uuid的数组下标，右移8位
         random.uuid_[5] = static_cast<uint8_t>((randomTime.tm_min + (randNum >> 8)) & 0xFF);
         // 4是uuid的数组下标，右移16位
