@@ -30,7 +30,8 @@ public:
 
     // ON_DIS_STA_CHANGE_CODE
     virtual void OnDiscoveryStateChanged(int32_t status) = 0;
-    virtual void OnDiscoveryResult(const BluetoothRawAddress &device) = 0;
+    virtual void OnDiscoveryResult(
+        const BluetoothRawAddress &device, int rssi, const std::string deviceName, int deviceClass) = 0;
     virtual void OnPairRequested(const int32_t transport, const BluetoothRawAddress &device) = 0;
     virtual void OnPairConfirmed(
         const int32_t transport, const BluetoothRawAddress &device, int reqType, int number) = 0;

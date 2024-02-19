@@ -68,6 +68,53 @@ napi_value NapiNativeDiscoveryResultArray::ToNapiValue(napi_env env) const
     return array;
 }
 
+void ConvertDeviceClassToJS(napi_env env, napi_value result, int deviceClass)
+{
+    BluetoothDeviceClass classOfDevice = BluetoothDeviceClass(deviceClass);
+    int tmpMajorClass = classOfDevice.GetMajorClass();
+    int tmpMajorMinorClass = classOfDevice.GetMajorMinorClass();
+
+    napi_value majorClass = 0;
+    napi_create_int32(env, tmpMajorClass, &majorClass);
+    napi_set_named_property(env, result, "majorClass", majorClass);
+    napi_value majorMinorClass = 0;
+    napi_create_int32(env, tmpMajorMinorClass, &majorMinorClass);
+    napi_set_named_property(env, result, "majorMinorClass", majorMinorClass);
+    napi_value cod = 0;
+    napi_create_int32(env, deviceClass, &cod);
+    napi_set_named_property(env, result, "classOfDevice", cod);
+}
+
+napi_value NapiNativeDiscoveryInfoResultArray::ToNapiValue(napi_env env) const
+{
+    CHECK_AND_RETURN_LOG_RET(remoteDevice_, nullptr, "remoteDevice is nullptr");
+
+    napi_value array;
+    napi_value result = nullptr;
+    napi_create_array(env, &array);
+    napi_create_object(env, &result);
+
+    napi_value device = nullptr;
+    std::string addr = remoteDevice_->GetDeviceAddr();
+    napi_create_string_utf8(env, addr.c_str(), addr.size(), &device);
+    napi_set_named_property(env, result, "deviceId", device);
+
+    napi_value rssi = nullptr;
+    napi_create_int32(env, rssi_, &rssi);
+    napi_set_named_property(env, result, "rssi", rssi);
+
+    napi_value deviceName = nullptr;
+    napi_create_string_utf8(env, deviceName_.c_str(), deviceName_.size(), &deviceName);
+    napi_set_named_property(env, result, "deviceName", deviceName);
+
+    napi_value deviceClass = nullptr;
+    napi_create_object(env, &deviceClass);
+    ConvertDeviceClassToJS(env, deviceClass, deviceClass_);
+    napi_set_named_property(env, result, "deviceClass", deviceClass);
+    napi_set_element(env, array, 0, result);
+    return array;
+}
+
 static std::string GetFormatPinCode(uint32_t pinType, uint32_t pinCode)
 {
     std::string pinCodeStr = std::to_string(pinCode);

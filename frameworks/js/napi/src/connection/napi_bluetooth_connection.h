@@ -36,6 +36,7 @@ enum class ScanMode {
 enum class BluetoothTransport { TRANSPORT_BR_EDR = 0, TRANSPORT_LE = 1 };
 
 const std::string REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
+const std::string REGISTER_DISCOVERY_RESULT_TYPE = "discoveryResult";
 const std::string REGISTER_PIN_REQUEST_TYPE = "pinRequired";
 const std::string REGISTER_BOND_STATE_TYPE = "bondStateChange";
 const std::string INVALID_PIN_CODE = "000000";

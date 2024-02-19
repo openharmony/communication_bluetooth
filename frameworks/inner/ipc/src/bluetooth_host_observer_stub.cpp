@@ -95,8 +95,11 @@ ErrCode BluetoothHostObserverStub::OnDiscoveryResultInner(MessageParcel &data, M
         return TRANSACTION_ERR;
     }
 
+    int32_t rssi = data.ReadInt32();
+    std::string deviceName = data.ReadString();
+    int32_t deviceClass = data.ReadInt32();
     HILOGD("OnDiscoveryResultInner starts");
-    OnDiscoveryResult(*device);
+    OnDiscoveryResult(*device, rssi, deviceName, deviceClass);
 
     return NO_ERROR;
 }
