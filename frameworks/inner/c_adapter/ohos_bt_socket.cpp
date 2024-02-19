@@ -424,9 +424,9 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
         HILOGE("client is null!");
         return OHOS_BT_STATUS_FAIL;
     }
-    size_t writeLen = client->GetOutputStream().Write(data, len);
-    HILOGI("end, writeLen: %{public}zu", writeLen);
-    return static_cast<int>(writeLen);
+    int writeLen = client->GetOutputStream().Write(data, len);
+    HILOGI("end, writeLen: %{public}d", writeLen);
+    return writeLen;
 }
 
 /**
