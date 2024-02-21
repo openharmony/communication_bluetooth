@@ -16,6 +16,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_BLE_CENTRAL_MANAGER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_BLE_CENTRAL_MANAGER_INTERFACE_H
 
+#include <set>
 #include "../parcel/bluetooth_ble_scan_filter.h"
 #include "../parcel/bluetooth_ble_scan_settings.h"
 #include "../parcel/bluetooth_ble_advertiser_data.h"
@@ -57,7 +58,7 @@ public:
     virtual int StopScan(int32_t scannerId) = 0;
     virtual int ConfigScanFilter(int32_t scannerId, const std::vector<BluetoothBleScanFilter> &filters) = 0;
     virtual void RemoveScanFilter(int32_t scannerId) = 0;
-    virtual bool FreezeByRss(int32_t uid, bool isProxy) = 0;
+    virtual bool FreezeByRss(std::set<int> pidSet, bool isProxy) = 0;
     virtual bool ResetAllProxy() = 0;
     virtual int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle) = 0;
     virtual int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable) = 0;
