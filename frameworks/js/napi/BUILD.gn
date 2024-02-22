@@ -43,7 +43,14 @@ ohos_shared_library("bluetooth") {
     "BT_LOG_TAG = \"bluetooth_napi\"",
     "BT_LOG_DOMAIN = 0xD000100",
   ]
-
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
   sources = [
     "src/a2dp/napi_bluetooth_a2dp_src.cpp",
     "src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",
@@ -133,6 +140,14 @@ ohos_shared_library("bluetoothmanager") {
     "ENABLE_NAPI_BLUETOOTH_MANAGER",
   ]
 
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
   sources = [
     "src/a2dp/napi_bluetooth_a2dp_src.cpp",
     "src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",

@@ -33,6 +33,15 @@ ohos_shared_library("connection") {
     "BLUETOOTH_API_SINCE_10",
   ]
 
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
+
   sources = [
     "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
     "$BT_NAPI_DIR/src/common/napi_async_work.cpp",
