@@ -106,7 +106,7 @@ bool BluetoothGattCharacteristic::ReadFromParcel(Parcel &parcel)
         return false;
     }
     uint32_t length = 0;
-    if (!parcel.ReadUint32(length) || length > GATT_CHARACTERISTIC_PARCEL_SIZE_MAX) {
+    if (!parcel.ReadUint32(length) || length > GATT_CHARACTERISTIC_PARCEL_SIZE_MAX || length == 0) {
         HILOGE("read parcel length error, len=0x%{public}x", length);
         return false;
     }
