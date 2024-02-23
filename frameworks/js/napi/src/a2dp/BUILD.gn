@@ -33,6 +33,15 @@ ohos_shared_library("a2dp") {
     "BLUETOOTH_API_SINCE_10",
   ]
 
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
+
   sources = [
     "$BT_NAPI_DIR/src/a2dp/napi_bluetooth_a2dp_src.cpp",
     "$BT_NAPI_DIR/src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",

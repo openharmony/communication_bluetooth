@@ -19,15 +19,6 @@ BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
 ohos_shared_library("pbap") {
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
 
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
-    debug = false
-  }
-
   include_dirs = [
     "$BT_NAPI_DIR/include",
     "$BT_PART_DIR/frameworks/inner/include",
@@ -39,6 +30,15 @@ ohos_shared_library("pbap") {
     "ENABLE_NAPI_BLUETOOTH_MANAGER",
     "BLUETOOTH_API_SINCE_10",
   ]
+
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
 
   sources = [
     "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
