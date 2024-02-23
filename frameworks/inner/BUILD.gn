@@ -143,7 +143,14 @@ ohos_shared_library("btframework") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
-
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
   subsystem_name = "communication"
   part_name = "bluetooth"
 }
@@ -165,6 +172,14 @@ ohos_shared_library("btcommon") {
   configs = [ ":btcommon_config" ]
   public_configs = [ ":btcommon_public_config" ]
   innerapi_tags = [ "chipsetsdk" ]
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
   sources = [
     "ipc/common/avrcp_media.cpp",
     "ipc/common/ble_parcel_data.cpp",
