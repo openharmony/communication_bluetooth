@@ -106,18 +106,18 @@ bool BluetoothGattCharacteristic::ReadFromParcel(Parcel &parcel)
         return false;
     }
     uint32_t length = 0;
-    if (!parcel.ReadUint32(length) || length > GATT_CHARACTERISTIC_PARCEL_SIZE_MAX || length == 0) {
+    if (!parcel.ReadUint32(length) || length > GATT_CHARACTERISTIC_PARCEL_SIZE_MAX) {
         HILOGE("read parcel length error, len=0x%{public}x", length);
         return false;
     }
     length_ = length;
-    uint8_t value[length_];
-    for (size_t i = 0; i < length_; i++) {
-        if (!parcel.ReadUint8(value[i])) {
-            return false;
+    if (length > 0) {
+        uint8_t value[length_];
+        for (size_t i = 0; i < length_; i++) {
+            if (!parcel.ReadUint8(value[i])) {
+                return false;
+            }
         }
-    }
-    if (length != 0) {
         value_ = std::make_unique<uint8_t[]>(length);
         if (memcpy_s(value_.get(), length, value, length_) != EOK) {
             HILOGE("BluetoothGattCharacteristic::ReadFromParcel error");
