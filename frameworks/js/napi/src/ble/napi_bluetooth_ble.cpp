@@ -122,12 +122,15 @@ napi_value SysStartBLEScan(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
 
-    BleScanSettings settinngs;
-    settinngs.SetReportDelay(scanOptions.interval);
-    settinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
-    settinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
+    std::vector<BleScanFilter> scanFilters;
+    BleScanFilter emptyFilter;
+    scanFilters.push_back(emptyFilter);
+    BleScanSettings settings;
+    settings.SetReportDelay(scanOptions.interval);
+    settings.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
+    settings.SetPhy(static_cast<int32_t>(scanOptions.phyType));
 
-    BleCentralManagerGetInstance()->StartScan(settinngs);
+    BleCentralManagerGetInstance()->StartScan(settings, scanFilters);
     return NapiGetNull(env);
 }
 
@@ -356,10 +359,10 @@ static void ConvertMatchMode(ScanOptions &params, int32_t matchMode)
 {
     switch (matchMode) {
         case MatchMode::MATCH_MODE_AGGRESSIVE:
-            params.MatchMode = MatchMode::MATCH_MODE_AGGRESSIVE;
+            params.matchMode = MatchMode::MATCH_MODE_AGGRESSIVE;
             break;
         case MatchMode::MATCH_MODE_STICKY:
-            params.MatchMode = MatchMode::MATCH_MODE_STICKY;
+            params.matchMode = MatchMode::MATCH_MODE_STICKY;
             break;
         default:
             break;
@@ -633,13 +636,11 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
     std::vector<BleScanFilter> scanfilters;
-    BleScanSettings settinngs;
-    auto status = CheckBleScanParams(env, info, scanfilters, settinngs);
+    BleScanSettings settings;
+    auto status = CheckBleScanParams(env, info, scanfilters, settings);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = BleCentralManagerGetInstance()->ConfigScanFilter(scanfilters);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
-    ret = BleCentralManagerGetInstance()->StartScan(settinngs);
+    int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
 
     return NapiGetUndefinedRet(env);

@@ -745,11 +745,57 @@ public:
         return phy_;
     }
 
+    /**
+     * @brief Set callback type.
+     *
+     * @param callbackType callback type.
+     * @since 12
+     */
+    void SetCallbackType(uint8_t callbackType)
+    {
+        callbackType_ = callbackType;
+    }
+
+    /**
+     * @brief Get callback type.
+     *
+     * @return callback type value.
+     * @since 12
+     */
+    uint8_t GetCallbackType() const
+    {
+        return callbackType_;
+    }
+
+    /**
+     * @brief Set match track adv type for total number of advertisers to track per filter.
+     *
+     * @param matchTrackAdvType match track adv type value.
+     * @since 12
+     */
+    void SetMatchTrackAdvType(uint8_t matchTrackAdvType)
+    {
+        matchTrackAdvType_ = matchTrackAdvType;
+    }
+
+    /**
+     * @brief Get match track adv type.
+     *
+     * @return match track adv type value.
+     * @since 12
+     */
+    uint8_t GetMatchTrackAdvType() const
+    {
+        return matchTrackAdvType_;
+    }
+
 public:
     long reportDelayMillis_ = 0;
     int scanMode_ = 0;
     bool legacy_ = true;
     int phy_ = 255;
+    uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+    uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
 };
 
 /**

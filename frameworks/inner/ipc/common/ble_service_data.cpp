@@ -76,6 +76,36 @@ int BleScanSettingsImpl::GetPhy() const
     return phy_;
 }
 
+void BleScanSettingsImpl::SetCallbackType(uint8_t callbackType)
+{
+    callbackType_ = callbackType;
+}
+
+uint8_t BleScanSettingsImpl::GetCallbackType() const
+{
+    return callbackType_;
+}
+
+void BleScanSettingsImpl::SetMatchTrackAdvType(uint8_t matchTrackAdvType)
+{
+    matchTrackAdvType_ = matchTrackAdvType;
+}
+
+uint8_t BleScanSettingsImpl::GetMatchTrackAdvType() const
+{
+    return matchTrackAdvType_;
+}
+
+void BleScanSettingsImpl::SetMatchMode(uint8_t matchMode)
+{
+    matchMode_ = matchMode;
+}
+
+uint8_t BleScanSettingsImpl::GetMatchMode() const
+{
+    return matchMode_;
+}
+
 void BleScanFilterImpl::SetDeviceId(const std::string &deviceId)
 {
     deviceId_ = deviceId;

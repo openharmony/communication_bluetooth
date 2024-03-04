@@ -18,6 +18,7 @@
 
 #include "../parcel/bluetooth_ble_scan_result.h"
 #include "../common/ble_service_data.h"
+#include "../common/bt_def.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 
@@ -27,7 +28,8 @@ class IBluetoothBleCentralManagerCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleCentralManagerCallback");
 
-    virtual void OnScanCallback(const BluetoothBleScanResult &result) = 0;
+    virtual void OnScanCallback(const BluetoothBleScanResult &result,
+        uint8_t callbackType = bluetooth::BLE_SCAN_CALLBACK_TYPE_ALL_MATCH) = 0;
     virtual void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) = 0;
     virtual void OnStartOrStopScanEvent(int resultCode, bool isStartScan) = 0;
     virtual void OnNotifyMsgReportFromLpDevice(const bluetooth::Uuid &uuid, int msgType,
