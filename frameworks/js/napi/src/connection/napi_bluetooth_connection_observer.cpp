@@ -44,21 +44,11 @@ void NapiBluetoothConnectionObserver::OnDiscoveryStateChanged(int status)
     }
 }
 
-void NapiBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDevice &device)
+void NapiBluetoothConnectionObserver::OnDiscoveryResult(
+    const BluetoothRemoteDevice &device, int rssi, const std::string deviceName, int deviceClass)
 {
-    std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
-    auto napiDiscoveryResultCallback = GetCallback(REGISTER_DEVICE_FIND_TYPE);
-    if (!napiDiscoveryResultCallback) {
-        HILOGD("DiscoveryResult callback is not registered");
-        return;
-    }
-
-    auto func = [remoteDevice, callback = napiDiscoveryResultCallback]() {
-        CHECK_AND_RETURN_LOG(callback, "DiscoveryResult callback is not registered");
-        auto napiNative = std::make_shared<NapiNativeDiscoveryResultArray>(remoteDevice);
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiDiscoveryResultCallback->GetNapiEnv(), func);
+    OnDiscoveryResultCallBack(device);
+    OnDiscoveryResultCallBack(device, rssi, deviceName, deviceClass);
 }
 
 void NapiBluetoothConnectionObserver::OnPairRequested(const BluetoothRemoteDevice &device)
@@ -133,6 +123,42 @@ void NapiBluetoothConnectionObserver::OnPairConfirmedCallBack(
         callback->CallFunction(napiNative);
     };
     DoInJsMainThread(napiPairConfirmedCallback->GetNapiEnv(), func);
+}
+
+void NapiBluetoothConnectionObserver::OnDiscoveryResultCallBack(const BluetoothRemoteDevice &device)
+{
+    std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
+    auto napiDiscoveryResultCallback = GetCallback(REGISTER_DEVICE_FIND_TYPE);
+    if (!napiDiscoveryResultCallback) {
+        HILOGD("DiscoveryResult callback is not registered");
+        return;
+    }
+
+    auto func = [remoteDevice, callback = napiDiscoveryResultCallback]() {
+        CHECK_AND_RETURN_LOG(callback, "DiscoveryResult callback is not registered");
+        auto napiNative = std::make_shared<NapiNativeDiscoveryResultArray>(remoteDevice);
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiDiscoveryResultCallback->GetNapiEnv(), func);
+}
+
+void NapiBluetoothConnectionObserver::OnDiscoveryResultCallBack(
+    const BluetoothRemoteDevice &device, int rssi, const std::string &deviceName, int deviceClass)
+{
+    std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
+    auto napiDiscoveryResultCallback = GetCallback(REGISTER_DISCOVERY_RESULT_TYPE);
+    if (!napiDiscoveryResultCallback) {
+        HILOGD("DiscoveryResult callback is not registered");
+        return;
+    }
+
+    auto func = [remoteDevice, rssi, deviceName, deviceClass, callback = napiDiscoveryResultCallback]() {
+        CHECK_AND_RETURN_LOG(callback, "DiscoveryResult callback is not registered");
+        auto napiNative = std::make_shared<NapiNativeDiscoveryInfoResultArray>(
+            remoteDevice, rssi, deviceName, deviceClass);
+        callback->CallFunction(napiNative);
+    };
+    DoInJsMainThread(napiDiscoveryResultCallback->GetNapiEnv(), func);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

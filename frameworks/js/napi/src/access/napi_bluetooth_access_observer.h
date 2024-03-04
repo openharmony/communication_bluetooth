@@ -29,7 +29,8 @@ public:
 
     void OnStateChanged(const int transport, const int status) override;
     void OnDiscoveryStateChanged(int status) override {};
-    void OnDiscoveryResult(const BluetoothRemoteDevice &device) override {};
+    void OnDiscoveryResult(
+        const BluetoothRemoteDevice &device, int rssi, const std::string deviceName, int deviceClass) override {};
     void OnPairRequested(const BluetoothRemoteDevice &device) override {};
     void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number) override {};
     void OnScanModeChanged(int mode) override {};
