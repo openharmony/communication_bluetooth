@@ -30,6 +30,7 @@ public:
     static NapiBluetoothBleCentralManagerCallback &GetInstance(void);
 
     void OnScanCallback(const BleScanResult &result) override;
+    void OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType) override {};
     void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override;
     void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override;
     void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) override {};

@@ -380,6 +380,15 @@ typedef enum {
     SCAN_MODE_INVALID
 } SCAN_MODE;
 
+// Scan callback type
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_ALL_MATCH = 1;
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_LOST_MATCH = 4;
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH = 6;
+
+// Determines total number of advertisers to track per filter
+typedef enum { ONE_MATCH_TRACK_ADV = 1, FEW_MATCH_TRACK_ADV = 2, MAX_MATCH_TRACK_ADV = 3 } MATCH_TRACK_ADV_TYPE;
+
 // Phy type
 typedef enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 } PHY_TYPE;
 

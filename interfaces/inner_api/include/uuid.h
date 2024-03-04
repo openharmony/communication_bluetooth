@@ -282,6 +282,18 @@ public:
     }
 
     /**
+     * @brief Compare two UUID whether are same or not.
+     *
+     * @param rhs Compared UUID instance.
+     * @return Returns <b>true</b> if this UUID is the same as compared UUID;
+     *         returns <b>false</b> if this UUID is not the same as compared UUID.
+     */
+    bool operator==(const UUID &rhs) const
+    {
+        return uuid_ == rhs.uuid_;
+    }
+
+    /**
      * @brief In order to use the object key in the map object, overload the operator <.
      * @param[in] uuid : UUID object.
      * @return @c bool : If the object uuid is the same, return true, otherwise return false.

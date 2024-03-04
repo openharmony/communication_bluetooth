@@ -400,7 +400,20 @@ typedef enum {
     SCAN_MODE_OP_P50_100_200 = 0x07,
     SCAN_MODE_OP_P10_30_300 = 0x08,
 } SCAN_MODE;
-/// Regular scan params
+
+// Scan callback type
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_ALL_MATCH = 1;
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_LOST_MATCH = 4;
+constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH = 6;
+
+// Match mode for Bluetooth LE scan filters hardware match
+typedef enum { MATCH_MODE_AGGRESSIVE = 1, MATCH_MODE_STICKY = 2 } MATCH_MODE;
+
+// Determines total number of advertisers to track per filter
+typedef enum { ONE_MATCH_TRACK_ADV = 1, FEW_MATCH_TRACK_ADV = 2, MAX_MATCH_TRACK_ADV = 3 } MATCH_TRACK_ADV_TYPE;
+
+// Regular scan params
 constexpr uint16_t BLE_SCAN_MODE_LOW_POWER_WINDOW_MS = 512;
 constexpr uint16_t BLE_SCAN_MODE_LOW_POWER_INTERVAL_MS = 5120;
 constexpr uint16_t BLE_SCAN_MODE_BALANCED_WINDOW_MS = 1024;

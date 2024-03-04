@@ -229,6 +229,15 @@ public:
     virtual void OnScanCallback(const BleScanResult &result) = 0;
 
     /**
+     * @brief Scan result for found or lost callback type.
+     *
+     * @param result Scan result.
+     * @param callbackType callback Type.
+     * @since 12
+     */
+    virtual void OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType) = 0;
+
+    /**
      * @brief Batch scan results event callback.
      *
      * @param results Scan results.
@@ -343,11 +352,44 @@ public:
      */
     int GetPhy() const;
 
+    /**
+     * @brief Set callback type.
+     *
+     * @param callbackType callback type.
+     * @since 12
+     */
+    void SetCallbackType(uint8_t callbackType);
+
+    /**
+     * @brief Get callback type.
+     *
+     * @return callback type value.
+     * @since 12
+     */
+    uint8_t GetCallbackType() const;
+
+    /**
+     * @brief Set match track adv type for total number of advertisers to track per filter.
+     *
+     * @param matchTrackAdvType match track adv type value.
+     * @since 12
+     */
+    void SetMatchTrackAdvType(uint8_t matchTrackAdvType);
+    /**
+     * @brief Get match track adv type.
+     *
+     * @return match track adv type value.
+     * @since 12
+     */
+    uint8_t GetMatchTrackAdvType() const;
+
 private:
     long reportDelayMillis_ = 0;
     int scanMode_ = SCAN_MODE_LOW_POWER;
     bool legacy_ = true;
     int phy_ = PHY_LE_1M;
+    uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+    uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
 };
 
 /**
@@ -419,6 +461,32 @@ public:
     void SetManufactureDataMask(std::vector<uint8_t> manufactureDataMask);
 
     std::vector<uint8_t> GetManufactureDataMask() const;
+
+    /**
+     * @brief Compare two BleScanFilter whether are same or not.
+     *
+     * @param rhs Compared BleScanFilter instance.
+     * @return Returns <b>true</b> if this BleScanFilter is the same as compared BleScanFilter;
+     *         returns <b>false</b> if this BleScanFilter is not the same as compared BleScanFilter.
+     */
+    bool operator==(const BleScanFilter &rhs) const
+    {
+        return (deviceId_ == rhs.deviceId_) &&
+            (name_ == rhs.name_) &&
+            (serviceUuid_ == rhs.serviceUuid_) &&
+            (serviceUuidMask_ == rhs.serviceUuidMask_) &&
+            (serviceSolicitationUuid_ == rhs.serviceSolicitationUuid_) &&
+            (serviceSolicitationUuidMask_ == rhs.serviceSolicitationUuidMask_) &&
+            (hasServiceUuid_ == rhs.hasServiceUuid_) &&
+            (hasServiceUuidMask_ == rhs.hasServiceUuidMask_) &&
+            (hasSolicitationUuid_ == rhs.hasSolicitationUuid_) &&
+            (hasSolicitationUuidMask_ == rhs.hasSolicitationUuidMask_) &&
+            (serviceData_ == rhs.serviceData_) &&
+            (serviceDataMask_ == rhs.serviceDataMask_) &&
+            (manufacturerId_ == rhs.manufacturerId_) &&
+            (manufactureData_ == rhs.manufactureData_) &&
+            (manufactureDataMask_ == rhs.manufactureDataMask_);
+    }
 
     private:
         std::string deviceId_;
@@ -495,17 +563,11 @@ public:
     /**
      * @brief Start scan.
      *
-     * @since 6
-     */
-    int StartScan();
-
-    /**
-     * @brief Start scan.
-     *
      * @param settings Scan settings.
-     * @since 6
+     * @param filters Scan filters.
+     * @since 11
      */
-    int StartScan(const BleScanSettings &settings);
+    int StartScan(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters);
 
     /**
      * @brief Stop scan.
@@ -513,12 +575,6 @@ public:
      * @since 6
      */
     int StopScan();
-
-    /**
-     * @brief Config scan filter.
-     *
-     */
-    int ConfigScanFilter(const std::vector<BleScanFilter> &filter);
 
     /**
     * @brief set low power device adv param.
