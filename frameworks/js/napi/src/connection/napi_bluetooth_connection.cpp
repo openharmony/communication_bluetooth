@@ -118,7 +118,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 static bool IsValidObserverType(const std::string &callbackName)
 {
     if (callbackName == REGISTER_DEVICE_FIND_TYPE || callbackName == REGISTER_PIN_REQUEST_TYPE ||
-        callbackName == REGISTER_BOND_STATE_TYPE) {
+        callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_DISCOVERY_RESULT_TYPE) {
         return true;
     } else {
         HILOGE("not support %{public}s.", callbackName.c_str());
