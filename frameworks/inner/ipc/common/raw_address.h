@@ -17,7 +17,7 @@
 #define RAW_ADDRESS_H
 
 #include <cstddef>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include "iosfwd"
 

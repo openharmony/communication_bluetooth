@@ -123,7 +123,7 @@ int BluetoothAvrcpCtObserverStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data,reply);
+            return (this->*memberFunc)(data, reply);
         }
     }
 
@@ -177,7 +177,7 @@ ErrCode BluetoothAvrcpCtObserverStub::OnSetBrowsedPlayerInner(MessageParcel &dat
     int result = data.ReadInt32();
     int detail = data.ReadInt32();
 
-    OnSetBrowsedPlayer(RawAddress(addr), uidCounter, numberOfItems, folderNames,result, detail);
+    OnSetBrowsedPlayer(RawAddress(addr), uidCounter, numberOfItems, folderNames, result, detail);
     return NO_ERROR;
 }
 
