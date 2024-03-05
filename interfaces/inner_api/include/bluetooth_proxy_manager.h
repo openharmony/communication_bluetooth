@@ -17,6 +17,7 @@
 #define BLUETOOTH_PROXY_MANAGER_H
 
 #include <mutex>
+#include <set>
 
 #include "iremote_broker.h"
 #include "refbase.h"
@@ -26,35 +27,13 @@ namespace Bluetooth {
 class IBluetoothBleCentralManager;
 class BluetoothProxyManager {
 public:
-    bool FreezeByRss(int32_t uid, bool isProxy);
+    bool FreezeByRss(std::set<int> pidSet, bool isProxy);
     bool ResetAllProxy();
 
     static BluetoothProxyManager& GetInstance();
-
 private:
     BluetoothProxyManager() = default;
     ~BluetoothProxyManager() = default;
-    BluetoothProxyManager(const BluetoothProxyManager& bleProxyManager);
-    const BluetoothProxyManager &operator=(const BluetoothProxyManager& bleProxyManager);
-
-private:
-    class BleCentralManagerDeathRecipient : public IRemoteObject::DeathRecipient {
-    public:
-        explicit BleCentralManagerDeathRecipient(BluetoothProxyManager &bleProxyManager);
-        ~BleCentralManagerDeathRecipient() override;
-
-        void OnRemoteDied(const wptr<IRemoteObject> &object) override;
-
-    private:
-        BluetoothProxyManager &bleProxyManager_;
-    };
-
-private:
-    bool GetBleCentralManagerProxy();
-    void ResetClient();
-    sptr<IBluetoothBleCentralManager> proxy_;
-    sptr<BleCentralManagerDeathRecipient> recipient_;
-    std::mutex mutex_;
 };
 } // namespace Bluetooth
 } // namespace OHOS
