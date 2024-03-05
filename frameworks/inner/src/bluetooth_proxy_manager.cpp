@@ -19,10 +19,8 @@
 #include "bluetooth_def.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
+#include "bluetooth_profile_manager.h"
 #include "i_bluetooth_ble_central_manager.h"
-#include "i_bluetooth_host.h"
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -32,18 +30,16 @@ BluetoothProxyManager& BluetoothProxyManager::GetInstance()
     return instance;
 }
 
-bool BluetoothProxyManager::FreezeByRss(int32_t uid, bool isProxy)
+bool BluetoothProxyManager::FreezeByRss(std::set<int> pidSet, bool isProxy)
 {
-    HILOGD("FreezeByRss start. uid:%{public}d , isProxy:%{public}d", uid, isProxy);
     if (!IS_BLE_ENABLED()) {
         HILOGD("bluetooth is off.");
         return false;
     }
-    if (!GetBleCentralManagerProxy()) {
-        HILOGE("GetBleCentralManagerProxy failed.");
-        return false;
-    }
-    return proxy_->FreezeByRss(uid, isProxy);
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy, false, "failed: no proxy");
+    return proxy->FreezeByRss(pidSet, isProxy);
 }
 
 bool BluetoothProxyManager::ResetAllProxy()
@@ -53,72 +49,10 @@ bool BluetoothProxyManager::ResetAllProxy()
         HILOGD("bluetooth is off.");
         return false;
     }
-    if (!GetBleCentralManagerProxy()) {
-        HILOGE("GetBleCentralManagerProxy failed.");
-        return false;
-    }
-    return proxy_->ResetAllProxy();
-}
-
-bool BluetoothProxyManager::GetBleCentralManagerProxy()
-{
-    if (proxy_) {
-        return true;
-    }
-
-    std::lock_guard<std::mutex> lock(mutex_);
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!samgr) {
-        HILOGE("samgr is null");
-        return false;
-    }
-
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-    if (!hostRemote) {
-        HILOGE("hostRemote is null");
-        return false;
-    }
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    if (!hostProxy) {
-        HILOGE("hostProxy is null");
-        return false;
-    }
-    sptr<IRemoteObject> remote = hostProxy->GetBleRemote(BLE_CENTRAL_MANAGER_SERVER);
-    if (!remote) {
-        HILOGE("remote is null");
-        return false;
-    }
-    proxy_ = iface_cast<IBluetoothBleCentralManager>(remote);
-    if (!proxy_ || !proxy_->AsObject()) {
-        HILOGE("proxy_ is null");
-        return false;
-    }
-    recipient_ = new (std::nothrow) BleCentralManagerDeathRecipient(*this);
-    if (!recipient_) {
-        HILOGE("recipient_ is null");
-        proxy_ = nullptr;
-        return false;
-    }
-    proxy_->AsObject()->AddDeathRecipient(recipient_);
-    return true;
-}
-
-void BluetoothProxyManager::ResetClient()
-{
-    if (proxy_ && proxy_->AsObject()) {
-        proxy_->AsObject()->RemoveDeathRecipient(recipient_);
-    }
-    proxy_ = nullptr;
-}
-
-BluetoothProxyManager::BleCentralManagerDeathRecipient::BleCentralManagerDeathRecipient(
-    BluetoothProxyManager &bleProxyManager) : bleProxyManager_(bleProxyManager) {}
-
-BluetoothProxyManager::BleCentralManagerDeathRecipient::~BleCentralManagerDeathRecipient() {}
-
-void BluetoothProxyManager::BleCentralManagerDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
-{
-    bleProxyManager_.ResetClient();
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy, false, "failed: no proxy");
+    return proxy->ResetAllProxy();
 }
 } // namespace Bluetooth
 } // namespace OHOS
