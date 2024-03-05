@@ -415,7 +415,8 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
     proxy->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
 }
 
-int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration, std::shared_ptr<BleAdvertiseCallback> callback)
+int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration,
+    std::shared_ptr<BleAdvertiseCallback> callback)
 {
     HILOGI("enter");
     if (!IS_BLE_ENABLED()) {

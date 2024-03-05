@@ -57,7 +57,7 @@ struct Descriptor {
 
     Descriptor(uint16_t handle, const uint8_t *value, size_t length);
 
-    ~Descriptor(){}
+    ~Descriptor() {}
 
     Descriptor &operator=(const Descriptor &src) = delete;
     Descriptor &operator=(Descriptor &&src) = delete;
@@ -97,7 +97,7 @@ struct Characteristic {
     {
     }
 
-    ~Characteristic(){}
+    ~Characteristic() {}
 
     Characteristic(const Characteristic &src);
 

@@ -41,12 +41,13 @@ void ConvertAddr(const unsigned char in[6], std::string &out)
     out = string(temp);
 }
 
-void GetAddrFromString(std::string in, unsigned char out[6]) {
+void GetAddrFromString(std::string in, unsigned char out[6])
+{
     int j = 0;
     for (unsigned int i = 0; i < in.length(); i++) {
         if (in.at(i) != ':') {
-            out[j] = strtoul(in.substr(i, 2).c_str(), 0, 16);
-            i += 2;
+            out[j] = strtoul(in.substr(i, 2).c_str(), 0, 16); // 2，16 作为截取字符的开始位置或截取长度
+            i += 2; // for循环中每轮i值增加2
             j++;
         }
     }
@@ -61,7 +62,7 @@ void GetAddrFromByte(unsigned char in[6], std::string &out)
 {
     char temp[18] = {0};
     (void)sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
-        in[0], in[1], in[2], in[3], in[4], in[5]);
+        in[0], in[1], in[2], in[3], in[4], in[5]); // 0, 1, 2, 3, 4, 5, 指MAC地址的6个数据段
     out = string(temp);
 }
 

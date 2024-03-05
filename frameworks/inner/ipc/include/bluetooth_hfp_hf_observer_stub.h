@@ -43,7 +43,7 @@ private:
     ErrCode OnVoiceRecognitionStatusChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnInBandRingToneChangedInner(MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothHfpHfObserverFunc = ErrCode (BluetoothHfpHfObserverStub::*)(MessageParcel &data, 
+    using BluetoothHfpHfObserverFunc = ErrCode (BluetoothHfpHfObserverStub::*)(MessageParcel &data,
         MessageParcel &reply);
     std::map<uint32_t, BluetoothHfpHfObserverFunc> memberFuncMap_;
 

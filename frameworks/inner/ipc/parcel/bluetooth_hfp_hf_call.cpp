@@ -69,7 +69,8 @@ bool BluetoothHfpHfCall::WriteToParcel(Parcel &parcel) const
     return true;
 }
 
-bool BluetoothHfpHfCall::ReadFromParcel(Parcel &parcel) {
+bool BluetoothHfpHfCall::ReadFromParcel(Parcel &parcel)
+{
     if (!parcel.ReadString(device_)) {
         return false;
     }
