@@ -691,7 +691,6 @@ public:
             resp.mediaItems_ = std::make_unique<AvrcpCtResponse::MediaItems>(uidCounter, mediaItems);
             observer->OnActionCompleted(device, resp);
         });
-
     }
 
     void OnGetItemAttributes(const BluetoothRemoteDevice &device, const std::vector<uint32_t> &attributes,

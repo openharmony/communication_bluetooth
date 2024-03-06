@@ -40,9 +40,6 @@ public:
     static std::shared_ptr<NapiA2dpSinkObserver> observer_;
     static bool isRegistered_;
 };
-
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_A2DP_SNK_H_ */

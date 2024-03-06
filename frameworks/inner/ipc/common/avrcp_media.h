@@ -16,7 +16,7 @@
 #ifndef AVRCP_MEDIA_H
 #define AVRCP_MEDIA_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 #include "cstdint"

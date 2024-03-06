@@ -437,7 +437,7 @@ struct HandsFreeUnit::impl {
         HILOGI("enter");
         observers_.Deregister(observer);
     }
-   int32_t profileRegisterId = 0;
+    int32_t profileRegisterId = 0;
 private:
     const static int HFP_HF_SLC_STATE_DISCONNECTED = static_cast<int>(BTConnectState::DISCONNECTED);
     const static int HFP_HF_SCO_STATE_DISCONNECTED = 3;

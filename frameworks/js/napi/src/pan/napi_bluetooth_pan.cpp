@@ -60,7 +60,7 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env, napi_value exports)
 #else
         DECLARE_NAPI_FUNCTION("getConnectionDevices", NapiBluetoothPan::GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", NapiBluetoothPan::GetDeviceState),
-#endif   
+#endif
     };
 
     napi_define_class(env, "NapiBluetoothPan", NAPI_AUTO_LENGTH, NapiBluetoothPan::PanConstructor, nullptr,
@@ -77,7 +77,7 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env, napi_value exports)
     NapiProfile::SetProfile(env, ProfileId::PROFILE_PAN_NETWORK, napiProfile);
     Pan *profile = Pan::GetProfile();
     profile->RegisterObserver(NapiBluetoothPan::observer_);
-#endif    
+#endif
 }
 
 napi_value NapiBluetoothPan::DefineCreateProfile(napi_env env, napi_value exports)
