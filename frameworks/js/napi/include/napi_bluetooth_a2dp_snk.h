@@ -24,7 +24,6 @@ namespace OHOS {
 namespace Bluetooth {
 class NapiA2dpSink {
 public:
-
     static void DefineA2dpSinkJSClass(napi_env env);
     static napi_value A2dpSinkConstructor(napi_env env, napi_callback_info info);
 
@@ -40,9 +39,6 @@ public:
     static NapiA2dpSinkObserver observer_;
     static bool isRegistered_;
 };
-
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_A2DP_SNK_H_ */

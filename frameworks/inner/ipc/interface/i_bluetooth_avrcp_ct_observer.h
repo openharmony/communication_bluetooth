@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
-class IBluetoothAvrcpCtObserver: public OHOS::IRemoteBroker {
+class IBluetoothAvrcpCtObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpCtObserver");
 
@@ -43,8 +43,8 @@ public:
         const RawAddress &rawAddr, std::vector<uint8_t> attributes, int result) = 0;
     virtual void OnGetPlayerAppSettingValues(const RawAddress &rawAddr,
         int attribute, const std::vector<uint8_t> &values, int result) = 0;
-    virtual void OnGetPlayerAppSettingCurrentValue(
-        const RawAddress &rawAddr, const std::vector<uint8_t> attributes, const std::vector<uint8_t> &values, int result) = 0;
+    virtual void OnGetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, const std::vector<uint8_t> attributes,
+        const std::vector<uint8_t> &values, int result) = 0;
     virtual void OnSetPlayerAppSettingCurrentValue(const RawAddress &rawAddr, int result) = 0;
     virtual void OnGetPlayerAppSettingAttributeText(const RawAddress &rawAddr,
         const std::vector<uint8_t> attribtues, const std::vector<std::string> &attributeName, int result) = 0;
@@ -75,8 +75,8 @@ public:
     virtual void OnVolumeChanged(const RawAddress &rawAddr, uint8_t volume, int result) = 0;
     virtual void OnGetMediaPlayers(const RawAddress &rawAddr, uint16_t uidCounter,
         std::vector<BluetoothAvrcpMpItem> &items, int result, int detail) = 0;
-    virtual void OnGetFolderItems(const RawAddress &rawAddr, uint16_t uidCounter, std::vector<BluetoothAvrcpMeItem> &items,
-           int result, int detail) = 0;
+    virtual void OnGetFolderItems(const RawAddress &rawAddr, uint16_t uidCounter,
+        std::vector<BluetoothAvrcpMeItem> &items, int result, int detail) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

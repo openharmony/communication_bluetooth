@@ -52,8 +52,6 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports
 
     napi_define_class(env, "NapiBluetoothHidHost", NAPI_AUTO_LENGTH, HidHostConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
-
-    
 #ifdef BLUETOOTH_API_SINCE_10
     DefineCreateProfile(env, exports);
     napi_create_reference(env, constructor, 1, &consRef_);

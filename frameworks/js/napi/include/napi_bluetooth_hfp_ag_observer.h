@@ -25,7 +25,7 @@ namespace Bluetooth {
 const std::string STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
 const std::string STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE = "scoStateChange";
 
-class NapiHandsFreeAudioGatewayObserver : public HandsFreeAudioGatewayObserver{
+class NapiHandsFreeAudioGatewayObserver : public HandsFreeAudioGatewayObserver {
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
     void OnScoStateChanged(const BluetoothRemoteDevice &device, int state) override;
