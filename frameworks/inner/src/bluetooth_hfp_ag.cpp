@@ -487,7 +487,7 @@ int32_t HandsFreeAudioGateway::ConnectSco(uint8_t callType)
 {
     HILOGI("enter, callType: %{public}d", callType);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-	sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY,
         "hfpAG proxy is nullptr.");
     CHECK_AND_RETURN_LOG_RET((pimpl->IsValidCallType(callType)), BT_ERR_INVALID_PARAM,
@@ -499,7 +499,7 @@ int32_t HandsFreeAudioGateway::DisconnectSco(uint8_t callType)
 {
     HILOGI("enter, callType: %{public}d", callType);
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-	sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY,
         "hfpAG proxy is nullptr.");
     CHECK_AND_RETURN_LOG_RET((pimpl->IsValidCallType(callType)), BT_ERR_INVALID_PARAM,
@@ -521,7 +521,7 @@ void HandsFreeAudioGateway::PhoneStateChanged(
     int numActive, int numHeld, int callState, const std::string &number, int type, const std::string &name)
 {
     CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
-	sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "hfpAG proxy is nullptr.");
 
     BluetoothPhoneState phoneState;

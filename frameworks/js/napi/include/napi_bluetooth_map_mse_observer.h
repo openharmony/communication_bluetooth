@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Bluetooth {
 const std::string STR_BT_MAP_MSE_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
-class NapiMapMseObserver : public MapMseObserver{
+class NapiMapMseObserver : public MapMseObserver {
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state) override;
 

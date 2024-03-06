@@ -25,7 +25,7 @@ namespace Bluetooth {
 
 const std::string STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
-class NapiA2dpSourceObserver : public A2dpSourceObserver{
+class NapiA2dpSourceObserver : public A2dpSourceObserver {
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 
