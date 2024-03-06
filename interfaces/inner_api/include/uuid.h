@@ -77,22 +77,26 @@ public:
      */
     UUID(const long mostSigBits, const long leastSigBits)
     {
-        this->uuid_[15] = static_cast<uint8_t>(leastSigBits & 0x00000000000000FF);
-        this->uuid_[14] = static_cast<uint8_t>((leastSigBits & 0x000000000000FF00) >> 8);
+        this->uuid_[15] = static_cast<uint8_t>(leastSigBits & 0x00000000000000FF); // 15是uuid的数组下标
+        this->uuid_[14] = static_cast<uint8_t>((leastSigBits & 0x000000000000FF00) >> 8); // 14是uuid的数组下标，右移8位
+        // 13是uuid的数组下标，右移16位
         this->uuid_[13] = static_cast<uint8_t>((leastSigBits & 0x0000000000FF0000) >> 16);
+        // 12是uuid的数组下标，右移24位
         this->uuid_[12] = static_cast<uint8_t>((leastSigBits & 0x00000000FF000000) >> 24);
+        // 11是uuid的数组下标，右移32位
         this->uuid_[11] = static_cast<uint8_t>((leastSigBits & 0x000000FF00000000) >> 32);
+        // 10是uuid的数组下标，右移40位
         this->uuid_[10] = static_cast<uint8_t>((leastSigBits & 0x0000FF0000000000) >> 40);
-        this->uuid_[9] = static_cast<uint8_t>((leastSigBits & 0x00FF000000000000) >> 48);
-        this->uuid_[8] = static_cast<uint8_t>((leastSigBits & 0xFF00000000000000) >> 56);
-        this->uuid_[7] = static_cast<uint8_t>(mostSigBits & 0x00000000000000FF);
-        this->uuid_[6] = static_cast<uint8_t>((mostSigBits & 0x000000000000FF00) >> 8);
-        this->uuid_[5] = static_cast<uint8_t>((mostSigBits & 0x0000000000FF0000) >> 16);
-        this->uuid_[4] = static_cast<uint8_t>((mostSigBits & 0x00000000FF000000) >> 24);
-        this->uuid_[3] = static_cast<uint8_t>((mostSigBits & 0x000000FF00000000) >> 32);
-        this->uuid_[2] = static_cast<uint8_t>((mostSigBits & 0x0000FF0000000000) >> 40);
-        this->uuid_[1] = static_cast<uint8_t>((mostSigBits & 0x00FF000000000000) >> 48);
-        this->uuid_[0] = static_cast<uint8_t>((mostSigBits & 0xFF00000000000000) >> 56);
+        this->uuid_[9] = static_cast<uint8_t>((leastSigBits & 0x00FF000000000000) >> 48); // 9是uuid的数组下标，右移48位
+        this->uuid_[8] = static_cast<uint8_t>((leastSigBits & 0xFF00000000000000) >> 56); // 8是uuid的数组下标，右移56位
+        this->uuid_[7] = static_cast<uint8_t>(mostSigBits & 0x00000000000000FF); // 7是uuid的数组下标，右移8位
+        this->uuid_[6] = static_cast<uint8_t>((mostSigBits & 0x000000000000FF00) >> 8); // 6是uuid的数组下标，右移8位
+        this->uuid_[5] = static_cast<uint8_t>((mostSigBits & 0x0000000000FF0000) >> 16); // 5是uuid的数组下标，右移16位
+        this->uuid_[4] = static_cast<uint8_t>((mostSigBits & 0x00000000FF000000) >> 24); // 4是uuid的数组下标，右移24位
+        this->uuid_[3] = static_cast<uint8_t>((mostSigBits & 0x000000FF00000000) >> 32); // 3是uuid的数组下标，右移32位
+        this->uuid_[2] = static_cast<uint8_t>((mostSigBits & 0x0000FF0000000000) >> 40); // 2是uuid的数组下标，右移40位
+        this->uuid_[1] = static_cast<uint8_t>((mostSigBits & 0x00FF000000000000) >> 48); // 1是uuid的数组下标，右移48位
+        this->uuid_[0] = static_cast<uint8_t>((mostSigBits & 0xFF00000000000000) >> 56); // 0是uuid的数组下标，右移56位
     }
 
     /**
@@ -115,8 +119,8 @@ public:
         }
 
         for (std::size_t i = 0; (i + 1) < tmp.length();) {
-            ret.uuid_[i / 2] = std::stoi(tmp.substr(i, 2), nullptr, 16);
-            i += 2;
+            ret.uuid_[i / 2] = std::stoi(tmp.substr(i, 2), nullptr, 16); // uuid的长度为16，i / 2作为uuid的数组下标
+            i += 2; // for 循环中，每轮增加2
         }
 
         return ret;
@@ -173,10 +177,10 @@ public:
         static const char *hex = "0123456789ABCDEF";
 
         for (auto it = this->uuid_.begin(); it != this->uuid_.end(); it++) {
-            tmp.push_back(hex[((*it) >> 4 & 0xF)]);
+            tmp.push_back(hex[(((*it) >> 4) & 0xF)]); // 右移4位
             tmp.push_back(hex[(*it) & 0xF]);
         }
-
+        // ToString操作，8， 4， 12， 16，20 作为截取字符的开始位置或截取长度
         ret = tmp.substr(0, 8) + "-" + tmp.substr(8, 4) + "-" + tmp.substr(12, 4) + "-" + tmp.substr(16, 4) + "-" +
               tmp.substr(20);
 
@@ -225,8 +229,8 @@ public:
     uint64_t GetLeastSignificantBits() const
     {
         uint64_t leastSigBits = 0;
-        for (int i = UUID128_BYTES_LEN / 2; i < UUID128_BYTES_LEN; i++) {
-            leastSigBits = (leastSigBits << 8) | (uuid_[i] & 0xFF);
+        for (int i = UUID128_BYTES_LEN / 2; i < UUID128_BYTES_LEN; i++) { // uuid长度/2作为i初始值
+            leastSigBits = (leastSigBits << 8) | (uuid_[i] & 0xFF); // 左移8位
         }
         return leastSigBits;
     }
@@ -240,8 +244,8 @@ public:
     uint64_t GetMostSignificantBits() const
     {
         uint64_t mostSigBits = 0;
-        for (int i = 0 / 2; i < UUID128_BYTES_LEN / 2; i++) {
-            mostSigBits = (mostSigBits << 8) | (uuid_[i] & 0xFF);
+        for (int i = 0 / 2; i < UUID128_BYTES_LEN / 2; i++) { // uuid长度/2作为i最大值
+            mostSigBits = (mostSigBits << 8) | (uuid_[i] & 0xFF); // 左移8位
         }
         return mostSigBits;
     }

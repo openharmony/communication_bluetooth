@@ -61,7 +61,7 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env, napi_value exports)
 #else
         DECLARE_NAPI_FUNCTION("getConnectionDevices", NapiBluetoothPan::GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", NapiBluetoothPan::GetDeviceState),
-#endif   
+#endif
     };
 
     napi_define_class(env, "NapiBluetoothPan", NAPI_AUTO_LENGTH, NapiBluetoothPan::PanConstructor, nullptr,
