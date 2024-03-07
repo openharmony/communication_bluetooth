@@ -64,7 +64,8 @@ private:
     ErrCode OnGetMediaPlayersInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnGetFolderItemsInner(MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothAvrcpCtObserverStubFunc = ErrCode (BluetoothAvrcpCtObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+    using BluetoothAvrcpCtObserverStubFunc =
+        ErrCode (BluetoothAvrcpCtObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothAvrcpCtObserverStubFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothAvrcpCtObserverStub);
