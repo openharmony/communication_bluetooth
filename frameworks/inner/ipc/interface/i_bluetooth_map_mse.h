@@ -29,7 +29,6 @@ class IBluetoothMapMse : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothMapMse");
 
-    // IBluetoothMapMse:
     virtual void RegisterObserver(
         const sptr<IBluetoothMapMseObserver> &observer) = 0;
     virtual void DeregisterObserver(

@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
-class IBluetoothAvrcpCt: public OHOS::IRemoteBroker {
+class IBluetoothAvrcpCt : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpCt");
 
