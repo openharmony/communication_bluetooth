@@ -34,7 +34,7 @@ namespace OHOS {
 namespace Bluetooth {
 class BluetoothMapMseObserverImp : public BluetoothMapMseObserverStub {
 public:
-    explicit BluetoothMapMseObserverImp(BluetoothObserverList<MapMseObserver> &observers) 
+    explicit BluetoothMapMseObserverImp(BluetoothObserverList<MapMseObserver> &observers)
         : observers_(observers)
     {}
     ~BluetoothMapMseObserverImp() override

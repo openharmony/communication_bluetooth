@@ -352,7 +352,8 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
         HILOGE("samgrProxy is nullptr.");
         return false;
     }
-   sptr<IRemoteObject> hostRemote = DelayedSingleton<BluetoothProfileManager>::GetInstance()->GetProfileRemote(BLUETOOTH_HOST);
+    sptr<IRemoteObject> hostRemote =
+        DelayedSingleton<BluetoothProfileManager>::GetInstance()->GetProfileRemote(BLUETOOTH_HOST);
     //当蓝牙服务已经起来的时候。这时的hostRemote不为空， 不需要进行后续的从sa拉起蓝牙服务的动作
     if (hostRemote != nullptr) {
         return true;

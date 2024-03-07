@@ -290,7 +290,7 @@ enum GattStatus {
     GATT_SUCCESS
 };
 
-enum BtStatus{
+enum BtStatus {
     BT_SUCCESS = 0,
     BT_FAILURE = -1,
 };

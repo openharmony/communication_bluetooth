@@ -87,8 +87,8 @@ int BluetoothAudioManagerProxy::GetWearDetectionState(const std::string &deviceI
 int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported)
 {
     MessageParcel data;
-    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
-        "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::IsWearDetectionSupported Write device error");
     MessageParcel reply;
@@ -101,11 +101,12 @@ int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const BluetoothRawA
     return reply.ReadInt32();
 }
 
-int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const BluetoothRawAddress &device, int useA2dp, int useHfp, int userSelection)
+int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const BluetoothRawAddress &device,
+    int useA2dp, int useHfp, int userSelection)
 {
     MessageParcel data;
-    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()), BT_ERR_INTERNAL_ERROR,
-        "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "BluetoothAudioManagerProxy::IsWearDetectionSupported WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::SendDeviceSelection Write device error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(useA2dp), BT_ERR_INTERNAL_ERROR,
