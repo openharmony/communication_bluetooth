@@ -131,7 +131,7 @@ bool IsBleEnabled();
 
 /**
  * @brief Get local host bluetooth address.
- * 
+ *
  * @return Returns <b>true</b> if the operation is accepted;
  *         returns <b>false</b> if the operation is rejected.
  */
@@ -139,7 +139,7 @@ bool GetLocalAddr(unsigned char *mac, unsigned int len);
 
 /**
  * @brief Set local device name.
- * 
+ *
  * @param localName Device name.
  * @param length localName length, The maximum length of the name is {@link OHOS_BD_NAME_LEN}.
  * @return Returns <b>true</b> if the operation is successful;
@@ -188,7 +188,7 @@ bool SetFastScan(bool isEnable);
 
 /**
  * @brief Gap state changed callback.
- * 
+ *
  * @param transport Transport type when state change, details see {@link BtTransportId}
  * @param status Change to the new state, details see {@link BtStackState}.
  */
@@ -196,7 +196,7 @@ typedef void (*GapStateChangedCallback)(const int transport, const int status);
 
 /**
  * @brief ACL state changed callback.
- * 
+ *
  * @param bdAddr device address.
  * @param state details of acl state changed.
  * @param reason clarify detals of REASON CODE from stack - If possible, suggest using the standard HCI error code.
@@ -205,21 +205,21 @@ typedef void (*GapAclStateChangedCallback)(const BdAddr *bdAddr, GapAclState sta
 
 /**
  * @brief Discovery state changed callback.
- * 
+ *
  * @param status DISCOVERY_STARTED/DISCOVERYING/DISCOVERY_STOPED
  */
 typedef void (*GapDiscoveryStateChangedCallback)(int status);
 
 /**
  * @brief Discovery state changed observer.
- * 
+ *
  * @param status Device discovery status.
  */
 typedef void (*GapDiscoveryResultCallback)(const BdAddr *bdAddr);
 
 /**
  * @brief Pair request observer.
- * 
+ *
  * @param bdAddr Remote device address.
  * @param transport Transport type, details see {@link BtTransportId}
  */
@@ -227,7 +227,7 @@ typedef void (*GapPairRequestedCallback)(const BdAddr *bdAddr, int transport);
 
 /**
  * @brief Pair confirmed observer.
- * 
+ *
  * @param bdAddr Remote device address.
  * @param transport Transport type, details see {@link BtTransportId}
  * @param reqType Pair type.
@@ -237,28 +237,28 @@ typedef void (*GapPairConfirmedCallback)(const BdAddr *bdAddr, int transport, in
 
 /**
  * @brief Scan mode changed observer.
- * 
+ *
  * @param mode Device scan mode.
  */
 typedef void (*GapScanModeChangedCallback)(int mode);
 
 /**
  * @brief Device name changed observer.
- * 
+ *
  * @param deviceName Device name.
  */
 typedef void (*GapLocalDeviceNameChangedCallback)(const unsigned char *deviceName, unsigned char length);
 
 /**
  * @brief Device address changed observer.
- * 
+ *
  * @param bdAddr Device address.
  */
 typedef void (*GapLocalDeviceAddrChangedCallback)(const BdAddr *bdAddr);
 
 /**
  * @brief Pair status changed observer.
- * 
+ *
  * @param bdAddr Device address.
  * @param status Remote device pair status.
  */
@@ -266,7 +266,7 @@ typedef void (*GapPairStatusChangedCallback)(const BdAddr *bdAddr, int status);
 
 /**
  * @brief Remote uuid changed observer.
- * 
+ *
  * @param bdAddr Device address.
  * @param uuid Remote device uuids.
  */
@@ -274,7 +274,7 @@ typedef void (*GapRemoteUuidChangedCallback)(const BdAddr *bdAddr, BtUuid uuid);
 
 /**
  * @brief Remote name changed observer.
- * 
+ *
  * @param bdAddr Device address.
  * @param deviceName Remote device name.
  */
@@ -283,7 +283,7 @@ typedef void (*GapRemoteNameChangedCallback)(const BdAddr *bdAddr,
 
 /**
  * @brief Remote alias changed observer.
- * 
+ *
  * @param bdAddr Device address.
  * @param alias Remote device alias.
  */
@@ -291,7 +291,7 @@ typedef void (*GapRemoteAliasChangedCallback)(const BdAddr *bdAddr, const unsign
 
 /**
  * @brief Remote cod changed observer.
- * 
+ *
  * @param bdAddr Device address.
  * @param cod Remote device cod.
  */
@@ -299,7 +299,7 @@ typedef void (*GapRemoteCodChangedCallback)(const BdAddr *bdAddr, int cod);
 
 /**
  * @brief Remote battery level changed observer.
- * 
+ *
  * @param bdAddr Device address.
  * @param cod Remote device battery Level.
  */
@@ -307,7 +307,7 @@ typedef void (*GapRemoteBatteryLevelChangedCallback)(const BdAddr *bdAddr, int b
 
 /**
  * @brief Remote rssi event observer.
- * 
+ *
  * @param bdAddr Device address.
  * @param rssi Remote device rssi.
  * @param status Read status.
@@ -316,7 +316,7 @@ typedef void (*GapReadRemoteRssiEventCallback)(const BdAddr *bdAddr, int rssi, i
 
 /**
  * @brief Query application whether to accept the connection.
- * 
+ *
  * @param bdAddr Device address.
  * @param res Application decision, 0 is reject, 1 is accept.
  */
@@ -347,7 +347,7 @@ typedef struct {
 
 /**
  * @brief Registers GAP callbacks.
- * 
+ *
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the callbacks are registered;
  * returns an error code defined in {@link BtStatus} otherwise.
  */

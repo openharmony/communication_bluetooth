@@ -336,7 +336,8 @@ public:
     /**
      * @brief Check whether in-band-ringing is enabled
      *
-     * @return Returns <b>true</b> if the in-band-ringing is enbale; returns <b>false</b> if the in-band-ringing is disable.
+     * @return Returns <b>true</b> if the in-band-ringing is enbale;
+     * returns <b>false</b> if the in-band-ringing is disable.
      * @since 11
      */
     int IsInbandRingingEnabled(bool &isEnabled) const;

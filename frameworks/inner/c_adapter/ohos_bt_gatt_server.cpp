@@ -188,7 +188,6 @@ static std::shared_ptr<GattAttribute> GetAttributeWithUuid(int serverId, int ser
     auto attribute = GetAttribute(serverId, serviceIndex, [attributeType, uuid](GattAttribute &attr) {
         return attr.attrType == attributeType && attr.uuid.Equals(uuid);
     });
-
     if (!attribute) {
         HILOGE("Not found attribute(attributeType: %{public}s, uuid: %{public}s)"
             "in serverId(%{public}d) serviceIndex(%{public}d)",
@@ -210,7 +209,6 @@ static std::shared_ptr<GattAttribute> GetDescriptorAttribute(
         [characterHandle = characterAttribute->handle, descriptorUuid](GattAttribute &attr) {
             return attr.handle > characterHandle && attr.uuid.Equals(descriptorUuid);
     });
-
     if (!descriptorAttribute) {
         HILOGE("Not found descriptorAttribute(uuid: %{public}s) in serverId(%{public}d) serviceIndex(%{public}d)",
             descriptorUuid.ToString().c_str(), serverId, serviceIndex);
@@ -948,7 +946,8 @@ int BleGattsDeleteService(int serverId, int srvcHandle)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsClearServices(int serverId) {
+int BleGattsClearServices(int serverId)
+{
     HILOGI("serverId: %{public}d", serverId);
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -1060,7 +1059,8 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct) {
+int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -1096,7 +1096,8 @@ int BleGattsRegisterCallbacks(BtGattServerCallbacks *func)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo) {
+int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -1110,7 +1111,8 @@ int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattsStopServiceEx(int srvcHandle) {
+int BleGattsStopServiceEx(int srvcHandle)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 }  // namespace Bluetooth
