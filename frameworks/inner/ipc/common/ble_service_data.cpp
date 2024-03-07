@@ -1280,7 +1280,7 @@ uint8_t BlePeripheralDevice::GetPairedStatus() const
  */
 bool BlePeripheralDevice::SetPairedStatus(uint8_t status)
 {
-    if (BLE_PAIR_NONE > status || BLE_PAIR_CANCELING < status) {
+    if (BLE_PAIR_CANCELING < status || status < BLE_PAIR_NONE) {
         return false;
     }
     if (pairState_ == status) {

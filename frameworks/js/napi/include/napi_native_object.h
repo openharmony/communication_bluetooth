@@ -78,7 +78,8 @@ private:
 
 class NapiNativeDiscoveryResultArray : public NapiNativeObject {
 public:
-    explicit NapiNativeDiscoveryResultArray(const std::shared_ptr<BluetoothRemoteDevice> &device) : remoteDevice_(device) {}
+    explicit NapiNativeDiscoveryResultArray(
+        const std::shared_ptr<BluetoothRemoteDevice> &device) : remoteDevice_(device) {}
     ~NapiNativeDiscoveryResultArray() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;

@@ -332,7 +332,7 @@ static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServe
 }
 
 #ifdef BLUETOOTH_API_SINCE_10
-static napi_status CheckNotifyCharacteristicChangedEx(napi_env env, napi_callback_info info, 
+static napi_status CheckNotifyCharacteristicChangedEx(napi_env env, napi_callback_info info,
     NapiGattServer **outServer, std::string &outDeviceId, NapiNotifyCharacteristic &outCharacter)
 {
     size_t argc = ARGS_SIZE_THREE;
@@ -361,7 +361,8 @@ napi_value NapiGattServer::NotifyCharacteristicChangedEx(napi_env env, napi_call
     std::string deviceId {};
     NapiNotifyCharacteristic notifyCharacter;
     auto status = CheckNotifyCharacteristicChangedEx(env, info, &napiServer, deviceId, notifyCharacter);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && napiServer && napiServer->GetServer()), BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && napiServer && napiServer->GetServer()),
+        BT_ERR_INVALID_PARAM);
 
     auto func = [server = napiServer->GetServer(), notifyCharacter, deviceId]() {
         int ret = BT_ERR_INTERNAL_ERROR;
