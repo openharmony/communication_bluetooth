@@ -247,7 +247,8 @@ private:
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int InitBtStack(void) {
+int InitBtStack(void)
+{
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -258,7 +259,8 @@ int InitBtStack(void) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int EnableBtStack(void) {
+int EnableBtStack(void)
+{
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -269,7 +271,8 @@ int EnableBtStack(void) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int DisableBtStack(void) {
+int DisableBtStack(void)
+{
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -282,7 +285,8 @@ int DisableBtStack(void) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int SetDeviceName(const char *name, unsigned int len) {
+int SetDeviceName(const char *name, unsigned int len)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -375,7 +379,8 @@ int BleStopAdv(int advId)
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleUpdateAdv(int advId, const BleAdvParams *param) {
+int BleUpdateAdv(int advId, const BleAdvParams *param)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -387,7 +392,8 @@ int BleUpdateAdv(int advId, const BleAdvParams *param) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleSetSecurityIoCap(BleIoCapMode mode) {
+int BleSetSecurityIoCap(BleIoCapMode mode)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -399,7 +405,8 @@ int BleSetSecurityIoCap(BleIoCapMode mode) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleSetSecurityAuthReq(BleAuthReqMode mode) {
+int BleSetSecurityAuthReq(BleAuthReqMode mode)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -413,7 +420,8 @@ int BleSetSecurityAuthReq(BleAuthReqMode mode) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int BleGattSecurityRsp(BdAddr bdAddr, bool accept) {
+int BleGattSecurityRsp(BdAddr bdAddr, bool accept)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -426,7 +434,8 @@ int BleGattSecurityRsp(BdAddr bdAddr, bool accept) {
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6
  */
-int ReadBtMacAddr(unsigned char *mac, unsigned int len) {
+int ReadBtMacAddr(unsigned char *mac, unsigned int len)
+{
     return OHOS_BT_STATUS_UNSUPPORTED;
 }
 
@@ -566,7 +575,8 @@ static bool IsRpa(const AdvOwnAddrParams *ownAddrParams)
  * @param advId Indicates the pointer to the advertisement ID.
  * @param rawData Indicates the advertising data. For details, see {@link StartAdvRawData}.
  * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
- * @param ownAddrParams Indicates the own address(little endian) and own address type. For details, see {@link AdvOwnAddrParams}.
+ * @param ownAddrParams Indicates the own address(little endian) and own address type.
+ * For details, see {@link AdvOwnAddrParams}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the operation is successful;
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 6

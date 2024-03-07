@@ -36,7 +36,7 @@ public:
     virtual int GetScoState(const BluetoothRawAddress &device) = 0;
     virtual int32_t ConnectSco(uint8_t callType) = 0;
     virtual int32_t DisconnectSco(uint8_t callType) = 0;
-    virtual bool ConnectSco() = 0; 
+    virtual bool ConnectSco() = 0;
     virtual bool DisconnectSco() = 0;
     virtual void PhoneStateChanged(BluetoothPhoneState &phoneState) = 0;
     virtual void ClccResponse(int index, int direction, int status, int mode, bool mpty, const std::string &number,
