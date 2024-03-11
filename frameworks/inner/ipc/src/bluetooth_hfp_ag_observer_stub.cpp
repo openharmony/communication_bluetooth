@@ -85,7 +85,8 @@ ErrCode BluetoothHfpAgObserverStub::OnScoStateChangedInner(MessageParcel &data, 
         return TRANSACTION_ERR;
     }
     int state = data.ReadInt32();
-    OnScoStateChanged(*device, state);
+    int reason = data.ReadInt32();
+    OnScoStateChanged(*device, state, reason);
     return BT_NO_ERROR;
 }
 
