@@ -67,9 +67,10 @@ public:
      *
      * @param device Remote device object.
      * @param state Audio connection state.
+     * @param reason Reason for Audio status change.
      * @since 6
      */
-    virtual void OnScoStateChanged(const BluetoothRemoteDevice &device, int32_t state)
+    virtual void OnScoStateChanged(const BluetoothRemoteDevice &device, int32_t state, int32_t reason)
     {}
 
     /**

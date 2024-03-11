@@ -52,12 +52,13 @@ public:
         });
     }
 
-    void OnScoStateChanged(const BluetoothRawAddress &device, int32_t state) override
+    void OnScoStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t reason) override
     {
-        HILOGI("enter, device: %{public}s, state: %{public}u", GetEncryptAddr((device).GetAddress()).c_str(), state);
+        HILOGI("enter, device: %{public}s, state: %{public}u, reason: %{public}u",
+            GetEncryptAddr((device).GetAddress()).c_str(), state, reason);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
-            observer->OnScoStateChanged(remoteDevice, state);
+        observers_.ForEach([remoteDevice, state, reason](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
+            observer->OnScoStateChanged(remoteDevice, state, reason);
         });
     }
 
