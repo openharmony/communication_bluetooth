@@ -50,7 +50,7 @@ int BluetoothRemoteDevice::GetDeviceType() const
 bool BluetoothRemoteDevice::IsValidBluetoothRemoteDevice() const
 {
     CHECK_AND_RETURN_LOG_RET(BluetoothHost::IsValidBluetoothAddr(address_), false,
-        "invalid bluetooth addr, address_: %{public}s", GetEncryptAddr(address_).c_str());
+        "invalid bluetooth addr, address_: %{public}s", GET_ENCRYPT_STR_ADDR(address_));
 
     CHECK_AND_RETURN_LOG_RET(transport_ == BT_TRANSPORT_BREDR ||
         transport_ == BT_TRANSPORT_BLE || transport_ == BT_TRANSPORT_NONE,
@@ -316,13 +316,13 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
     majorClass = deviceClass.GetMajorClass();
     majorMinorClass = deviceClass.GetMajorMinorClass();
     if (cod == 0) {
-        HILOGW("cod = %{public}d", cod);
+        HILOGW("address = %{public}s, cod = %{public}d", GET_ENCRYPT_STR_ADDR(address_), cod);
         cod = BluetoothDevice::MAJOR_UNCATEGORIZED;
         majorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
         majorMinorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
     }
-    HILOGD("cod = %{public}#X, majorClass = %{public}#X, majorMinorClass = %{public}#X",
-        cod, majorClass, majorMinorClass);
+    HILOGD("address = %{public}s, cod = %{public}#X, majorClass = %{public}#X, majorMinorClass = %{public}#X",
+        GET_ENCRYPT_STR_ADDR(address_), cod, majorClass, majorMinorClass);
 
     return ret;
 }

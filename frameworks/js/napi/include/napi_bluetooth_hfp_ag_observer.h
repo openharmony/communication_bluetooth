@@ -28,7 +28,7 @@ const std::string STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE = "s
 class NapiHandsFreeAudioGatewayObserver : public HandsFreeAudioGatewayObserver {
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
-    void OnScoStateChanged(const BluetoothRemoteDevice &device, int state) override;
+    void OnScoStateChanged(const BluetoothRemoteDevice &device, int state, int reason = 0) override;
 
     void OnActiveDeviceChanged(const BluetoothRemoteDevice &device) override{}
     void OnHfEnhancedDriverSafetyChanged(const BluetoothRemoteDevice &device, int indValue) override{}

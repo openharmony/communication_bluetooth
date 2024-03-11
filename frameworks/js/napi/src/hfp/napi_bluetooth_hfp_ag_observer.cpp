@@ -39,7 +39,7 @@ void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const Bluetooth
     NapiEvent::CheckAndNotify(callbackInfo, state);
 }
 
-void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state)
+void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state, int reason)
 {
     HILOGI("address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
     std::unique_lock<std::shared_mutex> guard(g_handsFreeAudioGatewayCallbackMutex);
