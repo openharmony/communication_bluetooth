@@ -45,25 +45,26 @@ public:
     void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
         HILOGD("hfpAg conn state, device: %{public}s, state: %{public}s",
-            GetEncryptAddr((device).GetAddress()).c_str(), GetProfileConnStateName(state).c_str());
+            GET_ENCRYPT_RAW_ADDR(device), GetProfileConnStateName(state).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
         });
     }
 
-    void OnScoStateChanged(const BluetoothRawAddress &device, int32_t state) override
+    void OnScoStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t reason) override
     {
-        HILOGI("enter, device: %{public}s, state: %{public}u", GetEncryptAddr((device).GetAddress()).c_str(), state);
+        HILOGI("enter, device: %{public}s, state: %{public}u, reason: %{public}u",
+            GET_ENCRYPT_RAW_ADDR(device), state, reason);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
-            observer->OnScoStateChanged(remoteDevice, state);
+        observers_.ForEach([remoteDevice, state, reason](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
+            observer->OnScoStateChanged(remoteDevice, state, reason);
         });
     }
 
     void OnActiveDeviceChanged(const BluetoothRawAddress &device) override
     {
-        HILOGI("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
+        HILOGI("enter, device: %{public}s", GET_ENCRYPT_RAW_ADDR(device));
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnActiveDeviceChanged(remoteDevice);
@@ -74,7 +75,7 @@ public:
         const BluetoothRawAddress &device, int32_t indValue) override
     {
         HILOGI("enter, device: %{public}s, indValue: %{public}d",
-            GetEncryptAddr((device).GetAddress()).c_str(), indValue);
+            GET_ENCRYPT_RAW_ADDR(device), indValue);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, indValue](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnHfEnhancedDriverSafetyChanged(remoteDevice, indValue);
