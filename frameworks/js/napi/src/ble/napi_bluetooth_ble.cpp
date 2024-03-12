@@ -410,7 +410,7 @@ static napi_status ParseScanParameters(
     const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params)
 {
     (void)info;
-    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanArg, {"interval", "dutyMode", "matchMode"}));
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanArg, {"interval", "dutyMode", "matchMode", "phyType"}));
 
     bool exist = false;
     int32_t interval = 0;
@@ -1063,8 +1063,10 @@ napi_value PropertyInit(napi_env env, napi_value exports)
 
     napi_value matchModeObj = nullptr;
     napi_value scanDutyObj = nullptr;
+    napi_value phyTypeObj = nullptr;
     napi_create_object(env, &matchModeObj);
     napi_create_object(env, &scanDutyObj);
+    napi_create_object(env, &phyTypeObj);
 
     SetNamedPropertyByInteger(env, matchModeObj, MatchMode::MATCH_MODE_STICKY, "MATCH_MODE_STICKY");
     SetNamedPropertyByInteger(env, matchModeObj, MatchMode::MATCH_MODE_AGGRESSIVE, "MATCH_MODE_AGGRESSIVE");
@@ -1074,6 +1076,10 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         env, scanDutyObj, static_cast<int32_t>(ScanDuty::SCAN_MODE_LOW_LATENCY), "SCAN_MODE_LOW_LATENCY");
     SetNamedPropertyByInteger(
         env, scanDutyObj, static_cast<int32_t>(ScanDuty::SCAN_MODE_LOW_POWER), "SCAN_MODE_LOW_POWER");
+    SetNamedPropertyByInteger(
+        env, phyTypeObj, static_cast<int32_t>(PhyType::PHY_LE_1M), "PHY_LE_1M");
+    SetNamedPropertyByInteger(
+        env, phyTypeObj, static_cast<int32_t>(PhyType::PHY_LE_ALL_SUPPORTED), "PHY_LE_ALL_SUPPORTED");
 
 #ifdef BLUETOOTH_API_SINCE_10
     napi_value gattWriteTypeObj = nullptr;
@@ -1093,6 +1099,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("MatchMode", matchModeObj),
         DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObj),
+        DECLARE_NAPI_PROPERTY("PhyType", phyTypeObj),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
         DECLARE_NAPI_PROPERTY("AdvertisingState", advertisingStateObj),
