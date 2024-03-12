@@ -163,7 +163,7 @@ BleCentralManager::impl::impl()
         .bleTurnOnFunc = bleTurnOnFunc,
         .bluetoothTurnOffFunc = bluetoothTurnOffFunc,
     };
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(
+    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(
         BLE_CENTRAL_MANAGER_SERVER, profileFunctions);
 }
 
@@ -285,7 +285,7 @@ int32_t BleCentralManager::impl::CheckScanParams(const BleScanSettings &settings
 BleCentralManager::impl::~impl()
 {
     HILOGD("start");
-    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");

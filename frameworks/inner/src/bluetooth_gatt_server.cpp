@@ -449,7 +449,7 @@ bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
         return true;
     }
     serviceCallback_ = new BluetoothGattServerCallbackStubImpl(server);
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_GATT_SERVER,
+    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_GATT_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothGattServer> proxy = iface_cast<IBluetoothGattServer>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -834,7 +834,7 @@ int GattServer::SendResponse(
 GattServer::~GattServer()
 {
     HILOGD("enter");
-    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(pimpl->profileRegisterId);
+    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(pimpl->profileRegisterId);
     sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     if (pimpl->isRegisterSucceeded_) {
