@@ -43,7 +43,7 @@ struct ProfileIdProperty {
     std::string objectName = "";
 };
 class BluetoothProfileManager {
-DECLARE_DELAYED_SINGLETON(BluetoothProfileManager);
+DECLARE_SINGLETON(BluetoothProfileManager);
 
 public:
     /**
