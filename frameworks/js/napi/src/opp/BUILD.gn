@@ -41,14 +41,6 @@ ohos_shared_library("opp") {
   ]
 
   sources = [
-    "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
-    "$BT_NAPI_DIR/src/common/napi_async_work.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_event.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
-    "$BT_NAPI_DIR/src/common/napi_native_object.cpp",
-    "$BT_NAPI_DIR/src/common/napi_timer.cpp",
-    "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
     "napi_bluetooth_opp.cpp",
     "napi_bluetooth_opp_observer.cpp",
     "native_module_opp.cpp",

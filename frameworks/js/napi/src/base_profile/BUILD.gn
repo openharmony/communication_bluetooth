@@ -44,7 +44,6 @@ ohos_shared_library("baseprofile") {
   }
 
   sources = [
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
     "napi_bluetooth_base_profile.cpp",
     "native_module_base_profile.cpp",
   ]

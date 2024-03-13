@@ -46,14 +46,6 @@ ohos_shared_library("a2dp") {
     "$BT_NAPI_DIR/src/a2dp/napi_bluetooth_a2dp_src.cpp",
     "$BT_NAPI_DIR/src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",
     "$BT_NAPI_DIR/src/a2dp/native_module_a2dp.cpp",
-    "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
-    "$BT_NAPI_DIR/src/common/napi_async_work.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_event.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
-    "$BT_NAPI_DIR/src/common/napi_native_object.cpp",
-    "$BT_NAPI_DIR/src/common/napi_timer.cpp",
-    "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
   ]
 
   deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
