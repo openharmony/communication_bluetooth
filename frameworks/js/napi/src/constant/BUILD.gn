@@ -44,7 +44,6 @@ ohos_shared_library("constant") {
   }
 
   sources = [
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
     "napi_bluetooth_constant.cpp",
     "native_module_constant.cpp",
   ]

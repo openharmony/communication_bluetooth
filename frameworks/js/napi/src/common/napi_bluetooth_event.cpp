@@ -47,10 +47,10 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 napi_value callResult = nullptr;
                 if (napi_get_undefined(callbackInfo->env_, &undefined) == napi_ok) {
                     result = callbackInfo->packResult();
-                    if (result != nullptr) {
-                        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE,
-                            &result, &callResult);
-                    }
+                }
+                if (result != nullptr) {
+                    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE,
+                        &result, &callResult);
                 }
             }
             delete callbackInfo;

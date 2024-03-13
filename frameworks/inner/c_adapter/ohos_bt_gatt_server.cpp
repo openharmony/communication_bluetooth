@@ -691,7 +691,7 @@ int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number
 {
     HILOGD("enter");
     string strUuid(srvcUuid.uuid);
-    if (!regex_match(strUuid, uuidRegex)) {
+    if (!IsValidUuid(strUuid)) {
         HILOGE("match the UUID faild.");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -763,7 +763,7 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
         return OHOS_BT_STATUS_PARM_INVALID;
     }
     string strUuid(characUuid.uuid);
-    if (!regex_match(strUuid, uuidRegex)) {
+    if (!IsValidUuid(strUuid)) {
         HILOGE("match the UUID faild.");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -815,7 +815,7 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
     }
     string strUuid(descUuid.uuid);
     HILOGD("descUuid: %{public}s", strUuid.c_str());
-    if (!regex_match(strUuid, uuidRegex)) {
+    if (!IsValidUuid(strUuid)) {
         HILOGE("match the UUID faild.");
         return OHOS_BT_STATUS_PARM_INVALID;
     }

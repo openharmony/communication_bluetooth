@@ -478,7 +478,6 @@ void AfterWorkCallback(uv_work_t *work, int status)
 int DoInJsMainThread(napi_env env, std::function<void(void)> func);
 
 bool IsValidAddress(std::string bdaddr);
-bool IsValidUuid(std::string uuid);
 bool IsValidTransport(int transport);
 bool IsValidConnectStrategy(int strategy);
 napi_status NapiIsBoolean(napi_env env, napi_value value);

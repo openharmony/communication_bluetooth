@@ -473,11 +473,6 @@ bool IsValidAddress(std::string bdaddr)
     return regex_match(bdaddr, deviceIdRegex);
 }
 
-bool IsValidUuid(std::string uuid)
-{
-    return regex_match(uuid, uuidRegex);
-}
-
 bool IsValidTransport(int transport)
 {
     return transport == BT_TRANSPORT_BREDR || transport == BT_TRANSPORT_BLE;
@@ -666,7 +661,7 @@ napi_status ParseUuidParams(napi_env env, napi_value object, const char *name, b
     std::string uuid {};
     NAPI_BT_CALL_RETURN(ParseStringParams(env, object, name, exist, uuid));
     if (exist) {
-        if (!regex_match(uuid, uuidRegex)) {
+        if (!IsValidUuid(uuid)) {
             HILOGE("match the UUID faild.");
             return napi_invalid_arg;
         }

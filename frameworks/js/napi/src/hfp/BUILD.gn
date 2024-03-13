@@ -43,15 +43,6 @@ ohos_shared_library("hfp") {
   }
 
   sources = [
-    "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
-    "$BT_NAPI_DIR/src/common/napi_async_work.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_event.cpp",
-    "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
-    "$BT_NAPI_DIR/src/common/napi_native_object.cpp",
-    "$BT_NAPI_DIR/src/common/napi_timer.cpp",
-    "$BT_NAPI_DIR/src/napi_bluetooth_profile.cpp",
-    "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
     "napi_bluetooth_hfp_ag.cpp",
     "napi_bluetooth_hfp_ag_observer.cpp",
     "napi_bluetooth_hfp_hf.cpp",
