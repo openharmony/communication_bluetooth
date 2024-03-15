@@ -83,6 +83,8 @@ public:
      */
     void NotifyBluetoothStateChange(int32_t transport, int32_t status);
 
+    static BluetoothProfileManager &GetInstance();
+
 private:
     class BluetoothSystemAbility : public SystemAbilityStatusChangeStub {
         void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
