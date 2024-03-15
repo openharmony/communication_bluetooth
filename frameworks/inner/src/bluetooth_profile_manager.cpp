@@ -42,6 +42,12 @@ BluetoothProfileManager::~BluetoothProfileManager()
     UnSubScribeBluetoothSystemAbility();
 }
 
+BluetoothProfileManager &BluetoothProfileManager::GetInstance()
+{
+    static BluetoothProfileManager instance;
+    return instance;
+}
+
 void BluetoothProfileManager::SubScribeBluetoothSystemAbility()
 {
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
