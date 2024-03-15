@@ -448,7 +448,7 @@ private:
 
 HandsFreeUnit::impl::impl()
 {
-    profileRegisterId = Singleton<BluetoothProfileManager>::GetInstance().RegisterFunc(PROFILE_HFP_HF,
+    profileRegisterId = GetInstance().RegisterFunc(PROFILE_HFP_HF,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothHfpHf> proxy = iface_cast<IBluetoothHfpHf>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -459,7 +459,7 @@ HandsFreeUnit::impl::impl()
 HandsFreeUnit::impl::~impl()
 {
     HILOGI("enter");
-    Singleton<BluetoothProfileManager>::GetInstance().DeregisterFunc(profileRegisterId);
+    GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(&serviceObserver_);
