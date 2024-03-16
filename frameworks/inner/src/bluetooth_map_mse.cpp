@@ -70,7 +70,7 @@ MapMse::impl::impl()
 {
     serviceObserverImp_ = new (std::nothrow) BluetoothMapMseObserverImp(observers_);
     CHECK_AND_RETURN_LOG(serviceObserverImp_ != nullptr, "serviceObserverImp_ is nullptr");
-    profileRegisterId = GetInstance().RegisterFunc(PROFILE_MAP_MSE,
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_MAP_MSE,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothMapMse> proxy = iface_cast<IBluetoothMapMse>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -81,7 +81,7 @@ MapMse::impl::impl()
 MapMse::impl::~impl()
 {
     HILOGD("enter");
-    GetInstance().DeregisterFunc(profileRegisterId);
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothMapMse> proxy = GetRemoteProxy<IBluetoothMapMse>(PROFILE_MAP_MSE);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(serviceObserverImp_);

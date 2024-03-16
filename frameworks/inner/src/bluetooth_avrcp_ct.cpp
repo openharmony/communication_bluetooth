@@ -437,7 +437,7 @@ public:
     ~impl()
     {
         HILOGI("enter");
-        GetInstance().DeregisterFunc(profileRegisterId);
+        BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
         sptr<IBluetoothAvrcpCt> proxy = GetRemoteProxy<IBluetoothAvrcpCt>(PROFILE_AVRCP_CT);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->UnregisterObserver(observer_);
@@ -886,7 +886,7 @@ AvrcpController::impl::impl()
 {
     observer_ = new (std::nothrow) ObserverImpl(this);
     CHECK_AND_RETURN_LOG(observer_ != nullptr, "observer_ is nullptr");
-    profileRegisterId = GetInstance().RegisterFunc(PROFILE_AVRCP_CT,
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_AVRCP_CT,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothAvrcpCt> proxy = iface_cast<IBluetoothAvrcpCt>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");

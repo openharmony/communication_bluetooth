@@ -106,7 +106,7 @@ private:
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
 {
-    return iface_cast<T>(GetInstance().GetProfileRemote(objectName));
+    return iface_cast<T>(BluetoothProfileManager::GetInstance().GetProfileRemote(objectName));
 };
 } // namespace bluetooth
 } // namespace OHOS
