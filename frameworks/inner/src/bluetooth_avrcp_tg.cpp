@@ -59,7 +59,7 @@ public:
     {
         observer_ = new (std::nothrow) ObserverImpl(this);
         CHECK_AND_RETURN_LOG(observer_ != nullptr, "observer_ is nullptr");
-        profileRegisterId = GetInstance().RegisterFunc(PROFILE_AVRCP_TG,
+        profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_AVRCP_TG,
             [this](sptr<IRemoteObject> remote) {
             sptr<IBluetoothAvrcpTg> proxy = iface_cast<IBluetoothAvrcpTg>(remote);
             CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -70,7 +70,7 @@ public:
     ~impl()
     {
         HILOGI("enter");
-        GetInstance().DeregisterFunc(profileRegisterId);
+        BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
         sptr<IBluetoothAvrcpTg> proxy = GetRemoteProxy<IBluetoothAvrcpTg>(PROFILE_AVRCP_TG);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->UnregisterObserver(observer_);

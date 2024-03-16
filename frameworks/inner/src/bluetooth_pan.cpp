@@ -149,7 +149,7 @@ private:
 Pan::impl::impl()
 {
     innerObserver_ = new PanInnerObserver(observers_);
-    profileRegisterId = GetInstance().RegisterFunc(PROFILE_PAN_SERVER,
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_PAN_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothPan> proxy = iface_cast<IBluetoothPan>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -160,7 +160,7 @@ Pan::impl::impl()
 Pan::impl::~impl()
 {
     HILOGD("start");
-    GetInstance().DeregisterFunc(profileRegisterId);
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(innerObserver_);
