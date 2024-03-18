@@ -755,18 +755,6 @@ ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, 
     : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
 {
     HILOGD("(4 parameters) starts");
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    CHECK_AND_RETURN_LOG(samgr, "samgr is nullptr.");
-
-    sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
-    CHECK_AND_RETURN_LOG(hostRemote, "failed: no hostRemote");
-
-    sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
-    sptr<IRemoteObject> remote = hostProxy->GetProfile(PROFILE_SOCKET);
-    CHECK_AND_RETURN_LOG(remote, "failed: no remote");
-
-    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
-    CHECK_AND_RETURN_LOG(proxy, "failed: no proxy");
     observer_ = new BluetoothServerSocketObserverStub();
 }
 
