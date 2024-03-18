@@ -43,7 +43,6 @@ struct ProfileIdProperty {
     std::string objectName = "";
 };
 class BluetoothProfileManager {
-
 public:
     /**
      * @brief Get the Remote of the Profile
