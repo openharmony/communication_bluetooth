@@ -758,14 +758,14 @@ static bool SetServiceUuidParameter(BleScanFilter &scanFilter, BleScanNativeFilt
 {
     HILOGD("SetServiceUuidParameter enter");
     if (nativeScanFilter->serviceUuidLength != 0 && nativeScanFilter->serviceUuid != nullptr) {
-        if (!regex_match(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuid)), uuidRegex)) {
+        if (!IsValidUuid(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuid)))) {
             HILOGE("match the UUID faild.");
             return false;
         }
         UUID serviceUuid = UUID::FromString((char *)nativeScanFilter->serviceUuid);
         scanFilter.SetServiceUuid(serviceUuid);
         if (nativeScanFilter->serviceUuidMask != nullptr) {
-            if (!regex_match(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuidMask)), uuidRegex)) {
+            if (!IsValidUuid(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuidMask)))) {
                 HILOGE("match the UUID faild.");
                 return false;
             }
@@ -1246,7 +1246,7 @@ bool ConvertBtUuid(const BtUuid &inUuid, UUID &outUuid)
     }
     string strUuid(inUuid.uuid);
     HILOGD("UUID: %{public}s", strUuid.c_str());
-    if (!regex_match(strUuid, uuidRegex)) {
+    if (!IsValidUuid(strUuid)) {
         HILOGE("match the UUID faild.");
         return false;
     }

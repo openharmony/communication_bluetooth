@@ -99,7 +99,7 @@ static GattCharacteristic *GattcFindCharacteristic(int clientId, std::shared_ptr
     string strUuidChar(characteristic.characteristicUuid.uuid);
     HILOGD("execute, strUuidSvc: %{public}s, strUuidChar: %{public}s",
         strUuidSvc.c_str(), strUuidChar.c_str());
-    if (!regex_match(strUuidSvc, uuidRegex) || (!regex_match(strUuidChar, uuidRegex))) {
+    if (!IsValidUuid(strUuidSvc) || !IsValidUuid(strUuidChar)) {
         HILOGE("match the UUID faild.");
         return nullptr;
     }
@@ -571,7 +571,7 @@ bool BleGattcGetService(int clientId, BtUuid serviceUuid)
     }
 
     string strUuid(serviceUuid.uuid);
-    if (!regex_match(strUuid, uuidRegex)) {
+    if (!IsValidUuid(strUuid)) {
         HILOGE("match the UUID faild.");
         return false;
     }
@@ -661,7 +661,7 @@ int BleGattcReadDescriptor(int clientId, BtGattDescriptor descriptor)
     }
 
     string strUuidDesc(descriptor.descriptorUuid.uuid);
-    if (!regex_match(strUuidDesc, uuidRegex)) {
+    if (!IsValidUuid(strUuidDesc)) {
         HILOGE("match the UUID faild.");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
@@ -696,7 +696,7 @@ int BleGattcWriteDescriptor(int clientId, BtGattDescriptor descriptor, int len, 
     }
 
     string strUuidDesc(descriptor.descriptorUuid.uuid);
-    if (!regex_match(strUuidDesc, uuidRegex)) {
+    if (!IsValidUuid(strUuidDesc)) {
         HILOGE("match the UUID faild.");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
