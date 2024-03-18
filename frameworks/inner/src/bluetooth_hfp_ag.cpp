@@ -355,7 +355,7 @@ private:
 HandsFreeAudioGateway::impl::impl()
 {
     serviceObserver_ = new AgServiceObserver(observers_);
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_HFP_AG,
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_HFP_AG,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothHfpAg> proxy = iface_cast<IBluetoothHfpAg>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -366,7 +366,7 @@ HandsFreeAudioGateway::impl::impl()
 HandsFreeAudioGateway::impl::~impl()
 {
     HILOGD("enter");
-    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(serviceObserver_);
