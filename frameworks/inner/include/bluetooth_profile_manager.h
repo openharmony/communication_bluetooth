@@ -43,7 +43,6 @@ struct ProfileIdProperty {
     std::string objectName = "";
 };
 class BluetoothProfileManager {
-DECLARE_SINGLETON(BluetoothProfileManager);
 
 public:
     /**
@@ -102,6 +101,8 @@ private:
     std::atomic_bool isBluetoothServiceOn_ = false;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
     std::mutex getProfileRemoteMutex_;
+    BluetoothProfileManager();
+    ~BluetoothProfileManager();
 };
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
