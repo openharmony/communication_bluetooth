@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
+JS_NAPI_DIR = "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi"
 
 FwkCAdapterSrc = [
   "c_adapter/ohos_bt_adapter_utils.cpp",
@@ -59,6 +60,16 @@ FwkSrc = [
   "src/bluetooth_utils.cpp",
   "src/bluetooth_host_load_callback.cpp",
   "src/bluetooth_audio_manager.cpp",
+  "src/uuid.cpp",
+  "$JS_NAPI_DIR/src/common/napi_async_callback.cpp",
+  "$JS_NAPI_DIR/src/common/napi_async_work.cpp",
+  "$JS_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
+  "$JS_NAPI_DIR/src/common/napi_bluetooth_event.cpp",
+  "$JS_NAPI_DIR/src/common/napi_bluetooth_profile.cpp",
+  "$JS_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
+  "$JS_NAPI_DIR/src/common/napi_native_object.cpp",
+  "$JS_NAPI_DIR/src/common/napi_timer.cpp",
+  "$JS_NAPI_DIR/src/parser/napi_parser_utils.cpp",
 ]
 
 BT_IPCSRC_DIR = "ipc/src"
@@ -113,6 +124,7 @@ config("btframework_config") {
     "include",
     "ipc/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
+    "$JS_NAPI_DIR/include",
   ]
 }
 
@@ -141,6 +153,8 @@ ohos_shared_library("btframework") {
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "libuv:uv",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
   sanitize = {

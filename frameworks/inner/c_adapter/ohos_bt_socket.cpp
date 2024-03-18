@@ -78,7 +78,7 @@ static bool GetSocketUuidPara(const BluetoothCreateSocketPara *socketPara, UUID 
             return false;
         }
         string tmpUuid(socketPara->uuid.uuid);
-        if (!regex_match(tmpUuid, uuidRegex)) {
+        if (!IsValidUuid(tmpUuid)) {
             HILOGE("match the UUID faild.");
             return false;
         }

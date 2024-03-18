@@ -78,7 +78,7 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     napi_create_string_utf8(env, "uuid", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     bool isSuccess = ParseString(env, sppOption->uuid_, value);
-    if (!isSuccess || (!regex_match(sppOption->uuid_, uuidRegex))) {
+    if (!isSuccess || (!IsValidUuid(sppOption->uuid_))) {
         HILOGE("Parse UUID faild.");
         return nullptr;
     }
