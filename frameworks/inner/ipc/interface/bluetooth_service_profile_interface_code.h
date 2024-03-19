@@ -78,6 +78,9 @@ enum BluetoothA2dpSrcInterfaceCode {
     BT_A2DP_SRC_OFFLOAD_STOP_PLAYING,
     BT_A2DP_SRC_OFFLOAD_SESSION_REQUEST,
     BT_A2DP_SRC_OFFLOAD_GET_CODEC_STATUS,
+    BT_A2DP_SRC_ENABLE_AUTO_PLAY,
+    BT_A2DP_SRC_DISABLE_AUTO_PLAY,
+    BT_A2DP_SRC_GET_AUTO_PLAY_DISABLED_DURATION,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_BUTT
 };

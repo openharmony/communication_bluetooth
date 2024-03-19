@@ -474,5 +474,52 @@ int BluetoothA2dpSrcProxy::OffloadPlayingControl(const RawAddress &device, const
 
     return reply.ReadInt32();
 }
+
+int BluetoothA2dpSrcProxy::EnableAutoPlay(const RawAddress &device)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), BT_ERR_IPC_TRANS_FAILED, "write device error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_ENABLE_AUTO_PLAY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+    return reply.ReadInt32();
+}
+
+int BluetoothA2dpSrcProxy::DisableAutoPlay(const RawAddress &device, const int duration)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(duration), BT_ERR_IPC_TRANS_FAILED, "write duration error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_DISABLE_AUTO_PLAY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+    return reply.ReadInt32();
+}
+
+int BluetoothA2dpSrcProxy::GetAutoPlayDisabledDuration(const RawAddress &device, int &duration)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), BT_ERR_IPC_TRANS_FAILED, "write device error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_AUTO_PLAY_DISABLED_DURATION,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+    int32_t res = reply.ReadInt32();
+    if (res == BT_NO_ERROR) {
+        duration = reply.ReadInt32();
+    }
+    return res;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

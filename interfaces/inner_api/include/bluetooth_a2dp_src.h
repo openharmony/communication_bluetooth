@@ -399,6 +399,35 @@ public:
     A2dpOffloadCodecStatus GetOffloadCodecStatus(const BluetoothRemoteDevice &device) const;
 
     /**
+     * Allow devices to automatically play music when connected.
+     *
+     * @param device Remote bluetooth sink device.
+     * @return Returns general <b>enum BtErrCode</b> for the operation.
+     * @since 12
+     */
+    int EnableAutoPlay(const BluetoothRemoteDevice &device);
+
+    /**
+     * Restriction devices to play music within {@code duration} milliseconds of connection.
+     *
+     * @param device Remote bluetooth sink device.
+     * @param duration Restricted duration <milliseconds>.
+     * @return Returns general <b>enum BtErrCode</b> for the operation.
+     * @since 12
+     */
+    int DisableAutoPlay(const BluetoothRemoteDevice &device, const int duration);
+
+    /**
+     * Obtains the duration for which automatic playback is disabled.
+     *
+     * @param device Remote bluetooth sink device.
+     * @param duration Restricted duration <milliseconds>.
+     * @return Returns general <b>enum BtErrCode</b> for the operation.
+     * @since 12
+     */
+    int GetAutoPlayDisabledDuration(const BluetoothRemoteDevice &device, int &duration);
+
+    /**
      * @brief The external process calls the A2dpSrc profile interface before the Bluetooth process starts. At this
      * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
      * A2dpSrc proflie.
