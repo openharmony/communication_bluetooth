@@ -85,6 +85,9 @@ public:
     static napi_value DisableAbsoluteVolume(napi_env env, napi_callback_info info);
     static napi_value SetCurrentCodecInfo(napi_env env, napi_callback_info info);
     static napi_value GetCurrentCodecInfo(napi_env env, napi_callback_info info);
+    static napi_value EnableAutoPlay(napi_env env, napi_callback_info info);
+    static napi_value DisableAutoPlay(napi_env env, napi_callback_info info);
+    static napi_value GetAutoPlayDisabledDuration(napi_env env, napi_callback_info info);
 #endif
     static std::shared_ptr<NapiA2dpSourceObserver> observer_;
     static bool isRegistered_;

@@ -113,6 +113,9 @@ napi_value NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env, napi_value expo
         DECLARE_NAPI_FUNCTION("disableAbsoluteVolume", DisableAbsoluteVolume),
         DECLARE_NAPI_FUNCTION("setCurrentCodecInfo", SetCurrentCodecInfo),
         DECLARE_NAPI_FUNCTION("getCurrentCodecInfo", GetCurrentCodecInfo),
+        DECLARE_NAPI_FUNCTION("enableAutoPlay", EnableAutoPlay),
+        DECLARE_NAPI_FUNCTION("disableAutoPlay", DisableAutoPlay),
+        DECLARE_NAPI_FUNCTION("getAutoPlayDisabledDuration", GetAutoPlayDisabledDuration),
 #endif
     };
 
@@ -670,6 +673,77 @@ napi_value NapiA2dpSource::GetCurrentCodecInfo(napi_env env, napi_callback_info 
     return ret;
 }
 
+napi_value NapiA2dpSource::EnableAutoPlay(napi_env env, napi_callback_info info)
+{
+    std::string deviceId = INVALID_MAC_ADDRESS;
+    auto status = CheckDeivceIdParam(env, info, deviceId);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status, BT_ERR_INVALID_PARAM);
+
+    auto func = [deviceId]() {
+        BluetoothRemoteDevice device(deviceId, BT_TRANSPORT_BREDR);
+        A2dpSource *profile = A2dpSource::GetProfile();
+        int err = profile->EnableAutoPlay(device);
+        HILOGI("err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    }
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+static napi_status CheckDisableAutoPlayParam(napi_env env, napi_callback_info info, std::string &addr,
+    int32_t &duration)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
+    NAPI_BT_RETURN_IF(!ParseInt32(env, duration, argv[PARAM1]), "ParseInt failed", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_value NapiA2dpSource::DisableAutoPlay(napi_env env, napi_callback_info info)
+{
+    std::string deviceId = INVALID_MAC_ADDRESS;
+    int duration = 0;
+    auto status = CheckDisableAutoPlayParam(env, info, deviceId, duration);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [deviceId, duration]() {
+        BluetoothRemoteDevice device(deviceId, BT_TRANSPORT_BREDR);
+        A2dpSource *profile = A2dpSource::GetProfile();
+        int err = profile->DisableAutoPlay(device, duration);
+        HILOGI("err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    }
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiA2dpSource::GetAutoPlayDisabledDuration(napi_env env, napi_callback_info info)
+{
+    std::string deviceId = INVALID_MAC_ADDRESS;
+    auto status = CheckDeivceIdParam(env, info, deviceId);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status, BT_ERR_INVALID_PARAM);
+
+    auto func = [deviceId]() {
+        int duration = 0;
+        BluetoothRemoteDevice device(deviceId, BT_TRANSPORT_BREDR);
+        A2dpSource *profile = A2dpSource::GetProfile();
+        int err = profile->GetAutoPlayDisabledDuration(device, duration);
+        HILOGI("err: %{public}d, duration: %{public}d", err, duration);
+        auto object = std::make_shared<NapiNativeInt>(duration);
+        return NapiAsyncWorkRet(err, object);
+    }
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
 #endif
 }  // namespace Bluetooth
 }  // namespace OHOS
