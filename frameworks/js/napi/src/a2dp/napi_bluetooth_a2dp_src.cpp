@@ -685,7 +685,7 @@ napi_value NapiA2dpSource::EnableAutoPlay(napi_env env, napi_callback_info info)
         int err = profile->EnableAutoPlay(device);
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
-    }
+    };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
@@ -717,7 +717,7 @@ napi_value NapiA2dpSource::DisableAutoPlay(napi_env env, napi_callback_info info
         int err = profile->DisableAutoPlay(device, duration);
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
-    }
+    };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
@@ -738,7 +738,7 @@ napi_value NapiA2dpSource::GetAutoPlayDisabledDuration(napi_env env, napi_callba
         HILOGI("err: %{public}d, duration: %{public}d", err, duration);
         auto object = std::make_shared<NapiNativeInt>(duration);
         return NapiAsyncWorkRet(err, object);
-    }
+    };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
