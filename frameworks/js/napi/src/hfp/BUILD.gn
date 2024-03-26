@@ -43,6 +43,7 @@ ohos_shared_library("hfp") {
   }
 
   sources = [
+    "$BT_NAPI_DIR/src/common/napi_bluetooth_profile.cpp",
     "napi_bluetooth_hfp_ag.cpp",
     "napi_bluetooth_hfp_ag_observer.cpp",
     "napi_bluetooth_hfp_hf.cpp",

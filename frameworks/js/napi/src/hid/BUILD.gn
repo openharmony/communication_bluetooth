@@ -43,6 +43,7 @@ ohos_shared_library("hid") {
   }
 
   sources = [
+    "$BT_NAPI_DIR/src/common/napi_bluetooth_profile.cpp",
     "napi_bluetooth_hid_host.cpp",
     "napi_bluetooth_hid_host_observer.cpp",
     "native_module_hid.cpp",
