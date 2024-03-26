@@ -938,29 +938,29 @@ std::string BluetoothHostProxy::GetDeviceAlias(const std::string &address)
     return reply.ReadString();
 }
 
-bool BluetoothHostProxy::SetDeviceAlias(const std::string &address, const std::string &aliasName)
+int32_t BluetoothHostProxy::SetDeviceAlias(const std::string &address, const std::string &aliasName)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::SetDeviceAlias WriteInterfaceToken error");
-        return false;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(address)) {
         HILOGE("BluetoothHostProxy::SetDeviceAlias address error");
-        return false;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteString(aliasName)) {
         HILOGE("BluetoothHostProxy::SetDeviceAlias aliasName error");
-        return false;
+        return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_DEVICE_ALIAS, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetDeviceAlias done fail, error: %{public}d", error);
-        return false;
+        return BT_ERR_INTERNAL_ERROR;
     }
-    return reply.ReadBool();
+    return reply.ReadInt32();
 }
 
 int32_t BluetoothHostProxy::GetDeviceBatteryLevel(const std::string &address)
