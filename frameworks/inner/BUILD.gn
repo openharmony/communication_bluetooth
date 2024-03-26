@@ -65,7 +65,6 @@ FwkSrc = [
   "$JS_NAPI_DIR/src/common/napi_async_work.cpp",
   "$JS_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
   "$JS_NAPI_DIR/src/common/napi_bluetooth_event.cpp",
-  "$JS_NAPI_DIR/src/common/napi_bluetooth_profile.cpp",
   "$JS_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
   "$JS_NAPI_DIR/src/common/napi_native_object.cpp",
   "$JS_NAPI_DIR/src/common/napi_timer.cpp",
