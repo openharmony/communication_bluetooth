@@ -138,13 +138,15 @@ std::string BluetoothRemoteDevice::GetDeviceAlias() const
     return hostProxy->GetDeviceAlias(address_);
 }
 
-bool BluetoothRemoteDevice::SetDeviceAlias(const std::string &aliasName)
+int32_t BluetoothRemoteDevice::SetDeviceAlias(const std::string &aliasName)
 {
     HILOGI("enter");
-    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(
+        IsValidBluetoothRemoteDevice() && aliasName != INVALID_NAME, BT_ERR_INVALID_PARAM, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     return hostProxy->SetDeviceAlias(address_, aliasName);
 }
 

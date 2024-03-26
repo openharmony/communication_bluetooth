@@ -76,6 +76,7 @@ napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info);
 napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info);
 napi_value GetRemoteProductId(napi_env env, napi_callback_info info);
 #endif
+napi_value SetRemoteDeviceName(napi_env env, napi_callback_info info);
 
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports);
 napi_value ScanModeInit(napi_env env);
