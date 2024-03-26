@@ -42,6 +42,7 @@ ohos_shared_library("pan") {
   }
 
   sources = [
+    "$BT_NAPI_DIR/src/common/napi_bluetooth_profile.cpp",
     "napi_bluetooth_pan.cpp",
     "napi_bluetooth_pan_observer.cpp",
     "native_module_pan.cpp",
