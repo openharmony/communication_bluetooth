@@ -267,6 +267,8 @@ enum BluetoothHostInterfaceCode {
     CONNECT_ALLOWED_PROFILES,
     DISCONNECT_ALLOWED_PROFILES,
     GET_DEVICE_PRODUCT_ID,
+    SET_CUSTOM_TYPE,
+    GET_CUSTOM_TYPE,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

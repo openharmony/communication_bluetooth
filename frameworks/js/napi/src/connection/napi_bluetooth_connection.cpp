@@ -110,6 +110,8 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getRemoteProductId", GetRemoteProductId),
 #endif
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", SetRemoteDeviceName),
+        DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
     };
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -727,6 +729,63 @@ napi_value SetRemoteDeviceName(napi_env env, napi_callback_info info)
         int32_t err = remoteDevice.SetDeviceAlias(deviceName);
         HILOGI("SetDeviceName err: %{public}d", err);
         return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_status ParseSetRemoteDeviceTypeParameters(napi_env env, napi_callback_info info,
+    std::string &outRemoteAddr, int32_t &outDeviceType)
+{
+    HILOGD("enter");
+    std::string remoteAddr{};
+    int32_t deviceType = DeviceType::DEVICE_TYPE_DEFAULT;
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, NULL));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], remoteAddr));
+    NAPI_BT_RETURN_IF(!ParseInt32(env, deviceType, argv[PARAM1]), "deviceType ParseInt32 failed", napi_invalid_arg);
+    outRemoteAddr = remoteAddr;
+    outDeviceType = deviceType;
+    return napi_ok;
+}
+
+napi_value SetRemoteDeviceType(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    int32_t deviceType = DeviceType::DEVICE_TYPE_DEFAULT;
+    auto status = ParseSetRemoteDeviceTypeParameters(env, info, remoteAddr, deviceType);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr, deviceType]() {
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+        int32_t err = remoteDevice.SetDeviceCustomType(deviceType);
+        HILOGI("SetRemoteDeviceType err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value GetRemoteDeviceType(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    std::string remoteAddr;
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+    auto func = [remoteAddr]() {
+        int32_t deviceType = DeviceType::DEVICE_TYPE_DEFAULT;
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+        int32_t err = remoteDevice.GetDeviceCustomType(deviceType);
+        HILOGI("GetRemoteDeviceType err: %{public}d", err);
+        auto object = std::make_shared<NapiNativeInt>(deviceType);
+        return NapiAsyncWorkRet(err, object);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
