@@ -22,7 +22,6 @@ ohos_shared_library("hid") {
   #install_enable = true
   include_dirs = [
     "$BT_NAPI_DIR/include",
-    "//third_party/node/src",
     "$BT_PART_DIR/frameworks/inner/include",
   ]
 
