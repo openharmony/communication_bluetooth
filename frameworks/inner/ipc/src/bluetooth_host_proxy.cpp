@@ -1641,5 +1641,41 @@ int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, std::
     return exception;
 }
 
+int32_t BluetoothHostProxy::SetDeviceCustomType(const std::string &address, int32_t deviceType)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
+    CHECK_AND_RETURN_LOG_RET(
+        data.WriteInt32(deviceType), BT_ERR_IPC_TRANS_FAILED, "Write deviceType error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_CUSTOM_TYPE, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::GetDeviceCustomType(const std::string &address, int32_t &deviceType)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_CUSTOM_TYPE, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+
+    int32_t exception = reply.ReadInt32();
+    if (exception == BT_NO_ERROR) {
+        deviceType = reply.ReadInt32();
+    }
+    return exception;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

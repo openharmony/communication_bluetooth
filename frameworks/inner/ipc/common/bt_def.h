@@ -1567,6 +1567,16 @@ enum UpdateOutputStackAction {
     ACTION_USER_OPERATION = 6,
 };
 
+enum DeviceType {
+    DEVICE_TYPE_DEFAULT = 0,
+    DEVICE_TYPE_CAR = 1,
+    DEVICE_TYPE_HEADSET = 2,
+    DEVICE_TYPE_HEARING = 3,
+    DEVICE_TYPE_GLASSES = 4,
+    DEVICE_TYPE_WATCH = 5,
+    DEVICE_TYPE_SPEAKER = 6,
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
