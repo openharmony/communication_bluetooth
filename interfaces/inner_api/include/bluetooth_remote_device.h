@@ -149,11 +149,11 @@ public:
      * @brief Set device alias.
      *
      * @param aliasName Device alias name.
-     * @return Returns <b>true</b> if the operation is successful;
-     *         returns <b>false</b> if the operation fails.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>other error code</b> if the operation fails.
      * @since 6
      */
-    bool SetDeviceAlias(const std::string &aliasName);
+    int32_t SetDeviceAlias(const std::string &aliasName);
 
     /**
      * @brief Get device type.
