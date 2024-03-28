@@ -23,7 +23,6 @@ ohos_shared_library("constant") {
   include_dirs = [
     "$BT_NAPI_DIR/include",
     "$BT_NAPI_DIR/src/constant",
-    "//third_party/node/src",
     "$BT_PART_DIR/frameworks/inner/include",
   ]
 
