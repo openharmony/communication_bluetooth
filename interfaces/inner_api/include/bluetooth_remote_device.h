@@ -337,6 +337,26 @@ public:
      */
     int GetDeviceProductType(int &cod, int &majorClass, int &majorMinorClass) const;
 
+    /**
+     * @brief Set the product type of the device, such as headsets, watchs and car.
+     *
+     * @param deviceType The type of device.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 12
+     */
+    int32_t SetDeviceCustomType(int32_t deviceType) const;
+
+    /**
+     * @brief Get the product type of the device, such as headsets, watchs and car.
+     *
+     * @param deviceType The type of device.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 12
+     */
+    int32_t GetDeviceCustomType(int32_t &deviceType) const;
+
 private:
     std::string address_ = "00:00:00:00:00:00";
     int transport_ = BT_TRANSPORT_NONE;
