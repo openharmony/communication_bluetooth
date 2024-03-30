@@ -17,44 +17,28 @@
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_event.h"
 #include "napi_bluetooth_opp_observer.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-std::shared_mutex NapiBluetoothOppObserver::g_oppCallbackInfosMutex;
+NapiBluetoothOppObserver::NapiBluetoothOppObserver()
+    : eventSubscribe_({STR_BT_OPP_OBSERVER_RECEIVE_INCOMING_FILE,
+        STR_BT_OPP_OBSERVER_TRANSFER_STATE_CHANGE},
+        BT_MODULE_NAME)
+{}
+
 void NapiBluetoothOppObserver::OnReceiveIncomingFileChanged(const BluetoothOppTransferInformation &transferInformation)
 {
     HILOGI("enter, OnReceiveIncomingFileChanged");
-    std::unique_lock<std::shared_mutex> guard(g_oppCallbackInfosMutex);
-
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_OPP_OBSERVER_RECEIVE_INCOMING_FILE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<TransforInformationCallbackInfo> callbackInfo =
-        std::static_pointer_cast<TransforInformationCallbackInfo>(it->second);
-
-    callbackInfo->deviceId_ = transferInformation.GetDeviceAddress();
-    NapiEvent::CheckAndNotify(callbackInfo, transferInformation);
+    auto nativeObject = std::make_shared<NapiNativeOppTransferInformation>(transferInformation);
+    eventSubscribe_.PublishEvent(STR_BT_OPP_OBSERVER_RECEIVE_INCOMING_FILE, nativeObject);
 }
 
 void NapiBluetoothOppObserver::OnTransferStateChanged(const BluetoothOppTransferInformation &transferInformation)
 {
     HILOGI("enter, OnTransferStateChanged");
-    std::unique_lock<std::shared_mutex> guard(g_oppCallbackInfosMutex);
-
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_OPP_OBSERVER_TRANSFER_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<TransforInformationCallbackInfo> callbackInfo =
-        std::static_pointer_cast<TransforInformationCallbackInfo>(it->second);
-
-    callbackInfo->deviceId_ = transferInformation.GetDeviceAddress();
-    NapiEvent::CheckAndNotify(callbackInfo, transferInformation);
+    auto nativeObject = std::make_shared<NapiNativeOppTransferInformation>(transferInformation);
+    eventSubscribe_.PublishEvent(STR_BT_OPP_OBSERVER_TRANSFER_STATE_CHANGE, nativeObject);
 }
 } // namespace Bluetooth
 } // namespace OHOS

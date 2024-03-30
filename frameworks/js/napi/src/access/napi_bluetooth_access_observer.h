@@ -19,12 +19,12 @@
 #include "bluetooth_host.h"
 #include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 namespace OHOS {
 namespace Bluetooth {
 class NapiBluetoothAccessObserver : public BluetoothHostObserver {
 public:
-    std::shared_ptr<NapiCallback> napiStateChangeCallback_ {nullptr};
-    NapiBluetoothAccessObserver() = default;
+    NapiBluetoothAccessObserver();
     ~NapiBluetoothAccessObserver() override = default;
 
     void OnStateChanged(const int transport, const int status) override;
@@ -43,6 +43,9 @@ private:
     void DisableBle();
     void GetBrStateByStatus(const int status, BluetoothState &state, bool &isCallback);
     void GetBleStateByStatus(const int status, BluetoothState &state);
+
+    friend class NapiAccess;
+    NapiEventSubscribeModule eventSubscribe_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

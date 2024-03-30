@@ -19,20 +19,20 @@
 #include <shared_mutex>
 #include "bluetooth_map_mse.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string STR_BT_MAP_MSE_CONNECTION_STATE_CHANGE = "connectionStateChange";
+const char * const STR_BT_MAP_MSE_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
 class NapiMapMseObserver : public MapMseObserver {
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state) override;
 
-    NapiMapMseObserver() = default;
+    NapiMapMseObserver();
     ~NapiMapMseObserver() override = default;
 
-    static std::shared_mutex g_mapMseCallbackInfosMutex;
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
+    NapiEventSubscribeModule eventSubscribe_;
 };
 
 }  // namespace Bluetooth

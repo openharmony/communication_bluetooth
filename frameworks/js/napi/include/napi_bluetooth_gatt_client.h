@@ -81,7 +81,7 @@ public:
         client_ = std::make_shared<GattClient>(*device_);
         client_->Init();
         callback_ = std::make_shared<NapiGattClientCallback>();
-        callback_->SetClient(this);
+        callback_->deviceAddr_ = deviceId;
     }
     ~NapiGattClient() = default;
 

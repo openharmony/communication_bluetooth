@@ -21,6 +21,7 @@
 #include "napi_bluetooth_ble_utils.h"
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 #include "../parser/napi_parser_utils.h"
 
 namespace OHOS {
@@ -96,72 +97,33 @@ static NapiGattServer *NapiGetGattServer(napi_env env, napi_value thisVar)
     return gattServer;
 }
 
-napi_status CheckGattsOn(napi_env env, napi_callback_info info)
+static NapiGattServer *NapiGetGattServer(napi_env env, napi_callback_info info)
 {
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
-
-    std::string type {};
-    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo {nullptr};
-
-    if (type == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ ||
-        type == STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE) {
-        callbackInfo = std::make_shared<GattCharacteristicCallbackInfo>();
-    } else if (type == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE ||
-        type == STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ) {
-        callbackInfo = std::make_shared<GattDescriptorCallbackInfo>();
-    } else {
-        callbackInfo = std::make_shared<BluetoothCallbackInfo>();
+    if (napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr) != napi_ok) {
+        return nullptr;
     }
-    callbackInfo->env_ = env;
-
-    auto gattServer = NapiGetGattServer(env, thisVar);
-    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
-
-    NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
-    NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_));
-    gattServer->GetCallback()->SetCallbackInfo(type, callbackInfo);
-    HILOGI("%{public}s is registered", type.c_str());
-    return napi_ok;
+    return NapiGetGattServer(env, thisVar);
 }
 
 napi_value NapiGattServer::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    auto status = CheckGattsOn(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NapiGattServer *napiGattServer = NapiGetGattServer(env, info);
+    if (napiGattServer && napiGattServer->GetCallback()) {
+        auto status = napiGattServer->GetCallback()->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
     return NapiGetUndefinedRet(env);
-}
-
-napi_status CheckGattsOff(napi_env env, napi_callback_info info)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {nullptr};  // argv[PARAM1] is not used.
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
-
-    std::string type {};
-    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-
-    auto gattServer = NapiGetGattServer(env, thisVar);
-    NAPI_BT_RETURN_IF(gattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
-    // callback_ need unref before, see napi_bluetooth_gatt_client
-    auto gattServerCallback = gattServer->GetCallback();
-    gattServerCallback->SetCallbackInfo(type, nullptr);
-    HILOGI("%{public}s is removed", type.c_str());
-    return napi_ok;
 }
 
 napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    auto status = CheckGattsOff(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NapiGattServer *napiGattServer = NapiGetGattServer(env, info);
+    if (napiGattServer && napiGattServer->GetCallback()) {
+        auto status = napiGattServer->GetCallback()->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
     return NapiGetUndefinedRet(env);
 }
 

@@ -19,20 +19,21 @@
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_ble_utils.h"
 #include "napi_async_callback.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ = "characteristicRead";
-const std::string STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE = "characteristicWrite";
-const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ = "descriptorRead";
-const std::string STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE = "descriptorWrite";
+const char * const STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ = "characteristicRead";
+const char * const STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE = "characteristicWrite";
+const char * const STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ = "descriptorRead";
+const char * const STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE = "descriptorWrite";
 
 #ifdef BLUETOOTH_API_SINCE_10
-const std::string STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectionStateChange";
+const char * const STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectionStateChange";
 #else
-const std::string STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectStateChange";
+const char * const STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectStateChange";
 #endif
-const std::string STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE = "BLEMtuChange";
+const char * const STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE = "BLEMtuChange";
 
 class NapiGattServerCallback : public GattServerCallback {
 public:
@@ -52,18 +53,11 @@ public:
     void OnConnectionParameterChanged(const BluetoothRemoteDevice &device,
         int interval, int latency, int timeout, int status) override {}
 
-    void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo)
-    {
-        HILOGI("enter, type: %{public}s", type.c_str());
-        callbackInfos_[type] = callbackInfo;
-    }
-
     NapiAsyncWorkMap asyncWorkMap_ {};
-    NapiGattServerCallback() = default;
+    NapiEventSubscribeModule eventSubscribe_;
+    NapiGattServerCallback();
     ~NapiGattServerCallback() override = default;
-
 private:
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

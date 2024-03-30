@@ -210,7 +210,7 @@ void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor& d
 }
 
 void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std::string &device,
-    GattCharacteristic &characteristic, int requestId)
+    const GattCharacteristic &characteristic, int requestId)
 {
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
@@ -239,7 +239,7 @@ void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std
 }
 
 void ConvertDescriptorReadReqToJS(napi_env env, napi_value result, const std::string &device,
-    GattDescriptor& descriptor, int requestId)
+    const GattDescriptor& descriptor, int requestId)
 {
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
@@ -275,7 +275,7 @@ void ConvertDescriptorReadReqToJS(napi_env env, napi_value result, const std::st
 }
 
 void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const std::string &device,
-    GattCharacteristic& characteristic, int requestId)
+    const GattCharacteristic& characteristic, int requestId)
 {
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
@@ -320,7 +320,7 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
 }
 
 void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::string &device,
-    GattDescriptor &descriptor, int requestId)
+    const GattDescriptor &descriptor, int requestId)
 {
     napi_value deviceId;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
@@ -419,5 +419,40 @@ napi_value NapiNativeAdvertisingStateInfo::ToNapiValue(napi_env env) const
     return object;
 }
 
+napi_value NapiNativeGattsCharacterReadRequest::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    ConvertCharacteristicReadReqToJS(env, result, deviceAddr_, character_, transId_);
+    return result;
+}
+
+napi_value NapiNativeGattsCharacterWriteRequest::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    ConvertCharacteristicWriteReqToJS(env, result, deviceAddr_, character_, transId_);
+    return result;
+}
+
+napi_value NapiNativeGattsDescriptorWriteRequest::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    ConvertDescriptorWriteReqToJS(env, result, deviceAddr_, descriptor_, transId_);
+    return result;
+}
+
+napi_value NapiNativeGattsDescriptorReadRequest::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    ConvertDescriptorReadReqToJS(env, result, deviceAddr_, descriptor_, transId_);
+    return result;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

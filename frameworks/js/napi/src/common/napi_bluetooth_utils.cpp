@@ -19,6 +19,8 @@
 #include <optional>
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
+#include "event_handler.h"  // libeventhandler
+#include "event_runner.h"  // libeventhandler
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_bluetooth_error.h"
@@ -133,7 +135,7 @@ bool ParseArrayBuffer(napi_env env, uint8_t** data, size_t &size, napi_value arg
 }
 
 napi_status ConvertOppTransferInformationToJS(napi_env env, napi_value result,
-    BluetoothOppTransferInformation& transferInformation)
+    const BluetoothOppTransferInformation& transferInformation)
 {
     HILOGI("ConvertOppTransferInformationToJS called");
     napi_value id;
@@ -433,6 +435,15 @@ void UnregisterSysBLEObserver(const std::string &type)
 struct UvWorkData {
     std::function<void(void)> func;
 };
+
+int DoInJsMainThread(std::function<void(void)> func)
+{
+    static auto handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    if (handler_) {
+        handler_->PostTask(func);
+    }
+    return 0;
+}
 
 int DoInJsMainThread(napi_env env, std::function<void(void)> func)
 {
@@ -809,6 +820,21 @@ napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info,
     NAPI_BT_RETURN_IF(!ParseInt32(env, accessAuthorization, argv[PARAM1]), "ParseInt failed", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!IsAccessAuthorizationValid(accessAuthorization),
         "Invalid accessAuthorization", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std::string &name)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc < ARGS_SIZE_TWO, "Requires at least 1 arguments", napi_invalid_arg);
+
+    std::string type {};
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
+
+    name = type;
     return napi_ok;
 }
 }  // namespace Bluetooth
