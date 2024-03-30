@@ -123,6 +123,17 @@ napi_env NapiCallback::GetNapiEnv(void)
     return env_;
 }
 
+bool NapiCallback::Equal(napi_value &callback) const
+{
+    NapiHandleScope scope(env_);
+    napi_value storedCallback = nullptr;
+    napi_get_reference_value(env_, callbackRef_, &storedCallback);
+
+    bool isEqual = false;
+    napi_strict_equals(env_, storedCallback, callback, &isEqual);
+    return isEqual;
+}
+
 NapiPromise::NapiPromise(napi_env env) : env_(env)
 {
     auto status = napi_create_promise(env, &deferred_, &promise_);

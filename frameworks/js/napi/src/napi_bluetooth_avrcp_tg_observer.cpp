@@ -16,28 +16,19 @@
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_avrcp_tg_observer.h"
 #include "napi_bluetooth_event.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
+NapiAvrcpTargetObserver::NapiAvrcpTargetObserver()
+    : eventSubscribe_(STR_BT_AVRCP_TG_CONNECTION_STATE_CHANGE, BT_MODULE_NAME)
+{}
 
-std::shared_mutex NapiAvrcpTargetObserver::g_avrcpTgCallbackInfosMutex;
 void NapiAvrcpTargetObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
     HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    std::unique_lock<std::shared_mutex> guard(g_avrcpTgCallbackInfosMutex);
-
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_AVRCP_TG_CONNECTION_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-    HILOGI("%{public}s is registered by ability", STR_BT_AVRCP_TG_CONNECTION_STATE_CHANGE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    NapiEvent::CheckAndNotify(callbackInfo, state);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_AVRCP_TG_CONNECTION_STATE_CHANGE, nativeObject);
 }
 
 } // namespace Bluetooth
