@@ -324,10 +324,18 @@ struct HandsFreeAudioGateway::impl {
 
     int IsInbandRingingEnabled(bool &isEnabled) const
     {
-        HILOGI("enter");
+        HILOGD("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
         return proxy->IsInbandRingingEnabled(isEnabled);
+    }
+
+    void CallDetailsChanged(int callId, int callState)
+    {
+        HILOGD("enter");
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is null");
+        proxy->CallDetailsChanged(callId, callState);
     }
 
     void RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
@@ -651,6 +659,15 @@ int HandsFreeAudioGateway::IsInbandRingingEnabled(bool &isEnabled) const
     sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "hfpAG proxy is nullptr");
     return pimpl->IsInbandRingingEnabled(isEnabled);
+}
+
+void HandsFreeAudioGateway::CallDetailsChanged(int callId, int callState)
+{
+    HILOGI("enter, callId: %{public}d, callState: %{public}d", callId, callState);
+    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "hfpAG proxy is nullptr");
+    piml->CallDetailsChanged(callId, callState);
 }
 
 void HandsFreeAudioGateway::RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)

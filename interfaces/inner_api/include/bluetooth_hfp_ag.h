@@ -344,6 +344,15 @@ public:
     int IsInbandRingingEnabled(bool &isEnabled) const;
 
     /**
+     * @brief This function used to update changed phone call state.
+     *
+     * @param callId Current call id.
+     * @param callState Current call state.
+     * @since 11
+     */
+    void CallDetailsChanged(int callId, int callState);
+
+    /**
      * @brief Static HandsFree AudioGateway observer instance.
      *
      * @since 6

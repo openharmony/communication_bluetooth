@@ -374,6 +374,19 @@ int BluetoothHfpAgProxy::IsInbandRingingEnabled(bool &isEnabled)
     return ret;
 }
 
+void BluetoothHfpAgProxy::CallDetailsChanged(int callId, int callState)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(callId), "write callId error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(callState), "write callState error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_CALL_DETAILS_CHANGED, data, reply, option);
+}
+
 void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer)
 {
     MessageParcel data;
