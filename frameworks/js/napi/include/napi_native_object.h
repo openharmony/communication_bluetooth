@@ -124,6 +124,18 @@ private:
     std::string deviceAddr_ = "";
     int bondStatus_ = -1;
 };
+
+class NapiNativeBatteryInfo : public NapiNativeObject {
+public:
+    explicit NapiNativeBatteryInfo(DeviceBatteryInfo batteryInfo) : batteryInfo_(batteryInfo) {}
+    ~NapiNativeBatteryInfo() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    DeviceBatteryInfo batteryInfo_;
+};
+
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_NATIVE_OBJECT_H

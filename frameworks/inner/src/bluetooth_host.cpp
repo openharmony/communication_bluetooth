@@ -255,14 +255,30 @@ public:
             });
     }
 
-    void OnRemoteBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel) override
+    void OnRemoteBatteryChanged(const BluetoothRawAddress &device, const BluetoothBatteryInfo &batteryInfo) override
     {
-        HILOGI("enter, device: %{public}s, batteryLevel: %{public}d",
-            GetEncryptAddr((device).GetAddress()).c_str(), batteryLevel);
+        BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
+        DeviceBatteryInfo info;
+        info.deviceId_ = device.GetAddress();
+        info.batteryLevel_ = batteryInfo.batteryLevel_;
+        info.leftEarBatteryLevel_ = batteryInfo.leftEarBatteryLevel_;
+        info.leftEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.leftEarChargeState_);
+        info.rightEarBatteryLevel_ = batteryInfo.rightEarBatteryLevel_;
+        info.rightEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.rightEarChargeState_);
+        info.boxBatteryLevel_ = batteryInfo.boxBatteryLevel_;
+        info.boxChargeState_ = static_cast<DeviceChargeState>(batteryInfo.boxChargeState_);
+        host_.remoteObservers_.ForEach(
+            [remoteDevice, info](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
+                observer->OnRemoteBatteryChanged(remoteDevice, info);
+            });
+    }
+
+    void OnRemoteDeviceCommonInfoReport(const BluetoothRawAddress &device, const std::vector<uint8_t> &value) override
+    {
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
-            [remoteDevice, batteryLevel](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
-                observer->OnRemoteBatteryLevelChanged(remoteDevice, batteryLevel);
+            [remoteDevice, value](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
+                observer->OnRemoteDeviceCommonInfoReport(remoteDevice, value);
             });
     }
 

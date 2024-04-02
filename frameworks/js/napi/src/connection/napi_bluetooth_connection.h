@@ -39,6 +39,7 @@ const std::string REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const std::string REGISTER_DISCOVERY_RESULT_TYPE = "discoveryResult";
 const std::string REGISTER_PIN_REQUEST_TYPE = "pinRequired";
 const std::string REGISTER_BOND_STATE_TYPE = "bondStateChange";
+const std::string REGISTER_BATTERY_CHANGE_TYPE = "batteryChange";
 const std::string INVALID_PIN_CODE = "000000";
 
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports);
@@ -79,6 +80,7 @@ napi_value GetRemoteProductId(napi_env env, napi_callback_info info);
 napi_value SetRemoteDeviceName(napi_env env, napi_callback_info info);
 napi_value SetRemoteDeviceType(napi_env env, napi_callback_info info);
 napi_value GetRemoteDeviceType(napi_env env, napi_callback_info info);
+napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info);
 
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports);
 napi_value ScanModeInit(napi_env env);
