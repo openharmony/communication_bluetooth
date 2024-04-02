@@ -23,6 +23,7 @@
 #include "i_bluetooth_host_observer.h"
 #include "i_bluetooth_remote_device_observer.h"
 #include "iremote_broker.h"
+#include "../parcel/bluetooth_device_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -97,7 +98,7 @@ public:
     virtual int32_t GetDeviceName(int32_t transport, const std::string &address, std::string &name) = 0;
     virtual std::string GetDeviceAlias(const std::string &address) = 0;
     virtual int32_t SetDeviceAlias(const std::string &address, const std::string &aliasName) = 0;
-    virtual int32_t GetDeviceBatteryLevel(const std::string &address) = 0;
+    virtual int32_t GetRemoteDeviceBatteryInfo(const std::string &address, BluetoothBatteryInfo &batteryInfo) = 0;
     virtual int32_t GetPairState(int32_t transport, const std::string &address, int32_t &pairState) = 0;
     virtual int32_t StartPair(int32_t transport, const std::string &address) = 0;
     virtual int32_t StartCrediblePair(int32_t transport, const std::string &address) = 0;

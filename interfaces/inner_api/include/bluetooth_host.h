@@ -35,6 +35,7 @@
 
 #include <string>
 
+#include "bluetooth_battery_info.h"
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
@@ -225,6 +226,26 @@ public:
      * @since 6
      */
     virtual void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) = 0;
+
+    /**
+     * @brief Remote device battery info observer.
+     *
+     * @param device Remote device.
+     * @param batteryInfo Remote device batteryInfo
+     * @since 12
+     */
+    virtual void OnRemoteBatteryChanged(const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo)
+    {};
+
+    /**
+     * @brief Remote device common value observer.
+     *
+     * @param device Remote device.
+     * @param value Remote device report info
+     * @since 12
+     */
+    virtual void OnRemoteDeviceCommonInfoReport(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &value)
+    {};
 };
 
 /**

@@ -39,6 +39,7 @@ public:
     void RegisterCallback(const std::string &callbackName, const std::shared_ptr<NapiCallback> &callback);
     void DeRegisterCallback(const std::string &callbackName);
     std::shared_ptr<NapiCallback> GetCallback(const std::string &callbackName);
+    void OnRemoteBatteryChanged(const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo) override;
 
 private:
     void UvQueueWorkOnPairStatusChanged(uv_work_t *work, std::pair<std::string, int> &data);

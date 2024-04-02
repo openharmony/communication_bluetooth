@@ -150,13 +150,24 @@ int32_t BluetoothRemoteDevice::SetDeviceAlias(const std::string &aliasName)
     return hostProxy->SetDeviceAlias(address_, aliasName);
 }
 
-int BluetoothRemoteDevice::GetDeviceBatteryLevel() const
+int BluetoothRemoteDevice::GetRemoteDeviceBatteryInfo(DeviceBatteryInfo &batteryInfo) const
 {
     HILOGI("enter");
-    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), INVALID_VALUE, "Invalid remote device.");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device.");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, INVALID_VALUE, "proxy is nullptr.");
-    return hostProxy->GetDeviceBatteryLevel(address_);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
+    BluetoothBatteryInfo bluetoothBatteryInfo;
+    int32_t ret = hostProxy->GetRemoteDeviceBatteryInfo(address_, bluetoothBatteryInfo);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "GetRemoteDeviceBatteryInfo fail");
+    batteryInfo.deviceId_ = address_;
+    batteryInfo.batteryLevel_ = bluetoothBatteryInfo.batteryLevel_;
+    batteryInfo.leftEarBatteryLevel_ = bluetoothBatteryInfo.leftEarBatteryLevel_;
+    batteryInfo.leftEarChargeState_ = static_cast<DeviceChargeState>(bluetoothBatteryInfo.leftEarChargeState_);
+    batteryInfo.rightEarBatteryLevel_ = bluetoothBatteryInfo.rightEarBatteryLevel_;
+    batteryInfo.rightEarChargeState_ = static_cast<DeviceChargeState>(bluetoothBatteryInfo.rightEarChargeState_);
+    batteryInfo.boxBatteryLevel_ = bluetoothBatteryInfo.boxBatteryLevel_;
+    batteryInfo.boxChargeState_ = static_cast<DeviceChargeState>(bluetoothBatteryInfo.boxChargeState_);
+    return ret;
 }
 
 int BluetoothRemoteDevice::GetPairState(int &pairState) const

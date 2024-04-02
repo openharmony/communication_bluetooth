@@ -963,25 +963,22 @@ int32_t BluetoothHostProxy::SetDeviceAlias(const std::string &address, const std
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::GetDeviceBatteryLevel(const std::string &address)
+int32_t BluetoothHostProxy::GetRemoteDeviceBatteryInfo(const std::string &address, BluetoothBatteryInfo &batteryInfo)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::GetDeviceBatteryLevel WriteInterfaceToken error");
-        return 0;
-    }
-    if (!data.WriteString(address)) {
-        HILOGE("BluetoothHostProxy::GetDeviceBatteryLevel address error");
-        return 0;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "write InterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_INTERNAL_ERROR, "write address error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_BATTERY_LEVEL, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::GetDeviceBatteryLevel done fail, error: %{public}d", error);
-        return 0;
-    }
-    return reply.ReadInt32();
+    int32_t ret = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_BATTERY_INFO, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR, "ret: %{public}d", ret);
+    ret = reply.ReadInt32();
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "ret: %{public}d", ret);
+    std::shared_ptr<BluetoothBatteryInfo> info(reply.ReadParcelable<BluetoothBatteryInfo>());
+    CHECK_AND_RETURN_LOG_RET(info != nullptr, BT_ERR_INTERNAL_ERROR, "read info fail");
+    batteryInfo = *info;
+    return ret;
 }
 
 int32_t BluetoothHostProxy::GetPairState(int32_t transport, const std::string &address, int32_t &pairState)

@@ -112,6 +112,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", SetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceBatteryInfo", GetRemoteDeviceBatteryInfo),
     };
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -121,7 +122,8 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 static bool IsValidObserverType(const std::string &callbackName)
 {
     if (callbackName == REGISTER_DEVICE_FIND_TYPE || callbackName == REGISTER_PIN_REQUEST_TYPE ||
-        callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_DISCOVERY_RESULT_TYPE) {
+        callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_DISCOVERY_RESULT_TYPE ||
+        callbackName == REGISTER_BATTERY_CHANGE_TYPE) {
         return true;
     } else {
         HILOGE("not support %{public}s.", callbackName.c_str());
@@ -141,7 +143,7 @@ napi_status CheckRegisterObserver(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF(!IsValidObserverType(callbackName), "Invalid type", napi_invalid_arg);
 
     auto napiCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
-    if (callbackName == REGISTER_BOND_STATE_TYPE) {
+    if (callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_BATTERY_CHANGE_TYPE) {
         g_remoteDeviceObserver->RegisterCallback(callbackName, napiCallback);
     } else {
         g_connectionObserver->RegisterCallback(callbackName, napiCallback);
@@ -162,7 +164,7 @@ napi_status CheckDeRegisterObserver(napi_env env, napi_callback_info info)
     NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], callbackName));
     NAPI_BT_RETURN_IF(!IsValidObserverType(callbackName), "Invalid type", napi_invalid_arg);
 
-    if (callbackName == REGISTER_BOND_STATE_TYPE) {
+    if (callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_BATTERY_CHANGE_TYPE) {
         g_remoteDeviceObserver->DeRegisterCallback(callbackName);
     } else {
         g_connectionObserver->DeRegisterCallback(callbackName);
@@ -785,6 +787,26 @@ napi_value GetRemoteDeviceType(napi_env env, napi_callback_info info)
         int32_t err = remoteDevice.GetDeviceCustomType(deviceType);
         HILOGI("GetRemoteDeviceType err: %{public}d", err);
         auto object = std::make_shared<NapiNativeInt>(deviceType);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    auto checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+    auto func = [remoteAddr]() {
+        DeviceBatteryInfo batteryInfo;
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+        int32_t err = remoteDevice.GetRemoteDeviceBatteryInfo(batteryInfo);
+        HILOGI("err: %{public}d", err);
+        auto object = std::make_shared<NapiNativeBatteryInfo>(batteryInfo);
         return NapiAsyncWorkRet(err, object);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
