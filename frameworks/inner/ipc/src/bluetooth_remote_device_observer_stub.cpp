@@ -16,6 +16,7 @@
 #include "bluetooth_remote_device_observer_stub.h"
 #include "bluetooth_bt_uuid.h"
 #include "bluetooth_log.h"
+#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
