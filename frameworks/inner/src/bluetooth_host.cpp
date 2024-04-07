@@ -196,14 +196,14 @@ public:
             });
     }
 
-    void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int32_t status) override
+    void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int32_t status, int32_t cause) override
     {
-        HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d",
-            transport, GetEncryptAddr((device).GetAddress()).c_str(), status);
+        HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
+            transport, GetEncryptAddr((device).GetAddress()).c_str(), status, cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
-            [remoteDevice, status](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
-                observer->OnPairStatusChanged(remoteDevice, status);
+            [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
+                observer->OnPairStatusChanged(remoteDevice, status, cause);
             });
     }
 
@@ -287,14 +287,14 @@ public:
             });
     }
 
-    void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status) override
+    void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status, int cause) override
     {
-        HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d",
-            transport, GetEncryptAddr((device).GetAddress()).c_str(), status);
+        HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
+            transport, GetEncryptAddr((device).GetAddress()).c_str(), status, cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
-            [remoteDevice, status](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
-                observer->OnPairStatusChanged(remoteDevice, status);
+            [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
+                observer->OnPairStatusChanged(remoteDevice, status, cause);
             });
     }
 

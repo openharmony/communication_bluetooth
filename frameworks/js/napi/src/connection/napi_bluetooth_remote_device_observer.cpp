@@ -28,7 +28,7 @@ void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
     const BluetoothRemoteDevice &device, int state, unsigned int reason)
 {}
 
-void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
+void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status, int cause)
 {
     std::shared_ptr<NapiCallback> napiPairStatusChangeCallback = GetCallback(REGISTER_BOND_STATE_TYPE);
     if (!napiPairStatusChangeCallback) {
@@ -38,11 +38,11 @@ void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemot
 
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
-    HILOGI("addr:%{public}s, bondStatus:%{public}d", GET_ENCRYPT_ADDR(device), bondStatus);
+    HILOGI("addr:%{public}s, bondStatus:%{public}d, cause:%{public}d", GET_ENCRYPT_ADDR(device), bondStatus, cause);
 
-    auto func = [bondStatus, addr = device.GetDeviceAddr(), callback = napiPairStatusChangeCallback]() {
+    auto func = [bondStatus, cause, addr = device.GetDeviceAddr(), callback = napiPairStatusChangeCallback]() {
         CHECK_AND_RETURN_LOG(callback, "PairStatusChangeCallback is not registered");
-        auto napiNative = std::make_shared<NapiNativeBondStateParam>(addr, bondStatus);
+        auto napiNative = std::make_shared<NapiNativeBondStateParam>(addr, bondStatus, cause);
         callback->CallFunction(napiNative);
     };
     DoInJsMainThread(napiPairStatusChangeCallback->GetNapiEnv(), func);
