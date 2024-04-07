@@ -27,7 +27,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBlePeripheralObserver");
 
     virtual void OnReadRemoteRssiEvent(const BluetoothRawAddress &device, int rssi, int status) = 0;
-    virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status) = 0;
+    virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status, int cause) = 0;
     virtual void OnAclStateChanged(const BluetoothRawAddress &device, int state, unsigned int reason) = 0;
 };
 }  // namespace Bluetooth
