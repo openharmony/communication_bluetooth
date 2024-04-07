@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -667,7 +667,7 @@ void HandsFreeAudioGateway::CallDetailsChanged(int callId, int callState)
     CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
     sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "hfpAG proxy is nullptr");
-    piml->CallDetailsChanged(callId, callState);
+    pimpl->CallDetailsChanged(callId, callState);
 }
 
 void HandsFreeAudioGateway::RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
