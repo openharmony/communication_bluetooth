@@ -1577,6 +1577,12 @@ enum DeviceType {
     DEVICE_TYPE_SPEAKER = 6,
 };
 
+enum HfpAgScoStateChangeReason {
+    HFP_AG_SCO_INVALID = 0,
+    HFP_AG_SCO_LOCAL_USER_TERMINATED = 1,
+    HFP_AG_SCO_REMOTE_USER_TERMINATED = 2,
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
