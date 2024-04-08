@@ -202,7 +202,7 @@ void BluetoothHfpAgProxy::PhoneStateChanged(BluetoothPhoneState &phoneState)
     CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG(data.WriteParcelable(&phoneState), "write phoneState error");
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_PHONE_STATE_CHANGED, data, reply, option);
 }
@@ -221,7 +221,7 @@ void BluetoothHfpAgProxy::ClccResponse(
     CHECK_AND_RETURN_LOG(data.WriteInt32(type), "write type error");
 
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_CLCC_RESPONSE, data, reply, option);
 }
@@ -374,6 +374,19 @@ int BluetoothHfpAgProxy::IsInbandRingingEnabled(bool &isEnabled)
     return ret;
 }
 
+void BluetoothHfpAgProxy::CallDetailsChanged(int callId, int callState)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(callId), "write callId error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(callState), "write callState error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_CALL_DETAILS_CHANGED, data, reply, option);
+}
+
 void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer)
 {
     MessageParcel data;
@@ -381,7 +394,7 @@ void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &
     CHECK_AND_RETURN_LOG(data.WriteRemoteObject(observer->AsObject()), "write object error");
 
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_REGISTER_OBSERVER, data, reply, option);
 }
@@ -393,7 +406,7 @@ void BluetoothHfpAgProxy::DeregisterObserver(const sptr<IBluetoothHfpAgObserver>
     CHECK_AND_RETURN_LOG(data.WriteRemoteObject(observer->AsObject()), "write object error");
 
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_DEREGISTER_OBSERVER, data, reply, option);
 }
