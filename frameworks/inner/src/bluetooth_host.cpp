@@ -258,7 +258,7 @@ public:
     void OnRemoteBatteryChanged(const BluetoothRawAddress &device, const BluetoothBatteryInfo &batteryInfo) override
     {
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
-        DeviceBatteryInfo info(device.GetAddress(),batteryInfo);
+        DeviceBatteryInfo info(device.GetAddress(), batteryInfo);
         host_.remoteObservers_.ForEach(
             [remoteDevice, info](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
                 observer->OnRemoteBatteryChanged(remoteDevice, info);
