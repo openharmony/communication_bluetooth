@@ -71,6 +71,17 @@ struct DeviceBatteryInfo {
 
     // The charge state of the box
     DeviceChargeState boxChargeState_;
+
+    DeviceBatteryInfo(const std::string &address, const BluetoothBatteryInfo &batteryInfo) {
+        deviceId_ = address;
+        batteryLevel_ = batteryInfo.batteryLevel_;
+        leftEarBatteryLevel_ = batteryInfo.leftEarBatteryLevel_;
+        leftEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.leftEarChargeState_);
+        rightEarBatteryLevel_ = batteryInfo.rightEarBatteryLevel_;
+        rightEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.rightEarChargeState_);
+        boxBatteryLevel_ = batteryInfo.boxBatteryLevel_;
+        boxChargeState_ = static_cast<DeviceChargeState>(batteryInfo.boxChargeState_);
+    }
 };
 } // namespace Bluetooth
 } // namespace OHOS
