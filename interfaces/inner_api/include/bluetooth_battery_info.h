@@ -84,7 +84,7 @@ struct DeviceBatteryInfo {
         rightEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.rightEarChargeState_);
         boxBatteryLevel_ = batteryInfo.boxBatteryLevel_;
         boxChargeState_ = static_cast<DeviceChargeState>(batteryInfo.boxChargeState_);
-    }
+    };
 };
 } // namespace Bluetooth
 } // namespace OHOS
