@@ -18,6 +18,8 @@
 
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
+#include "bluetooth_raw_address.h"
+#include "../parcel/bluetooth_device_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
