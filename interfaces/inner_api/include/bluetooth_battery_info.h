@@ -72,7 +72,8 @@ struct DeviceBatteryInfo {
     // The charge state of the box
     DeviceChargeState boxChargeState_;
 
-    DeviceBatteryInfo(const std::string &address, const BluetoothBatteryInfo &batteryInfo) {
+    DeviceBatteryInfo(const std::string &address, const BluetoothBatteryInfo &batteryInfo)
+    {
         deviceId_ = address;
         batteryLevel_ = batteryInfo.batteryLevel_;
         leftEarBatteryLevel_ = batteryInfo.leftEarBatteryLevel_;
