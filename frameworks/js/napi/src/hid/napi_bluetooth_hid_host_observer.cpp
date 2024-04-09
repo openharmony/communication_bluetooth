@@ -24,32 +24,14 @@
 
 namespace OHOS {
 namespace Bluetooth {
+NapiBluetoothHidHostObserver::NapiBluetoothHidHostObserver()
+    : eventSubscribe_(STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE, BT_MODULE_NAME)
+{}
+    
 void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
-    if (!callbackInfos_[STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE]) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-    HILOGI("addr:%{public}s, state:%{public}d", GET_ENCRYPT_ADDR(device), state);
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
-        callbackInfos_[STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE];
-
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    auto func = [callbackInfo]() {
-        NapiHandleScope scope(callbackInfo->env_);
-        napi_value result = nullptr;
-        napi_create_object(callbackInfo->env_, &result);
-        ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
-            callbackInfo->state_);
-        napi_value callback = nullptr;
-        napi_value undefined = nullptr;
-        napi_value callResult = nullptr;
-        napi_get_undefined(callbackInfo->env_, &undefined);
-        napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-    };
-    DoInJsMainThread(callbackInfo->env_, func);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE, nativeObject);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

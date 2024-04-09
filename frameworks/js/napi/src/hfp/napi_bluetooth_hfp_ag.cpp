@@ -20,6 +20,7 @@
 #include "napi_bluetooth_hfp_ag.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_event.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -96,29 +97,20 @@ napi_value NapiHandsFreeAudioGateway::HandsFreeAudioGatewayConstructor(napi_env 
 
 napi_value NapiHandsFreeAudioGateway::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
-    if (!isRegistered_) {
-        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-        profile->RegisterObserver(observer_);
-        isRegistered_ = true;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
-
-    return ret;
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiHandsFreeAudioGateway::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
-    HILOGI("Hands Free Audio Gateway is unregistered");
-    return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiHandsFreeAudioGateway::GetConnectionDevices(napi_env env, napi_callback_info info)

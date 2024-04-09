@@ -169,16 +169,14 @@ void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
 }
 } // namespace
 
+NapiBluetoothBleCentralManagerCallback::NapiBluetoothBleCentralManagerCallback()
+    : eventSubscribe_(REGISTER_BLE_FIND_DEVICE_TYPE, BT_MODULE_NAME)
+{}
+
 NapiBluetoothBleCentralManagerCallback &NapiBluetoothBleCentralManagerCallback::GetInstance(void)
 {
     static NapiBluetoothBleCentralManagerCallback instance;
     return instance;
-}
-
-void NapiBluetoothBleCentralManagerCallback::SetNapiScanCallback(const std::shared_ptr<NapiCallback> &callback)
-{
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    napiScanCallback_ = callback;
 }
 
 static void OnSysScanCallback(const BleScanResult &result, const std::string &type)
@@ -197,21 +195,8 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
     // system scan
     OnSysScanCallback(result, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
 
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    if (napiScanCallback_ == nullptr) {
-        HILOGE("napiScanCallback_ is nullptr");
-        return;
-    }
-
-    auto func = [result, callback = napiScanCallback_]() {
-        if (callback == nullptr) {
-            HILOGE("napiScanCallback_ is nullptr");
-            return;
-        }
-        auto napiNative = std::make_shared<NapiNativeBleScanResult>(result);
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiScanCallback_->GetNapiEnv(), func);
+    auto nativeObject = std::make_shared<NapiNativeBleScanResult>(result);
+    eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEvent(

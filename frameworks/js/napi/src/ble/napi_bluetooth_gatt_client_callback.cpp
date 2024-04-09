@@ -18,34 +18,22 @@
 #include "napi_bluetooth_event.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_client_callback.h"
+#include "napi_event_subscribe_module.h"
 #include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
-std::shared_mutex NapiGattClientCallback::g_gattClientCallbackInfosMutex;
+NapiGattClientCallback::NapiGattClientCallback()
+    : eventSubscribe_({STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE,
+        STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE,
+        STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE},
+        BT_MODULE_NAME)
+{}
 
 void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
 {
-    auto status = napi_acquire_threadsafe_function(onBleCharacterChangedThreadSafeFunc_);
-    if (status != napi_ok) {
-        HILOGE("napi_acquire_threadsafe_function failed, status: %{public}d", status);
-        return;
-    }
-
-    GattCharacteristic *character = new GattCharacteristic(characteristic);
-    status = napi_call_threadsafe_function(
-        onBleCharacterChangedThreadSafeFunc_, static_cast<void *>(character), napi_tsfn_blocking);
-    if (status != napi_ok) {
-        HILOGE("napi_call_threadsafe_function failed, status: %{public}d", status);
-        delete character;
-        return;
-    }
-
-    status = napi_release_threadsafe_function(onBleCharacterChangedThreadSafeFunc_, napi_tsfn_release);
-    if (status != napi_ok) {
-        HILOGE("napi_release_threadsafe_function failed, status: %{public}d", status);
-        return;
-    }
+    auto nativeObject = std::make_shared<NapiNativeBleCharacteristic>(characteristic);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE, nativeObject);
 }
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
@@ -64,18 +52,9 @@ void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descri
 
 void NapiGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
 {
-    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
     HILOGI("connectionState:%{public}d, ret:%{public}d", connectionState, ret);
-    callbackInfo->state_ = connectionState;
-    callbackInfo->deviceId_ = client_->GetDevice()->GetDeviceAddr();
-    NapiEvent::CheckAndNotify(callbackInfo, callbackInfo->state_);
+    auto nativeObject = std::make_shared<NapiNativeBleConnectionStateChangeParam>(deviceAddr_, connectionState);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE, nativeObject);
 }
 
 void NapiGattClientCallback::OnServicesDiscovered(int status)
@@ -120,26 +99,8 @@ void NapiGattClientCallback::OnMtuUpdate(int mtu, int ret)
 {
 #ifdef BLUETOOTH_API_SINCE_10
     HILOGI("ret: %{public}d, mtu: %{public}d", ret, mtu);
-    std::unique_lock<std::shared_mutex> guard(g_gattClientCallbackInfosMutex);
-    auto it = callbackInfos_.find(STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGI("BLEMtuChange callback is not registered.");
-        return;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-
-    auto func = [callbackInfo, mtu]() {
-        napi_value result = nullptr;
-        napi_create_int32(callbackInfo->env_, mtu, &result);
-
-        napi_value callback = nullptr;
-        napi_value undefined = nullptr;
-        napi_value callResult = nullptr;
-        napi_get_undefined(callbackInfo->env_, &undefined);
-        napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-        napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-    };
-    DoInJsMainThread(callbackInfo->env_, func);
+    auto nativeObject = std::make_shared<NapiNativeInt>(mtu);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE, nativeObject);
 #endif
 }
 

@@ -19,20 +19,23 @@
 #include <shared_mutex>
 #include "bluetooth_a2dp_src.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
 
-const std::string STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE = "connectionStateChange";
+const char * const STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
 class NapiA2dpSourceObserver : public A2dpSourceObserver {
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 
-    NapiA2dpSourceObserver() = default;
+    NapiA2dpSourceObserver();
     ~NapiA2dpSourceObserver() override = default;
-    static std::shared_mutex g_a2dpSrcCallbackInfosMutex;
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
+
+private:
+    friend class NapiA2dpSource;
+    NapiEventSubscribeModule eventSubscribe_;
 };
 
 }  // namespace Bluetooth

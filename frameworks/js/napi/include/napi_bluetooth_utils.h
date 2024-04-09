@@ -87,9 +87,9 @@ struct SppOption {
     BtSocketType type_;
 };
 
-const std::string REGISTER_STATE_CHANGE_TYPE = "stateChange";
+const char * const REGISTER_STATE_CHANGE_TYPE = "stateChange";
 
-const std::string INVALID_DEVICE_ID = "00:00:00:00:00:00";
+const char * const INVALID_DEVICE_ID = "00:00:00:00:00:00";
 
 bool ParseString(napi_env env, std::string &param, napi_value args);
 bool ParseInt32(napi_env env, int32_t &param, napi_value args);
@@ -102,7 +102,7 @@ void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::str
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
 napi_status ConvertOppTransferInformationToJS(napi_env env,
-    napi_value result, BluetoothOppTransferInformation& transferInformation);
+    napi_value result, const BluetoothOppTransferInformation& transferInformation);
 
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
@@ -475,6 +475,7 @@ void AfterWorkCallback(uv_work_t *work, int status)
         }                                                   \
     } while (0)
 
+int DoInJsMainThread(std::function<void(void)> func);
 int DoInJsMainThread(napi_env env, std::function<void(void)> func);
 
 bool IsValidAddress(std::string bdaddr);
@@ -509,7 +510,7 @@ napi_status CheckSetConnectStrategyParam(napi_env env, napi_callback_info info, 
 napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::string &addr);
 napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,
     int32_t &accessAuthorization);
-
+napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std::string &name);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H
