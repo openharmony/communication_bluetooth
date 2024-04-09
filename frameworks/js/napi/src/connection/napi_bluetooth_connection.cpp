@@ -802,7 +802,8 @@ napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info)
     auto checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
     auto func = [remoteAddr]() {
-        DeviceBatteryInfo batteryInfo;
+        BluetoothBatteryInfo bluetoothBatteryInfo;
+        DeviceBatteryInfo batteryInfo(remoteAddr, bluetoothBatteryInfo);
         BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
         int32_t err = remoteDevice.GetRemoteDeviceBatteryInfo(batteryInfo);
         HILOGI("err: %{public}d", err);
