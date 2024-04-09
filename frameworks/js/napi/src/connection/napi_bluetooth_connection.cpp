@@ -25,6 +25,7 @@
 #include "napi_async_work.h"
 #include "napi_bluetooth_utils.h"
 #include "parser/napi_parser_utils.h"
+#include "../../parcel/bluetooth_device_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
