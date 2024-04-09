@@ -19,22 +19,22 @@
 #include <shared_mutex>
 #include "bluetooth_opp.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string STR_BT_OPP_OBSERVER_RECEIVE_INCOMING_FILE = "receiveIncomingFile";
-const std::string STR_BT_OPP_OBSERVER_TRANSFER_STATE_CHANGE = "transferStateChange";
+const char * const STR_BT_OPP_OBSERVER_RECEIVE_INCOMING_FILE = "receiveIncomingFile";
+const char * const STR_BT_OPP_OBSERVER_TRANSFER_STATE_CHANGE = "transferStateChange";
 
 class NapiBluetoothOppObserver : public OppObserver {
 public:
-    NapiBluetoothOppObserver() = default;
+    NapiBluetoothOppObserver();
     ~NapiBluetoothOppObserver() override = default;
 
     void OnReceiveIncomingFileChanged(const BluetoothOppTransferInformation &transferInformation) override;
     void OnTransferStateChanged(const BluetoothOppTransferInformation &transferInformation) override;
 
-    static std::shared_mutex g_oppCallbackInfosMutex;
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
+    NapiEventSubscribeModule eventSubscribe_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

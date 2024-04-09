@@ -23,6 +23,7 @@
 #include "napi_bluetooth_event.h"
 #include "napi_bluetooth_host.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 #include "../parser/napi_parser_utils.h"
 
 
@@ -140,6 +141,16 @@ static NapiGattClient *NapiGetGattClient(napi_env env, napi_value thisVar)
     return gattClient;
 }
 
+static NapiGattClient *NapiGetGattClient(napi_env env, napi_callback_info info)
+{
+    size_t argc = 0;
+    napi_value thisVar = nullptr;
+    if (napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr) != napi_ok) {
+        return nullptr;
+    }
+    return NapiGetGattClient(env, thisVar);
+}
+
 static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &client,
     const UUID &serviceUuid, const UUID &characterUuid)
 {
@@ -182,141 +193,23 @@ static GattDescriptor *GetGattcDescriptor(const std::shared_ptr<GattClient> &cli
     return descriptor;
 }
 
-static void NapiThreadSafeFunctionCallJs(napi_env env, napi_value jsCallback, void *context, void *data)
-{
-    napi_value undefined = nullptr;
-    napi_value callRet = nullptr;
-    napi_value result = nullptr;
-    GattCharacteristic *character = static_cast<GattCharacteristic *>(data);
-    if (character == nullptr) {
-        HILOGE("character is nullptr");
-        return;
-    }
-
-    napi_create_object(env, &result);
-    ConvertBLECharacteristicToJS(env, result, *character);
-    delete character;  // character is malloc in onCharacteristicChanged callback
-
-    auto status = napi_call_function(env, undefined, jsCallback, ARGS_SIZE_ONE, &result, &callRet);
-    if (status != napi_ok) {
-        HILOGE("napi_call_function status: %{public}d", status);
-    }
-}
-
-static napi_status NapiGattClientCreateThreadSafeFunction(
-    napi_env env, napi_value jsCallback, NapiGattClient *gattClient)
-{
-    if (gattClient == nullptr) {
-        HILOGE("gattClient is nullptr");
-        return napi_invalid_arg;
-    }
-    NAPI_BT_CALL_RETURN(NapiIsFunction(env, jsCallback));
-
-    napi_value name;
-    napi_threadsafe_function tsfn;
-    const size_t maxQueueSize = 0;  // 0 means no limited
-    const size_t initialThreadCount = 1;
-    NAPI_BT_CALL_RETURN(napi_create_string_utf8(env, "GattClient", NAPI_AUTO_LENGTH, &name));
-    NAPI_BT_CALL_RETURN(napi_create_threadsafe_function(env, jsCallback, nullptr, name, maxQueueSize,
-        initialThreadCount, nullptr, nullptr, nullptr, NapiThreadSafeFunctionCallJs, &tsfn));
-    if (gattClient->GetCallback() == nullptr) {
-        HILOGE("gattClient->GetCallback is nullptr");
-        return napi_invalid_arg;
-    }
-    gattClient->GetCallback()->onBleCharacterChangedThreadSafeFunc_ = tsfn;
-    return napi_ok;
-}
-
-napi_status CheckGattClientOn(napi_env env, napi_callback_info info)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
-
-    std::string type {};
-    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo {nullptr};
-
-    auto gattClient = NapiGetGattClient(env, thisVar);
-    NAPI_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", napi_invalid_arg);
-
-    if (type == STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE) {
-        return NapiGattClientCreateThreadSafeFunction(env, argv[PARAM1], gattClient);
-    } else {
-        callbackInfo = std::make_shared<BluetoothCallbackInfo>();
-    }
-    callbackInfo->env_ = env;
-
-    NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
-    std::unique_lock<std::shared_mutex> guard(NapiGattClientCallback::g_gattClientCallbackInfosMutex);
-    NAPI_BT_CALL_RETURN(napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_));
-    if (gattClient->GetCallback() == nullptr) {
-        HILOGE("gattClient->GetCallback is nullptr");
-        return napi_invalid_arg;
-    }
-    gattClient->GetCallback()->SetCallbackInfo(type, callbackInfo);
-    HILOGI("%{public}s is registered", type.c_str());
-    return napi_ok;
-}
-
 napi_value NapiGattClient::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    auto status = CheckGattClientOn(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NapiGattClient *napiGattClient = NapiGetGattClient(env, info);
+    if (napiGattClient && napiGattClient->GetCallback()) {
+        auto status = napiGattClient->GetCallback()->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
     return NapiGetUndefinedRet(env);
-}
-
-napi_status CheckGattClientOff(napi_env env, napi_callback_info info)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {nullptr};  // argv[PARAM1] is not used.
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
-
-    std::string type {};
-    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-
-    auto gattClient = NapiGetGattClient(env, thisVar);
-    NAPI_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", napi_invalid_arg);
-
-    // Clear 'BLECharacteristicChange' callback, different with others callback.
-    auto gattClientCallback = gattClient->GetCallback();
-    if (gattClientCallback == nullptr) {
-        HILOGE("gattClient->GetCallback is nullptr");
-        return napi_invalid_arg;
-    }
-    if (type == STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE) {
-        NAPI_BT_CALL_RETURN(napi_release_threadsafe_function(
-            gattClientCallback->onBleCharacterChangedThreadSafeFunc_, napi_tsfn_abort));
-        gattClientCallback->onBleCharacterChangedThreadSafeFunc_ = nullptr;
-        return napi_ok;
-    }
-
-    // callback_ need unref before, see napi_bluetooth_gatt_client
-    std::unique_lock<std::shared_mutex> guard(NapiGattClientCallback::g_gattClientCallbackInfosMutex);
-    uint32_t refCount = INVALID_REF_COUNT;
-    if (gattClientCallback->GetCallbackInfo(type) == nullptr) {
-        return napi_invalid_arg;
-    }
-    NAPI_BT_CALL_RETURN(napi_reference_unref(env, gattClientCallback->GetCallbackInfo(type)->callback_, &refCount));
-    HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
-    if (refCount == 0) {
-        NAPI_BT_CALL_RETURN(napi_delete_reference(env, gattClientCallback->GetCallbackInfo(type)->callback_));
-    }
-    gattClientCallback->SetCallbackInfo(type, nullptr);
-    HILOGI("%{public}s is removed", type.c_str());
-    return napi_ok;
 }
 
 napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    auto status = CheckGattClientOff(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NapiGattClient *napiGattClient = NapiGetGattClient(env, info);
+    if (napiGattClient && napiGattClient->GetCallback()) {
+        auto status = napiGattClient->GetCallback()->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
     return NapiGetUndefinedRet(env);
 }
 
@@ -344,7 +237,7 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
     std::shared_ptr<GattClient> client = gattClient->GetClient();
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
 
-    int ret = client->Connect(gattClient->GetCallback(), true, GATT_TRANSPORT_TYPE_LE);
+    int ret = client->Connect(gattClient->GetCallback(), false, GATT_TRANSPORT_TYPE_LE);
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);

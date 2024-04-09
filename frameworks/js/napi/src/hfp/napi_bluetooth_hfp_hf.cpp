@@ -14,8 +14,11 @@
  */
 #include "napi_bluetooth_hfp_hf.h"
 #include "napi_bluetooth_profile.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hfp_hf.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_event.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -56,33 +59,22 @@ napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callba
     return thisVar;
 }
 
-
 napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
-    if (!isRegistered_) {
-        HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
-        profile->RegisterObserver(observer_);
-        isRegistered_ = true;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
-
-    HILOGI("Hands Free Unit is registered");
-    return ret;
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiHandsFreeUnit::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
-    HILOGI("Hands Free Unit is unregistered");
-    return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiHandsFreeUnit::GetConnectionDevices(napi_env env, napi_callback_info info)

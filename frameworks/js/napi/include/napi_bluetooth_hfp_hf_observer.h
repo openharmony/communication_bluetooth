@@ -19,11 +19,12 @@
 #include <shared_mutex>
 #include "bluetooth_hfp_hf.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
-const std::string STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE = "scoStateChange";
+const char * const STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
+const char * const STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE = "scoStateChange";
 
 class NapiHandsFreeUnitObserver : public HandsFreeUnitObserver {
 public:
@@ -39,10 +40,10 @@ public:
     void OnVoiceRecognitionStatusChanged(const BluetoothRemoteDevice &device, int status) override{}
     void OnInBandRingToneChanged(const BluetoothRemoteDevice &device, int status) override{}
 
-    NapiHandsFreeUnitObserver() = default;
+    NapiHandsFreeUnitObserver();
     ~NapiHandsFreeUnitObserver() override = default;
-    static std::shared_mutex g_handsFreeUnitCallbackInfosMutex;
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
+
+    NapiEventSubscribeModule eventSubscribe_;
 };
 
 }  // namespace Bluetooth

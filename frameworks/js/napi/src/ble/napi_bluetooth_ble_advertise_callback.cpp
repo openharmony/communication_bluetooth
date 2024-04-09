@@ -23,6 +23,10 @@
 
 namespace OHOS {
 namespace Bluetooth {
+NapiBluetoothBleAdvertiseCallback::NapiBluetoothBleAdvertiseCallback()
+    : eventSubscribe_(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, BT_MODULE_NAME)
+{}
+    
 std::shared_ptr<NapiBluetoothBleAdvertiseCallback> NapiBluetoothBleAdvertiseCallback::GetInstance(void)
 {
     static std::shared_ptr<NapiBluetoothBleAdvertiseCallback> instance =
@@ -30,82 +34,36 @@ std::shared_ptr<NapiBluetoothBleAdvertiseCallback> NapiBluetoothBleAdvertiseCall
     return instance;
 }
 
-void NapiBluetoothBleAdvertiseCallback::SetNapiAdvertisingStateCallback(const std::shared_ptr<NapiCallback> &callback)
-{
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    napiAdvertisingStateCallback_ = callback;
-}
-
 void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
-
-    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
-        if (callback == nullptr) {
-            HILOGE("napiAdvertisingStateCallback_ is nullptr");
-            return;
-        }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
-            static_cast<int>(AdvertisingState::STARTED));
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+    auto nativeObject =
+        std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::STARTED));
+    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
-
-    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
-        if (callback == nullptr) {
-            HILOGE("napiAdvertisingStateCallback_ is nullptr");
-            return;
-        }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
-            static_cast<int>(AdvertisingState::ENABLED));
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+    auto nativeObject =
+        std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::ENABLED));
+    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
-
-    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
-        if (callback == nullptr) {
-            HILOGE("napiAdvertisingStateCallback_ is nullptr");
-            return;
-        }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
-            static_cast<int>(AdvertisingState::DISABLED));
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+    auto nativeObject =
+        std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::DISABLED));
+    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    CHECK_AND_RETURN_LOG(napiAdvertisingStateCallback_ != nullptr, "AdvCallback is nullptr!");
-
-    auto func = [advHandle, callback = napiAdvertisingStateCallback_]() {
-        if (callback == nullptr) {
-            HILOGE("napiAdvertisingStateCallback_ is nullptr");
-            return;
-        }
-        auto napiNative = std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle,
-            static_cast<int>(AdvertisingState::STOPPED));
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiAdvertisingStateCallback_->GetNapiEnv(), func);
+    auto nativeObject =
+        std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::STOPPED));
+    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnSetAdvDataEvent(int result)

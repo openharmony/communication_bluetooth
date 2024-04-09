@@ -52,6 +52,7 @@ public:
     void CallFunction(const std::shared_ptr<NapiNativeObject> &object);
     void CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object);
     napi_env GetNapiEnv(void);
+    bool Equal(napi_value &callback) const;
 private:
     NapiCallback(const NapiCallback &) = delete;
     NapiCallback &operator=(const NapiCallback &) = delete;
