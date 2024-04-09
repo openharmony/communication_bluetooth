@@ -258,15 +258,7 @@ public:
     void OnRemoteBatteryChanged(const BluetoothRawAddress &device, const BluetoothBatteryInfo &batteryInfo) override
     {
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
-        DeviceBatteryInfo info;
-        info.deviceId_ = device.GetAddress();
-        info.batteryLevel_ = batteryInfo.batteryLevel_;
-        info.leftEarBatteryLevel_ = batteryInfo.leftEarBatteryLevel_;
-        info.leftEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.leftEarChargeState_);
-        info.rightEarBatteryLevel_ = batteryInfo.rightEarBatteryLevel_;
-        info.rightEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.rightEarChargeState_);
-        info.boxBatteryLevel_ = batteryInfo.boxBatteryLevel_;
-        info.boxChargeState_ = static_cast<DeviceChargeState>(batteryInfo.boxChargeState_);
+        DeviceBatteryInfo info(device.GetAddress(), batteryInfo);
         host_.remoteObservers_.ForEach(
             [remoteDevice, info](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
                 observer->OnRemoteBatteryChanged(remoteDevice, info);
