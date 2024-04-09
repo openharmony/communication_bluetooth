@@ -170,5 +170,24 @@ napi_value NapiNativeBondStateParam::ToNapiValue(napi_env env) const
     napi_set_named_property(env, result, "cause", unbondCause);
     return result;
 }
+
+napi_value NapiNativeStateChangeParam::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    ConvertStateChangeParamToJS(env, result, deviceAddr_, connectState_);
+    return result;
+}
+
+napi_value NapiNativeOppTransferInformation::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    ConvertOppTransferInformationToJS(env, result, information_);
+    return result;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

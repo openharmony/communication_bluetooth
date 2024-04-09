@@ -41,6 +41,7 @@ ohos_shared_library("bluetooth") {
   defines = [
     "BT_LOG_TAG = \"bluetooth_napi\"",
     "BT_LOG_DOMAIN = 0xD000100",
+    "BT_MODULE_NAME = \"bluetooth\"",
   ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
@@ -126,6 +127,7 @@ ohos_shared_library("bluetoothmanager") {
     "BT_LOG_TAG = \"bluetooth_napi\"",
     "BT_LOG_DOMAIN = 0xD000100",
     "ENABLE_NAPI_BLUETOOTH_MANAGER",
+    "BT_MODULE_NAME = \"bluetoothmanager\"",
   ]
 
   sanitize = {

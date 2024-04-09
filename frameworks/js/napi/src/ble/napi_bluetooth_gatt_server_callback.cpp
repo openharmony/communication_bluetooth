@@ -17,55 +17,30 @@
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_gatt_server.h"
 #include "napi_bluetooth_gatt_server_callback.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
+
+NapiGattServerCallback::NapiGattServerCallback()
+    : eventSubscribe_({STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ,
+        STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE,
+        STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ,
+        STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE,
+        STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE,
+        STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE},
+        BT_MODULE_NAME)
+{}
 
 void NapiGattServerCallback::OnCharacteristicReadRequest(
     const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId)
 {
     HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
         GET_ENCRYPT_ADDR(device), requestId);
-    if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ]) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
-        std::static_pointer_cast<GattCharacteristicCallbackInfo>(
-            callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ]);
-    callbackInfo->info_ = requestId;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    callbackInfo->characteristic_ = characteristic;
-
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = static_cast<void *>(callbackInfo.get());
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            GattCharacteristicCallbackInfo *callbackInfo = static_cast<GattCharacteristicCallbackInfo *>(work->data);
-            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
-            NapiHandleScope scope(callbackInfo->env_);
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertCharacteristicReadReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
-                callbackInfo->characteristic_, callbackInfo->info_);
-
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    auto nativeObject =
+        std::make_shared<NapiNativeGattsCharacterReadRequest>(requestId, device.GetDeviceAddr(), characteristic);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_READ, nativeObject);
 }
 
 void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device,
@@ -73,45 +48,9 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
 {
     HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
         GET_ENCRYPT_ADDR(device), requestId);
-    if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE]) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-
-    std::shared_ptr<GattCharacteristicCallbackInfo> callbackInfo =
-        std::static_pointer_cast<GattCharacteristicCallbackInfo>(
-            callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE]);
-    callbackInfo->info_ = requestId;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    callbackInfo->characteristic_ = characteristic;
-
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = static_cast<void *>(callbackInfo.get());
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            GattCharacteristicCallbackInfo *callbackInfo = static_cast<GattCharacteristicCallbackInfo *>(work->data);
-            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
-            NapiHandleScope scope(callbackInfo->env_);
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertCharacteristicWriteReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
-                callbackInfo->characteristic_, callbackInfo->info_);
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    auto nativeObject =
+        std::make_shared<NapiNativeGattsCharacterWriteRequest>(requestId, device.GetDeviceAddr(), characteristic);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE, nativeObject);
 }
 
 void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
@@ -141,41 +80,9 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
         }
     }
 
-    if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE]) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
-        callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE];
-
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = static_cast<void *>(callbackInfo.get());
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            BluetoothCallbackInfo *callbackInfo = static_cast<BluetoothCallbackInfo *>(work->data);
-            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
-            NapiHandleScope scope(callbackInfo->env_);
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertStateChangeParamToJS(callbackInfo->env_, result, callbackInfo->deviceId_, callbackInfo->state_);
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    auto nativeObject =
+        std::make_shared<NapiNativeBleConnectionStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE, nativeObject);
 }
 
 void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
@@ -183,45 +90,9 @@ void NapiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevic
 {
     HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
         GET_ENCRYPT_ADDR(device), requestId);
-    if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE]) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<GattDescriptorCallbackInfo> callbackInfo =
-        std::static_pointer_cast<GattDescriptorCallbackInfo>(
-            callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE]);
-    callbackInfo->info_ = requestId;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    callbackInfo->descriptor_ = descriptor;
-
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = static_cast<void *>(callbackInfo.get());
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            GattDescriptorCallbackInfo *callbackInfo = static_cast<GattDescriptorCallbackInfo *>(work->data);
-            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
-            NapiHandleScope scope(callbackInfo->env_);
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertDescriptorWriteReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
-                callbackInfo->descriptor_, callbackInfo->info_);
-
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    auto nativeObject =
+        std::make_shared<NapiNativeGattsDescriptorWriteRequest>(requestId, device.GetDeviceAddr(), descriptor);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE, nativeObject);
 }
 
 void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &device,
@@ -229,88 +100,17 @@ void NapiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice
 {
     HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
         GET_ENCRYPT_ADDR(device), requestId);
-    if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ]) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<GattDescriptorCallbackInfo> callbackInfo =
-        std::static_pointer_cast<GattDescriptorCallbackInfo>(
-            callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ]);
-    callbackInfo->info_ = requestId;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    callbackInfo->descriptor_ = descriptor;
-
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = static_cast<void *>(callbackInfo.get());
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            GattDescriptorCallbackInfo *callbackInfo = static_cast<GattDescriptorCallbackInfo *>(work->data);
-            CHECK_AND_RETURN_LOG(callbackInfo, "callbackInfo is null");
-            NapiHandleScope scope(callbackInfo->env_);
-            napi_value result = nullptr;
-            napi_create_object(callbackInfo->env_, &result);
-            ConvertDescriptorReadReqToJS(callbackInfo->env_, result, callbackInfo->deviceId_,
-                callbackInfo->descriptor_, callbackInfo->info_);
-
-            napi_value callback = nullptr;
-            napi_value undefined = nullptr;
-            napi_value callResult = nullptr;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    auto nativeObject =
+        std::make_shared<NapiNativeGattsDescriptorReadRequest>(requestId, device.GetDeviceAddr(), descriptor);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_DESCRIPTOR_READ, nativeObject);
 }
 
 void NapiGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu)
 {
     HILOGI("enter, remote device address: %{public}s, mtu: %{public}d",
         GET_ENCRYPT_ADDR(device), mtu);
-    if (!callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE]) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo =
-        callbackInfos_[STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE];
-    callbackInfo->info_ = mtu;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    uv_work_t *work = new uv_work_t;
-    work->data = static_cast<void *>(callbackInfo.get());
-
-    uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            BluetoothCallbackInfo *callbackInfo = static_cast<BluetoothCallbackInfo *>(work->data);
-            if (callbackInfo == nullptr) {
-                HILOGE("callbackInfo is null!");
-                return;
-            }
-            NapiHandleScope scope(callbackInfo->env_);
-            napi_value result = 0;
-            napi_value callback = 0;
-            napi_value undefined = 0;
-            napi_value callResult = 0;
-            napi_get_undefined(callbackInfo->env_, &undefined);
-            napi_create_int32(callbackInfo->env_, static_cast<int32_t>(callbackInfo->info_), &result);
-            napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-            delete work;
-            work = nullptr;
-        }
-    );
+    auto nativeObject = std::make_shared<NapiNativeInt>(mtu);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE, nativeObject);
 }
 
 void NapiGattServerCallback::OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int ret)

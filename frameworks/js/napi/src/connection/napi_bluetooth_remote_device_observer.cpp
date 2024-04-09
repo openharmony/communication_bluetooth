@@ -24,28 +24,22 @@
 
 namespace OHOS {
 namespace Bluetooth {
+NapiBluetoothRemoteDeviceObserver::NapiBluetoothRemoteDeviceObserver()
+    : eventSubscribe_(REGISTER_BOND_STATE_TYPE, BT_MODULE_NAME)
+{}
+
 void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
     const BluetoothRemoteDevice &device, int state, unsigned int reason)
 {}
 
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status, int cause)
 {
-    std::shared_ptr<NapiCallback> napiPairStatusChangeCallback = GetCallback(REGISTER_BOND_STATE_TYPE);
-    if (!napiPairStatusChangeCallback) {
-        HILOGD("PairStatusChangeCallback is not registered");
-        return;
-    }
-
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
     HILOGI("addr:%{public}s, bondStatus:%{public}d, cause:%{public}d", GET_ENCRYPT_ADDR(device), bondStatus, cause);
 
-    auto func = [bondStatus, cause, addr = device.GetDeviceAddr(), callback = napiPairStatusChangeCallback]() {
-        CHECK_AND_RETURN_LOG(callback, "PairStatusChangeCallback is not registered");
-        auto napiNative = std::make_shared<NapiNativeBondStateParam>(addr, bondStatus, cause);
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiPairStatusChangeCallback->GetNapiEnv(), func);
+    auto nativeObject = std::make_shared<NapiNativeBondStateParam>(device.GetDeviceAddr(), bondStatus, cause);
+    eventSubscribe_.PublishEvent(REGISTER_BOND_STATE_TYPE, nativeObject);
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteUuidChanged(
@@ -82,28 +76,6 @@ void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
     const BluetoothRemoteDevice &device, int rssi, int status)
 {
     HILOGD("addr:%{public}s, rssi:%{public}d, status is %{public}d", GET_ENCRYPT_ADDR(device), rssi, status);
-}
-
-void NapiBluetoothRemoteDeviceObserver::RegisterCallback(
-    const std::string &callbackName, const std::shared_ptr<NapiCallback> &callback)
-{
-    std::lock_guard<std::mutex> lock(callbacksMapLock_);
-    callbacks_[callbackName] = callback;
-}
-
-void NapiBluetoothRemoteDeviceObserver::DeRegisterCallback(const std::string &callbackName)
-{
-    std::lock_guard<std::mutex> lock(callbacksMapLock_);
-    callbacks_.erase(callbackName);
-}
-
-std::shared_ptr<NapiCallback> NapiBluetoothRemoteDeviceObserver::GetCallback(const std::string &callbackName)
-{
-    std::lock_guard<std::mutex> lock(callbacksMapLock_);
-    if (callbacks_.find(callbackName) != callbacks_.end()) {
-        return callbacks_[callbackName];
-    }
-    return nullptr;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

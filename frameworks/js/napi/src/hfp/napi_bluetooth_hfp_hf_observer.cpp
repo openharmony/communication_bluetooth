@@ -16,44 +16,28 @@
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_hfp_hf_observer.h"
 #include "napi_bluetooth_event.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-std::shared_mutex NapiHandsFreeUnitObserver::g_handsFreeUnitCallbackInfosMutex;
+NapiHandsFreeUnitObserver::NapiHandsFreeUnitObserver()
+    : eventSubscribe_({STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE,
+        STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE},
+        BT_MODULE_NAME)
+{}
 
 void NapiHandsFreeUnitObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
     HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    std::unique_lock<std::shared_mutex> guard(g_handsFreeUnitCallbackInfosMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-    HILOGI("%{public}s is registered by ability", STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    NapiEvent::CheckAndNotify(callbackInfo, state);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE, nativeObject);
 }
 
 void NapiHandsFreeUnitObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    std::unique_lock<std::shared_mutex> guard(g_handsFreeUnitCallbackInfosMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-
-    HILOGI("%{public}s is registered by ability", STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    NapiEvent::CheckAndNotify(callbackInfo, state);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE, nativeObject);
 }
 
 } // namespace Bluetooth

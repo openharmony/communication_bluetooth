@@ -20,13 +20,14 @@
 #include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_ble_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
 
-const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLECharacteristicChange";
-const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
-const std::string STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE = "BLEMtuChange";
+const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLECharacteristicChange";
+const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
+const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE = "BLEMtuChange";
 class NapiGattClient;
 
 class NapiGattClientCallback : public GattClientCallback {
@@ -42,28 +43,16 @@ public:
     void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override {}
     void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override;
     void OnReadRemoteRssiValueResult(int rssi, int status)  override;
-    void SetCallbackInfo(const std::string &type, std::shared_ptr<BluetoothCallbackInfo> callbackInfo)
-    {
-        callbackInfos_[type] = callbackInfo;
-    }
-    void SetClient(NapiGattClient *client)
-    {
-        client_ = client;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfo(const std::string &type)
-    {
-        return callbackInfos_[type];
-    }
-    NapiGattClientCallback() = default;
+
+    NapiGattClientCallback();
     ~NapiGattClientCallback() override = default;
-    static std::shared_mutex g_gattClientCallbackInfosMutex;
 
     NapiAsyncWorkMap asyncWorkMap_ {};
-    napi_threadsafe_function onBleCharacterChangedThreadSafeFunc_ = nullptr;
-
 private:
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
-    NapiGattClient *client_ = nullptr;
+    friend class NapiGattClient;
+    NapiEventSubscribeModule eventSubscribe_;
+
+    std::string deviceAddr_ = INVALID_MAC_ADDRESS;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -147,63 +147,21 @@ napi_value NapiAccess::StateChangeInit(napi_env env)
     return state;
 }
 
-static bool IsValidObserverType(const std::string &outType)
-{
-    return outType == REGISTER_STATE_CHANGE_TYPE;
-}
-
-static napi_status NapiParseObserverType(napi_env env, napi_value value, std::string &outType)
-{
-    std::string type{};
-    NAPI_BT_CALL_RETURN(NapiParseString(env, value, type));
-    HILOGI("type: %{public}s", type.c_str());
-    NAPI_BT_RETURN_IF(!IsValidObserverType(type), "Invalid type", napi_invalid_arg);
-    outType = std::move(type);
-    return napi_ok;
-}
-
-static napi_status CheckAccessObserverParams(napi_env env, napi_callback_info info)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
-    std::string type;
-    NAPI_BT_CALL_RETURN(NapiParseObserverType(env, argv[PARAM0], type));
-    HILOGI("%{public}s is registered", type.c_str());
-
-    g_bluetoothAccessObserver->napiStateChangeCallback_ = std::make_shared<NapiCallback>(env, argv[PARAM1]);
-    return napi_ok;
-}
-
 napi_value NapiAccess::RegisterAccessObserver(napi_env env, napi_callback_info info)
 {
-    auto status = CheckAccessObserverParams(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    if (g_bluetoothAccessObserver) {
+        auto status = g_bluetoothAccessObserver->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
     return NapiGetUndefinedRet(env);
-}
-
-static napi_status CheckAccessDeregisterObserver(napi_env env, napi_callback_info info)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
-
-    std::string type;
-    NAPI_BT_CALL_RETURN(NapiParseObserverType(env, argv[PARAM0], type));
-    HILOGI("%{public}s is unregistered", type.c_str());
-
-    g_bluetoothAccessObserver->napiStateChangeCallback_ = nullptr;
-    return napi_ok;
 }
 
 napi_value NapiAccess::DeregisterAccessObserver(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    auto status = CheckAccessDeregisterObserver(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    if (g_bluetoothAccessObserver) {
+        auto status = g_bluetoothAccessObserver->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
     return NapiGetUndefinedRet(env);
 }
 

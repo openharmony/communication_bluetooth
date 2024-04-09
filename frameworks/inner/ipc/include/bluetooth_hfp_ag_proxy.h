@@ -49,6 +49,7 @@ public:
     int SetConnectStrategy(const BluetoothRawAddress &device, int strategy) override;
     int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) override;
     int IsInbandRingingEnabled(bool &isEnabled) override;
+    void CallDetailsChanged(int callId, int callState) override;
 
 private:
     static inline BrokerDelegator<BluetoothHfpAgProxy> delegator_;
