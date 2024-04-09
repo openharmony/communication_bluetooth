@@ -132,6 +132,7 @@ config("btframework_public_config") {
   include_dirs = [
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
   ]
 }
 
