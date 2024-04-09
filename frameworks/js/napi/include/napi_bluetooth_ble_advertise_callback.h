@@ -18,12 +18,13 @@
 
 #include "bluetooth_ble_advertiser.h"
 #include "napi_async_callback.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
 class NapiBluetoothBleAdvertiseCallback : public BleAdvertiseCallback {
 public:
-    NapiBluetoothBleAdvertiseCallback() = default;
+    NapiBluetoothBleAdvertiseCallback();
     ~NapiBluetoothBleAdvertiseCallback() override = default;
 
     static std::shared_ptr<NapiBluetoothBleAdvertiseCallback> GetInstance(void);
@@ -34,12 +35,9 @@ public:
     void OnStopResultEvent(int result, int advHandle) override;
     void OnSetAdvDataEvent(int result) override;
     void OnGetAdvHandleEvent(int result, int advHandle) override;
-    void SetNapiAdvertisingStateCallback(const std::shared_ptr<NapiCallback> &callback);
 
     NapiAsyncWorkMap asyncWorkMap_ {};
-private:
-    std::mutex callbackMutex_ {};
-    std::shared_ptr<NapiCallback> napiAdvertisingStateCallback_ {nullptr};
+    NapiEventSubscribeModule eventSubscribe_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

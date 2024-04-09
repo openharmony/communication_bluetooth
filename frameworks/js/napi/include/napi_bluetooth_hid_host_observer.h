@@ -18,19 +18,20 @@
 
 #include "bluetooth_hid_host.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
+const char * const STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
 
 class NapiBluetoothHidHostObserver : public HidHostObserver {
 public:
-    NapiBluetoothHidHostObserver() = default;
+    NapiBluetoothHidHostObserver();
     ~NapiBluetoothHidHostObserver() override = default;
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
 
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
+    NapiEventSubscribeModule eventSubscribe_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

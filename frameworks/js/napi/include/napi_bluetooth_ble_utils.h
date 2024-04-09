@@ -46,10 +46,10 @@ enum class NapiGattWriteType {
     WRITE_NO_RESPONSE = 2,
 };
 
-const std::string REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
-const std::string REGISTER_SYS_BLE_SCAN_TYPE = "sysBLEScan";
-const std::string REGISTER_SYS_BLE_FIND_DEVICE_TYPE = "sysBLEDeviceFonud";
-const std::string REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE = "advertisingStateChange";
+const char * const REGISTER_BLE_FIND_DEVICE_TYPE = "BLEDeviceFind";
+const char * const REGISTER_SYS_BLE_SCAN_TYPE = "sysBLEScan";
+const char * const REGISTER_SYS_BLE_FIND_DEVICE_TYPE = "sysBLEDeviceFonud";
+const char * const REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE = "advertisingStateChange";
 
 void ConvertGattServiceToJS(napi_env env, napi_value result, GattService &service);
 void ConvertGattServiceVectorToJS(napi_env env, napi_value result, std::vector<GattService> &services);

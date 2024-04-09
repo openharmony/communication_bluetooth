@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 #include "bluetooth_a2dp_snk.h"
+#include "bluetooth_errorcode.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_a2dp_snk.h"
 #include "napi_bluetooth_event.h"
+#include "napi_bluetooth_error.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -53,29 +55,20 @@ napi_value NapiA2dpSink::A2dpSinkConstructor(napi_env env, napi_callback_info in
 
 napi_value NapiA2dpSink::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiA2dpSinkObserver::g_a2dpSinkCallbackInfosMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
-    if (!isRegistered_) {
-        A2dpSink *profile = A2dpSink::GetProfile();
-        profile->RegisterObserver(observer_);
-        isRegistered_ = true;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
-    HILOGI("Napi A2dpSink is registered");
-    return ret;
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiA2dpSink::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiA2dpSinkObserver::g_a2dpSinkCallbackInfosMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
-    HILOGI("napi A2dpSink is unregistered");
-    return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiA2dpSink::GetConnectionDevices(napi_env env, napi_callback_info info)

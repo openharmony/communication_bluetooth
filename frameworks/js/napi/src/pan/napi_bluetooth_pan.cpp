@@ -112,71 +112,20 @@ napi_value NapiBluetoothPan::PanConstructor(napi_env env, napi_callback_info inf
 
 napi_value NapiBluetoothPan::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 2 argument.");
-        return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BluetoothCallbackInfo>();
-    callbackInfo->env_ = env;
-
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[PARAM1], &valueType);
-    if (valueType != napi_function) {
-        HILOGE("Wrong argument type. Function expected.");
-        return ret;
-    }
-    napi_create_reference(env, argv[PARAM1], 1, &callbackInfo->callback_);
-    observer_->callbackInfos_[type] = callbackInfo;
-
-    HILOGI("%{public}s is registered", type.c_str());
-    return ret;
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
-    napi_value thisVar = nullptr;
-
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
-    string type;
-    if (!ParseString(env, type, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
-    if (observer_->callbackInfos_[type] != nullptr) {
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = observer_->callbackInfos_[type];
-    napi_delete_reference(env, callbackInfo->callback_);
-    }
-    observer_->callbackInfos_[type] = nullptr;
-
-    HILOGI("%{public}s is unregistered", type.c_str());
-
-    return ret;
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_info info)

@@ -262,65 +262,50 @@ void DefineSystemBLEInterface(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
+using NapiBluetoothOnOffFunc = std::function<napi_status(napi_env env, napi_callback_info info)>;
+
+static napi_status NapiBluetoothBleOnOffExecute(napi_env env, napi_callback_info info,
+    NapiBluetoothOnOffFunc bleCentralManagerFunc, NapiBluetoothOnOffFunc bleAdvertiserFunc)
+{
+    std::string type = "";
+    NAPI_BT_CALL_RETURN(NapiGetOnOffCallbackName(env, info, type));
+
+    napi_status status = napi_ok;
+    if (type == REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE) {
+        status = bleAdvertiserFunc(env, info);
+    } else if (type == REGISTER_BLE_FIND_DEVICE_TYPE) {
+        status = bleCentralManagerFunc(env, info);
+    } else {
+        HILOGE("Unsupported callback: %{public}s", type.c_str());
+        status = napi_invalid_arg;
+    }
+    return status;
+}
+
 static napi_value On(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
-    auto CheckBleOnFunc = [env, info]() -> napi_status {
-        size_t argc = ARGS_SIZE_TWO;
-        napi_value argv[ARGS_SIZE_TWO] = {nullptr};
-        napi_value thisVar = nullptr;
-        NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-        NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments", napi_invalid_arg);
-
-        std::string type {};
-        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-        if (type == REGISTER_BLE_FIND_DEVICE_TYPE) {
-            NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
-            auto napiScanCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
-            NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(napiScanCallback);
-        } else if (type == REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE) {
-            NAPI_BT_CALL_RETURN(NapiIsFunction(env, argv[PARAM1]));
-            auto napiAdvertisingStateCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
-            NapiBluetoothBleAdvertiseCallback::GetInstance()->SetNapiAdvertisingStateCallback(
-                napiAdvertisingStateCallback);
-        } else {
-            HILOGE("Invalid type: %{public}s", type.c_str());
-            return napi_invalid_arg;
-        }
-
-        return napi_ok;
+    auto bleCentralManagerFunc = [](napi_env env, napi_callback_info info) {
+        return NapiBluetoothBleCentralManagerCallback::GetInstance().eventSubscribe_.Register(env, info);
+    };
+    auto bleAdvertiserFunc =  [](napi_env env, napi_callback_info info) {
+        return NapiBluetoothBleAdvertiseCallback::GetInstance()->eventSubscribe_.Register(env, info);
     };
 
-    auto status = CheckBleOnFunc();
+    auto status = NapiBluetoothBleOnOffExecute(env, info, bleCentralManagerFunc, bleAdvertiserFunc);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     return NapiGetUndefinedRet(env);
 }
 
 static napi_value Off(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
-    auto CheckBleOffFunc = [env, info]() -> napi_status {
-        size_t argc = ARGS_SIZE_TWO;
-        napi_value argv[ARGS_SIZE_TWO] = {nullptr};
-        napi_value thisVar = nullptr;
-        NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-        NAPI_BT_RETURN_IF(
-            argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments", napi_invalid_arg);
-
-        std::string type {};
-        NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
-        if (type == REGISTER_BLE_FIND_DEVICE_TYPE) {
-            NapiBluetoothBleCentralManagerCallback::GetInstance().SetNapiScanCallback(nullptr);
-        } else if (type == REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE) {
-            NapiBluetoothBleAdvertiseCallback::GetInstance()->SetNapiAdvertisingStateCallback(nullptr);
-        } else {
-            HILOGE("Invalid type: %{public}s", type.c_str());
-            return napi_invalid_arg;
-        }
-        return napi_ok;
+    auto bleCentralManagerFunc = [](napi_env env, napi_callback_info info) {
+        return NapiBluetoothBleCentralManagerCallback::GetInstance().eventSubscribe_.Deregister(env, info);
+    };
+    auto bleAdvertiserFunc =  [](napi_env env, napi_callback_info info) {
+        return NapiBluetoothBleAdvertiseCallback::GetInstance()->eventSubscribe_.Deregister(env, info);
     };
 
-    auto status = CheckBleOffFunc();
+    auto status = NapiBluetoothBleOnOffExecute(env, info, bleCentralManagerFunc, bleAdvertiserFunc);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     return NapiGetUndefinedRet(env);
 }
