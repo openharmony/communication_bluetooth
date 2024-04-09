@@ -188,6 +188,7 @@ napi_value NapiNativeOppTransferInformation::ToNapiValue(napi_env env) const
 napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
 {
     napi_value value = nullptr;
+    napi_value result = nullptr;
     napi_create_string_utf8(env, batteryInfo_.deviceId_.c_str(), batteryInfo_.deviceId_.size(), &value);
     napi_set_named_property(env, result, "deviceId", value);
     napi_create_int32(env, batteryInfo_.batteryLevel_, &value);
