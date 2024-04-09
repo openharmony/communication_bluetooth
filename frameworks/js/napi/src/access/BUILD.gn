@@ -31,6 +31,7 @@ ohos_shared_library("access") {
     "BT_LOG_DOMAIN = 0xD000100",
     "ENABLE_NAPI_BLUETOOTH_MANAGER",
     "BLUETOOTH_API_SINCE_10",
+    "BT_MODULE_NAME = \"bluetooth.access\"",
   ]
 
   sanitize = {

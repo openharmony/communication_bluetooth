@@ -82,27 +82,22 @@ napi_value NapiBluetoothOpp::OppConstructor(napi_env env, napi_callback_info inf
     return thisVar;
 }
 
-
 napi_value NapiBluetoothOpp::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiBluetoothOppObserver::g_oppCallbackInfosMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
-    HILOGI("napi NapiBluetoothOpp is registered");
-    return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBluetoothOpp::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiBluetoothOppObserver::g_oppCallbackInfosMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
-    HILOGI("Napi NapiBluetoothOpp is unregistered");
-    return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
 }
 
 napi_status CheckSetIncomingFileConfirmation(napi_env env, napi_callback_info info, bool &accept)

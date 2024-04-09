@@ -19,24 +19,15 @@
 
 namespace OHOS {
 namespace Bluetooth {
+NapiA2dpSourceObserver::NapiA2dpSourceObserver()
+    : eventSubscribe_(STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE, BT_MODULE_NAME)
+{}
 
-std::shared_mutex NapiA2dpSourceObserver::g_a2dpSrcCallbackInfosMutex;
 void NapiA2dpSourceObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
     HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    std::unique_lock<std::shared_mutex> guard(g_a2dpSrcCallbackInfosMutex);
-
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    NapiEvent::CheckAndNotify(callbackInfo, state);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE, nativeObject);
 }
 
 } // namespace Bluetooth

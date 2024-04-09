@@ -13,9 +13,12 @@
  * limitations under the License.
  */
 #include "bluetooth_avrcp_tg.h"
+#include "bluetooth_errorcode.h"
 #include "napi_bluetooth_avrcp_tg.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_event.h"
+#include "napi_bluetooth_error.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -52,29 +55,27 @@ napi_value NapiAvrcpTarget::AvrcpTargetConstructor(napi_env env, napi_callback_i
 
 napi_value NapiAvrcpTarget::On(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiAvrcpTargetObserver::g_avrcpTgCallbackInfosMutex);
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Register(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
 
-    napi_value ret = nullptr;
-    ret = NapiEvent::OnEvent(env, info, observer_->callbackInfos_);
     if (!isRegistered_) {
         AvrcpTarget *profile = AvrcpTarget::GetProfile();
         profile->RegisterObserver(observer_);
         isRegistered_ = true;
     }
     HILOGI("Napi Avrcp Target is registered");
-    return ret;
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiAvrcpTarget::Off(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    std::unique_lock<std::shared_mutex> guard(NapiAvrcpTargetObserver::g_avrcpTgCallbackInfosMutex);
-
-    napi_value ret = nullptr;
-    ret = NapiEvent::OffEvent(env, info, observer_->callbackInfos_);
-    HILOGI("Napi Avrcp Target is unregistered");
-    return ret;
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiAvrcpTarget::GetConnectionDevices(napi_env env, napi_callback_info info)
