@@ -25,7 +25,6 @@
 #include "napi_async_work.h"
 #include "napi_bluetooth_utils.h"
 #include "parser/napi_parser_utils.h"
-#include "../../parcel/bluetooth_device_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -803,8 +802,7 @@ napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info)
     auto checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
     auto func = [remoteAddr]() {
-        BluetoothBatteryInfo bluetoothBatteryInfo;
-        DeviceBatteryInfo batteryInfo(remoteAddr, bluetoothBatteryInfo);
+        DeviceBatteryInfo batteryInfo;
         BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
         int32_t err = remoteDevice.GetRemoteDeviceBatteryInfo(batteryInfo);
         HILOGI("err: %{public}d", err);
