@@ -19,20 +19,20 @@
 #include <shared_mutex>
 #include "bluetooth_avrcp_ct.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
 
-const std::string STR_BT_AVRCP_CT_CONNECTION_STATE_CHANGE = "connectionStateChange";
+const char * const STR_BT_AVRCP_CT_CONNECTION_STATE_CHANGE = "connectionStateChange";
 class NapiAvrcpControllerObserver : public AvrcpController::IObserver {
 public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
     void OnActionCompleted(const BluetoothRemoteDevice &device, const AvrcpCtResponse &resp) override {}
-    NapiAvrcpControllerObserver() = default;
+    NapiAvrcpControllerObserver();
     ~NapiAvrcpControllerObserver() override = default;
 
-    static std::shared_mutex g_avrcpCtCallbackInfosMutex;
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
+    NapiEventSubscribeModule eventSubscribe_;
 };
 
 }  // namespace Bluetooth

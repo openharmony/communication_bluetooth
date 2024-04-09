@@ -19,43 +19,24 @@
 
 namespace OHOS {
 namespace Bluetooth {
+NapiHandsFreeAudioGatewayObserver::NapiHandsFreeAudioGatewayObserver()
+    : eventSubscribe_({STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE,
+        STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE},
+        BT_MODULE_NAME)
+{}
 
-std::shared_mutex NapiHandsFreeAudioGatewayObserver::g_handsFreeAudioGatewayCallbackMutex;
 void NapiHandsFreeAudioGatewayObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
 {
     HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    std::unique_lock<std::shared_mutex> guard(g_handsFreeAudioGatewayCallbackMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-    HILOGD("%{public}s is registered by ability",
-        STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    NapiEvent::CheckAndNotify(callbackInfo, state);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE, nativeObject);
 }
 
 void NapiHandsFreeAudioGatewayObserver::OnScoStateChanged(const BluetoothRemoteDevice &device, int state, int reason)
 {
     HILOGI("address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    std::unique_lock<std::shared_mutex> guard(g_handsFreeAudioGatewayCallbackMutex);
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>>::iterator it =
-        callbackInfos_.find(STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE);
-    if (it == callbackInfos_.end() || it->second == nullptr) {
-        HILOGW("This callback is not registered by ability.");
-        return;
-    }
-
-    HILOGI("%{public}s is registered by ability",
-        STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE.c_str());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = it->second;
-    callbackInfo->state_ = state;
-    callbackInfo->deviceId_ = device.GetDeviceAddr();
-    NapiEvent::CheckAndNotify(callbackInfo, state);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    eventSubscribe_.PublishEvent(STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE, nativeObject);
 }
 
 } // namespace Bluetooth

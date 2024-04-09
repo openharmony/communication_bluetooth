@@ -66,6 +66,7 @@ FwkSrc = [
   "$JS_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
   "$JS_NAPI_DIR/src/common/napi_bluetooth_event.cpp",
   "$JS_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
+  "$JS_NAPI_DIR/src/common/napi_event_subscribe_module.cpp",
   "$JS_NAPI_DIR/src/common/napi_native_object.cpp",
   "$JS_NAPI_DIR/src/common/napi_timer.cpp",
   "$JS_NAPI_DIR/src/parser/napi_parser_utils.cpp",
@@ -149,6 +150,7 @@ ohos_shared_library("btframework") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "init:libbegetutil",

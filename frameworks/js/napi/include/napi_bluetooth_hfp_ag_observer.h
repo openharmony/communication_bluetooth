@@ -19,11 +19,12 @@
 #include <shared_mutex>
 #include "bluetooth_hfp_ag.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
-const std::string STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE = "scoStateChange";
+const char * const STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_CONNECTION_STATE_CHANGE = "connectionStateChange";
+const char * const STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE = "scoStateChange";
 
 class NapiHandsFreeAudioGatewayObserver : public HandsFreeAudioGatewayObserver {
 public:
@@ -34,11 +35,10 @@ public:
     void OnHfEnhancedDriverSafetyChanged(const BluetoothRemoteDevice &device, int indValue) override{}
     void OnHfpStackChanged(const BluetoothRemoteDevice &device, int action) override{}
 
-    NapiHandsFreeAudioGatewayObserver() = default;
+    NapiHandsFreeAudioGatewayObserver();
     ~NapiHandsFreeAudioGatewayObserver() override = default;
 
-    static std::shared_mutex g_handsFreeAudioGatewayCallbackMutex;
-    std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> callbackInfos_ = {};
+    NapiEventSubscribeModule eventSubscribe_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

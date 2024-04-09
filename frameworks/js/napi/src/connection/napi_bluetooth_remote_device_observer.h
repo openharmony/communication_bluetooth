@@ -19,12 +19,13 @@
 #include "bluetooth_host.h"
 #include "napi_async_callback.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
 class NapiBluetoothRemoteDeviceObserver : public BluetoothRemoteDeviceObserver {
 public:
-    NapiBluetoothRemoteDeviceObserver() = default;
+    NapiBluetoothRemoteDeviceObserver();
     ~NapiBluetoothRemoteDeviceObserver() override = default;
 
     void OnAclStateChanged(const BluetoothRemoteDevice &device, int state, unsigned int reason) override;
@@ -35,18 +36,9 @@ public:
     void OnRemoteCodChanged(const BluetoothRemoteDevice &device, const BluetoothDeviceClass &cod) override;
     void OnRemoteBatteryLevelChanged(const BluetoothRemoteDevice &device, int batteryLevel) override;
     void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override;
-
-    void RegisterCallback(const std::string &callbackName, const std::shared_ptr<NapiCallback> &callback);
-    void DeRegisterCallback(const std::string &callbackName);
-    std::shared_ptr<NapiCallback> GetCallback(const std::string &callbackName);
     void OnRemoteBatteryChanged(const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo) override;
 
-private:
-    void UvQueueWorkOnPairStatusChanged(uv_work_t *work, std::pair<std::string, int> &data);
-
-private:
-    std::mutex callbacksMapLock_;
-    std::unordered_map<std::string, std::shared_ptr<NapiCallback>> callbacks_;
+    NapiEventSubscribeModule eventSubscribe_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -21,11 +21,19 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_bluetooth_connection.h"
+#include "napi_event_subscribe_module.h"
 
 #include <uv.h>
 
 namespace OHOS {
 namespace Bluetooth {
+NapiBluetoothConnectionObserver::NapiBluetoothConnectionObserver()
+    : eventSubscribe_({REGISTER_DEVICE_FIND_TYPE,
+        REGISTER_DISCOVERY_RESULT_TYPE,
+        REGISTER_PIN_REQUEST_TYPE},
+        BT_MODULE_NAME)
+{}
+
 void NapiBluetoothConnectionObserver::OnDiscoveryStateChanged(int status)
 {
     switch (status) {
@@ -86,79 +94,30 @@ void NapiBluetoothConnectionObserver::OnDeviceAddrChanged(const std::string &add
     HILOGI("address is %{public}s", GetEncryptAddr(address).c_str());
 }
 
-void NapiBluetoothConnectionObserver::RegisterCallback(
-    const std::string &callbackName, const std::shared_ptr<NapiCallback> &callback)
-{
-    std::lock_guard<std::mutex> lock(callbacksMapLock_);
-    callbacks_[callbackName] = callback;
-}
-
-void NapiBluetoothConnectionObserver::DeRegisterCallback(const std::string &callbackName)
-{
-    std::lock_guard<std::mutex> lock(callbacksMapLock_);
-    callbacks_.erase(callbackName);
-}
-
-std::shared_ptr<NapiCallback> NapiBluetoothConnectionObserver::GetCallback(const std::string &callbackName)
-{
-    std::lock_guard<std::mutex> lock(callbacksMapLock_);
-    if (callbacks_.find(callbackName) != callbacks_.end()) {
-        return callbacks_[callbackName];
-    }
-    return nullptr;
-}
-
 void NapiBluetoothConnectionObserver::OnPairConfirmedCallBack(
     const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo)
 {
     CHECK_AND_RETURN_LOG(pairConfirmInfo, "pairConfirmInfo is nullptr");
     HILOGI("Addr: %{public}s", GetEncryptAddr(pairConfirmInfo->deviceAddr).c_str());
 
-    auto napiPairConfirmedCallback = GetCallback(REGISTER_PIN_REQUEST_TYPE);
-    CHECK_AND_RETURN_LOG(napiPairConfirmedCallback, "PairConfirmed callback is not registered");
-
-    auto func = [pairConfirmInfo, callback = napiPairConfirmedCallback]() {
-        CHECK_AND_RETURN_LOG(callback, "PairConfirmed callback is not registered");
-        auto napiNative = std::make_shared<NapiNativePinRequiredParam>(pairConfirmInfo);
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiPairConfirmedCallback->GetNapiEnv(), func);
+    auto nativeObject = std::make_shared<NapiNativePinRequiredParam>(pairConfirmInfo);
+    eventSubscribe_.PublishEvent(REGISTER_PIN_REQUEST_TYPE, nativeObject);
 }
 
 void NapiBluetoothConnectionObserver::OnDiscoveryResultCallBack(const BluetoothRemoteDevice &device)
 {
     std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
-    auto napiDiscoveryResultCallback = GetCallback(REGISTER_DEVICE_FIND_TYPE);
-    if (!napiDiscoveryResultCallback) {
-        HILOGD("DiscoveryResult callback is not registered");
-        return;
-    }
-
-    auto func = [remoteDevice, callback = napiDiscoveryResultCallback]() {
-        CHECK_AND_RETURN_LOG(callback, "DiscoveryResult callback is not registered");
-        auto napiNative = std::make_shared<NapiNativeDiscoveryResultArray>(remoteDevice);
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiDiscoveryResultCallback->GetNapiEnv(), func);
+    auto nativeObject = std::make_shared<NapiNativeDiscoveryResultArray>(remoteDevice);
+    eventSubscribe_.PublishEvent(REGISTER_DEVICE_FIND_TYPE, nativeObject);
 }
 
 void NapiBluetoothConnectionObserver::OnDiscoveryResultCallBack(
     const BluetoothRemoteDevice &device, int rssi, const std::string &deviceName, int deviceClass)
 {
     std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
-    auto napiDiscoveryResultCallback = GetCallback(REGISTER_DISCOVERY_RESULT_TYPE);
-    if (!napiDiscoveryResultCallback) {
-        HILOGD("DiscoveryResult callback is not registered");
-        return;
-    }
-
-    auto func = [remoteDevice, rssi, deviceName, deviceClass, callback = napiDiscoveryResultCallback]() {
-        CHECK_AND_RETURN_LOG(callback, "DiscoveryResult callback is not registered");
-        auto napiNative = std::make_shared<NapiNativeDiscoveryInfoResultArray>(
-            remoteDevice, rssi, deviceName, deviceClass);
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiDiscoveryResultCallback->GetNapiEnv(), func);
+    auto nativeObject =
+        std::make_shared<NapiNativeDiscoveryInfoResultArray>(remoteDevice, rssi, deviceName, deviceClass);
+    eventSubscribe_.PublishEvent(REGISTER_DISCOVERY_RESULT_TYPE, nativeObject);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

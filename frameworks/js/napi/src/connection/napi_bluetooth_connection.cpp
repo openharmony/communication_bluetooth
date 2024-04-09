@@ -40,7 +40,7 @@ std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefault
             napi_value result = 0;
             napi_value value = 0;
             napi_create_array(env, &result);
-            napi_create_string_utf8(env, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &value);
+            napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &value);
             napi_set_element(env, result, 0, value);
             return result;
         }},
@@ -50,9 +50,9 @@ std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefault
             napi_value deviceId = nullptr;
             napi_value pinCode = nullptr;
             napi_create_object(env, &result);
-            napi_create_string_utf8(env, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &deviceId);
+            napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &deviceId);
             napi_set_named_property(env, result, "deviceId", deviceId);
-            napi_create_string_utf8(env, INVALID_PIN_CODE.c_str(), NAPI_AUTO_LENGTH, &pinCode);
+            napi_create_string_utf8(env, INVALID_PIN_CODE, NAPI_AUTO_LENGTH, &pinCode);
             napi_set_named_property(env, result, "pinCode", pinCode);
             return result;
         }},
@@ -61,7 +61,7 @@ std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefault
          napi_value deviceId = nullptr;
          napi_value state = nullptr;
          napi_create_object(env, &result);
-         napi_create_string_utf8(env, INVALID_DEVICE_ID.c_str(), NAPI_AUTO_LENGTH, &deviceId);
+         napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &deviceId);
          napi_set_named_property(env, result, "deviceId", deviceId);
          napi_create_int32(env, static_cast<int32_t>(BondState::BOND_STATE_INVALID), &state);
          napi_set_named_property(env, result, "state", state);
@@ -119,80 +119,55 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
     return exports;
 }
 
-static bool IsValidObserverType(const std::string &callbackName)
+using NapiBluetoothOnOffFunc = std::function<napi_status(napi_env env, napi_callback_info info)>;
+
+static napi_status NapiConnectionOnOffExecute(napi_env env, napi_callback_info info,
+    NapiBluetoothOnOffFunc connectionObserverFunc, NapiBluetoothOnOffFunc remoteDeviceObserverFunc)
 {
-    if (callbackName == REGISTER_DEVICE_FIND_TYPE || callbackName == REGISTER_PIN_REQUEST_TYPE ||
-        callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_DISCOVERY_RESULT_TYPE ||
-        callbackName == REGISTER_BATTERY_CHANGE_TYPE) {
-        return true;
+    std::string type = "";
+    NAPI_BT_CALL_RETURN(NapiGetOnOffCallbackName(env, info, type));
+
+    napi_status status = napi_ok;
+    if (type == REGISTER_DEVICE_FIND_TYPE ||
+        type == REGISTER_DISCOVERY_RESULT_TYPE ||
+        type == REGISTER_PIN_REQUEST_TYPE ||
+        type == REGISTER_BATTERY_CHANGE_TYPE) {
+        status = connectionObserverFunc(env, info);
+    } else if (type == REGISTER_BOND_STATE_TYPE || type == REGISTER_BATTERY_CHANGE_TYPE) {
+        status = remoteDeviceObserverFunc(env, info);
     } else {
-        HILOGE("not support %{public}s.", callbackName.c_str());
-        return false;
+        HILOGE("Unsupported callback: %{public}s", type.c_str());
+        status = napi_invalid_arg;
     }
-}
-
-napi_status CheckRegisterObserver(napi_env env, napi_callback_info info)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
-
-    std::string callbackName;
-    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], callbackName));
-    NAPI_BT_RETURN_IF(!IsValidObserverType(callbackName), "Invalid type", napi_invalid_arg);
-
-    auto napiCallback = std::make_shared<NapiCallback>(env, argv[PARAM1]);
-    if (callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_BATTERY_CHANGE_TYPE) {
-        g_remoteDeviceObserver->RegisterCallback(callbackName, napiCallback);
-    } else {
-        g_connectionObserver->RegisterCallback(callbackName, napiCallback);
-    }
-    HILOGI("%{public}s registered", callbackName.c_str());
-    return napi_ok;
-}
-
-napi_status CheckDeRegisterObserver(napi_env env, napi_callback_info info)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {0};
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments.", napi_invalid_arg);
-
-    std::string callbackName;
-    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], callbackName));
-    NAPI_BT_RETURN_IF(!IsValidObserverType(callbackName), "Invalid type", napi_invalid_arg);
-
-    if (callbackName == REGISTER_BOND_STATE_TYPE || callbackName == REGISTER_BATTERY_CHANGE_TYPE) {
-        g_remoteDeviceObserver->DeRegisterCallback(callbackName);
-    } else {
-        g_connectionObserver->DeRegisterCallback(callbackName);
-    }
-    HILOGI("%{public}s unregistered", callbackName.c_str());
-    return napi_ok;
+    return status;
 }
 
 napi_value RegisterConnectionObserver(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
-    auto status = CheckRegisterObserver(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto connectionObserverFunc = [](napi_env env, napi_callback_info info) {
+        return g_connectionObserver->eventSubscribe_.Register(env, info);
+    };
+    auto remoteDeviceObserverFunc =  [](napi_env env, napi_callback_info info) {
+        return g_remoteDeviceObserver->eventSubscribe_.Register(env, info);
+    };
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-    return ret;
+    auto status = NapiConnectionOnOffExecute(env, info, connectionObserverFunc, remoteDeviceObserverFunc);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value DeRegisterConnectionObserver(napi_env env, napi_callback_info info)
 {
-    HILOGD("enter");
-    auto status = CheckDeRegisterObserver(env, info);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto connectionObserverFunc = [](napi_env env, napi_callback_info info) {
+        return g_connectionObserver->eventSubscribe_.Deregister(env, info);
+    };
+    auto remoteDeviceObserverFunc =  [](napi_env env, napi_callback_info info) {
+        return g_remoteDeviceObserver->eventSubscribe_.Deregister(env, info);
+    };
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-    return ret;
+    auto status = NapiConnectionOnOffExecute(env, info, connectionObserverFunc, remoteDeviceObserverFunc);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value GetBtConnectionState(napi_env env, napi_callback_info info)

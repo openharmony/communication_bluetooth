@@ -125,6 +125,88 @@ private:
     int bondStatus_ = -1;
 };
 
+class NapiNativeStateChangeParam : public NapiNativeObject {
+public:
+    NapiNativeStateChangeParam(std::string deviceAddr, int connectState)
+        : deviceAddr_(deviceAddr), connectState_(connectState) {}
+    virtual ~NapiNativeStateChangeParam() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::string deviceAddr_ = "";
+    int connectState_ = -1;
+};
+
+class NapiNativeBleConnectionStateChangeParam : public NapiNativeStateChangeParam {
+public:
+    NapiNativeBleConnectionStateChangeParam(std::string deviceAddr, int connectState)
+        : NapiNativeStateChangeParam(deviceAddr, connectState) {}
+    ~NapiNativeBleConnectionStateChangeParam() override = default;
+};
+
+class NapiNativeGattsCharacterReadRequest : public NapiNativeObject {
+public:
+    NapiNativeGattsCharacterReadRequest(int transId, std::string deviceAddr, GattCharacteristic &character)
+        : transId_(transId), deviceAddr_(deviceAddr), character_(character) {}
+    ~NapiNativeGattsCharacterReadRequest() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int transId_ = 0;
+    std::string deviceAddr_ = "";
+    GattCharacteristic character_;
+};
+
+class NapiNativeGattsCharacterWriteRequest : public NapiNativeObject {
+public:
+    NapiNativeGattsCharacterWriteRequest(int transId, std::string deviceAddr, GattCharacteristic &character)
+        : transId_(transId), deviceAddr_(deviceAddr), character_(character) {}
+    ~NapiNativeGattsCharacterWriteRequest() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int transId_ = 0;
+    std::string deviceAddr_ = "";
+    GattCharacteristic character_;
+};
+
+class NapiNativeGattsDescriptorWriteRequest : public NapiNativeObject {
+public:
+    NapiNativeGattsDescriptorWriteRequest(int transId, std::string deviceAddr, GattDescriptor &descriptor)
+        : transId_(transId), deviceAddr_(deviceAddr), descriptor_(descriptor) {}
+    ~NapiNativeGattsDescriptorWriteRequest() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int transId_ = 0;
+    std::string deviceAddr_ = "";
+    GattDescriptor descriptor_;
+};
+
+class NapiNativeGattsDescriptorReadRequest : public NapiNativeObject {
+public:
+    NapiNativeGattsDescriptorReadRequest(int transId, std::string deviceAddr, GattDescriptor &descriptor)
+        : transId_(transId), deviceAddr_(deviceAddr), descriptor_(descriptor) {}
+    ~NapiNativeGattsDescriptorReadRequest() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int transId_ = 0;
+    std::string deviceAddr_ = "";
+    GattDescriptor descriptor_;
+};
+
+class NapiNativeOppTransferInformation : public NapiNativeObject {
+public:
+    explicit NapiNativeOppTransferInformation(const BluetoothOppTransferInformation &information)
+        : information_(information) {}
+    ~NapiNativeOppTransferInformation() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    BluetoothOppTransferInformation information_;
+};
+
 class NapiNativeBatteryInfo : public NapiNativeObject {
 public:
     explicit NapiNativeBatteryInfo(DeviceBatteryInfo batteryInfo) : batteryInfo_(batteryInfo) {}
@@ -134,8 +216,6 @@ public:
 private:
     DeviceBatteryInfo batteryInfo_;
 };
-
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_NATIVE_OBJECT_H

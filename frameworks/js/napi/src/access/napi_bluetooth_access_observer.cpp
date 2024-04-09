@@ -18,11 +18,16 @@
 #include "bluetooth_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_event_subscribe_module.h"
 
 #include <uv.h>
 
 namespace OHOS {
 namespace Bluetooth {
+NapiBluetoothAccessObserver::NapiBluetoothAccessObserver()
+    : eventSubscribe_(REGISTER_STATE_CHANGE_TYPE, BT_MODULE_NAME)
+{}
+
 void NapiBluetoothAccessObserver::OnStateChanged(const int transport, const int status)
 {
     BluetoothState state = BluetoothState::STATE_OFF;
@@ -32,17 +37,8 @@ void NapiBluetoothAccessObserver::OnStateChanged(const int transport, const int 
     }
 
     HILOGD("state is %{public}d", state);
-    if (!napiStateChangeCallback_) {
-        HILOGD("stateChangeCallback is not registered");
-        return;
-    }
-
-    auto func = [state, callback = napiStateChangeCallback_]() {
-        CHECK_AND_RETURN_LOG(callback, "stateChangeCallback is not registered");
-        auto napiNative = std::make_shared<NapiNativeInt>(static_cast<int>(state));
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiStateChangeCallback_->GetNapiEnv(), func);
+    auto nativeObject = std::make_shared<NapiNativeInt>(static_cast<int>(state));
+    eventSubscribe_.PublishEvent(REGISTER_STATE_CHANGE_TYPE, nativeObject);
 }
 
 void NapiBluetoothAccessObserver::EnableBt()

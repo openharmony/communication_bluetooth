@@ -167,11 +167,26 @@ napi_value NapiNativeBondStateParam::ToNapiValue(napi_env env) const
     return result;
 }
 
-napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
+napi_value NapiNativeStateChangeParam::ToNapiValue(napi_env env) const
 {
     napi_value result = nullptr;
     napi_create_object(env, &result);
 
+    ConvertStateChangeParamToJS(env, result, deviceAddr_, connectState_);
+    return result;
+}
+
+napi_value NapiNativeOppTransferInformation::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    ConvertOppTransferInformationToJS(env, result, information_);
+    return result;
+}
+
+napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
+{
     napi_value value = nullptr;
     napi_create_string_utf8(env, batteryInfo_.deviceId_.c_str(), batteryInfo_.deviceId_.size(), &value);
     napi_set_named_property(env, result, "deviceId", value);
@@ -191,5 +206,6 @@ napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
     napi_set_named_property(env, result, "boxChargeState", value);
     return result;
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS
