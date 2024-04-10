@@ -130,8 +130,7 @@ static napi_status NapiConnectionOnOffExecute(napi_env env, napi_callback_info i
     napi_status status = napi_ok;
     if (type == REGISTER_DEVICE_FIND_TYPE ||
         type == REGISTER_DISCOVERY_RESULT_TYPE ||
-        type == REGISTER_PIN_REQUEST_TYPE ||
-        type == REGISTER_BATTERY_CHANGE_TYPE) {
+        type == REGISTER_PIN_REQUEST_TYPE) {
         status = connectionObserverFunc(env, info);
     } else if (type == REGISTER_BOND_STATE_TYPE || type == REGISTER_BATTERY_CHANGE_TYPE) {
         status = remoteDeviceObserverFunc(env, info);
