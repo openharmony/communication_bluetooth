@@ -146,7 +146,7 @@ int32_t BluetoothRemoteDevice::SetDeviceAlias(const std::string &aliasName)
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr.");
     return hostProxy->SetDeviceAlias(address_, aliasName);
 }
 
@@ -338,7 +338,7 @@ int32_t BluetoothRemoteDevice::SetDeviceCustomType(int32_t deviceType) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr.");
     return hostProxy->SetDeviceCustomType(address_, deviceType);
 }
 
@@ -349,7 +349,7 @@ int32_t BluetoothRemoteDevice::GetDeviceCustomType(int32_t &deviceType) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
 
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr.");
     return hostProxy->GetDeviceCustomType(address_, deviceType);
 }
 }  // namespace Bluetooth
