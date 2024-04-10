@@ -200,7 +200,7 @@ public:
         int32_t status, int32_t cause) override
     {
         HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
-            transport, GetEncryptAddr((device).GetAddress()).c_str(), status, cause);
+            transport, GET_ENCRYPT_ADDR(device), status, cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
             [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -291,7 +291,7 @@ public:
     void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status, int cause) override
     {
         HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
-            transport, GetEncryptAddr((device).GetAddress()).c_str(), status, cause);
+            transport, GET_ENCRYPT_ADDR(device), status, cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
             [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
