@@ -133,7 +133,7 @@ public:
     void OnPairRequested(const int32_t transport, const BluetoothRawAddress &device) override
     {
         HILOGI("enter, transport: %{public}d, device: %{public}s",
-            transport, GetEncryptAddr((device).GetAddress()).c_str());
+            transport, GET_ENCRYPT_RAW_ADDR(device));
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.observers_.ForEach([remoteDevice](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnPairRequested(remoteDevice);
@@ -143,7 +143,7 @@ public:
     void OnPairConfirmed(const int32_t transport, const BluetoothRawAddress &device, int reqType, int number) override
     {
         HILOGI("enter, transport: %{public}d, device: %{public}s, reqType: %{public}d, number: %{public}d",
-            transport, GetEncryptAddr((device).GetAddress()).c_str(), reqType, number);
+            transport, GET_ENCRYPT_RAW_ADDR(device), reqType, number);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.observers_.ForEach([remoteDevice, reqType, number](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnPairConfirmed(remoteDevice, reqType, number);
@@ -188,7 +188,7 @@ public:
     void OnAclStateChanged(const BluetoothRawAddress &device, int32_t state, uint32_t reason) override
     {
         HILOGD("enter, device: %{public}s, state: %{public}d, reason: %{public}u",
-            GetEncryptAddr((device).GetAddress()).c_str(), state, reason);
+            GET_ENCRYPT_RAW_ADDR(device), state, reason);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
             [remoteDevice, state, reason](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -200,7 +200,7 @@ public:
         int32_t status, int32_t cause) override
     {
         HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
-            transport, GetEncryptAddr((device).GetAddress()).c_str(), status, cause);
+            transport, GET_ENCRYPT_RAW_ADDR(device), status, cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
             [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -210,7 +210,7 @@ public:
 
     void OnRemoteUuidChanged(const BluetoothRawAddress &device, const std::vector<bluetooth::Uuid> uuids) override
     {
-        HILOGD("enter, device: %{public}s", GetEncryptAddr((device).GetAddress()).c_str());
+        HILOGD("enter, device: %{public}s", GET_ENCRYPT_RAW_ADDR(device));
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
             [remoteDevice, uuids](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -226,7 +226,7 @@ public:
     void OnRemoteNameChanged(const BluetoothRawAddress &device, const std::string deviceName) override
     {
         HILOGD("enter, device: %{public}s, deviceName: %{public}s",
-            GetEncryptAddr((device).GetAddress()).c_str(), deviceName.c_str());
+            GET_ENCRYPT_RAW_ADDR(device), deviceName.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
             [remoteDevice, deviceName](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -237,7 +237,7 @@ public:
     void OnRemoteAliasChanged(const BluetoothRawAddress &device, const std::string alias) override
     {
         HILOGI("enter, device: %{public}s, alias: %{public}s",
-            GetEncryptAddr((device).GetAddress()).c_str(), alias.c_str());
+            GET_ENCRYPT_RAW_ADDR(device), alias.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
             [remoteDevice, alias](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -247,7 +247,7 @@ public:
 
     void OnRemoteCodChanged(const BluetoothRawAddress &device, int32_t cod) override
     {
-        HILOGD("enter, device: %{public}s, cod: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), cod);
+        HILOGD("enter, device: %{public}s, cod: %{public}d", GET_ENCRYPT_RAW_ADDR(device), cod);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         BluetoothDeviceClass deviceClass(cod);
         host_.remoteObservers_.ForEach(
@@ -259,7 +259,7 @@ public:
     void OnRemoteBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel) override
     {
         HILOGI("enter, device: %{public}s, batteryLevel: %{public}d",
-            GetEncryptAddr((device).GetAddress()).c_str(), batteryLevel);
+            GET_ENCRYPT_RAW_ADDR(device), batteryLevel);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
             [remoteDevice, batteryLevel](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -280,7 +280,7 @@ public:
     void OnAclStateChanged(const BluetoothRawAddress &device, int state, unsigned int reason) override
     {
         HILOGD("enter, device: %{public}s, state: %{public}d, reason: %{public}u",
-            GetEncryptAddr((device).GetAddress()).c_str(), state, reason);
+            GET_ENCRYPT_RAW_ADDR(device), state, reason);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BLE);
         host_.remoteObservers_.ForEach(
             [remoteDevice, state, reason](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -291,7 +291,7 @@ public:
     void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status, int cause) override
     {
         HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
-            transport, GetEncryptAddr((device).GetAddress()).c_str(), status, cause);
+            transport, GET_ENCRYPT_RAW_ADDR(device), status, cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
             [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
@@ -302,7 +302,7 @@ public:
     void OnReadRemoteRssiEvent(const BluetoothRawAddress &device, int rssi, int status) override
     {
         HILOGI("enter, device: %{public}s, rssi: %{public}d, status: %{public}d",
-            GetEncryptAddr((device).GetAddress()).c_str(), rssi, status);
+            GET_ENCRYPT_RAW_ADDR(device), rssi, status);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BLE);
         host_.remoteObservers_.ForEach(
             [remoteDevice, rssi, status](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
