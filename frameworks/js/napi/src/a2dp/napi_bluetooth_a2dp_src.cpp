@@ -692,6 +692,12 @@ napi_value NapiA2dpSource::EnableAutoPlay(napi_env env, napi_callback_info info)
     return asyncWork->GetRet();
 }
 
+static bool IsInvalidAutoPlayDuration(int32_t duration)
+{
+    return duration < MIN_AUTO_PLAY_DURATION_SEC
+        || duration> MAX_AUTO_PLAY_DURATION_SEC;
+}
+
 static napi_status CheckDisableAutoPlayParam(napi_env env, napi_callback_info info, std::string &addr,
     int32_t &duration)
 {
@@ -701,6 +707,7 @@ static napi_status CheckDisableAutoPlayParam(napi_env env, napi_callback_info in
     NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments", napi_invalid_arg);
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     NAPI_BT_RETURN_IF(!ParseInt32(env, duration, argv[PARAM1]), "ParseInt failed", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(IsInvalidAutoPlayDuration(duration), "Invalid duration", napi_invalid_arg);
     return napi_ok;
 }
 
