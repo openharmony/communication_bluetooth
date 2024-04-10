@@ -75,15 +75,8 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryLevelChanged(
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryChanged(
     const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo)
 {
-    std::shared_ptr<NapiCallback> napiBatteryChangeCallback = GetCallback(REGISTER_BATTERY_CHANGE_TYPE);
-    CHECK_AND_RETURN_LOG(napiBatteryChangeCallback != nullptr, "BatteryChangeCallback is not registered");
-
-    auto func = [batteryInfo, callback = napiBatteryChangeCallback]() {
-        CHECK_AND_RETURN_LOG(callback, "BatteryChangeCallback is not registered");
-        auto napiNative = std::make_shared<NapiNativeBatteryInfo>(batteryInfo);
-        callback->CallFunction(napiNative);
-    };
-    DoInJsMainThread(napiBatteryChangeCallback->GetNapiEnv(), func);
+    auto nativeObject = std::make_shared<NapiNativeBatteryInfo>(batteryInfo);
+    eventSubscribe_.PublishEvent(REGISTER_BATTERY_CHANGE_TYPE, nativeObject);
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
