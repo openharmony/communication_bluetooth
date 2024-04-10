@@ -25,7 +25,9 @@
 namespace OHOS {
 namespace Bluetooth {
 NapiBluetoothRemoteDeviceObserver::NapiBluetoothRemoteDeviceObserver()
-    : eventSubscribe_(REGISTER_BOND_STATE_TYPE, BT_MODULE_NAME)
+    : eventSubscribe_({REGISTER_BOND_STATE_TYPE,
+        REGISTER_BATTERY_CHANGE_TYPE},
+        BT_MODULE_NAME)
 {}
 
 void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
