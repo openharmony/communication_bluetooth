@@ -93,7 +93,8 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner(MessageParce
         return TRANSACTION_ERR;
     }
     int32_t status = data.ReadInt32();
-    OnPairStatusChanged(transport, *result, status);
+    int32_t cause = data.ReadInt32();
+    OnPairStatusChanged(transport, *result, status, cause);
     return NO_ERROR;
 }
 

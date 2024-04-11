@@ -32,13 +32,13 @@ void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
     const BluetoothRemoteDevice &device, int state, unsigned int reason)
 {}
 
-void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status)
+void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status, int cause)
 {
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
-    HILOGI("addr:%{public}s, bondStatus:%{public}d", GET_ENCRYPT_ADDR(device), bondStatus);
+    HILOGI("addr:%{public}s, bondStatus:%{public}d, cause:%{public}d", GET_ENCRYPT_ADDR(device), bondStatus, cause);
 
-    auto nativeObject = std::make_shared<NapiNativeBondStateParam>(device.GetDeviceAddr(), bondStatus);
+    auto nativeObject = std::make_shared<NapiNativeBondStateParam>(device.GetDeviceAddr(), bondStatus, cause);
     eventSubscribe_.PublishEvent(REGISTER_BOND_STATE_TYPE, nativeObject);
 }
 
