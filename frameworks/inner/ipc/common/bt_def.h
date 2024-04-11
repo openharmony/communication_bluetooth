@@ -179,6 +179,14 @@ const int DISCOVERY_STOPED = 0x03;
 const int PAIR_NONE = 0x01;
 const int PAIR_PAIRING = 0x02;
 const int PAIR_PAIRED = 0x03;
+enum UnbondCause : int {
+    PAIR_COMMON_BOND_CAUSE = 0,          // Common bond cause value.
+    UNBOND_CAUSE_USER_REMOVED = 0,       // User proactively removed device.
+    UNBOND_CAUSE_REMOTE_DEVICE_DOWN = 1, // Remote device shut down.
+    UNBOND_CAUSE_AUTH_FAILURE = 2,       // Wrong PIN code.
+    UNBOND_CAUSE_AUTH_REJECTED = 3,      // Remote device rejected.
+    UNBOND_CAUSE_INTERNAL_ERROR = 4,     // Internal error.
+};
 
 /**
  * @brief discoverable mode and connect mode

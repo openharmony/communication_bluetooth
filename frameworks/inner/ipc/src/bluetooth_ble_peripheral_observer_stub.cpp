@@ -81,8 +81,8 @@ ErrCode BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner(MessageParc
         return TRANSACTION_ERR;
     }
     const int32_t status = static_cast<int32_t>(data.ReadInt32());
-
-    OnPairStatusChanged(transport, *device, status);
+    const int32_t cause = static_cast<int32_t>(data.ReadInt32());
+    OnPairStatusChanged(transport, *device, status, cause);
     return NO_ERROR;
 }
 

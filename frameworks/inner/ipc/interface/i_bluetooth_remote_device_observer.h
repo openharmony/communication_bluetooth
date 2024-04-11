@@ -29,7 +29,8 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothRemoteDeviceObserver");
 
     virtual void OnAclStateChanged(const BluetoothRawAddress &device, int32_t state, uint32_t reason) = 0;
-    virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int32_t status) = 0;
+    virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device,
+        int32_t status, int32_t cause) = 0;
     virtual void OnRemoteUuidChanged(const BluetoothRawAddress &device, const std::vector<bluetooth::Uuid> uuids) = 0;
     virtual void OnRemoteNameChanged(const BluetoothRawAddress &device, const std::string deviceName) = 0;
     virtual void OnRemoteAliasChanged(const BluetoothRawAddress &device, const std::string alias) = 0;

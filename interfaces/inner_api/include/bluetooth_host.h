@@ -168,9 +168,10 @@ public:
      *
      * @param device Remote device.
      * @param status Remote device pair status.
-     * @since 6
+     * @param cause Pair fail cause.
+     * @since 12
      */
-    virtual void OnPairStatusChanged(const BluetoothRemoteDevice &device, int status) = 0;
+    virtual void OnPairStatusChanged(const BluetoothRemoteDevice &device, int status, int cause) = 0;
 
     /**
      * @brief Remote uuid changed observer.
