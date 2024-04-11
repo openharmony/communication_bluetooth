@@ -159,7 +159,7 @@ int BluetoothRemoteDevice::GetRemoteDeviceBatteryInfo(DeviceBatteryInfo &battery
     BluetoothBatteryInfo bluetoothBatteryInfo;
     int32_t ret = hostProxy->GetRemoteDeviceBatteryInfo(address_, bluetoothBatteryInfo);
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "GetRemoteDeviceBatteryInfo fail");
-    batteryInfo.deviceId_ = address;
+    batteryInfo.deviceId_ = address_;
     batteryInfo.batteryLevel_ = bluetoothBatteryInfo.batteryLevel_;
     batteryInfo.leftEarBatteryLevel_ = bluetoothBatteryInfo.leftEarBatteryLevel_;
     batteryInfo.leftEarChargeState_ = static_cast<DeviceChargeState>(bluetoothBatteryInfo.leftEarChargeState_);
