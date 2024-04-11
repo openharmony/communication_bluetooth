@@ -18,8 +18,6 @@
 
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
-#include "bluetooth_raw_address.h"
-#include "../parcel/bluetooth_device_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -73,30 +71,6 @@ struct DeviceBatteryInfo {
 
     // The charge state of the box
     DeviceChargeState boxChargeState_;
-
-    DeviceBatteryInfo()
-    {
-        deviceId_ = "";
-        batteryLevel_ = -1;
-        leftEarBatteryLevel_ = -1;
-        leftEarChargeState_ = DeviceChargeState::DEVICE_NORMAL_CHARGE_NOT_CHARGED;
-        rightEarBatteryLevel_ = -1;
-        rightEarChargeState_ = DeviceChargeState::DEVICE_NORMAL_CHARGE_NOT_CHARGED;
-        boxBatteryLevel_ = -1;
-        boxChargeState_ = DeviceChargeState::DEVICE_NORMAL_CHARGE_NOT_CHARGED;
-    };
-
-    DeviceBatteryInfo(const std::string &address, const BluetoothBatteryInfo &batteryInfo)
-    {
-        deviceId_ = address;
-        batteryLevel_ = batteryInfo.batteryLevel_;
-        leftEarBatteryLevel_ = batteryInfo.leftEarBatteryLevel_;
-        leftEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.leftEarChargeState_);
-        rightEarBatteryLevel_ = batteryInfo.rightEarBatteryLevel_;
-        rightEarChargeState_ = static_cast<DeviceChargeState>(batteryInfo.rightEarChargeState_);
-        boxBatteryLevel_ = batteryInfo.boxBatteryLevel_;
-        boxChargeState_ = static_cast<DeviceChargeState>(batteryInfo.boxChargeState_);
-    };
 };
 } // namespace Bluetooth
 } // namespace OHOS
