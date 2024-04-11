@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
+constexpr int32_t MIN_AUTO_PLAY_DURATION_SEC = 3 * 1000;
+constexpr int32_t MAX_AUTO_PLAY_DURATION_SEC = 20 * 1000;
 enum CodecType {
     CODEC_TYPE_SBC = 0,
     CODEC_TYPE_AAC = 1,
@@ -85,6 +87,9 @@ public:
     static napi_value DisableAbsoluteVolume(napi_env env, napi_callback_info info);
     static napi_value SetCurrentCodecInfo(napi_env env, napi_callback_info info);
     static napi_value GetCurrentCodecInfo(napi_env env, napi_callback_info info);
+    static napi_value EnableAutoPlay(napi_env env, napi_callback_info info);
+    static napi_value DisableAutoPlay(napi_env env, napi_callback_info info);
+    static napi_value GetAutoPlayDisabledDuration(napi_env env, napi_callback_info info);
 #endif
     static std::shared_ptr<NapiA2dpSourceObserver> observer_;
     static bool isRegistered_;
