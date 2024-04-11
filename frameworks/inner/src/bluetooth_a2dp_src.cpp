@@ -669,5 +669,32 @@ A2dpOffloadCodecStatus A2dpSource::GetOffloadCodecStatus(const BluetoothRemoteDe
     HILOGI("codecType:%{public}x,mtu:%{public}d", status.offloadInfo.codecType, status.offloadInfo.mtu);
     return status;
 }
+
+int A2dpSource::EnableAutoPlay(const BluetoothRemoteDevice &device)
+{
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "input device err");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "a2dpSrc proxy is nullptr");
+    return proxy->EnableAutoPlay(RawAddress(device.GetDeviceAddr()));
+}
+
+int A2dpSource::DisableAutoPlay(const BluetoothRemoteDevice &device, const int duration)
+{
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "input device err");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "a2dpSrc proxy is nullptr");
+    return proxy->DisableAutoPlay(RawAddress(device.GetDeviceAddr()), duration);
+}
+
+int A2dpSource::GetAutoPlayDisabledDuration(const BluetoothRemoteDevice &device, int &duration)
+{
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "input device err");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "a2dpSrc proxy is nullptr");
+    return proxy->GetAutoPlayDisabledDuration(RawAddress(device.GetDeviceAddr()), duration);
+}
 } // namespace Bluetooth
 } // namespace OHOS

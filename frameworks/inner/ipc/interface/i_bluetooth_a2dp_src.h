@@ -58,6 +58,9 @@ public:
     virtual int A2dpOffloadSessionPathRequest(const RawAddress &device,
         const std::vector<BluetoothA2dpStreamInfo> &info) = 0;
     virtual BluetoothA2dpOffloadCodecStatus GetOffloadCodecStatus(const RawAddress &device) = 0;
+    virtual int EnableAutoPlay(const RawAddress &device) = 0;
+    virtual int DisableAutoPlay(const RawAddress &device, const int duration) = 0;
+    virtual int GetAutoPlayDisabledDuration(const RawAddress &device, int &duration) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
