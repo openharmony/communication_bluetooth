@@ -65,6 +65,11 @@ napi_value NapiHandsFreeUnit::On(napi_env env, napi_callback_info info)
         auto status = observer_->eventSubscribe_.Register(env, info);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
+    if (!isRegistered_) {
+        HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
+        profile->RegisterObserver(observer_);
+        isRegistered_ = true;
+    }
     return NapiGetUndefinedRet(env);
 }
 

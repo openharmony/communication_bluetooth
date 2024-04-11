@@ -164,6 +164,10 @@ napi_value NapiNativeBondStateParam::ToNapiValue(napi_env env) const
     napi_value bondState = nullptr;
     napi_create_int32(env, bondStatus_, &bondState);
     napi_set_named_property(env, result, "state", bondState);
+
+    napi_value unbondCause = nullptr;
+    napi_create_int32(env, unbondCause_, &unbondCause);
+    napi_set_named_property(env, result, "cause", unbondCause);
     return result;
 }
 

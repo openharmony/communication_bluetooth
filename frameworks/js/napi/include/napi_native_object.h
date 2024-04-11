@@ -115,14 +115,15 @@ private:
 
 class NapiNativeBondStateParam : public NapiNativeObject {
 public:
-    NapiNativeBondStateParam(std::string deviceAddr, int bondStatus)
-        : deviceAddr_(deviceAddr), bondStatus_(bondStatus) {}
+    NapiNativeBondStateParam(std::string deviceAddr, int bondStatus, int unbondCause)
+        : deviceAddr_(deviceAddr), bondStatus_(bondStatus), unbondCause_(unbondCause) {}
     ~NapiNativeBondStateParam() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:
     std::string deviceAddr_ = "";
     int bondStatus_ = -1;
+    int unbondCause_ = -1;
 };
 
 class NapiNativeStateChangeParam : public NapiNativeObject {
