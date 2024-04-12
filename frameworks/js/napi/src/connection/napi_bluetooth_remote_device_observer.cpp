@@ -25,7 +25,9 @@
 namespace OHOS {
 namespace Bluetooth {
 NapiBluetoothRemoteDeviceObserver::NapiBluetoothRemoteDeviceObserver()
-    : eventSubscribe_(REGISTER_BOND_STATE_TYPE, BT_MODULE_NAME)
+    : eventSubscribe_({REGISTER_BOND_STATE_TYPE,
+        REGISTER_BATTERY_CHANGE_TYPE},
+        BT_MODULE_NAME)
 {}
 
 void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
@@ -70,6 +72,13 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryLevelChanged(
     const BluetoothRemoteDevice &device, int batteryLevel)
 {
     HILOGD("addr:%{public}s, batteryLevel:%{public}d", GET_ENCRYPT_ADDR(device), batteryLevel);
+}
+
+void NapiBluetoothRemoteDeviceObserver ::OnRemoteBatteryChanged(
+    const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo)
+{
+    auto nativeObject = std::make_shared<NapiNativeBatteryInfo>(batteryInfo);
+    eventSubscribe_.PublishEvent(REGISTER_BATTERY_CHANGE_TYPE, nativeObject);
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(

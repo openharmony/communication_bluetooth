@@ -189,5 +189,30 @@ napi_value NapiNativeOppTransferInformation::ToNapiValue(napi_env env) const
     return result;
 }
 
+napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value value = nullptr;
+    napi_create_string_utf8(env, batteryInfo_.deviceId_.c_str(), batteryInfo_.deviceId_.size(), &value);
+    napi_set_named_property(env, result, "deviceId", value);
+    napi_create_int32(env, batteryInfo_.batteryLevel_, &value);
+    napi_set_named_property(env, result, "batteryLevel", value);
+    napi_create_int32(env, batteryInfo_.leftEarBatteryLevel_, &value);
+    napi_set_named_property(env, result, "leftEarBatteryLevel", value);
+    napi_create_int32(env, static_cast<int32_t>(batteryInfo_.leftEarChargeState_), &value);
+    napi_set_named_property(env, result, "leftEarChargeState", value);
+    napi_create_int32(env, batteryInfo_.rightEarBatteryLevel_, &value);
+    napi_set_named_property(env, result, "rightEarBatteryLevel", value);
+    napi_create_int32(env, static_cast<int32_t>(batteryInfo_.rightEarChargeState_), &value);
+    napi_set_named_property(env, result, "rightEarChargeState", value);
+    napi_create_int32(env, batteryInfo_.boxBatteryLevel_, &value);
+    napi_set_named_property(env, result, "boxBatteryLevel", value);
+    napi_create_int32(env, static_cast<int32_t>(batteryInfo_.boxChargeState_), &value);
+    napi_set_named_property(env, result, "boxChargeState", value);
+    return result;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

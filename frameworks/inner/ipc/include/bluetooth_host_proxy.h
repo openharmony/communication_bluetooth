@@ -73,7 +73,7 @@ public:
     int32_t GetDeviceName(int32_t transport, const std::string &address, std::string &name) override;
     std::string GetDeviceAlias(const std::string &address) override;
     int32_t SetDeviceAlias(const std::string &address, const std::string &aliasName) override;
-    int32_t GetDeviceBatteryLevel(const std::string &address) override;
+    int32_t GetRemoteDeviceBatteryInfo(const std::string &address, BluetoothBatteryInfo &info) override;
     int32_t GetPairState(int32_t transport, const std::string &address, int32_t &pairState) override;
     int32_t StartPair(int32_t transport, const std::string &address) override;
     int32_t StartCrediblePair(int32_t transport, const std::string &address) override;

@@ -20,6 +20,7 @@
 #include "bluetooth_service_ipc_interface_code.h"
 #include "../common/bt_uuid.h"
 #include "iremote_broker.h"
+#include "../parcel/bluetooth_device_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -34,7 +35,9 @@ public:
     virtual void OnRemoteNameChanged(const BluetoothRawAddress &device, const std::string deviceName) = 0;
     virtual void OnRemoteAliasChanged(const BluetoothRawAddress &device, const std::string alias) = 0;
     virtual void OnRemoteCodChanged(const BluetoothRawAddress &device, int32_t cod) = 0;
-    virtual void OnRemoteBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel) = 0;
+    virtual void OnRemoteBatteryChanged(const BluetoothRawAddress &device, const BluetoothBatteryInfo &batteryInfo) = 0;
+    virtual void OnRemoteDeviceCommonInfoReport(const BluetoothRawAddress &device,
+        const std::vector<uint8_t> &value) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
