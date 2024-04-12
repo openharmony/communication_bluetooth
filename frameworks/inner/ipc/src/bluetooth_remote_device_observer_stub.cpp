@@ -16,6 +16,7 @@
 #include "bluetooth_remote_device_observer_stub.h"
 #include "bluetooth_bt_uuid.h"
 #include "bluetooth_log.h"
+#include "bluetooth_errorcode.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -41,7 +42,10 @@ const std::map<uint32_t, std::function<ErrCode(BluetoothRemoteDeviceObserverstub
             std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
         {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteBatteryLevelChangedInner, std::placeholders::_1,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteBatteryChangedInner, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_INFO_REPORT,
+            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteDeviceCommonInfoReportInner, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
 };
 
@@ -154,14 +158,26 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner(MessageParcel
     return NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteBatteryChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
-    if (!result) {
-        return TRANSACTION_ERR;
-    }
-    int32_t batteryLevel = data.ReadInt32();
-    OnRemoteBatteryLevelChanged(*result, batteryLevel);
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    CHECK_AND_RETURN_LOG_RET((device != nullptr), BT_ERR_INTERNAL_ERROR, "Read device error");
+    std::shared_ptr<BluetoothBatteryInfo> batteryInfo(data.ReadParcelable<BluetoothBatteryInfo>());
+    CHECK_AND_RETURN_LOG_RET((batteryInfo != nullptr), BT_ERR_INTERNAL_ERROR, "Read batteryInfo error");
+
+    OnRemoteBatteryChanged(*device, *batteryInfo);
+    return BT_NO_ERROR;
+}
+
+ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteDeviceCommonInfoReportInner(MessageParcel &data,
+    MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    CHECK_AND_RETURN_LOG_RET((device != nullptr), BT_ERR_INTERNAL_ERROR, "Read device error");
+    std::vector<uint8_t> dataValue;
+    CHECK_AND_RETURN_LOG_RET(data.ReadUInt8Vector(&dataValue), BT_ERR_INTERNAL_ERROR, "Read dataValue error");
+
+    OnRemoteDeviceCommonInfoReport(*device, dataValue);
     return NO_ERROR;
 }
 }  // namespace Bluetooth

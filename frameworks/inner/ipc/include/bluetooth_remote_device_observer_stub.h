@@ -40,7 +40,8 @@ private:
     ErrCode OnRemoteNameChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnRemoteAliasChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnRemoteCodChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRemoteBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnRemoteBatteryChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnRemoteDeviceCommonInfoReportInner(MessageParcel &data, MessageParcel &reply);
 
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothRemoteDeviceObserverstub *, MessageParcel &, MessageParcel &)>>

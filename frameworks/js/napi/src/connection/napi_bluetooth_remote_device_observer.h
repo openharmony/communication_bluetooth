@@ -36,6 +36,7 @@ public:
     void OnRemoteCodChanged(const BluetoothRemoteDevice &device, const BluetoothDeviceClass &cod) override;
     void OnRemoteBatteryLevelChanged(const BluetoothRemoteDevice &device, int batteryLevel) override;
     void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override;
+    void OnRemoteBatteryChanged(const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo) override;
 
     NapiEventSubscribeModule eventSubscribe_;
 };

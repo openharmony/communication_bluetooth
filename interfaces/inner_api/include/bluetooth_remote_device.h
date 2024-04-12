@@ -22,6 +22,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_device_class.h"
+#include "bluetooth_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -166,10 +167,11 @@ public:
     /**
      * @brief Get device battery levele.
      *
-     * @return Returns device battery levele.
-     * @since 6
+     * @param[out] batteryInfo the device battery info.
+     * @return Returns operation code
+     * @since 12
      */
-    int GetDeviceBatteryLevel() const;
+    int GetRemoteDeviceBatteryInfo(DeviceBatteryInfo &batteryInfo) const;
 
     /**
      * @brief Get device pair state.

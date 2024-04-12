@@ -112,6 +112,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", SetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceBatteryInfo", GetRemoteDeviceBatteryInfo),
     };
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -131,7 +132,7 @@ static napi_status NapiConnectionOnOffExecute(napi_env env, napi_callback_info i
         type == REGISTER_DISCOVERY_RESULT_TYPE ||
         type == REGISTER_PIN_REQUEST_TYPE) {
         status = connectionObserverFunc(env, info);
-    } else if (type == REGISTER_BOND_STATE_TYPE) {
+    } else if (type == REGISTER_BOND_STATE_TYPE || type == REGISTER_BATTERY_CHANGE_TYPE) {
         status = remoteDeviceObserverFunc(env, info);
     } else {
         HILOGE("Unsupported callback: %{public}s", type.c_str());
@@ -760,6 +761,26 @@ napi_value GetRemoteDeviceType(napi_env env, napi_callback_info info)
         int32_t err = remoteDevice.GetDeviceCustomType(deviceType);
         HILOGI("GetRemoteDeviceType err: %{public}d", err);
         auto object = std::make_shared<NapiNativeInt>(deviceType);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    auto checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+    auto func = [remoteAddr]() {
+        DeviceBatteryInfo batteryInfo;
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+        int32_t err = remoteDevice.GetRemoteDeviceBatteryInfo(batteryInfo);
+        HILOGI("err: %{public}d", err);
+        auto object = std::make_shared<NapiNativeBatteryInfo>(batteryInfo);
         return NapiAsyncWorkRet(err, object);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);

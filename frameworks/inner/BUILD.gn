@@ -214,6 +214,7 @@ ohos_shared_library("btcommon") {
     "ipc/parcel/bluetooth_ble_scan_result.cpp",
     "ipc/parcel/bluetooth_ble_scan_settings.cpp",
     "ipc/parcel/bluetooth_bt_uuid.cpp",
+    "ipc/parcel/bluetooth_device_battery_info.cpp",
     "ipc/parcel/bluetooth_gatt_characteristic_parcel.cpp",
     "ipc/parcel/bluetooth_gatt_descriptor_parcel.cpp",
     "ipc/parcel/bluetooth_gatt_device.cpp",
