@@ -623,6 +623,16 @@ public:
         return name_;
     }
 
+    void SetEventType(uint16_t eventType)
+    {
+        eventType_ = eventType;
+    }
+
+    uint16_t GetEventType() const
+    {
+        return eventType_;
+    }
+
 public:
     std::vector<Uuid> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
@@ -633,6 +643,7 @@ public:
     uint8_t advertiseFlag_ {};
     std::string payload_ {};
     std::string name_ {};
+    uint16_t eventType_{};
 };
 
 /**
@@ -960,6 +971,16 @@ public:
         return manufactureDataMask_;
     }
 
+    void SetAdvIndReportFlag(bool advIndReport)
+    {
+        advIndReport_ = advIndReport;
+    }
+
+    bool GetAdvIndReportFlag()
+    {
+        return advIndReport_;
+    }
+
 public:
     std::string deviceId_;
     std::string name_;
@@ -979,6 +1000,7 @@ public:
     uint16_t manufacturerId_ = 0;
     std::vector<uint8_t> manufactureData_;
     std::vector<uint8_t> manufactureDataMask_;
+    bool advIndReport_ = false;
 };
 }  // namespace bluetooth
 }  // namespace OHOS

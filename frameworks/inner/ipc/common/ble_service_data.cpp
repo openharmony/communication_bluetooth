@@ -240,6 +240,16 @@ std::vector<uint8_t> BleScanFilterImpl::GetManufactureDataMask() const
     return manufactureDataMask_;
 }
 
+void BleScanFilterImpl::SetAdvIndReportFlag(bool advIndReport)
+{
+    advIndReport_ = advIndReport;
+}
+
+bool BleScanFilterImpl::GetAdvIndReportFlag() const
+{
+    return advIndReport_;
+}
+
 void BleScanFilterImpl::SetClientId(int clientId)
 {
     clientId_ = clientId;
@@ -994,6 +1004,7 @@ bool BlePeripheralDevice::IsConnectable() const
 {
     return connectable_;
 }
+
 /**
  * @brief Sets whether the peer device is connectable.
  *
@@ -1003,6 +1014,39 @@ void BlePeripheralDevice::SetConnectable(bool connectable)
 {
     connectable_ = connectable;
 }
+
+/**
+ * @brief Sets adv event type.
+ *
+ * @param peer adv event type.
+ */
+void BlePeripheralDevice::SetEventType(uint16_t eventType)
+{
+    eventType_ = eventType;
+    isEventType_ = true;
+}
+
+/**
+ * @brief Check whether adv event type is included.
+ *
+ * return Returns <b>true</b> if event type is included.
+ *        Returns <b>false</b> otherwisee.
+ */
+bool BlePeripheralDevice::IsEventType() const
+{
+    return isEventType_;
+}
+
+/**
+ * @brief Get adv event type.
+ *
+ * @return adv event type
+ */
+uint16_t BlePeripheralDevice::GetEventType() const
+{
+    return eventType_;
+}
+
 /**
  * @brief Parse advertisement packets.
  *

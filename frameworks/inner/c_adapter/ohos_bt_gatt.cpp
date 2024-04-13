@@ -834,6 +834,7 @@ static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nati
         if (nativeScanFilter->manufactureId != 0) {
             scanFilter.SetManufacturerId(nativeScanFilter->manufactureId);
         }
+    scanFilter.SetAdvIndReportFlag(nativeScanFilter->advIndReport);
     }
     return OHOS_BT_STATUS_SUCCESS;
 }

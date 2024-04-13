@@ -222,6 +222,7 @@ void BleCentralManager::impl::ConvertBleScanFilter(const std::vector<BleScanFilt
         scanFilter.SetManufacturerId(filter.GetManufacturerId());
         scanFilter.SetManufactureData(filter.GetManufactureData());
         scanFilter.SetManufactureDataMask(filter.GetManufactureDataMask());
+        scanFilter.SetAdvIndReportFlag(filter.GetAdvIndReportFlag());
         bluetoothBleScanFilters.push_back(scanFilter);
     }
 }
@@ -826,5 +827,16 @@ std::vector<uint8_t> BleScanFilter::GetManufactureDataMask() const
 {
     return manufactureDataMask_;
 }
+
+void BleScanFilter::SetAdvIndReportFlag(bool advIndReprot)
+{
+    advIndReprot_ = advIndReprot;
+}
+
+bool BleScanFilter::GetAdvIndReportFlag() const
+{
+    return advIndReprot_;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS
