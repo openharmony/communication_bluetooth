@@ -462,6 +462,10 @@ public:
 
     std::vector<uint8_t> GetManufactureDataMask() const;
 
+    void SetAdvIndReportFlag(bool advIndReprot);
+
+    bool GetAdvIndReportFlag() const;
+
     /**
      * @brief Compare two BleScanFilter whether are same or not.
      *
@@ -485,7 +489,8 @@ public:
             (serviceDataMask_ == rhs.serviceDataMask_) &&
             (manufacturerId_ == rhs.manufacturerId_) &&
             (manufactureData_ == rhs.manufactureData_) &&
-            (manufactureDataMask_ == rhs.manufactureDataMask_);
+            (manufactureDataMask_ == rhs.manufactureDataMask_) &&
+            (advIndReprot_ == rhs.advIndReprot_);
     }
 
     private:
@@ -507,6 +512,7 @@ public:
         uint16_t manufacturerId_ = 0;
         std::vector<uint8_t> manufactureData_;
         std::vector<uint8_t> manufactureDataMask_;
+        bool advIndReprot_ = false;
 };
 
 struct BleActiveDeviceInfo {

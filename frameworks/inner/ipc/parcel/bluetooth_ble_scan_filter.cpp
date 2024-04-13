@@ -69,6 +69,9 @@ bool BluetoothBleScanFilter::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUInt8Vector(manufactureDataMask_)) {
         return false;
     }
+    if (!parcel.WriteBool(advIndReport_)) {
+        return false;
+    }
     return true;
 }
 
@@ -120,6 +123,9 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadUInt8Vector(&manufactureDataMask_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(advIndReport_)) {
         return false;
     }
     return true;

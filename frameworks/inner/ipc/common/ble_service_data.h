@@ -456,6 +456,10 @@ public:
 
     uint8_t GetFilterAction() const;
 
+    void SetAdvIndReportFlag(bool advIndReport);
+
+    bool GetAdvIndReportFlag() const;
+
 private:
     std::string deviceId_;
     std::string name_;
@@ -475,6 +479,7 @@ private:
     uint16_t manufacturerId_ = 0;
     std::vector<uint8_t> manufactureData_;
     std::vector<uint8_t> manufactureDataMask_;
+    bool advIndReport_ = false;
 
     int clientId_ = 0;
     uint8_t filtIndex_ = 0;
@@ -1091,6 +1096,31 @@ public:
      */
     void SetManufacturerData(std::string manufacturerData);
 
+/**
+ * @brief Sets adv event type.
+ *
+ * @param peer adv event type.
+ * @since 11
+ */
+    void SetEventType(uint16_t eventType);
+
+/**
+ * @brief Check whether adv event type is included.
+ *
+ * return Returns <b>true</b> if event type is included.
+ *        Returns <b>false</b> otherwisee.
+ * @since 11
+ */
+bool IsEventType() const;
+
+/**
+ * @brief Get adv event type.
+ *
+ * @return adv event type
+ * @since 11
+ */
+uint16_t GetEventType() const;
+
 private:
     /**
      * @brief Set advertising flag.
@@ -1180,6 +1210,9 @@ private:
     bool connectable_ = true;
     uint8_t* payload_ {};
     size_t payloadLen_ = 0;
+    // include eventType value
+    bool isEventType_ = false;
+    uint16_t eventType_ = BLE_LEGACY_ADV_NONCONN_IND_WITH_EX_ADV;
 };
 
 /**
