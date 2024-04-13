@@ -53,6 +53,11 @@ ScanResult::ScanResult(const BleScanResultImpl &other)
     if (device.IsName()) {
         this->SetName(device.GetName());
     }
+
+    if (device.IsEventType()) {
+        this->SetEventType(device.GetEventType());
+    }
+
     this->SetPeripheralDevice(device.GetRawAddress());
     this->SetPayload(std::string(device.GetPayload(), device.GetPayload() + device.GetPayloadLen()));
 }
