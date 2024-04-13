@@ -383,6 +383,8 @@ typedef struct {
     unsigned char *manufactureDataMask;
     /** Handling advertisments sent by advertisers with specific manufactureId */
     unsigned short manufactureId;
+    /** Adv_Ind Report */
+    bool advIndReport;
 } BleScanNativeFilter;
 
 /**
