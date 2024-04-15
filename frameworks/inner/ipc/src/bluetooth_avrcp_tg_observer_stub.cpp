@@ -60,8 +60,9 @@ ErrCode BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner(MessageParce
         return TRANSACTION_ERR;
     }
     int state = data.ReadInt32();
+    int cause = data.ReadInt32();
 
-    OnConnectionStateChanged(*addr, state);
+    OnConnectionStateChanged(*addr, state, cause);
     return NO_ERROR;
 }
 }  // namespace Bluetooth

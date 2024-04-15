@@ -68,7 +68,8 @@ napi_value NapiEvent::CreateResult(const std::shared_ptr<BluetoothCallbackInfo> 
         return result;
     }
     napi_create_object(cb->env_, &result);
-    ConvertStateChangeParamToJS(cb->env_, result, cb->deviceId_, value);
+    ConvertStateChangeParamToJS(cb->env_, result, cb->deviceId_, value,
+        static_cast<int>(ConnChangeCause::CONNECT_CHANGE_COMMON_CAUSE));
     return result;
 }
 

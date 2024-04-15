@@ -59,8 +59,9 @@ int32_t BluetoothPbapPseObserverStub::OnConnectionStateChangedInner(MessageParce
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     CHECK_AND_RETURN_LOG_RET((device != nullptr), BT_ERR_INTERNAL_ERROR, "Read device error");
     int32_t state = data.ReadInt32();
+    int32_t cause = data.ReadInt32();
 
-    OnConnectionStateChanged(*device, state);
+    OnConnectionStateChanged(*device, state, cause);
     return BT_NO_ERROR;
 }
 }  // namespace Bluetooth

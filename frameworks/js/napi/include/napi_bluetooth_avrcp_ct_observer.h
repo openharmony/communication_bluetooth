@@ -27,7 +27,7 @@ namespace Bluetooth {
 const char * const STR_BT_AVRCP_CT_CONNECTION_STATE_CHANGE = "connectionStateChange";
 class NapiAvrcpControllerObserver : public AvrcpController::IObserver {
 public:
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause) override;
     void OnActionCompleted(const BluetoothRemoteDevice &device, const AvrcpCtResponse &resp) override {}
     NapiAvrcpControllerObserver();
     ~NapiAvrcpControllerObserver() override = default;

@@ -35,7 +35,7 @@ public:
         BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED,
     };
 
-    virtual void OnConnectionStateChanged(const RawAddress &device, int state) = 0;
+    virtual void OnConnectionStateChanged(const RawAddress &device, int state, int cause) = 0;
     virtual void OnPlayingStatusChanged(const RawAddress &device, int playingState, int error) = 0;
     virtual void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) = 0;
     virtual void OnMediaStackChanged(const RawAddress &device, int action) = 0;

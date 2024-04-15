@@ -28,7 +28,7 @@ const char * const STR_BT_HANDS_FREE_AUDIO_GATEWAY_OBSERVER_SCO_STATE_CHANGE = "
 
 class NapiHandsFreeAudioGatewayObserver : public HandsFreeAudioGatewayObserver {
 public:
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause) override;
     void OnScoStateChanged(const BluetoothRemoteDevice &device, int state, int reason = 0) override;
 
     void OnActiveDeviceChanged(const BluetoothRemoteDevice &device) override{}

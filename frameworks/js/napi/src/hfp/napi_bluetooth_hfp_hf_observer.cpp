@@ -26,10 +26,11 @@ NapiHandsFreeUnitObserver::NapiHandsFreeUnitObserver()
         BT_MODULE_NAME)
 {}
 
-void NapiHandsFreeUnitObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+void NapiHandsFreeUnitObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
 {
-    HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d",
+        GET_ENCRYPT_ADDR(device), state, cause);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state, cause);
     eventSubscribe_.PublishEvent(STR_BT_HANDS_FREE_UNIT_OBSERVER_CONNECTION_STATE_CHANGE, nativeObject);
 }
 

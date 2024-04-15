@@ -28,7 +28,7 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothHfpHfObserver");
 
-    virtual void OnConnectionStateChanged(const BluetoothRawAddress &device, int state) = 0;
+    virtual void OnConnectionStateChanged(const BluetoothRawAddress &device, int state, int cause) = 0;
     virtual void OnScoStateChanged(const BluetoothRawAddress &device,  int state) = 0;
     virtual void OnCallChanged(const BluetoothRawAddress &device, const BluetoothHfpHfCall &call) = 0;
     virtual void OnSignalStrengthChanged(const BluetoothRawAddress &device,  int signal) = 0;

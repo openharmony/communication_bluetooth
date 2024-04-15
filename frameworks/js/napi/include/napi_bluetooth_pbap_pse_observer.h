@@ -27,7 +27,7 @@ const char * const STR_BT_PBAP_PSE_CONNECTION_STATE_CHANGE = "connectionStateCha
 
 class NapiPbapPseObserver : public PbapPseObserver {
 public:
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state, int32_t cause) override;
 
     NapiPbapPseObserver();
     ~NapiPbapPseObserver() override = default;
