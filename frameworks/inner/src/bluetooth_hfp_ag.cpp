@@ -42,13 +42,13 @@ public:
         HILOGD("enter");
     };
 
-    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
+    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t cause) override
     {
-        HILOGD("hfpAg conn state, device: %{public}s, state: %{public}s",
-            GET_ENCRYPT_RAW_ADDR(device), GetProfileConnStateName(state).c_str());
+        HILOGD("hfpAg conn state, device: %{public}s, state: %{public}s, cause: %{public}d",
+            GET_ENCRYPT_RAW_ADDR(device), GetProfileConnStateName(state).c_str(), cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
-            observer->OnConnectionStateChanged(remoteDevice, state);
+        observers_.ForEach([remoteDevice, state, cause](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
+            observer->OnConnectionStateChanged(remoteDevice, state, cause);
         });
     }
 

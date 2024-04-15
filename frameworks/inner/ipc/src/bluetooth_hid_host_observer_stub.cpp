@@ -35,7 +35,8 @@ int BluetoothHidHostObserverStub::OnRemoteRequest(
                 return IPC_INVOKER_TRANSLATE_ERR;
             }
             int state = data.ReadInt32();
-            OnConnectionStateChanged(*device, state);
+            int cause = data.ReadInt32();
+            OnConnectionStateChanged(*device, state, cause);
             return NO_ERROR;
         }
         default:

@@ -92,6 +92,15 @@ enum class BTConnectState : int {
     DISCONNECTING,
     DISCONNECTED,
 };
+enum class ConnChangeCause : int {
+    CONNECT_CHANGE_COMMON_CAUSE = 0,            // Common connect change cause.
+    DISCONNECT_CAUSE_USER_DISCONNECT = 0,       // User disconnect device.
+    DISCONNECT_CAUSE_CONNECT_FROM_KEYBOARD = 1, // The connection needs to be initiated from the keyboard side.
+    DISCONNECT_CAUSE_CONNECT_FROM_MOUSE = 2,    // The connection needs to be initiated from the mouse side.
+    DISCONNECT_CAUSE_CONNECT_FROM_CAR = 3,      // The connection needs to be initiated from the car side.
+    DISCONNECT_TOO_MANY_CONNECTED_DEVICES = 4,  // Too many devices are currently connected.
+    DISCONNECT_CAUSE_CONNECT_FAIL_INTERNAL = 5, // Connection failed due to an internal error.
+};
 /**
  * @brief access permission define
  * use to

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,13 @@ public:
         HILOGD("Enter!");
     }
 
-    ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
+    ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t cause) override
     {
-        HILOGD("hid conn state, device: %{public}s, state: %{public}s",
-            GetEncryptAddr((device).GetAddress()).c_str(), GetProfileConnStateName(state).c_str());
+        HILOGD("hid conn state, device: %{public}s, state: %{public}s, cause: %{public}d",
+            GET_ENCRYPT_RAW_ADDR(device), GetProfileConnStateName(state).c_str(), cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        observers_.ForEach([remoteDevice, state](std::shared_ptr<HidHostObserver> observer) {
-            observer->OnConnectionStateChanged(remoteDevice, state);
+        observers_.ForEach([remoteDevice, state, cause](std::shared_ptr<HidHostObserver> observer) {
+            observer->OnConnectionStateChanged(remoteDevice, state, cause);
         });
         return NO_ERROR;
     }

@@ -207,7 +207,7 @@ napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector
     return napi_ok;
 }
 
-void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state)
+void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state, int cause)
 {
     napi_value deviceId = nullptr;
     napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
@@ -216,6 +216,10 @@ void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::str
     napi_value profileState = nullptr;
     napi_create_int32(env, GetProfileConnectionState(state), &profileState);
     napi_set_named_property(env, result, "state", profileState);
+
+    napi_value stateChangeCause = nullptr;
+    napi_create_int32(env, cause, &stateChangeCause);
+    napi_set_named_property(env, result, "cause", stateChangeCause);
 }
 
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state)

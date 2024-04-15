@@ -29,7 +29,7 @@ class IBluetoothPanObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothPanObserver");
 
-    virtual ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int state) = 0;
+    virtual ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int state, int cause) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -61,12 +61,12 @@ public:
         a2dpSource_.observers_.Deregister(observer);
     }
 
-    void OnConnectionStateChanged(const RawAddress &device, int state) override
+    void OnConnectionStateChanged(const RawAddress &device, int state, int cause) override
     {
-        HILOGD("a2dpSrc conn state, device: %{public}s, state: %{public}s",
-            GetEncryptAddr((device).GetAddress()).c_str(), GetProfileConnStateName(state).c_str());
-        a2dpSource_.observers_.ForEach([device, state](std::shared_ptr<A2dpSourceObserver> observer) {
-            observer->OnConnectionStateChanged(BluetoothRemoteDevice(device.GetAddress(), 0), state);
+        HILOGD("a2dpSrc conn state, device: %{public}s, state: %{public}s, cause: %{public}d",
+            GET_ENCRYPT_RAW_ADDR(device), GetProfileConnStateName(state).c_str(),cause);
+        a2dpSource_.observers_.ForEach([device, state, cause](std::shared_ptr<A2dpSourceObserver> observer) {
+            observer->OnConnectionStateChanged(BluetoothRemoteDevice(device.GetAddress(), 0), state, cause);
         });
     }
 

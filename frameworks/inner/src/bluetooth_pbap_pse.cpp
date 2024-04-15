@@ -46,11 +46,11 @@ public:
     ~BluetoothPbapPseObserverImp() override
     {}
 
-    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
+    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t cause) override
     {
-        observers_.ForEach([device, state](std::shared_ptr<PbapPseObserver> observer) {
+        observers_.ForEach([device, state, cause](std::shared_ptr<PbapPseObserver> observer) {
             BluetoothRemoteDevice dev(device.GetAddress(), 0);
-            observer->OnConnectionStateChanged(dev, state);
+            observer->OnConnectionStateChanged(dev, state, cause);
         });
     }
 
