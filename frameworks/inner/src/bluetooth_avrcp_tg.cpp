@@ -79,7 +79,8 @@ public:
 
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
     {
-        HILOGI("enter, device: %{public}s, state: %{public}d, cause: %{public}d", GET_ENCRYPT_ADDR(device), state, cause);
+        HILOGI("enter, device: %{public}s, state: %{public}d, cause: %{public}d",
+            GET_ENCRYPT_ADDR(device), state, cause);
         std::lock_guard<std::mutex> lock(observerMutex_);
         observers_.ForEach([device, state, cause](std::shared_ptr<IObserver> observer) {
             observer->OnConnectionStateChanged(device, state, cause);
