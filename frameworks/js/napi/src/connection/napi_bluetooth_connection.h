@@ -88,6 +88,8 @@ napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);
 #endif
 
+napi_value DeviceTypeInit(napi_env env);
+
 void RegisterObserverToHost();
 void DealPairStatus(const int &status, int &bondStatus);
 }  // namespace Bluetooth

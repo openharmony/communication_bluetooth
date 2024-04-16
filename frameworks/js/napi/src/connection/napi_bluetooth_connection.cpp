@@ -777,6 +777,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
     napi_value bluetoothTransportObject = BluetoothTransportInit(env);
     napi_value pinTypeObject = PinTypeInit(env);
 #endif
+    napi_value deviceTypeObject = DeviceTypeInit(env);
     napi_property_descriptor exportProperties[] = {
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
         DECLARE_NAPI_PROPERTY("BondState", bondStateObj),
@@ -784,6 +785,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("BluetoothTransport", bluetoothTransportObject),
         DECLARE_NAPI_PROPERTY("PinType", pinTypeObject),
 #endif
+        DECLARE_NAPI_PROPERTY("DeviceType", deviceTypeObject),
     };
     napi_define_properties(env, exports, sizeof(exportProperties) / sizeof(*exportProperties), exportProperties);
     return exports;
@@ -859,6 +861,28 @@ napi_value PinTypeInit(napi_env env)
     return pinType;
 }
 #endif
+
+napi_value DeviceTypeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value deviceType = nullptr;
+    napi_create_object(env, &deviceType);
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_DEFAULT), "DEVICE_TYPE_DEFAULT");
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_CAR), "DEVICE_TYPE_CAR");
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_HEADSET), "DEVICE_TYPE_HEADSET");
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_HEARING), "DEVICE_TYPE_HEARING");
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_GLASSES), "DEVICE_TYPE_GLASSES");
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_WATCH), "DEVICE_TYPE_WATCH");
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_SPEAKER), "DEVICE_TYPE_SPEAKER");
+    return deviceType;
+}
 
 void RegisterObserverToHost()
 {
