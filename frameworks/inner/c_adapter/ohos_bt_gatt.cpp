@@ -76,11 +76,7 @@ public:
     void OnScanCallback(const BleScanResult &result) override
     {
         BtScanResultData scanResult;
-        if (result.IsConnectable()) {
-            scanResult.eventType = OHOS_BLE_EVT_LEGACY_CONNECTABLE;
-        } else {
-            scanResult.eventType = OHOS_BLE_EVT_LEGACY_NON_CONNECTABLE;
-        }
+        scanResult.eventType = result.GetEventType();
         scanResult.dataStatus = OHOS_BLE_DATA_COMPLETE;
         scanResult.addrType = OHOS_BLE_RANDOM_DEVICE_ADDRESS;
         scanResult.primaryPhy = OHOS_BLE_SCAN_PHY_1M;
@@ -834,8 +830,8 @@ static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nati
         if (nativeScanFilter->manufactureId != 0) {
             scanFilter.SetManufacturerId(nativeScanFilter->manufactureId);
         }
-    scanFilter.SetAdvIndReportFlag(nativeScanFilter->advIndReport);
     }
+    scanFilter.SetAdvIndReportFlag(nativeScanFilter->advIndReport);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
