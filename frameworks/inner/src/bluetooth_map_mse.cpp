@@ -40,13 +40,13 @@ public:
     ~BluetoothMapMseObserverImp() override
     {}
 
-    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
+    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t cause) override
     {
-        HILOGI("enter, device: %{public}s, state: %{public}s",
-            GetEncryptAddr((device).GetAddress()).c_str(), GetProfileConnStateName(state).c_str());
-        observers_.ForEach([device, state](std::shared_ptr<MapMseObserver> observer) {
+        HILOGI("enter, device: %{public}s, state: %{public}s, cause: %{public}d",
+            GET_ENCRYPT_RAW_ADDR(device), GetProfileConnStateName(state).c_str(), cause);
+        observers_.ForEach([device, state, cause](std::shared_ptr<MapMseObserver> observer) {
             BluetoothRemoteDevice dev(device.GetAddress(), 0);
-            observer->OnConnectionStateChanged(dev, state);
+            observer->OnConnectionStateChanged(dev, state, cause);
         });
     }
 

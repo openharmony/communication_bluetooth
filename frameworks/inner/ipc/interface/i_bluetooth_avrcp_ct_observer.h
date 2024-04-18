@@ -32,7 +32,7 @@ class IBluetoothAvrcpCtObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpCtObserver");
 
-    virtual void OnConnectionStateChanged(const RawAddress &rawAddr, int state) = 0;
+    virtual void OnConnectionStateChanged(const RawAddress &rawAddr, int state, int cause) = 0;
     virtual void OnPressButton(const RawAddress &rawAddr, uint8_t button, int result) = 0;
     virtual void OnReleaseButton(const RawAddress &rawAddr, uint8_t button,  int result) = 0;
     virtual void OnSetBrowsedPlayer(const RawAddress &rawAddr, uint16_t uidCounter,

@@ -39,12 +39,13 @@ public:
         HILOGI("enter");
     }
 
-    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) override
+    void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t cause) override
     {
-        HILOGD("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
+        HILOGD("enter, device: %{public}s, state: %{public}d, cause: %{public}d",
+            GET_ENCRYPT_RAW_ADDR(device), state, cause);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
-        observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeUnitObserver> observer) {
-            observer->OnConnectionStateChanged(remoteDevice, state);
+        observers_.ForEach([remoteDevice, state, cause](std::shared_ptr<HandsFreeUnitObserver> observer) {
+            observer->OnConnectionStateChanged(remoteDevice, state, cause);
         });
     }
 

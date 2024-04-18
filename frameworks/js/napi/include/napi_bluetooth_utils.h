@@ -98,7 +98,7 @@ bool ParseArrayBuffer(napi_env env, uint8_t **data, size_t &size, napi_value arg
 napi_value GetCallbackErrorValue(napi_env env, int errCode);
 
 napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string> &stringVector);
-void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
+void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state, int cause);
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
 napi_status ConvertOppTransferInformationToJS(napi_env env,

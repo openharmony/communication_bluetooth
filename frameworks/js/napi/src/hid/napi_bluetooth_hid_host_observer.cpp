@@ -28,9 +28,9 @@ NapiBluetoothHidHostObserver::NapiBluetoothHidHostObserver()
     : eventSubscribe_(STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE, BT_MODULE_NAME)
 {}
     
-void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
 {
-    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state, cause);
     eventSubscribe_.PublishEvent(STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE, nativeObject);
 }
 }  // namespace Bluetooth

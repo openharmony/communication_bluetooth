@@ -62,8 +62,9 @@ ErrCode BluetoothA2dpSinkObserverStub::OnConnectionStateChangedInner(MessageParc
     }
     std::string addr = data.ReadString();
     int state = data.ReadInt32();
+    int cause = data.ReadInt32();
 
-    OnConnectionStateChanged(RawAddress(addr), state);
+    OnConnectionStateChanged(RawAddress(addr), state, cause);
 
     return NO_ERROR;
 }

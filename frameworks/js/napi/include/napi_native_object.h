@@ -128,14 +128,15 @@ private:
 
 class NapiNativeStateChangeParam : public NapiNativeObject {
 public:
-    NapiNativeStateChangeParam(std::string deviceAddr, int connectState)
-        : deviceAddr_(deviceAddr), connectState_(connectState) {}
+    NapiNativeStateChangeParam(std::string deviceAddr, int connectState, int cause = 0)
+        : deviceAddr_(deviceAddr), connectState_(connectState), stateChangeCause_(cause) {}
     virtual ~NapiNativeStateChangeParam() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:
     std::string deviceAddr_ = "";
     int connectState_ = -1;
+    int stateChangeCause_ = -1;
 };
 
 class NapiNativeBleConnectionStateChangeParam : public NapiNativeStateChangeParam {

@@ -27,7 +27,7 @@ class IBluetoothAvrcpTgObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothAvrcpTgObserver");
 
-    virtual void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state) = 0;
+    virtual void OnConnectionStateChanged(const BluetoothRawAddress &device, int32_t state, int32_t cause) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

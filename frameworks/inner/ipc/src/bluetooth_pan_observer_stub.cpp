@@ -32,7 +32,8 @@ int BluetoothPanObserverStub::OnRemoteRequest(
                 return ERR_TRANSACTION_FAILED;
             }
             int state = data.ReadInt32();
-            OnConnectionStateChanged(*address, state);
+            int cause = data.ReadInt32();
+            OnConnectionStateChanged(*address, state, cause);
             return NO_ERROR;
         }
         default:
