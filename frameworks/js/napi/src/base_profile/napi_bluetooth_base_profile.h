@@ -27,6 +27,7 @@ public:
 private:
     static napi_value BaseProfilePropertyValueInit(napi_env env, napi_value exports);
     static napi_value ConnectionStrategyInit(napi_env env);
+    static napi_value DisconnectCauseInit(napi_env env);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

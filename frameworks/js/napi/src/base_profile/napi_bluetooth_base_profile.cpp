@@ -33,8 +33,10 @@ napi_value NapiBaseProfile::BaseProfilePropertyValueInit(napi_env env, napi_valu
 {
     HILOGD("start");
     napi_value strategyObj = ConnectionStrategyInit(env);
+    napi_value disconnectCauseObj = DisconnectCauseInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("ConnectionStrategy", strategyObj),
+        DECLARE_NAPI_PROPERTY("DisconnectCause", disconnectCauseObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     HILOGI("end");
@@ -53,6 +55,26 @@ napi_value NapiBaseProfile::ConnectionStrategyInit(napi_env env)
     SetNamedPropertyByInteger(env, strategyObj, ConnectionStrategy::CONNECTION_FORBIDDEN,
         "CONNECTION_STRATEGY_FORBIDDEN");
     return strategyObj;
+}
+
+napi_value NapiBaseProfile::DisconnectCauseInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value disconnectCauseObj = nullptr;
+    napi_create_object(env, &disconnectCauseObj);
+    SetNamedPropertyByInteger(env, disconnectCauseObj,
+        static_cast<int>(ConnChangeCause::DISCONNECT_CAUSE_USER_DISCONNECT), "USER_DISCONNECT");
+    SetNamedPropertyByInteger(env, disconnectCauseObj,
+        static_cast<int>(ConnChangeCause::DISCONNECT_CAUSE_CONNECT_FROM_KEYBOARD), "CONNECT_FROM_KEYBOARD");
+    SetNamedPropertyByInteger(env, disconnectCauseObj,
+        static_cast<int>(ConnChangeCause::DISCONNECT_CAUSE_CONNECT_FROM_MOUSE), "CONNECT_FROM_MOUSE");
+    SetNamedPropertyByInteger(env, disconnectCauseObj,
+        static_cast<int>(ConnChangeCause::DISCONNECT_CAUSE_CONNECT_FROM_CAR), "CONNECT_FROM_CAR");
+    SetNamedPropertyByInteger(env, disconnectCauseObj,
+        static_cast<int>(ConnChangeCause::DISCONNECT_TOO_MANY_CONNECTED_DEVICES), "TOO_MANY_CONNECTED_DEVICES");
+    SetNamedPropertyByInteger(env, disconnectCauseObj,
+        static_cast<int>(ConnChangeCause::DISCONNECT_CAUSE_CONNECT_FAIL_INTERNAL), "CONNECT_FAIL_INTERNAL");
+    return disconnectCauseObj;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
