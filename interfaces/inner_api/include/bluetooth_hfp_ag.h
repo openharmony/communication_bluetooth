@@ -57,9 +57,10 @@ public:
      *
      * @param device Remote device object.
      * @param state Connection state.
-     * @since 6
+     * @param cause Connecton cause.
+     * @since 12
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state)
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state, int32_t cause)
     {}
 
     /**

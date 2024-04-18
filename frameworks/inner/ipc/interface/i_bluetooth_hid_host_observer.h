@@ -29,7 +29,7 @@ class IBluetoothHidHostObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothHidHostObserver");
 
-    virtual ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int state) = 0;
+    virtual ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int state, int cause) = 0;
 };
 } // Bluetooth
 } // OHOS

@@ -28,7 +28,7 @@ const char * const STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE = "connectionState
 
 class NapiA2dpSourceObserver : public A2dpSourceObserver {
 public:
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause) override;
 
     NapiA2dpSourceObserver();
     ~NapiA2dpSourceObserver() override = default;

@@ -28,7 +28,7 @@ const char * const STR_BT_HANDS_FREE_UNIT_OBSERVER_SCO_STATE_CHANGE = "scoStateC
 
 class NapiHandsFreeUnitObserver : public HandsFreeUnitObserver {
 public:
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause) override;
     void OnScoStateChanged(const BluetoothRemoteDevice &device, int state) override;
 
     void OnCallChanged(const BluetoothRemoteDevice &device, const HandsFreeUnitCall &call) override{}

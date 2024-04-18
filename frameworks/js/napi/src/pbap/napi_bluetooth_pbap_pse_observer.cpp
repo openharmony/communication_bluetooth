@@ -25,10 +25,11 @@ NapiPbapPseObserver::NapiPbapPseObserver()
     : eventSubscribe_(STR_BT_PBAP_PSE_CONNECTION_STATE_CHANGE, BT_MODULE_NAME)
 {}
 
-void NapiPbapPseObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state)
+void NapiPbapPseObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state, int32_t cause)
 {
-    HILOGD("enter, remote device address: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
-    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d",
+        GET_ENCRYPT_ADDR(device), state, cause);
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state, cause);
     eventSubscribe_.PublishEvent(STR_BT_PBAP_PSE_CONNECTION_STATE_CHANGE, nativeObject);
 }
 

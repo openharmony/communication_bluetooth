@@ -27,7 +27,7 @@ const char * const STR_BT_A2DP_SINK_CONNECTION_STATE_CHANGE = "connectionStateCh
 
 class NapiA2dpSinkObserver : public A2dpSinkObserver {
 public:
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause) override;
 
     NapiA2dpSinkObserver();
     ~NapiA2dpSinkObserver() override = default;

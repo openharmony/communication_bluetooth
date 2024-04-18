@@ -28,7 +28,7 @@ class IBluetoothA2dpSinkObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothA2dpSinkObserver");
 
-    virtual void OnConnectionStateChanged(const RawAddress &device, int state) = 0;
+    virtual void OnConnectionStateChanged(const RawAddress &device, int state, int cause) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

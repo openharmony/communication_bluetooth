@@ -27,7 +27,7 @@ const char * const STR_BT_MAP_MSE_CONNECTION_STATE_CHANGE = "connectionStateChan
 
 class NapiMapMseObserver : public MapMseObserver {
 public:
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int32_t state, int32_t cause) override;
 
     NapiMapMseObserver();
     ~NapiMapMseObserver() override = default;

@@ -29,7 +29,7 @@ public:
     NapiBluetoothPanObserver();
     ~NapiBluetoothPanObserver() override = default;
 
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause) override;
 
     NapiEventSubscribeModule eventSubscribe_;
 };

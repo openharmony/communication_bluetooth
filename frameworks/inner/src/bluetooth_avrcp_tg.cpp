@@ -42,11 +42,12 @@ public:
         {}
         ~ObserverImpl() override = default;
 
-        void OnConnectionStateChanged(const BluetoothRawAddress &addr, int32_t state) override
+        void OnConnectionStateChanged(const BluetoothRawAddress &addr, int32_t state, int32_t cause) override
         {
-            HILOGD("enter, address: %{public}s, state: %{public}d", GetEncryptAddr(addr.GetAddress()).c_str(), state);
+            HILOGD("enter, address: %{public}s, state: %{public}d, cause: %{public}d",
+                GET_ENCRYPT_RAW_ADDR(addr), state, cause);
             BluetoothRemoteDevice device(addr.GetAddress(), BTTransport::ADAPTER_BREDR);
-            impl_->OnConnectionStateChanged(device, static_cast<int>(state));
+            impl_->OnConnectionStateChanged(device, static_cast<int>(state), cause);
 
             return;
         }
@@ -76,12 +77,13 @@ public:
         proxy->UnregisterObserver(observer_);
     }
 
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
     {
-        HILOGI("enter, device: %{public}s, state: %{public}d", GET_ENCRYPT_ADDR(device), state);
+        HILOGI("enter, device: %{public}s, state: %{public}d, cause: %{public}d",
+            GET_ENCRYPT_ADDR(device), state, cause);
         std::lock_guard<std::mutex> lock(observerMutex_);
-        observers_.ForEach([device, state](std::shared_ptr<IObserver> observer) {
-            observer->OnConnectionStateChanged(device, state);
+        observers_.ForEach([device, state, cause](std::shared_ptr<IObserver> observer) {
+            observer->OnConnectionStateChanged(device, state, cause);
         });
     }
 

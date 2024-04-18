@@ -439,10 +439,11 @@ public:
          *
          * @param[in] device The bluetooth device.
          * @param[in] state  The connection state. Refer to <b>BTConnectState</b>.
+         * @param[in] cause  The connection change cause.
          *
-         * @since 6
+         * @since 12
          */
-        virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) = 0;
+        virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause) = 0;
 
         /**
          * @brief Observes the status of the other actions.

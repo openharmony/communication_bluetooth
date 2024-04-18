@@ -74,9 +74,10 @@ public:
      * @brief ConnectionState Changed observer.
      * @param device bluetooth device address.
      * @param state Connection state.
-     * @since 6.0
+     * @param cause Connecton cause.
+     * @since 12
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
     {}
 
     /**
