@@ -71,6 +71,7 @@ struct BleCentralManager::impl {
                 scanResult.SetPeripheralDevice(device);
                 scanResult.SetPayload(tempResult.GetPayload());
                 scanResult.SetName(tempResult.GetName());
+                scanResult.SetEventType(tempResult.GetEventType());
                 if (callbackType == BLE_SCAN_CALLBACK_TYPE_ALL_MATCH) {
                     observer->OnScanCallback(scanResult);
                 } else {
@@ -611,9 +612,20 @@ void BleScanResult::SetName(const std::string &name)
 {
     name_ = name;
 }
+
 std::string BleScanResult::GetName(void)
 {
     return name_;
+}
+
+void BleScanResult::SetEventType(uint16_t eventType)
+{
+    eventType_ = eventType;
+}
+
+uint16_t BleScanResult::GetEventType(void) const
+{
+    return eventType_;
 }
 
 BleScanSettings::BleScanSettings()
