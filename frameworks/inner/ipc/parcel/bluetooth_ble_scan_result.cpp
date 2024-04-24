@@ -48,9 +48,6 @@ bool BluetoothBleScanResult::Marshalling(Parcel &parcel) const
     if (!parcel.WriteString(name_)) {
         return false;
     }
-    if (!parcel.WriteUint16(eventType_)) {
-        return false;
-    }
     return true;
 }
 
@@ -99,9 +96,6 @@ bool BluetoothBleScanResult::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadString(name_)) {
-        return false;
-    }
-    if (!parcel.ReadUint16(eventType_)) {
         return false;
     }
     return true;

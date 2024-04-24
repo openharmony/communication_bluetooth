@@ -194,8 +194,6 @@ public:
 
     void SetName(const std::string &name);
     std::string GetName(void);
-    void SetEventType(uint16_t eventType);
-    uint16_t GetEventType(void) const;
 
 private:
     std::vector<UUID> serviceUuids_ {};
@@ -207,7 +205,6 @@ private:
     uint8_t advertiseFlag_ {};
     std::vector<uint8_t> payload_ {};
     std::string name_ {};
-    uint16_t eventType_ {};
 };
 /**
  * @brief Represents central manager callback.
