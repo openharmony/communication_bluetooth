@@ -338,7 +338,7 @@ struct HandsFreeAudioGateway::impl {
         proxy->CallDetailsChanged(callId, callState);
     }
 
-    int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) const
+    int IsVgsSupported(const BluetoothRemoteDevice &device, bool &isSupported) const
     {
         HILOGD("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
