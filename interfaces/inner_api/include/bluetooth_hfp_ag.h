@@ -365,7 +365,7 @@ public:
      *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
      * @since 11
      */
-    int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) const;
+    int IsVgsSupported(const BluetoothRemoteDevice &device, bool &isSupported) const;
 
     /**
      * @brief Static HandsFree AudioGateway observer instance.
