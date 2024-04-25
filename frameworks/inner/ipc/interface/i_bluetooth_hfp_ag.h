@@ -53,6 +53,7 @@ public:
     virtual int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) = 0;
     virtual int IsInbandRingingEnabled(bool &isEnabled) = 0;
     virtual void CallDetailsChanged(int callId, int callState) = 0;
+    virtual int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) = 0;
 };
 
 }  // namespace Bluetooth

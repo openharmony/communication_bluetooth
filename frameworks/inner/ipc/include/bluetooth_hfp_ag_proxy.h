@@ -50,6 +50,7 @@ public:
     int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) override;
     int IsInbandRingingEnabled(bool &isEnabled) override;
     void CallDetailsChanged(int callId, int callState) override;
+    int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) override;
 
 private:
     static inline BrokerDelegator<BluetoothHfpAgProxy> delegator_;
