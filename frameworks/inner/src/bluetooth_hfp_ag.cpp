@@ -338,6 +338,14 @@ struct HandsFreeAudioGateway::impl {
         proxy->CallDetailsChanged(callId, callState);
     }
 
+    int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) const
+    {
+        HILOGD("enter");
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+        return proxy->IsVgsSupported(BluetoothRawAddress(device.GetDeviceAddr()), isSupported);
+    }
+
     void RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
     {
         HILOGD("enter");

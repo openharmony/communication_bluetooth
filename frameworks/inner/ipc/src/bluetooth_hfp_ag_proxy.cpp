@@ -387,6 +387,27 @@ void BluetoothHfpAgProxy::CallDetailsChanged(int callId, int callState)
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_CALL_DETAILS_CHANGED, data, reply, option);
 }
 
+int BluetoothHfpAgProxy::IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpAgInterfaceCode::BT_HFP_AG_IS_VGS_SUPPORTED,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    int32_t res = reply.ReadInt32();
+    if (res == NO_ERROR) {
+        isSupported = reply.ReadBool();
+    }
+
+    return res;
+}
+
 void BluetoothHfpAgProxy::RegisterObserver(const sptr<IBluetoothHfpAgObserver> &observer)
 {
     MessageParcel data;

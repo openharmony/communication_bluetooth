@@ -354,6 +354,20 @@ public:
     void CallDetailsChanged(int callId, int callState);
 
     /**
+     * @brief Check whether vgs is supported.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param isSupported Whether vgs is supported.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
+     * @since 11
+     */
+    int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) const;
+
+    /**
      * @brief Static HandsFree AudioGateway observer instance.
      *
      * @since 6
