@@ -833,7 +833,7 @@ napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std:
     napi_value argv[ARGS_SIZE_TWO] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-    NAPI_BT_RETURN_IF(argc < ARGS_SIZE_TWO, "Requires at least 1 arguments", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc == ARGS_SIZE_ZERO, "Requires at least 1 arguments", napi_invalid_arg);
 
     std::string type {};
     NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], type));
