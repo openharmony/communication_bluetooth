@@ -127,14 +127,15 @@ bool NapiEventSubscribeModule::IsNapiCallbackExist(
 void NapiEventSubscribeModule::CallFunction(
     std::shared_ptr<NapiNativeObject> nativeObject, std::vector<std::shared_ptr<NapiCallback>> napiCallbackVec)
 {
-    auto func = [nativeObject, callbackVec = std::move(napiCallbackVec)]() {
-        for (const auto &callback : callbackVec) {
-            if (callback) {
-                callback->CallFunction(nativeObject);
-            }
+    for (const auto &callback : napiCallbackVec) {
+        if (callback == nullptr) {
+            continue;
         }
-    };
-    DoInJsMainThread(func);
+        auto func = [nativeObject, callback]() {
+            callback->CallFunction(nativeObject);
+        };
+        DoInJsMainThread(callback->GetNapiEnv(), std::move(func));
+    }
 }
 
 void NapiEventSubscribeModule::PublishEvent(
@@ -143,9 +144,6 @@ void NapiEventSubscribeModule::PublishEvent(
     eventSubscribeMap_.Iterate([this, &eventName, &nativeObject](
         const std::string &name, std::vector<std::shared_ptr<NapiCallback>> &napiCallbackVec) {
         if (name != eventName) {
-            return;
-        }
-        if (napiCallbackVec.empty()) {
             return;
         }
         CallFunction(nativeObject, napiCallbackVec);
