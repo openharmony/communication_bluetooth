@@ -128,6 +128,8 @@ public:
     virtual int32_t GetDeviceProductId(const std::string &address, std::string &prodcutId) = 0;
     virtual int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) = 0;
     virtual int32_t GetDeviceCustomType(const std::string &address, int32_t &deviceType) = 0;
+    virtual int32_t GetDeviceVendorId(const std::string &address, uint16_t &vendorId) = 0;
+    virtual int32_t GetDeviceProductId(const std::string &address, uint16_t &productId) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
