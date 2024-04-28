@@ -19,6 +19,7 @@
 #include "bluetooth_raw_address.h"
 #include "i_bluetooth_host.h"
 #include "iremote_proxy.h"
+#include "bt_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
