@@ -1600,7 +1600,7 @@ enum HfpAgScoStateChangeReason {
     HFP_AG_SCO_REMOTE_USER_TERMINATED = 2,
 };
 
-struct DeviceInfo {
+struct RemoteDeviceInfo {
     uint16_t vendorId;
     uint16_t productId;
     std::string modelId;
