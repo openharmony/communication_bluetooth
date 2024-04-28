@@ -363,7 +363,7 @@ public:
      *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
      *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
      *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
-     * @since 11
+     * @since 12
      */
     int IsVgsSupported(const BluetoothRemoteDevice &device, bool &isSupported) const;
 
