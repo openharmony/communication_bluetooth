@@ -187,15 +187,14 @@ int32_t BluetoothHidHostProxy::HidHostSendData(std::string &device,
 }
 
 int32_t BluetoothHidHostProxy::HidHostSetReport(std::string &device,
-    uint8_t &type, uint16_t &size, uint8_t &report, int& result)
+    uint8_t &type, std::string &report, int& result)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHidHostProxy::GetDescriptor()),
         BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteString(device), BT_ERR_IPC_TRANS_FAILED, "write device error");
     CHECK_AND_RETURN_LOG_RET(data.WriteUint8(type), BT_ERR_IPC_TRANS_FAILED, "write type error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteUint16(size), BT_ERR_IPC_TRANS_FAILED, "write size error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteUint8(report), BT_ERR_IPC_TRANS_FAILED, "write report error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(report), BT_ERR_IPC_TRANS_FAILED, "write report error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
