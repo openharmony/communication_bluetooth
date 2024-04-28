@@ -363,5 +363,25 @@ int32_t BluetoothRemoteDevice::GetDeviceCustomType(int32_t &deviceType) const
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr.");
     return hostProxy->GetDeviceCustomType(address_, deviceType);
 }
+
+int32_t BluetoothRemoteDevice::GetDeviceVendorId(uint16_t &vendorId) const
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote Device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    return hostProxy->GetDeviceVendorId(address_, vendorId);
+}
+
+int32_t BluetoothRemoteDevice::GetDeviceProductId(uint16_t &productId) const
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote Device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    return hostProxy->GetDeviceProductId(address_, productId);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
