@@ -16,7 +16,8 @@
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
-#include "bt_def.h"
+
+using namespace OHOS::Bluetooth;
 namespace OHOS {
 namespace Bluetooth {
 void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &observer)
