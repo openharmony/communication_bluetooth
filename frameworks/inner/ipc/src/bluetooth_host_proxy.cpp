@@ -1623,7 +1623,7 @@ int32_t BluetoothHostProxy::DisconnectAllowedProfiles(const std::string &remoteA
 int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, std::string &prodcutId)
 {
     bluetooth::DeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfo::DEVICE_MODEL_ID);
+    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_MODEL_ID);
     prodcutId = info.modelId;
     return exception;
 }
@@ -1648,7 +1648,7 @@ int32_t BluetoothHostProxy::SetDeviceCustomType(const std::string &address, int3
 int32_t BluetoothHostProxy::GetDeviceCustomType(const std::string &address, int32_t &deviceType)
 {
     bluetooth::DeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfo::DEVICE_CUSTOM_TYPE);
+    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_CUSTOM_TYPE);
     deviceType = info.customType;
     return exception;
 }
@@ -1656,7 +1656,7 @@ int32_t BluetoothHostProxy::GetDeviceCustomType(const std::string &address, int3
 int32_t BluetoothHostProxy::GetDeviceVendorId(const std::string &address, uint16_t &vendorId)
 {
     bluetooth::DeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfo::DEVICE_VENDOR_ID);
+    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_VENDOR_ID);
     vendorId = info.vendorId;
     return exception;
 }
@@ -1664,7 +1664,7 @@ int32_t BluetoothHostProxy::GetDeviceVendorId(const std::string &address, uint16
 int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, uint16_t &productId)
 {
     bluetooth::DeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfo::DEVICE_PRODUCT_ID);
+    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_PRODUCT_ID);
     productId = info.productId;
     return exception;
 }
@@ -1682,16 +1682,16 @@ int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address, Devi
     BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
     if (exception == BT_NO_ERROR) {
         switch (type) {
-            case DeviceInfo::DEVICE_VENDOR_ID:
+            case DeviceInfoType::DEVICE_VENDOR_ID:
                 deviceInfo.vendorId = reply.ReadUint16();
                 break;
-            case DeviceInfo::DEVICE_PRODUCT_ID:
+            case DeviceInfoType::DEVICE_PRODUCT_ID:
                 deviceInfo.productId = reply.ReadUint16();
                 break;
-            case DeviceInfo::DEVICE_MODEL_ID:
+            case DeviceInfoType::DEVICE_MODEL_ID:
                 deviceInfo.modelId = reply.ReadString();
                 break;
-            case DeviceInfo::DEVICE_CUSTOM_TYPE:
+            case DeviceInfoType::DEVICE_CUSTOM_TYPE:
                 deviceInfo.customType = reply.ReadInt32();
                 break;
             default:
