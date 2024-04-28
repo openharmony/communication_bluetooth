@@ -1677,7 +1677,7 @@ int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address, Devi
     CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetootBluetoothHostInterfaceCode::GET_DEVICE_INFO_ID, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_INFO_ID, option, data, reply);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
     if (exception == BT_NO_ERROR) {
