@@ -152,13 +152,13 @@ struct HidHost::impl {
         }
     }
 
-    void HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t report)
+    void HidHostSetReport(std::string device, uint8_t type, std::string &report)
     {
         HILOGI("Enter!");
         int result;
         sptr<IBluetoothHidHost> proxy = GetRemoteProxy<IBluetoothHidHost>(PROFILE_HID_HOST_SERVER);
         if (proxy != nullptr) {
-            proxy->HidHostSetReport(device, type, size, report, result);
+            proxy->HidHostSetReport(device, type, report, result);
         }
     }
 
@@ -353,7 +353,7 @@ void HidHost::HidHostSendData(std::string device, uint8_t id, uint16_t size, uin
     return pimpl->HidHostSendData(device, id, size, type);
 }
 
-void HidHost::HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t report)
+void HidHost::HidHostSetReport(std::string device, uint8_t type, std::string &report)
 {
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
@@ -362,7 +362,7 @@ void HidHost::HidHostSetReport(std::string device, uint8_t type, uint16_t size, 
     sptr<IBluetoothHidHost> proxy = GetRemoteProxy<IBluetoothHidHost>(PROFILE_HID_HOST_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
 
-    return pimpl->HidHostSetReport(device, type, size, report);
+    return pimpl->HidHostSetReport(device, type, report);
 }
 
 void HidHost::HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type)

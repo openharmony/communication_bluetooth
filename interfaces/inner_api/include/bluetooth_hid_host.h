@@ -172,7 +172,7 @@ public:
      *
      * @param observer Hid Host device type size report.
      */
-    void HidHostSetReport(std::string device, uint8_t type, uint16_t size, uint8_t report);
+    void HidHostSetReport(std::string device, uint8_t type, std::string &report);
 
     /**
      * @brief Hid Host Get Report.
