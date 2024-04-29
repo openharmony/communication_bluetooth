@@ -44,13 +44,13 @@ static BluetoothObjectMap<std::shared_ptr<ClientSocket>, MAX_OBJECT_NUM> g_clien
 
 class BluetoothConnectionObserverWapper : public BluetoothConnectionObserver {
 public:
-    explicit BluetoothConnectionObserverWapper(BtSocketConnectionCallback *callback)
+    explicit BluetoothConnectionObserverWapper(BtSocketConnectionCallback &callback)
     {
-        callback_ = callback;
+        socektConnectCallback.connStateCb = callback.connStateCb;
     }
     void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result) override
     {
-        if (callback_ == nullptr || callback_->connStateCb == nullptr) {
+        if (socektConnectCallback.connStateCb == nullptr) {
             HILOGE("callback is null");
             return;
         }
@@ -60,10 +60,10 @@ public:
         string strUuid = uuid.ToString();
         btUuid.uuid = (char *)strUuid.c_str();
         btUuid.uuidLen = strUuid.size();
-        callback_->connStateCb(&addr, btUuid, status, result);
+        socektConnectCallback.connStateCb(&addr, btUuid, status, result);
     }
 
-    BtSocketConnectionCallback *callback_;
+    BtSocketConnectionCallback socektConnectCallback;
 };
 
 static std::map<int, std::shared_ptr<BluetoothConnectionObserverWapper>> g_clientCbMap;
@@ -283,7 +283,7 @@ int SocketConnectEx(const BluetoothCreateSocketPara *socketPara, const BdAddr *b
     }
 
     std::shared_ptr<BluetoothConnectionObserverWapper> connWrapper =
-        std::make_shared<BluetoothConnectionObserverWapper>(callback);
+        std::make_shared<BluetoothConnectionObserverWapper>(*callback);
     std::shared_ptr<ClientSocket> client = std::make_shared<ClientSocket>(*device, serverUuid,
         BtSocketType(socketPara->socketType), socketPara->isEncrypt, connWrapper);
     HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
@@ -321,10 +321,6 @@ int SocketDisconnect(int clientId)
     std::lock_guard<std::mutex> lock(g_clientCbMapMutex);
     ClientCbIterator it = g_clientCbMap.find(clientId);
     if (it != g_clientCbMap.end()) {
-        auto &clientWrapper = it->second;
-        if (clientWrapper->callback_ != nullptr) {
-            clientWrapper->callback_ = nullptr;
-        }
         g_clientCbMap.erase(it);
     }
     HILOGI("SocketDisConnect success, clientId: %{public}d", clientId);
