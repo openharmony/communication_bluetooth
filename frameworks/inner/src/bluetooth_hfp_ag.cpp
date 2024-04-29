@@ -338,6 +338,14 @@ struct HandsFreeAudioGateway::impl {
         proxy->CallDetailsChanged(callId, callState);
     }
 
+    int IsVgsSupported(const BluetoothRemoteDevice &device, bool &isSupported) const
+    {
+        HILOGD("enter");
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+        return proxy->IsVgsSupported(BluetoothRawAddress(device.GetDeviceAddr()), isSupported);
+    }
+
     void RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
     {
         HILOGD("enter");
@@ -668,6 +676,16 @@ void HandsFreeAudioGateway::CallDetailsChanged(int callId, int callState)
     sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "hfpAG proxy is nullptr");
     pimpl->CallDetailsChanged(callId, callState);
+}
+
+int HandsFreeAudioGateway::IsVgsSupported(const BluetoothRemoteDevice &device, bool &isSupported) const
+{
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "input parameter error.");
+    return pimpl->IsVgsSupported(device, isSupported);
 }
 
 void HandsFreeAudioGateway::RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)
