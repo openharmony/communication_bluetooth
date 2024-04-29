@@ -19,6 +19,7 @@
 #include "bluetooth_raw_address.h"
 #include "i_bluetooth_host.h"
 #include "iremote_proxy.h"
+#include "bt_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -103,6 +104,9 @@ public:
     int32_t GetDeviceProductId(const std::string &address, std::string &prodcutId) override;
     int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) override;
     int32_t GetDeviceCustomType(const std::string &address, int32_t &deviceType) override;
+    int32_t GetDeviceVendorId(const std::string &address, uint16_t &vendorId) override;
+    int32_t GetDeviceProductId(const std::string &address, uint16_t &productId) override;
+    int32_t GetRemoteDeviceInfo(const std::string &address, bluetooth::RemoteDeviceInfo &deviceInfo, int32_t type);
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

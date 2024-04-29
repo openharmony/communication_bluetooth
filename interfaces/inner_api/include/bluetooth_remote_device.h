@@ -359,6 +359,26 @@ public:
      */
     int32_t GetDeviceCustomType(int32_t &deviceType) const;
 
+    /**
+     * @brief Get the vendor id of the device.
+     *
+     * @param[out] vendorId The vendor id of device.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 12
+     */
+    int32_t GetDeviceVendorId(uint16_t &vendorId) const;
+
+    /**
+     * @brief Get the product id of the device.
+     *
+     * @param[out] productId The product id of device.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 12
+     */
+    int32_t GetDeviceProductId(uint16_t &productId) const;
+
 private:
     std::string address_ = "00:00:00:00:00:00";
     int transport_ = BT_TRANSPORT_NONE;
