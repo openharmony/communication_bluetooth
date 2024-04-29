@@ -44,6 +44,8 @@ struct ProfileIdProperty {
 };
 class BluetoothProfileManager {
 public:
+    BluetoothProfileManager();
+    ~BluetoothProfileManager();
     /**
      * @brief Get the Remote of the Profile
      *
@@ -100,8 +102,6 @@ private:
     std::atomic_bool isBluetoothServiceOn_ = false;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
     std::mutex getProfileRemoteMutex_;
-    BluetoothProfileManager();
-    ~BluetoothProfileManager();
 };
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
