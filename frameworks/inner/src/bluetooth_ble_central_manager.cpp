@@ -300,6 +300,7 @@ BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : pimp
         pimpl = std::make_unique<impl>();
         if (pimpl == nullptr) {
             HILOGE("failed, no pimpl");
+            return;
         }
     }
 
@@ -317,6 +318,7 @@ BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> 
         pimpl = std::make_unique<impl>();
         if (pimpl == nullptr) {
             HILOGE("failed, no pimpl");
+            return;
         }
     }
     HILOGI("successful");
