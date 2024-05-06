@@ -38,7 +38,7 @@ bool BluetoothRemoteDeviceInfo::Marshalling(Parcel &parcel) const
 BluetoothRemoteDeviceInfo *BluetoothRemoteDeviceInfo::Unmarshalling(Parcel &parcel)
 {
     BluetoothRemoteDeviceInfo *info = new BluetoothRemoteDeviceInfo();
-    if (info != nullptr && info->ReadFromParcel(parcel)) {
+    if (info != nullptr && !info->ReadFromParcel(parcel)) {
         delete info;
         info = nullptr;
     }
