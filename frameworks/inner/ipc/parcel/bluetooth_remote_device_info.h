@@ -27,7 +27,7 @@ public:
     explicit BluetoothRemoteDeviceInfo() = default;
     ~BluetoothRemoteDeviceInfo() = default;
     bool Marshalling(Parcel &parcel) const override;
-    static BluetoothRemoteDeviceInfo *Unmarshlling(Parcel &parcel);
+    static BluetoothRemoteDeviceInfo *Unmarshalling(Parcel &parcel);
     bool WriteToParcel(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel);
 
