@@ -1600,20 +1600,6 @@ enum HfpAgScoStateChangeReason {
     HFP_AG_SCO_REMOTE_USER_TERMINATED = 2,
 };
 
-struct RemoteDeviceInfo {
-    uint16_t vendorId;
-    uint16_t productId;
-    std::string modelId;
-    int32_t customType;
-};
-
-enum DeviceInfoType {
-    DEVICE_VENDOR_ID = 0,
-    DEVICE_PRODUCT_ID = 1,
-    DEVICE_MODEL_ID = 2,
-    DEVICE_CUSTOM_TYPE = 3
-};
-
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
