@@ -1619,14 +1619,6 @@ int32_t BluetoothHostProxy::DisconnectAllowedProfiles(const std::string &remoteA
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, std::string &prodcutId)
-{
-    BluetoothRemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info);
-    prodcutId = info.modelId_;
-    return exception;
-}
-
 int32_t BluetoothHostProxy::SetDeviceCustomType(const std::string &address, int32_t deviceType)
 {
     MessageParcel data;
@@ -1644,31 +1636,8 @@ int32_t BluetoothHostProxy::SetDeviceCustomType(const std::string &address, int3
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::GetDeviceCustomType(const std::string &address, int32_t &deviceType)
-{
-    BluetoothRemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info);
-    deviceType = info.customType_;
-    return exception;
-}
-
-int32_t BluetoothHostProxy::GetDeviceVendorId(const std::string &address, uint16_t &vendorId)
-{
-    BluetoothRemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info);
-    vendorId = info.vendorId_;
-    return exception;
-}
-
-int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, uint16_t &productId)
-{
-    BluetoothRemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info);
-    productId = info.productId_;
-    return exception;
-}
-
-int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address, BluetoothRemoteDeviceInfo &deviceInfo)
+int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address,
+    std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
@@ -1680,7 +1649,7 @@ int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address, Blue
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
     if (exception == BT_NO_ERROR) {
-        deviceInfo.ReadFromParcel(reply);
+        deviceInfo = std::shared_ptr<BluetoothRemoteDeviceInfo>(reply.ReadParcelable<BluetoothRemoteDeviceInfo>());
     }
     return exception;
 }
