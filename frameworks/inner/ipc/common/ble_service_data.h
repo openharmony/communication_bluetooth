@@ -1086,7 +1086,7 @@ public:
      * @param type Device type.
      * @since 6
      */
-    void SetDeviceType(uint8_t type);
+    void SetDeviceType(uint8_t type) {};
 
     /**
      * @brief Set manufacturer data.
