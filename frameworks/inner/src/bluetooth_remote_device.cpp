@@ -257,8 +257,12 @@ int BluetoothRemoteDevice::GetDeviceProductId(std::string &prodcutId) const
 
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
-
-    return hostProxy->GetDeviceProductId(address_, prodcutId);
+    std::shared_ptr<BluetoothRemoteDeviceInfo> info;
+    int32_t exception = hostProxy->GetRemoteDeviceInfo(address_, info);
+    if (exception == BT_NO_ERROR && info != nullptr) {
+        prodcutId = info->modelId_;
+    }
+    return exception;
 }
 
 int BluetoothRemoteDevice::GetDeviceUuids(std::vector<std::string> &uuids) const
@@ -361,7 +365,11 @@ int32_t BluetoothRemoteDevice::GetDeviceCustomType(int32_t &deviceType) const
 
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr.");
-    return hostProxy->GetDeviceCustomType(address_, deviceType);
+    int32_t exception = hostProxy->GetRemoteDeviceInfo(address_, info);
+    if (exception == BT_NO_ERROR && info != nullptr) {
+        deviceType = info->customType_;
+    }
+    return exception;
 }
 
 int32_t BluetoothRemoteDevice::GetDeviceVendorId(uint16_t &vendorId) const
@@ -371,7 +379,12 @@ int32_t BluetoothRemoteDevice::GetDeviceVendorId(uint16_t &vendorId) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-    return hostProxy->GetDeviceVendorId(address_, vendorId);
+    std::shared_ptr<BluetoothRemoteDeviceInfo> info;
+    int32_t exception = hostProxy->GetRemoteDeviceInfo(address_, info);
+    if (exception == BT_NO_ERROR && info != nullptr) {
+        vendorId = info->vendorId_;
+    }
+    return exception;
 }
 
 int32_t BluetoothRemoteDevice::GetDeviceProductId(uint16_t &productId) const
@@ -381,7 +394,11 @@ int32_t BluetoothRemoteDevice::GetDeviceProductId(uint16_t &productId) const
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-    return hostProxy->GetDeviceProductId(address_, productId);
+    int32_t exception = hostProxy->GetRemoteDeviceInfo(address_, info);
+    if (exception == BT_NO_ERROR && info != nullptr) {
+        productId = info->productId_;
+    }
+    return exception;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
