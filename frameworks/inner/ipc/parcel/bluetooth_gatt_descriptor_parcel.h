@@ -28,7 +28,6 @@ public:
     {}
     explicit BluetoothGattDescriptor(const BluetoothGattDescriptor &other) : bluetooth::Descriptor(other)
     {}
-    BluetoothGattDescriptor& operator = (const BluetoothGattDescriptor &other);
     ~BluetoothGattDescriptor() override = default;
 
     bool Marshalling(Parcel &parcel) const override;

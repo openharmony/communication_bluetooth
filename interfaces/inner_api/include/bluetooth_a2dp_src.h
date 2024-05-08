@@ -428,13 +428,6 @@ public:
      */
     int GetAutoPlayDisabledDuration(const BluetoothRemoteDevice &device, int &duration);
 
-    /**
-     * @brief The external process calls the A2dpSrc profile interface before the Bluetooth process starts. At this
-     * time, it needs to monitor the start of the Bluetooth process, and then call this interface to initialize the
-     * A2dpSrc proflie.
-     */
-    void Init();
-
 private:
     /**
      * @brief A constructor used to create a a2dp source instance.

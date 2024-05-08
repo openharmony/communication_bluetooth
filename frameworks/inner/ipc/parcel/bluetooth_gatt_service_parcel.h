@@ -28,7 +28,6 @@ public:
     {}
     BluetoothGattService(const BluetoothGattService &other) : bluetooth::Service(other)
     {}
-    BluetoothGattService& operator = (const BluetoothGattService &other);
 
     ~BluetoothGattService() override = default;
 
