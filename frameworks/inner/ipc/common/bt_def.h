@@ -1600,6 +1600,14 @@ enum HfpAgScoStateChangeReason {
     HFP_AG_SCO_REMOTE_USER_TERMINATED = 2,
 };
 
+enum DeviceInfoType {
+    DEVICE_INFO_UNKNOWN = -1,
+    DEVICE_VENDOR_ID = 0,
+    DEVICE_PRODUCT_ID = 1,
+    DEVICE_MODEL_ID = 2,
+    DEVICE_CUSTOM_TYPE = 3
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
