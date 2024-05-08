@@ -128,7 +128,7 @@ public:
     virtual int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) = 0;
     virtual int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) = 0;
     virtual int32_t GetRemoteDeviceInfo(const std::string &address,
-        std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo) = 0;
+        std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
