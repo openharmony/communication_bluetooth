@@ -104,7 +104,7 @@ public:
     int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) override;
     int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) override;
     int32_t GetRemoteDeviceInfo(const std::string &address,
-        std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo) override;
+        std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
