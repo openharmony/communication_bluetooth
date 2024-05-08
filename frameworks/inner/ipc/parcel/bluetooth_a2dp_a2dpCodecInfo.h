@@ -46,8 +46,6 @@ public:
         : bluetooth::OffloadCodecInfo(other) {}
     BluetoothA2dpOffloadCodecInfo(const BluetoothA2dpOffloadCodecInfo &other)
         : bluetooth::OffloadCodecInfo(other) {}
-    BluetoothA2dpOffloadCodecInfo &operator=(const bluetooth::OffloadCodecInfo &other);
-    BluetoothA2dpOffloadCodecInfo &operator=(const BluetoothA2dpOffloadCodecInfo &other);
     ~BluetoothA2dpOffloadCodecInfo() override = default;
 
     bool Marshalling(Parcel &parcel) const override;

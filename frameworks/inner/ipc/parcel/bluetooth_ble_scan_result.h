@@ -37,7 +37,6 @@ public:
     static BluetoothBleScanResult *Unmarshalling(Parcel &parcel);
 
     bool WriteToParcel(Parcel &parcel);
-    bool ReadFromParcelInt(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel);
 
 private:

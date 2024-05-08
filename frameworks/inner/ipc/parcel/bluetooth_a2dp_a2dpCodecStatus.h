@@ -49,8 +49,6 @@ public:
     BluetoothA2dpOffloadCodecStatus(const BluetoothA2dpOffloadCodecStatus &other)
         : bluetooth::OffloadCodecStatus(other) {}
     ~BluetoothA2dpOffloadCodecStatus() override = default;
-    BluetoothA2dpOffloadCodecStatus &operator = (const bluetooth::OffloadCodecStatus &other);
-    BluetoothA2dpOffloadCodecStatus &operator = (const BluetoothA2dpOffloadCodecStatus &other);
 
     bool Marshalling(Parcel &parcel) const override;
 

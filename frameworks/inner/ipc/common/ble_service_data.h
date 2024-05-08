@@ -1081,14 +1081,6 @@ public:
     uint8_t GetIoCapability() const;
 
     /**
-     * @brief Set device type.
-     *
-     * @param type Device type.
-     * @since 6
-     */
-    void SetDeviceType(uint8_t type) {};
-
-    /**
      * @brief Set manufacturer data.
      *
      * @param manufacturerData Manufacturer data.
