@@ -1637,12 +1637,13 @@ int32_t BluetoothHostProxy::SetDeviceCustomType(const std::string &address, int3
 }
 
 int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address,
-    std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo)
+    std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
         BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(type), BT_ERR_IPC_TRANS_FAILED, "Write type error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_INFO_ID, option, data, reply);
