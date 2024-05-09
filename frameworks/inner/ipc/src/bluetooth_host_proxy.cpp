@@ -18,6 +18,7 @@
 #include "bluetooth_errorcode.h"
 
 using namespace OHOS::bluetooth;
+
 namespace OHOS {
 namespace Bluetooth {
 void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &observer)
@@ -1620,14 +1621,6 @@ int32_t BluetoothHostProxy::DisconnectAllowedProfiles(const std::string &remoteA
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, std::string &prodcutId)
-{
-    RemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_MODEL_ID);
-    prodcutId = info.modelId;
-    return exception;
-}
-
 int32_t BluetoothHostProxy::SetDeviceCustomType(const std::string &address, int32_t deviceType)
 {
     MessageParcel data;
@@ -1645,58 +1638,21 @@ int32_t BluetoothHostProxy::SetDeviceCustomType(const std::string &address, int3
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::GetDeviceCustomType(const std::string &address, int32_t &deviceType)
-{
-    RemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_CUSTOM_TYPE);
-    deviceType = info.customType;
-    return exception;
-}
-
-int32_t BluetoothHostProxy::GetDeviceVendorId(const std::string &address, uint16_t &vendorId)
-{
-    RemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_VENDOR_ID);
-    vendorId = info.vendorId;
-    return exception;
-}
-
-int32_t BluetoothHostProxy::GetDeviceProductId(const std::string &address, uint16_t &productId)
-{
-    RemoteDeviceInfo info;
-    int32_t exception = GetRemoteDeviceInfo(address, info, DeviceInfoType::DEVICE_PRODUCT_ID);
-    productId = info.productId;
-    return exception;
-}
-
-int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address, RemoteDeviceInfo &deviceInfo, int32_t type)
+int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address,
+    std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
         BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(type), BT_ERR_IPC_TRANS_FAILED, "Write type error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_INFO_ID, option, data, reply);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
     if (exception == BT_NO_ERROR) {
-        switch (type) {
-            case DeviceInfoType::DEVICE_VENDOR_ID:
-                deviceInfo.vendorId = reply.ReadUint16();
-                break;
-            case DeviceInfoType::DEVICE_PRODUCT_ID:
-                deviceInfo.productId = reply.ReadUint16();
-                break;
-            case DeviceInfoType::DEVICE_MODEL_ID:
-                deviceInfo.modelId = reply.ReadString();
-                break;
-            case DeviceInfoType::DEVICE_CUSTOM_TYPE:
-                deviceInfo.customType = reply.ReadInt32();
-                break;
-            default:
-                break;
-        }
+        deviceInfo = std::shared_ptr<BluetoothRemoteDeviceInfo>(reply.ReadParcelable<BluetoothRemoteDeviceInfo>());
     }
     return exception;
 }

@@ -24,6 +24,7 @@
 #include "i_bluetooth_remote_device_observer.h"
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_device_battery_info.h"
+#include "../parcel/bluetooth_remote_device_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -125,11 +126,9 @@ public:
     virtual int32_t CountEnableTimes(bool enable) = 0;
     virtual int32_t ConnectAllowedProfiles(const std::string &remoteAddr) = 0;
     virtual int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) = 0;
-    virtual int32_t GetDeviceProductId(const std::string &address, std::string &prodcutId) = 0;
     virtual int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) = 0;
-    virtual int32_t GetDeviceCustomType(const std::string &address, int32_t &deviceType) = 0;
-    virtual int32_t GetDeviceVendorId(const std::string &address, uint16_t &vendorId) = 0;
-    virtual int32_t GetDeviceProductId(const std::string &address, uint16_t &productId) = 0;
+    virtual int32_t GetRemoteDeviceInfo(const std::string &address,
+        std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
