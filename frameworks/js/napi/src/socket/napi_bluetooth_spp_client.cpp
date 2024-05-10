@@ -175,6 +175,8 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         static_cast<void*>(callbackInfo),
         &callbackInfo->asyncWork_);
     napi_queue_async_work(env, callbackInfo->asyncWork_);
+    delete callbackInfo;
+    callbackInfo = nullptr;
     return NapiGetUndefinedRet(env);
 }
 

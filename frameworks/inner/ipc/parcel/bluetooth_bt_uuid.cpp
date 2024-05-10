@@ -22,14 +22,16 @@ namespace Bluetooth {
 bool BluetoothUuid::Marshalling(Parcel &parcel) const
 {
     uint64_t mostSigBits =
-        ((((uint64_t)uuid_[0]) << EIGHT*7) | (((uint64_t)uuid_[1]) << EIGHT*6) | (((uint64_t)uuid_[2]) << EIGHT*5) |
-            (((uint64_t)uuid_[3]) << EIGHT*4) | (((uint64_t)uuid_[4]) << EIGHT*3) | (((uint64_t)uuid_[5]) << EIGHT*2) |
-            (((uint64_t)uuid_[6]) << EIGHT) | uuid_[7]);
+        (((static_cast<uint64_t>(uuid_[0])) << EIGHT * 7) | ((static_cast<uint64_t>(uuid_[1])) << EIGHT * 6) |
+        ((static_cast<uint64_t>(uuid_[2])) << EIGHT * 5) | ((static_cast<uint64_t>(uuid_[3])) << EIGHT * 4) |
+        ((static_cast<uint64_t>(uuid_[4])) << EIGHT * 3) | ((static_cast<uint64_t>(uuid_[5])) << EIGHT * 2) |
+        ((static_cast<uint64_t>(uuid_[6])) << EIGHT) | uuid_[7]);
 
     uint64_t leastSigBits =
-        ((((uint64_t)uuid_[8]) << EIGHT*7) | (((uint64_t)uuid_[9]) << EIGHT*6) | (((uint64_t)uuid_[10]) << EIGHT*5) |
-            (((uint64_t)uuid_[11]) << EIGHT*4) | (((uint64_t)uuid_[12]) << EIGHT*3) |
-            (((uint64_t)uuid_[13]) << EIGHT*2) | (((uint64_t)uuid_[14]) << EIGHT) | uuid_[15]);
+        (((static_cast<uint64_t>(uuid_[8])) << EIGHT * 7) | ((static_cast<uint64_t>(uuid_[9])) << EIGHT * 6) |
+        ((static_cast<uint64_t>(uuid_[10])) << EIGHT * 5) | ((static_cast<uint64_t>(uuid_[11])) << EIGHT * 4) |
+        ((static_cast<uint64_t>(uuid_[12])) << EIGHT * 3) | ((static_cast<uint64_t>(uuid_[13])) << EIGHT * 2) |
+        ((static_cast<uint64_t>(uuid_[14])) << EIGHT) | uuid_[15]);
 
     bool ret = parcel.WriteUint64(mostSigBits);
     if (!ret) {
