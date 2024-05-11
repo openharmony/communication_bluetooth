@@ -902,6 +902,8 @@ napi_value DeviceTypeInit(napi_env env)
         env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_WATCH), "DEVICE_TYPE_WATCH");
     SetNamedPropertyByInteger(
         env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_SPEAKER), "DEVICE_TYPE_SPEAKER");
+    SetNamedPropertyByInteger(
+        env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_OTHERS), "DEVICE_TYPE_OTHERS");
     return deviceType;
 }
 

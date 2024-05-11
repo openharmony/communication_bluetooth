@@ -1505,6 +1505,7 @@ enum DeviceType {
     DEVICE_TYPE_GLASSES = 4,
     DEVICE_TYPE_WATCH = 5,
     DEVICE_TYPE_SPEAKER = 6,
+    DEVICE_TYPE_OTHERS = 7,
 };
 
 enum HfpAgScoStateChangeReason {
