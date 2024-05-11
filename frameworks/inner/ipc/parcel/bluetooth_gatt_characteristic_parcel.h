@@ -28,7 +28,6 @@ public:
     {}
     explicit BluetoothGattCharacteristic(const BluetoothGattCharacteristic &other) : bluetooth::Characteristic(other)
     {}
-    BluetoothGattCharacteristic& operator = (const BluetoothGattCharacteristic &other);
     ~BluetoothGattCharacteristic() override = default;
 
     bool Marshalling(Parcel &parcel) const override;
