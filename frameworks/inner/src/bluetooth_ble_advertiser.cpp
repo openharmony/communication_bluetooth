@@ -333,7 +333,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         ret = proxy->GetAdvertiserHandle(advHandle);
         if (ret != BT_NO_ERROR || advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
             HILOGE("Invalid advertising handle");
-            callback->OnStartResultEvent(BT_ERR_INTERNAL_ERROR, BLE_INVALID_ADVERTISING_HANDLE);
+            callback->OnStartResultEvent(BT_ERR_INTERNAL_ERROR, static_cast<int>(BLE_INVALID_ADVERTISING_HANDLE));
             return ret;
         }
         callback->OnGetAdvHandleEvent(0, advHandle);
