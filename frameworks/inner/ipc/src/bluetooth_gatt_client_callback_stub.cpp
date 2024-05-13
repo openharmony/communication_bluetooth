@@ -84,6 +84,7 @@ int BluetoothGattClientCallbackStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("BluetoothGattClientCallbackStub::OnConnectionStateChangedInner Triggered!");
@@ -93,6 +94,7 @@ ErrCode BluetoothGattClientCallbackStub::OnConnectionStateChangedInner(MessagePa
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnCharacteristicChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
@@ -103,6 +105,7 @@ ErrCode BluetoothGattClientCallbackStub::OnCharacteristicChangedInner(MessagePar
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnCharacteristicReadInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnCharacteristicReadInner Triggered!");
@@ -115,6 +118,7 @@ ErrCode BluetoothGattClientCallbackStub::OnCharacteristicReadInner(MessageParcel
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnCharacteristicWriteInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnCharacteristicWriteInner Triggered!");
@@ -127,6 +131,7 @@ ErrCode BluetoothGattClientCallbackStub::OnCharacteristicWriteInner(MessageParce
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnDescriptorReadInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnDescriptorReadInner Triggered!");
@@ -140,6 +145,7 @@ ErrCode BluetoothGattClientCallbackStub::OnDescriptorReadInner(MessageParcel &da
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnDescriptorWriteInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnDescriptorWriteInner Triggered!");
@@ -152,6 +158,7 @@ ErrCode BluetoothGattClientCallbackStub::OnDescriptorWriteInner(MessageParcel &d
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnMtuChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnMtuChangedInner Triggered!");
@@ -161,6 +168,7 @@ ErrCode BluetoothGattClientCallbackStub::OnMtuChangedInner(MessageParcel &data, 
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnServicesDiscoveredInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnServicesDiscoveredInner Triggered!");
@@ -169,6 +177,7 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesDiscoveredInner(MessageParcel
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner Triggered!");
@@ -180,6 +189,7 @@ ErrCode BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner(Messa
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnServicesChangedInner Triggered!");
@@ -200,6 +210,7 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(MessageParcel &d
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner Triggered!");
