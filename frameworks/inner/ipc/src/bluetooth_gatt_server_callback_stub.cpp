@@ -76,6 +76,7 @@ int BluetoothGattServerCallbackStub::OnRemoteRequest(
     HILOGW("BluetoothGattServerCallbackStub::OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 };
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
@@ -91,6 +92,7 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(Messag
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner Triggered!");
@@ -106,6 +108,7 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessagePa
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("BluetoothGattServerCallbackStub::OnAddServiceInner Triggered!");
@@ -121,6 +124,7 @@ ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(MessageParcel &data, 
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
@@ -137,6 +141,7 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner(Messa
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
@@ -152,6 +157,7 @@ ErrCode BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner(MessagePar
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
@@ -167,6 +173,7 @@ ErrCode BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner(MessagePa
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnMtuChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
@@ -179,6 +186,7 @@ ErrCode BluetoothGattServerCallbackStub::OnMtuChangedInner(MessageParcel &data, 
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnNotifyConfirmInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
@@ -195,6 +203,7 @@ ErrCode BluetoothGattServerCallbackStub::OnNotifyConfirmInner(MessageParcel &dat
 
     return NO_ERROR;
 }
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());

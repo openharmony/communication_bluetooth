@@ -69,6 +69,7 @@ int BluetoothBleCentralManagerCallBackStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothBleScanResult> result(data.ReadParcelable<BluetoothBleScanResult>());
@@ -80,6 +81,7 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner(MessageParce
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner(
     MessageParcel &data, MessageParcel &reply)
 {
@@ -102,6 +104,7 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner(
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner(MessageParcel &data, MessageParcel &reply)
 {
     int32_t resultCode = data.ReadInt32();
@@ -110,6 +113,7 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner(Mess
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromLpDeviceInner(MessageParcel &data,
     MessageParcel &reply)
 {
