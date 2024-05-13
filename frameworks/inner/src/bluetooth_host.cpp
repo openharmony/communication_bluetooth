@@ -489,6 +489,16 @@ int BluetoothHost::DisableBt()
     return proxy->DisableBt();
 }
 
+int BluetoothHost::RestrictBluetooth()
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BTStateID::STATE_TURN_OFF, "proxy is nullptr");
+    return proxy->RestrictBluetooth();
+
+}
+
 int BluetoothHost::GetBtState() const
 {
     HILOGD("enter");
