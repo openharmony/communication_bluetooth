@@ -32,6 +32,7 @@
 namespace OHOS {
 namespace Bluetooth {
 const std::string BLUETOOTH_HOST = "BluetoothHost";
+const int32_t BEGIN_ID = 0;
 // It is recommended to ues one of the between bluetoothLoadedfunc and bleTurnOnFunc
 struct ProfileFunctions {
     std::function<void(sptr<IRemoteObject>)> bluetoothLoadedfunc {};
@@ -95,12 +96,14 @@ private:
     void UnSubScribeBluetoothSystemAbility();
     void RunFuncWhenBluetoothServiceStarted();
     sptr<IRemoteObject> GetHostRemote();
-    void GetValidId();
+    int32_t GetValidId();
 
     SafeMap<std::string, sptr<IRemoteObject>> profileRemoteMap_;
     SafeMap<int32_t, ProfileIdProperty> profileIdFuncMap_;
     std::atomic_bool isBluetoothServiceOn_ = false;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
+    int32_t registerValidId_ = BEGIN_ID;
+    std::mutex idMutex_;
     std::mutex getProfileRemoteMutex_;
 };
 template <typename T>

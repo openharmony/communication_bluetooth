@@ -29,8 +29,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-const int32_t BEGIN_ID = 1;
-std::atomic_int32_t id = BEGIN_ID;
 
 BluetoothProfileManager::BluetoothProfileManager()
 {
@@ -178,27 +176,22 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int3
     return;
 }
 
-void BluetoothProfileManager::GetValidId()
+int32_t BluetoothProfileManager::GetValidId()
 {
-    ProfileIdProperty value;
-    while (profileIdFuncMap_.Find(id, value)) {
-        id++;
-        if (id == INT32_MAX) {
-            id = BEGIN_ID;
-        }
-    }
+    std::lock_guard<std::mutex> lock(idMutex_);
+    registerValidId_++;
+    return registerValidId_;
 }
 
 int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName,
     std::function<void (sptr<IRemoteObject>)> func)
 {
-    GetValidId();
+    int32_t id = GetValidId();
     ProfileIdProperty value;
     ProfileIdProperty idProperties;
     idProperties.objectName = objectName;
     idProperties.functions.bluetoothLoadedfunc = func;
-    int32_t idForPrint = id;
-    HILOGI("objectname: %{public}s, id: %{public}d", objectName.c_str(), idForPrint);
+    HILOGI("objectname: %{public}s, id: %{public}d", objectName.c_str(), id);
     profileIdFuncMap_.Insert(id, idProperties);
     if (isBluetoothServiceOn_) {
         sptr<IRemoteObject> remote = GetProfileRemote(objectName);
@@ -210,13 +203,12 @@ int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName,
 
 int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName, ProfileFunctions profileFunctions)
 {
-    GetValidId();
+    int32_t id = GetValidId();
     ProfileIdProperty value;
     ProfileIdProperty idProperties;
     idProperties.objectName = objectName;
     idProperties.functions = profileFunctions;
-    int32_t idForPrint = id;
-    HILOGI("objectname: %{public}s, id: %{public}d", objectName.c_str(), idForPrint);
+    HILOGI("objectname: %{public}s, id: %{public}d", objectName.c_str(), id);
     profileIdFuncMap_.Insert(id, idProperties);
     if (isBluetoothServiceOn_) {
         sptr<IRemoteObject> remote = GetProfileRemote(objectName);
