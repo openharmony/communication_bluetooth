@@ -101,6 +101,25 @@ int32_t BluetoothHostProxy::DisableBt()
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHostProxy::RestrictBluetooth()
+{
+    HILOGI("BluetoothHostProxy::RestrictBluetooth starts");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::DisableBt WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::RESTRICT_BLUETOOTH, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::RestrictBluetooth done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
 sptr<IRemoteObject> BluetoothHostProxy::GetProfile(const std::string &name)
 {
     MessageParcel data;

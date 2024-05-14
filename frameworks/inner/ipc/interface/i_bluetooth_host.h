@@ -59,6 +59,7 @@ public:
     virtual void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual int32_t EnableBt() = 0;
     virtual int32_t DisableBt() = 0;
+    virtual int32_t RestrictBluetooth() = 0;
     virtual sptr<IRemoteObject> GetProfile(const std::string &name) = 0;
     virtual sptr<IRemoteObject> GetBleRemote(const std::string &name) = 0;
     virtual int32_t BluetoothFactoryReset() = 0;
