@@ -71,6 +71,7 @@ int BluetoothBleAdvertiseCallbackStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner(MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
@@ -81,6 +82,7 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner(MessageParcel
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleAdvertiseCallbackStub::OnEnableResultEventInner(MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
@@ -89,6 +91,7 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnEnableResultEventInner(MessageParce
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleAdvertiseCallbackStub::OnDisableResultEventInner(MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
@@ -97,6 +100,7 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnDisableResultEventInner(MessageParc
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleAdvertiseCallbackStub::OnStopResultEventInner(MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
@@ -105,6 +109,7 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnStopResultEventInner(MessageParcel 
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner(MessageParcel &data, MessageParcel &reply)
 {
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
@@ -112,6 +117,7 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner(MessageParcel
     return NO_ERROR;
 }
 
+__attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner(MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
