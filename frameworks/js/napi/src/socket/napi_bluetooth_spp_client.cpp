@@ -172,11 +172,12 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
             delete callbackInfo;
             callbackInfo = nullptr;
         },
-        static_cast<void*>(callbackInfo),
-        &callbackInfo->asyncWork_);
-    napi_queue_async_work(env, callbackInfo->asyncWork_);
-    delete callbackInfo;
-    callbackInfo = nullptr;
+        static_cast<void*>(callbackInfo), &callbackInfo->asyncWork_);
+    if (napi_queue_async_work(env, callbackInfo->asyncWork_) != napi_ok) {
+        HILOGE("SppConnect napi_queue_async_work failed");
+        delete callbackInfo;
+        callbackInfo = nullptr;
+    }
     return NapiGetUndefinedRet(env);
 }
 
