@@ -618,9 +618,6 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     BluetoothTimer::GetInstance()->Register(timerCallback, timerId, ADV_ADDR_TIME_THRESHOLD);
     g_advAddrTimerIds[i] = timerId;
 
-    *advId = i;
-    HILOGI("ret advId: %{public}d.", *advId);
-
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam->minInterval);
     if (advParam->advType == OHOS_BLE_ADV_SCAN_IND || advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
@@ -637,7 +634,16 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
     int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
-    return ret == BT_NO_ERROR ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
+    if (ret != BT_NO_ERROR) {
+        HILOGE("fail, ret: %{public}d", ret);
+        //StartAdvertise fail, return default handle -1 to softbus
+        g_bleAdvCallbacks[i] = nullptr;
+        *advId = -1;
+        return OHOS_BT_STATUS_FAIL;
+    }
+    *advId = i;
+    HILOGI("ret advId: %{public}d.", *advId);
+    return OHOS_BT_STATUS_SUCCESS;
 }
 
 /**
@@ -668,11 +674,9 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     }
 
     if (i == MAX_BLE_ADV_NUM) {
+        HILOGW("reach the max num of adv");
         return OHOS_BT_STATUS_UNHANDLED;
     }
-
-    *advId = i;
-    HILOGI("ret advId: %{public}d.", *advId);
 
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam.minInterval);
@@ -685,9 +689,14 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     auto scanResponse = ConvertDataToVec(rawData.rspData, rawData.rspDataLen);
     int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
     if (ret != BT_NO_ERROR) {
-        HILOGE("fail, advId: %{public}d, ret: %{public}d", *advId, ret);
+        HILOGE("fail, ret: %{public}d", ret);
+        //StartAdvertise fail, return default handle -1 to softbus
+        g_bleAdvCallbacks[i] = nullptr;
+        *advId = -1;
         return OHOS_BT_STATUS_FAIL;
     }
+    *advId = i;
+    HILOGI("ret advId: %{public}d.", *advId);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
