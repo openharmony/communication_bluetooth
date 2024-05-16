@@ -120,7 +120,13 @@ int SocketServerCreate(const BluetoothCreateSocketPara *socketPara, const char *
     string serverName(name);
     std::shared_ptr<ServerSocket> server = std::make_shared<ServerSocket>(serverName, serverUuid,
         BtSocketType(socketPara->socketType), socketPara->isEncrypt);
-    server->Listen();
+    int result = server->Listen();
+    if (result != BT_NO_ERROR) {
+        HILOGE("SocketServerCreate fail, result: %{public}d", result);
+        server->Close();
+        HILOGE("SocketServerCreate closed.");
+        return BT_SOCKET_INVALID_ID;
+    }
     int serverId = g_serverMap.AddObject(server);
     HILOGI("success, serverId: %{public}d, socketType: %{public}d, isEncrypt: %{public}d", serverId,
         socketPara->socketType, socketPara->isEncrypt);
