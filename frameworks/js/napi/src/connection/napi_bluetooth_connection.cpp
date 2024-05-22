@@ -800,6 +800,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
     napi_value pinTypeObject = PinTypeInit(env);
 #endif
     napi_value deviceTypeObject = DeviceTypeInit(env);
+    napi_value deviceChargeStateObject = DeviceChargeStateInit(env);
     napi_property_descriptor exportProperties[] = {
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
         DECLARE_NAPI_PROPERTY("BondState", bondStateObj),
@@ -809,6 +810,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("PinType", pinTypeObject),
 #endif
         DECLARE_NAPI_PROPERTY("DeviceType", deviceTypeObject),
+        DECLARE_NAPI_PROPERTY("DeviceChargeState", deviceChargeStateObject),
     };
     napi_define_properties(env, exports, sizeof(exportProperties) / sizeof(*exportProperties), exportProperties);
     return exports;
@@ -920,6 +922,26 @@ napi_value DeviceTypeInit(napi_env env)
     SetNamedPropertyByInteger(
         env, deviceType, static_cast<int>(DeviceType::DEVICE_TYPE_OTHERS), "DEVICE_TYPE_OTHERS");
     return deviceType;
+}
+
+napi_value DeviceChargeStateInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value deviceChargeState = nullptr;
+    napi_create_object(env, &deviceChargeState);
+    SetNamedPropertyByInteger(
+        env, deviceChargeState, static_cast<int32_t>(DeviceChargeState::DEVICE_NORMAL_CHARGE_NOT_CHARGED),
+        "DEVICE_NORMAL_CHARGE_NOT_CHARGED");
+    SetNamedPropertyByInteger(
+        env, deviceChargeState, static_cast<int32_t>(DeviceChargeState::DEVICE_NORMAL_CHARGE_IN_CHARGING),
+        "DEVICE_NORMAL_CHARGE_IN_CHARGING");
+    SetNamedPropertyByInteger(
+        env, deviceChargeState, static_cast<int32_t>(DeviceChargeState::DEVICE_SUPER_CHARGE_NOT_CHARGED),
+        "DEVICE_SUPER_CHARGE_NOT_CHARGED");
+    SetNamedPropertyByInteger(
+        env, deviceChargeState, static_cast<int32_t>(DeviceChargeState::DEVICE_SUPER_CHARGE_IN_CHARGING),
+        "DEVICE_SUPER_CHARGE_IN_CHARGING");
+    return deviceChargeState;
 }
 
 void RegisterObserverToHost()
