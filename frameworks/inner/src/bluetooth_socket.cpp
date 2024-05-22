@@ -389,7 +389,11 @@ bool ClientSocket::Init()
 int ClientSocket::Connect(int psm)
 {
     HILOGD("enter");
-    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+    if (pimpl->type_ == TYPE_L2CAP_LE) {
+        CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "BLE is not TURN_ON");
+    } else {
+        CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+    }
 
     if (!pimpl->Init(weak_from_this())) {
         HILOGE("clientSocket proxy is nullptr");
