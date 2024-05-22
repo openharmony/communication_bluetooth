@@ -26,6 +26,7 @@
 #include "bluetooth_remote_device.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "bluetooth_audio_manager.h"
 
 using namespace OHOS::bluetooth;
 
@@ -330,6 +331,15 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
 
     int deviceCod = 0;
     int ret = GetDeviceClass(deviceCod);
+    // if device support wear detection and cod invalid, treat as headset
+    if (deviceCod == 0) {
+        bool wearDetectionSupported = false;
+        BluetoothAudioManager::GetInstance().IsWearDetectionSupported(*this, wearDetectionSupported);
+        if (wearDetectionSupported) {
+            HILOGW("device %{public}s support wear detection, treat as headset", GetEncryptAddr(address_).c_str());
+            deviceCod = BluetoothDevice::AUDIO_VIDEO_HEADPHONES;
+        }
+    }
     BluetoothDeviceClass deviceClass = BluetoothDeviceClass(deviceCod);
     cod = deviceClass.GetClassOfDevice();
     majorClass = deviceClass.GetMajorClass();
@@ -340,8 +350,8 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
         majorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
         majorMinorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
     }
-    HILOGD("cod = %{public}#X, majorClass = %{public}#X, majorMinorClass = %{public}#X",
-        cod, majorClass, majorMinorClass);
+    HILOGD("device %{public}s cod = %{public}#X, majorClass = %{public}#X, majorMinorClass = %{public}#X",
+        GetEncryptAddr(address_).c_str(), cod, majorClass, majorMinorClass);
 
     return ret;
 }
