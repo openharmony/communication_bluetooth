@@ -71,6 +71,9 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
     if (profileRemoteMap_.Find(BLUETOOTH_HOST, value)) {
         return value;
     }
+    if (!isBluetoothServiceOn_) {
+        return value;
+    }
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, nullptr, "samgrProxy is nullptr");
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
