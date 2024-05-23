@@ -54,6 +54,7 @@ public:
     virtual int IsInbandRingingEnabled(bool &isEnabled) = 0;
     virtual void CallDetailsChanged(int callId, int callState) = 0;
     virtual int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) = 0;
+    virtual void EnableBtCallLog(bool state) = 0;
 };
 
 }  // namespace Bluetooth

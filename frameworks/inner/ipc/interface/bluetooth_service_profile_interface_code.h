@@ -224,6 +224,7 @@ enum BluetoothHfpAgInterfaceCode {
     BT_HFP_AG_IS_IN_BAND_RINGING_ENABLE,
     BT_HFP_AG_CALL_DETAILS_CHANGED,
     BT_HFP_AG_IS_VGS_SUPPORTED,
+    BT_HFP_AG_CALL_LOG,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_BUTT
 };
