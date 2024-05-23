@@ -21,6 +21,7 @@
 #include "i_bluetooth_host.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_profile_manager.h"
+#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -140,8 +141,13 @@ int BluetoothAudioManager::SendDeviceSelection(const BluetoothRemoteDevice &devi
 
 BluetoothAudioManager &BluetoothAudioManager::GetInstance()
 {
+#ifdef DTFUZZ_TEST
+    static NoDestructor<BluetoothAudioManager> instance;
+    return *instance;
+#else
     static BluetoothAudioManager instance;
     return instance;
+#endif
 }
 
 }  // namespace Bluetooth
