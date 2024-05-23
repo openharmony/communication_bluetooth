@@ -29,6 +29,7 @@
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
 #include "bluetooth_profile_manager.h"
+#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -109,8 +110,13 @@ void PbapPse::impl::DeregisterObserver(std::shared_ptr<PbapPseObserver> &observe
 
 PbapPse *PbapPse::GetProfile()
 {
+#ifdef DTFUZZ_TEST
+    static NoDestructor<PbapPse> instance;
+    return instance;
+#else
     static PbapPse instance;
     return &instance;
+#endif
 }
 
 PbapPse::PbapPse()
