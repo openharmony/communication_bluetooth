@@ -292,8 +292,8 @@ public:
 
     void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid, int status, int result) override
     {
-        HILOGI("dev: %s, uuid: %s, status: %d, result: %d", GetEncryptAddr((dev).GetAddress()).c_str(),
-            uuid.ToString().c_str(), status, result);
+        HILOGI("dev: %{public}s, uuid:%{public}s, status: %{public}d, result: %{public}d",
+            GetEncryptAddr((dev).GetAddress()).c_str(), uuid.ToString().c_str(), status, result);
         BluetoothRemoteDevice device(dev.GetAddress(), BTTransport::ADAPTER_BREDR);
         UUID btUuid = UUID::ConvertFrom128Bits(uuid.ConvertTo128Bits());
         auto clientSptr = GetClientSocketSptr();

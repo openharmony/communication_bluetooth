@@ -104,6 +104,9 @@ int32_t BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &st
     // read devices
     for (int i = 0; i < rawAddsSize; i++) {
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
+        if (!address) {
+            return TRANSACTION_ERR;
+        }
         result.push_back(*address);
     }
     return BT_NO_ERROR;
