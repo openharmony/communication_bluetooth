@@ -166,6 +166,7 @@ bool BluetoothObserverMap<T>::IsExistAdvertiserCallback(T observer, int &handle)
         return isExtist;
     }
 
+    std::lock_guard<std::mutex> lock(lock_);
     auto it = observers_.begin();
     for (; it != observers_.end(); it++) {
         if (it->second == observer) {

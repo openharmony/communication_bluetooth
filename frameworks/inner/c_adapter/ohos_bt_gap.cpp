@@ -482,6 +482,9 @@ bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool acce
     return isSuccess;
 }
 
+/**
+ * explain: This function does not support dynamic registration;
+ */
 int GapRegisterCallbacks(BtGapCallBacks *func)
 {
     HILOGI("enter");

@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <string>
 #include <unistd.h>
+#include <atomic>
 #include "bluetooth_log.h"
 #include "bluetooth_host.h"
 #include "bluetooth_host_proxy.h"
@@ -264,9 +265,9 @@ struct ClientSocket::impl {
     int fd_;
     bool auth_;
     int socketStatus_;
-    int socketChannel_ = -1;
-    uint32_t maxTxPacketSize_ = 0;
-    uint32_t maxRxPacketSize_ = 0;
+    std::atomic<int> socketChannel_{ -1 };
+    std::atomic<uint32_t> maxTxPacketSize_{ 0 };
+    std::atomic<uint32_t> maxRxPacketSize_{ 0 };
 };
 
 class ClientSocket::impl::BluetoothSocketObserverImp : public BluetoothClientSocketObserverStub {
@@ -482,25 +483,25 @@ int ClientSocket::GetSocketFd()
 
 int ClientSocket::GetL2capPsm()
 {
-    HILOGI("psm:%{public}d", pimpl->socketChannel_);
+    HILOGI("psm:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 int ClientSocket::GetRfcommScn()
 {
-    HILOGI("scn:%{public}d", pimpl->socketChannel_);
+    HILOGI("scn:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 uint32_t ClientSocket::GetMaxTransmitPacketSize()
 {
-    HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_);
+    HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_.load());
     return pimpl->maxTxPacketSize_;
 }
 
 uint32_t ClientSocket::GetMaxReceivePacketSize()
 {
-    HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_);
+    HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_.load());
     return pimpl->maxRxPacketSize_;
 }
 
@@ -750,9 +751,9 @@ struct ServerSocket::impl {
     std::string socketServiceType_ {
         ""
     };
-    int socketChannel_ = -1;
-    uint32_t maxTxPacketSize_ = 0;
-    uint32_t maxRxPacketSize_ = 0;
+    std::atomic<int> socketChannel_{ -1 };
+    std::atomic<uint32_t> maxTxPacketSize_{ 0 };
+    std::atomic<uint32_t> maxRxPacketSize_{ 0 };
 };
 
 ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
@@ -797,25 +798,25 @@ const std::string &ServerSocket::GetStringTag()
 
 int ServerSocket::GetL2capPsm()
 {
-    HILOGI("psm:%{public}d", pimpl->socketChannel_);
+    HILOGI("psm:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 int ServerSocket::GetRfcommScn()
 {
-    HILOGI("scn:%{public}d", pimpl->socketChannel_);
+    HILOGI("scn:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 uint32_t ServerSocket::GetMaxTransmitPacketSize()
 {
-    HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_);
+    HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_.load());
     return pimpl->maxTxPacketSize_;
 }
 
 uint32_t ServerSocket::GetMaxReceivePacketSize()
 {
-    HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_);
+    HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_.load());
     return pimpl->maxRxPacketSize_;
 }
 
