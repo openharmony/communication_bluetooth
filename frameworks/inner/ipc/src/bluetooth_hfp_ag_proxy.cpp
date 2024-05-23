@@ -431,5 +431,16 @@ void BluetoothHfpAgProxy::DeregisterObserver(const sptr<IBluetoothHfpAgObserver>
 
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_DEREGISTER_OBSERVER, data, reply, option);
 }
+
+void BluetoothHfpAgProxy::EnableBtCallLog(bool state)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), "WriteInterfaceToken error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_CALL_LOG, data, reply, option);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
