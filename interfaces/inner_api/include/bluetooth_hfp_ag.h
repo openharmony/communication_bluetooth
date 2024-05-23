@@ -354,6 +354,14 @@ public:
     void CallDetailsChanged(int callId, int callState);
 
     /**
+     * @brief Enable or disable the bluetooth log.
+     *
+     * @param state True: enable log, false: diaable log.
+     * @since 11
+     */
+    void EnableBtCallLog(bool state);
+
+    /**
      * @brief Check whether vgs is supported.
      *
      * @param device The address of the peer bluetooth device.
