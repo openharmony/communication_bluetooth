@@ -1585,6 +1585,7 @@ enum UpdateOutputStackAction {
     ACTION_ENABLE_WEAR_DETECTION = 4,
     ACTION_DISABLE_WEAR_DETECTION = 5,
     ACTION_USER_OPERATION = 6,
+    ACTION_STOP_VIRTUAL_CALL = 7,
 };
 
 enum DeviceType {
