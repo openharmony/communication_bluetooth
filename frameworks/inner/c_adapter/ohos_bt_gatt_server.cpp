@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -595,7 +595,7 @@ int BleGattsRegister(BtUuid appUuid)
     int i = 0;
     {
         std::lock_guard<std::mutex> lock(g_gattServersMutex);
-        for (int i = 0; i < MAXIMUM_NUMBER_APPLICATION; i++) {
+        for (; i < MAXIMUM_NUMBER_APPLICATION; i++) {
             if (GATTSERVER(i) == nullptr) {
                 std::shared_ptr<GattServerCallback> callbackWapper =
                     std::make_shared<GattServerCallbackWapper>(g_GattsCallback, i);
@@ -721,7 +721,7 @@ int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number
     int i = 0;
     {
         std::lock_guard<std::mutex> lock(g_gattServersMutex);
-        for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
+        for (; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
             if (GATTSERVICE(serverId, i) == nullptr) {
                 HILOGD("add srvcHandle: %{public}d", i);
                 GATTSERVICE(serverId, i) = new GattService(
