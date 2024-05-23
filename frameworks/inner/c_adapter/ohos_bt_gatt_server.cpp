@@ -126,6 +126,7 @@ static uint16_t GetNextAttributeHandle(void)
 }
 
 GattServerWrapper g_gattServers[MAXIMUM_NUMBER_APPLICATION];
+static mutex g_gattServersMutex;
 
 #define GATTSERVER(x) g_gattServers[x].gattServer
 #define GATTSERVICES(x, y) g_gattServers[x].gattServices[y]
@@ -143,6 +144,7 @@ static void AddAttribute(int serverId, int serviceIndex, int attrType, UUID uuid
     CHECK_AND_RETURN_LOG(0 <= serviceIndex && serviceIndex < MAXIMUM_NUMBER_GATTSERVICE,
         "serviceIndex(%{public}d) is invalid", serviceIndex);
     
+    std::lock_guard<std::mutex> lock(g_gattServersMutex);
     GattServiceWrapper &gattServiceWrapper = GATTSERVICES(serverId, serviceIndex);
     auto attribute = std::make_shared<GattAttribute>(handle, uuid, attrType);
     gattServiceWrapper.attributes.push_back(attribute);
@@ -158,6 +160,7 @@ static std::shared_ptr<GattAttribute> GetAttribute(int serverId, int serviceInde
     CHECK_AND_RETURN_LOG_RET(0 <= serviceIndex && serviceIndex < MAXIMUM_NUMBER_GATTSERVICE, nullptr,
         "serviceIndex(%{public}d) is invalid", serviceIndex);
 
+    std::lock_guard<std::mutex> lock(g_gattServersMutex);
     GattServiceWrapper &gattServiceWrapper = GATTSERVICES(serverId, serviceIndex);
     for (auto &attribute : gattServiceWrapper.attributes) {
         if (attribute != nullptr && predicate(*attribute)) {
@@ -277,15 +280,18 @@ public:
             0 <= serverId_ && serverId_ < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId_);
         CHECK_AND_RETURN_LOG(g_GattsCallback && g_GattsCallback->serviceStartCb, "callback is nullptr");
 
-        for (i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-            if (GATTSERVICE(serverId_, i) == nullptr) {
-                continue;
-            }
-            auto &gattServiceWrapper = GATTSERVICES(serverId_, i);
-            if (gattServiceWrapper.isAdding && GATTSERVICE(serverId_, i)->GetUuid().Equals(Service->GetUuid())) {
-                gattServiceWrapper.isAdding = false;
-                HILOGI("find service, serverId: %{public}d, serviceIndex: %{public}d", serverId_, i);
-                break;
+        {
+            std::lock_guard<std::mutex> lock(g_gattServersMutex);
+            for (i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
+                if (GATTSERVICE(serverId_, i) == nullptr) {
+                    continue;
+                }
+                auto &gattServiceWrapper = GATTSERVICES(serverId_, i);
+                if (gattServiceWrapper.isAdding && GATTSERVICE(serverId_, i)->GetUuid().Equals(Service->GetUuid())) {
+                    gattServiceWrapper.isAdding = false;
+                    HILOGI("find service, serverId: %{public}d, serviceIndex: %{public}d", serverId_, i);
+                    break;
+                }
             }
         }
         if (i == MAXIMUM_NUMBER_GATTSERVICE) {
@@ -586,17 +592,24 @@ int BleGattsRegister(BtUuid appUuid)
         HILOGE("callback is null, call BleGattsRegisterCallbacks first");
         return OHOS_BT_STATUS_FAIL;
     }
-    for (int i = 0; i < MAXIMUM_NUMBER_APPLICATION; i++) {
-        if (GATTSERVER(i) == nullptr) {
-            std::shared_ptr<GattServerCallback> callbackWapper =
-                std::make_shared<GattServerCallbackWapper>(g_GattsCallback, i);
-            GATTSERVER(i) = GattServer::CreateInstance(callbackWapper);
-            HILOGI("register gattServer: %{public}d", i);
-            if (g_GattsCallback->registerServerCb != nullptr) {
-                g_GattsCallback->registerServerCb(0, i, &appUuid);
+    int i = 0;
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        for (int i = 0; i < MAXIMUM_NUMBER_APPLICATION; i++) {
+            if (GATTSERVER(i) == nullptr) {
+                std::shared_ptr<GattServerCallback> callbackWapper =
+                    std::make_shared<GattServerCallbackWapper>(g_GattsCallback, i);
+                GATTSERVER(i) = GattServer::CreateInstance(callbackWapper);
+                HILOGI("register gattServer: %{public}d", i);
+                break;
             }
-            return OHOS_BT_STATUS_SUCCESS;
         }
+    }
+    if (i != MAXIMUM_NUMBER_APPLICATION) {
+        if (g_GattsCallback->registerServerCb != nullptr) {
+            g_GattsCallback->registerServerCb(0, i, &appUuid);
+        }
+        return OHOS_BT_STATUS_SUCCESS;
     }
 
     if (g_GattsCallback->registerServerCb != nullptr) {
@@ -616,6 +629,7 @@ int BleGattsRegister(BtUuid appUuid)
 int BleGattsUnRegister(int serverId)
 {
     HILOGI("serverId: %{public}d", serverId);
+    std::lock_guard<std::mutex> lock(g_gattServersMutex);
     if (serverId >= 0 && serverId < MAXIMUM_NUMBER_APPLICATION) {
         if (GATTSERVER(serverId) != nullptr) {
             GATTSERVER(serverId) = nullptr;
@@ -640,6 +654,7 @@ int BleGattsConnect(int serverId, BdAddr bdAddr)
     HILOGI("serverId: %{public}d", serverId);
     CHECK_AND_RETURN_LOG_RET(
         0 <= serverId && serverId < MAXIMUM_NUMBER_APPLICATION, OHOS_BT_STATUS_PARM_INVALID, "serverId is invalid!");
+    std::lock_guard<std::mutex> lock(g_gattServersMutex);
     CHECK_AND_RETURN_LOG_RET(GATTSERVER(serverId), OHOS_BT_STATUS_UNHANDLED, "GATTSERVER(serverId) is null!");
 
     string strAddress;
@@ -663,6 +678,7 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
     HILOGI("serverId: %{public}d, connId: %{public}d", serverId, connId);
     CHECK_AND_RETURN_LOG_RET(
         0 <= serverId && serverId < MAXIMUM_NUMBER_APPLICATION, OHOS_BT_STATUS_PARM_INVALID, "serverId is invalid!");
+    std::lock_guard<std::mutex> lock(g_gattServersMutex);
     CHECK_AND_RETURN_LOG_RET(GATTSERVER(serverId), OHOS_BT_STATUS_UNHANDLED, "GATTSERVER(serverId) is null!");
 
     string strAddress;
@@ -702,19 +718,26 @@ int BleGattsAddService(int serverId, BtUuid srvcUuid, bool isPrimary, int number
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
-    for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
-        if (GATTSERVICE(serverId, i) == nullptr) {
-            HILOGD("add srvcHandle: %{public}d", i);
-            GATTSERVICE(serverId, i) = new GattService(
-                uuid, i, number, isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
-            GATTSERVICES(serverId, i).isAdding = false;
-            if (g_GattsCallback != nullptr && g_GattsCallback->serviceAddCb != nullptr) {
-                g_GattsCallback->serviceAddCb(0, serverId, &srvcUuid, i);
-            } else {
-                HILOGW("call back is null");
+    int i = 0;
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        for (int i = 0; i < MAXIMUM_NUMBER_GATTSERVICE; i++) {
+            if (GATTSERVICE(serverId, i) == nullptr) {
+                HILOGD("add srvcHandle: %{public}d", i);
+                GATTSERVICE(serverId, i) = new GattService(
+                    uuid, i, number, isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
+                GATTSERVICES(serverId, i).isAdding = false;
+                break;
             }
-            return OHOS_BT_STATUS_SUCCESS;
         }
+    }
+    if (i != MAXIMUM_NUMBER_GATTSERVICE) {
+        if (g_GattsCallback != nullptr && g_GattsCallback->serviceAddCb != nullptr) {
+            g_GattsCallback->serviceAddCb(0, serverId, &srvcUuid, i);
+        } else {
+            HILOGW("call back is null");
+        }
+        return OHOS_BT_STATUS_SUCCESS;
     }
     return OHOS_BT_STATUS_FAIL;
 }
@@ -769,17 +792,21 @@ int BleGattsAddCharacteristic(int serverId, int srvcHandle, BtUuid characUuid,
     }
     UUID uuid(UUID::FromString(strUuid));
 
-    if (GATTSERVICE(serverId, srvcHandle) == nullptr) {
-        HILOGE("GATTSERVICE(serverId:%{public}d, srvcHandle:%{public}u) is null!", serverId, srvcHandle);
-        return OHOS_BT_STATUS_UNHANDLED;
+    uint16_t characterHandle = 0;
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        if (GATTSERVICE(serverId, srvcHandle) == nullptr) {
+            HILOGE("GATTSERVICE(serverId:%{public}d, srvcHandle:%{public}u) is null!", serverId, srvcHandle);
+            return OHOS_BT_STATUS_UNHANDLED;
+        }
+
+        unsigned char stubValue[1] = {0x31};
+        GattCharacteristic characteristic(uuid, permissions, properties);
+        characteristic.SetValue(stubValue, sizeof(stubValue));
+
+        characterHandle = GetNextAttributeHandle();
+        GATTSERVICE(serverId, srvcHandle)->AddCharacteristic(characteristic);
     }
-
-    unsigned char stubValue[1] = {0x31};
-    GattCharacteristic characteristic(uuid, permissions, properties);
-    characteristic.SetValue(stubValue, sizeof(stubValue));
-
-    uint16_t characterHandle = GetNextAttributeHandle();
-    GATTSERVICE(serverId, srvcHandle)->AddCharacteristic(characteristic);
     AddAttribute(serverId, srvcHandle, GattAttribute::GATT_CHARACTERISTIC, uuid, characterHandle);
 
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d, charHandle: %{public}d",
@@ -821,18 +848,22 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
     }
     UUID uuid(UUID::FromString(strUuid));
 
-    if (GATTSERVICE(serverId, srvcHandle) == nullptr) {
-        HILOGE("GATTSERVICE(serverId, srvcHandle) is null!");
-        return OHOS_BT_STATUS_UNHANDLED;
+    uint16_t desHandle = 0;
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        if (GATTSERVICE(serverId, srvcHandle) == nullptr) {
+            HILOGE("GATTSERVICE(serverId, srvcHandle) is null!");
+            return OHOS_BT_STATUS_UNHANDLED;
+        }
+        GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
+        desHandle = GetNextAttributeHandle();
+        GattDescriptor descriptor(uuid, desHandle, permissions);
+
+        unsigned char stubValue[2] = {0x01, 0x00};
+        descriptor.SetValue(stubValue, sizeof(stubValue));
+
+        characteristic.AddDescriptor(descriptor);
     }
-    GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
-    uint16_t desHandle = GetNextAttributeHandle();
-    GattDescriptor descriptor(uuid, desHandle, permissions);
-
-    unsigned char stubValue[2] = {0x01, 0x00};
-    descriptor.SetValue(stubValue, sizeof(stubValue));
-
-    characteristic.AddDescriptor(descriptor);
     AddAttribute(serverId, srvcHandle, GattAttribute::GATT_DESCRIPTOR, uuid, desHandle);
     HILOGI("serverId: %{public}d, srvcHandle: %{public}d, desHandle: %{public}d", serverId, srvcHandle, desHandle);
     if (g_GattsCallback != nullptr && g_GattsCallback->descriptorAddCb != nullptr) {
@@ -862,6 +893,7 @@ int BleGattsStartService(int serverId, int srvcHandle)
         HILOGE("serverId srvcHandle is invalid!");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
+    std::lock_guard<std::mutex> lock(g_gattServersMutex);
     if (GATTSERVER(serverId) == nullptr) {
         HILOGE("GATTSERVER(serverId) is null!");
         return OHOS_BT_STATUS_UNHANDLED;
@@ -889,13 +921,16 @@ int BleGattsStopService(int serverId, int srvcHandle)
         HILOGE("serverId srvcHandle is invalid!");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
-    if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serverId, srvcHandle) == nullptr) {
-        HILOGE("param is null!");
-        return OHOS_BT_STATUS_UNHANDLED;
-    }
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serverId, srvcHandle) == nullptr) {
+            HILOGE("param is null!");
+            return OHOS_BT_STATUS_UNHANDLED;
+        }
 
-    GATTSERVICES(serverId, srvcHandle).isAdding = false;
-    GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
+        GATTSERVICES(serverId, srvcHandle).isAdding = false;
+        GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
+    }
     if (g_GattsCallback != nullptr && g_GattsCallback->serviceStopCb != nullptr) {
         g_GattsCallback->serviceStopCb(OHOS_BT_STATUS_SUCCESS, serverId, srvcHandle);
     } else {
@@ -922,14 +957,17 @@ int BleGattsDeleteService(int serverId, int srvcHandle)
         HILOGE("serverId srvcHandle is invalid!");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
-    if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serverId, srvcHandle) == nullptr) {
-        HILOGE("param is null!");
-        return OHOS_BT_STATUS_UNHANDLED;
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serverId, srvcHandle) == nullptr) {
+            HILOGE("param is null!");
+            return OHOS_BT_STATUS_UNHANDLED;
+        }
+        GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
+        delete GATTSERVICE(serverId, srvcHandle);
+        GATTSERVICE(serverId, srvcHandle) = nullptr;
+        GATTSERVICES(serverId, srvcHandle).attributes.clear();
     }
-    GATTSERVER(serverId)->RemoveGattService(*GATTSERVICE(serverId, srvcHandle));
-    delete GATTSERVICE(serverId, srvcHandle);
-    GATTSERVICE(serverId, srvcHandle) = nullptr;
-    GATTSERVICES(serverId, srvcHandle).attributes.clear();
     if (g_GattsCallback != nullptr && g_GattsCallback->serviceDeleteCb != nullptr) {
         g_GattsCallback->serviceDeleteCb(OHOS_BT_STATUS_SUCCESS, serverId, srvcHandle);
     } else {
@@ -973,28 +1011,32 @@ int BleGattsSendResponse(int serverId, GattsSendRspParam *param)
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
-    if (GATTSERVER(serverId) == nullptr) {
-        HILOGE("param is null!");
-        return OHOS_BT_STATUS_UNHANDLED;
+    int ret = 0;
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        if (GATTSERVER(serverId) == nullptr) {
+            HILOGE("param is null!");
+            return OHOS_BT_STATUS_UNHANDLED;
+        }
+
+        HILOGD("serverId:%{public}d, requestId:%{public}d, valueLen:%{public}d",
+            serverId, param->attrHandle, param->valueLen);
+        std::optional<ConnectedDevice> deviceInfo = GetDeviceInfoByConnId(param->connectId);
+        if (!deviceInfo.has_value()) {
+            HILOGE("connectId is invalid!");
+            return OHOS_BT_STATUS_FAIL;
+        }
+        struct ConnectedDevice value = deviceInfo.value();
+
+        string strAddress;
+        GetAddrFromByte(value.remoteAddr.addr, strAddress);
+
+        BluetoothRemoteDevice device(strAddress, 1);
+
+        // param->attrHandle is used as requestId
+        ret = GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
+            param->status, 0, reinterpret_cast<unsigned char *>(param->value), param->valueLen);
     }
-
-    HILOGD("serverId:%{public}d, requestId:%{public}d, valueLen:%{public}d",
-        serverId, param->attrHandle, param->valueLen);
-    std::optional<ConnectedDevice> deviceInfo = GetDeviceInfoByConnId(param->connectId);
-    if (!deviceInfo.has_value()) {
-        HILOGE("connectId is invalid!");
-        return OHOS_BT_STATUS_FAIL;
-    }
-    struct ConnectedDevice value = deviceInfo.value();
-
-    string strAddress;
-    GetAddrFromByte(value.remoteAddr.addr, strAddress);
-
-    BluetoothRemoteDevice device(strAddress, 1);
-
-    // param->attrHandle is used as requestId
-    int ret = GATTSERVER(serverId)->SendResponse(device, param->attrHandle,
-        param->status, 0, reinterpret_cast<unsigned char *>(param->value), param->valueLen);
 
     if (g_GattsCallback != nullptr && g_GattsCallback->responseConfirmationCb != nullptr) {
         g_GattsCallback->responseConfirmationCb(ret, param->attrHandle);
@@ -1021,8 +1063,7 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
         HILOGE("param is null, serverId: %{public}d", serverId);
         return OHOS_BT_STATUS_FAIL;
     }
-    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0 ||
-        GATTSERVER(serverId) == nullptr) {
+    if (serverId >= MAXIMUM_NUMBER_APPLICATION || serverId < 0) {
         HILOGE("param is null!");
         return OHOS_BT_STATUS_UNHANDLED;
     }
@@ -1045,8 +1086,15 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
     GattCharacteristic characteristic(attribute->uuid, attribute->actualHandle, 0, 0);
 
     characteristic.SetValue(reinterpret_cast<unsigned char*>(param->value), param->valueLen);
-    GATTSERVER(serverId)->NotifyCharacteristicChanged(device, characteristic,
-        (param->confirm == 1) ? true : false);
+    {
+        std::lock_guard<std::mutex> lock(g_gattServersMutex);
+        if (GATTSERVER(serverId) == nullptr) {
+            HILOGE("param is null!");
+            return OHOS_BT_STATUS_UNHANDLED;
+        }
+        GATTSERVER(serverId)->NotifyCharacteristicChanged(device, characteristic,
+            (param->confirm == 1) ? true : false);
+    }
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -1066,7 +1114,7 @@ int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct)
 
 /**
  * @brief Registers GATT server callbacks.
- *
+ * explain: This function does not support dynamic registration;
  * @param func Indicates the pointer to the callbacks to register, as enumerated in {@link BtGattServerCallbacks}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the callbacks are registered;
  * returns an error code defined in {@link BtStatus} otherwise.

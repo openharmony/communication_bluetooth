@@ -58,12 +58,13 @@ static BtGattCallbacks *g_AppCallback;
 
 static std::shared_ptr<BleAdvCallback> g_bleAdvCallbacks[MAX_BLE_ADV_NUM];
 static std::shared_ptr<BleAdvertiser> g_BleAdvertiser = nullptr;
+static mutex g_advMutex;
 
 constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
-static mutex g_advMutex;
 static uint32_t g_advAddrTimerIds[MAX_BLE_ADV_NUM];
+static mutex g_advTimerMutex;
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -204,11 +205,14 @@ public:
         } else {
             HILOGW("call back is null.");
         }
-        if (g_advAddrTimerIds[advId_] != 0) {
-            BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId_]);
-            g_advAddrTimerIds[advId_] = 0;
-        } else {
-            HILOGW("TimerId no registered, is 0.");
+        {
+            lock_guard<mutex> lock(g_advTimerMutex);
+            if (g_advAddrTimerIds[advId_] != 0) {
+                BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId_]);
+                g_advAddrTimerIds[advId_] = 0;
+            } else {
+                HILOGW("TimerId no registered, is 0.");
+            }
         }
         g_bleAdvCallbacks[advId_] = nullptr;
     }
@@ -489,7 +493,7 @@ int BleStopScan(int32_t scannerId)
 
 /**
  * @brief Registers GATT callbacks.
- *
+ * explain: This function does not support dynamic registration;
  * @param func Indicates the pointer to the callbacks to register. For details, see {@link BtGattCallbacks}.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the GATT callbacks are registered;
  * returns an error code defined in {@link BtStatus} otherwise.
@@ -616,7 +620,10 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     };
     uint32_t timerId = 0;
     BluetoothTimer::GetInstance()->Register(timerCallback, timerId, ADV_ADDR_TIME_THRESHOLD);
-    g_advAddrTimerIds[i] = timerId;
+    {
+        lock_guard<mutex> lock(g_advTimerMutex);
+        g_advAddrTimerIds[i] = timerId;
+    }
 
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam->minInterval);

@@ -106,6 +106,7 @@ struct GattClient::impl {
     sptr<IBluetoothGattClient> proxy;
     sptr<BluetoothGattClientCallbackStubImpl> clientCallback_;
     std::vector<GattService> gattServices_;
+    std::mutex gattServicesMutex_;
     std::mutex connStateMutex_;
     RequestInformation requestInformation_;
     DiscoverInfomation discoverInformation_;
@@ -164,6 +165,7 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
+        std::lock_guarp<std::mutex> lock(gattServicesMutex_);
         for (auto &svc : clientSptr->pimpl->gattServices_) {
             for (auto &character : svc.GetCharacteristics()) {
                 if (character.GetHandle() == characteristic.handle_) {
@@ -409,6 +411,7 @@ void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> 
             }
             svcTmp.AddCharacteristic(std::move(characterTmp));
         }
+        std::lock_guarp<std::mutex> lock(gattServicesMutex_);
         gattServices_.emplace_back(std::move(svcTmp));
     }
     for (auto &svc : src) {
@@ -425,6 +428,7 @@ void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> 
 
 GattService *GattClient::impl::FindService(uint16_t handle)
 {
+    std::lock_guarp<std::mutex> lock(gattServicesMutex_);
     for (auto &item : gattServices_) {
         if (item.GetHandle() == handle) {
             return &item;
@@ -457,7 +461,10 @@ void GattClient::impl::GetServices()
         HILOGE("isRegisterSucceeded_ is false");
         return;
     }
-    gattServices_.clear();
+    {
+        std::lock_guarp<std::mutex> lock(gattServicesMutex_);
+        gattServices_.clear();
+    }
     std::vector<BluetoothGattService> result;
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     if (!proxy) {
@@ -638,6 +645,7 @@ std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const 
     }
 
     pimpl->GetServices();
+    std::lock_guarp<std::mutex> lock(gattServicesMutex_);
     for (auto &svc : pimpl->gattServices_) {
         if (svc.GetUuid().Equals(uuid)) {
             HILOGD("successful");
@@ -651,17 +659,19 @@ std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const 
 std::vector<GattService> &GattClient::GetService()
 {
     HILOGI("enter");
+    std::vector<GattService> gattServices;
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return pimpl->gattServices_;
+        return gattServices;
     }
 
     if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
         HILOGE("pimpl or gatt client proxy is nullptr");
-        return pimpl->gattServices_;
+        return gattServices;
     }
 
     pimpl->GetServices();
+    std::lock_guarp<std::mutex> lock(gattServicesMutex_);
     return pimpl->gattServices_;
 }
 
