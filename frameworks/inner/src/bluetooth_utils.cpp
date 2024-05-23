@@ -116,6 +116,8 @@ std::string GetUpdateOutputStackActionName(int action)
             return "DISABLE_WEAR_DETECTION(5)";
         case static_cast<int>(UpdateOutputStackAction::ACTION_USER_OPERATION):
             return "USER_OPERATION(6)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_STOP_VIRTUAL_CALL):
+            return "STOP_VIRTUAL_CALL(7)";
         default:
             return "Unknown";
     }
