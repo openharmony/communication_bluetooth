@@ -165,7 +165,7 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        std::lock_guard<std::mutex> lock(gattServicesMutex_);
+        std::lock_guard<std::mutex> lock(clientSptr->pimpl->gattServicesMutex_);
         for (auto &svc : clientSptr->pimpl->gattServices_) {
             for (auto &character : svc.GetCharacteristics()) {
                 if (character.GetHandle() == characteristic.handle_) {
@@ -645,7 +645,7 @@ std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const 
     }
 
     pimpl->GetServices();
-    std::lock_guard<std::mutex> lock(gattServicesMutex_);
+    std::lock_guard<std::mutex> lock(pimpl->gattServicesMutex_);
     for (auto &svc : pimpl->gattServices_) {
         if (svc.GetUuid().Equals(uuid)) {
             HILOGD("successful");
@@ -671,7 +671,7 @@ std::vector<GattService> &GattClient::GetService()
     }
 
     pimpl->GetServices();
-    std::lock_guard<std::mutex> lock(gattServicesMutex_);
+    std::lock_guard<std::mutex> lock(pimpl->gattServicesMutex_);
     return pimpl->gattServices_;
 }
 
