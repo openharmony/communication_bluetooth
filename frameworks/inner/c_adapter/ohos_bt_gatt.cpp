@@ -179,7 +179,7 @@ public:
 
     void OnStartResultEvent(int result, int advHandle) override
     {
-        HILOGI("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
+        HILOGD("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
         advHandle_ = advHandle;
         if (g_AppCallback != nullptr && g_AppCallback->advEnableCb != nullptr) {
@@ -197,7 +197,7 @@ public:
 
     void OnStopResultEvent(int result, int advHandle) override
     {
-        HILOGI("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
+        HILOGD("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
         advHandle_ = 0xFF; // restore invalid advHandle
         if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
@@ -211,7 +211,7 @@ public:
                 BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId_]);
                 g_advAddrTimerIds[advId_] = 0;
             } else {
-                HILOGW("TimerId no registered, is 0.");
+                HILOGD("TimerId no registered, is 0.");
             }
         }
         g_bleAdvCallbacks[advId_] = nullptr;
@@ -219,7 +219,7 @@ public:
 
     void OnSetAdvDataEvent(int result) override
     {
-        HILOGI("advId: %{public}d, ret: %{public}d", advId_, result);
+        HILOGD("advId: %{public}d, ret: %{public}d", advId_, result);
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
         if (g_AppCallback != nullptr && g_AppCallback->advDataCb  != nullptr) {
             g_AppCallback->advDataCb(advId_, ret);
@@ -323,7 +323,7 @@ int BleSetAdvData(int advId, const StartAdvRawData data)
         HILOGE("Adv is not started, need call 'BleStartAdvEx' first.");
         return OHOS_BT_STATUS_FAIL;
     }
-    HILOGI("advId: %{public}d, advLen: %{public}u, scanRspLen: %{public}u", advId, data.advDataLen, data.rspDataLen);
+    HILOGD("advId: %{public}d, advLen: %{public}u, scanRspLen: %{public}u", advId, data.advDataLen, data.rspDataLen);
 
     auto advData = ConvertDataToVec(data.advData, data.advDataLen);
     auto rspData = ConvertDataToVec(data.rspData, data.rspDataLen);
@@ -355,7 +355,7 @@ int BleStartAdv(int advId, const BleAdvParams *param)
  */
 int BleStopAdv(int advId)
 {
-    HILOGI("BleStopAdv, advId: %{public}d.", advId);
+    HILOGD("BleStopAdv, advId: %{public}d.", advId);
     if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
         HILOGE("BleStopAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
@@ -480,7 +480,7 @@ int BleStartScan(void)
  */
 int BleStopScan(int32_t scannerId)
 {
-    HILOGI("BleStopScan enter scannerId: %{public}d", scannerId);
+    HILOGD("BleStopScan enter scannerId: %{public}d", scannerId);
     std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
     if (bleCentralManager == nullptr) {
         HILOGE("BleStopScan fail, scannerId is invalid.");
@@ -667,7 +667,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
  */
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam)
 {
-    HILOGI("BleStartAdvEx enter");
+    HILOGD("BleStartAdvEx enter");
     lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
@@ -703,7 +703,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
         return OHOS_BT_STATUS_FAIL;
     }
     *advId = i;
-    HILOGI("ret advId: %{public}d.", *advId);
+    HILOGD("ret advId: %{public}d.", *advId);
     return OHOS_BT_STATUS_SUCCESS;
 }
 

@@ -82,7 +82,7 @@ public:
 
     void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) override
     {
-        HILOGI("device: %{public}s, error: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), error);
+        HILOGD("device: %{public}s, error: %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), error);
         a2dpSource_.observers_.ForEach([device, info, error](std::shared_ptr<A2dpSourceObserver> observer) {
             A2dpCodecInfo codecInfo;
 
@@ -202,7 +202,7 @@ int A2dpSource::GetDeviceState(const BluetoothRemoteDevice &device, int &state) 
     }
 
     int ret = proxy->GetDeviceState(RawAddress(device.GetDeviceAddr()), state);
-    HILOGI("state: %{public}d", ret);
+    HILOGD("state: %{public}d", ret);
     return ret;
 }
 

@@ -28,13 +28,13 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOGI("-----Access Init start------");
+    HILOGD("-----Access Init start------");
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
     NapiAccess::DefineAccessJSFunction(env, exports);
 
-    HILOGI("-----Access Init end------");
+    HILOGD("-----Access Init end------");
     return exports;
 }
 EXTERN_C_END

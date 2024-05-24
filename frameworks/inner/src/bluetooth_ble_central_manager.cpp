@@ -333,7 +333,7 @@ BleCentralManager::~BleCentralManager()
 int BleCentralManager::StartScan(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters)
 {
     if (!IS_BLE_ENABLED()) {
-        HILOGE("bluetooth is off.");
+        HILOGD("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
 
@@ -364,7 +364,7 @@ int BleCentralManager::StartScan(const BleScanSettings &settings, const std::vec
 int BleCentralManager::StopScan()
 {
     if (!IS_BLE_ENABLED()) {
-        HILOGE("bluetooth is off.");
+        HILOGD("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
 
@@ -376,7 +376,7 @@ int BleCentralManager::StopScan()
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
-    HILOGI("scannerId_: %{public}d", pimpl->scannerId_);
+    HILOGD("scannerId_: %{public}d", pimpl->scannerId_);
 
     int ret = proxy->StopScan(pimpl->scannerId_);
     proxy->RemoveScanFilter(pimpl->scannerId_);

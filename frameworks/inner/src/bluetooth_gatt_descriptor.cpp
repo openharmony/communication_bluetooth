@@ -92,7 +92,7 @@ const std::unique_ptr<uint8_t[]> &GattDescriptor::GetValue(size_t *size) const
 void GattDescriptor::SetValue(const uint8_t *values, const size_t length)
 {
     if (length == 0 || values == nullptr) {
-        HILOGI("value is nullptr, or length is 0");
+        HILOGD("value is nullptr, or length is 0");
         return;
     }
     value_ = std::make_unique<uint8_t[]>(length);

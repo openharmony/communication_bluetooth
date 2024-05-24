@@ -52,7 +52,7 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGI("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
+            HILOGD("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
             std::shared_ptr<BleAdvertiseCallback> observer = nullptr;
             if (opcode == bluetooth::BLE_ADV_START_FAILED_OP_CODE) {
                 observer = advertiserSptr->pimpl->callbacks_.PopAdvertiserObserver(advHandle);
@@ -94,7 +94,7 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
             auto observer = advertiserSptr->pimpl->callbacks_.PopAdvertiserObserver(advHandle);
             if (observer != nullptr) {
                 observer->OnStopResultEvent(result, advHandle);
@@ -118,7 +118,7 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
             auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer) {
                 observer->OnSetAdvDataEvent(result);
@@ -325,7 +325,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         return ret;
     }
 
-    HILOGI("duration=%{public}d", duration);
+    HILOGD("duration=%{public}d", duration);
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
@@ -481,7 +481,7 @@ int BleAdvertiser::StopAdvertising(std::shared_ptr<BleAdvertiseCallback> callbac
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
 
-    HILOGI("enter");
+    HILOGD("enter");
     uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
     if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
         HILOGE("Invalid advertising handle");
