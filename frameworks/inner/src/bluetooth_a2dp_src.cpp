@@ -30,6 +30,7 @@
 #include "bluetooth_utils.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -284,8 +285,13 @@ int32_t A2dpSource::Disconnect(const BluetoothRemoteDevice &device)
 A2dpSource *A2dpSource::GetProfile()
 {
     HILOGD("enter");
+#ifdef DTFUZZ_TEST
+    static NoDestructor<A2dpSource> service;
+    return service;
+#else
     static A2dpSource service;
     return &service;
+#endif
 }
 
 int A2dpSource::SetActiveSinkDevice(const BluetoothRemoteDevice &device)
