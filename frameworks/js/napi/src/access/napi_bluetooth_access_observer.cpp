@@ -32,7 +32,7 @@ void NapiBluetoothAccessObserver::OnStateChanged(const int transport, const int 
 {
     BluetoothState state = BluetoothState::STATE_OFF;
     if (!DealStateChange(transport, status, state)) {
-        HILOGE("No need callback");
+        HILOGD("No need callback");
         return;
     }
 

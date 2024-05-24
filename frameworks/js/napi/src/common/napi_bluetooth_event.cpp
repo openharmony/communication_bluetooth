@@ -89,7 +89,7 @@ void UpdateCallbackInfo(std::map<std::string, std::shared_ptr<BluetoothCallbackI
 {
     auto it = callbackInfos.find(type);
     if (it != callbackInfos.end() && it->second != nullptr) {
-        HILOGW("repetition type %{public}s is register, old callbackInfo will be deleted.", type.c_str());
+        HILOGD("repetition type %{public}s is register, old callbackInfo will be deleted.", type.c_str());
         // as long as the type is same, callbackInfo will be covered.
         uint32_t refCount = INVALID_REF_COUNT;
         napi_value handlerTemp = nullptr;
@@ -100,16 +100,16 @@ void UpdateCallbackInfo(std::map<std::string, std::shared_ptr<BluetoothCallbackI
         }
         // if handlerTemp exist clear it. no exist, memory leak safe
         if (handlerTemp != nullptr) {
-            HILOGI("napi_get_reference_value succeed");
+            HILOGD("napi_get_reference_value succeed");
             napi_reference_unref(it->second->env_, it->second->callback_, &refCount);
-            HILOGI("decrements the refernce count, refCount: %{public}d", refCount);
+            HILOGD("decrements the refernce count, refCount: %{public}d", refCount);
             // other place like EventNotify before use will add refCount, happen refCount != 0,
             // ensure other place copy the prepare covered callbackInfo、add refCount and unref and delete refCount
             if (refCount == 0) {
-                HILOGI("delete the reference");
+                HILOGD("delete the reference");
                 napi_delete_reference(it->second->env_, it->second->callback_);
             }
-            HILOGI("old %{public}s is deleted", type.c_str());
+            HILOGD("old %{public}s is deleted", type.c_str());
         } else {
             HILOGI("napi_get_reference_value is nullptr");
         }

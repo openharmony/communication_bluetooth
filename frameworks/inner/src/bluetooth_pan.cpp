@@ -112,7 +112,7 @@ struct Pan::impl {
 
     void RegisterObserver(std::shared_ptr<PanObserver> observer)
     {
-        HILOGI("enter");
+        HILOGD("enter");
         observers_.Register(observer);
     }
 
@@ -154,7 +154,10 @@ Pan::impl::impl()
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_PAN_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothPan> proxy = iface_cast<IBluetoothPan>(remote);
-        CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+        if (proxy == nullptr) {
+            HILOGD("failed: no proxy");
+            return;
+        }
         proxy->RegisterObserver(innerObserver_);
     });
 }

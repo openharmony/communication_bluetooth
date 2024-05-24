@@ -171,7 +171,7 @@ int SppRead(int clientId, char *buf, const unsigned int bufLen)
  */
 int SppWrite(int clientId, const char *data, const unsigned int len)
 {
-    HILOGI("start, clientId: %{public}d, len: %{public}d", clientId, len);
+    HILOGD("start, clientId: %{public}d, len: %{public}d", clientId, len);
     return SocketWrite(clientId, reinterpret_cast<const uint8_t*>(data), len);
 }
 

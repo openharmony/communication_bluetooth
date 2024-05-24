@@ -50,7 +50,7 @@ void NapiAsyncWork::Info::Execute(void)
 
 void NapiAsyncWork::Info::Complete(void)
 {
-    HILOGI("needCallback: %{public}d, errCode: %{public}d", needCallback, errCode);
+    HILOGD("needCallback: %{public}d, errCode: %{public}d", needCallback, errCode);
     if (napiAsyncWork == nullptr) {
         HILOGE("napiAsyncWork is nullptr");
         return;

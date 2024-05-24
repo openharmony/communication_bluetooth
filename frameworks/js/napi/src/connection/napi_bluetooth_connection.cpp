@@ -175,7 +175,7 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int state = static_cast<int>(BTConnectState::DISCONNECTED);
     int32_t err = host->GetBtConnectionState(state);
-    HILOGI("start state %{public}d", state);
+    HILOGD("start state %{publDc}d", state);
     napi_value result = nullptr;
     napi_create_int32(env, GetProfileConnectionState(state), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
@@ -302,7 +302,7 @@ napi_value GetProfileConnectionState(napi_env env, napi_callback_info info)
     napi_value ret = nullptr;
     napi_create_int32(env, status, &ret);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, ret);
-    HILOGI("status: %{public}d", status);
+    HILOGD("status: %{public}d", status);
     return ret;
 }
 
@@ -954,7 +954,7 @@ void RegisterObserverToHost()
 
 void DealPairStatus(const int &status, int &bondStatus)
 {
-    HILOGI("status is %{public}d", status);
+    HILOGD("status is %{public}d", status);
     switch (status) {
         case PAIR_NONE:
             bondStatus = static_cast<int>(BondState::BOND_STATE_INVALID);

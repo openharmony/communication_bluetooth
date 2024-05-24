@@ -65,7 +65,7 @@ public:
 
     void OnActiveDeviceChanged(const BluetoothRawAddress &device) override
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_RAW_ADDR(device));
+        HILOGD("enter, device: %{public}s", GET_ENCRYPT_RAW_ADDR(device));
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
             observer->OnActiveDeviceChanged(remoteDevice);
