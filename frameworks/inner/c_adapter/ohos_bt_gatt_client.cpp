@@ -18,6 +18,7 @@
 #include <map>
 #include "__config"
 #include <functional>
+#include <atomic>
 
 #include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_client.h"
@@ -57,7 +58,7 @@ struct GattClientWrapper {
 
 using ClientIterator = std::map<int, struct GattClientWrapper>::iterator;
 
-static int g_clientIncrease = 0;
+static std::atomic<int> g_clientIncrease(0);
 static std::map<int, struct GattClientWrapper> g_MapGattClient;
 static std::mutex g_MapGattClientMutex;
 
@@ -341,7 +342,7 @@ int BleGattcRegister(BtUuid appUuid)
     clientWrapper.gattClientCallback = nullptr;
     clientWrapper.remoteAddr = "";
     clientWrapper.fastestConnFlag = false;
-    int clientId = g_clientIncrease;
+    int clientId = g_clientIncrease.load();
     GATTCLIENT.insert(std::pair<int, struct GattClientWrapper>(clientId, clientWrapper));
     HILOGI("clientId: %{public}d", clientId);
     return clientId;
