@@ -183,6 +183,9 @@ int32_t BluetoothOppProxy::GetDevicesByStates(
     int32_t rawAddsSize = reply.ReadInt32();
     for (int i = 0; i < rawAddsSize; i++) {
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
+        if (!address) {
+            return TRANSACTION_ERR;
+        }
         result.push_back(*address);
     }
     return BT_NO_ERROR;
