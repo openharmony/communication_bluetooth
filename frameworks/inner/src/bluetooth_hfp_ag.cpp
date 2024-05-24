@@ -690,8 +690,6 @@ void HandsFreeAudioGateway::EnableBtCallLog(bool state)
 {
     HILOGI("enter");
     CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
-    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "hfpAG proxy is nullptr");
     pimpl->EnableBtCallLog(state);
 }
 

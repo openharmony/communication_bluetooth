@@ -436,6 +436,7 @@ void BluetoothHfpAgProxy::EnableBtCallLog(bool state)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteBool(state), "Write state error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
