@@ -24,6 +24,7 @@
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -252,8 +253,13 @@ Opp::~Opp()
 
 Opp *Opp::GetProfile()
 {
+#ifdef DTFUZZ_TEST
+    static NoDestructor<Opp> instance;
+    return instance;
+#else
     static Opp instance;
     return &instance;
+#endif
 }
 
 int32_t Opp::GetDevicesByStates(const std::vector<int32_t> &states,

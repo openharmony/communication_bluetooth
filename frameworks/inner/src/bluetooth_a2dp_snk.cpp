@@ -40,6 +40,7 @@
 #include "string"
 #include "system_ability_definition.h"
 #include "vector"
+#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -261,8 +262,13 @@ bool A2dpSink::Disconnect(const BluetoothRemoteDevice &device)
 A2dpSink *A2dpSink::GetProfile()
 {
     HILOGI("enter");
+#ifdef DTFUZZ_TEST
+    static NoDestructor<A2dpSink> service;
+    return service;
+#else
     static A2dpSink service;
     return &service;
+#endif
 }
 
 bool A2dpSink::SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
