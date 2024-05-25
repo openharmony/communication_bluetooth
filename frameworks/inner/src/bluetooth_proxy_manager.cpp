@@ -21,19 +21,13 @@
 #include "bluetooth_log.h"
 #include "bluetooth_profile_manager.h"
 #include "i_bluetooth_ble_central_manager.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
 BluetoothProxyManager& BluetoothProxyManager::GetInstance()
 {
-#ifdef DTFUZZ_TEST
-    static NoDestructor<BluetoothProxyManager> instance;
-    return *instance;
-#else
     static BluetoothProxyManager instance;
     return instance;
-#endif
 }
 
 bool BluetoothProxyManager::FreezeByRss(std::set<int> pidSet, bool isProxy)

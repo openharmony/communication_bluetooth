@@ -126,11 +126,6 @@ config("btframework_config") {
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
     "$JS_NAPI_DIR/include",
   ]
-
-  defines = []
-  if (is_asan) {
-    defines += [ "DTFUZZ_TEST" ]
-  }
 }
 
 config("btframework_public_config") {

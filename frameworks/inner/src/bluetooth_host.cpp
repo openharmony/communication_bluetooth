@@ -29,7 +29,6 @@
 #include "iservice_registry.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -442,14 +441,9 @@ BluetoothHost::~BluetoothHost() {}
 
 BluetoothHost &BluetoothHost::GetDefaultHost()
 {
-#ifdef DTFUZZ_TEST
-    static NoDestructor<BluetoothHost> instance;
-    return *instance;
-#else
     // C++11 static local variable initialization is thread-safe.
     static BluetoothHost hostAdapter;
     return hostAdapter;
-#endif
 }
 
 void BluetoothHost::RegisterObserver(std::shared_ptr<BluetoothHostObserver> observer)
