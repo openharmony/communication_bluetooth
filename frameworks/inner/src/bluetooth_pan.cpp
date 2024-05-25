@@ -24,7 +24,6 @@
 #include "bluetooth_utils.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -178,13 +177,8 @@ Pan::~Pan()
 
 Pan *Pan::GetProfile()
 {
-#ifdef DTFUZZ_TEST
-    static NoDestructor<Pan> instance;
-    return instance;
-#else
     static Pan instance;
     return &instance;
-#endif
 }
 
 int32_t Pan::GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice> &result)

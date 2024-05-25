@@ -26,7 +26,6 @@
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -222,13 +221,8 @@ HidHost::~HidHost() {}
 
 HidHost *HidHost::GetProfile()
 {
-#ifdef DTFUZZ_TEST
-    static NoDestructor<HidHost> instance;
-    return instance;
-#else
     static HidHost instance;
     return &instance;
-#endif
 }
 
 int32_t HidHost::GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice> &result)

@@ -30,7 +30,6 @@
 #include "raw_address.h"
 #include "system_ability_definition.h"
 #include "bluetooth_avrcp_tg.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -97,13 +96,10 @@ public:
 AvrcpTarget *AvrcpTarget::GetProfile(void)
 {
     HILOGI("enter");
-#ifdef DTFUZZ_TEST
-    static NoDestructor<AvrcpTarget> instance;
-    return instance;
-#else
+
     static AvrcpTarget instance;
+
     return &instance;
-#endif
 }
 
 int32_t AvrcpTarget::SetDeviceAbsoluteVolume(const BluetoothRemoteDevice &device, int32_t volumeLevel)

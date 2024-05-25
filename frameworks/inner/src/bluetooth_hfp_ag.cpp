@@ -27,7 +27,6 @@
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -400,13 +399,8 @@ HandsFreeAudioGateway::impl::~impl()
 HandsFreeAudioGateway *HandsFreeAudioGateway::GetProfile()
 {
     HILOGD("enter");
-#ifdef DTFUZZ_TEST
-    static NoDestructor<HandsFreeAudioGateway> instance;
-    return instance;
-#else
     static HandsFreeAudioGateway instance;
     return &instance;
-#endif
 }
 
 HandsFreeAudioGateway::HandsFreeAudioGateway()
