@@ -98,6 +98,7 @@ sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string 
         remote = hostRemote;
     } else {
         sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+        CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, nullptr, "hostProxy is nullptr");
         if (objectName == BLE_ADVERTISER_SERVER || objectName == BLE_CENTRAL_MANAGER_SERVER) {
             remote = hostProxy->GetBleRemote(objectName);
         } else {
