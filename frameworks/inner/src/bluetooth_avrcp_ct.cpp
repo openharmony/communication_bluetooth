@@ -28,7 +28,6 @@
 #include "i_bluetooth_avrcp_ct.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -902,7 +901,7 @@ AvrcpController *AvrcpController::GetProfile(void)
     HILOGI("enter");
 #ifdef DTFUZZ_TEST
     static NoDestructor<AvrcpController> instance;
-    return instance;
+    return instance.get();
 #else
     static AvrcpController instance;
     return &instance;

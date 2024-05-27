@@ -24,6 +24,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
+#include "../../../frameworks/inner/include/no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -75,6 +76,9 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothAudioManager);
     BLUETOOTH_DECLARE_IMPL();
 
+#ifdef DTFUZZ_TEST
+    friend class NoDestructor<BluetoothAudioManager>;
+#endif
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

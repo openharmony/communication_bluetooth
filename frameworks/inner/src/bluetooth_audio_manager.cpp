@@ -21,7 +21,6 @@
 #include "i_bluetooth_host.h"
 #include "bluetooth_utils.h"
 #include "bluetooth_profile_manager.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {

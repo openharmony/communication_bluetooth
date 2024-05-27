@@ -29,7 +29,6 @@
 #include "iservice_registry.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {

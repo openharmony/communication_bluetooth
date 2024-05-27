@@ -28,6 +28,7 @@
 #include <cstdio>
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
+#include "../../../frameworks/inner/include/no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -207,6 +208,10 @@ private:
     ~A2dpSink(void);
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(A2dpSink);
     BLUETOOTH_DECLARE_IMPL();
+
+#ifdef DTFUZZ_TEST
+    friend class NoDestructor<A2dpSink>;
+#endif
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

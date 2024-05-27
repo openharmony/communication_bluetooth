@@ -40,7 +40,6 @@
 #include "string"
 #include "system_ability_definition.h"
 #include "vector"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -264,7 +263,7 @@ A2dpSink *A2dpSink::GetProfile()
     HILOGI("enter");
 #ifdef DTFUZZ_TEST
     static NoDestructor<A2dpSink> service;
-    return service;
+    return service.get();
 #else
     static A2dpSink service;
     return &service;
