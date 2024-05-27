@@ -29,7 +29,6 @@
 #include "system_ability_definition.h"
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -108,7 +107,7 @@ MapMse *MapMse::GetProfile()
 {
 #ifdef DTFUZZ_TEST
     static NoDestructor<MapMse> instance;
-    return instance;
+    return instance.get();
 #else
     static MapMse instance;
     return &instance;
