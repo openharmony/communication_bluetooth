@@ -402,7 +402,7 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
     }
 
     int readLen = client->GetInputStream().Read(buf, bufLen);
-    HILOGR("SocketRead ret, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
+    HILOGD("SocketRead ret, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
     return readLen;
 }
 
