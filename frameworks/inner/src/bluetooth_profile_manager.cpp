@@ -93,7 +93,10 @@ sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string 
         return remote;
     } // SafeMap
     auto hostRemote = GetHostRemote();
-    CHECK_AND_RETURN_LOG_RET(hostRemote != nullptr, nullptr, "hostRemote is nullptr");
+    if (hostRemote == nullptr) {
+        HILOGD("hostRemote is nullptr");
+        return nullptr;
+    }
     if (objectName == BLUETOOTH_HOST) {
         remote = hostRemote;
     } else {
@@ -105,7 +108,10 @@ sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string 
             remote = hostProxy->GetProfile(objectName);
         }
     }
-    CHECK_AND_RETURN_LOG_RET(remote != nullptr, nullptr, "remote is nullptr");
+    if (remote == nullptr) {
+        HILOGD("remote is nullptr");
+        return nullptr;
+    }
     profileRemoteMap_.Insert(objectName, remote);
     return remote;
 }
@@ -146,7 +152,7 @@ void BluetoothProfileManager::RunFuncWhenBluetoothServiceStarted()
 void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t systemAbilityId,
     const std::string &deviceId)
 {
-    HILOGI("systemAbilityId:%{public}d", systemAbilityId);
+    HILOGD("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
             BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = true;
@@ -163,7 +169,7 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t
 void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int32_t systemAbilityId,
     const std::string &deviceId)
 {
-    HILOGI("systemAbilityId:%{public}d", systemAbilityId);
+    HILOGD("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
             HILOGD("Clear global variables first");
@@ -195,7 +201,7 @@ int32_t BluetoothProfileManager::RegisterFunc(const std::string &objectName,
     ProfileIdProperty idProperties;
     idProperties.objectName = objectName;
     idProperties.functions.bluetoothLoadedfunc = func;
-    HILOGI("objectname: %{public}s, id: %{public}d", objectName.c_str(), id);
+    HILOGD("objectname: %{public}s, id: %{public}d", objectName.c_str(), id);
     profileIdFuncMap_.Insert(id, idProperties);
     if (isBluetoothServiceOn_) {
         sptr<IRemoteObject> remote = GetProfileRemote(objectName);

@@ -183,7 +183,7 @@ int GattCharacteristic::SetWriteType(int type)
 void GattCharacteristic::SetValue(const uint8_t *values, const size_t length)
 {
     if (values == nullptr || length == 0) {
-        HILOGE("values is nullptr, or length is 0");
+        HILOGD("values is nullptr, or length is 0");
         return;
     }
     value_ = std::make_unique<uint8_t[]>(length);

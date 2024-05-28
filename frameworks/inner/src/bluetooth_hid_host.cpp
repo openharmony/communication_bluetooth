@@ -123,7 +123,7 @@ struct HidHost::impl {
 
     void RegisterObserver(std::shared_ptr<HidHostObserver> observer)
     {
-        HILOGI("Enter!");
+        HILOGD("Enter!");
         observers_.Register(observer);
     }
 

@@ -148,7 +148,7 @@ ErrCode BluetoothGattClientCallbackStub::OnDescriptorReadInner(MessageParcel &da
 __attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnDescriptorWriteInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothGattClientCallbackStub::OnDescriptorWriteInner Triggered!");
+    HILOGD("BluetoothGattClientCallbackStub::OnDescriptorWriteInner Triggered!");
     int32_t ret = data.ReadInt32();
     std::shared_ptr<BluetoothGattDescriptor> descriptor(data.ReadParcelable<BluetoothGattDescriptor>());
     if (!descriptor) {
@@ -180,7 +180,7 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesDiscoveredInner(MessageParcel
 __attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner Triggered!");
+    HILOGD("BluetoothGattClientCallbackStub::OnConnectionParameterChangedInner Triggered!");
     int32_t interval = data.ReadInt32();
     int32_t latency = data.ReadInt32();
     int32_t timeout = data.ReadInt32();

@@ -348,7 +348,7 @@ public:
     void OnConnectionParameterChanged(
         const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status) override
     {
-        HILOGI("remote device: %{public}s, interval: %{public}d, "
+        HILOGD("remote device: %{public}s, interval: %{public}d, "
             "latency: %{public}d, timeout: %{public}d, status: %{public}d",
             GET_ENCRYPT_GATT_ADDR(device), interval, latency, timeout, status);
         auto serverSptr = GetServerSptr();
@@ -754,7 +754,7 @@ int GattServer::RemoveGattService(const GattService &service)
 {
     HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
-        HILOGE("bluetooth is off.");
+        HILOGD("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
 
@@ -827,7 +827,7 @@ int GattServer::SendResponse(
             pimpl->requests_.erase(request);
         }
     }
-    HILOGI("result = %{public}d.", result);
+    HILOGD("result = %{public}d.", result);
     return result;
 }
 

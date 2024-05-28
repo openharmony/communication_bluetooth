@@ -235,7 +235,7 @@ void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::
 
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     size_t idx = 0;
 
     if (uuids.empty()) {
@@ -527,6 +527,10 @@ napi_status NapiIsFunction(napi_env env, napi_value value)
 {
     napi_valuetype valuetype = napi_undefined;
     NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    if (valuetype != napi_function) {
+        HILOGD("Wrong argument type. Function expected.");
+        return napi_function_expected;
+    }
     NAPI_BT_RETURN_IF(valuetype != napi_function, "Wrong argument type. Function expected.", napi_function_expected);
     return napi_ok;
 }

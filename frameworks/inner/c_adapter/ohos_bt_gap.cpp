@@ -383,7 +383,7 @@ bool IsBleEnabled()
 
 bool GetLocalAddr(unsigned char *mac, unsigned int len)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (mac == nullptr || len < OHOS_BD_ADDR_LEN) {
         HILOGE("invalid param, len:%{public}d", len);
         return false;

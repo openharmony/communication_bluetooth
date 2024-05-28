@@ -519,7 +519,7 @@ public:
     void OnConnectionParameterChanged(
         const BluetoothRemoteDevice &device, int interval, int latency, int timeout, int status) override
     {
-        HILOGI("enter");
+        HILOGD("enter");
     }
 
 private:

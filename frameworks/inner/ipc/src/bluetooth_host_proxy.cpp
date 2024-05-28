@@ -135,7 +135,7 @@ sptr<IRemoteObject> BluetoothHostProxy::GetProfile(const std::string &name)
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GETPROFILE, option, data, reply);
     if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::GetProfile done fail, error: %{public}d", error);
+        HILOGD("BluetoothHostProxy::GetProfile done fail, error: %{public}d", error);
         return nullptr;
     }
     return reply.ReadRemoteObject();
@@ -333,7 +333,7 @@ int32_t BluetoothHostProxy::GetMaxNumConnectedAudioDevices()
 
 int32_t BluetoothHostProxy::GetBtConnectionState(int &state)
 {
-    HILOGI("BluetoothHostProxy::GetBtConnectionState starts");
+    HILOGD("BluetoothHostProxy::GetBtConnectionState starts");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::GetBtConnectionState WriteInterfaceToken error");
@@ -1514,7 +1514,7 @@ int32_t BluetoothHostProxy::InnerTransact(
     }
     int32_t err = remote->SendRequest(code, data, reply, flags);
     if (err != NO_ERROR) {
-        HILOGW("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
+        HILOGD("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
     }
     return err;
 }
