@@ -128,7 +128,7 @@ ErrCode BluetoothHostObserverStub::OnPairConfirmedInner(MessageParcel &data, Mes
     int32_t reqType = data.ReadInt32();
     int32_t number = data.ReadInt32();
 
-    HILOGI("OnPairConfirmedInner starts");
+    HILOGD("OnPairConfirmedInner starts");
     OnPairConfirmed(transport, *device, reqType, number);
 
     return NO_ERROR;

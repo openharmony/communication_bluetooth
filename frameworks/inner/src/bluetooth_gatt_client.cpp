@@ -237,7 +237,7 @@ public:
 
     void OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor &descriptor) override
     {
-        HILOGI("ret:%{public}d, length:%{public}zu", ret, descriptor.length_);
+        HILOGD("ret:%{public}d, length:%{public}zu", ret, descriptor.length_);
         std::shared_ptr<GattClient> clientSptr = (client_).lock();
         if (!clientSptr) {
             HILOGE("callback client is nullptr");
@@ -280,7 +280,7 @@ public:
 
     void OnConnectionParameterChanged(int32_t interval, int32_t latency, int32_t timeout, int32_t status) override
     {
-        HILOGI("interval: %{public}d, latency: %{public}d, timeout: %{public}d, status: %{public}d",
+        HILOGD("interval: %{public}d, latency: %{public}d, timeout: %{public}d, status: %{public}d",
             interval, latency, timeout, status);
         std::shared_ptr<GattClient> clientSptr = (client_).lock();
         if (!clientSptr) {
@@ -454,7 +454,7 @@ void GattClient::impl::GetServices()
         }
     }
     if (isGetServiceYet_) {
-        HILOGE("isGetServiceYet_ is true");
+        HILOGD("isGetServiceYet_ is true");
         return;
     }
     if (!isRegisterSucceeded_) {
@@ -817,7 +817,7 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
     int result = GattStatus::GATT_FAILURE;
     HILOGD("applicationId: %{public}d", pimpl->applicationId_);
     result = proxy->WriteDescriptor(pimpl->applicationId_, &desc);
-    HILOGI("result: %{public}d", result);
+    HILOGD("result: %{public}d", result);
     if (result == BT_NO_ERROR) {
         pimpl->requestInformation_.type_ = REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS;
         pimpl->requestInformation_.context_.characteristic_ = &characteristic;

@@ -43,7 +43,7 @@ constexpr int OCT_BASE = 8;
 std::string GetEncryptAddr(std::string addr)
 {
     if (addr.empty() || addr.length() != ADDRESS_LENGTH) {
-        HILOGE("addr is invalid.");
+        HILOGD("addr is invalid.");
         return std::string("");
     }
     std::string tmp = "**:**:**:**:**:**";

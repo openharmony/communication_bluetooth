@@ -640,7 +640,7 @@ int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristi
     tmpCharac->SetWriteType(newWriteType);
     std::vector<uint8_t> characterValue(value, value + len);
     int result = client->WriteCharacteristic(*tmpCharac, std::move(characterValue));
-    HILOGI("clientId: %{public}d, result: %{public}d", clientId, result);
+    HILOGD("clientId: %{public}d, result: %{public}d", clientId, result);
     return GetGattcResult(result);
 }
 

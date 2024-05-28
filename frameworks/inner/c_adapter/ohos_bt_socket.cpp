@@ -103,7 +103,7 @@ int SocketServerCreate(const BluetoothCreateSocketPara *socketPara, const char *
 {
     HILOGD("SocketServerCreate start!");
     if (!IS_BT_ENABLED()) {
-        HILOGE("fail,BR is not TURN_ON");
+        HILOGD("fail,BR is not TURN_ON");
         return BT_SOCKET_INVALID_ID;
     }
 
@@ -149,7 +149,7 @@ int SocketServerAccept(int serverId)
     HILOGI("SocketServerAccept start, serverId: %{public}d", serverId);
     std::shared_ptr<ServerSocket> server = g_serverMap.GetObject(serverId);
     if (server == nullptr) {
-        HILOGE("server is null!");
+        HILOGD("server is null!");
         return BT_SOCKET_INVALID_ID;
     }
 
@@ -390,7 +390,7 @@ bool IsSocketConnected(int clientId)
  */
 int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
 {
-    HILOGI("SocketRead start, clientId: %{public}d, bufLen: %{public}d", clientId, bufLen);
+    HILOGD("SocketRead start, clientId: %{public}d, bufLen: %{public}d", clientId, bufLen);
     if (buf == nullptr || bufLen == 0) {
         HILOGE("buf is null or bufLen is 0!");
         return OHOS_BT_STATUS_PARM_INVALID;
@@ -402,7 +402,7 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
     }
 
     int readLen = client->GetInputStream().Read(buf, bufLen);
-    HILOGI("SocketRead ret, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
+    HILOGD("SocketRead ret, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
     return readLen;
 }
 
@@ -416,7 +416,7 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
  */
 int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
 {
-    HILOGI("SocketWrite start, clientId: %{public}d, len: %{public}d", clientId, len);
+    HILOGD("SocketWrite start, clientId: %{public}d, len: %{public}d", clientId, len);
     if (data == nullptr || len == 0) {
         HILOGE("data is null or len is 0!");
         return OHOS_BT_STATUS_PARM_INVALID;
@@ -427,7 +427,7 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
         return OHOS_BT_STATUS_FAIL;
     }
     int writeLen = client->GetOutputStream().Write(data, len);
-    HILOGI("end, writeLen: %{public}d", writeLen);
+    HILOGD("end, writeLen: %{public}d", writeLen);
     return writeLen;
 }
 
