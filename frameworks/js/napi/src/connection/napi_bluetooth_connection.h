@@ -85,6 +85,7 @@ napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info);
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports);
 napi_value ScanModeInit(napi_env env);
 napi_value BondStateInit(napi_env env);
+napi_value UnbondCauseInit(napi_env env);
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);

@@ -794,6 +794,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
     HILOGD("enter");
     napi_value scanModeObj = ScanModeInit(env);
     napi_value bondStateObj = BondStateInit(env);
+    napi_value unbondCauseObj = UnbondCauseInit(env);
 #ifdef BLUETOOTH_API_SINCE_10
     napi_value bluetoothTransportObject = BluetoothTransportInit(env);
     napi_value pinTypeObject = PinTypeInit(env);
@@ -802,6 +803,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
     napi_property_descriptor exportProperties[] = {
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
         DECLARE_NAPI_PROPERTY("BondState", bondStateObj),
+        DECLARE_NAPI_PROPERTY("UnbondCause", unbondCauseObj),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("BluetoothTransport", bluetoothTransportObject),
         DECLARE_NAPI_PROPERTY("PinType", pinTypeObject),
@@ -844,6 +846,19 @@ napi_value BondStateInit(napi_env env)
     SetNamedPropertyByInteger(env, bondState, static_cast<int>(BondState::BOND_STATE_BONDING), "BOND_STATE_BONDING");
     SetNamedPropertyByInteger(env, bondState, static_cast<int>(BondState::BOND_STATE_BONDED), "BOND_STATE_BONDED");
     return bondState;
+}
+
+napi_value UnbondCauseInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value unbondCause = nullptr;
+    napi_create_object(env, &unbondCause);
+    SetNamedPropertyByInteger(env, unbondCause, UNBOND_CAUSE_USER_REMOVED, "USER_REMOVED");
+    SetNamedPropertyByInteger(env, unbondCause, UNBOND_CAUSE_REMOTE_DEVICE_DOWN, "REMOTE_DEVICE_DOWN");
+    SetNamedPropertyByInteger(env, unbondCause, UNBOND_CAUSE_AUTH_FAILURE, "AUTH_FAILURE");
+    SetNamedPropertyByInteger(env, unbondCause, UNBOND_CAUSE_AUTH_REJECTED, "AUTH_REJECTED");
+    SetNamedPropertyByInteger(env, unbondCause, UNBOND_CAUSE_INTERNAL_ERROR, "INTERNAL_ERROR");
+    return unbondCause;
 }
 
 #ifdef BLUETOOTH_API_SINCE_10
