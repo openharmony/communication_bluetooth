@@ -30,7 +30,6 @@
 #include "bluetooth_utils.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -287,7 +286,7 @@ A2dpSource *A2dpSource::GetProfile()
     HILOGD("enter");
 #ifdef DTFUZZ_TEST
     static NoDestructor<A2dpSource> service;
-    return service;
+    return service.get();
 #else
     static A2dpSource service;
     return &service;

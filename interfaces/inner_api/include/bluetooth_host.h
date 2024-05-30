@@ -41,6 +41,7 @@
 #include "bluetooth_remote_device.h"
 #include "bluetooth_device_class.h"
 #include "refbase.h"
+#include "../../../frameworks/inner/include/no_destructor.h"
 
 namespace OHOS { class IRemoteObject; }
 namespace OHOS {
@@ -738,6 +739,10 @@ private:
 
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHost);
     BLUETOOTH_DECLARE_IMPL();
+
+#ifdef DTFUZZ_TEST
+    friend class NoDestructor<BluetoothHost>;
+#endif
 };
 } // namespace Bluetooth
 } // namespace OHOS
