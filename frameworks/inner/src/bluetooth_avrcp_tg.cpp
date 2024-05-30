@@ -30,7 +30,6 @@
 #include "raw_address.h"
 #include "system_ability_definition.h"
 #include "bluetooth_avrcp_tg.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -99,7 +98,7 @@ AvrcpTarget *AvrcpTarget::GetProfile(void)
     HILOGI("enter");
 #ifdef DTFUZZ_TEST
     static NoDestructor<AvrcpTarget> instance;
-    return instance;
+    return instance.get();
 #else
     static AvrcpTarget instance;
     return &instance;

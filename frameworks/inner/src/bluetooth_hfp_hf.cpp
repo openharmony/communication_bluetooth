@@ -24,7 +24,6 @@
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -479,7 +478,7 @@ HandsFreeUnit *HandsFreeUnit::GetProfile()
 {
 #ifdef DTFUZZ_TEST
     static NoDestructor<HandsFreeUnit> instance;
-    return instance;
+    return instance.get();
 #else
     static HandsFreeUnit instance;
     return &instance;

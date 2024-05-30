@@ -42,6 +42,7 @@
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_hf_call.h"
+#include "../../../frameworks/inner/include/no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -404,6 +405,10 @@ private:
     ~HandsFreeUnit();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(HandsFreeUnit);
     BLUETOOTH_DECLARE_IMPL();
+
+#ifdef DTFUZZ_TEST
+    friend class NoDestructor<HandsFreeUnit>;
+#endif
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
