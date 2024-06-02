@@ -84,6 +84,23 @@ int BluetoothAudioManagerProxy::GetWearDetectionState(const std::string &deviceI
     return ret;
 }
 
+int32_t BluetoothAudioManagerProxy::IsDeviceWearing(const BluetoothRawAddress &device)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "BluetoothAudioManagerProxy::IsDeviceWearing WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::IsDeviceWearing Write device error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int error = Remote()->SendRequest(
+        BluetoothAudioManagerInterfaceCode::IS_DEVICE_WEARING, data, reply, option);
+
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::IsDeviceWearing fail, error: %{public}d", error);
+    return reply.ReadInt32();
+}
+
 int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported)
 {
     MessageParcel data;

@@ -44,6 +44,16 @@ public:
     int GetWearDetectionState(const std::string &deviceId, int32_t &ability);
 
     /**
+     * @brief Headset is wearing.
+     *
+     * @param device Remote device.
+     * @return Returns {@link BT_NO_ERROR} if the operation fails.
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 11
+     */
+    int IsDeviceWearing(const BluetoothRawAddress &device);
+
+    /**
      * @brief Whether wear detection is supported
      *
      * @param device Remote device.
