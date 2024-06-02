@@ -30,6 +30,7 @@ public:
     virtual int EnableWearDetection(const std::string &deviceId) = 0;
     virtual int DisableWearDetection(const std::string &deviceId) = 0;
     virtual int GetWearDetectionState(const std::string &deviceId, int32_t &ability) = 0;
+    virtual int32_t IsDeviceWearing(const BluetoothRawAddress &device) = 0;
     virtual int32_t IsWearDetectionSupported(const BluetoothRawAddress &device, bool &isSupported) = 0;
     virtual int32_t SendDeviceSelection(const BluetoothRawAddress &device,
         int useA2dp, int useHfp, int userSelection) = 0;
