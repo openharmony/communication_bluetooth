@@ -29,6 +29,7 @@ struct BluetoothAudioManager::impl {
     int EnableWearDetection(const std::string &deviceId);
     int DisableWearDetection(const std::string &deviceId);
     int GetWearDetectionState(const std::string &deviceId, int32_t &ability);
+    int IsDeviceWearing(const BluetoothRemoteDevice &device);
     int IsWearDetectionSupported(const BluetoothRemoteDevice &device, bool &isSupported);
     int SendDeviceSelection(const BluetoothRemoteDevice &device, int useA2dp, int useHfp, int userSelection);
 };
@@ -58,6 +59,13 @@ int BluetoothAudioManager::impl::GetWearDetectionState(const std::string &device
     sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
     return proxy->GetWearDetectionState(deviceId, ability);
+}
+
+int BluetoothAudioManager::impl::IsDeviceWearing(const BluetoothRemoteDevice &device)
+{
+    sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
+    return proxy->IsDeviceWearing(BluetoothRawAddress(device.GetDeviceAddr()));
 }
 
 int BluetoothAudioManager::impl::IsWearDetectionSupported(const BluetoothRemoteDevice &device, bool &isSupported)
@@ -94,6 +102,16 @@ int BluetoothAudioManager::GetWearDetectionState(const std::string &deviceId, in
     sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
     return pimpl->GetWearDetectionState(deviceId, ability);
+}
+
+int BluetoothAudioManager::IsDeviceWearing(const BluetoothRemoteDevice &device)
+{
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_STATE, "input parameter error");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INVALID_STATE, "pimpl is null");
+
+    return pimpl->IsDeviceWearing(device);
 }
 
 int BluetoothAudioManager::IsWearDetectionSupported(const BluetoothRemoteDevice &device, bool &isSupported)

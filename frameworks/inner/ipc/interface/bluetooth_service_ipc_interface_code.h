@@ -457,6 +457,7 @@ enum BluetoothAudioManagerInterfaceCode {
     IS_WEAR_DETECTION_ENABLED,
     BT_IS_WEAR_DETECTION_SUPPORTED,
     BT_SEND_DEVICE_SELECTION,
+    IS_DEVICE_WEARING,
     // The last code, if you want to add a new code, please add it before this
     WEAR_DETECTION_BUTT
 };
