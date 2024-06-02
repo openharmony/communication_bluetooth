@@ -61,7 +61,7 @@ int BluetoothAudioManager::impl::GetWearDetectionState(const std::string &device
     return proxy->GetWearDetectionState(deviceId, ability);
 }
 
-int BluetoothAudioManager::impl::IsDeviceWearing(const BluetoothRemoteDevice &device, bool &isSupported)
+int BluetoothAudioManager::impl::IsDeviceWearing(const BluetoothRemoteDevice &device)
 {
     sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
