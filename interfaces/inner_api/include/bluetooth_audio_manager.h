@@ -47,8 +47,8 @@ public:
      * @brief Headset is wearing.
      *
      * @param device Remote device.
-     * @return Returns {@link BT_NO_ERROR} if the operation fails.
-     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @return Returns {@link BtErrCode} if the operation fails.
+     *         returns {wear 1 or unwear 0} otherwise.
      * @since 11
      */
     int IsDeviceWearing(const BluetoothRemoteDevice &device);
