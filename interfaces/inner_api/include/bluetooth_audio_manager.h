@@ -51,7 +51,7 @@ public:
      *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 11
      */
-    int IsDeviceWearing(const BluetoothRawAddress &device);
+    int IsDeviceWearing(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Whether wear detection is supported
