@@ -331,15 +331,6 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
 
     int deviceCod = 0;
     int ret = GetDeviceClass(deviceCod);
-    // if device support wear detection and cod invalid, treat as headset
-    if (deviceCod == 0) {
-        bool wearDetectionSupported = false;
-        BluetoothAudioManager::GetInstance().IsWearDetectionSupported(*this, wearDetectionSupported);
-        if (wearDetectionSupported) {
-            HILOGW("device %{public}s support wear detection, treat as headset", GetEncryptAddr(address_).c_str());
-            deviceCod = BluetoothDevice::AUDIO_VIDEO_HEADPHONES;
-        }
-    }
     BluetoothDeviceClass deviceClass = BluetoothDeviceClass(deviceCod);
     cod = deviceClass.GetClassOfDevice();
     majorClass = deviceClass.GetMajorClass();
