@@ -110,6 +110,7 @@ struct GattClient::impl {
     std::mutex connStateMutex_;
     RequestInformation requestInformation_;
     DiscoverInfomation discoverInformation_;
+    int32_t profileRegisterId = 0;
 
     explicit impl(const BluetoothRemoteDevice &device);
     ~impl();
@@ -332,11 +333,23 @@ GattClient::impl::impl(const BluetoothRemoteDevice &device)
       connectionState_(static_cast<int>(BTConnectState::DISCONNECTED)),
       device_(device)
 {
+    auto bluetoothTurnOffFunc = [this]() {
+        applicationId_ = 0;
+        isRegisterSucceeded_ = false;
+    };
+    ProfileFunctions profileFunctions = {
+        .bluetoothLoadedfunc = nullptr,
+        .bleTurnOnFunc = nullptr,
+        .bluetoothTurnOffFunc = bluetoothTurnOffFunc,
+    };
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(
+        PROFILE_GATT_CLIENT, profileFunctions);
 }
 
 GattClient::impl::~impl()
 {
     HILOGI("GattClient ~impl");
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
 }
 
 int GattClient::impl::DiscoverStart()
