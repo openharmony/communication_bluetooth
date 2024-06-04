@@ -26,6 +26,7 @@ public:
     static napi_value DefineAccessJSFunction(napi_env env, napi_value exports);
     static napi_value EnableBluetooth(napi_env env, napi_callback_info info);
     static napi_value DisableBluetooth(napi_env env, napi_callback_info info);
+    static napi_value RestrictBluetooth(napi_env env, napi_callback_info info);
     static napi_value GetState(napi_env env, napi_callback_info info);
     static napi_value RegisterAccessObserver(napi_env env, napi_callback_info info);
     static napi_value DeregisterAccessObserver(napi_env env, napi_callback_info info);
