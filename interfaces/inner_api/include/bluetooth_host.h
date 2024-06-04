@@ -702,6 +702,15 @@ public:
     */
     int DisconnectAllowedProfiles(const std::string &remoteAddr) const;
 
+    /**
+    * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available
+    *
+    * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+    *         returns an error code defined in {@link BtErrCode} otherwise.
+    * @since 12
+    */
+    int RestrictBluetooth();
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

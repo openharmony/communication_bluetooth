@@ -41,6 +41,7 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getState", GetState),
         DECLARE_NAPI_FUNCTION("enableBluetooth", EnableBluetooth),
         DECLARE_NAPI_FUNCTION("disableBluetooth", DisableBluetooth),
+        DECLARE_NAPI_FUNCTION("restrictBluetooth", RestrictBluetooth),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
         DECLARE_NAPI_FUNCTION("getLocalAddress", GetLocalAddress),
@@ -63,6 +64,15 @@ napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
     HILOGI("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
+    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    return NapiGetBooleanTrue(env);
+}
+
+napi_value NapiAccess::RestrictBluetooth(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    int32_t ret = host->RestrictBluetooth();
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
