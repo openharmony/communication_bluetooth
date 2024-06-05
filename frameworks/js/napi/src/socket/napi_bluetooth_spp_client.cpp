@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-const int sleepTime = 5;
 std::map<int, std::shared_ptr<NapiSppClient>> NapiSppClient::clientMap;
 int NapiSppClient::count = 0;
 const int SOCKET_BUFFER_SIZE = 1024;
@@ -358,7 +357,8 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
     std::string type;
 
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
-    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(
+        (argc > ARGS_SIZE_THREE || argc == ARGS_SIZE_ONE), "Requires 2 or 3 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
                       "Wrong argument type. String expected.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
@@ -373,7 +373,6 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
     client->sppReadThreadSafeFunc_ = nullptr;
     client->callbackInfos_[type] = nullptr;
     client->sppReadFlag = false;
-    sleep(sleepTime);
     return napi_ok;
 }
 
