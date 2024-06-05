@@ -17,6 +17,7 @@
 #include "bluetooth_log.h"
 #include "bt_uuid.h"
 
+using OHOS::bluetooth::Uuid;
 namespace OHOS {
 namespace Bluetooth {
 const int32_t BLE_ADV__SERVICE_READ_DATA_SIZE_MAX_LEN = 0x400;
@@ -93,14 +94,18 @@ bool BluetoothBleAdvertiserData::WriteServiceUuids(Parcel &parcel) const
         return false;
     }
     for (auto &serviceUuids : serviceUuids_) {
-        if (!parcel.WriteInt32(serviceUuids.ConvertTo32Bits())) {
+        uint8_t buffer[Uuid::UUID128_BYTES_TYPE] = {0};
+        if (!serviceUuids.ConvertToBytesLE(buffer, Uuid::UUID128_BYTES_TYPE)) {
+            return false;
+        }
+        if (!parcel.WriteBuffer(static_cast<void *>(buffer), Uuid::UUID128_BYTES_TYPE)) {
             return false;
         }
     }
     return true;
 }
 
-bool BluetoothBleAdvertiserData::ReadServiceUuids(std::vector<bluetooth::Uuid> &serviceUuids, Parcel &parcel)
+bool BluetoothBleAdvertiserData::ReadServiceUuids(std::vector<Uuid> &serviceUuids, Parcel &parcel)
 {
     int32_t serviceUuidSize = 0;
     if (!parcel.ReadInt32(serviceUuidSize) || serviceUuidSize > BLE_ADV__SERVICE_READ_DATA_SIZE_MAX_LEN) {
@@ -108,12 +113,13 @@ bool BluetoothBleAdvertiserData::ReadServiceUuids(std::vector<bluetooth::Uuid> &
         return false;
     }
     for (int i = 0; i < serviceUuidSize; ++i) {
-        uint32_t uuid;
-        if (parcel.ReadUint32(uuid)) {
-            serviceUuids.push_back(bluetooth::Uuid::ConvertFrom32Bits(uuid));
-        } else {
+        const uint8_t *buffer = parcel.ReadBuffer(static_cast<size_t>(Uuid::UUID128_BYTES_TYPE));
+        if (buffer == nullptr) {
+            HILOGE("ReadBuffer failed");
             return false;
         }
+        Uuid uuid = Uuid::ConvertFromBytesLE(buffer, static_cast<size_t>(Uuid::UUID128_BYTES_TYPE));
+        serviceUuids.push_back(uuid);
     }
     return true;
 }
@@ -171,19 +177,19 @@ bool BluetoothBleAdvertiserData::WriteServiceData(Parcel &parcel) const
     return true;
 }
 
-bool BluetoothBleAdvertiserData::ReadServiceData(std::map<bluetooth::Uuid, std::string> &serviceData, Parcel &parcel)
+bool BluetoothBleAdvertiserData::ReadServiceData(std::map<Uuid, std::string> &serviceData, Parcel &parcel)
 {
     int serviceDataSize = 0;
     if (!parcel.ReadInt32(serviceDataSize) || serviceDataSize > BLE_ADV__SERVICE_READ_DATA_SIZE_MAX_LEN) {
         HILOGE("read Parcelable size failed.");
         return false;
     }
-    bluetooth::Uuid serviceDataId;
+    Uuid serviceDataId;
     std::string serviceDataData;
     for (int i = 0; i < serviceDataSize; ++i) {
         uint32_t uuid;
         if (parcel.ReadUint32(uuid)) {
-            serviceDataId = bluetooth::Uuid::ConvertFrom32Bits(uuid);
+            serviceDataId = Uuid::ConvertFrom32Bits(uuid);
         } else {
             return false;
         }
