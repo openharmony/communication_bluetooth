@@ -177,7 +177,7 @@ public:
         advId_ = advId;
     }
 
-    void OnStartResultEvent(int result, int advHandle) override
+    void OnStartResultEvent(int32_t result, int32_t advHandle) override
     {
         HILOGD("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
@@ -241,7 +241,7 @@ protected:
 
 private:
     int advId_;
-    int advHandle_ = 0xFF;
+    int32_t advHandle_ = 0xFF;
 };
 
 /**
