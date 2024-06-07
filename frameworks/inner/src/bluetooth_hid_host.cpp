@@ -176,6 +176,7 @@ struct HidHost::impl {
     {
         HILOGI("enter");
         sptr<IBluetoothHidHost> proxy = GetRemoteProxy<IBluetoothHidHost>(PROFILE_HID_HOST_SERVER);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
         return proxy->SetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
@@ -183,6 +184,7 @@ struct HidHost::impl {
     {
         HILOGI("enter");
         sptr<IBluetoothHidHost> proxy = GetRemoteProxy<IBluetoothHidHost>(PROFILE_HID_HOST_SERVER);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
         return proxy->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
     }
 
