@@ -358,7 +358,7 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
 
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
     NAPI_BT_RETURN_IF(
-        (argc != ARGS_SIZE_THREE || argc != ARGS_SIZE_TWO), "Requires 2 or 3 arguments.", napi_invalid_arg);
+        (argc != ARGS_SIZE_THREE && argc != ARGS_SIZE_TWO), "Requires 2 or 3 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
                       "Wrong argument type. String expected.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
