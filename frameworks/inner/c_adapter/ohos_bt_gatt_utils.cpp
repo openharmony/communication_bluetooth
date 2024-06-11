@@ -15,6 +15,7 @@
 
 #include "ohos_bt_gatt_utils.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include <map>
 #include <queue>
 #include <mutex>
@@ -75,11 +76,12 @@ void RemoveTimeoutAdvAddr()
 bool CanStartAdv(const string& addrStr)
 {
     lock_guard<mutex> lock(g_mapQueMutex);
+    HILOGI("addr: %{public}s", GetEncryptAddr(addrStr).c_str());
     uint64_t currentMillis = GetBootMillis();
     auto addrTime = g_advAddrMap.find(addrStr);
     if (addrTime != g_advAddrMap.end()) {
         if (currentMillis >= addrTime->second + ADV_ADDR_TIME_THRESHOLD) {
-            HILOGW("has the same adv addr in [15mins, 60mins]");
+            HILOGW("has the same adv addr in [15mins, 60mins]: %{public}s", GetEncryptAddr(addrStr).c_str());
             return false;
         } else {
             return true;
