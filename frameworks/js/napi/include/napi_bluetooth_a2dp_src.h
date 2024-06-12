@@ -28,6 +28,7 @@ enum CodecType {
     CODEC_TYPE_SBC = 0,
     CODEC_TYPE_AAC = 1,
     CODEC_TYPE_L2HC = 2,
+    CODEC_TYPE_L2HCST = 3,
     CODEC_TYPE_INVALID = -1,
 };
 
