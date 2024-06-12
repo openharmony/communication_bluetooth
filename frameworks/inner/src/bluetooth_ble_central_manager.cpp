@@ -72,6 +72,9 @@ struct BleCentralManager::impl {
                 scanResult.SetPayload(tempResult.GetPayload());
                 scanResult.SetName(tempResult.GetName());
                 scanResult.SetEventType(tempResult.GetEventType());
+                std::string address = result.GetPeripheralDevice().GetAddress();
+                HILOGI("device: %{public}s, len: %{public}d",
+                    GetEncryptAddr(address).c_str(), static_cast<int>(scanResult.GetPayload().size()));
                 if (callbackType == BLE_SCAN_CALLBACK_TYPE_ALL_MATCH) {
                     observer->OnScanCallback(scanResult);
                 } else {
