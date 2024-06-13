@@ -22,10 +22,6 @@ namespace Bluetooth {
 /* Bluetooth errcode defines */
 enum BtErrCode {
     // Common error codes
-    REGITSER_OBSERVER_FAIL = 50,
-    CONNECT_FAILED = 51,
-    RECV_PSM_OR_SCN_FAILED = 52,
-    RECVSOCKETSIGNAL_CONNECT_FAILED = 53,
     BT_ERR_PERMISSION_FAILED = 201,
     BT_ERR_SYSTEM_PERMISSION_FAILED = 202,
     BT_ERR_PROHIBITED_BY_EDM = 203,

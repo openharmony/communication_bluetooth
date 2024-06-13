@@ -249,7 +249,6 @@ public:
 private:
     ClientSocket() = delete;
     BLUETOOTH_DECLARE_IMPL();
-    void BleConnectError(bool isValid, const std::string &addr, UUID uuid, int errorCode, int type);
 };
 
 /**
