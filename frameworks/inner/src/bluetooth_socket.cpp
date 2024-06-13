@@ -427,7 +427,7 @@ int ClientSocket::Connect(int psm)
     HILOGI("fd_: %{public}d", pimpl->fd_);
     CHECK_AND_RETURN_LOG_RET(pimpl->fd_ != -1, BtStatus::BT_FAILURE, "connect failed!");
     CHECK_AND_RETURN_LOG_RET(pimpl->RecvSocketPsmOrScn(), BT_ERR_INVALID_STATE, "recv psm or scn failed");
-    
+
     bool recvret = pimpl->RecvSocketSignal();
     HILOGI("recvret: %{public}d", recvret);
     pimpl->inputStream_ = std::make_unique<InputStream>(pimpl->fd_);
