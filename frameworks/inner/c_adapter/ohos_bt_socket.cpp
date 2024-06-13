@@ -47,10 +47,12 @@ public:
     explicit BluetoothConnectionObserverWapper(BtSocketConnectionCallback &callback)
     {
         socektConnectCallback.connStateCb = callback.connStateCb;
+        socektConnectCallback.bleConnStateCb = callback.bleConnStateCb;
     }
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result) override
+    void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result,
+                                  int type) override
     {
-        if (socektConnectCallback.connStateCb == nullptr) {
+        if (socektConnectCallback.connStateCb == nullptr && socektConnectCallback.bleConnStateCb == nullptr) {
             HILOGE("callback is null");
             return;
         }
@@ -60,7 +62,12 @@ public:
         string strUuid = uuid.ToString();
         btUuid.uuid = (char *)strUuid.c_str();
         btUuid.uuidLen = strUuid.size();
-        socektConnectCallback.connStateCb(&addr, btUuid, status, result);
+        if (type == OHOS_SOCKET_SPP_RFCOMM && socektConnectCallback.connStateCb != nullptr) {
+            socektConnectCallback.connStateCb(&addr, btUuid, status, result);
+        }
+        if (type == OHOS_SOCKET_L2CAP_LE && socektConnectCallback.bleConnStateCb != nullptr) {
+            socektConnectCallback.bleConnStateCb(&addr, btUuid, result);
+        }
     }
 
     BtSocketConnectionCallback socektConnectCallback;
@@ -283,7 +290,7 @@ int SocketConnectEx(const BluetoothCreateSocketPara *socketPara, const BdAddr *b
     }
 
     /** Only support registering connection callbacks for sockets of Type TYPE_RFCOMM. */
-    if (socketPara->socketType != OHOS_SOCKET_SPP_RFCOMM) {
+    if (socketPara->socketType != OHOS_SOCKET_SPP_RFCOMM && socketPara->socketType != OHOS_SOCKET_L2CAP_LE) {
         HILOGE("SocketType is not support");
         return BT_SOCKET_INVALID_TYPE;
     }
