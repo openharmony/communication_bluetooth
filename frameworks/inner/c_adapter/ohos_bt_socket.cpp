@@ -50,7 +50,7 @@ public:
         socektConnectCallback.bleConnStateCb = callback.bleConnStateCb;
     }
     void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result,
-                                  int type) override
+        int type) override
     {
         if (socektConnectCallback.connStateCb == nullptr && socektConnectCallback.bleConnStateCb == nullptr) {
             HILOGE("callback is null");

@@ -59,7 +59,8 @@ int32_t BluetoothClientSocketObserverStub::OnConnectionStateChangedInner(Message
     bluetooth::Uuid btUuid = bluetooth::Uuid(*uuid);
     int status = data.ReadInt32();
     int result = data.ReadInt32();
-    OnConnectionStateChanged(*addr, btUuid, status, result);
+    int type = data.ReadInt32();
+    OnConnectionStateChanged(*addr, btUuid, status, result, type);
     return BT_NO_ERROR;
 }
 

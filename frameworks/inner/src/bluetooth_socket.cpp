@@ -291,7 +291,8 @@ public:
         HILOGD("enter");
     }
 
-    void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid, int status, int result) override
+    void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid, int status, int result,
+        int type) override
     {
         HILOGD("dev: %{public}s, uuid:%{public}s, status: %{public}d, result: %{public}d",
             GetEncryptAddr((dev).GetAddress()).c_str(), uuid.ToString().c_str(), status, result);
@@ -305,7 +306,7 @@ public:
             HILOGE("impl is nullptr");
             return;
         }
-        WPTR_SOCKET_CBACK(clientSptr->pimpl->observer_, OnConnectionStateChanged, device, btUuid, status, result);
+        WPTR_SOCKET_CBACK(clientSptr->pimpl->observer_, OnConnectionStateChanged, device, btUuid, status, result, type);
     }
 
 private:
@@ -411,6 +412,8 @@ int ClientSocket::Connect(int psm)
     bluetooth::Uuid tempUuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits());
     int ret = proxy->RegisterClientObserver(BluetoothRawAddress(pimpl->address_), tempUuid,
         pimpl->observerImp_);
+    BleConnectError(ret == BT_NO_ERROR, tempAddress, pimpl->uuid_, REGITSER_OBSERVER_FAIL,
+        (int32_t)pimpl->type_);
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "regitser observer fail, ret = %d", ret);
 
     ConnectSocketParam param {
@@ -424,13 +427,20 @@ int ClientSocket::Connect(int psm)
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Connect error %{public}d", ret);
 
     HILOGI("fd_: %{public}d", pimpl->fd_);
+    BleConnectError(pimpl->fd_ != -1, tempAddress, pimpl->uuid_, CONNECT_FAILED,
+        (int32_t)pimpl->type_);
     CHECK_AND_RETURN_LOG_RET(pimpl->fd_ != -1, BtStatus::BT_FAILURE, "connect failed!");
-    CHECK_AND_RETURN_LOG_RET(pimpl->RecvSocketPsmOrScn(), BT_ERR_INVALID_STATE, "recv psm or scn failed");
+    bool recvRes = pimpl->RecvSocketPsmOrScn();
+    BleConnectError(recvRes, tempAddress, pimpl->uuid_, RECV_PSM_OR_SCN_FAILED,
+        (int32_t)pimpl->type_);
+    CHECK_AND_RETURN_LOG_RET(recvRes, BT_ERR_INVALID_STATE, "recv psm or scn failed");
 
     bool recvret = pimpl->RecvSocketSignal();
     HILOGI("recvret: %{public}d", recvret);
     pimpl->inputStream_ = std::make_unique<InputStream>(pimpl->fd_);
     pimpl->outputStream_ = std::make_unique<OutputStream>(pimpl->fd_);
+    BleConnectError(recvret, tempAddress, pimpl->uuid_, RECVSOCKETSIGNAL_CONNECT_FAILED,
+        (int32_t)pimpl->type_);
     CHECK_AND_RETURN_LOG_RET(recvret, BtStatus::BT_FAILURE, "recvSocketSignal connect failed!");
     pimpl->socketStatus_ = SOCKET_CONNECTED;
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
@@ -878,5 +888,15 @@ int ClientSocket::UpdateCocConnectionParams(CocUpdateSocketParam &param)
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "proxy is null");
     return proxy->UpdateCocConnectionParams(info);
 }
+
+void ClientSocket::BleConnectError(bool isValid, const std::string &addr, UUID uuid, int errorCode, int type)
+{
+    if (isValid || type != TYPE_L2CAP_LE) {
+        return;
+    }
+    bluetooth::Uuid btUdid = bluetooth::Uuid::ConvertFrom128Bits(uuid.ConvertTo128Bits());
+    pimpl->observerImp_->OnConnectionStateChanged(BluetoothRawAddress(addr), btUdid, 0, errorCode, type);
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS
