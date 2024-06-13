@@ -396,26 +396,22 @@ int ClientSocket::Connect(int psm)
     } else {
         CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
     }
-
     if (!pimpl->Init(weak_from_this())) {
         HILOGE("clientSocket proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
-
     pimpl->address_ = pimpl->remoteDevice_.GetDeviceAddr();
     std::string tempAddress = pimpl->address_;
     CHECK_AND_RETURN_LOG_RET(tempAddress.size(), BtStatus::BT_FAILURE, "address size error");
     CHECK_AND_RETURN_LOG_RET(pimpl->socketStatus_ != SOCKET_CLOSED, BT_ERR_INVALID_STATE, "socket closed");
     sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "proxy is nullptr");
-
     bluetooth::Uuid tempUuid = bluetooth::Uuid::ConvertFrom128Bits(pimpl->uuid_.ConvertTo128Bits());
     int ret = proxy->RegisterClientObserver(BluetoothRawAddress(pimpl->address_), tempUuid,
         pimpl->observerImp_);
     BleConnectError(ret == BT_NO_ERROR, tempAddress, pimpl->uuid_, REGITSER_OBSERVER_FAIL,
         (int32_t)pimpl->type_);
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "regitser observer fail, ret = %d", ret);
-
     ConnectSocketParam param {
         .addr = tempAddress,
         .uuid = tempUuid,
@@ -425,7 +421,6 @@ int ClientSocket::Connect(int psm)
     };
     ret = proxy->Connect(param, pimpl->fd_);
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Connect error %{public}d", ret);
-
     HILOGI("fd_: %{public}d", pimpl->fd_);
     BleConnectError(pimpl->fd_ != -1, tempAddress, pimpl->uuid_, CONNECT_FAILED,
         (int32_t)pimpl->type_);
@@ -434,7 +429,6 @@ int ClientSocket::Connect(int psm)
     BleConnectError(recvRes, tempAddress, pimpl->uuid_, RECV_PSM_OR_SCN_FAILED,
         (int32_t)pimpl->type_);
     CHECK_AND_RETURN_LOG_RET(recvRes, BT_ERR_INVALID_STATE, "recv psm or scn failed");
-
     bool recvret = pimpl->RecvSocketSignal();
     HILOGI("recvret: %{public}d", recvret);
     pimpl->inputStream_ = std::make_unique<InputStream>(pimpl->fd_);
