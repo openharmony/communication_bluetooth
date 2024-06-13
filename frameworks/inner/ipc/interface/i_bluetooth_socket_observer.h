@@ -28,7 +28,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothClientSocketObserver");
 
     virtual void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid,
-        int status, int result) = 0;
+        int status, int result, int type) = 0;
 };
 
 class IBluetoothServerSocketObserver : public OHOS::IRemoteBroker {

@@ -75,7 +75,8 @@ public:
     /**
      * @brief notify connection status and result.
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result) = 0;
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result,
+        int type) = 0;
 };
 
 /**
@@ -248,6 +249,7 @@ public:
 private:
     ClientSocket() = delete;
     BLUETOOTH_DECLARE_IMPL();
+    void BleConnectError(bool isValid, const std::string &addr, UUID uuid, int errorCode, int type);
 };
 
 /**
