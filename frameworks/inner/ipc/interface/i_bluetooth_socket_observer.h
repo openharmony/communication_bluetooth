@@ -18,6 +18,7 @@
 
 #include "iremote_broker.h"
 #include "bluetooth_raw_address.h"
+#include "bluetooth_remote_device.h"
 #include "bluetooth_bt_uuid.h"
 #include "bluetooth_service_ipc_interface_code.h"
 
@@ -26,9 +27,16 @@ namespace Bluetooth {
 class IBluetoothClientSocketObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothClientSocketObserver");
+    typedef struct {
+        BluetoothRemoteDevice dev;
+        UUID uuid;
+        int state;
+        int result;
+        int type;
+        int psm;
+    } CallbackParam;
 
-    virtual void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid,
-        int status, int result, int type) = 0;
+    virtual void OnConnectionStateChanged(CallbackParam callbackParam) = 0;
 };
 
 class IBluetoothServerSocketObserver : public OHOS::IRemoteBroker {

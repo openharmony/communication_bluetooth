@@ -49,8 +49,7 @@ public:
         socektConnectCallback.connStateCb = callback.connStateCb;
         socektConnectCallback.bleConnStateCb = callback.bleConnStateCb;
     }
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result,
-        int type) override
+    void OnConnectionStateChanged(CallbackConnectParam param) override
     {
         if (socektConnectCallback.connStateCb == nullptr && socektConnectCallback.bleConnStateCb == nullptr) {
             HILOGE("callback is null");
@@ -62,11 +61,11 @@ public:
         string strUuid = uuid.ToString();
         btUuid.uuid = (char *)strUuid.c_str();
         btUuid.uuidLen = strUuid.size();
-        if (type == OHOS_SOCKET_SPP_RFCOMM && socektConnectCallback.connStateCb != nullptr) {
-            socektConnectCallback.connStateCb(&addr, btUuid, status, result);
+        if (param.type == OHOS_SOCKET_SPP_RFCOMM && socektConnectCallback.connStateCb != nullptr) {
+            socektConnectCallback.connStateCb(param.addr, param.btUuid, param.status, param.result);
         }
-        if (type == OHOS_SOCKET_L2CAP_LE && socektConnectCallback.bleConnStateCb != nullptr) {
-            socektConnectCallback.bleConnStateCb(&addr, status, result);
+        if (param.type == OHOS_SOCKET_L2CAP_LE && socektConnectCallback.bleConnStateCb != nullptr) {
+            socektConnectCallback.bleConnStateCb(param.addr, param.psm, param.status, param.result);
         }
     }
 
