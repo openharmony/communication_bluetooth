@@ -26,9 +26,16 @@ namespace Bluetooth {
 class IBluetoothClientSocketObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothClientSocketObserver");
+    typedef struct {
+        BluetoothRawAddress dev;
+        bluetooth::Uuid uuid;
+        int status;
+        int result;
+        int type;
+        int psm;
+    } CallbackParam;
 
-    virtual void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid,
-        int status, int result) = 0;
+    virtual void OnConnectionStateChanged(CallbackParam callbackParam) = 0;
 };
 
 class IBluetoothServerSocketObserver : public OHOS::IRemoteBroker {

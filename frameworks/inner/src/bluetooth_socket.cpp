@@ -291,12 +291,13 @@ public:
         HILOGD("enter");
     }
 
-    void OnConnectionStateChanged(const BluetoothRawAddress &dev, bluetooth::Uuid uuid, int status, int result) override
+    void OnConnectionStateChanged(CallbackParam callbackParam) override
     {
-        HILOGD("dev: %{public}s, uuid:%{public}s, status: %{public}d, result: %{public}d",
-            GetEncryptAddr((dev).GetAddress()).c_str(), uuid.ToString().c_str(), status, result);
-        BluetoothRemoteDevice device(dev.GetAddress(), BTTransport::ADAPTER_BREDR);
-        UUID btUuid = UUID::ConvertFrom128Bits(uuid.ConvertTo128Bits());
+        HILOGD("dev: %{public}s, uuid:%{public}s, status: %{public}d, psm: %{public}d, result: %{public}d",
+            GetEncryptAddr((callbackParam.dev).GetAddress()).c_str(), callbackParam.uuid.ToString().c_str(),
+            callbackParam.status, callbackParam.psm, callbackParam.result);
+        BluetoothRemoteDevice device(callbackParam.dev.GetAddress(), BTTransport::ADAPTER_BREDR);
+        UUID btUuid = UUID::ConvertFrom128Bits(callbackParam.uuid.ConvertTo128Bits());
         auto clientSptr = GetClientSocketSptr();
         if (!clientSptr) {
             return;
@@ -305,7 +306,15 @@ public:
             HILOGE("impl is nullptr");
             return;
         }
-        WPTR_SOCKET_CBACK(clientSptr->pimpl->observer_, OnConnectionStateChanged, device, btUuid, status, result);
+        CallbackConnectParam callbackConnectParam = {
+            .addr = device,
+            .uuid = btUuid,
+            .status = callbackParam.status,
+            .result = callbackParam.result,
+            .type = callbackParam.type,
+            .psm = callbackParam.psm,
+        };
+        WPTR_SOCKET_CBACK(clientSptr->pimpl->observer_, OnConnectionStateChanged, callbackConnectParam);
     }
 
 private:
