@@ -84,8 +84,7 @@ public:
     /**
      * @brief notify connection status and result.
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result,
-        int type) = 0;
+    virtual void OnConnectionStateChanged(CallbackConnectParam callbackConnectParam) = 0;
 };
 
 /**
