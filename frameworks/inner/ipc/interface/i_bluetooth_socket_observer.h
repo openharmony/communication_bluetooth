@@ -27,8 +27,8 @@ class IBluetoothClientSocketObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothClientSocketObserver");
     typedef struct {
-        BluetoothRemoteDevice dev;
-        UUID uuid;
+        BluetoothRawAddress dev;
+        bluetooth::Uuid uuid;
         int state;
         int result;
         int type;
