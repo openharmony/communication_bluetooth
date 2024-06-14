@@ -18,7 +18,6 @@
 
 #include "iremote_broker.h"
 #include "bluetooth_raw_address.h"
-#include "bluetooth_remote_device.h"
 #include "bluetooth_bt_uuid.h"
 #include "bluetooth_service_ipc_interface_code.h"
 
