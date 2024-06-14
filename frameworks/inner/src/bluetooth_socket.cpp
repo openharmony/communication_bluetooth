@@ -309,10 +309,10 @@ public:
         CallbackConnectParam callbackConnectParam = {
             .addr = device,
             .uuid = btUuid,
-            .status = callbackConnectParam.status,
-            .result = callbackConnectParam.result,
-            .type = callbackConnectParam.type,
-            .psm = callbackConnectParam.psm,
+            .status = callbackParam.status,
+            .result = callbackParam.result,
+            .type = callbackParam.type,
+            .psm = callbackParam.psm,
         };
         WPTR_SOCKET_CBACK(clientSptr->pimpl->observer_, OnConnectionStateChanged, callbackConnectParam);
     }
