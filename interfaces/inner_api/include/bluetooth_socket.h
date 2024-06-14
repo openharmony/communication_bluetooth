@@ -62,6 +62,15 @@ const int FLAG_AUTH = 1 << 1;
 
 const int SPP_SOCKET_PSM_VALUE = -1;
 
+typedef struct {
+    BluetoothRemoteDevice addr;
+    UUID uuid;
+    int status;
+    int result;
+    int type;
+    int psm;
+} CallbackConnectParam;
+
 /**
  * @brief Represents bluetooth connection callbcak.
  */

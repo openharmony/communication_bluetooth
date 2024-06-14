@@ -60,7 +60,16 @@ int32_t BluetoothClientSocketObserverStub::OnConnectionStateChangedInner(Message
     int status = data.ReadInt32();
     int result = data.ReadInt32();
     int type = data.ReadInt32();
-    OnConnectionStateChanged(*addr, btUuid, status, result, type);
+    int psm = data.ReadInt32();
+    CallbackParam callbackParam = {
+        .dev = *addr,
+        .uuid = btUuid,
+        .status = status,
+        .result = result,
+        .type = type,
+        .psm = psm,
+    };
+    OnConnectionStateChanged(callbackParam);
     return BT_NO_ERROR;
 }
 
