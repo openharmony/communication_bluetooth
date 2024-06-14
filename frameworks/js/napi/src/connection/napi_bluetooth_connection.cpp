@@ -25,6 +25,8 @@
 #include "napi_async_work.h"
 #include "napi_bluetooth_utils.h"
 #include "parser/napi_parser_utils.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -238,8 +240,10 @@ napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)
     int tmpCod = MajorClass::MAJOR_UNCATEGORIZED;
     int tmpMajorClass = MajorClass::MAJOR_UNCATEGORIZED;
     int tmpMajorMinorClass = MajorClass::MAJOR_UNCATEGORIZED;
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer(
+        "GetDeviceProductType", 10, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG); // 10 表示超时时间为10s
     int32_t err = remoteDevice.GetDeviceProductType(tmpCod, tmpMajorClass, tmpMajorMinorClass);
-
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     napi_value result = nullptr;
     napi_create_object(env, &result);
     napi_value majorClass = 0;
