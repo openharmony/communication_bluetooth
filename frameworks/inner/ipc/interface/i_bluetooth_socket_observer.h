@@ -29,7 +29,7 @@ public:
     typedef struct {
         BluetoothRawAddress dev;
         bluetooth::Uuid uuid;
-        int state;
+        int status;
         int result;
         int type;
         int psm;
