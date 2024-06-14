@@ -58,6 +58,7 @@
         "bundle_framework",
         "c_utils",
         "eventhandler",
+        "hicollie",
         "hilog",
         "hisysevent",
         "hitrace",
