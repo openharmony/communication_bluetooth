@@ -47,20 +47,26 @@ public:
     explicit BluetoothConnectionObserverWapper(BtSocketConnectionCallback &callback)
     {
         socektConnectCallback.connStateCb = callback.connStateCb;
+        socektConnectCallback.bleConnStateCb = callback.bleConnStateCb;
     }
-    void OnConnectionStateChanged(const BluetoothRemoteDevice &dev, UUID uuid, int status, int result) override
+    void OnConnectionStateChanged(CallbackConnectParam param) override
     {
-        if (socektConnectCallback.connStateCb == nullptr) {
+        if (socektConnectCallback.connStateCb == nullptr && socektConnectCallback.bleConnStateCb == nullptr) {
             HILOGE("callback is null");
             return;
         }
         BdAddr addr;
-        GetAddrFromString(dev.GetDeviceAddr(), addr.addr);
+        GetAddrFromString(param.addr.GetDeviceAddr(), addr.addr);
         BtUuid btUuid;
-        string strUuid = uuid.ToString();
+        string strUuid = param.uuid.ToString();
         btUuid.uuid = (char *)strUuid.c_str();
         btUuid.uuidLen = strUuid.size();
-        socektConnectCallback.connStateCb(&addr, btUuid, status, result);
+        if (param.type == OHOS_SOCKET_SPP_RFCOMM && socektConnectCallback.connStateCb != nullptr) {
+            socektConnectCallback.connStateCb(&addr, btUuid, param.status, param.result);
+        }
+        if (param.type == OHOS_SOCKET_L2CAP_LE && socektConnectCallback.bleConnStateCb != nullptr) {
+            socektConnectCallback.bleConnStateCb(&addr, param.psm, param.status, param.result);
+        }
     }
 
     BtSocketConnectionCallback socektConnectCallback;
@@ -282,8 +288,7 @@ int SocketConnectEx(const BluetoothCreateSocketPara *socketPara, const BdAddr *b
         return BT_SOCKET_INVALID_ID;
     }
 
-    /** Only support registering connection callbacks for sockets of Type TYPE_RFCOMM. */
-    if (socketPara->socketType != OHOS_SOCKET_SPP_RFCOMM) {
+    if (socketPara->socketType != OHOS_SOCKET_SPP_RFCOMM && socketPara->socketType != OHOS_SOCKET_L2CAP_LE) {
         HILOGE("SocketType is not support");
         return BT_SOCKET_INVALID_TYPE;
     }
