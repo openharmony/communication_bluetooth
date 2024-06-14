@@ -295,9 +295,9 @@ public:
     {
         HILOGD("dev: %{public}s, uuid:%{public}s, status: %{public}d, psm: %{public}d, result: %{public}d",
             GetEncryptAddr((callbackParam.dev).GetAddress()).c_str(), callbackParam.uuid.ToString().c_str(),
-            callbackParam.psm, callbackParam.status, callbackParam.result);
+            callbackParam.status, callbackParam.psm, callbackParam.result);
         BluetoothRemoteDevice device(callbackParam.dev.GetAddress(), BTTransport::ADAPTER_BREDR);
-        UUID btUuid = UUID::ConvertFrom128Bits(uuid.ConvertTo128Bits());
+        UUID btUuid = UUID::ConvertFrom128Bits(callbackParam.uuid.ConvertTo128Bits());
         auto clientSptr = GetClientSocketSptr();
         if (!clientSptr) {
             return;
