@@ -101,6 +101,7 @@ private:
     SafeMap<std::string, sptr<IRemoteObject>> profileRemoteMap_;
     SafeMap<int32_t, ProfileIdProperty> profileIdFuncMap_;
     std::atomic_bool isBluetoothServiceOn_ = false;
+    std::atomic_bool isNeedCheckBluetoothSerivceOn_ = true;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
     int32_t registerValidId_ = BEGIN_ID;
     std::mutex idMutex_;
