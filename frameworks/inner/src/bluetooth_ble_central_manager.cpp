@@ -157,7 +157,9 @@ BleCentralManager::impl::impl()
         sptr<IBluetoothBleCentralManager> proxy = iface_cast<IBluetoothBleCentralManager>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         std::lock_guard<std::mutex> lock(scannerIdMutex_);
-        proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
+        if (scannerId_ == BLE_SCAN_INVALID_ID) {
+            proxy->RegisterBleCentralManagerCallback(scannerId_, enableRandomAddrMode_, callbackImp_);
+        }
     };
     auto bluetoothTurnOffFunc = [this]() {
         scannerId_ = BLE_SCAN_INVALID_ID;
