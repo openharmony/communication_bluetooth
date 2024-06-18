@@ -71,11 +71,16 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
     if (profileRemoteMap_.Find(BLUETOOTH_HOST, value)) {
         return value;
     }
+    if (!isNeedCheckBluetoothSerivceOn_.load()) {
+        HILOGD("Bluetooth service is not start");
+        return value;
+    }
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, nullptr, "samgrProxy is nullptr");
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (object == nullptr) {
         HILOGD("object is nullptr");
+        isNeedCheckBluetoothSerivceOn_ = false;
         return nullptr;
     }
     CHECK_AND_RETURN_LOG_RET(object != nullptr, nullptr, "object is nullptr");
@@ -153,6 +158,7 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
             BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = true;
+            BluetoothProfileManager::GetInstance().isNeedCheckBluetoothSerivceOn_ = true;
             BluetoothProfileManager::GetInstance().RunFuncWhenBluetoothServiceStarted();
             break;
         }
@@ -173,6 +179,7 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int3
             ClearGlobalResource();
             BluetoothProfileManager::GetInstance().profileRemoteMap_.Clear();
             BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = false;
+            BluetoothProfileManager::GetInstance().isNeedCheckBluetoothSerivceOn_ = true;
             BluetoothHost::GetDefaultHost().OnRemoveBluetoothSystemAbility();
             break;
         }
