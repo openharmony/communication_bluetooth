@@ -42,6 +42,12 @@ BluetoothProfileManager::~BluetoothProfileManager()
     UnSubScribeBluetoothSystemAbility();
 }
 
+BluetoothProfileManager &BluetoothProfileManager::GetInstance()
+{
+    static BluetoothProfileManager instance;
+    return instance;
+}
+
 void BluetoothProfileManager::SubScribeBluetoothSystemAbility()
 {
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -69,6 +75,10 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, nullptr, "samgrProxy is nullptr");
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    if (object == nullptr) {
+        HILOGD("object is nullptr");
+        return nullptr;
+    }
     CHECK_AND_RETURN_LOG_RET(object != nullptr, nullptr, "object is nullptr");
     return object;
 }
@@ -136,8 +146,8 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t
     HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
-            DelayedSingleton<BluetoothProfileManager>::GetInstance()->isBluetoothServiceOn_ = true;
-            DelayedSingleton<BluetoothProfileManager>::GetInstance()->RunFuncWhenBluetoothServiceStarted();
+            BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = true;
+            BluetoothProfileManager::GetInstance().RunFuncWhenBluetoothServiceStarted();
             break;
         }
         default:
@@ -155,8 +165,8 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int3
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
             HILOGD("Clear global variables first");
             ClearGlobalResource();
-            DelayedSingleton<BluetoothProfileManager>::GetInstance()->profileRemoteMap_.Clear();
-            DelayedSingleton<BluetoothProfileManager>::GetInstance()->isBluetoothServiceOn_ = false;
+            BluetoothProfileManager::GetInstance().profileRemoteMap_.Clear();
+            BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = false;
             BluetoothHost::GetDefaultHost().OnRemoveBluetoothSystemAbility();
             break;
         }

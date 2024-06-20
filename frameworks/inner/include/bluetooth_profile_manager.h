@@ -43,9 +43,9 @@ struct ProfileIdProperty {
     std::string objectName = "";
 };
 class BluetoothProfileManager {
-DECLARE_DELAYED_SINGLETON(BluetoothProfileManager);
-
 public:
+    BluetoothProfileManager();
+    ~BluetoothProfileManager();
     /**
      * @brief Get the Remote of the Profile
      *
@@ -83,6 +83,8 @@ public:
      */
     void NotifyBluetoothStateChange(int32_t transport, int32_t status);
 
+    static BluetoothProfileManager &GetInstance();
+
 private:
     class BluetoothSystemAbility : public SystemAbilityStatusChangeStub {
         void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
@@ -104,7 +106,7 @@ private:
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
 {
-    return iface_cast<T>(DelayedSingleton<BluetoothProfileManager>::GetInstance()->GetProfileRemote(objectName));
+    return iface_cast<T>(BluetoothProfileManager::GetInstance().GetProfileRemote(objectName));
 };
 } // namespace bluetooth
 } // namespace OHOS
