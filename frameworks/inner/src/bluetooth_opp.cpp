@@ -334,7 +334,7 @@ private:
 Opp::impl::impl()
 {
     innerObserver_ = new OppInnerObserver(observers_);
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_OPP_SERVER,
+        profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_OPP_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothOpp> proxy = iface_cast<IBluetoothOpp>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -345,7 +345,7 @@ Opp::impl::impl()
 Opp::impl::~impl()
 {
     HILOGD("start");
-    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(innerObserver_);
