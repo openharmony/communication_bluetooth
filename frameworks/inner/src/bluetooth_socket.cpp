@@ -154,22 +154,22 @@ struct ClientSocket::impl {
         return flags;
     }
 
-    std::shared_ptr<InputStream> GetInputStream()
+    InputStream &GetInputStream()
     {
         HILOGD("enter");
         if (inputStream_ == nullptr) {
             HILOGE("inputStream is NULL, failed. please Connect");
         }
-        return inputStream_;
+        return *inputStream_;
     }
 
-    std::shared_ptr<OutputStream> GetOutputStream()
+    OutputStream &GetOutputStream()
     {
         HILOGD("enter");
         if (outputStream_ == nullptr) {
             HILOGE("outputStream is NULL, failed. please Connect");
         }
-        return outputStream_;
+        return *outputStream_;
     }
 
     BluetoothRemoteDevice &GetRemoteDevice()
@@ -251,10 +251,10 @@ struct ClientSocket::impl {
 
     // socket observer
     sptr<BluetoothSocketObserverImp> observerImp_ = nullptr;
-    std::shared_ptr<InputStream> inputStream_ {
+    std::unique_ptr<InputStream> inputStream_ {
         nullptr
     };
-    std::shared_ptr<OutputStream> outputStream_ {
+    std::unique_ptr<OutputStream> outputStream_ {
         nullptr
     };
     bool Init(std::weak_ptr<ClientSocket> client);
@@ -454,13 +454,13 @@ void ClientSocket::Close()
     return pimpl->Close();
 }
 
-std::shared_ptr<InputStream> ClientSocket::GetInputStream()
+InputStream &ClientSocket::GetInputStream()
 {
     HILOGD("enter");
     return pimpl->GetInputStream();
 }
 
-std::shared_ptr<OutputStream> ClientSocket::GetOutputStream()
+OutputStream &ClientSocket::GetOutputStream()
 {
     HILOGD("enter");
     return pimpl->GetOutputStream();
