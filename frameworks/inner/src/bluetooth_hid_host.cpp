@@ -195,7 +195,7 @@ private:
 HidHost::impl::impl()
 {
     innerObserver_ = new HidHostInnerObserver(observers_);
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_HID_HOST_SERVER,
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_HID_HOST_SERVER,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothHidHost> proxy = iface_cast<IBluetoothHidHost>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -206,7 +206,7 @@ HidHost::impl::impl()
 HidHost::impl::~impl()
 {
     HILOGD("start");
-    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothHidHost> proxy = GetRemoteProxy<IBluetoothHidHost>(PROFILE_HID_HOST_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(innerObserver_);

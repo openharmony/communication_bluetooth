@@ -157,7 +157,7 @@ BleCentralManager::impl::impl()
         .bleTurnOnFunc = bleTurnOnFunc,
         .bluetoothTurnOffFunc = bluetoothTurnOffFunc,
     };
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(
         BLE_CENTRAL_MANAGER_SERVER, profileFunctions);
 }
 
@@ -242,7 +242,7 @@ void BleCentralManager::impl::ConvertActiveDeviceInfo(const std::vector<BleActiv
 BleCentralManager::impl::~impl()
 {
     HILOGD("start");
-    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
