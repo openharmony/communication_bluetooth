@@ -244,9 +244,9 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_FALSE(env, clientMap[id] > 0, BT_ERR_INTERNAL_ERROR);
-    std::shared_ptr<OutputStream> outputStream = clientMap[id]->client_->GetOutputStream();
+    OutputStream outputStream = clientMap[id]->client_->GetOutputStream();
     while (totalSize) {
-        int result = outputStream->Write(totalBuf, totalSize);
+        int result = outputStream.Write(totalBuf, totalSize);
         NAPI_BT_ASSERT_RETURN_FALSE(env, result > 0, BT_ERR_SPP_IO);
         totalSize = totalSize - static_cast<size_t>(result);
         totalBuf += static_cast<size_t>(result);
@@ -391,14 +391,14 @@ void NapiSppClient::SppRead(int id)
         HILOGE("thread start failed.");
         return;
     }
-    std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
+    InputStream inputStream = client->client_->GetInputStream();
     uint8_t buf[SOCKET_BUFFER_SIZE];
 
     while (true) {
         HILOGI("thread start.");
         (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
         HILOGI("inputStream.Read start");
-        int ret = inputStream->Read(buf, sizeof(buf));
+        int ret = inputStream.Read(buf, sizeof(buf));
         HILOGI("inputStream.Read end");
         if (ret <= 0) {
             HILOGI("inputStream.Read failed, ret = %{public}d", ret);
