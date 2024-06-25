@@ -39,6 +39,9 @@
 #include "bluetooth_object_map.h"
 #include "ohos_bt_gatt_utils.h"
 #include "bluetooth_timer.h"
+#include "ffrt.h"
+#include <functional>
+#include "ohos_bt_gap.h"
 
 
 #ifdef __cplusplus
@@ -65,6 +68,8 @@ static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM 
 
 static uint32_t g_advAddrTimerIds[MAX_BLE_ADV_NUM];
 static mutex g_advTimerMutex;
+// ffrt queue
+static ffrt::queue startAdvQueue("startAdv_Queue");
 
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
@@ -588,41 +593,29 @@ static bool IsRpa(const AdvOwnAddrParams *ownAddrParams)
 int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdvParams *advParam,
     const AdvOwnAddrParams *ownAddrParams)
 {
-    HILOGI("BleStartAdvWithAddr enter");
+    HILOGD("BleStartAdvWithAddr enter");
     if (advId == nullptr || rawData == nullptr || advParam == nullptr || !IsRpa(ownAddrParams)) {
         HILOGW("params are invalid");
         return OHOS_BT_STATUS_PARM_INVALID;
     }
-    lock_guard<mutex> lock(g_advMutex);
-    int i = 0;
-    for (; i < MAX_BLE_ADV_NUM; i++) {
-        if (g_bleAdvCallbacks[i] == nullptr) {
-            g_bleAdvCallbacks[i] = make_shared<BleAdvCallback>(i);
-            break;
-        }
+    if (!IsBleEnabled()) {
+        HILOGE("bluetooth is off.");
+        *advId = -1;
+        return OHOS_BT_STATUS_NOT_READY;
     }
-
+    lock_guard<mutex> lock(g_advMutex);
+    int i = AllocateAdvHandle();
     if (i == MAX_BLE_ADV_NUM) {
         HILOGW("reach the max num of adv");
         return OHOS_BT_STATUS_UNHANDLED;
     }
+    *advId = i;
 
-    RemoveTimeoutAdvAddr();
-    string addrStr(reinterpret_cast<const char*>(ownAddrParams->addr), sizeof(ownAddrParams->addr));
-    if (!CanStartAdv(addrStr)) {
+    if (!StartAdvAddrTimer(i, ownAddrParams)) {
+        HILOGE("Duplicate addresses after 15 minutes are not allowed to be broadcast");
         g_bleAdvCallbacks[i] = nullptr;
+        *advId = -1;
         return OHOS_BT_STATUS_UNHANDLED;
-    }
-    // adv must stop after {@link ADV_ADDR_TIME_THRESHOLD}
-    auto timerCallback = [i]() {
-        HILOGI("Stop adv : %{public}d.", i);
-        BleStopAdv(i);
-    };
-    uint32_t timerId = 0;
-    BluetoothTimer::GetInstance()->Register(timerCallback, timerId, ADV_ADDR_TIME_THRESHOLD);
-    {
-        lock_guard<mutex> lock(g_advTimerMutex);
-        g_advAddrTimerIds[i] = timerId;
     }
 
     BleAdvertiserSettings settings;
@@ -640,20 +633,18 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
-    int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
-    if (ret != BT_NO_ERROR) {
-        HILOGE("fail, ret: %{public}d", ret);
-        //StartAdvertise fail, return default handle -1 to softbus
-        g_bleAdvCallbacks[i] = nullptr;
-        *advId = -1;
-        BluetoothTimer::GetInstance()->UnRegister(timerId);
-        {
-            lock_guard<mutex> lock(g_advTimerMutex);
-            g_advAddrTimerIds[i] = 0;
+
+    std::function startAdvFunc = [i, advData, scanResponse, settings]() {
+        HILOGI("start adv in startAdv_Queue thread, handle = %{public}d", i);
+        lock_guard<mutex> lock(g_advMutex);
+        int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("fail, ret: %{public}d", ret);
+            //StartAdvertise fail, return default handle -1 to softbus
+            g_bleAdvCallbacks[i] = nullptr;
         }
-        return OHOS_BT_STATUS_FAIL;
-    }
-    *advId = i;
+    };
+    startAdvQueue.submit(startAdvFunc);
     HILOGI("ret advId: %{public}d.", *advId);
     return OHOS_BT_STATUS_SUCCESS;
 }
@@ -673,6 +664,12 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
 int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advParam)
 {
     HILOGD("BleStartAdvEx enter");
+    if (!IsBleEnabled()) {
+        HILOGE("bluetooth is off.");
+        *advId = -1;
+        return OHOS_BT_STATUS_NOT_READY;
+    }
+
     lock_guard<mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
@@ -689,26 +686,27 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
         HILOGW("reach the max num of adv");
         return OHOS_BT_STATUS_UNHANDLED;
     }
-
+    *advId = i;
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam.minInterval);
-    if (advParam.advType == OHOS_BLE_ADV_SCAN_IND ||
-        advParam.advType == OHOS_BLE_ADV_NONCONN_IND) {
+    if (advParam.advType == OHOS_BLE_ADV_SCAN_IND || advParam.advType == OHOS_BLE_ADV_NONCONN_IND) {
         settings.SetConnectable(false);
     }
-
     auto advData = ConvertDataToVec(rawData.advData, rawData.advDataLen);
     auto scanResponse = ConvertDataToVec(rawData.rspData, rawData.rspDataLen);
-    int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
-    if (ret != BT_NO_ERROR) {
-        HILOGE("fail, ret: %{public}d", ret);
-        //StartAdvertise fail, return default handle -1 to softbus
-        g_bleAdvCallbacks[i] = nullptr;
-        *advId = -1;
-        return OHOS_BT_STATUS_FAIL;
-    }
-    *advId = i;
-    HILOGD("ret advId: %{public}d.", *advId);
+
+    std::function startAdvFunc = [i, advData, scanResponse, settings]() {
+        HILOGI("start adv in startAdv_Queue thread, handle = %{public}d", i);
+        lock_guard<mutex> lock(g_advMutex);
+        int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("fail, ret: %{public}d", ret);
+            //StartAdvertise fail, return default handle -1 to softbus
+            g_bleAdvCallbacks[i] = nullptr;
+        }
+    };
+    startAdvQueue.submit(startAdvFunc);
+    HILOGI("ret advId: %{public}d.", *advId);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -1396,6 +1394,40 @@ void ClearGlobalResource(void)
         g_bleAdvCallbacks[i] = nullptr;
     }
     HILOGD("clear all g_bleAdvCallbacks when ble turn on or bluetooth_serivce unload");
+}
+
+bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams)
+{
+    RemoveTimeoutAdvAddr();
+    string addrStr(reinterpret_cast<const char*>(ownAddrParams->addr), sizeof(ownAddrParams->addr));
+    if (!CanStartAdv(addrStr)) {
+        g_bleAdvCallbacks[advHandle] = nullptr;
+        return false;
+    }
+    // adv must stop after {@link ADV_ADDR_TIME_THRESHOLD}
+    auto timerCallback = [advHandle]() {
+        HILOGI("Stop adv : %{public}d.", advHandle);
+        BleStopAdv(advHandle);
+    };
+    uint32_t timerId = 0;
+    BluetoothTimer::GetInstance()->Register(timerCallback, timerId, ADV_ADDR_TIME_THRESHOLD);
+    {
+        lock_guard<mutex> lock(g_advTimerMutex);
+        g_advAddrTimerIds[advHandle] = timerId;
+    }
+    return true;
+}
+
+int AllocateAdvHandle()
+{
+    int i = 0;
+    for (; i < MAX_BLE_ADV_NUM; i++) {
+        if (g_bleAdvCallbacks[i] == nullptr) {
+            g_bleAdvCallbacks[i] = make_shared<BleAdvCallback>(i);
+            break;
+        }
+    }
+    return i;
 }
 
 }  // namespace Bluetooth
