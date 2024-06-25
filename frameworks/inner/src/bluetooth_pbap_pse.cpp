@@ -74,7 +74,7 @@ private:
 PbapPse::impl::impl()
 {
     serviceObserverImp_ = new BluetoothPbapPseObserverImp(observers_);
-    profileRegisterId = DelayedSingleton<BluetoothProfileManager>::GetInstance()->RegisterFunc(PROFILE_PBAP_PSE,
+    profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_PBAP_PSE,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothPbapPse> proxy = iface_cast<IBluetoothPbapPse>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -85,7 +85,7 @@ PbapPse::impl::impl()
 PbapPse::impl::~impl()
 {
     HILOGI("enter");
-    DelayedSingleton<BluetoothProfileManager>::GetInstance()->DeregisterFunc(profileRegisterId);
+    BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothPbapPse> proxy = GetRemoteProxy<IBluetoothPbapPse>(PROFILE_PBAP_PSE);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
     proxy->DeregisterObserver(serviceObserverImp_);
