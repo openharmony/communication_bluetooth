@@ -168,7 +168,7 @@ public:
      * @return Returns the object of the InputStream class.
      * @since 6
      */
-    InputStream &GetInputStream();
+    std::shared_ptr<InputStream> GetInputStream();
 
     /**
      * @brief Get the output stream with this socket.
@@ -176,7 +176,7 @@ public:
      * @return Returns the object of the OutputStream class.
      * @since 6
      */
-    OutputStream &GetOutputStream();
+    std::shared_ptr<OutputStream> GetOutputStream();
 
     /**
      * @brief Get the remote device with this socket.
