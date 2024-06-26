@@ -943,6 +943,21 @@ int RemoveLpDeviceParam(BtUuid uuid);
  */
 void ClearGlobalResource(void);
 
+/**
+ * @brief start RPA adv addr timer
+ * @param advHandle Indicates the advertise handle.
+ * @param ownAddrParams Indicates the own address(little endian) and own address type.
+ * @return true: start timer; false: start timer fail.
+ * @since 12
+ */
+bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams);
+
+/**
+ * @brief Allocate adv handle
+ * @return advertiser handle.
+ * @since 12
+ */
+int AllocateAdvHandle();
 #ifdef __cplusplus
 }
 #endif
