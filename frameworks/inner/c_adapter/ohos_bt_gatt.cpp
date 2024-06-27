@@ -634,7 +634,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
 
-    std::function startAdvFunc = [i, advData, scanResponse, settings]() {
+    std::function startAdvFunc = [i, advData, scanResponse, settings, timerId]() {
         HILOGI("start adv in startAdv_Queue thread, handle = %{public}d", i);
         lock_guard<mutex> lock(g_advMutex);
         int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
@@ -642,6 +642,11 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
             HILOGE("fail, ret: %{public}d", ret);
             //StartAdvertise fail, return default handle -1 to softbus
             g_bleAdvCallbacks[i] = nullptr;
+            BluetoothTimer::GetInstance()->UnRegister(timerId);
+            {
+                lock_guard<mutex> lock(g_advTimerMutex);
+                g_advAddrTimerIds[i] = 0;
+            }
         }
     };
     startAdvQueue.submit(startAdvFunc);
