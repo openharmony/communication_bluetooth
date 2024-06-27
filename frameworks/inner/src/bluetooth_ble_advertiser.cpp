@@ -52,7 +52,7 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGD("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
+            HILOGI("result: %{public}d, advHandle: %{public}d, opcode: %{public}d", result, advHandle, opcode);
             std::shared_ptr<BleAdvertiseCallback> observer = nullptr;
             if (opcode == bluetooth::BLE_ADV_START_FAILED_OP_CODE) {
                 observer = advertiserSptr->pimpl->callbacks_.PopAdvertiserObserver(advHandle);
@@ -94,7 +94,7 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
             auto observer = advertiserSptr->pimpl->callbacks_.PopAdvertiserObserver(advHandle);
             if (observer != nullptr) {
                 observer->OnStopResultEvent(result, advHandle);

@@ -120,7 +120,7 @@ struct BleCentralManager::impl {
 
         void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override
         {
-            HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+            HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
             bleCentralManger_.callbacks_.ForEach(
                 [resultCode, isStartScan](std::shared_ptr<BleCentralManagerCallback> observer) {
                     observer->OnStartOrStopScanEvent(resultCode, isStartScan);
