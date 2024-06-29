@@ -129,7 +129,7 @@ struct BleCentralManager::impl {
         void OnNotifyMsgReportFromLpDevice(const bluetooth::Uuid &uuid, int msgType,
             const std::vector<uint8_t> &value) override
         {
-           callbacks_.ForEach(
+            callbacks_.ForEach(
                 [uuid, msgType, value](std::shared_ptr<BleCentralManagerCallback> observer) {
                     UUID btUuid = UUID::ConvertFrom128Bits(uuid.ConvertTo128Bits());
                     observer->OnNotifyMsgReportFromLpDevice(btUuid, msgType, value);
@@ -309,7 +309,7 @@ BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : pimp
 
     HILOGI("successful");
     std::shared_ptr<BleCentralManagerCallback> pointer(&callback, [](BleCentralManagerCallback *) {});
-    bool ret = pimpl->callbackImpl_->callbacks_.Register(pointer);
+    bool ret = pimpl->callbackImp_->callbacks_.Register(pointer);
     if (ret)
         return;
 }
@@ -326,7 +326,7 @@ BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> 
     }
     HILOGI("successful");
     pimpl->enableRandomAddrMode_ = enableRandomAddrMode;
-    pimpl->callbackImpl_->callbacks_.Register(callback);
+    pimpl->callbackImp_->callbacks_.Register(callback);
 }
 
 BleCentralManager::~BleCentralManager()
