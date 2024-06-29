@@ -642,6 +642,11 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
             HILOGE("fail, ret: %{public}d", ret);
             //StartAdvertise fail, return default handle -1 to softbus
             g_bleAdvCallbacks[i] = nullptr;
+            BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[i]);
+            {
+                lock_guard<mutex> lock(g_advTimerMutex);
+                g_advAddrTimerIds[i] = 0;
+            }
         }
     };
     startAdvQueue.submit(startAdvFunc);
