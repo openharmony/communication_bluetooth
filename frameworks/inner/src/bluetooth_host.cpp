@@ -17,6 +17,7 @@
 #include <memory>
 #include <mutex>
 #include <unistd.h>
+#include <thread>
 #include "bluetooth_ble_peripheral_observer_stub.h"
 #include "bluetooth_host_load_callback.h"
 #include "bluetooth_host_observer_stub.h"
@@ -43,6 +44,7 @@ struct BluetoothHost::impl {
     bool LoadBluetoothHostService();
     void LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject);
     void LoadSystemAbilityFail();
+    int EnableBluetoothAfterFactoryReset(void);
 
     // host observer
     class BluetoothHostObserverImp;
@@ -69,6 +71,7 @@ struct BluetoothHost::impl {
     std::string stagingRealAddr_;
     std::string stagingRandomAddr_;
     int32_t profileRegisterId = 0;
+    std::atomic_bool isFactoryReseting_ { false };
 
 private:
     std::condition_variable proxyConVar_;
@@ -534,18 +537,28 @@ int BluetoothHost::GetBtState(int &state) const
     return ret;
 }
 
+int BluetoothHost::impl::EnableBluetoothAfterFactoryReset(void)
+{
+    HILOGI("Attempt to enable bluetooth after factory reset");
+    isFactoryReseting_ = false;
+    SetParameter("persist.bluetooth.switch_enable", "2");  // 2 means bluetooth auto enter restricted mode
+    return BT_NO_ERROR;
+}
+
 int BluetoothHost::BluetoothFactoryReset()
 {
-    HILOGD("enter");
+    HILOGI("enter");
     constexpr const char* BLUETOOTH_FACTORY_RESET_KEY = "persist.bluetooth.factoryreset";
     int ret = SetParameter(BLUETOOTH_FACTORY_RESET_KEY, "true");
     CHECK_AND_RETURN_LOG_RET(ret == 0, BT_ERR_INTERNAL_ERROR, "SetParameter failed");
 
-    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_NO_ERROR, "bluetooth is off.");
+    pimpl->isFactoryReseting_ = true;
 
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
-
+    if (proxy == nullptr) {
+        return pimpl->EnableBluetoothAfterFactoryReset();
+    }
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_NO_ERROR, "bluetooth is off.");
     return proxy->BluetoothFactoryReset();
 }
 
@@ -1008,6 +1021,9 @@ void BluetoothHost::OnRemoveBluetoothSystemAbility()
         HILOGD("bluetooth_servi died and send state off to app");
         pimpl->observerImp_->OnStateChanged(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
         pimpl->bleObserverImp_->OnStateChanged(BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
+    }
+    if (pimpl->isFactoryReseting_.load()) {
+        pimpl->EnableBluetoothAfterFactoryReset();
     }
 }
 } // namespace Bluetooth
