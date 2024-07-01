@@ -41,12 +41,11 @@ struct BleCentralManager::impl {
 
     class BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
     public:
-        explicit BluetoothBleCentralManagerCallbackImp(BleCentralManager::impl &bleCentralManger)
-            : bleCentralManger_(bleCentralManger){};
+        explicit BluetoothBleCentralManagerCallbackImp() {};
         ~BluetoothBleCentralManagerCallbackImp() override = default;
         void OnScanCallback(const BluetoothBleScanResult &result, uint8_t callbackType) override
         {
-            bleCentralManger_.callbacks_.ForEach(
+            callbacks_.ForEach(
                 [callbackType, &result](std::shared_ptr<BleCentralManagerCallback> observer) {
                 BluetoothBleScanResult tempResult(result);
                 BleScanResult scanResult;
@@ -86,7 +85,7 @@ struct BleCentralManager::impl {
         void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) override
         {
             HILOGI("enter");
-            bleCentralManger_.callbacks_.ForEach([&results](std::shared_ptr<BleCentralManagerCallback> observer) {
+            callbacks_.ForEach([&results](std::shared_ptr<BleCentralManagerCallback> observer) {
                 std::vector<BleScanResult> scanResults;
                 for (auto &result : results) {
                     BleScanResult scanResult;
@@ -121,7 +120,7 @@ struct BleCentralManager::impl {
         void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override
         {
             HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
-            bleCentralManger_.callbacks_.ForEach(
+            callbacks_.ForEach(
                 [resultCode, isStartScan](std::shared_ptr<BleCentralManagerCallback> observer) {
                     observer->OnStartOrStopScanEvent(resultCode, isStartScan);
             });
@@ -130,19 +129,18 @@ struct BleCentralManager::impl {
         void OnNotifyMsgReportFromLpDevice(const bluetooth::Uuid &uuid, int msgType,
             const std::vector<uint8_t> &value) override
         {
-            bleCentralManger_.callbacks_.ForEach(
+            callbacks_.ForEach(
                 [uuid, msgType, value](std::shared_ptr<BleCentralManagerCallback> observer) {
                     UUID btUuid = UUID::ConvertFrom128Bits(uuid.ConvertTo128Bits());
                     observer->OnNotifyMsgReportFromLpDevice(btUuid, msgType, value);
             });
         }
-
+    public:
+        BluetoothObserverList<BleCentralManagerCallback> callbacks_;
     private:
-        BleCentralManager::impl &bleCentralManger_;
         BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleCentralManagerCallbackImp);
     };
     sptr<BluetoothBleCentralManagerCallbackImp> callbackImp_ = nullptr;
-    BluetoothObserverList<BleCentralManagerCallback> callbacks_;
 
     int32_t scannerId_ = BLE_SCAN_INVALID_ID;  // lock by scannerIdMutex_
     std::mutex scannerIdMutex_ {};
@@ -152,7 +150,7 @@ struct BleCentralManager::impl {
 
 BleCentralManager::impl::impl()
 {
-    callbackImp_ = new BluetoothBleCentralManagerCallbackImp(*this);
+    callbackImp_ = new BluetoothBleCentralManagerCallbackImp();
     auto bleTurnOnFunc = [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothBleCentralManager> proxy = iface_cast<IBluetoothBleCentralManager>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
@@ -311,7 +309,7 @@ BleCentralManager::BleCentralManager(BleCentralManagerCallback &callback) : pimp
 
     HILOGI("successful");
     std::shared_ptr<BleCentralManagerCallback> pointer(&callback, [](BleCentralManagerCallback *) {});
-    bool ret = pimpl->callbacks_.Register(pointer);
+    bool ret = pimpl->callbackImp_->callbacks_.Register(pointer);
     if (ret)
         return;
 }
@@ -328,7 +326,7 @@ BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> 
     }
     HILOGI("successful");
     pimpl->enableRandomAddrMode_ = enableRandomAddrMode;
-    pimpl->callbacks_.Register(callback);
+    pimpl->callbackImp_->callbacks_.Register(callback);
 }
 
 BleCentralManager::~BleCentralManager()
@@ -533,7 +531,9 @@ BleScanResult::BleScanResult()
 {}
 
 BleScanResult::~BleScanResult()
-{}
+{
+    HILOGD("~BleScanResult");
+}
 
 std::vector<UUID> BleScanResult::GetServiceUuids() const
 {
