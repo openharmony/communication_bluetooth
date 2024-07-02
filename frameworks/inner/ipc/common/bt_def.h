@@ -1617,6 +1617,8 @@ enum HfpAgScoStateChangeReason {
     HFP_AG_SCO_INVALID = 0,
     HFP_AG_SCO_LOCAL_USER_TERMINATED = 1,
     HFP_AG_SCO_REMOTE_USER_TERMINATED = 2,
+    HFP_AG_SCO_LOCAL_USER_SET_UP = 3,
+    HFP_AG_SCO_REMOTE_USER_SET_UP = 4,
 };
 
 enum DeviceInfoType {
