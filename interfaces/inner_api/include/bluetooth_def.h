@@ -452,11 +452,22 @@ typedef enum {
     BLE_IO_CAP_KBDISP = 0x04  // Keyboard display
 } BLE_IO_CAP;
 
-// Adv status
+// Adv state
 typedef enum {
     BLE_ADV_STATE_IDLE,
     BLE_ADV_STATE_ADVERTISING,
 } Ble_AdvState;
+
+// Adv status
+typedef enum {
+    ADVERTISE_NOT_STARTED = -1,
+    ADVERTISE_SUCCESS = 0,
+    ADVERTISE_FAILED_DATA_TOO_LARGE,
+    ADVERTISE_FAILED_TOO_MANY_ADVERTISERS,
+    ADVERTISE_FAILED_ALREADY_STARTED,
+    ADVERTISE_FAILED_INTERNAL_ERROR,
+    ADVERTISE_FAILED_FEATURE_UNSUPPORTED,
+} ADVERTISE_STATUS;
 
 // The type of advertising data(not adv_type)
 typedef enum {
