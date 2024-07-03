@@ -489,6 +489,8 @@ int BleAdvertiser::StopAdvertising(std::shared_ptr<BleAdvertiseCallback> callbac
     }
 
     int ret = proxy->StopAdvertising(advHandle);
+    CHECK_AND_RETURN_LOG_RET(pimpl->callbackImp_ != nullptr, BT_ERR_INTERNAL_ERROR, "callbackImp is nullptr");
+    pimpl->callbackImp_->OnStopResultEvent();
     return ret;
 }
 
