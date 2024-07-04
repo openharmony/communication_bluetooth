@@ -34,7 +34,7 @@
 namespace OHOS {
 namespace Bluetooth {
 namespace {
-constexpr int32_t LOAD_SA_TIMEOUT_MS = 5000;
+constexpr int32_t LOAD_SA_TIMEOUT_MS = 4000;
 }
 
 struct BluetoothHost::impl {
@@ -392,12 +392,16 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
 
     auto waitStatus = proxyConVar_.wait_for(
         lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), []() {
-            sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-            HILOGD("bluetooth_service has found, proxy not null");
-            return proxy != nullptr;
+            HILOGI("bluetooth_service load systemAbility finished");
+            return true;
         });
     if (!waitStatus) {
         HILOGE("load bluetooth systemAbility timeout");
+        return false;
+    }
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    if (proxy == nullptr) {
+        HILOGE("GetRemoteProxy result is failed proxy is nullptr");
         return false;
     }
     return true;
