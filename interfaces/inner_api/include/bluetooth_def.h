@@ -367,7 +367,7 @@ const int8_t BLE_ADV_TX_POWER_LOW_VALUE = -15;
 const int8_t BLE_ADV_TX_POWER_MEDIUM_VALUE = -7;
 const int8_t BLE_ADV_TX_POWER_HIGH_VALUE = 1;
 const int8_t BLE_ADV_TX_POWER_MIN_VALUE = -127;
-const int8_t BLE_ADV_TX_POWER_MAX_VALUE = 1;
+const int8_t BLE_ADV_TX_POWER_MAX_VALUE = 20;
 
 // Entended Advertising PHY
 const uint8_t BLE_ADVERTISEMENT_PHY_NONE = 0x00;
