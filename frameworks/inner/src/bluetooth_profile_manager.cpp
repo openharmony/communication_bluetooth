@@ -244,5 +244,10 @@ void BluetoothProfileManager::DeregisterFunc(int32_t id)
     CHECK_AND_RETURN_LOG(profileIdFuncMap_.Find(id, value), "id is not exist");
     profileIdFuncMap_.Erase(id);
 }
+
+bool BluetoothProfileManager::IsBluetoothServiceOn()
+{
+    return isBluetoothServiceOn_;
+}
 } // namespace bluetooth
 } // namespace OHOS
