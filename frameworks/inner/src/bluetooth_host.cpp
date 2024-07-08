@@ -97,19 +97,7 @@ public:
         if (status == BTStateID::STATE_TURN_ON) {
             host_.SyncRandomAddrToService();
         }
-        if (status == BTStateID::STATE_TURN_OFF) {
-            if (transport == BTTransport::ADAPTER_BLE && preBleState_ == BTStateID::STATE_TURN_OFF) {
-                return;
-            }
-            if (transport == BTTransport::ADAPTER_BREDR && preBrState_ == BTStateID::STATE_TURN_OFF) {
-                return;
-            }
-        }
-        if (transport == BTTransport::ADAPTER_BREDR) {
-            preBrState_ = status;
-        } else {
-            preBleState_ = status;
-        }
+        CHECK_AND_RETURN_LOG(!isNeedInterceptSwitchStatus(transport, status), "No Need transform same status");
         BluetoothProfileManager::GetInstance().NotifyBluetoothStateChange(transport, status);
         host_.observers_.ForEach([transport, status](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnStateChanged(transport, status);
@@ -176,6 +164,26 @@ public:
     }
 
 private:
+    bool isNeedInterceptSwitchStatus(int32_t transport, int32_t status)
+    {
+        bool isBluetoothSeriviceOn = BluetoothProfileManager::GetInstance().IsBluetoothServiceOn();
+        if (status == BTStateID::STATE_TURN_OFF) {
+            if (transport == BTTransport::ADAPTER_BLE &&
+                preBleState_ == BTStateID::STATE_TURN_OFF && !isBluetoothSeriviceOn) {
+                return true;
+            }
+            if (transport == BTTransport::ADAPTER_BREDR &&
+                preBrState_ == BTStateID::STATE_TURN_OFF && !isBluetoothSeriviceOn) {
+                return true;
+            }
+        }
+        if (transport == BTTransport::ADAPTER_BREDR) {
+            preBrState_ = status;
+        } else {
+            preBleState_ = status;
+        }
+        return false;
+    }
     BluetoothHost::impl &host_;
     const int32_t INVALID_STATE = -1;
     int32_t preBrState_ = INVALID_STATE;
