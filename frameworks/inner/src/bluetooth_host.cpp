@@ -74,6 +74,7 @@ struct BluetoothHost::impl {
     std::atomic_bool isFactoryReseting_ { false };
 
 private:
+    int8_t saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::WAIT_NOTIFY);
     std::condition_variable proxyConVar_;
 };
 
@@ -391,14 +392,15 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
     }
 
     auto waitStatus = proxyConVar_.wait_for(
-        lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), []() {
+        lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), [this]() {
             HILOGI("bluetooth_service load systemAbility finished");
-            return true;
+            return saManagerStatus_ != static_cast<int8_t>(SaManagerStatus::WAIT_NOTIFY);
         });
     if (!waitStatus) {
         HILOGE("load bluetooth systemAbility timeout");
         return false;
     }
+    saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::WAIT_NOTIFY);
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     if (proxy == nullptr) {
         HILOGE("GetRemoteProxy result is failed proxy is nullptr");
@@ -410,12 +412,14 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
 void BluetoothHost::impl::LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject)
 {
     HILOGI("LoadSystemAbilitySuccess FinishStart SA");
+    saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::LOAD_SUCCESS);
     proxyConVar_.notify_one();
 }
 
 void BluetoothHost::impl::LoadSystemAbilityFail()
 {
     HILOGI("LoadSystemAbilityFail FinishStart SA");
+    saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::LOAD_FAIL);
     proxyConVar_.notify_one();
 }
 
