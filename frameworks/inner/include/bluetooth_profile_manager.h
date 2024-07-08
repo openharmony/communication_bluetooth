@@ -83,6 +83,10 @@ public:
      * @brief Notify Bluetooth State Change
      */
     void NotifyBluetoothStateChange(int32_t transport, int32_t status);
+    /**
+     * @brief check bluetooth service is on or not
+     */
+    bool IsBluetoothServiceOn();
 
     static BluetoothProfileManager &GetInstance();
 
