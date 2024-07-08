@@ -124,6 +124,12 @@ enum class BTCallType : uint8_t {
     CALL_TYPE_VIRTUAL = 1,
     CALL_TYPE_RECOGNITION = 2,
 };
+
+enum class SaManagerStatus : int8_t {
+    WAIT_NOTIFY = 0,
+    LOAD_FAIL = -1,
+    LOAD_SUCCESS = 1,
+};
 /**
  * @brief profile id define
  * use to
