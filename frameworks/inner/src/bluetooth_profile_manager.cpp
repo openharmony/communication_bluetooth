@@ -247,7 +247,7 @@ void BluetoothProfileManager::DeregisterFunc(int32_t id)
 
 bool BluetoothProfileManager::IsBluetoothServiceOn()
 {
-    return isBluetoothServiceOn_;
+    return isBluetoothServiceOn_.load();
 }
 } // namespace bluetooth
 } // namespace OHOS
