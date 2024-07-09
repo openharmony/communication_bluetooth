@@ -1404,7 +1404,8 @@ void ClearGlobalResource(void)
 bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams)
 {
     RemoveTimeoutAdvAddr();
-    string addrStr(reinterpret_cast<const char*>(ownAddrParams->addr), sizeof(ownAddrParams->addr));
+    string addrStr;
+    ConvertAddr(ownAddrParams->addr, addrStr);
     if (!CanStartAdv(addrStr)) {
         g_bleAdvCallbacks[advHandle] = nullptr;
         return false;
