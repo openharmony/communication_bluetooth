@@ -544,6 +544,14 @@ public:
     void AddServiceUuid(const Uuid &uuid);
 
     /**
+     * @brief Add service uuids.
+     *
+     * @param uuid Service uuids.
+     * @since 12
+     */
+    void AddServiceUuids(const std::vector<Uuid> &uuidVec);
+
+    /**
      * @brief Set device appearance.
      *
      * @param appearance Device appearance.

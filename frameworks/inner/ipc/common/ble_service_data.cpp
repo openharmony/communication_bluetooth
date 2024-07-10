@@ -557,6 +557,53 @@ void BleAdvertiserDataImpl::AddServiceUuid(const Uuid &uuid)
 }
 
 /**
+ * @brief Add service uuids.
+ *
+ * @param uuid Service uuids.
+ * @since 12
+ */
+void BleAdvertiserDataImpl::AddServiceUuids(const std::vector<Uuid> &uuidVec)
+{
+    if (uuidVec.empty()) {
+        return;
+    }
+    std::string serviceUuid16 = "";
+    std::string serviceUuid32 = "";
+    std::string serviceUuid128 = "";
+
+    char cdata[BLE_ADV_DATA_FIELD_TYPE_AND_LEN];
+    for (auto &uuid : uuidVec) {
+        if (uuid.GetUuidType() == Uuid::UUID16_BYTES_TYPE) {
+            uint16_t uuid16 = uuid.ConvertTo16Bits();
+            serviceUuid16.append(std::string(reinterpret_cast<char *>(&uuid16), BLE_UUID_LEN_16));
+        } else if (uuid.GetUuidType() == Uuid::UUID32_BYTES_TYPE) {
+            uint16_t uuid32 = uuid.ConvertTo32Bits();
+            serviceUuid32.append(std::string(reinterpret_cast<char *>(&uuid32), BLE_UUID_LEN_32));
+        } else {
+            uint8_t uuidData[BLE_UUID_LEN_128];
+            uuid.ConvertToBytesLE(uuidData);
+            serviceUuid128.append(std::string(reinterpret_cast<char *>(uuidData), BLE_UUID_LEN_128));
+        }
+    }
+
+    if (!serviceUuid16.empty()) {
+        cdata[0] = serviceUuid16.size() + 1; // 1指BLE_AD_TYPE_16SRV_CMPL标识
+        cdata[1] = BLE_AD_TYPE_16SRV_CMPL; // 0x03
+        AddData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) + serviceUuid16);
+    }
+    if (!serviceUuid32.empty()) {
+        cdata[0] = serviceUuid32.size() + 1; // 1 指 BLE_AD_TYPE_32SRV_CMPL 标识
+        cdata[1] = BLE_AD_TYPE_32SRV_CMPL; // 0x05
+        AddData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) + serviceUuid32);
+    }
+    if (!serviceUuid128.empty()) {
+        cdata[0] = serviceUuid128.size() + 1; // 1 指 BLE_AD_TYPE_128SRV_CMPL 标识
+        cdata[1] = BLE_AD_TYPE_128SRV_CMPL; // 0x07
+        AddData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) + serviceUuid128);
+    }
+}
+
+/**
  * @brief Set device appearance.
  *
  * @param appearance Device appearance.
