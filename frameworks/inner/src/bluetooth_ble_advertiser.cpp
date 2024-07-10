@@ -241,12 +241,28 @@ uint32_t BleAdvertiser::impl::GetAdvertiserTotalBytes(const BluetoothBleAdvertis
         size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + static_cast<uint32_t>(iter->first.GetUuidType())
         + iter->second.length();
     }
-
+    int num16BitUuids = 0;
+    int num32BitUuids = 0;
+    int num128BitUuids = 0;
     std::vector<Uuid> serviceUuids = data.GetServiceUuids();
     for (auto iter = serviceUuids.begin(); iter != serviceUuids.end(); ++iter) {
-        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + static_cast<uint32_t>(iter->GetUuidType());
+        if (iter->GetUuidType() == Uuid::UUID16_BYTES_TYPE) {
+            ++num16BitUuids;
+        } else if (iter->GetUuidType() == Uuid::UUID32_BYTES_TYPE) {
+            ++num32BitUuids;
+        } else {
+            ++num128BitUuids;
+        }
     }
-
+    if (num16BitUuids != 0) {
+        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + num16BitUuids * Uuid::UUID16_BYTES_TYPE;
+    }
+    if (num32BitUuids != 0) {
+        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + num32BitUuids * Uuid::UUID32_BYTES_TYPE;
+    }
+    if (num128BitUuids != 0) {
+        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + num128BitUuids * Uuid::UUID128_BYTES_TYPE;
+    }
     if (data.GetIncludeDeviceName()) {
         uint32_t deviceNameLen = BluetoothHost::GetDefaultHost().GetLocalName().length();
         deviceNameLen = (deviceNameLen > DEVICE_NAME_MAX_LEN) ?  DEVICE_NAME_MAX_LEN : deviceNameLen;
