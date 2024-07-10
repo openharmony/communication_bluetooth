@@ -370,7 +370,11 @@ int BleStopAdv(int advId)
         HILOGE("BleStopAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
     }
-
+    {
+        lock_guard<mutex> lock(g_advTimerMutex);
+        BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId]);
+        g_advAddrTimerIds[advId] = 0;
+    }
     int ret = g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
     if (ret != BT_NO_ERROR) {
         HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
@@ -642,9 +646,9 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
             HILOGE("fail, ret: %{public}d", ret);
             //StartAdvertise fail, return default handle -1 to softbus
             g_bleAdvCallbacks[i] = nullptr;
-            BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[i]);
             {
                 lock_guard<mutex> lock(g_advTimerMutex);
+                BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[i]);
                 g_advAddrTimerIds[i] = 0;
             }
         }
