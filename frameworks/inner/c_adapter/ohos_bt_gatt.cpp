@@ -619,7 +619,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         HILOGE("Duplicate addresses after 15 minutes are not allowed to be broadcast");
         g_bleAdvCallbacks[i] = nullptr;
         *advId = -1;
-        return OHOS_BT_STATUS_UNHANDLED;
+        return OHOS_BT_STATUS_DUPLICATE_ADDR;
     }
 
     BleAdvertiserSettings settings;
