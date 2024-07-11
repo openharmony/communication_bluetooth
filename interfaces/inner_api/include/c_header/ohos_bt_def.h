@@ -207,7 +207,9 @@ typedef enum {
     /** Remote device shut down */
     OHOS_BT_STATUS_RMT_DEV_DOWN,
     /** Authentication rejected */
-    OHOS_BT_STATUS_AUTH_REJECTED
+    OHOS_BT_STATUS_AUTH_REJECTED,
+    /** Duplicate advertising address */
+    OHOS_BT_STATUS_DUPLICATED_ADDR
 } BtStatus;
 
 /**
