@@ -209,7 +209,7 @@ typedef enum {
     /** Authentication rejected */
     OHOS_BT_STATUS_AUTH_REJECTED,
     /** Duplicate advertising address */
-    OHOS_BT_STATUS_DUPLICATE_ADDR
+    OHOS_BT_STATUS_DUPLICATED_ADDR
 } BtStatus;
 
 /**
