@@ -402,7 +402,8 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
     auto waitStatus = proxyConVar_.wait_for(
         lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), [this]() {
             HILOGI("bluetooth_service load systemAbility finished");
-            return saManagerStatus_ != static_cast<int8_t>(SaManagerStatus::WAIT_NOTIFY);
+            sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+            return proxy != nullptr || saManagerStatus_ == static_cast<int8_t>(SaManagerStatus::LOAD_FAIL);
         });
     if (!waitStatus) {
         HILOGE("load bluetooth systemAbility timeout");
