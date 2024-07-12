@@ -1170,7 +1170,8 @@ bool IsLpDeviceAvailable(void)
 void BleScanNativeFilterLog(BleScanNativeFilter &filter)
 {
     if (filter.address != nullptr) {
-        HILOGI("address: %{public}s", filter.address);
+        std::string address(filter.address);
+        HILOGI("address: %{public}s", GetEncryptAddr(filter.address).c_str());
     }
     if (filter.deviceName != nullptr) {
         HILOGI("deviceName: %{public}s", filter.deviceName);
