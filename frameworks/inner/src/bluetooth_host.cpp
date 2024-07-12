@@ -74,7 +74,7 @@ struct BluetoothHost::impl {
     std::atomic_bool isFactoryReseting_ { false };
 
 private:
-    int8_t saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::WAIT_NOTIFY);
+    SaManagerStatus saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
     std::condition_variable proxyConVar_;
 };
 
@@ -403,32 +403,32 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
         lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), [this]() {
             HILOGI("bluetooth_service load systemAbility finished");
             sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-            return proxy != nullptr || saManagerStatus_ == static_cast<int8_t>(SaManagerStatus::LOAD_FAIL);
+            return proxy != nullptr || saManagerStatus_ == SaManagerStatus::LOAD_FAIL;
         });
     if (!waitStatus) {
         HILOGE("load bluetooth systemAbility timeout");
         return false;
     }
-    saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::WAIT_NOTIFY);
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    if (proxy == nullptr) {
-        HILOGE("GetRemoteProxy result is failed proxy is nullptr");
+    if (saManagerStatus_ == SaManagerStatus::LOAD_FAIL) {
+        HILOGE("load bluetooth_service fail");
+        saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
         return false;
     }
+    saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
     return true;
 }
 
 void BluetoothHost::impl::LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject)
 {
     HILOGI("LoadSystemAbilitySuccess FinishStart SA");
-    saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::LOAD_SUCCESS);
+    saManagerStatus_ = SaManagerStatus::LOAD_SUCCESS;
     proxyConVar_.notify_one();
 }
 
 void BluetoothHost::impl::LoadSystemAbilityFail()
 {
     HILOGI("LoadSystemAbilityFail FinishStart SA");
-    saManagerStatus_ = static_cast<int8_t>(SaManagerStatus::LOAD_FAIL);
+    saManagerStatus_ = SaManagerStatus::LOAD_FAIL;
     proxyConVar_.notify_one();
 }
 
