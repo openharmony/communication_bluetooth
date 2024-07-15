@@ -16,6 +16,9 @@
 #include <map>
 #include <chrono>
 #include <random>
+#if defined(IOS_PLATFORM)
+#include <regex>
+#endif
 #include "securec.h"
 #include "__config"
 #include "bluetooth_def.h"
@@ -32,6 +35,10 @@ namespace OHOS {
 namespace Bluetooth {
 constexpr int startPos = 6;
 constexpr int endPos = 13;
+#if defined(IOS_PLATFORM)
+constexpr int START_POS_IOS_PLATFORM = 9;
+constexpr int END_POS_IOS_PLATFORM = 22;
+#endif
 constexpr int RANDOM_ADDR_ARRAY_SIZE = 4;
 constexpr int RANDOM_ADDR_MAC_BIT_SIZE = 12;
 constexpr int RANDOM_ADDR_FIRST_BIT = 1;
@@ -42,6 +49,18 @@ constexpr int OCT_BASE = 8;
 
 std::string GetEncryptAddr(std::string addr)
 {
+#if defined(IOS_PLATFORM)
+    const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
+    if (!regex_match(addr, deviceIdRegex)) {
+        return std::string("");
+    }
+    std::string tmp = "********-****-****-****-************";
+    std::string out = addr;
+    for (int i = START_POS_IOS_PLATFORM; i <= END_POS_IOS_PLATFORM; i++) {
+        out[i] = tmp[i];
+    }
+    return out;
+#else
     if (addr.empty() || addr.length() != ADDRESS_LENGTH) {
         HILOGD("addr is invalid.");
         return std::string("");
@@ -53,6 +72,7 @@ std::string GetEncryptAddr(std::string addr)
         out[i] = tmp[i];
     }
     return out;
+#endif
 }
 
 std::string GetBtStateName(int state)
