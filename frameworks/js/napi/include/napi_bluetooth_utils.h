@@ -449,6 +449,9 @@ void AfterWorkCallback(uv_work_t *work, int status)
         return;
     }
     T data = static_cast<T>(work->data);
+    if (data == nullptr) {
+        return;
+    }
     (data->object->*(data->function))(work, data->data);
     if (work->data != nullptr) {
         delete data;
