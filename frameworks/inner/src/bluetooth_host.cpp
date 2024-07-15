@@ -581,6 +581,13 @@ int BluetoothHost::BluetoothFactoryReset()
 
 bool BluetoothHost::IsValidBluetoothAddr(const std::string &addr)
 {
+#if defined(IOS_PLATFORM)
+    const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
+    return regex_match(addr, deviceIdRegex);
+#elif defined(ANDROID_PLATFORM)
+    const std::regex deviceIdRegex("^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$");
+    return regex_match(addr, deviceIdRegex);
+#else
     if (addr.length() != ADDRESS_LENGTH) {
         HILOGD("invalid address len.");
         return false;
@@ -604,6 +611,7 @@ bool BluetoothHost::IsValidBluetoothAddr(const std::string &addr)
         }
     }
     return true;
+#endif
 }
 
 BluetoothRemoteDevice BluetoothHost::GetRemoteDevice(const std::string &addr, int transport) const
