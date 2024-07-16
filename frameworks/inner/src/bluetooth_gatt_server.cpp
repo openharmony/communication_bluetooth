@@ -345,7 +345,7 @@ public:
 
     void OnAddService(int32_t ret, const BluetoothGattService &service) override
     {
-        HILOGI("enter, ret: %{public}d", ret);
+        HILOGI("enter, ret: %{public}d, handle: %{public}d", ret, service.handle_);
         auto serverSptr = GetServerSptr();
         if (!serverSptr) {
             return;
@@ -788,9 +788,9 @@ int GattServer::RemoveGattService(const GattService &service)
 
     int ret = BT_ERR_INVALID_PARAM;
     for (auto sIt = pimpl->gattServices_.begin(); sIt != pimpl->gattServices_.end(); sIt++) {
-        if (sIt->GetHandle() == service.GetHandle()) {
+        if (sIt->GetUuid().Equals(service.GetUuid())) {
             ret = proxy->RemoveService(
-                pimpl->applicationId_, (BluetoothGattService)bluetooth::Service(service.GetHandle()));
+                pimpl->applicationId_, (BluetoothGattService)bluetooth::Service(sIt->GetHandle()));
             pimpl->gattServices_.erase(sIt);
             break;
         }
