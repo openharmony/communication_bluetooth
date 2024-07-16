@@ -71,7 +71,8 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
     if (profileRemoteMap_.Find(BLUETOOTH_HOST, value)) {
         return value;
     }
-    if (!isNeedCheckBluetoothSerivceOn_.load()) {
+    std::lock_guard<std::mutex> lock(needCheckBluetoothServiceOnMutex_);
+    if (!isNeedCheckBluetoothServiceOn_.load()) {
         HILOGD("Bluetooth service is not start");
         return value;
     }
@@ -80,7 +81,7 @@ sptr<IRemoteObject> BluetoothProfileManager::GetHostRemote()
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (object == nullptr) {
         HILOGE("object is nullptr");
-        isNeedCheckBluetoothSerivceOn_ = false;
+        isNeedCheckBluetoothServiceOn_ = false;
         return nullptr;
     }
     CHECK_AND_RETURN_LOG_RET(object != nullptr, nullptr, "object is nullptr");
@@ -158,7 +159,11 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
             BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = true;
-            BluetoothProfileManager::GetInstance().isNeedCheckBluetoothSerivceOn_ = true;
+            {
+                std::lock_guard<std::mutex> lock(
+                    BluetoothProfileManager::GetInstance().needCheckBluetoothServiceOnMutex_);
+                BluetoothProfileManager::GetInstance().isNeedCheckBluetoothServiceOn_ = true;
+            }
             BluetoothProfileManager::GetInstance().RunFuncWhenBluetoothServiceStarted();
             break;
         }
@@ -179,7 +184,11 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int3
             ClearGlobalResource();
             BluetoothProfileManager::GetInstance().profileRemoteMap_.Clear();
             BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = false;
-            BluetoothProfileManager::GetInstance().isNeedCheckBluetoothSerivceOn_ = true;
+            {
+                std::lock_guard<std::mutex> lock(
+                    BluetoothProfileManager::GetInstance().needCheckBluetoothServiceOnMutex_);
+                BluetoothProfileManager::GetInstance().isNeedCheckBluetoothServiceOn_ = true;
+            }
             BluetoothHost::GetDefaultHost().OnRemoveBluetoothSystemAbility();
             break;
         }

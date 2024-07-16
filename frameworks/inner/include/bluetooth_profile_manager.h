@@ -92,8 +92,9 @@ public:
 
 private:
     class BluetoothSystemAbility : public SystemAbilityStatusChangeStub {
-        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        public:
+            void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+            void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     };
 
     void SubScribeBluetoothSystemAbility();
@@ -105,11 +106,12 @@ private:
     SafeMap<std::string, sptr<IRemoteObject>> profileRemoteMap_;
     SafeMap<int32_t, ProfileIdProperty> profileIdFuncMap_;
     std::atomic_bool isBluetoothServiceOn_ = false;
-    std::atomic_bool isNeedCheckBluetoothSerivceOn_ = true;
+    std::atomic_bool isNeedCheckBluetoothServiceOn_ = true;
     sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
     int32_t registerValidId_ = BEGIN_ID;
     std::mutex idMutex_;
     std::mutex getProfileRemoteMutex_;
+    std::mutex needCheckBluetoothServiceOnMutex_;
 };
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
