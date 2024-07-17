@@ -36,6 +36,7 @@ public:
     int32_t EnableBt() override;
     int32_t DisableBt() override;
     int32_t RestrictBluetooth() override;
+    int32_t SatelliteControl(int state) override;
     sptr<IRemoteObject> GetProfile(const std::string &name) override;
     sptr<IRemoteObject> GetBleRemote(const std::string &name) override;
     int32_t BluetoothFactoryReset() override;
