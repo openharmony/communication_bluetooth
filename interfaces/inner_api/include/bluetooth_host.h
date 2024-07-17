@@ -712,6 +712,16 @@ public:
     */
     int RestrictBluetooth();
 
+    /**
+    * @brief Switch antenna when satellie mode switches.
+    *
+    * @param state satellite state.
+    * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+    *         returns an error code defined in {@link BtErrCode} otherwise.
+    * @since 12
+    */
+    int SatelliteControl(int state);
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
