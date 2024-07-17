@@ -120,6 +120,26 @@ int32_t BluetoothHostProxy::RestrictBluetooth()
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHostProxy::SatelliteControl(int state)
+{
+    HILOGI("BluetoothHostProxy::SatelliteControl starts");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::DisableBt WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(state), BT_ERR_IPC_TRANS_FAILED, "Write state error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SATELLITE_CONTROL, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::SatelliteControl done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
 sptr<IRemoteObject> BluetoothHostProxy::GetProfile(const std::string &name)
 {
     MessageParcel data;
