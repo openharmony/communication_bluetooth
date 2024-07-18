@@ -1076,7 +1076,6 @@ int BluetoothHost::DisconnectAllowedProfiles(const std::string &remoteAddr) cons
 
 void BluetoothHost::RegisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer)
 {
-    HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
 
     pimpl->resourceManagerObservers_.Register(observer);
@@ -1084,7 +1083,6 @@ void BluetoothHost::RegisterBtResourceManagerObserver(std::shared_ptr<BluetoothR
 
 void BluetoothHost::DeregisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer)
 {
-    HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
 
     pimpl->resourceManagerObservers_.Deregister(observer);
