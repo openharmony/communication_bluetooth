@@ -270,6 +270,8 @@ enum BluetoothHostInterfaceCode {
     GET_DEVICE_INFO_ID,
     RESTRICT_BLUETOOTH,
     SATELLITE_CONTROL,
+    BT_REGISTER_RESOURCE_MANAGER_OBSERVER,
+    BT_DEREGISTER_RESOURCE_MANAGER_OBSERVER,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
@@ -461,6 +463,13 @@ enum BluetoothAudioManagerInterfaceCode {
     IS_DEVICE_WEARING,
     // The last code, if you want to add a new code, please add it before this
     WEAR_DETECTION_BUTT
+};
+
+enum BluetoothResourceManagerObserverInterfaceCode {
+    SENSING_STATE_CHANGED = 0,
+    BLUETOOTH_RESOURCE_DECISION,
+    // The last code, if you want to add a new code, please add it before this
+    BT_RESOURCE_MANAGER_OBSERVER_BUTT
 };
 
 }  // namespace Bluetooth

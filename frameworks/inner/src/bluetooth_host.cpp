@@ -27,6 +27,7 @@
 #include "bluetooth_utils.h"
 #include "bluetooth_observer_list.h"
 #include "bluetooth_remote_device_observer_stub.h"
+#include "bluetooth_resource_manager_observer_stub.h"
 #include "iservice_registry.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -59,11 +60,18 @@ struct BluetoothHost::impl {
     class BluetoothBlePeripheralCallbackImp;
     sptr<BluetoothBlePeripheralCallbackImp> bleRemoteObserverImp_ = nullptr;
 
+    // bluetooth resource manager observer
+    class BluetoothResourceManagerObserverImp;
+    sptr<BluetoothResourceManagerObserverImp> resourceManagerObserverImp_ = nullptr;
+
     // user regist observers
     BluetoothObserverList<BluetoothHostObserver> observers_;
 
     // user regist remote observers
     BluetoothObserverList<BluetoothRemoteDeviceObserver> remoteObservers_;
+
+    // user regist resource manager observers
+    BluetoothObserverList<BluetoothResourceManagerObserver> resourceManagerObservers_;
 
     void SyncRandomAddrToService(void);
 
@@ -343,12 +351,55 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBlePeripheralCallbackImp);
 };
 
+class BluetoothHost::impl::BluetoothResourceManagerObserverImp : public BluetoothResourceManagerObserverStub {
+public:
+    explicit BluetoothResourceManagerObserverImp(BluetoothHost::impl &host) : host_(host){};
+    ~BluetoothResourceManagerObserverImp() override = default;
+
+    void OnSensingStateChanged(uint8_t eventId, const BluetoothSensingInfo &info) override
+    {
+        HILOGD("enter, eventId: %{public}d", eventId);
+        SensingInfo sensingInfo;
+        sensingInfo.addr_ = info.addr_;
+        sensingInfo.uuid_ = info.uuid_;
+        sensingInfo.resourceId_ = info.resourceId_;
+        sensingInfo.pkgName_ = info.pkgName_;
+        sensingInfo.isServer_ = info.isServer_;
+        sensingInfo.interval_ = info.interval_;
+        host_.resourceManagerObservers_.ForEach(
+            [eventId, sensingInfo](std::shared_ptr<BluetoothResourceManagerObserver> observer) {
+                observer->OnSensingStateChanged(eventId, sensingInfo);
+            });
+    }
+
+    void OnBluetoothResourceDecision(uint8_t eventId, const BluetoothSensingInfo &info, uint32_t &result) override
+    {
+        HILOGD("enter, eventId: %{public}d, result: %{public}d", eventId, result);
+        SensingInfo sensingInfo;
+        sensingInfo.addr_ = info.addr_;
+        sensingInfo.uuid_ = info.uuid_;
+        sensingInfo.resourceId_ = info.resourceId_;
+        sensingInfo.pkgName_ = info.pkgName_;
+        sensingInfo.isServer_ = info.isServer_;
+        sensingInfo.interval_ = info.interval_;
+        host_.resourceManagerObservers_.ForEach(
+            [eventId, sensingInfo, &result](std::shared_ptr<BluetoothResourceManagerObserver> observer) {
+                observer->OnBluetoothResourceDecision(eventId, sensingInfo, result);
+            });
+    }
+
+private:
+    BluetoothHost::impl &host_;
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothResourceManagerObserverImp);
+};
+
 BluetoothHost::impl::impl()
 {
     observerImp_ = new BluetoothHostObserverImp(*this);
     remoteObserverImp_ = new BluetoothRemoteDeviceObserverImp(*this);
     bleRemoteObserverImp_ = new BluetoothBlePeripheralCallbackImp(*this);
     bleObserverImp_ = new BluetoothHostObserverImp(*this);
+    resourceManagerObserverImp_ = new BluetoothResourceManagerObserverImp(*this);
 
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(BLUETOOTH_HOST,
         [this](sptr<IRemoteObject> remote) {
@@ -358,6 +409,7 @@ BluetoothHost::impl::impl()
         proxy->RegisterBleAdapterObserver(bleObserverImp_);
         proxy->RegisterRemoteDeviceObserver(remoteObserverImp_);
         proxy->RegisterBlePeripheralCallback(bleRemoteObserverImp_);
+        proxy->RegisterBtResourceManagerObserver(resourceManagerObserverImp_);
     });
 }
 
@@ -371,6 +423,7 @@ BluetoothHost::impl::~impl()
     proxy->DeregisterBleAdapterObserver(bleObserverImp_);
     proxy->DeregisterRemoteDeviceObserver(remoteObserverImp_);
     proxy->DeregisterBlePeripheralCallback(bleRemoteObserverImp_);
+    proxy->DeregisterBtResourceManagerObserver(resourceManagerObserverImp_);
 }
 
 bool BluetoothHost::impl::LoadBluetoothHostService()
@@ -1019,6 +1072,22 @@ int BluetoothHost::DisconnectAllowedProfiles(const std::string &remoteAddr) cons
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
 
     return proxy->DisconnectAllowedProfiles(remoteAddr);
+}
+
+void BluetoothHost::RegisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer)
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+
+    pimpl->resourceManagerObservers_.Register(observer);
+}
+
+void BluetoothHost::DeregisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer)
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+
+    pimpl->resourceManagerObservers_.Deregister(observer);
 }
 
 bool BluetoothHost::IsBtProhibitedByEdm(void)
