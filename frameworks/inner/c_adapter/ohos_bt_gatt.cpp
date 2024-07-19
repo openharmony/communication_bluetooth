@@ -1429,7 +1429,7 @@ bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams)
     return true;
 }
 
-int AllocateAdvHandle()
+int AllocateAdvHandle(void)
 {
     int i = 0;
     for (; i < MAX_BLE_ADV_NUM; i++) {
