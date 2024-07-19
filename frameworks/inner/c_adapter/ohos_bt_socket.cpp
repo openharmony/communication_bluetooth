@@ -349,7 +349,7 @@ int SocketGetRemoteAddr(int clientId, BdAddr *remoteAddr)
 {
     HILOGI("SocketGetRemoteAddr clientId: %{public}d", clientId);
     if (remoteAddr == nullptr) {
-        HILOGE("remoteAddr is null");
+        HILOGE("remoteAddr is null, clientId: %{public}d", clientId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
     std::shared_ptr<ClientSocket> client = g_clientMap.GetObject(clientId);
@@ -397,7 +397,7 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
 {
     HILOGD("SocketRead start, clientId: %{public}d, bufLen: %{public}d", clientId, bufLen);
     if (buf == nullptr || bufLen == 0) {
-        HILOGE("buf is null or bufLen is 0!");
+        HILOGE("buf is null or bufLen is 0! clientId: %{public}d", clientId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
     std::shared_ptr<ClientSocket> client = g_clientMap.GetObject(clientId);
@@ -423,12 +423,12 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
 {
     HILOGD("SocketWrite start, clientId: %{public}d, len: %{public}d", clientId, len);
     if (data == nullptr || len == 0) {
-        HILOGE("data is null or len is 0!");
+        HILOGE("data is null or len is 0! clientId: %{public}d", clientId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
     std::shared_ptr<ClientSocket> client = g_clientMap.GetObject(clientId);
     if (client == nullptr) {
-        HILOGE("client is null!");
+        HILOGE("client is null! clientId: %{public}d", clientId);
         return OHOS_BT_STATUS_FAIL;
     }
     int writeLen = client->GetOutputStream().Write(data, len);
@@ -480,7 +480,7 @@ int SetSocketBufferSize(int clientId, uint32_t bufferSize)
     HILOGI("start, clientId: %{public}d, bufferSize: %{public}d", clientId, bufferSize);
     std::shared_ptr<ClientSocket> client = g_clientMap.GetObject(clientId);
     if (client == nullptr) {
-        HILOGE("client is null!");
+        HILOGE("client is null! clientId: %{public}d", clientId);
         return OHOS_BT_STATUS_FAIL;
     }
     int ret = client->SetBufferSize(bufferSize);
