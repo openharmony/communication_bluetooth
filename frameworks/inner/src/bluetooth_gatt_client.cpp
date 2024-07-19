@@ -192,6 +192,7 @@ public:
         auto ptr = clientSptr->pimpl->requestInformation_.context_.characteristic_;
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_READ) {
             HILOGE("Unexpected call!");
+            return;
         }
         if (ret == GattStatus::GATT_SUCCESS) {
             ptr->SetValue(characteristic.value_.get(), characteristic.length_);
@@ -212,6 +213,7 @@ public:
         auto ptr = clientSptr->pimpl->requestInformation_.context_.characteristic_;
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_WRITE) {
             HILOGE("Unexpected call!");
+            return;
         }
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicWriteResult, *ptr, ret);
     }
@@ -229,6 +231,7 @@ public:
         auto ptr = clientSptr->pimpl->requestInformation_.context_.descriptor_;
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_DESCRIPTOR_READ) {
             HILOGE("Unexpected call!");
+            return;
         }
         if (ret == GattStatus::GATT_SUCCESS) {
             ptr->SetValue(descriptor.value_.get(), descriptor.length_);
@@ -254,6 +257,7 @@ public:
             WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnSetNotifyCharacteristic, *characterPtr, ret);
         } else {
             HILOGE("Unexpected call!");
+            return;
         }
     }
 
@@ -908,15 +912,14 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
         withoutRespond = ((characteristic.GetWriteType() ==
             static_cast<int>(GattCharacteristic::WriteType::DEFAULT)) ? false : true);
         HILOGD("Write without response");
-        result = proxy->WriteCharacteristic(pimpl->applicationId_, &character, withoutRespond);
-    }
-    if (result == GattStatus::GATT_SUCCESS && !withoutRespond) {
-        HILOGI("successful");
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_WRITE;
         pimpl->requestInformation_.context_.characteristic_ = &characteristic;
         pimpl->requestInformation_.doing_ = true;
-    } else {
-        HILOGD("result: %{public}d", result);
+        result = proxy->WriteCharacteristic(pimpl->applicationId_, &character, withoutRespond);
+    }
+    if (result != GattStatus::GATT_SUCCESS) {
+        HILOGE("Write failed, ret: %{public}d", result);
+        pimpl->requestInformation_.doing_ = false;
     }
     return result;
 }
