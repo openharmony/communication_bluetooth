@@ -255,13 +255,13 @@ uint32_t BleAdvertiser::impl::GetAdvertiserTotalBytes(const BluetoothBleAdvertis
         }
     }
     if (num16BitUuids != 0) {
-        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + num16BitUuids * Uuid::UUID16_BYTES_TYPE;
+        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + static_cast<uint32_t>(num16BitUuids * Uuid::UUID16_BYTES_TYPE);
     }
     if (num32BitUuids != 0) {
-        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + num32BitUuids * Uuid::UUID32_BYTES_TYPE;
+        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + static_cast<uint32_t>(num32BitUuids * Uuid::UUID32_BYTES_TYPE);
     }
     if (num128BitUuids != 0) {
-        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + num128BitUuids * Uuid::UUID128_BYTES_TYPE;
+        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + static_cast<uint32_t>(num128BitUuids * Uuid::UUID128_BYTES_TYPE);
     }
     if (data.GetIncludeDeviceName()) {
         uint32_t deviceNameLen = BluetoothHost::GetDefaultHost().GetLocalName().length();

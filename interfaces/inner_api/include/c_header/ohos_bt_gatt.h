@@ -957,7 +957,7 @@ bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams);
  * @return advertiser handle.
  * @since 12
  */
-int AllocateAdvHandle();
+int AllocateAdvHandle(void);
 #ifdef __cplusplus
 }
 #endif
