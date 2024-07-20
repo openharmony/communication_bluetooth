@@ -21,7 +21,7 @@
 
 #include "iremote_broker.h"
 #include "refbase.h"
-#include "../../../frameworks/inner/include/no_destructor.h"
+#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
