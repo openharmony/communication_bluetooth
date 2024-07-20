@@ -31,7 +31,7 @@
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_a2dp_codec.h"
-#include "../../../frameworks/inner/include/no_destructor.h"
+#include "no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
