@@ -550,7 +550,11 @@ struct ServerSocket::impl {
             .observer = observer_
         };
         int ret = proxy->Listen(param, fd_);
-        CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Listen error %{public}d.", ret);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("Listen error %{public}d.", ret);
+            socketStatus_ = SOCKET_CLOSED;
+            return ret;
+        }
 
         if (fd_ == BT_INVALID_SOCKET_FD) {
             HILOGE("listen socket failed");
