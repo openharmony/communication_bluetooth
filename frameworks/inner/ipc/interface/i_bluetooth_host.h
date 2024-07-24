@@ -22,6 +22,7 @@
 #include "i_bluetooth_ble_peripheral_observer.h"
 #include "i_bluetooth_host_observer.h"
 #include "i_bluetooth_remote_device_observer.h"
+#include "i_bluetooth_resource_manager_observer.h"
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_device_battery_info.h"
 #include "../parcel/bluetooth_remote_device_info.h"
@@ -135,6 +136,8 @@ public:
     virtual int32_t IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport) = 0;
     virtual int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) = 0;
     virtual int32_t SetFastScanLevel(int level) = 0;
+    virtual void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
+    virtual void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
