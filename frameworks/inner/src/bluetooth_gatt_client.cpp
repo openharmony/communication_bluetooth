@@ -914,7 +914,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
         HILOGD("Write without response");
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_WRITE;
         pimpl->requestInformation_.context_.characteristic_ = &characteristic;
-        pimpl->requestInformation_.doing_ = true;
+        pimpl->requestInformation_.doing_ = (!withoutRespond);
         result = proxy->WriteCharacteristic(pimpl->applicationId_, &character, withoutRespond);
     }
     if (result != GattStatus::GATT_SUCCESS) {
