@@ -417,6 +417,8 @@ typedef enum {
     SCAN_MODE_OP_P50_100_200 = 0x07,
     SCAN_MODE_OP_P10_30_300 = 0x08,
     SCAN_MODE_OP_P2_30_1500 = 0x09,
+    SCAN_MODE_OP_P75_30_40 = 0x0A,
+    SCAN_MODE_OP_P50_30_60 = 0x0B,
     SCAN_MODE_OP_MAX,
 } SCAN_MODE;
 
@@ -453,6 +455,10 @@ constexpr uint16_t BLE_SCAN_MODE_OP_P10_30_300_WINDOW_MS = 30;
 constexpr uint16_t BLE_SCAN_MODE_OP_P10_30_300_INTERVAL_MS = 300;
 constexpr uint16_t BLE_SCAN_MODE_OP_P2_30_1500_WINDOW_MS = 30;
 constexpr uint16_t BLE_SCAN_MODE_OP_P2_30_1500_INTERVAL_MS = 1500;
+constexpr uint16_t BLE_SCAN_MODE_OP_P75_30_40_WINDOW_MS = 30;
+constexpr uint16_t BLE_SCAN_MODE_OP_P75_30_40_INTERVAL_MS = 40;
+constexpr uint16_t BLE_SCAN_MODE_OP_P50_30_60_WINDOW_MS = 30;
+constexpr uint16_t BLE_SCAN_MODE_OP_P50_30_60_INTERVAL_MS = 60;
 constexpr float BLE_SCAN_UNIT_TIME = 0.625;
 void ConvertBleScanMode(int scanMode, uint16_t &outScanWindow, uint16_t &outScanInterval);
 
