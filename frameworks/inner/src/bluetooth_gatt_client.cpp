@@ -911,10 +911,11 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
     } else {
         withoutRespond = ((characteristic.GetWriteType() ==
             static_cast<int>(GattCharacteristic::WriteType::DEFAULT)) ? false : true);
-        HILOGD("Write without response");
+        HILOGD("Write without response：%{public}d", withoutRespond);
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_WRITE;
         pimpl->requestInformation_.context_.characteristic_ = &characteristic;
-        pimpl->requestInformation_.doing_ = true;
+        // if withoutRespond is true, no need wait for callback
+        pimpl->requestInformation_.doing_ = (!withoutRespond);
         result = proxy->WriteCharacteristic(pimpl->applicationId_, &character, withoutRespond);
     }
     if (result != GattStatus::GATT_SUCCESS) {
