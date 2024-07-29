@@ -49,6 +49,7 @@ public:
         socektConnectCallback.connStateCb = callback.connStateCb;
         socektConnectCallback.bleConnStateCb = callback.bleConnStateCb;
     }
+    __attribute__((no_sanitize("cfi")))
     void OnConnectionStateChanged(CallbackConnectParam param) override
     {
         if (socektConnectCallback.connStateCb == nullptr && socektConnectCallback.bleConnStateCb == nullptr) {
