@@ -291,6 +291,7 @@ public:
         HILOGD("enter");
     }
 
+    __attribute__((no_sanitize("cfi")))
     void OnConnectionStateChanged(CallbackParam callbackParam) override
     {
         HILOGD("dev: %{public}s, uuid:%{public}s, status: %{public}d, psm: %{public}d, result: %{public}d",
