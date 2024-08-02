@@ -399,7 +399,7 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
     HILOGD("SocketRead start, clientId: %{public}d, bufLen: %{public}d", clientId, bufLen);
     if (buf == nullptr || bufLen == 0) {
         HILOGE("buf is null or bufLen is 0! clientId: %{public}d", clientId);
-        return OHOS_BT_STATUS_PARM_INVALID;
+        return BT_SOCKET_READ_FAILED;
     }
     std::shared_ptr<ClientSocket> client = g_clientMap.GetObject(clientId);
     if (client == nullptr) {
@@ -425,12 +425,12 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
     HILOGD("SocketWrite start, clientId: %{public}d, len: %{public}d", clientId, len);
     if (data == nullptr || len == 0) {
         HILOGE("data is null or len is 0! clientId: %{public}d", clientId);
-        return OHOS_BT_STATUS_PARM_INVALID;
+        return BT_SOCKET_WRITE_FAILED;
     }
     std::shared_ptr<ClientSocket> client = g_clientMap.GetObject(clientId);
     if (client == nullptr) {
         HILOGE("client is null! clientId: %{public}d", clientId);
-        return OHOS_BT_STATUS_FAIL;
+        return BT_SOCKET_WRITE_FAILED;
     }
     int writeLen = client->GetOutputStream().Write(data, len);
     HILOGD("end, writeLen: %{public}d", writeLen);
