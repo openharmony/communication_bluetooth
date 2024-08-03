@@ -584,7 +584,7 @@ int A2dpSource::GetRenderPosition(const BluetoothRemoteDevice &device, uint32_t 
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "a2dpSrc proxy is nullptr");
-    return proxy->GetRenderPosition(delayValue, sendDataSize, timeStamp);
+    return proxy->GetRenderPosition(RawAddress(device.GetDeviceAddr()), delayValue, sendDataSize, timeStamp);
 }
 
 int A2dpSource::OffloadStartPlaying(const BluetoothRemoteDevice &device, const std::vector<int32_t> &sessionsId)
