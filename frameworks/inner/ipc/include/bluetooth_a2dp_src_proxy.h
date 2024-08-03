@@ -50,7 +50,7 @@ public:
     int SuspendPlaying(const RawAddress &device) override;
     int StopPlaying(const RawAddress &device) override;
     int WriteFrame(const uint8_t *data, uint32_t size) override;
-    int GetRenderPosition(const RawAddress &device, uint32_t &delayValue, uint64_t &sendDataSize, 
+    int GetRenderPosition(const RawAddress &device, uint32_t &delayValue, uint64_t &sendDataSize,
                           uint32_t &timeStamp) override;
     int OffloadStartPlaying(const RawAddress &device, const std::vector<int32_t> &sessionId) override;
     int OffloadStopPlaying(const RawAddress &device, const std::vector<int32_t> &sessionId) override;
