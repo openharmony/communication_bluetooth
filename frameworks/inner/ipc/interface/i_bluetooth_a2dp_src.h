@@ -52,7 +52,8 @@ public:
     virtual int SuspendPlaying(const RawAddress &device) = 0;
     virtual int StopPlaying(const RawAddress &device) = 0;
     virtual int WriteFrame(const uint8_t *data, uint32_t size) = 0;
-    virtual void GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp) = 0;
+    virtual int GetRenderPosition(const RawAddress &device, uint32_t &delayValue, uint64_t &sendDataSize,
+                                  uint32_t &timeStamp) = 0;
     virtual int OffloadStartPlaying(const RawAddress &device, const std::vector<int32_t> &sessionsId) = 0;
     virtual int OffloadStopPlaying(const RawAddress &device, const std::vector<int32_t> &sessionsId) = 0;
     virtual int A2dpOffloadSessionPathRequest(const RawAddress &device,
