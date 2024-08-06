@@ -463,9 +463,13 @@ GattServer::impl::impl(std::shared_ptr<GattServerCallback> callback)
     HILOGD("enter");
 };
 
-GattServer::GattServer(std::shared_ptr<GattServerCallback> callback) : pimpl(new GattServer::impl(callback))
+GattServer::GattServer(std::shared_ptr<GattServerCallback> callback)
 {
-    HILOGD("enter");
+    HILOGI("create GattServer start.");
+    pimpl = std::make_unique<GattServer::impl>(callback);
+    if (!pimpl) {
+        HILOGE("create GattServer failed.");
+    }
 }
 
 bool GattServer::impl::Init(std::weak_ptr<GattServer> server)

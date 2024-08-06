@@ -181,7 +181,7 @@ Pan::~Pan()
 Pan *Pan::GetProfile()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<Pan> instance;
+    static BluetoothNoDestructor<Pan> instance;
     return instance.get();
 #else
     static Pan instance;

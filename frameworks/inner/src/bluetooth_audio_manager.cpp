@@ -75,8 +75,8 @@ int BluetoothAudioManager::impl::IsWearDetectionSupported(const BluetoothRemoteD
     return proxy->IsWearDetectionSupported(BluetoothRawAddress(device.GetDeviceAddr()), isSupported);
 }
 
-int BluetoothAudioManager::impl::SendDeviceSelection(const BluetoothRemoteDevice &device, int useA2dp,
-    int useHfp, int userSelection)
+int BluetoothAudioManager::impl::SendDeviceSelection(const BluetoothRemoteDevice &device, 
+    int useA2dp, int useHfp, int userSelection)
 {
     sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
@@ -159,7 +159,7 @@ int BluetoothAudioManager::SendDeviceSelection(const BluetoothRemoteDevice &devi
 BluetoothAudioManager &BluetoothAudioManager::GetInstance()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<BluetoothAudioManager> instance;
+    static BluetoothNoDestructor<BluetoothAudioManager> instance;
     return *instance;
 #else
     static BluetoothAudioManager instance;

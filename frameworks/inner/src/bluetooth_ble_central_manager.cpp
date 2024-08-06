@@ -119,7 +119,7 @@ struct BleCentralManager::impl {
 
         void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override
         {
-            HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+            HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
             callbacks_.ForEach(
                 [resultCode, isStartScan](std::shared_ptr<BleCentralManagerCallback> observer) {
                     observer->OnStartOrStopScanEvent(resultCode, isStartScan);
@@ -331,6 +331,7 @@ BleCentralManager::BleCentralManager(std::shared_ptr<BleCentralManagerCallback> 
 
 BleCentralManager::~BleCentralManager()
 {
+    HILOGD("~BleCentralManager");
 }
 
 int BleCentralManager::StartScan(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters)
@@ -531,9 +532,7 @@ BleScanResult::BleScanResult()
 {}
 
 BleScanResult::~BleScanResult()
-{
-    HILOGD("~BleScanResult");
-}
+{}
 
 std::vector<UUID> BleScanResult::GetServiceUuids() const
 {

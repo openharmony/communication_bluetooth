@@ -1401,7 +1401,9 @@ void ClearGlobalResource(void)
     int i = 0;
     lock_guard<mutex> lock(g_advMutex);
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
-        g_bleAdvCallbacks[i] = nullptr;
+        if (g_bleAdvCallbacks[i] != nullptr) {
+            g_bleAdvCallbacks[i] = nullptr;
+        }
     }
     HILOGD("clear all g_bleAdvCallbacks when ble turn on or bluetooth_serivce unload");
 }

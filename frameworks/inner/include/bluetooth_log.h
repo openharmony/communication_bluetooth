@@ -44,23 +44,27 @@
 #undef HILOGD
 #endif
 
-#define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define __FILENAME__SHORT (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define HILOGD(fmt, ...)                 \
     HILOG_DEBUG(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGI(fmt, ...)                \
     HILOG_INFO(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGW(fmt, ...)                \
     HILOG_WARN(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGE(fmt, ...)                 \
     HILOG_ERROR(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGF(fmt, ...)                 \
     HILOG_FATAL(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        __FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+
+#ifdef CHECK_AND_RETURN_LOG
+#undef CHECK_AND_RETURN_LOG
+#endif
 
 #define CHECK_AND_RETURN_LOG(cond, fmt, ...)        \
     do {                                            \
@@ -70,10 +74,14 @@
         }                                           \
     } while (0)
 
+#ifdef CHECK_AND_RETURN_LOG_RET
+#undef CHECK_AND_RETURN_LOG_RET
+#endif
+
 #define CHECK_AND_RETURN_LOG_RET(cond, ret, fmt, ...)               \
     do {                                                            \
         if (!(cond)) {                                              \
-            HILOGE(fmt, ##__VA_ARGS__);    \
+            HILOGE(fmt, ##__VA_ARGS__);                             \
             return ret;                                             \
         }                                                           \
     } while (0)

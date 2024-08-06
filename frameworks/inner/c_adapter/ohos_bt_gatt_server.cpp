@@ -143,7 +143,7 @@ static void AddAttribute(int serverId, int serviceIndex, int attrType, UUID uuid
         0 <= serverId && serverId < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId);
     CHECK_AND_RETURN_LOG(0 <= serviceIndex && serviceIndex < MAXIMUM_NUMBER_GATTSERVICE,
         "serviceIndex(%{public}d) is invalid", serviceIndex);
-    
+
     std::lock_guard<std::mutex> lock(g_gattServersMutex);
     GattServiceWrapper &gattServiceWrapper = GATTSERVICES(serverId, serviceIndex);
     auto attribute = std::make_shared<GattAttribute>(handle, uuid, attrType);
