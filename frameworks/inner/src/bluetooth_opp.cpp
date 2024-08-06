@@ -253,7 +253,7 @@ Opp::~Opp()
 Opp *Opp::GetProfile()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<Opp> instance;
+    static BluetoothNoDestructor<Opp> instance;
     return instance.get();
 #else
     static Opp instance;

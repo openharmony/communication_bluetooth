@@ -46,11 +46,11 @@ class BluetoothConnectionObserverWapper : public BluetoothConnectionObserver {
 public:
     explicit BluetoothConnectionObserverWapper(BtSocketConnectionCallback &callback)
     {
-        socektConnectCallback.connStateCb = callback.connStateCb;
-        socektConnectCallback.bleConnStateCb = callback.bleConnStateCb;
+        socektConnectCallback = callback;
     }
+
     __attribute__((no_sanitize("cfi")))
-    void OnConnectionStateChanged(CallbackConnectParam param) override
+    void OnConnectionStateChanged(const CallbackConnectParam &param) override
     {
         if (socektConnectCallback.connStateCb == nullptr && socektConnectCallback.bleConnStateCb == nullptr) {
             HILOGE("callback is null");
@@ -406,8 +406,11 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
         HILOGE("client is null, clientId: %{public}d", clientId);
         return BT_SOCKET_READ_FAILED;
     }
-
-    int readLen = client->GetInputStream().Read(buf, bufLen);
+    if (client->GetInputStream() == nullptr) {
+        HILOGE("inputStream is null, clientId: %{public}d", clientId);
+        return BT_SOCKET_READ_FAILED;
+    }
+    int readLen = client->GetInputStream()->Read(buf, bufLen);
     HILOGD("SocketRead ret, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
     return readLen;
 }
@@ -432,7 +435,11 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
         HILOGE("client is null! clientId: %{public}d", clientId);
         return OHOS_BT_STATUS_FAIL;
     }
-    int writeLen = client->GetOutputStream().Write(data, len);
+    if (client->GetOutputStream() == nullptr) {
+        HILOGE("outputStream is null, clientId: %{public}d", clientId);
+        return BT_SOCKET_READ_FAILED;
+    }
+    int writeLen = client->GetOutputStream()->Write(data, len);
     HILOGD("end, writeLen: %{public}d", writeLen);
     return writeLen;
 }
