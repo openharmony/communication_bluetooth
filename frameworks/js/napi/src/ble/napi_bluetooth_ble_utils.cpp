@@ -303,7 +303,9 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     uint8_t* valueData = characteristic.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
     napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-    (void)memcpy_s(bufferData, valueSize, valueData, valueSize);
+    if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+        HILOGE("memcpy_s error");
+    }
     napi_set_named_property(env, result, "value", value);
 
     napi_value characteristicUuid;
@@ -348,7 +350,9 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     uint8_t* valueData = descriptor.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
     napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
-    (void)memcpy_s(bufferData, valueSize, valueData, valueSize);
+    if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+        HILOGE("memcpy_s error");
+    }
     napi_set_named_property(env, result, "value", value);
 
     napi_value descriptorUuid;

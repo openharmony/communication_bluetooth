@@ -224,7 +224,7 @@ HidHost::~HidHost() {}
 HidHost *HidHost::GetProfile()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<HidHost> instance;
+    static BluetoothNoDestructor<HidHost> instance;
     return instance.get();
 #else
     static HidHost instance;

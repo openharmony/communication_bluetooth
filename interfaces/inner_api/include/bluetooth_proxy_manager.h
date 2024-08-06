@@ -21,7 +21,7 @@
 
 #include "iremote_broker.h"
 #include "refbase.h"
-#include "no_destructor.h"
+#include "bluetooth_no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -37,7 +37,7 @@ private:
     ~BluetoothProxyManager() = default;
 
 #ifdef DTFUZZ_TEST
-    friend class NoDestructor<BluetoothProxyManager>;
+    friend class BluetoothNoDestructor<BluetoothProxyManager>;
 #endif
 };
 } // namespace Bluetooth

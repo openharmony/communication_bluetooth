@@ -33,7 +33,6 @@ public:
 
     NapiEventSubscribeModule eventSubscribe_;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_AVRCP_TG_OBSERVER_H_ */
