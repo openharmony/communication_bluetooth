@@ -1608,6 +1608,14 @@ enum UpdateOutputStackAction {
     ACTION_STOP_VIRTUAL_CALL = 7,
 };
 
+enum HfpAgScoStateChangeReason {
+    HFP_AG_SCO_INVALID = 0,
+    HFP_AG_SCO_LOCAL_USER_TERMINATED = 1,
+    HFP_AG_SCO_REMOTE_USER_TERMINATED = 2,
+    HFP_AG_SCO_LOCAL_USER_SET_UP = 3,
+    HFP_AG_SCO_REMOTE_USER_SET_UP = 4,
+};
+
 enum DeviceType {
     DEVICE_TYPE_DEFAULT = 0,
     DEVICE_TYPE_CAR = 1,
@@ -1617,14 +1625,6 @@ enum DeviceType {
     DEVICE_TYPE_WATCH = 5,
     DEVICE_TYPE_SPEAKER = 6,
     DEVICE_TYPE_OTHERS = 7,
-};
-
-enum HfpAgScoStateChangeReason {
-    HFP_AG_SCO_INVALID = 0,
-    HFP_AG_SCO_LOCAL_USER_TERMINATED = 1,
-    HFP_AG_SCO_REMOTE_USER_TERMINATED = 2,
-    HFP_AG_SCO_LOCAL_USER_SET_UP = 3,
-    HFP_AG_SCO_REMOTE_USER_SET_UP = 4,
 };
 
 enum DeviceInfoType {

@@ -29,7 +29,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
 #include "bluetooth_remote_device.h"
-#include "no_destructor.h"
+#include "bluetooth_no_destructor.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -323,7 +323,7 @@ private:
     BLUETOOTH_DECLARE_IMPL();
 
 #ifdef DTFUZZ_TEST
-    friend class NoDestructor<AvrcpTarget>;
+    friend class BluetoothNoDestructor<AvrcpTarget>;
 #endif
 };
 }  // namespace Bluetooth

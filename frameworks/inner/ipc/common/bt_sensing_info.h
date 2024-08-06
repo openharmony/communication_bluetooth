@@ -61,7 +61,7 @@ struct SensingInfo {
         : addr_(addr), uuid_(INVALID_UUID_STRING), resourceId_(0), pkgName_(INVALID_PKGNAME),
         isServer_(false), interval_(interval)
     {}
-    //used by stack sensing info transfer
+    // used by stack sensing info transfer
     SensingInfo(const std::string &addr, const std::string &uuid, uint32_t resourceId, uint16_t interval)
         : addr_(addr), uuid_(uuid), resourceId_(resourceId), pkgName_(INVALID_PKGNAME), isServer_(false),
         interval_(interval)

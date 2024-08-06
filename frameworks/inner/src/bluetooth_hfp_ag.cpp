@@ -400,7 +400,7 @@ HandsFreeAudioGateway *HandsFreeAudioGateway::GetProfile()
 {
     HILOGD("enter");
 #ifdef DTFUZZ_TEST
-    static NoDestructor<HandsFreeAudioGateway> instance;
+    static BluetoothNoDestructor<HandsFreeAudioGateway> instance;
     return instance.get();
 #else
     static HandsFreeAudioGateway instance;

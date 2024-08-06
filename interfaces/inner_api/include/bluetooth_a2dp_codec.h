@@ -82,7 +82,7 @@ struct A2dpCodecStatus {
 };
 
 /**
- * @brief A2dp Offload Codec configuration information of a2dp source
+ * @brief A2dp offload Codec configuration information of a2dp source
  *
  * @since 6.0
  */
@@ -113,9 +113,10 @@ struct A2dpOffloadCodecInfo {
 };
 
 class BluetoothA2dpOffloadCodecStatus;
+
 struct A2dpOffloadCodecStatus {
     A2dpOffloadCodecInfo offloadInfo;
-    A2dpOffloadCodecStatus() {}
+    A2dpOffloadCodecStatus() {};
     A2dpOffloadCodecStatus(const BluetoothA2dpOffloadCodecStatus &status);
 };
 }  // namespace Bluetooth

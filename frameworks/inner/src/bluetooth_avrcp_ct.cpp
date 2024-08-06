@@ -900,7 +900,7 @@ AvrcpController *AvrcpController::GetProfile(void)
 {
     HILOGI("enter");
 #ifdef DTFUZZ_TEST
-    static NoDestructor<AvrcpController> instance;
+    static BluetoothNoDestructor<AvrcpController> instance;
     return instance.get();
 #else
     static AvrcpController instance;
