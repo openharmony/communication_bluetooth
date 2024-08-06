@@ -154,22 +154,22 @@ struct ClientSocket::impl {
         return flags;
     }
 
-    InputStream &GetInputStream()
+    std::shared_ptr<InputStream> GetInputStream()
     {
         HILOGD("enter");
         if (inputStream_ == nullptr) {
             HILOGE("inputStream is NULL, failed. please Connect");
         }
-        return *inputStream_;
+        return inputStream_;
     }
 
-    OutputStream &GetOutputStream()
+    std::shared_ptr<OutputStream> GetOutputStream()
     {
         HILOGD("enter");
         if (outputStream_ == nullptr) {
             HILOGE("outputStream is NULL, failed. please Connect");
         }
-        return *outputStream_;
+        return outputStream_;
     }
 
     BluetoothRemoteDevice &GetRemoteDevice()
@@ -251,10 +251,10 @@ struct ClientSocket::impl {
 
     // socket observer
     sptr<BluetoothSocketObserverImp> observerImp_ = nullptr;
-    std::unique_ptr<InputStream> inputStream_ {
+    std::shared_ptr<InputStream> inputStream_ {
         nullptr
     };
-    std::unique_ptr<OutputStream> outputStream_ {
+    std::shared_ptr<OutputStream> outputStream_ {
         nullptr
     };
     bool Init(std::weak_ptr<ClientSocket> client);
@@ -292,7 +292,7 @@ public:
     }
 
     __attribute__((no_sanitize("cfi")))
-    void OnConnectionStateChanged(CallbackParam callbackParam) override
+    void OnConnectionStateChanged(const CallbackParam &callbackParam) override
     {
         HILOGD("dev: %{public}s, uuid:%{public}s, status: %{public}d, psm: %{public}d, result: %{public}d",
             GetEncryptAddr((callbackParam.dev).GetAddress()).c_str(), callbackParam.uuid.ToString().c_str(),
@@ -455,13 +455,13 @@ void ClientSocket::Close()
     return pimpl->Close();
 }
 
-InputStream &ClientSocket::GetInputStream()
+std::shared_ptr<InputStream> ClientSocket::GetInputStream()
 {
     HILOGD("enter");
     return pimpl->GetInputStream();
 }
 
-OutputStream &ClientSocket::GetOutputStream()
+std::shared_ptr<OutputStream> ClientSocket::GetOutputStream()
 {
     HILOGD("enter");
     return pimpl->GetOutputStream();

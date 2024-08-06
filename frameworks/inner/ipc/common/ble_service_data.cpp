@@ -21,6 +21,7 @@
 #include "map"
 #include "vector"
 #include "securec.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -1401,7 +1402,7 @@ uint8_t BlePeripheralDevice::GetPairedStatus() const
  */
 bool BlePeripheralDevice::SetPairedStatus(uint8_t status)
 {
-    if (BLE_PAIR_CANCELING < status || status < BLE_PAIR_NONE) {
+    if (status < BLE_PAIR_NONE || status > BLE_PAIR_CANCELING) {
         return false;
     }
     if (pairState_ == status) {

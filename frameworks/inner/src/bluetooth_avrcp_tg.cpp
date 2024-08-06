@@ -97,7 +97,7 @@ AvrcpTarget *AvrcpTarget::GetProfile(void)
 {
     HILOGI("enter");
 #ifdef DTFUZZ_TEST
-    static NoDestructor<AvrcpTarget> instance;
+    static BluetoothNoDestructor<AvrcpTarget> instance;
     return instance.get();
 #else
     static AvrcpTarget instance;

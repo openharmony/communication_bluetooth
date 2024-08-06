@@ -46,11 +46,11 @@ class BluetoothConnectionObserverWapper : public BluetoothConnectionObserver {
 public:
     explicit BluetoothConnectionObserverWapper(BtSocketConnectionCallback &callback)
     {
-        socektConnectCallback.connStateCb = callback.connStateCb;
-        socektConnectCallback.bleConnStateCb = callback.bleConnStateCb;
+        socektConnectCallback = callback;
     }
+
     __attribute__((no_sanitize("cfi")))
-    void OnConnectionStateChanged(CallbackConnectParam param) override
+    void OnConnectionStateChanged(const CallbackConnectParam &param) override
     {
         if (socektConnectCallback.connStateCb == nullptr && socektConnectCallback.bleConnStateCb == nullptr) {
             HILOGE("callback is null");
@@ -127,13 +127,7 @@ int SocketServerCreate(const BluetoothCreateSocketPara *socketPara, const char *
     string serverName(name);
     std::shared_ptr<ServerSocket> server = std::make_shared<ServerSocket>(serverName, serverUuid,
         BtSocketType(socketPara->socketType), socketPara->isEncrypt);
-    int result = server->Listen();
-    if (result != BT_NO_ERROR) {
-        HILOGE("SocketServerCreate fail, result: %{public}d", result);
-        server->Close();
-        HILOGE("SocketServerCreate closed.");
-        return BT_SOCKET_INVALID_ID;
-    }
+    server->Listen();
     int serverId = g_serverMap.AddObject(server);
     HILOGI("success, serverId: %{public}d, socketType: %{public}d, isEncrypt: %{public}d", serverId,
         socketPara->socketType, socketPara->isEncrypt);
@@ -406,8 +400,11 @@ int SocketRead(int clientId, uint8_t *buf, uint32_t bufLen)
         HILOGE("client is null, clientId: %{public}d", clientId);
         return BT_SOCKET_READ_FAILED;
     }
-
-    int readLen = client->GetInputStream().Read(buf, bufLen);
+    if (client->GetInputStream() == nullptr) {
+        HILOGE("inputStream is null, clientId: %(public)d", clientId);
+        return BT_SOCKET_READ_FAILED;
+    }
+    int readLen = client->GetInputStream()->Read(buf, bufLen);
     HILOGD("SocketRead ret, clientId: %{public}d, readLen: %{public}d", clientId, readLen);
     return readLen;
 }
@@ -431,6 +428,10 @@ int SocketWrite(int clientId, const uint8_t *data, uint32_t len)
     if (client == nullptr) {
         HILOGE("client is null! clientId: %{public}d", clientId);
         return OHOS_BT_STATUS_FAIL;
+    }
+    if (client->GetOutputStream() == nullptr) {
+        HILOGE("outputStream is null, clientId: %(public)d", clientId);
+        return BT_SOCKET_READ_FAILED;
     }
     int writeLen = client->GetOutputStream().Write(data, len);
     HILOGD("end, writeLen: %{public}d", writeLen);
