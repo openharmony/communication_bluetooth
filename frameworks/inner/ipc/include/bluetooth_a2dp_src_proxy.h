@@ -77,7 +77,7 @@ private:
      * @param control audio control action request playing or stop playing.
      * @return true: control remote sink device successfully; otherwise is not.
      */
-    int OffloadPlayingControl(const RawAddress &device, const std::vector<int32_t> &sessionsId, int control);
+    int OffloadPlayingControl(const RawAddress &device, const std::vector<int32_t> &sessionsId, int32_t control);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

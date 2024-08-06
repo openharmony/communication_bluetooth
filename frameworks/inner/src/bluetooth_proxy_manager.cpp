@@ -27,7 +27,7 @@ namespace Bluetooth {
 BluetoothProxyManager& BluetoothProxyManager::GetInstance()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<BluetoothProxyManager> instance;
+    static BluetoothNoDestructor<BluetoothProxyManager> instance;
     return *instance;
 #else
     static BluetoothProxyManager instance;

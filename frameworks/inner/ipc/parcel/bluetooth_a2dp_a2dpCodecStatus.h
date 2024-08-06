@@ -40,8 +40,7 @@ public:
     bool ReadFromParcel(Parcel &parcel);
 };
 
-class BluetoothA2dpOffloadCodecStatus : public Parcelable,
-                                        public bluetooth::OffloadCodecStatus {
+class BluetoothA2dpOffloadCodecStatus : public Parcelable, public bluetooth::OffloadCodecStatus {
 public:
     BluetoothA2dpOffloadCodecStatus() = default;
     explicit BluetoothA2dpOffloadCodecStatus(const bluetooth::OffloadCodecStatus &other)

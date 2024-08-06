@@ -21,32 +21,32 @@
 
 namespace OHOS {
 namespace Bluetooth {
-// Only used in Singleton pattern, for example: static NoDestructor<SingletonDemo> instance;
+// Only used in Singleton pattern, for example: static BluetoothNoDestructor<SingletonDemo> instance;
 template <typename T>
-class NoDestructor {
+class BluetoothNoDestructor {
 public:
     template <typename... Args>
-    explicit NoDestructor(Args&&... args)
+    explicit BluetoothNoDestructor(Args&&... args)
     {
-        new (storage_) T(std::forward<Args>(args)...);
+        new (buff_) T(std::forward<Args>(args)...);
     }
 
-    explicit NoDestructor(const T& x) { new (storage_) T(x); }
-    explicit NoDestructor(T&& x) { new (storage_) T(std::move(x)); }
+    explicit BluetoothNoDestructor(const T& x) { new (buff_) T(x); }
+    explicit BluetoothNoDestructor(T&& x) { new (buff_) T(std::move(x)); }
 
-    NoDestructor(const NoDestructor&) = delete;
-    NoDestructor& operator=(const NoDestructor&) = delete;
+    ~BluetoothNoDestructor() = default;
 
-    ~NoDestructor() = default;
+    BluetoothNoDestructor(const BluetoothNoDestructor&) = delete;
+    BluetoothNoDestructor& operator=(const BluetoothNoDestructor&) = delete;
 
     const T& operator*() const { return *get(); }
     T& operator*() { return *get(); }
 
-    const T* get() const { return reinterpret_cast<const T*>(storage_); }
-    T* get() { return reinterpret_cast<T*>(storage_); }
+    const T* get() const { return reinterpret_cast<const T*>(buff_); }
+    T* get() { return reinterpret_cast<T*>(buff_); }
 
 private:
-    alignas(T) char storage_[sizeof(T)];
+    alignas(T) char buff_[sizeof(T)];
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
