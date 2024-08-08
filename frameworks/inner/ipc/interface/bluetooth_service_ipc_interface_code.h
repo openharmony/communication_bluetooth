@@ -270,6 +270,7 @@ enum BluetoothHostInterfaceCode {
     GET_DEVICE_INFO_ID,
     RESTRICT_BLUETOOTH,
     SATELLITE_CONTROL,
+    UPDATE_VIRTUAL_DEVICE,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

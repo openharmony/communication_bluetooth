@@ -111,6 +111,16 @@ public:
      */
     virtual ~HandsFreeAudioGatewayObserver()
     {}
+
+    /**
+     * @brief The observer function to notify virtual device changed.
+     *
+     * @param Action on the device.
+     * @param device bluetooth device address.
+     * @since 12
+     */
+    virtual void OnVirtualDeviceChanged(int32_t action, std::string address)
+    {}
 };
 
 /**
@@ -375,6 +385,14 @@ public:
      * @since 12
      */
     int IsVgsSupported(const BluetoothRemoteDevice &device, bool &isSupported) const;
+
+    /**
+     * get virtual device list.
+     *
+     * @param devices virtual device list.
+     * @since 12
+     */
+    void GetVirtualDeviceList(std::vector<std::string> &devices) const;
 
     /**
      * @brief Static HandsFree AudioGateway observer instance.

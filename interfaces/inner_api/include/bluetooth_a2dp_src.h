@@ -89,6 +89,16 @@ public:
      */
     virtual void OnMediaStackChanged(const BluetoothRemoteDevice &device, int action)
     {}
+
+    /**
+     * @brief The observer function to notify virtual device changed.
+     *
+     * @param Action on the device.
+     * @param device bluetooth device address.
+     * @since 12
+     */
+    virtual void OnVirtualDeviceChanged(int32_t action, std::string address)
+    {}
 };
 
 /**
@@ -429,6 +439,13 @@ public:
      */
     int GetAutoPlayDisabledDuration(const BluetoothRemoteDevice &device, int &duration);
 
+    /**
+     * get virtual device list.
+     *
+     * @param devices virtual device list.
+     * @since 12
+     */
+    void GetVirtualDeviceList(std::vector<std::string> &devices);
 private:
     /**
      * @brief A constructor used to create a a2dp source instance.
