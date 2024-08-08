@@ -37,6 +37,9 @@ BluetoothHfpAgObserverStub::BluetoothHfpAgObserverStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_HFP_STACK_CHANGED)] =
         &BluetoothHfpAgObserverStub::OnHfpStackChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothHfpAgObserverInterfaceCode::BT_HFP_AG_OBSERVER_VIRTUALDEVICE_CHANGED)] =
+        &BluetoothHfpAgObserverStub::OnVirtualDeviceChangedInner;
 
     HILOGD("ends.");
 }
@@ -119,6 +122,16 @@ int32_t BluetoothHfpAgObserverStub::OnHfpStackChangedInner(MessageParcel &data, 
         "BluetoothHfpAgObserverStub::OnHfpStackChangedInnerInner error, service is null");
     int action = data.ReadInt32();
     OnHfpStackChanged(*device, action);
+    return BT_NO_ERROR;
+}
+
+ErrCode BluetoothHfpAgObserverStub::OnVirtualDeviceChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t action = data.ReadInt32();
+    std::string addr = data.ReadString();
+
+    OnVirtualDeviceChanged(action, addr);
+    
     return BT_NO_ERROR;
 }
 }  // namespace Bluetooth

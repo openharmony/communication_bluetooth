@@ -1696,5 +1696,18 @@ int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address,
     return exception;
 }
 
+
+void BluetoothHostProxy::UpdateVirtualDevice(int32_t action, const std::string &address)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(action), "Write action error");
+    CHECK_AND_RETURN_LOG(data.WriteString(address), "Write address error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::UPDATE_VIRTUAL_DEVICE, option, data, reply);
+    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
+    return;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

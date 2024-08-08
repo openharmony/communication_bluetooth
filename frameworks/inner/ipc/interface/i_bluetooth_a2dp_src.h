@@ -61,6 +61,8 @@ public:
     virtual int EnableAutoPlay(const RawAddress &device) = 0;
     virtual int DisableAutoPlay(const RawAddress &device, const int duration) = 0;
     virtual int GetAutoPlayDisabledDuration(const RawAddress &device, int &duration) = 0;
+    virtual void GetVirtualDeviceList(std::vector<std::string> &devices) = 0;
+    virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
