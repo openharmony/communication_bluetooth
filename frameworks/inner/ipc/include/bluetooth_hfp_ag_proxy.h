@@ -52,6 +52,8 @@ public:
     void CallDetailsChanged(int callId, int callState) override;
     int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) override;
     void EnableBtCallLog(bool state) override;
+    void GetVirtualDeviceList(std::vector<std::string> &devices) override;
+    void UpdateVirtualDevice(int32_t action, const std::string &address) override;
 
 private:
     static inline BrokerDelegator<BluetoothHfpAgProxy> delegator_;

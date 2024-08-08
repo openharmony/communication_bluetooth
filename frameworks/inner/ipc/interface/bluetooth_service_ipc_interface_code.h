@@ -272,6 +272,7 @@ enum BluetoothHostInterfaceCode {
     SATELLITE_CONTROL,
     BT_REGISTER_RESOURCE_MANAGER_OBSERVER,
     BT_DEREGISTER_RESOURCE_MANAGER_OBSERVER,
+    UPDATE_VIRTUAL_DEVICE,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
