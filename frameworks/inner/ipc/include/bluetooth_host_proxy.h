@@ -109,6 +109,7 @@ public:
         std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) override;
     void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
     void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
+    void UpdateVirtualDevice(int32_t action, const std::string &address) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
