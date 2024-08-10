@@ -53,21 +53,7 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { BtErrCode::BT_ERR_DISCONNECT_SCO_FAILED, "Disconnect sco failed." },
 };
 
-static napi_value GenerateBusinessError(napi_env env, int32_t errCode, const std::string &errMsg)
-{
-    napi_value businessError = nullptr;
-    napi_value code = nullptr;
-    napi_create_int32(env, errCode, &code);
-
-    napi_value message = nullptr;
-    napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
-
-    napi_create_error(env, nullptr, message, &businessError);
-    napi_set_named_property(env, businessError, "code", code);
-    return businessError;
-}
-
-std::string GetNapiErrMsg(napi_env env, int32_t errCode)
+std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
 {
     auto iter = napiErrMsgMap.find(errCode);
     if (iter != napiErrMsgMap.end()) {
@@ -78,14 +64,15 @@ std::string GetNapiErrMsg(napi_env env, int32_t errCode)
     return "Inner error.";
 }
 
-void HandleSyncErr(napi_env env, int32_t errCode)
+void HandleSyncErr(const napi_env &env, int32_t errCode)
 {
     if (errCode == BtErrCode::BT_NO_ERROR) {
         return;
     }
     std::string errMsg = GetNapiErrMsg(env, errCode);
-    int ret = napi_throw(env, GenerateBusinessError(env, errCode, errMsg));
-    CHECK_AND_RETURN_LOG(ret == napi_ok, "napi_throw failed, ret: %{public}d", ret);
+    if (errMsg != "") {
+        napi_throw_error(env, std::to_string(errCode).c_str(), errMsg.c_str());
+    }
 }
 }
 }

@@ -616,7 +616,7 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
     DealPairStatus(state, pairState);
     napi_value result = nullptr;
     NAPI_BT_ASSERT_RETURN(env, napi_create_int32(env, pairState, &result) == napi_ok, err, result);
-    NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
+    NAPI_BT_ASSERT_RETURN(env, (err == BT_NO_ERROR || err == BT_ERR_INTERNAL_ERROR), err, result);
     HILOGI("getPairState :%{public}d", pairState);
     return result;
 }

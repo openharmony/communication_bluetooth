@@ -61,8 +61,8 @@ do {                                                     \
     NAPI_BT_ASSERT_RETURN((env), (cond), (errCode), res); \
 } while (0)
 
-std::string GetNapiErrMsg(napi_env env, int32_t errCode);
-void HandleSyncErr(napi_env env, int32_t errCode);
+std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode);
+void HandleSyncErr(const napi_env &env, int32_t errCode);
 }
 }
 #endif
