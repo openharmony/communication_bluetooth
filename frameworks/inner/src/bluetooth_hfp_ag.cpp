@@ -92,6 +92,14 @@ public:
         });
     }
 
+    void OnVirtualDeviceChanged(int32_t action, std::string address) override
+    {
+        HILOGI("enter, device: %{public}s, action: %{public}d", GetEncryptAddr(address).c_str(), action);
+        observers_.ForEach([action, address](std::shared_ptr<HandsFreeAudioGatewayObserver> observer) {
+            observer->OnVirtualDeviceChanged(action, address);
+        });
+    }
+
 private:
     BluetoothObserverList<HandsFreeAudioGatewayObserver> &observers_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(AgServiceObserver);
@@ -706,6 +714,14 @@ int HandsFreeAudioGateway::IsVgsSupported(const BluetoothRemoteDevice &device, b
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "input parameter error.");
     return pimpl->IsVgsSupported(device, isSupported);
+}
+
+void HandsFreeAudioGateway::GetVirtualDeviceList(std::vector<std::string> &devices) const
+{
+    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "hfpAG proxy is nullptr");
+    proxy->GetVirtualDeviceList(devices);
 }
 
 void HandsFreeAudioGateway::RegisterObserver(std::shared_ptr<HandsFreeAudioGatewayObserver> observer)

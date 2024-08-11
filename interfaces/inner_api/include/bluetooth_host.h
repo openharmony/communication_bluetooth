@@ -747,6 +747,14 @@ public:
     * @since 12
     */
     int RestrictBluetooth();
+    /**
+    * @brief update virtual device
+    *
+    * @param action add or delete virtual device.
+    * @param device device need to be operator.
+    * @since 12
+    */
+    void UpdateVirtualDevice(int32_t action, const std::string &address);
 
     /**
     * @brief Switch antenna when satellie mode switches.

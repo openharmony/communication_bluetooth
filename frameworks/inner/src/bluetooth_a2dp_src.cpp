@@ -104,6 +104,13 @@ public:
         });
     }
 
+    void OnVirtualDeviceChanged(int action, std::string &address) override
+    {
+        HILOGI("device: %{public}s, action: %{public}d", GetEncryptAddr(address).c_str(), action);
+        a2dpSource_.observers_.ForEach([action, address](std::shared_ptr<A2dpSourceObserver> observer) {
+            observer->OnVirtualDeviceChanged(action, address);
+        });
+    }
 private:
     A2dpSource::impl &a2dpSource_;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothA2dpSourceObserverImp);
@@ -701,6 +708,14 @@ int A2dpSource::GetAutoPlayDisabledDuration(const BluetoothRemoteDevice &device,
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "a2dpSrc proxy is nullptr");
     return proxy->GetAutoPlayDisabledDuration(RawAddress(device.GetDeviceAddr()), duration);
+}
+
+void A2dpSource::GetVirtualDeviceList(std::vector<std::string> &devices)
+{
+    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off.");
+    sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "a2dpSrc proxy is nullptr");
+    proxy->GetVirtualDeviceList(devices);
 }
 } // namespace Bluetooth
 } // namespace OHOS
