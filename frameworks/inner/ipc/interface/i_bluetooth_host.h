@@ -134,6 +134,7 @@ public:
         std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) = 0;
     virtual void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
     virtual void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
+    virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

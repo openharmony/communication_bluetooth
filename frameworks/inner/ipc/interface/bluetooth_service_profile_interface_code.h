@@ -47,6 +47,7 @@ enum BluetoothA2dpSourceObserverInterfaceCode {
     BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED,
     BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
     BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED,
+    BT_A2DP_SRC_OBSERVER_VIRTUALDEVICE_CHANGED,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_OBSERVER_BUTT
 };
@@ -81,6 +82,8 @@ enum BluetoothA2dpSrcInterfaceCode {
     BT_A2DP_SRC_ENABLE_AUTO_PLAY,
     BT_A2DP_SRC_DISABLE_AUTO_PLAY,
     BT_A2DP_SRC_GET_AUTO_PLAY_DISABLED_DURATION,
+    BT_A2DP_SRC_SET_VIRTUAL_DEVICE,
+    BT_A2DP_SRC_GET_VIRTUALDEVICE_LIST,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_BUTT
 };
@@ -194,6 +197,7 @@ enum BluetoothHfpAgObserverInterfaceCode {
     BT_HFP_AG_OBSERVER_ACTIVE_DEVICE_CHANGED,
     BT_HFP_AG_OBSERVER_HF_ENHANCED_DRIVER_SAFETY_CHANGED,
     BT_HFP_AG_OBSERVER_HFP_STACK_CHANGED,
+    BT_HFP_AG_OBSERVER_VIRTUALDEVICE_CHANGED,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_OBSERVER_BUTT
 };
@@ -225,6 +229,8 @@ enum BluetoothHfpAgInterfaceCode {
     BT_HFP_AG_CALL_DETAILS_CHANGED,
     BT_HFP_AG_IS_VGS_SUPPORTED,
     BT_HFP_AG_CALL_LOG,
+    BT_HFP_AG_GET_VIRTUALDEVICE_LIST,
+    BT_HFP_AG_UPDATE_VIRTUALDEVICE,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_BUTT
 };

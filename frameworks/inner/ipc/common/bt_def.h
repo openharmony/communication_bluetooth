@@ -1548,6 +1548,9 @@ const uint8_t PBAP_FLAG_GO_TO_ROOT = 0x02;  // go back to root
 const uint8_t PBAP_FLAG_GO_DOWN = 0x02;     // go down
 const uint8_t PBAP_FLAG_GO_UP = 0x03;       // go up
 
+constexpr const int32_t VIRTUAL_DEVICE_ADD = 0; // add virtual device
+constexpr const int32_t VIRTUAL_DEVICE_REMOVE = 1; // delete virtual device
+
 enum PbapResponseCode : uint8_t {
     PBAP_CONTINUE = 0x90,                    // 100 Continue
     PBAP_SUCCESS = 0xA0,                     // 200 OK, Success
