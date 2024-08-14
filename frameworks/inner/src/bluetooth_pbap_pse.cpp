@@ -110,7 +110,7 @@ void PbapPse::impl::DeregisterObserver(std::shared_ptr<PbapPseObserver> &observe
 PbapPse *PbapPse::GetProfile()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<PbapPse> instance;
+    static BluetoothNoDestructor<PbapPse> instance;
     return instance.get();
 #else
     static PbapPse instance;

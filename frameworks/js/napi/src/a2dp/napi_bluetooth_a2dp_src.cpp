@@ -615,8 +615,8 @@ static void ConvertCodecInfoToJs(napi_env env, napi_value &object, const A2dpCod
     napi_set_named_property(env, object, "codecSampleRate", value);
 }
 
-static napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info info, std::string &addr,
-    A2dpCodecInfo &a2dpCodecInfo)
+static napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info info,
+    std::string &addr, A2dpCodecInfo &a2dpCodecInfo)
 {
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {nullptr};

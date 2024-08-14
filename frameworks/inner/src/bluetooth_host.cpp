@@ -434,8 +434,7 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
         HILOGE("samgrProxy is nullptr.");
         return false;
     }
-    sptr<IRemoteObject> hostRemote =
-        BluetoothProfileManager::GetInstance().GetProfileRemote(BLUETOOTH_HOST);
+    sptr<IRemoteObject> hostRemote = BluetoothProfileManager::GetInstance().GetProfileRemote(BLUETOOTH_HOST);
     //当蓝牙服务已经起来的时候。这时的hostRemote不为空， 不需要进行后续的从sa拉起蓝牙服务的动作
     if (hostRemote != nullptr) {
         return true;
@@ -451,7 +450,6 @@ bool BluetoothHost::impl::LoadBluetoothHostService()
         HILOGE("Failed to load bluetooth systemAbility");
         return false;
     }
-
     auto waitStatus = proxyConVar_.wait_for(
         lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS), [this]() {
             HILOGI("bluetooth_service load systemAbility finished");
@@ -515,7 +513,7 @@ BluetoothHost::~BluetoothHost() {}
 BluetoothHost &BluetoothHost::GetDefaultHost()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<BluetoothHost> instance;
+    static BluetoothNoDestructor<BluetoothHost> instance;
     return *instance;
 #else
     // C++11 static local variable initialization is thread-safe.

@@ -41,7 +41,7 @@
 #include "bluetooth_remote_device.h"
 #include "bluetooth_device_class.h"
 #include "refbase.h"
-#include "no_destructor.h"
+#include "bluetooth_no_destructor.h"
 
 namespace OHOS { class IRemoteObject; }
 namespace OHOS {
@@ -740,7 +740,7 @@ public:
     int DisconnectAllowedProfiles(const std::string &remoteAddr) const;
 
     /**
-    * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available
+    * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available.
     *
     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
     *         returns an error code defined in {@link BtErrCode} otherwise.
@@ -757,7 +757,7 @@ public:
     void UpdateVirtualDevice(int32_t action, const std::string &address);
 
     /**
-    * @brief Switch antenna when satellie mode switches.
+    * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available.
     *
     * @param state satellite state.
     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
@@ -811,7 +811,7 @@ private:
     BLUETOOTH_DECLARE_IMPL();
 
 #ifdef DTFUZZ_TEST
-    friend class NoDestructor<BluetoothHost>;
+    friend class BluetoothNoDestructor<BluetoothHost>;
 #endif
 };
 } // namespace Bluetooth

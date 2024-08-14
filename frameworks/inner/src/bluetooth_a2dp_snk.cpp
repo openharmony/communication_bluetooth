@@ -262,7 +262,7 @@ A2dpSink *A2dpSink::GetProfile()
 {
     HILOGI("enter");
 #ifdef DTFUZZ_TEST
-    static NoDestructor<A2dpSink> service;
+    static BluetoothNoDestructor<A2dpSink> service;
     return service.get();
 #else
     static A2dpSink service;
