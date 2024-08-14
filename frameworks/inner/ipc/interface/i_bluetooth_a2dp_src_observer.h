@@ -40,7 +40,7 @@ public:
     virtual void OnPlayingStatusChanged(const RawAddress &device, int playingState, int error) = 0;
     virtual void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) = 0;
     virtual void OnMediaStackChanged(const RawAddress &device, int action) = 0;
-    virtual void OnVirtualDeviceChanged(int32_t action, std::string &address) {};
+    virtual void OnVirtualDeviceChanged(int32_t action, std::string address) {};
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
