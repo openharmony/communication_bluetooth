@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+#define MAX_A2DP_VIRTUAL_DEVICE 10
 int32_t BluetoothA2dpSrcProxy::Connect(const RawAddress &device)
 {
     MessageParcel data;
@@ -532,6 +533,9 @@ void BluetoothA2dpSrcProxy::GetVirtualDeviceList(std::vector<std::string> &devic
     SEND_IPC_REQUEST_RETURN(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_VIRTUALDEVICE_LIST, data, reply, option);
 
     int32_t rawAddsSize = reply.ReadInt32();
+
+    CHECK_AND_RETURN_LOG(rawAddsSize <= MAX_A2DP_VIRTUAL_DEVICE, "virtual device size error.");
+
     for (int i = 0; i < rawAddsSize; i++) {
         devices.push_back(reply.ReadString());
     }
