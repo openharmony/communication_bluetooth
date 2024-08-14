@@ -104,7 +104,7 @@ public:
         });
     }
 
-    void OnVirtualDeviceChanged(int action, std::string &address) override
+    void OnVirtualDeviceChanged(int action, std::string address) override
     {
         HILOGI("device: %{public}s, action: %{public}d", GetEncryptAddr(address).c_str(), action);
         a2dpSource_.observers_.ForEach([action, address](std::shared_ptr<A2dpSourceObserver> observer) {
