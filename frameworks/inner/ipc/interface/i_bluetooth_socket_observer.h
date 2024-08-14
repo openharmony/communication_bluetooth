@@ -35,7 +35,7 @@ public:
         int psm;
     } CallbackParam;
 
-    virtual void OnConnectionStateChanged(CallbackParam callbackParam) = 0;
+    virtual void OnConnectionStateChanged(const CallbackParam &callbackParam) = 0;
 };
 
 class IBluetoothServerSocketObserver : public OHOS::IRemoteBroker {

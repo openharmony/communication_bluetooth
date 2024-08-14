@@ -292,7 +292,7 @@ A2dpSource *A2dpSource::GetProfile()
 {
     HILOGD("enter");
 #ifdef DTFUZZ_TEST
-    static NoDestructor<A2dpSource> service;
+    static BluetoothNoDestructor<A2dpSource> service;
     return service.get();
 #else
     static A2dpSource service;
