@@ -760,12 +760,13 @@ public:
     /**
     * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available.
     *
+    * @param type satellite control type.
     * @param state satellite state.
     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
     *         returns an error code defined in {@link BtErrCode} otherwise.
     * @since 12
     */
-    int SatelliteControl(int state);
+    int SatelliteControl(int type, int state);
 
     /**
      * @brief Set local adapter scan level.
