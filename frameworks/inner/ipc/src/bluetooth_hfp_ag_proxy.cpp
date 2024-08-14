@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
+#define MAX_HFP_VIRTUAL_DEVICE 10
 int32_t BluetoothHfpAgProxy::GetConnectDevices(std::vector<BluetoothRawAddress> &devices)
 {
     MessageParcel data;
@@ -455,6 +456,9 @@ void BluetoothHfpAgProxy::GetVirtualDeviceList(std::vector<std::string> &devices
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_GET_VIRTUALDEVICE_LIST, data, reply, option);
 
     int32_t rawAddsSize = reply.ReadInt32();
+
+    CHECK_AND_RETURN_LOG(rawAddsSize <= MAX_HFP_VIRTUAL_DEVICE, "virtual device size error.");
+
     for (int i = 0; i < rawAddsSize; i++) {
         devices.push_back(reply.ReadString());
     }
