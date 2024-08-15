@@ -1752,5 +1752,47 @@ void BluetoothHostProxy::UpdateVirtualDevice(int32_t action, const std::string &
     CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
     return;
 }
+
+int32_t BluetoothHostProxy::IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_VIRTUAL_AUTO_CONN_SWITCH, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    outSupport = reply.ReadBool();
+    return BT_NO_ERROR;
+}
+
+int32_t BluetoothHostProxy::SetVirtualAutoConnectType(const std::string &address, int connType, int businessType)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "Write remoteAddr error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(connType), BT_ERR_IPC_TRANS_FAILED, "Write connType error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(businessType), BT_ERR_IPC_TRANS_FAILED, "Write businessType error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_VIRTUAL_AUTO_CONN_TYPE, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return BT_NO_ERROR;
+}
+
+int32_t BluetoothHostProxy::SetFastScanLevel(int level)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(level), BT_ERR_IPC_TRANS_FAILED, "Write level error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_FAST_SCAN_LEVEL, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

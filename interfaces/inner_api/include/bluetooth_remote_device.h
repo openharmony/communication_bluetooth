@@ -379,6 +379,27 @@ public:
      */
     int32_t GetDeviceProductId(uint16_t &productId) const;
 
+    /**
+     * @brief Get remote device is supported virtual auto connect.
+     *
+     * @param[out] outSupport The remote device configured auto connect value.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 12
+     */
+    int32_t IsSupportVirtualAutoConnect(bool &outSupport) const;
+
+    /**
+     * @brief Set remote device auto connect type and business connect type.
+     *
+     * @param connType Auto connect type value.
+     * @param businessType Business connect type value.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 12
+     */
+    int32_t SetVirtualAutoConnectType(int connType, int businessType) const;
+
 private:
     std::string address_ = "00:00:00:00:00:00";
     int transport_ = BT_TRANSPORT_NONE;
