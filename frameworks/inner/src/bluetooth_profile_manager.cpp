@@ -164,6 +164,7 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t
                     BluetoothProfileManager::GetInstance().needCheckBluetoothServiceOnMutex_);
                 BluetoothProfileManager::GetInstance().isNeedCheckBluetoothServiceOn_ = true;
             }
+            BluetoothHost::GetDefaultHost().LoadSystemAbilitySuccess(nullptr);
             BluetoothProfileManager::GetInstance().RunFuncWhenBluetoothServiceStarted();
             break;
         }
