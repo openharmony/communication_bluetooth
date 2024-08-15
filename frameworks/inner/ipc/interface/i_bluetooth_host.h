@@ -135,6 +135,9 @@ public:
     virtual void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
     virtual void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
     virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
+    virtual int32_t IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport) = 0;
+    virtual int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) = 0;
+    virtual int32_t SetFastScanLevel(int level) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
