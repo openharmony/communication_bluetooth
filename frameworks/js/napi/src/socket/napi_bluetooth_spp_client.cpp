@@ -330,6 +330,7 @@ napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
 
     std::shared_ptr<NapiSppClient> client = NapiSppClient::clientMap[id];
     NAPI_BT_RETURN_IF(!client, "client is nullptr.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(client->sppReadFlag, "client is reading... please off first", napi_invalid_arg);
     client->sppReadFlag = true;
     client->callbackInfos_[type] = callbackInfo;
     NAPI_BT_RETURN_IF(NapiSppCreateThreadSafeFunc(client) != napi_ok, "inner error", napi_invalid_arg);
