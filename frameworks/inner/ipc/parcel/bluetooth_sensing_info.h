@@ -25,8 +25,8 @@ class BluetoothSensingInfo : public Parcelable {
 public:
     BluetoothSensingInfo() = default;
     ~BluetoothSensingInfo() = default;
-    explicit BluetoothSensingInfo(const bluetooth::SensingInfo &info) :
-        addr_(info.addr_), uuid_(info.uuid_), resourceId_(info.resourceId_), pkgName_(info.pkgName_),
+    explicit BluetoothSensingInfo(const bluetooth::SensingInfo &info)
+        : addr_(info.addr_), uuid_(info.uuid_), resourceId_(info.resourceId_), pkgName_(info.pkgName_),
         isServer_(info.isServer_), interval_(info.interval_)
     {}
     bool Marshalling(Parcel &parcel) const override;
