@@ -21,24 +21,25 @@
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothSensingInfo : public Parcelable, public bluetooth::SensingInfo {
+class BluetoothSensingInfo : public Parcelable {
 public:
     BluetoothSensingInfo() = default;
-    explicit BluetoothSensingInfo(const bluetooth::SensingInfo &other) : bluetooth::SensingInfo(other)
+    ~BluetoothSensingInfo() = default;
+    explicit BluetoothSensingInfo(const bluetooth::SensingInfo &info)
+        : addr_(info.addr_), uuid_(info.uuid_), resourceId_(info.resourceId_), pkgName_(info.pkgName_),
+        isServer_(info.isServer_), interval_(info.interval_)
     {}
-    explicit BluetoothSensingInfo(const BluetoothSensingInfo &other) : bluetooth::SensingInfo(other)
-    {}
-    BluetoothSensingInfo& operator=(const bluetooth::SensingInfo &other) = delete;
-    BluetoothSensingInfo& operator=(const BluetoothSensingInfo &other) = delete;
-    ~BluetoothSensingInfo() override = default;
-
     bool Marshalling(Parcel &parcel) const override;
-
     static BluetoothSensingInfo *Unmarshalling(Parcel &parcel);
-
     bool WriteToParcel(Parcel &parcel);
-
     bool ReadFromParcel(Parcel &parcel);
+
+    std::string addr_;
+    std::string uuid_;
+    uint32_t resourceId_;
+    std::string pkgName_;
+    bool isServer_;
+    uint16_t interval_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
