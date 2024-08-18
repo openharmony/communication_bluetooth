@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 JS_NAPI_DIR = "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi"
@@ -132,6 +133,9 @@ config("btframework_config") {
   if (is_asan) {
     defines += [ "DTFUZZ_TEST" ]
   }
+  if (bluetooth_service_resourceschedule) {
+    defines += [ "RES_SCHED_SUPPORT" ]
+  }
 }
 
 config("btframework_public_config") {
@@ -165,6 +169,11 @@ ohos_shared_library("btframework") {
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
+
+  if (bluetooth_service_resourceschedule) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
+
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
