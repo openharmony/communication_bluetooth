@@ -32,6 +32,10 @@
 #include "raw_address.h"
 #include "bluetooth_socket_observer_stub.h"
 #include "bluetooth_profile_manager.h"
+#ifdef RES_SCHED_SUPPORT
+#include "res_type.h"
+#include "res_sched_client.h"
+#endif
 
 namespace OHOS {
 namespace Bluetooth {
@@ -60,6 +64,23 @@ do {                                            \
     }                                            \
 } while (0)
 
+static void ReportDataToRss(const std::string &action, int id, const std::string &address, int pid, int uid)
+{
+#ifdef RES_SCHED_SUPPORT
+    HILOGD("report SPP_CONNECT_STATE");
+    std::unordered_map<std::string, std::string> payload;
+    payload["ACTION"] = action;
+    payload["ID"] = std::to_string(id);
+    payload["ADDRESS"] = address;
+    payload["PID"] = std::to_string(pid);
+    payload["UID"] = std::to_string(uid);
+    ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        OHOS::ResourceSchedule::ResType::RES_TYPE_BT_SERVICE_EVENT,
+        OHOS::ResourceSchedule::ResType::BtServiceEvent::SPP_CONNECT_STATE,
+        payload);
+#endif
+}
+
 struct ClientSocket::impl {
     impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth);
     impl(int fd, std::string address, BtSocketType type);
@@ -76,6 +97,7 @@ struct ClientSocket::impl {
             HiSysEventWrite(BLUETOOTH_UE_DOMAIN, "SOCKET_DISCONN", HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
                 "PNAMEID", "Bluetooth", "PVERSIONID", "1.0", "DEV_ADDRESS", GetEncryptAddr(address_),
                 "SCENE_CODE", fd_);
+            ReportDataToRss("close", fd_, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
             HILOGI("fd closed, fd_: %{public}d", fd_);
             close(fd_);
             fd_ = -1;
@@ -100,6 +122,7 @@ struct ClientSocket::impl {
                 HiSysEventWrite(BLUETOOTH_UE_DOMAIN, "SOCKET_DISCONN", HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
                     "PNAMEID", "Bluetooth", "PVERSIONID", "1.0", "DEV_ADDRESS", GetEncryptAddr(address_),
                     "SCENE_CODE", fd_);
+                ReportDataToRss("close", fd_, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 close(fd_);
                 fd_ = -1;
@@ -447,6 +470,8 @@ int ClientSocket::Connect(int psm)
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", pimpl->fd_, "ADDRESS",
         GetEncryptAddr(tempAddress), "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
+    ReportDataToRss("connect", pimpl->fd_, GetEncryptAddr(tempAddress), IPCSkeleton::GetCallingPid(),
+        IPCSkeleton::GetCallingUid());
     return BtStatus::BT_SUCCESS;
 }
 
@@ -618,7 +643,8 @@ struct ServerSocket::impl {
         HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
             HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", acceptFd_, "ADDRESS",
             GetEncryptAddr(acceptAddress_), "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
-
+        ReportDataToRss("connect", acceptFd_, GetEncryptAddr(acceptAddress_), IPCSkeleton::GetCallingPid(),
+            IPCSkeleton::GetCallingUid());
         return clientSocket;
     }
 
