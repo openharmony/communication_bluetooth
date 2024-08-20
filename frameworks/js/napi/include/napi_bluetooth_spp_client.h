@@ -57,7 +57,7 @@ private:
     std::queue<std::shared_ptr<SppCallbackBuffer>> buffer_;
 };
 
-const std::string REGISTER_SPP_READ_TYPE = "sppRead";
+constexpr const char *REGISTER_SPP_READ_TYPE = "sppRead";
 std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object);
 
 struct NapiSppClient {
