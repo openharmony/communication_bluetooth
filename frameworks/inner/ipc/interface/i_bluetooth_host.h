@@ -61,7 +61,7 @@ public:
     virtual int32_t EnableBt() = 0;
     virtual int32_t DisableBt() = 0;
     virtual int32_t RestrictBluetooth() = 0;
-    virtual int32_t SatelliteControl(int state) = 0;
+    virtual int32_t SatelliteControl(int type, int state) = 0;
     virtual sptr<IRemoteObject> GetProfile(const std::string &name) = 0;
     virtual sptr<IRemoteObject> GetBleRemote(const std::string &name) = 0;
     virtual int32_t BluetoothFactoryReset() = 0;

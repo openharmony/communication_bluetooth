@@ -120,7 +120,7 @@ int32_t BluetoothHostProxy::RestrictBluetooth()
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::SatelliteControl(int state)
+int32_t BluetoothHostProxy::SatelliteControl(int type, int state)
 {
     HILOGI("BluetoothHostProxy::SatelliteControl starts");
     MessageParcel data;
@@ -128,6 +128,7 @@ int32_t BluetoothHostProxy::SatelliteControl(int state)
         HILOGE("BluetoothHostProxy::SatelliteControl WriteInterfaceToken error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(type), BT_ERR_IPC_TRANS_FAILED, "Write type error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(state), BT_ERR_IPC_TRANS_FAILED, "Write state error");
 
     MessageParcel reply;

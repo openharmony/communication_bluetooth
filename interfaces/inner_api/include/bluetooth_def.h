@@ -1550,6 +1550,11 @@ struct SensingInfo {
     uint16_t interval_;
 };
 
+enum class SATELLITE_CONTROL_MODE {
+    ANTENNA = 0,
+    BLUETOOTH_SWITCH = 1,
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
