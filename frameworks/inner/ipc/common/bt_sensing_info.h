@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace bluetooth {
-const std::string INVALID_UUID_STRING = "00000000-0000-0000-0000-000000000000";
-const std::string INVALID_PKGNAME = "invalid_name";
+constexpr const char *INVALID_UUID_STRING = "00000000-0000-0000-0000-000000000000";
+constexpr const char *INVALID_PKGNAME = "invalid_name";
 
 struct SensingInfo {
     SensingInfo()
