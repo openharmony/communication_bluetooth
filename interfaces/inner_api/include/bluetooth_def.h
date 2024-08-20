@@ -525,8 +525,8 @@ enum class MapMessageType : int {
 // Map Message Status
 enum class MapMessageStatus : int { READ, UNREAD, INVALID };  // default UNREAD
 
-// Map BoolType , YES or NO
-enum class MapBoolType : int { YES, NO, INVALID };  // default NO
+// Map BoolType , YES_TYPE or NO_TYPE
+enum class MapBoolType : int { YES_TYPE, NO_TYPE, INVALID };  // default NO_TYPE
 
 // Map Message ReceptionStatus
 enum class MapMsgReceptionStatus : int { COMPLETE, FRACTIONED, NOTIFICATION, INVALID };
@@ -550,7 +550,7 @@ enum class MapOnOffType : uint8_t { OFF = 0, ON = 1, INVALID = 3 };
 enum class MapCharsetType : uint8_t { NATIVE = 0x00, UTF_8 = 0x01, INVALID = 0x02 };
 
 // Attachment Type
-enum class MapAttachmentType : uint8_t { NO = 0x00, HAVE = 0x01, INVALID = 0x02 };
+enum class MapAttachmentType : uint8_t { NO_TYPE = 0x00, HAVE = 0x01, INVALID = 0x02 };
 
 // Map StatusIndicator Type
 enum class MapStatusIndicatorType : uint8_t {
@@ -561,7 +561,7 @@ enum class MapStatusIndicatorType : uint8_t {
 };
 
 // Map StatusValue Type
-enum class MapStatusValueType : uint8_t { NO = 0x00, YES = 0x01 };
+enum class MapStatusValueType : uint8_t { NO_TYPE = 0x00, YES_TYPE = 0x01 };
 
 // Map ModifyText Type
 enum class MapModifyTextType : uint8_t { REPLACE = 0x00, PREPEND = 0x01, INVALID = 0x02 };
