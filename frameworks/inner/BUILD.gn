@@ -62,6 +62,7 @@ FwkSrc = [
   "src/bluetooth_host_load_callback.cpp",
   "src/bluetooth_audio_manager.cpp",
   "src/uuid.cpp",
+  "src/bluetooth_switch_module.cpp",
   "$JS_NAPI_DIR/src/common/napi_async_callback.cpp",
   "$JS_NAPI_DIR/src/common/napi_async_work.cpp",
   "$JS_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
