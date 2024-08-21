@@ -42,6 +42,7 @@ private:
     ErrCode OnScanModeChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnDeviceNameChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnDeviceAddrChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnBluetoothStateChangedInner(MessageParcel &data, MessageParcel &reply);
 
     using BluetoothObserverHostFunc = ErrCode (BluetoothHostObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothObserverHostFunc> memberFuncMap_;
