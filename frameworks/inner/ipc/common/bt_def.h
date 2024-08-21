@@ -1658,6 +1658,12 @@ enum BluetoothResourceDecisionResult {
     CONNECTION_PREEMPTION,
 };
 
+enum BluetoothSwitchState {
+    STATE_ON,
+    STATE_OFF,
+    STATE_HALF,
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else

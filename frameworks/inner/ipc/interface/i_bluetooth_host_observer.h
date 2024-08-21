@@ -38,6 +38,7 @@ public:
     virtual void OnScanModeChanged(int32_t mode) = 0;
     virtual void OnDeviceNameChanged(const std::string &deviceName) = 0;
     virtual void OnDeviceAddrChanged(const std::string &address) = 0;
+    virtual void OnBluetoothStateChanged(int32_t state) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
