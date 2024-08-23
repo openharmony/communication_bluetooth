@@ -30,26 +30,26 @@
 namespace OHOS {
 namespace Bluetooth {
 namespace {
-const std::string PROFILE_GATT_CLIENT = "GattClientServer";
-const std::string PROFILE_GATT_SERVER = "GattServerServer";
-const std::string PROFILE_A2DP_SRC = "A2dpSrcServer";
-const std::string PROFILE_A2DP_SINK = "A2dpSnkServer";
-const std::string PROFILE_AVRCP_CT = "AvrcpCtServer";
-const std::string PROFILE_AVRCP_TG = "AvrcpTgServer";
-const std::string PROFILE_HFP_AG = "HfpAgServer";
-const std::string PROFILE_HFP_HF = "HfpHfServer";
-const std::string PROFILE_MAP_MCE = "MapMceServer";
-const std::string PROFILE_MAP_MSE = "MapMseServer";
-const std::string PROFILE_PBAP_PCE = "PbapPceServer";
-const std::string PROFILE_PBAP_PSE = "PbapPseServer";
-const std::string PROFILE_SOCKET = "SocketServer";
-const std::string PROFILE_DI = "DIServer";
-const std::string BLE_ADVERTISER_SERVER = "BleAdvertiserServer";
-const std::string BLE_CENTRAL_MANAGER_SERVER = "BleCentralMangerServer";
-const std::string PROFILE_HID_HOST_SERVER = "BluetoothHidHostServer";
-const std::string PROFILE_PAN_SERVER = "BluetoothPanServer";
-const std::string PROFILE_OPP_SERVER = "BluetoothOppServer";
-const std::string PROFILE_AUDIO_MANAGER = "BluetoothAudioManagerServer";
+constexpr const char *PROFILE_GATT_CLIENT = "GattClientServer";
+constexpr const char *PROFILE_GATT_SERVER = "GattServerServer";
+constexpr const char *PROFILE_A2DP_SRC = "A2dpSrcServer";
+constexpr const char *PROFILE_A2DP_SINK = "A2dpSnkServer";
+constexpr const char *PROFILE_AVRCP_CT = "AvrcpCtServer";
+constexpr const char *PROFILE_AVRCP_TG = "AvrcpTgServer";
+constexpr const char *PROFILE_HFP_AG = "HfpAgServer";
+constexpr const char *PROFILE_HFP_HF = "HfpHfServer";
+constexpr const char *PROFILE_MAP_MCE = "MapMceServer";
+constexpr const char *PROFILE_MAP_MSE = "MapMseServer";
+constexpr const char *PROFILE_PBAP_PCE = "PbapPceServer";
+constexpr const char *PROFILE_PBAP_PSE = "PbapPseServer";
+constexpr const char *PROFILE_SOCKET = "SocketServer";
+constexpr const char *PROFILE_DI = "DIServer";
+constexpr const char *BLE_ADVERTISER_SERVER = "BleAdvertiserServer";
+constexpr const char *BLE_CENTRAL_MANAGER_SERVER = "BleCentralMangerServer";
+constexpr const char *PROFILE_HID_HOST_SERVER = "BluetoothHidHostServer";
+constexpr const char *PROFILE_PAN_SERVER = "BluetoothPanServer";
+constexpr const char *PROFILE_OPP_SERVER = "BluetoothOppServer";
+constexpr const char *PROFILE_AUDIO_MANAGER = "BluetoothAudioManagerServer";
 }  // namespace
 
 class IBluetoothHost : public OHOS::IRemoteBroker {
