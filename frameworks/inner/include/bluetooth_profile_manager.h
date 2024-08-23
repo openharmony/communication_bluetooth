@@ -31,7 +31,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-const std::string BLUETOOTH_HOST = "BluetoothHost";
+constexpr const char *BLUETOOTH_HOST = "BluetoothHost";
 const int32_t BEGIN_ID = 0;
 // It is recommended to ues one of the between bluetoothLoadedfunc and bleTurnOnFunc
 struct ProfileFunctions {
