@@ -67,8 +67,7 @@
         "ipc",
         "libuv",
         "napi",
-        "samgr",
-        "resource_schedule_service"
+        "samgr"
       ],
       "third_party": []
     },
