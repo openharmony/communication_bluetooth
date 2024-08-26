@@ -37,6 +37,8 @@ BluetoothHostObserverStub::BluetoothHostObserverStub()
         &BluetoothHostObserverStub::OnDeviceNameChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED)] =
         &BluetoothHostObserverStub::OnDeviceAddrChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_STATE_CHANGE_V2)] =
+        &BluetoothHostObserverStub::OnBluetoothStateChangedInner;
 }
 
 BluetoothHostObserverStub::~BluetoothHostObserverStub()
@@ -161,6 +163,13 @@ ErrCode BluetoothHostObserverStub::OnDeviceAddrChangedInner(MessageParcel &data,
     HILOGI("OnDeviceAddrChangedInner starts");
     OnDeviceAddrChanged(address);
 
+    return NO_ERROR;
+}
+
+ErrCode BluetoothHostObserverStub::OnBluetoothStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t state = data.ReadInt32();
+    OnBluetoothStateChanged(state);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
