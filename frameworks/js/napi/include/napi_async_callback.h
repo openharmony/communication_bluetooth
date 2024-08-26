@@ -76,6 +76,7 @@ private:
     napi_env env_;
     napi_value promise_;
     napi_deferred deferred_;
+    bool isResolvedOrRejected_ = false;
 };
 
 class NapiHandleScope {

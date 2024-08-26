@@ -149,6 +149,11 @@ void NapiPromise::ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeO
         return;
     }
 
+    if (isResolvedOrRejected_) {
+        HILOGE("napi Resolved Or Rejected");
+        return;
+    }
+
     NapiHandleScope scope(env_);
 
     if (errCode == BT_NO_ERROR) {
@@ -158,6 +163,7 @@ void NapiPromise::ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeO
         napi_value code = GetCallbackErrorValue(env_, errCode);
         Reject(code);
     }
+    isResolvedOrRejected_ = true;
 }
 
 void NapiPromise::Resolve(napi_value resolution)
