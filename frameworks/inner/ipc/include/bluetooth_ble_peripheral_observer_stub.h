@@ -32,12 +32,15 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnReadRemoteRssiEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnAclStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnReadRemoteRssiEventInner(
+        BluetoothBlePeripheralObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnPairStatusChangedInner(
+        BluetoothBlePeripheralObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnAclStateChangedInner(
+        BluetoothBlePeripheralObserverStub *stub, MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t,
-        ErrCode (BluetoothBlePeripheralObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
+        ErrCode (*)(BluetoothBlePeripheralObserverStub *stub, MessageParcel &data, MessageParcel &reply)>
         memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothBlePeripheralObserverStub);
 };

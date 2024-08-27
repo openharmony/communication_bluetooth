@@ -32,10 +32,14 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnScanCallbackInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBleBatchScanResultsEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnStartOrStopScanEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnNotifyMsgReportFromLpDeviceInner(MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnScanCallbackInner(
+        BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnBleBatchScanResultsEventInner(
+        BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnStartOrStopScanEventInner(
+        BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnNotifyMsgReportFromLpDeviceInner(
+        BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data, MessageParcel &reply);
 
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothBleCentralManagerCallBackStub *, MessageParcel &, MessageParcel &)>>
