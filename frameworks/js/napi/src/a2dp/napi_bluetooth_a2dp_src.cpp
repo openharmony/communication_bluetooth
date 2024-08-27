@@ -37,6 +37,7 @@ const static std::map<int32_t, int32_t> g_codecTypeMap = {
     {CODEC_TYPE_AAC, A2DP_CODEC_TYPE_AAC_USER},
     {CODEC_TYPE_L2HC, A2DP_CODEC_TYPE_L2HCV2_USER},
     {CODEC_TYPE_L2HCST, A2DP_CODEC_TYPE_L2HCST_USER},
+    {CODEC_TYPE_LDAC, A2DP_CODEC_TYPE_LDAC_USER},
     {CODEC_TYPE_INVALID, A2DP_CODEC_TYPE_NONA2DP_USER},
 };
 
@@ -68,6 +69,7 @@ const static std::map<int32_t, CodecType> g_a2dpCodecTypeMap = {
     {A2DP_CODEC_TYPE_AAC_USER, CODEC_TYPE_AAC},
     {A2DP_CODEC_TYPE_L2HCV2_USER, CODEC_TYPE_L2HC},
     {A2DP_CODEC_TYPE_L2HCST_USER, CODEC_TYPE_L2HCST},
+    {A2DP_CODEC_TYPE_LDAC_USER, CODEC_TYPE_LDAC},
     {A2DP_CODEC_TYPE_NONA2DP_USER, CODEC_TYPE_INVALID},
 };
 
@@ -243,6 +245,7 @@ napi_value CodecTypeInit(napi_env env)
     SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_AAC, "CODEC_TYPE_AAC");
     SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_L2HC, "CODEC_TYPE_L2HC");
     SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_L2HCST, "CODEC_TYPE_L2HCST");
+    SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_LDAC, "CODEC_TYPE_LDAC");
     SetNamedPropertyByInteger(env, codecType, CodecType::CODEC_TYPE_INVALID, "CODEC_TYPE_INVALID");
     return codecType;
 }
