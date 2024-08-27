@@ -22,21 +22,21 @@ BluetoothHostObserverStub::BluetoothHostObserverStub()
 {
     HILOGD("enter");
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_STATE_CHANGE)] =
-        &BluetoothHostObserverStub::OnStateChangedInner;
+        BluetoothHostObserverStub::OnStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DISCOVERY_STATE_CHANGE)] =
-        &BluetoothHostObserverStub::OnDiscoveryStateChangedInner;
+        BluetoothHostObserverStub::OnDiscoveryStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DISCOVERY_RESULT)] =
-        &BluetoothHostObserverStub::OnDiscoveryResultInner;
+        BluetoothHostObserverStub::OnDiscoveryResultInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_PAIR_REQUESTED)] =
-        &BluetoothHostObserverStub::OnPairRequestedInner;
+        BluetoothHostObserverStub::OnPairRequestedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_PAIR_CONFIRMED)] =
-        &BluetoothHostObserverStub::OnPairConfirmedInner;
+        BluetoothHostObserverStub::OnPairConfirmedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_SCAN_MODE_CHANGED)] =
-        &BluetoothHostObserverStub::OnScanModeChangedInner;
+        BluetoothHostObserverStub::OnScanModeChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DEVICE_NAME_CHANGED)] =
-        &BluetoothHostObserverStub::OnDeviceNameChangedInner;
+        BluetoothHostObserverStub::OnDeviceNameChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED)] =
-        &BluetoothHostObserverStub::OnDeviceAddrChangedInner;
+        BluetoothHostObserverStub::OnDeviceAddrChangedInner;
 }
 
 BluetoothHostObserverStub::~BluetoothHostObserverStub()
@@ -58,7 +58,7 @@ int32_t BluetoothHostObserverStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
 
@@ -66,29 +66,32 @@ int32_t BluetoothHostObserverStub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothHostObserverStub::OnStateChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnStateChangedInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
     int32_t status = data.ReadInt32();
 
     HILOGD("OnStateChangedInner starts");
-    OnStateChanged(transport, status);
+    stub->OnStateChanged(transport, status);
 
     return NO_ERROR;
 }
 
 // ON_DIS_STA_CHANGE_CODE
-ErrCode BluetoothHostObserverStub::OnDiscoveryStateChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnDiscoveryStateChangedInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     int32_t status = data.ReadInt32();
 
     HILOGD("OnDiscoveryStateChangedInner starts");
-    OnDiscoveryStateChanged(status);
+    stub->OnDiscoveryStateChanged(status);
 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostObserverStub::OnDiscoveryResultInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnDiscoveryResultInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
@@ -99,12 +102,13 @@ ErrCode BluetoothHostObserverStub::OnDiscoveryResultInner(MessageParcel &data, M
     std::string deviceName = data.ReadString();
     int32_t deviceClass = data.ReadInt32();
     HILOGD("OnDiscoveryResultInner starts");
-    OnDiscoveryResult(*device, rssi, deviceName, deviceClass);
+    stub->OnDiscoveryResult(*device, rssi, deviceName, deviceClass);
 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostObserverStub::OnPairRequestedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnPairRequestedInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
@@ -113,12 +117,13 @@ ErrCode BluetoothHostObserverStub::OnPairRequestedInner(MessageParcel &data, Mes
     }
 
     HILOGI("OnPairRequestedInner starts");
-    OnPairRequested(transport, *device);
+    stub->OnPairRequested(transport, *device);
 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostObserverStub::OnPairConfirmedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnPairConfirmedInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
@@ -129,37 +134,40 @@ ErrCode BluetoothHostObserverStub::OnPairConfirmedInner(MessageParcel &data, Mes
     int32_t number = data.ReadInt32();
 
     HILOGD("OnPairConfirmedInner starts");
-    OnPairConfirmed(transport, *device, reqType, number);
+    stub->OnPairConfirmed(transport, *device, reqType, number);
 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostObserverStub::OnScanModeChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnScanModeChangedInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     int32_t mode = data.ReadInt32();
 
     HILOGI("OnScanModeChangedInner starts");
-    OnScanModeChanged(mode);
+    stub->OnScanModeChanged(mode);
 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostObserverStub::OnDeviceNameChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnDeviceNameChangedInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::string deviceName = data.ReadString();
 
     HILOGI("OnDeviceNameChangedInner starts");
-    OnDeviceNameChanged(deviceName);
+    stub->OnDeviceNameChanged(deviceName);
 
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostObserverStub::OnDeviceAddrChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostObserverStub::OnDeviceAddrChangedInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::string address = data.ReadString();
 
     HILOGI("OnDeviceAddrChangedInner starts");
-    OnDeviceAddrChanged(address);
+    stub->OnDeviceAddrChanged(address);
 
     return NO_ERROR;
 }
