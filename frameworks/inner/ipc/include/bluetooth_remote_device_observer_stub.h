@@ -34,18 +34,26 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnAclStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRemoteNameUuidChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRemoteNameChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRemoteAliasChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRemoteCodChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRemoteBatteryChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRemoteDeviceCommonInfoReportInner(MessageParcel &data, MessageParcel &reply);
+    static int32_t OnAclStateChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnPairStatusChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnRemoteNameUuidChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnRemoteNameChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnRemoteAliasChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnRemoteCodChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnRemoteBatteryChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnRemoteDeviceCommonInfoReportInner(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
 
-    static const std::map<uint32_t,
-        std::function<ErrCode(BluetoothRemoteDeviceObserverstub *, MessageParcel &, MessageParcel &)>>
-        memberFuncMap_;
+    using BluetoothRemoteDeviceObserverFunc = int32_t (*)(BluetoothRemoteDeviceObserverstub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    std::map<uint32_t, BluetoothRemoteDeviceObserverFunc> memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothRemoteDeviceObserverstub);
 };
 }  // namespace Bluetooth
