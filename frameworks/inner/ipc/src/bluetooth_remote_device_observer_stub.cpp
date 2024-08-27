@@ -21,42 +21,40 @@
 namespace OHOS {
 namespace Bluetooth {
 constexpr uint16_t UUID_SIZE_MAX = 1024;
-const std::map<uint32_t, std::function<ErrCode(BluetoothRemoteDeviceObserverstub *, MessageParcel &, MessageParcel &)>>
-    BluetoothRemoteDeviceObserverstub::memberFuncMap_ = {
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_ACL_STATE,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnAclStateChangedInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_PAIR_STATUS,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_ALIAS,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteBatteryChangedInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_INFO_REPORT,
-            std::bind(&BluetoothRemoteDeviceObserverstub::OnRemoteDeviceCommonInfoReportInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-};
 
 BluetoothRemoteDeviceObserverstub::BluetoothRemoteDeviceObserverstub()
 {
     HILOGD("start.");
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_ACL_STATE)] =
+        BluetoothRemoteDeviceObserverstub::OnAclStateChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_PAIR_STATUS)] =
+        BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_UUID)] =
+        BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_NAME)] =
+        BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_ALIAS)] =
+        BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_COD)] =
+        BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_LEVEL)] =
+        BluetoothRemoteDeviceObserverstub::OnRemoteBatteryChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothRemoteDeviceObserverInterfaceCode::BT_REMOTE_DEVICE_OBSERVER_REMOTE_BATTERY_INFO_REPORT)] =
+        BluetoothRemoteDeviceObserverstub::OnRemoteDeviceCommonInfoReportInner;
 }
 
 BluetoothRemoteDeviceObserverstub::~BluetoothRemoteDeviceObserverstub()
 {
     HILOGD("start.");
+    memberFuncMap_.clear();
 }
 
 int BluetoothRemoteDeviceObserverstub::OnRemoteRequest(
@@ -77,7 +75,8 @@ int BluetoothRemoteDeviceObserverstub::OnRemoteRequest(
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnAclStateChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothRemoteDeviceObserverstub::OnAclStateChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
     if (!result) {
@@ -85,11 +84,12 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnAclStateChangedInner(MessageParcel 
     }
     int32_t state = data.ReadInt32();
     uint32_t reason = data.ReadUint32();
-    OnAclStateChanged(*result, state, reason);
+    stub->OnAclStateChanged(*result, state, reason);
     return NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     int32_t transport = data.ReadInt32();
     std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
@@ -98,11 +98,12 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner(MessageParce
     }
     int32_t status = data.ReadInt32();
     int32_t cause = data.ReadInt32();
-    OnPairStatusChanged(transport, *result, status, cause);
+    stub->OnPairStatusChanged(transport, *result, status, cause);
     return NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
     if (!result) {
@@ -121,55 +122,60 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameUuidChangedInner(MessageP
         }
         uuids.push_back(*uuid);
     }
-    OnRemoteUuidChanged(*result, uuids);
+    stub->OnRemoteUuidChanged(*result, uuids);
     return NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothRemoteDeviceObserverstub::OnRemoteNameChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
     if (!result) {
         return TRANSACTION_ERR;
     }
     std::string deviceName = data.ReadString();
-    OnRemoteNameChanged(*result, deviceName);
+    stub->OnRemoteNameChanged(*result, deviceName);
     return NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothRemoteDeviceObserverstub::OnRemoteAliasChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
     if (!result) {
         return TRANSACTION_ERR;
     }
     std::string alias = data.ReadString();
-    OnRemoteAliasChanged(*result, alias);
+    stub->OnRemoteAliasChanged(*result, alias);
     return NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothRemoteDeviceObserverstub::OnRemoteCodChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> result(data.ReadParcelable<BluetoothRawAddress>());
     if (!result) {
         return TRANSACTION_ERR;
     }
     int32_t cod = data.ReadInt32();
-    OnRemoteCodChanged(*result, cod);
+    stub->OnRemoteCodChanged(*result, cod);
     return NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteBatteryChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothRemoteDeviceObserverstub::OnRemoteBatteryChangedInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     CHECK_AND_RETURN_LOG_RET((device != nullptr), BT_ERR_INTERNAL_ERROR, "Read device error");
     std::shared_ptr<BluetoothBatteryInfo> batteryInfo(data.ReadParcelable<BluetoothBatteryInfo>());
     CHECK_AND_RETURN_LOG_RET((batteryInfo != nullptr), BT_ERR_INTERNAL_ERROR, "Read batteryInfo error");
 
-    OnRemoteBatteryChanged(*device, *batteryInfo);
+    stub->OnRemoteBatteryChanged(*device, *batteryInfo);
     return BT_NO_ERROR;
 }
 
-ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteDeviceCommonInfoReportInner(MessageParcel &data,
+int32_t BluetoothRemoteDeviceObserverstub::OnRemoteDeviceCommonInfoReportInner(BluetoothRemoteDeviceObserverstub *stub,
+    MessageParcel &data,
     MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
@@ -177,7 +183,7 @@ ErrCode BluetoothRemoteDeviceObserverstub::OnRemoteDeviceCommonInfoReportInner(M
     std::vector<uint8_t> dataValue;
     CHECK_AND_RETURN_LOG_RET(data.ReadUInt8Vector(&dataValue), BT_ERR_INTERNAL_ERROR, "Read dataValue error");
 
-    OnRemoteDeviceCommonInfoReport(*device, dataValue);
+    stub->OnRemoteDeviceCommonInfoReport(*device, dataValue);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
