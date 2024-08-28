@@ -32,18 +32,30 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnCharacteristicChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnCharacteristicReadInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnCharacteristicWriteInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnDescriptorReadInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnDescriptorWriteInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnMtuChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnServicesDiscoveredInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnServicesChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnReadRemoteRssiValueInner(MessageParcel &data, MessageParcel &reply);
-    using BluetoothHostFunc = ErrCode (BluetoothGattClientCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnConnectionStateChangedInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnCharacteristicChangedInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnCharacteristicReadInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnCharacteristicWriteInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnDescriptorReadInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnDescriptorWriteInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnMtuChangedInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnServicesDiscoveredInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnConnectionParameterChangedInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnServicesChangedInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnReadRemoteRssiValueInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    using BluetoothHostFunc = ErrCode (*)(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHostFunc> memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothGattClientCallbackStub);
 };

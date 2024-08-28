@@ -25,11 +25,11 @@ BluetoothBlePeripheralObserverStub::BluetoothBlePeripheralObserverStub()
     HILOGD("start.");
     memberFuncMap_ = {
         {static_cast<uint32_t>(BluetoothBlePeripheralObserverInterfaceCode::BLE_ON_READ_REMOTE_RSSI_EVENT),
-            &BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner},
+            BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner},
         {static_cast<uint32_t>(BluetoothBlePeripheralObserverInterfaceCode::BLE_PAIR_STATUS_CHANGED),
-            &BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner},
+            BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner},
         {static_cast<uint32_t>(BluetoothBlePeripheralObserverInterfaceCode::BLE_ACL_STATE_CHANGED),
-            &BluetoothBlePeripheralObserverStub::OnAclStateChangedInner},
+            BluetoothBlePeripheralObserverStub::OnAclStateChangedInner},
     };
 }
 
@@ -53,14 +53,15 @@ int BluetoothBlePeripheralObserverStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
     HILOGW("BleCentralManagerCallBackStub::OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner(
+    BluetoothBlePeripheralObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
@@ -69,11 +70,12 @@ ErrCode BluetoothBlePeripheralObserverStub::OnReadRemoteRssiEventInner(MessagePa
     const int32_t rssi = static_cast<int32_t>(data.ReadInt32());
     const int32_t status = static_cast<int32_t>(data.ReadInt32());
 
-    OnReadRemoteRssiEvent(*device, rssi, status);
+    stub->OnReadRemoteRssiEvent(*device, rssi, status);
     return NO_ERROR;
 }
 
-ErrCode BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner(
+    BluetoothBlePeripheralObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     const int32_t transport = static_cast<int32_t>(data.ReadInt32());
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
@@ -82,11 +84,12 @@ ErrCode BluetoothBlePeripheralObserverStub::OnPairStatusChangedInner(MessageParc
     }
     const int32_t status = static_cast<int32_t>(data.ReadInt32());
     const int32_t cause = static_cast<int32_t>(data.ReadInt32());
-    OnPairStatusChanged(transport, *device, status, cause);
+    stub->OnPairStatusChanged(transport, *device, status, cause);
     return NO_ERROR;
 }
 
-ErrCode BluetoothBlePeripheralObserverStub::OnAclStateChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBlePeripheralObserverStub::OnAclStateChangedInner(
+    BluetoothBlePeripheralObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
     if (!device) {
@@ -95,7 +98,7 @@ ErrCode BluetoothBlePeripheralObserverStub::OnAclStateChangedInner(MessageParcel
     const int32_t state = static_cast<int32_t>(data.ReadInt32());
     const uint32_t reason = static_cast<uint32_t>(data.ReadUint32());
 
-    OnAclStateChanged(*device, state, reason);
+    stub->OnAclStateChanged(*device, state, reason);
     return NO_ERROR;
 }
 }  // namespace Bluetooth

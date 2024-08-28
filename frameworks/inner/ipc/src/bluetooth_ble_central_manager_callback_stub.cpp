@@ -25,18 +25,18 @@ const int32_t BLE_CENTRAL_MANAGER_READ_DATA_SIZE_MAX_LEN = 0x100;
 const std::map<uint32_t,
     std::function<ErrCode(BluetoothBleCentralManagerCallBackStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleCentralManagerCallBackStub::memberFuncMap_ = {
-        {BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_CENTRAL_MANAGER_CALLBACK,
-            std::bind(&BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK,
-            std::bind(&BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED,
-            std::bind(&BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_LPDEVICE_CALLBACK_NOTIFY_MSG_REPORT,
-            std::bind(&BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromLpDeviceInner,
-                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
+        {static_cast<uint32_t>(
+            BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_CENTRAL_MANAGER_CALLBACK),
+            BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner},
+        {static_cast<uint32_t>(
+            BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_CENTRAL_MANAGER_BLE_BATCH_CALLBACK),
+            BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_CENTRAL_MANAGER_CALLBACK_SCAN_FAILED),
+            BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleCentralManagerCallbackInterfaceCode::BT_BLE_LPDEVICE_CALLBACK_NOTIFY_MSG_REPORT),
+            BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromLpDeviceInner},
 };
 
 BluetoothBleCentralManagerCallBackStub::BluetoothBleCentralManagerCallBackStub()
@@ -70,20 +70,21 @@ int BluetoothBleCentralManagerCallBackStub::OnRemoteRequest(
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleCentralManagerCallBackStub::OnScanCallbackInner(
+    BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothBleScanResult> result(data.ReadParcelable<BluetoothBleScanResult>());
     if (!result) {
         return TRANSACTION_ERR;
     }
     uint8_t callbackType = data.ReadUint8();
-    OnScanCallback(*result, callbackType);
+    stub->OnScanCallback(*result, callbackType);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
 ErrCode BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner(
-    MessageParcel &data, MessageParcel &reply)
+    BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     int32_t infoSize = 0;
     if (!data.ReadInt32(infoSize) || infoSize > BLE_CENTRAL_MANAGER_READ_DATA_SIZE_MAX_LEN) {
@@ -100,21 +101,23 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnBleBatchScanResultsEventInner(
         }
         parcelableInfos.emplace_back(*info);
     }
-    OnBleBatchScanResultsEvent(parcelableInfos);
+    stub->OnBleBatchScanResultsEvent(parcelableInfos);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleCentralManagerCallBackStub::OnStartOrStopScanEventInner(
+    BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     int32_t resultCode = data.ReadInt32();
     bool isStartScan = data.ReadBool();
-    OnStartOrStopScanEvent(resultCode, isStartScan);
+    stub->OnStartOrStopScanEvent(resultCode, isStartScan);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromLpDeviceInner(MessageParcel &data,
+ErrCode BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromLpDeviceInner(
+    BluetoothBleCentralManagerCallBackStub *stub, MessageParcel &data,
     MessageParcel &reply)
 {
     std::shared_ptr<BluetoothUuid> uuid(data.ReadParcelable<BluetoothUuid>());
@@ -129,7 +132,7 @@ ErrCode BluetoothBleCentralManagerCallBackStub::OnNotifyMsgReportFromLpDeviceInn
         HILOGE("[OnNotifyMsgReportFromLpDeviceInner] read dataValue failed");
         return ERR_INVALID_VALUE;
     }
-    OnNotifyMsgReportFromLpDevice(btUuid, msgType, dataValue);
+    stub->OnNotifyMsgReportFromLpDevice(btUuid, msgType, dataValue);
     return NO_ERROR;
 }
 

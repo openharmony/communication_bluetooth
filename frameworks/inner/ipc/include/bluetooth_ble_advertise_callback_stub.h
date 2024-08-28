@@ -32,12 +32,18 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnAutoStopAdvEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnStartResultEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnEnableResultEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnDisableResultEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnStopResultEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnSetAdvDataEventInner(MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnAutoStopAdvEventInner(
+        BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnStartResultEventInner(
+        BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnEnableResultEventInner(
+        BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnDisableResultEventInner(
+        BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnStopResultEventInner(
+        BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnSetAdvDataEventInner(
+        BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
         memberFuncMap_;
