@@ -32,19 +32,28 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnStateChangedInner(MessageParcel &data, MessageParcel &reply);
-
+    static int32_t OnStateChangedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
     // ON_DIS_STA_CHANGE_CODE
-    ErrCode OnDiscoveryStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnDiscoveryResultInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPairRequestedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPairConfirmedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnScanModeChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnDeviceNameChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnDeviceAddrChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBluetoothStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    static int32_t OnDiscoveryStateChangedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnDiscoveryResultInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnPairRequestedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnPairConfirmedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnScanModeChangedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnDeviceNameChangedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnDeviceAddrChangedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnBluetoothStateChangedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothObserverHostFunc = ErrCode (BluetoothHostObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+    using BluetoothObserverHostFunc = int32_t (*)(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothObserverHostFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothHostObserverStub);
