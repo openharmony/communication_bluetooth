@@ -1193,10 +1193,23 @@ bool BluetoothHost::IsBtProhibitedByEdm(void)
     return false;
 }
 
+static bool IsBluetoothSystemAbilityOn(void)
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, false, "samgrProxy is nullptr");
+    auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
+    return object != nullptr;
+}
+
 void BluetoothHost::OnRemoveBluetoothSystemAbility()
 {
     // Notify the upper layer that bluetooth is disabled.
-    if (pimpl->observerImp_ != nullptr && pimpl->bleObserverImp_ != nullptr) {
+    bool isBluetoothSystemAbilityOn = IsBluetoothSystemAbilityOn();
+    if (isBluetoothSystemAbilityOn) {
+        HILOGW("Bluetooth SA is started, the hap application may be freezed by rss");
+    }
+    bool isNeedNotifyBluetoothOffState = pimpl->observerImp_ && pimpl->bleObserverImp_ && !isBluetoothSystemAbilityOn;
+    if (isNeedNotifyBluetoothOffState) {
         HILOGD("bluetooth_servi died and send state off to app");
         pimpl->observerImp_->OnStateChanged(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
         pimpl->bleObserverImp_->OnStateChanged(BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
