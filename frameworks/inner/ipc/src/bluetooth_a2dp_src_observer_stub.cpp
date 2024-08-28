@@ -26,19 +26,19 @@ BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
     HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CONNECTION_STATE_CHANGED)] =
-        &BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner;
+        BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_PLAYING_STATUS_CHANGED)] =
-        &BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner;
+        BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
-        &BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner;
+        BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED)] =
-        &BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner;
+        BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_VIRTUALDEVICE_CHANGED)] =
-        &BluetoothA2dpSrcObserverStub::OnVirtualDeviceChangedInner;
+        BluetoothA2dpSrcObserverStub::OnVirtualDeviceChangedInner;
 }
 
 BluetoothA2dpSrcObserverStub::~BluetoothA2dpSrcObserverStub()
@@ -59,36 +59,39 @@ int BluetoothA2dpSrcObserverStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
     HILOGW("default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-int32_t BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnConnectionStateChangedInner(
+    BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int state = data.ReadInt32();
     int cause = data.ReadInt32();
 
-    OnConnectionStateChanged(RawAddress(addr), state, cause);
+    stub->OnConnectionStateChanged(RawAddress(addr), state, cause);
 
     return NO_ERROR;
 }
 
-int32_t BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnPlayingStatusChangedInner(
+    BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int playingState = data.ReadInt32();
     int error = data.ReadInt32();
 
-    OnPlayingStatusChanged(RawAddress(addr), playingState, error);
+    stub->OnPlayingStatusChanged(RawAddress(addr), playingState, error);
 
     return NO_ERROR;
 }
 
-int32_t BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(
+    BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
@@ -97,24 +100,26 @@ int32_t BluetoothA2dpSrcObserverStub::OnConfigurationChangedInner(MessageParcel 
     }
     int error = data.ReadInt32();
 
-    OnConfigurationChanged(RawAddress(addr), *info, error);
+    stub->OnConfigurationChanged(RawAddress(addr), *info, error);
     return NO_ERROR;
 }
 
-int32_t BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothA2dpSrcObserverStub::OnMediaStackChangedInner(
+    BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
     int action = data.ReadInt32();
-    OnMediaStackChanged(RawAddress(addr), action);
+    stub->OnMediaStackChanged(RawAddress(addr), action);
     return BT_NO_ERROR;
 }
 
-ErrCode BluetoothA2dpSrcObserverStub::OnVirtualDeviceChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothA2dpSrcObserverStub::OnVirtualDeviceChangedInner(
+    BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     int action = data.ReadInt32();
     std::string addr = data.ReadString();
 
-    OnVirtualDeviceChanged(action, addr);
+    stub->OnVirtualDeviceChanged(action, addr);
 
     return BT_NO_ERROR;
 }

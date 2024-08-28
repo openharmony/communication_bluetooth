@@ -33,39 +33,69 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPressButtonInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnReleaseButtonInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnSetBrowsedPlayerInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetCapabilitiesInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetPlayerAppSettingAttributesInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetPlayerAppSettingValuesInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetPlayerAppSettingCurrentValueInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnSetPlayerAppSettingCurrentValueInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetPlayerAppSettingAttributeTextInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetPlayerAppSettingValueTextInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetElementAttributesInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetPlayStatusInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPlayItemInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetTotalNumberOfItemsInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetItemAttributesInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnSetAbsoluteVolumeInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPlaybackStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnTrackChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnTrackReachedEndInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnTrackReachedStartInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPlaybackPosChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPlayerAppSettingChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnNowPlayingContentChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnAvailablePlayersChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnAddressedPlayerChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnUidChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnVolumeChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetMediaPlayersInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnGetFolderItemsInner(MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnConnectionStateChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnPressButtonInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnReleaseButtonInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnSetBrowsedPlayerInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetCapabilitiesInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetPlayerAppSettingAttributesInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetPlayerAppSettingValuesInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetPlayerAppSettingCurrentValueInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnSetPlayerAppSettingCurrentValueInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetPlayerAppSettingAttributeTextInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetPlayerAppSettingValueTextInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetElementAttributesInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetPlayStatusInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnPlayItemInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetTotalNumberOfItemsInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetItemAttributesInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnSetAbsoluteVolumeInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnPlaybackStatusChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnTrackChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnTrackReachedEndInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnTrackReachedStartInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnPlaybackPosChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnPlayerAppSettingChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnNowPlayingContentChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnAvailablePlayersChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnAddressedPlayerChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnUidChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnVolumeChangedInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetMediaPlayersInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnGetFolderItemsInner(
+        BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
 
     using BluetoothAvrcpCtObserverStubFunc =
-        ErrCode (BluetoothAvrcpCtObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+        ErrCode (*)(BluetoothAvrcpCtObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothAvrcpCtObserverStubFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothAvrcpCtObserverStub);
