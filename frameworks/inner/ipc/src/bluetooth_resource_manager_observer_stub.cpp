@@ -24,10 +24,10 @@ BluetoothResourceManagerObserverStub::BluetoothResourceManagerObserverStub()
     HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothResourceManagerObserverInterfaceCode::SENSING_STATE_CHANGED)] =
-        &BluetoothResourceManagerObserverStub::OnSensingStateChangedInner;
+        BluetoothResourceManagerObserverStub::OnSensingStateChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothResourceManagerObserverInterfaceCode::BLUETOOTH_RESOURCE_DECISION)] =
-        &BluetoothResourceManagerObserverStub::OnBluetoothResourceDecisionInner;
+        BluetoothResourceManagerObserverStub::OnBluetoothResourceDecisionInner;
 }
 
 BluetoothResourceManagerObserverStub::~BluetoothResourceManagerObserverStub()
@@ -49,25 +49,14 @@ int BluetoothResourceManagerObserverStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
     HILOGW("OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothResourceManagerObserverStub::OnSensingStateChangedInner(MessageParcel &data, MessageParcel &reply)
-{
-    uint8_t eventId = data.ReadUint8();
-    std::shared_ptr<BluetoothSensingInfo> info(data.ReadParcelable<BluetoothSensingInfo>());
-    if (!info) {
-        return TRANSACTION_ERR;
-    }
-    OnSensingStateChanged(eventId, *info);
-    return NO_ERROR;
-}
-
-ErrCode BluetoothResourceManagerObserverStub::OnBluetoothResourceDecisionInner(
+int32_t BluetoothResourceManagerObserverStub::OnSensingStateChangedInner(BluetoothResourceManagerObserverStub *stub,
     MessageParcel &data, MessageParcel &reply)
 {
     uint8_t eventId = data.ReadUint8();
@@ -75,8 +64,20 @@ ErrCode BluetoothResourceManagerObserverStub::OnBluetoothResourceDecisionInner(
     if (!info) {
         return TRANSACTION_ERR;
     }
+    stub->OnSensingStateChanged(eventId, *info);
+    return NO_ERROR;
+}
+
+int32_t BluetoothResourceManagerObserverStub::OnBluetoothResourceDecisionInner(
+    BluetoothResourceManagerObserverStub *stub, MessageParcel &data, MessageParcel &reply)
+{
+    uint8_t eventId = data.ReadUint8();
+    std::shared_ptr<BluetoothSensingInfo> info(data.ReadParcelable<BluetoothSensingInfo>());
+    if (!info) {
+        return TRANSACTION_ERR;
+    }
     uint32_t result = bluetooth::CONNECTION_ACCEPT;
-    OnBluetoothResourceDecision(eventId, *info, result);
+    stub->OnBluetoothResourceDecision(eventId, *info, result);
     if (!reply.WriteUint32(result)) {
         HILOGE("reply write failed.");
         return BT_ERR_IPC_TRANS_FAILED;
