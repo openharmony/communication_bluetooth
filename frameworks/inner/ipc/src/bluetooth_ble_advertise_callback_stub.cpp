@@ -23,20 +23,27 @@ using std::placeholders::_2;
 using std::placeholders::_3;
 namespace OHOS {
 namespace Bluetooth {
-const std::map<uint32_t, std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
+const std::map<uint32_t, std::function<ErrCode(
+    BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
     BluetoothBleAdvertiseCallbackStub::memberFuncMap_ = {
-        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner, _1, _2, _3)},
-        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_START_RESULT_EVENT,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner, _1, _2, _3)},
-        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_ENABLE_RESULT_EVENT,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnEnableResultEventInner, _1, _2, _3)},
-        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_DISABLE_RESULT_EVENT,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnDisableResultEventInner, _1, _2, _3)},
-        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_STOP_RESULT_EVENT,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnStopResultEventInner, _1, _2, _3)},
-        {BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
-            std::bind(&BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner, _1, _2, _3)},
+        {static_cast<uint32_t>(
+            BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_AUTO_STOP_EVENT),
+            BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_START_RESULT_EVENT),
+            BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_ENABLE_RESULT_EVENT),
+            BluetoothBleAdvertiseCallbackStub::OnEnableResultEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_DISABLE_RESULT_EVENT),
+            BluetoothBleAdvertiseCallbackStub::OnDisableResultEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_STOP_RESULT_EVENT),
+            BluetoothBleAdvertiseCallbackStub::OnStopResultEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA),
+            BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner},
 };
 
 BluetoothBleAdvertiseCallbackStub::BluetoothBleAdvertiseCallbackStub()
@@ -72,57 +79,63 @@ int BluetoothBleAdvertiseCallbackStub::OnRemoteRequest(
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleAdvertiseCallbackStub::OnStartResultEventInner(
+    BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
     const int32_t opcode = static_cast<int32_t>(data.ReadInt32());
 
-    OnStartResultEvent(result, advHandle, opcode);
+    stub->OnStartResultEvent(result, advHandle, opcode);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleAdvertiseCallbackStub::OnEnableResultEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleAdvertiseCallbackStub::OnEnableResultEventInner(
+    BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
-    OnEnableResultEvent(result, advHandle);
+    stub->OnEnableResultEvent(result, advHandle);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleAdvertiseCallbackStub::OnDisableResultEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleAdvertiseCallbackStub::OnDisableResultEventInner(
+    BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
-    OnDisableResultEvent(result, advHandle);
+    stub->OnDisableResultEvent(result, advHandle);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleAdvertiseCallbackStub::OnStopResultEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleAdvertiseCallbackStub::OnStopResultEventInner(
+    BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
-    OnStopResultEvent(result, advHandle);
+    stub->OnStopResultEvent(result, advHandle);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleAdvertiseCallbackStub::OnAutoStopAdvEventInner(
+    BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
-    OnAutoStopAdvEvent(advHandle);
+    stub->OnAutoStopAdvEvent(advHandle);
     return NO_ERROR;
 }
 
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner(
+    BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
-    OnSetAdvDataEvent(result, advHandle);
+    stub->OnSetAdvDataEvent(result, advHandle);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
