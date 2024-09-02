@@ -32,10 +32,11 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    int32_t OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    static int32_t OnConnectionStateChangedInner(
+        BluetoothMapMseObserverStub *stub, MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothMapMseObserverFunc = int32_t (BluetoothMapMseObserverStub::*)(
-        MessageParcel &data, MessageParcel &reply);
+    using BluetoothMapMseObserverFunc = int32_t (*)(
+        BluetoothMapMseObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothMapMseObserverFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothMapMseObserverStub);

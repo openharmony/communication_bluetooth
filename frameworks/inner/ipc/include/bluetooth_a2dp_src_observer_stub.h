@@ -32,13 +32,18 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    int32_t OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnVirtualDeviceChangedInner(MessageParcel &data, MessageParcel &reply);
+    static int32_t OnConnectionStateChangedInner(
+        BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static int32_t OnPlayingStatusChangedInner(
+        BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static int32_t OnConfigurationChangedInner(
+        BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static int32_t OnMediaStackChangedInner(
+        BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnVirtualDeviceChangedInner(
+        BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     using BluetoothA2dpSrcObserverFunc =
-        int32_t (BluetoothA2dpSrcObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+        int32_t (*)(BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothA2dpSrcObserverFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothA2dpSrcObserverStub);
