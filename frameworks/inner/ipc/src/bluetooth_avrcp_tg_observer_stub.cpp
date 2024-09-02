@@ -23,7 +23,7 @@ BluetoothAvrcpTgObserverStub::BluetoothAvrcpTgObserverStub()
     HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothAvrcpTgObserverInterfaceCode::BT_AVRCP_TG_OBSERVER_CONNECTION_STATE_CHANGED)] =
-        &BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner;
+        BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner;
 }
 
 BluetoothAvrcpTgObserverStub::~BluetoothAvrcpTgObserverStub()
@@ -45,14 +45,15 @@ int BluetoothAvrcpTgObserverStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
     HILOGW("BluetoothAvrcpTgObserverStub::OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-ErrCode BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner(
+    BluetoothAvrcpTgObserverStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner Triggered!");
     std::shared_ptr<BluetoothRawAddress> addr(data.ReadParcelable<BluetoothRawAddress>());
@@ -62,7 +63,7 @@ ErrCode BluetoothAvrcpTgObserverStub::OnConnectionStateChangedInner(MessageParce
     int state = data.ReadInt32();
     int cause = data.ReadInt32();
 
-    OnConnectionStateChanged(*addr, state, cause);
+    stub->OnConnectionStateChanged(*addr, state, cause);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
