@@ -309,7 +309,9 @@ typedef enum {
     /** Prepare write requiring a response from the server */
     OHOS_GATT_WRITE_PREPARE = 0x03,
     /** Write operation with an authentication signature */
-    OHOS_GATT_WRITE_SIGNED = 0x04
+    OHOS_GATT_WRITE_SIGNED = 0x04,
+    /** Write operation unknow type */
+    OHOS_GATT_WRITE_TYPE_UNKNOW = 0xFF
 } BtGattWriteType;
 
 /**
