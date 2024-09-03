@@ -104,6 +104,7 @@ struct ClientSocket::impl {
         }
     }
 
+    __attribute__((no_sanitize("cfi")))
     void Close()
     {
         HILOGD("enter");
