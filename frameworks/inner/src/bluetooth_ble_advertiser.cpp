@@ -48,6 +48,7 @@ struct BleAdvertiser::impl {
         ~BluetoothBleAdvertiserCallbackImp()
         {}
 
+        __attribute__((no_sanitize("cfi")))
         void OnStartResultEvent(int32_t result, int32_t advHandle, int32_t opcode) override
         {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
