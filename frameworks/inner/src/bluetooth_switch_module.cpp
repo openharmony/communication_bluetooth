@@ -193,7 +193,8 @@ void BluetoothSwitchModule::DeduplicateCacheEvent(BluetoothSwitchEvent curEvent)
     // 从缓存事件列表里，找到最后一个 curEvent，保留该事件之后的缓存事件
     auto it = std::find(cachedEventVec_.rbegin(), cachedEventVec_.rend(), curEvent);
     if (it != cachedEventVec_.rend()) {
-        size_t pos = std::distance(cachedEventVec_.begin(), it.base()) - 1;
+        // The it.base() is greater than cachedEventVec_.begin(), so std::distance > 0.
+        size_t pos = static_cast<size_t>(std::distance(cachedEventVec_.begin(), it.base())) - 1;
 
         LogCacheEventIgnored(
             std::vector<BluetoothSwitchEvent>(cachedEventVec_.begin(), cachedEventVec_.begin() + pos + 1));
