@@ -636,8 +636,11 @@ int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristi
         return OHOS_BT_STATUS_FAIL;
     }
 
-    int newWriteType = ConverWriteType(writeType);
-    tmpCharac->SetWriteType(newWriteType);
+    if (writeType != OHOS_GATT_WRITE_TYPE_UNKNOW) {
+        int newWriteType = ConverWriteType(writeType);
+        tmpCharac->SetWriteType(newWriteType);
+    }
+
     std::vector<uint8_t> characterValue(value, value + len);
     int result = client->WriteCharacteristic(*tmpCharac, std::move(characterValue));
     HILOGD("clientId: %{public}d, result: %{public}d", clientId, result);
