@@ -311,7 +311,7 @@ typedef enum {
     /** Write operation with an authentication signature */
     OHOS_GATT_WRITE_SIGNED = 0x04,
     /** Write operation unknow type */
-    OHOS_GATT_WRITE_TYPE_UNKNOW = 0xFF
+    OHOS_GATT_WRITE_TYPE_UNKNOWN = 0xFF
 } BtGattWriteType;
 
 /**
