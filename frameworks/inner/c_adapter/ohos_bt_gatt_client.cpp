@@ -636,7 +636,7 @@ int BleGattcWriteCharacteristic(int clientId, BtGattCharacteristic characteristi
         return OHOS_BT_STATUS_FAIL;
     }
 
-    if (writeType != OHOS_GATT_WRITE_TYPE_UNKNOW) {
+    if (writeType != OHOS_GATT_WRITE_TYPE_UNKNOWN) {
         int newWriteType = ConverWriteType(writeType);
         tmpCharac->SetWriteType(newWriteType);
     }
