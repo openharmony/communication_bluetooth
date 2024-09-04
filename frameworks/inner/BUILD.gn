@@ -131,7 +131,7 @@ config("btframework_config") {
   ]
 
   defines = []
-  if (is_asan) {
+  if (is_asan || use_clang_coverage) {
     defines += [ "DTFUZZ_TEST" ]
   }
   if (bluetooth_service_resourceschedule) {
