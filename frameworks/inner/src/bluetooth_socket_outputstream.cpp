@@ -21,6 +21,16 @@
 
 namespace OHOS {
 namespace Bluetooth {
+
+static constexpr int32_t SOCKET_SEND_TIME_THRESHOLD = 1000; // 1000ms
+static int64_t GetNowTimestamp(void)
+{
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    int64_t timestamp = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return timestamp;
+}
+
 OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 {}
 
@@ -33,7 +43,13 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
         HILOGE("socket closed.");
         return -1;
     }
+
+    int64_t beginTimestamp = GetNowTimestamp();
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
+    int64_t endTimestamp = GetNowTimestamp();
+    if (endTimestamp - beginTimestamp > SOCKET_SEND_TIME_THRESHOLD) {
+        HILOGE("socket send time %{public}ld ms", endTimestamp - beginTimestamp);
+    }
 
     HILOGD("ret: %{public}zu", ret);
 
