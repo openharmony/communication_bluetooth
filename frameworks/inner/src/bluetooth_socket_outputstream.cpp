@@ -15,7 +15,7 @@
 
 #include <unistd.h>
 #include <cerrno>
-#include <inttypes.h>
+#include <cinttypes>
 #include "bluetooth_socket_outputstream.h"
 #include "bluetooth_log.h"
 #include "sys/socket.h"
