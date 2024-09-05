@@ -24,7 +24,7 @@
 #include "bluetooth_log.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "no_destructor.h"
+#include "bluetooth_no_destructor.h"
 #include "ohos_bt_gatt.h"
 
 namespace OHOS {
@@ -43,7 +43,7 @@ BluetoothProfileManager::~BluetoothProfileManager()
 
 BluetoothProfileManager &BluetoothProfileManager::GetInstance()
 {
-    static NoDestructor<BluetoothProfileManager> instance;
+    static BluetoothNoDestructor<BluetoothProfileManager> instance;
     return *instance;
 }
 
