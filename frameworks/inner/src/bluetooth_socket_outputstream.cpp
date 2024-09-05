@@ -48,7 +48,7 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
     int64_t endTimestamp = GetNowTimestamp();
     if (endTimestamp - beginTimestamp > SOCKET_SEND_TIME_THRESHOLD) {
-        HILOGE("socket send time %{public} PRId64 ms", endTimestamp - beginTimestamp);
+        HILOGE("socket send time %{public}" PRId64, endTimestamp - beginTimestamp);
     }
 
     HILOGD("ret: %{public}zu", ret);
