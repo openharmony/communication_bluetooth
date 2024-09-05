@@ -477,7 +477,7 @@ HandsFreeUnit::~HandsFreeUnit()
 HandsFreeUnit *HandsFreeUnit::GetProfile()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<HandsFreeUnit> instance;
+    static BluetoothNoDestructor<HandsFreeUnit> instance;
     return instance.get();
 #else
     static HandsFreeUnit instance;

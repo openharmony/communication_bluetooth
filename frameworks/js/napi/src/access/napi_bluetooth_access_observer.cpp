@@ -90,8 +90,6 @@ void NapiBluetoothAccessObserver::GetBrStateByStatus(const int status, Bluetooth
             break;
         case BTStateID::STATE_TURN_OFF: {
             HILOGD("STATE_OFF(0)");
-            //Restricted bluetooth state, when br off report state off;
-            state = BluetoothState::STATE_OFF;
             break;
         }
         default:

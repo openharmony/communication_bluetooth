@@ -91,7 +91,6 @@ bool ParseInt32(napi_env env, int32_t &param, napi_value args)
 {
     napi_valuetype valuetype;
     napi_typeof(env, args, &valuetype);
-
     if (valuetype != napi_number) {
         HILOGE("Wrong argument type(%{public}d). Int32 expected.", valuetype);
         return false;

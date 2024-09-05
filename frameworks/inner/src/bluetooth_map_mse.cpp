@@ -106,7 +106,7 @@ void MapMse::impl::DeregisterObserver(std::shared_ptr<MapMseObserver> &observer)
 MapMse *MapMse::GetProfile()
 {
 #ifdef DTFUZZ_TEST
-    static NoDestructor<MapMse> instance;
+    static BluetoothNoDestructor<MapMse> instance;
     return instance.get();
 #else
     static MapMse instance;
