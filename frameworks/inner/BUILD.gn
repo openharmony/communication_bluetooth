@@ -111,7 +111,6 @@ FwkIpcSrc = [
   "$BT_IPCSRC_DIR/bluetooth_socket_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_socket_observer_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_audio_manager_proxy.cpp",
-  "$BT_IPCSRC_DIR/bluetooth_resource_manager_observer_stub.cpp",
 ]
 
 config("btframework_config") {
@@ -231,7 +230,6 @@ ohos_shared_library("btcommon") {
     "ipc/parcel/bluetooth_phone_state.cpp",
     "ipc/parcel/bluetooth_raw_address.cpp",
     "ipc/parcel/bluetooth_remote_device_info.cpp",
-    "ipc/parcel/bluetooth_sensing_info.cpp",
     "ipc/parcel/bluetooth_socket_coc.cpp",
     "ipc/parcel/parcel_bt_uuid.cpp",
   ]

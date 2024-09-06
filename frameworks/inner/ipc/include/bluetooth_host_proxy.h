@@ -107,8 +107,6 @@ public:
     int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) override;
     int32_t GetRemoteDeviceInfo(const std::string &address,
         std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) override;
-    void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
-    void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

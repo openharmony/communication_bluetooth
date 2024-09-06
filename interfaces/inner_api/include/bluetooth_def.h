@@ -1550,15 +1550,6 @@ constexpr int32_t BLE_SCAN_INVALID_ID = 0;
 
 #define IS_BLE_ENABLED() (BluetoothHost::GetDefaultHost().IsBleEnabled())
 
-struct SensingInfo {
-    std::string addr_;
-    std::string uuid_;
-    uint32_t resourceId_;
-    std::string pkgName_;
-    bool isServer_;
-    uint16_t interval_;
-};
-
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
