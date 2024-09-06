@@ -106,9 +106,6 @@ bool BluetoothIOppTransferInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     SetDirection(val);
-    if (!parcel.ReadInt32(val)) {
-        return false;
-    }
     SetStatus(val);
     if (!parcel.ReadInt32(val)) {
         return false;
@@ -122,9 +119,6 @@ bool BluetoothIOppTransferInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     SetCurrentBytes(val64);
-    if (!parcel.ReadInt64(val64)) {
-        return false;
-    }
     SetTotalBytes(val64);
 
     return true;
