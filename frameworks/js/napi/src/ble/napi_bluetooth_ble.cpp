@@ -626,7 +626,7 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
 
     return NapiGetUndefinedRet(env);
 }

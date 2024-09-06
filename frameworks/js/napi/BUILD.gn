@@ -18,16 +18,6 @@ SUBSYSTEM_DIR = "//foundation/communication"
 ohos_shared_library("bluetooth") {
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
 
-  # sanitize = {
-  #   cfi = true  # Enable/disable control flow integrity detection
-  #   boundary_sanitize = true  # Enable boundary san detection
-  #   cfi_cross_dso = true  # Cross-SO CFI Checks
-  #   integer_overflow = true  # Enable integer overflow detection
-  #   ubsan = true  # Enable some Ubsan options
-  #   debug = false
-  #   blocklist = "./js_napi_blocklist.txt"
-  # }
-
   #install_enable = true
   include_dirs = [
     "include",

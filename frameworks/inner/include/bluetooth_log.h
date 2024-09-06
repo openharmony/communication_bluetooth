@@ -44,23 +44,23 @@
 #undef HILOGD
 #endif
 
-#define FILENAME__SHORT (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define FILENAME_SHORT (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define HILOGD(fmt, ...)                 \
     HILOG_DEBUG(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGI(fmt, ...)                \
     HILOG_INFO(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGW(fmt, ...)                \
     HILOG_WARN(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGE(fmt, ...)                 \
     HILOG_ERROR(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGF(fmt, ...)                 \
     HILOG_FATAL(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        FILENAME__SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+        FILENAME_SHORT, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef CHECK_AND_RETURN_LOG
 #undef CHECK_AND_RETURN_LOG

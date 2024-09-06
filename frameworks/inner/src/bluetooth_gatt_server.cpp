@@ -138,15 +138,11 @@ public:
                         REQUEST_TYPE_CHARACTERISTICS_READ, GET_ENCRYPT_GATT_ADDR(device));
                 }
             }
-
-            if (serverSptr->pimpl->callback_) {
-                serverSptr->pimpl->callback_->OnCharacteristicReadRequest(
-                    BluetoothRemoteDevice(device.addr_.GetAddress(),
-                        (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                    gattcharacter.value().get(),
-                    serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_READ, device.transport_));
-            }
-            
+            serverSptr->pimpl->callback_->OnCharacteristicReadRequest(
+                BluetoothRemoteDevice(device.addr_.GetAddress(),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                gattcharacter.value().get(),
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_READ, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Characteristic!");
@@ -181,14 +177,11 @@ public:
                 }
             }
 
-            if (serverSptr->pimpl->callback_) {
-                serverSptr->pimpl->callback_->OnCharacteristicWriteRequest(
-                    BluetoothRemoteDevice(device.addr_.GetAddress(),
-                        (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                    gattcharacter.value().get(),
-                    serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_WRITE, device.transport_));
-            }
-            
+            serverSptr->pimpl->callback_->OnCharacteristicWriteRequest(
+                BluetoothRemoteDevice(device.addr_.GetAddress(),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                gattcharacter.value().get(),
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_WRITE, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Characteristic!");
@@ -218,15 +211,11 @@ public:
                         REQUEST_TYPE_DESCRIPTOR_READ, GET_ENCRYPT_GATT_ADDR(device));
                 }
             }
-
-            if (serverSptr->pimpl->callback_) {
-                serverSptr->pimpl->callback_->OnDescriptorReadRequest(
-                    BluetoothRemoteDevice(device.addr_.GetAddress(),
-                        (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                    gattdesc.value().get(),
-                    serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_READ, device.transport_));
-            }
-        
+            serverSptr->pimpl->callback_->OnDescriptorReadRequest(
+                BluetoothRemoteDevice(device.addr_.GetAddress(),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                gattdesc.value().get(),
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_READ, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Descriptor!");
@@ -258,15 +247,11 @@ public:
                         REQUEST_TYPE_DESCRIPTOR_WRITE, GET_ENCRYPT_GATT_ADDR(device));
                 }
             }
-
-            if (serverSptr->pimpl->callback_) {
-                serverSptr->pimpl->callback_->OnDescriptorWriteRequest(
-                    BluetoothRemoteDevice(device.addr_.GetAddress(),
-                        (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                    gattdesc.value().get(),
-                    serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_WRITE, device.transport_));
-            }
-            
+            serverSptr->pimpl->callback_->OnDescriptorWriteRequest(
+                BluetoothRemoteDevice(device.addr_.GetAddress(),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                gattdesc.value().get(),
+                serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_WRITE, device.transport_));
             return;
         } else {
             HILOGE("Can not Find Descriptor!");
@@ -284,12 +269,10 @@ public:
             return;
         }
 
-        if (serverSptr->pimpl->callback_) {
-            serverSptr->pimpl->callback_->OnNotificationCharacteristicChanged(
-                BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                result);
-        }
+        serverSptr->pimpl->callback_->OnNotificationCharacteristicChanged(
+            BluetoothRemoteDevice(device.addr_.GetAddress(),
+            (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+            result);
         return;
     }
 
@@ -315,13 +298,10 @@ public:
             }
         }
 
-        if (serverSptr->pimpl->callback_) {
-            serverSptr->pimpl->callback_->OnConnectionStateUpdate(
-                BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                state);
-        }
-        
+        serverSptr->pimpl->callback_->OnConnectionStateUpdate(
+            BluetoothRemoteDevice(device.addr_.GetAddress(),
+            (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+            state);
         return;
     }
 
@@ -333,13 +313,10 @@ public:
             return;
         }
 
-        if (serverSptr->pimpl->callback_) {
-            serverSptr->pimpl->callback_->OnMtuUpdate(
-                BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                mtu);
-        }
-        
+        serverSptr->pimpl->callback_->OnMtuUpdate(
+            BluetoothRemoteDevice(device.addr_.GetAddress(),
+            (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+            mtu);
         return;
     }
 
@@ -379,15 +356,13 @@ public:
             return;
         }
 
-        if (serverSptr->pimpl->callback_) {
-            serverSptr->pimpl->callback_->OnConnectionParameterChanged(
-                BluetoothRemoteDevice(device.addr_.GetAddress(),
-                    (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
-                interval,
-                latency,
-                timeout,
-                status);
-        }
+        serverSptr->pimpl->callback_->OnConnectionParameterChanged(
+            BluetoothRemoteDevice(device.addr_.GetAddress(),
+            (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+            interval,
+            latency,
+            timeout,
+            status);
 
         return;
     }
