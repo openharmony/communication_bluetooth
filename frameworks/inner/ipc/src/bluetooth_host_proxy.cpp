@@ -1696,48 +1696,5 @@ int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address,
     return exception;
 }
 
-void BluetoothHostProxy::RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(
-        BluetoothHostInterfaceCode::BT_REGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver done fail, error: %{public}d", error);
-        return;
-    }
-    return;
-}
-
-void BluetoothHostProxy::DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(
-        BluetoothHostInterfaceCode::BT_DEREGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver done fail, error: %{public}d", error);
-        return;
-    }
-    return;
-}
 }  // namespace Bluetooth
 }  // namespace OHOS
