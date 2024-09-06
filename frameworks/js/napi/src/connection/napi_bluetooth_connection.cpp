@@ -36,40 +36,6 @@ std::shared_ptr<NapiBluetoothRemoteDeviceObserver> g_remoteDeviceObserver =
     std::make_shared<NapiBluetoothRemoteDeviceObserver>();
 std::mutex deviceMutex;
 
-std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefaultValue = {
-    {REGISTER_DEVICE_FIND_TYPE,
-        [](napi_env env) -> napi_value {
-            napi_value result = 0;
-            napi_value value = 0;
-            napi_create_array(env, &result);
-            napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &value);
-            napi_set_element(env, result, 0, value);
-            return result;
-        }},
-    {REGISTER_PIN_REQUEST_TYPE,
-        [](napi_env env) -> napi_value {
-            napi_value result = 0;
-            napi_value deviceId = nullptr;
-            napi_value pinCode = nullptr;
-            napi_create_object(env, &result);
-            napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &deviceId);
-            napi_set_named_property(env, result, "deviceId", deviceId);
-            napi_create_string_utf8(env, INVALID_PIN_CODE, NAPI_AUTO_LENGTH, &pinCode);
-            napi_set_named_property(env, result, "pinCode", pinCode);
-            return result;
-        }},
-    {REGISTER_BOND_STATE_TYPE, [](napi_env env) -> napi_value {
-         napi_value result = 0;
-         napi_value deviceId = nullptr;
-         napi_value state = nullptr;
-         napi_create_object(env, &result);
-         napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &deviceId);
-         napi_set_named_property(env, result, "deviceId", deviceId);
-         napi_create_int32(env, static_cast<int32_t>(BondState::BOND_STATE_INVALID), &state);
-         napi_set_named_property(env, result, "state", state);
-         return result;
-     }}};
-
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
     HILOGD("enter");
@@ -616,7 +582,7 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
     DealPairStatus(state, pairState);
     napi_value result = nullptr;
     NAPI_BT_ASSERT_RETURN(env, napi_create_int32(env, pairState, &result) == napi_ok, err, result);
-    NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
+    NAPI_BT_ASSERT_RETURN(env, (err == BT_NO_ERROR || err == BT_ERR_INTERNAL_ERROR), err, result);
     HILOGI("getPairState :%{public}d", pairState);
     return result;
 }
