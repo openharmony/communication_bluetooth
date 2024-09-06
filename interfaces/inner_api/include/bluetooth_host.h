@@ -251,42 +251,6 @@ public:
 };
 
 /**
- * @brief Represents bluetooth resource manager observer.
- *
- * @since 12
- */
-class BluetoothResourceManagerObserver {
-public:
-    /**
-     * @brief A destructor used to delete the <b>BluetoothResourceManagerObserver</b> instance.
-     *
-     * @since 12
-     */
-    virtual ~BluetoothResourceManagerObserver() = default;
-
-    /**
-     * @brief sensing state changed observer.
-     *
-     * @param eventId bluetooth resource manager event id.
-     * @param info bluetooth sensing information.
-     * @since 12
-     */
-    virtual void OnSensingStateChanged(uint8_t eventId, const SensingInfo &info)
-    {};
-
-    /**
-     * @brief bluetooth resource decision observer.
-     *
-     * @param eventId bluetooth resource manager event id.
-     * @param info bluetooth sensing information.
-     * @param result bluetooth resource decision result.
-     * @since 12
-     */
-    virtual void OnBluetoothResourceDecision(uint8_t eventId, const SensingInfo &info, uint32_t &result)
-    {};
-};
-
-/**
  * @brief Represents framework host device.
  *
  * @since 6
@@ -757,22 +721,6 @@ public:
     * @since 12
     */
     int SatelliteControl(int state);
-
-    /**
-     * @brief Register bluetooth resource manager observer.
-     *
-     * @param observer Class RegisterBtResourceManagerObserver pointer to register observer.
-     * @since 12
-     */
-    void RegisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer);
-
-    /**
-     * @brief Deregister bluetooth resource manager observer.
-     *
-     * @param observer Class RegisterBtResourceManagerObserver pointer to deregister observer.
-     * @since 12
-     */
-    void DeregisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer);
 
 private:
     /**
