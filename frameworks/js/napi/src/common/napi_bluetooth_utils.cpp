@@ -483,13 +483,8 @@ int DoInJsMainThread(napi_env env, std::function<void(void)> func)
 
 bool IsValidAddress(std::string bdaddr)
 {
-#if defined(IOS_PLATFORM)
-    const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
-    return regex_match(bdaddr, deviceIdRegex);
-#else
     const std::regex deviceIdRegex("^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$");
     return regex_match(bdaddr, deviceIdRegex);
-#endif
 }
 
 bool IsValidTransport(int transport)
