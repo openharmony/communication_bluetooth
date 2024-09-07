@@ -706,6 +706,7 @@ public:
     /**
     * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available.
     *
+    * @param remoteAddr remote device addr.
     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
     *         returns an error code defined in {@link BtErrCode} otherwise.
     * @since 12

@@ -125,7 +125,7 @@ int32_t BluetoothHostProxy::SatelliteControl(int state)
     HILOGI("BluetoothHostProxy::SatelliteControl starts");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::SatelliteControl WriteInterfaceToken error");
+        HILOGI("BluetoothHostProxy::SatelliteControl WriteInterfaceToken error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(state), BT_ERR_IPC_TRANS_FAILED, "Write state error");
