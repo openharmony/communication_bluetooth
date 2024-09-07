@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 
 BT_PART_DIR = "../../.."
 BT_CJ_DIR = "$BT_PART_DIR/frameworks/cj/connection"
+BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
 
 ohos_shared_library("cj_bluetooth_connection_ffi") {
   sanitize = {
@@ -29,15 +30,22 @@ ohos_shared_library("cj_bluetooth_connection_ffi") {
   include_dirs = [
     "$BT_CJ_DIR/include",
     "$BT_CJ_DIR/src",
+    "$BT_NAPI_DIR/include",
     "$BT_PART_DIR/frameworks/inner/include",
   ]
 
-  sources = [ "src/bluetooth_connection_ffi.cpp" ]
+  sources = [
+    "src/bluetooth_connection_callback.cpp",
+    "src/bluetooth_connection_common.cpp",
+    "src/bluetooth_connection_ffi.cpp",
+    "src/bluetooth_connection_impl.cpp",
+  ]
 
   deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
 
   external_deps = [
     "c_utils:utils",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "napi:ace_napi",
     "napi:cj_bind_ffi",

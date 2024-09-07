@@ -14,110 +14,112 @@
  */
 
 #include "bluetooth_connection_ffi.h"
+
+#include "bluetooth_connection_impl.h"
 #include "bluetooth_log.h"
 
 using namespace OHOS::FFI;
 
 namespace OHOS {
 namespace CJSystemapi {
-namespace BluetoothConnection {
+namespace CJBluetoothConnection {
 
 extern "C" {
-void FfiBluetoothConPairDevice(char* deviceId, int32_t* errCode)
+void FfiBluetoothConPairDevice(const char* deviceId, int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::PairDevice(deviceId, errCode);
 }
 
-char* FfiBluetoothConGetRemoteDeviceName(char* deviceId, int32_t* errCode)
+char* FfiBluetoothConGetRemoteDeviceName(const char* deviceId, int32_t* errCode)
 {
-    return nullptr;
+    return ConnectionImpl::GetRemoteDeviceName(deviceId, errCode);
 }
 
-DeviceClass FfiBluetoothConGetRemoteDeviceClass(char* deviceId, int32_t* errCode)
+DeviceClass FfiBluetoothConGetRemoteDeviceClass(const char* deviceId, int32_t* errCode)
 {
-    DeviceClass ret{0};
-    return ret;
+    return ConnectionImpl::GetRemoteDeviceClass(deviceId, errCode);
 }
 
-CArrString FfiBluetoothConGetRemoteProfileUuids(char* deviceId, int32_t* errCode)
+CArrString FfiBluetoothConGetRemoteProfileUuids(const char* deviceId, int32_t* errCode)
 {
-    CArrString ret{0};
-    return ret;
+    return ConnectionImpl::GetRemoteProfileUuids(deviceId, errCode);
 }
 
 char* FfiBluetoothConGetLocalName(int32_t* errCode)
 {
-    return nullptr;
+    return ConnectionImpl::GetLocalName(errCode);
 }
 
 CArrString FfiBluetoothConGetPairedDevices(int32_t* errCode)
 {
-    CArrString ret{0};
-    return ret;
+    return ConnectionImpl::GetPairedDevices(errCode);
 }
 
-int32_t FfiBluetoothConGetPairedState(char* deviceId, int32_t* errCode)
+int32_t FfiBluetoothConGetPairState(const char* deviceId, int32_t* errCode)
 {
-    return 0;
+    return ConnectionImpl::GetPairState(deviceId, errCode);
 }
 
-int32_t FfiBluetoothConGetProfileConnectionState(int32_t profileIdId, int32_t* errCode)
+int32_t FfiBluetoothConGetProfileConnectionState(int32_t profileId, int32_t* errCode)
 {
-    return 0;
+    return ConnectionImpl::GetProfileConnectionState(profileId, errCode);
 }
 
-void FfiBluetoothConSetDevicePairingConfirmation(char* deviceId, bool accept, int32_t* errCode)
+void FfiBluetoothConSetDevicePairingConfirmation(const char* deviceId, bool accept, int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::SetDevicePairingConfirmation(deviceId, accept, errCode);
 }
 
-void FfiBluetoothConSetDevicePinCode(char* deviceId, char* code, int32_t* errCode)
+void FfiBluetoothConSetDevicePinCode(const char* deviceId, const char* code, int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::SetDevicePinCode(deviceId, code, errCode);
 }
 
-void FfiBluetoothConSetLocalName(char* name, int32_t* errCode)
+void FfiBluetoothConSetLocalName(const char* localName, int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::SetLocalName(localName, errCode);
 }
 
 void FfiBluetoothConSetBluetoothScanMode(int32_t mode, int32_t duration, int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::SetBluetoothScanMode(mode, duration, errCode);
 }
 
 int32_t FfiBluetoothConGetBluetoothScanMode(int32_t* errCode)
 {
-    return 0;
+    return ConnectionImpl::GetBluetoothScanMode(errCode);
 }
 
 void FfiBluetoothConStartBluetoothDiscovery(int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::StartBluetoothDiscovery(errCode);
 }
 
-void FfiBluetoothConStoptBluetoothDiscovery(int32_t* errCode)
+void FfiBluetoothConStopBluetoothDiscovery(int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::StoptBluetoothDiscovery(errCode);
 }
 
-bool FfiBluetoothConIstBluetoothDiscovery(int32_t* errCode)
+bool FfiBluetoothConIsBluetoothDiscovering(int32_t* errCode)
 {
-    return false;
+    return ConnectionImpl::IsBluetoothDiscovering(errCode);
 }
 
-void FfiBluetoothConSetRemoteDeviceName(char* deviceId, char* name, int32_t* errCode)
+void FfiBluetoothConSetRemoteDeviceName(const char* deviceId, const char* name, int32_t* errCode)
 {
-    return;
+    return ConnectionImpl::SetRemoteDeviceName(deviceId, name, errCode);
 }
 
-CBatteryInfo FfiBluetoothConGetRemoteDeviceBatteryInfo(char* deviceId, int32_t* errCode)
+CBatteryInfo FfiBluetoothConGetRemoteDeviceBatteryInfo(const char* deviceId, int32_t* errCode)
 {
-    CBatteryInfo info{0};
-    return info;
-}
+    return ConnectionImpl::GetRemoteDeviceBatteryInfo(deviceId, errCode);
 }
 
+void FfiBluetoothConOn(int32_t callbackType, void (*callback)(), int32_t* errCode)
+{
+    return ConnectionImpl::RegisterConnectionObserver(callbackType, callback, errCode);
+}
+}
 } // namespace BluetoothConnection
 } // namespace CJSystemapi
 } // namespace OHOS

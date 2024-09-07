@@ -195,8 +195,7 @@
           "header": {
             "header_base": "//foundation/communication/bluetooth/frameworks/cj/connection/include",
             "header_files": [
-              "bluetooth_connection_ffi.h",
-              "bluetooth_connection_util.h"
+              "bluetooth_connection_ffi.h"
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi"
