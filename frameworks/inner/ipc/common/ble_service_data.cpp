@@ -578,7 +578,7 @@ void BleAdvertiserDataImpl::AddServiceUuids(const std::vector<Uuid> &uuidVec)
             uint16_t uuid16 = uuid.ConvertTo16Bits();
             serviceUuid16.append(std::string(reinterpret_cast<char *>(&uuid16), BLE_UUID_LEN_16));
         } else if (uuid.GetUuidType() == Uuid::UUID32_BYTES_TYPE) {
-            uint16_t uuid32 = uuid.ConvertTo32Bits();
+            uint32_t uuid32 = uuid.ConvertTo32Bits();
             serviceUuid32.append(std::string(reinterpret_cast<char *>(&uuid32), BLE_UUID_LEN_32));
         } else {
             uint8_t uuidData[BLE_UUID_LEN_128];
