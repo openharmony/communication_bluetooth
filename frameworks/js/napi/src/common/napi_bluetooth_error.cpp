@@ -17,6 +17,11 @@
 
 #include "bluetooth_errorcode.h"
 #include "napi_bluetooth_utils.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#include "bundle_mgr_proxy.h"
+
+static const int SDK_VERSION_13 = 13;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -53,7 +58,52 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { BtErrCode::BT_ERR_DISCONNECT_SCO_FAILED, "Disconnect sco failed." },
 };
 
-std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
+static int GetSdkVersion(void)
+{
+    int version = SDK_VERSION_13;  // default sdk version is api 13
+
+    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!systemAbilityManager) {
+        HILOGE("fail to get system ability mgr.");
+        return version;
+    }
+    auto remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (!remoteObject) {
+        HILOGE("fail to get bundle manager proxy.");
+        return version;
+    }
+    sptr<AppExecFwk::BundleMgrProxy> bundleMgrProxy = iface_cast<AppExecFwk::BundleMgrProxy>(remoteObject);
+    if (bundleMgrProxy == nullptr) {
+        HILOGE("Failed to get bundle manager proxy.");
+        return version;
+    }
+    AppExecFwk::BundleInfo bundleInfo;
+    auto flags = AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION;
+    auto ret = bundleMgrProxy->GetBundleInfoForSelf(static_cast<int32_t>(flags), bundleInfo);
+    if (ret != ERR_OK) {
+        HILOGE("GetBundleInfoForSelf: get fail.");
+        return version;
+    }
+
+    version = bundleInfo.targetVersion % 100; // %100 to get the real version
+    return version;
+}
+
+static napi_value GenerateBusinessError(napi_env env, int32_t errCode, const std::string &errMsg)
+{
+    napi_value businessError = nullptr;
+    napi_value code = nullptr;
+    napi_create_int32(env, errCode, &code);
+
+    napi_value message = nullptr;
+    napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
+
+    napi_create_error(env, nullptr, message, &businessError);
+    napi_set_named_property(env, businessError, "code", code);
+    return businessError;
+}
+
+std::string GetNapiErrMsg(napi_env env, int32_t errCode)
 {
     auto iter = napiErrMsgMap.find(errCode);
     if (iter != napiErrMsgMap.end()) {
@@ -64,15 +114,21 @@ std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
     return "Inner error.";
 }
 
-void HandleSyncErr(const napi_env &env, int32_t errCode)
+void HandleSyncErr(napi_env env, int32_t errCode)
 {
     if (errCode == BtErrCode::BT_NO_ERROR) {
         return;
     }
+
+    int ret = -1;
     std::string errMsg = GetNapiErrMsg(env, errCode);
-    if (errMsg != "") {
-        napi_throw_error(env, std::to_string(errCode).c_str(), errMsg.c_str());
+    // In API13 version, the error code type is changed from string to number.
+    if (GetSdkVersion() >= SDK_VERSION_13) {
+        ret = napi_throw(env, GenerateBusinessError(env, errCode, errMsg));
+    } else {
+        ret = napi_throw_error(env, std::to_string(errCode).c_str(), errMsg.c_str());
     }
+    CHECK_AND_RETURN_LOG(ret == napi_ok, "napi_throw failed, ret: %{public}d", ret);
 }
 }
 }
