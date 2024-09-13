@@ -295,7 +295,7 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     napi_set_named_property(env, result, "isPrepared", isPrepared);
 
     napi_value needRsp;
-    napi_get_boolean(env, true, &needRsp);
+    napi_get_boolean(env, characteristic.GetWriteType() == GattCharacteristic::WriteType::DEFAULT, &needRsp);
     napi_set_named_property(env, result, "needRsp", needRsp);
 
     napi_value value;
