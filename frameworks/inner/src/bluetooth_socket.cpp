@@ -88,6 +88,7 @@ struct ClientSocket::impl {
         std::weak_ptr<BluetoothConnectionObserver> observer);
     ~impl()
     {
+        HILOGI("ClientSocket::impl ~impl");
         if (fd_ > 0) {
             shutdown(fd_, SHUT_RD);
             shutdown(fd_, SHUT_WR);
@@ -418,12 +419,14 @@ ClientSocket::~ClientSocket()
 bool ClientSocket::Init()
 {
     HILOGI("ClientSocket Init");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, false, "pimpl is nullptr!");
     return pimpl->Init(weak_from_this());
 }
 
 int ClientSocket::Connect(int psm)
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     if (pimpl->type_ == TYPE_L2CAP_LE) {
         CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "BLE is not TURN_ON");
     } else {
@@ -478,18 +481,21 @@ int ClientSocket::Connect(int psm)
 void ClientSocket::Close()
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is nullptr!");
     return pimpl->Close();
 }
 
 std::shared_ptr<InputStream> ClientSocket::GetInputStream()
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, nullptr, "pimpl is nullptr!");
     return pimpl->GetInputStream();
 }
 
 std::shared_ptr<OutputStream> ClientSocket::GetOutputStream()
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, nullptr, "pimpl is nullptr!");
     return pimpl->GetOutputStream();
 }
 
@@ -502,41 +508,48 @@ BluetoothRemoteDevice &ClientSocket::GetRemoteDevice()
 bool ClientSocket::IsConnected() const
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, false, "pimpl is nullptr!");
     return pimpl->IsConnected();
 }
 
 int ClientSocket::SetBufferSize(int bufferSize)
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, false, "pimpl is nullptr!");
     return pimpl->SetBufferSize(bufferSize);
 }
 
 int ClientSocket::GetSocketFd()
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     return pimpl->fd_;
 }
 
 int ClientSocket::GetL2capPsm()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("psm:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 int ClientSocket::GetRfcommScn()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("scn:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 uint32_t ClientSocket::GetMaxTransmitPacketSize()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_.load());
     return pimpl->maxTxPacketSize_;
 }
 
 uint32_t ClientSocket::GetMaxReceivePacketSize()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_.load());
     return pimpl->maxRxPacketSize_;
 }
@@ -816,18 +829,21 @@ ServerSocket::~ServerSocket()
 int ServerSocket::Listen()
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     return pimpl->Listen();
 }
 
 std::shared_ptr<ClientSocket> ServerSocket::Accept(int timeout)
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, nullptr, "pimpl is nullptr!");
     return pimpl->Accept(timeout);
 }
 
 void ServerSocket::Close()
 {
     HILOGD("enter");
+    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is nullptr!");
     return pimpl->Close();
 }
 
@@ -839,30 +855,35 @@ const std::string &ServerSocket::GetStringTag()
 
 int ServerSocket::GetL2capPsm()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("psm:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 int ServerSocket::GetRfcommScn()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("scn:%{public}d", pimpl->socketChannel_.load());
     return pimpl->socketChannel_;
 }
 
 uint32_t ServerSocket::GetMaxTransmitPacketSize()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_.load());
     return pimpl->maxTxPacketSize_;
 }
 
 uint32_t ServerSocket::GetMaxReceivePacketSize()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_.load());
     return pimpl->maxRxPacketSize_;
 }
 
 int ServerSocket::GetSocketFd()
 {
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_DEVICE_DISCONNECTED, "pimpl is nullptr!");
     return pimpl->fd_;
 }
 
