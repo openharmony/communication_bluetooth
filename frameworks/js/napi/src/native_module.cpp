@@ -37,7 +37,7 @@
 #include "access/napi_bluetooth_access.h"
 #include "connection/napi_bluetooth_connection.h"
 #include "constant/napi_bluetooth_constant.h"
-
+#include "hitrace_meter.h"
 namespace OHOS {
 namespace Bluetooth {
 EXTERN_C_START
@@ -46,6 +46,11 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
+#ifdef ENABLE_NAPI_BLUETOOTH_MANAGER
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "bluetoothManager init");
+#else
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "bluetooth init");
+#endif
     HILOGD("-----Init start------");
     napi_property_descriptor desc[] = {};
 

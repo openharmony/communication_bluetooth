@@ -27,6 +27,7 @@
 #include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
 #include "../parser/napi_parser_utils.h"
+#include "hitrace_meter.h"
 
 #include <memory>
 namespace OHOS {
@@ -259,6 +260,7 @@ void DefineSystemBLEInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("subscribeBLEFound", SysSubscribeBLEFound),
         DECLARE_NAPI_FUNCTION("unsubscribeBLEFound", SysUnsubscribeBLEFound),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "ble:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
@@ -330,6 +332,7 @@ void DefineBLEJSObject(napi_env env, napi_value exports)
 #endif
     };
 
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "ble:napi_define_properties");
 #ifdef BLUETOOTH_API_SINCE_10
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 #else
@@ -1092,6 +1095,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
 #endif
     };
 
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "ble:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
 
     return exports;

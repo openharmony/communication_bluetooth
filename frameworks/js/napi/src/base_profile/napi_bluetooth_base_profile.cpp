@@ -16,6 +16,7 @@
 
 #include "bluetooth_log.h"
 #include "napi_bluetooth_utils.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -38,6 +39,7 @@ napi_value NapiBaseProfile::BaseProfilePropertyValueInit(napi_env env, napi_valu
         DECLARE_NAPI_PROPERTY("ConnectionStrategy", strategyObj),
         DECLARE_NAPI_PROPERTY("DisconnectCause", disconnectCauseObj),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "baseprofile:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     HILOGI("end");
     return exports;
