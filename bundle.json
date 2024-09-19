@@ -78,7 +78,8 @@
         "fwk_group": [
           "//foundation/communication/bluetooth/frameworks/inner:btframework",
           "//foundation/communication/bluetooth/frameworks/inner:btcommon",
-          "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi"
+          "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi",
+          "//foundation/communication/bluetooth/frameworks/cj:bluetooth_ffi"
         ],
         "service_group": [
         ]
@@ -190,15 +191,6 @@
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/inner:btcommon"
-        },
-        {
-          "header": {
-            "header_base": "//foundation/communication/bluetooth/frameworks/cj/connection/include",
-            "header_files": [
-              "bluetooth_connection_ffi.h"
-            ]
-          },
-          "name": "//foundation/communication/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi"
         }
       ]
     }
