@@ -24,10 +24,10 @@ BluetoothOppObserverStub::BluetoothOppObserverStub()
     HILOGI("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothOppObserverInterfaceCode::OPP_ON_RECEIVE_INCOMING_FILE_CHANGED)] =
-        &BluetoothOppObserverStub::OnReceiveIncomingFileChangedInner;
+        BluetoothOppObserverStub::OnReceiveIncomingFileChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothOppObserverInterfaceCode::OPP_ON_TRANSFER_STATE_CHANGED)] =
-        &BluetoothOppObserverStub::OnTransferStateChangedInner;
+        BluetoothOppObserverStub::OnTransferStateChangedInner;
 }
 
 BluetoothOppObserverStub::~BluetoothOppObserverStub()
@@ -49,30 +49,32 @@ int32_t BluetoothOppObserverStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
     HILOGW("OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-int32_t BluetoothOppObserverStub::OnReceiveIncomingFileChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothOppObserverStub::OnReceiveIncomingFileChangedInner(BluetoothOppObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("Enter.");
     std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
         data.ReadParcelable<BluetoothIOppTransferInformation>());
     CHECK_AND_RETURN_LOG_RET((oppInformation != nullptr), BT_ERR_INTERNAL_ERROR, "Read oppInformation error");
-    OnReceiveIncomingFileChanged(*oppInformation);
+    stub->OnReceiveIncomingFileChanged(*oppInformation);
     return BT_NO_ERROR;
 }
 
-int32_t BluetoothOppObserverStub::OnTransferStateChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothOppObserverStub::OnTransferStateChangedInner(BluetoothOppObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("Enter.");
     std::shared_ptr<BluetoothIOppTransferInformation> oppInformation(
         data.ReadParcelable<BluetoothIOppTransferInformation>());
     CHECK_AND_RETURN_LOG_RET((oppInformation != nullptr), BT_ERR_INTERNAL_ERROR, "Read oppInformation error");
-    OnTransferStateChanged(*oppInformation);
+    stub->OnTransferStateChanged(*oppInformation);
     return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
