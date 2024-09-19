@@ -32,9 +32,11 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnConnectionStateChangedInner(
+        BluetoothAvrcpTgObserverStub *stub, MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothHostFunc = ErrCode (BluetoothAvrcpTgObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+    using BluetoothHostFunc = ErrCode (*)(
+        BluetoothAvrcpTgObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHostFunc> memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothAvrcpTgObserverStub);
 };

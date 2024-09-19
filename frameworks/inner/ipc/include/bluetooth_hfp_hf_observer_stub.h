@@ -32,19 +32,29 @@ public:
 
 private:
 
-    ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnScoStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnCallChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnSignalStrengthChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRegistrationStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnRoamingStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnOperatorSelectionChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnSubscriberNumberChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnVoiceRecognitionStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnInBandRingToneChangedInner(MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnConnectionStateChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnScoStateChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnCallChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnSignalStrengthChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnRegistrationStatusChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnRoamingStatusChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnOperatorSelectionChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnSubscriberNumberChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnVoiceRecognitionStatusChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnInBandRingToneChangedInner(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothHfpHfObserverFunc = ErrCode (BluetoothHfpHfObserverStub::*)(MessageParcel &data,
-        MessageParcel &reply);
+    using BluetoothHfpHfObserverFunc = ErrCode (*)(
+        BluetoothHfpHfObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHfpHfObserverFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothHfpHfObserverStub);

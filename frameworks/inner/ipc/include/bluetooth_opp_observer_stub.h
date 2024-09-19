@@ -31,10 +31,12 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    int32_t OnReceiveIncomingFileChangedInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnTransferStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    static int32_t OnReceiveIncomingFileChangedInner(BluetoothOppObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnTransferStateChangedInner(BluetoothOppObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothOppObserverFunc = int32_t (BluetoothOppObserverStub::*)(
+    using BluetoothOppObserverFunc = int32_t (*)(BluetoothOppObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothOppObserverFunc> memberFuncMap_;
 
