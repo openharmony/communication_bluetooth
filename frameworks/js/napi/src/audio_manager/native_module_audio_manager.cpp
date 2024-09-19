@@ -15,7 +15,8 @@
 
 #include "bluetooth_log.h"
 #include "napi_bluetooth_audio_manager.h"
- 
+#include "hitrace_meter.h"
+
 namespace OHOS {
 namespace Bluetooth {
 EXTERN_C_START
@@ -24,6 +25,7 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "wearDetection init");
     HILOGI("-----wear detection Init start------");
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);

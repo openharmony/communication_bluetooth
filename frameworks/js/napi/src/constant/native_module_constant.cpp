@@ -19,6 +19,7 @@
 
 #include "napi_bluetooth_constant.h"
 #include "bluetooth_log.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -28,6 +29,7 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "constant init");
     HILOGD("-----Constant Init start------");
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
