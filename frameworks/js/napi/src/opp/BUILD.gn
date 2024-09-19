@@ -56,6 +56,7 @@ ohos_shared_library("opp") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "libuv:uv",
     "napi:ace_napi",
