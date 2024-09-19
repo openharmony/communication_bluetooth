@@ -25,29 +25,31 @@ BluetoothGattServerCallbackStub::BluetoothGattServerCallbackStub()
     HILOGD("start.");
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CHARACTERISTIC_READREQUEST)] =
-        &BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner;
+        BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CONNECTIONSTATE_CHANGED)] =
-        &BluetoothGattServerCallbackStub::OnConnectionStateChangedInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_ADD_SERVICE)] =
-        &BluetoothGattServerCallbackStub::OnAddServiceInner;
+        BluetoothGattServerCallbackStub::OnConnectionStateChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_ADD_SERVICE)] =
+        BluetoothGattServerCallbackStub::OnAddServiceInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE_REQUEST)] =
-        &BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner;
+        BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_DESCRIPTOR_READ_REQUEST)] =
-        &BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner;
+        BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_DESCRIPTOR_WRITE_REQUEST)] =
-        &BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner;
-    memberFuncMap_[static_cast<uint32_t>(BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_MTU_CHANGED)] =
-        &BluetoothGattServerCallbackStub::OnMtuChangedInner;
+        BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_MTU_CHANGED)] =
+        BluetoothGattServerCallbackStub::OnMtuChangedInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_NOTIFY_CONFIRM)] =
-        &BluetoothGattServerCallbackStub::OnNotifyConfirmInner;
+        BluetoothGattServerCallbackStub::OnNotifyConfirmInner;
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattServerCallbackInterfaceCode::GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED)] =
-        &BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner;
+        BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner;
     HILOGD("ends.");
 }
 
@@ -70,14 +72,15 @@ int BluetoothGattServerCallbackStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(this, data, reply);
         }
     }
     HILOGW("BluetoothGattServerCallbackStub::OnRemoteRequest, default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 };
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
@@ -88,12 +91,13 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicReadRequestInner(Messag
         return TRANSACTION_ERR;
     }
 
-    OnCharacteristicReadRequest(*device, *characteristic);
+    stub->OnCharacteristicReadRequest(*device, *characteristic);
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("BluetoothGattServerCallbackStub::OnConnectionStateChangedInner Triggered!");
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
@@ -104,12 +108,13 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(MessagePa
 
     int32_t ret = data.ReadInt32();
     int32_t state = data.ReadInt32();
-    OnConnectionStateChanged(*device, ret, state);
+    stub->OnConnectionStateChanged(*device, ret, state);
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     HILOGD("BluetoothGattServerCallbackStub::OnAddServiceInner Triggered!");
     int32_t ret = data.ReadInt32();
@@ -118,14 +123,15 @@ ErrCode BluetoothGattServerCallbackStub::OnAddServiceInner(MessageParcel &data, 
         return TRANSACTION_ERR;
     }
 
-    OnAddService(ret, *service);
+    stub->OnAddService(ret, *service);
 
     service = nullptr;
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
@@ -137,12 +143,13 @@ ErrCode BluetoothGattServerCallbackStub::OnCharacteristicWriteRequestInner(Messa
     }
     bool needRespones = data.ReadBool();
 
-    OnCharacteristicWriteRequest(*device, *characteristic, needRespones);
+    stub->OnCharacteristicWriteRequest(*device, *characteristic, needRespones);
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
@@ -153,12 +160,13 @@ ErrCode BluetoothGattServerCallbackStub::OnDescriptorReadRequestInner(MessagePar
         return TRANSACTION_ERR;
     }
 
-    OnDescriptorReadRequest(*device, *descriptor);
+    stub->OnDescriptorReadRequest(*device, *descriptor);
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
@@ -169,12 +177,13 @@ ErrCode BluetoothGattServerCallbackStub::OnDescriptorWriteRequestInner(MessagePa
         return TRANSACTION_ERR;
     }
 
-    OnDescriptorWriteRequest(*device, *descriptor);
+    stub->OnDescriptorWriteRequest(*device, *descriptor);
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnMtuChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnMtuChangedInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
@@ -182,12 +191,13 @@ ErrCode BluetoothGattServerCallbackStub::OnMtuChangedInner(MessageParcel &data, 
     }
     int32_t mtu = data.ReadInt32();
 
-    OnMtuChanged(*device, mtu);
+    stub->OnMtuChanged(*device, mtu);
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnNotifyConfirmInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnNotifyConfirmInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
@@ -199,12 +209,13 @@ ErrCode BluetoothGattServerCallbackStub::OnNotifyConfirmInner(MessageParcel &dat
     }
     int32_t result = data.ReadInt32();
 
-    OnNotifyConfirm(*device, *characteristic, result);
+    stub->OnNotifyConfirm(*device, *characteristic, result);
 
     return NO_ERROR;
 }
 __attribute__((no_sanitize("cfi")))
-ErrCode BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner(MessageParcel &data, MessageParcel &reply)
+ErrCode BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner(
+    BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<BluetoothGattDevice> device(data.ReadParcelable<BluetoothGattDevice>());
     if (!device) {
@@ -215,7 +226,7 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionParameterChangedInner(Messa
     int32_t timeout = data.ReadInt32();
     int32_t status = data.ReadInt32();
 
-    OnConnectionParameterChanged(*device, interval, latency, timeout, status);
+    stub->OnConnectionParameterChanged(*device, interval, latency, timeout, status);
 
     return NO_ERROR;
 }
