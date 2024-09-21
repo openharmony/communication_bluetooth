@@ -478,7 +478,6 @@ void AfterWorkCallback(uv_work_t *work, int status)
         }                                                   \
     } while (0)
 
-int DoInJsMainThread(std::function<void(void)> func);
 int DoInJsMainThread(napi_env env, std::function<void(void)> func);
 
 bool IsValidAddress(std::string bdaddr);
