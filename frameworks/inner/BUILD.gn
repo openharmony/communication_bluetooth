@@ -160,6 +160,7 @@ ohos_shared_library("btframework") {
 
   external_deps = [
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "hilog:libhilog",
