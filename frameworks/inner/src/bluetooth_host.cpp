@@ -1209,5 +1209,11 @@ void BluetoothHost::OnRemoveBluetoothSystemAbility()
         pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_OFF);
     }
 }
+
+void BluetoothHost::Close(void)
+{
+    std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    pimpl->switchModule_ = nullptr;
+}
 } // namespace Bluetooth
 } // namespace OHOS
