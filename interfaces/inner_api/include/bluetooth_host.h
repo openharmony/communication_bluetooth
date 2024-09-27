@@ -803,6 +803,13 @@ public:
      */
     void DeregisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer);
 
+
+    /**
+     * @brief Close the bluetooth host to release resources, only called before the process exits.
+     *
+     * @since 13
+     */
+    void Close(void);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
