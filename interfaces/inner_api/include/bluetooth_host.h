@@ -801,6 +801,13 @@ public:
      * @since 12
      */
     int SetFastScanLevel(int level);
+
+    /**
+     * @brief Close the bluetooth host to release resources, only called before the process exits.
+     *
+     * @since 13
+     */
+    void Close(void);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
