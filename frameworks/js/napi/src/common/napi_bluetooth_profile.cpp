@@ -14,6 +14,7 @@
  */
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_utils.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -26,6 +27,7 @@ void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getProfileInst", GetProfile),
         DECLARE_NAPI_FUNCTION("getProfileInstance", GetProfile),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "profile:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     ProfileEnumInit(env, exports);
 }
@@ -77,6 +79,7 @@ void NapiProfile::ProfileEnumInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("PlayingState", playingStateObj),
         DECLARE_NAPI_PROPERTY("ProfileId", profileIdObj),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "profile:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
 }
 

@@ -24,6 +24,7 @@
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_spp_client.h"
 #include "../parser/napi_parser_utils.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -49,6 +50,7 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", DeregisterAccessObserver),
 #endif
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "access:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;
 }
@@ -136,6 +138,7 @@ napi_value NapiAccess::AccessPropertyValueInit(napi_env env, napi_value exports)
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("BluetoothState", stateObj),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "access:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     return exports;
 }

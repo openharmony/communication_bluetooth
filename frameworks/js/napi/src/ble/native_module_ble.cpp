@@ -21,6 +21,7 @@
 #include "napi_bluetooth_ble.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -30,6 +31,7 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "ble init");
     HILOGI("-----Ble Init start------");
     napi_property_descriptor desc[] = {};
 
