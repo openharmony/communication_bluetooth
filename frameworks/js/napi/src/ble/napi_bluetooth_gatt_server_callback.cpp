@@ -56,10 +56,11 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
 void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
+    std::lock_guard<std::mutex> lock(NapiGattServer::deviceListMutex_);
     if (state == static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGI("connected");
         bool hasAddr = false;
-        for (auto it = NapiGattServer::deviceList.begin(); it != NapiGattServer::deviceList.end(); ++it) {
+        for (auto it = NapiGattServer::deviceList_.begin(); it != NapiGattServer::deviceList_.end(); ++it) {
             if (*it == device.GetDeviceAddr()) {
                 hasAddr = true;
                 break;
@@ -67,14 +68,14 @@ void NapiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice
         }
         if (!hasAddr) {
             HILOGI("add devices");
-            NapiGattServer::deviceList.push_back(device.GetDeviceAddr());
+            NapiGattServer::deviceList_.push_back(device.GetDeviceAddr());
         }
     } else if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
         HILOGI("disconnected");
-        for (auto it = NapiGattServer::deviceList.begin(); it != NapiGattServer::deviceList.end(); ++it) {
+        for (auto it = NapiGattServer::deviceList_.begin(); it != NapiGattServer::deviceList_.end(); ++it) {
             if (*it == device.GetDeviceAddr()) {
                 HILOGI("romove device");
-                NapiGattServer::deviceList.erase(it);
+                NapiGattServer::deviceList_.erase(it);
                 break;
             }
         }

@@ -52,7 +52,8 @@ public:
     {
         return callback_;
     }
-    static std::vector<std::string> deviceList;
+    static std::vector<std::string> deviceList_;
+    static std::mutex deviceListMutex_;
 
     NapiGattServer()
     {
