@@ -73,8 +73,6 @@ public:
     BtSocketConnectionCallback socektConnectCallback;
 };
 
-static std::map<int, std::shared_ptr<BluetoothConnectionObserverWapper>> g_clientCbMap;
-static std::mutex g_clientCbMapMutex;
 using ClientCbIterator = std::map<int, std::shared_ptr<BluetoothConnectionObserverWapper>>::iterator;
 
 static bool GetSocketUuidPara(const BluetoothCreateSocketPara *socketPara, UUID &serverUuid)
@@ -309,8 +307,6 @@ int SocketConnectEx(const BluetoothCreateSocketPara *socketPara, const BdAddr *b
         return BT_SOCKET_INVALID_ID;
     }
     int clientId = g_clientMap.AddObject(client);
-    std::lock_guard<std::mutex> lock(g_clientCbMapMutex);
-    g_clientCbMap.insert(std::pair<int, std::shared_ptr<BluetoothConnectionObserverWapper>>(clientId, connWrapper));
     HILOGI("SocketConnect success, clientId: %{public}d", clientId);
     return clientId;
 }
@@ -331,11 +327,6 @@ int SocketDisconnect(int clientId)
     }
     client->Close();
     g_clientMap.RemoveObject(clientId);
-    std::lock_guard<std::mutex> lock(g_clientCbMapMutex);
-    ClientCbIterator it = g_clientCbMap.find(clientId);
-    if (it != g_clientCbMap.end()) {
-        g_clientCbMap.erase(it);
-    }
     HILOGI("SocketDisConnect success, clientId: %{public}d", clientId);
     return OHOS_BT_STATUS_SUCCESS;
 }
