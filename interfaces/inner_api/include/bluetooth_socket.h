@@ -136,7 +136,7 @@ public:
      * @since 6
      */
     ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth,
-        std::weak_ptr<BluetoothConnectionObserver> observer);
+        std::shared_ptr<BluetoothConnectionObserver> observer);
 
     /**
      * @brief Destroy the ClientSocket object.
