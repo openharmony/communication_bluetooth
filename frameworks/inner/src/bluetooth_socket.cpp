@@ -570,8 +570,11 @@ struct ServerSocket::impl {
     int Listen()
     {
         HILOGD("enter");
-
-        CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+        if (type_ == TYPE_L2CAP_LE) {
+            CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "BLE is not TURN_ON");
+        } else {
+            CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+        }
 
         sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
         if (!proxy) {
