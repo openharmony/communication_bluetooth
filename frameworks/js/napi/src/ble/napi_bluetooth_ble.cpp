@@ -1040,7 +1040,8 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_array(env, &result);
 
-    auto status = ConvertStringVectorToJS(env, result, NapiGattServer::deviceList);
+    std::lock_guard<std::mutex> lock(NapiGattServer::deviceListMutex_);
+    auto status = ConvertStringVectorToJS(env, result, NapiGattServer::deviceList_);
     NAPI_BT_ASSERT_RETURN(env, status == napi_ok, BT_ERR_INTERNAL_ERROR, result);
     return result;
 }
