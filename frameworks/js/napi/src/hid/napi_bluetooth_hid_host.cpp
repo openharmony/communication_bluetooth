@@ -23,6 +23,7 @@
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_hid_host.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -69,6 +70,7 @@ napi_value NapiBluetoothHidHost::DefineCreateProfile(napi_env env, napi_value ex
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("createHidHostProfile", CreateHidHostProfile),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "hid:napi_define_properties");
     napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
     return exports;
 }

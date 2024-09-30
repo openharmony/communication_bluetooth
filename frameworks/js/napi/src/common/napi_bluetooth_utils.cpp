@@ -435,47 +435,10 @@ void UnregisterSysBLEObserver(const std::string &type)
     }
 }
 
-struct UvWorkData {
-    std::function<void(void)> func;
-};
-
-int DoInJsMainThread(std::function<void(void)> func)
-{
-    static auto handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
-    if (handler_) {
-        handler_->PostTask(func);
-    }
-    return 0;
-}
-
 int DoInJsMainThread(napi_env env, std::function<void(void)> func)
 {
-    uv_loop_s *loop = nullptr;
-    auto status = napi_get_uv_event_loop(env, &loop);
-    if (status != napi_ok) {
-        HILOGE("napi_get_uv_event_loop failed");
-        return -1;
-    }
-
-    UvWorkData *data = new UvWorkData;
-    data->func = func;
-    uv_work_t *work = new uv_work_t;
-    work->data = data;
-
-    auto emptyWork = [](uv_work_t *work) {};
-    int ret = uv_queue_work(loop, work, emptyWork,
-        [](uv_work_t *work, int status) {
-            UvWorkData *data = static_cast<UvWorkData *>(work->data);
-            if (data) {
-                data->func();
-                delete data;
-            }
-            delete work;
-        });
-    if (ret != 0) {
-        HILOGE("uv_queue_work failed");
-        delete data;
-        delete work;
+    if (napi_send_event(env, func, napi_eprio_high) != napi_ok) {
+        HILOGE("Failed to SendEvent");
         return -1;
     }
     return 0;

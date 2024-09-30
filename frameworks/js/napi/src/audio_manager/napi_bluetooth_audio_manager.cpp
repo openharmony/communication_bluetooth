@@ -26,6 +26,7 @@
 #include "napi_bluetooth_utils.h"
 #include "parser/napi_parser_utils.h"
 #include "napi_bluetooth_utils.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -41,6 +42,7 @@ void NapiBluetoothAudioManager::DefineSystemWearDetectionInterface(napi_env env,
         DECLARE_NAPI_FUNCTION("isWearDetectionEnabled", IsWearDetectionEnabled),
         DECLARE_NAPI_FUNCTION("isWearDetectionSupported", IsWearDetectionSupported),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "audio:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     HILOGI("DefineSystemWearDetectionInterface init");
 }
