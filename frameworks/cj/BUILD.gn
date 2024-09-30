@@ -11,9 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+SUBSYSTEM_DIR = "//foundation/communication"
+
 group("bluetooth_ffi") {
   deps = [
-    "//foundation/communication/bluetooth/frameworks/cj/access:cj_bluetooth_access_ffi",
-    "//foundation/communication/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi"
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/access:cj_bluetooth_access_ffi",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi"
   ]
 }
