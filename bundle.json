@@ -79,6 +79,7 @@
           "//foundation/communication/bluetooth/frameworks/inner:btframework",
           "//foundation/communication/bluetooth/frameworks/inner:btcommon",
           "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi",
+          "//foundation/communication/bluetooth/frameworks/c_api:bluetooth_ndk",
           "//foundation/communication/bluetooth/frameworks/cj:bluetooth_ffi"
         ],
         "service_group": [

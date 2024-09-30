@@ -54,13 +54,12 @@ const int SOCKET_RECV_FD_SIGNAL = 11; // state(1)+addr(6)+tx(2)+rx(2)
 constexpr char BLUETOOTH_UE_DOMAIN[] = "BLUETOOTH_UE";
 std::mutex g_socketProxyMutex;
 
-#define WPTR_SOCKET_CBACK(cbWptr, func, ...)      \
+#define SPTR_SOCKET_CBACK(cbSptr, func, ...)      \
 do {                                            \
-    auto cbSptr = (cbWptr).lock();               \
     if (cbSptr) {                                \
         cbSptr->func(__VA_ARGS__);               \
     } else {                                     \
-        HILOGE(#cbWptr ": callback is nullptr"); \
+        HILOGE(#cbSptr ": callback is nullptr"); \
     }                                            \
 } while (0)
 
@@ -85,7 +84,7 @@ struct ClientSocket::impl {
     impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth);
     impl(int fd, std::string address, BtSocketType type);
     impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth,
-        std::weak_ptr<BluetoothConnectionObserver> observer);
+        std::shared_ptr<BluetoothConnectionObserver> observer);
     ~impl()
     {
         HILOGI("ClientSocket::impl ~impl");
@@ -271,7 +270,7 @@ struct ClientSocket::impl {
     }
 
     // user register observer
-    std::weak_ptr<BluetoothConnectionObserver> observer_;
+    std::shared_ptr<BluetoothConnectionObserver> observer_;
     class BluetoothSocketObserverImp;
 
     // socket observer
@@ -326,6 +325,7 @@ public:
         UUID btUuid = UUID::ConvertFrom128Bits(callbackParam.uuid.ConvertTo128Bits());
         auto clientSptr = GetClientSocketSptr();
         if (!clientSptr) {
+            HILOGE("clientSptr is nullptr");
             return;
         }
         if (!clientSptr->pimpl) {
@@ -340,7 +340,7 @@ public:
             .type = callbackParam.type,
             .psm = callbackParam.psm,
         };
-        WPTR_SOCKET_CBACK(clientSptr->pimpl->observer_, OnConnectionStateChanged, callbackConnectParam);
+        SPTR_SOCKET_CBACK(clientSptr->pimpl->observer_, OnConnectionStateChanged, callbackConnectParam);
     }
 
 private:
@@ -386,7 +386,7 @@ ClientSocket::impl::impl(int fd, std::string address, BtSocketType type)
 }
 
 ClientSocket::impl::impl(const BluetoothRemoteDevice &addr, UUID uuid, BtSocketType type, bool auth,
-    std::weak_ptr<BluetoothConnectionObserver> observer)
+    std::shared_ptr<BluetoothConnectionObserver> observer)
     : observer_(observer),
       inputStream_(nullptr),
       outputStream_(nullptr),
@@ -409,7 +409,7 @@ ClientSocket::ClientSocket(int fd, std::string address, BtSocketType type)
 {}
 
 ClientSocket::ClientSocket(const BluetoothRemoteDevice &bda, UUID uuid, BtSocketType type, bool auth,
-    std::weak_ptr<BluetoothConnectionObserver> observer)
+    std::shared_ptr<BluetoothConnectionObserver> observer)
     : pimpl(new ClientSocket::impl(bda, uuid, type, auth, observer))
 {}
 
@@ -570,8 +570,11 @@ struct ServerSocket::impl {
     int Listen()
     {
         HILOGD("enter");
-
-        CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+        if (type_ == TYPE_L2CAP_LE) {
+            CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "BLE is not TURN_ON");
+        } else {
+            CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "BR is not TURN_ON");
+        }
 
         sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
         if (!proxy) {

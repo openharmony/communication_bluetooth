@@ -23,6 +23,7 @@
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_utils.h"
 #include "../parser/napi_parser_utils.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -59,6 +60,7 @@ napi_value NapiBluetoothOpp::DefineCreateProfile(napi_env env, napi_value export
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("createOppServerProfile", CreateOppServerProfile),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "opp:napi_define_properties");
     napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
     return exports;
 }

@@ -15,6 +15,7 @@
 
 #include "bluetooth_log.h"
 #include "napi_bluetooth_spp_server.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -24,6 +25,7 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "socket init");
     HILOGI("-----socket Init start------");
     napi_property_descriptor desc[] = {};
 

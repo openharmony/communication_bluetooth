@@ -16,6 +16,7 @@
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_spp_server.h"
 #include "bluetooth_errorcode.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -39,6 +40,7 @@ void DefineSppFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", NapiSppServer::DeRegisterSocketObserver),
 #endif
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "spp:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
@@ -67,6 +69,7 @@ void SppPropertyValueInit(napi_env env, napi_value exports)
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("SppType", sppTypeObj),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "spp:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
 }
 

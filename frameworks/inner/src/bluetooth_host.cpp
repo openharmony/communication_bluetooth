@@ -33,6 +33,11 @@
 #include "system_ability_definition.h"
 #include "bluetooth_switch_module.h"
 #include "ffrt_inner.h"
+#include "common_event.h"
+#include "common_event_data.h"
+#include "common_event_manager.h"
+
+using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Bluetooth {
@@ -615,10 +620,28 @@ int BluetoothHost::DisableBt()
     return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::DISABLE_BLUETOOTH);
 }
 
+static void PublishBtSwitchRestrictBluetoothEvent(void)
+{
+    OHOS::AAFwk::Want want;
+    want.SetAction("usual.event.bluetooth.BT_SWITCH_RESTRICT_BLUETOOTH");
+
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+
+    OHOS::EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetSubscriberPermissions({"ohos.permission.ACCESS_BLUETOOTH"});
+    bool ret = OHOS::EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
+    if (!ret) {
+        HILOGE("Publish usual.event.bluetooth.BT_SWITCH_RESTRICT_BLUETOOTH event failed");
+        return;
+    }
+}
+
 int BluetoothHost::RestrictBluetooth()
 {
     HILOGI("enter");
     std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    PublishBtSwitchRestrictBluetoothEvent();
     CHECK_AND_RETURN_LOG_RET(pimpl->switchModule_, BT_ERR_INTERNAL_ERROR, "switchModule is nullptr");
     int ret =  pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::DISABLE_BLUETOOTH);
     if (ret != BT_NO_ERROR) {
@@ -1221,6 +1244,12 @@ void BluetoothHost::OnRemoveBluetoothSystemAbility()
     if (pimpl->switchModule_) {
         pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_OFF);
     }
+}
+
+void BluetoothHost::Close(void)
+{
+    std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    pimpl->switchModule_ = nullptr;
 }
 } // namespace Bluetooth
 } // namespace OHOS
