@@ -202,6 +202,15 @@ public:
             HILOGW("TimerId no registered, is 0.");
         }
         g_bleAdvCallbacks[advId_] = nullptr;
+        int i = 0;
+        for (; i < MAX_BLE_ADV_NUM; i++) {
+            if (g_bleAdvCallbacks[i] != nullptr) {
+                break;
+            }
+        }
+        if (i == MAX_BLE_ADV_NUM) {
+            g_BleAdvertiser = nullptr;
+        }
     }
 
     void OnSetAdvDataEvent(int result) override
