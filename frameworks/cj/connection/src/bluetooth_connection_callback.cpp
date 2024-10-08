@@ -36,12 +36,13 @@ bool g_flag = false;
 CjBluetoothConnectionObserver::CjBluetoothConnectionObserver()
 {}
 
-void CjBluetoothConnectionObserver::OnDiscoveryStateChanged(int status)
-{}
-
 void CjBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDevice &device,
     int rssi, const std::string deviceName, int deviceClass)
 {
+    if (deviceFindFunc == nullptr) {
+        HILOGD("not register bluetoothDeviceFind event failed");
+        return;
+    }
     CArrString array{0};
     std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
     array.size = 1;
@@ -54,6 +55,7 @@ void CjBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDevic
         retValue[i] = MallocCString(remoteDevice->GetDeviceAddr());
     }
     array.head = retValue;
+
     deviceFindFunc(array);
 
     for (int i = 0; i < array.size; i++) {
@@ -64,11 +66,12 @@ void CjBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDevic
     retValue = nullptr;
 }
 
-void CjBluetoothConnectionObserver::OnPairRequested(const BluetoothRemoteDevice &device)
-{}
-
 void CjBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
 {
+    if (pinRequestFunc == nullptr) {
+        HILOGD("not register pinRequired event failed");
+        return;
+    }
     CPinRequiredParam cPinRequiredParam{0};
     char* deviceAddr = MallocCString(device.GetDeviceAddr());
     cPinRequiredParam.deviceId = deviceAddr;
@@ -77,20 +80,12 @@ void CjBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice 
     cPinRequiredParam.pinCode = pinCodeNative;
 
     pinRequestFunc(cPinRequiredParam);
+
     free(deviceAddr);
     deviceAddr = nullptr;
     free(pinCodeNative);
     pinCodeNative = nullptr;
 }
-
-void CjBluetoothConnectionObserver::OnScanModeChanged(int mode)
-{}
-
-void CjBluetoothConnectionObserver::OnDeviceNameChanged(const std::string &deviceName)
-{}
-
-void CjBluetoothConnectionObserver::OnDeviceAddrChanged(const std::string &address)
-{}
 
 void CjBluetoothConnectionObserver::RegisterDeviceFindFunc(std::function<void(CArrString)> cjCallback)
 {
@@ -105,13 +100,13 @@ void CjBluetoothConnectionObserver::RegisterPinRequestFunc(std::function<void(CP
 CjBluetoothRemoteDeviceObserver::CjBluetoothRemoteDeviceObserver()
 {}
 
-void CjBluetoothRemoteDeviceObserver::OnAclStateChanged(const BluetoothRemoteDevice &device,
-    int state, unsigned int reason)
-{}
-
 void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device,
     int status, int cause)
 {
+    if (bondStateFunc == nullptr) {
+        HILOGD("not register bondStateChange event failed");
+        return;
+    }
     CBondStateParam cBondStateParam{0};
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
@@ -123,37 +118,18 @@ void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteD
     cBondStateParam.cause = cause;
 
     bondStateFunc(cBondStateParam);
+
     free(deviceAddr);
     deviceAddr = nullptr;
 }
 
-void CjBluetoothRemoteDeviceObserver::OnRemoteUuidChanged(const BluetoothRemoteDevice &device,
-    const std::vector<ParcelUuid> &uuids)
-{}
-
-void CjBluetoothRemoteDeviceObserver::OnRemoteNameChanged(const BluetoothRemoteDevice &device,
-    const std::string &deviceName)
-{}
-
-void CjBluetoothRemoteDeviceObserver::OnRemoteAliasChanged(const BluetoothRemoteDevice &device,
-    const std::string &alias)
-{}
-
-void CjBluetoothRemoteDeviceObserver::OnRemoteCodChanged(const BluetoothRemoteDevice &device,
-    const BluetoothDeviceClass &cod)
-{}
-
-void CjBluetoothRemoteDeviceObserver::OnRemoteBatteryLevelChanged(const BluetoothRemoteDevice &device,
-    int batteryLevel)
-{}
-
-void CjBluetoothRemoteDeviceObserver::OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device,
-    int rssi, int status)
-{}
-
 void CjBluetoothRemoteDeviceObserver::OnRemoteBatteryChanged(const BluetoothRemoteDevice &device,
     const DeviceBatteryInfo &batteryInfo)
 {
+    if (batteryChangeFunc == nullptr) {
+        HILOGD("not register batteryChange event failed");
+        return;
+    }
     CBatteryInfo cBatteryInfo{0};
     cBatteryInfo.batteryLevel = batteryInfo.batteryLevel_;
     cBatteryInfo.leftEarBatteryLevel = batteryInfo.leftEarBatteryLevel_;
@@ -193,7 +169,7 @@ void ConnectionImpl::RegisterConnectionObserver(int32_t callbackType, void (*cal
     if (callbackType == REGISTER_DEVICE_FIND_TYPE) {
         auto connectionObserverFunc = CJLambda::Create(reinterpret_cast<void (*)(CArrString)>(callback));
         if (!connectionObserverFunc) {
-            HILOGI("Register bluetoothDeviceFind event failed");
+            HILOGD("Register bluetoothDeviceFind event failed");
             *errCode = BT_ERR_INTERNAL_ERROR;
             return;
         }
@@ -203,7 +179,7 @@ void ConnectionImpl::RegisterConnectionObserver(int32_t callbackType, void (*cal
     if (callbackType == REGISTER_PIN_REQUEST_TYPE) {
         auto connectionObserverFunc = CJLambda::Create(reinterpret_cast<void (*)(CPinRequiredParam)>(callback));
         if (!connectionObserverFunc) {
-            HILOGI("Register pinRequired event failed");
+            HILOGD("Register pinRequired event failed");
             *errCode = BT_ERR_INTERNAL_ERROR;
             return;
         }
@@ -213,7 +189,7 @@ void ConnectionImpl::RegisterConnectionObserver(int32_t callbackType, void (*cal
     if (callbackType == REGISTER_BOND_STATE_TYPE) {
         auto remoteDeviceObserverFunc = CJLambda::Create(reinterpret_cast<void (*)(CBondStateParam)>(callback));
         if (!remoteDeviceObserverFunc) {
-            HILOGI("Register bondStateChange event failed");
+            HILOGD("Register bondStateChange event failed");
             *errCode = BT_ERR_INTERNAL_ERROR;
             return;
         }
@@ -223,7 +199,7 @@ void ConnectionImpl::RegisterConnectionObserver(int32_t callbackType, void (*cal
     if (callbackType == REGISTER_BATTERY_CHANGE_TYPE) {
         auto remoteDeviceObserverFunc = CJLambda::Create(reinterpret_cast<void (*)(CBatteryInfo)>(callback));
         if (!remoteDeviceObserverFunc) {
-            HILOGI("Register batteryChange event failed");
+            HILOGD("Register batteryChange event failed");
             *errCode = BT_ERR_INTERNAL_ERROR;
             return;
         }

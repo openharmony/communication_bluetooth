@@ -62,14 +62,14 @@ public:
     ~CjBluetoothConnectionObserver() override = default;
 
     void OnStateChanged(const int transport, const int status) override{};
-    void OnDiscoveryStateChanged(int status) override;
+    void OnDiscoveryStateChanged(int status) override{};
     void OnDiscoveryResult(
         const BluetoothRemoteDevice &device, int rssi, const std::string deviceName, int deviceClass) override;
-    void OnPairRequested(const BluetoothRemoteDevice &device) override;
+    void OnPairRequested(const BluetoothRemoteDevice &device) override{};
     void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number) override;
-    void OnScanModeChanged(int mode) override;
-    void OnDeviceNameChanged(const std::string &deviceName) override;
-    void OnDeviceAddrChanged(const std::string &address) override;
+    void OnScanModeChanged(int mode) override{};
+    void OnDeviceNameChanged(const std::string &deviceName) override{};
+    void OnDeviceAddrChanged(const std::string &address) override{};
 
     void RegisterDeviceFindFunc(std::function<void(CArrString)> cjCallback);
     void RegisterPinRequestFunc(std::function<void(CPinRequiredParam)> cjCallback);
@@ -84,14 +84,14 @@ public:
     CjBluetoothRemoteDeviceObserver();
     ~CjBluetoothRemoteDeviceObserver() override = default;
 
-    void OnAclStateChanged(const BluetoothRemoteDevice &device, int state, unsigned int reason) override;
+    void OnAclStateChanged(const BluetoothRemoteDevice &device, int state, unsigned int reason) override{};
     void OnPairStatusChanged(const BluetoothRemoteDevice &device, int status, int cause) override;
-    void OnRemoteUuidChanged(const BluetoothRemoteDevice &device, const std::vector<ParcelUuid> &uuids) override;
-    void OnRemoteNameChanged(const BluetoothRemoteDevice &device, const std::string &deviceName) override;
-    void OnRemoteAliasChanged(const BluetoothRemoteDevice &device, const std::string &alias) override;
-    void OnRemoteCodChanged(const BluetoothRemoteDevice &device, const BluetoothDeviceClass &cod) override;
-    void OnRemoteBatteryLevelChanged(const BluetoothRemoteDevice &device, int batteryLevel) override;
-    void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override;
+    void OnRemoteUuidChanged(const BluetoothRemoteDevice &device, const std::vector<ParcelUuid> &uuids) override{};
+    void OnRemoteNameChanged(const BluetoothRemoteDevice &device, const std::string &deviceName) override{};
+    void OnRemoteAliasChanged(const BluetoothRemoteDevice &device, const std::string &alias) override{};
+    void OnRemoteCodChanged(const BluetoothRemoteDevice &device, const BluetoothDeviceClass &cod) override{};
+    void OnRemoteBatteryLevelChanged(const BluetoothRemoteDevice &device, int batteryLevel) override{};
+    void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override{};
     void OnRemoteBatteryChanged(const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo) override;
 
     void RegisterBondStateFunc(std::function<void(CBondStateParam)> cjCallback);
