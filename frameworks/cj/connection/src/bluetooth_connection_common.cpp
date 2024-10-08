@@ -89,7 +89,7 @@ CArrString Convert2CArrString(std::vector<std::string> &tids)
     for (; i < size; ++i) {
         res.head[i] = MallocCString(tids[i]);
     }
-    res.size = i;
+    res.size = static_cast<int64_t>(i);
 
     return res;
 }
