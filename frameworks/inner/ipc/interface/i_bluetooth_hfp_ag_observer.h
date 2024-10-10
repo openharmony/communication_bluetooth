@@ -31,6 +31,7 @@ public:
     virtual void OnActiveDeviceChanged(const BluetoothRawAddress &device) = 0;
     virtual void OnHfEnhancedDriverSafetyChanged(const BluetoothRawAddress &device, int indValue) = 0;
     virtual void OnHfpStackChanged(const BluetoothRawAddress &device, int action) = 0;
+    virtual void OnVirtualDeviceChanged(int32_t action, std::string address) = 0;
 };
 
 }  // namespace Bluetooth

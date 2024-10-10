@@ -523,6 +523,15 @@ int BluetoothHost::RestrictBluetooth()
 
 }
 
+void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &address)
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
+    proxy->UpdateVirtualDevice(action, address);
+}
+
 int BluetoothHost::SatelliteControl(int state)
 {
     HILOGD("enter");
