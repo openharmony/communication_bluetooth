@@ -35,6 +35,7 @@ private:
     ErrCode OnActiveDeviceChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnHfEnhancedDriverSafetyChangedInner(MessageParcel &data, MessageParcel &reply);
     int32_t OnHfpStackChangedInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnVirtualDeviceChangedInner(MessageParcel &data, MessageParcel &reply);
 
     using BluetoothHfpAgObserverFunc =
         ErrCode (BluetoothHfpAgObserverStub::*)(MessageParcel &data, MessageParcel &reply);

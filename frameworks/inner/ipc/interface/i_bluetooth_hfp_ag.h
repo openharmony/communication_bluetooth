@@ -55,6 +55,8 @@ public:
     virtual void CallDetailsChanged(int callId, int callState) = 0;
     virtual int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) = 0;
     virtual void EnableBtCallLog(bool state) = 0;
+    virtual void GetVirtualDeviceList(std::vector<std::string> &devices) = 0;
+    virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
 };
 
 }  // namespace Bluetooth

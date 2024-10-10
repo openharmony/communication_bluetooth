@@ -521,5 +521,35 @@ int BluetoothA2dpSrcProxy::GetAutoPlayDisabledDuration(const RawAddress &device,
     }
     return res;
 }
+
+void BluetoothA2dpSrcProxy::GetVirtualDeviceList(std::vector<std::string> &devices)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()), "WriteInterfaceToken error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    SEND_IPC_REQUEST_RETURN(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_VIRTUALDEVICE_LIST, data, reply, option);
+
+    int32_t rawAddsSize = reply.ReadInt32();
+    for (int i = 0; i < rawAddsSize; i++) {
+        devices.push_back(reply.ReadString());
+    }
+
+    return;
+}
+
+void BluetoothA2dpSrcProxy::UpdateVirtualDevice(int32_t action, const std::string &address)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(action), "write action error");
+    CHECK_AND_RETURN_LOG(data.WriteString(address), "write address error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    SEND_IPC_REQUEST_RETURN(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_SET_VIRTUAL_DEVICE, data, reply, option);
+    return;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
