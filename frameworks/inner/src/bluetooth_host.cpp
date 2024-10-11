@@ -1029,6 +1029,14 @@ int BluetoothHost::DisconnectAllowedProfiles(const std::string &remoteAddr) cons
     return proxy->DisconnectAllowedProfiles(remoteAddr);
 }
 
+int BluetoothHost::SetFastScanLevel(int level)
+{
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    return proxy->SetFastScanLevel(level);
+}
+
 bool BluetoothHost::IsBtProhibitedByEdm(void)
 {
     constexpr const char* BLUETOOTH_EDM_KEY = "persist.edm.prohibit_bluetooth";

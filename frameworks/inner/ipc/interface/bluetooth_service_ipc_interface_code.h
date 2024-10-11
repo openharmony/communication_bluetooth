@@ -271,6 +271,9 @@ enum BluetoothHostInterfaceCode {
     RESTRICT_BLUETOOTH,
     SATELLITE_CONTROL,
     UPDATE_VIRTUAL_DEVICE,
+    GET_VIRTUAL_AUTO_CONN_SWITCH,
+    SET_VIRTUAL_AUTO_CONN_TYPE,
+    SET_FAST_SCAN_LEVEL,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
