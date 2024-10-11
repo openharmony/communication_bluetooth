@@ -939,12 +939,6 @@ int RemoveLpDeviceParam(BtUuid uuid);
  */
 void ClearGlobalResource(void);
 
-/**
- * @brief Clear global adv resource before thread end.
- * @since 11
- */
-void ClearGlobalAdv(void);
-
 #ifdef __cplusplus
 }
 #endif
