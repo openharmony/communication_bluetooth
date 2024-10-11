@@ -731,6 +731,15 @@ public:
     */
     int SatelliteControl(int state);
 
+    /**
+     * @brief Set local adapter scan level.
+     *
+     * @param level Scan level.
+     * @return Returns <b>true</b> if the operation is successful;
+     *         returns <b>false</b> if the operation fails.
+     * @since 12
+     */
+    int SetFastScanLevel(int level);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
