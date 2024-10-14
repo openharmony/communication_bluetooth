@@ -111,6 +111,8 @@ public:
     int32_t IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport) override;
     int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) override;
     int32_t SetFastScanLevel(int level) override;
+    void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
+    void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
