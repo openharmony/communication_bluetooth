@@ -109,14 +109,15 @@ static bool GetSocketUuidPara(const BluetoothCreateSocketPara *socketPara, UUID 
 int SocketServerCreate(const BluetoothCreateSocketPara *socketPara, const char *name)
 {
     HILOGD("SocketServerCreate start!");
-    if (!IS_BT_ENABLED()) {
-        HILOGD("fail,BR is not TURN_ON");
-        return BT_SOCKET_INVALID_ID;
-    }
-
     if (socketPara == nullptr || name == nullptr) {
         HILOGE("socketPara or name is null.");
         return BT_SOCKET_INVALID_ID;
+    }
+
+    if (socketPara->socketType == OHOS_SOCKET_L2CAP_LE) {
+        CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_SOCKET_INVALID_ID, "BLE is not TURN_ON");
+    } else {
+        CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_SOCKET_INVALID_ID, "BR is not TURN_ON");
     }
 
     UUID serverUuid;
