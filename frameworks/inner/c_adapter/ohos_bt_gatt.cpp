@@ -375,11 +375,17 @@ int BleStopAdv(int advId)
         BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId]);
         g_advAddrTimerIds[advId] = 0;
     }
-    int ret = g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
-    if (ret != BT_NO_ERROR) {
-        HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
-        return OHOS_BT_STATUS_FAIL;
-    }
+
+    std::function stopAdvFunc = [advId]() {
+        HILOGI("stop adv in adv_Queue thread, advId = %{public}d", advId);
+        lock_guard<mutex> lock(g_advMutex);
+        int ret = g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
+        }
+    };
+    startAdvQueue.submit(stopAdvFunc);
+
     return OHOS_BT_STATUS_SUCCESS;
 }
 
