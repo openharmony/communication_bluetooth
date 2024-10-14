@@ -375,19 +375,23 @@ int BluetoothA2dpSrcProxy::WriteFrame(const uint8_t *data, uint32_t size)
     return reply.ReadInt32();
 }
 
-void BluetoothA2dpSrcProxy::GetRenderPosition(uint16_t &delayValue, uint16_t &sendDataSize, uint32_t &timeStamp)
+int BluetoothA2dpSrcProxy::GetRenderPosition(const RawAddress &device, uint32_t &delayValue, uint64_t &sendDataSize,
+                                             uint32_t &timeStamp)
 {
     MessageParcel data;
-    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()), "WriteInterfaceToken error");
-
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothA2dpSrcProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+                             "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(device.GetAddress()), BT_ERR_IPC_TRANS_FAILED, "write device error");
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
-    SEND_IPC_REQUEST_RETURN(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_RENDER_POSITION, data, reply, option);
-
-    delayValue = reply.ReadUint16();
-    sendDataSize = reply.ReadUint16();
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothA2dpSrcInterfaceCode::BT_A2DP_SRC_GET_RENDER_POSITION, data, reply, option,
+                                   BT_ERR_IPC_TRANS_FAILED);
+    int ret = reply.ReadInt32();
+    delayValue = reply.ReadUint32();
+    sendDataSize = reply.ReadUint64();
     timeStamp = reply.ReadUint32();
+    return ret;
 }
 
 int BluetoothA2dpSrcProxy::OffloadStartPlaying(const RawAddress &device, const std::vector<int32_t> &sessionsId)
