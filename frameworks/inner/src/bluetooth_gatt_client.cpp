@@ -85,10 +85,6 @@ struct DiscoverInfomation {
 struct RequestInformation {
     bool doing_;
     uint8_t type_ = 0;
-    union {
-        GattCharacteristic *characteristic_;
-        GattDescriptor *descriptor_;
-    } context_;
     std::mutex mutex_;
     RequestInformation() : doing_(false)
     {}
@@ -123,6 +119,8 @@ struct GattClient::impl {
     GattService *FindService(uint16_t handle);
     void GetServices();
     void CleanConnectionInfo();
+    bool GetCharacteristicByHandle(uint16_t handle, GattCharacteristic &outCharac);
+    bool GetDescriptorByHandle(uint16_t handle, GattDescriptor &outDesc);
 };
 
 class GattClient::impl::BluetoothGattClientCallbackStubImpl : public BluetoothGattClientCallbackStub {
@@ -189,15 +187,21 @@ public:
         }
         std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
         clientSptr->pimpl->requestInformation_.doing_ = false;
-        auto ptr = clientSptr->pimpl->requestInformation_.context_.characteristic_;
+        GattCharacteristic charac(UUID(), 0, 0);
+        bool isExist = clientSptr->pimpl->GetCharacteristicByHandle(characteristic.handle_, charac);
+        if (!isExist) {
+            HILOGE("no expected characteristic handle:%{public}d type:%{public}d",
+                characteristic.handle_, clientSptr->pimpl->requestInformation_.type_);
+            ret = BT_ERR_INTERNAL_ERROR;
+        }
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_READ) {
             HILOGE("Unexpected call!");
             return;
         }
         if (ret == GattStatus::GATT_SUCCESS) {
-            ptr->SetValue(characteristic.value_.get(), characteristic.length_);
+            charac.SetValue(characteristic.value_.get(), characteristic.length_);
         }
-        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicReadResult, *ptr, ret);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicReadResult, charac, ret);
     }
 
     void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic) override
@@ -210,12 +214,18 @@ public:
         }
         std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
         clientSptr->pimpl->requestInformation_.doing_ = false;
-        auto ptr = clientSptr->pimpl->requestInformation_.context_.characteristic_;
+        GattCharacteristic charac(UUID(), 0, 0);
+        bool isExist = clientSptr->pimpl->GetCharacteristicByHandle(characteristic.handle_, charac);
+        if (!isExist) {
+            HILOGE("no expected characteristic handle:%{public}d type:%{public}d",
+                characteristic.handle_, clientSptr->pimpl->requestInformation_.type_);
+            ret = BT_ERR_INTERNAL_ERROR;
+        }
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_WRITE) {
             HILOGE("Unexpected call!");
             return;
         }
-        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicWriteResult, *ptr, ret);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicWriteResult, charac, ret);
     }
 
     void OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor &descriptor) override
@@ -228,15 +238,21 @@ public:
         }
         std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
         clientSptr->pimpl->requestInformation_.doing_ = false;
-        auto ptr = clientSptr->pimpl->requestInformation_.context_.descriptor_;
+        GattDescriptor desc(UUID(), 0);
+        bool isExist = clientSptr->pimpl->GetDescriptorByHandle(descriptor.handle_, desc);
+        if (!isExist) {
+            HILOGE("no expected descriptor handle:%{public}d type:%{public}d",
+                descriptor.handle_, clientSptr->pimpl->requestInformation_.type_);
+            ret = BT_ERR_INTERNAL_ERROR;
+        }
         if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_DESCRIPTOR_READ) {
             HILOGE("Unexpected call!");
             return;
         }
         if (ret == GattStatus::GATT_SUCCESS) {
-            ptr->SetValue(descriptor.value_.get(), descriptor.length_);
+            desc.SetValue(descriptor.value_.get(), descriptor.length_);
         }
-        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnDescriptorReadResult, *ptr, ret);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnDescriptorReadResult, desc, ret);
     }
 
     void OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor &descriptor) override
@@ -249,12 +265,21 @@ public:
         }
         std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
         clientSptr->pimpl->requestInformation_.doing_ = false;
-        auto ptr = clientSptr->pimpl->requestInformation_.context_.descriptor_;
+        GattDescriptor desc(UUID(), 0);
+        bool isExist = clientSptr->pimpl->GetDescriptorByHandle(descriptor.handle_, desc);
+        if (!isExist) {
+            HILOGE("no expected descriptor handle:%{public}d type:%{public}d",
+                descriptor.handle_, clientSptr->pimpl->requestInformation_.type_);
+            ret = BT_ERR_INTERNAL_ERROR;
+        }
         if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_DESCRIPTOR_WRITE) {
-            WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnDescriptorWriteResult, *ptr, ret);
+            WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnDescriptorWriteResult, desc, ret);
         } else if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS) {
-            auto characterPtr = clientSptr->pimpl->requestInformation_.context_.characteristic_;
-            WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnSetNotifyCharacteristic, *characterPtr, ret);
+            GattCharacteristic charac(UUID(), 0, 0);
+            if (isExist && desc.GetCharacteristic() != nullptr) {
+                charac = *desc.GetCharacteristic();
+            }
+            WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnSetNotifyCharacteristic, charac, ret);
         } else {
             HILOGE("Unexpected call!");
             return;
@@ -503,6 +528,46 @@ void GattClient::impl::CleanConnectionInfo()
     requestInformation_.doing_ = false;
 }
 
+bool GattClient::impl::GetCharacteristicByHandle(uint16_t handle, GattCharacteristic &outCharac)
+{
+    std::lock_guard<std::mutex> lock(gattServicesMutex_);
+    for (auto &svc : gattServices_) {
+        std::vector<GattCharacteristic> &characs = svc.GetCharacteristics();
+        for (auto &charac : characs) {
+            if (handle == charac.GetHandle()) {
+                outCharac = charac;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool GattClient::impl::GetDescriptorByHandle(uint16_t handle, GattDescriptor &outDesc)
+{
+    std::lock_guard<std::mutex> lock(gattServicesMutex_);
+    auto getDescriptorFunc = [handle](std::vector<GattCharacteristic> &characs) -> GattDescriptor* {
+        for (auto &charac : characs) {
+            std::vector<GattDescriptor> &descs = charac.GetDescriptors();
+            for (auto &desc : descs) {
+                if (handle == desc.GetHandle()) {
+                    return &desc;
+                }
+            }
+        }
+        return nullptr;
+    };
+
+    for (auto &svc : gattServices_) {
+        GattDescriptor *descPtr = getDescriptorFunc(svc.GetCharacteristics());
+        if (descPtr != nullptr) {
+            outDesc = *descPtr;
+            return true;
+        }
+    }
+    return false;
+}
+
 GattClient::GattClient(const BluetoothRemoteDevice &device) : pimpl(new GattClient::impl(device))
 {
     HILOGI("enter");
@@ -728,7 +793,6 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
     if (result == BT_NO_ERROR) {
         pimpl->requestInformation_.doing_ = true;
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_READ;
-        pimpl->requestInformation_.context_.characteristic_ = &characteristic;
     }
     return result;
 }
@@ -766,7 +830,6 @@ int GattClient::ReadDescriptor(GattDescriptor &descriptor)
     if (result == BT_NO_ERROR) {
         pimpl->requestInformation_.doing_ = true;
         pimpl->requestInformation_.type_ = REQUEST_TYPE_DESCRIPTOR_READ;
-        pimpl->requestInformation_.context_.descriptor_ = &descriptor;
     }
     return result;
 }
@@ -840,7 +903,6 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
     HILOGD("result: %{public}d", result);
     if (result == BT_NO_ERROR) {
         pimpl->requestInformation_.type_ = REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS;
-        pimpl->requestInformation_.context_.characteristic_ = &characteristic;
         pimpl->requestInformation_.doing_ = true;
     }
     return result;
@@ -913,7 +975,6 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
             static_cast<int>(GattCharacteristic::WriteType::DEFAULT)) ? false : true);
         HILOGD("Write without response：%{public}d", withoutRespond);
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_WRITE;
-        pimpl->requestInformation_.context_.characteristic_ = &characteristic;
         // if withoutRespond is true, no need wait for callback
         pimpl->requestInformation_.doing_ = (!withoutRespond);
         result = proxy->WriteCharacteristic(pimpl->applicationId_, &character, withoutRespond);
@@ -963,7 +1024,6 @@ int GattClient::WriteDescriptor(GattDescriptor &descriptor)
     if (result == BT_NO_ERROR) {
         pimpl->requestInformation_.doing_ = true;
         pimpl->requestInformation_.type_ = REQUEST_TYPE_DESCRIPTOR_WRITE;
-        pimpl->requestInformation_.context_.descriptor_ = &descriptor;
     }
     return result;
 }
