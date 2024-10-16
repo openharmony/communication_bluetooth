@@ -879,16 +879,16 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
         HILOGE("Request not supported");
         return BT_ERR_INTERNAL_ERROR;
     }
-    std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
-    if (pimpl->requestInformation_.doing_) {
-        HILOGI("Remote device busy");
-        return BT_ERR_INTERNAL_ERROR;
-    }
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int ret = proxy->RequestNotification(pimpl->applicationId_, characteristic.GetHandle(), enable);
     if (ret != BT_NO_ERROR) {
         return ret;
+    }
+    std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
+    if (pimpl->requestInformation_.doing_) {
+        HILOGI("Remote device busy");
+        return BT_ERR_INTERNAL_ERROR;
     }
     auto descriptor = characteristic.GetDescriptor(UUID::FromString("00002902-0000-1000-8000-00805F9B34FB"));
     if (descriptor == nullptr) {
