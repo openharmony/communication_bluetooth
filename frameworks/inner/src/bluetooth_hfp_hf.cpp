@@ -444,16 +444,17 @@ private:
     const static int HFP_HF_SCO_STATE_DISCONNECTED = 3;
 
     BluetoothObserverList<HandsFreeUnitObserver> observers_;
-    HfServiceObserver serviceObserver_ {HfServiceObserver(observers_)};
+    sptr<HfServiceObserver> serviceObserver_;
 };
 
 HandsFreeUnit::impl::impl()
 {
+    serviceObserver_ = new HfServiceObserver(observers_);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_HFP_HF,
         [this](sptr<IRemoteObject> remote) {
         sptr<IBluetoothHfpHf> proxy = iface_cast<IBluetoothHfpHf>(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
-        proxy->RegisterObserver(&serviceObserver_);
+        proxy->RegisterObserver(serviceObserver_);
     });
 }
 
@@ -463,7 +464,7 @@ HandsFreeUnit::impl::~impl()
     BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
     sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
-    proxy->DeregisterObserver(&serviceObserver_);
+    proxy->DeregisterObserver(serviceObserver_);
 }
 
 HandsFreeUnit::HandsFreeUnit()
