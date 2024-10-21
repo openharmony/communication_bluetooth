@@ -92,6 +92,17 @@ enum class BTConnectState : int {
     DISCONNECTING,
     DISCONNECTED,
 };
+
+/**
+ * @brief hdap connect state define
+ * use to HdapConnectionState()...
+ */
+enum class BTHdapConnectState : int {
+    CONNECTED,
+    DISCONNECTED,
+    UPDATE_CODEC,
+};
+
 enum class ConnChangeCause : int {
     CONNECT_CHANGE_COMMON_CAUSE = 0,            // Common connect change cause.
     DISCONNECT_CAUSE_USER_DISCONNECT = 0,       // User disconnect device.
